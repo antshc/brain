@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from domain.services.thread_filter import ThreadFilter
-from infrastructure.agent import review
+from infrastructure.ai_agent import AIAgent
 from infrastructure.vcs_client import VCSClient
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
@@ -63,7 +63,7 @@ def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_
 
         vcs.checkout_pr(pr.url)
 
-        review(actionable_threads)
+        AIAgent().review(actionable_threads)
 
         exec_log.update(pr.url, thread_ids)
         log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))
