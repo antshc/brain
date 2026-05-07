@@ -29,44 +29,19 @@ ralph/
 │   │   ├── review_thread.py        # ReviewThread dataclass + ThreadLabel enum
 │   │   └── execution_record.py     # ExecutionRecord dataclass (pr_url, count, last_run, last_threads)
 │   ├── infrastructure/
-│   │   ├── gh_client.py            # Thin wrapper around the `gh` CLI (GraphQL + REST)
-│   │   └── copilot_client.py       # Thin wrapper around the `copilot` CLI
+│   │   ├── vcs_client.py            # Thin wrapper around the `gh` CLI (GraphQL + REST)
+│   │   └── ai_agent.py       # Thin wrapper around the `copilot` CLI
 │   └── shared/
 │       ├── log.py                  # log_json() — structured JSON logging to stderr
 │       └── pr_url.py               # Parses GitHub PR URLs → (owner, repo, number)
 └── logs/                           # Runtime logs written by run_agent and track_execution
 ```
 
-### Slice Responsibilities
-
-| Slice | Responsibility |
-|---|---|
-| `features/list_prs` | Lists open PR URLs for a given user and repo |
-| `features/fetch_threads` | Fetches threads via `gh_client`, classifies by label |
-| `features/run_agent` | Builds the prompt and launches the `copilot` CLI |
-| `features/track_execution` | Reads/writes daily execution logs to cap retries |
-| `infrastructure/gh_client.py` | All `gh` CLI calls — GraphQL queries, `pr list`, `pr checkout` |
-| `infrastructure/copilot_client.py` | Launches `copilot` CLI, streams JSON output |
-| `shared/log.py` | `log_json(level, message, **extra)` — structured stderr logging |
-| `shared/pr_url.py` | Single-purpose URL parser — returns `(owner, repo, number)` |
-
 Each feature's `handler.py` is the only public entry point for that slice. Do not call `classifier.py` or `prompt_builder.py` directly from outside their slice.
 
 ### Domain Entities
 
 Domain types are plain Python `dataclass`es (or `Enum`s). They must not import from `features`, `infrastructure`, or `shared`.
-
-| Entity | File | Fields |
-|---|---|---|
-| `PullRequest` | `domain/pull_request.py` | `owner: str`, `repo: str`, `number: int`, `url: str` |
-| `ThreadLabel` | `domain/review_thread.py` | Enum: `FIX`, `SUGGEST_BANG`, `SUGGEST`, `NIT`, `GOOD`, `QUESTION` |
-| `ReviewThread` | `domain/review_thread.py` | `thread_id: str`, `label: ThreadLabel`, `path: str`, `lines: str`, `body: str`, `discussion: list[dict]` |
-| `ExecutionRecord` | `domain/execution_record.py` | `pr_url: str`, `count: int`, `last_run: str`, `last_threads: list[str]` |
-
-- `ThreadLabel.is_actionable()` returns `True` for `FIX` and `SUGGEST_BANG`.
-- `PullRequest` is constructed from a URL via `pr_url.parse_pr_url()`.
-- `ExecutionRecord` is the domain model backing the `track_execution` feature. `ExecutionLog` serialises it to JSON under `logs/<repo-slug>/execution-log-<date>.json`. The `count` field is what the orchestrator checks against `max_executions` to prevent infinite retry loops.
-- Features receive and return domain types — not raw dicts from the GitHub API.
 
 ---
 
@@ -75,18 +50,6 @@ Domain types are plain Python `dataclass`es (or `Enum`s). They must not import f
 ### GitHub Integration
 
 All GitHub access goes through the `gh` CLI — never call the GitHub REST/GraphQL APIs directly over HTTP.
-
-```python
-# gh_client.py — GraphQL helper
-def graphql(query: str, variables: dict | None = None) -> dict:
-    cmd = ["gh", "api", "graphql", "-f", f"query={query}"]
-    for key, value in (variables or {}).items():
-        flag = "-F" if isinstance(value, (int, float)) else "-f"
-        cmd.extend([flag, f"{key}={value}"])
-    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    return json.loads(result.stdout)
-```
-
 - String variables use `-f`, numeric variables use `-F`.
 - `subprocess.run(..., check=True)` — let exceptions propagate; do not swallow `CalledProcessError`.
 
@@ -116,14 +79,6 @@ Threads are classified by label prefix in `fetch_threads.py`:
 - Skip the PR (log a warning) if `count >= max_executions`.
 
 ### Copilot Agent
-
-`copilot_client.py` assembles the prompt and runs the `copilot` CLI:
-
-```python
-def build_prompt(threads_json: str) -> str:
-    template = PROMPT_PATH.read_text()
-    return f"# Review Threads\n\n{threads_json}\n\n{template}"
-```
 
 - The agent instructions live in `prompt.md` — edit that file to change agent behavior.
 - Denied tools: `shell(git reset)`, `shell(git rebase)`, `shell(git clean)`.
