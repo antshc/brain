@@ -13,7 +13,7 @@ from domain.comment import Comment
 from domain.review_thread import ReviewThread
 from domain.thread_classification_policy import ThreadClassificationPolicy
 from domain.thread_label import ThreadLabel
-from features.review._classifier import ThreadClassifier
+from domain.services.thread_filter import ThreadFilter
 
 _policy = ThreadClassificationPolicy()
 detect_label = _policy.detect_label
@@ -40,7 +40,7 @@ def classify_thread(thread: dict) -> ReviewThread | None:
 
 def classify_threads(raw_threads: list) -> list[ReviewThread]:
     threads = [t for raw in raw_threads if (t := classify_thread(raw)) is not None]
-    return ThreadClassifier().classify(threads)
+    return ThreadFilter().get_actionable_threads(threads)
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
