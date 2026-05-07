@@ -4,7 +4,7 @@ from pathlib import Path
 
 from domain.pull_request import PullRequest
 from domain.services.thread_filter import ThreadFilter
-from infrastructure.agent import review
+from infrastructure.ai_agent import AIAgent
 from infrastructure.vcs_client import VCSClient
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
@@ -33,10 +33,10 @@ def review_pull_request(pr_url: str, log_dir: Path, max_executions: int) -> None
     exec_count = exec_log.get_count(pr.url)
 
     fetched_threads = vcs.fetch_review_threads(pr.owner, pr.repo, pr.number)
-    actionable_threads = thread_filter.get_actionable_threads(fetched_threads)
-    thread_ids = [t.thread_id for t in actionable_threads]
+    actionable_pr_threads = thread_filter.get_actionable_threads(fetched_threads)
+    thread_ids = [t.thread_id for t in actionable_pr_threads]
 
-    if len(actionable_threads) == 0:
+    if len(actionable_pr_threads) == 0:
         log_json("info", "No actionable threads, skipping", pr_url=pr.url)
         if exec_count > 0:
             exec_log.reset(pr.url)
@@ -48,19 +48,19 @@ def review_pull_request(pr_url: str, log_dir: Path, max_executions: int) -> None
         log_json(
             "warn", "PR exceeded max executions, skipping",
             pr_url=pr.url, count=str(exec_count), max=str(max_executions),
-            unresolved_threads=str(len(actionable_threads)),
+            unresolved_threads=str(len(actionable_pr_threads)),
         )
         log_json("info", "Service run completed")
         return
 
     log_json(
         "info", "Running copilot agent",
-        pr_url=pr.url, threads=str(len(actionable_threads)), attempt=str(exec_count + 1),
+        pr_url=pr.url, threads=str(len(actionable_pr_threads)), attempt=str(exec_count + 1),
     )
 
     vcs.checkout_pr(pr.url)
 
-    review(actionable_threads)
+    AIAgent().review(actionable_pr_threads)
 
     exec_log.update(pr.url, thread_ids)
     log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))
