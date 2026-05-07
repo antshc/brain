@@ -18,23 +18,20 @@ Exit codes:
     1 - usage / argument error
 """
 
-import json
 import logging
 import os
 import re
 import sys
 from pathlib import Path
 
-# Allow imports from the scripts directory
+# Add app/ to path so feature/domain/shared imports resolve
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import copilot_client
-from execution_log import ExecutionLog
-from fetch_threads import fetch_and_classify_threads
-from gh_client import checkout_pr, list_open_prs
-from log import log_json
-
-logger = logging.getLogger(__name__)
+from features.fetch_threads.handler import fetch_and_classify_threads
+from features.list_prs.handler import list_prs
+from features.run_agent.handler import run_agent
+from features.track_execution.handler import ExecutionLog
+from shared.log import log_json
 
 DEFAULT_MAX_EXECUTIONS = 5
 
@@ -64,53 +61,46 @@ def main() -> None:
 
     log_json("info", "Service run started", user=github_user, repo=github_repo)
 
-    pr_urls = list_open_prs(github_user, github_repo)
+    pull_requests = list_prs(github_user, github_repo)
 
-    if not pr_urls:
+    if not pull_requests:
         log_json("info", "No open PRs found for user", user=github_user, repo=github_repo)
         sys.exit(0)
 
-    log_json("info", "Found open PRs", count=str(len(pr_urls)), user=github_user)
+    log_json("info", "Found open PRs", count=str(len(pull_requests)), user=github_user)
 
-    for pr_url in pr_urls:
-        log_json("info", "Processing PR", pr_url=pr_url)
+    for pr in pull_requests:
+        log_json("info", "Processing PR", pr_url=pr.url)
 
-        exec_count = exec_log.get_count(pr_url)
+        exec_count = exec_log.get_count(pr.url)
 
-        threads = fetch_and_classify_threads(pr_url)
-        thread_ids = [t["thread_id"] for t in threads]
+        threads = fetch_and_classify_threads(pr.url)
+        thread_ids = [t.thread_id for t in threads]
 
         if len(threads) == 0:
-            log_json("info", "No actionable threads, skipping", pr_url=pr_url)
+            log_json("info", "No actionable threads, skipping", pr_url=pr.url)
             if exec_count > 0:
-                exec_log.reset(pr_url)
-                log_json("info", "Reset execution count (all threads resolved)", pr_url=pr_url)
+                exec_log.reset(pr.url)
+                log_json("info", "Reset execution count (all threads resolved)", pr_url=pr.url)
             continue
 
         if exec_count >= max_executions:
             log_json(
                 "warn", "PR exceeded max executions, skipping",
-                pr_url=pr_url, count=str(exec_count), max=str(max_executions),
+                pr_url=pr.url, count=str(exec_count), max=str(max_executions),
                 unresolved_threads=str(len(threads)),
             )
             continue
 
         log_json(
             "info", "Running copilot agent",
-            pr_url=pr_url, threads=str(len(threads)), attempt=str(exec_count + 1),
+            pr_url=pr.url, threads=str(len(threads)), attempt=str(exec_count + 1),
         )
 
-        checkout_pr(pr_url)
+        run_agent(pr, threads)
 
-        # Run copilot agent on the actionable threads
-        threads_json = json.dumps(threads)
-        prompt = copilot_client.build_prompt(threads_json)
-        proc = copilot_client.run(prompt)
-        copilot_client.stream_text(proc)
-
-        # Update execution log after copilot finishes
-        exec_log.update(pr_url, thread_ids)
-        log_json("info", "Completed PR processing", pr_url=pr_url, attempt=str(exec_count + 1))
+        exec_log.update(pr.url, thread_ids)
+        log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))
 
     log_json("info", "Service run completed")
 

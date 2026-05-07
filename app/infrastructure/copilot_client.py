@@ -4,9 +4,8 @@ import json
 import subprocess
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROMPT_PATH = SCRIPT_DIR.parent / "prompt.md"
-LOG_DIR = SCRIPT_DIR.parent / "logs"
+# infra → app → root → logs
+LOG_DIR = Path(__file__).resolve().parent.parent.parent / "logs"
 
 DEFAULT_MODEL = "claude-sonnet-4.6"
 
@@ -42,19 +41,6 @@ def run(prompt: str, *, model: str = DEFAULT_MODEL) -> subprocess.Popen:
         cmd.extend(["--deny-tool", tool])
 
     return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-
-def build_prompt(threads_json: str) -> str:
-    """Build the full copilot prompt from review threads and the prompt template.
-
-    Args:
-        threads_json: JSON string of actionable review threads.
-
-    Returns:
-        The assembled prompt string.
-    """
-    template = PROMPT_PATH.read_text()
-    return f"# Review Threads\n\n{threads_json}\n\n{template}"
 
 
 def stream_text(proc: subprocess.Popen) -> str:

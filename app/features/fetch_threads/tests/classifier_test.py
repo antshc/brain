@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
-"""Tests for fetch_threads.py — mirrors the bash test suite."""
+"""Tests for fetch_threads classifier and handler."""
 
-import json
 import logging
-import subprocess
 import sys
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# Add app/ to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
-from fetch_threads import (
-    classify_thread,
-    detect_label,
-    fetch_and_classify_threads,
-)
+from domain.review_thread import ThreadLabel
+from features.fetch_threads.classifier import classify_thread, detect_label
+from features.fetch_threads.handler import fetch_and_classify_threads
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -46,7 +43,7 @@ def make_thread_multi_comments(id, path, line, *bodies):
 def mock_gh(threads):
     """Patch fetch_review_threads to return given threads."""
     return patch(
-        "fetch_threads.fetch_review_threads",
+        "features.fetch_threads.handler.gh_client.fetch_review_threads",
         return_value=threads,
     )
 
@@ -55,19 +52,19 @@ def mock_gh(threads):
 
 class TestDetectLabel:
     def test_fix_bang(self):
-        assert detect_label("fix!: broken null check") == "fix!"
+        assert detect_label("fix!: broken null check") == ThreadLabel.FIX
 
     def test_suggest_bang(self):
-        assert detect_label("suggest!: consider extracting") == "suggest!"
+        assert detect_label("suggest!: consider extracting") == ThreadLabel.SUGGEST_BANG
 
     def test_suggest(self):
-        assert detect_label("suggest: could improve") == "suggest"
+        assert detect_label("suggest: could improve") == ThreadLabel.SUGGEST
 
     def test_nit(self):
-        assert detect_label("nit: minor style") == "nit"
+        assert detect_label("nit: minor style") == ThreadLabel.NIT
 
     def test_good(self):
-        assert detect_label("good: nice approach") == "good"
+        assert detect_label("good: nice approach") == ThreadLabel.GOOD
 
     def test_unrecognized(self):
         assert detect_label("looks fine to me") is None
@@ -77,12 +74,12 @@ class TestClassifyThread:
     def test_fix_thread(self):
         thread = make_thread("T1", "src/foo.ts", 10, 15, "fix!: broken null check")
         result = classify_thread(thread)
-        assert result["prefix"] == "fix!"
-        assert result["thread_id"] == "T1"
-        assert result["path"] == "src/foo.ts"
-        assert result["lines"] == "10-15"
-        assert result["body"] == "fix!: broken null check"
-        assert result["discussion"][0]["author"] == "reviewer"
+        assert result.label == ThreadLabel.FIX
+        assert result.thread_id == "T1"
+        assert result.path == "src/foo.ts"
+        assert result.lines == "10-15"
+        assert result.body == "fix!: broken null check"
+        assert result.discussion[0]["author"] == "reviewer"
 
     def test_excluded_when_fixed(self):
         thread = make_thread_multi_comments(
@@ -101,8 +98,8 @@ class TestClassifyThread:
             "T3", "src/foo.ts", 20, "LGTM overall", "fix!: but this part is wrong"
         )
         result = classify_thread(thread)
-        assert result["prefix"] == "fix!"
-        assert result["body"] == "fix!: but this part is wrong"
+        assert result.label == ThreadLabel.FIX
+        assert result.body == "fix!: but this part is wrong"
 
     def test_fix_after_question_returns_last_fix(self):
         """fix!: → question!: → fix!: — last fix wins, thread is NOT excluded."""
@@ -114,8 +111,8 @@ class TestClassifyThread:
         )
         result = classify_thread(thread)
         assert result is not None
-        assert result["prefix"] == "fix!"
-        assert result["body"] == "fix!: new fix"
+        assert result.label == ThreadLabel.FIX
+        assert result.body == "fix!: new fix"
 
     def test_fix_then_question_excludes(self):
         """fix!: → question!: — question is last signal, thread excluded."""
@@ -136,8 +133,8 @@ class TestClassifyThread:
         )
         result = classify_thread(thread)
         assert result is not None
-        assert result["prefix"] == "fix!"
-        assert result["body"] == "fix!: actually not fixed"
+        assert result.label == ThreadLabel.FIX
+        assert result.body == "fix!: actually not fixed"
 
     def test_unrecognized_label_returns_none(self, caplog):
         thread = make_thread("TX", "src/x.ts", 1, 1, "looks fine to me")
@@ -153,18 +150,18 @@ class TestFetchAndClassify:
         with mock_gh(threads):
             result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
         assert len(result) == 1
-        assert result[0]["prefix"] == "fix!"
-        assert result[0]["thread_id"] == "T1"
-        assert result[0]["path"] == "src/foo.ts"
-        assert result[0]["lines"] == "10-15"
+        assert result[0].label == ThreadLabel.FIX
+        assert result[0].thread_id == "T1"
+        assert result[0].path == "src/foo.ts"
+        assert result[0].lines == "10-15"
 
     def test_suggest_bang_label(self):
         threads = [make_thread("T2", "src/bar.ts", 5, 5, "suggest!: consider extracting method")]
         with mock_gh(threads):
             result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
         assert len(result) == 1
-        assert result[0]["prefix"] == "suggest!"
-        assert result[0]["thread_id"] == "T2"
+        assert result[0].label == ThreadLabel.SUGGEST_BANG
+        assert result[0].thread_id == "T2"
 
     def test_non_actionable_excluded(self):
         threads = [
@@ -184,8 +181,8 @@ class TestFetchAndClassify:
         with mock_gh(threads):
             result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
         assert len(result) == 2
-        assert result[0]["prefix"] == "fix!"
-        assert result[1]["prefix"] == "suggest!"
+        assert result[0].label == ThreadLabel.FIX
+        assert result[1].label == ThreadLabel.SUGGEST_BANG
 
     def test_no_threads(self):
         with mock_gh([]):
@@ -207,8 +204,8 @@ class TestFetchAndClassify:
         with mock_gh(threads):
             result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
         assert len(result) == 2
-        assert result[0]["prefix"] == "fix!"
-        assert result[1]["prefix"] == "suggest!"
+        assert result[0].label == ThreadLabel.FIX
+        assert result[1].label == ThreadLabel.SUGGEST_BANG
 
     def test_discussion_includes_all_comments(self):
         threads = [
@@ -220,10 +217,10 @@ class TestFetchAndClassify:
         ]
         with mock_gh(threads):
             result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
-        assert len(result[0]["discussion"]) == 2
+        assert len(result[0].discussion) == 2
 
     def test_single_line_thread(self):
         threads = [make_thread("TL", "src/l.ts", 7, 7, "fix!: off by one")]
         with mock_gh(threads):
             result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
-        assert result[0]["lines"] == "7-7"
+        assert result[0].lines == "7-7"
