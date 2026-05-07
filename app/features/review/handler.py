@@ -3,8 +3,8 @@
 from pathlib import Path
 
 from features.review._fetch_threads import fetch_and_classify_threads
-from features.review._list_prs import list_prs
 from features.review._run_agent import run_agent
+from infrastructure.gh_client import list_prs
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
 
