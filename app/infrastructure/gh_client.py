@@ -3,6 +3,9 @@
 import json
 import subprocess
 
+from domain.pull_request import PullRequest
+from shared.pr_url import parse_pr_url
+
 
 def graphql(query: str, variables: dict | None = None) -> dict:
     """Execute a GraphQL query via `gh api graphql` and return the parsed JSON response.
@@ -56,6 +59,16 @@ def list_open_prs(user: str, repo: str) -> list[str]:
         capture_output=True, text=True, check=True,
     )
     return [url.strip() for url in result.stdout.strip().splitlines() if url.strip()]
+
+
+def list_prs(user: str, repo: str) -> list[PullRequest]:
+    """Return open PRs authored by *user* in *repo* as PullRequest domain objects."""
+    urls = list_open_prs(user, repo)
+    result = []
+    for url in urls:
+        owner, repo_name, number = parse_pr_url(url)
+        result.append(PullRequest(owner=owner, repo=repo_name, number=number, url=url))
+    return result
 
 
 def checkout_pr(pr_url: str) -> None:
