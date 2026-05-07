@@ -32,8 +32,6 @@ def classify_thread(thread: dict) -> ReviewThread | None:
     thread_id = thread["id"]
 
     # Scan comments in reverse: last significant signal wins.
-    # An actionable label (fix!, suggest!) after question!/fixed. un-excludes;
-    # question!/fixed. after an actionable label re-excludes.
     body = None
     for comment in reversed(thread["comments"]):
         text = comment["body"]

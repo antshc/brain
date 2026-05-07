@@ -1,14 +1,11 @@
 """Review use case: lists open PRs and drives the Copilot agent to address review threads."""
 
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-
-from features.fetch_threads.handler import fetch_and_classify_threads
-from features.list_prs.handler import list_prs
-from features.run_agent.handler import run_agent
-from features.track_execution.handler import ExecutionLog
+from features.review._fetch_threads import fetch_and_classify_threads
+from features.review._list_prs import list_prs
+from features.review._run_agent import run_agent
+from shared.execution_log import ExecutionLog
 from shared.log import log_json
 
 
