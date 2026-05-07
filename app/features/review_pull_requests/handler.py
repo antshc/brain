@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from domain.services.thread_filter import ThreadFilter
-from app.infrastructure.agent import review
+from infrastructure.agent import review
 from infrastructure.gh_client import checkout_pr, fetch_review_threads, list_prs
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
