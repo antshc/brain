@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from features.review._fetch_threads import fetch_and_classify_threads
+from features.review._classifier import ThreadClassifier
 from features.review._run_agent import run_agent
-from infrastructure.gh_client import list_prs
+from infrastructure.gh_client import fetch_review_threads, list_prs
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
 
@@ -19,6 +19,7 @@ def run_review(github_user: str, github_repo: str, log_dir: Path, max_executions
         max_executions: Maximum processing attempts per PR before skipping.
     """
     exec_log = ExecutionLog(log_dir, github_repo)
+    thread_fetcher = ThreadClassifier()
 
     log_json("info", "Service run started", user=github_user, repo=github_repo)
 
@@ -35,7 +36,8 @@ def run_review(github_user: str, github_repo: str, log_dir: Path, max_executions
 
         exec_count = exec_log.get_count(pr.url)
 
-        threads = fetch_and_classify_threads(pr.url)
+        fetched_threads = fetch_review_threads(pr.owner, pr.repo, pr.number)
+        threads = thread_fetcher.classify(fetched_threads)
         thread_ids = [t.thread_id for t in threads]
 
         if len(threads) == 0:

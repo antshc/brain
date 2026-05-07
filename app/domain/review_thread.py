@@ -1,24 +1,27 @@
-from dataclasses import dataclass, field
-from enum import Enum
+from dataclasses import InitVar, dataclass, field
 
-
-class ThreadLabel(Enum):
-    FIX = "fix!"
-    SUGGEST_BANG = "suggest!"
-    SUGGEST = "suggest"
-    NIT = "nit"
-    GOOD = "good"
-    QUESTION = "question"
-
-    def is_actionable(self) -> bool:
-        return self in (ThreadLabel.FIX, ThreadLabel.SUGGEST_BANG)
+from domain.comment import Comment
+from domain.thread_classification_policy import ThreadClassificationPolicy
+from domain.thread_label import ThreadLabel
 
 
 @dataclass
 class ReviewThread:
     thread_id: str
-    label: ThreadLabel
     path: str
     lines: str
-    body: str
-    discussion: list[dict] = field(default_factory=list)
+    is_resolved: bool
+    comments: list[Comment]
+    policy: InitVar[ThreadClassificationPolicy]
+    label: ThreadLabel = field(init=False)
+    body: str = field(init=False)
+
+    def __post_init__(self, policy: ThreadClassificationPolicy) -> None:
+        result = policy.classify_comments(self.comments)
+        if result is None:
+            raise ValueError(f"Thread {self.thread_id!r} is excluded or unclassifiable")
+        self.body, self.label = result
+
+    @property
+    def is_actionable(self) -> bool:
+        return self.label.is_actionable()

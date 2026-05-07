@@ -1,10 +1,18 @@
 """Thin wrapper around the GitHub CLI (`gh`) for GraphQL and REST operations."""
 
 import json
+import logging
 import subprocess
 
+from domain.comment import Comment
 from domain.pull_request import PullRequest
+from domain.review_thread import ReviewThread
+from domain.thread_classification_policy import ThreadClassificationPolicy
 from shared.pr_url import parse_pr_url
+
+logger = logging.getLogger(__name__)
+
+_policy = ThreadClassificationPolicy()
 
 
 def graphql(query: str, variables: dict | None = None) -> dict:
@@ -76,13 +84,32 @@ def checkout_pr(pr_url: str) -> None:
     subprocess.run(["gh", "pr", "checkout", pr_url], check=True)
 
 
-def fetch_review_threads(owner: str, repo: str, number: int) -> list[dict]:
+def _thread_from_raw(raw: dict) -> ReviewThread | None:
+    """Map a raw GitHub API thread dict to a ReviewThread domain entity."""
+    comments = [Comment(author=c["author"]["login"], body=c["body"]) for c in raw.get("comments", [])]
+    start = raw.get("startLine") or raw.get("line")
+    end = raw.get("line")
+    try:
+        return ReviewThread(
+            thread_id=raw["id"],
+            path=raw.get("path", ""),
+            lines=f"{start}-{end}",
+            is_resolved=raw.get("isResolved", False),
+            comments=comments,
+            policy=_policy,
+        )
+    except ValueError:
+        logger.debug("Thread excluded or unclassifiable: %s", raw["id"])
+        return None
+
+
+def fetch_review_threads(owner: str, repo: str, number: int) -> list[ReviewThread]:
     """Fetch review threads for a PR via GraphQL.
 
-    Returns a list of thread dicts with comments flattened (comments.nodes → comments).
+    Returns classified ReviewThread domain entities (excluded/unclassifiable threads omitted).
     """
     data = graphql(_REVIEW_THREADS_QUERY, {"owner": owner, "repo": repo, "number": number})
-    threads = data["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
-    for t in threads:
-        t["comments"] = t["comments"]["nodes"]
-    return threads
+    nodes = data["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
+    for node in nodes:
+        node["comments"] = node["comments"]["nodes"]
+    return [t for node in nodes if (t := _thread_from_raw(node)) is not None]
