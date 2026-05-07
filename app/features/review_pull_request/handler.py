@@ -5,7 +5,7 @@ from pathlib import Path
 from domain.pull_request import PullRequest
 from domain.services.thread_filter import ThreadFilter
 from infrastructure.agent import review
-from infrastructure.gh_client import checkout_pr, fetch_review_threads
+from infrastructure.vcs_client import VCSClient
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
 from shared.pr_url import parse_pr_url
@@ -25,13 +25,14 @@ def review_pull_request(pr_url: str, log_dir: Path, max_executions: int) -> None
 
     exec_log = ExecutionLog(log_dir, github_repo)
     thread_filter = ThreadFilter()
+    vcs = VCSClient()
 
     log_json("info", "Service run started", pr_url=pr_url)
     log_json("info", "Processing PR", pr_url=pr.url)
 
     exec_count = exec_log.get_count(pr.url)
 
-    fetched_threads = fetch_review_threads(pr.owner, pr.repo, pr.number)
+    fetched_threads = vcs.fetch_review_threads(pr.owner, pr.repo, pr.number)
     actionable_threads = thread_filter.get_actionable_threads(fetched_threads)
     thread_ids = [t.thread_id for t in actionable_threads]
 
@@ -57,7 +58,7 @@ def review_pull_request(pr_url: str, log_dir: Path, max_executions: int) -> None
         pr_url=pr.url, threads=str(len(actionable_threads)), attempt=str(exec_count + 1),
     )
 
-    checkout_pr(pr.url)
+    vcs.checkout_pr(pr.url)
 
     review(actionable_threads)
 

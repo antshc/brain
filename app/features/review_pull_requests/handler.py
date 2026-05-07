@@ -4,7 +4,7 @@ from pathlib import Path
 
 from domain.services.thread_filter import ThreadFilter
 from infrastructure.agent import review
-from infrastructure.gh_client import checkout_pr, fetch_review_threads, list_prs
+from infrastructure.vcs_client import VCSClient
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
 
@@ -20,10 +20,11 @@ def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_
     """
     exec_log = ExecutionLog(log_dir, github_repo)
     thread_filter = ThreadFilter()
+    vcs = VCSClient()
 
     log_json("info", "Service run started", user=github_user, repo=github_repo)
 
-    pull_requests = list_prs(github_user, github_repo)
+    pull_requests = vcs.list_prs(github_user, github_repo)
 
     if not pull_requests:
         log_json("info", "No open PRs found for user", user=github_user, repo=github_repo)
@@ -36,7 +37,7 @@ def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_
 
         exec_count = exec_log.get_count(pr.url)
 
-        fetched_threads = fetch_review_threads(pr.owner, pr.repo, pr.number)
+        fetched_threads = vcs.fetch_review_threads(pr.owner, pr.repo, pr.number)
         actionable_threads = thread_filter.get_actionable_threads(fetched_threads)
         thread_ids = [t.thread_id for t in actionable_threads]
 
@@ -60,7 +61,7 @@ def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_
             pr_url=pr.url, threads=str(len(actionable_threads)), attempt=str(exec_count + 1),
         )
 
-        checkout_pr(pr.url)
+        vcs.checkout_pr(pr.url)
 
         review(actionable_threads)
 
