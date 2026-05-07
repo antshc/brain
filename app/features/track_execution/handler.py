@@ -1,9 +1,14 @@
-"""Execution log for tracking PR processing attempts."""
+"""ExecutionLog: reads/writes per-PR attempt counts to cap retries."""
 
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from domain.execution_record import ExecutionRecord
 
 
 class ExecutionLog:
@@ -30,13 +35,19 @@ class ExecutionLog:
     def get_count(self, pr_url: str) -> int:
         return self._log.get(pr_url, {}).get("count", 0)
 
-    def update(self, pr_url: str, thread_ids: list) -> None:
+    def update(self, pr_url: str, thread_ids: list[str]) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         entry = self._log.get(pr_url, {})
+        record = ExecutionRecord(
+            pr_url=pr_url,
+            count=entry.get("count", 0) + 1,
+            last_run=ts,
+            last_threads=thread_ids,
+        )
         self._log[pr_url] = {
-            "count": entry.get("count", 0) + 1,
-            "last_threads": thread_ids,
-            "last_run": ts,
+            "count": record.count,
+            "last_run": record.last_run,
+            "last_threads": record.last_threads,
         }
         self._save()
 
