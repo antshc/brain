@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from features.review._classifier import ThreadClassifier
+from domain.services.thread_filter import ThreadFilter
 from features.review._run_agent import run_agent
 from infrastructure.gh_client import fetch_review_threads, list_prs
 from shared.execution_log import ExecutionLog
@@ -19,7 +19,7 @@ def run_review(github_user: str, github_repo: str, log_dir: Path, max_executions
         max_executions: Maximum processing attempts per PR before skipping.
     """
     exec_log = ExecutionLog(log_dir, github_repo)
-    thread_fetcher = ThreadClassifier()
+    thread_filter = ThreadFilter()
 
     log_json("info", "Service run started", user=github_user, repo=github_repo)
 
@@ -37,10 +37,10 @@ def run_review(github_user: str, github_repo: str, log_dir: Path, max_executions
         exec_count = exec_log.get_count(pr.url)
 
         fetched_threads = fetch_review_threads(pr.owner, pr.repo, pr.number)
-        threads = thread_fetcher.classify(fetched_threads)
-        thread_ids = [t.thread_id for t in threads]
+        actionable_threads = thread_filter.get_actionable_threads(fetched_threads)
+        thread_ids = [t.thread_id for t in actionable_threads]
 
-        if len(threads) == 0:
+        if len(actionable_threads) == 0:
             log_json("info", "No actionable threads, skipping", pr_url=pr.url)
             if exec_count > 0:
                 exec_log.reset(pr.url)
@@ -51,16 +51,16 @@ def run_review(github_user: str, github_repo: str, log_dir: Path, max_executions
             log_json(
                 "warn", "PR exceeded max executions, skipping",
                 pr_url=pr.url, count=str(exec_count), max=str(max_executions),
-                unresolved_threads=str(len(threads)),
+                unresolved_threads=str(len(actionable_threads)),
             )
             continue
 
         log_json(
             "info", "Running copilot agent",
-            pr_url=pr.url, threads=str(len(threads)), attempt=str(exec_count + 1),
+            pr_url=pr.url, threads=str(len(actionable_threads)), attempt=str(exec_count + 1),
         )
 
-        run_agent(pr, threads)
+        run_agent(pr, actionable_threads)
 
         exec_log.update(pr.url, thread_ids)
         log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))
