@@ -1,19 +1,46 @@
 #!/usr/bin/env python3
-"""Tests for review classifier and fetch_threads."""
+"""Tests for review classifier."""
 
-import logging
 import sys
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
 # Add app/ to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
-from domain.review_thread import ThreadLabel
-from features.review._classifier import classify_thread, detect_label
-from features.review._fetch_threads import fetch_and_classify_threads
+from domain.comment import Comment
+from domain.review_thread import ReviewThread
+from domain.thread_classification_policy import ThreadClassificationPolicy
+from domain.thread_label import ThreadLabel
+from features.review._classifier import ThreadClassifier
+
+_policy = ThreadClassificationPolicy()
+detect_label = _policy.detect_label
+
+
+def classify_thread(thread: dict) -> ReviewThread | None:
+    """Build a ReviewThread from a raw dict using the domain policy."""
+    raw_comments = thread.get("comments", [])
+    comments = [Comment(author=c["author"]["login"], body=c["body"]) for c in raw_comments]
+    start = thread.get("startLine") or thread.get("line")
+    end = thread.get("line")
+    try:
+        return ReviewThread(
+            thread_id=thread["id"],
+            path=thread.get("path", ""),
+            lines=f"{start}-{end}",
+            is_resolved=thread.get("isResolved", False),
+            comments=comments,
+            policy=_policy,
+        )
+    except ValueError:
+        return None
+
+
+def classify_threads(raw_threads: list) -> list[ReviewThread]:
+    threads = [t for raw in raw_threads if (t := classify_thread(raw)) is not None]
+    return ThreadClassifier().classify(threads)
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -38,14 +65,6 @@ def make_thread_multi_comments(id, path, line, *bodies):
         "line": line,
         "comments": [{"author": {"login": "reviewer"}, "body": b} for b in bodies],
     }
-
-
-def mock_gh(threads):
-    """Patch fetch_review_threads to return given threads."""
-    return patch(
-        "features.review._fetch_threads.gh_client.fetch_review_threads",
-        return_value=threads,
-    )
 
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
@@ -79,7 +98,7 @@ class TestClassifyThread:
         assert result.path == "src/foo.ts"
         assert result.lines == "10-15"
         assert result.body == "fix!: broken null check"
-        assert result.discussion[0]["author"] == "reviewer"
+        assert result.comments[0].author == "reviewer"
 
     def test_excluded_when_fixed(self):
         thread = make_thread_multi_comments(
@@ -136,19 +155,15 @@ class TestClassifyThread:
         assert result.label == ThreadLabel.FIX
         assert result.body == "fix!: actually not fixed"
 
-    def test_unrecognized_label_returns_none(self, caplog):
+    def test_unrecognized_label_returns_none(self):
         thread = make_thread("TX", "src/x.ts", 1, 1, "looks fine to me")
-        with caplog.at_level(logging.WARNING):
-            result = classify_thread(thread)
-        assert result is None
-        assert "Unrecognized label" in caplog.text
+        assert classify_thread(thread) is None
 
 
 class TestFetchAndClassify:
     def test_fix_label(self):
         threads = [make_thread("T1", "src/foo.ts", 10, 15, "fix!: broken null check")]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
+        result = classify_threads(threads)
         assert len(result) == 1
         assert result[0].label == ThreadLabel.FIX
         assert result[0].thread_id == "T1"
@@ -157,8 +172,7 @@ class TestFetchAndClassify:
 
     def test_suggest_bang_label(self):
         threads = [make_thread("T2", "src/bar.ts", 5, 5, "suggest!: consider extracting method")]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
+        result = classify_threads(threads)
         assert len(result) == 1
         assert result[0].label == ThreadLabel.SUGGEST_BANG
         assert result[0].thread_id == "T2"
@@ -169,8 +183,7 @@ class TestFetchAndClassify:
             make_thread("S1", "src/c.ts", 3, 3, "suggest: could improve"),
             make_thread("G1", "src/d.ts", 4, 4, "good: nice approach"),
         ]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
+        result = classify_threads(threads)
         assert len(result) == 0
 
     def test_priority_ordering(self):
@@ -178,21 +191,18 @@ class TestFetchAndClassify:
             make_thread("S1", "src/a.ts", 1, 1, "suggest!: improve naming"),
             make_thread("F1", "src/b.ts", 2, 2, "fix!: crash on null"),
         ]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
+        result = classify_threads(threads)
         assert len(result) == 2
         assert result[0].label == ThreadLabel.FIX
         assert result[1].label == ThreadLabel.SUGGEST_BANG
 
     def test_no_threads(self):
-        with mock_gh([]):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
+        result = classify_threads([])
         assert len(result) == 0
 
     def test_resolved_excluded(self):
         threads = [make_thread("TR", "src/r.ts", 1, 1, "fix!: old issue", resolved=True)]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
+        result = classify_threads(threads)
         assert len(result) == 0
 
     def test_mixed_labels(self):
@@ -201,8 +211,7 @@ class TestFetchAndClassify:
             make_thread("N1", "b.ts", 2, 2, "nit: spacing"),
             make_thread("S1", "c.ts", 3, 3, "suggest!: refactor"),
         ]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
+        result = classify_threads(threads)
         assert len(result) == 2
         assert result[0].label == ThreadLabel.FIX
         assert result[1].label == ThreadLabel.SUGGEST_BANG
@@ -215,6 +224,5 @@ class TestFetchAndClassify:
                 "Author: agreed, will fix",
             )
         ]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
-        assert len(result[0].discussion) == 2
+        result = classify_threads(threads)
+        assert len(result[0].comments) == 2

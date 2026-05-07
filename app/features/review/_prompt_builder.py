@@ -18,7 +18,7 @@ def build_prompt(threads: list[ReviewThread]) -> str:
             "path": t.path,
             "lines": t.lines,
             "body": t.body,
-            "discussion": t.discussion,
+            "comments": [{"author": c.author, "body": c.body} for c in t.comments],
         }
         for t in threads
     ]

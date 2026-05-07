@@ -17,26 +17,13 @@ ralph/
 ├── afk-review-service.sh           # Shell entry point — cds into repo-dir, invokes review_service.py
 ├── prompt.md                       # Copilot agent instructions injected into every run
 ├── app/
-│   ├── review_service.py           # Orchestrator: arg parsing, PR loop, skip logic
+│   ├── main.py           # Orchestrator: arg parsing, delegate the call to the features
 │   ├── features/
-│   │   ├── list_prs/
-│   │   │   ├── handler.py          # Lists open PRs authored by a user
-│   │   │   └── tests/
-│   │   │       └── handler_test.py
-│   │   ├── fetch_threads/
+│   │   ├── usecase/
 │   │   │   ├── handler.py          # Entry point: fetch + classify for a PR URL
 │   │   │   ├── classifier.py       # Label detection and thread classification logic
 │   │   │   └── tests/
 │   │   │       └── classifier_test.py
-│   │   ├── run_agent/
-│   │   │   ├── handler.py          # Dispatches threads to the Copilot agent
-│   │   │   ├── prompt_builder.py   # Assembles the prompt from threads + template
-│   │   │   └── tests/
-│   │   │       └── handler_test.py
-│   │   └── track_execution/
-│   │       ├── handler.py          # ExecutionLog: reads/writes per-PR attempt counts
-│   │       └── tests/
-│   │           └── handler_test.py
 │   ├── domain/
 │   │   ├── pull_request.py         # PullRequest dataclass (owner, repo, number, url)
 │   │   ├── review_thread.py        # ReviewThread dataclass + ThreadLabel enum
@@ -154,6 +141,30 @@ log_json("warning", "Execution limit reached", pr_url=pr_url, count=str(exec_cou
 All values must be strings. Output goes to stderr as newline-delimited JSON.
 
 ---
+
+## Python CLI
+
+Use `python3` — `python` is not available in this environment.
+
+```bash
+python3 app/main.py ...
+```
+
+## Running Tests
+
+Tests use `pytest` via the `python3 -m pytest` invocation. Run all tests from the repo root:
+
+```bash
+python3 -m pytest app/
+```
+
+Run a specific test file:
+
+```bash
+python3 -m pytest app/features/review/tests/classifier_test.py -v
+```
+
+Test files add `app/` to `sys.path` manually, so no `PYTHONPATH` export is needed.
 
 ## Running the Service
 
