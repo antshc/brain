@@ -3,13 +3,13 @@
 from pathlib import Path
 
 from domain.services.thread_filter import ThreadFilter
-from features.review._run_agent import run_agent
-from infrastructure.gh_client import fetch_review_threads, list_prs
+from app.infrastructure.agent import review
+from infrastructure.gh_client import checkout_pr, fetch_review_threads, list_prs
 from shared.execution_log import ExecutionLog
 from shared.log import log_json
 
 
-def run_review(github_user: str, github_repo: str, log_dir: Path, max_executions: int) -> None:
+def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_executions: int) -> None:
     """List open PRs for *github_user* and run the Copilot agent on actionable review threads.
 
     Args:
@@ -60,7 +60,9 @@ def run_review(github_user: str, github_repo: str, log_dir: Path, max_executions
             pr_url=pr.url, threads=str(len(actionable_threads)), attempt=str(exec_count + 1),
         )
 
-        run_agent(pr, actionable_threads)
+        checkout_pr(pr.url)
+
+        review(actionable_threads)
 
         exec_log.update(pr.url, thread_ids)
         log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))
