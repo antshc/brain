@@ -1,12 +1,7 @@
-"""Entry point: fetch and classify review threads for a PR URL."""
-
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+"""Fetch and classify review threads for a PR URL."""
 
 from domain.review_thread import ReviewThread
-from features.fetch_threads import classifier
+from features.review import _classifier
 from infrastructure import gh_client
 from shared.pr_url import parse_pr_url
 
@@ -22,7 +17,7 @@ def fetch_and_classify_threads(pr_url: str) -> list[ReviewThread]:
     for thread in raw_threads:
         if thread.get("isResolved"):
             continue
-        classified = classifier.classify_thread(thread)
+        classified = _classifier.classify_thread(thread)
         if not classified or not classified.label.is_actionable():
             continue
         if classified.label.value == "fix!":

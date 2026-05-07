@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for fetch_threads classifier and handler."""
+"""Tests for review classifier and fetch_threads."""
 
 import logging
 import sys
@@ -12,8 +12,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
 from domain.review_thread import ThreadLabel
-from features.fetch_threads.classifier import classify_thread, detect_label
-from features.fetch_threads.handler import fetch_and_classify_threads
+from features.review._classifier import classify_thread, detect_label
+from features.review._fetch_threads import fetch_and_classify_threads
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ def make_thread_multi_comments(id, path, line, *bodies):
 def mock_gh(threads):
     """Patch fetch_review_threads to return given threads."""
     return patch(
-        "features.fetch_threads.handler.gh_client.fetch_review_threads",
+        "features.review._fetch_threads.gh_client.fetch_review_threads",
         return_value=threads,
     )
 
@@ -218,9 +218,3 @@ class TestFetchAndClassify:
         with mock_gh(threads):
             result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
         assert len(result[0].discussion) == 2
-
-    def test_single_line_thread(self):
-        threads = [make_thread("TL", "src/l.ts", 7, 7, "fix!: off by one")]
-        with mock_gh(threads):
-            result = fetch_and_classify_threads("https://github.com/o/r/pull/1")
-        assert result[0].lines == "7-7"

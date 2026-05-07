@@ -1,10 +1,5 @@
 """Lists open PRs authored by a user in a given repo."""
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-
 from domain.pull_request import PullRequest
 from infrastructure import gh_client
 from shared.pr_url import parse_pr_url
