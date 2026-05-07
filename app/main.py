@@ -26,7 +26,7 @@ from pathlib import Path
 # Add app/ to path so feature/domain/shared imports resolve
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from features.review.handler import run_review
+from features.review.handler import review_pull_requests
 
 DEFAULT_MAX_EXECUTIONS = 5
 
@@ -52,7 +52,7 @@ def main() -> None:
     logging.basicConfig(level=logging.DEBUG if "AFK_DEBUG" in os.environ else logging.WARNING)
 
     log_dir = Path(__file__).resolve().parent.parent / "logs"
-    run_review(github_user, github_repo, log_dir, max_executions)
+    review_pull_requests(github_user, github_repo, log_dir, max_executions)
 
 
 if __name__ == "__main__":

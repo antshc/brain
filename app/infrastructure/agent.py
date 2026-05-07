@@ -4,8 +4,12 @@ import json
 import subprocess
 from pathlib import Path
 
-# infra → app → root → logs
-LOG_DIR = Path(__file__).resolve().parent.parent.parent / "logs"
+from domain.review_thread import ReviewThread
+
+# infra → app → root
+_ROOT = Path(__file__).resolve().parent.parent.parent
+LOG_DIR = _ROOT / "logs"
+PROMPT_PATH = _ROOT / "prompt.md"
 
 DEFAULT_MODEL = "claude-sonnet-4.6"
 
@@ -73,3 +77,28 @@ def stream_text(proc: subprocess.Popen) -> str:
     proc.wait()
     print()
     return full_text
+
+
+def build_prompt(threads: list[ReviewThread]) -> str:
+    """Build the full copilot prompt from review threads and the prompt template."""
+    threads_data = [
+        {
+            "thread_id": t.thread_id,
+            "prefix": t.label.value,
+            "path": t.path,
+            "lines": t.lines,
+            "body": t.body,
+            "comments": [{"author": c.author, "body": c.body} for c in t.comments],
+        }
+        for t in threads
+    ]
+    threads_json = json.dumps(threads_data, indent=2)
+    template = PROMPT_PATH.read_text()
+    return f"# Review Threads\n\n{threads_json}\n\n{template}"
+
+
+def review(threads: list[ReviewThread]) -> None:
+    """Build the prompt and run the Copilot agent on the given review threads."""
+    prompt = build_prompt(threads)
+    proc = run(prompt)
+    stream_text(proc)
