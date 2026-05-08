@@ -1,0 +1,188 @@
+[
+  {
+    "id": "PRRT_synthetic_0000001",
+    "isResolved": true,
+    "path": "src/Services/OrderService.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": { "login": "reviewer-alice" },
+        "body": "fix!: use the injected repository instead of creating a new instance directly"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000002",
+    "isResolved": true,
+    "path": "src/Services/OrderService.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": { "login": "reviewer-alice" },
+        "body": "fix!: use [Theory] for the ProcessOrder_WhenAmountIsZero_ThrowsException and ProcessOrder_WhenAmountIsNegative_ThrowsException tests"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000003",
+    "isResolved": true,
+    "path": "src/Controllers/PaymentController.cs",
+    "line": 42,
+    "startLine": 40,
+    "comments": [
+      {
+        "author": { "login": "reviewer-carol" },
+        "body": "suggest!: extract this block into a private method `ValidatePaymentRequest` to reduce nesting and improve readability"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000004",
+    "isResolved": true,
+    "path": "src/Infrastructure/DatabaseModule.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": { "login": "reviewer-alice" },
+        "body": "**nit:** `IReadOnlyRepository<Order>` is registered in the DI container but never resolved — no class requests it. Consider removing this registration to avoid dead wiring."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000005",
+    "isResolved": true,
+    "path": "tests/Services/OrderServiceTests.cs",
+    "line": 120,
+    "startLine": 120,
+    "comments": [
+      {
+        "author": { "login": "reviewer-carol" },
+        "body": "the \"Arrange, Act, Assert\" comments are missing"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "fix!: Add the Arrange, Act, Assert comments in all test methods where they are missing."
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000006",
+    "isResolved": false,
+    "path": "src/Abstractions/IPaymentGateway.cs",
+    "line": 5,
+    "startLine": 5,
+    "comments": [
+      {
+        "author": { "login": "reviewer-carol" },
+        "body": "It looks like overhead. Why not extend ITransactionService and use it in PaymentCleanupHostedService?"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "The split was intentional: ITransactionService handles transaction lifecycle while IPaymentGateway handles the external provider connection — different responsibilities."
+      },
+      {
+        "author": { "login": "reviewer-carol" },
+        "body": "Why does the engine level need to know about the gateway? Can't ITransactionService expose whether a payment can be processed?"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "The gateway abstraction may eventually expose retry policies, circuit-breaker state, and provider metadata — collapsing it into ITransactionService would widen that interface beyond its responsibility."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000007",
+    "isResolved": false,
+    "path": "src/Services/InventoryService.cs",
+    "line": 15,
+    "startLine": 15,
+    "comments": [
+      {
+        "author": { "login": "reviewer-alice" },
+        "body": "Why not just use IStockRepository here instead of introducing IInventoryStorageAccess?"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "IStockRepository manages individual stock records; IInventoryStorageAccess is about warehouse-level storage state (capacity, availability) — different levels of abstraction."
+      },
+      {
+        "author": { "login": "reviewer-alice" },
+        "body": "I don't see a reason why storage availability can't live in IStockRepository. How is this different from the CanFulfill method?"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "CanFulfill checks whether a specific SKU quantity can be fulfilled. IInventoryStorageAccess.IsAvailable checks whether the warehouse itself is reachable and healthy — broader scope. I'm open to renaming it to IWarehouseHealthAccess if that makes the distinction clearer."
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "fix!: Rename IInventoryStorageAccess to IWarehouseHealthAccess and update all usages. Verify the build and unit tests pass after the rename."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000008",
+    "isResolved": false,
+    "path": "tests/Controllers/PaymentControllerTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": { "login": "reviewer-carol" },
+        "body": "Name violates the \"MethodName_Scenario_ExpectedBehavior\" test naming convention"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "fix!: Rename the test to Charge_WhenAmountExceedsLimit_ReturnsBadRequest"
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000009",
+    "isResolved": true,
+    "path": "src/Services/NotificationService.cs",
+    "line": 88,
+    "startLine": 85,
+    "comments": [
+      {
+        "author": { "login": "reviewer-alice" },
+        "body": "suggest: consider using a `StringBuilder` here — the current string concatenation inside a loop allocates a new string on every iteration"
+      },
+      {
+        "author": { "login": "pr-author-bob" },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_synthetic_0000010",
+    "isResolved": true,
+    "path": "tests/Services/InventoryServiceTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": { "login": "reviewer-carol" },
+        "body": "good: clean test structure, the parameterised cases cover both boundary values nicely"
+      }
+    ]
+  }
+]
