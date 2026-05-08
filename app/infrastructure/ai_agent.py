@@ -42,7 +42,7 @@ class AIAgent:
                 ),
                 "path": t.path,
                 "lines": t.lines,
-                "body": t.body,
+                "actionable_comment": t.actionable_comment,
                 "comments": [{"author": c.author, "body": c.body} for c in t.comments],
             }
             for t in threads
