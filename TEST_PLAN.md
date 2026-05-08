@@ -496,6 +496,60 @@ Scenario: PR with no actionable threads and prior count resets execution log
 
 ---
 
+## Feature: Fetch Threads
+
+> Unit: `fetch_threads()` handler · Integration: mocked `GhCli`
+
+```gherkin
+Scenario: Handler returns correctly shaped output for actionable threads
+  Given a PR URL "https://github.com/owner/repo/pull/1"
+    And the VCS returns 2 unresolved threads with labels "fix!:" and "suggest!:"
+  When fetch_threads() is called
+  Then the result is a list of 2 dicts
+    And each dict contains keys: thread_id, prefix, path, lines, actionable_comment, comments
+    And the first dict has thread_id "T1" and prefix "fix!"
+
+Scenario: Handler returns empty list when no actionable threads exist
+  Given a PR URL "https://github.com/owner/repo/pull/2"
+    And the VCS returns threads with only "nit:" and "good:" labels
+  When fetch_threads() is called
+  Then the result is an empty list
+
+Scenario: Handler excludes resolved and non-actionable threads
+  Given a PR URL "https://github.com/owner/repo/pull/3"
+    And the VCS returns 3 threads:
+      | id | body                    | resolved |
+      | T1 | fix!: broken null check | false    |
+      | T2 | fix!: another issue     | true     |
+      | T3 | nit: minor style        | false    |
+  When fetch_threads() is called
+  Then the result contains only thread T1
+```
+
+**Coverage:** Unit test · Integration test
+
+```gherkin
+Scenario: CLI invocation outputs JSON array to stdout
+  Given a valid PR URL is passed as a CLI argument
+  When fetch_threads.py is executed
+  Then it exits with code 0
+    And stdout contains a JSON array of actionable thread objects
+
+Scenario: CLI invocation with no arguments
+  Given fetch_threads.py is invoked with no arguments
+  When it is executed
+  Then it exits with code 1 and prints usage to stderr
+
+Scenario: CLI invocation with invalid PR URL
+  Given fetch_threads.py is invoked with "not-a-url"
+  When it is executed
+  Then it exits with code 1 and prints an error message to stderr
+```
+
+**Coverage:** Manual test
+
+---
+
 ## Feature: CLI Argument Parsing (main.py)
 
 > Manual testing
