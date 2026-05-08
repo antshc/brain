@@ -11,7 +11,16 @@ from shared.log import log_json
 from shared.pr_url import parse_pr_url
 
 
-def review_pull_request(pr_url: str, log_dir: Path, max_executions: int, prompt: str = "/review") -> None:
+def review_pull_request(
+    pr_url: str,
+    log_dir: Path,
+    max_executions: int,
+    prompt: str = "/review",
+    *,
+    vcs: VCSClient | None = None,
+    agent: AIAgent | None = None,
+    exec_log: ExecutionLog | None = None,
+) -> None:
     """Run the Copilot agent on actionable review threads for a single PR URL.
 
     Args:
@@ -19,14 +28,17 @@ def review_pull_request(pr_url: str, log_dir: Path, max_executions: int, prompt:
         log_dir:        Directory where execution logs are written.
         max_executions: Maximum processing attempts before skipping.
         prompt:         Prompt text passed to the AI agent (default: "/review").
+        vcs:            VCSClient instance (defaults to VCSClient()).
+        agent:          AIAgent instance (defaults to AIAgent()).
+        exec_log:       ExecutionLog instance (defaults to ExecutionLog(log_dir, github_repo)).
     """
     owner, repo_name, number = parse_pr_url(pr_url)
     github_repo = f"{owner}/{repo_name}"
     pr = PullRequest(owner=owner, repo=repo_name, number=number, url=pr_url)
 
-    exec_log = ExecutionLog(log_dir, github_repo)
+    exec_log = exec_log or ExecutionLog(log_dir, github_repo)
     thread_filter = ThreadFilter()
-    vcs = VCSClient()
+    vcs = vcs or VCSClient()
 
     log_json("info", "Service run started", pr_url=pr_url)
     log_json("info", "Processing PR", pr_url=pr.url)
@@ -61,7 +73,7 @@ def review_pull_request(pr_url: str, log_dir: Path, max_executions: int, prompt:
 
     vcs.checkout_pr(pr.url)
 
-    AIAgent().review(actionable_pr_threads, prompt)
+    (agent or AIAgent()).review(actionable_pr_threads, prompt)
 
     exec_log.update(pr.url, thread_ids)
     log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))
