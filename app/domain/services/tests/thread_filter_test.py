@@ -88,7 +88,7 @@ class TestClassifyThread:
         assert result.thread_id == "T1"
         assert result.path == "src/foo.ts"
         assert result.lines == "10-15"
-        assert result.body == "fix!: broken null check"
+        assert result.actionable_comment == "fix!: broken null check"
         assert result.comments[0].author == "reviewer"
         assert result.is_actionable
 
@@ -109,7 +109,7 @@ class TestClassifyThread:
             "T3", "src/foo.ts", 20, "LGTM overall", "fix!: but this part is wrong"
         )
         result = classify_thread(thread)
-        assert result.body == "fix!: but this part is wrong"
+        assert result.actionable_comment == "fix!: but this part is wrong"
         assert result.is_actionable
 
     def test_fix_after_question_returns_last_fix(self):
@@ -121,7 +121,7 @@ class TestClassifyThread:
             "fix!: new fix",
         )
         result = classify_thread(thread)
-        assert result.body == "fix!: new fix"
+        assert result.actionable_comment == "fix!: new fix"
         assert result.is_actionable
 
     def test_fix_then_question_excludes(self):
@@ -142,7 +142,7 @@ class TestClassifyThread:
             "fix!: actually not fixed",
         )
         result = classify_thread(thread)
-        assert result.body == "fix!: actually not fixed"
+        assert result.actionable_comment == "fix!: actually not fixed"
         assert result.is_actionable
 
     def test_unrecognized_label_not_actionable(self):

@@ -12,7 +12,7 @@ class ReviewThread:
     comments: list[Comment]
 
     @property
-    def body(self) -> str:
+    def actionable_comment(self) -> str:
         labeled = next((c for c in reversed(self.comments) if c.get_label() is not None), None)
         return labeled.body if labeled else (self.comments[0].body if self.comments else "")
 
