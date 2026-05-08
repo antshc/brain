@@ -98,7 +98,4 @@ python3 -m pytest unit_tests/ integration_tests/ -v
 
 # Unit tests only
 python3 -m pytest unit_tests/ -v
-
-# Integration tests against live GitHub API and Copilot CLI
-python3 -m pytest integration_tests/ --real -v
 ```
