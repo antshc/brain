@@ -7,7 +7,6 @@ import subprocess
 from domain.comment import Comment
 from domain.pull_request import PullRequest
 from domain.review_thread import ReviewThread
-from domain.thread_classification_policy import ThreadClassificationPolicy
 from shared.pr_url import parse_pr_url
 
 logger = logging.getLogger(__name__)
@@ -33,9 +32,6 @@ query($owner: String!, $repo: String!, $number: Int!) {
 class VCSClient:
     """Thin wrapper around the VCS host CLI for PR and review thread operations."""
 
-    def __init__(self) -> None:
-        self._policy = ThreadClassificationPolicy()
-
     def list_prs(self, user: str, repo: str) -> list[PullRequest]:
         """Return open PRs authored by *user* in *repo* as PullRequest domain objects."""
         urls = self._list_open_prs(user, repo)
@@ -58,7 +54,7 @@ class VCSClient:
         nodes = data["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
         for node in nodes:
             node["comments"] = node["comments"]["nodes"]
-        return [t for node in nodes if (t := self._thread_from_raw(node)) is not None]
+        return [self._thread_from_raw(node) for node in nodes]
 
     def _graphql(self, query: str, variables: dict | None = None) -> dict:
         """Execute a GraphQL query via `gh api graphql` and return the parsed JSON response."""
@@ -84,20 +80,15 @@ class VCSClient:
         )
         return [url.strip() for url in result.stdout.strip().splitlines() if url.strip()]
 
-    def _thread_from_raw(self, raw: dict) -> ReviewThread | None:
+    def _thread_from_raw(self, raw: dict) -> ReviewThread:
         """Map a raw GitHub API thread dict to a ReviewThread domain entity."""
         comments = [Comment(author=c["author"]["login"], body=c["body"]) for c in raw.get("comments", [])]
         start = raw.get("startLine") or raw.get("line")
         end = raw.get("line")
-        try:
-            return ReviewThread(
-                thread_id=raw["id"],
-                path=raw.get("path", ""),
-                lines=f"{start}-{end}",
-                is_resolved=raw.get("isResolved", False),
-                comments=comments,
-                policy=self._policy,
-            )
-        except ValueError:
-            logger.debug("Thread excluded or unclassifiable: %s", raw["id"])
-            return None
+        return ReviewThread(
+            thread_id=raw["id"],
+            path=raw.get("path", ""),
+            lines=f"{start}-{end}",
+            is_resolved=raw.get("isResolved", False),
+            comments=comments,
+        )

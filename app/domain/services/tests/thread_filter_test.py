@@ -11,35 +11,27 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
 from domain.comment import Comment
 from domain.review_thread import ReviewThread
-from domain.thread_classification_policy import ThreadClassificationPolicy
 from domain.thread_label import ThreadLabel
 from domain.services.thread_filter import ThreadFilter
 
-_policy = ThreadClassificationPolicy()
-detect_label = _policy.detect_label
 
-
-def classify_thread(thread: dict) -> ReviewThread | None:
-    """Build a ReviewThread from a raw dict using the domain policy."""
+def classify_thread(thread: dict) -> ReviewThread:
+    """Build a ReviewThread from a raw dict."""
     raw_comments = thread.get("comments", [])
     comments = [Comment(author=c["author"]["login"], body=c["body"]) for c in raw_comments]
     start = thread.get("startLine") or thread.get("line")
     end = thread.get("line")
-    try:
-        return ReviewThread(
-            thread_id=thread["id"],
-            path=thread.get("path", ""),
-            lines=f"{start}-{end}",
-            is_resolved=thread.get("isResolved", False),
-            comments=comments,
-            policy=_policy,
-        )
-    except ValueError:
-        return None
+    return ReviewThread(
+        thread_id=thread["id"],
+        path=thread.get("path", ""),
+        lines=f"{start}-{end}",
+        is_resolved=thread.get("isResolved", False),
+        comments=comments,
+    )
 
 
 def classify_threads(raw_threads: list) -> list[ReviewThread]:
-    threads = [t for raw in raw_threads if (t := classify_thread(raw)) is not None]
+    threads = [classify_thread(raw) for raw in raw_threads]
     return ThreadFilter().get_actionable_threads(threads)
 
 
@@ -69,56 +61,56 @@ def make_thread_multi_comments(id, path, line, *bodies):
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
 
-class TestDetectLabel:
+class TestGetLabel:
     def test_fix_bang(self):
-        assert detect_label("fix!: broken null check") == ThreadLabel.FIX
+        assert Comment(author="", body="fix!: broken null check").get_label() == ThreadLabel.FIX
 
     def test_suggest_bang(self):
-        assert detect_label("suggest!: consider extracting") == ThreadLabel.SUGGEST_BANG
+        assert Comment(author="", body="suggest!: consider extracting").get_label() == ThreadLabel.SUGGEST_BANG
 
     def test_suggest(self):
-        assert detect_label("suggest: could improve") == ThreadLabel.SUGGEST
+        assert Comment(author="", body="suggest: could improve").get_label() == ThreadLabel.SUGGEST
 
     def test_nit(self):
-        assert detect_label("nit: minor style") == ThreadLabel.NIT
+        assert Comment(author="", body="nit: minor style").get_label() == ThreadLabel.NIT
 
     def test_good(self):
-        assert detect_label("good: nice approach") == ThreadLabel.GOOD
+        assert Comment(author="", body="good: nice approach").get_label() == ThreadLabel.GOOD
 
     def test_unrecognized(self):
-        assert detect_label("looks fine to me") is None
+        assert Comment(author="", body="looks fine to me").get_label() is None
 
 
 class TestClassifyThread:
     def test_fix_thread(self):
         thread = make_thread("T1", "src/foo.ts", 10, 15, "fix!: broken null check")
         result = classify_thread(thread)
-        assert result.label == ThreadLabel.FIX
         assert result.thread_id == "T1"
         assert result.path == "src/foo.ts"
         assert result.lines == "10-15"
         assert result.body == "fix!: broken null check"
         assert result.comments[0].author == "reviewer"
+        assert result.is_actionable
 
     def test_excluded_when_fixed(self):
         thread = make_thread_multi_comments(
             "T1", "src/foo.ts", 10, "fix!: issue", "Fixed."
         )
-        assert classify_thread(thread) is None
+        assert not classify_thread(thread).is_actionable
 
     def test_excluded_when_question(self):
         thread = make_thread_multi_comments(
             "T1", "src/foo.ts", 10, "question!: why is this needed?"
         )
-        assert classify_thread(thread) is None
+        assert not classify_thread(thread).is_actionable
 
     def test_label_in_later_comment(self):
         thread = make_thread_multi_comments(
             "T3", "src/foo.ts", 20, "LGTM overall", "fix!: but this part is wrong"
         )
         result = classify_thread(thread)
-        assert result.label == ThreadLabel.FIX
         assert result.body == "fix!: but this part is wrong"
+        assert result.is_actionable
 
     def test_fix_after_question_returns_last_fix(self):
         """fix!: → question!: → fix!: — last fix wins, thread is NOT excluded."""
@@ -129,9 +121,8 @@ class TestClassifyThread:
             "fix!: new fix",
         )
         result = classify_thread(thread)
-        assert result is not None
-        assert result.label == ThreadLabel.FIX
         assert result.body == "fix!: new fix"
+        assert result.is_actionable
 
     def test_fix_then_question_excludes(self):
         """fix!: → question!: — question is last signal, thread excluded."""
@@ -140,7 +131,7 @@ class TestClassifyThread:
             "fix!: Expl",
             "question!: Clarification?",
         )
-        assert classify_thread(thread) is None
+        assert not classify_thread(thread).is_actionable
 
     def test_fix_after_fixed_returns_last_fix(self):
         """fix!: → Fixed. → fix!: — last fix wins, thread is NOT excluded."""
@@ -151,13 +142,12 @@ class TestClassifyThread:
             "fix!: actually not fixed",
         )
         result = classify_thread(thread)
-        assert result is not None
-        assert result.label == ThreadLabel.FIX
         assert result.body == "fix!: actually not fixed"
+        assert result.is_actionable
 
-    def test_unrecognized_label_returns_none(self):
+    def test_unrecognized_label_not_actionable(self):
         thread = make_thread("TX", "src/x.ts", 1, 1, "looks fine to me")
-        assert classify_thread(thread) is None
+        assert not classify_thread(thread).is_actionable
 
 
 class TestFetchAndClassify:
@@ -165,17 +155,17 @@ class TestFetchAndClassify:
         threads = [make_thread("T1", "src/foo.ts", 10, 15, "fix!: broken null check")]
         result = classify_threads(threads)
         assert len(result) == 1
-        assert result[0].label == ThreadLabel.FIX
         assert result[0].thread_id == "T1"
         assert result[0].path == "src/foo.ts"
         assert result[0].lines == "10-15"
+        assert result[0].is_actionable
 
     def test_suggest_bang_label(self):
         threads = [make_thread("T2", "src/bar.ts", 5, 5, "suggest!: consider extracting method")]
         result = classify_threads(threads)
         assert len(result) == 1
-        assert result[0].label == ThreadLabel.SUGGEST_BANG
         assert result[0].thread_id == "T2"
+        assert result[0].is_actionable
 
     def test_non_actionable_excluded(self):
         threads = [
@@ -186,15 +176,15 @@ class TestFetchAndClassify:
         result = classify_threads(threads)
         assert len(result) == 0
 
-    def test_priority_ordering(self):
+    def test_actionable_ordering_preserves_input_order(self):
         threads = [
             make_thread("S1", "src/a.ts", 1, 1, "suggest!: improve naming"),
             make_thread("F1", "src/b.ts", 2, 2, "fix!: crash on null"),
         ]
         result = classify_threads(threads)
         assert len(result) == 2
-        assert result[0].label == ThreadLabel.FIX
-        assert result[1].label == ThreadLabel.SUGGEST_BANG
+        assert result[0].thread_id == "S1"
+        assert result[1].thread_id == "F1"
 
     def test_no_threads(self):
         result = classify_threads([])
@@ -213,8 +203,8 @@ class TestFetchAndClassify:
         ]
         result = classify_threads(threads)
         assert len(result) == 2
-        assert result[0].label == ThreadLabel.FIX
-        assert result[1].label == ThreadLabel.SUGGEST_BANG
+        assert result[0].thread_id == "F1"
+        assert result[1].thread_id == "S1"
 
     def test_discussion_includes_all_comments(self):
         threads = [
