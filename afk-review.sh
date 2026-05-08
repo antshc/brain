@@ -15,4 +15,4 @@ fi
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 cd "$1" # <repo-dir>
-python3 "$SCRIPT_DIR/app/main.py" "$@"
+python3 "$SCRIPT_DIR/ralph_tools/main.py" "$@"

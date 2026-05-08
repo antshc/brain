@@ -6,16 +6,12 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
-import sys
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 import pytest
 
-# unit_tests/shared/ → unit_tests/ → ralph root → app/
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "app"))
-
-from shared.execution_log import ExecutionLog
+from ralph_tools.shared.execution_log import ExecutionLog
 
 _PR = "https://github.com/owner/repo/pull/1"
 

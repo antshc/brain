@@ -33,12 +33,8 @@ Exit codes:
 import json
 import re
 import sys
-from pathlib import Path
 
-# Add app/ to path so feature/domain/shared imports resolve
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from features.fetch_threads.handler import fetch_threads
+from ralph_tools.features.fetch_threads.handler import fetch_threads
 
 _USAGE = "Usage: fetch_threads.py <pr-url>"
 _PR_URL_RE = re.compile(r"^https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/pull/\d+$")

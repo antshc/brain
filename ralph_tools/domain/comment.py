@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import ClassVar
 
-from domain.thread_label import ThreadLabel
+from ralph_tools.domain.thread_label import ThreadLabel
 
 
 @dataclass

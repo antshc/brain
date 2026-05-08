@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "ralph-tools"
+version = "0.1.0"
+description = "AFK automated PR review service driven by Copilot"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+ralph = "ralph_tools.main:main"
+ralph-fetch-threads = "ralph_tools.fetch_threads:main"
+
+[tool.setuptools.packages.find]
+include = ["ralph_tools*"]

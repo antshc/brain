@@ -1,11 +1,6 @@
 """Test double for GhCli — returns configured data without spawning subprocesses."""
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-
-from infrastructure.gh_cli import GhCli
+from ralph_tools.infrastructure.gh_cli import GhCli
 
 
 class FakeGhCli(GhCli):

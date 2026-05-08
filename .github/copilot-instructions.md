@@ -14,27 +14,33 @@ The codebase follows **Vertical Slice Architecture** — each feature owns all t
 
 ```
 ralph/
-├── afk-review-service.sh           # Shell entry point — cds into repo-dir, invokes review_service.py
+├── pyproject.toml                  # Package definition and CLI entry points
+├── afk-review.sh                   # Shell entry point — cds into repo-dir, invokes ralph_tools/main.py
 ├── prompt.md                       # Copilot agent instructions injected into every run
 ├── unit_tests/                     # uses for the unit tests
 ├── integration_tests/              # uses for integration tests
-├── app/
+├── ralph_tools/
 │   ├── main.py           # Orchestrator: arg parsing, delegate the call to the features
 │   ├── features/
-│   │   ├── usecase/
-│   │   │   ├── handler.py          # Entry point: fetch + classify for a PR URL
-│   │   │   ├── classifier.py       # Label detection and thread classification logic
-│   │   │   └── tests/
-│   │   │       └── classifier_test.py
+│   │   ├── fetch_threads/
+│   │   │   └── handler.py          # Entry point: fetch + classify for a PR URL
+│   │   ├── review_pull_request/
+│   │   │   └── handler.py          # Entry point: review a single PR
+│   │   └── review_pull_requests/
+│   │       └── handler.py          # Entry point: review all open PRs for a user
 │   ├── domain/
 │   │   ├── pull_request.py         # PullRequest dataclass (owner, repo, number, url)
 │   │   ├── review_thread.py        # ReviewThread dataclass + ThreadLabel enum
-│   │   └── execution_record.py     # ExecutionRecord dataclass (pr_url, count, last_run, last_threads)
+│   │   ├── execution_record.py     # ExecutionRecord dataclass (pr_url, count, last_run, last_threads)
+│   │   └── services/
+│   │       └── thread_filter.py    # ThreadFilter — filters actionable threads
 │   ├── infrastructure/
-│   │   ├── vcs_client.py            # Thin wrapper around the `gh` CLI (GraphQL + REST)
-│   │   └── ai_agent.py       # Thin wrapper around the `copilot` CLI
+│   │   ├── vcs_client.py           # Thin wrapper around the `gh` CLI (GraphQL + REST)
+│   │   ├── gh_cli.py               # Raw `gh` CLI invocations
+│   │   └── ai_agent.py             # Thin wrapper around the `copilot` CLI
 │   └── shared/
 │       ├── log.py                  # log_json() — structured JSON logging to stderr
+│       ├── execution_log.py        # ExecutionLog — daily per-repo retry tracking
 │       └── pr_url.py               # Parses GitHub PR URLs → (owner, repo, number)
 └── logs/                           # Runtime logs written by run_agent and track_execution
 ```

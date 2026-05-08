@@ -2,11 +2,11 @@
 
 import logging
 
-from domain.comment import Comment
-from domain.pull_request import PullRequest
-from domain.review_thread import ReviewThread
-from infrastructure.gh_cli import GhCli
-from shared.pr_url import parse_pr_url
+from ralph_tools.domain.comment import Comment
+from ralph_tools.domain.pull_request import PullRequest
+from ralph_tools.domain.review_thread import ReviewThread
+from ralph_tools.infrastructure.gh_cli import GhCli
+from ralph_tools.shared.pr_url import parse_pr_url
 
 logger = logging.getLogger(__name__)
 

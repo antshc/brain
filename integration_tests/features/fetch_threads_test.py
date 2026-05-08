@@ -21,9 +21,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from infrastructure.gh_cli import GhCli
-from infrastructure.vcs_client import VCSClient
-from features.fetch_threads.handler import fetch_threads
+from ralph_tools.infrastructure.gh_cli import GhCli
+from ralph_tools.infrastructure.vcs_client import VCSClient
+from ralph_tools.features.fetch_threads.handler import fetch_threads
 
 _PR_URL = "https://github.com/owner/repo/pull/1"
 
