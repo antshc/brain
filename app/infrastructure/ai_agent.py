@@ -9,9 +9,9 @@ from domain.review_thread import ReviewThread
 # infra → app → root
 _ROOT = Path(__file__).resolve().parent.parent.parent
 _LOG_DIR = _ROOT / "logs"
-_PROMPT_PATH = _ROOT / "prompt.md"
 
 _DEFAULT_MODEL = "claude-sonnet-4.6"
+_DEFAULT_PROMPT = "/review"
 
 _DENIED_TOOLS = [
     "shell(git reset)",
@@ -26,13 +26,13 @@ class AIAgent:
     def __init__(self, *, model: str = _DEFAULT_MODEL) -> None:
         self._model = model
 
-    def review(self, threads: list[ReviewThread]) -> None:
+    def review(self, threads: list[ReviewThread], prompt: str = _DEFAULT_PROMPT) -> None:
         """Build the prompt and run the Copilot agent on the given review threads."""
-        prompt = self._build_prompt(threads)
-        proc = self._run(prompt)
+        full_prompt = self._build_prompt(threads, prompt)
+        proc = self._run(full_prompt)
         self._stream_text(proc)
 
-    def _build_prompt(self, threads: list[ReviewThread]) -> str:
+    def _build_prompt(self, threads: list[ReviewThread], prompt: str) -> str:
         threads_data = [
             {
                 "thread_id": t.thread_id,
@@ -48,8 +48,7 @@ class AIAgent:
             for t in threads
         ]
         threads_json = json.dumps(threads_data, indent=2)
-        template = _PROMPT_PATH.read_text()
-        return f"# Review Threads\n\n{threads_json}\n\n{template}"
+        return f"{prompt}\n\n{threads_json}"
 
     def _run(self, prompt: str) -> subprocess.Popen:
         cmd = [

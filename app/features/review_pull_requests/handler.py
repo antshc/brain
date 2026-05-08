@@ -9,7 +9,7 @@ from shared.execution_log import ExecutionLog
 from shared.log import log_json
 
 
-def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_executions: int) -> None:
+def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_executions: int, prompt: str = "/review") -> None:
     """List open PRs for *github_user* and run the Copilot agent on actionable review threads.
 
     Args:
@@ -17,6 +17,7 @@ def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_
         github_repo:    Repository in owner/repo format.
         log_dir:        Directory where execution logs are written.
         max_executions: Maximum processing attempts per PR before skipping.
+        prompt:         Prompt text passed to the AI agent (default: "/review").
     """
     exec_log = ExecutionLog(log_dir, github_repo)
     thread_filter = ThreadFilter()
@@ -63,7 +64,7 @@ def review_pull_requests(github_user: str, github_repo: str, log_dir: Path, max_
 
         vcs.checkout_pr(pr.url)
 
-        AIAgent().review(actionable_threads)
+        AIAgent().review(actionable_threads, prompt)
 
         exec_log.update(pr.url, thread_ids)
         log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))

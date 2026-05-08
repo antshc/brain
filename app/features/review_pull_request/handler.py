@@ -11,13 +11,14 @@ from shared.log import log_json
 from shared.pr_url import parse_pr_url
 
 
-def review_pull_request(pr_url: str, log_dir: Path, max_executions: int) -> None:
+def review_pull_request(pr_url: str, log_dir: Path, max_executions: int, prompt: str = "/review") -> None:
     """Run the Copilot agent on actionable review threads for a single PR URL.
 
     Args:
         pr_url:         Full GitHub PR URL (e.g. https://github.com/owner/repo/pull/123).
         log_dir:        Directory where execution logs are written.
         max_executions: Maximum processing attempts before skipping.
+        prompt:         Prompt text passed to the AI agent (default: "/review").
     """
     owner, repo_name, number = parse_pr_url(pr_url)
     github_repo = f"{owner}/{repo_name}"
@@ -60,7 +61,7 @@ def review_pull_request(pr_url: str, log_dir: Path, max_executions: int) -> None
 
     vcs.checkout_pr(pr.url)
 
-    AIAgent().review(actionable_pr_threads)
+    AIAgent().review(actionable_pr_threads, prompt)
 
     exec_log.update(pr.url, thread_ids)
     log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))
