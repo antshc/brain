@@ -1,0 +1,3 @@
+[console_scripts]
+ralph = ralph_tools.main:main
+ralph-fetch-threads = ralph_tools.fetch_threads:main
