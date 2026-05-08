@@ -36,7 +36,10 @@ class AIAgent:
         threads_data = [
             {
                 "thread_id": t.thread_id,
-                "prefix": t.label.value,
+                "prefix": next(
+                    (lbl.value for c in reversed(t.comments) if (lbl := c.get_label()) is not None),
+                    "",
+                ),
                 "path": t.path,
                 "lines": t.lines,
                 "body": t.body,

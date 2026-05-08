@@ -1,8 +1,6 @@
-from dataclasses import InitVar, dataclass, field
+from dataclasses import dataclass
 
 from domain.comment import Comment
-from domain.thread_classification_policy import ThreadClassificationPolicy
-from domain.thread_label import ThreadLabel
 
 
 @dataclass
@@ -12,16 +10,28 @@ class ReviewThread:
     lines: str
     is_resolved: bool
     comments: list[Comment]
-    policy: InitVar[ThreadClassificationPolicy]
-    label: ThreadLabel = field(init=False)
-    body: str = field(init=False)
 
-    def __post_init__(self, policy: ThreadClassificationPolicy) -> None:
-        result = policy.classify_comments(self.comments)
-        if result is None:
-            raise ValueError(f"Thread {self.thread_id!r} is excluded or unclassifiable")
-        self.body, self.label = result
+    @property
+    def body(self) -> str:
+        labeled = next((c for c in reversed(self.comments) if c.get_label() is not None), None)
+        return labeled.body if labeled else (self.comments[0].body if self.comments else "")
 
     @property
     def is_actionable(self) -> bool:
-        return self.label.is_actionable()
+        if self.is_resolved:
+            return False
+        label = None
+        for comment in reversed(self.comments):
+            if comment.is_excluded():
+                return False
+            lbl = comment.get_label()
+            if lbl is not None:
+                label = lbl
+                break
+        if label is None:
+            if not self.comments:
+                return False
+            label = self.comments[0].get_label()
+        if not label:
+            return False
+        return label.is_actionable()
