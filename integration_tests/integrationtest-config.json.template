@@ -1,0 +1,9 @@
+{
+  "_comment": "Copy this file to integrationtest-config.json and fill in real values to run integration tests against live GitHub and Copilot CLI.",
+  "github_user": "your-github-username",
+  "github_repo": "owner/repo",
+  "pr_url": "https://github.com/owner/repo/pull/123",
+  "log_dir": "/tmp/ralph-integration-test-logs",
+  "max_executions": 1,
+  "prompt": "/review"
+}

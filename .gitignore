@@ -427,3 +427,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Integration test local config (contains real credentials/URLs)
+integrationtest-config.json
