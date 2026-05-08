@@ -1,3 +1,13 @@
+Metadata-Version: 2.4
+Name: ralph-tools
+Version: 0.1.0
+Summary: AFK automated PR review service driven by Copilot
+License: MIT
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+
 # ralph
 
 AFK automated PR review service. Finds open GitHub PRs, fetches unresolved review threads, and drives the Copilot CLI agent to address them.
