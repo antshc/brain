@@ -1,9 +1,9 @@
 """Fetch Threads use case: fetches actionable review threads for a single PR URL."""
 
-from domain.services.thread_filter import ThreadFilter
-from domain.review_thread import ReviewThread
-from infrastructure.vcs_client import VCSClient
-from shared.pr_url import parse_pr_url
+from ralph_tools.domain.services.thread_filter import ThreadFilter
+from ralph_tools.domain.review_thread import ReviewThread
+from ralph_tools.infrastructure.vcs_client import VCSClient
+from ralph_tools.shared.pr_url import parse_pr_url
 
 
 def fetch_threads(

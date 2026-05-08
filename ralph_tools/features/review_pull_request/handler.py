@@ -2,13 +2,13 @@
 
 from pathlib import Path
 
-from domain.pull_request import PullRequest
-from domain.services.thread_filter import ThreadFilter
-from infrastructure.ai_agent import AIAgent
-from infrastructure.vcs_client import VCSClient
-from shared.execution_log import ExecutionLog
-from shared.log import log_json
-from shared.pr_url import parse_pr_url
+from ralph_tools.domain.pull_request import PullRequest
+from ralph_tools.domain.services.thread_filter import ThreadFilter
+from ralph_tools.infrastructure.ai_agent import AIAgent
+from ralph_tools.infrastructure.vcs_client import VCSClient
+from ralph_tools.shared.execution_log import ExecutionLog
+from ralph_tools.shared.log import log_json
+from ralph_tools.shared.pr_url import parse_pr_url
 
 
 def review_pull_request(

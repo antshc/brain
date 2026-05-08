@@ -4,6 +4,18 @@ AFK automated PR review service. Finds open GitHub PRs, fetches unresolved revie
 
 ---
 
+## Installation
+
+```bash
+pip install git+https://github.com/antshc/ralph.git
+```
+
+This installs two CLI entry points: `ralph` and `ralph-fetch-threads`.
+
+**Prerequisites:** `gh` CLI (GitHub CLI), `copilot` CLI, and `git` must be available on your `PATH`.
+
+---
+
 ## Running
 
 ### Review PRs
@@ -11,13 +23,13 @@ AFK automated PR review service. Finds open GitHub PRs, fetches unresolved revie
 Process all open PRs for a user in a repository:
 
 ```bash
-python3 app/main.py review-prs <repo-dir> <github-user> <owner/repo> [max-executions] [--prompt <text>]
+ralph review-prs <repo-dir> <github-user> <owner/repo> [max-executions] [--prompt <text>]
 ```
 
 Process a single PR by URL:
 
 ```bash
-python3 app/main.py review-pr <repo-dir> <pr-url> [max-executions] [--prompt <text>]
+ralph review-pr <repo-dir> <pr-url> [max-executions] [--prompt <text>]
 ```
 
 | Argument | Description |
@@ -33,10 +45,10 @@ python3 app/main.py review-pr <repo-dir> <pr-url> [max-executions] [--prompt <te
 
 ```bash
 # All open PRs for user "alice" in owner/my-repo
-python3 app/main.py review-prs /path/to/repo alice owner/my-repo
+ralph review-prs /path/to/repo alice owner/my-repo
 
 # Single PR with a custom prompt and max 3 attempts
-python3 app/main.py review-pr /path/to/repo https://github.com/owner/my-repo/pull/42 3 --prompt /fix
+ralph review-pr /path/to/repo https://github.com/owner/my-repo/pull/42 3 --prompt /fix
 ```
 
 ---
@@ -46,7 +58,7 @@ python3 app/main.py review-pr /path/to/repo https://github.com/owner/my-repo/pul
 Fetch actionable review threads for a PR and print them as JSON to stdout. Useful for inspecting threads or piping into other tools (drop-in replacement for `fetch-threads.sh`).
 
 ```bash
-python3 app/fetch_threads.py <pr-url>
+ralph-fetch-threads <pr-url>
 ```
 
 | Argument | Description |
@@ -73,7 +85,7 @@ Output is a JSON array of actionable thread objects:
 **Example:**
 
 ```bash
-python3 app/fetch_threads.py https://github.com/owner/my-repo/pull/42
+ralph-fetch-threads https://github.com/owner/my-repo/pull/42
 ```
 
 ---

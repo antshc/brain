@@ -4,7 +4,7 @@ import json
 import subprocess
 from pathlib import Path
 
-from domain.review_thread import ReviewThread
+from ralph_tools.domain.review_thread import ReviewThread
 
 # infra → app → root
 _ROOT = Path(__file__).resolve().parent.parent.parent

@@ -6,13 +6,7 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
-import sys
-from pathlib import Path
-
-# unit_tests/domain/ → unit_tests/ → ralph root → app/
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "app"))
-
-from domain.thread_label import ThreadLabel
+from ralph_tools.domain.thread_label import ThreadLabel
 
 
 class TestThreadLabelActionability:

@@ -6,18 +6,14 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
-import sys
 from pathlib import Path
 from unittest.mock import MagicMock, call
 
-# integration_tests/features/ → integration_tests/ → ralph root → app/
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "app"))
-
-from infrastructure.ai_agent import AIAgent
-from infrastructure.gh_cli import GhCli
-from infrastructure.vcs_client import VCSClient
-from shared.execution_log import ExecutionLog
-from features.review_pull_request.handler import review_pull_request
+from ralph_tools.infrastructure.ai_agent import AIAgent
+from ralph_tools.infrastructure.gh_cli import GhCli
+from ralph_tools.infrastructure.vcs_client import VCSClient
+from ralph_tools.shared.execution_log import ExecutionLog
+from ralph_tools.features.review_pull_request.handler import review_pull_request
 
 _PR_URL = "https://github.com/owner/repo/pull/1"
 _LOG_DIR = Path("/tmp/ralph-test-logs")

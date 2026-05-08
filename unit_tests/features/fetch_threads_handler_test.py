@@ -6,17 +6,12 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
-import sys
-from pathlib import Path
 from unittest.mock import MagicMock
 
-# unit_tests/features/ → unit_tests/ → ralph root → app/
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "app"))
-
-from domain.comment import Comment
-from domain.review_thread import ReviewThread
-from features.fetch_threads.handler import fetch_threads
-from infrastructure.vcs_client import VCSClient
+from ralph_tools.domain.comment import Comment
+from ralph_tools.domain.review_thread import ReviewThread
+from ralph_tools.features.fetch_threads.handler import fetch_threads
+from ralph_tools.infrastructure.vcs_client import VCSClient
 
 
 def _make_thread(thread_id: str, body: str, resolved: bool = False) -> ReviewThread:

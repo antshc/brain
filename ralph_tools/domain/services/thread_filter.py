@@ -1,6 +1,6 @@
 """Classify review threads by priority."""
 
-from domain.review_thread import ReviewThread
+from ralph_tools.domain.review_thread import ReviewThread
 
 
 class ThreadFilter:

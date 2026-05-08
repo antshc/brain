@@ -5,7 +5,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from domain.execution_record import ExecutionRecord
+from ralph_tools.domain.execution_record import ExecutionRecord
 
 
 class ExecutionLog:

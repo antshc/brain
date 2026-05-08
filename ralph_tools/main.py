@@ -35,11 +35,8 @@ import re
 import sys
 from pathlib import Path
 
-# Add app/ to path so feature/domain/shared imports resolve
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from features.review_pull_requests.handler import review_pull_requests
-from features.review_pull_request.handler import review_pull_request
+from ralph_tools.features.review_pull_requests.handler import review_pull_requests
+from ralph_tools.features.review_pull_request.handler import review_pull_request
 
 DEFAULT_MAX_EXECUTIONS = 5
 
