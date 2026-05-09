@@ -1,9 +1,11 @@
 """Thin wrapper around the Copilot CLI for code-review operations."""
 
 import json
+import os
 import subprocess
 from pathlib import Path
 
+from afk.shared.log import log_json
 from modules.github.domain.review_thread import ReviewThread
 
 # infrastructure → afk → src → tools → brain (root)
@@ -20,6 +22,12 @@ _DENIED_TOOLS = [
 ]
 
 
+def _is_dry_run() -> bool:
+    """Return True (dry-run on) unless AFK_DRY_RUN is explicitly '0' or 'false'."""
+    val = os.environ.get("AFK_DRY_RUN", "1")
+    return val.lower() not in ("0", "false")
+
+
 class AIAgent:
     """Copilot CLI agent for automated code-review operations."""
 
@@ -30,7 +38,8 @@ class AIAgent:
         """Build the prompt and run the Copilot agent on the given review threads."""
         full_prompt = self._build_prompt(threads, prompt)
         proc = self._run(full_prompt)
-        self._stream_text(proc)
+        if proc is not None:
+            self._stream_text(proc)
 
     def _build_prompt(self, threads: list[ReviewThread], prompt: str) -> str:
         threads_data = [
@@ -50,7 +59,7 @@ class AIAgent:
         threads_json = json.dumps(threads_data, indent=2)
         return f"{prompt}\n\n{threads_json}"
 
-    def _run(self, prompt: str) -> subprocess.Popen:
+    def _run(self, prompt: str) -> subprocess.Popen | None:
         cmd = [
             "copilot",
             "-p", prompt,
@@ -62,6 +71,10 @@ class AIAgent:
         ]
         for tool in _DENIED_TOOLS:
             cmd.extend(["--deny-tool", tool])
+
+        if _is_dry_run():
+            log_json("info", "dry-run: skipping copilot agent", command=str(cmd))
+            return None
 
         return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
