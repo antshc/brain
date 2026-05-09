@@ -3,9 +3,9 @@
 from pathlib import Path
 
 from modules.github.domain.services.thread_filter import ThreadFilter
-from modules.github.infrastructure.ai_agent import AIAgent
+from ralph.infrastructure.ai_agent import AIAgent
 from modules.github.infrastructure.vcs_client import VCSClient
-from modules.github.shared.execution_log import ExecutionLog
+from ralph.shared.execution_log import ExecutionLog
 from modules.github.shared.log import log_json
 
 
