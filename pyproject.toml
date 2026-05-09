@@ -3,7 +3,7 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ralph-tools"
+name = "brain-tools"
 version = "0.1.0"
 description = "AFK automated PR review service driven by Copilot"
 readme = "README.md"
@@ -15,8 +15,8 @@ dependencies = []
 dev = ["pytest"]
 
 [project.scripts]
-ralph = "ralph_tools.main:main"
-ralph-fetch-threads = "ralph_tools.fetch_threads:main"
+ralph = "brain_tools.ralph:main"
+fetch-threads-script = "brain_tools.fetch_threads:main"
 
 [tool.setuptools.packages.find]
-include = ["ralph_tools*"]
+include = ["brain_tools*"]
