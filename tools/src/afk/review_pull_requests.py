@@ -2,22 +2,14 @@
 """Entry point for the AFK review service.
 
 Parses arguments, validates inputs, and delegates to the review use case.
-
-Usage:
-    python review_pull_requests.py <repo-dir> <github-user> <owner/repo> [max-executions] [--prompt <text>]
-
-Arguments:
-    repo-dir        Path to the local repository clone.
-    github-user     GitHub username to filter open PRs by author.
-    owner/repo      GitHub repository in owner/repo format.
-    max-executions  Max processing attempts per PR before skipping (default: 5).
-    --prompt        Prompt text passed to the AI agent (default: /review).
+Run with --help for usage.
 
 Exit codes:
     0 - success (may have 0 PRs to process)
-    1 - usage / argument error
+    2 - usage / argument error (argparse default)
 """
 
+import argparse
 import logging
 import os
 import re
@@ -28,62 +20,44 @@ from afk.features.review_pull_requests.handler import review_pull_requests
 
 DEFAULT_MAX_EXECUTIONS = 5
 
-_USAGE = (
-    "Usage:\n"
-    "  review_pull_requests.py <repo-dir> <github-user> <owner/repo> [max-executions] [--prompt <text>]"
-)
 
-
-def _parse_repo_dir(value: str) -> Path:
+def _repo_dir(value: str) -> Path:
     repo_dir = Path(value).resolve()
     if not repo_dir.is_dir():
-        print(f"Error: repo-dir does not exist: {repo_dir}", file=sys.stderr)
-        sys.exit(1)
+        raise argparse.ArgumentTypeError(f"repo-dir does not exist: {repo_dir}")
     return repo_dir
 
 
-def _parse_max_executions(value: str) -> int:
-    try:
-        return int(value)
-    except ValueError:
-        print(f"Error: max-executions must be an integer, got: {value}", file=sys.stderr)
-        sys.exit(1)
+def _github_repo(value: str) -> str:
+    if not re.match(r"^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$", value):
+        raise argparse.ArgumentTypeError(f"Invalid repo format. Expected owner/repo, got: {value}")
+    return value
 
 
-def _parse_prompt(args: list[str]) -> tuple[str, list[str]]:
-    """Extract --prompt value from args, return (prompt, remaining_args)."""
-    if "--prompt" in args:
-        idx = args.index("--prompt")
-        if idx + 1 >= len(args):
-            print("Error: --prompt requires a value", file=sys.stderr)
-            sys.exit(1)
-        prompt = args[idx + 1]
-        remaining = args[:idx] + args[idx + 2:]
-        return prompt, remaining
-    return "/review", args
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="review_pull_requests.py",
+        description="AFK automated PR review service.",
+    )
+    parser.add_argument("repo_dir", type=_repo_dir, metavar="repo-dir",
+                        help="Path to the local repository clone.")
+    parser.add_argument("github_user", metavar="github-user",
+                        help="GitHub username to filter open PRs by author.")
+    parser.add_argument("github_repo", type=_github_repo, metavar="owner/repo",
+                        help="GitHub repository in owner/repo format.")
+    parser.add_argument("max_executions", nargs="?", type=int, default=DEFAULT_MAX_EXECUTIONS,
+                        metavar="max-executions",
+                        help=f"Max processing attempts per PR before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
+    parser.add_argument("--prompt", default="/review",
+                        help="Prompt text passed to the AI agent (default: /review).")
+    return parser
 
 
 def main() -> None:
-    if len(sys.argv) < 2:
-        print(_USAGE, file=sys.stderr)
-        sys.exit(1)
+    parser = _build_parser()
+    args = parser.parse_args()
 
-    args = sys.argv[1:]
-    prompt, args = _parse_prompt(args)
     logging.basicConfig(level=logging.DEBUG if "AFK_DEBUG" in os.environ else logging.WARNING)
     log_dir = Path(__file__).resolve().parent.parent.parent.parent / "logs"
 
-    if len(args) < 3 or len(args) > 4:
-        print(_USAGE, file=sys.stderr)
-        sys.exit(1)
-
-    _parse_repo_dir(args[0])
-    github_user = args[1]
-    github_repo = args[2]
-    max_executions = _parse_max_executions(args[3]) if len(args) == 4 else DEFAULT_MAX_EXECUTIONS
-
-    if not re.match(r"^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$", github_repo):
-        print(f"Error: Invalid repo format. Expected owner/repo, got: {github_repo}", file=sys.stderr)
-        sys.exit(1)
-
-    review_pull_requests(github_user, github_repo, log_dir, max_executions, prompt)
+    review_pull_requests(args.github_user, args.github_repo, log_dir, args.max_executions, args.prompt)
