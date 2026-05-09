@@ -15,11 +15,11 @@ dependencies = []
 dev = ["pytest"]
 
 [project.scripts]
-ralph = "ralph.main:main"
+ralph = "afk.main:main"
 
 [tool.setuptools.packages.find]
 where = ["tools/src"]
-include = ["ralph*", "modules*"]
+include = ["afk*", "modules*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tools/tests"]

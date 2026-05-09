@@ -6,7 +6,7 @@ from pathlib import Path
 
 from modules.github.domain.review_thread import ReviewThread
 
-# infrastructure → ralph → src → tools → brain (root)
+# infrastructure → afk → src → tools → brain (root)
 _ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 _LOG_DIR = _ROOT / "logs"
 

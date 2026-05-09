@@ -9,11 +9,11 @@ When a test or scenario changes, update both sides to stay in sync.
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from ralph.infrastructure.ai_agent import AIAgent
+from afk.infrastructure.ai_agent import AIAgent
 from modules.github.infrastructure.gh_cli import GhCli
 from modules.github.infrastructure.vcs_client import VCSClient
-from ralph.shared.execution_log import ExecutionLog
-from ralph.features.review_pull_requests.handler import review_pull_requests
+from afk.shared.execution_log import ExecutionLog
+from afk.features.review_pull_requests.handler import review_pull_requests
 
 _USER = "dev"
 _REPO = "owner/repo"
