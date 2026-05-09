@@ -10,42 +10,34 @@
 
 ### Folder Structure
 
-The codebase follows **Vertical Slice Architecture** — each feature owns all the logic it needs. Cross-cutting concerns live in `shared/`; external system adapters live in `infrastructure/`.
+Vertical Slice Architecture — each feature owns all the logic it needs. Cross-cutting concerns live in `shared/`; external adapters in `infrastructure/`.
 
 ```
-ralph/
-├── pyproject.toml                  # Package definition and CLI entry points
-├── afk-review.sh                   # Shell entry point — cds into repo-dir, invokes ralph_tools/main.py
-├── prompt.md                       # Copilot agent instructions injected into every run
-├── unit_tests/                     # uses for the unit tests
-├── integration_tests/              # uses for integration tests
-├── ralph_tools/
-│   ├── main.py           # Orchestrator: arg parsing, delegate the call to the features
-│   ├── features/
-│   │   ├── fetch_threads/
-│   │   │   └── handler.py          # Entry point: fetch + classify for a PR URL
-│   │   ├── review_pull_request/
-│   │   │   └── handler.py          # Entry point: review a single PR
-│   │   └── review_pull_requests/
-│   │       └── handler.py          # Entry point: review all open PRs for a user
-│   ├── domain/
-│   │   ├── pull_request.py         # PullRequest dataclass (owner, repo, number, url)
-│   │   ├── review_thread.py        # ReviewThread dataclass + ThreadLabel enum
-│   │   ├── execution_record.py     # ExecutionRecord dataclass (pr_url, count, last_run, last_threads)
-│   │   └── services/
-│   │       └── thread_filter.py    # ThreadFilter — filters actionable threads
-│   ├── infrastructure/
-│   │   ├── vcs_client.py           # Thin wrapper around the `gh` CLI (GraphQL + REST)
-│   │   ├── gh_cli.py               # Raw `gh` CLI invocations
-│   │   └── ai_agent.py             # Thin wrapper around the `copilot` CLI
-│   └── shared/
-│       ├── log.py                  # log_json() — structured JSON logging to stderr
-│       ├── execution_log.py        # ExecutionLog — daily per-repo retry tracking
-│       └── pr_url.py               # Parses GitHub PR URLs → (owner, repo, number)
-└── logs/                           # Runtime logs written by run_agent and track_execution
+brain/
+├── .githooks/pre-commit            # Syncs modules into plugins/skills before each commit
+├── pyproject.toml
+├── plugins/                        # Copilot agent plugins
+├── skills/                         # Copilot agent skills
+├── tools/
+│   ├── src/
+│   │   ├── modules/                # Shared Python modules — source of truth
+│   │   │   └── github/             # GitHub domain + infrastructure (domain/, features/, infrastructure/, shared/)
+│   │   └── ralph/                  # ralph CLI tool
+│   │       ├── main.py             # Orchestrator: arg parsing, delegates to features
+│   │       └── features/           # review_pull_request/, review_pull_requests/
+│   └── tests/
+│       ├── unit/                   # Unit tests mirroring src/ structure
+│       └── integration/            # Integration tests
+└── logs/                           # Runtime logs (daily JSON per repo)
 ```
 
-Each feature's `handler.py` is the only public entry point for that slice. Do not call `classifier.py` or `prompt_builder.py` directly from outside their slice.
+### Module Sync (pre-commit hook)
+
+`modules/` contains shared Python code used by skills. The pre-commit hook (`./githooks/pre-commit`) syncs each module into the plugin/skill that consumes it using `rsync`. Paths in the hook are relative to the repo root. Example: `tools/src/modules/github/` → `plugins/review/skills/fix/github/`.
+
+- **Edit source in `tools/src/modules/<module>/`** — NEVER EDIT the copy inside `plugins/`.
+- Import paths inside a skill use relative imports matching the synced destination folder name.
+- Add new module→destination mappings to `.githooks/pre-commit`.
 
 ### Domain Entities
 
@@ -86,35 +78,22 @@ All values must be strings. Output goes to stderr as newline-delimited JSON.
 
 Use `python3` — `python` is not available in this environment.
 
-## Test writing Guidelines
+## Tests
 
-- Tests live in `unit_tests/`m `integration_tests` and mirror the module they test.
-- Every test must be traceable to a scenario in `TEST_PLAN.md`:
+- Tests live in `tools/tests/unit/` and `tools/tests/integration/`, mirroring `tools/src/`.
+- Every test is traceable to a scenario in `TEST_PLAN.md`:
   - Test class docstring → Feature name (e.g., `"Feature: Comment Label Detection"`).
-  - Test method name → Scenario name in snake_case and the comment under the Test method name with the scenario name `Scenario: a ReviewThread from a raw dict.`.
-  - When a test or scenario changes, update both sides to keep the mapping in sync.
-
-## Running Tests
-
-Tests use `pytest` via the `python3 -m pytest` invocation. Run all tests from the repo root:
-
-```bash
-python3 -m pytest app/
-```
-
-Run a specific test file:
-
-```bash
-python3 -m pytest app/features/review/tests/classifier_test.py -v
-```
-
-Test files add `app/` to `sys.path` manually, so no `PYTHONPATH` export is needed.
+  - Test method name → Scenario name in snake_case; add `# Scenario: ...` comment below the def.
+  - Keep both sides in sync when changing a test or scenario.
+- Run all tests: `python3 -m pytest tools/` from repo root.
+- Run a specific file: `python3 -m pytest tools/tests/unit/domain/thread_label_test.py -v`.
 
 
 ## General Guidelines
 
 - Each module has a single, clearly named responsibility — do not merge concerns.
-- All GitHub I/O goes through `gh_client.py`; all Copilot I/O through `copilot_client.py`.
-- Prefer `subprocess.run(..., check=True)` and let errors bubble — no silent failures.
+- All GitHub I/O goes through `infrastructure/` adapters; never call GitHub APIs directly over HTTP.
+- Prefer `subprocess.run(..., check=True)` — let errors bubble, no silent failures.
 - Use `pathlib.Path` for all file system operations.
+- Edit shared code in `tools/src/modules/` only; the pre-commit hook propagates changes to plugins.
 
