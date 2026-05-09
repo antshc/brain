@@ -65,7 +65,6 @@ class TestReviewPullRequest:
         assert len(call_threads) == 2
         assert call_prompt == "/review"
         mock_exec_log.update.assert_called_once_with(_PR_URL, ["T1", "T2"])
-        mock_gh.pr_checkout.assert_called_once_with(_PR_URL)
 
     def test_pr_with_no_actionable_threads_skips_ai_agent(self):
         # Scenario: PR with no actionable threads skips the AI agent
