@@ -9,7 +9,7 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
 1. `gh pr checkout <number> --repo <owner>/<repo>`
-2. `<skill-directory>/scripts/run-fetch-threads.sh <pr_url>`
+2. `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads sorted by priority (`fix!` before `suggest!`). Each thread has: `thread_id`, `prefix`, `path`, `lines`, `body`, `discussion`.
 
