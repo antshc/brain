@@ -5,11 +5,6 @@
     },
     "plugins": [
         {
-            "name": "dotnet",
-            "source": "./plugins/dotnet",
-            "description": "Common everyday C#/.NET coding skills. Expected to be useful to all .NET developers."
-        },
-        {
             "name": "review",
             "source": "./plugins/review",
             "description": "PR code review skills with modular standards and guidance."
@@ -20,9 +15,9 @@
             "description": "Common everyday workflow automation skills. Expected to be useful to all developers."
         },
         {
-            "name": "zvm",
-            "source": "./plugins/zvm",
-            "description": "Plugin for managing the Zerto project."
+            "name": "ralph",
+            "source": "./plugins/ralph",
+            "description": "ralph AFK PR review automation skills."
         }
     ]
 }
