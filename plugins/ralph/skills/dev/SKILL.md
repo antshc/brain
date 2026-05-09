@@ -5,7 +5,7 @@ description: AFK autonomous development loop — picks the next open issue, impl
 
 # Setup
 
-Run the following commands and print their output so it is available as context:
+Run the following commands and print their output so it is available as context. If output is empty or unavailable, proceed with what is present:
 
 ```bash
 commits=$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found")
@@ -13,6 +13,8 @@ issues=$(gh issue list --state open --json number,title,body,comments)
 echo "=== COMMITS ==="; echo "$commits"
 echo "=== ISSUES ==="; echo "$issues"
 ```
+
+If both `COMMITS` and `ISSUES` are empty or unavailable, output <promise>NO CONTEXT AVAILABLE</promise>.
 
 # ISSUES
 
