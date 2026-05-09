@@ -1,0 +1,269 @@
+[
+  {
+    "id": "PRRT_kwDORpwshM58wGpP",
+    "isResolved": true,
+    "path": "main/Tests/Zerto.PromotionWorker.Accessors.JournalCache.UnitTests/CachedObjectAccessTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: use the m_sut instead of new instance creation"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM58wGut",
+    "isResolved": true,
+    "path": "main/Tests/Zerto.PromotionWorker.Accessors.JournalCache.UnitTests/CachedObjectAccessTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: use the m_sut instead of new instance creation"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM58wHs-",
+    "isResolved": true,
+    "path": "main/Tests/Zerto.PromotionWorker.Accessors.JournalCache.UnitTests/CachedObjectAccessTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: use [Theory] for the IsAvailable_WhenDirectoryDoesNotExist_ReturnsFalse and IsAvailable_WhenDirectoryExists_ReturnsTrue"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM58wIXF",
+    "isResolved": true,
+    "path": "main/Tests/Zerto.PromotionWorker.Accessors.JournalCache.UnitTests/CachedObjectAccessTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: use [Theory] for the IsAvailable_WhenRootPathIsEmpty_ReturnsFalse and the IsAvailable_WhenRootPathIsNull_ReturnsFalse"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM58wLfS",
+    "isResolved": true,
+    "path": "main/Tests/Zerto.PromotionWorker.Accessors.JournalCache.UnitTests/JournalCacheAccessorTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: use the [Theory] for IsAvailable_WhenDelegateReturnsTrue_ReturnsTrue and IsAvailable_WhenDelegateReturnsFalse_ReturnsFalse"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM58wWoB",
+    "isResolved": true,
+    "path": "main/Zerto.PromotionWorker.Accessors.JournalCache/JournalCacheAccessorsModule.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "**nit:** `ICachedObjectStorageAccess` is registered in the DI container but never resolved \u2014 no class or service requests it. It exists only as a base interface for `ICachedObjectAccess` (which is already registered). Consider removing this registration to avoid dead wiring that could confuse future readers."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM58wWyl",
+    "isResolved": true,
+    "path": "main/Zerto.PromotionWorker.Accessors.JournalCache/ICachedObjectAccess.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: Remove inheritance of the ICachedObjectStorageAccess, the JournalCacheAccessor must inject the ICachedObjectStorageAccess. check the build and the test after the fix."
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM59Fjza",
+    "isResolved": false,
+    "path": "core/Zerto.PromotionWorker.Accessors.Abstractions/IJournalCacheStorageAccessor.cs",
+    "line": 3,
+    "startLine": 3,
+    "comments": [
+      {
+        "author": {
+          "login": "vasyl-prystoinyi_hpeprod"
+        },
+        "body": "It looks like overhead. Why don't extend the IJournalCacheAccessor  and use it in JournalCacheCleanupHostedService.cs\u200e?"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "The implementation decision was chosen because IJournalCacheAccessor is about working with the cache objects and the IJournalCacheStorageAccessor is about storage itself, defferent responsibilities"
+      },
+      {
+        "author": {
+          "login": "vasyl-prystoinyi_hpeprod"
+        },
+        "body": "Why does the manager/engine level need to care about the cache storage? Why can\u2019t IJournalCacheAccessor encapsulate the ability to indicate whether the cache can be used or not? Or let's name the IJournalCacheStorageAccessor as IJournalCacheAvailabilityAccessor"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Accessors works with the resources. The design idea is the JournalCacheStorage is represent the object storage metadata resource, it could expose the storage resource metadata such as lifecycle, free space, availability and access status.\r\nNaming the class Availability focuses on only one aspect, reduces reusability, and may lead to extra fragmented classes later."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM59F1k5",
+    "isResolved": false,
+    "path": "main/Zerto.PromotionWorker.Accessors.JournalCache/ICachedObjectStorageAccess.cs",
+    "line": 3,
+    "startLine": 3,
+    "comments": [
+      {
+        "author": {
+          "login": "vasyl-prystoinyi_hpeprod"
+        },
+        "body": "Why don't use just ICachedObjectAccess?"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "The implementation decision was chosen because ICacheObjectAccess is about working with the cache objects and the ICachedObjectStorageAccess is about storage itself, defferent responsibilities"
+      },
+      {
+        "author": {
+          "login": "vasyl-prystoinyi_hpeprod"
+        },
+        "body": "I don\u2019t see any reason why cache availability cannot be defined in the main abstraction. I understand this separation from the Single Responsibility Principle perspective, but in this specific case it feels like unnecessary overhead.\r\n\r\nHow is this different from the CanWrite method?"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "It more interface segragation principle, because the logic still in the CachedObjecAccess implementation class. In the current implementation CanWrite is works on the cache object level and check if it possible to write an object itself. ICachedObjectStorageAccess checks the storage itself, it also can have the connection to the storage etc..."
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "I looked to the interfaces and i think the better name for the ICachedObjectStorageAccess will be the ICacheStorageInfoAccess mirrors the DriveInfo. ICacheStorageInfoAccessor(IJournalCacheStorageAccessor). It can have to methods IsConfigured(IsAvailable) and IsFull (CanWrite). In the JournalCacheAccessor the logic will be more descriptive if(!cacheStorage.IsFull() then write. and in the JournalCacheCleanupHostedService will be CacheStorageInfo.IsConfigured(). What do you think?"
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM59F3Fs",
+    "isResolved": true,
+    "path": "main/Tests/Zerto.PromotionWorker.Accessors.JournalCache.UnitTests/JournalCacheAccessorTests.cs",
+    "line": 384,
+    "startLine": 384,
+    "comments": [
+      {
+        "author": {
+          "login": "vasyl-prystoinyi_hpeprod"
+        },
+        "body": "the \"Arrange,Act,Assert\" comments are missing"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: Add the Arrange,Act,Assert comments in the test method where they missed."
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  },
+  {
+    "id": "PRRT_kwDORpwshM59F9m2",
+    "isResolved": false,
+    "path": "main/Tests/Zerto.PromotionWorker.Accessors.JournalCache.UnitTests/CachedObjectAccessTests.cs",
+    "line": null,
+    "startLine": null,
+    "comments": [
+      {
+        "author": {
+          "login": "vasyl-prystoinyi_hpeprod"
+        },
+        "body": "Name violates the \"MethodName_Scenario_ExpectedBehavior\" test naming convention "
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "fix!: Rename the test to IsAvailable_DirectoryExist_ReturnsAvailability"
+      },
+      {
+        "author": {
+          "login": "anton-shcherbyna_hpeprod"
+        },
+        "body": "Fixed."
+      }
+    ]
+  }
+]

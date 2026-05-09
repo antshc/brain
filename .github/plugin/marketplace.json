@@ -1,0 +1,28 @@
+{
+    "name": "csharp-skills",
+    "owner": {
+        "name": "anton.shcherbyna"
+    },
+    "plugins": [
+        {
+            "name": "dotnet",
+            "source": "./plugins/dotnet",
+            "description": "Common everyday C#/.NET coding skills. Expected to be useful to all .NET developers."
+        },
+        {
+            "name": "review",
+            "source": "./plugins/review",
+            "description": "PR code review skills with modular standards and guidance."
+        },
+        {
+            "name": "wf",
+            "source": "./plugins/wf",
+            "description": "Common everyday workflow automation skills. Expected to be useful to all developers."
+        },
+        {
+            "name": "zvm",
+            "source": "./plugins/zvm",
+            "description": "Plugin for managing the Zerto project."
+        }
+    ]
+}

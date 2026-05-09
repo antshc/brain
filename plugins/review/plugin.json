@@ -1,0 +1,6 @@
+{
+  "name": "review",
+  "version": "1.0.1",
+  "description": "PR code review skills with modular standards and guidance.",
+  "skills": ["./skills"]
+}
