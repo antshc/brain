@@ -16,6 +16,7 @@ def review_pull_requests(
     max_executions: int,
     prompt: str = "/review",
     *,
+    agent_name: str = "copilot",
     vcs: VCSClient | None = None,
     agent: AIAgent | None = None,
     exec_log: ExecutionLog | None = None,
@@ -75,7 +76,7 @@ def review_pull_requests(
             pr_url=pr.url, threads=str(len(actionable_threads)), attempt=str(exec_count + 1),
         )
 
-        (agent or AIAgent()).run(actionable_threads, prompt)
+        (agent or AIAgent(alias=agent_name, prompt=prompt)).run()
 
         exec_log.update(pr.url, thread_ids)
         log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))

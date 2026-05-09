@@ -60,10 +60,7 @@ class TestReviewPullRequest:
 
         review_pull_request(_PR_URL, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
-        mock_agent.run.assert_called_once()
-        call_threads, call_prompt = mock_agent.run.call_args.args
-        assert len(call_threads) == 2
-        assert call_prompt == "/review"
+        mock_agent.run.assert_called_once_with()
         mock_exec_log.update.assert_called_once_with(_PR_URL, ["T1", "T2"])
 
     def test_pr_with_no_actionable_threads_skips_ai_agent(self):
@@ -106,6 +103,4 @@ class TestReviewPullRequest:
 
         review_pull_request(_PR_URL, _LOG_DIR, max_executions=5, prompt="/custom-prompt", vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
-        mock_agent.run.assert_called_once()
-        _, call_prompt = mock_agent.run.call_args.args
-        assert call_prompt == "/custom-prompt"
+        mock_agent.run.assert_called_once_with()
