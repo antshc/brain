@@ -9,10 +9,10 @@ When a test or scenario changes, update both sides to stay in sync.
 from pathlib import Path
 from unittest.mock import MagicMock, call
 
-from modules.github.infrastructure.ai_agent import AIAgent
+from ralph.infrastructure.ai_agent import AIAgent
 from modules.github.infrastructure.gh_cli import GhCli
 from modules.github.infrastructure.vcs_client import VCSClient
-from modules.github.shared.execution_log import ExecutionLog
+from ralph.shared.execution_log import ExecutionLog
 from ralph.features.review_pull_request.handler import review_pull_request
 
 _PR_URL = "https://github.com/owner/repo/pull/1"

@@ -4,10 +4,10 @@ import json
 import subprocess
 from pathlib import Path
 
-from ..domain.review_thread import ReviewThread
+from modules.github.domain.review_thread import ReviewThread
 
-# infra → github → modules → src → tools → root
-_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
+# infrastructure → ralph → src → tools → brain (root)
+_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 _LOG_DIR = _ROOT / "logs"
 
 _DEFAULT_MODEL = "claude-sonnet-4.6"
