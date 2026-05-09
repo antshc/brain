@@ -33,11 +33,15 @@ brain/
 
 ### Module Sync (pre-commit hook)
 
-`modules/` contains shared Python code used by skills. The pre-commit hook (`./githooks/pre-commit`) syncs each module into the plugin/skill that consumes it using `rsync`. Paths in the hook are relative to the repo root. Example: `tools/src/modules/github/` → `plugins/review/skills/fix/github/`.
+`modules/` contains shared Python code used by skills. The pre-commit hook (`./githooks/pre-commit`) syncs each module into the plugin/skill that consumes it using `rsync`. Paths in the hook are relative to the repo root. Example: `tools/src/modules/github/` → `plugins/ralph/skills/fix/github/`.
 
 - **Edit source in `tools/src/modules/<module>/`** — NEVER EDIT the copy inside `plugins/`.
 - Import paths inside a skill use relative imports matching the synced destination folder name.
 - Add new module→destination mappings to `.githooks/pre-commit`.
+
+### Plugin Marketplace
+
+All plugins are registered in `.github/plugin/marketplace.json`. **When adding, renaming, or deleting a plugin under `plugins/`, always update `marketplace.json` to match.**
 
 ### Domain Entities
 
