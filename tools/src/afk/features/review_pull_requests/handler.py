@@ -75,7 +75,7 @@ def review_pull_requests(
             pr_url=pr.url, threads=str(len(actionable_threads)), attempt=str(exec_count + 1),
         )
 
-        (agent or AIAgent()).review(actionable_threads, prompt)
+        (agent or AIAgent()).run(actionable_threads, prompt)
 
         exec_log.update(pr.url, thread_ids)
         log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))

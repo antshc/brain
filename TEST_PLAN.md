@@ -403,7 +403,7 @@ Scenario: PR with actionable threads triggers the AI agent
     And max_executions is 5
   When review_pull_request() is called
   Then the VCS client checks out the PR branch
-    And AIAgent.review() is called with the 2 actionable threads and the prompt
+    And AIAgent.run() is called with the 2 actionable threads and the prompt
     And the execution log is updated with the PR URL and thread IDs
 
 Scenario: PR with no actionable threads skips the AI agent
@@ -411,7 +411,7 @@ Scenario: PR with no actionable threads skips the AI agent
     And the VCS returns 1 resolved thread and 1 thread with label "nit:"
     And the execution count for the PR is 0
   When review_pull_request() is called
-  Then AIAgent.review() is NOT called
+  Then AIAgent.run() is NOT called
     And the execution log is NOT updated
 
 Scenario: PR with no actionable threads resets execution count if previously processed
@@ -419,7 +419,7 @@ Scenario: PR with no actionable threads resets execution count if previously pro
     And the VCS returns no actionable threads
     And the execution count for the PR is 2
   When review_pull_request() is called
-  Then AIAgent.review() is NOT called
+  Then AIAgent.run() is NOT called
     And the execution log reset() is called for the PR
 
 Scenario: PR at max executions is skipped
@@ -428,7 +428,7 @@ Scenario: PR at max executions is skipped
     And the execution count for the PR is 5
     And max_executions is 5
   When review_pull_request() is called
-  Then AIAgent.review() is NOT called
+  Then AIAgent.run() is NOT called
     And the execution log is NOT updated
 
 Scenario: Custom prompt is passed to the AI agent
@@ -437,7 +437,7 @@ Scenario: Custom prompt is passed to the AI agent
     And the execution count is 0
     And the prompt is "/custom-prompt"
   When review_pull_request() is called
-  Then AIAgent.review() is called with prompt "/custom-prompt"
+  Then AIAgent.run() is called with prompt "/custom-prompt"
 ```
 
 **Coverage:** Integration test
@@ -455,14 +455,14 @@ Scenario: Multiple PRs with actionable threads are all processed
     And each PR has at least 1 actionable thread
     And execution counts are 0 for both PRs
   When review_pull_requests() is called
-  Then AIAgent.review() is called twice (once per PR)
+  Then AIAgent.run() is called twice (once per PR)
     And the execution log is updated for each PR
 
 Scenario: No open PRs found — early exit
   Given github_user "dev" and github_repo "owner/repo"
     And no open PRs exist for user "dev"
   When review_pull_requests() is called
-  Then AIAgent.review() is NOT called
+  Then AIAgent.run() is NOT called
 
 Scenario: Mix of actionable and non-actionable PRs
   Given github_user "dev" and github_repo "owner/repo"
@@ -471,8 +471,8 @@ Scenario: Mix of actionable and non-actionable PRs
     And PR #2 has only non-actionable threads
     And PR #3 has actionable threads
   When review_pull_requests() is called
-  Then AIAgent.review() is called for PR #1 and PR #3
-    And AIAgent.review() is NOT called for PR #2
+  Then AIAgent.run() is called for PR #1 and PR #3
+    And AIAgent.run() is NOT called for PR #2
 
 Scenario: PR at max executions is skipped while others are processed
   Given github_user "dev" and github_repo "owner/repo"
@@ -482,7 +482,7 @@ Scenario: PR at max executions is skipped while others are processed
     And both have actionable threads
     And max_executions is 5
   When review_pull_requests() is called
-  Then AIAgent.review() is called only for PR #2
+  Then AIAgent.run() is called only for PR #2
 
 Scenario: PR with no actionable threads and prior count resets execution log
   Given github_user "dev" and github_repo "owner/repo"

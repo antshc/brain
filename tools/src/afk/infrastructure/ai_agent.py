@@ -1,6 +1,5 @@
 """Thin wrapper around the Copilot CLI for code-review operations."""
 
-import json
 import os
 import subprocess
 from pathlib import Path
@@ -34,30 +33,11 @@ class AIAgent:
     def __init__(self, *, model: str = _DEFAULT_MODEL) -> None:
         self._model = model
 
-    def review(self, threads: list[ReviewThread], prompt: str = _DEFAULT_PROMPT) -> None:
-        """Build the prompt and run the Copilot agent on the given review threads."""
-        full_prompt = self._build_prompt(threads, prompt)
-        proc = self._run(full_prompt)
+    def run(self, threads: list[ReviewThread], prompt: str = _DEFAULT_PROMPT) -> None:
+        """Run the Copilot agent on the given review threads."""
+        proc = self._run(prompt)
         if proc is not None:
             self._stream_text(proc)
-
-    def _build_prompt(self, threads: list[ReviewThread], prompt: str) -> str:
-        threads_data = [
-            {
-                "thread_id": t.thread_id,
-                "prefix": next(
-                    (lbl.value for c in reversed(t.comments) if (lbl := c.get_label()) is not None),
-                    "",
-                ),
-                "path": t.path,
-                "lines": t.lines,
-                "actionable_comment": t.actionable_comment,
-                "comments": [{"author": c.author, "body": c.body} for c in t.comments],
-            }
-            for t in threads
-        ]
-        threads_json = json.dumps(threads_data, indent=2)
-        return f"{prompt}\n\n{threads_json}"
 
     def _run(self, prompt: str) -> subprocess.Popen | None:
         cmd = [

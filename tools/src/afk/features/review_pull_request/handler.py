@@ -73,7 +73,7 @@ def review_pull_request(
 
     vcs.checkout_pr(pr.url)
 
-    (agent or AIAgent()).review(actionable_pr_threads, prompt)
+    (agent or AIAgent()).run(actionable_pr_threads, prompt)
 
     exec_log.update(pr.url, thread_ids)
     log_json("info", "Completed PR processing", pr_url=pr.url, attempt=str(exec_count + 1))

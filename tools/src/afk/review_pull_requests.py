@@ -50,6 +50,9 @@ def _build_parser() -> argparse.ArgumentParser:
                         help=f"Max processing attempts per PR before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
     parser.add_argument("--prompt", default="/review",
                         help="Prompt text passed to the AI agent (default: /review).")
+    parser.add_argument("--log-dir", type=Path, default=Path(__file__).resolve().parent.parent.parent.parent / "logs",
+                        metavar="log-dir",
+                        help="Directory for execution logs (default: <repo-root>/logs).")
     return parser
 
 
@@ -58,6 +61,5 @@ def main() -> None:
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if "AFK_DEBUG" in os.environ else logging.WARNING)
-    log_dir = Path(__file__).resolve().parent.parent.parent.parent / "logs"
 
-    review_pull_requests(args.github_user, args.github_repo, log_dir, args.max_executions, args.prompt)
+    review_pull_requests(args.github_user, args.github_repo, args.log_dir, args.max_executions, args.prompt)
