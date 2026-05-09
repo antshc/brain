@@ -1,6 +1,6 @@
 """Test double for GhCli — returns configured data without spawning subprocesses."""
 
-from modules.github.infrastructure.gh_cli import GhCli
+from ..gh_cli import GhCli
 
 
 class FakeGhCli(GhCli):

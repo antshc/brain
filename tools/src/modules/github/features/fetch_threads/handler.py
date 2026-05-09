@@ -1,9 +1,9 @@
 """Fetch Threads use case: fetches actionable review threads for a single PR URL."""
 
-from modules.github.domain.services.thread_filter import ThreadFilter
-from modules.github.domain.review_thread import ReviewThread
-from modules.github.infrastructure.vcs_client import VCSClient
-from modules.github.shared.pr_url import parse_pr_url
+from ...domain.services.thread_filter import ThreadFilter
+from ...domain.review_thread import ReviewThread
+from ...infrastructure.vcs_client import VCSClient
+from ...shared.pr_url import parse_pr_url
 
 
 def fetch_threads(

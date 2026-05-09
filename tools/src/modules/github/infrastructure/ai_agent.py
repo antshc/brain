@@ -4,7 +4,7 @@ import json
 import subprocess
 from pathlib import Path
 
-from modules.github.domain.review_thread import ReviewThread
+from ..domain.review_thread import ReviewThread
 
 # infra → github → modules → src → tools → root
 _ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent

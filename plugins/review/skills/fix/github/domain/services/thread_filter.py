@@ -1,6 +1,6 @@
 """Classify review threads by priority."""
 
-from modules.github.domain.review_thread import ReviewThread
+from ..review_thread import ReviewThread
 
 
 class ThreadFilter:

@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import ClassVar
 
-from modules.github.domain.thread_label import ThreadLabel
+from .thread_label import ThreadLabel
 
 
 @dataclass

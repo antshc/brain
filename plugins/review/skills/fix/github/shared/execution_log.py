@@ -5,7 +5,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from modules.github.domain.execution_record import ExecutionRecord
+from ..domain.execution_record import ExecutionRecord
 
 
 class ExecutionLog:
