@@ -2,11 +2,11 @@
 
 import logging
 
-from modules.github.domain.comment import Comment
-from modules.github.domain.pull_request import PullRequest
-from modules.github.domain.review_thread import ReviewThread
-from modules.github.infrastructure.gh_cli import GhCli
-from modules.github.shared.pr_url import parse_pr_url
+from ..domain.comment import Comment
+from ..domain.pull_request import PullRequest
+from ..domain.review_thread import ReviewThread
+from .gh_cli import GhCli
+from ..shared.pr_url import parse_pr_url
 
 logger = logging.getLogger(__name__)
 

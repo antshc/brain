@@ -35,10 +35,11 @@ import pathlib
 import re
 import sys
 
-# Make "modules.github.*" importable when this script is run directly from any location.
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent.parent))
+# Add the parent of the github/ folder to sys.path so "github" is importable
+# regardless of where this file lives (tools/src/modules/ or any plugin copy).
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from modules.github.features.fetch_threads.handler import fetch_threads
+from github.features.fetch_threads.handler import fetch_threads
 
 _USAGE = "Usage: fetch_threads.py <pr-url>"
 _PR_URL_RE = re.compile(r"^https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/pull/\d+$")

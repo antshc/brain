@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from modules.github.domain.comment import Comment
+from .comment import Comment
 
 
 @dataclass
