@@ -3,10 +3,10 @@
 from pathlib import Path
 
 from modules.github.domain.services.thread_filter import ThreadFilter
-from ralph.infrastructure.ai_agent import AIAgent
+from afk.infrastructure.ai_agent import AIAgent
 from modules.github.infrastructure.vcs_client import VCSClient
-from ralph.shared.execution_log import ExecutionLog
-from ralph.shared.log import log_json
+from afk.shared.execution_log import ExecutionLog
+from afk.shared.log import log_json
 
 
 def review_pull_requests(
