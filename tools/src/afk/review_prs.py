@@ -16,7 +16,7 @@ import re
 import sys
 from pathlib import Path
 
-from afk.features.review_pull_requests.handler import review_pull_requests
+from afk.features.review_prs.handler import review_prs
 
 DEFAULT_MAX_EXECUTIONS = 5
 
@@ -36,7 +36,7 @@ def _github_repo(value: str) -> str:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="review_pull_requests.py",
+        prog="review_prs.py",
         description="AFK automated PR review service.",
     )
     parser.add_argument("repo_dir", type=_repo_dir, metavar="repo-dir",
@@ -64,4 +64,4 @@ def main() -> None:
 
     logging.basicConfig(level=logging.DEBUG if "AFK_DEBUG" in os.environ else logging.WARNING)
 
-    review_pull_requests(args.github_user, args.github_repo, args.log_dir, args.max_executions, args.prompt, agent_name=args.agent)
+    review_prs(args.github_user, args.github_repo, args.log_dir, args.max_executions, args.prompt, agent_name=args.agent)

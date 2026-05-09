@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Integration tests for the review_pull_requests handler.
+"""Integration tests for the review_prs handler.
 
 Mapped to TEST_PLAN.md — every class docstring names the Feature,
 every method name is the Scenario in snake_case.
@@ -13,7 +13,7 @@ from afk.infrastructure.ai_agent import AIAgent
 from modules.github.infrastructure.gh_cli import GhCli
 from modules.github.infrastructure.vcs_client import VCSClient
 from afk.shared.execution_log import ExecutionLog
-from afk.features.review_pull_requests.handler import review_pull_requests
+from afk.features.review_prs.handler import review_prs
 
 _USER = "dev"
 _REPO = "owner/repo"
@@ -62,7 +62,7 @@ def setup_handler(pr_urls: list[str], threads_by_pr_number: dict[int, list[dict]
 # ── Tests ──────────────────────────────────────────────────────────────────────
 
 class TestReviewPullRequests:
-    """Feature: Review Multiple PRs (review_pull_requests handler)"""
+    """Feature: Review Multiple PRs (review_prs handler)"""
 
     def test_multiple_prs_with_actionable_threads_are_all_processed(self):
         # Scenario: Multiple PRs with actionable threads are all processed
@@ -72,7 +72,7 @@ class TestReviewPullRequests:
         }
         mock_gh, vcs, mock_agent, mock_exec_log = setup_handler([_PR1_URL, _PR2_URL], threads_by_pr)
 
-        review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
+        review_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         assert mock_agent.run.call_count == 2
         mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"])
@@ -82,7 +82,7 @@ class TestReviewPullRequests:
         # Scenario: No open PRs found — early exit
         mock_gh, vcs, mock_agent, mock_exec_log = setup_handler([], {})
 
-        review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
+        review_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         mock_agent.run.assert_not_called()
 
@@ -95,7 +95,7 @@ class TestReviewPullRequests:
         }
         mock_gh, vcs, mock_agent, mock_exec_log = setup_handler([_PR1_URL, _PR2_URL, _PR3_URL], threads_by_pr)
 
-        review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
+        review_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         assert mock_agent.run.call_count == 2
         mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"])
@@ -110,7 +110,7 @@ class TestReviewPullRequests:
         exec_counts = {_PR1_URL: 5, _PR2_URL: 0}
         mock_gh, vcs, mock_agent, mock_exec_log = setup_handler([_PR1_URL, _PR2_URL], threads_by_pr, exec_counts)
 
-        review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
+        review_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         assert mock_agent.run.call_count == 1
         mock_exec_log.update.assert_called_once_with(_PR2_URL, ["T2"])
@@ -120,7 +120,7 @@ class TestReviewPullRequests:
         threads_by_pr = {1: [make_raw_thread("T1", "nit: style")]}
         mock_gh, vcs, mock_agent, mock_exec_log = setup_handler([_PR1_URL], threads_by_pr, {_PR1_URL: 3})
 
-        review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
+        review_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         mock_agent.run.assert_not_called()
         mock_exec_log.reset.assert_called_once_with(_PR1_URL)
