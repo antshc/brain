@@ -15,8 +15,11 @@ dependencies = []
 dev = ["pytest"]
 
 [project.scripts]
-ralph = "brain_tools.ralph:main"
-fetch-threads-script = "brain_tools.fetch_threads:main"
+ralph = "ralph.main:main"
 
 [tool.setuptools.packages.find]
-include = ["brain_tools*"]
+where = ["tools/src"]
+include = ["ralph*", "modules*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tools/tests"]
