@@ -15,7 +15,7 @@ dependencies = []
 dev = ["pytest"]
 
 [project.scripts]
-ralph = "afk.review_pull_requests:main"
+ralph = "afk.review_prs:main"
 
 [tool.setuptools.packages.find]
 where = ["tools/src"]
