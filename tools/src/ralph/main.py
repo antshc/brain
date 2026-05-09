@@ -35,8 +35,8 @@ import re
 import sys
 from pathlib import Path
 
-from modules.github.features.review_pull_requests.handler import review_pull_requests
-from modules.github.features.review_pull_request.handler import review_pull_request
+from ralph.features.review_pull_requests.handler import review_pull_requests
+from ralph.features.review_pull_request.handler import review_pull_request
 
 DEFAULT_MAX_EXECUTIONS = 5
 

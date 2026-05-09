@@ -13,7 +13,7 @@ from modules.github.infrastructure.ai_agent import AIAgent
 from modules.github.infrastructure.gh_cli import GhCli
 from modules.github.infrastructure.vcs_client import VCSClient
 from modules.github.shared.execution_log import ExecutionLog
-from modules.github.features.review_pull_requests.handler import review_pull_requests
+from ralph.features.review_pull_requests.handler import review_pull_requests
 
 _USER = "dev"
 _REPO = "owner/repo"
