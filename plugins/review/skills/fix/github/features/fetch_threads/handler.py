@@ -3,7 +3,7 @@
 from modules.github.domain.services.thread_filter import ThreadFilter
 from modules.github.domain.review_thread import ReviewThread
 from modules.github.infrastructure.vcs_client import VCSClient
-from modules.github.pr_url import parse_pr_url
+from modules.github.shared.pr_url import parse_pr_url
 
 
 def fetch_threads(

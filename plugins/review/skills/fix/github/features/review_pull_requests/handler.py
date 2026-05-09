@@ -5,8 +5,8 @@ from pathlib import Path
 from modules.github.domain.services.thread_filter import ThreadFilter
 from modules.github.infrastructure.ai_agent import AIAgent
 from modules.github.infrastructure.vcs_client import VCSClient
-from modules.github.execution_log import ExecutionLog
-from modules.github.log import log_json
+from modules.github.shared.execution_log import ExecutionLog
+from modules.github.shared.log import log_json
 
 
 def review_pull_requests(
