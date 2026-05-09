@@ -56,7 +56,6 @@ Group threads by `path`. For each file group (`fix!` groups first):
 
 - `git commit` with summary of changes, files, and any blockers.
 - `git push` (no flags).
-- Remove the worktree folder: `git worktree remove "$repo_root.worktrees/$branch" --force`
 
 ## 5. Reply
 
