@@ -17,7 +17,7 @@ Real mode (hits live GitHub API and Copilot CLI)::
 """
 
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -92,14 +92,15 @@ class TestReviewPullRequest:
         ]
         pr_url, vcs, agent, exec_log = setup_handler(threads_raw, exec_count=0, use_real=use_real, real_config=real_config)
 
-        review_pull_request(pr_url, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
+        with patch.object(vcs, 'checkout_pr') as mock_checkout:
+            review_pull_request(pr_url, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
+        mock_checkout.assert_called_once_with(pr_url)
         agent.review.assert_called_once()
         call_threads, call_prompt = agent.review.call_args.args
         assert len(call_threads) == 2
         assert call_prompt == "/review"
         exec_log.update.assert_called_once_with(pr_url, ["T1", "T2"])
-        vcs._gh.pr_checkout.assert_called_once_with(pr_url)
 
     @pytest.mark.mock_only
     def test_pr_with_no_actionable_threads_skips_ai_agent(self, use_real, real_config):
