@@ -74,7 +74,7 @@ class TestReviewPullRequests:
 
         review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
-        assert mock_agent.review.call_count == 2
+        assert mock_agent.run.call_count == 2
         mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"])
         mock_exec_log.update.assert_any_call(_PR2_URL, ["T2"])
 
@@ -84,7 +84,7 @@ class TestReviewPullRequests:
 
         review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
-        mock_agent.review.assert_not_called()
+        mock_agent.run.assert_not_called()
 
     def test_mix_of_actionable_and_non_actionable_prs(self):
         # Scenario: Mix of actionable and non-actionable PRs
@@ -97,7 +97,7 @@ class TestReviewPullRequests:
 
         review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
-        assert mock_agent.review.call_count == 2
+        assert mock_agent.run.call_count == 2
         mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"])
         mock_exec_log.update.assert_any_call(_PR3_URL, ["T3"])
 
@@ -112,7 +112,7 @@ class TestReviewPullRequests:
 
         review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
-        assert mock_agent.review.call_count == 1
+        assert mock_agent.run.call_count == 1
         mock_exec_log.update.assert_called_once_with(_PR2_URL, ["T2"])
 
     def test_pr_with_no_actionable_threads_and_prior_count_resets_log(self):
@@ -122,5 +122,5 @@ class TestReviewPullRequests:
 
         review_pull_requests(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
-        mock_agent.review.assert_not_called()
+        mock_agent.run.assert_not_called()
         mock_exec_log.reset.assert_called_once_with(_PR1_URL)
