@@ -9,7 +9,7 @@ from afk.shared.execution_log import ExecutionLog
 from afk.shared.log import log_json
 
 
-def review_prs(
+def fix_prs(
     github_user: str,
     github_repo: str,
     log_dir: Path,
