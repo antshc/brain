@@ -14,7 +14,7 @@ def fix_prs(
     github_repo: str,
     log_dir: Path,
     max_executions: int,
-    prompt: str = "/review",
+    prompt: str = "/ralph:fix",
     *,
     agent_name: str = "copilot",
     vcs: VCSClient | None = None,
@@ -28,7 +28,7 @@ def fix_prs(
         github_repo:    Repository in owner/repo format.
         log_dir:        Directory where execution logs are written.
         max_executions: Maximum processing attempts per PR before skipping.
-        prompt:         Prompt text passed to the AI agent (default: "/review").
+        prompt:         Prompt text passed to the AI agent (default: "/ralph:fix").
         vcs:            VCSClient instance (defaults to VCSClient()).
         agent:          AIAgent instance (defaults to AIAgent()).
         exec_log:       ExecutionLog instance (defaults to ExecutionLog(log_dir, github_repo)).

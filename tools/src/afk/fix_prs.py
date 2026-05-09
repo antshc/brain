@@ -50,8 +50,8 @@ def _build_parser() -> argparse.ArgumentParser:
                         help=f"Max processing attempts per PR before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
     parser.add_argument("--agent", default="copilot",
                         help="Agent CLI alias to invoke (default: copilot).")
-    parser.add_argument("--prompt", default="/review",
-                        help="Prompt text passed to the AI agent (default: /review).")
+    parser.add_argument("--prompt", default="/ralph:fix",
+                        help="Prompt text passed to the AI agent (default: /ralph:fix).")
     parser.add_argument("--log-dir", type=Path, default=Path(__file__).resolve().parent.parent.parent.parent / "logs",
                         metavar="log-dir",
                         help="Directory for execution logs (default: <repo-root>/logs).")
