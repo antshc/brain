@@ -2,24 +2,8 @@
 
 import os
 import subprocess
-from pathlib import Path
 
 from afk.shared.log import log_json
-from modules.github.domain.review_thread import ReviewThread
-
-# infrastructure → afk → src → tools → brain (root)
-_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
-_LOG_DIR = _ROOT / "logs"
-
-_DEFAULT_MODEL = "claude-sonnet-4.6"
-_DEFAULT_PROMPT = "/review"
-
-_DENIED_TOOLS = [
-    "shell(git reset)",
-    "shell(git rebase)",
-    "shell(git clean)",
-]
-
 
 def _is_dry_run() -> bool:
     """Return True (dry-run on) unless AFK_DRY_RUN is explicitly '0' or 'false'."""
@@ -30,27 +14,18 @@ def _is_dry_run() -> bool:
 class AIAgent:
     """Copilot CLI agent for automated code-review operations."""
 
-    def __init__(self, *, model: str = _DEFAULT_MODEL) -> None:
-        self._model = model
+    def __init__(self, *, alias: str = "copilot", prompt: str = "/review") -> None:
+        self._alias = alias
+        self._prompt = prompt
 
-    def run(self, threads: list[ReviewThread], prompt: str = _DEFAULT_PROMPT) -> None:
+    def run(self) -> None:
         """Run the Copilot agent on the given review threads."""
-        proc = self._run(prompt)
+        proc = self._run(self._prompt)
         if proc is not None:
             self._stream_text(proc)
 
     def _run(self, prompt: str) -> subprocess.Popen | None:
-        cmd = [
-            "copilot",
-            "-p", prompt,
-            "--model", self._model,
-            "--output-format", "json",
-            "--allow-all-tools",
-            "--no-ask-user",
-            "--log-dir", str(_LOG_DIR),
-        ]
-        for tool in _DENIED_TOOLS:
-            cmd.extend(["--deny-tool", tool])
+        cmd = [self._alias, "-p", prompt]
 
         if _is_dry_run():
             log_json("info", "dry-run: skipping copilot agent", command=str(cmd))

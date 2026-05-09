@@ -48,6 +48,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("max_executions", nargs="?", type=int, default=DEFAULT_MAX_EXECUTIONS,
                         metavar="max-executions",
                         help=f"Max processing attempts per PR before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
+    parser.add_argument("--agent", default="copilot",
+                        help="Agent CLI alias to invoke (default: copilot).")
     parser.add_argument("--prompt", default="/review",
                         help="Prompt text passed to the AI agent (default: /review).")
     parser.add_argument("--log-dir", type=Path, default=Path(__file__).resolve().parent.parent.parent.parent / "logs",
@@ -62,4 +64,4 @@ def main() -> None:
 
     logging.basicConfig(level=logging.DEBUG if "AFK_DEBUG" in os.environ else logging.WARNING)
 
-    review_pull_requests(args.github_user, args.github_repo, args.log_dir, args.max_executions, args.prompt)
+    review_pull_requests(args.github_user, args.github_repo, args.log_dir, args.max_executions, args.prompt, agent_name=args.agent)
