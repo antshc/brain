@@ -6,7 +6,7 @@ from modules.github.domain.comment import Comment
 from modules.github.domain.pull_request import PullRequest
 from modules.github.domain.review_thread import ReviewThread
 from modules.github.infrastructure.gh_cli import GhCli
-from modules.github.pr_url import parse_pr_url
+from modules.github.shared.pr_url import parse_pr_url
 
 logger = logging.getLogger(__name__)
 

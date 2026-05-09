@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from modules.github.execution_log import ExecutionLog
+from modules.github.shared.execution_log import ExecutionLog
 
 _PR = "https://github.com/owner/repo/pull/1"
 

@@ -6,7 +6,7 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
-from modules.github.pr_url import parse_pr_url
+from modules.github.shared.pr_url import parse_pr_url
 
 
 class TestPRURLParsing:
