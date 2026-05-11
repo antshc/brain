@@ -52,9 +52,9 @@ def _build_parser() -> argparse.ArgumentParser:
                         help="Agent CLI alias to invoke (default: copiloty).")
     parser.add_argument("--prompt", default="/ralph:fix",
                         help="Prompt text passed to the AI agent (default: /ralph:fix).")
-    parser.add_argument("--log-dir", type=Path, default=Path(__file__).resolve().parent.parent.parent.parent / "logs",
+    parser.add_argument("--log-dir", type=Path, default=Path("/var/log/ralph"),
                         metavar="log-dir",
-                        help="Directory for execution logs (default: <repo-root>/logs).")
+                        help="Directory for execution logs (default: /var/log/ralph).")
     return parser
 
 

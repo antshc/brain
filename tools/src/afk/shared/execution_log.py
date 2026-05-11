@@ -1,7 +1,6 @@
 """ExecutionLog: reads/writes per-PR attempt counts to cap retries."""
 
 import json
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -10,8 +9,7 @@ from modules.github.domain.execution_record import ExecutionRecord
 
 class ExecutionLog:
     def __init__(self, log_dir: Path, repo: str):
-        slug = re.sub(r"[^A-Za-z0-9._-]", "-", repo)
-        self._log_dir = log_dir / slug
+        self._log_dir = log_dir
         self._log: dict = {}
         self._init()
 
