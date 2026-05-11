@@ -1,5 +1,6 @@
 """Thin wrapper around the Copilot CLI for code-review operations."""
 
+import json
 import logging
 import os
 import subprocess
