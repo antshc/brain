@@ -111,10 +111,10 @@ ralph-fetch-threads https://github.com/owner/my-repo/pull/42
 
 ```bash
 # All tests
-python3 -m pytest unit_tests/ integration_tests/ -v
+python3 -m pytest tools/ -v
 
 # Unit tests only
-python3 -m pytest unit_tests/ -v
+python3 -m pytest tools/tests/unit/ -v
 ```
 
 ---
