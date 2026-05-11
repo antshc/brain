@@ -164,3 +164,13 @@ class TestReviewPullRequests:
 
         agent.review.assert_not_called()
         exec_log.reset.assert_called_once_with(_PR1_URL)
+
+
+class TestReviewPullRequestsSmoke:
+    """Feature: Review Multiple PRs (review_pull_requests handler)"""
+
+    def test_review_pull_requests_with_no_prs_does_not_raise(self, use_real, real_config):
+        # Scenario: review_pull_requests with no open PRs does not raise
+        github_user, github_repo, vcs, agent, exec_log = setup_handler([], {}, use_real=use_real, real_config=real_config)
+
+        review_pull_requests(github_user, github_repo, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)

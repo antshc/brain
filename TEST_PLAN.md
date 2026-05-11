@@ -438,9 +438,14 @@ Scenario: Custom prompt is passed to the AI agent
     And the prompt is "/custom-prompt"
   When review_pull_request() is called
   Then AIAgent.review() is called with prompt "/custom-prompt"
+
+Scenario: review_pull_request with no actionable threads does not raise
+  Given a PR with no actionable threads
+  When review_pull_request() is called in mock or real mode
+  Then no exception is raised
 ```
 
-**Coverage:** Integration test
+**Coverage:** Integration test (mock_only scenarios) · Smoke test (all modes)
 
 ---
 
@@ -490,9 +495,15 @@ Scenario: PR with no actionable threads and prior count resets execution log
     And execution count for that PR is 3
   When review_pull_requests() is called
   Then exec_log.reset() is called for that PR
+
+Scenario: review_pull_requests with no open PRs does not raise
+  Given github_user "dev" and github_repo "owner/repo"
+    And no open PRs exist
+  When review_pull_requests() is called in mock or real mode
+  Then no exception is raised
 ```
 
-**Coverage:** Integration test
+**Coverage:** Integration test (mock_only scenarios) · Smoke test (all modes)
 
 ---
 

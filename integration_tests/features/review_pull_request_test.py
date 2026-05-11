@@ -149,3 +149,14 @@ class TestReviewPullRequest:
         agent.review.assert_called_once()
         _, call_prompt = agent.review.call_args.args
         assert call_prompt == "/custom-prompt"
+
+
+class TestReviewPullRequestSmoke:
+    """Feature: Review Single PR (review_pull_request handler)"""
+
+    def test_review_pull_request_with_no_actionable_threads_does_not_raise(self, use_real, real_config):
+        # Scenario: review_pull_request with no actionable threads does not raise
+        threads_raw = [make_raw_thread("T1", "nit: minor style")]
+        pr_url, vcs, agent, exec_log = setup_handler(threads_raw, exec_count=0, use_real=use_real, real_config=real_config)
+
+        review_pull_request(pr_url, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
