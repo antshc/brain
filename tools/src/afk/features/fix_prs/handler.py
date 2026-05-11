@@ -16,7 +16,7 @@ def fix_prs(
     max_executions: int,
     prompt: str = "/ralph:fix",
     *,
-    agent_name: str = "copilot",
+    agent_name: str = "copiloty",
     vcs: VCSClient | None = None,
     agent: AIAgent | None = None,
     exec_log: ExecutionLog | None = None,
