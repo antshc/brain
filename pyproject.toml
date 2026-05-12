@@ -15,7 +15,7 @@ dependencies = []
 dev = ["pytest"]
 
 [project.scripts]
-afk_fix_prs = "afk.fix_prs:main"
+afk_fix_prs = "afk.features.fix_prs.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["tools/src"]
