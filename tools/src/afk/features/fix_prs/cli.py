@@ -40,13 +40,13 @@ def _build_parser() -> argparse.ArgumentParser:
         prog="fix_prs.py",
         description="AFK automated PR review service.",
     )
-    parser.add_argument("repo_dir", type=_repo_dir, metavar="repo-dir",
+    parser.add_argument("--repo_dir", type=_repo_dir, metavar="repo-dir",
                         help="Path to the local repository clone.")
-    parser.add_argument("github_user", metavar="github-user",
+    parser.add_argument("--github_user", metavar="github-user",
                         help="GitHub username to filter open PRs by author.")
-    parser.add_argument("github_repo", type=_github_repo, metavar="owner/repo",
+    parser.add_argument("--github_repo", type=_github_repo, metavar="owner/repo",
                         help="GitHub repository in owner/repo format.")
-    parser.add_argument("max_executions", nargs="?", type=int, default=DEFAULT_MAX_EXECUTIONS,
+    parser.add_argument("--max_executions", nargs="?", type=int, default=DEFAULT_MAX_EXECUTIONS,
                         metavar="max-executions",
                         help=f"Max processing attempts per PR before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
     parser.add_argument("--agent", default="copiloty",
