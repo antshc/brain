@@ -65,17 +65,6 @@ All GitHub access goes through the `gh` CLI — never call the GitHub REST/Graph
 - Call `exec_log.update(pr_url, thread_ids)` after dispatching to the agent.
 - Skip the PR (log a warning) if `count >= max_executions`.
 
-### Logging
-
-Use `log_json` from `log.py` for all runtime events — never `print()` to stdout in library code.
-
-```python
-log_json("info", "Processing PR", pr_url=pr_url)
-log_json("warning", "Execution limit reached", pr_url=pr_url, count=str(exec_count))
-```
-
-All values must be strings. Output goes to stderr as newline-delimited JSON.
-
 ---
 
 ## Python CLI
