@@ -9,7 +9,7 @@ Run the following commands and print their output so it is available as context.
 
 ```bash
 commits=$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found")
-issues=$(gh issue list --state open --json number,title,body,comments)
+issues=$(gh issue list --state open --json number,labels,title,body,comments)
 echo "=== COMMITS ===/n"; echo "$commits"; 
 echo "/n"
 echo "=== TASKS ===/n"; echo "$issues"
