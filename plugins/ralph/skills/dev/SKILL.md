@@ -5,30 +5,39 @@ description: AFK autonomous development loop — picks the next open issue, impl
 
 # Setup
 
-Run the following commands and print their output so it is available as context. If output is empty or unavailable, proceed with what is present:
+Run the following commands and print their output so it is available as context. 
 
 ```bash
 commits=$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found")
 issues=$(gh issue list --state open --json number,title,body,comments)
-echo "=== COMMITS ==="; echo "$commits"
-echo "=== ISSUES ==="; echo "$issues"
+echo "=== COMMITS ===/n"; echo "$commits"; 
+echo "/n"
+echo "=== TASKS ===/n"; echo "$issues"
 ```
 
-If both `COMMITS` and `ISSUES` are empty or unavailable, output <promise>NO CONTEXT AVAILABLE</promise>.
+If `TASKS` json array is empty or unavailable, stop doing any work.
 
-# ISSUES
+# TASKS
+The `TASK` is the Github issue. 
 
-Parse the `ISSUES` output from Setup. Each issue has `number`, `title`, `body`, and `comments`.
+Each `TASK` has `number`, `labels`, `title`, `body`, and `comments`.
 
-You will work on the AFK issues only, not the HITL ones.
+Parse the `TASKS` output json array from **Setup**. 
 
-Review the `COMMITS` output from Setup to understand what work has already been done.
+Filter tasks using the following steps:
+1. Start with all open tasks.
+2. Keep only tasks that have both the `afk` and `ready` labels.
+3. If a task has the `blocked` label, skip it — even if it also has `afk` and `ready`.
+4. Skip tasks with no labels.
+5. The remaining tasks are eligible for implementation.
 
-If all AFK tasks are complete, output <promise>NO MORE TASKS</promise>.
+Review the `COMMITS` output from **Setup** to understand what work has already been done.
+
+If all `afk` tasks are complete close the PRD task.
 
 # TASK SELECTION
 
-Pick the next task. Prioritize tasks in this order:
+Pick the next task. Prioritize tasks in this order. If a task falls into multiple categories, prioritize the one listed first.
 
 1. Critical bugfixes
 2. Development infrastructure
@@ -44,22 +53,24 @@ TL;DR - build a tiny, end-to-end slice of the feature first, then expand it out.
 4. Polish and quick wins
 5. Refactors
 
-# EXPLORATION
+# TASK IMPLEMENTATION WORKFLOW
+
+## EXPLORATION
 
 Explore the repo.
 
-# IMPLEMENTATION
+## IMPLEMENTATION
 
-Complete the task.
+Implement the task using the `/tdd`, `/wf:tdd` skill.
 
-# FEEDBACK LOOPS
+## FEEDBACK LOOPS
 
 Before committing, run the feedback loops:
 
 - Build the project with changed files
 - Run only specific tests for changed files
 
-# COMMIT
+## COMMIT
 
 Make a git commit. The commit message must:
 
@@ -67,7 +78,7 @@ Make a git commit. The commit message must:
 2. Include files changed
 3. Blockers or notes for next iteration
 
-# THE ISSUE
+## THE ISSUE
 
 If the task is complete, close the original GitHub issue.
 
@@ -75,5 +86,7 @@ If the task is not complete, leave a comment on the GitHub issue with what was d
 
 # FINAL RULES
 
-ONLY WORK ON A SINGLE TASK.
-
+WORK ON ONE TASK AT A TIME. DO NOT START A NEW TASK UNTIL THE CURRENT ONE IS COMPLETE.
+WHEN THE CURRENT TASK IS COMPLETE, PICK THE NEXT ELIGIBLE TASK.
+IF THE CURRENT TASK IS BLOCKED, LEAVE A COMMENT ON THE GITHUB ISSUE WITH WHAT WAS DONE AND WHAT THE BLOCKER IS, ADD `blocked` LABEL.
+IF NO TASKS ARE AVAILABLE, EXIT.
