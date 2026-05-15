@@ -1,5 +1,5 @@
 ---
-name: auth
+name: conf-auth
 description: 'Authorize acli with Confluence. Use when acli Confluence auth is missing or expired, or when mention "conf-auth".'
 ---
 
@@ -7,7 +7,7 @@ description: 'Authorize acli with Confluence. Use when acli Confluence auth is m
 ```bash
 source ~/.profile
 if [[ -z "$ACLI_API_TOKEN" ]]; then
-  echo "ACLI_API_TOKEN is not set. Run /conf:setup first."
+  echo "ACLI_API_TOKEN is not set. Run /atl:setup-acli first."
   exit 1
 fi
 ```

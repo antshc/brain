@@ -1,5 +1,5 @@
 ---
-name: fetch
+name: fetch-conf
 description: 'Fetch confluence page content. Use when mention "Fetch <confluence_page_url>".'
 argument-hint: '<page_url> (e.g., "https://<organization>.atlassian.net/wiki/spaces/~63f4d6193ec8aa51d3d20548/pages/1888616534/CR", /wiki/spaces/~63f4d6193ec8aa51d3d20548/pages/1888616534/CR)'
 ---
@@ -18,4 +18,4 @@ python3 <skill-directory>/scripts/page_view_json_to_markdown.py "$page_json"
 ---
 
 **Troubleshooting — Authorization error**
-If the acli command fails with an authorization or authentication error, invoke `/conf:auth` and then retry.
+If the acli command fails with an authorization or authentication error, invoke `/atl:conf-auth` and then retry.

@@ -1,5 +1,5 @@
 ---
-name: fetch
+name: fetch-jira
 description: 'Fetch Jira work item content. Use when mention "Fetch <jira_wi_url>".'
 argument-hint: '<jira_wi_url> (e.g., "https://<organization>.atlassian.net/browse/<wi_key>")'
 ---
@@ -18,4 +18,4 @@ python3 <skill-directory>/scripts/wi_json_to_markdown.py "$wi_json"
 ---
 
 **Troubleshooting — Authorization error**
-If the acli command fails with an authorization or authentication error, invoke `/jira:auth` and then retry.
+If the acli command fails with an authorization or authentication error, invoke `/atl:jira-auth` and then retry.

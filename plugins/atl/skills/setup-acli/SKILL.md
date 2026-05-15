@@ -1,6 +1,6 @@
 ---
-name: setup
-description: 'Set up acli for Jira on Windows or Linux. Installs acli, configures ACLI_API_TOKEN, ACLI_EMAIL, and ACLI_SITE, and authorizes with Jira. Use when acli is not installed, needs to be configured, or when mention "setup jira".'
+name: setup-acli
+description: 'Set up acli for Atlassian (Confluence + Jira) on Windows or Linux. Installs acli, configures ACLI_API_TOKEN, ACLI_EMAIL, and ACLI_SITE, and authorizes with both Confluence and Jira. Use when acli is not installed, needs to be configured, or when mention "setup acli".'
 ---
 
 **Step 0 — Detect OS**
@@ -79,8 +79,11 @@ $env:ACLI_EMAIL     = '<email>'
 $env:ACLI_SITE      = '<site>'
 ```
 
-**Step 5 — Authorize Jira**
+**Step 5 — Authorize Confluence and Jira**
 ```bash
+if ! err=$(echo "$ACLI_API_TOKEN" | acli confluence auth login --token --email "$ACLI_EMAIL" --site "$ACLI_SITE" 2>&1); then
+  echo "acli confluence auth login failed: $err"
+fi
 if ! err=$(echo "$ACLI_API_TOKEN" | acli jira auth login --token --email "$ACLI_EMAIL" --site "$ACLI_SITE" 2>&1); then
   echo "acli jira auth login failed: $err"
 fi
@@ -88,6 +91,7 @@ fi
 
 **Step 6 — Verify**
 ```bash
+acli confluence page list --space-key TEAM --limit 1
 acli jira workitem list --limit 1
 ```
-If this succeeds, setup is complete. If it fails, check that `ACLI_API_TOKEN`, `ACLI_EMAIL`, and `ACLI_SITE` are set and re-run Step 5.
+If both succeed, setup is complete. If either fails, check that `ACLI_API_TOKEN`, `ACLI_EMAIL`, and `ACLI_SITE` are set and re-run Step 5.

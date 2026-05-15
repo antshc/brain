@@ -1,5 +1,5 @@
 ---
-name: run
+name: conf-run
 description: 'Run instructions from the Confluence page. Use when user wants to run a prompt from Confluence page, or when mention "Run <confluence_page>".'
 argument-hint: '<page_url> (e.g., "https://<organization>.atlassian.net/wiki/spaces/~63f4d6193ec8aa51d3d20548/pages/1888616534/CR", /wiki/spaces/~63f4d6193ec8aa51d3d20548/pages/1888616534/CR)'
 ---
@@ -13,11 +13,11 @@ argument-hint: '<page_url> (e.g., "https://<organization>.atlassian.net/wiki/spa
 Parse the user input: `{{input}}`
 Extract: <page_id> from <page_url> in the format `https://<organization>.atlassian.net/wiki/spaces/~{space_key}/pages/{page_id}/{page_title}` or `/wiki/spaces/~{space_key}/pages/{page_id}/{page_title}`
 
-**Step 2 — Fetch confluence page content using `fetch`** `<page_url>`
+**Step 2 — Fetch confluence page content using `fetch-conf`** `<page_url>`
 
 **Step 3 — Run the instructions from the PAGE content**
 
 ---
 
 **Troubleshooting — Authorization error**
-If any acli command fails with an authorization or authentication error, invoke `/conf:auth` and then retry.
+If any acli command fails with an authorization or authentication error, invoke `/atl:conf-auth` and then retry.
