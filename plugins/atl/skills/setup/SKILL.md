@@ -26,10 +26,14 @@ If acli is already installed, skip to **Step 3**.
 
 **Linux (x86-64):**
 ```bash
+mkdir -p "$HOME/.local/bin"
 curl -LO "https://acli.atlassian.com/linux/latest/acli_linux_amd64/acli"
 chmod +x ./acli
-sudo install -o root -g root -m 0755 acli /usr/local/bin/acli
-rm ./acli
+mv ./acli "$HOME/.local/bin/acli"
+# Add ~/.local/bin to PATH if not already present
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi
 acli --version
 ```
 
@@ -58,9 +62,9 @@ Ask the user:
 
 **Step 4 — Persist environment variables**
 
-**Linux** — prepend the three export lines to `~/.profile` (at the top, before existing content):
+**Linux** — prepend the four export lines (including PATH) to `~/.profile` (at the top, before existing content):
 ```bash
-{ printf 'export ACLI_API_TOKEN="%s"\nexport ACLI_EMAIL="%s"\nexport ACLI_SITE="%s"\n\n' "<token>" "<email>" "<site>"; cat ~/.profile; } > /tmp/.profile.tmp && mv /tmp/.profile.tmp ~/.profile
+{ printf 'export PATH="$HOME/.local/bin:$PATH"\nexport ACLI_API_TOKEN="%s"\nexport ACLI_EMAIL="%s"\nexport ACLI_SITE="%s"\n\n' "<token>" "<email>" "<site>"; cat ~/.profile; } > /tmp/.profile.tmp && mv /tmp/.profile.tmp ~/.profile
 source ~/.profile
 ```
 
