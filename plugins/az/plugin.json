@@ -1,0 +1,6 @@
+{
+  "name": "az",
+  "version": "1.0.0",
+  "description": "Azure CLI workflow skills.",
+  "skills": ["./skills"]
+}
