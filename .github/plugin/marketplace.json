@@ -28,6 +28,11 @@
             "name": "jira",
             "source": "./plugins/jira",
             "description": "Jira workflow skills."
+        },
+        {
+            "name": "az",
+            "source": "./plugins/az",
+            "description": "Azure CLI workflow skills."
         }
     ]
 }
