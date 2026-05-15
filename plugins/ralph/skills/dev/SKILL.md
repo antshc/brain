@@ -11,7 +11,7 @@ Run the following commands and print their output so it is available as context.
 echo "=== COMMITS ===/n"; 
 echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
 echo "/n"
-echo "=== TASKS ===/n"; echo "$(gh issue list --state open --label "afk" --label "ready" --json number,labels,title,body,comments | jq '[.[] | select(.labels | map(.name) | contains(["blocked"]) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
+echo "=== TASKS ===/n"; echo "$(gh issue list --state open --label "afk" --label "ready" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | contains(["blocked"]) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
 ```
 
 The `TASK` is the Github issue. 
@@ -75,5 +75,6 @@ If the task is not complete, leave a comment on the GitHub issue with what was d
 
 WORK ON ONE TASK AT A TIME. DO NOT START A NEW TASK UNTIL THE CURRENT ONE IS COMPLETE.
 WHEN THE CURRENT TASK IS COMPLETE, PICK THE NEXT ELIGIBLE TASK.
+IF THE CURRENT TASK IS PARTIALLY COMPLETED BUT NOT BLOCKED, LEAVE A COMMENT SUMMARIZING PROGRESS AND CONTINUE WORKING ON IT.
 IF THE CURRENT TASK IS BLOCKED, LEAVE A COMMENT ON THE GITHUB ISSUE WITH WHAT WAS DONE AND WHAT THE BLOCKER IS, ADD `blocked` LABEL.
 IF NO TASKS ARE AVAILABLE, EXIT.
