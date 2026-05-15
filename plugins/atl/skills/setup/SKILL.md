@@ -57,7 +57,7 @@ $env:PATH += ";$binDir"
 **Step 3 — Collect credentials**
 Ask the user:
 1. "Enter your Atlassian email address (e.g. user@example.com):" → store as `<email>`
-2. "Enter your Atlassian site (e.g. zerto.atlassian.net):" → store as `<site>`
+2. "Enter your Atlassian site (e.g. <organization>.atlassian.net):" → store as `<site>`
 3. "Enter your ACLI API token (from https://id.atlassian.com/manage-profile/security/api-tokens):" → store as `<token>`
 
 **Step 4 — Persist environment variables**
