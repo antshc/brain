@@ -1,25 +1,25 @@
 ---
-name: auth
-description: 'Authorize az with Azure using a Service Principal. Use when Azure CLI auth is missing or expired, or when mention "/az:auth".'
+name: auth-principal
+description: 'Authorize az with Azure using a Service Principal. Use when Azure CLI auth is missing or expired, or when mention "/az:auth-principal".'
 ---
 
 **Step 1 — Load credentials**
 ```bash
 source ~/.profile
 if [[ -z "$AZURE_CLIENT_ID" ]]; then
-  echo "AZURE_CLIENT_ID is not set. Run /az:setup first."
+  echo "AZURE_CLIENT_ID is not set. Run /az:setup-cli first."
   exit 1
 fi
 if [[ -z "$AZURE_CLIENT_SECRET" ]]; then
-  echo "AZURE_CLIENT_SECRET is not set. Run /az:setup first."
+  echo "AZURE_CLIENT_SECRET is not set. Run /az:setup-cli first."
   exit 1
 fi
 if [[ -z "$AZURE_TENANT_ID" ]]; then
-  echo "AZURE_TENANT_ID is not set. Run /az:setup first."
+  echo "AZURE_TENANT_ID is not set. Run /az:setup-cli first."
   exit 1
 fi
 if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
-  echo "AZURE_SUBSCRIPTION_ID is not set. Run /az:setup first."
+  echo "AZURE_SUBSCRIPTION_ID is not set. Run /az:setup-cli first."
   exit 1
 fi
 ```

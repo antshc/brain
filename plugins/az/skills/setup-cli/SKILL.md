@@ -1,5 +1,5 @@
 ---
-name: setup
+name: setup-cli
 description: 'Set up Azure CLI on Windows or Linux. Installs az, configures AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, and AZURE_SUBSCRIPTION_ID, and authorizes with Azure. Use when az is not installed, needs to be configured, or when mention "setup az".'
 ---
 
@@ -81,4 +81,4 @@ source ~/.profile
 ```
 
 **Step 7 — Authorize**
-Invoke `/az:auth`.
+Invoke `/az:auth-principal`.
