@@ -20,9 +20,14 @@
             "description": "ralph AFK PR review automation skills."
         },
         {
-            "name": "atl",
-            "source": "./plugins/atl",
-            "description": "Atlassian workflow skills."
+            "name": "conf",
+            "source": "./plugins/conf",
+            "description": "Confluence workflow skills."
+        },
+        {
+            "name": "jira",
+            "source": "./plugins/jira",
+            "description": "Jira workflow skills."
         }
     ]
 }
