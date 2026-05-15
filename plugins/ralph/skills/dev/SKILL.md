@@ -2,40 +2,27 @@
 name: dev
 description: AFK autonomous development loop — picks the next open issue, implements it, and commits the result.
 ---
-
-# Setup
+# TASK SELECTION
+## Read state
 
 Run the following commands and print their output so it is available as context. 
 
 ```bash
-commits=$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found")
-issues=$(gh issue list --state open --json number,labels,title,body,comments)
-echo "=== COMMITS ===/n"; echo "$commits"; 
+echo "=== COMMITS ===/n"; 
+echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
 echo "/n"
-echo "=== TASKS ===/n"; echo "$issues"
+echo "=== TASKS ===/n"; echo "$(gh issue list --state open --label "afk" --label "ready" --json number,labels,title,body,comments | jq '[.[] | select(.labels | map(.name) | contains(["blocked"]) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
 ```
 
-If `TASKS` json array is empty or unavailable, stop doing any work.
-
-# TASKS
 The `TASK` is the Github issue. 
-
 Each `TASK` has `number`, `labels`, `title`, `body`, and `comments`.
 
-Parse the `TASKS` output json array from **Setup**. 
-
-Filter tasks using the following steps:
-1. Start with all open tasks.
-2. Keep only tasks that have both the `afk` and `ready` labels.
-3. If a task has the `blocked` label, skip it — even if it also has `afk` and `ready`.
-4. Skip tasks with no labels.
-5. The remaining tasks are eligible for implementation.
-
-Review the `COMMITS` output from **Setup** to understand what work has already been done.
+Parse the `TASKS` output json array from **TASKS**. 
+Review the `COMMITS` output from **COMMITS** to understand what work has already been done.
 
 If all `afk` tasks are complete close the PRD task.
 
-# TASK SELECTION
+## Next task selection
 
 Pick the next task. Prioritize tasks in this order. If a task falls into multiple categories, prioritize the one listed first.
 
