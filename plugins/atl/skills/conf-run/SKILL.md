@@ -16,3 +16,8 @@ Extract: <page_id> from <page_url> in the format `https://zerto.atlassian.net/wi
 **Step 2 — Fetch confluence page content using `conf-fetch`** `<page_url>`
 
 **Step 3 — Run the instructions from the PAGE content**
+
+---
+
+**Troubleshooting — Authorization error**
+If any acli command fails with an authorization or authentication error, invoke `/atl:conf-auth` and then retry.
