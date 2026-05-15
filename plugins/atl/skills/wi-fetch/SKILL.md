@@ -1,5 +1,5 @@
 ---
-name: fetch-wi
+name: wi-fetch
 description: 'Fetch Jira work item content. Use when mention "Fetch <jira_wi_url>".'
 argument-hint: '<jira_wi_url> (e.g., "https://zerto.atlassian.net/browse/<wi_key>")'
 ---
