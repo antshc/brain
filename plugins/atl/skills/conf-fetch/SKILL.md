@@ -1,5 +1,5 @@
 ---
-name: fetch-conf
+name: conf-fetch
 description: 'Fetch confluence page content. Use when mention "Fetch <confluence_page_url>".'
 argument-hint: '<page_url> (e.g., "https://zerto.atlassian.net/wiki/spaces/~63f4d6193ec8aa51d3d20548/pages/1888616534/CR", /wiki/spaces/~63f4d6193ec8aa51d3d20548/pages/1888616534/CR)'
 ---

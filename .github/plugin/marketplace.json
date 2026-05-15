@@ -18,6 +18,11 @@
             "name": "ralph",
             "source": "./plugins/ralph",
             "description": "ralph AFK PR review automation skills."
+        },
+        {
+            "name": "atl",
+            "source": "./plugins/atl",
+            "description": "Atlassian workflow skills."
         }
     ]
 }
