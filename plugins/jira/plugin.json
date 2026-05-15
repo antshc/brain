@@ -1,0 +1,6 @@
+{
+  "name": "jira",
+  "version": "1.0.0",
+  "description": "Jira workflow skills.",
+  "skills": ["./skills"]
+}
