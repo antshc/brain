@@ -14,3 +14,8 @@ Run the following command to fetch the work item content in markdown format:
 wi_json=$(acli jira workitem view <wi_key> -f summary,description --json)
 python3 <skill-directory>/scripts/wi_json_to_markdown.py "$wi_json"
 ```
+
+---
+
+**Troubleshooting — Authorization error**
+If the acli command fails with an authorization or authentication error, invoke `/atl:jira-auth` and then retry.

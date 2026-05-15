@@ -14,3 +14,8 @@ Run the following command to fetch the page content in markdown format:
 page_json=$(acli confluence page view --id <page_id> --body-format view --json)
 python3 <skill-directory>/scripts/page_view_json_to_markdown.py "$page_json"
 ```
+
+---
+
+**Troubleshooting — Authorization error**
+If the acli command fails with an authorization or authentication error, invoke `/atl:conf-auth` and then retry.
