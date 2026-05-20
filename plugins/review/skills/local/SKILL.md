@@ -1,5 +1,5 @@
 ---
-name: 'review-local'
+name: 'local'
 description: 'Perform a local code review'
 argument-hint: 'Provide the base branch to diff against (e.g., release/10.9)'
 ---
