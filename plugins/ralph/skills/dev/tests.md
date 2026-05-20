@@ -1,24 +1,25 @@
 # Tests
 
-## Good Tests
+## Rules
 
-Test through real interfaces, not mocks of internal parts. Characteristics:
-
-- Tests behavior users/callers care about
-- Uses public API only
-- Survives internal refactors
-- Describes WHAT, not HOW
+- Test through public API only — verify WHAT, not HOW
 - One logical assertion per test
+- Verify by calling back through the same interface, not inspecting internals
+- SUT: create in constructor via `new`. Use factory method when config varies per test
+- Mocks: wrap setup in named helper methods when reused across tests
+- No `if` in tests — exception: reducing excessive duplication
+- Name describes observable behavior, not implementation mechanism
 
-## Bad Tests (red flags)
+## Names Conventions
+
+- `Read_ThrowsCircuitOpenException_AfterRepeatedTransientFailures` — Test method name describing observable behavior
+- `SetupReadMock(arg1, arg2)` — Setup Method mock, configures mock for list of items returned by read method
+
+## Red Flags
 
 - Mocking internal collaborators
+- `Times.Exactly(N)` / call-count assertions
+- `MockBehavior.Strict`
 - Testing private methods
-- Asserting on call counts/order
-- Test breaks when refactoring without behavior change
-- Test name describes HOW not WHAT
-- Verifying through external means (e.g. querying DB directly) instead of the public interface
-
-## Verify Through the Interface
-
-Always verify behavior by calling back through the same public API — not by inspecting internal state, database rows, or side effects directly.
+- Verifying via DB/state inspection instead of public API
+- Test breaks on refactor with no behavior change
