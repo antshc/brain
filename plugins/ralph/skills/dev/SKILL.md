@@ -104,12 +104,20 @@ Implement the following GitHub issue.
 <last 5 commits from step 1>
 ```
 
-## 5. Handle result
+## 5. Commit
 
-Read the agent's status report:
+After the agent reports back, use its status report to make a git commit. The commit message is composed from the agent's report fields:
 
-- **complete**: Push the branch and loop back to step 1 (re-read fresh state).
-- **partial**: Push the branch and loop back to step 1 (agent already commented on issue).
+- **SUMMARY** → commit subject and body (key technical decisions)
+- **FILES** → list of files changed
+- **NOTES** → blockers or context for the next iteration
+
+## 6. Handle result
+
+Read the agent's `STATUS` field:
+
+- **complete**: Close the issue with `gh issue close <number>`, push the branch, and loop back to step 1.
+- **partial**: Comment on the issue with the agent's SUMMARY using `gh issue comment <number> --body "..."`, push the branch, and loop back to step 1.
 - **blocked**: Add `blocked` label to the issue with `gh issue edit <number> --add-label "blocked"`, then loop back to step 1 to pick the next task.
 
 After **complete** or **partial**, push the feature branch:
