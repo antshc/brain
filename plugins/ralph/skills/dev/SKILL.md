@@ -7,27 +7,25 @@ description: AFK autonomous development loop — picks the next open issue, impl
 
 Before entering the orchestrator loop, resolve the PRD and set up the worktree.
 
-## 1. Fetch tasks and resolve parent PRD
+## 1. Fetch the PRD
 
 ```bash
-tasks=$(gh issue list --state open --label "ready" --json number,labels,title,body,comments 2>/dev/null \
-  | jq '[.[] | select(.labels | map(.name) | (contains(["blocked"]) or contains(["hitl"])) | not)]')
+prd=$(gh issue list --state open --label "ready,prd" --json number,labels,title,body,comments --limit 1 -q '.[0]' 2>/dev/null)
 ```
 
-If no tasks are available, **exit** and report "No ready tasks found."
+If no PRD is found, **exit** and report "No open PRD found."
 
-Extract the parent PRD issue number from the first task's body (look for the `## Parent PRD` section containing `#<number>`).
+## 2. Parse PRD metadata
 
-## 2. Fetch and parse PRD metadata
+Extract from the PRD body by matching these lines:
 
-```bash
-prd=$(gh issue view <prd-number> --json body,title -q '.')
+```
+**Target Branch:** `<target-branch>`
+**Jira Ticket:** `<jira-ticket>`
 ```
 
-Extract from the PRD body:
-
-- **Target Branch** — from `## Target Branch` section (e.g. `release/1.3.10`)
-- **Jira Ticket** — from `## Jira Ticket` section (e.g. `PROJ-1234`)
+- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`)
+- **Jira Ticket** — value inside backticks after `**Jira Ticket:**` (e.g. `PROJ-1234`)
 - **PRD Title** — from the issue title
 
 If either field is missing, **exit** and report that the PRD is missing required metadata.
