@@ -1,5 +1,5 @@
 ---
-name: ralph-impl
+name: ralphy-coder
 description: Autonomous task implementation agent. Explores the repo, implements via TDD, runs feedback loops, commits, and updates the GitHub issue. Invoked by the dev orchestrator with task context.
 ---
 
