@@ -1,5 +1,7 @@
 # Module and Interface Design
 
+See [layers.md](layers.md) for the architectural layer structure and dependency direction between modules.
+
 ## Deep Modules
 
 From "A Philosophy of Software Design": **deep module** = small interface + lots of implementation.
