@@ -8,18 +8,13 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
-1. Resolve repository root: `repo_root=$(git rev-parse --show-toplevel)`
-2. Get PR branch name: `branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)`
-3. Ensure worktree parent directory exists: `mkdir -p "$repo_root.worktrees"`
-   - If this command fails, stop and report the error before continuing.
-4. Fetch latest remote state: `git fetch --all --prune`
-   - If this fails, stop and report.
-5. Create a dedicated worktree for the PR branch:
-   - If the local branch already exists: `git worktree add "$repo_root.worktrees/$branch" "$branch"`
-   - If the local branch does not exist (command above exits non-zero): `git worktree add --track -b "$branch" "$repo_root.worktrees/$branch" "origin/$branch"`
-   - If the worktree directory already exists (exit 128), skip creation and proceed.
-6. Switch into the worktree: `cd "$repo_root.worktrees/$branch"`
-7. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
+1. Get PR branch name: `branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)`
+2. Invoke the `/worktree` skill:
+   ```
+   /worktree <branch> <branch>
+   ```
+   Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
+3. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:
 

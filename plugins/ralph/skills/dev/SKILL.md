@@ -3,6 +3,60 @@ name: dev
 description: AFK autonomous development loop — picks the next open issue, implements it, and commits the result.
 ---
 
+# WORKTREE SETUP
+
+Before entering the orchestrator loop, resolve the PRD and set up the worktree.
+
+## 1. Fetch tasks and resolve parent PRD
+
+```bash
+tasks=$(gh issue list --state open --label "ready" --json number,labels,title,body,comments 2>/dev/null \
+  | jq '[.[] | select(.labels | map(.name) | (contains(["blocked"]) or contains(["hitl"])) | not)]')
+```
+
+If no tasks are available, **exit** and report "No ready tasks found."
+
+Extract the parent PRD issue number from the first task's body (look for the `## Parent PRD` section containing `#<number>`).
+
+## 2. Fetch and parse PRD metadata
+
+```bash
+prd=$(gh issue view <prd-number> --json body,title -q '.')
+```
+
+Extract from the PRD body:
+
+- **Target Branch** — from `## Target Branch` section (e.g. `release/1.3.10`)
+- **Jira Ticket** — from `## Jira Ticket` section (e.g. `PROJ-1234`)
+- **PRD Title** — from the issue title
+
+If either field is missing, **exit** and report that the PRD is missing required metadata.
+
+## 3. Compute feature branch name
+
+Format: `<version_underscored>_<jira-ticket-lowercased>-<prd-title-slug>`
+
+Rules:
+- Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `10_9_10`
+- Lowercase the Jira ticket (e.g. `PROJ-1234` → `proj-1234`)
+- Slugify the PRD title: lowercase, replace spaces/special chars with hyphens, strip consecutive hyphens, max 40 chars
+
+Example: target `release/1.3.10`, jira `PROJ-1234`, title "Azure Storage Circuit Breaker" → `10_9_10_proj-1234-azure-storage-circuit-breaker`
+
+## 4. Create worktree
+
+Invoke the `/worktree` skill:
+
+```
+/worktree <target-branch> <feature-branch>
+```
+
+Parse the output to capture `WORKTREE_PATH` and `BRANCH`. All subsequent commands run inside `WORKTREE_PATH`.
+
+If the worktree skill exits with an error, **exit**.
+
+---
+
 # ORCHESTRATOR LOOP
 
 Repeat the following loop until no tasks remain.
@@ -56,12 +110,19 @@ Implement the following GitHub issue.
 
 Read the agent's status report:
 
-- **complete**: Loop back to step 1 (re-read fresh state).
-- **partial**: Loop back to step 1 (agent already commented on issue).
+- **complete**: Push the branch and loop back to step 1 (re-read fresh state).
+- **partial**: Push the branch and loop back to step 1 (agent already commented on issue).
 - **blocked**: Add `blocked` label to the issue with `gh issue edit <number> --add-label "blocked"`, then loop back to step 1 to pick the next task.
+
+After **complete** or **partial**, push the feature branch:
+
+```bash
+git push -u origin "$branch" 2>/dev/null || git push
+```
 
 # RULES
 
 - ONE TASK AT A TIME. The agent handles one task per invocation.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT.
+- ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
