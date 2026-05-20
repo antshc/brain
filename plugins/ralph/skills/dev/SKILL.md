@@ -2,79 +2,66 @@
 name: dev
 description: AFK autonomous development loop — picks the next open issue, implements it, and commits the result.
 ---
-# TASK SELECTION
-## Read state
 
-Run the following commands and print their output so it is available as context. 
+# ORCHESTRATOR LOOP
+
+Repeat the following loop until no tasks remain.
+
+## 1. Read state
+
+Run the following commands and print their output so it is available as context.
 
 ```bash
-echo "=== COMMITS ===/n"; 
+echo "=== COMMITS ==="; 
 echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
-echo "/n"
-echo "=== TASKS ===/n"; echo "$(gh issue list --state open --label "afk" --label "ready" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | contains(["blocked"]) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
+echo ""
+echo "=== TASKS ==="; echo "$(gh issue list --state open --label "ready" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["blocked"]) or contains(["hitl"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
 ```
 
-The `TASK` is the Github issue. 
-Each `TASK` has `number`, `labels`, `title`, `body`, and `comments`.
+Parse the `TASKS` json array. Review `COMMITS` to understand what work has already been done.
 
-Parse the `TASKS` output json array from **TASKS**. 
-Review the `COMMITS` output from **COMMITS** to understand what work has already been done.
+## 2. Exit conditions
 
-If all `afk` tasks are complete close the PRD task.
+- If no tasks are available, **exit**.
+- If all `ready` tasks are complete, close the PRD task and **exit**.
 
-## Next task selection
+## 3. Select next task
 
-Pick the next task. Prioritize tasks in this order. If a task falls into multiple categories, prioritize the one listed first.
+Pick the next task. Prioritize in this order (first match wins):
 
 1. Critical bugfixes
-2. Development infrastructure
-
-Getting development infrastructure like tests and types and dev scripts ready is an important precursor to building features.
-
-3. Tracer bullets for new features
-
-Tracer bullets are small slices of functionality that go through all layers of the system, allowing you to test and validate your approach early. This helps in identifying potential issues and ensures that the overall architecture is sound before investing significant time in development.
-
-TL;DR - build a tiny, end-to-end slice of the feature first, then expand it out.
-
+2. Development infrastructure — tests, types, dev scripts are precursors to features
+3. Tracer bullets — tiny end-to-end slices that validate the approach early
 4. Polish and quick wins
 5. Refactors
 
-# TASK IMPLEMENTATION WORKFLOW
+## 4. Invoke implementation agent
 
-## EXPLORATION
+Invoke the `ralph-impl` agent via `runSubagent` with the following prompt (substitute actual values):
 
-Explore the repo.
+```
+Implement the following GitHub issue.
 
-## IMPLEMENTATION
+## TASK
+- Issue: #<number>
+- Title: <title>
+- Body: <body>
+- Comments: <comments>
 
-Implement the task using the `/tdd`, `/wf:tdd` skill.
+## RECENT COMMITS
+<last 5 commits from step 1>
+```
 
-## FEEDBACK LOOPS
+## 5. Handle result
 
-Before committing, run the feedback loops:
+Read the agent's status report:
 
-- Build the project with changed files
-- Run only specific tests for changed files
+- **complete**: Loop back to step 1 (re-read fresh state).
+- **partial**: Loop back to step 1 (agent already commented on issue).
+- **blocked**: Add `blocked` label to the issue with `gh issue edit <number> --add-label "blocked"`, then loop back to step 1 to pick the next task.
 
-## COMMIT
+# RULES
 
-Make a git commit. The commit message must:
-
-1. Include key decisions made
-2. Include files changed
-3. Blockers or notes for next iteration
-
-## THE ISSUE
-
-If the task is complete, close the original GitHub issue.
-
-If the task is not complete, leave a comment on the GitHub issue with what was done.
-
-# FINAL RULES
-
-WORK ON ONE TASK AT A TIME. DO NOT START A NEW TASK UNTIL THE CURRENT ONE IS COMPLETE.
-WHEN THE CURRENT TASK IS COMPLETE, PICK THE NEXT ELIGIBLE TASK.
-IF THE CURRENT TASK IS PARTIALLY COMPLETED BUT NOT BLOCKED, LEAVE A COMMENT SUMMARIZING PROGRESS AND CONTINUE WORKING ON IT.
-IF THE CURRENT TASK IS BLOCKED, LEAVE A COMMENT ON THE GITHUB ISSUE WITH WHAT WAS DONE AND WHAT THE BLOCKER IS, ADD `blocked` LABEL.
-IF NO TASKS ARE AVAILABLE, EXIT.
+- ONE TASK AT A TIME. The agent handles one task per invocation.
+- ALWAYS re-read state before selecting the next task — context changes after each commit.
+- IF NO TASKS ARE AVAILABLE, EXIT.
