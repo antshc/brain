@@ -16,7 +16,7 @@ Explore the repo to understand:
 
 ## IMPLEMENTATION
 
-Implement the task using the `/tdd` skill (test-driven development with red-green-refactor).
+Follow the autonomous TDD workflow in [tdd.md](tdd.md). Write all C# code according to [style.md](style.md).
 
 ## FEEDBACK LOOPS
 
