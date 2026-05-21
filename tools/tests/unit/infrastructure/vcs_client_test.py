@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit tests for VCSClient._thread_from_raw().
+"""Unit tests for VCSClient._thread_from_raw() and VCSClient._issue_from_raw().
 
 Mapped to TEST_PLAN.md — every class docstring names the Feature,
 every method name is the Scenario in snake_case.
@@ -42,3 +42,57 @@ class TestVCSClientThreadMapping:
         }
         result = VCSClient()._thread_from_raw(raw)
         assert result.lines == "5-5"
+
+
+class TestVCSClientIssueMapping:
+    """Feature: VCS Client Issue Mapping"""
+
+    def test_raw_issue_node_is_mapped_to_issue_domain_entity(self):
+        # Scenario: Raw issue node is mapped to Issue domain entity
+        raw = {
+            "number": 42,
+            "title": "Fix the thing",
+            "body": "Some description",
+            "url": "https://github.com/owner/repo/issues/42",
+            "labels": ["ready", "bug"],
+            "comments": [
+                {"id": "C1", "body": "First comment", "updatedAt": "2024-01-01T00:00:00Z"},
+            ],
+        }
+        result = VCSClient()._issue_from_raw(raw)
+        assert result.number == 42
+        assert result.title == "Fix the thing"
+        assert result.body == "Some description"
+        assert result.url == "https://github.com/owner/repo/issues/42"
+        assert result.labels == ["ready", "bug"]
+        assert len(result.comments) == 1
+        assert result.comments[0].id == "C1"
+        assert result.comments[0].body == "First comment"
+        assert result.comments[0].updated_at == "2024-01-01T00:00:00Z"
+
+    def test_issue_with_no_comments_maps_to_empty_comments_list(self):
+        # Scenario: Issue with no comments maps to empty comments list
+        raw = {
+            "number": 1,
+            "title": "Empty",
+            "body": "",
+            "url": "https://github.com/owner/repo/issues/1",
+            "labels": ["prd"],
+            "comments": [],
+        }
+        result = VCSClient()._issue_from_raw(raw)
+        assert result.comments == []
+
+    def test_issue_labels_are_extracted_as_flat_list_of_strings(self):
+        # Scenario: Issue labels are extracted as flat list of strings
+        raw = {
+            "number": 2,
+            "title": "Labelled",
+            "body": "",
+            "url": "https://github.com/owner/repo/issues/2",
+            "labels": ["ready", "prd", "feature"],
+            "comments": [],
+        }
+        result = VCSClient()._issue_from_raw(raw)
+        assert result.labels == ["ready", "prd", "feature"]
+

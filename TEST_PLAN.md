@@ -550,7 +550,182 @@ Scenario: CLI invocation with invalid PR URL
 
 ---
 
-## Feature: CLI Argument Parsing (main.py)
+## Feature: Issue Actionability
+
+> Unit: `Issue.is_actionable`
+
+```gherkin
+Scenario: Issue with ready label is actionable
+  Given an issue with labels ["ready"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with prd label is actionable
+  Given an issue with labels ["prd"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with ready and prd labels is actionable
+  Given an issue with labels ["ready", "prd"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with no labels is not actionable
+  Given an issue with no labels
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with unrelated label only is not actionable
+  Given an issue with labels ["bug"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with ready and blocked labels is not actionable
+  Given an issue with labels ["ready", "blocked"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with prd and hitl labels is not actionable
+  Given an issue with labels ["prd", "hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with blocked label only is not actionable
+  Given an issue with labels ["blocked"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with hitl label only is not actionable
+  Given an issue with labels ["hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with ready and hitl labels is not actionable
+  Given an issue with labels ["ready", "hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Issue Filter
+
+> Unit: `IssueFilter.get_actionable_issues()`
+
+```gherkin
+Scenario: Only actionable issues are returned from a mixed list
+  Given a list of issues:
+    | number | labels                  |
+    | 1      | ["ready"]               |
+    | 2      | ["bug"]                 |
+    | 3      | ["prd"]                 |
+    | 4      | ["ready", "blocked"]    |
+  When get_actionable_issues() is called
+  Then the result contains issues with numbers [1, 3]
+
+Scenario: All actionable issues — all returned
+  Given a list of issues all with actionable labels
+  When get_actionable_issues() is called
+  Then all issues are returned
+
+Scenario: No actionable issues — empty list returned
+  Given a list of issues none with actionable labels
+  When get_actionable_issues() is called
+  Then the result is an empty list
+
+Scenario: Empty input returns empty list
+  Given an empty list of issues
+  When get_actionable_issues() is called
+  Then the result is an empty list
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: VCS Client Issue Mapping
+
+> Unit: `VCSClient._issue_from_raw()`
+
+```gherkin
+Scenario: Raw issue node is mapped to Issue domain entity
+  Given a raw issue dict with number 42, title, body, url, labels ["ready","bug"]
+    And one comment with id "C1", body "First comment", updatedAt "2024-01-01T00:00:00Z"
+  When _issue_from_raw() is called
+  Then the result is an Issue with all required fields populated
+  And comments[0].id is "C1", body is "First comment", updated_at is "2024-01-01T00:00:00Z"
+
+Scenario: Issue with no comments maps to empty comments list
+  Given a raw issue dict with no comments
+  When _issue_from_raw() is called
+  Then result.comments is an empty list
+
+Scenario: Issue labels are extracted as flat list of strings
+  Given a raw issue dict with labels ["ready", "prd", "feature"]
+  When _issue_from_raw() is called
+  Then result.labels == ["ready", "prd", "feature"]
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Fetch Issues
+
+> Unit: `fetch_issues()` handler · Integration: FakeGhCli
+
+```gherkin
+Scenario: Handler returns correctly shaped output for actionable issues
+  Given owner "owner" and repo "repo"
+    And VCS returns 2 issues: one with label "ready", one with label "prd"
+  When fetch_issues() is called
+  Then the result is a list of 2 dicts
+    And each dict contains keys: number, title, body, url, labels, comments
+
+Scenario: Handler returns empty list when no actionable issues exist
+  Given owner "owner" and repo "repo"
+    And VCS returns issues with only non-actionable labels
+  When fetch_issues() is called
+  Then the result is an empty list
+
+Scenario: Non-actionable issues are excluded
+  Given VCS returns a mix of actionable and non-actionable issues
+  When fetch_issues() is called
+  Then only actionable issues are included in the result
+
+Scenario: No issues found — empty JSON array; exit code 0
+  Given the repository has no open issues
+  When fetch_issues() is called
+  Then the result is an empty list
+```
+
+**Coverage:** Unit test · Integration test
+
+```gherkin
+Scenario: CLI invocation outputs JSON array to stdout
+  Given a valid owner/repo is passed as a CLI argument
+  When fetch_issues.py is executed
+  Then it exits with code 0
+    And stdout contains a JSON array of actionable issue objects
+
+Scenario: CLI invocation with no arguments
+  Given fetch_issues.py is invoked with no arguments
+  When it is executed
+  Then it exits with code 1 and prints usage to stderr
+
+Scenario: CLI invocation with invalid owner/repo format
+  Given fetch_issues.py is invoked with "not-a-repo"
+  When it is executed
+  Then it exits with code 1 and prints an error message to stderr
+```
+
+**Coverage:** Manual test
+
+---
+
+
 
 > Manual testing
 
