@@ -1,5 +1,5 @@
 ---
-name: ralphy-coder
+name: cscoder
 description: Autonomous task implementation agent. Explores the repo, implements via TDD, and runs feedback loops. Invoked by the dev orchestrator with task context.
 ---
 

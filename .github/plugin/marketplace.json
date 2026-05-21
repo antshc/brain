@@ -28,6 +28,11 @@
             "name": "az",
             "source": "./plugins/az",
             "description": "Azure CLI workflow skills."
+        },
+        {
+            "name": "petproj",
+            "source": "./plugins/petproj",
+            "description": "petproj C# autonomous coding agent and conventions."
         }
     ]
 }

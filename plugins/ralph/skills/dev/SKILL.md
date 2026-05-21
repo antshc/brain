@@ -89,7 +89,7 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-Invoke the `ralphy-coder` agent via `runSubagent` with the following prompt (substitute actual values):
+Invoke the `cscoder` agent via `runSubagent` with the following prompt (substitute actual values):
 
 ```
 Implement the following GitHub issue.
