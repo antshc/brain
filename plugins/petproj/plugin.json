@@ -1,0 +1,7 @@
+{
+  "name": "petproj",
+  "version": "1.0.0",
+  "description": "petproj C# autonomous coding agent and conventions.",
+  "skills": ["./skills"],
+  "agents": ["./skills/cscoder/cscoder.agent.md"]
+}
