@@ -41,17 +41,27 @@ The problem that the user is facing, from the user's perspective.
 
 The solution to the problem, from the user's perspective.
 
-## User Stories
+## Behavior Rules
 
-A LONG, numbered list of user stories. Each user story should be in the format of:
+**Writing style for behavior rules**
+- No implementation details: rules describe observable external behavior, not internal details or class structure.
+- Plain words only: no backticks, code formatting, or type names; refer to types and methods by descriptive role (e.g., "the break duration", "a circuit-open error", "the pipeline execute").
+- Single-responsibility: each rule covers exactly one scenario or transition; do not combine two independent behaviors in one bullet.
+- Rule format: use one of the three formats below; one cause-effect pair per rule.
 
-1. As an <actor>, I want a <feature>, so that <benefit>
+A LONG, numbered list of Behavior Rules. Each behavior rule should be in one of the formats:
 
-<user-story-example>
-1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
-</user-story-example>
+1. <triggering condition> → <resulting behavior>
+2. The system MUST/SHOULD <behavior> when <condition>
+3. <subject> <behavior>
 
-This list of user stories should be extremely extensive and cover all aspects of the feature.
+<behavior-rule-example>
+1. Customer opens the accounts screen → the current balance is displayed for each account
+2. The system must display the current balance for each account when the customer opens the accounts screen
+3. The accounts screen shows the current balance for each account
+</behavior-rule-example>
+
+This list of behavior rules should be extremely extensive and cover all aspects of the feature.
 
 ## Implementation Decisions
 
@@ -64,6 +74,7 @@ A list of implementation decisions that were made. This can include:
 - Schema changes
 - API contracts
 - Specific interactions
+- New configuration options, changes to existing configuration options
 
 Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
 
