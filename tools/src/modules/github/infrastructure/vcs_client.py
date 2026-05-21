@@ -3,6 +3,7 @@
 import logging
 
 from ..domain.comment import Comment
+from ..domain.issue import Issue, IssueComment
 from ..domain.pull_request import PullRequest
 from ..domain.review_thread import ReviewThread
 from .gh_cli import GhCli
@@ -34,6 +35,30 @@ class VCSClient:
         """Fetch review threads for a PR via GraphQL."""
         nodes = self._gh.fetch_threads_raw(owner, repo, number)
         return [self._thread_from_raw(node) for node in nodes]
+
+    def fetch_issues(self, owner: str, repo: str) -> list[Issue]:
+        """Fetch open issues for a repository via GraphQL."""
+        nodes = self._gh.fetch_issues_raw(owner, repo)
+        return [self._issue_from_raw(node) for node in nodes]
+
+    def _issue_from_raw(self, raw: dict) -> Issue:
+        """Map a raw GitHub API issue dict to an Issue domain entity."""
+        comments = [
+            IssueComment(
+                id=c["id"],
+                body=c["body"],
+                updated_at=c.get("updatedAt", ""),
+            )
+            for c in raw.get("comments", [])
+        ]
+        return Issue(
+            number=raw["number"],
+            title=raw["title"],
+            body=raw.get("body", ""),
+            url=raw["url"],
+            labels=raw.get("labels", []),
+            comments=comments,
+        )
 
     def _thread_from_raw(self, raw: dict) -> ReviewThread:
         """Map a raw GitHub API thread dict to a ReviewThread domain entity."""
