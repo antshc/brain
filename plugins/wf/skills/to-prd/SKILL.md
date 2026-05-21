@@ -6,13 +6,13 @@ argument-hint: '<target-branch> <jira-ticket> <feature description>'
 
 This skill will be invoked when the user wants to create a PRD. You may skip steps if you don't consider them necessary.
 
-The skill accepts positional arguments: `<target-branch> <jira-ticket> <feature description>`. If provided, skip the questions in step 1.
+The skill accepts positional arguments: `<target-branch> <jira-ticket> <feature description>`. If provided, use those values directly. If not provided, ask for them at the end, after the PRD is written.
 
 1. **Before anything else**, establish the release context:
    - **Target branch**: Which release branch should this work be based on? (e.g. `release/1.1.10`)
    - **Jira ticket**: What is the Jira ticket number for this work? (e.g. `PROJ-1234`)
 
-   If these were provided as positional arguments, use those values and confirm with the user. Otherwise, ask explicitly before proceeding.
+   If these were provided as positional arguments, use those values. Otherwise, skip this step and ask for them after the PRD is written.
 
 2. Ask the user for a long, detailed description of the problem they want to solve and any potential ideas for solutions.
 
