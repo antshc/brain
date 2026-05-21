@@ -21,7 +21,7 @@ Follow the autonomous TDD workflow in [tdd.md](tdd.md). Write all C# code accord
 
 ## FEEDBACK LOOPS
 
-Before committing, run the feedback loops:
+Run the feedback loops:
 
 - Build the project with changed files
 - Run only specific tests for changed files
