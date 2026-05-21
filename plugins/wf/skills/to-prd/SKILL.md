@@ -26,7 +26,7 @@ A deep module (as opposed to a shallow module) is one which encapsulates a lot o
 
 Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
-6. Once you have a complete understanding of the problem and solution, use the template below to write the PRD. The PRD should be submitted as a GitHub issue with the `prd` label.
+6. Once you have a complete understanding of the problem and solution, use the template below to write a **compressed (Compress wording, not meaning.)**, **high-density** PRD. The PRD should be submitted as a GitHub issue with the `prd` label.
 
 <prd-template>
 
@@ -37,13 +37,16 @@ Check with the user that these modules match their expectations. Check with the 
 
 The problem that the user is facing, from the user's perspective.
 
+**Do NOT use any technical language here; this section should be understandable to a non-technical stakeholder.**
+
 ## Solution
 
-The solution to the problem, from the user's perspective.
+The solution to the problem, from the user's perspective. 
+
+**Do NOT use any technical language here; this section should be understandable to a non-technical stakeholder.**
 
 ## Behavior Rules
-
-**Writing style for behavior rules**
+**Writing style**
 - No implementation details: rules describe observable external behavior, not internal details or class structure.
 - Plain words only: no backticks, code formatting, or type names; refer to types and methods by descriptive role (e.g., "the break duration", "a circuit-open error", "the pipeline execute").
 - Single-responsibility: each rule covers exactly one scenario or transition; do not combine two independent behaviors in one bullet.
@@ -64,6 +67,13 @@ A LONG, numbered list of Behavior Rules. Each behavior rule should be in one of 
 This list of behavior rules should be extremely extensive and cover all aspects of the feature.
 
 ## Implementation Decisions
+
+**Writing style**
+- Preserve integration constraints
+- Preserve assumptions required for implementation
+- Use short technical statements
+- Use implementation-oriented language
+- Remove filler, explanations, marketing wording, repetition, generic statements
 
 A list of implementation decisions that were made. This can include:
 
