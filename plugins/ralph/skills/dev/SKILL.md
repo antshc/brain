@@ -35,11 +35,11 @@ If either field is missing, **exit** and report that the PRD is missing required
 Format: `<version_underscored>_<jira-ticket-lowercased>-<prd-title-slug>`
 
 Rules:
-- Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `10_9_10`
+- Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `1_3_10`
 - Lowercase the Jira ticket (e.g. `PROJ-1234` → `proj-1234`)
 - Slugify the PRD title: lowercase, replace spaces/special chars with hyphens, strip consecutive hyphens, max 40 chars
 
-Example: target `release/1.3.10`, jira `PROJ-1234`, title "Azure Storage Circuit Breaker" → `10_9_10_proj-1234-azure-storage-circuit-breaker`
+Example: target `release/1.3.10`, jira `PROJ-1234`, title "Azure Storage Circuit Breaker" → `1_3_10_proj-1234-azure-storage-circuit-breaker`
 
 ## 4. Create worktree
 
@@ -52,20 +52,6 @@ Invoke the `/worktree` skill:
 Parse the output to capture `WORKTREE_PATH` and `BRANCH`. All subsequent commands run inside `WORKTREE_PATH`.
 
 If the worktree skill exits with an error, **exit**.
-
-## 5. Create pull request
-
-From inside `WORKTREE_PATH`, open a draft PR targeting the target branch:
-
-```bash
-gh pr create --draft \
-  --title "[<jira-ticket>]: <prd-title>" \
-  --body "**Jira Ticket:** \`<jira-ticket>\`" \
-  --base "<target-branch>" \
-  --head "$branch"
-```
-
-If the PR creation fails, **exit** and report the error.
 
 ---
 
@@ -103,7 +89,7 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-Invoke the `cscoder` agent via `runSubagent` with the following prompt (substitute actual values):
+Invoke the `cscoder` agent (or `general-purpose` if unavailable) via `runSubagent` with the following prompt (substitute actual values):
 
 ```
 Implement the following GitHub issue.
@@ -139,6 +125,20 @@ After **complete** or **partial**, push the feature branch:
 ```bash
 git push -u origin "$branch" 2>/dev/null || git push
 ```
+
+# CREATE PULL REQUEST
+
+Once all tasks are complete and the loop exits, open a draft PR targeting the target branch from inside `WORKTREE_PATH`:
+
+```bash
+gh pr create --draft \
+  --title "[<jira-ticket>]: <prd-title>" \
+  --body "**Jira Ticket:** \`<jira-ticket>\`" \
+  --base "<target-branch>" \
+  --head "$branch"
+```
+
+If the PR creation fails, **exit** and report the error.
 
 # RULES
 
