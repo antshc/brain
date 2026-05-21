@@ -53,6 +53,20 @@ Parse the output to capture `WORKTREE_PATH` and `BRANCH`. All subsequent command
 
 If the worktree skill exits with an error, **exit**.
 
+## 5. Create pull request
+
+From inside `WORKTREE_PATH`, open a draft PR targeting the target branch:
+
+```bash
+gh pr create --draft \
+  --title "[<jira-ticket>]: <prd-title>" \
+  --body "**Jira Ticket:** \`<jira-ticket>\`" \
+  --base "<target-branch>" \
+  --head "$branch"
+```
+
+If the PR creation fails, **exit** and report the error.
+
 ---
 
 # ORCHESTRATOR LOOP
