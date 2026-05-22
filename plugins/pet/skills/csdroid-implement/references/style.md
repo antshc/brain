@@ -14,7 +14,6 @@ Before writing new code, look at existing files in the same project to match the
 | Protected constants | `c_camelCase` | `c_defaultTimeout` |
 | Protected readonly fields | `PascalCase` | `BaseUrl` |
 | Parameters | `camelCase` | `userId` |
-| Public methods (test files) | `PascalCase_With_Underscores` | `Checkout_WithValidCart_ReturnsConfirmed` |
 
 ## `var` Usage
 
