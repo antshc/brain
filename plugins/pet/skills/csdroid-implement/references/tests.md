@@ -3,6 +3,7 @@
 ## Rules
 
 - Test through public API only — verify WHAT, not HOW
+- Use `// Arrange`, `// Act`, `// Assert` comments to separate test phases
 - One logical assertion per test
 - Verify by calling back through the same interface, not inspecting internals
 - SUT: create in constructor via `new`. Use factory method when config varies per test
