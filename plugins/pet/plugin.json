@@ -1,0 +1,7 @@
+{
+  "name": "pet",
+  "version": "1.0.0",
+  "description": "pet C# autonomous coding agent and conventions.",
+  "skills": ["./skills"],
+  "agents": ["./agents"]
+}

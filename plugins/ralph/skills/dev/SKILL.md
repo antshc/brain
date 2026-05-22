@@ -89,7 +89,7 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-Invoke the `cscoder` agent (or `general-purpose` if unavailable) via `runSubagent` with the following prompt (substitute actual values):
+Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent` with the following prompt (substitute actual values):
 
 ```
 Implement the following GitHub issue.

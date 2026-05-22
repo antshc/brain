@@ -1,4 +1,11 @@
-# Autonomous TDD Workflow
+---
+name: csdroid-implement
+description: Implement C# features using project-specific conventions, TDD workflow, and architectural layers. Use when working on C# code in pet projects.
+---
+
+# Implementation
+
+Follow the autonomous TDD workflow. Write all C# code according to [style.md](references/style.md).
 
 ## Philosophy
 
@@ -8,7 +15,7 @@ Tests verify **behavior through public interfaces**, not implementation details.
 - A good test reads like a specification: "user can checkout with valid cart"
 - If you refactor internals and tests break but behavior hasn't changed, the tests were bad
 
-See [tests.md](tests.md) for good/bad examples, [mocking.md](mocking.md) for mocking rules, [design.md](design.md) for module and interface design.
+ See [tests.md](references/tests.md) for good/bad examples, [mocking.md](references/mocking.md) for mocking rules, [design.md](references/design.md) for module and interface design. 
 
 ## Vertical Slices (mandatory)
 
@@ -43,3 +50,4 @@ Each test responds to what you learned from the previous cycle.
 [ ] Code is minimal for this test
 [ ] No speculative features added
 ```
+
