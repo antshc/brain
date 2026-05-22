@@ -30,9 +30,9 @@
             "description": "Azure CLI workflow skills."
         },
         {
-            "name": "petproj",
-            "source": "./plugins/petproj",
-            "description": "petproj C# autonomous coding agent and conventions."
+            "name": "pet",
+            "source": "./plugins/pet",
+            "description": "pet C# autonomous coding agent and conventions."
         },
         {
             "name": "learn-ms",
