@@ -95,7 +95,6 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 Implement the following GitHub issue.
 
 ## TASK
-- Issue: #<number>
 - Title: <title>
 - Body: <body>
 - Comments: <comments>
