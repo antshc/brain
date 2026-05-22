@@ -33,6 +33,11 @@
             "name": "petproj",
             "source": "./plugins/petproj",
             "description": "petproj C# autonomous coding agent and conventions."
+        },
+        {
+            "name": "learn-ms",
+            "source": "./plugins/learn-ms",
+            "description": "Microsoft Learn skills for querying official Microsoft documentation and code references."
         }
     ]
 }

@@ -1,0 +1,7 @@
+{
+  "name": "learn-ms",
+  "version": "1.0.0",
+  "description": "Microsoft Learn skills for querying official Microsoft documentation and code references.",
+  "skills": ["./skills"],
+  "mcpServers": ".mcp.json"
+}
