@@ -38,6 +38,11 @@
             "name": "learn-ms",
             "source": "./plugins/learn-ms",
             "description": "Microsoft Learn skills for querying official Microsoft documentation and code references."
+        },
+        {
+            "name": "learn-aws",
+            "source": "./plugins/learn-aws",
+            "description": "AWS documentation skills for querying official AWS docs, API references, and regional availability."
         }
     ]
 }
