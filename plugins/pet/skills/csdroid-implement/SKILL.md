@@ -19,5 +19,4 @@ Implement the requested C# change.
 ## References
 
 - Test examples: [tests.md](references/tests.md)
-- Mocking rules: [mocking.md](references/mocking.md)
 - Module/interface design: [design.md](references/design.md)
