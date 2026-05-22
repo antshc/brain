@@ -1,6 +1,6 @@
 ---
 name: csdroid
-description: Autonomous C# implementation agent. Explores the repo, implements via TDD, and runs feedback loops.
+description: Autonomous C# implementation agent. Explores the repo, implements changes, and runs feedback loops.
 ---
 
 # C# Implementation Agent
