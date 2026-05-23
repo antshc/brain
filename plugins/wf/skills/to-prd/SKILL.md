@@ -24,7 +24,7 @@ Check with the user that these modules match their expectations. Check with the 
    - **Target branch**: Which release branch should this work be based on? (e.g. `release/1.1.10`)
    - **Jira ticket**: What is the Jira ticket number for this work? (e.g. `PROJ-1234`)
    - **Save destination**: Where should the PRD be saved?
-     - File: `/plans/{prd-title}.prd.md`
+     - File: `<repo-root>/plans/{prd-title}.prd.md`
      - GitHub issue (with `prd` label)
 
    If these were provided as positional arguments, skip asking.
