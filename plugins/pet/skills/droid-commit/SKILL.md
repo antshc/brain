@@ -1,0 +1,16 @@
+---
+name: droid-commit
+description: Commit staged/unstaged changes using the droid agent's status report or the diff itself. Use after a droid task completes or when the user says "droid commit".
+---
+
+Commit all uncommitted changes using the format below.
+
+**Source:** Use the agent's status report if available. Otherwise run `git diff HEAD` and derive the message from the diff.
+
+**Format:**
+```
+- **dcode:** → commit subject (one line summary)
+- **SUMMARY** → commit body (key technical decisions)
+- **FILES** → list of files changed
+- **NOTES** → blockers or context for the next iteration
+```
