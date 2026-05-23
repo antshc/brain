@@ -30,4 +30,11 @@ Check with the user that these modules match their expectations. Check with the 
    If these were provided as positional arguments, skip asking.
 
 6. Write the PRD using the `format-prd` skill's template and writing style. Save to the chosen destination.
-   - If GitHub issue creation fails because issues are disabled on the repo, ask the user for the correct repo URL and retry.
+
+**Troubleshooting:**
+On `Issues are disabled for this repo`: fall back to the user's private repo, then prompt for the correct repo URL and retry.
+
+Resolve target repo:
+- `<owner>`: `gh api user --jq .login`
+- `<repo>`: `basename "$(git rev-parse --show-toplevel)"`
+- Create with: `gh issue create --repo <owner>/<repo>`
