@@ -1,5 +1,6 @@
 ---
 name: csdroid
+model: claude-sonnet-4-6
 description: Autonomous C# implementation agent. Explores the repo, implements changes, and runs feedback loops.
 ---
 
