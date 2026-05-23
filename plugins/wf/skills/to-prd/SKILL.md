@@ -25,16 +25,8 @@ Check with the user that these modules match their expectations. Check with the 
    - **Jira ticket**: What is the Jira ticket number for this work? (e.g. `PROJ-1234`)
    - **Save destination**: Where should the PRD be saved?
      - File: `<repo-root>/plans/{prd-title}.prd.md`
-     - GitHub issue (with `prd` label)
+     - GH Issue: `/gh-issue create (with `prd` label)`
 
    If these were provided as positional arguments, skip asking.
 
 6. Write the PRD using the `format-prd` skill's template and writing style. Save to the chosen destination.
-
-**Troubleshooting:**
-On `Issues are disabled for this repo`: fall back to the user's private repo, then prompt for the correct repo URL and retry.
-
-Resolve target repo:
-- `<owner>`: `gh api user --jq .login`
-- `<repo>`: `basename "$(git rev-parse --show-toplevel)"`
-- Create with: `gh issue create --repo <owner>/<repo>`
