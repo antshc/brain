@@ -103,9 +103,10 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 
 ## 5. Commit
 
-After the agent reports back, use its status report to make a git commit. The commit message is composed from the agent's report fields:
-
-- **SUMMARY** → commit subject and body (key technical decisions)
+After the agent reports back, use its status report to make a git commit. 
+The commit message is composed from the agent's report fields:
+- **dcode:** → commit subject (one line summary)
+- **SUMMARY** → commit body (key technical decisions)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
