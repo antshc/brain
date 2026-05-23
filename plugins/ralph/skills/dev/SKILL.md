@@ -92,14 +92,12 @@ Pick the next task. Prioritize in this order (first match wins):
 Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent` with the following prompt (substitute actual values):
 
 ```
-Implement the following GitHub issue.
-
 ## TASK
 - Title: <title>
 - Body: <body>
 - Comments: <comments>
 
-## RECENT COMMITS
+## RECENT CHANGES
 <last 5 commits from step 1>
 ```
 
