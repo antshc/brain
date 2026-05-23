@@ -5,7 +5,7 @@
 Each layer only depends on layers below it. Never reference upward.
 
 ```
-Client
+Client             ← controllers, backround services
   ↓
 Manager            ← coordinates use cases (most volatile)
   ↓
@@ -17,7 +17,7 @@ Repository (optional) ← data access pattern
   ↓
 Resource           ← DB, FS, REST, Queue (least volatile)
 
-Utilities are callable by all layers.
+Utilities          ← callable by all layers.
 ```
 
 ## Dependency Rules
