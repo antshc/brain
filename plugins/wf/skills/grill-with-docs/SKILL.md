@@ -3,10 +3,11 @@ name: grill-with-docs
 description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
 ---
 
-<docs-repo-prequisites>
-1. Get <docs-repo>: `$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`, get <repo>: `${<docs-repo>##*/}`
-2. If the  `[ -d "../<repo>" ] && echo "exists" || echo "missing"` exists, explore it, if not git clone it to <docs-local-repo>: `../<repo>`
-</docs-repo-prequisites>
+<docs-repo-setup>
+1. Run `git remote get-url board 2>/dev/null`
+   - **Succeeds** → docs are in a separate repo. Resolve `<owner>/<repo>`: `git remote get-url board | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##'`. Set `<docs-path>` = `../<repo>` (sibling of repo root). If `[ ! -d "<docs-path>" ]` → `git clone <board-url> <docs-path>`.
+   - **Fails** → docs live in the current repository. Set `<docs-path>` = `.`
+</docs-repo-setup>
 
 <what-to-do>
 
@@ -22,11 +23,11 @@ If a question can be answered by exploring the codebase, explore the codebase in
 
 ## Domain awareness
 
-During codebase exploration, also look for existing documentation in the <docs-local-repo>:
+During codebase exploration, also look for existing documentation in `<docs-path>`:
 
 ### File structure
 
-Most <docs-local-repo> repos have a single context:
+Most `<docs-path>` repos have a single context:
 
 ```
 /
@@ -38,7 +39,7 @@ Most <docs-local-repo> repos have a single context:
 └── src/
 ```
 
-If a `CONTEXT-MAP.md` exists at the root, the <docs-local-repo> has multiple contexts. The map points to where each one lives:
+If a `CONTEXT-MAP.md` exists at the root, `<docs-path>` has multiple contexts. The map points to where each one lives:
 
 ```
 /
