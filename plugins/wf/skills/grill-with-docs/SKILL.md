@@ -3,6 +3,11 @@ name: grill-with-docs
 description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
 ---
 
+<docs-repo-prequisites>
+1. Get <docs-repo>: `$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`
+2. If the  `[ -d "../<docs-repo>" ] && echo "exists" || echo "missing"` exists, explore it, if not git clone it to `../<docs-repo>`
+</docs-repo-prequisites>
+
 <what-to-do>
 
 Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
@@ -17,7 +22,7 @@ If a question can be answered by exploring the codebase, explore the codebase in
 
 ## Domain awareness
 
-During codebase exploration, also look for existing documentation:
+During codebase exploration, also look for existing documentation in the <docs-repo>:
 
 ### File structure
 
