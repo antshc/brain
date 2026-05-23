@@ -1,5 +1,5 @@
 ---
-name: droid-commit
+name: to-commit
 description: Commit staged/unstaged changes using the droid agent's status report or the diff itself. Use after a droid task completes or when the user says "droid commit".
 ---
 
