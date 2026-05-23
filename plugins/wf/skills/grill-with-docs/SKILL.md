@@ -26,7 +26,7 @@ During codebase exploration, also look for existing documentation in the <docs-r
 
 ### File structure
 
-Most repos have a single context:
+Most <docs-repo> have a single context:
 
 ```
 /
@@ -38,7 +38,7 @@ Most repos have a single context:
 └── src/
 ```
 
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+If a `CONTEXT-MAP.md` exists at the root, the <docs-repo> has multiple contexts. The map points to where each one lives:
 
 ```
 /
