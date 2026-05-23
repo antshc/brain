@@ -4,8 +4,8 @@ description: Grilling session that challenges your plan against the existing dom
 ---
 
 <docs-repo-prequisites>
-1. Get <docs-repo>: `$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`
-2. If the  `[ -d "../<docs-repo>" ] && echo "exists" || echo "missing"` exists, explore it, if not git clone it to `../<docs-repo>`
+1. Get <docs-repo>: `$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`, get <repo>: `${<docs-repo>##*/}`
+2. If the  `[ -d "../<repo>" ] && echo "exists" || echo "missing"` exists, explore it, if not git clone it to <docs-local-repo>: `../<repo>`
 </docs-repo-prequisites>
 
 <what-to-do>
@@ -22,11 +22,11 @@ If a question can be answered by exploring the codebase, explore the codebase in
 
 ## Domain awareness
 
-During codebase exploration, also look for existing documentation in the <docs-repo>:
+During codebase exploration, also look for existing documentation in the <docs-local-repo>:
 
 ### File structure
 
-Most <docs-repo> have a single context:
+Most <docs-local-repo> repos have a single context:
 
 ```
 /
@@ -38,7 +38,7 @@ Most <docs-repo> have a single context:
 └── src/
 ```
 
-If a `CONTEXT-MAP.md` exists at the root, the <docs-repo> has multiple contexts. The map points to where each one lives:
+If a `CONTEXT-MAP.md` exists at the root, the <docs-local-repo> has multiple contexts. The map points to where each one lives:
 
 ```
 /
