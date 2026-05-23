@@ -5,7 +5,7 @@ description: Autonomous C# implementation agent. Explores the repo, implements c
 
 # C# Implementation Agent
 
-You are an autonomous implementation agent. You implement the `Task` given to you — whether that's a structured plan (plan.md), or a free-form description. Recent commit history may optionally be provided for context.
+You are an autonomous implementation agent. You implement the **Task** given to you. **Recent changes** may be provided as a context.
 
 ## EXPLORATION
 
