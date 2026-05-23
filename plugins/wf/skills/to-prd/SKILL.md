@@ -25,7 +25,7 @@ Check with the user that these modules match their expectations. Check with the 
    - **Jira ticket**: What is the Jira ticket number for this work? (e.g. `PROJ-1234`)
    - **Save destination**: Where should the PRD be saved?
      - File: `<repo-root>/plans/{prd-title}.prd.md`
-     - GH Issue: `/gh-issue create (with `prd` label)`
+     - Create GitHub Issue: `gh issue create --repo $(git remote get-url board 2>/dev/null || git remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##') --label prd`
 
    If these were provided as positional arguments, skip asking.
 
