@@ -13,7 +13,13 @@ Break a PRD into independently-grabbable GitHub issues using vertical slices (tr
 
 Ask the user for the PRD GitHub issue number (or URL).
 
-If the PRD is not already in your context window, fetch it with `gh issue view <number>` (with comments).
+If the PRD is not already in your context window, fetch it:
+
+```bash
+gh issue view <number> --json number,title,body,comments,milestone
+```
+
+Store `milestone.title` if present — it will be used when creating issues in step 5.
 
 ### 2. Explore the codebase (optional)
 
@@ -51,7 +57,7 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue using `gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`. Use the issue body template below.
+For each approved slice, create a GitHub issue using `gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`. If the PRD has a milestone, add `--milestone "<milestone-title>"` to each command. Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
