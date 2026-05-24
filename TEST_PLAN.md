@@ -260,6 +260,86 @@ Scenario: Empty input returns empty list
 
 ---
 
+## Feature: Issue Actionability
+
+> Unit: `Issue.is_actionable`
+
+```gherkin
+Scenario: Issue with ready label is actionable
+  Given an issue labeled ["ready"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with prd label is actionable
+  Given an issue labeled ["prd"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with ready and prd labels is actionable
+  Given an issue labeled ["ready", "prd"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with no actionable labels is not actionable
+  Given an issue labeled ["enhancement"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with ready and blocked labels is not actionable
+  Given an issue labeled ["ready", "blocked"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with prd and hitl labels is not actionable
+  Given an issue labeled ["prd", "hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with ready, prd, and blocking labels is not actionable
+  Given an issue labeled ["ready", "prd", "blocked", "hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with actionable and unrelated labels is actionable
+  Given an issue labeled ["ready", "bug"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue comment fields are preserved
+  Given an issue with one comment containing id, body, and created_at
+  When the issue is created
+  Then the issue exposes the same comment fields
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Issue Filter
+
+> Unit: `IssueFilter.get_actionable_issues()`
+
+```gherkin
+Scenario: Only actionable issues are returned
+  Given a list of issues with labels ["ready"], ["blocked"], ["prd"], and ["ready", "hitl"]
+  When get_actionable_issues() is called
+  Then the result contains issue numbers [1, 3]
+
+Scenario: All issues are non-actionable — empty list returned
+  Given a list of issues with labels ["bug"] and ["blocked"]
+  When get_actionable_issues() is called
+  Then the result is an empty list
+
+Scenario: Empty input returns empty list
+  Given an empty list of issues
+  When get_actionable_issues() is called
+  Then the result is an empty list
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: ThreadLabel Actionability
 
 > Unit: `ThreadLabel.is_actionable()`
@@ -327,6 +407,99 @@ Scenario: Missing startLine falls back to line for both start and end
   Given a raw thread dict with id "T2", path "a.py", startLine null, line 5
   When _thread_from_raw() is called
   Then the ReviewThread lines field is "5-5"
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: VCS Client Issue Mapping
+
+> Unit: `VCSClient.fetch_issues()`
+
+```gherkin
+Scenario: Raw issue nodes are mapped to Issue domain entities
+  Given GhCli returns one raw issue dict with number 13, title "Add fetch issues", body "Need issue + comment mapping"
+    And url "https://github.com/owner/repo/issues/13"
+    And labels ["ready", "bug"]
+    And one comment with id "IC_1", body "Need more context", createdAt "2026-05-24T10:00:00Z"
+  When fetch_issues() is called
+  Then the result contains one Issue with number 13, title "Add fetch issues", and labels ["ready", "bug"]
+  And comments[0] preserves id, body, and created_at
+
+Scenario: Missing issue labels and comments map to empty lists
+  Given GhCli returns one raw issue dict with number 21 and no labels or comments keys
+  When fetch_issues() is called
+  Then the result Issue has empty labels and empty comments lists
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Fetch Issues
+
+> Integration: mocked `GhCli`
+
+```gherkin
+Scenario: Handler returns correctly shaped output for actionable issues
+  Given the repository "owner/repo"
+    And the VCS returns actionable issues 14 and 15 with labels and comments
+  When fetch_issues() is called
+  Then the result is a serialisable list with both actionable issues and comment created_at fields
+
+Scenario: Handler returns empty list when no actionable issues exist
+  Given the repository "owner/repo"
+    And the VCS returns only non-actionable issues
+  When fetch_issues() is called
+  Then the result is []
+
+Scenario: Handler excludes blocked and non-actionable issues
+  Given the repository "owner/repo"
+    And the VCS returns one ready issue, one blocked ready issue, and one unrelated issue
+  When fetch_issues() is called
+  Then only the ready issue is returned
+
+Scenario: Milestone title is forwarded to GhCli
+  Given the repository "owner/repo"
+    And the VCS is backed by a mocked GhCli
+  When fetch_issues() is called with milestone_title "Sprint 1"
+  Then GhCli.fetch_issues_raw() is called with owner "owner", repo "repo", and milestone title "Sprint 1"
+```
+
+**Coverage:** Integration test
+
+---
+
+## Feature: Fetch Issues CLI
+
+> Unit: `fetch_issues.py`
+
+```gherkin
+Scenario: CLI prints JSON array for valid repository
+  Given fetch_issues() returns one serialisable issue for "owner/repo"
+  When main() is called with ["owner/repo"]
+  Then exit code is 0 and stdout is that JSON array
+
+Scenario: Missing argument prints usage error and returns one
+  Given no CLI arguments
+  When main() is called
+  Then exit code is 1 and stderr is the usage string
+
+Scenario: Invalid repository format prints error and returns one
+  Given the argument "owner-repo"
+  When main() is called
+  Then exit code is 1 and stderr reports invalid repository format
+
+Scenario: No actionable issues prints empty JSON array
+  Given fetch_issues() returns [] for "owner/repo"
+  When main() is called with ["owner/repo"]
+  Then exit code is 0 and stdout is []
+
+Scenario: CLI passes milestone title when provided
+  Given fetch_issues() is stubbed to capture its inputs
+  When main() is called with ["owner/repo", "--milestone", "Sprint 1"]
+  Then fetch_issues() receives repository "owner/repo" and milestone title "Sprint 1"
 ```
 
 **Coverage:** Unit test

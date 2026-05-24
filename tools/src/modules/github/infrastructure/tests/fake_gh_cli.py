@@ -19,10 +19,12 @@ class FakeGhCli(GhCli):
         self,
         pr_list_output: list[dict] | None = None,
         threads_raw: list[dict] | None = None,
+        issues_raw: list[dict] | None = None,
         checkout_error: Exception | None = None,
     ) -> None:
         self._pr_list_output = pr_list_output or []
         self._threads_raw = threads_raw or []
+        self._issues_raw = issues_raw or []
         self._checkout_error = checkout_error
 
     def pr_list(self, user: str, repo: str) -> list[dict]:
@@ -30,6 +32,9 @@ class FakeGhCli(GhCli):
 
     def fetch_threads_raw(self, owner: str, repo: str, number: int) -> list[dict]:
         return self._threads_raw
+
+    def fetch_issues_raw(self, owner: str, repo: str, milestone_title: str | None = None) -> list[dict]:
+        return self._issues_raw
 
     def pr_checkout(self, pr_url: str) -> None:
         if self._checkout_error:
