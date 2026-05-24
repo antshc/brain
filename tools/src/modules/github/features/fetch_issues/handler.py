@@ -9,6 +9,7 @@ from ...infrastructure.vcs_client import VCSClient
 def fetch_issues(
     repository: str,
     *,
+    milestone_title: str | None = None,
     vcs: VCSClient | None = None,
 ) -> list[dict]:
     """Fetch and return actionable issues for a repository as serialisable dicts."""
@@ -16,7 +17,7 @@ def fetch_issues(
     vcs = vcs or VCSClient()
     issue_filter = IssueFilter()
 
-    fetched_issues = vcs.fetch_issues(owner, repo)
+    fetched_issues = vcs.fetch_issues(owner, repo, milestone_title)
     actionable_issues = issue_filter.get_actionable_issues(fetched_issues)
 
     return [_issue_to_dict(issue) for issue in actionable_issues]

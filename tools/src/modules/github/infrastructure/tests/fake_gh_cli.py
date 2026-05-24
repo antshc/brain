@@ -33,7 +33,7 @@ class FakeGhCli(GhCli):
     def fetch_threads_raw(self, owner: str, repo: str, number: int) -> list[dict]:
         return self._threads_raw
 
-    def fetch_issues_raw(self, owner: str, repo: str) -> list[dict]:
+    def fetch_issues_raw(self, owner: str, repo: str, milestone_title: str | None = None) -> list[dict]:
         return self._issues_raw
 
     def pr_checkout(self, pr_url: str) -> None:

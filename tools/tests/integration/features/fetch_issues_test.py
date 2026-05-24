@@ -42,10 +42,10 @@ def make_raw_issue(
 
 
 def setup_handler(issues_raw: list[dict]):
-    """Return (repository, vcs) wired for a test with a mock GhCli."""
+    """Return (repository, vcs, gh) wired for a test with a mock GhCli."""
     mock_gh = MagicMock(spec=GhCli)
     mock_gh.fetch_issues_raw.return_value = issues_raw
-    return _REPOSITORY, VCSClient(gh=mock_gh)
+    return _REPOSITORY, VCSClient(gh=mock_gh), mock_gh
 
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ class TestFetchIssues:
                 ],
             ),
         ]
-        repository, vcs = setup_handler(issues_raw)
+        repository, vcs, _ = setup_handler(issues_raw)
 
         result = fetch_issues(repository, vcs=vcs)
 
@@ -94,7 +94,7 @@ class TestFetchIssues:
             make_raw_issue(20, ["bug"]),
             make_raw_issue(21, ["blocked"]),
         ]
-        repository, vcs = setup_handler(issues_raw)
+        repository, vcs, _ = setup_handler(issues_raw)
 
         result = fetch_issues(repository, vcs=vcs)
 
@@ -107,9 +107,34 @@ class TestFetchIssues:
             make_raw_issue(31, ["ready", "blocked"]),
             make_raw_issue(32, ["enhancement"]),
         ]
-        repository, vcs = setup_handler(issues_raw)
+        repository, vcs, _ = setup_handler(issues_raw)
 
         result = fetch_issues(repository, vcs=vcs)
 
         assert len(result) == 1
         assert result[0]["number"] == 30
+
+    def test_milestone_title_is_forwarded_to_gh_cli(self):
+        # Scenario: Milestone title is forwarded to GhCli
+        issues_raw = [make_raw_issue(40, ["ready"])]
+        repository, vcs, gh = setup_handler(issues_raw)
+
+        result = fetch_issues(repository, milestone_title="Sprint 1", vcs=vcs)
+
+        gh.fetch_issues_raw.assert_called_once_with("owner", "repo", "Sprint 1")
+        assert result == [
+            {
+                "number": 40,
+                "title": "Issue 40",
+                "body": "Body for issue 40",
+                "url": "https://github.com/owner/repo/issues/40",
+                "labels": ["ready"],
+                "comments": [
+                    {
+                        "id": "IC_40",
+                        "body": "Comment for issue 40",
+                        "created_at": "2026-05-24T10:00:00Z",
+                    }
+                ],
+            }
+        ]
