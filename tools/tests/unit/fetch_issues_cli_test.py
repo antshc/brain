@@ -19,7 +19,7 @@ class TestFetchIssuesCli:
         monkeypatch.setattr(
             fetch_issues_cli,
             "fetch_issues",
-            lambda repository: [{"number": 14, "title": "Issue 14", "body": "", "url": "u", "labels": [], "comments": []}],
+            lambda repository, milestone_title=None: [{"number": 14, "title": "Issue 14", "body": "", "url": "u", "labels": [], "comments": []}],
         )
 
         exit_code = fetch_issues_cli.main(["owner/repo"])
@@ -38,7 +38,7 @@ class TestFetchIssuesCli:
 
         assert exit_code == 1
         assert captured.out == ""
-        assert captured.err == "Usage: fetch_issues.py <owner>/<repo>\n"
+        assert captured.err == "Usage: fetch_issues.py <owner>/<repo> [--milestone <title>]\n"
 
     def test_invalid_repository_format_prints_error_and_returns_one(self, capsys):
         # Scenario: Invalid repository format prints error and returns one
@@ -51,7 +51,7 @@ class TestFetchIssuesCli:
 
     def test_no_actionable_issues_prints_empty_json_array(self, monkeypatch, capsys):
         # Scenario: No actionable issues prints empty JSON array
-        monkeypatch.setattr(fetch_issues_cli, "fetch_issues", lambda repository: [])
+        monkeypatch.setattr(fetch_issues_cli, "fetch_issues", lambda repository, milestone_title=None: [])
 
         exit_code = fetch_issues_cli.main(["owner/repo"])
         captured = capsys.readouterr()
@@ -59,3 +59,22 @@ class TestFetchIssuesCli:
         assert exit_code == 0
         assert json.loads(captured.out) == []
         assert captured.err == ""
+
+    def test_cli_passes_milestone_title_when_provided(self, monkeypatch, capsys):
+        # Scenario: CLI passes milestone title when provided
+        captured_args = {}
+
+        def fake_fetch_issues(repository, milestone_title=None):
+            captured_args["repository"] = repository
+            captured_args["milestone_title"] = milestone_title
+            return []
+
+        monkeypatch.setattr(fetch_issues_cli, "fetch_issues", fake_fetch_issues)
+
+        exit_code = fetch_issues_cli.main(["owner/repo", "--milestone", "Sprint 1"])
+        captured = capsys.readouterr()
+
+        assert exit_code == 0
+        assert json.loads(captured.out) == []
+        assert captured.err == ""
+        assert captured_args == {"repository": "owner/repo", "milestone_title": "Sprint 1"}

@@ -437,6 +437,75 @@ Scenario: Missing issue labels and comments map to empty lists
 
 ---
 
+## Feature: Fetch Issues
+
+> Integration: mocked `GhCli`
+
+```gherkin
+Scenario: Handler returns correctly shaped output for actionable issues
+  Given the repository "owner/repo"
+    And the VCS returns actionable issues 14 and 15 with labels and comments
+  When fetch_issues() is called
+  Then the result is a serialisable list with both actionable issues and comment created_at fields
+
+Scenario: Handler returns empty list when no actionable issues exist
+  Given the repository "owner/repo"
+    And the VCS returns only non-actionable issues
+  When fetch_issues() is called
+  Then the result is []
+
+Scenario: Handler excludes blocked and non-actionable issues
+  Given the repository "owner/repo"
+    And the VCS returns one ready issue, one blocked ready issue, and one unrelated issue
+  When fetch_issues() is called
+  Then only the ready issue is returned
+
+Scenario: Milestone title is forwarded to GhCli
+  Given the repository "owner/repo"
+    And the VCS is backed by a mocked GhCli
+  When fetch_issues() is called with milestone_title "Sprint 1"
+  Then GhCli.fetch_issues_raw() is called with owner "owner", repo "repo", and milestone title "Sprint 1"
+```
+
+**Coverage:** Integration test
+
+---
+
+## Feature: Fetch Issues CLI
+
+> Unit: `fetch_issues.py`
+
+```gherkin
+Scenario: CLI prints JSON array for valid repository
+  Given fetch_issues() returns one serialisable issue for "owner/repo"
+  When main() is called with ["owner/repo"]
+  Then exit code is 0 and stdout is that JSON array
+
+Scenario: Missing argument prints usage error and returns one
+  Given no CLI arguments
+  When main() is called
+  Then exit code is 1 and stderr is the usage string
+
+Scenario: Invalid repository format prints error and returns one
+  Given the argument "owner-repo"
+  When main() is called
+  Then exit code is 1 and stderr reports invalid repository format
+
+Scenario: No actionable issues prints empty JSON array
+  Given fetch_issues() returns [] for "owner/repo"
+  When main() is called with ["owner/repo"]
+  Then exit code is 0 and stdout is []
+
+Scenario: CLI passes milestone title when provided
+  Given fetch_issues() is stubbed to capture its inputs
+  When main() is called with ["owner/repo", "--milestone", "Sprint 1"]
+  Then fetch_issues() receives repository "owner/repo" and milestone title "Sprint 1"
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: PR URL Parsing
 
 > Unit: `parse_pr_url()`

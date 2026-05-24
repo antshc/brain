@@ -37,6 +37,23 @@ query($owner: String!, $repo: String!) {{
   }}
 }}
 """.format(comments_limit=_ISSUE_COMMENTS_LIMIT)
+_OPEN_ISSUES_BY_MILESTONE_QUERY = """
+query($owner: String!, $repo: String!, $milestone: String!) {{
+  repository(owner: $owner, name: $repo) {{
+    issues(first: 100, states: OPEN, filterBy: {{ milestone: $milestone }}) {{
+      nodes {{
+        number title body url
+        labels(first: 20) {{
+          nodes {{ name }}
+        }}
+        comments(first: {comments_limit}) {{
+          nodes {{ id body createdAt }}
+        }}
+      }}
+    }}
+  }}
+}}
+""".format(comments_limit=_ISSUE_COMMENTS_LIMIT)
 
 
 class GhCli:
@@ -72,14 +89,17 @@ class GhCli:
             node["comments"] = node["comments"]["nodes"]
         return nodes
 
-    def fetch_issues_raw(self, owner: str, repo: str) -> list[dict]:
+    def fetch_issues_raw(self, owner: str, repo: str, milestone_title: str | None = None) -> list[dict]:
         """Run `gh api graphql` for open issues and return flattened nodes."""
+        query = _OPEN_ISSUES_BY_MILESTONE_QUERY if milestone_title else _OPEN_ISSUES_QUERY
         cmd = [
             "gh", "api", "graphql",
-            "-f", f"query={_OPEN_ISSUES_QUERY}",
+            "-f", f"query={query}",
             "-f", f"owner={owner}",
             "-f", f"repo={repo}",
         ]
+        if milestone_title:
+            cmd.extend(["-f", f"milestone={milestone_title}"])
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         data = json.loads(result.stdout)
         nodes = data["data"]["repository"]["issues"]["nodes"]

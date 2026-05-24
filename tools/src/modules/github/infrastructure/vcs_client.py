@@ -37,9 +37,9 @@ class VCSClient:
         nodes = self._gh.fetch_threads_raw(owner, repo, number)
         return [self._thread_from_raw(node) for node in nodes]
 
-    def fetch_issues(self, owner: str, repo: str) -> list[Issue]:
+    def fetch_issues(self, owner: str, repo: str, milestone_title: str | None = None) -> list[Issue]:
         """Fetch open issues via GraphQL."""
-        nodes = self._gh.fetch_issues_raw(owner, repo)
+        nodes = self._gh.fetch_issues_raw(owner, repo, milestone_title)
         return [self._issue_from_raw(node) for node in nodes]
 
     def _thread_from_raw(self, raw: dict) -> ReviewThread:

@@ -10,14 +10,14 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from github.features.fetch_issues.handler import fetch_issues
 
-_USAGE = "Usage: fetch_issues.py <owner>/<repo>"
+_USAGE = "Usage: fetch_issues.py <owner>/<repo> [--milestone <title>]"
 _REPOSITORY_RE = re.compile(r"^[^/]+/[^/]+$")
 
 
 def main(argv: list[str] | None = None) -> int:
-    argv = argv or sys.argv[1:]
+    argv = sys.argv[1:] if argv is None else argv
 
-    if len(argv) != 1:
+    if not argv:
         print(_USAGE, file=sys.stderr)
         return 1
 
@@ -29,7 +29,16 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
 
-    print(json.dumps(fetch_issues(repository), indent=2))
+    milestone_title: str | None = None
+    if len(argv) == 1:
+        pass
+    elif len(argv) == 3 and argv[1] == "--milestone":
+        milestone_title = argv[2]
+    else:
+        print(_USAGE, file=sys.stderr)
+        return 1
+
+    print(json.dumps(fetch_issues(repository, milestone_title=milestone_title), indent=2))
     return 0
 
 
