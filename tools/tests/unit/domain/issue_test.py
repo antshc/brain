@@ -13,45 +13,45 @@ from modules.github.domain.issue_comment import IssueComment
 class TestIssueActionability:
     """Feature: Issue Actionability"""
 
-    def test_issue_with_ready_label_is_actionable(self):
-        # Scenario: Issue with ready label is actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready"])
+    def test_issue_with_no_labels_is_actionable(self):
+        # Scenario: Issue with no labels is actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=[])
         assert issue.is_actionable is True
 
-    def test_issue_with_prd_label_is_actionable(self):
-        # Scenario: Issue with prd label is actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["prd"])
-        assert issue.is_actionable is True
-
-    def test_issue_with_ready_and_prd_labels_is_actionable(self):
-        # Scenario: Issue with ready and prd labels is actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "prd"])
-        assert issue.is_actionable is True
-
-    def test_issue_with_no_actionable_labels_is_not_actionable(self):
-        # Scenario: Issue with no actionable labels is not actionable
+    def test_issue_with_unrelated_label_is_actionable(self):
+        # Scenario: Issue with unrelated label is actionable
         issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["enhancement"])
-        assert issue.is_actionable is False
-
-    def test_issue_with_ready_and_blocked_labels_is_not_actionable(self):
-        # Scenario: Issue with ready and blocked labels is not actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "blocked"])
-        assert issue.is_actionable is False
-
-    def test_issue_with_prd_and_hitl_labels_is_not_actionable(self):
-        # Scenario: Issue with prd and hitl labels is not actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["prd", "hitl"])
-        assert issue.is_actionable is False
-
-    def test_issue_with_ready_prd_and_blocking_labels_is_not_actionable(self):
-        # Scenario: Issue with ready, prd, and blocking labels is not actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "prd", "blocked", "hitl"])
-        assert issue.is_actionable is False
-
-    def test_issue_with_actionable_and_unrelated_labels_is_actionable(self):
-        # Scenario: Issue with actionable and unrelated labels is actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "bug"])
         assert issue.is_actionable is True
+
+    def test_issue_with_blocked_label_is_actionable(self):
+        # Scenario: Issue with blocked label is actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["blocked"])
+        assert issue.is_actionable is True
+
+    def test_issue_with_ready_and_blocked_labels_is_actionable(self):
+        # Scenario: Issue with ready and blocked labels is actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "blocked"])
+        assert issue.is_actionable is True
+
+    def test_issue_with_hitl_label_is_not_actionable(self):
+        # Scenario: Issue with hitl label is not actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["hitl"])
+        assert issue.is_actionable is False
+
+    def test_issue_with_prd_label_is_not_actionable(self):
+        # Scenario: Issue with prd label is not actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["prd"])
+        assert issue.is_actionable is False
+
+    def test_issue_with_ready_and_prd_labels_is_not_actionable(self):
+        # Scenario: Issue with ready and prd labels is not actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "prd"])
+        assert issue.is_actionable is False
+
+    def test_issue_with_blocked_and_hitl_labels_is_not_actionable(self):
+        # Scenario: Issue with blocked and hitl labels is not actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["blocked", "hitl"])
+        assert issue.is_actionable is False
 
     def test_issue_comment_fields_are_preserved(self):
         # Scenario: Issue comment fields are preserved

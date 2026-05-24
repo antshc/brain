@@ -57,10 +57,10 @@ class TestFetchIssues:
     def test_returns_correctly_shaped_output_for_actionable_issues(self):
         # Scenario: Handler returns correctly shaped output for actionable issues
         issues_raw = [
-            make_raw_issue(14, ["ready", "bug"]),
+            make_raw_issue(14, ["bug"]),
             make_raw_issue(
                 15,
-                ["prd"],
+                ["blocked"],
                 comments=[
                     {
                         "id": "IC_15",
@@ -80,7 +80,7 @@ class TestFetchIssues:
         assert issue["title"] == "Issue 14"
         assert issue["body"] == "Body for issue 14"
         assert issue["url"] == "https://github.com/owner/repo/issues/14"
-        assert issue["labels"] == ["ready", "bug"]
+        assert issue["labels"] == ["bug"]
         assert issue["comments"] == [
             {
                 "id": "IC_14",
@@ -92,8 +92,8 @@ class TestFetchIssues:
     def test_returns_empty_list_when_no_actionable_issues(self):
         # Scenario: Handler returns empty list when no actionable issues exist
         issues_raw = [
-            make_raw_issue(20, ["bug"]),
-            make_raw_issue(21, ["blocked"]),
+            make_raw_issue(20, ["prd"]),
+            make_raw_issue(21, ["hitl"]),
         ]
         owner, repo, vcs, _ = setup_handler(issues_raw)
 
@@ -101,23 +101,23 @@ class TestFetchIssues:
 
         assert result == []
 
-    def test_excludes_blocked_and_non_actionable_issues(self):
-        # Scenario: Handler excludes blocked and non-actionable issues
+    def test_includes_blocked_and_excludes_prd_and_hitl_issues(self):
+        # Scenario: Handler includes blocked issues and excludes prd and hitl issues
         issues_raw = [
-            make_raw_issue(30, ["ready"]),
-            make_raw_issue(31, ["ready", "blocked"]),
-            make_raw_issue(32, ["enhancement"]),
+            make_raw_issue(30, ["blocked"]),
+            make_raw_issue(31, ["prd"]),
+            make_raw_issue(32, ["enhancement", "hitl"]),
+            make_raw_issue(33, []),
         ]
         owner, repo, vcs, _ = setup_handler(issues_raw)
 
         result = fetch_issues(owner, repo, vcs=vcs)
 
-        assert len(result) == 1
-        assert result[0]["number"] == 30
+        assert [issue["number"] for issue in result] == [30, 33]
 
     def test_milestone_title_is_forwarded_to_gh_cli(self):
         # Scenario: Milestone title is forwarded to GhCli
-        issues_raw = [make_raw_issue(40, ["ready"])]
+        issues_raw = [make_raw_issue(40, ["bug"])]
         owner, repo, vcs, gh = setup_handler(issues_raw)
 
         result = fetch_issues(owner, repo, milestone_title="Sprint 1", vcs=vcs)
@@ -129,7 +129,7 @@ class TestFetchIssues:
                 "title": "Issue 40",
                 "body": "Body for issue 40",
                 "url": "https://github.com/owner/repo/issues/40",
-                "labels": ["ready"],
+                "labels": ["bug"],
                 "comments": [
                     {
                         "id": "IC_40",
