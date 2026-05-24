@@ -437,6 +437,43 @@ Scenario: Missing issue labels and comments map to empty lists
 
 ---
 
+## Feature: VCS Client Milestone Mapping
+
+> Unit: `VCSClient.list_milestones()`
+
+```gherkin
+Scenario: Raw milestone nodes are mapped to Milestone domain entities
+  Given GhCli returns one raw milestone dict with id "M1", title "Sprint 1", and description "First delivery slice"
+    And url "https://github.com/owner/repo/milestone/1"
+  When list_milestones() is called
+  Then the result contains one Milestone with the same id, title, description, and url
+
+Scenario: Missing milestone description maps to empty string
+  Given GhCli returns one raw milestone dict with id "M2", title "Backlog", and description null
+  When list_milestones() is called
+  Then the result Milestone description is ""
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: GhCli Milestone Query Construction
+
+> Unit: `GhCli.list_milestones_raw()`
+
+```gherkin
+Scenario: Open milestones query is built and nodes are returned
+  Given gh api graphql returns one milestone node for owner "owner" and repo "repo"
+  When list_milestones_raw() is called
+  Then subprocess.run() is invoked with the open milestones GraphQL query and repository variables
+  And the returned nodes are passed through unchanged
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: Fetch Issues
 
 > Integration: mocked `GhCli`

@@ -54,6 +54,17 @@ query($owner: String!, $repo: String!, $milestone: String!) {{
   }}
 }}
 """.format(comments_limit=_ISSUE_COMMENTS_LIMIT)
+_MILESTONES_QUERY = """
+query($owner: String!, $repo: String!) {
+  repository(owner: $owner, name: $repo) {
+    milestones(first: 100, states: [OPEN]) {
+      nodes {
+        id title description url
+      }
+    }
+  }
+}
+"""
 
 
 class GhCli:
@@ -107,6 +118,18 @@ class GhCli:
             node["labels"] = [label["name"] for label in node["labels"]["nodes"]]
             node["comments"] = node["comments"]["nodes"]
         return nodes
+
+    def list_milestones_raw(self, owner: str, repo: str) -> list[dict]:
+        """Run `gh api graphql` for open milestones and return flattened nodes."""
+        cmd = [
+            "gh", "api", "graphql",
+            "-f", f"query={_MILESTONES_QUERY}",
+            "-f", f"owner={owner}",
+            "-f", f"repo={repo}",
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        data = json.loads(result.stdout)
+        return data["data"]["repository"]["milestones"]["nodes"]
 
     def pr_checkout(self, pr_url: str) -> None:
         """Run `gh pr checkout` for the given PR URL."""
