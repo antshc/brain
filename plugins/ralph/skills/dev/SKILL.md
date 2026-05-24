@@ -40,7 +40,23 @@ Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1
 
 ## 3. Create worktree
 
-Invoke the `/worktree` skill:
+Before invoking `/worktree`, check whether the current branch is already the computed feature branch:
+
+```bash
+current_branch=$(git branch --show-current)
+```
+
+**If `current_branch` equals `<feature-branch>`:**
+
+```bash
+WORKTREE_PATH=$(pwd)
+BRANCH=$current_branch
+echo "Already on feature branch $BRANCH, skipping worktree setup."
+```
+
+Skip the `/worktree` invocation and proceed directly to the ORCHESTRATOR LOOP.
+
+**Otherwise**, invoke the `/worktree` skill:
 
 ```
 /worktree <target-branch> <feature-branch>
@@ -159,7 +175,20 @@ git push -u origin "$branch" 2>/dev/null || git push
 
 # CREATE PULL REQUEST
 
-Once all tasks are complete and the loop exits, open a draft PR targeting the target branch from inside `WORKTREE_PATH`:
+Once all tasks are complete and the loop exits, check whether a PR already exists for `$branch` targeting `<target-branch>`:
+
+```bash
+existing_pr=$(gh pr list \
+  --head "$branch" \
+  --base "<target-branch>" \
+  --state open \
+  --json url \
+  --jq '.[0].url' 2>/dev/null)
+```
+
+**If `existing_pr` is non-empty**, a PR already exists — print `"PR already exists: $existing_pr"` and skip creation.
+
+**Otherwise**, open a draft PR from inside `WORKTREE_PATH`:
 
 ```bash
 gh pr create --draft \
