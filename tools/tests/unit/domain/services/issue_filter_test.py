@@ -26,19 +26,19 @@ class TestIssueFilter:
     def test_only_actionable_issues_are_returned(self):
         # Scenario: Only actionable issues are returned
         issues = [
-            _make_issue(1, ["ready"]),
+            _make_issue(1, []),
             _make_issue(2, ["blocked"]),
             _make_issue(3, ["prd"]),
-            _make_issue(4, ["ready", "hitl"]),
+            _make_issue(4, ["bug", "hitl"]),
         ]
         result = IssueFilter().get_actionable_issues(issues)
-        assert [issue.number for issue in result] == [1, 3]
+        assert [issue.number for issue in result] == [1, 2]
 
     def test_all_issues_are_non_actionable_empty_list_returned(self):
         # Scenario: All issues are non-actionable — empty list returned
         issues = [
-            _make_issue(1, ["bug"]),
-            _make_issue(2, ["blocked"]),
+            _make_issue(1, ["prd"]),
+            _make_issue(2, ["hitl"]),
         ]
         result = IssueFilter().get_actionable_issues(issues)
         assert result == []
