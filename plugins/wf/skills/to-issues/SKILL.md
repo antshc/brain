@@ -1,25 +1,28 @@
 ---
 name: to-issues
-description: Break a PRD into independently-grabbable GitHub issues using tracer-bullet vertical slices. Use when user wants to convert a PRD to issues, create implementation tickets, or break down a PRD into work items.
+description: Breaks a PRD into tracer-bullet GitHub issues. Accepts an optional plan or plan.md to guide slicing.
+argument-hint: "<prd-id> [<implementation details or path to plan.md>]"
 ---
 
-# PRD to Issues
-
-Break a PRD into independently-grabbable GitHub issues using vertical slices (tracer bullets).
+# Implementation details to Issues
 
 ## Process
 
-### 1. Locate the PRD
+### 1. Gather inputs
 
-Ask the user for the PRD GitHub issue number (or URL).
-
-If the PRD is not already in your context window, fetch it:
+**PRD (required)** — first argument: issue number or URL. If missing, ask for it.
 
 ```bash
 gh issue view <number> --json number,title,body,comments,milestone
 ```
 
-Store `milestone.title` if present — it will be used when creating issues in step 5.
+Store `milestone.title` if present — used in step 5.
+
+**Implementation details (optional)** — second argument, if provided:
+- **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
+- **Inline text** — use directly as implementation context.
+
+If omitted, codebase exploration in step 2 supplies context instead.
 
 ### 2. Explore the codebase (optional)
 
@@ -44,7 +47,7 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Title**: short descriptive name
 - **Type**: HITL / AFK
 - **Blocked by**: which other slices (if any) must complete first
-- **User stories covered**: which user stories from the PRD this addresses
+- **Behavior Rules covered**: which behavior rules from the PRD this addresses
 
 Ask the user:
 
@@ -82,12 +85,18 @@ A concise description of this vertical slice. Describe the end-to-end behavior, 
 
 Or "None - can start immediately" if no blockers.
 
-## User stories addressed
+## Behavior Rules addressed
 
 Reference by number from the parent PRD:
 
-- User story 3
-- User story 7
+- Behavior rule 3
+- Behavior rule 7
+
+## Implementation Decisions
+
+- Preserve integration constraints and assumptions required for implementation.
+- Use short technical statements and implementation-oriented language.
+- No specific file paths or code snippets (they become outdated quickly).
 
 </issue-template>
 
