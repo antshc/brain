@@ -3,6 +3,7 @@
 import json
 import subprocess
 
+_ISSUE_COMMENTS_LIMIT = 20
 _REVIEW_THREADS_QUERY = """
 query($owner: String!, $repo: String!, $number: Int!) {
   repository(owner: $owner, name: $repo) {
@@ -19,6 +20,23 @@ query($owner: String!, $repo: String!, $number: Int!) {
   }
 }
 """
+_OPEN_ISSUES_QUERY = """
+query($owner: String!, $repo: String!) {{
+  repository(owner: $owner, name: $repo) {{
+    issues(first: 100, states: OPEN) {{
+      nodes {{
+        number title body url
+        labels(first: 20) {{
+          nodes {{ name }}
+        }}
+        comments(first: {comments_limit}) {{
+          nodes {{ id body createdAt }}
+        }}
+      }}
+    }}
+  }}
+}}
+""".format(comments_limit=_ISSUE_COMMENTS_LIMIT)
 
 
 class GhCli:
@@ -51,6 +69,22 @@ class GhCli:
         data = json.loads(result.stdout)
         nodes = data["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
         for node in nodes:
+            node["comments"] = node["comments"]["nodes"]
+        return nodes
+
+    def fetch_issues_raw(self, owner: str, repo: str) -> list[dict]:
+        """Run `gh api graphql` for open issues and return flattened nodes."""
+        cmd = [
+            "gh", "api", "graphql",
+            "-f", f"query={_OPEN_ISSUES_QUERY}",
+            "-f", f"owner={owner}",
+            "-f", f"repo={repo}",
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        data = json.loads(result.stdout)
+        nodes = data["data"]["repository"]["issues"]["nodes"]
+        for node in nodes:
+            node["labels"] = [label["name"] for label in node["labels"]["nodes"]]
             node["comments"] = node["comments"]["nodes"]
         return nodes
 

@@ -413,6 +413,30 @@ Scenario: Missing startLine falls back to line for both start and end
 
 ---
 
+## Feature: VCS Client Issue Mapping
+
+> Unit: `VCSClient.fetch_issues()`
+
+```gherkin
+Scenario: Raw issue nodes are mapped to Issue domain entities
+  Given GhCli returns one raw issue dict with number 13, title "Add fetch issues", body "Need issue + comment mapping"
+    And url "https://github.com/owner/repo/issues/13"
+    And labels ["ready", "bug"]
+    And one comment with id "IC_1", body "Need more context", createdAt "2026-05-24T10:00:00Z"
+  When fetch_issues() is called
+  Then the result contains one Issue with number 13, title "Add fetch issues", and labels ["ready", "bug"]
+  And comments[0] preserves id, body, and created_at
+
+Scenario: Missing issue labels and comments map to empty lists
+  Given GhCli returns one raw issue dict with number 21 and no labels or comments keys
+  When fetch_issues() is called
+  Then the result Issue has empty labels and empty comments lists
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: PR URL Parsing
 
 > Unit: `parse_pr_url()`
