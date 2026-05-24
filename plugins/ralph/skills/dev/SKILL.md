@@ -23,7 +23,7 @@ If the milestone is not found, **exit** and report "Milestone not found: `<argum
 Store `milestone.title` for use in issue commands below.
 
 Extract from `milestone.description`:
-- **Jira Ticket** — value inside backticks after `**Jira Ticket:**` (e.g. `PROJ-1234`)
+- **Feature ID** — value inside backticks after `**Feature ID:**` (e.g. `PROJ-1234`)
 - **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`)
 
 If either field is missing, **exit** and report "Milestone is missing required metadata."
@@ -130,8 +130,8 @@ Once all tasks are complete and the loop exits, open a draft PR targeting the ta
 
 ```bash
 gh pr create --draft \
-  --title "[<jira-ticket>]: <prd-title>" \
-  --body "**Jira Ticket:** \`<jira-ticket>\`" \
+  --title "[<feature-id>]: <prd-title>" \
+  --body "**Feature ID:** \`<feature-id>\`" \
   --base "<target-branch>" \
   --head "$branch"
 ```
