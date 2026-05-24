@@ -21,6 +21,7 @@ class TestGhCliMilestoneQueryConstruction:
         nodes = [
             {
                 "id": "M1",
+                "number": 1,
                 "title": "Sprint 1",
                 "description": "First delivery slice",
                 "url": "https://github.com/owner/repo/milestone/1",

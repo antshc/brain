@@ -59,7 +59,7 @@ query($owner: String!, $repo: String!) {
   repository(owner: $owner, name: $repo) {
     milestones(first: 100, states: [OPEN]) {
       nodes {
-        id title description url
+        id number title description url
       }
     }
   }
