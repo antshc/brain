@@ -15,7 +15,8 @@ A `<milestone>` argument is **required** in the format `#<id>` (e.g. `#1`, `#42`
 Strip the `#` prefix and fetch the milestone directly:
 
 ```bash
-gh api repos/{owner}/{repo}/milestones/<id>
+repo=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+gh api repos/$repo/milestones/<id>
 ```
 
 If the milestone is not found, **exit** and report "Milestone not found: `<argument>`".
@@ -64,7 +65,7 @@ Run the following commands and print their output so it is available as context.
 echo "=== COMMITS ==="; 
 echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
 echo ""
-echo "=== TASKS ==="; echo "$(gh issue list --state open --milestone "<milestone>" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["prd"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
+echo "=== TASKS ==="; echo "$(gh issue list --repo $repo --state open --milestone "<milestone>" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["prd"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
 ```
 
 Parse the `TASKS` json array. Review `COMMITS` to understand what work has already been done.
@@ -132,7 +133,7 @@ Using the Implementation Decisions and Behavior Rules from step 5, update both s
 
 1. Fetch the open PRD issue:
    ```bash
-   gh issue list --milestone "<milestone>" --label "prd" --state open --json number,body --jq '.[0]'
+   gh issue list --repo $repo --milestone "<milestone>" --label "prd" --state open --json number,body --jq '.[0]'
    ```
 2. If no PRD issue is found, skip this step and continue.
 3. For each section — `## Implementation Decisions` and `## Behavior Rules` — apply the same merge logic:
