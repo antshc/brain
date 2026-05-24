@@ -40,23 +40,7 @@ Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1
 
 ## 3. Create worktree
 
-Before invoking `/worktree`, check whether the current branch is already the computed feature branch:
-
-```bash
-current_branch=$(git branch --show-current)
-```
-
-**If `current_branch` equals `<feature-branch>`:**
-
-```bash
-WORKTREE_PATH=$(pwd)
-BRANCH=$current_branch
-echo "Already on feature branch $BRANCH, skipping worktree setup."
-```
-
-Skip the `/worktree` invocation and proceed directly to the ORCHESTRATOR LOOP.
-
-**Otherwise**, invoke the `/worktree` skill:
+Invoke the `/worktree` skill:
 
 ```
 /worktree <target-branch> <feature-branch>
