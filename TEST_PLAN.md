@@ -265,45 +265,45 @@ Scenario: Empty input returns empty list
 > Unit: `Issue.is_actionable`
 
 ```gherkin
-Scenario: Issue with ready label is actionable
-  Given an issue labeled ["ready"]
+Scenario: Issue with no labels is actionable
+  Given an issue labeled []
   When is_actionable is evaluated
   Then the result is True
 
-Scenario: Issue with prd label is actionable
-  Given an issue labeled ["prd"]
-  When is_actionable is evaluated
-  Then the result is True
-
-Scenario: Issue with ready and prd labels is actionable
-  Given an issue labeled ["ready", "prd"]
-  When is_actionable is evaluated
-  Then the result is True
-
-Scenario: Issue with no actionable labels is not actionable
+Scenario: Issue with unrelated label is actionable
   Given an issue labeled ["enhancement"]
   When is_actionable is evaluated
-  Then the result is False
+  Then the result is True
 
-Scenario: Issue with ready and blocked labels is not actionable
-  Given an issue labeled ["ready", "blocked"]
-  When is_actionable is evaluated
-  Then the result is False
-
-Scenario: Issue with prd and hitl labels is not actionable
-  Given an issue labeled ["prd", "hitl"]
-  When is_actionable is evaluated
-  Then the result is False
-
-Scenario: Issue with ready, prd, and blocking labels is not actionable
-  Given an issue labeled ["ready", "prd", "blocked", "hitl"]
-  When is_actionable is evaluated
-  Then the result is False
-
-Scenario: Issue with actionable and unrelated labels is actionable
-  Given an issue labeled ["ready", "bug"]
+Scenario: Issue with blocked label is actionable
+  Given an issue labeled ["blocked"]
   When is_actionable is evaluated
   Then the result is True
+
+Scenario: Issue with ready and blocked labels is actionable
+  Given an issue labeled ["ready", "blocked"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with hitl label is not actionable
+  Given an issue labeled ["hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with prd label is not actionable
+  Given an issue labeled ["prd"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with ready and prd labels is not actionable
+  Given an issue labeled ["ready", "prd"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with blocked and hitl labels is not actionable
+  Given an issue labeled ["blocked", "hitl"]
+  When is_actionable is evaluated
+  Then the result is False
 
 Scenario: Issue comment fields are preserved
   Given an issue with one comment containing id, body, and created_at
@@ -321,12 +321,12 @@ Scenario: Issue comment fields are preserved
 
 ```gherkin
 Scenario: Only actionable issues are returned
-  Given a list of issues with labels ["ready"], ["blocked"], ["prd"], and ["ready", "hitl"]
+  Given a list of issues with labels [], ["blocked"], ["prd"], and ["bug", "hitl"]
   When get_actionable_issues() is called
-  Then the result contains issue numbers [1, 3]
+  Then the result contains issue numbers [1, 2]
 
 Scenario: All issues are non-actionable — empty list returned
-  Given a list of issues with labels ["bug"] and ["blocked"]
+  Given a list of issues with labels ["prd"] and ["hitl"]
   When get_actionable_issues() is called
   Then the result is an empty list
 
@@ -491,11 +491,11 @@ Scenario: Handler returns empty list when no actionable issues exist
   When fetch_issues() is called
   Then the result is []
 
-Scenario: Handler excludes blocked and non-actionable issues
+Scenario: Handler includes blocked issues and excludes prd and hitl issues
   Given the repository "owner/repo"
-    And the VCS returns one ready issue, one blocked ready issue, and one unrelated issue
+    And the VCS returns one blocked issue, one prd issue, one hitl issue, and one unlabeled issue
   When fetch_issues() is called
-  Then only the ready issue is returned
+  Then only the blocked and unlabeled issues are returned
 
 Scenario: Milestone title is forwarded to GhCli
   Given the repository "owner/repo"
