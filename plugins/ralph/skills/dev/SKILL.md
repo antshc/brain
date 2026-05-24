@@ -72,10 +72,9 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 ## 2. Exit conditions
 
 - If no tasks are available, **exit**.
-- If all tasks are complete, close the `prd`-labeled issue in the milestone and **exit**:
-  ```bash
-  gh issue list --milestone "<milestone>" --label "prd" --state open --json number --jq '.[0].number' | xargs gh issue close
-  ```
+- If all tasks are complete, **exit**. The `prd`-labeled issue is owned by the user — do not close it.
+
+> `prd`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
 
 ## 3. Select next task
 
@@ -103,14 +102,37 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 
 ## 5. Commit
 
-After the agent reports back, use its status report to make a git commit. 
-The commit message is composed from the agent's report fields:
+After the agent reports back, distill the agent's SUMMARY into **Implementation Decisions** — 1–3 compressed technical bullets:
+- Short, implementation-oriented statements.
+- No file paths or code snippets.
+- No filler — every word carries information.
+
+Use these decisions for both the commit body and the PRD update in step 6.
+
+Build the commit from the agent's report fields:
 - **dcode:** → commit subject (one line summary)
-- **SUMMARY** → commit body (key technical decisions)
+- **SUMMARY** → commit body (Implementation Decisions)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
-## 6. Handle result
+## 6. Update PRD
+
+Using the Implementation Decisions from step 5, update the `## Implementation Decisions` section of the PRD issue.
+
+1. Fetch the open PRD issue:
+   ```bash
+   gh issue list --milestone "<milestone>" --label "prd" --state open --json number,body --jq '.[0]'
+   ```
+2. If no PRD issue is found, skip this step and continue.
+3. Review the existing `## Implementation Decisions` entries against the new decisions:
+   - Replace any entry that conflicts with or is superseded by a new decision.
+   - Append decisions that are additive.
+4. Write the updated body back:
+   ```bash
+   gh issue edit <prd-number> --body "<updated-body>"
+   ```
+
+## 7. Handle result
 
 Read the agent's `STATUS` field:
 
@@ -144,3 +166,4 @@ If the PR creation fails, **exit** and report the error.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
+- NEVER IMPLEMENT `prd`-LABELED ISSUES. They define the work; the user owns their lifecycle.
