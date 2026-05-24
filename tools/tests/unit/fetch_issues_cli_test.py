@@ -19,7 +19,7 @@ class TestFetchIssuesCli:
         monkeypatch.setattr(
             fetch_issues_cli,
             "fetch_issues",
-            lambda repository, milestone_title=None: [{"number": 14, "title": "Issue 14", "body": "", "url": "u", "labels": [], "comments": []}],
+            lambda owner, repo, milestone_title=None: [{"number": 14, "title": "Issue 14", "body": "", "url": "u", "labels": [], "comments": []}],
         )
 
         exit_code = fetch_issues_cli.main(["owner/repo"])
@@ -51,7 +51,7 @@ class TestFetchIssuesCli:
 
     def test_no_actionable_issues_prints_empty_json_array(self, monkeypatch, capsys):
         # Scenario: No actionable issues prints empty JSON array
-        monkeypatch.setattr(fetch_issues_cli, "fetch_issues", lambda repository, milestone_title=None: [])
+        monkeypatch.setattr(fetch_issues_cli, "fetch_issues", lambda owner, repo, milestone_title=None: [])
 
         exit_code = fetch_issues_cli.main(["owner/repo"])
         captured = capsys.readouterr()
@@ -64,8 +64,9 @@ class TestFetchIssuesCli:
         # Scenario: CLI passes milestone title when provided
         captured_args = {}
 
-        def fake_fetch_issues(repository, milestone_title=None):
-            captured_args["repository"] = repository
+        def fake_fetch_issues(owner, repo, milestone_title=None):
+            captured_args["owner"] = owner
+            captured_args["repo"] = repo
             captured_args["milestone_title"] = milestone_title
             return []
 
@@ -77,4 +78,4 @@ class TestFetchIssuesCli:
         assert exit_code == 0
         assert json.loads(captured.out) == []
         assert captured.err == ""
-        assert captured_args == {"repository": "owner/repo", "milestone_title": "Sprint 1"}
+        assert captured_args == {"owner": "owner", "repo": "repo", "milestone_title": "Sprint 1"}

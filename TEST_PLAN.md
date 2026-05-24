@@ -437,6 +437,43 @@ Scenario: Missing issue labels and comments map to empty lists
 
 ---
 
+## Feature: VCS Client Milestone Mapping
+
+> Unit: `VCSClient.list_milestones()`
+
+```gherkin
+Scenario: Raw milestone nodes are mapped to Milestone domain entities
+  Given GhCli returns one raw milestone dict with id "M1", number 1, title "Sprint 1", and description "First delivery slice"
+    And url "https://github.com/owner/repo/milestone/1"
+  When list_milestones() is called
+  Then the result contains one Milestone with the same id, number, title, description, and url
+
+Scenario: Missing milestone description maps to empty string
+  Given GhCli returns one raw milestone dict with id "M2", number 2, title "Backlog", and description null
+  When list_milestones() is called
+  Then the result Milestone description is ""
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: GhCli Milestone Query Construction
+
+> Unit: `GhCli.list_milestones_raw()`
+
+```gherkin
+Scenario: Open milestones query is built and nodes are returned
+  Given gh api graphql returns one milestone node for owner "owner" and repo "repo"
+  When list_milestones_raw() is called
+  Then subprocess.run() is invoked with the open milestones GraphQL query and repository variables
+  And the returned nodes are passed through unchanged
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: Fetch Issues
 
 > Integration: mocked `GhCli`
@@ -500,6 +537,90 @@ Scenario: CLI passes milestone title when provided
   Given fetch_issues() is stubbed to capture its inputs
   When main() is called with ["owner/repo", "--milestone", "Sprint 1"]
   Then fetch_issues() receives repository "owner/repo" and milestone title "Sprint 1"
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Dev Milestone Loop
+
+> Unit: `afk.features.dev.handler.dev()`
+
+```gherkin
+Scenario: No open milestones found — early exit
+  Given list_milestones() returns no milestones for owner "owner" and repo "repo"
+  When dev() is called
+  Then no issues are fetched and the AI agent is not invoked
+
+Scenario: Milestone with no actionable issues is skipped
+  Given list_milestones() returns milestone "Sprint 3"
+    And fetch_issues() returns only non-actionable issues for that milestone
+  When dev() is called
+  Then the milestone is skipped without updating the execution log
+
+Scenario: Milestone at max executions is skipped
+  Given list_milestones() returns milestone "Sprint 3"
+    And fetch_issues() returns actionable issues for that milestone
+    And the execution log count for the milestone URL equals the max executions limit
+  When dev() is called
+  Then the AI agent is not invoked and the milestone is skipped
+
+Scenario: Actionable milestone invokes agent and updates execution log
+  Given list_milestones() returns milestone number 3 titled "Sprint 3"
+    And fetch_issues() returns at least one actionable issue for that milestone
+    And the execution log count for the milestone URL is 0
+  When dev() is called
+  Then AIAgent is invoked with prompt "/ralph:dev #3"
+    And the execution log is updated for the milestone URL with no thread ids
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Dev CLI
+
+> Unit: `afk.features.dev.cli`
+
+```gherkin
+Scenario: Parser applies default arguments for valid repository
+  Given the argument ["--github_repo", "owner/repo"]
+  When the dev CLI parser parses arguments
+  Then github_repo is "owner/repo" and defaults are applied for max_executions, agent, prompt, and log_dir
+
+Scenario: Parser accepts custom arguments
+  Given the arguments ["--github_repo", "owner/repo", "--max_executions", "7", "--agent", "other-agent", "--prompt", "/custom:dev", "--log-dir", "custom-logs"]
+  When the dev CLI parser parses arguments
+  Then the parsed values match the provided overrides
+
+Scenario: Parser requires github_repo argument
+  Given no CLI arguments
+  When the dev CLI parser parses arguments
+  Then argparse exits with code 2
+
+Scenario: GitHub repo validator rejects invalid repository format
+  Given the repository value "owner-repo"
+  When _github_repo() is called
+  Then an ArgumentTypeError is raised
+
+Scenario: Repo dir validator rejects missing directory
+  Given a path to a directory that does not exist
+  When _repo_dir() is called
+  Then an ArgumentTypeError is raised
+
+Scenario: Main delegates to handler with info logging
+  Given parsed arguments for repository "owner/repo" and custom execution settings
+    And AFK_DEBUG is not set
+  When main() is called
+  Then logging is configured at INFO level with file and stderr handlers
+    And dev() is called with owner "owner" and repo "repo"
+
+Scenario: Main uses debug logging when AFK_DEBUG is set
+  Given parsed arguments for repository "owner/repo"
+    And AFK_DEBUG is set
+  When main() is called
+  Then logging is configured at DEBUG level
 ```
 
 **Coverage:** Unit test
