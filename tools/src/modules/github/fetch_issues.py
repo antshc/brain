@@ -28,6 +28,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 1
+    owner, repo = repository.split("/", 1)
 
     milestone_title: str | None = None
     if len(argv) == 1:
@@ -38,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
         print(_USAGE, file=sys.stderr)
         return 1
 
-    print(json.dumps(fetch_issues(repository, milestone_title=milestone_title), indent=2))
+    print(json.dumps(fetch_issues(owner, repo, milestone_title=milestone_title), indent=2))
     return 0
 
 
