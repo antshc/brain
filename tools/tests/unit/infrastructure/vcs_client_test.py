@@ -6,6 +6,7 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
+from modules.github.domain.milestone import Milestone
 from modules.github.infrastructure.tests.fake_gh_cli import FakeGhCli
 from modules.github.infrastructure.vcs_client import VCSClient
 
@@ -103,3 +104,55 @@ class TestVCSClientIssueMapping:
         assert len(result) == 1
         assert result[0].labels == []
         assert result[0].comments == []
+
+
+class TestVCSClientMilestoneMapping:
+    """Feature: VCS Client Milestone Mapping"""
+
+    def test_raw_milestone_nodes_are_mapped_to_milestone_domain_entities(self):
+        # Scenario: Raw milestone nodes are mapped to Milestone domain entities
+        client = VCSClient(
+            gh=FakeGhCli(
+                milestones_raw=[
+                    {
+                        "id": "M1",
+                        "number": 1,
+                        "title": "Sprint 1",
+                        "description": "First delivery slice",
+                        "url": "https://github.com/owner/repo/milestone/1",
+                    }
+                ]
+            )
+        )
+
+        result = client.list_milestones("owner", "repo")
+
+        assert result == [
+            Milestone(
+                id="M1",
+                number=1,
+                title="Sprint 1",
+                description="First delivery slice",
+                url="https://github.com/owner/repo/milestone/1",
+            )
+        ]
+
+    def test_missing_milestone_description_maps_to_empty_string(self):
+        # Scenario: Missing milestone description maps to empty string
+        client = VCSClient(
+            gh=FakeGhCli(
+                milestones_raw=[
+                    {
+                        "id": "M2",
+                        "number": 2,
+                        "title": "Backlog",
+                        "description": None,
+                        "url": "https://github.com/owner/repo/milestone/2",
+                    }
+                ]
+            )
+        )
+
+        result = client.list_milestones("owner", "repo")
+
+        assert result[0].description == ""

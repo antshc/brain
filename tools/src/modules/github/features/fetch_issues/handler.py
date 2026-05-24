@@ -7,13 +7,13 @@ from ...infrastructure.vcs_client import VCSClient
 
 
 def fetch_issues(
-    repository: str,
+    owner: str,
+    repo: str,
     *,
     milestone_title: str | None = None,
     vcs: VCSClient | None = None,
 ) -> list[dict]:
     """Fetch and return actionable issues for a repository as serialisable dicts."""
-    owner, repo = repository.split("/", 1)
     vcs = vcs or VCSClient()
     issue_filter = IssueFilter()
 
