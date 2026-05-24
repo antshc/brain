@@ -1,7 +1,7 @@
 ---
 name: to-issues
 description: Breaks a PRD into tracer-bullet GitHub issues. Accepts an optional plan or plan.md to guide slicing.
-argument-hint: "<prd-id> [<implementation details or path to plan.md>]"
+argument-hint: "[<implementation details or path to plan.md>]"
 ---
 
 # Implementation details to Issues
@@ -10,7 +10,7 @@ argument-hint: "<prd-id> [<implementation details or path to plan.md>]"
 
 ### 1. Gather inputs
 
-**PRD (required)** — first argument: issue number or URL. If missing, ask for it.
+**PRD (required)** — resolve in this order: Already in context (e.g. an open GitHub issue with the `prd` label, a prior message, or a URL). Ask the user for it if not found.
 
 ```bash
 gh issue view <number> --json number,title,body,comments,milestone
@@ -60,7 +60,9 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue using `gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`. If the PRD has a milestone, add `--milestone "<milestone-title>"` to each command. Use the issue body template below.
+For each approved slice, create a GitHub issue using `gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`.
+
+The `--milestone "<milestone-title>"` from the PRD is required for each command, if missing ask user. Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
