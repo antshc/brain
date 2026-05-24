@@ -12,7 +12,8 @@ from modules.github.features.fetch_issues.handler import fetch_issues
 from modules.github.infrastructure.gh_cli import GhCli
 from modules.github.infrastructure.vcs_client import VCSClient
 
-_REPOSITORY = "owner/repo"
+_OWNER = "owner"
+_REPO = "repo"
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -42,10 +43,10 @@ def make_raw_issue(
 
 
 def setup_handler(issues_raw: list[dict]):
-    """Return (repository, vcs, gh) wired for a test with a mock GhCli."""
+    """Return (owner, repo, vcs, gh) wired for a test with a mock GhCli."""
     mock_gh = MagicMock(spec=GhCli)
     mock_gh.fetch_issues_raw.return_value = issues_raw
-    return _REPOSITORY, VCSClient(gh=mock_gh), mock_gh
+    return _OWNER, _REPO, VCSClient(gh=mock_gh), mock_gh
 
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
@@ -69,9 +70,9 @@ class TestFetchIssues:
                 ],
             ),
         ]
-        repository, vcs, _ = setup_handler(issues_raw)
+        owner, repo, vcs, _ = setup_handler(issues_raw)
 
-        result = fetch_issues(repository, vcs=vcs)
+        result = fetch_issues(owner, repo, vcs=vcs)
 
         assert len(result) == 2
         issue = result[0]
@@ -94,9 +95,9 @@ class TestFetchIssues:
             make_raw_issue(20, ["bug"]),
             make_raw_issue(21, ["blocked"]),
         ]
-        repository, vcs, _ = setup_handler(issues_raw)
+        owner, repo, vcs, _ = setup_handler(issues_raw)
 
-        result = fetch_issues(repository, vcs=vcs)
+        result = fetch_issues(owner, repo, vcs=vcs)
 
         assert result == []
 
@@ -107,9 +108,9 @@ class TestFetchIssues:
             make_raw_issue(31, ["ready", "blocked"]),
             make_raw_issue(32, ["enhancement"]),
         ]
-        repository, vcs, _ = setup_handler(issues_raw)
+        owner, repo, vcs, _ = setup_handler(issues_raw)
 
-        result = fetch_issues(repository, vcs=vcs)
+        result = fetch_issues(owner, repo, vcs=vcs)
 
         assert len(result) == 1
         assert result[0]["number"] == 30
@@ -117,9 +118,9 @@ class TestFetchIssues:
     def test_milestone_title_is_forwarded_to_gh_cli(self):
         # Scenario: Milestone title is forwarded to GhCli
         issues_raw = [make_raw_issue(40, ["ready"])]
-        repository, vcs, gh = setup_handler(issues_raw)
+        owner, repo, vcs, gh = setup_handler(issues_raw)
 
-        result = fetch_issues(repository, milestone_title="Sprint 1", vcs=vcs)
+        result = fetch_issues(owner, repo, milestone_title="Sprint 1", vcs=vcs)
 
         gh.fetch_issues_raw.assert_called_once_with("owner", "repo", "Sprint 1")
         assert result == [
