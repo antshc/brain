@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Unit tests for VCSClient._thread_from_raw().
+"""Unit tests for VCSClient mapping helpers.
 
 Mapped to TEST_PLAN.md — every class docstring names the Feature,
 every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
+from modules.github.infrastructure.tests.fake_gh_cli import FakeGhCli
 from modules.github.infrastructure.vcs_client import VCSClient
 
 
@@ -42,3 +43,63 @@ class TestVCSClientThreadMapping:
         }
         result = VCSClient()._thread_from_raw(raw)
         assert result.lines == "5-5"
+
+
+class TestVCSClientIssueMapping:
+    """Feature: VCS Client Issue Mapping"""
+
+    def test_raw_issue_nodes_are_mapped_to_issue_domain_entities(self):
+        # Scenario: Raw issue nodes are mapped to Issue domain entities
+        client = VCSClient(
+            gh=FakeGhCli(
+                issues_raw=[
+                    {
+                        "number": 13,
+                        "title": "Add fetch issues",
+                        "body": "Need issue + comment mapping",
+                        "url": "https://github.com/owner/repo/issues/13",
+                        "labels": ["ready", "bug"],
+                        "comments": [
+                            {
+                                "id": "IC_1",
+                                "body": "Need more context",
+                                "createdAt": "2026-05-24T10:00:00Z",
+                            }
+                        ],
+                    }
+                ]
+            )
+        )
+
+        result = client.fetch_issues("owner", "repo")
+
+        assert len(result) == 1
+        assert result[0].number == 13
+        assert result[0].title == "Add fetch issues"
+        assert result[0].body == "Need issue + comment mapping"
+        assert result[0].url == "https://github.com/owner/repo/issues/13"
+        assert result[0].labels == ["ready", "bug"]
+        assert result[0].comments[0].id == "IC_1"
+        assert result[0].comments[0].body == "Need more context"
+        assert result[0].comments[0].created_at == "2026-05-24T10:00:00Z"
+
+    def test_missing_issue_labels_and_comments_map_to_empty_lists(self):
+        # Scenario: Missing issue labels and comments map to empty lists
+        client = VCSClient(
+            gh=FakeGhCli(
+                issues_raw=[
+                    {
+                        "number": 21,
+                        "title": "No metadata",
+                        "body": "",
+                        "url": "https://github.com/owner/repo/issues/21",
+                    }
+                ]
+            )
+        )
+
+        result = client.fetch_issues("owner", "repo")
+
+        assert len(result) == 1
+        assert result[0].labels == []
+        assert result[0].comments == []
