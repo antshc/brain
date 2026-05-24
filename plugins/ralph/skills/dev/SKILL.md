@@ -100,39 +100,50 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 <last 5 commits from step 1>
 ```
 
-## 5. Commit
+## 5. Distill
 
-After the agent reports back, distill the agent's SUMMARY into **Implementation Decisions** — 1–3 compressed technical bullets:
+Distill the agent's SUMMARY into two outputs. Use both in step 6 (commit body) and step 7 (PRD update).
+
+**Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-Use these decisions for both the commit body and the PRD update in step 6.
+**Behavior Rules** — observable external behavior statements:
+- No implementation details — rules describe externally visible behavior, not internals.
+- Plain words only — no backticks, type names, or code formatting.
+- Single-responsibility — one scenario or transition per rule.
+- Rule format (pick one per bullet):
+  1. `<triggering condition>` → `<resulting behavior>`
+  2. The system MUST/SHOULD `<behavior>` when `<condition>`
+  3. `<subject>` `<behavior>`
 
-Build the commit from the agent's report fields:
+## 6. Commit
+
+Build the commit from the agent's report fields and the distilled outputs from step 5:
 - **dcode:** → commit subject (one line summary)
-- **SUMMARY** → commit body (Implementation Decisions)
+- **SUMMARY** → commit body (two labelled blocks: Behavior Rules, then Implementation Decisions)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
-## 6. Update PRD
+## 7. Update PRD
 
-Using the Implementation Decisions from step 5, update the `## Implementation Decisions` section of the PRD issue.
+Using the Implementation Decisions and Behavior Rules from step 5, update both sections of the PRD issue.
 
 1. Fetch the open PRD issue:
    ```bash
    gh issue list --milestone "<milestone>" --label "prd" --state open --json number,body --jq '.[0]'
    ```
 2. If no PRD issue is found, skip this step and continue.
-3. Review the existing `## Implementation Decisions` entries against the new decisions:
-   - Replace any entry that conflicts with or is superseded by a new decision.
-   - Append decisions that are additive.
+3. For each section — `## Implementation Decisions` and `## Behavior Rules` — apply the same merge logic:
+   - Replace any entry that conflicts with or is superseded by a new decision/rule.
+   - Append decisions/rules that are additive.
 4. Write the updated body back:
    ```bash
    gh issue edit <prd-number> --body "<updated-body>"
    ```
 
-## 7. Handle result
+## 8. Handle result
 
 Read the agent's `STATUS` field:
 
