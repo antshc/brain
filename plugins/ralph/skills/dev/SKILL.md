@@ -137,7 +137,7 @@ Distill the agent's SUMMARY into two outputs. Use both in step 6 (commit body) a
 ## 6. Commit
 
 Build the commit from the agent's report fields and the distilled outputs from step 5:
-- **dcode:** → commit subject (one line summary)
+- **SUBJECT** → dcode: one line summary
 - **SUMMARY** → commit body (two labelled blocks: Behavior Rules, then Implementation Decisions)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
