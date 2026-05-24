@@ -116,6 +116,7 @@ class TestVCSClientMilestoneMapping:
                 milestones_raw=[
                     {
                         "id": "M1",
+                        "number": 1,
                         "title": "Sprint 1",
                         "description": "First delivery slice",
                         "url": "https://github.com/owner/repo/milestone/1",
@@ -129,6 +130,7 @@ class TestVCSClientMilestoneMapping:
         assert result == [
             Milestone(
                 id="M1",
+                number=1,
                 title="Sprint 1",
                 description="First delivery slice",
                 url="https://github.com/owner/repo/milestone/1",
@@ -142,6 +144,7 @@ class TestVCSClientMilestoneMapping:
                 milestones_raw=[
                     {
                         "id": "M2",
+                        "number": 2,
                         "title": "Backlog",
                         "description": None,
                         "url": "https://github.com/owner/repo/milestone/2",

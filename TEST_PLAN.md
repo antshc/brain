@@ -443,13 +443,13 @@ Scenario: Missing issue labels and comments map to empty lists
 
 ```gherkin
 Scenario: Raw milestone nodes are mapped to Milestone domain entities
-  Given GhCli returns one raw milestone dict with id "M1", title "Sprint 1", and description "First delivery slice"
+  Given GhCli returns one raw milestone dict with id "M1", number 1, title "Sprint 1", and description "First delivery slice"
     And url "https://github.com/owner/repo/milestone/1"
   When list_milestones() is called
-  Then the result contains one Milestone with the same id, title, description, and url
+  Then the result contains one Milestone with the same id, number, title, description, and url
 
 Scenario: Missing milestone description maps to empty string
-  Given GhCli returns one raw milestone dict with id "M2", title "Backlog", and description null
+  Given GhCli returns one raw milestone dict with id "M2", number 2, title "Backlog", and description null
   When list_milestones() is called
   Then the result Milestone description is ""
 ```
@@ -537,6 +537,42 @@ Scenario: CLI passes milestone title when provided
   Given fetch_issues() is stubbed to capture its inputs
   When main() is called with ["owner/repo", "--milestone", "Sprint 1"]
   Then fetch_issues() receives repository "owner/repo" and milestone title "Sprint 1"
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Dev Milestone Loop
+
+> Unit: `afk.features.dev.handler.dev()`
+
+```gherkin
+Scenario: No open milestones found — early exit
+  Given list_milestones() returns no milestones for owner "owner" and repo "repo"
+  When dev() is called
+  Then no issues are fetched and the AI agent is not invoked
+
+Scenario: Milestone with no actionable issues is skipped
+  Given list_milestones() returns milestone "Sprint 3"
+    And fetch_issues() returns only non-actionable issues for that milestone
+  When dev() is called
+  Then the milestone is skipped without updating the execution log
+
+Scenario: Milestone at max executions is skipped
+  Given list_milestones() returns milestone "Sprint 3"
+    And fetch_issues() returns actionable issues for that milestone
+    And the execution log count for the milestone URL equals the max executions limit
+  When dev() is called
+  Then the AI agent is not invoked and the milestone is skipped
+
+Scenario: Actionable milestone invokes agent and updates execution log
+  Given list_milestones() returns milestone number 3 titled "Sprint 3"
+    And fetch_issues() returns at least one actionable issue for that milestone
+    And the execution log count for the milestone URL is 0
+  When dev() is called
+  Then AIAgent is invoked with prompt "/ralph:dev #3"
+    And the execution log is updated for the milestone URL with no thread ids
 ```
 
 **Coverage:** Unit test

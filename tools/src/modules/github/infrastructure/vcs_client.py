@@ -85,6 +85,7 @@ class VCSClient:
         """Map a raw GitHub API milestone dict to a Milestone domain entity."""
         return Milestone(
             id=raw["id"],
+            number=raw["number"],
             title=raw.get("title", ""),
             description=raw.get("description") or "",
             url=raw["url"],
