@@ -3,6 +3,8 @@
 import logging
 
 from ..domain.comment import Comment
+from ..domain.issue import Issue
+from ..domain.issue_comment import IssueComment
 from ..domain.pull_request import PullRequest
 from ..domain.review_thread import ReviewThread
 from .gh_cli import GhCli
@@ -35,6 +37,11 @@ class VCSClient:
         nodes = self._gh.fetch_threads_raw(owner, repo, number)
         return [self._thread_from_raw(node) for node in nodes]
 
+    def fetch_issues(self, owner: str, repo: str) -> list[Issue]:
+        """Fetch open issues via GraphQL."""
+        nodes = self._gh.fetch_issues_raw(owner, repo)
+        return [self._issue_from_raw(node) for node in nodes]
+
     def _thread_from_raw(self, raw: dict) -> ReviewThread:
         """Map a raw GitHub API thread dict to a ReviewThread domain entity."""
         comments = [Comment(author=c["author"]["login"], body=c["body"]) for c in raw.get("comments", [])]
@@ -45,5 +52,25 @@ class VCSClient:
             path=raw.get("path", ""),
             lines=f"{start}-{end}",
             is_resolved=raw.get("isResolved", False),
+            comments=comments,
+        )
+
+    def _issue_from_raw(self, raw: dict) -> Issue:
+        """Map a raw GitHub API issue dict to an Issue domain entity."""
+        labels = [label["name"] if isinstance(label, dict) else label for label in raw.get("labels", [])]
+        comments = [
+            IssueComment(
+                id=comment["id"],
+                body=comment.get("body", ""),
+                created_at=comment.get("createdAt", comment.get("created_at", "")),
+            )
+            for comment in raw.get("comments", [])
+        ]
+        return Issue(
+            number=raw["number"],
+            title=raw.get("title", ""),
+            body=raw.get("body", ""),
+            url=raw["url"],
+            labels=labels,
             comments=comments,
         )
