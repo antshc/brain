@@ -29,4 +29,17 @@ Check with the user that these modules match their expectations. Check with the 
 
    If these were provided as positional arguments, skip asking.
 
-6. Write the PRD using the `format-prd` skill's template and writing style. Save to the chosen destination.
+6. **If saving as a GitHub issue**, after the issue is created, create a milestone and assign the issue to it:
+
+   ```bash
+   repo=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+   gh api repos/$repo/milestones \
+     --method POST \
+     --field title="<jira-ticket>: <prd-title>" \
+     --field description="**Jira Ticket:** \`<jira-ticket>\`\n**Target Branch:** \`<target-branch>\`"
+   gh issue edit <number> --milestone "<jira-ticket>: <prd-title>"
+   ```
+
+   Report the milestone title and URL to the user.
+
+7. Write the PRD using the `format-prd` skill's template and writing style. Save to the chosen destination.

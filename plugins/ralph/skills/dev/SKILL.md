@@ -1,47 +1,44 @@
 ---
 name: dev
 description: AFK autonomous development loop — picks the next open issue, implements it, and commits the result.
+argument-hint: '#<milestone-id>'
 ---
 
 # WORKTREE SETUP
 
 Before entering the orchestrator loop, resolve the PRD and set up the worktree.
 
-## 1. Fetch the PRD
+## 1. Resolve milestone
+
+A `<milestone>` argument is **required** in the format `#<id>` (e.g. `#1`, `#42`). If not provided, **exit** and report `Usage: /dev #<milestone-id>`.
+
+Strip the `#` prefix and fetch the milestone directly:
 
 ```bash
-prd=$(gh issue list --state open --label "ready,prd" --json number,labels,title,body,comments --limit 1 -q '.[0]' 2>/dev/null)
+gh api repos/{owner}/{repo}/milestones/<id>
 ```
 
-If no PRD is found, **exit** and report "No open PRD found."
+If the milestone is not found, **exit** and report "Milestone not found: `<argument>`".
 
-## 2. Parse PRD metadata
+Store `milestone.title` for use in issue commands below.
 
-Extract from the PRD body by matching these lines:
-
-```
-**Target Branch:** `<target-branch>`
-**Jira Ticket:** `<jira-ticket>`
-```
-
-- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`)
+Extract from `milestone.description`:
 - **Jira Ticket** — value inside backticks after `**Jira Ticket:**` (e.g. `PROJ-1234`)
-- **PRD Title** — from the issue title
+- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`)
 
-If either field is missing, **exit** and report that the PRD is missing required metadata.
+If either field is missing, **exit** and report "Milestone is missing required metadata."
 
-## 3. Compute feature branch name
+## 2. Compute feature branch name
 
-Format: `<version_underscored>_<jira-ticket-lowercased>-<prd-title-slug>`
+Format: `<version_underscored>_<milestone-title-slug>`
 
 Rules:
 - Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `1_3_10`
-- Lowercase the Jira ticket (e.g. `PROJ-1234` → `proj-1234`)
-- Slugify the PRD title: lowercase, replace spaces/special chars with hyphens, strip consecutive hyphens, max 40 chars
+- Slugify the full milestone title: lowercase, replace spaces and special chars (including `:`) with hyphens, strip consecutive hyphens, max 50 chars
 
-Example: target `release/1.3.10`, jira `PROJ-1234`, title "Azure Storage Circuit Breaker" → `1_3_10_proj-1234-azure-storage-circuit-breaker`
+Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1.3.10` → `1_3_10_proj-1234-azure-storage-circuit-breaker`
 
-## 4. Create worktree
+## 3. Create worktree
 
 Invoke the `/worktree` skill:
 
@@ -67,7 +64,7 @@ Run the following commands and print their output so it is available as context.
 echo "=== COMMITS ==="; 
 echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
 echo ""
-echo "=== TASKS ==="; echo "$(gh issue list --state open --label "ready" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["blocked"]) or contains(["hitl"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
+echo "=== TASKS ==="; echo "$(gh issue list --state open --milestone "<milestone>" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["prd"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
 ```
 
 Parse the `TASKS` json array. Review `COMMITS` to understand what work has already been done.
@@ -75,7 +72,10 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 ## 2. Exit conditions
 
 - If no tasks are available, **exit**.
-- If all `ready` tasks are complete, close the PRD task and **exit**.
+- If all `ready` tasks are complete, close the `prd`-labeled issue in the milestone and **exit**:
+  ```bash
+  gh issue list --milestone "<milestone>" --label "prd" --state open --json number --jq '.[0].number' | xargs gh issue close
+  ```
 
 ## 3. Select next task
 
@@ -116,7 +116,7 @@ Read the agent's `STATUS` field:
 
 - **complete**: Close the issue with `gh issue close <number>`, push the branch, and loop back to step 1.
 - **partial**: Comment on the issue with the agent's SUMMARY using `gh issue comment <number> --body "..."`, push the branch, and loop back to step 1.
-- **blocked**: Add `blocked` label to the issue with `gh issue edit <number> --add-label "blocked"`, then loop back to step 1 to pick the next task.
+- **blocked**: Add `hitl` label to the issue with `gh issue edit <number> --add-label "hitl"`, then loop back to step 1 to pick the next task.
 
 After **complete** or **partial**, push the feature branch:
 
