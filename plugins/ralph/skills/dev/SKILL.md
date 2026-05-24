@@ -72,7 +72,7 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 ## 2. Exit conditions
 
 - If no tasks are available, **exit**.
-- If all `ready` tasks are complete, close the `prd`-labeled issue in the milestone and **exit**:
+- If all tasks are complete, close the `prd`-labeled issue in the milestone and **exit**:
   ```bash
   gh issue list --milestone "<milestone>" --label "prd" --state open --json number --jq '.[0].number' | xargs gh issue close
   ```
