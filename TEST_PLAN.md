@@ -260,6 +260,86 @@ Scenario: Empty input returns empty list
 
 ---
 
+## Feature: Issue Actionability
+
+> Unit: `Issue.is_actionable`
+
+```gherkin
+Scenario: Issue with ready label is actionable
+  Given an issue labeled ["ready"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with prd label is actionable
+  Given an issue labeled ["prd"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with ready and prd labels is actionable
+  Given an issue labeled ["ready", "prd"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue with no actionable labels is not actionable
+  Given an issue labeled ["enhancement"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with ready and blocked labels is not actionable
+  Given an issue labeled ["ready", "blocked"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with prd and hitl labels is not actionable
+  Given an issue labeled ["prd", "hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with ready, prd, and blocking labels is not actionable
+  Given an issue labeled ["ready", "prd", "blocked", "hitl"]
+  When is_actionable is evaluated
+  Then the result is False
+
+Scenario: Issue with actionable and unrelated labels is actionable
+  Given an issue labeled ["ready", "bug"]
+  When is_actionable is evaluated
+  Then the result is True
+
+Scenario: Issue comment fields are preserved
+  Given an issue with one comment containing id, body, and created_at
+  When the issue is created
+  Then the issue exposes the same comment fields
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Issue Filter
+
+> Unit: `IssueFilter.get_actionable_issues()`
+
+```gherkin
+Scenario: Only actionable issues are returned
+  Given a list of issues with labels ["ready"], ["blocked"], ["prd"], and ["ready", "hitl"]
+  When get_actionable_issues() is called
+  Then the result contains issue numbers [1, 3]
+
+Scenario: All issues are non-actionable — empty list returned
+  Given a list of issues with labels ["bug"] and ["blocked"]
+  When get_actionable_issues() is called
+  Then the result is an empty list
+
+Scenario: Empty input returns empty list
+  Given an empty list of issues
+  When get_actionable_issues() is called
+  Then the result is an empty list
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: ThreadLabel Actionability
 
 > Unit: `ThreadLabel.is_actionable()`
