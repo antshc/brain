@@ -579,6 +579,54 @@ Scenario: Actionable milestone invokes agent and updates execution log
 
 ---
 
+## Feature: Dev CLI
+
+> Unit: `afk.features.dev.cli`
+
+```gherkin
+Scenario: Parser applies default arguments for valid repository
+  Given the argument ["--github_repo", "owner/repo"]
+  When the dev CLI parser parses arguments
+  Then github_repo is "owner/repo" and defaults are applied for max_executions, agent, prompt, and log_dir
+
+Scenario: Parser accepts custom arguments
+  Given the arguments ["--github_repo", "owner/repo", "--max_executions", "7", "--agent", "other-agent", "--prompt", "/custom:dev", "--log-dir", "custom-logs"]
+  When the dev CLI parser parses arguments
+  Then the parsed values match the provided overrides
+
+Scenario: Parser requires github_repo argument
+  Given no CLI arguments
+  When the dev CLI parser parses arguments
+  Then argparse exits with code 2
+
+Scenario: GitHub repo validator rejects invalid repository format
+  Given the repository value "owner-repo"
+  When _github_repo() is called
+  Then an ArgumentTypeError is raised
+
+Scenario: Repo dir validator rejects missing directory
+  Given a path to a directory that does not exist
+  When _repo_dir() is called
+  Then an ArgumentTypeError is raised
+
+Scenario: Main delegates to handler with info logging
+  Given parsed arguments for repository "owner/repo" and custom execution settings
+    And AFK_DEBUG is not set
+  When main() is called
+  Then logging is configured at INFO level with file and stderr handlers
+    And dev() is called with owner "owner" and repo "repo"
+
+Scenario: Main uses debug logging when AFK_DEBUG is set
+  Given parsed arguments for repository "owner/repo"
+    And AFK_DEBUG is set
+  When main() is called
+  Then logging is configured at DEBUG level
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: PR URL Parsing
 
 > Unit: `parse_pr_url()`
