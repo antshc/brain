@@ -22,13 +22,6 @@ from afk.features.fix_prs.handler import fix_prs
 DEFAULT_MAX_EXECUTIONS = 5
 
 
-def _repo_dir(value: str) -> Path:
-    repo_dir = Path(value).resolve()
-    if not repo_dir.is_dir():
-        raise argparse.ArgumentTypeError(f"repo-dir does not exist: {repo_dir}")
-    return repo_dir
-
-
 def _github_repo(value: str) -> str:
     if not re.match(r"^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$", value):
         raise argparse.ArgumentTypeError(f"Invalid repo format. Expected owner/repo, got: {value}")
@@ -40,8 +33,6 @@ def _build_parser() -> argparse.ArgumentParser:
         prog="fix_prs.py",
         description="AFK automated PR review service.",
     )
-    parser.add_argument("--repo_dir", type=_repo_dir, metavar="repo-dir",
-                        help="Path to the local repository clone.")
     parser.add_argument("--github_user", metavar="github-user",
                         help="GitHub username to filter open PRs by author.")
     parser.add_argument("--github_repo", type=_github_repo, metavar="owner/repo",
