@@ -1,7 +1,7 @@
 ---
 name: to-issues
 description: Breaks a PRD into tracer-bullet GitHub issues. Accepts an optional plan or plan.md to guide slicing.
-argument-hint: "[<implementation details or path to plan.md>]"
+argument-hint: "<milestone-title> [<implementation details>, <plan.md>]"
 ---
 
 # Implementation details to Issues
@@ -10,19 +10,25 @@ argument-hint: "[<implementation details or path to plan.md>]"
 
 ### 1. Gather inputs
 
-**PRD (required)** — resolve in this order: Already in context (e.g. an open GitHub issue with the `prd` label, a prior message, or a URL). Ask the user for it if not found.
+`<milestone-title>` is **required**. If not provided as argument, ask the user.
 
+**If only `<milestone-title>` is provided:**
+
+Find the PRD issue by milestone and label:
 ```bash
-gh issue view <number> --json number,title,body,comments,milestone
+gh issue list --milestone "<milestone-title>" --label "prd" --json number,title,body,comments --limit 1
 ```
+If no issue is found, ask the user for the GitHub issue number and fetch it:
+```bash
+gh issue view <number> --json number,title,body,comments
+```
+Use the issue title, body, and comments as the PRD content.
 
-Store `milestone.title` if present — used in step 5.
+**If `<implementation details>` or `<plan.md>` is also provided:**
 
-**Implementation details (optional)** — second argument, if provided:
+Use the implementation details as the PRD content instead of a GitHub issue:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
-- **Inline text** — use directly as implementation context.
-
-If omitted, codebase exploration in step 2 supplies context instead.
+- **Inline text** — use directly.
 
 ### 2. Explore the codebase (optional)
 
