@@ -47,11 +47,24 @@ A numbered list of behavior rules following the formats above.
 
 ## Implementation Decisions
 
-A list of implementation decisions: modules to build/modify, interfaces, architectural decisions, schema changes, API contracts, configuration options.
+A list of implementation decisions that were made. This can include:
+
+- The modules that will be built/modified
+- The interfaces of those modules that will be modified
+- Technical clarifications from the developer
+- Architectural decisions
+- Schema changes
+- API contracts
+- Specific interactions
+- Configuration options that will be added/modified
 
 ## Testing Decisions
 
-Which modules will be tested, what makes a good test, prior art.
+A list of testing decisions that were made. This can include:
+
+- Which modules will be tested
+- What makes a good test
+- Prior art for the tests
 
 ## Out of Scope
 
@@ -61,13 +74,3 @@ What is explicitly out of scope.
 
 Any additional notes.
 ```
-
-## Formatting Instructions
-
-When formatting or updating a PRD:
-
-1. Preserve all existing meaning and decisions.
-2. Remove bloat: filler words, redundant explanations, verbose phrasing.
-3. Ensure every section matches the writing style above.
-4. Do not add new content unless the user provides it.
-5. Do not remove sections even if empty — keep the heading with a brief note if nothing applies.
