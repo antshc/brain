@@ -35,17 +35,31 @@ Check with the user that these modules match their expectations. Check with the 
 
 ### Create GitHub Issue section (if user chooses GitHub issue as destination)
 
+Resolve the target repo once.
+
+**bash:**
+```bash
+REPO=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+```
+
+**PowerShell:**
+```powershell
+$REPO = ($(git remote get-url board 2>$null) ?? $(git remote get-url origin)) `
+  -replace '^git@[^:]+:','' `
+  -replace '^https?://[^/]+/','' `
+  -replace '\.git$',''
+```
+
 1. Create the issue:
    ```bash
-   gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##') --label prd
+   gh issue create --repo "$REPO" --label prd
    ```
 
 2. Create a milestone and assign the issue to it:
    ```bash
-   repo=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
-   gh api repos/$repo/milestones \
+   gh api repos/$REPO/milestones \
      --method POST \
      --field title="<feature-id>: <prd-title>" \
      --field description="**Feature ID:** \`<feature-id>\`\n**Target Branch:** \`<target-branch>\`"
-   gh issue edit <number> --milestone "<feature-id>: <prd-title>"
+   gh issue edit <number> --repo "$REPO" --milestone "<feature-id>: <prd-title>"
    ```
