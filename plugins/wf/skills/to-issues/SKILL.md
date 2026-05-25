@@ -24,7 +24,7 @@ gh issue view <number> --json number,title,body,comments
 ```
 Use the issue title, body, and comments as the PRD content.
 
-**If `<implementation details>` or `<plan.md>` is also provided:**
+**If `<milestone-title>` and (`<implementation details>` or `<plan.md>`) is provided:**
 
 Use the implementation details as the PRD content instead of a GitHub issue:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
