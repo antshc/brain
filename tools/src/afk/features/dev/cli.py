@@ -39,7 +39,7 @@ def _build_parser() -> argparse.ArgumentParser:
         prog="dev.py",
         description="AFK autonomous development service.",
     )
-    parser.add_argument("--github_repo", required=True, type=_github_repo, metavar="owner/repo",
+    parser.add_argument("--github_repo_board", type=_github_repo, metavar="owner/repo",
                         help="GitHub repository in owner/repo format.")
     parser.add_argument("--max_executions", nargs="?", type=int, default=DEFAULT_MAX_EXECUTIONS,
                         metavar="max-executions",
@@ -68,5 +68,4 @@ def main() -> None:
                             logging.StreamHandler(),
                         ])
 
-    owner, repo = args.github_repo.split("/", 1)
-    dev(owner, repo, args.log_dir, args.max_executions, args.prompt, agent_name=args.agent)
+    dev(args.github_repo_board, args.log_dir, args.max_executions, args.prompt, agent_name=args.agent)
