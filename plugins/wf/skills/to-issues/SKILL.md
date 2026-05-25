@@ -14,9 +14,19 @@ argument-hint: "<milestone-title> [<implementation details>, <plan.md>]"
 
 **If only `<milestone-title>` is provided:**
 
-Resolve the target repo once:
+Resolve the target repo once.
+
+**bash:**
 ```bash
 REPO=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+```
+
+**PowerShell:**
+```powershell
+$REPO = ($(git remote get-url board 2>$null) ?? $(git remote get-url origin)) `
+  -replace '^git@[^:]+:','' `
+  -replace '^https?://[^/]+/','' `
+  -replace '\.git$',''
 ```
 
 Find the PRD issue by milestone and label:
