@@ -9,7 +9,7 @@ Commit all uncommitted changes using the format below.
 
 **Format:**
 ```
-- **dcode:** → commit subject (one line summary)
+- **SUBJECT** → Use **dcode:** prefix, than one line commit summary
 - **SUMMARY** → commit body (key technical decisions)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
