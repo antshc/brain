@@ -14,13 +14,18 @@ argument-hint: "<milestone-title> [<implementation details>, <plan.md>]"
 
 **If only `<milestone-title>` is provided:**
 
+Resolve the target repo once:
+```bash
+REPO=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+```
+
 Find the PRD issue by milestone and label:
 ```bash
-gh issue list --milestone "<milestone-title>" --label "prd" --json number,title,body,comments --limit 1
+gh issue list --repo "$REPO" --milestone "<milestone-title>" --label "prd" --json number,title,body,comments --limit 1
 ```
 If no issue is found, ask the user for the GitHub issue number and fetch it:
 ```bash
-gh issue view <number> --json number,title,body,comments
+gh issue view <number> --repo "$REPO" --json number,title,body,comments
 ```
 Use the issue title, body, and comments as the PRD content.
 
@@ -66,7 +71,7 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue using `gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')`.
+For each approved slice, create a GitHub issue using `gh issue create --repo "$REPO"`.
 
 The `--milestone "<milestone-title>"` from the PRD is required for each command, if missing ask user. Use the issue body template below.
 
