@@ -81,9 +81,12 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue using `gh issue create --repo "$REPO"`.
+For each approved slice, create a GitHub issue using `gh issue create --repo "$REPO" --milestone "<milestone-title>" --label "hitl"`.
 
-The `--milestone "<milestone-title>"` from the PRD is required for each command, if missing ask user. Use the issue body template below.
+Use `--label "hitl"` for all issues `HITL` or `AFK` to indicate that user review is required.
+
+The `--milestone "<milestone-title>"` from the PRD is required for each command, if missing ask user. 
+Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
