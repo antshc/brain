@@ -18,17 +18,29 @@ A deep module (as opposed to a shallow module) is one which encapsulates a lot o
 
 Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
-5. **Before writing the PRD**, ask the user:
+5. Ask the user:
    - **Target branch**: Which release branch should this work be based on? (e.g. `release/1.1.10`)
    - **Feature ID**: What is the feature ID for this work? (e.g. a Jira ticket `PROJ-1234`, a GitHub issue `#42`)
-   - **Save destination**: Where should the PRD be saved?
-     - File: `<repo-root>/plans/{prd-title}.prd.md`
-     - Create GitHub Issue: `gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##') --label prd`
 
-   If these were provided as positional arguments, skip asking.
+   Write the PRD using the template and writing style defined in `references/format-prd.md`.
 
-6. **If saving as a GitHub issue**, after the issue is created, create a milestone and assign the issue to it:
+6. Ask the user where the PRD should be saved:
+   - **File**: `<repo-root>/plans/{prd-title}.prd.md`
+   - **GitHub Issue**: see _Create GitHub Issue section_ below
 
+   Save to the chosen destination.
+
+7. Report the PRD location, milestone title, and URLs to the user.
+---
+
+### Create GitHub Issue section (if user chooses GitHub issue as destination)
+
+1. Create the issue:
+   ```bash
+   gh issue create --repo $((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##') --label prd
+   ```
+
+2. Create a milestone and assign the issue to it:
    ```bash
    repo=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
    gh api repos/$repo/milestones \
@@ -37,7 +49,3 @@ Check with the user that these modules match their expectations. Check with the 
      --field description="**Feature ID:** \`<feature-id>\`\n**Target Branch:** \`<target-branch>\`"
    gh issue edit <number> --milestone "<feature-id>: <prd-title>"
    ```
-
-   Report the milestone title and URL to the user.
-
-7. Write the PRD using the template and writing style defined in `references/format-prd.md`. Save to the chosen destination.
