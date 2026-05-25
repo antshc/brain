@@ -2,19 +2,18 @@
 
 from pathlib import Path
 
+from modules.github.domain.services.issue_filter import IssueFilter
+from afk.infrastructure.ai_agent import AIAgent
+from modules.github.infrastructure.vcs_client import VCSClient
 import logging
 
-from afk.infrastructure.ai_agent import AIAgent
 from afk.shared.execution_log import ExecutionLog
-from modules.github.domain.services.issue_filter import IssueFilter
-from modules.github.infrastructure.vcs_client import VCSClient
 
 _log = logging.getLogger(__name__)
 
 
 def dev(
-    owner: str,
-    repo: str,
+    github_repo: str,
     log_dir: Path,
     max_executions: int,
     prompt: str = "/ralph:dev",
@@ -24,8 +23,19 @@ def dev(
     agent: AIAgent | None = None,
     exec_log: ExecutionLog | None = None,
 ) -> None:
-    """List open milestones for *owner/repo* and run the Copilot agent on actionable work."""
-    exec_log = exec_log or ExecutionLog(log_dir, f"{owner}/{repo}")
+    """List open milestones for *github_repo* and run the Copilot agent on actionable work.
+
+    Args:
+        github_repo:    Repository in owner/repo format.
+        log_dir:        Directory where execution logs are written.
+        max_executions: Maximum processing attempts per milestone before skipping.
+        prompt:         Prompt text passed to the AI agent (default: "/ralph:dev").
+        vcs:            VCSClient instance (defaults to VCSClient()).
+        agent:          AIAgent instance (defaults to AIAgent()).
+        exec_log:       ExecutionLog instance (defaults to ExecutionLog(log_dir, github_repo)).
+    """
+    exec_log = exec_log or ExecutionLog(log_dir, github_repo)
+    owner, repo = github_repo.split("/", 1)
     issue_filter = IssueFilter()
     vcs = vcs or VCSClient()
 
