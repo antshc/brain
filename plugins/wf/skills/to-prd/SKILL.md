@@ -42,4 +42,4 @@ Check with the user that these modules match their expectations. Check with the 
 
    Report the milestone title and URL to the user.
 
-7. Write the PRD using the `format-prd` skill's template and writing style. Save to the chosen destination.
+7. Write the PRD using the template and writing style defined in `references/format-prd.md`. Save to the chosen destination.
