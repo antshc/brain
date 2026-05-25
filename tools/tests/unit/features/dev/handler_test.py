@@ -18,8 +18,7 @@ from modules.github.domain.milestone import Milestone
 from modules.github.infrastructure.vcs_client import VCSClient
 
 _LOG_DIR = Path("logs")
-_OWNER = "owner"
-_REPO = "repo"
+_GITHUB_REPO = "owner/repo"
 _MILESTONE_URL = "https://github.com/owner/repo/milestone/3"
 
 
@@ -34,9 +33,9 @@ class TestDevMilestoneLoop:
         exec_log = MagicMock(spec=ExecutionLog)
 
         with caplog.at_level(logging.INFO):
-            dev(_OWNER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
+            dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
-        vcs.list_milestones.assert_called_once_with(_OWNER, _REPO)
+        vcs.list_milestones.assert_called_once_with("owner", "repo")
         vcs.fetch_issues.assert_not_called()
         agent.run.assert_not_called()
         assert "No open milestones found" in caplog.text
@@ -59,9 +58,9 @@ class TestDevMilestoneLoop:
         exec_log = MagicMock(spec=ExecutionLog)
 
         with caplog.at_level(logging.INFO):
-            dev(_OWNER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
+            dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
-        vcs.fetch_issues.assert_called_once_with(_OWNER, _REPO, milestone.title)
+        vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
         exec_log.get_count.assert_not_called()
         exec_log.update.assert_not_called()
         agent.run.assert_not_called()
@@ -86,7 +85,7 @@ class TestDevMilestoneLoop:
         exec_log.get_count.return_value = 5
 
         with caplog.at_level(logging.WARNING):
-            dev(_OWNER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
+            dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
         exec_log.get_count.assert_called_once_with(milestone.url)
         exec_log.update.assert_not_called()
@@ -113,10 +112,10 @@ class TestDevMilestoneLoop:
         mock_agent = MagicMock()
         mock_agent_class.return_value = mock_agent
 
-        dev(_OWNER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, exec_log=exec_log)
+        dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, exec_log=exec_log)
 
-        vcs.list_milestones.assert_called_once_with(_OWNER, _REPO)
-        vcs.fetch_issues.assert_called_once_with(_OWNER, _REPO, milestone.title)
+        vcs.list_milestones.assert_called_once_with("owner", "repo")
+        vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
         exec_log.get_count.assert_called_once_with(milestone.url)
         mock_agent_class.assert_called_once_with(alias="copiloty", prompt="/ralph:dev #3")
         mock_agent.run.assert_called_once_with()
