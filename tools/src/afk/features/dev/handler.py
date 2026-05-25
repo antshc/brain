@@ -71,7 +71,7 @@ def dev(
             milestone.url, len(actionable_issues), exec_count + 1,
         )
 
-        (agent or AIAgent(alias=agent_name, prompt=f"{prompt} #{milestone.number}")).run()
+        (agent or AIAgent(alias=agent_name, prompt=f"{prompt} {milestone.title}")).run()
 
         exec_log.update(milestone.url, [])
         _log.info("Completed milestone processing milestone_url=%s attempt=%d", milestone.url, exec_count + 1)
