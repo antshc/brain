@@ -21,9 +21,9 @@ class TestDevCli:
 
     def test_parser_applies_default_arguments_for_valid_repository(self):
         # Scenario: Parser applies default arguments for valid repository
-        args = dev_cli._build_parser().parse_args(["--github_repo", "owner/repo"])
+        args = dev_cli._build_parser().parse_args(["--github_repo_board", "owner/repo"])
 
-        assert args.github_repo == "owner/repo"
+        assert args.github_repo_board == "owner/repo"
         assert args.max_executions == dev_cli.DEFAULT_MAX_EXECUTIONS
         assert args.agent == "copiloty"
         assert args.prompt == "/ralph:dev"
@@ -32,25 +32,24 @@ class TestDevCli:
     def test_parser_accepts_custom_arguments(self):
         # Scenario: Parser accepts custom arguments
         args = dev_cli._build_parser().parse_args([
-            "--github_repo", "owner/repo",
+            "--github_repo_board", "owner/repo",
             "--max_executions", "7",
             "--agent", "other-agent",
             "--prompt", "/custom:dev",
             "--log-dir", "custom-logs",
         ])
 
-        assert args.github_repo == "owner/repo"
+        assert args.github_repo_board == "owner/repo"
         assert args.max_executions == 7
         assert args.agent == "other-agent"
         assert args.prompt == "/custom:dev"
         assert args.log_dir == Path("custom-logs")
 
-    def test_parser_requires_github_repo_argument(self):
-        # Scenario: Parser requires github_repo argument
-        with pytest.raises(SystemExit) as excinfo:
-            dev_cli._build_parser().parse_args([])
+    def test_parser_accepts_no_arguments(self):
+        # Scenario: Parser accepts no arguments (github_repo_board is optional)
+        args = dev_cli._build_parser().parse_args([])
 
-        assert excinfo.value.code == 2
+        assert args.github_repo_board is None
 
     def test_github_repo_validator_rejects_invalid_repository_format(self):
         # Scenario: GitHub repo validator rejects invalid repository format
@@ -65,7 +64,7 @@ class TestDevCli:
     def test_main_delegates_to_handler_with_info_logging(self, monkeypatch):
         # Scenario: Main delegates to handler with info logging
         args = argparse.Namespace(
-            github_repo="owner/repo",
+            github_repo_board="owner/repo",
             max_executions=7,
             agent="other-agent",
             prompt="/custom:dev",
@@ -91,9 +90,8 @@ class TestDevCli:
         monkeypatch.setattr(
             dev_cli,
             "dev",
-            lambda owner, repo, log_dir, max_executions, prompt, agent_name: captured_dev_call.update(
-                owner=owner,
-                repo=repo,
+            lambda github_repo, log_dir, max_executions, prompt, agent_name: captured_dev_call.update(
+                github_repo=github_repo,
                 log_dir=log_dir,
                 max_executions=max_executions,
                 prompt=prompt,
@@ -114,8 +112,7 @@ class TestDevCli:
             ],
         }
         assert captured_dev_call == {
-            "owner": "owner",
-            "repo": "repo",
+            "github_repo": "owner/repo",
             "log_dir": args.log_dir,
             "max_executions": 7,
             "prompt": "/custom:dev",
@@ -125,7 +122,7 @@ class TestDevCli:
     def test_main_uses_debug_logging_when_afk_debug_is_set(self, monkeypatch):
         # Scenario: Main uses debug logging when AFK_DEBUG is set
         args = argparse.Namespace(
-            github_repo="owner/repo",
+            github_repo_board="owner/repo",
             max_executions=dev_cli.DEFAULT_MAX_EXECUTIONS,
             agent="copiloty",
             prompt="/ralph:dev",
