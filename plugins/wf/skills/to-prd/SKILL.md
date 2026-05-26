@@ -1,36 +1,30 @@
 ---
 name: to-prd
-description: Create a PRD through user interview, codebase exploration, and module design, then submit as a GitHub issue. Use when user wants to write a PRD, create a product requirements document, or plan a new feature.
+description: Create a PRD from codebase context and submit as a GitHub issue. Use when user wants to write a PRD or plan a new feature.
 argument-hint: '<feature description>'
 ---
 
-This skill will be invoked when the user wants to create a PRD. You may skip steps if you don't consider them necessary.
+Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_
 
-1. Ask the user for a long, detailed description of the problem they want to solve and any potential ideas for solutions.
+You may skip steps if you don't consider them necessary.
 
-2. Explore the repo to verify their assertions and understand the current state of the codebase.
+Harvest from the conversation before writing:
+- Grilling decisions → *Implementation Decisions*
+- Out-of-scope items → *Out of Scope*
 
-3. Interview the user relentlessly about every aspect of this plan until you reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
+1. Explore the repo to understand the current state of the codebase, if you haven't already. If `grill-with-docs` ran, use the project's domain glossary vocabulary throughout the PRD and respect any ADRs in the area you're touching.
 
-4. Sketch out the major modules you will need to build or modify to complete the implementation. Actively look for opportunities to extract deep modules that can be tested in isolation.
+2. Sketch out the major modules you will need to build or modify to complete the implementation. Actively look for opportunities to extract deep modules that can be tested in isolation.
 
 A deep module (as opposed to a shallow module) is one which encapsulates a lot of functionality in a simple, testable interface which rarely changes.
 
 Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
-5. Ask the user:
-   - **Target branch**: Which release branch should this work be based on? (e.g. `release/1.1.10`)
-   - **Feature ID**: What is the feature ID for this work? (e.g. a Jira ticket `PROJ-1234`, a GitHub issue `#42`)
+3. Write the PRD using the template and writing style defined in `references/format-prd.md`.
 
-   Write the PRD using the template and writing style defined in `references/format-prd.md`.
+4. Save to GitHub — see _Create GitHub Issue section_ below.
 
-6. Ask the user where the PRD should be saved:
-   - **File**: `<repo-root>/plans/{prd-title}.prd.md`
-   - **GitHub Issue**: see _Create GitHub Issue section_ below
-
-   Save to the chosen destination.
-
-7. Report the PRD location, milestone title, and URLs to the user.
+5. Report the PRD location, milestone title, and URLs to the user.
 ---
 
 ### Create GitHub Issue section (if user chooses GitHub issue as destination)
@@ -63,3 +57,9 @@ $REPO = ($(git remote get-url board 2>$null) ?? $(git remote get-url origin)) `
      --field description="**Feature ID:** \`<feature-id>\`\n**Target Branch:** \`<target-branch>\`"
    gh issue edit <number> --repo "$REPO" --milestone "<feature-id>: <prd-title>"
    ```
+
+---
+
+## Troubleshooting
+
+**Label not found** (`prd` label missing): run `setup-gh-labels` to create the required labels, then retry.
