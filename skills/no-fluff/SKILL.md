@@ -1,6 +1,6 @@
 ---
-name: format-text
-description: Format a text according to the style. Use when user wants to format a PRD, format a product requirements document, or improve the writing style of a document.
+name: no-fluff
+description: Strip filler words and tighten writing without changing meaning. Use when user mentions nofluff, wants to cut bloat, or asks to rewrite/tighten a document.
 ---
 
 ## Formatting Instructions
