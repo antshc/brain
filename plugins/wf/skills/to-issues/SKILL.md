@@ -127,3 +127,9 @@ Reference by number from the parent PRD:
 </issue-template>
 
 Do NOT close or modify the parent PRD issue.
+
+---
+
+## Troubleshooting
+
+**Label not found** (`hitl` or `prd` label missing): run `setup-gh-labels` to create the required labels, then retry.
