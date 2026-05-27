@@ -9,7 +9,9 @@ description = "AFK automated PR review service driven by Copilot"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-dependencies = []
+dependencies = [
+    "python-json-logger>=2.0",
+]
 
 [project.optional-dependencies]
 dev = ["pytest"]
