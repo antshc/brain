@@ -7,7 +7,6 @@ When a test or scenario changes, update both sides to stay in sync.
 """
 
 import argparse
-import logging
 from datetime import date
 from pathlib import Path
 
@@ -61,8 +60,8 @@ class TestDevCli:
         with pytest.raises(argparse.ArgumentTypeError, match="repo-dir does not exist"):
             dev_cli._repo_dir("__missing_repo_dir__")
 
-    def test_main_delegates_to_handler_with_info_logging(self, monkeypatch):
-        # Scenario: Main delegates to handler with info logging
+    def test_main_calls_configure_logging_with_dated_log_file(self, monkeypatch):
+        # Scenario: Main calls configure_logging with a dated log file path
         args = argparse.Namespace(
             github_repo_board="owner/repo",
             max_executions=7,
@@ -70,23 +69,19 @@ class TestDevCli:
             prompt="/custom:dev",
             log_dir=Path("dev-logs"),
         )
-        mkdir_calls = []
-        captured_basic_config = {}
+        captured_configure_logging = {}
         captured_dev_call = {}
 
         class FakeParser:
             def parse_args(self):
                 return args
 
-        def fake_mkdir(self, parents=False, exist_ok=False):
-            mkdir_calls.append((self, parents, exist_ok))
-
-        monkeypatch.delenv("AFK_DEBUG", raising=False)
         monkeypatch.setattr(dev_cli, "_build_parser", lambda: FakeParser())
-        monkeypatch.setattr(Path, "mkdir", fake_mkdir)
-        monkeypatch.setattr(dev_cli.logging, "FileHandler", lambda path, mode="a": ("file", path, mode))
-        monkeypatch.setattr(dev_cli.logging, "StreamHandler", lambda: ("stream",))
-        monkeypatch.setattr(dev_cli.logging, "basicConfig", lambda **kwargs: captured_basic_config.update(kwargs))
+        monkeypatch.setattr(
+            dev_cli,
+            "configure_logging",
+            lambda log_file: captured_configure_logging.update(log_file=log_file),
+        )
         monkeypatch.setattr(
             dev_cli,
             "dev",
@@ -102,15 +97,7 @@ class TestDevCli:
         result = dev_cli.main()
 
         assert result is None
-        assert mkdir_calls == [(args.log_dir, True, True)]
-        assert captured_basic_config == {
-            "level": logging.INFO,
-            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
-            "handlers": [
-                ("file", args.log_dir / f"dev-{date.today()}.log", "a"),
-                ("stream",),
-            ],
-        }
+        assert captured_configure_logging["log_file"] == args.log_dir / f"dev-{date.today()}.log"
         assert captured_dev_call == {
             "github_repo": "owner/repo",
             "log_dir": args.log_dir,
@@ -119,8 +106,8 @@ class TestDevCli:
             "agent_name": "other-agent",
         }
 
-    def test_main_uses_debug_logging_when_afk_debug_is_set(self, monkeypatch):
-        # Scenario: Main uses debug logging when AFK_DEBUG is set
+    def test_main_does_not_use_afk_debug_env_var(self, monkeypatch):
+        # Scenario: Main does not inspect AFK_DEBUG (level is delegated to configure_logging)
         args = argparse.Namespace(
             github_repo_board="owner/repo",
             max_executions=dev_cli.DEFAULT_MAX_EXECUTIONS,
@@ -128,20 +115,23 @@ class TestDevCli:
             prompt="/ralph:dev",
             log_dir=Path("dev-logs"),
         )
-        captured_basic_config = {}
+        configure_logging_calls = []
 
         class FakeParser:
             def parse_args(self):
                 return args
 
-        monkeypatch.setenv("AFK_DEBUG", "1")
         monkeypatch.setattr(dev_cli, "_build_parser", lambda: FakeParser())
-        monkeypatch.setattr(Path, "mkdir", lambda self, parents=False, exist_ok=False: None)
-        monkeypatch.setattr(dev_cli.logging, "FileHandler", lambda path, mode="a": ("file", path, mode))
-        monkeypatch.setattr(dev_cli.logging, "StreamHandler", lambda: ("stream",))
-        monkeypatch.setattr(dev_cli.logging, "basicConfig", lambda **kwargs: captured_basic_config.update(kwargs))
-        monkeypatch.setattr(dev_cli, "dev", lambda *args, **kwargs: None)
+        monkeypatch.setattr(
+            dev_cli,
+            "configure_logging",
+            lambda log_file: configure_logging_calls.append(log_file),
+        )
+        monkeypatch.setattr(dev_cli, "dev", lambda *a, **kw: None)
+        monkeypatch.setenv("AFK_DEBUG", "1")
 
         dev_cli.main()
 
-        assert captured_basic_config["level"] == logging.DEBUG
+        # configure_logging is called exactly once with no explicit level arg —
+        # level resolution is fully delegated to configure_logging (reads AFK_LOG_LEVEL).
+        assert len(configure_logging_calls) == 1
