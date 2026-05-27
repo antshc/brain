@@ -10,14 +10,12 @@ Exit codes:
 """
 
 import argparse
-import logging
-import os
 import re
-import sys
 from datetime import date
 from pathlib import Path
 
 from afk.features.fix_prs.handler import fix_prs
+from afk.shared.logging import configure_logging
 
 DEFAULT_MAX_EXECUTIONS = 5
 
@@ -54,14 +52,7 @@ def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
 
-    level = logging.DEBUG if "AFK_DEBUG" in os.environ else logging.INFO
-    args.log_dir.mkdir(parents=True, exist_ok=True)
     log_file = args.log_dir / f"fix_prs-{date.today()}.log"
-    logging.basicConfig(level=level,
-                        format="%(asctime)s %(levelname)s %(name)s %(message)s",
-                        handlers=[
-                            logging.FileHandler(log_file, mode="a"),
-                            logging.StreamHandler(),
-                        ])
+    configure_logging(log_file)
 
     fix_prs(args.github_user, args.github_repo, args.log_dir, args.max_executions, args.prompt, agent_name=args.agent)
