@@ -39,41 +39,41 @@ def dev(
     issue_filter = IssueFilter()
     vcs = vcs or VCSClient()
 
-    _log.info("Service run started owner=%s repo=%s", owner, repo)
+    _log.info("Service run started", extra={"owner": owner, "repo": repo})
 
     milestones = vcs.list_milestones(owner, repo)
     if not milestones:
-        _log.info("No open milestones found owner=%s repo=%s", owner, repo)
+        _log.info("No open milestones found", extra={"owner": owner, "repo": repo})
         return
 
-    _log.info("Found open milestones count=%d owner=%s repo=%s", len(milestones), owner, repo)
+    _log.info("Found open milestones", extra={"count": len(milestones), "owner": owner, "repo": repo})
 
     for milestone in milestones:
-        _log.info("Processing milestone milestone_url=%s title=%s", milestone.url, milestone.title)
+        _log.info("Processing milestone", extra={"milestone_url": milestone.url, "title": milestone.title})
 
         fetched_issues = vcs.fetch_issues(owner, repo, milestone.title)
         actionable_issues = issue_filter.get_actionable_issues(fetched_issues)
 
         if len(actionable_issues) == 0:
-            _log.info("No actionable issues, skipping milestone_url=%s", milestone.url)
+            _log.info("No actionable issues, skipping", extra={"milestone_url": milestone.url})
             continue
 
         exec_count = exec_log.get_count(milestone.url)
         if exec_count >= max_executions:
             _log.warning(
-                "Milestone exceeded max executions, skipping milestone_url=%s count=%d max=%d actionable_issues=%d",
-                milestone.url, exec_count, max_executions, len(actionable_issues),
+                "Milestone exceeded max executions, skipping",
+                extra={"milestone_url": milestone.url, "count": exec_count, "max": max_executions, "actionable_issues": len(actionable_issues)},
             )
             continue
 
         _log.info(
-            "Running copilot agent milestone_url=%s issues=%d attempt=%d",
-            milestone.url, len(actionable_issues), exec_count + 1,
+            "Running copilot agent",
+            extra={"milestone_url": milestone.url, "issues": len(actionable_issues), "attempt": exec_count + 1},
         )
 
         (agent or AIAgent(alias=agent_name, prompt=f"{prompt} {milestone.title}")).run()
 
         exec_log.update(milestone.url, [])
-        _log.info("Completed milestone processing milestone_url=%s attempt=%d", milestone.url, exec_count + 1)
+        _log.info("Completed milestone processing", extra={"milestone_url": milestone.url, "attempt": exec_count + 1})
 
     _log.info("Service run completed")
