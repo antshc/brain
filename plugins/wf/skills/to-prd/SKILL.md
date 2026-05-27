@@ -46,7 +46,7 @@ $REPO = ($(git remote get-url board 2>$null) ?? $(git remote get-url origin)) `
 
 1. Create the issue:
    ```bash
-   gh issue create --repo "$REPO" --label prd
+   gh issue create --repo "$REPO" --label prd --title "<feature-id>: <prd-title>"
    ```
 
 2. Create a milestone and assign the issue to it:
