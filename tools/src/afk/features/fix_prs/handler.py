@@ -40,18 +40,18 @@ def fix_prs(
     thread_filter = ThreadFilter()
     vcs = vcs or VCSClient()
 
-    _log.info("Service run started user=%s repo=%s", github_user, github_repo)
+    _log.info("Service run started", extra={"user": github_user, "repo": github_repo})
 
     pull_requests = vcs.list_prs(github_user, github_repo)
 
     if not pull_requests:
-        _log.info("No open PRs found for user user=%s repo=%s", github_user, github_repo)
+        _log.info("No open PRs found for user", extra={"user": github_user, "repo": github_repo})
         return
 
-    _log.info("Found open PRs count=%d user=%s", len(pull_requests), github_user)
+    _log.info("Found open PRs", extra={"count": len(pull_requests), "user": github_user})
 
     for pr in pull_requests:
-        _log.info("Processing PR pr_url=%s", pr.url)
+        _log.info("Processing PR", extra={"pr_url": pr.url})
 
         exec_count = exec_log.get_count(pr.url)
 
@@ -60,27 +60,27 @@ def fix_prs(
         thread_ids = [t.thread_id for t in actionable_threads]
 
         if len(actionable_threads) == 0:
-            _log.info("No actionable threads, skipping pr_url=%s", pr.url)
+            _log.info("No actionable threads, skipping", extra={"pr_url": pr.url})
             if exec_count > 0:
                 exec_log.reset(pr.url)
-                _log.info("Reset execution count (all threads resolved) pr_url=%s", pr.url)
+                _log.info("Reset execution count (all threads resolved)", extra={"pr_url": pr.url})
             continue
 
         if exec_count >= max_executions:
             _log.warning(
-                "PR exceeded max executions, skipping pr_url=%s count=%d max=%d unresolved_threads=%d",
-                pr.url, exec_count, max_executions, len(actionable_threads),
+                "PR exceeded max executions, skipping",
+                extra={"pr_url": pr.url, "count": exec_count, "max": max_executions, "unresolved_threads": len(actionable_threads)},
             )
             continue
 
         _log.info(
-            "Running copilot agent pr_url=%s threads=%d attempt=%d",
-            pr.url, len(actionable_threads), exec_count + 1,
+            "Running copilot agent",
+            extra={"pr_url": pr.url, "threads": len(actionable_threads), "attempt": exec_count + 1},
         )
 
         (agent or AIAgent(alias=agent_name, prompt=prompt)).run()
 
         exec_log.update(pr.url, thread_ids)
-        _log.info("Completed PR processing pr_url=%s attempt=%d", pr.url, exec_count + 1)
+        _log.info("Completed PR processing", extra={"pr_url": pr.url, "attempt": exec_count + 1})
 
     _log.info("Service run completed")
