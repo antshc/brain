@@ -19,46 +19,45 @@ class AIAgent:
     def __init__(self, *, alias: str = "copiloty", prompt: str = "/ralph:fix") -> None:
         self._alias = alias
         self._prompt = prompt
-        logger.debug("AIAgent initialized alias=%s prompt=%s", alias, prompt)
+        logger.info("AIAgent initialized", extra={"alias": alias, "prompt": prompt})
 
     def run(self) -> None:
         """Run the Copilot agent on the given review threads."""
-        logger.debug("run() called")
+        logger.info("run() called")
         proc = self._run(self._prompt)
         if proc is not None:
             self._stream_text(proc)
-        logger.debug("run() finished")
+        logger.info("run() finished")
 
     def _run(self, prompt: str) -> subprocess.Popen | None:
         cmd = [self._alias, "-p", prompt]
 
         if _is_dry_run():
-            logger.info("dry-run: skipping copilot agent command=%s", cmd)
+            logger.info("dry-run: skipping copilot agent", extra={"command": cmd})
             return None
 
-        logger.debug("spawning process cmd=%s", cmd)
+        logger.debug("spawning process", extra={"cmd": cmd})
         return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     def _stream_text(self, proc: subprocess.Popen) -> str:
-        logger.debug("streaming output pid=%s", proc.pid)
+        logger.debug("streaming output", extra={"pid": proc.pid})
         full_text = ""
         for line in proc.stdout:
             line = line.strip()
-            logger.debug("stdout: %s", line)
+            logger.info(line)
             if not line.startswith("{"):
                 continue
             try:
                 event = json.loads(line)
             except json.JSONDecodeError:
-                logger.debug("non-JSON line skipped: %s", line)
+                logger.debug("non-JSON line skipped", extra={"line": line})
                 continue
             if event.get("type") == "assistant.message_delta":
                 delta = event.get("data", {}).get("deltaContent", "")
                 if delta:
-                    print(delta, end="", flush=True)
                     full_text += delta
 
         proc.wait()
-        logger.debug("process exited returncode=%s", proc.returncode)
-        print()
+        logger.debug("process exited", extra={"returncode": proc.returncode})
+        logger.info("agent response", extra={"text": full_text})
         return full_text

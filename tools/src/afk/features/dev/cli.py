@@ -10,13 +10,12 @@ Exit codes:
 """
 
 import argparse
-import logging
-import os
 import re
 from datetime import date
 from pathlib import Path
 
 from afk.features.dev.handler import dev
+from afk.shared.logging import configure_logging
 
 DEFAULT_MAX_EXECUTIONS = 5
 
@@ -58,14 +57,7 @@ def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
 
-    level = logging.DEBUG if "AFK_DEBUG" in os.environ else logging.INFO
-    args.log_dir.mkdir(parents=True, exist_ok=True)
     log_file = args.log_dir / f"dev-{date.today()}.log"
-    logging.basicConfig(level=level,
-                        format="%(asctime)s %(levelname)s %(name)s %(message)s",
-                        handlers=[
-                            logging.FileHandler(log_file, mode="a"),
-                            logging.StreamHandler(),
-                        ])
+    configure_logging(log_file)
 
     dev(args.github_repo_board, args.log_dir, args.max_executions, args.prompt, agent_name=args.agent)
