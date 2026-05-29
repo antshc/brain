@@ -75,8 +75,8 @@ class TestReviewPullRequests:
         fix_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         assert mock_agent.run.call_count == 2
-        mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"])
-        mock_exec_log.update.assert_any_call(_PR2_URL, ["T2"])
+        mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"], "owner", "repo", "pull_request", 1)
+        mock_exec_log.update.assert_any_call(_PR2_URL, ["T2"], "owner", "repo", "pull_request", 2)
 
     def test_no_open_prs_early_exit(self):
         # Scenario: No open PRs found — early exit
@@ -98,8 +98,8 @@ class TestReviewPullRequests:
         fix_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         assert mock_agent.run.call_count == 2
-        mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"])
-        mock_exec_log.update.assert_any_call(_PR3_URL, ["T3"])
+        mock_exec_log.update.assert_any_call(_PR1_URL, ["T1"], "owner", "repo", "pull_request", 1)
+        mock_exec_log.update.assert_any_call(_PR3_URL, ["T3"], "owner", "repo", "pull_request", 3)
 
     def test_pr_at_max_executions_skipped_while_others_processed(self):
         # Scenario: PR at max executions is skipped while others are processed
@@ -113,7 +113,7 @@ class TestReviewPullRequests:
         fix_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=mock_agent, exec_log=mock_exec_log)
 
         assert mock_agent.run.call_count == 1
-        mock_exec_log.update.assert_called_once_with(_PR2_URL, ["T2"])
+        mock_exec_log.update.assert_called_once_with(_PR2_URL, ["T2"], "owner", "repo", "pull_request", 2)
 
     def test_pr_with_no_actionable_threads_and_prior_count_resets_log(self):
         # Scenario: PR with no actionable threads and prior count resets execution log

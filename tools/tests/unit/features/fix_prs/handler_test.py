@@ -148,6 +148,7 @@ class TestFixPrsHandlerStructuredLogging:
         with caplog.at_level(logging.INFO):
             fix_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
+        exec_log.update.assert_called_once_with(_PR_URL, ["T1"], "owner", "repo", "pull_request", 1)
         record = next(r for r in caplog.records if r.getMessage() == "Completed PR processing")
         extra = _extra(record)
         assert extra["pr_url"] == _PR_URL

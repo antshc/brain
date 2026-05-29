@@ -1,6 +1,7 @@
 """ExecutionLog: reads/writes per-PR attempt counts to cap retries."""
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -43,7 +44,15 @@ class ExecutionLog:
             return 0
         return int(self._log[index].get("count", 0))
 
-    def update(self, task: str, item_ids: list[str | int]) -> None:
+    def update(
+        self,
+        task: str,
+        item_ids: list[str | int],
+        owner: str,
+        repo: str,
+        type: str,
+        id: str | int,
+    ) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         index = self._find_entry_index(task)
         entry = self._log[index] if index is not None else {}
@@ -54,6 +63,11 @@ class ExecutionLog:
             last_items=item_ids,
         )
         persisted = {
+            "hashkey": str(uuid.uuid4()),
+            "owner": owner,
+            "repo": repo,
+            "type": type,
+            "id": id,
             "task": record.task,
             "count": record.count,
             "last_run": record.last_run,

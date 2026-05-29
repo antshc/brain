@@ -80,7 +80,7 @@ def fix_prs(
 
         (agent or AIAgent(alias=agent_name, prompt=prompt)).run()
 
-        exec_log.update(pr.url, thread_ids)
+        exec_log.update(pr.url, thread_ids, pr.owner, pr.repo, "pull_request", pr.number)
         _log.info("Completed PR processing", extra={"pr_url": pr.url, "attempt": exec_count + 1})
 
     _log.info("Service run completed")
