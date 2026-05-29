@@ -119,4 +119,24 @@ class TestDevMilestoneLoop:
         exec_log.get_count.assert_called_once_with(milestone.url)
         mock_agent_class.assert_called_once_with(alias="copiloty", prompt="/ralph:dev Sprint 3")
         mock_agent.run.assert_called_once_with()
-        exec_log.update.assert_called_once_with(milestone.url, [])
+        exec_log.update.assert_called_once_with(milestone.url, [14])
+
+    @patch("afk.features.dev.handler.ExecutionLog")
+    def test_default_execution_log_uses_dev_log_name(self, mock_execution_log_class):
+        # Scenario: Default ExecutionLog is created with dev log name
+        milestone = Milestone(
+            id="M1",
+            number=3,
+            title="Sprint 3",
+            description="",
+            url=_MILESTONE_URL,
+        )
+        vcs = MagicMock(spec=VCSClient)
+        vcs.list_milestones.return_value = [milestone]
+        vcs.fetch_issues.return_value = []
+        exec_log = MagicMock(spec=ExecutionLog)
+        mock_execution_log_class.return_value = exec_log
+
+        dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=MagicMock(spec=AIAgent))
+
+        mock_execution_log_class.assert_called_once_with(_LOG_DIR, _GITHUB_REPO, "dev")

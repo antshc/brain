@@ -8,7 +8,7 @@ When a test or scenario changes, update both sides to stay in sync.
 
 import logging
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -152,3 +152,15 @@ class TestFixPrsHandlerStructuredLogging:
         extra = _extra(record)
         assert extra["pr_url"] == _PR_URL
         assert extra["attempt"] == 1
+
+    @patch("afk.features.fix_prs.handler.ExecutionLog")
+    def test_default_execution_log_uses_fix_prs_log_name(self, mock_execution_log_class):
+        # Scenario: Default ExecutionLog is created with fix-prs log name
+        vcs = MagicMock(spec=VCSClient)
+        vcs.list_prs.return_value = []
+        exec_log = MagicMock(spec=ExecutionLog)
+        mock_execution_log_class.return_value = exec_log
+
+        fix_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=MagicMock(spec=AIAgent))
+
+        mock_execution_log_class.assert_called_once_with(_LOG_DIR, _REPO, "fix-prs")

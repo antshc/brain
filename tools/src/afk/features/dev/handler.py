@@ -32,9 +32,9 @@ def dev(
         prompt:         Prompt text passed to the AI agent (default: "/ralph:dev").
         vcs:            VCSClient instance (defaults to VCSClient()).
         agent:          AIAgent instance (defaults to AIAgent()).
-        exec_log:       ExecutionLog instance (defaults to ExecutionLog(log_dir, github_repo)).
+        exec_log:       ExecutionLog instance (defaults to ExecutionLog(log_dir, github_repo, "dev")).
     """
-    exec_log = exec_log or ExecutionLog(log_dir, github_repo)
+    exec_log = exec_log or ExecutionLog(log_dir, github_repo, "dev")
     owner, repo = github_repo.split("/", 1)
     issue_filter = IssueFilter()
     vcs = vcs or VCSClient()
@@ -53,6 +53,7 @@ def dev(
 
         fetched_issues = vcs.fetch_issues(owner, repo, milestone.title)
         actionable_issues = issue_filter.get_actionable_issues(fetched_issues)
+        issue_ids = [issue.number for issue in actionable_issues]
 
         if len(actionable_issues) == 0:
             _log.info("No actionable issues, skipping", extra={"milestone_url": milestone.url})
@@ -73,7 +74,7 @@ def dev(
 
         (agent or AIAgent(alias=agent_name, prompt=f"{prompt} {milestone.title}")).run()
 
-        exec_log.update(milestone.url, [])
+        exec_log.update(milestone.url, issue_ids)
         _log.info("Completed milestone processing", extra={"milestone_url": milestone.url, "attempt": exec_count + 1})
 
     _log.info("Service run completed")
