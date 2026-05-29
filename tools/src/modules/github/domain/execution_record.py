@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class ExecutionRecord:
-    pr_url: str
+    task: str
     count: int
     last_run: str
-    last_threads: list[str] = field(default_factory=list)
+    last_items: list[str | int] = field(default_factory=list)

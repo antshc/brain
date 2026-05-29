@@ -34,9 +34,9 @@ def fix_prs(
         prompt:         Prompt text passed to the AI agent (default: "/ralph:fix").
         vcs:            VCSClient instance (defaults to VCSClient()).
         agent:          AIAgent instance (defaults to AIAgent()).
-        exec_log:       ExecutionLog instance (defaults to ExecutionLog(log_dir, github_repo)).
+        exec_log:       ExecutionLog instance (defaults to ExecutionLog(log_dir, github_repo, "fix-prs")).
     """
-    exec_log = exec_log or ExecutionLog(log_dir, github_repo)
+    exec_log = exec_log or ExecutionLog(log_dir, github_repo, "fix-prs")
     thread_filter = ThreadFilter()
     vcs = vcs or VCSClient()
 
