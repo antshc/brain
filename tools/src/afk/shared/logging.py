@@ -7,6 +7,7 @@ Attaches two handlers to the root logger:
 AFK_LOG_LEVEL environment variable controls the log level (default: info).
 """
 
+import datetime
 import logging
 import os
 import sys
@@ -17,6 +18,12 @@ from pythonjsonlogger.json import JsonFormatter
 
 class _EcsJsonFormatter(JsonFormatter):
     """Rename stdlib fields to ECS names: levelname→level, name→logger."""
+
+    def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
+        ct = datetime.datetime.fromtimestamp(record.created, tz=datetime.timezone.utc)
+        if datefmt:
+            return ct.strftime(datefmt)
+        return ct.isoformat()
 
     def add_fields(self, log_record: dict, record: logging.LogRecord, message_dict: dict) -> None:
         super().add_fields(log_record, record, message_dict)
