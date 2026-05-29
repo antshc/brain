@@ -67,7 +67,7 @@ class ExecutionLog:
             "owner": owner,
             "repo": repo,
             "type": type,
-            "id": id,
+            "task_id": str(id),
             "task": record.task,
             "count": record.count,
             "last_run": record.last_run,
