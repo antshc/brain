@@ -53,7 +53,9 @@ class ExecutionLog:
         type: str,
         id: str | int,
     ) -> None:
-        ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        now = datetime.now(timezone.utc)
+        ts = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+        timestamp = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         index = self._find_entry_index(task)
         entry = self._log[index] if index is not None else {}
         record = ExecutionRecord(
@@ -68,6 +70,7 @@ class ExecutionLog:
             "repo": repo,
             "type": type,
             "task_id": str(id),
+            "@timestamp": timestamp,
             "task": record.task,
             "count": record.count,
             "last_run": record.last_run,

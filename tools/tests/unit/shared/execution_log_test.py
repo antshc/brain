@@ -7,6 +7,7 @@ When a test or scenario changes, update both sides to stay in sync.
 """
 
 import json
+import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -91,6 +92,7 @@ class TestExecutionLog:
         assert payload[0]["repo"] == _REPO
         assert payload[0]["type"] == "pull_request"
         assert payload[0]["task_id"] == "1"
+        assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$", payload[0]["@timestamp"])
         assert payload[0]["task"] == _PR
         assert payload[0]["count"] == 1
         assert payload[0]["last_items"] == ["T1", "T2"]
