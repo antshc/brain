@@ -90,7 +90,7 @@ class TestExecutionLog:
         assert payload[0]["owner"] == _OWNER
         assert payload[0]["repo"] == _REPO
         assert payload[0]["type"] == "pull_request"
-        assert payload[0]["id"] == 1
+        assert payload[0]["task_id"] == "1"
         assert payload[0]["task"] == _PR
         assert payload[0]["count"] == 1
         assert payload[0]["last_items"] == ["T1", "T2"]
