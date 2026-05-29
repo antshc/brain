@@ -29,7 +29,7 @@ class ExecutionLog:
         self._log = payload
 
     def _save(self) -> None:
-        self._log_path().write_text(json.dumps(self._log, indent=2))
+        self._log_path().write_text(json.dumps(self._log, separators=(",", ":")))
 
     def _find_entry_index(self, task: str) -> int | None:
         for index, entry in enumerate(self._log):
