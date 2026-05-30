@@ -31,7 +31,7 @@ If feedback loops fail, fix the issues before proceeding.
 Use `/csdroid-memory` for durable decisions.
 
 Decision store:
-`plugins/pet/skills/csdroid-memory/decisions.jsonl`
+`$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`
 
 Rules:
 - Before deciding, read/search prior entries by `topic`, `scope`, and `tags`.
