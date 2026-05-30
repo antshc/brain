@@ -62,7 +62,7 @@ class GhCli:
                 "--repo", repo,
                 "--author", user,
                 "--state", "open",
-                "--json", "url",
+                "--json", "url,title",
             ],
             capture_output=True, text=True, check=True,
         )
