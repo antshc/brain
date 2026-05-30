@@ -17,19 +17,16 @@ On Windows:
 
 `%USERPROFILE%\.copilot\memories\csdroid-memory\decisions.jsonl`
 
-## Required Workflow
+## Agent Usage
 
-Before making a new durable decision:
-1. Resolve the decision store path from `Context` for the current OS.
-2. Read the decision store file if it exists.
-3. Search related entries by topic, scope, and tags.
-4. Reuse valid prior decisions when applicable.
-
-After making a new durable decision:
-1. Create the decision store parent directory if it does not exist.
-2. Append exactly one JSON object line to the decision store file.
-3. If it supersedes an earlier entry, set `supersedes` to the previous `id`.
-4. Keep entries durable and reusable (no transient notes).
+1. Resolve OS path from `Context`.
+2. Read `decisions.jsonl` if present.
+3. Search by `topic`, `scope`, and `tags`.
+4. Reuse a valid prior decision when applicable.
+5. For a new durable decision, create parent directory if needed.
+6. Append exactly one JSON object line.
+7. If replacing an older decision, set `supersedes` to that decision `id`.
+8. Do not log transient notes or routine execution steps.
 
 ## Data Contract
 
@@ -50,7 +47,19 @@ Optional fields:
 - `related` (string array)
 - `confidence` (`low` | `medium` | `high`)
 
+## Confidence Lifecycle
+
+Use a monotonic 3-level model:
+- `low`: first reusable observation.
+- `medium`: independently confirmed across sessions/agents.
+- `high`: repeatedly validated and established.
+
+Bump rule:
+- Increase confidence only after independent successful validation in real work.
+- Never decrease confidence. Only `low` -> `medium` -> `high`;
+
 ## Hard Constraints
 
 - Keep durable memory only in the OS-specific decision store path defined in `Context`.
 - Do not log transient notes, temporary experiments, or routine execution steps.
+- On every append, set/update `confidence` using the **Confidence Lifecycle** rules.
