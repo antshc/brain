@@ -11,6 +11,7 @@ Write code using [style.md](references/style.md)
 ## Rules
 
 - Follow [layers.md](references/layers.md) for module structure and dependencies.
+- Follow agent-level `csdroid-memory` rules for durable decisions (read/reuse/append-only/supersedes/confidence).
 - Use tests when behavior changes or risk is non-trivial. Follow Testing and mocking [tests.md](references/tests.md)
 - Tests verify behavior through public interfaces, not internals.
 - Prefer small public surfaces with deep implementation. Follow [design.md](references/design.md).
