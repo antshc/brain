@@ -1,30 +1,39 @@
 # csdroid-memory Skill
 
-This skill provides toolless, local decision memory for durable decisions.
+This skill provides toolless, durable decision memory for Copilot agents.
+This repository plugin is an installation source. Durable memory is stored outside the repo.
+
+## Decision store
+
+- Canonical path: `$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`
+- Windows: `C:\Users\antsh\.copilot\memories\csdroid-memory\decisions.jsonl`
+- Linux: `/home/<user>/.copilot/memories/csdroid-memory/decisions.jsonl`
 
 ## What is included
 
 - `SKILL.md` - skill instructions.
-- `decisions.jsonl` - append-only decision store.
+- Usage examples in this README - reference records, not durable source of truth.
 
 ## How to use
 
 1. Load/invoke the `csdroid-memory` skill.
-2. Before making a decision, search `decisions.jsonl`.
+2. Before making a decision, search `$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`.
 3. Reuse a valid prior decision when applicable.
-4. After a durable decision, append exactly one JSON object line to `decisions.jsonl`.
-5. If replacing a prior decision, set `supersedes` to the old decision `id`.
+4. If needed, create `$HOME/.copilot/memories/csdroid-memory`.
+5. After a durable decision, append exactly one JSON object line to `$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`.
+6. If replacing a prior decision, set `supersedes` to the old decision `id`.
 
 ## Usage example
 
 Read existing entries first, then append one durable decision line.
 
 ```json
-{"id":"dec-001","timestamp":"2026-05-30T10:00:00Z","agent":"csdroid","topic":"build-loop","decision":"Run targeted tests after each C# change set.","rationale":"Fast feedback with lower CI risk.","scope":"plugins/pet","tags":["testing","feedback-loop"],"confidence":"medium"}
-{"id":"dec-002","timestamp":"2026-05-30T11:00:00Z","agent":"csdroid","topic":"build-loop","decision":"Run lsp + build first, then targeted tests.","rationale":"Build failures should fail fast before test selection.","scope":"plugins/pet","tags":["testing","build","feedback-loop"],"supersedes":"dec-001","confidence":"high"}
+{"id":"dec-100","timestamp":"2026-05-30T09:30:00Z","agent":"csdroid","topic":"testing-order","decision":"Run lsp diagnostics before build and tests.","rationale":"Surface syntax/type issues first for faster iteration.","scope":"plugins/pet","tags":["quality","feedback-loop"],"confidence":"medium"}
+{"id":"dec-101","timestamp":"2026-05-30T10:15:00Z","agent":"csdroid","topic":"test-selection","decision":"Run targeted tests for changed modules before full-suite checks.","rationale":"Reduce cycle time while maintaining relevant coverage.","scope":"plugins/pet","tags":["testing","performance"],"related":["dec-100"],"confidence":"medium"}
+{"id":"dec-102","timestamp":"2026-05-30T11:05:00Z","agent":"csdroid","topic":"test-selection","decision":"Always run a build before targeted tests.","rationale":"Avoid running tests against uncompilable code.","scope":"plugins/pet","tags":["build","testing"],"supersedes":"dec-101","related":["dec-100"],"confidence":"high"}
 ```
 
-`dec-002` actualizes `dec-001` by superseding it. Old entries stay unchanged.
+`dec-102` actualizes `dec-101` by superseding it. Old entries stay unchanged.
 
 ## JSONL contract
 
@@ -57,5 +66,5 @@ Confidence bumps when an agent independently validates an existing skill - appli
 
 ## Constraints
 
-- Keep memory local to `plugins/pet/skills/csdroid-memory/decisions.jsonl`.
+- Keep durable memory in `$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`.
 - Do not log transient notes, temporary experiments, or routine execution steps.
