@@ -26,6 +26,26 @@ Run the feedback loops:
 
 If feedback loops fail, fix the issues before proceeding.
 
+## DECISION MEMORY (dmem)
+
+Use `/dmem` for durable decisions.
+
+Decision store:
+`plugins/pet/skills/dmem/decisions.jsonl`
+
+Rules:
+- Before deciding, read/search prior entries by `topic`, `scope`, and `tags`.
+- Reuse valid prior decisions when applicable.
+- Save new durable decisions by appending exactly one JSON object line.
+- Update/actualize decisions by appending a new line with `supersedes`; never edit old lines.
+- Increase `confidence` only after independent successful validation.
+- Confidence is monotonic only: `low` -> `medium` -> `high`.
+- Do not log transient notes, temporary experiments, or routine execution steps.
+
+JSONL contract:
+- Required: `id,timestamp,agent,topic,decision,rationale,scope,tags`
+- Optional: `supersedes,related,confidence`
+
 ## STATUS REPORT
 
 When done, report your result in this format:
