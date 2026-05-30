@@ -1,5 +1,5 @@
 ---
-name: "dmem"
+name: "csdroid-memory"
 description: "Toolless, skill-local decision memory using append-only JSONL."
 domain: "decision-governance"
 confidence: "high"
@@ -17,17 +17,17 @@ Persistent memory path (fixed):
 
 In this skill:
 
-`plugins/pet/skills/dmem/decisions.jsonl`
+`plugins/pet/skills/csdroid-memory/decisions.jsonl`
 
 ## Required Workflow
 
 Before making a new durable decision:
-1. Read `plugins/pet/skills/dmem/decisions.jsonl` if it exists.
+1. Read `plugins/pet/skills/csdroid-memory/decisions.jsonl` if it exists.
 2. Search related entries by topic, scope, and tags.
 3. Reuse valid prior decisions when applicable.
 
 After making a new durable decision:
-1. Append exactly one JSON object line to `plugins/pet/skills/dmem/decisions.jsonl`.
+1. Append exactly one JSON object line to `plugins/pet/skills/csdroid-memory/decisions.jsonl`.
 2. If it supersedes an earlier entry, set `supersedes` to the previous `id`.
 3. Keep entries durable and reusable (no transient notes).
 
@@ -52,5 +52,5 @@ Optional fields:
 
 ## Hard Constraints
 
-- Keep memory local to `plugins/pet/skills/dmem/decisions.jsonl`.
+- Keep memory local to `plugins/pet/skills/csdroid-memory/decisions.jsonl`.
 - Do not log transient notes, temporary experiments, or routine execution steps.

@@ -1,4 +1,4 @@
-# dmem Skill
+# csdroid-memory Skill
 
 This skill provides toolless, local decision memory for durable decisions.
 
@@ -9,7 +9,7 @@ This skill provides toolless, local decision memory for durable decisions.
 
 ## How to use
 
-1. Load/invoke the `dmem` skill.
+1. Load/invoke the `csdroid-memory` skill.
 2. Before making a decision, search `decisions.jsonl`.
 3. Reuse a valid prior decision when applicable.
 4. After a durable decision, append exactly one JSON object line to `decisions.jsonl`.
@@ -57,5 +57,5 @@ Confidence bumps when an agent independently validates an existing skill - appli
 
 ## Constraints
 
-- Keep memory local to `plugins/pet/skills/dmem/decisions.jsonl`.
+- Keep memory local to `plugins/pet/skills/csdroid-memory/decisions.jsonl`.
 - Do not log transient notes, temporary experiments, or routine execution steps.

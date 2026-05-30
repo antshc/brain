@@ -26,12 +26,12 @@ Run the feedback loops:
 
 If feedback loops fail, fix the issues before proceeding.
 
-## DECISION MEMORY (dmem)
+## DECISION MEMORY (csdroid-memory)
 
-Use `/dmem` for durable decisions.
+Use `/csdroid-memory` for durable decisions.
 
 Decision store:
-`plugins/pet/skills/dmem/decisions.jsonl`
+`plugins/pet/skills/csdroid-memory/decisions.jsonl`
 
 Rules:
 - Before deciding, read/search prior entries by `topic`, `scope`, and `tags`.
