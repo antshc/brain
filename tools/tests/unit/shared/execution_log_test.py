@@ -40,22 +40,22 @@ class TestExecutionLog:
     def test_count_increments_after_update(self):
         # Scenario: Count increments after update
         log, _ = make_log()
-        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", _PR_TITLE)
+        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
         assert log.get_count(_PR) == 1
 
     def test_multiple_updates_increment_count(self):
         # Scenario: Multiple updates increment count
         log, _ = make_log()
-        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", _PR_TITLE)
-        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", _PR_TITLE)
+        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
+        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
         assert log.get_count(_PR) == 2
 
     def test_reset_clears_execution_count(self):
         # Scenario: Reset clears execution count
         log, _ = make_log()
-        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", _PR_TITLE)
-        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", _PR_TITLE)
-        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", _PR_TITLE)
+        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
+        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
+        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
         log.reset(_PR)
         assert log.get_count(_PR) == 0
 
@@ -67,7 +67,7 @@ class TestExecutionLog:
     def test_writes_per_workflow_file_name(self):
         # Scenario: Separate workflow logs write to separate files
         log, tmp = make_log("dev")
-        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", _PR_TITLE)
+        log.update(_PR, ["T1"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
         assert len(list(tmp.glob("dev-execution-log-*.json"))) == 1
         assert len(list(tmp.glob("fix-prs-execution-log-*.json"))) == 0
 
@@ -76,14 +76,14 @@ class TestExecutionLog:
         tmp = Path(tempfile.mkdtemp())
         dev_log = ExecutionLog(tmp, "owner/repo", "dev")
         fix_log = ExecutionLog(tmp, "owner/repo", "fix-prs")
-        dev_log.update(_PR, [14], _OWNER, _REPO, "pull_request", _PR_TITLE)
+        dev_log.update(_PR, [14], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
         assert dev_log.get_count(_PR) == 1
         assert fix_log.get_count(_PR) == 0
 
     def test_persists_array_record_schema(self):
         # Scenario: Persisted schema is array records with task and last_items
         log, tmp = make_log("fix-prs")
-        log.update(_PR, ["T1", "T2"], _OWNER, _REPO, "pull_request", _PR_TITLE)
+        log.update(_PR, ["T1", "T2"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
         path = next(tmp.glob("fix-prs-execution-log-*.json"))
         payload = json.loads(path.read_text())
         assert isinstance(payload, list)
@@ -91,7 +91,8 @@ class TestExecutionLog:
         assert payload[0]["owner"] == _OWNER
         assert payload[0]["repo"] == _REPO
         assert payload[0]["type"] == "pull_request"
-        assert payload[0]["task_id"] == _PR_TITLE
+        assert payload[0]["task_id"] == "1"
+        assert payload[0]["title"] == _PR_TITLE
         assert "@timestamp" not in payload[0]
         assert payload[0]["task"] == _PR
         assert payload[0]["count"] == 1
@@ -102,7 +103,7 @@ class TestExecutionLog:
         log, _ = make_log("fix-prs")
 
         with caplog.at_level(logging.INFO):
-            log.update(_PR, ["T1", "T2"], _OWNER, _REPO, "pull_request", _PR_TITLE)
+            log.update(_PR, ["T1", "T2"], _OWNER, _REPO, "pull_request", 1, _PR_TITLE)
 
         records = [record for record in caplog.records if record.message == "execution log persisted"]
         assert len(records) == 1
@@ -111,7 +112,8 @@ class TestExecutionLog:
         assert info.owner == _OWNER
         assert info.repo == _REPO
         assert info.type == "pull_request"
-        assert info.task_id == _PR_TITLE
+        assert info.task_id == "1"
+        assert info.title == _PR_TITLE
         assert not hasattr(info, "@timestamp")
         assert info.task == _PR
         assert info.count == 1
