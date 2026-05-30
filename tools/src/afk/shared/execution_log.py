@@ -1,11 +1,13 @@
 """ExecutionLog: reads/writes per-PR attempt counts to cap retries."""
 
 import json
-import uuid
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
 from modules.github.domain.execution_record import ExecutionRecord
+
+_log = logging.getLogger(__name__)
 
 
 class ExecutionLog:
@@ -55,7 +57,6 @@ class ExecutionLog:
     ) -> None:
         now = datetime.now(timezone.utc)
         ts = now.strftime("%Y-%m-%dT%H:%M:%SZ")
-        timestamp = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         index = self._find_entry_index(task)
         entry = self._log[index] if index is not None else {}
         record = ExecutionRecord(
@@ -65,12 +66,10 @@ class ExecutionLog:
             last_items=item_ids,
         )
         persisted = {
-            "hashkey": str(uuid.uuid4()),
             "owner": owner,
             "repo": repo,
             "type": type,
             "task_id": str(id),
-            "@timestamp": timestamp,
             "task": record.task,
             "count": record.count,
             "last_run": record.last_run,
@@ -81,6 +80,19 @@ class ExecutionLog:
         else:
             self._log[index] = persisted
         self._save()
+        _log.info(
+            "execution log persisted",
+            extra={
+                "owner": owner,
+                "repo": repo,
+                "type": type,
+                "task_id": str(id),
+                "task": record.task,
+                "count": record.count,
+                "last_run": record.last_run,
+                "last_items": record.last_items,
+            },
+        )
 
     def reset(self, task: str) -> None:
         self._log = [entry for entry in self._log if entry.get("task") != task]

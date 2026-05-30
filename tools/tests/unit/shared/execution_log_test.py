@@ -7,11 +7,11 @@ When a test or scenario changes, update both sides to stay in sync.
 """
 
 import json
+import logging
 import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -79,23 +79,44 @@ class TestExecutionLog:
         assert dev_log.get_count(_PR) == 1
         assert fix_log.get_count(_PR) == 0
 
-    @patch("afk.shared.execution_log.uuid.uuid4", return_value="fixed-hashkey")
-    def test_persists_array_record_schema(self, _mock_uuid):
+    def test_persists_array_record_schema(self):
         # Scenario: Persisted schema is array records with task and last_items
         log, tmp = make_log("fix-prs")
         log.update(_PR, ["T1", "T2"], _OWNER, _REPO, "pull_request", 1)
         path = next(tmp.glob("fix-prs-execution-log-*.json"))
         payload = json.loads(path.read_text())
         assert isinstance(payload, list)
-        assert payload[0]["hashkey"] == "fixed-hashkey"
+        assert "hashkey" not in payload[0]
         assert payload[0]["owner"] == _OWNER
         assert payload[0]["repo"] == _REPO
         assert payload[0]["type"] == "pull_request"
         assert payload[0]["task_id"] == "1"
-        assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$", payload[0]["@timestamp"])
+        assert "@timestamp" not in payload[0]
         assert payload[0]["task"] == _PR
         assert payload[0]["count"] == 1
         assert payload[0]["last_items"] == ["T1", "T2"]
+
+    def test_update_emits_info_log_with_persistence_metadata(self, caplog):
+        # Scenario: Update emits info log with persistence metadata
+        log, _ = make_log("fix-prs")
+
+        with caplog.at_level(logging.INFO):
+            log.update(_PR, ["T1", "T2"], _OWNER, _REPO, "pull_request", 1)
+
+        records = [record for record in caplog.records if record.message == "execution log persisted"]
+        assert len(records) == 1
+        info = records[0]
+        assert info.levelno == logging.INFO
+        assert info.owner == _OWNER
+        assert info.repo == _REPO
+        assert info.type == "pull_request"
+        assert info.task_id == "1"
+        assert not hasattr(info, "@timestamp")
+        assert info.task == _PR
+        assert info.count == 1
+        assert info.last_run.endswith("Z")
+        assert info.last_items == ["T1", "T2"]
+        assert not hasattr(info, "path")
 
     def test_old_object_format_fails_fast(self):
         # Scenario: Old object format is not supported
