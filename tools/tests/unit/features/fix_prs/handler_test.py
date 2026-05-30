@@ -24,10 +24,11 @@ _USER = "alice"
 _REPO = "owner/repo"
 _LOG_DIR = Path("logs")
 _PR_URL = "https://github.com/owner/repo/pull/1"
+_PR_TITLE = "Fix race in queue consumer"
 
 
 def _make_pr(url: str = _PR_URL) -> PullRequest:
-    return PullRequest(owner="owner", repo="repo", number=1, url=url)
+    return PullRequest(owner="owner", repo="repo", number=1, url=url, title=_PR_TITLE)
 
 
 def _make_thread(thread_id: str = "T1", body: str = "fix!: issue") -> ReviewThread:
@@ -148,7 +149,7 @@ class TestFixPrsHandlerStructuredLogging:
         with caplog.at_level(logging.INFO):
             fix_prs(_USER, _REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
-        exec_log.update.assert_called_once_with(_PR_URL, ["T1"], "owner", "repo", "pull_request", 1)
+        exec_log.update.assert_called_once_with(_PR_URL, ["T1"], "owner", "repo", "pull_request", _PR_TITLE)
         record = next(r for r in caplog.records if r.getMessage() == "Completed PR processing")
         extra = _extra(record)
         assert extra["pr_url"] == _PR_URL

@@ -11,6 +11,49 @@ from modules.github.infrastructure.tests.fake_gh_cli import FakeGhCli
 from modules.github.infrastructure.vcs_client import VCSClient
 
 
+class TestVCSClientPrMapping:
+    """Feature: VCS Client PR Mapping"""
+
+    def test_pr_list_nodes_are_mapped_to_pull_request_domain_entities(self):
+        # Scenario: Raw PR nodes are mapped to PullRequest domain entities
+        client = VCSClient(
+            gh=FakeGhCli(
+                pr_list_output=[
+                    {
+                        "url": "https://github.com/owner/repo/pull/42",
+                        "title": "Fix cache invalidation bug",
+                    }
+                ]
+            )
+        )
+
+        result = client.list_prs("alice", "owner/repo")
+
+        assert len(result) == 1
+        assert result[0].owner == "owner"
+        assert result[0].repo == "repo"
+        assert result[0].number == 42
+        assert result[0].url == "https://github.com/owner/repo/pull/42"
+        assert result[0].title == "Fix cache invalidation bug"
+
+    def test_missing_pr_title_maps_to_empty_string(self):
+        # Scenario: Missing PR title maps to empty string
+        client = VCSClient(
+            gh=FakeGhCli(
+                pr_list_output=[
+                    {
+                        "url": "https://github.com/owner/repo/pull/7",
+                    }
+                ]
+            )
+        )
+
+        result = client.list_prs("alice", "owner/repo")
+
+        assert len(result) == 1
+        assert result[0].title == ""
+
+
 class TestVCSClientThreadMapping:
     """Feature: VCS Client Thread Mapping"""
 

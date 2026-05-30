@@ -24,9 +24,10 @@ class VCSClient:
         """Return open PRs authored by *user* in *repo* as PullRequest domain objects."""
         prs = self._gh.pr_list(user, repo)
         result = []
-        for url in [pr["url"] for pr in prs]:
+        for pr in prs:
+            url = pr["url"]
             owner, repo_name, number = parse_pr_url(url)
-            result.append(PullRequest(owner=owner, repo=repo_name, number=number, url=url))
+            result.append(PullRequest(owner=owner, repo=repo_name, number=number, url=url, title=pr.get("title", "")))
         return result
 
     def checkout_pr(self, pr_url: str) -> None:
