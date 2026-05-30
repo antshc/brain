@@ -54,6 +54,7 @@ class ExecutionLog:
         repo: str,
         type: str,
         id: str | int,
+        title: str = "",
     ) -> None:
         now = datetime.now(timezone.utc)
         ts = now.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -70,6 +71,7 @@ class ExecutionLog:
             "repo": repo,
             "type": type,
             "task_id": str(id),
+            "title": title,
             "task": record.task,
             "count": record.count,
             "last_run": record.last_run,
@@ -87,6 +89,7 @@ class ExecutionLog:
                 "repo": repo,
                 "type": type,
                 "task_id": str(id),
+                "title": title,
                 "task": record.task,
                 "count": record.count,
                 "last_run": record.last_run,

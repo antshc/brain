@@ -74,7 +74,7 @@ def dev(
 
         (agent or AIAgent(alias=agent_name, prompt=f"{prompt} {milestone.title}")).run()
 
-        exec_log.update(milestone.url, issue_ids, owner, repo, "milestone", milestone.title)
+        exec_log.update(milestone.url, issue_ids, owner, repo, "milestone", milestone.number, milestone.title)
         _log.info("Completed milestone processing", extra={"milestone_url": milestone.url, "attempt": exec_count + 1})
 
     _log.info("Service run completed")
