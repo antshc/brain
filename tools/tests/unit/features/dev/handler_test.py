@@ -119,7 +119,7 @@ class TestDevMilestoneLoop:
         exec_log.get_count.assert_called_once_with(milestone.url)
         mock_agent_class.assert_called_once_with(alias="copiloty", prompt="/ralph:dev Sprint 3")
         mock_agent.run.assert_called_once_with()
-        exec_log.update.assert_called_once_with(milestone.url, [14], "owner", "repo", "milestone", "M1")
+        exec_log.update.assert_called_once_with(milestone.url, [14], "owner", "repo", "milestone", 3)
 
     @patch("afk.features.dev.handler.ExecutionLog")
     def test_default_execution_log_uses_dev_log_name(self, mock_execution_log_class):
