@@ -40,8 +40,8 @@ class TestDevMilestoneLoop:
         agent.run.assert_not_called()
         assert "No open milestones found" in caplog.text
 
-    def test_milestone_with_no_actionable_issues_is_skipped(self, caplog):
-        # Scenario: Milestone with no actionable issues is skipped
+    def test_milestone_with_no_actionable_issues_and_prior_count_resets_log(self, caplog):
+        # Scenario: Milestone with no actionable issues and prior count resets execution log
         milestone = Milestone(
             id="M1",
             number=3,
@@ -56,12 +56,43 @@ class TestDevMilestoneLoop:
         ]
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)
+        exec_log.get_count.return_value = 3
 
         with caplog.at_level(logging.INFO):
             dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
         vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
-        exec_log.get_count.assert_not_called()
+        exec_log.get_count.assert_called_once_with(milestone.url)
+        exec_log.reset.assert_called_once_with(milestone.url)
+        exec_log.update.assert_not_called()
+        agent.run.assert_not_called()
+        assert "No actionable issues, skipping" in caplog.text
+        assert "Reset execution count (all issues resolved)" in caplog.text
+
+    def test_milestone_with_no_actionable_issues_and_zero_count_does_not_reset_log(self, caplog):
+        # Scenario: Milestone with no actionable issues and zero count does not reset execution log
+        milestone = Milestone(
+            id="M1",
+            number=3,
+            title="Sprint 3",
+            description="",
+            url=_MILESTONE_URL,
+        )
+        vcs = MagicMock(spec=VCSClient)
+        vcs.list_milestones.return_value = [milestone]
+        vcs.fetch_issues.return_value = [
+            Issue(number=14, title="Refactor", body="", url="https://github.com/owner/repo/issues/14", labels=["prd"])
+        ]
+        agent = MagicMock(spec=AIAgent)
+        exec_log = MagicMock(spec=ExecutionLog)
+        exec_log.get_count.return_value = 0
+
+        with caplog.at_level(logging.INFO):
+            dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
+
+        vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
+        exec_log.get_count.assert_called_once_with(milestone.url)
+        exec_log.reset.assert_not_called()
         exec_log.update.assert_not_called()
         agent.run.assert_not_called()
         assert "No actionable issues, skipping" in caplog.text
@@ -135,6 +166,7 @@ class TestDevMilestoneLoop:
         vcs.list_milestones.return_value = [milestone]
         vcs.fetch_issues.return_value = []
         exec_log = MagicMock(spec=ExecutionLog)
+        exec_log.get_count.return_value = 0
         mock_execution_log_class.return_value = exec_log
 
         dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=MagicMock(spec=AIAgent))

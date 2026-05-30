@@ -57,6 +57,10 @@ def dev(
 
         if len(actionable_issues) == 0:
             _log.info("No actionable issues, skipping", extra={"milestone_url": milestone.url})
+            exec_count = exec_log.get_count(milestone.url)
+            if exec_count > 0:
+                exec_log.reset(milestone.url)
+                _log.info("Reset execution count (all issues resolved)", extra={"milestone_url": milestone.url})
             continue
 
         exec_count = exec_log.get_count(milestone.url)
