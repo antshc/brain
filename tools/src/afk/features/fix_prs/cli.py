@@ -38,8 +38,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max_executions", nargs="?", type=int, default=DEFAULT_MAX_EXECUTIONS,
                         metavar="max-executions",
                         help=f"Max processing attempts per PR before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
-    parser.add_argument("--agent", default="copiloty",
-                        help="Agent CLI alias to invoke (default: copiloty).")
+    parser.add_argument("--agent", default="yolo",
+                        help="Agent CLI alias to invoke (default: yolo).")
     parser.add_argument("--prompt", default="/ralph:fix",
                         help="Prompt text passed to the AI agent (default: /ralph:fix).")
     parser.add_argument("--log-dir", type=Path, default=Path("/var/log/ralph"),
