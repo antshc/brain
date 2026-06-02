@@ -25,6 +25,8 @@ Run the feedback loops:
 - Run only specific tests for changed files
 
 If feedback loops fail, fix the issues before proceeding.
+You implement exactly the task given to you.
+If blocked, stop and report. Do not try to work around fundamental blockers.
 
 ## DECISION MEMORY (csdroid-memory)
 
@@ -56,8 +58,3 @@ SUMMARY: <key technical decisions made>
 FILES: <list of files changed>
 NOTES: <blockers or context for the next iteration>
 ```
-
-## RULES
-
-- Do NOT pick tasks or prioritize. You implement exactly the task given to you.
-- If blocked, stop and report. Do not try to work around fundamental blockers.
