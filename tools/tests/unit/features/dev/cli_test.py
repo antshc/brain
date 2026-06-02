@@ -24,7 +24,7 @@ class TestDevCli:
 
         assert args.github_repo_board == "owner/repo"
         assert args.max_executions == dev_cli.DEFAULT_MAX_EXECUTIONS
-        assert args.agent == "copiloty"
+        assert args.agent == "yolo"
         assert args.prompt == "/ralph:dev"
         assert args.log_dir == Path("/var/log/ralph")
 
@@ -111,7 +111,7 @@ class TestDevCli:
         args = argparse.Namespace(
             github_repo_board="owner/repo",
             max_executions=dev_cli.DEFAULT_MAX_EXECUTIONS,
-            agent="copiloty",
+            agent="yolo",
             prompt="/ralph:dev",
             log_dir=Path("dev-logs"),
         )

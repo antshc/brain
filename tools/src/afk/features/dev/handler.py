@@ -18,7 +18,7 @@ def dev(
     max_executions: int,
     prompt: str = "/ralph:dev",
     *,
-    agent_name: str = "copiloty",
+    agent_name: str = "yolo",
     vcs: VCSClient | None = None,
     agent: AIAgent | None = None,
     exec_log: ExecutionLog | None = None,

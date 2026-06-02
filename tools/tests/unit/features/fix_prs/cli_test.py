@@ -25,7 +25,7 @@ class TestFixPrsCli:
         assert args.github_user is None
         assert args.github_repo is None
         assert args.max_executions == fix_prs_cli.DEFAULT_MAX_EXECUTIONS
-        assert args.agent == "copiloty"
+        assert args.agent == "yolo"
         assert args.prompt == "/ralph:fix"
         assert args.log_dir == Path("/var/log/ralph")
 
@@ -58,7 +58,7 @@ class TestFixPrsCli:
             github_user="alice",
             github_repo="owner/repo",
             max_executions=5,
-            agent="copiloty",
+            agent="yolo",
             prompt="/ralph:fix",
             log_dir=Path("fix-logs"),
         )
@@ -98,7 +98,7 @@ class TestFixPrsCli:
             "log_dir": args.log_dir,
             "max_executions": 5,
             "prompt": "/ralph:fix",
-            "agent_name": "copiloty",
+            "agent_name": "yolo",
         }
 
     def test_main_does_not_use_afk_debug_env_var(self, monkeypatch):
@@ -107,7 +107,7 @@ class TestFixPrsCli:
             github_user=None,
             github_repo=None,
             max_executions=fix_prs_cli.DEFAULT_MAX_EXECUTIONS,
-            agent="copiloty",
+            agent="yolo",
             prompt="/ralph:fix",
             log_dir=Path("fix-logs"),
         )

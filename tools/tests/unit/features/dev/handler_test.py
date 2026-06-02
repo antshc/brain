@@ -148,7 +148,7 @@ class TestDevMilestoneLoop:
         vcs.list_milestones.assert_called_once_with("owner", "repo")
         vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
         exec_log.get_count.assert_called_once_with(milestone.url)
-        mock_agent_class.assert_called_once_with(alias="copiloty", prompt="/ralph:dev Sprint 3")
+        mock_agent_class.assert_called_once_with(alias="yolo", prompt="/ralph:dev Sprint 3")
         mock_agent.run.assert_called_once_with()
         exec_log.update.assert_called_once_with(milestone.url, [14], "owner", "repo", "milestone", 3, milestone.title)
 

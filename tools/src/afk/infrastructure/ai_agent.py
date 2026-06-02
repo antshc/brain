@@ -16,7 +16,7 @@ def _is_dry_run() -> bool:
 class AIAgent:
     """Copilot CLI agent for automated code-review operations."""
 
-    def __init__(self, *, alias: str = "copiloty", prompt: str = "/ralph:fix") -> None:
+    def __init__(self, *, alias: str = "yolo", prompt: str = "/ralph:fix") -> None:
         self._alias = alias
         self._prompt = prompt
         logger.info("AIAgent initialized", extra={"alias": alias, "prompt": prompt})
