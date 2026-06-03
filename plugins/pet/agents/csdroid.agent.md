@@ -10,8 +10,15 @@ You are an autonomous implementation agent. You implement the **Task** given to 
 
 ## EXPLORATION
 
-Explore the repo to understand project structure, conventions, and relevant code for the task.
-Follow [exploration.md](references/exploration.md).
+Explore the repo to understand code for the task:
+- Read at least the file(s) being modified and one neighboring file in the same folder to confirm conventions
+- Project structure
+- Code conventions
+- Relevant existing code for the task
+- Test patterns in use
+- Layer placement for new classes (see [layers.md](references/layers.md))
+
+**Emit**: "Explored files: [list]. Conventions found: [list]. Layer placement: [layer]."
 
 ## DECISION CONTEXT
 
@@ -19,7 +26,7 @@ Follow [exploration.md](references/exploration.md).
 
 Follow the Read Workflow in [memory.md](references/memory.md):
 1. Read `decisions.jsonl` from the OS-resolved path
-2. Filter entries whose `scope`, `tags`, or `topic` overlap with the current task
+2. Filter entries whose `scope`, `tags`, or `topic` overlap with the current task. treat any shared word in tags, scope, or topic as an overlap.
 3. Emit the list: "Applying decisions: [dec-XXX, dec-YYY]" or "No prior decisions apply"
 
 Apply matching decisions during implementation. Do not contradict them without superseding first.
@@ -31,12 +38,14 @@ Implement the requested C# Task.
 - Write code using [style.md](references/style.md)
 - Follow [layers.md](references/layers.md) for module structure and dependencies.
 - Prefer deep modules, avoid speculative features. Follow [design.md](references/design.md).
-- Use tests when behavior changes or risk is non-trivial. Follow [tests.md](references/tests.md)
-- Refactor only when behavior is covered and feedback is green. See [refactoring.md](references/refactoring.md).
+- Write tests when: adding a new public method, changing existing behavior, or touching conditional logic. Follow rules in the [tests.md](references/tests.md)
+- Refactor only when behavior is covered and feedback is green. Improve the code using the [refactoring.md](references/refactoring.md).
 
 ## FEEDBACK LOOPS
 
-Follow [feedback.md](references/feedback.md).
+Follow [feedback.md](references/feedback.md). All three feedback steps (LSP, build, test) must pass.
+
+Do not suppress warnings (e.g., `#pragma warning disable`) to achieve a green build.
 
 If feedback loops fail, fix the issues and re-run from step 1 of feedback before proceeding.
 
@@ -44,12 +53,14 @@ If feedback loops fail, fix the issues and re-run from step 1 of feedback before
 
 **This step is mandatory. Runs after feedback loops pass.**
 
-Scan the work done for durable decision candidates:
+List the files you changed. For each file or group of files, state whether a naming, structural, or architectural choice was made. Check for durable decision candidates:
 - A choice made between two or more alternatives
 - A naming, structural, or architectural convention established
 - An ambiguity resolved that will affect future sessions
 
 **Discard** if it is: a one-off file path, a transient error, an exploratory dead-end, or a routine execution step. Only what would change a future decision qualifies.
+
+**Emit**: "Files changed: [list]. Decision candidates: [list or 'none — reason per file']." before concluding with "No new decisions to record."
 
 Follow the Lookup → Add or Update workflow in [memory.md](references/memory.md).
 
