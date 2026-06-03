@@ -6,11 +6,9 @@ The `decisions.jsonl` store file in JSONL format.
 
 Resolve the path at runtime based on the detected OS:
 
-- Linux/macOS: `$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`
-- Windows: `%USERPROFILE%\.copilot\memories\csdroid-memory\decisions.jsonl`
-
-Initialize if missing:
-- `mkdir -p ~/.copilot/memories/csdroid-memory && touch ~/.copilot/memories/csdroid-memory/decisions.jsonl`
+Initialize `decisions.jsonl` store if missing:
+- Linux/macOS: `mkdir -p $HOME/.copilot/memories/csdroid-memory && touch $HOME/.copilot/memories/csdroid-memory/decisions.jsonl`
+- Windows (PowerShell): `$f="$env:USERPROFILE\.copilot\memories\csdroid-memory\decisions.jsonl"; md -Force (Split-Path $f) | Out-Null; if(!(Test-Path $f)){New-Item $f | Out-Null}`
 
 ## Usage
 
