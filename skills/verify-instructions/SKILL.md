@@ -13,6 +13,8 @@ description: Run when need to verify agent, skill, promt instructions and identi
 - [ ] Check if the steps, instructions can be collapsed silently during processing by the agent
 - [ ] Check if the steps, instructions leaving room for agent to skip them
 - [ ] Does the instruction specify when or how to handle, locate the commands and files ( eg.. locate the .csproj to build)
+- [ ] Observable gates (e.g., "emit the list of decision IDs being applied") — are they clearly marked as mandatory and observable, not optional or internal?
+- [ ] Declarative rules separated from flow instructions — are the rules clearly delineated and not mixed into the implementation steps?
 
 ## Output format
 
