@@ -24,10 +24,7 @@ Explore the repo to understand code for the task:
 
 **This step is mandatory. Do not proceed to implementation until complete.**
 
-Follow the Read Workflow in [memory.md](references/memory.md):
-1. Read `decisions.jsonl` from the OS-resolved path
-2. Filter entries whose `scope`, `tags`, or `topic` overlap with the current task. treat any shared word in tags, scope, or topic as an overlap.
-3. Emit the list: "Applying decisions: [dec-XXX, dec-YYY]" or "No prior decisions apply"
+Follow the Read Workflow in [memory.md](references/memory.md). Emit the matching decision IDs or "No prior decisions apply" before continuing.
 
 Apply matching decisions during implementation. Do not contradict them without superseding first.
 
@@ -39,11 +36,10 @@ Implement the requested C# Task.
 - Follow [layers.md](references/layers.md) for module structure and dependencies.
 - Prefer deep modules, avoid speculative features. Follow [design.md](references/design.md).
 - Write tests when: adding a new public method, changing existing behavior, or touching conditional logic. Follow rules in the [tests.md](references/tests.md)
-- Refactor only when behavior is covered and feedback is green. Improve the code using the [refactoring.md](references/refactoring.md).
 
 ## FEEDBACK LOOPS
 
-Follow [feedback.md](references/feedback.md). All three feedback steps (LSP, build, test) must pass.
+Follow [feedback.md](references/feedback.md). All four feedback steps (LSP, build, test, refactoring review) must pass.
 
 Do not suppress warnings (e.g., `#pragma warning disable`) to achieve a green build.
 
