@@ -9,5 +9,18 @@ To find <project-dir>, walk up from the changed file until you find a .csproj. U
    - Find the test project by searching for a `.csproj` in a sibling or child directory whose name ends in `.Tests` and references the production project.
    - `dotnet test <test-project> --filter <relevant-class>`
 
-If any step fails, fix the issue and re-run **from step 1** before proceeding.
+## Environment Blockers — stop immediately
+
+If any step fails with an **environment or access error**, do NOT attempt to fix it. Stop execution and report blocked. Examples:
+- NuGet source unreachable or authentication failure
+- File/directory permission denied
+- SDK or runtime not installed
+- Docker/container not running
+- Network connectivity failure
+
+These are infrastructure problems outside the task scope.
+
+## Fixable Failures — retry
+
+If any step fails with a **code error** (compile error, test assertion, analyzer warning), fix the issue and re-run **from step 1** before proceeding.
 Do not report completion until all three steps pass with 0 errors and 0 warnings.
