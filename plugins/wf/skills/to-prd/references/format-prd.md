@@ -49,7 +49,7 @@ A numbered list of behavior rules following the formats above.
 
 A list of implementation decisions that were made. This can include:
 
-- The modules that will be built/modified
+- The modules that will be built/modified, each with its assigned layer (Manager / Engine / ResourceAccessor / Repository / Client / Utilities)
 - The interfaces of those modules that will be modified
 - Technical clarifications from the developer
 - Architectural decisions
