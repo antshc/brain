@@ -12,9 +12,13 @@ Harvest from the conversation before writing:
 - Grilling decisions → *Implementation Decisions*
 - Out-of-scope items → *Out of Scope*
 
-1. Explore the repo. Use domain glossary and respect ADRs if `grill-with-docs` ran. Identify the layer structure in use (`references/layers.md`): layers present, naming conventions, one example each — emit a brief layer map.
+1. Explore the repo to understand the current state of the codebase, if you haven't already. If `grill-with-docs` ran, use the project's domain glossary vocabulary throughout the PRD and respect any ADRs in the area you're touching.
 
-2. Sketch modules to build or modify. Prefer deep modules (broad functionality, simple stable interface). Assign each a layer (Manager / Engine / ResourceAccessor / Repository / Client / Utilities) and validate dependency direction — flag upward references. Confirm modules, layer assignments, and test scope with the user.
+2. Sketch out the major modules you will need to build or modify to complete the implementation. Actively look for opportunities to extract deep modules that can be tested in isolation.
+
+A deep module (as opposed to a shallow module) is one which encapsulates a lot of functionality in a simple, testable interface which rarely changes.
+
+Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
 3. Write the PRD using the template and writing style defined in `references/format-prd.md`.
 
