@@ -1,8 +1,3 @@
----
-name: csdroid-feedback
-description: Run mandatory feedback loops after every C# file change — LSP diagnostics, build, and tests. Use after any implementation step in C# projects.
----
-
 # Feedback Loops
 
 These steps are **mandatory** after every file change — all three must run:
