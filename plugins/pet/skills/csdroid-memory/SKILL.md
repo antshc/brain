@@ -1,65 +1,56 @@
 ---
 name: "csdroid-memory"
-description: "Copilot-user-local decision memory using append-only JSONL."
+description: "csdroid agent decision memory using append-only JSONL."
 ---
 
-## Context
+## Store
+The `decisions.jsonl` store file in the JSONL format
 
-This skill is standalone and uses local files only.
+Resolve the path at runtime based on the detected OS:
 
-Persistent memory path (fixed):
+- Linux/macOS: `$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`
+- Windows: `%USERPROFILE%\.copilot\memories\csdroid-memory\decisions.jsonl`
 
-On Linux:
+Initialize:
+- `mkdir -p ~/.copilot/memories/csdroid-memory && touch ~/.copilot/memories/csdroid-memory/decisions.jsonl`
 
-`$HOME/.copilot/memories/csdroid-memory/decisions.jsonl`
+## Usage
 
-On Windows:
+1. Determine the operation type:
 
-`%USERPROFILE%\.copilot\memories\csdroid-memory\decisions.jsonl`
+   **Before recording any decision** → Follow "Lookup workflow"  
+   **No match found or new topic** → Follow "Add workflow"  
+   **Existing decision changed** → Follow "Update workflow"  
 
-## Agent Usage
+2. Lookup workflow:
+   - Read `decisions.jsonl`
+   - Search all lines for entries where `topic`, `scope`, or `tags` overlap with the current decision
+   - If a match is found and still applies, reuse it — stop here, do not duplicate
 
-1. Resolve OS path from `Context`.
-2. Read `decisions.jsonl` if present.
-3. Search by `topic`, `scope`, and `tags`.
-4. Reuse a valid prior decision when applicable.
-5. For a new durable decision, create parent directory if needed.
-6. Append exactly one JSON object line.
-7. If replacing an older decision, set `supersedes` to that decision `id`.
-8. Do not log transient notes or routine execution steps.
+3. Add workflow:
+   - Append exactly one JSON object line to `decisions.jsonl`
+   - Set `confidence` per the **Confidence** rules
+   - Do not record transient notes, temporary experiments, or routine steps
 
-## Data Contract
+4. Update workflow:
+   - Append a new JSON object line with `supersedes` set to the older entry's `id`
+   - Never edit or delete old lines
 
-Each line in `decisions.jsonl` must be one valid JSON object.
+## Record Schema
 
-Required fields:
-- `id` (string)
-- `timestamp` (ISO-8601 string)
-- `agent` (string)
-- `topic` (string)
-- `decision` (string)
-- `rationale` (string)
-- `scope` (string)
-- `tags` (string array)
+Required: `id`, `timestamp`, `agent`, `topic`, `decision`, `rationale`, `scope`, `tags[]`  
+Optional: `supersedes`, `related[]`, `confidence` (`low` → `medium` → `high`)
 
-Optional fields:
-- `supersedes` (string)
-- `related` (string array)
-- `confidence` (`low` | `medium` | `high`)
+## Confidence
 
-## Confidence Lifecycle
+- `low`: first reusable observation
+- `medium`: independently confirmed across sessions/agents
+- `high`: repeatedly validated and established
 
-Use a monotonic 3-level model:
-- `low`: first reusable observation.
-- `medium`: independently confirmed across sessions/agents.
-- `high`: repeatedly validated and established.
-
-Bump rule:
-- Increase confidence only after independent successful validation in real work.
-- Never decrease confidence. Only `low` -> `medium` -> `high`;
+Increase only after independent successful validation. Never decrease.
 
 ## Hard Constraints
 
-- Keep durable memory only in the OS-specific decision store path defined in `Context`.
-- Do not log transient notes, temporary experiments, or routine execution steps.
-- On every append, set/update `confidence` using the **Confidence Lifecycle** rules.
+- Write only to the OS-resolved path defined in **Store**. Never use any other location.
+- Do not record transient notes, temporary experiments, or routine execution steps.
+- On every append, set `confidence` according to the **Confidence** rules above.
