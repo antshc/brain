@@ -1,5 +1,5 @@
 ---
-name: conf-cpage
+name: create-conf
 description: 'Create a Confluence page from a local Markdown file. Use when user wants to publish a markdown file to Confluence, create a Confluence page from md, or mentions "conf-cpage".'
 argument-hint: '<md_file_path> <parent_page_url> (e.g., "./docs/page.md https://<org>.atlassian.net/wiki/spaces/~.../pages/1234567/Title")'
 ---
