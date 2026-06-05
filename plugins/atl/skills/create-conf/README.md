@@ -5,7 +5,7 @@ Create a Confluence page from a local Markdown file using the Atlassian CLI (`ac
 ## Prerequisites
 
 - [`acli`](https://developer.atlassian.com/cloud/acli/) installed and configured
-- Environment variables set (via `setup-acli` or manually in `~/.profile`):
+- Environment variables set (via `setup-atl` or manually in `~/.profile`):
   ```bash
   export ACLI_EMAIL="you@example.com"
   export ACLI_API_TOKEN="ATATT3..."

@@ -7,7 +7,7 @@ description: 'Authorize acli with Jira. Use when acli Jira auth is missing or ex
 ```bash
 source ~/.profile
 if [[ -z "$ACLI_API_TOKEN" ]]; then
-  echo "ACLI_API_TOKEN is not set. Run /atl:setup-acli first."
+  echo "ACLI_API_TOKEN is not set. Run /atl:setup-atl first."
   exit 1
 fi
 ```
