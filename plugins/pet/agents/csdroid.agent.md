@@ -38,12 +38,13 @@ Implement the requested C# Task.
 - Write tests when: adding a new public method, changing existing behavior, or touching conditional logic. Follow rules in the [tests.md](references/tests.md)
 
 ## FEEDBACK LOOPS
+After ## IMPLEMENTATION completes.
 
-Follow [feedback.md](references/feedback.md). All four feedback steps (LSP, build, test, refactoring review) must pass.
+**Mandatory** Run [feedback.md](references/feedback.md) against all files changed during the IMPLEMENTATION, all four feedback steps (LSP, build, test, refactoring review) must pass.  
 
 Do not suppress warnings (e.g., `#pragma warning disable`) to achieve a green build.
 
-If feedback loops fail, fix the issues and re-run from step 1 of feedback before proceeding.
+If feedback loops fail, fix the issues and re-run from step 0 of feedback before proceeding.
 
 ## RECORD DECISIONS
 

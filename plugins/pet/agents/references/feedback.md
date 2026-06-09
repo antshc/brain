@@ -1,38 +1,41 @@
 # Feedback Loops
 
-**Mandatory** after every file change. Copy this checklist and check off items as you complete them:
-
 ```
 Task Progress:
-- [ ] Step 1: LSP diagnostics (get_errors on every edited file)
-- [ ] Step 2: Build (dotnet build --no-incremental)
-- [ ] Step 3: Tests (dotnet test --filter)
-- [ ] Step 4: Refactoring review
+- [ ] Step 0: Collect changed files
+- [ ] Step 1: LSP diagnostics (get_errors on all changed files)
+- [ ] Step 2: Build (dotnet build --no-incremental, deduplicated)
+- [ ] Step 3: Tests (dotnet test --filter, all affected projects)
+- [ ] Step 4: Refactoring review (all changed files)
 ```
 
-## Setup
+## Step 0: Collect changed files
 
-To find `<project-dir>`, walk up from the changed file until you find a `.csproj`. Use that directory.
+Gather the full list of files changed during implementation. For each changed file, walk up to its `.csproj` to identify the affected project. Deduplicate:
+- **Projects**: unique set of `.csproj` directories containing changed files.
+- **Test projects**: for each affected project, find the sibling/child `.csproj` ending in `.Tests` that references it.
+
+**Emit**: "Changed files: [list]. Affected projects: [list]. Test projects: [list]."
 
 ## Step 1: LSP diagnostics
 
-Run: `get_errors` on every edited file.
+Run: `get_errors` on all changed files.
 
 ## Step 2: Build
 
-Run: `dotnet build <project-dir> --no-incremental` for every `.csproj` that contains a changed file.
+Run: `dotnet build <project-dir> --no-incremental` for each unique affected project (do not build the same project twice).
 
 A passing `get_errors` does NOT replace a build — StyleCop and analyzers only fire during a real build.
 
 ## Step 3: Tests
 
-Find the test project by searching for a `.csproj` in a sibling or child directory whose name ends in `.Tests` and references the production project.
+Run: `dotnet test <test-project> --filter <relevant-classes>` for each unique affected test project.
 
-Run: `dotnet test <test-project> --filter <relevant-class>`
+Filter by all classes that correspond to changed files in that test project's scope.
 
 ## Step 4: Refactoring review
 
-After steps 1–3 pass, review changed files for refactoring candidates:
+After steps 1–3 pass, review all changed files together for refactoring candidates:
 - **Duplication** → extract function/class
 - **Long methods** → break into private helpers (keep tests on public interface)
 - **Shallow modules** → combine or deepen
@@ -40,7 +43,7 @@ After steps 1–3 pass, review changed files for refactoring candidates:
 - **Primitive obsession** → introduce value objects
 - **Existing code** the new code reveals as problematic
 
-If any candidate applies, refactor and return to Step 1.
+If any candidate applies, refactor and return to Step 1 (re-run over the updated full set of changed files).
 If none apply, emit: "Refactoring review: no candidates." and proceed.
 
 ---
