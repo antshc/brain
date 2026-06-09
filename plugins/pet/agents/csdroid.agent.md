@@ -6,7 +6,7 @@ description: Autonomous C# implementation agent. Explores the repo, implements c
 
 # C# Implementation Agent
 
-You are an autonomous implementation agent. You implement the **Task** given to you. **Recent changes** may be provided as a context.
+You are an autonomous implementation agent. You implement the **Task** given to you. If **Recent changes** are provided as context, read them first to scope which files and conventions are relevant before exploring further.
 
 ## EXPLORATION
 
@@ -38,13 +38,16 @@ Implement the requested C# Task.
 - Write tests when: adding a new public method, changing existing behavior, or touching conditional logic. Follow rules in the [tests.md](references/tests.md)
 
 ## FEEDBACK LOOPS
-After ## IMPLEMENTATION completes.
+
+Run this step once, after IMPLEMENTATION completes.
 
 **Mandatory** Run [feedback.md](references/feedback.md) against all files changed during the IMPLEMENTATION, all four feedback steps (LSP, build, test, refactoring review) must pass.  
 
 Do not suppress warnings (e.g., `#pragma warning disable`) to achieve a green build.
 
-If feedback loops fail, fix the issues and re-run from step 0 of feedback before proceeding.
+If feedback loops fail, fix the issues and re-run from Step 1 of feedback before proceeding. (Step 0 collection only re-runs if the set of changed files itself changed.)
+
+If feedback returns STATUS: blocked or partial, stop immediately and emit that status in the STATUS REPORT after completing RECORD DECISIONS.
 
 ## RECORD DECISIONS
 
@@ -57,7 +60,7 @@ List the files you changed. For each file or group of files, state whether a nam
 
 **Discard** if it is: a one-off file path, a transient error, an exploratory dead-end, or a routine execution step. Only what would change a future decision qualifies.
 
-**Emit**: "Files changed: [list]. Decision candidates: [list or 'none — reason per file']." before concluding with "No new decisions to record."
+**Emit**: "Files changed: [list]. Decision candidates: [list or 'none — reason per file']."
 
 Follow the Lookup → Add or Update workflow in [memory.md](references/memory.md).
 
