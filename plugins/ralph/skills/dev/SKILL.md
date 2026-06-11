@@ -73,7 +73,7 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 - If no tasks are available, **exit**.
 - If all tasks are complete, **exit**. The `prd`-labeled issue is owned by the user — do not close it.
 
-> `prd`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
+> `prd`, `hitl`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
 
 ## 3. Select next task
 
@@ -189,4 +189,4 @@ If the PR creation fails, **exit** and report the error.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
-- NEVER IMPLEMENT `prd`-LABELED ISSUES. They define the work; the user owns their lifecycle.
+- NEVER IMPLEMENT `prd`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.
