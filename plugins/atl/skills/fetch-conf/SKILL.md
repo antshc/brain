@@ -9,7 +9,7 @@ Parse the user input: `{{input}}`
 Extract: <page_id> from <page_url> in the format `https://<organization>.atlassian.net/wiki/spaces/~{space_key}/pages/{page_id}/{page_title}` or `/wiki/spaces/~{space_key}/pages/{page_id}/{page_title}`
 
 **Step 2 — Fetch PAGE content**
-Run the following command to fetch the page content in markdown format:
+Run the following command (It supports stdin) to fetch the page content in markdown format:
 ```
 page_json=$(acli confluence page view --id <page_id> --body-format view --json)
 python3 <skill-directory>/scripts/page_view_json_to_markdown.py "$page_json"
