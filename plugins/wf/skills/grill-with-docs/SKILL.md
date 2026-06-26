@@ -37,6 +37,7 @@ If a `CONTEXT-MAP.md` exists at the root, `<docs-path>` has multiple contexts. T
 ```
 /                                    ← reporoot (docs/context)
 ├── CONTEXT-MAP.md
+├── ARCHITECTURE.md
 ├── docs/
 │   └── adr/                          ← system-wide decisions
 └── workspace/
