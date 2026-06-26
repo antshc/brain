@@ -1,30 +1,14 @@
 ---
 name: grill-with-docs
-description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise. Assumes a fixed topology — the current repo (reporoot) holds the context/docs and a nested `workspace/` holds the source code and worktrees where development happens. Use when user wants to stress-test a plan against their project's language and documented decisions.
+description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs, ARCHITECTURE.md) inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
 ---
-
-<repo-topology>
-
-This skill assumes a fixed repository layout:
-
-- **reporoot** (the current repository) is the **documentation/context repo**. It holds `CONTEXT.md` (and optional `CONTEXT-MAP.md`) at the root and ADRs under `docs/adr/`.
-- **`reporoot/workspace/`** holds the **project source code and git worktrees**. All development and code changes happen here, inside the active worktree — never in reporoot.
-- Documentation (`CONTEXT.md`, ADRs) is authored and updated at **reporoot**, never inside `workspace/`.
-
-So:
-
-- `<docs-path>` = `.` (reporoot) — where CONTEXT.md and `docs/adr/` live.
-- `<code-path>` = `workspace/` — where source and worktrees live and where development must happen.
-
-</repo-topology>
-
 <what-to-do>
 
 Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 
 Ask the questions one at a time, waiting for feedback on each question before continuing.
 
-If a question can be answered by exploring the codebase, explore the codebase instead. Source code lives under `<code-path>` (`workspace/`).
+If a question can be answered by exploring the codebase, explore the codebase instead.
 
 </what-to-do>
 
@@ -41,11 +25,11 @@ Most `<docs-path>` repos have a single context:
 ```
 /                                    ← reporoot (docs/context)
 ├── CONTEXT.md
+├── ARCHITECTURE.md
 ├── docs/
 │   └── adr/
 │       ├── 0001-event-sourced-orders.md
 │       └── 0002-postgres-for-write-model.md
-└── workspace/                       ← source code + worktrees (development happens here)
 ```
 
 If a `CONTEXT-MAP.md` exists at the root, `<docs-path>` has multiple contexts. The map points to where each one lives:
@@ -72,6 +56,10 @@ Create files lazily — only when you have something to write. If no `CONTEXT.md
 
 When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
 
+### Challenge against the existing architecture
+
+When the user's plan conflicts with the documented architecture in `ARCHITECTURE.md`, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan represents a deliberate architectural shift, surface it as a candidate for an ADR.
+
 ### Sharpen fuzzy language
 
 When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
@@ -82,7 +70,7 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 ### Cross-reference with code
 
-When the user states how something works, check whether the code agrees. The code lives under `<code-path>` (`workspace/`, including the active worktree) — not at reporoot. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
+When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
 
 ### Update CONTEXT.md inline
 
