@@ -3,9 +3,8 @@ name: brainstorm
 description: Interview the user relentlessly about an idea, problem or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test an idea, get brainstormed on their design, or mentions "brainstorm".
 ---
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
+Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action.
 </HARD-GATE>
-
 
 Interview me relentlessly about every aspect of the idea, problem or design until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 
