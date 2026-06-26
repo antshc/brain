@@ -10,14 +10,11 @@
 ## Sections
 
 - **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited
-- **Considered Options** — only when the rejected alternatives are worth remembering
+- **Date** YYYY-MM-DD
+- **Considered Options**
 - **Consequences** — only when non-obvious downstream effects need to be called out
 
 ```
-
-## Numbering
-
-Scan `docs/adr/` for the highest existing number and increment by one.
 
 ### What qualifies
 
