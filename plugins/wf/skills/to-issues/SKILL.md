@@ -100,10 +100,18 @@ Create issues in dependency order (blockers first) so you can reference real iss
 A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation. Reference specific sections of the parent PRD rather than duplicating content.
 
 ## Acceptance criteria
+<acceptance-criteria-rule>
+- Written for a manual QA tester. Each criterion must be a single, self-contained check the tester can perform and judge as pass or fail without reading code or the PRD.
+- Phrase as an observable action and its expected result (e.g. "When <action>, then <observable outcome>").
+- Use the domain language of the PRD or the CONTEXT.md. Never reference file paths, class names,variable names, or other implementation details.
+- Avoid vague or unverifiable words such as "works", "correctly", "properly", "as expected". State the exact expected outcome instead.
+- If a relevant error condition exists, add a criterion for the expected behavior during that failure (e.g. the message or state the tester should see).
+- Prefer 3–6 criteria total.
+</acceptance-criteria-rule>
 
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
+- [ ] Acceptance criteria 1
+- [ ] Acceptance criteria 2
+- [ ] Acceptance criteria 3
 
 ## Blocked by
 
