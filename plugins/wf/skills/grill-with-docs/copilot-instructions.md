@@ -14,7 +14,9 @@ This repository (the **reporoot**) is the **documentation / context repository**
 
 ## Rules
 
-- **Do all development inside `workspace/`** — the active worktree. Never create or edit source code at the reporoot.
-- **Author documentation at the reporoot** — `CONTEXT.md` and ADRs under `docs/adr/` are created and updated here, never inside `workspace/`.
+- **Do all development inside `workspace/`** — the active worktree.
+- **Author documentation at the reporoot** — `CONTEXT.md`, `CONTEXT-MAP.md` and ADRs under `docs/adr/` are created and updated here, never inside `workspace/`.
 - `CONTEXT.md` is a glossary only. Keep implementation details, specs, and scratch notes out of it.
+- if a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives. Mirrors the folder structure from the `workspace/` under the `src/`. 
+- `ARCHITECTURE.md` is a high level architecture. Keep implementation details, specs, and scratch notes out of it.
 - When cross-referencing the plan against code, look under `workspace/` (including the active worktree), not the reporoot.
