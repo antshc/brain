@@ -1,8 +1,15 @@
 # ADR Format
 
+Architecture Decision Records (ADRs) capture **localized, often non-obvious decisions**: the
+choices made for a specific context or feature that may not be immediately apparent to a future developer. An ADR is a *point-in-time decision record*, not a backbone rule.
+
 ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
 
 Create the `docs/adr/` directory lazily — only when the first ADR is needed.
+
+Every ADR is **indexed in `ARCHITECTURE.md`** under a `## Architecture Decision Records` section with a
+one-line summary and a link. The index is the entry point: read it during a modeling
+session, and open the full ADR only when a decision is relevant to the work at hand.
 
 ## Template
 
@@ -45,3 +52,9 @@ If a decision is easy to reverse, skip it — you'll just reverse it. If it's no
 - **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
 - **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
 - **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it — otherwise someone will suggest GraphQL again in six months.
+
+## Keeping the index in sync
+
+When you add, supersede, or retire an ADR, update the `## Architecture Decision Records` table in
+`ARCHITECTURE.md` in the same change. The index summary must match the ADR's `**Summary:**`
+line.
