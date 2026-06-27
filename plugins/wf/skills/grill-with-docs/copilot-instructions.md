@@ -31,10 +31,5 @@ This repository (the **reporoot**) is the **documentation / context repository**
 ### Troubleshooting the LSP
 
 - If the LSP returns no results, incomplete results, or fails to resolve symbols, the C# language server likely hasn't loaded the project yet.
-- Build the solution to make the LSP work:
-
-  ```bash
-  cd workspace/zerto-zic && dotnet build all.sln
-  ```
-
+- Build the solution to make the LSP work.
 - After a successful build, retry the LSP navigation. A full restore/build populates the metadata the language server needs to resolve symbols across projects.
