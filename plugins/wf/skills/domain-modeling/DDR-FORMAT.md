@@ -5,8 +5,8 @@ solution-strategy decisions about the top-level decomposition of the system — 
 an architectural or design pattern that every feature is expected to follow. A DDR is a
 *main architecture rule*, not a one-off.
 
-DDRs live in `docs/design/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`,
-etc. Create the `docs/design/` directory lazily — only when the first DDR is needed.
+DDRs live in `docs/ddr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`,
+etc. Create the `docs/ddr/` directory lazily — only when the first DDR is needed.
 
 Every DDR is **indexed in `ARCHITECTURE.md`** under a `## Design Decisions` section with a
 one-line summary and a link. The index is the entry point: read it during a modeling
@@ -39,7 +39,7 @@ Include only when they add genuine value:
 
 ## Numbering
 
-Scan `docs/design/` for the highest existing number and increment by one.
+Scan `docs/ddr/` for the highest existing number and increment by one.
 
 ## When to offer a DDR
 
