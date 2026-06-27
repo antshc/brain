@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural or design decision (ADR/DDR), or when another skill needs to maintain the domain model.
+description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural or design decision (ADR/SDR), or when another skill needs to maintain the domain model.
 ---
 
 # Domain Modeling
@@ -13,10 +13,10 @@ Most repos have a single context:
 
 ```
 /
-├── ARCHITECTURE.md                      ← also indexes the Design Decisions (DDRs)
+├── ARCHITECTURE.md                      ← also indexes the Solution Design Strategy (SDRs)
 ├── CONTEXT.md
 ├── docs/
-│   ├── ddr/                             ← Design Decision Records (backbone rules)
+│   ├── sdr/                             ← Solution Design Records (backbone rules)
 │   │   └── 0001-persisted-domain-model-repository.md
 │   └── adr/
 │       ├── 0001-event-sourced-orders.md
@@ -31,9 +31,9 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 ├── ARCHITECTURE.md
 ├── CONTEXT-MAP.md
 ├── docs/
-│   ├── ddr/                             ← Design Decision Records (backbone rules)
+│   ├── sdr/                             ← Solution Design Records (backbone rules)
 │   │   └── 0001-persisted-domain-model-repository.md
-│   └── adr/                          ← system-wide ADRs (docs/ddr/ holds system-wide DDRs)
+│   └── adr/                          ← system-wide ADRs (docs/sdr/ holds system-wide SDRs)
 ├── src/
 │   ├── ordering/
 │   │   ├── CONTEXT.md
@@ -51,7 +51,7 @@ If no `ARCHITECTURE.md` exists, create one when the first term is resolved. .
 
 If no `docs/adr/` exists, create it when the first ADR is needed. 
 
-If no `docs/ddr/` exists, create it when the first DDR is needed, then add it to the `## Design Decisions` index in `ARCHITECTURE.md`.
+If no `docs/sdr/` exists, create it when the first SDR is needed, then add it to the `## Solution Design Strategy` index in `ARCHITECTURE.md`.
 
 ## During the session
 
@@ -61,7 +61,7 @@ When the user uses a term that conflicts with the existing language in `CONTEXT.
 
 ### Challenge against the existing architecture
 
-When the user's plan conflicts with the documented architecture in `ARCHITECTURE.md`, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan represents a deliberate architectural shift, surface it as a candidate for an ADR or a Design Decision Record.
+When the user's plan conflicts with the documented architecture in `ARCHITECTURE.md`, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan represents a deliberate architectural shift, surface it as a candidate for an ADR or a Solution Design Record.
 
 ### Sharpen fuzzy language
 
@@ -83,19 +83,19 @@ When a term is resolved, update `CONTEXT.md` right there. Don't batch these up �
 
 ### Update ARCHITECTURE.md inline
 
-When the structure or layering changes, update `ARCHITECTURE.md` right there. Don't batch these up — capture them as they happen. When a new DDR is created, add its summary row to the `## Design Decisions` index in the same change. When a new ADR is created, add its summary row to the `## Architecture Decision Records` index in the same change. Use the format in [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+When the structure or layering changes, update `ARCHITECTURE.md` right there. Don't batch these up — capture them as they happen. When a new SDR is created, add its summary row to the `## Solution Design Strategy` index in the same change. When a new ADR is created, add its summary row to the `## Architecture Decision Records` index in the same change. Use the format in [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
 
-`ARCHITECTURE.md` should describe *shape and rules*, not implementation detail. Do not treat `ARCHITECTURE.md` as a spec, a scratch pad, or a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Design Decision Records. It is the structural map and nothing else.
+`ARCHITECTURE.md` should describe *shape and rules*, not implementation detail. Do not treat `ARCHITECTURE.md` as a spec, a scratch pad, or a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Solution Design Records. It is the structural map and nothing else.
 
-### DDR vs ADR
-Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's a DDR. If it explains why **one** thing was done a surprising way, it's an ADR.
+### SDR vs ADR
+Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's an SDR. If it explains why **one** thing was done a surprising way, it's an ADR.
 
-| | **DDR** (`docs/ddr/`) | **ADR** (`docs/adr/`) |
+| | **SDR** (`docs/sdr/`) | **ADR** (`docs/adr/`) |
 |---|---|---|
 | Scope | Top-level decomposition; architectural/design pattern; the backbone | A single, localized decision |
 | Altitude | High-level — a rule the whole system follows | Low-level — often non-obvious to a developer |
 | Reuse | A template every new feature applies | A point-in-time choice for one area |
-| Indexed in `ARCHITECTURE.md` | **Yes** — `## Design Decisions` | **Yes** — `## Architecture Decision Records` |
+| Indexed in `ARCHITECTURE.md` | **Yes** — `## Solution Design Strategy` | **Yes** — `## Architecture Decision Records` |
 | Example | "Every persisted entity is built as Model → Document → Mapping → Repository → Accessor" | "Task initiator is captured from the Keycloak `preferred_username` claim" |
 
 ### Offer ADRs sparingly
@@ -109,11 +109,11 @@ Only offer to create an ADR when all three are true:
 
 If any of the three is missing, skip the ADR. When you write an ADR: put the full record in `docs/adr/` and add a one-line summary row to the `## Architecture Decision Records` table in `ARCHITECTURE.md`. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-### Offer Design Decision Records (DDRs) for backbone rules
+### Offer Solution Design Records (SDRs) for backbone rules
 
-A **Design Decision Record** is different from an ADR. A DDR captures a *backbone* decision: the solution strategy, the top-level decomposition of the system, or a mandated architectural/design pattern that every feature of a given kind must follow. It is a **main architecture rule**. 
+A **Solution Design Record** is different from an ADR. An SDR captures a *backbone* decision: the solution strategy, the top-level decomposition of the system, or a mandated architectural/design pattern that every feature of a given kind must follow. It is a **main architecture rule**. 
 
-Offer a DDR (instead of, or in addition to, an ADR) when all three are true:
+Offer an SDR (instead of, or in addition to, an ADR) when all three are true:
 
 1. **Structural** — it shapes the top-level decomposition or mandates a pattern, rather
    than settling one local question.
@@ -121,5 +121,5 @@ Offer a DDR (instead of, or in addition to, an ADR) when all three are true:
 3. **Backbone-defining** — it belongs in the `ARCHITECTURE.md` index where every
    contributor sees it.
 
-If any of the three is missing, skip the DDR. When you write a DDR: put the full record in `docs/ddr/` and add a one-line summary row to the `## Design Decisions` table in `ARCHITECTURE.md` (the summary must match the DDR's
-`**Summary:**` line). Use the format in [DDR-FORMAT.md](./DDR-FORMAT.md).
+If any of the three is missing, skip the SDR. When you write an SDR: put the full record in `docs/sdr/` and add a one-line summary row to the `## Solution Design Strategy` table in `ARCHITECTURE.md` (the summary must match the SDR's
+`**Summary:**` line). Use the format in [SDR-FORMAT.md](./SDR-FORMAT.md).
