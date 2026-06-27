@@ -1,11 +1,11 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
+description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural or design decision (ADR/DDR), or when another skill needs to maintain the domain model.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively build and sharpen the project's domain model and design decisions. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## File structure
 
@@ -13,9 +13,11 @@ Most repos have a single context:
 
 ```
 /
-├── ARCHITECTURE.md
+├── ARCHITECTURE.md                      ← also indexes the Design Decisions (DDRs)
 ├── CONTEXT.md
 ├── docs/
+│   ├── design/                          ← Design Decision Records (backbone rules)
+│   │   └── 0001-persisted-domain-model-repository.md
 │   └── adr/
 │       ├── 0001-event-sourced-orders.md
 │       └── 0002-postgres-for-write-model.md
@@ -29,7 +31,9 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 ├── ARCHITECTURE.md
 ├── CONTEXT-MAP.md
 ├── docs/
-│   └── adr/                          ← system-wide decisions
+│   ├── design/                          ← Design Decision Records (backbone rules)
+│   │   └── 0001-persisted-domain-model-repository.md
+│   └── adr/                          ← system-wide ADRs (docs/design/ holds system-wide DDRs)
 ├── src/
 │   ├── ordering/
 │   │   ├── CONTEXT.md
@@ -39,7 +43,15 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 │       └── docs/adr/
 ```
 
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily — only when you have something to write. 
+
+If no `CONTEXT.md` exists, create one when the first term is resolved. 
+
+If no `ARCHITECTURE.md` exists, create one when the first term is resolved. .
+
+If no `docs/adr/` exists, create it when the first ADR is needed. 
+
+If no `docs/design/` exists, create it when the first DDR is needed, then add it to the `## Design Decisions` index in `ARCHITECTURE.md`.
 
 ## During the session
 
@@ -49,7 +61,7 @@ When the user uses a term that conflicts with the existing language in `CONTEXT.
 
 ### Challenge against the existing architecture
 
-When the user's plan conflicts with the documented architecture in `ARCHITECTURE.md`, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan represents a deliberate architectural shift, surface it as a candidate for an ADR.
+When the user's plan conflicts with the documented architecture in `ARCHITECTURE.md`, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan represents a deliberate architectural shift, surface it as a candidate for an ADR or a Design Decision Record.
 
 ### Sharpen fuzzy language
 
@@ -69,7 +81,25 @@ When a term is resolved, update `CONTEXT.md` right there. Don't batch these up �
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
+### Update ARCHITECTURE.md inline
+
+When the structure or layering changes, update `ARCHITECTURE.md` right there. Don't batch these up — capture them as they happen. When a new DDR is created, add its summary row to the `## Design Decisions` index in the same change. When a new ADR is created, add its summary row to the `## Architecture Decision Records` index in the same change. Use the format in [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+
+`ARCHITECTURE.md` should describe *shape and rules*, not implementation detail. Do not treat `ARCHITECTURE.md` as a spec, a scratch pad, or a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Design Decision Records. It is the structural map and nothing else.
+
+### DDR vs ADR
+Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's a DDR. If it explains why **one** thing was done a surprising way, it's an ADR.
+
+| | **DDR** (`docs/design/`) | **ADR** (`docs/adr/`) |
+|---|---|---|
+| Scope | Top-level decomposition; architectural/design pattern; the backbone | A single, localized decision |
+| Altitude | High-level — a rule the whole system follows | Low-level — often non-obvious to a developer |
+| Reuse | A template every new feature applies | A point-in-time choice for one area |
+| Indexed in `ARCHITECTURE.md` | **Yes** — `## Design Decisions` | **Yes** — `## Architecture Decision Records` |
+| Example | "Every persisted entity is built as Model → Document → Mapping → Repository → Accessor" | "Task initiator is captured from the Keycloak `preferred_username` claim" |
+
 ### Offer ADRs sparingly
+ADRs are records of localized decisions that are often non-obvious to a developer but do not shape the whole system.
 
 Only offer to create an ADR when all three are true:
 
@@ -77,4 +107,19 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+If any of the three is missing, skip the ADR. When you write an ADR: put the full record in `docs/adr/` and add a one-line summary row to the `## Architecture Decision Records` table in `ARCHITECTURE.md`. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+
+### Offer Design Decision Records (DDRs) for backbone rules
+
+A **Design Decision Record** is different from an ADR. A DDR captures a *backbone* decision: the solution strategy, the top-level decomposition of the system, or a mandated architectural/design pattern that every feature of a given kind must follow. It is a **main architecture rule**. 
+
+Offer a DDR (instead of, or in addition to, an ADR) when all three are true:
+
+1. **Structural** — it shapes the top-level decomposition or mandates a pattern, rather
+   than settling one local question.
+2. **Reusable** — future features of the same kind are expected to follow it every time.
+3. **Backbone-defining** — it belongs in the `ARCHITECTURE.md` index where every
+   contributor sees it.
+
+If any of the three is missing, skip the DDR. When you write a DDR: put the full record in `docs/design/` and add a one-line summary row to the `## Design Decisions` table in `ARCHITECTURE.md` (the summary must match the DDR's
+`**Summary:**` line). Use the format in [DDR-FORMAT.md](./DDR-FORMAT.md).
