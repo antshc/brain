@@ -54,7 +54,7 @@ One row per DDR. The Summary cell must match the DDR's `**Summary:**` line verba
 
 | # | Decision | Summary |
 |---|----------|---------|
-| [{NNNN}](docs/design/{NNNN}-{slug}.md) | {Decision title} | {One- or two-sentence summary, copied from the DDR.} |
+| [{NNNN}](docs/ddr/{NNNN}-{slug}.md) | {Decision title} | {One- or two-sentence summary, copied from the DDR.} |
 
 ## Architecture Decision Records
 
@@ -69,14 +69,14 @@ decisions. One row per ADR. See [ADR-FORMAT.md](./ADR-FORMAT.md).}
 ## Rules
 
 - **Shape, not steps.** Describe how the system is decomposed and the rules that hold it
-  together. Step-by-step "how to build X" guidance belongs in a DDR (`docs/design/`) or the
+  together. Step-by-step "how to build X" guidance belongs in a DDR (`docs/ddr/`) or the
   code, not here.
 - **One directional layering.** State the dependency direction explicitly and the
   prohibited references. The arrows are the contract.
 - **Index every DDR.** The `## Design Decisions` table is the entry point a reader (or
-  agent) scans before designing. Every record in `docs/design/` appears here with a
+  agent) scans before designing. Every record in `docs/ddr/` appears here with a
   matching summary; nothing is added or retired without updating this table.
-- **Link, don't inline.** Backbone decisions live in `docs/design/` and are *linked* from
+- **Link, don't inline.** Backbone decisions live in `docs/ddr/` and are *linked* from
   the index — keep their full content out of `ARCHITECTURE.md` so the map stays scannable.
 - **Index every ADR.** The `## Architecture Decision Records` table is the entry point a reader (or
   agent) scans before designing. Every record in `docs/adr/` appears here with a
@@ -89,7 +89,7 @@ decisions. One row per ADR. See [ADR-FORMAT.md](./ADR-FORMAT.md).}
 ## Relationship to the other documents
 
 - **`CONTEXT.md`** — the glossary (the *language*). `ARCHITECTURE.md` is the *structure*.
-- **`docs/design/` (DDRs)** — the backbone decisions, indexed here. Use
+- **`docs/ddr/` (DDRs)** — the backbone decisions, indexed here. Use
   [DDR-FORMAT.md](./DDR-FORMAT.md).
 - **`docs/adr/` (ADRs)** — localized, often non-obvious decisions, indexed in the
   `## Architecture Decision Records` table. Use [ADR-FORMAT.md](./ADR-FORMAT.md).

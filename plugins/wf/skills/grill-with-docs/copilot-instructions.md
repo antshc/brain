@@ -7,7 +7,7 @@ This repository (the **reporoot**) is the **documentation / context repository**
 - **Context and decisions live at the reporoot:**
   - `CONTEXT.md` (and `CONTEXT-MAP.md` when multiple contexts exist) at the root — the domain glossary.
   - Architecture Decision Records under `docs/adr/`. Indexed in `ARCHITECTURE.md`.
-  - Design Decision Records (DDRs) under `docs/design/` — the architectural backbone; broader than ADRs, which record localized decisions. Indexed in `ARCHITECTURE.md`.
+  - Design Decision Records (DDRs) under `docs/ddr/` — the architectural backbone; broader than ADRs, which record localized decisions. Indexed in `ARCHITECTURE.md`.
   - The source code folder structure and architecture in `ARCHITECTURE.md`.
 - **Source code and git worktrees live in `workspace/`:**
   - `workspace/` contains the project's source code and any git worktrees.
@@ -16,7 +16,7 @@ This repository (the **reporoot**) is the **documentation / context repository**
 ## Rules
 
 - **Do all development inside `workspace/`** — the active worktree.
-- **Author documentation at the reporoot** — `CONTEXT.md`, `CONTEXT-MAP.md`, ADRs under `docs/adr/` and DDRs under `docs/design/` are created and updated here, never inside `workspace/`.
+- **Author documentation at the reporoot** — `CONTEXT.md`, `CONTEXT-MAP.md`, ADRs under `docs/adr/` and DDRs under `docs/ddr/` are created and updated here, never inside `workspace/`.
 - `CONTEXT.md` is a glossary only. Keep implementation details, specs, and scratch notes out of it.
 - if a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives. Mirrors the folder structure from the `workspace/` under the `src/`. 
 - `ARCHITECTURE.md` is a high level architecture. Keep implementation details, specs, and scratch notes out of it.

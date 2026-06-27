@@ -16,7 +16,7 @@ Most repos have a single context:
 ├── ARCHITECTURE.md                      ← also indexes the Design Decisions (DDRs)
 ├── CONTEXT.md
 ├── docs/
-│   ├── design/                          ← Design Decision Records (backbone rules)
+│   ├── ddr/                             ← Design Decision Records (backbone rules)
 │   │   └── 0001-persisted-domain-model-repository.md
 │   └── adr/
 │       ├── 0001-event-sourced-orders.md
@@ -31,9 +31,9 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 ├── ARCHITECTURE.md
 ├── CONTEXT-MAP.md
 ├── docs/
-│   ├── design/                          ← Design Decision Records (backbone rules)
+│   ├── ddr/                             ← Design Decision Records (backbone rules)
 │   │   └── 0001-persisted-domain-model-repository.md
-│   └── adr/                          ← system-wide ADRs (docs/design/ holds system-wide DDRs)
+│   └── adr/                          ← system-wide ADRs (docs/ddr/ holds system-wide DDRs)
 ├── src/
 │   ├── ordering/
 │   │   ├── CONTEXT.md
@@ -51,7 +51,7 @@ If no `ARCHITECTURE.md` exists, create one when the first term is resolved. .
 
 If no `docs/adr/` exists, create it when the first ADR is needed. 
 
-If no `docs/design/` exists, create it when the first DDR is needed, then add it to the `## Design Decisions` index in `ARCHITECTURE.md`.
+If no `docs/ddr/` exists, create it when the first DDR is needed, then add it to the `## Design Decisions` index in `ARCHITECTURE.md`.
 
 ## During the session
 
@@ -90,7 +90,7 @@ When the structure or layering changes, update `ARCHITECTURE.md` right there. Do
 ### DDR vs ADR
 Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's a DDR. If it explains why **one** thing was done a surprising way, it's an ADR.
 
-| | **DDR** (`docs/design/`) | **ADR** (`docs/adr/`) |
+| | **DDR** (`docs/ddr/`) | **ADR** (`docs/adr/`) |
 |---|---|---|
 | Scope | Top-level decomposition; architectural/design pattern; the backbone | A single, localized decision |
 | Altitude | High-level — a rule the whole system follows | Low-level — often non-obvious to a developer |
@@ -121,5 +121,5 @@ Offer a DDR (instead of, or in addition to, an ADR) when all three are true:
 3. **Backbone-defining** — it belongs in the `ARCHITECTURE.md` index where every
    contributor sees it.
 
-If any of the three is missing, skip the DDR. When you write a DDR: put the full record in `docs/design/` and add a one-line summary row to the `## Design Decisions` table in `ARCHITECTURE.md` (the summary must match the DDR's
+If any of the three is missing, skip the DDR. When you write a DDR: put the full record in `docs/ddr/` and add a one-line summary row to the `## Design Decisions` table in `ARCHITECTURE.md` (the summary must match the DDR's
 `**Summary:**` line). Use the format in [DDR-FORMAT.md](./DDR-FORMAT.md).
