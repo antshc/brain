@@ -43,12 +43,12 @@ Initialize `decisions.jsonl` store if missing:
 ### 4. Update Workflow
 
 - Append a new JSON object line with `supersedes` set to the older entry's `id`
-- Never edit or delete old lines
+- Never edit or delete old lines when the decision content changes (a confidence bump is the only exception — see step 5)
 
 ### 5. Confidence Bump (after successful reuse)
 
 - If you applied an existing decision during implementation AND feedback loops passed → check its current confidence
-- If currently `low` → append an Update with confidence bumped to `medium`
+- If currently `low` → edit that record's line in place: change only `confidence` from `low` to `medium` and refresh its `timestamp`. Do NOT append a new record and do NOT set `supersedes`.
 - If currently `medium` or `high` → no action needed
 
 ## Record Schema
@@ -69,5 +69,6 @@ Increase only after independent successful validation. Never decrease.
 - Write only to the OS-resolved path defined in **Store**. Never use any other location.
 - Do not record transient notes, temporary experiments, or routine execution steps.
 - On every append, set `confidence` according to the **Confidence** rules above.
+- A confidence bump is the only edit-in-place operation: it changes `confidence` (and `timestamp`) on the existing line. All other changes must append a superseding record — never edit or delete old lines.
 - **Must-emit after reading**: emit the list of decision IDs being applied (or "none"). This is observable output — do not skip silently.
 - **Must-emit after recording**: emit the new decision ID (or "No new decisions to record"). This is observable output — do not skip silently.
