@@ -7,22 +7,44 @@ description: C# decision memory — read, look up, add, update, and bump confide
 
 ## Store
 
-The `decisions.jsonl` store file in JSONL format.
+The `decisions.jsonl` store file in JSONL format, kept inside the source repo at `agent/decisions.jsonl`.
 
-Resolve the path at runtime based on the detected OS:
+### Resolve repo
 
-Linux/macOS: $HOME/.copilot/memories/csdroid-memory/decisions.jsonl
-Windows: $env:USERPROFILE\.copilot\memories\csdroid-memory\decisions.jsonl
+Resolve which repo holds the store **before** any read or write. The current repository is the harness root; the actual source code may live in a separate repo under `workspace/`.
 
-Initialize `decisions.jsonl` store if missing:
-- Linux/macOS: `mkdir -p $HOME/.copilot/memories/csdroid-memory && touch $HOME/.copilot/memories/csdroid-memory/decisions.jsonl`
-- Windows (PowerShell): `$f="$env:USERPROFILE\.copilot\memories\csdroid-memory\decisions.jsonl"; md -Force (Split-Path $f) | Out-Null; if(!(Test-Path $f)){New-Item $f | Out-Null}`
+Linux/macOS:
+```bash
+harness_root=$(git rev-parse --show-toplevel)
+src_git=$(find "$harness_root/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
+if [ -n "$src_git" ]; then
+  SOURCE_REPO=$(dirname "$src_git")
+else
+  SOURCE_REPO=$harness_root
+fi
+STORE="$SOURCE_REPO/agent/decisions.jsonl"
+```
+
+Windows (PowerShell):
+```powershell
+$harnessRoot = git rev-parse --show-toplevel
+$srcGit = Get-ChildItem -Path "$harnessRoot\workspace" -Filter .git -Recurse -Depth 1 -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($srcGit) { $SourceRepo = $srcGit.Parent.FullName } else { $SourceRepo = $harnessRoot }
+$STORE = Join-Path $SourceRepo "agent\decisions.jsonl"
+```
+
+- If a `.git` directory is found under `workspace/` (including one subfolder level), use that source repo.
+- Otherwise, fall back to the current (harness) repo.
+
+Initialize the `decisions.jsonl` store if missing:
+- Linux/macOS: `mkdir -p "$SOURCE_REPO/agent" && touch "$STORE"`
+- Windows (PowerShell): `md -Force (Split-Path $STORE) | Out-Null; if(!(Test-Path $STORE)){New-Item $STORE | Out-Null}`
 
 ## Usage
 
 ### 1. Read Workflow (mandatory before implementation)
 
-- Read `decisions.jsonl` in full from the OS-resolved path
+- Read `decisions.jsonl` in full from the repo-resolved store path
 - Filter all entries where `scope`, `tags`, or `topic` overlap with the current task
 - **Emit** the matching decision IDs: "Applying decisions: [dec-XXX, dec-YYY]" or "No prior decisions apply"
 - If the file doesn't exist or is empty → "No prior decisions"
@@ -66,7 +88,7 @@ Increase only after independent successful validation. Never decrease.
 
 ## Hard Constraints
 
-- Write only to the OS-resolved path defined in **Store**. Never use any other location.
+- Write only to the repo-resolved store path defined in **Store**. Never use any other location.
 - Do not record transient notes, temporary experiments, or routine execution steps.
 - On every append, set `confidence` according to the **Confidence** rules above.
 - A confidence bump is the only edit-in-place operation: it changes `confidence` (and `timestamp`) on the existing line. All other changes must append a superseding record — never edit or delete old lines.
