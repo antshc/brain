@@ -63,6 +63,11 @@ When the user uses a term that conflicts with the existing language in `CONTEXT.
 
 When the user's plan conflicts with the documented architecture in `ARCHITECTURE.md`, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan represents a deliberate architectural shift, surface it as a candidate for an ADR or a Solution Design Record.
 
+### Challenge against the testing strategy
+ 
+ When the plan adds a new REST api endpoint,external-service integration, persisted entity, or a new module, challenge which documented test categories must cover it — consult the
+ project's testing strategy (e.g. a testing SDR, Testing.md, Readme.md), explore the codebase to find existing tests rather than defaulting to unit tests. "This adds a new repository against the database — your testing strategy mandates an integration-test category for that. Which testing category covers persistence round-trips and queries?"
+
 ### Sharpen fuzzy language
 
 When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
