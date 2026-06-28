@@ -15,15 +15,17 @@ A `<milestone-title>` argument is **required**. If not provided, **exit** and re
 Fetch the milestone by title:
 
 ```bash
-repo=$((git remote get-url board 2>/dev/null || git remote get-url origin) | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+repo=$(git remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
 gh api "repos/$repo/milestones?per_page=100&state=all" | jq '.[] | select(.title == "<milestone-title>")'
 ```
+
+Tasks live in the **current (harness) repository**, so `repo` always resolves the harness `origin` remote. Run this while the working directory is still the harness root — before the worktree is created.
 
 If no milestone matches, **exit** and report "Milestone not found: `<milestone-title>`".
 
 Extract from `milestone.description`:
 - **Feature ID** — value inside backticks after `**Feature ID:**` (e.g. `PROJ-1234`)
-- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`)
+- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`). This branch lives in the **source repository** the worktree is created from (the `workspace/` source repo when present, otherwise the harness repo), not necessarily the harness repo.
 
 If either field is missing, **exit** and report "Milestone is missing required metadata."
 
@@ -45,7 +47,7 @@ Invoke the `/worktree` skill:
 /worktree <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `WORKTREE_PATH` and `BRANCH`. All subsequent commands run inside `WORKTREE_PATH`.
+Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. The `/worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the harness repo) and creates the worktree there. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
 
 If the worktree skill exits with an error, **exit**.
 
@@ -158,7 +160,7 @@ git push -u origin "$branch" 2>/dev/null || git push
 
 # CREATE PULL REQUEST
 
-Once all tasks are complete and the loop exits, check whether a PR already exists for `$branch` targeting `<target-branch>`:
+Once all tasks are complete and the loop exits, check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
 
 ```bash
 existing_pr=$(gh pr list \

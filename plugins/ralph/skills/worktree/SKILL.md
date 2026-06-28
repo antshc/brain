@@ -1,6 +1,6 @@
 ---
 name: worktree
-description: Create or reuse an isolated git worktree. Takes a target branch and feature branch name, creates the worktree based off origin/<target-branch>. No detection logic — callers are responsible for determining what to pass.
+description: Resolve the source repo (workspace source repo when present, else current repo) and create or reuse an isolated git worktree for a feature branch based off origin/<target-branch>. Branch detection is the caller's responsibility — this skill only resolves which repo to operate in.
 argument-hint: '<target-branch> <feature-branch>'
 ---
 
@@ -9,6 +9,26 @@ argument-hint: '<target-branch> <feature-branch>'
 Create or reuse an isolated git worktree for a feature branch based off a target branch.
 
 **Arguments:** `<target-branch> <feature-branch>`
+
+## 0. Resolve source repo
+
+The current repository is the harness root. The actual source code may live in a separate repo under `workspace/`. Resolve which repo to develop in **before** any branch or worktree operation.
+
+```bash
+harness_root=$(git rev-parse --show-toplevel)
+src_git=$(find "$harness_root/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
+if [ -n "$src_git" ]; then
+  SOURCE_REPO=$(dirname "$src_git")
+else
+  SOURCE_REPO=$harness_root
+fi
+cd "$SOURCE_REPO"
+```
+
+- If a `.git` directory is found under `workspace/` (including one subfolder level), develop in that source repo.
+- Otherwise, fall back to the current (harness) repo.
+
+All subsequent commands run inside `SOURCE_REPO`. Worktrees are created as `<SOURCE_REPO>.worktrees/<feature-branch>`.
 
 ## Actualize Branch
 
@@ -58,7 +78,7 @@ Run **Actualize Branch**, then jump to **Output**.
 ## 2. Create worktree
 
 ```bash
-repo_root=$(git rev-parse --show-toplevel)
+repo_root=$SOURCE_REPO
 mkdir -p "$repo_root.worktrees"
 git fetch --all --prune
 git worktree add -b <feature-branch> "$repo_root.worktrees/<feature-branch>" "origin/<target-branch>"
@@ -81,6 +101,7 @@ cd "$repo_root.worktrees/<feature-branch>"
 Report the result:
 
 ```
+SOURCE_REPO: $SOURCE_REPO
 WORKTREE_PATH: $repo_root.worktrees/<feature-branch>
 BRANCH: <feature-branch>
 TARGET_BRANCH: <target-branch>

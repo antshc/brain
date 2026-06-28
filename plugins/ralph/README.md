@@ -32,4 +32,4 @@ Implement the following GitHub issue.
 |-------|-------------|
 | `/dev` | AFK loop — picks next issue, invokes `ralphy-coder`, pushes |
 | `/fix` | Apply PR review comments |
-| `/worktree` | Create/reuse isolated git worktree |
+| `/worktree` | Resolve the source repo (workspace source repo when present, else current repo) and create/reuse an isolated git worktree |
