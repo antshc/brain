@@ -59,7 +59,7 @@ Repeat the following loop until no tasks remain.
 
 ## 1. Read state
 
-Run the following commands and print their output so it is available as context.
+Run the following commands from the `WORKTREE_PATH` and print their output so it is available as context.
 
 ```bash
 echo "=== COMMITS ==="; 

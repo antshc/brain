@@ -71,6 +71,38 @@ Initialize the `decisions.jsonl` store if missing:
 - If currently `low` → edit that record's line in place: change only `confidence` from `low` to `medium` and refresh its `timestamp`. Do NOT append a new record and do NOT set `supersedes`.
 - If currently `medium` or `high` → no action needed
 
+### 6. Commit & Push (once, after recording)
+
+- Run **once** at the end of the RECORD DECISIONS step, after any Add / Update / Confidence Bump has written to the store.
+- Operate in `$HARNESS_ROOT` (resolved in **Store**) — never the worktree.
+- Stage `decisions.jsonl` on top of whatever is already staged, then commit and push. If nothing is staged, skip the commit (no empty commits).
+- **Emit** the commit SHA, or "nothing to commit".
+
+Linux/macOS:
+```bash
+git -C "$HARNESS_ROOT" add agent/decisions.jsonl
+if git -C "$HARNESS_ROOT" diff --cached --quiet; then
+  echo "nothing to commit"
+else
+  git -C "$HARNESS_ROOT" commit -m "chore(agent): update decision memory"
+  git -C "$HARNESS_ROOT" rev-parse HEAD
+  git -C "$HARNESS_ROOT" push
+fi
+```
+
+Windows (PowerShell):
+```powershell
+git -C $HarnessRoot add agent/decisions.jsonl
+git -C $HarnessRoot diff --cached --quiet
+if ($LASTEXITCODE -eq 0) {
+  Write-Output "nothing to commit"
+} else {
+  git -C $HarnessRoot commit -m "chore(agent): update decision memory"
+  git -C $HarnessRoot rev-parse HEAD
+  git -C $HarnessRoot push
+}
+```
+
 ## Record Schema
 
 Required: `id`, `timestamp`, `agent`, `topic`, `decision`, `rationale`, `scope`, `tags[]`
@@ -92,3 +124,4 @@ Increase only after independent successful validation. Never decrease.
 - A confidence bump is the only edit-in-place operation: it changes `confidence` (and `timestamp`) on the existing line. All other changes must append a superseding record — never edit or delete old lines.
 - **Must-emit after reading**: emit the list of decision IDs being applied (or "none"). This is observable output — do not skip silently.
 - **Must-emit after recording**: emit the new decision ID (or "No new decisions to record"). This is observable output — do not skip silently.
+- Commit & push runs **once** per RECORD DECISIONS step, always from `$HARNESS_ROOT` (never the worktree), and always pushes. Skip the commit only when nothing is staged.
