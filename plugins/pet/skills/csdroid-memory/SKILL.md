@@ -7,37 +7,35 @@ description: C# decision memory — read, look up, add, update, and bump confide
 
 ## Store
 
-The `decisions.jsonl` store file in JSONL format, kept inside the source repo at `agent/decisions.jsonl`.
+The `decisions.jsonl` store file in JSONL format, kept inside the harness root repository at `agent/decisions.jsonl`.
 
 ### Resolve repo
 
-Resolve which repo holds the store **before** any read or write. The current repository is the harness root; the actual source code may live in a separate repo under `workspace/`.
+The store always lives in the **harness root repository** — the outermost repo, never a worktree or a nested `workspace/` source repo. Two layouts are supported:
+
+- **Harness only** — no source repo under `workspace/`; the harness repo is the source repo.
+- **Harness + workspace** — the source code lives in a separate repo under `workspace/`; the harness still owns the store.
+
+This skill runs from inside a worktree, so resolving the harness root takes two steps that work for both layouts: find the **main** working tree of the current repo (worktrees share it via `--git-common-dir`), then climb out to the outermost enclosing repo. Resolve it **before** any read or write.
 
 Linux/macOS:
 ```bash
-harness_root=$(git rev-parse --show-toplevel)
-src_git=$(find "$harness_root/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
-if [ -n "$src_git" ]; then
-  SOURCE_REPO=$(dirname "$src_git")
-else
-  SOURCE_REPO=$harness_root
-fi
-STORE="$SOURCE_REPO/agent/decisions.jsonl"
+HARNESS_ROOT=$(cd "$(git rev-parse --git-common-dir)/.." && pwd)
+while parent=$(cd "$HARNESS_ROOT/.." && git rev-parse --show-toplevel 2>/dev/null); do
+  HARNESS_ROOT=$parent
+done
+STORE="$HARNESS_ROOT/agent/decisions.jsonl"
 ```
 
 Windows (PowerShell):
 ```powershell
-$harnessRoot = git rev-parse --show-toplevel
-$srcGit = Get-ChildItem -Path "$harnessRoot\workspace" -Filter .git -Recurse -Depth 1 -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
-if ($srcGit) { $SourceRepo = $srcGit.Parent.FullName } else { $SourceRepo = $harnessRoot }
-$STORE = Join-Path $SourceRepo "agent\decisions.jsonl"
+$HarnessRoot = (Resolve-Path (Join-Path (git rev-parse --git-common-dir) "..")).Path
+while ($parent = (git -C (Join-Path $HarnessRoot "..") rev-parse --show-toplevel 2>$null)) { $HarnessRoot = $parent }
+$STORE = Join-Path $HarnessRoot "agent\decisions.jsonl"
 ```
 
-- If a `.git` directory is found under `workspace/` (including one subfolder level), use that source repo.
-- Otherwise, fall back to the current (harness) repo.
-
 Initialize the `decisions.jsonl` store if missing:
-- Linux/macOS: `mkdir -p "$SOURCE_REPO/agent" && touch "$STORE"`
+- Linux/macOS: `mkdir -p "$HARNESS_ROOT/agent" && touch "$STORE"`
 - Windows (PowerShell): `md -Force (Split-Path $STORE) | Out-Null; if(!(Test-Path $STORE)){New-Item $STORE | Out-Null}`
 
 ## Usage
