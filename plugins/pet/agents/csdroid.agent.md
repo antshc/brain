@@ -16,7 +16,6 @@ Explore the repo to understand code for the task:
 - Code conventions
 - Relevant existing code for the task
 - Test patterns in use
-- Layer placement for new classes (see [layers.md](references/layers.md))
 
 **Emit**: "Explored files: [list]. Conventions found: [list]. Layer placement: [layer]."
 
@@ -24,30 +23,21 @@ Explore the repo to understand code for the task:
 
 **This step is mandatory. Do not proceed to implementation until complete.**
 
-Follow the Read Workflow in [memory.md](references/memory.md). Emit the matching decision IDs or "No prior decisions apply" before continuing.
+Follow the Read Workflow in the `csdroid-memory` skill. Emit the matching decision IDs or "No prior decisions apply" before continuing.
 
 Apply matching decisions during implementation. Do not contradict them without superseding first.
 
 ## IMPLEMENTATION
 
 Implement the requested C# Task.
-- Confirm you have loaded decisions from [memory.md](references/memory.md). List IDs you are applying.
-- Write code using [style.md](references/style.md)
-- Follow [layers.md](references/layers.md) for module structure and dependencies.
-- Prefer deep modules, avoid speculative features. Follow [design.md](references/design.md).
-- Write tests when: adding a new public method, changing existing behavior, or touching conditional logic. Follow rules in the [tests.md](references/tests.md)
+- Confirm you have loaded decisions from the `csdroid-memory` skill. List IDs you are applying.
+- Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules.
 
 ## FEEDBACK LOOPS
 
 Run this step once, after IMPLEMENTATION completes.
 
-**Mandatory** Run [feedback.md](references/feedback.md) against all files changed during the IMPLEMENTATION, all four feedback steps (LSP, build, test, refactoring review) must pass.  
-
-Do not suppress warnings (e.g., `#pragma warning disable`) to achieve a green build.
-
-If feedback loops fail, fix the issues and re-run from Step 1 of feedback before proceeding. (Step 0 collection only re-runs if the set of changed files itself changed.)
-
-If feedback returns STATUS: blocked or partial, stop immediately and emit that status in the STATUS REPORT after completing RECORD DECISIONS.
+**Mandatory** Follow the `csdroid-feedback` skill.
 
 ## RECORD DECISIONS
 
@@ -62,9 +52,9 @@ List the files you changed. For each file or group of files, state whether a nam
 
 **Emit**: "Files changed: [list]. Decision candidates: [list or 'none — reason per file']."
 
-Follow the Lookup → Add or Update workflow in [memory.md](references/memory.md).
+Follow the Lookup → Add or Update workflow in the `csdroid-memory` skill.
 
-If you applied an existing decision and feedback passed, follow the Confidence Bump workflow in [memory.md](references/memory.md).
+If you applied an existing decision and feedback passed, follow the Confidence Bump workflow in the `csdroid-memory` skill.
 
 If no durable decision was made, state: "No new decisions to record."
 

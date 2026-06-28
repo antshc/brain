@@ -1,3 +1,8 @@
+---
+name: csdroid-memory
+description: C# decision memory — read, look up, add, update, and bump confidence on durable decisions stored in decisions.jsonl. Apply during DECISION CONTEXT and RECORD DECISIONS steps.
+---
+
 # Decision Memory
 
 ## Store
