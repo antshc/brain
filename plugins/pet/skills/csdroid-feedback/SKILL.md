@@ -7,7 +7,7 @@ Run the feedback loop below against all files changed during the IMPLEMENTATION.
 
 Do not suppress warnings (e.g., `#pragma warning disable`) to achieve a green build.
 
-If feedback loops fail, fix the issues and re-run from Step 1 before proceeding. (Step 0 collection only re-runs if the set of changed files itself changed.)
+If feedback loops fail, fix the issues and re-run.
 
 If feedback returns STATUS: blocked or partial, stop immediately and emit that status in the STATUS REPORT after completing RECORD DECISIONS.
 
