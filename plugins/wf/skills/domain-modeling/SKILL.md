@@ -49,7 +49,7 @@ If no `CONTEXT.md` exists, create one when the first term is resolved.
 
 If no `ARCHITECTURE.md` exists, create one when the first term is resolved. .
 
-If no `docs/adr/` exists, create it when the first ADR is needed. 
+If no `docs/adr/` exists, create it when the first ADR is needed, then add it to the `## Architecture Decision Records` index in `ARCHITECTURE.md`. 
 
 If no `docs/sdr/` exists, create it when the first SDR is needed, then add it to the `## Solution Design Strategy` index in `ARCHITECTURE.md`.
 
