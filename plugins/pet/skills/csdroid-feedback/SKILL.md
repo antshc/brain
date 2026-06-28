@@ -3,13 +3,7 @@ name: csdroid-feedback
 description: C# feedback loop — run LSP, build, test, and refactoring review against all changed files after implementation.
 ---
 
-Run the feedback loop below against all files changed during the IMPLEMENTATION. All four steps must pass.
-
-Do not suppress warnings (e.g., `#pragma warning disable`) to achieve a green build.
-
-If feedback loops fail, fix the issues and re-run.
-
-If feedback returns STATUS: blocked or partial, stop immediately and emit that status in the STATUS REPORT after completing RECORD DECISIONS.
+Run the feedback loop below against all files changed during the IMPLEMENTATION. All steps must pass.
 
 ---
 
@@ -18,10 +12,8 @@ If feedback returns STATUS: blocked or partial, stop immediately and emit that s
 ```
 Task Progress:
 - [ ] Step 0: Collect changed files
-- [ ] Step 1: LSP diagnostics (get_errors on all changed files)
-- [ ] Step 2: Build (dotnet build --no-incremental, deduplicated)
-- [ ] Step 3: Tests (dotnet test --filter, all affected projects)
-- [ ] Step 4: Refactoring review (all changed files)
+- [ ] Step 1: Verify — diagnostics, build, tests, and any project-specific checks (from VERIFY.md if present, else fallback)
+- [ ] Step 2: Refactoring review (all changed files)
 ```
 
 ## Step 0: Collect changed files
@@ -32,25 +24,19 @@ Gather the full list of files changed during implementation. For each changed fi
 
 **Emit**: "Changed files: [list]. Affected projects: [list]. Test projects: [list]."
 
-## Step 1: LSP diagnostics
+## Step 1: Verify (diagnostics, build, tests)
 
-Run: `get_errors` on all changed files.
+Look for `VERIFY.md` at the harness repo. If it exists, follow **all** of its steps in order — it may define more steps than the fallback, and may add project-specific checks (linting, formatting, integration tests, etc.) — then emit: "Verify steps: VERIFY.md". Otherwise, use the fallback below and emit: "Verify steps: fallback".
 
-## Step 2: Build
+### Fallback
 
-Run: `dotnet build <project-dir> --no-incremental` for each unique affected project (do not build the same project twice).
+- **LSP diagnostics**: run `get_errors` on all changed files.
+- **Build**: run `dotnet build <project-dir> --no-incremental` for each unique affected project (do not build the same project twice). A passing `get_errors` does NOT replace a build — StyleCop and analyzers only fire during a real build.
+- **Tests**: run `dotnet test <test-project> --filter <relevant-classes>` for each unique affected test project, filtering by the classes that correspond to changed files in that test project's scope.
 
-A passing `get_errors` does NOT replace a build — StyleCop and analyzers only fire during a real build.
+## Step 2: Refactoring review
 
-## Step 3: Tests
-
-Run: `dotnet test <test-project> --filter <relevant-classes>` for each unique affected test project.
-
-Filter by all classes that correspond to changed files in that test project's scope.
-
-## Step 4: Refactoring review
-
-After steps 1–3 pass, review all changed files together for refactoring candidates:
+After the Verify phase passes, review all changed files together for refactoring candidates:
 - **Duplication** → extract function/class
 - **Long methods** → break into private helpers (keep tests on public interface)
 - **Shallow modules** → combine or deepen
@@ -58,7 +44,7 @@ After steps 1–3 pass, review all changed files together for refactoring candid
 - **Primitive obsession** → introduce value objects
 - **Existing code** the new code reveals as problematic
 
-If any candidate applies, refactor and return to Step 1 (re-run over the updated full set of changed files).
+If any candidate applies, refactor and return to the Verify phase (re-run over the updated full set of changed files).
 If none apply, emit: "Refactoring review: no candidates." and proceed.
 
 ---
@@ -74,12 +60,12 @@ If any step fails with an **environment or access error**, do NOT attempt to fix
 - Docker/container not running
 - Network connectivity failure
 
-### Code errors — fix and retry from Step 1
+### Code errors — fix and retry from the Verify phase
 
 If any step fails with a **code error** (compile error, test assertion, analyzer warning):
 1. Fix the issue
-2. Return to Step 1
+2. Return to the Verify phase
 
 **Retry cap**: If after 3 retry cycles the same error persists, stop and report `STATUS: partial`. Do not continue.
 
-Do not report completion until all four steps pass with 0 errors and 0 warnings.
+Do not report completion until all steps pass with 0 errors and 0 warnings.
