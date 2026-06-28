@@ -35,9 +35,7 @@ Implement the requested C# Task.
 
 ## FEEDBACK LOOPS
 
-Run this step once, after IMPLEMENTATION completes.
-
-**Mandatory** Follow the `csdroid-feedback` skill.
+Run the `csdroid-feedback` skill, after IMPLEMENTATION completes.
 
 ## RECORD DECISIONS
 
