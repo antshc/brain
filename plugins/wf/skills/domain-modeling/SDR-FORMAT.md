@@ -31,8 +31,10 @@ this kind. Cite a canonical reference implementation in the codebase.}
 
 ## Optional sections
 
-Include only when they add genuine value:
+Only include these when they add genuine value. Most ADRs won't need them.
 
+- **Context** — the forces and the problem; why the architecture needs a backbone rule here
+- **Decision** — the rule itself: the pattern, the layers/steps, the file map, the checklist, the invariants; cite a canonical reference implementation in the codebase
 - **Status** frontmatter (`proposed | accepted | deprecated | superseded by SDR-NNNN`)
 - **Rationale / Trade-offs** — why this pattern over the alternatives
 - **Consequences** — non-obvious downstream effects of adopting the pattern
@@ -40,6 +42,11 @@ Include only when they add genuine value:
 ## Numbering
 
 Scan `docs/sdr/` for the highest existing number and increment by one.
+
+## Writing style
+
+1. Prioritize directness and facts: keep only sentences that add actionable value; cut any that just take up space.
+2. Remove bloat: filler words, redundant explanations, verbose phrasing. If the text already has no removable bloat, leave it unchanged.
 
 ## When to offer an SDR
 
