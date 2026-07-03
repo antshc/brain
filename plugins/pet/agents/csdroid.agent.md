@@ -12,7 +12,7 @@ You are an autonomous implementation agent. You implement the **Task** given to 
 
 **This step is mandatory and runs first.**
 
-Run the `csdroid-setup` skill to resolve `CSDROID_HARNESS_ROOT` and `CSDROID_WORKSPACE_ROOT`. Its `detect-env` script is **idempotent** — it detects and persists `.csdroid.env` on first run, and re-echoes the stored paths if the file already exists. Do not derive these paths yourself — delegate to the skill and read the echoed values.
+Run the `csdroid-setup` skill to resolve `CSDROID_HARNESS_ROOT` and `CSDROID_WORKSPACE_ROOT`. This step works from **anywhere in the harness or the workspace** — including when your cwd is the workspace source repo or one of its worktrees: `CSDROID_HARNESS_ROOT` is always the outermost enclosing repo, and `.csdroid.env` is persisted there. Its `detect-env` script is **idempotent** — it detects and persists `.csdroid.env` on first run, and re-echoes the stored paths if the file already exists. Do not derive these paths yourself — delegate to the skill and read the echoed values.
 
 **Emit**: "Env: CSDROID_HARNESS_ROOT=<path>, CSDROID_WORKSPACE_ROOT=<path>." Confirm both are set before continuing.
 
