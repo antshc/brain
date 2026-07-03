@@ -47,18 +47,21 @@ Use the implementation details as the PRD content instead of a GitHub issue:
 
 ### 2. Explore the codebase (optional)
 
-If you have not already explored the codebase, do so to understand the current state of the code.
+If you have not already explored the codebase, do so to understand the current state of the code. Issue titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs and SDRs in the area you're touching. 
+
+Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 
 ### 3. Draft vertical slices
 
-Break the PRD into **tracer bullet** issues. Each issue is a thin vertical slice that cuts through ALL integration layers end-to-end, NOT a horizontal slice of one layer.
+Break the plan into **tracer bullet** issues. Each issue is a thin vertical slice that cuts through ALL integration layers end-to-end, NOT a horizontal slice of one layer.
 
 Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an architectural decision or a design review. AFK slices can be implemented and merged without human interaction. Prefer AFK over HITL where possible.
 
 <vertical-slice-rules>
+
 - Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests)
 - A completed slice is demoable or verifiable on its own
-- Prefer many thin slices over few thick ones
+- Any prefactoring should be done first
 </vertical-slice-rules>
 
 ### 4. Quiz the user
@@ -97,7 +100,9 @@ Create issues in dependency order (blockers first) so you can reference real iss
 
 ## What to build
 
-A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation. Reference specific sections of the parent PRD rather than duplicating content.
+A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation.
+
+Avoid specific file paths or code snippets — they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 
 ## Acceptance criteria
 <acceptance-criteria-rule>
@@ -134,7 +139,7 @@ Reference by number from the parent PRD:
 
 </issue-template>
 
-Do NOT close or modify the parent PRD issue.
+Do NOT close or modify the parent issue.
 
 ---
 
