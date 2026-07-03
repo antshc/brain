@@ -16,9 +16,9 @@ A C# autonomous coding harness. One agent (`csdroid`) orchestrates a fixed pipel
 
 `csdroid-setup` bundles the detection scripts (in its `scripts/` directory):
 
-- `detect-env.sh` / `detect-env.ps1` — resolve both paths, write `.csdroid.env`, and echo the values. Idempotent: if the file already exists they re-echo it and skip detection. Run once, in the agent's ENVIRONMENT SETUP phase; downstream skills reuse the emitted literal paths.
+- `detect-env.sh` / `detect-env.ps1` — resolve both paths, write `.csdroid.env` at the harness root, and echo the values. Works from the harness root, the workspace source repo, or any of their worktrees. Idempotent: if the file already exists they re-echo it and skip detection. Run once, in the agent's ENVIRONMENT SETUP phase; downstream skills reuse the emitted literal paths.
 
-`.csdroid.env` lives at the worktree top-level and is gitignored via `*.env`. The file is the persistence mechanism — a plain `export` cannot survive because each shell invocation is a fresh process.
+`.csdroid.env` lives at the **harness root** and is gitignored via `*.env`. Persisting it there (not the current worktree) keeps it consistent and discoverable regardless of which repo/worktree setup runs from. The file is the persistence mechanism — a plain `export` cannot survive because each shell invocation is a fresh process.
 
 - `CSDROID_HARNESS_ROOT` — outermost enclosing repo; owns `agent/decisions.jsonl` and **all** convention docs (`ARCHITECTURE.md`, `CODE.md`, `TESTS.md`, ADR/SDR, `VERIFY.md`).
 - `CSDROID_WORKSPACE_ROOT` — the `workspace/` source repo when present, else the harness root; used for source-code operations.
@@ -35,7 +35,7 @@ graph TD
     AG -->|FEEDBACK LOOPS| FB[csdroid-feedback skill]
     TC[to-commit skill] -.->|reads STATUS REPORT| AG
 
-    SET -.writes + emits paths.-> ENVF[(.csdroid.env @ worktree root)]
+    SET -.writes + emits paths.-> ENVF[(.csdroid.env @ harness root)]
     MEM -.reuses emitted paths.-> SET
     IMP -.reuses emitted paths.-> SET
     FB -.reuses emitted paths.-> SET

@@ -1,10 +1,18 @@
 #!/usr/bin/env pwsh
 # Detect CSDROID_HARNESS_ROOT and CSDROID_WORKSPACE_ROOT and persist them to
-# "$(git rev-parse --show-toplevel)/.csdroid.env" as export lines.
+# "$CsdroidHarnessRoot/.csdroid.env" as export lines.
+# Works from the harness root, the workspace source repo, or any of their worktrees.
 # Idempotent: if the env file already exists, load it and skip detection.
 $ErrorActionPreference = "Stop"
 
-$EnvFile = Join-Path (git rev-parse --show-toplevel) ".csdroid.env"
+# Main working tree of the current repo (resolves through linked worktrees).
+$CurrentMain = (Resolve-Path (Join-Path (git rev-parse --git-common-dir) "..")).Path
+
+# Harness root: climb from the current repo to the outermost enclosing repo.
+$CsdroidHarnessRoot = $CurrentMain
+while ($parent = (git -C (Join-Path $CsdroidHarnessRoot "..") rev-parse --show-toplevel 2>$null)) { $CsdroidHarnessRoot = $parent }
+
+$EnvFile = Join-Path $CsdroidHarnessRoot ".csdroid.env"
 
 if (Test-Path $EnvFile) {
   Get-Content $EnvFile | ForEach-Object {
@@ -16,16 +24,19 @@ if (Test-Path $EnvFile) {
   exit 0
 }
 
-# Harness root: main working tree of the current repo, then climb to the outermost repo.
-$CsdroidHarnessRoot = (Resolve-Path (Join-Path (git rev-parse --git-common-dir) "..")).Path
-while ($parent = (git -C (Join-Path $CsdroidHarnessRoot "..") rev-parse --show-toplevel 2>$null)) { $CsdroidHarnessRoot = $parent }
-
-# Workspace root: the workspace/ source repo if present, else the harness root.
-$workspace = Join-Path $CsdroidHarnessRoot "workspace"
-if ((Test-Path $workspace) -and (git -C $workspace rev-parse --show-toplevel 2>$null)) {
-  $CsdroidWorkspaceRoot = (git -C $workspace rev-parse --show-toplevel)
+# Workspace root:
+# - If we started inside a nested repo (current repo != harness), that repo IS the workspace source.
+# - Otherwise, look for a source repo under workspace/ (matching the worktree skill's resolution).
+# - Else, fall back to the harness root (harness-only layout).
+if ($CurrentMain -ne $CsdroidHarnessRoot) {
+  $CsdroidWorkspaceRoot = $CurrentMain
 } else {
-  $CsdroidWorkspaceRoot = $CsdroidHarnessRoot
+  $srcGit = Get-ChildItem -Path (Join-Path $CsdroidHarnessRoot "workspace") -Filter ".git" -Directory -Recurse -Depth 1 -Force -ErrorAction SilentlyContinue | Select-Object -First 1
+  if ($srcGit) {
+    $CsdroidWorkspaceRoot = $srcGit.Parent.FullName
+  } else {
+    $CsdroidWorkspaceRoot = $CsdroidHarnessRoot
+  }
 }
 
 @(
