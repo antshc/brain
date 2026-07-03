@@ -11,18 +11,16 @@ The `decisions.jsonl` store file in JSONL format, kept inside the harness root r
 
 ### Resolve repo
 
-The store always lives at `$CSDROID_HARNESS_ROOT/agent/decisions.jsonl` — the harness root, never a worktree or nested `workspace/` repo. Load the environment before any read or write by sourcing the `csdroid-setup` skill's `load-env` script (see `csdroid-setup` → **Load environment** for the variables and layouts). It sources `.csdroid.env` if present, else falls back to inline detection.
+The store always lives at `$CSDROID_HARNESS_ROOT/agent/decisions.jsonl` — the harness root, never a worktree or nested `workspace/` repo. Use the `CSDROID_HARNESS_ROOT` path resolved at ENVIRONMENT SETUP: substitute its literal absolute value wherever `$CSDROID_HARNESS_ROOT` appears below.
 
 Linux/macOS:
 ```bash
-. <csdroid-setup-dir>/load-env.sh
 STORE="$CSDROID_HARNESS_ROOT/agent/decisions.jsonl"
 ```
 
 Windows (PowerShell):
 ```powershell
-. <csdroid-setup-dir>/load-env.ps1
-$STORE = Join-Path $Env:CSDROID_HARNESS_ROOT "agent\decisions.jsonl"
+$STORE = Join-Path $CSDROID_HARNESS_ROOT "agent\decisions.jsonl"
 ```
 
 Initialize the `decisions.jsonl` store if missing:

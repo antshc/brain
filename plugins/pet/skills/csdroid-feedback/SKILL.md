@@ -26,7 +26,7 @@ Gather the full list of files changed during implementation. For each changed fi
 
 ## Step 1: Verify (diagnostics, build, tests)
 
-Load the environment first (see the `csdroid-setup` skill → **Load environment**) so `$CSDROID_HARNESS_ROOT` is set. Look for `VERIFY.md` at `$CSDROID_HARNESS_ROOT`. If it exists, follow **all** of its steps in order — it may define more steps than the fallback, and may add project-specific checks (linting, formatting, integration tests, etc.) — then emit: "Verify steps: VERIFY.md". Otherwise, use the fallback below and emit: "Verify steps: fallback".
+Use the `CSDROID_HARNESS_ROOT` path resolved at ENVIRONMENT SETUP (substitute its literal absolute value for `$CSDROID_HARNESS_ROOT`). Look for `VERIFY.md` at `$CSDROID_HARNESS_ROOT`. If it exists, follow **all** of its steps in order — it may define more steps than the fallback, and may add project-specific checks (linting, formatting, integration tests, etc.) — then emit: "Verify steps: VERIFY.md". Otherwise, use the fallback below and emit: "Verify steps: fallback".
 
 ### Fallback
 

@@ -12,11 +12,11 @@ You are an autonomous implementation agent. You implement the **Task** given to 
 
 **This step is mandatory and runs first.**
 
-**Guard**: if `.csdroid.env` already exists at the worktree top-level, skip setup — source it to load `CSDROID_HARNESS_ROOT` and `CSDROID_WORKSPACE_ROOT`, then continue.
-
-Otherwise, run the `csdroid-setup` skill to detect and persist `CSDROID_HARNESS_ROOT` and `CSDROID_WORKSPACE_ROOT`. Do not derive these paths yourself — delegate to the skill.
+Run the `csdroid-setup` skill to resolve `CSDROID_HARNESS_ROOT` and `CSDROID_WORKSPACE_ROOT`. Its `detect-env` script is **idempotent** — it detects and persists `.csdroid.env` on first run, and re-echoes the stored paths if the file already exists. Do not derive these paths yourself — delegate to the skill and read the echoed values.
 
 **Emit**: "Env: CSDROID_HARNESS_ROOT=<path>, CSDROID_WORKSPACE_ROOT=<path>." Confirm both are set before continuing.
+
+**Reuse downstream**: remember these two resolved absolute paths and substitute them literally into every command in later steps (e.g. `git -C <CSDROID_HARNESS_ROOT> ...`). Downstream skills rely on the paths resolved here.
 
 ## EXPLORATION
 
