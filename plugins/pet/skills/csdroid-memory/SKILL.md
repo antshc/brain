@@ -11,31 +11,22 @@ The `decisions.jsonl` store file in JSONL format, kept inside the harness root r
 
 ### Resolve repo
 
-The store always lives in the **harness root repository** — the outermost repo, never a worktree or a nested `workspace/` source repo. Two layouts are supported:
-
-- **Harness only** — no source repo under `workspace/`; the harness repo is the source repo.
-- **Harness + workspace** — the source code lives in a separate repo under `workspace/`; the harness still owns the store.
-
-This skill runs from inside a worktree, so resolving the harness root takes two steps that work for both layouts: find the **main** working tree of the current repo (worktrees share it via `--git-common-dir`), then climb out to the outermost enclosing repo. Resolve it **before** any read or write.
+The store always lives at `$CSDROID_HARNESS_ROOT/agent/decisions.jsonl` — the harness root, never a worktree or nested `workspace/` repo. Load the environment before any read or write by sourcing the `csdroid-setup` skill's `load-env` script (see `csdroid-setup` → **Load environment** for the variables and layouts). It sources `.csdroid.env` if present, else falls back to inline detection.
 
 Linux/macOS:
 ```bash
-HARNESS_ROOT=$(cd "$(git rev-parse --git-common-dir)/.." && pwd)
-while parent=$(cd "$HARNESS_ROOT/.." && git rev-parse --show-toplevel 2>/dev/null); do
-  HARNESS_ROOT=$parent
-done
-STORE="$HARNESS_ROOT/agent/decisions.jsonl"
+. <csdroid-setup-dir>/load-env.sh
+STORE="$CSDROID_HARNESS_ROOT/agent/decisions.jsonl"
 ```
 
 Windows (PowerShell):
 ```powershell
-$HarnessRoot = (Resolve-Path (Join-Path (git rev-parse --git-common-dir) "..")).Path
-while ($parent = (git -C (Join-Path $HarnessRoot "..") rev-parse --show-toplevel 2>$null)) { $HarnessRoot = $parent }
-$STORE = Join-Path $HarnessRoot "agent\decisions.jsonl"
+. <csdroid-setup-dir>/load-env.ps1
+$STORE = Join-Path $Env:CSDROID_HARNESS_ROOT "agent\decisions.jsonl"
 ```
 
 Initialize the `decisions.jsonl` store if missing:
-- Linux/macOS: `mkdir -p "$HARNESS_ROOT/agent" && touch "$STORE"`
+- Linux/macOS: `mkdir -p "$CSDROID_HARNESS_ROOT/agent" && touch "$STORE"`
 - Windows (PowerShell): `md -Force (Split-Path $STORE) | Out-Null; if(!(Test-Path $STORE)){New-Item $STORE | Out-Null}`
 
 ## Usage
@@ -74,32 +65,32 @@ Initialize the `decisions.jsonl` store if missing:
 ### 6. Commit & Push (once, after recording)
 
 - Run **once** at the end of the RECORD DECISIONS step, after any Add / Update / Confidence Bump has written to the store.
-- Operate in `$HARNESS_ROOT` (resolved in **Store**) — never the worktree.
+- Operate in `$CSDROID_HARNESS_ROOT` (resolved in **Store**) — never the worktree.
 - Stage `decisions.jsonl` on top of whatever is already staged, then commit and push. If nothing is staged, skip the commit (no empty commits).
 - **Emit** the commit SHA, or "nothing to commit".
 
 Linux/macOS:
 ```bash
-git -C "$HARNESS_ROOT" add agent/decisions.jsonl
-if git -C "$HARNESS_ROOT" diff --cached --quiet; then
+git -C "$CSDROID_HARNESS_ROOT" add agent/decisions.jsonl
+if git -C "$CSDROID_HARNESS_ROOT" diff --cached --quiet; then
   echo "nothing to commit"
 else
-  git -C "$HARNESS_ROOT" commit -m "chore(agent): update decision memory"
-  git -C "$HARNESS_ROOT" rev-parse HEAD
-  git -C "$HARNESS_ROOT" push
+  git -C "$CSDROID_HARNESS_ROOT" commit -m "chore(agent): update decision memory"
+  git -C "$CSDROID_HARNESS_ROOT" rev-parse HEAD
+  git -C "$CSDROID_HARNESS_ROOT" push
 fi
 ```
 
 Windows (PowerShell):
 ```powershell
-git -C $HarnessRoot add agent/decisions.jsonl
-git -C $HarnessRoot diff --cached --quiet
+git -C $Env:CSDROID_HARNESS_ROOT add agent/decisions.jsonl
+git -C $Env:CSDROID_HARNESS_ROOT diff --cached --quiet
 if ($LASTEXITCODE -eq 0) {
   Write-Output "nothing to commit"
 } else {
-  git -C $HarnessRoot commit -m "chore(agent): update decision memory"
-  git -C $HarnessRoot rev-parse HEAD
-  git -C $HarnessRoot push
+  git -C $Env:CSDROID_HARNESS_ROOT commit -m "chore(agent): update decision memory"
+  git -C $Env:CSDROID_HARNESS_ROOT rev-parse HEAD
+  git -C $Env:CSDROID_HARNESS_ROOT push
 }
 ```
 
@@ -124,4 +115,4 @@ Increase only after independent successful validation. Never decrease.
 - A confidence bump is the only edit-in-place operation: it changes `confidence` (and `timestamp`) on the existing line. All other changes must append a superseding record — never edit or delete old lines.
 - **Must-emit after reading**: emit the list of decision IDs being applied (or "none"). This is observable output — do not skip silently.
 - **Must-emit after recording**: emit the new decision ID (or "No new decisions to record"). This is observable output — do not skip silently.
-- Commit & push runs **once** per RECORD DECISIONS step, always from `$HARNESS_ROOT` (never the worktree), and always pushes. Skip the commit only when nothing is staged.
+- Commit & push runs **once** per RECORD DECISIONS step, always from `$CSDROID_HARNESS_ROOT` (never the worktree), and always pushes. Skip the commit only when nothing is staged.
