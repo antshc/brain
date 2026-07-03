@@ -51,3 +51,58 @@ graph TD
 - **Soft/implicit**: `to-commit` depends on the agent's STATUS REPORT format (the `dcode:` convention couples them, but nothing enforces it).
 - **Environment contract**: `csdroid-setup` writes `.csdroid.env` and emits `$CSDROID_HARNESS_ROOT` / `$CSDROID_WORKSPACE_ROOT` at ENVIRONMENT SETUP; `csdroid-memory`, `csdroid-implement`, and `csdroid-feedback` reuse those literal paths.
 - **External file contracts**: `csdroid-implement` and `csdroid-feedback` depend on convention docs living at `$CSDROID_HARNESS_ROOT` (`ARCHITECTURE.md` etc.), each with its own fallback. `csdroid-memory` keeps the store at `$CSDROID_HARNESS_ROOT/agent/decisions.jsonl`.
+
+## Execution sequence
+
+The `csdroid` agent runs a fixed pipeline. Each phase and the skill it invokes:
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant TD as to-droid skill
+    participant AG as csdroid agent
+    participant SET as csdroid-setup skill
+    participant MEM as csdroid-memory skill
+    participant IMP as csdroid-implement skill
+    participant FB as csdroid-feedback skill
+    participant TC as to-commit skill
+
+    User->>TD: task (<description> | @plan | issue URL)
+    TD->>TD: resolve task + gather recent git changes
+    TD->>AG: runSubagent(csdroid, task + recent changes)
+
+    rect rgba(160, 190, 255, 0.08)
+    note over AG,SET: ENVIRONMENT SETUP
+    AG->>SET: run detect-env (idempotent)
+    SET-->>AG: CSDROID_HARNESS_ROOT / CSDROID_WORKSPACE_ROOT
+    end
+
+    note over AG: EXPLORATION — read changed + neighboring files, conventions
+
+    rect rgba(160, 190, 255, 0.08)
+    note over AG,MEM: DECISION CONTEXT
+    AG->>MEM: Read Workflow (match prior decisions)
+    MEM-->>AG: matching decision IDs or "none"
+    end
+
+    rect rgba(160, 190, 255, 0.08)
+    note over AG,IMP: IMPLEMENTATION
+    AG->>IMP: apply style / layers / tests rules
+    IMP-->>AG: docs loaded + code implemented
+    end
+
+    rect rgba(160, 190, 255, 0.08)
+    note over AG,FB: FEEDBACK LOOPS
+    AG->>FB: verify (LSP / build / test / refactor)
+    FB-->>AG: pass or issues to fix
+    end
+
+    rect rgba(160, 190, 255, 0.08)
+    note over AG,MEM: RECORD DECISIONS
+    AG->>MEM: Lookup → Add/Update / Confidence Bump
+    MEM-->>AG: decision IDs recorded
+    end
+
+    AG-->>User: STATUS REPORT
+    TC-->>AG: reads STATUS REPORT (dcode: commit, post-task)
+```
