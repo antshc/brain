@@ -143,12 +143,9 @@ Reference by number from the parent PRD:
 
 ### Verify section
 
-This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes.
-
+This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes. 
+- *Mandatory*: The Verify section must be present in every issue. It is used to verify the code changes. Respect the Code changes verification strategy from the `ARCHITECTURE.md` if present. Include the commands what will be use to run the integration, REST API automation tests for the verification.
 - Only test external behavior, not implementation details.
-- **Tests to add**: new tests covering the behavior introduced by this slice.
-- **Tests to update**: existing tests that must change due to this slice.
-- **Tests to run**: the commands or test suites to execute to verify the changes.
 - List which modules will be tested and prior art for the tests.
 
 </issue-template>
