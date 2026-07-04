@@ -14,11 +14,22 @@ You may be given an optional **`HARNESS_ROOT`** argument — the absolute path t
 
 You may also be given an optional **`WORKTREE_PATH`** argument — the absolute path to the git worktree where all code, git, build, and test commands must run. **If provided, your very first action must be `cd $WORKTREE_PATH` before any exploration, tool call, or command.** After that cd, all commands run there — no path prefix, no `git -C`. If not provided, your workspace is your current working directory.
 
-- Convention/decision/verify files are located **under `HARNESS_ROOT`** (e.g. `$HARNESS_ROOT/agent/decisions.jsonl`, `$HARNESS_ROOT/VERIFY.md`, `$HARNESS_ROOT/ARCHITECTURE.md`). Do not detect or derive any other paths yourself.
+- Convention/decision/verify files are located **under `HARNESS_ROOT`** (e.g. `$HARNESS_ROOT/agent/decisions.jsonl`, `$HARNESS_ROOT/VERIFY.md`, `$HARNESS_ROOT/ARCHITECTURE.md`, `$HARNESS_ROOT/README.md`). Do not detect or derive any other paths yourself.
 - **Your workspace is `WORKTREE_PATH` (if provided) or your current working directory.** Run **all** code, git, build, test, and exploration commands there — no path prefix, no `git -C`.
 - Substitute the resolved `HARNESS_ROOT` value literally wherever `$HARNESS_ROOT` appears, and pass it to every skill you invoke.
 
 **Emit**: "HARNESS_ROOT=<path> (argument | default cwd). Workspace=<WORKTREE_PATH or cwd>."
+
+## BUILD & LSP CHECK
+
+Before exploring, confirm the project builds and check whether an LSP is available to assist exploration:
+
+- Build the project in your workspace using the "Build the solution" instructions in `$HARNESS_ROOT/README.md` (located under `HARNESS_ROOT`). If it fails, report the failure and stop — do not explore a broken build.
+- Check whether an LSP (language server) is available for this workspace.
+  - **If available**, use it for exploration (symbol lookup, go-to-definition, references) instead of raw text search.
+  - **If not available**, skip LSP usage and fall back to grep/glob/file reads during exploration.
+
+**Emit**: "Build: pass | fail. LSP: available (using for exploration) | unavailable (skipped)."
 
 ## EXPLORATION
 
