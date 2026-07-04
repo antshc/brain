@@ -175,6 +175,39 @@ After **complete** or **partial**, push the feature branch:
 git push -u origin "$branch" 2>/dev/null || git push
 ```
 
+## 9. Commit harness root
+
+Run **once** per iteration, after Handle result and after the agent has recorded any decisions to `agent/decisions.jsonl`. Operate in `$HARNESS_ROOT` (resolved in step 4) — never the worktree.
+
+- Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
+- If nothing is staged, skip the commit (no empty commits).
+- **Emit** the commit SHA, or "nothing to commit".
+
+Linux/macOS:
+```bash
+git -C "$HARNESS_ROOT" add -A
+if git -C "$HARNESS_ROOT" diff --cached --quiet; then
+  echo "nothing to commit"
+else
+  git -C "$HARNESS_ROOT" commit -m "chore(agent): update decision memory"
+  git -C "$HARNESS_ROOT" rev-parse HEAD
+  git -C "$HARNESS_ROOT" push
+fi
+```
+
+Windows (PowerShell):
+```powershell
+git -C $Env:HARNESS_ROOT add -A
+git -C $Env:HARNESS_ROOT diff --cached --quiet
+if ($LASTEXITCODE -eq 0) {
+  Write-Output "nothing to commit"
+} else {
+  git -C $Env:HARNESS_ROOT commit -m "chore(agent): update decision memory"
+  git -C $Env:HARNESS_ROOT rev-parse HEAD
+  git -C $Env:HARNESS_ROOT push
+}
+```
+
 # CREATE PULL REQUEST
 
 Once all tasks are complete and the loop exits, check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
@@ -208,4 +241,5 @@ If the PR creation fails, **exit** and report the error.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
+- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 9), always from `$HARNESS_ROOT` (never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `prd`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.
