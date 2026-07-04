@@ -101,11 +101,14 @@ Windows (PowerShell):
 $HARNESS_ROOT = (pwsh <skill-dir>/scripts/detect-env.ps1 | Select-String '^HARNESS_ROOT=').Line -replace '^HARNESS_ROOT=',''
 ```
 
-Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`, running from inside `WORKTREE_PATH` (the agent's workspace is its current working directory), with the following prompt (substitute actual values):
+Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`, with the following prompt (substitute actual values). The agent will `cd` into `WORKTREE_PATH` as its very first action:
 
 ```
 ## HARNESS_ROOT
 <absolute path to the harness repo>
+
+## WORKTREE_PATH
+<absolute path to the worktree — cd here as your very first action>
 
 ## TASK
 - Title: <title>
@@ -116,7 +119,7 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 <last 5 commits from step 1>
 ```
 
-The agent reads convention docs, `VERIFY.md`, and `agent/decisions.jsonl` from `HARNESS_ROOT`, and runs all code/git/test commands in its current directory (`WORKTREE_PATH`).
+The agent reads convention docs, `VERIFY.md`, and `agent/decisions.jsonl` from `HARNESS_ROOT`, and runs all code/git/test commands in `WORKTREE_PATH` (which it cds into on startup).
 
 ## 5. Distill
 
