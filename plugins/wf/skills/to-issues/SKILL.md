@@ -142,8 +142,14 @@ Reference by number from the parent PRD:
 - Use short technical statements and implementation-oriented language.
 - No specific file paths or code snippets (they become outdated quickly).
 
-### Testing Decisions section
+### Verify section
+
+This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes.
+
 - Only test external behavior, not implementation details.
+- **Tests to add**: new tests covering the behavior introduced by this slice.
+- **Tests to update**: existing tests that must change due to this slice.
+- **Tests to run**: the commands or test suites to execute to verify the changes.
 - List which modules will be tested and prior art for the tests.
 
 </issue-template>
