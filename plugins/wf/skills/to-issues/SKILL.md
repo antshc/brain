@@ -137,6 +137,10 @@ Reference by number from the parent PRD:
 - Use short technical statements and implementation-oriented language.
 - No specific file paths or code snippets (they become outdated quickly).
 
+### Testing Decisions section
+- Only test external behavior, not implementation details.
+- List which modules will be tested and prior art for the tests.
+
 </issue-template>
 
 Do NOT close or modify the parent issue.
