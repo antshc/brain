@@ -89,9 +89,24 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent` with the following prompt (substitute actual values):
+The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/decisions.jsonl`, and is distinct from `WORKTREE_PATH`. Resolve it once, before invoking the agent, by running the bundled detection script (in this skill's `scripts/` directory). It resolves the outermost enclosing repo, persists it to `.agent.env` at the harness root (gitignored via `*.env`), and is idempotent:
+
+Linux/macOS:
+```bash
+HARNESS_ROOT=$(bash "<skill-dir>/scripts/detect-env.sh" | sed -n 's/^HARNESS_ROOT=//p')
+```
+
+Windows (PowerShell):
+```powershell
+$HARNESS_ROOT = (pwsh <skill-dir>/scripts/detect-env.ps1 | Select-String '^HARNESS_ROOT=').Line -replace '^HARNESS_ROOT=',''
+```
+
+Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`, running from inside `WORKTREE_PATH` (the agent's workspace is its current working directory), with the following prompt (substitute actual values):
 
 ```
+## HARNESS_ROOT
+<absolute path to the harness repo>
+
 ## TASK
 - Title: <title>
 - Body: <body>
@@ -100,6 +115,8 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 ## RECENT CHANGES
 <last 5 commits from step 1>
 ```
+
+The agent reads convention docs, `VERIFY.md`, and `agent/decisions.jsonl` from `HARNESS_ROOT`, and runs all code/git/test commands in its current directory (`WORKTREE_PATH`).
 
 ## 5. Distill
 

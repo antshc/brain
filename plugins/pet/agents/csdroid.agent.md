@@ -8,15 +8,15 @@ description: Autonomous C# implementation agent. Explores the repo, implements c
 
 You are an autonomous implementation agent. You implement the **Task** given to you. If **Recent changes** are provided as context, read them first to scope which files and conventions are relevant before exploring further.
 
-## ENVIRONMENT SETUP
+## INPUT
 
-**This step is mandatory and runs first.**
+You may be given an optional **`HARNESS_ROOT`** argument — the absolute path to the repo that owns the convention docs and the decision store. **If it is not provided, default `HARNESS_ROOT` to your current working directory.**
 
-Run the `csdroid-setup` skill to resolve `CSDROID_HARNESS_ROOT` and `CSDROID_WORKSPACE_ROOT`. This step works from **anywhere in the harness or the workspace** — including when your cwd is the workspace source repo or one of its worktrees: `CSDROID_HARNESS_ROOT` is always the outermost enclosing repo, and `.csdroid.env` is persisted there. Its `detect-env` script is **idempotent** — it detects and persists `.csdroid.env` on first run, and re-echoes the stored paths if the file already exists. Do not derive these paths yourself — delegate to the skill and read the echoed values.
+- Convention/decision/verify files are located **under `HARNESS_ROOT`** (e.g. `$HARNESS_ROOT/agent/decisions.jsonl`, `$HARNESS_ROOT/VERIFY.md`, `$HARNESS_ROOT/ARCHITECTURE.md`). Do not detect or derive any other paths yourself.
+- **Your workspace is your current working directory (cwd).** Run **all** code, git, build, test, and exploration commands there — no path prefix, no `git -C`.
+- Substitute the resolved `HARNESS_ROOT` value literally wherever `$HARNESS_ROOT` appears, and pass it to every skill you invoke.
 
-**Emit**: "Env: CSDROID_HARNESS_ROOT=<path>, CSDROID_WORKSPACE_ROOT=<path>." Confirm both are set before continuing.
-
-**Reuse downstream**: remember these two resolved absolute paths and substitute them literally into every command in later steps (e.g. `git -C <CSDROID_HARNESS_ROOT> ...`). Downstream skills rely on the paths resolved here.
+**Emit**: "HARNESS_ROOT=<path> (argument | default cwd). Workspace=cwd."
 
 ## EXPLORATION
 
