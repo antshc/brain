@@ -45,9 +45,14 @@ Use the implementation details as the PRD content instead of a GitHub issue:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
 - **Inline text** — use directly.
 
-### 2. Explore the codebase (optional)
+### 2. Explore the codebase and scan ADRs/SDRs
 
-If you have not already explored the codebase, do so to understand the current state of the code. Issue titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs and SDRs in the area you're touching. 
+If you have not already explored the codebase, do so to understand the current state of the code. 
+Issue titles and descriptions should use the project's domain glossary vocabulary (CONTEXT.md).
+Read the ADR and SDR indexes in `ARCHITECTURE.md`, then open every ADR under `docs/adr/` and every SDR under `docs/sdr/` that touches the area you're changing.
+- **SDRs** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to them.
+- **ADRs** capture localized decisions — respect and reference the relevant ones in the issue body.
+- Confirm you have scanned both `docs/adr/` and `docs/sdr/` before moving on; if either directory is absent, note that and continue.
 
 Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 
