@@ -116,7 +116,6 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 - Use the domain language of the PRD or the CONTEXT.md. Never reference file paths, class names,variable names, or other implementation details.
 - Avoid vague or unverifiable words such as "works", "correctly", "properly", "as expected". State the exact expected outcome instead.
 - If a relevant error condition exists, add a criterion for the expected behavior during that failure (e.g. the message or state the tester should see).
-- Prefer 3–6 criteria total.
 </acceptance-criteria-rule>
 
 - [ ] Acceptance criteria 1
