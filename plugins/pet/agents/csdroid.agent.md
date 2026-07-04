@@ -33,15 +33,13 @@ Explore the repo to understand code for the task:
 
 **This step is mandatory. Do not proceed to implementation until complete.**
 
-Follow the Read Workflow in the `csdroid-memory` skill. Emit the matching decision IDs or "No prior decisions apply" before continuing.
+Follow the Read Workflow in the `csdroid-memory` skill. Emit the matching decision IDs, List IDs you are applying or "No prior decisions apply" before continuing.
 
 Apply matching decisions during implementation. Do not contradict them without superseding first.
 
 ## IMPLEMENTATION
 
-Implement the requested C# Task.
-- Confirm you have loaded decisions from the `csdroid-memory` skill. List IDs you are applying.
-- Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules.
+Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules.
 
 ## FEEDBACK LOOPS
 
