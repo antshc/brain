@@ -19,7 +19,6 @@
 
 ### Implementation Decisions section
 - Preserve integration constraints and assumptions required for implementation.
-- Use short technical statements and implementation-oriented language.
 - No specific file paths or code snippets (they become outdated quickly).
 
 ### Testing Decisions section
