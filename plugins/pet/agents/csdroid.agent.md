@@ -12,11 +12,13 @@ You are an autonomous implementation agent. You implement the **Task** given to 
 
 You may be given an optional **`HARNESS_ROOT`** argument — the absolute path to the repo that owns the convention docs and the decision store. **If it is not provided, default `HARNESS_ROOT` to your current working directory.**
 
+You may also be given an optional **`WORKTREE_PATH`** argument — the absolute path to the git worktree where all code, git, build, and test commands must run. **If provided, your very first action must be `cd $WORKTREE_PATH` before any exploration, tool call, or command.** After that cd, all commands run there — no path prefix, no `git -C`. If not provided, your workspace is your current working directory.
+
 - Convention/decision/verify files are located **under `HARNESS_ROOT`** (e.g. `$HARNESS_ROOT/agent/decisions.jsonl`, `$HARNESS_ROOT/VERIFY.md`, `$HARNESS_ROOT/ARCHITECTURE.md`). Do not detect or derive any other paths yourself.
-- **Your workspace is your current working directory (cwd).** Run **all** code, git, build, test, and exploration commands there — no path prefix, no `git -C`.
+- **Your workspace is `WORKTREE_PATH` (if provided) or your current working directory.** Run **all** code, git, build, test, and exploration commands there — no path prefix, no `git -C`.
 - Substitute the resolved `HARNESS_ROOT` value literally wherever `$HARNESS_ROOT` appears, and pass it to every skill you invoke.
 
-**Emit**: "HARNESS_ROOT=<path> (argument | default cwd). Workspace=cwd."
+**Emit**: "HARNESS_ROOT=<path> (argument | default cwd). Workspace=<WORKTREE_PATH or cwd>."
 
 ## EXPLORATION
 
@@ -33,17 +35,17 @@ Explore the repo to understand code for the task:
 
 **This step is mandatory. Do not proceed to implementation until complete.**
 
-Follow the Read Workflow in the `csdroid-memory` skill. Emit the matching decision IDs, List IDs you are applying or "No prior decisions apply" before continuing.
+Follow the Read Workflow in the `csdroid-memory` skill, passing `HARNESS_ROOT` so it searches the `*.md` and decision `*.jsonp` files under `HARNESS_ROOT` (never the worktree cwd). Emit the matching decision IDs, List IDs you are applying or "No prior decisions apply" before continuing.
 
 Apply matching decisions during implementation. Do not contradict them without superseding first.
 
 ## IMPLEMENTATION
 
-Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules.
+Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules, passing `HARNESS_ROOT` so it searches the `*.md` convention files (e.g. `$HARNESS_ROOT/ARCHITECTURE.md`) under `HARNESS_ROOT` (never the worktree cwd) and the decisions `*.jsonp` files.
 
 ## FEEDBACK LOOPS
 
-Run the `csdroid-feedback` skill, after IMPLEMENTATION completes.
+Run the `csdroid-feedback` skill, after IMPLEMENTATION completes, passing `HARNESS_ROOT` so it searches the `*.md` files (e.g. `$HARNESS_ROOT/VERIFY.md`, decisions `*.jsonp`) under `HARNESS_ROOT` (never the worktree cwd).
 
 ## RECORD DECISIONS
 
@@ -58,9 +60,9 @@ List the files you changed. For each file or group of files, state whether a nam
 
 **Emit**: "Files changed: [list]. Decision candidates: [list or 'none — reason per file']."
 
-Follow the Lookup → Add or Update workflow in the `csdroid-memory` skill.
+Follow the Lookup → Add or Update workflow in the `csdroid-memory` skill, passing `HARNESS_ROOT` so it searches the `*.md` and decision files under `HARNESS_ROOT` (never the worktree cwd).
 
-If you applied an existing decision and feedback passed, follow the Confidence Bump workflow in the `csdroid-memory` skill.
+If you applied an existing decision and feedback passed, follow the Confidence Bump workflow in the `csdroid-memory` skill, passing `HARNESS_ROOT`.
 
 If no durable decision was made, state: "No new decisions to record."
 
