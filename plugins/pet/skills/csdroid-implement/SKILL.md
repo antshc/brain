@@ -7,7 +7,7 @@ Implement the requested C# task using the rules below.
 
 ## Load reference docs (mandatory)
 
-Use the `CSDROID_HARNESS_ROOT` path resolved at ENVIRONMENT SETUP (substitute its literal absolute value for `$CSDROID_HARNESS_ROOT`). Then locate docs `ARCHITECTURE.md`, `CODE.md`, and `TESTS.md` at `$CSDROID_HARNESS_ROOT`. For each that exists:
+Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given). Then locate docs `ARCHITECTURE.md`, `CODE.md`, and `TESTS.md` at `$HARNESS_ROOT`. For each that exists:
 
 1. Read it. You **must not** skip a file that is present.
 2. `ARCHITECTURE.md` indexes ADRs (`docs/adr/`) and SDRs (`docs/sdr/`) as a table of one-line summaries. Scan that table, pick the rows whose summary relates to the current task, and read **only those** ADR/SDR files in full.

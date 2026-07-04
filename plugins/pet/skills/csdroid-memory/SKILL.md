@@ -11,20 +11,20 @@ The `decisions.jsonl` store file in JSONL format, kept inside the harness root r
 
 ### Resolve repo
 
-The store always lives at `$CSDROID_HARNESS_ROOT/agent/decisions.jsonl` — the harness root, never a worktree or nested `workspace/` repo. Use the `CSDROID_HARNESS_ROOT` path resolved at ENVIRONMENT SETUP: substitute its literal absolute value wherever `$CSDROID_HARNESS_ROOT` appears below.
+The store always lives at `$HARNESS_ROOT/agent/decisions.jsonl` — the harness root, never a worktree. Use the `HARNESS_ROOT` value provided by the agent (it defaults to the current working directory when no argument was given): substitute its literal absolute value wherever `$HARNESS_ROOT` appears below.
 
 Linux/macOS:
 ```bash
-STORE="$CSDROID_HARNESS_ROOT/agent/decisions.jsonl"
+STORE="$HARNESS_ROOT/agent/decisions.jsonl"
 ```
 
 Windows (PowerShell):
 ```powershell
-$STORE = Join-Path $CSDROID_HARNESS_ROOT "agent\decisions.jsonl"
+$STORE = Join-Path $HARNESS_ROOT "agent\decisions.jsonl"
 ```
 
 Initialize the `decisions.jsonl` store if missing:
-- Linux/macOS: `mkdir -p "$CSDROID_HARNESS_ROOT/agent" && touch "$STORE"`
+- Linux/macOS: `mkdir -p "$HARNESS_ROOT/agent" && touch "$STORE"`
 - Windows (PowerShell): `md -Force (Split-Path $STORE) | Out-Null; if(!(Test-Path $STORE)){New-Item $STORE | Out-Null}`
 
 ## Usage
@@ -63,32 +63,32 @@ Initialize the `decisions.jsonl` store if missing:
 ### 6. Commit & Push (once, after recording)
 
 - Run **once** at the end of the RECORD DECISIONS step, after any Add / Update / Confidence Bump has written to the store.
-- Operate in `$CSDROID_HARNESS_ROOT` (resolved in **Store**) — never the worktree.
+- Operate in `$HARNESS_ROOT` (resolved in **Store**) — never the worktree.
 - Stage `decisions.jsonl` on top of whatever is already staged, then commit and push. If nothing is staged, skip the commit (no empty commits).
 - **Emit** the commit SHA, or "nothing to commit".
 
 Linux/macOS:
 ```bash
-git -C "$CSDROID_HARNESS_ROOT" add agent/decisions.jsonl
-if git -C "$CSDROID_HARNESS_ROOT" diff --cached --quiet; then
+git -C "$HARNESS_ROOT" add agent/decisions.jsonl
+if git -C "$HARNESS_ROOT" diff --cached --quiet; then
   echo "nothing to commit"
 else
-  git -C "$CSDROID_HARNESS_ROOT" commit -m "chore(agent): update decision memory"
-  git -C "$CSDROID_HARNESS_ROOT" rev-parse HEAD
-  git -C "$CSDROID_HARNESS_ROOT" push
+  git -C "$HARNESS_ROOT" commit -m "chore(agent): update decision memory"
+  git -C "$HARNESS_ROOT" rev-parse HEAD
+  git -C "$HARNESS_ROOT" push
 fi
 ```
 
 Windows (PowerShell):
 ```powershell
-git -C $Env:CSDROID_HARNESS_ROOT add agent/decisions.jsonl
-git -C $Env:CSDROID_HARNESS_ROOT diff --cached --quiet
+git -C $Env:HARNESS_ROOT add agent/decisions.jsonl
+git -C $Env:HARNESS_ROOT diff --cached --quiet
 if ($LASTEXITCODE -eq 0) {
   Write-Output "nothing to commit"
 } else {
-  git -C $Env:CSDROID_HARNESS_ROOT commit -m "chore(agent): update decision memory"
-  git -C $Env:CSDROID_HARNESS_ROOT rev-parse HEAD
-  git -C $Env:CSDROID_HARNESS_ROOT push
+  git -C $Env:HARNESS_ROOT commit -m "chore(agent): update decision memory"
+  git -C $Env:HARNESS_ROOT rev-parse HEAD
+  git -C $Env:HARNESS_ROOT push
 }
 ```
 
@@ -113,4 +113,4 @@ Increase only after independent successful validation. Never decrease.
 - A confidence bump is the only edit-in-place operation: it changes `confidence` (and `timestamp`) on the existing line. All other changes must append a superseding record — never edit or delete old lines.
 - **Must-emit after reading**: emit the list of decision IDs being applied (or "none"). This is observable output — do not skip silently.
 - **Must-emit after recording**: emit the new decision ID (or "No new decisions to record"). This is observable output — do not skip silently.
-- Commit & push runs **once** per RECORD DECISIONS step, always from `$CSDROID_HARNESS_ROOT` (never the worktree), and always pushes. Skip the commit only when nothing is staged.
+- Commit & push runs **once** per RECORD DECISIONS step, always from `$HARNESS_ROOT` (never the worktree), and always pushes. Skip the commit only when nothing is staged.
