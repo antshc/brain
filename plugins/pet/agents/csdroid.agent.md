@@ -34,6 +34,7 @@ Before exploring, confirm the project builds and check whether an LSP is availab
 ## EXPLORATION
 
 Explore the repo to understand code for the task:
+- Use the `Source Code Structure` and `Layers Dependency` sections from `$HARNESS_ROOT/ARCHITECTURE.md` if present to orient project structure and layer placement
 - Read at least the file(s) being modified and one neighboring file in the same folder to confirm conventions
 - Project structure
 - Code conventions
