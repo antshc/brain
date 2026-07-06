@@ -7,6 +7,17 @@ description: Build and sharpen a project's domain model. Use when the user wants
 
 Actively build and sharpen the project's domain model and design decisions. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
+## SDR vs ADR
+Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's an SDR. If it explains why **one** thing was done a surprising way, it's an ADR.
+
+| | **SDR** (`docs/sdr/`) | **ADR** (`docs/adr/`) |
+|---|---|---|
+| Scope | Top-level decomposition; architectural/design pattern; the backbone | A single, localized decision |
+| Altitude | High-level — a rule the whole system follows | Low-level — often non-obvious to a developer |
+| Reuse | A template every new feature applies | A point-in-time choice for one area |
+| Indexed in `ARCHITECTURE.md` | **Yes** — `## Solution Design Strategy` | **Yes** — `## Architecture Decision Records` |
+| Example | "Every persisted entity is built as Model → Document → Mapping → Repository → Accessor" | "Task initiator is captured from the Keycloak `preferred_username` claim" |
+
 ## File structure
 
 Most repos have a single context:
@@ -90,17 +101,6 @@ When a term is resolved, update `CONTEXT.md` right there. Don't batch these up �
 When the structure or layering changes, update `ARCHITECTURE.md` right there. Don't batch these up — capture them as they happen. When a new SDR is created, add its summary row to the `## Solution Design Strategy` index in the same change. When a new ADR is created, add its summary row to the `## Architecture Decision Records` index in the same change. Use the format in [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
 
 `ARCHITECTURE.md` should describe *shape and rules*, not implementation detail. Do not treat `ARCHITECTURE.md` as a spec, a scratch pad, or a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Solution Design Records. It is the structural map and nothing else.
-
-### SDR vs ADR
-Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's an SDR. If it explains why **one** thing was done a surprising way, it's an ADR.
-
-| | **SDR** (`docs/sdr/`) | **ADR** (`docs/adr/`) |
-|---|---|---|
-| Scope | Top-level decomposition; architectural/design pattern; the backbone | A single, localized decision |
-| Altitude | High-level — a rule the whole system follows | Low-level — often non-obvious to a developer |
-| Reuse | A template every new feature applies | A point-in-time choice for one area |
-| Indexed in `ARCHITECTURE.md` | **Yes** — `## Solution Design Strategy` | **Yes** — `## Architecture Decision Records` |
-| Example | "Every persisted entity is built as Model → Document → Mapping → Repository → Accessor" | "Task initiator is captured from the Keycloak `preferred_username` claim" |
 
 ### Offer ADRs sparingly
 ADRs are records of localized decisions that are often non-obvious to a developer but do not shape the whole system.
