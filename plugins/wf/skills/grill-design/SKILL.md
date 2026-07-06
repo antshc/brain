@@ -1,13 +1,17 @@
 ---
-name: domain-modeling
-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural or design decision (ADR/SDR), or when another skill needs to maintain the domain model.
+name: grill-design
+description: A relentless interview to sharpen a plan or design, which also creates docs (ADRs, SDRs, and glossary) as we go.
+disable-model-invocation: true
 ---
 
-# Domain Modeling
+# Grill Design
 
-Actively build and sharpen the project's domain model and design decisions. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Run a `/grilling` session — interview the user relentlessly, one question at a time, walking every branch of the design tree and giving your recommended answer for each. As decisions crystallise, write them down immediately: sharpen the glossary, challenge the architecture, and pin down the testing strategy, capturing each in the right document (`CONTEXT.md`, `ARCHITECTURE.md`, and `docs/sdr/` or `docs/adr/`) inline.
+
+This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.
 
 ## SDR vs ADR
+
 Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's an SDR. If it explains why **one** thing was done a surprising way, it's an ADR.
 
 | | **SDR** (`docs/sdr/`) | **ADR** (`docs/adr/`) |
@@ -22,68 +26,94 @@ Rule of thumb: if a future engineer should follow it **every time** they build s
 
 Where the domain-model files live and when to create them (single- vs multi-context repos, lazy creation rules): see [FILE-STRUCTURE.md](./FILE-STRUCTURE.md). Read it once when setting up the files or deciding where a new file belongs.
 
-## Workflows
+## Lines of inquiry
 
-Run **all three flows in sequence** — Flow 1 (Glossary), then Flow 2 (Architecture), then Flow 3 (Testing strategy). Do not skip a flow, and do not skip any step within a flow. Each flow below opens with a checklist: copy it into your response and check off every item as you complete it.
+The grilling must cover **all three lines of inquiry** — Glossary, Architecture, and Testing strategy. Do not skip a line of inquiry, and do not skip any probe within one. These are not a batch to run top-to-bottom: they are the branches the interview walks, one question at a time.
 
-### Flow 1 — Glossary (CONTEXT.md)
+### Coverage checklist
 
-Copy this checklist and track your progress:
+Keep this checklist alive throughout the grilling. Tick each probe off only once you have genuinely covered it, and do not conclude the grilling until every probe is checked (or explicitly ruled not-applicable, with a reason).
 
 ```
-Flow 1 — Glossary Progress:
-- [ ] Step 1: Challenge against the glossary
-- [ ] Step 2: Sharpen fuzzy language
-- [ ] Step 3: Discuss concrete scenarios
-- [ ] Step 4: Cross-reference with code
-- [ ] Step 5: Update CONTEXT.md inline
+Grill-design coverage:
+Glossary
+- [ ] Challenge against the glossary
+- [ ] Sharpen fuzzy language
+- [ ] Discuss concrete scenarios
+- [ ] Cross-reference with code
+- [ ] Update CONTEXT.md inline
+Architecture
+- [ ] Challenge against the existing architecture
+- [ ] Trace a concrete flow through the layers
+- [ ] Pin down module boundaries and responsibilities
+- [ ] Cross-reference against the actual code structure
+- [ ] Probe dependency direction and layering
+- [ ] Hunt for a deeper module
+- [ ] Update ARCHITECTURE.md inline
+- [ ] Offer Solution Design Records (SDRs) for backbone rules
+- [ ] Offer ADRs sparingly
+Testing strategy
+- [ ] Locate the testing strategy (SDR or fallback)
+- [ ] Challenge which test categories must cover the change
 ```
 
-**Step 1: Challenge against the glossary**
+### Line of inquiry: Glossary (CONTEXT.md)
+
+**Probe — Challenge against the glossary**
 
 When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
 
-**Step 2: Sharpen fuzzy language**
+**Probe — Sharpen fuzzy language**
 
 When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
 
-**Step 3: Discuss concrete scenarios**
+**Probe — Discuss concrete scenarios**
 
 When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
 
-**Step 4: Cross-reference with code**
+**Probe — Cross-reference with code**
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
 
-**Step 5: Update CONTEXT.md inline**
+**Probe — Update CONTEXT.md inline**
 
 When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
-### Flow 2 — Architecture (ARCHITECTURE.md + SDR/ADR)
+### Line of inquiry: Architecture (ARCHITECTURE.md + SDR/ADR)
 
-Copy this checklist and track your progress:
-
-```
-Flow 2 — Architecture Progress:
-- [ ] Step 1: Challenge against the existing architecture
-- [ ] Step 2: Update ARCHITECTURE.md inline
-- [ ] Step 3: Offer Solution Design Records (SDRs) for backbone rules
-- [ ] Step 4: Offer ADRs sparingly
-```
-
-**Step 1: Challenge against the existing architecture**
+**Probe — Challenge against the existing architecture**
 
 Read `ARCHITECTURE.md` in full first. Absorb the codebase structure and the layered dependency model — layering direction and dependency rules — then scan the two index tables (`## Solution Design Strategy` for SDRs, `## Architecture Decision Records` for ADRs). Read only the summary rows in those tables, opening a full record in `docs/sdr/` or `docs/adr/` only when a row is relevant. If the plan conflicts with the documented structure, layering, or any record, call it out immediately: "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that intentional?" If the plan is a deliberate architectural shift, surface it as a candidate for an ADR or an SDR.
 
-**Step 2: Update ARCHITECTURE.md inline**
+**Probe — Trace a concrete flow through the layers**
+
+Walk one real use-case end-to-end and force each step into a layer. Where does each step live, and where do the boundaries — transaction, process, network — fall? "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?"
+
+**Probe — Pin down module boundaries and responsibilities**
+
+When a component's responsibility is vague or overlaps another's, force a crisp boundary. "Where exactly does the ordering module end and billing begin? Which one owns pricing?"
+
+**Probe — Cross-reference against the actual code structure**
+
+Check whether the proposed shape matches how the code is really laid out — folders, projects, and existing modules — not just what `ARCHITECTURE.md` claims. If they disagree, surface it: "Your plan adds a `Payments` module, but billing already lives inside `Ordering` in the code — are you splitting it out, or is the doc stale?"
+
+**Probe — Probe dependency direction and layering**
+
+Grill for dependency-rule and layering violations the plan sneaks in. "This makes the domain layer import the HTTP client — that inverts your documented dependency direction. Is that intentional, or should it go through a port?"
+
+**Probe — Hunt for a deeper module**
+
+Push for a deep module — a lot of functionality behind a simple, stable interface — over several shallow ones. "Could this be one deep module with a narrow interface, instead of three shallow modules that leak their internals to each other?"
+
+**Probe — Update ARCHITECTURE.md inline**
 
 When the structure or layering changes, update `ARCHITECTURE.md` right there. Don't batch these up — capture them as they happen. When a new SDR is created, add its summary row to the `## Solution Design Strategy` index in the same change. When a new ADR is created, add its summary row to the `## Architecture Decision Records` index in the same change. Use the format in [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
 
 `ARCHITECTURE.md` should describe *shape and rules*, not implementation detail. Do not treat `ARCHITECTURE.md` as a spec, a scratch pad, or a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Solution Design Records. It is the structural map and nothing else.
 
-**Step 3: Offer Solution Design Records (SDRs) for backbone rules**
+**Probe — Offer Solution Design Records (SDRs) for backbone rules**
 
 A **Solution Design Record** is different from an ADR. An SDR captures a *backbone* decision: the solution strategy, the top-level decomposition of the system, or a mandated architectural/design pattern that every feature of a given kind must follow. It is a **main architecture rule**.
 
@@ -98,7 +128,7 @@ Offer an SDR (instead of, or in addition to, an ADR) when all three are true:
 If any of the three is missing, skip the SDR. When you write an SDR: put the full record in `docs/sdr/` and add a one-line summary row to the `## Solution Design Strategy` table in `ARCHITECTURE.md` (the summary must match the SDR's
 `**Summary:**` line). Use the format in [SDR-FORMAT.md](./SDR-FORMAT.md).
 
-**Step 4: Offer ADRs sparingly**
+**Probe — Offer ADRs sparingly**
 
 ADRs are records of localized decisions that are often non-obvious to a developer but do not shape the whole system.
 
@@ -110,20 +140,12 @@ Only offer to create an ADR when all three are true:
 
 If any of the three is missing, skip the ADR. When you write an ADR: put the full record in `docs/adr/` and add a one-line summary row to the `## Architecture Decision Records` table in `ARCHITECTURE.md`. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-### Flow 3 — Testing strategy
+### Line of inquiry: Testing strategy
 
-Copy this checklist and track your progress:
-
-```
-Flow 3 — Testing Strategy Progress:
-- [ ] Step 1: Locate the testing strategy (SDR or fallback)
-- [ ] Step 2: Challenge which test categories must cover the change
-```
-
-**Step 1: Locate the testing strategy (SDR or fallback)**
+**Probe — Locate the testing strategy (SDR or fallback)**
 
 The testing strategy is usually an SDR — look for it by scanning the `## Solution Design Strategy` index in `ARCHITECTURE.md` for a testing-strategy row and opening that record in `docs/sdr/`. It may not exist; if there's no SDR, fall back to other documented conventions (e.g. `Testing.md`, `README.md`) and the existing tests in the codebase.
 
-**Step 2: Challenge which test categories must cover the change**
+**Probe — Challenge which test categories must cover the change**
 
 When the plan adds a new REST API endpoint, external-service integration, persisted entity, or a new module, challenge which documented test categories must cover it — consult the testing-strategy SDR (or fallback) and explore the codebase to find existing tests rather than defaulting to unit tests. "This adds a new repository against the database — your testing strategy mandates an integration-test category for that. Which testing category covers persistence round-trips and queries?"
