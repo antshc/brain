@@ -20,49 +20,7 @@ Rule of thumb: if a future engineer should follow it **every time** they build s
 
 ## File structure
 
-Most repos have a single context:
-
-```
-/
-├── ARCHITECTURE.md                      ← also indexes the Solution Design Strategy (SDRs)
-├── CONTEXT.md
-├── docs/
-│   ├── sdr/                             ← Solution Design Records (backbone rules)
-│   │   └── 0001-persisted-domain-model-repository.md
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
-
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
-
-```
-/
-├── ARCHITECTURE.md
-├── CONTEXT-MAP.md
-├── docs/
-│   ├── sdr/                             ← Solution Design Records (backbone rules)
-│   │   └── 0001-persisted-domain-model-repository.md
-│   └── adr/                          ← system-wide ADRs (docs/sdr/ holds system-wide SDRs)
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
-
-Create files lazily — only when you have something to write. 
-
-If no `CONTEXT.md` exists, create one when the first term is resolved. 
-
-If no `ARCHITECTURE.md` exists, create one when the first term is resolved. .
-
-If no `docs/adr/` exists, create it when the first ADR is needed, then add it to the `## Architecture Decision Records` index in `ARCHITECTURE.md`. 
-
-If no `docs/sdr/` exists, create it when the first SDR is needed, then add it to the `## Solution Design Strategy` index in `ARCHITECTURE.md`.
+Where the domain-model files live and when to create them (single- vs multi-context repos, lazy creation rules): see [FILE-STRUCTURE.md](./FILE-STRUCTURE.md). Read it once when setting up the files or deciding where a new file belongs.
 
 ## Workflows
 
