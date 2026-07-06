@@ -2,7 +2,6 @@
 
 - **Compressed**: compress wording, not meaning.
 - **High-density**: every sentence carries unique information — if a word can be removed without losing meaning, remove it.
-- No filler, explanations, marketing wording, repetition, or generic statements.
 
 ### Problem Statement & Solution sections
 - No technical language; understandable to a non-technical stakeholder.
