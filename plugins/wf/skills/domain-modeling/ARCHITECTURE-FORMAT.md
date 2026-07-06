@@ -49,8 +49,9 @@ dependency arrow. Map each layer onto the project's naming/folder conventions.}
 ## Solution Design Strategy
 
 {The index of Solution Design Records (SDRs) — the backbone rules every feature follows.
-One row per SDR. The Summary cell must match the SDR's `**Summary:**` line verbatim. See
-[SDR-FORMAT.md](./SDR-FORMAT.md).}
+One row per SDR. The Summary cell must match the SDR's `**Summary:**` line verbatim. State
+that this table is the index: scan it during design and modeling, and open the full record
+only when a decision is relevant to the work at hand. See [SDR-FORMAT.md](./SDR-FORMAT.md).}
 
 | # | Decision | Summary |
 |---|----------|---------|
@@ -59,7 +60,9 @@ One row per SDR. The Summary cell must match the SDR's `**Summary:**` line verba
 ## Architecture Decision Records
 
 {The index of Architecture Decision Records (ADRs) — localized, often non-obvious
-decisions. One row per ADR. See [ADR-FORMAT.md](./ADR-FORMAT.md).}
+decisions. One row per ADR. State that this table is the index: scan it during design and
+modeling, and open the full record only when a decision is relevant to the work at hand.
+See [ADR-FORMAT.md](./ADR-FORMAT.md).}
 
 | # | Decision | Summary |
 |---|----------|---------|
