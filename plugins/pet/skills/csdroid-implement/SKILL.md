@@ -21,4 +21,3 @@ Use the `HARNESS_ROOT` value provided to you by the agent (substitute its litera
 - Apply `Solution Design Strategy` and `Architecture Decision Records` from `ARCHITECTURE.md` if present; else follow the design choices established in existing code.
 - Write code using the `CODE.md` conventions if present; else match the style of surrounding code. Prefer deep modules, avoid speculative features.
 - Write tests when: adding a new public method, changing existing behavior, or touching conditional logic. Follow rules in `CODE.md` if present; else match the existing test patterns found during EXPLORATION.
-- Do **not** run tests during implementation. Only get diagnostics and build to verify your changes compile. Tests are run in the FEEDBACK LOOPS step.
