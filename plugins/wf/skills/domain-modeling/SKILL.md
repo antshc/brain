@@ -61,12 +61,11 @@ When the user uses a term that conflicts with the existing language in `CONTEXT.
 
 ### Challenge against the existing architecture
 
-When the user's plan conflicts with the documented architecture in `ARCHITECTURE.md`, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan represents a deliberate architectural shift, surface it as a candidate for an ADR or a Solution Design Record.
+Scan `ARCHITECTURE.md` first — the codebase structure, the layered dependency model and its rules, and the index tables (`## Solution Design Strategy` for SDRs and `## Architecture Decision Records` for ADRs). Read the structure and layering directly; from the index tables read only the summary rows, opening a full record in `docs/sdr/` or `docs/adr/` when a row is relevant. When the plan conflicts with the documented structure, layering, or a record, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan is a deliberate architectural shift, surface it as a candidate for an ADR or a Solution Design Record.
 
 ### Challenge against the testing strategy
- 
- When the plan adds a new REST api endpoint,external-service integration, persisted entity, or a new module, challenge which documented test categories must cover it — consult the
- project's testing strategy (e.g. a testing SDR, Testing.md, Readme.md), explore the codebase to find existing tests rather than defaulting to unit tests. "This adds a new repository against the database — your testing strategy mandates an integration-test category for that. Which testing category covers persistence round-trips and queries?"
+
+The testing strategy is usually an SDR — look for it by scanning the `## Solution Design Strategy` index in `ARCHITECTURE.md` for a testing-strategy row and opening that record in `docs/sdr/`. It may not exist; if there's no SDR, fall back to other documented conventions (e.g. `Testing.md`, `README.md`) and the existing tests in the codebase. When the plan adds a new REST API endpoint, external-service integration, persisted entity, or a new module, challenge which documented test categories must cover it — consult the testing-strategy SDR (or fallback) and explore the codebase to find existing tests rather than defaulting to unit tests. "This adds a new repository against the database — your testing strategy mandates an integration-test category for that. Which testing category covers persistence round-trips and queries?"
 
 ### Sharpen fuzzy language
 
