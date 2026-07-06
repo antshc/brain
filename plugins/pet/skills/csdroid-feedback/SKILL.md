@@ -26,10 +26,13 @@ Gather the full list of files changed during implementation. For each changed fi
 
 ## Step 1: Verify (diagnostics, build, tests)
 
+Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given). Look for `VERIFY.md` at `$HARNESS_ROOT`. If it exists, follow **all** of its steps in order — it may define more steps than the fallback, and may add project-specific checks (linting, formatting, integration tests, etc.) — then emit: "Verify steps: `VERIFY.md`". Otherwise, use the fallback below and emit: "Verify steps: fallback".
+
+### Fallback
+
 - **LSP diagnostics**: run `get_errors` on all changed files.
 - **Build**: run `dotnet build <project-dir> --no-incremental` for each unique affected project (do not build the same project twice). A passing `get_errors` does NOT replace a build — StyleCop and analyzers only fire during a real build.
-- **Unit Tests**: run `dotnet test <test-project> --filter <relevant-classes>` for each unique affected test project, filtering by the classes that correspond to changed files in that test project's scope.
-- **Project-specific Tests**: If Verify section present, run any additional project-specific checks (integration tests, rest api sanity tests, linting, formatting, etc.) listed there.
+- **Tests**: run `dotnet test <test-project> --filter <relevant-classes>` for each unique affected test project, filtering by the classes that correspond to changed files in that test project's scope.
 
 ## Step 2: Refactoring review
 
