@@ -75,7 +75,7 @@ Flow 2 — Architecture Progress:
 
 **Step 1: Challenge against the existing architecture**
 
-Scan `ARCHITECTURE.md` first — the codebase structure, the layered dependency model and its rules, and the index tables (`## Solution Design Strategy` for SDRs and `## Architecture Decision Records` for ADRs). Read the structure and layering directly; from the index tables read only the summary rows, opening a full record in `docs/sdr/` or `docs/adr/` when a row is relevant. When the plan conflicts with the documented structure, layering, or a record, call it out immediately. "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that an intentional change?" If the plan is a deliberate architectural shift, surface it as a candidate for an ADR or a Solution Design Record.
+Read `ARCHITECTURE.md` in full first. Absorb the codebase structure and the layered dependency model — layering direction and dependency rules — then scan the two index tables (`## Solution Design Strategy` for SDRs, `## Architecture Decision Records` for ADRs). Read only the summary rows in those tables, opening a full record in `docs/sdr/` or `docs/adr/` only when a row is relevant. If the plan conflicts with the documented structure, layering, or any record, call it out immediately: "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that intentional?" If the plan is a deliberate architectural shift, surface it as a candidate for an ADR or an SDR.
 
 **Step 2: Update ARCHITECTURE.md inline**
 
