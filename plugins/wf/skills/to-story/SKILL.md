@@ -32,13 +32,13 @@ The statement is the single sentence that names the capability. Write it so it s
 **Pattern:** `The <actor/system> continuously <behavior> <entity> for <who/scope>, so <business value>.`
 
 A strong statement encodes:
-- **Behavior** — what the system *does* (surface, keep current, block, reconcile), not what is *built* (indicator, button, banner, dropdown).
+- **Behavior** — what the system *does* (surface, keep current, block, reconcile), not what is *built* (button, banner, dropdown).
 - **Entity** — the domain thing acted on (items in the cart, reserved stock, order total).
 - **Scope/actor** — whose data or which context (the current shopper, authorized viewers, per storefront).
 - **Value** — the outcome that justifies the work.
 - **Implied hard parts** — the wording should hint at freshness, authorization, and failure so they surface as acceptance criteria.
 
-**Lift-the-widget rule:** if the statement names a UI artifact or component (indicator, screen, service, table), it is describing the solution. Raise it one level to the behavior it enables, and move the artifact into design.
+**Lift-the-widget rule:** if the statement names a UI artifact or component (screen, service, table), it is describing the solution. Raise it one level to the behavior it enables, and move the artifact into design.
 - Reject: *Display a cart badge in the page header.* (names a widget + placement)
 - Prefer: *Keep shoppers aware of the number of items in their cart so they can proceed to purchase without leaving their current view.* (names behavior, entity, scope, value)
 
@@ -51,7 +51,8 @@ A strong statement encodes:
 | header / sidebar / placement | keep the user aware during their workflow |
 | button / link / "click X" | let the user act on … in a single step |
 | banner / toast / popup | inform the user when … |
-| dropdown / list / table | let the user review … |
+| dropdown / picker | let the user choose one option from the available set |
+| table / grid | let the user review list of records ..|
 | counter / number display | keep the count of … current for the user |
 
 ## Acceptance Criteria
