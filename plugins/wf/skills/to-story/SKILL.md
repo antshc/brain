@@ -9,13 +9,9 @@ Rewrite an **idea description** or a **list of requirements** into one or more a
 - A single idea or requirement → produce **one** story.
 - A list of requirements, or an idea covering several distinct capabilities → produce **one story per capability**. Split anything non-atomic; never merge unrelated behaviors into one story.
 
-Interview me relentlessly about every aspect of the ideas/requirements until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+Ground every requirement in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout.
 
-Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
-
-Ground every requirement in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout. If a fact can be found by exploring the codebase, look it up rather than asking me. The decisions, though, are mine — put each one to me and wait for my answer.
-
-Do not enact the requirements list until I confirm we have reached a shared understanding.
+Run a /grilling session to clarify any ambiguity, surface missing acceptance criteria, and ensure the story is atomic and testable.
 
 ## Principle
 Describe system behavior, not implementation. Every requirement answers: WHO, WHAT behavior, WHAT entity, WHEN, WHAT result, WHAT on failure. Name the **entity and behavior**, never a widget, screen element, or technical artifact.
@@ -38,22 +34,7 @@ A strong statement encodes:
 - **Value** — the outcome that justifies the work.
 - **Implied hard parts** — the wording should hint at freshness, authorization, and failure so they surface as acceptance criteria.
 
-**Lift-the-widget rule:** if the statement names a UI artifact or component (screen, service, table), it is describing the solution. Raise it one level to the behavior it enables, and move the artifact into design.
-- Reject: *Display a cart badge in the page header.* (names a widget + placement)
-- Prefer: *Keep shoppers aware of the number of items in their cart so they can proceed to purchase without leaving their current view.* (names behavior, entity, scope, value)
-
-**Solution-agnostic test:** if changing the UI or technology (badge → banner, poll → push) would force you to reword the statement, it is over-specified — rewrite it.
-
-**De-lifting reference** (raise the named artifact to the behavior it enables):
-| Leaked artifact | Behavior to state instead |
-| --- | --- |
-| badge / icon | make the user aware that … |
-| header / sidebar / placement | keep the user aware during their workflow |
-| button / link / "click X" | let the user act on … in a single step |
-| banner / toast / popup | inform the user when … |
-| dropdown / picker | let the user choose one option from the available set |
-| table / grid | let the user review list of records ..|
-| counter / number display | keep the count of … current for the user |
+**Lift-the-widget rule (core):** if the statement names a UI artifact or component (screen, service, table), it is describing the solution. Raise it one level to the behavior it enables, and move the artifact into design. For the full rule, the de-lifting reference table, and the solution-agnostic test, see [references/lift-the-widget.md](references/lift-the-widget.md).
 
 ## Acceptance Criteria
 Write 3–6 criteria per requirement. If more are needed, the requirement is too broad — split it. Write each rule as one observable behavior:
@@ -67,12 +48,7 @@ Cover these rule types:
 - **State** — persistence/state changes.
 - **Failure** — error handling.
 
-**Criteria obey lift-the-widget too.** A criterion states an observable outcome, not the control that produces it. Write what the user perceives or can do, not what they tap.
-- Reject: *Selecting the cart badge opens the cart panel.* (names widget + interaction)
-- Prefer: *The shopper can reach the full cart contents in a single step from the notification.*
-
-## Verb → Component Hints
-persist → repository/accessor · validate → validator · create → provisioner · external API → client/gateway · emit alert → alert service · process async → worker · expose API → controller
+Criteria obey the lift-the-widget rule too: state an observable outcome, not the control that produces it. See [references/lift-the-widget.md](references/lift-the-widget.md) for examples and the verb → component hints.
 
 ## Quality Check (before output)
 - Requirement is atomic and behavior-focused.
@@ -81,65 +57,8 @@ persist → repository/accessor · validate → validator · create → provisio
 - Each rule = one behavior, exposes data flow + failure handling.
 - Each rule implies clear code changes. If not, rewrite.
 
-## Output Format
-Write for Product Owners and QA — plain business language, no code, class names, or technical jargon. Each criterion is one clear, testable statement of expected behavior.
-
-One story:
-```
-<Short requirement title>
-
-<One-line business value: what capability this delivers and why it matters.>
-
-## Acceptance Criteria
-- The system <does observable outcome> when <condition>.
-- If <failure condition>, the system <what the user/operator sees>.
-```
-
-Multiple stories — repeat the block, one per capability, under a numbered heading:
-```
-## Story 1 
-<Short requirement title>
-<One-line business value: what capability this delivers and why it matters.>
-### Acceptance Criteria
-- ...
-
-```
-
-## Example
-```
-Reserve stock for cart items
-
-Stock for items in a shopper's cart is held while they complete checkout so that purchased items remain available and cannot be oversold.
-
-## Acceptance Criteria
-- Stock for each cart item is reserved when the shopper begins checkout.
-- Checkout is blocked and the affected items are identified when requested quantity exceeds available stock.
-- If a reservation cannot be placed, checkout fails and the shopper's cart remains unchanged.
-- Reserved stock is released and returned to availability when checkout is abandoned or the reservation expires.
-```
-
-## Example — lifting a widget requirement
-Shows a solution-leaking request raised to behavior. The input names a widget (*badge*) and a placement (*page header*); the output names the behavior, entity, scope, and value.
-
-**Input (rejected):** *Display a cart badge in the page header to show the number of items.*
-
-**Rewritten:**
-```
-Keep shoppers aware of their cart contents while they browse
-
-Shoppers stay aware of the items they have added to their cart during their normal browsing so they can proceed to purchase without navigating away to check.
-
-## Acceptance Criteria
-- The system signals that the cart contains items whenever at least one item is in the shopper's cart.
-- The system stops signaling cart contents when the cart is empty.
-- The count of cart items stays current for the shopper as items are added or removed, without a manual refresh.
-- The shopper can reach the full cart contents in a single step from the notification.
-- If cart information cannot be retrieved, the shopper is not shown an incorrect cart state and the rest of their shopping remains usable.
-```
-
-## Anti-Patterns (reject)
-- "Add support for X", "Improve performance", "Refactor component", "Create service Y" — these are tasks, not behavior rules.
-- "Display a badge", "Add a button/banner/dropdown", "Show a table" — these name UI artifacts, not behavior. Apply the lift-the-widget rule and describe what the system does and why.
+## Output & Examples
+Write for Product Owners and QA — plain business language, no code, class names, or technical jargon. Each criterion is one clear, testable statement of expected behavior. For the exact output format (single and multiple stories), worked examples, and anti-patterns to reject, see [references/output-and-examples.md](references/output-and-examples.md).
 
 ## Golden Rule
 A good criterion is written in plain business language a PO can approve and a QA can verify by testing — clear, specific, and unambiguous about the expected outcome. If a QA couldn't confirm it passed or failed, rewrite.
