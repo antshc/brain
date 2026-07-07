@@ -1,20 +1,29 @@
 ---
+description: Rewrite an **idea description** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** (behavior rules + acceptance criteria) that map to a production codebase..
 name: to-story
-description: Rewrite ideas or raw requirements into atomic, testable, implementation-agnostic behavior rules with acceptance criteria that map to a production codebase. Use when the user wants to turn a feature idea, client request, or vague requirement into a Product Owner requirement statement plus QA-verifiable acceptance criteria, or mentions "write a story", "requirement and acceptance criteria", or "lift the widget".
 ---
 
-# Product Owner — Code-Mappable Requirements Writer
+Rewrite an **idea description** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** (behavior rules + acceptance criteria) that map to a production codebase.
 
-## Role
-Rewrite ideas/requirements into atomic, testable, implementation-agnostic **behavior rules** that map to a production codebase and generate design + implementation tasks.
+**Input & output shape:**
+- A single idea or requirement → produce **one** story.
+- A list of requirements, or an idea covering several distinct capabilities → produce **one story per capability**. Split anything non-atomic; never merge unrelated behaviors into one story.
+
+Interview me relentlessly about every aspect of the ideas/requirements until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+
+Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
+
+Ground every requirement in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout. If a fact can be found by exploring the codebase, look it up rather than asking me. The decisions, though, are mine — put each one to me and wait for my answer.
+
+Do not enact the requirements list until I confirm we have reached a shared understanding.
 
 ## Principle
 Describe system behavior, not implementation. Every requirement answers: WHO, WHAT behavior, WHAT entity, WHEN, WHAT result, WHAT on failure. Name the **entity and behavior**, never a widget, screen element, or technical artifact.
 
 ## Workflow
-1. **Analyze input** → identify capability, domain/module, actors, inputs, outputs, failure cases.
-2. **Write the requirement statement** → lead with behavior and value, not a solution (see Requirement Statement). Atomic, behavior-focused, domain-specific.
-3. **Derive acceptance criteria** as behavior rules (see below).
+1. **Analyze input** → identify each distinct capability, its domain/module, actors, inputs, outputs, failure cases. One capability → one story; a list or multi-capability idea → one story each.
+2. **Write the requirement statement** per story → lead with behavior and value, not a solution (see Requirement Statement). Atomic, behavior-focused, domain-specific.
+3. **Derive acceptance criteria** per story as behavior rules (see below).
 4. **Verify** each rule implies concrete code changes and maps to a responsibility.
 
 ## Requirement Statement
@@ -38,7 +47,7 @@ A strong statement encodes:
 **De-lifting reference** (raise the named artifact to the behavior it enables):
 | Leaked artifact | Behavior to state instead |
 | --- | --- |
-| indicator / badge / icon | make the user aware that … |
+| badge / icon | make the user aware that … |
 | header / sidebar / placement | keep the user aware during their workflow |
 | button / link / "click X" | let the user act on … in a single step |
 | banner / toast / popup | inform the user when … |
@@ -73,8 +82,10 @@ persist → repository/accessor · validate → validator · create → provisio
 
 ## Output Format
 Write for Product Owners and QA — plain business language, no code, class names, or technical jargon. Each criterion is one clear, testable statement of expected behavior.
+
+One story:
 ```
-<Requirement title>
+<Short requirement title>
 
 <One-line business value: what capability this delivers and why it matters.>
 
@@ -83,9 +94,19 @@ Write for Product Owners and QA — plain business language, no code, class name
 - If <failure condition>, the system <what the user/operator sees>.
 ```
 
+Multiple stories — repeat the block, one per capability, under a numbered heading:
+```
+## Story 1 
+<Short requirement title>
+<One-line business value: what capability this delivers and why it matters.>
+### Acceptance Criteria
+- ...
+
+```
+
 ## Example
 ```
-Reserve stock for cart items during checkout
+Reserve stock for cart items
 
 Stock for items in a shopper's cart is held while they complete checkout so that purchased items remain available and cannot be oversold.
 
