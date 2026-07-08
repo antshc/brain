@@ -13,6 +13,8 @@ Write for Product Owners and analysts — plain business language, no code, clas
 ```markdown
 ## <Capability title — behavior + entity, no surface or placement>
 
+> **Priority**: <Importance of the requirement: MVP/Should have/Nice to have. If not applicable, use MVP as default> | **Risk**: <Complexity: Low/Medium/High. If not applicable, use Low as default>
+
 ### Stakeholder Requirement
 The <actor> needs to <behavior> <entity>, so <value>.
 
