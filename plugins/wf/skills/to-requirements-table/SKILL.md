@@ -21,13 +21,14 @@ The skill accepts one of:
 Each requirement block in the requirements.md file follows this Markdown structure:
 
 ```
-### <Requirement Name>
+## <Capability title>
 
 > **Priority**: <Priority> | **Risk**: <Risk>
 
-<Requirement explanation paragraph>
+### Stakeholder Requirement
+<Stakeholder Requirement>
 
-#### Acceptance Criteria
+### Functional Requirements
 
 - <criterion 1>
 - <criterion 2>
@@ -38,15 +39,15 @@ Extract the following fields per requirement:
 
 | Field | Source |
 |---|---|
-| **Name** | The `###` heading text — preserve exactly as written |
+| **Name** | The `##` heading text — preserve exactly as written |
 | **Priority** | Value after `**Priority**:` in the blockquote |
 | **Risk** | Value after `**Risk**:` in the blockquote |
-| **Explanation** | The paragraph immediately after the blockquote (before `#### Acceptance Criteria`) — preserve exactly as written |
-| **Acceptance Criteria** | The list items under `#### Acceptance Criteria` |
+| **Stakeholder Requirement** | The paragraph under `### Stakeholder Requirement` — preserve exactly as written |
+| **Functional Requirements** | The list items under `### Functional Requirements` |
 
 
-> **Critical**: The requirement name and explanation text must be copied.**verbatim** — do not rephrase, summarize, or alter wording.
-> **Critical**: The Acceptance criteria must NOT be copied.
+> **Critical**: The requirement name and stakeholder requirement text must be copied **verbatim** — do not rephrase, summarize, or alter wording.
+> **Critical**: The Functional Requirements must NOT be copied.
 
 ---
 
@@ -55,7 +56,7 @@ Extract the following fields per requirement:
 Generate a **single `<table>`** element. Each requirement produces **two `<tbody>` rows**:
 
 1. **Header row** — ID (left empty), Requirement name, Priority, Risk
-2. **Detail row** — `colspan="4"` cell containing the explanation paragraph followed by the acceptance criteria as a `<ul>` list
+2. **Detail row** — `colspan="4"` cell containing the stakeholder requirement paragraph followed by the functional requirements as a `<ul>` list
 
 ```html
 <table>
@@ -76,7 +77,11 @@ Generate a **single `<table>`** element. Each requirement produces **two `<tbody
     </tr>
     <tr>
       <td colspan="4">
-        <p>Requirement explanation paragraph.</p>
+        <p>Stakeholder requirement paragraph.</p>
+        <ul>
+          <li>Functional requirement 1</li>
+          <li>Functional requirement 2</li>
+        </ul>
       </td>
     </tr>
     <!-- repeat for each requirement -->
@@ -129,7 +134,7 @@ Save the HTML file alongside the source requirements.md file:
 
 1. **Locate the input**: Read the requirements.md file (or use active selection).
 2. **Identify the ADDED section**: Find requirements under the `## ADDED Requirements` heading. Skip `## MODIFIED` and `## REMOVED` sections unless the user explicitly asks to include them.
-3. **Parse each requirement**: Extract Name, Priority, Risk, Explanation, and Acceptance Criteria per the parsing rules above.
+3. **Parse each requirement**: Extract Name, Priority, Risk, Stakeholder Requirement, and Functional Requirements per the parsing rules above.
 4. **Generate HTML**: Build the full HTML document using the output format above. Requirement text must be copied verbatim.
 5. **Save file**: Write the HTML to `requirements.html` next to the requirements.md, or to the user-specified path. Use the `create_file` tool (if the file does not exist) or `replace_string_in_file`/`multi_replace_string_in_file` (if updating).
 6. **Confirm**: Report the saved file path to the user.
@@ -138,7 +143,7 @@ Save the HTML file alongside the source requirements.md file:
 
 ## Edge Cases
 
-- If a requirement has no Acceptance Criteria section, omit the `<ul>` and include only the `<p>` explanation.
+- If a requirement has no Functional Requirements section, omit the `<ul>` and include only the `<p>` stakeholder requirement.
 - If Priority or Risk is absent, leave the cell empty.
 - Inline Markdown (`` `code` ``, `**bold**`) may be preserved as HTML (`<code>`, `<strong>`) or stripped — prefer preserving `<code>` spans.
 - The ID column is always left empty (sequential numbering is not assigned by this skill).
