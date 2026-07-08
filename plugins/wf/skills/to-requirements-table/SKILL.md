@@ -1,24 +1,24 @@
 ---
 name: to-requirements-table
-description: Convert requirements from a requirements.md file (or selection) into a formatted HTML requirements table and save to an HTML file. Use whenever a user wants to export, format, or save requirements as HTML, generate a requirements report, or convert spec sections to an HTML table. Trigger on phrases like "format requirements to html", "export requirements", "save requirements as html", "create html table from spec".
+description: Convert a Markdown requirements file into a styled HTML requirements table. Use when the user wants to export requirements as HTML or mentions "format requirements to html", "export requirements", "save requirements as html".
 ---
 
-Convert **ADDED requirements** from a requirements.md file into a styled HTML requirements table and save it to disk.
+Convert **Requirements** from a provided Markdown file into a styled HTML requirements table and save it to disk.
 
 ---
 
 ## Input
 
 The skill accepts one of:
-- The user's **active selection** from a requirements.md file
-- A **full requirements.md file path** provided by the user
-- The **currently open requirements.md file** in the editor
+- The user's **active selection** from a Markdown requirements file
+- A **full file path** to a Markdown requirements file provided by the user
+- The **currently open** Markdown requirements file in the editor
 
 ---
 
 ## Parsing Rules
 
-Each requirement block in the requirements.md file follows this Markdown structure:
+Each requirement block in the Markdown requirements file follows this structure:
 
 ```
 ## <Capability title>
@@ -125,18 +125,18 @@ Wrap the table in a complete HTML document:
 ## Output File Location
 
 Save the HTML file alongside the source requirements.md file:
-- If source is `path/to/requirements.md` → save as `path/to/requirements.html`
+- If source is `path/to/filename.md` → save as `path/to/filename.html`
 - If the user specifies a different output path, use that instead.
 
 ---
 
 ## Step-by-Step Workflow
 
-1. **Locate the input**: Read the requirements.md file (or use active selection).
-2. **Identify the ADDED section**: Find requirements under the `## ADDED Requirements` heading. Skip `## MODIFIED` and `## REMOVED` sections unless the user explicitly asks to include them.
+1. **Locate the input**: Read the Markdown requirements file (or use active selection).
+2. **Identify the Requirements section**: Find requirements under the `# Requirements` heading.
 3. **Parse each requirement**: Extract Name, Priority, Risk, Stakeholder Requirement, and Functional Requirements per the parsing rules above.
 4. **Generate HTML**: Build the full HTML document using the output format above. Requirement text must be copied verbatim.
-5. **Save file**: Write the HTML to `requirements.html` next to the requirements.md, or to the user-specified path. Use the `create_file` tool (if the file does not exist) or `replace_string_in_file`/`multi_replace_string_in_file` (if updating).
+5. **Save file**: Write the HTML to an `.html` file with the same base name as the source file, placed alongside it, or to the user-specified path. Use the `create_file` tool (if the file does not exist) or `replace_string_in_file`/`multi_replace_string_in_file` (if updating).
 6. **Confirm**: Report the saved file path to the user.
 
 ---
