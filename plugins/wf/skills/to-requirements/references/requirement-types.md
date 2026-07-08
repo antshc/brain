@@ -18,7 +18,7 @@ A bounded unit of behavior that scopes one requirement set. A capability names w
 
 A **capability title** names the behavior and entity:
 - Reject: *Surface active alerts in the page header* · *Manage tasks on the Monitoring page*
-- Prefer: *Surface the count of active alerts* · *Manage tasks*
+- Prefer: *Present the count of active alerts* · *Manage tasks*
 
 Capability is a **scoping unit**, not a requirement type. It exists to prevent requirement sprawl — each set stays focused on one behavior rather than bundling several unrelated behaviors under one title.
 
@@ -105,7 +105,7 @@ Statements currently believed true; not requirements, but they affect planning. 
 
 ## Full Example — real-time availability in the catalog
 
-**Capability:** *Surface item availability in the catalog*
+**Capability:** *Present item availability in the catalog*
 
 **Business requirement:** *The business must display current availability to reduce frustration from ordering unavailable products.*
 
