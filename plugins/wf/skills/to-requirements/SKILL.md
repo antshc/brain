@@ -16,13 +16,15 @@ The **capability title** names the behavior and entity, never the surface or pla
 Name entities and behaviors in the project's approved language. `CONTEXT.md` is the domain glossary — the source of allowed terms. When it exists in the repo, prefer its exact terms over synonyms so requirements match the shared language; when it is absent, fall back to the plainest business language for the domain.
 
 ## Workflow
-1. **Analyze input** → split the input into **capabilities** using the grouping rule and five-question decision process in [references/capability-detection.md](references/capability-detection.md) — grounding first in `CONTEXT.md` (name each capability in approved domain terms) and `ARCHITECTURE.md` (module boundaries signal ownership and rates of change: a candidate straddling two modules is a split signal) — then note each capability's domain/module, actors, inputs, and outputs. *Done when* every capability passes all five questions and no two independently-changing capabilities share a set.
-2. **Grill** → consult the taxonomy in [references/requirement-types.md](references/requirement-types.md); run /grilling to resolve ambiguity and surface actors, failure paths, and edge cases. *Done when* no open ambiguity remains before writing.
-3. **Write the stakeholder requirement** → one sentence per capability (see **Stakeholder Requirement**).
-4. **Derive functional requirements** → the `The system must …` statements that make the capability concrete and testable (see **Functional Requirements**).
-5. **Capture business rules** → the invariants that must always hold (see **Business Rules**).
-6. **Capture edge cases** → the boundary and failure conditions (see **Edge Cases**).
-7. **Verify** → every requirement passes the **Quality Check**.
+1. **Read the domain context** → load `CONTEXT.md` first and treat it as the domain glossary: the source of approved entity and behavior terms for everything that follows. *Done when* the input's entities and behaviors are mapped to `CONTEXT.md`'s terms, or their absence is noted when the file does not exist.
+2. **Ground the input** → restate the input in the approved domain terms from step 1, then load `ARCHITECTURE.md` only if the input touches module boundaries, integrations, or persistence — its module layout signals ownership and rates of change (a candidate straddling two modules is a split signal). *Done when* the input is expressed in domain terms and the relevant module boundaries are identified.
+3. **Analyze input** → split the grounded input into **capabilities** using the grouping rule and five-question decision process in [references/capability-detection.md](references/capability-detection.md), then note each capability's domain/module, actors, inputs, and outputs. *Done when* every capability passes all five questions and no two independently-changing capabilities share a set.
+4. **Grill** → consult the taxonomy in [references/requirement-types.md](references/requirement-types.md); run /grilling to clarify capabilities and requirements — resolving ambiguity and surfacing actors, failure paths, and edge cases. *Done when* no open ambiguity remains before writing.
+5. **Write the stakeholder requirement** → one sentence per capability (see **Stakeholder Requirement**).
+6. **Derive functional requirements** → the `The system must …` statements that make the capability concrete and testable (see **Functional Requirements**).
+7. **Capture business rules** → the invariants that must always hold (see **Business Rules**).
+8. **Capture edge cases** → the boundary and failure conditions (see **Edge Cases**).
+9. **Verify** → every requirement passes the **Quality Check**.
 
 ## Stakeholder Requirement
 The single sentence that names what the user needs to achieve, written to survive any design choice.
