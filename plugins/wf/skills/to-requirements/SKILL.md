@@ -53,9 +53,6 @@ Write each as a policy that must **always** hold, independent of any single inte
 ## Edge Cases
 List the boundary and failure conditions the functional requirements must handle: missing or unknown data, expired windows, absent permissions, unavailable dependencies, and entities that no longer exist. When `ARCHITECTURE.md` is present, derive a dependency-failure edge case for each boundary it reveals (the dependency is slow, unavailable, or returns nothing). Each edge case should trace to a functional requirement or business rule that covers it.
 
-## Output
-Follow the template and writing style in [references/output-format.md](references/output-format.md). For worked examples, see [references/examples.md](references/examples.md).
-
 ## Quality Check (before output)
 - Each capability is atomic; unrelated capabilities are split into separate requirement sets.
 - The **capability title** is solution-agnostic — it names a behavior and entity, not a page, screen, header, panel, tab, dropdown, grid, badge, endpoint, or route.
@@ -65,5 +62,8 @@ Follow the template and writing style in [references/output-format.md](reference
 - Business rules state invariants, not capabilities.
 - Every edge case traces to a functional requirement or business rule.
 
-## Next Step
-The output of this skill is the input to /to-story: hand the functional requirements (with their business rules and edge cases) to /to-story to package each capability into a backlog-ready user story with acceptance criteria.
+## Output
+Follow the template and writing style in [references/output-format.md](references/output-format.md). For worked examples, see [references/examples.md](references/examples.md).
+
+After writing, save the result to `docs/requirements/<slug>.md` where `<slug>` is a short kebab-case identifier derived from the capability title (e.g., `recover-deleted-files`, `real-time-catalog-availability`). Create the `docs/requirements/` directory if it does not exist.
+
