@@ -7,7 +7,7 @@ Worked examples of a complete requirement set produced by /to-requirements. Writ
 **Input idea:** *Let administrators restore files that were accidentally deleted.*
 
 ```
-Recover accidentally deleted files
+## Recover accidentally deleted files
 
 ### Stakeholder Requirement
 Administrators need to restore accidentally deleted files without contacting support, so content is recovered quickly and support load drops.
@@ -36,7 +36,7 @@ Administrators need to restore accidentally deleted files without contacting sup
 **Input idea:** *Show real-time banana stock in the catalog.*
 
 ```
-Show real-time availability in the catalog
+## Show real-time availability in the catalog
 
 ### Stakeholder Requirement
 Customers need to know whether an item is currently available before adding it to the cart, so they avoid ordering products that cannot be fulfilled.
