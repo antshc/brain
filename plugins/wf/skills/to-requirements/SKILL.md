@@ -54,28 +54,7 @@ Write each as a policy that must **always** hold, independent of any single inte
 List the boundary and failure conditions the functional requirements must handle: missing or unknown data, expired windows, absent permissions, unavailable dependencies, and entities that no longer exist. When `ARCHITECTURE.md` is present, derive a dependency-failure edge case for each boundary it reveals (the dependency is slow, unavailable, or returns nothing). Each edge case should trace to a functional requirement or business rule that covers it.
 
 ## Output
-Write for Product Owners and analysts — plain business language, no code, class names, or technical jargon. Emit one block per capability:
-
-```
-## <Capability title — behavior + entity, no surface or placement>
-
-### Stakeholder Requirement
-The <actor> needs to <behavior> <entity>, so <value>.
-
-### Functional Requirements
-- The system must <behavior> when <condition>.
-- ...
-
-### Business Rules
-- If <condition>, <invariant>.
-- ...
-
-### Edge Cases
-- <boundary/failure condition> → <expected handling>.
-- ...
-```
-
-For a full worked example (stakeholder requirement + functional requirements + business rules + edge cases), see [references/requirement-output-examples.md](references/requirement-output-examples.md).
+Follow the template and writing style in [references/output-format.md](references/output-format.md). For worked examples, see [references/examples.md](references/examples.md).
 
 ## Quality Check (before output)
 - Each capability is atomic; unrelated capabilities are split into separate requirement sets.
