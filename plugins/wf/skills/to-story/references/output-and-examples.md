@@ -38,7 +38,7 @@ Stock for items in a shopper's cart is held while they complete checkout so that
 - Reserved stock is released and returned to availability when checkout is abandoned or the reservation expires.
 ```
 
-## Example — lifting a widget requirement
+## Example — lifting a solution-leaking requirement
 Shows a solution-leaking request raised to behavior. The input names a widget (*badge*) and a placement (*page header*); the output names the behavior, entity, scope, and value.
 
 **Input (rejected):** *Display a cart badge in the page header to show the number of items.*
@@ -59,4 +59,4 @@ Shoppers stay aware of the items they have added to their cart during their norm
 
 ## Anti-Patterns (reject)
 - "Add support for X", "Improve performance", "Refactor component", "Create service Y" — these are tasks, not behavior rules.
-- "Display a badge", "Add a button/banner/dropdown", "Show a table" — these name UI artifacts, not behavior. Apply the lift-the-widget rule and describe what the system does and why.
+- "Display a badge", "Add a button/banner/dropdown", "Show a table" — these name UI artifacts, not behavior. Apply the solution-agnostic rule and describe what the system does and why.

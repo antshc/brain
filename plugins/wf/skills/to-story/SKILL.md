@@ -1,43 +1,29 @@
 ---
-description: Rewrite an **idea description** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** (behavior rules + acceptance criteria) that map to a production codebase..
+description: Package a **single requirement** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** (title + business value + acceptance criteria) that map to a production codebase. Use when the user has requirements and wants stories, backlog-ready items, or acceptance criteria.
 name: to-story
 ---
 
-Rewrite an **idea description** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** (behavior rules + acceptance criteria) that map to a production codebase.
+Package a **single requirement** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** (title + business value + acceptance criteria) that map to a production codebase.
+
+The input is typically the output of /to-requirements — a stakeholder requirement with its functional requirements, business rules, and edge cases. It also works standalone on any requirement text.
 
 **Input & output shape:**
-- A single idea or requirement → produce **one** story.
-- A list of requirements, or an idea covering several distinct capabilities → produce **one story per capability**. Split anything non-atomic; never merge unrelated behaviors into one story.
+- A single requirement → produce **one** story.
+- A list of requirements, or a requirement covering several distinct capabilities → produce **one story per capability**. Split anything non-atomic; never merge unrelated behaviors into one story.
 
-Ground every requirement in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout.
-
-Run a /grilling session to clarify any ambiguity, surface missing acceptance criteria, and ensure the story is atomic and testable.
+Ground every story in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout.
 
 ## Principle
-Describe system behavior, not implementation. Every requirement answers: WHO, WHAT behavior, WHAT entity, WHEN, WHAT result, WHAT on failure. Name the **entity and behavior**, never a widget, screen element, or technical artifact.
+Describe system behavior, not implementation. Name the **entity and behavior**, never a widget, screen element, or technical artifact. If the input requirement already leaks a solution, raise it to the behavior it enables before writing the story (see the solution-agnostic rule).
 
 ## Workflow
-1. **Analyze input** → identify each distinct capability, its domain/module, actors, inputs, outputs, failure cases. One capability → one story; a list or multi-capability idea → one story each.
-2. **Write the requirement statement** per story → lead with behavior and value, not a solution (see Requirement Statement). Atomic, behavior-focused, domain-specific.
+1. **Analyze input** → identify each distinct capability, its domain/module, actors, inputs, outputs, failure cases. One capability → one story; a list or multi-capability input → one story each.
+2. **Write the story header** per capability → a short title and a one-line business value that names the capability and why it matters.
 3. **Derive acceptance criteria** per story as behavior rules (see below).
 4. **Verify** each rule implies concrete code changes and maps to a responsibility.
 
-## Requirement Statement
-The statement is the single sentence that names the capability. Write it so it survives any design choice.
-
-**Pattern:** `The <actor/system> continuously <behavior> <entity> for <who/scope>, so <business value>.`
-
-A strong statement encodes:
-- **Behavior** — what the system *does* (surface, keep current, block, reconcile), not what is *built* (button, banner, dropdown).
-- **Entity** — the domain thing acted on (items in the cart, reserved stock, order total).
-- **Scope/actor** — whose data or which context (the current shopper, authorized viewers, per storefront).
-- **Value** — the outcome that justifies the work.
-- **Implied hard parts** — the wording should hint at freshness, authorization, and failure so they surface as acceptance criteria.
-
-**Lift-the-widget rule (core):** if the statement names a UI artifact or component (screen, service, table), it is describing the solution. Raise it one level to the behavior it enables, and move the artifact into design. For the full rule, the de-lifting reference table, and the solution-agnostic test, see [references/lift-the-widget.md](references/lift-the-widget.md).
-
 ## Acceptance Criteria
-Write 3–6 criteria per requirement. If more are needed, the requirement is too broad — split it. Write each rule as one observable behavior:
+Write 3–6 criteria per story. If more are needed, the story is too broad — split it. Write each rule as one observable behavior:
 - `The system must <behavior> when <condition>.`
 - `If <condition>, the <actor> must <result>.`
 
@@ -48,12 +34,14 @@ Cover these rule types:
 - **State** — persistence/state changes.
 - **Failure** — error handling.
 
-Criteria obey the lift-the-widget rule too: state an observable outcome, not the control that produces it. See [references/lift-the-widget.md](references/lift-the-widget.md) for examples and the verb → component hints.
+When the input comes from /to-requirements, its functional requirements, business rules, and edge cases map directly onto these criteria.
+
+Criteria obey the solution-agnostic rule: state an observable outcome, not the control that produces it. See [../to-requirements/SKILL.md](../to-requirements/SKILL.md) and `SOLUTION-AGNOSTIC-TERMS.md` for the de-referencing tables and verb → component hints.
 
 ## Quality Check (before output)
-- Requirement is atomic and behavior-focused.
-- Statement names a behavior + entity, not a widget, screen, or component. Apply the lift-the-widget rule.
-- Statement is solution-agnostic: swapping UI or technology would not force a reword.
+- Story is atomic and behavior-focused.
+- Title and value name a behavior + entity, not a widget, screen, or component. Apply the solution-agnostic rule.
+- Story is solution-agnostic: swapping UI or technology would not force a reword.
 - Each rule = one behavior, exposes data flow + failure handling.
 - Each rule implies clear code changes. If not, rewrite.
 
