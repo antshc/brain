@@ -16,8 +16,8 @@ The **capability title** names the behavior and entity, never the surface or pla
 Name entities and behaviors in the project's approved language. `CONTEXT.md` is the domain glossary — the source of allowed terms. When it exists in the repo, prefer its exact terms over synonyms so requirements match the shared language; when it is absent, fall back to the plainest business language for the domain.
 
 ## Workflow
-1. **Analyze input** → identify each distinct capability with its domain/module, actors, inputs, and outputs. *Done when* every capability is separated and no two unrelated capabilities share a set.
-2. **Ground & grill** → when present, read `CONTEXT.md` (approved vocabulary) and `ARCHITECTURE.md` (module layout); consult the taxonomy in [references/requirement-types.md](references/requirement-types.md); run /grilling to resolve ambiguity and surface actors, failure paths, and edge cases. *Done when* no open ambiguity remains before writing.
+1. **Analyze input** → split the input into **capabilities** using the grouping rule and five-question decision process in [references/capability-detection.md](references/capability-detection.md) — grounding first in `CONTEXT.md` (name each capability in approved domain terms) and `ARCHITECTURE.md` (module boundaries signal ownership and rates of change: a candidate straddling two modules is a split signal) — then note each capability's domain/module, actors, inputs, and outputs. *Done when* every capability passes all five questions and no two independently-changing capabilities share a set.
+2. **Grill** → consult the taxonomy in [references/requirement-types.md](references/requirement-types.md); run /grilling to resolve ambiguity and surface actors, failure paths, and edge cases. *Done when* no open ambiguity remains before writing.
 3. **Write the stakeholder requirement** → one sentence per capability (see **Stakeholder Requirement**).
 4. **Derive functional requirements** → the `The system must …` statements that make the capability concrete and testable (see **Functional Requirements**).
 5. **Capture business rules** → the invariants that must always hold (see **Business Rules**).
@@ -38,7 +38,7 @@ A strong statement encodes:
 Keep it **solution-agnostic**: the sentence names a behavior, never an artifact.
 
 ## Functional Requirements
-Write each as `The system must <behavior> when <condition>.` — specific, testable, and focused on externally visible behavior. Cover, at minimum:
+Write each as `The system must <behavior> when <condition>.` — specific, testable, and focused on externally visible behavior. When `ARCHITECTURE.md` is present, use its module layout to find the capability's dependencies and surface the **Integration** and **Degraded behavior** requirements — name the behavior at each boundary, never the component that implements it. Cover, at minimum:
 - **Capability** — what actions the system performs and what outcomes it produces.
 - **Integration** — external system interactions the capability depends on.
 - **State** — persistence, retention, and state changes.
@@ -51,7 +51,7 @@ Keep it **solution-agnostic**: state an observable outcome, not the control that
 Write each as a policy that must **always** hold, independent of any single interaction: `If <condition>, <the invariant that must be true>.` Business rules drive validation, eligibility, permissions, calculations, and display logic. A functional requirement says a capability must exist; a business rule says what must always be true.
 
 ## Edge Cases
-List the boundary and failure conditions the functional requirements must handle: missing or unknown data, expired windows, absent permissions, unavailable dependencies, and entities that no longer exist. Each edge case should trace to a functional requirement or business rule that covers it.
+List the boundary and failure conditions the functional requirements must handle: missing or unknown data, expired windows, absent permissions, unavailable dependencies, and entities that no longer exist. When `ARCHITECTURE.md` is present, derive a dependency-failure edge case for each boundary it reveals (the dependency is slow, unavailable, or returns nothing). Each edge case should trace to a functional requirement or business rule that covers it.
 
 ## Output
 Write for Product Owners and analysts — plain business language, no code, class names, or technical jargon. Emit one block per capability:
