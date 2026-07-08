@@ -23,7 +23,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 4. **Verify** each rule implies concrete code changes and maps to a responsibility.
 
 ## Acceptance Criteria
-Write 3–6 criteria per story. If more are needed, the story is too broad — split it. Write each rule as one observable behavior:
+Write one criterion per observable behavior:
 - `The system must <behavior> when <condition>.`
 - `If <condition>, the <actor> must <result>.`
 
