@@ -5,12 +5,22 @@ Teams mix requirement types and cause confusion. Quick map:
 | Question | Type |
 | --- | --- |
 | Why are we building this? | Business requirement |
+| What distinct behavior are we scoping? | Capability |
 | What must the system do? | Functional requirement |
 | How well must it work? | Non-functional requirement |
 | What must always be true? | Business rule |
 | What does the user want to achieve? | Stakeholder requirement / user story |
 | What steps happen in the interaction? | Use case |
 | How do we know it is done? | Acceptance criteria |
+
+## Capability
+A bounded unit of behavior that scopes one requirement set. A capability names what the system *does* and the outcome the actor gets — never a screen, widget, or implementation artifact. One distinct capability yields exactly one requirement set (stakeholder requirement + functional requirements + business rules + edge cases); an idea spanning several unrelated behaviors yields one set per capability, never merged.
+
+A **capability title** names the behavior and entity:
+- Reject: *Surface active alerts in the page header* · *Manage tasks on the Monitoring page*
+- Prefer: *Surface the count of active alerts* · *Manage tasks*
+
+Capability is a **scoping unit**, not a requirement type. It exists to prevent requirement sprawl — each set stays focused on one behavior rather than bundling several unrelated behaviors under one title.
 
 ## Business Requirements
 Why the feature exists — the business need, value, or goal. Understandable by business stakeholders; no implementation detail.
@@ -95,6 +105,8 @@ Statements currently believed true; not requirements, but they affect planning. 
 
 ## Full Example — real-time availability in the catalog
 
+**Capability:** *Surface item availability in the catalog*
+
 **Business requirement:** *The business must display current availability to reduce frustration from ordering unavailable products.*
 
 **Stakeholder requirement:** *Customers need to know whether an item is available before adding it to the cart.*
@@ -124,6 +136,7 @@ Statements currently believed true; not requirements, but they affect planning. 
 | Type | Best for | Audience |
 | --- | --- | --- |
 | Business requirement | Why the feature exists | Business, product |
+| Capability | Scoping one bounded behavior | Product, analysts |
 | Stakeholder requirement | What a user needs | Product, analysts, UX |
 | Functional requirement | Exact system behavior | Devs, testers, analysts |
 | Non-functional requirement | Quality attributes | Devs, testers, architects |
