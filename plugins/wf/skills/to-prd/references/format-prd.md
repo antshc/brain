@@ -1,8 +1,3 @@
-## Writing Style
-
-- **Compressed**: compress wording, not meaning.
-- **High-density**: every sentence carries unique information — if a word can be removed without losing meaning, remove it.
-
 ### Problem Statement & Solution sections
 - No technical language; understandable to a non-technical stakeholder.
 
@@ -27,6 +22,9 @@
 ## Template
 
 ```markdown
+
+{Writing style: concise, no-fluff, Terse}
+
 **Target Branch:** `<target-branch>`
 **Jira Ticket:** `<jira-ticket>`
 
@@ -43,6 +41,8 @@ The solution from the user's perspective. No technical language.
 A numbered list of behavior rules following the formats above.
 
 ## Implementation Decisions
+
+{Writing style: concise, no-fluff, Terse, technical tone.}
 
 A list of implementation decisions that were made. This can include:
 
