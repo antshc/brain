@@ -21,7 +21,7 @@ Name entities and behaviors in the project's approved language. `CONTEXT.md` is 
 3. **Analyze input** → split the grounded input into **capabilities** using the grouping rule and five-question decision process in [references/capability-detection.md](references/capability-detection.md), then note each capability's domain/module, actors, inputs, and outputs. *Done when* every capability passes all five questions and no two independently-changing capabilities share a set.
 4. **Grill** → consult the taxonomy in [references/requirement-types.md](references/requirement-types.md); run /grilling to clarify capabilities and requirements — resolving ambiguity and surfacing actors, failure paths, and edge cases. *Done when* no open ambiguity remains before writing.
 5. **Write the stakeholder requirement** → one sentence per capability (see **Stakeholder Requirement**).
-6. **Derive functional requirements** → the `The system must …` statements that make the capability concrete and testable (see **Functional Requirements**).
+6. **Derive functional requirements** → the imperative behavior statements that make the capability concrete and testable (see **Functional Requirements**).
 7. **Capture business rules** → the invariants that must always hold (see **Business Rules**).
 8. **Capture edge cases** → the boundary and failure conditions (see **Edge Cases**).
 9. **Verify** → every requirement passes the **Quality Check**.
@@ -40,7 +40,7 @@ A strong statement encodes:
 Keep it **solution-agnostic**: the sentence names a behavior, never an artifact.
 
 ## Functional Requirements
-Write each as `The system must <behavior> when <condition>.` — specific, testable, and focused on externally visible behavior. When `ARCHITECTURE.md` is present, use its module layout to find the capability's dependencies and surface the **Integration** and **Degraded behavior** requirements — name the behavior at each boundary, never the component that implements it. Cover, at minimum:
+Write each as an imperative `<Behavior> when <condition>.` — start with the behavior verb, omit any `The system must`/`The system shall` prefix, and keep it specific, testable, and focused on externally visible behavior. When `ARCHITECTURE.md` is present, use its module layout to find the capability's dependencies and surface the **Integration** and **Degraded behavior** requirements — name the behavior at each boundary, never the component that implements it. Cover, at minimum:
 - **Capability** — what actions the system performs and what outcomes it produces.
 - **Integration** — external system interactions the capability depends on.
 - **State** — persistence, retention, and state changes.
