@@ -20,7 +20,7 @@ A deep module (as opposed to a shallow module) is one which encapsulates a lot o
 
 Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
-3. Write the PRD using the template and writing style defined in `references/format-prd.md`.
+3. Write the PRD using the template and writing style defined in `references/output-format.md`.
 
 4. Save to GitHub — see _Create GitHub Issue section_ below.
 
