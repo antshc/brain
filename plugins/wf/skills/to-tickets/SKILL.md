@@ -1,6 +1,6 @@
 ---
-name: to-issues
-description: Breaks a spec into tracer-bullet GitHub issues. Accepts an optional plan or plan.md to guide slicing.
+name: to-tickets
+description: Breaks a spec into tracer-bullet GitHub tickets. Accepts an optional plan or plan.md to guide slicing.
 argument-hint: "<milestone-title> [<implementation details>, <plan.md>]"
 ---
 
