@@ -130,35 +130,32 @@ Distill the agent's SUMMARY into two outputs. Use both in step 6 (commit body) a
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-**Behavior Rules** — observable external behavior statements:
-- No implementation details — rules describe externally visible behavior, not internals.
+**Functional Requirements** — observable external behavior statements:
+- No implementation details — requirements describe externally visible behavior, not internals.
 - Plain words only — no backticks, type names, or code formatting.
-- Single-responsibility — one scenario or transition per rule.
-- Rule format (pick one per bullet):
-  1. `<triggering condition>` → `<resulting behavior>`
-  2. The system MUST/SHOULD `<behavior>` when `<condition>`
-  3. `<subject>` `<behavior>`
+- Single-responsibility — one scenario or transition per requirement.
+- Requirement format: `- <Behavior> when <condition>.`
 
 ## 6. Commit
 
 Build the commit from the agent's report fields and the distilled outputs from step 5:
 - **SUBJECT** → Use **dcode:** prefix, than one line commit summary
-- **SUMMARY** → commit body (two labelled blocks: Behavior Rules, then Implementation Decisions)
+- **SUMMARY** → commit body (two labelled blocks: Functional Requirements, then Implementation Decisions)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
 ## 7. Update PRD
 
-Using the Implementation Decisions and Behavior Rules from step 5, update both sections of the PRD issue.
+Using the Implementation Decisions and Functional Requirements from step 5, update both sections of the PRD issue.
 
 1. Fetch the open PRD issue:
    ```bash
    gh issue list --repo $repo --milestone "<milestone-title>" --label "prd" --state open --json number,body --jq '.[0]'
    ```
 2. If no PRD issue is found, skip this step and continue.
-3. For each section — `## Implementation Decisions` and `## Behavior Rules` — apply the same merge logic:
-   - Replace any entry that conflicts with or is superseded by a new decision/rule.
-   - Append decisions/rules that are additive.
+3. For each section — `## Implementation Decisions` and `## Functional Requirements` — apply the same merge logic:
+   - Replace any entry that conflicts with or is superseded by a new decision/requirement.
+   - Append decisions/requirements that are additive.
 4. Write the updated body back:
    ```bash
    gh issue edit <prd-number> --body "<updated-body>"
