@@ -14,7 +14,7 @@ Create missing GitHub issue labels for AFK/HITL task workflow.
 | Name | Color | Description |
 |---|---:|---|
 | `hitl` | `fbca04` | Requires human implementation |
-| `prd` | `5319e7` | PRD task with implementation context |
+| `spec` | `5319e7` | Spec task with implementation context |
 
 ## Rules
 
@@ -55,7 +55,7 @@ create_label_if_missing() {
 
 create_label_if_missing "ready"   "0e8a16" "Ready for AFK implementation"
 create_label_if_missing "hitl"    "fbca04" "Requires human implementation"
-create_label_if_missing "prd"     "5319e7" "PRD task with implementation context"
+create_label_if_missing "spec"    "5319e7" "Spec task with implementation context"
 ```
 
 ## Expected output
@@ -63,7 +63,7 @@ create_label_if_missing "prd"     "5319e7" "PRD task with implementation context
 ```text
 exists:  ready
 created: hitl
-created: prd
+created: spec
 ```
 
 ## Done

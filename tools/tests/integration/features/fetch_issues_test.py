@@ -92,7 +92,7 @@ class TestFetchIssues:
     def test_returns_empty_list_when_no_actionable_issues(self):
         # Scenario: Handler returns empty list when no actionable issues exist
         issues_raw = [
-            make_raw_issue(20, ["prd"]),
+            make_raw_issue(20, ["spec"]),
             make_raw_issue(21, ["hitl"]),
         ]
         owner, repo, vcs, _ = setup_handler(issues_raw)
@@ -101,11 +101,11 @@ class TestFetchIssues:
 
         assert result == []
 
-    def test_includes_blocked_and_excludes_prd_and_hitl_issues(self):
-        # Scenario: Handler includes blocked issues and excludes prd and hitl issues
+    def test_includes_blocked_and_excludes_spec_and_hitl_issues(self):
+        # Scenario: Handler includes blocked issues and excludes spec and hitl issues
         issues_raw = [
             make_raw_issue(30, ["blocked"]),
-            make_raw_issue(31, ["prd"]),
+            make_raw_issue(31, ["spec"]),
             make_raw_issue(32, ["enhancement", "hitl"]),
             make_raw_issue(33, []),
         ]

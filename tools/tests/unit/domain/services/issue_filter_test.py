@@ -28,7 +28,7 @@ class TestIssueFilter:
         issues = [
             _make_issue(1, []),
             _make_issue(2, ["blocked"]),
-            _make_issue(3, ["prd"]),
+            _make_issue(3, ["spec"]),
             _make_issue(4, ["bug", "hitl"]),
         ]
         result = IssueFilter().get_actionable_issues(issues)
@@ -37,7 +37,7 @@ class TestIssueFilter:
     def test_all_issues_are_non_actionable_empty_list_returned(self):
         # Scenario: All issues are non-actionable — empty list returned
         issues = [
-            _make_issue(1, ["prd"]),
+            _make_issue(1, ["spec"]),
             _make_issue(2, ["hitl"]),
         ]
         result = IssueFilter().get_actionable_issues(issues)

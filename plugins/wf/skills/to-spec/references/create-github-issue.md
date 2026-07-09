@@ -17,18 +17,18 @@ $REPO = $(git remote get-url origin) `
 
 1. Create the issue:
    ```bash
-   gh issue create --repo "$REPO" --label prd --title "<feature-id>: <prd-title>"
+   gh issue create --repo "$REPO" --label spec --title "<feature-id>: <spec-title>"
    ```
 
 2. Create a milestone and assign the issue to it:
    ```bash
    gh api repos/$REPO/milestones \
      --method POST \
-     --field title="<feature-id>: <prd-title>" \
+     --field title="<feature-id>: <spec-title>" \
      --field description="**Feature ID:** \`<feature-id>\`\n**Target Branch:** \`<target-branch>\`"
-   gh issue edit <number> --repo "$REPO" --milestone "<feature-id>: <prd-title>"
+   gh issue edit <number> --repo "$REPO" --milestone "<feature-id>: <spec-title>"
    ```
 
 ## Troubleshooting
 
-**Label not found** (`prd` label missing): run `setup-gh-labels` to create the required labels, then retry.
+**Label not found** (`spec` label missing): run `setup-gh-labels` to create the required labels, then retry.

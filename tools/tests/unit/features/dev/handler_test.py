@@ -52,7 +52,7 @@ class TestDevMilestoneLoop:
         vcs = MagicMock(spec=VCSClient)
         vcs.list_milestones.return_value = [milestone]
         vcs.fetch_issues.return_value = [
-            Issue(number=14, title="Refactor", body="", url="https://github.com/owner/repo/issues/14", labels=["prd"])
+            Issue(number=14, title="Refactor", body="", url="https://github.com/owner/repo/issues/14", labels=["spec"])
         ]
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)
@@ -81,7 +81,7 @@ class TestDevMilestoneLoop:
         vcs = MagicMock(spec=VCSClient)
         vcs.list_milestones.return_value = [milestone]
         vcs.fetch_issues.return_value = [
-            Issue(number=14, title="Refactor", body="", url="https://github.com/owner/repo/issues/14", labels=["prd"])
+            Issue(number=14, title="Refactor", body="", url="https://github.com/owner/repo/issues/14", labels=["spec"])
         ]
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)

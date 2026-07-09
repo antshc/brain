@@ -6,7 +6,7 @@ argument-hint: '<milestone-title>'
 
 # WORKTREE SETUP
 
-Before entering the orchestrator loop, resolve the PRD and set up the worktree.
+Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 1. Resolve milestone
 
@@ -65,7 +65,7 @@ Run the following commands from the `WORKTREE_PATH` and print their output so it
 echo "=== COMMITS ==="; 
 echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
 echo ""
-echo "=== TASKS ==="; echo "$(gh issue list --repo $repo --state open --milestone "<milestone-title>" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["prd"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
+echo "=== TASKS ==="; echo "$(gh issue list --repo $repo --state open --milestone "<milestone-title>" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["spec"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
 ```
 
 Parse the `TASKS` json array. Review `COMMITS` to understand what work has already been done.
@@ -73,9 +73,9 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 ## 2. Exit conditions
 
 - If no tasks are available, **exit**.
-- If all tasks are complete, **exit**. The `prd`-labeled issue is owned by the user — do not close it.
+- If all tasks are complete, **exit**. The `spec`-labeled issue is owned by the user — do not close it.
 
-> `prd`, `hitl`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
+> `spec`, `hitl`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
 
 ## 3. Select next task
 
@@ -123,7 +123,7 @@ The agent reads convention docs, `VERIFY.md`, and `agent/decisions.jsonl` from `
 
 ## 5. Distill
 
-Distill the agent's SUMMARY into two outputs. Use both in step 6 (commit body) and step 7 (PRD update).
+Distill the agent's SUMMARY into two outputs. Use both in step 6 (commit body) and step 7 (spec update).
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
@@ -144,21 +144,21 @@ Build the commit from the agent's report fields and the distilled outputs from s
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
-## 7. Update PRD
+## 7. Update Spec
 
-Using the Implementation Decisions and Functional Requirements from step 5, update both sections of the PRD issue.
+Using the Implementation Decisions and Functional Requirements from step 5, update both sections of the spec issue.
 
-1. Fetch the open PRD issue:
+1. Fetch the open spec issue:
    ```bash
-   gh issue list --repo $repo --milestone "<milestone-title>" --label "prd" --state open --json number,body --jq '.[0]'
+   gh issue list --repo $repo --milestone "<milestone-title>" --label "spec" --state open --json number,body --jq '.[0]'
    ```
-2. If no PRD issue is found, skip this step and continue.
+2. If no spec issue is found, skip this step and continue.
 3. For each section — `## Implementation Decisions` and `## Functional Requirements` — apply the same merge logic:
    - Replace any entry that conflicts with or is superseded by a new decision/requirement.
    - Append decisions/requirements that are additive.
 4. Write the updated body back:
    ```bash
-   gh issue edit <prd-number> --body "<updated-body>"
+   gh issue edit <spec-number> --body "<updated-body>"
    ```
 
 ## 8. Handle result
@@ -227,7 +227,7 @@ existing_pr=$(gh pr list \
 
 ```bash
 gh pr create --draft \
-  --title "[<feature-id>]: <prd-title>" \
+  --title "[<feature-id>]: <spec-title>" \
   --body "**Feature ID:** \`<feature-id>\`" \
   --base "<target-branch>" \
   --head "$branch"
@@ -242,4 +242,4 @@ If the PR creation fails, **exit** and report the error.
 - IF NO TASKS ARE AVAILABLE, EXIT.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
 - HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 9), always from `$HARNESS_ROOT` (never the worktree), and always pushes. Skip only when nothing is staged.
-- NEVER IMPLEMENT `prd`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.
+- NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.

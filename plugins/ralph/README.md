@@ -20,7 +20,7 @@ Implement the following GitHub issue.
 <last 5 commits for context>
 ```
 
-**Via `/dev` skill** (fully automated — fetches PRD, picks tasks, loops):
+**Via `/dev` skill** (fully automated — fetches spec, picks tasks, loops):
 
 ```
 /dev
