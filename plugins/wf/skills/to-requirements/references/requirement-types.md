@@ -33,11 +33,11 @@ What a user, admin, or other stakeholder needs to achieve — more user-oriented
 - *Customers need to see accurate delivery costs before confirming an order.*
 
 ## Functional Requirements
-What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail.
-- *The system must retain deleted files for 30 days before permanent deletion.*
-- *The system must allow administrators to restore a deleted file to its original location.*
-- *The system must prevent standard users from restoring files unless authorized.*
-- *The system must record an audit event when a file is restored.*
+What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
+- *Retain deleted files for 30 days before permanent deletion.*
+- *Allow administrators to restore a deleted file to its original location.*
+- *Prevent standard users from restoring files unless authorized.*
+- *Record an audit event when a file is restored.*
 - Bad (design decision): *The backend should use a soft-delete flag.*
 
 ## Non-Functional Requirements

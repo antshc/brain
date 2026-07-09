@@ -19,7 +19,7 @@ Write for Product Owners and analysts — plain business language, no code, clas
 The <actor> needs to <behavior> <entity>, so <value>.
 
 ### Functional Requirements
-- The system must <behavior> when <condition>.
+- <Behavior> when <condition>.
 - ...
 
 ### Business Rules
