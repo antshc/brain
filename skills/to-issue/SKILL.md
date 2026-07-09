@@ -5,7 +5,7 @@ description: Publish the session plan as a GitHub issue. Use when the user wants
 
 # Session Plan to GitHub Issue
 
-Publish the session `plan.md` from memory as a GitHub issue formatted to match the `to-issues` template.
+Publish the session `plan.md` from memory as a GitHub issue formatted to match the `to-tickets` template.
 
 ## Process
 

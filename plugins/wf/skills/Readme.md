@@ -2,7 +2,7 @@
 
 ## Ad Hoc: Use an external GitHub repository as a board remote
 
-Some skills (e.g. `to-issues`, `to-spec`) need to target a GitHub repo that is not the current `origin`.
+Some skills (e.g. `to-tickets`, `to-spec`) need to target a GitHub repo that is not the current `origin`.
 The pattern below registers it temporarily as a `board` remote, extracts the `owner/repo` slug
 for use in API calls, then removes the remote when done.
 
