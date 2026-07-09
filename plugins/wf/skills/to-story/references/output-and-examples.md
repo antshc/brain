@@ -22,7 +22,7 @@ Each criterion states one observable outcome bound to a condition (`<outcome> wh
 - If <failure condition>, <what the user/operator sees>.
 
 **Functional Requirements:**
-- The system must <behavior> when <condition>.
+- <Behavior> when <condition>.
 - ...
 
 
@@ -58,10 +58,10 @@ Shoppers need stock for items in their cart held while they complete checkout, s
 - Reserved stock is released and returned to availability when checkout is abandoned or the reservation expires.
 
 **Functional Requirements:**
-- The system must reserve stock for each cart item when the shopper begins checkout.
-- The system must block checkout and identify the affected items when requested quantity exceeds available stock.
-- The system must leave the cart unchanged when a reservation cannot be placed.
-- The system must release reserved stock when checkout is abandoned or the reservation expires.
+- Reserve stock for each cart item when the shopper begins checkout.
+- Block checkout and identify the affected items when requested quantity exceeds available stock.
+- Leave the cart unchanged when a reservation cannot be placed.
+- Release reserved stock when checkout is abandoned or the reservation expires.
 ```
 
 ## Example — lifting a solution-leaking requirement
@@ -78,17 +78,17 @@ Keep shoppers aware of their cart contents while they browse
 Shoppers need to stay aware of the items in their cart during normal browsing, so they can proceed to purchase without navigating away to check.
 
 ### Acceptance Criteria
-- The system signals that the cart contains items whenever at least one item is in the shopper's cart.
-- The system stops signaling cart contents when the cart is empty.
+- A cart-contents signal is shown whenever at least one item is in the shopper's cart.
+- The cart-contents signal clears when the cart is empty.
 - The count of cart items stays current for the shopper as items are added or removed, without a manual refresh.
 - The shopper can reach the full cart contents in a single step from the notification.
 - If cart information cannot be retrieved, the shopper is not shown an incorrect cart state and the rest of their shopping remains usable.
 
 **Functional Requirements:**
-- The system must signal that the cart contains items whenever at least one item is in the shopper's cart.
-- The system must keep the count of cart items current as items are added or removed.
-- The system must let the shopper reach the full cart contents in a single step from the notification.
-- The system must avoid showing an incorrect cart state when cart information cannot be retrieved.
+- Signal that the cart contains items whenever at least one item is in the shopper's cart.
+- Keep the count of cart items current as items are added or removed.
+- Let the shopper reach the full cart contents in a single step from the notification.
+- Avoid showing an incorrect cart state when cart information cannot be retrieved.
 ```
 
 ## Anti-Patterns (reject)
