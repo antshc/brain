@@ -1,14 +1,11 @@
 ### Problem Statement & Solution sections
 - No technical language; understandable to a non-technical stakeholder.
 
-### Behavior Rules section
-- No implementation details: rules describe observable external behavior, not internal details or class structure.
+### Functional Requirements section
+- No implementation details: requirements describe observable external behavior, not internal details or class structure.
 - Plain words only: no backticks, code formatting, or type names; refer to types and methods by descriptive role (e.g., "the break duration", "a circuit-open error", "the pipeline execute").
-- Single-responsibility: each rule covers exactly one scenario or transition; do not combine two independent behaviors in one bullet.
-- Rule format: use one of the three formats below; one cause-effect pair per rule.
-  1. `<triggering condition>` → `<resulting behavior>`
-  2. The system MUST/SHOULD `<behavior>` when `<condition>`
-  3. `<subject>` `<behavior>`
+- Single-responsibility: each requirement covers exactly one scenario or transition; do not combine two independent behaviors in one bullet.
+- Requirement format: `- <Behavior> when <condition>.`; one behavior-condition pair per requirement.
 - The list must be extensive and cover all aspects of the feature.
 
 ### Implementation Decisions section
@@ -36,9 +33,9 @@ The problem from the user's perspective. No technical language.
 
 The solution from the user's perspective. No technical language.
 
-## Behavior Rules
+## Functional Requirements
 
-A numbered list of behavior rules following the formats above.
+A bulleted list of functional requirements following the format above.
 
 ## Implementation Decisions
 

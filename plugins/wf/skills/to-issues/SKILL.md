@@ -76,7 +76,7 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Title**: short descriptive name
 - **Type**: HITL / AFK
 - **Blocked by**: which other slices (if any) must complete first
-- **Behavior Rules covered**: which behavior rules from the PRD this addresses
+- **Functional Requirements covered**: which functional requirements from the PRD this addresses
 
 Ask the user:
 
@@ -128,12 +128,12 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 
 Or "None - can start immediately" if no blockers.
 
-## Behavior Rules addressed
+## Functional Requirements addressed
 
 Reference by number from the parent PRD:
 
-- Behavior rule 3
-- Behavior rule 7
+- <3 Functional requirement name>
+- ...
 
 ## Implementation Decisions
 
