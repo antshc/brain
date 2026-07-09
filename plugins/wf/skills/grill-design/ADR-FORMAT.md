@@ -36,7 +36,7 @@ Scan `docs/adr/` for the highest existing number and increment by one.
 ## Writing style
 
 1. Prioritize directness and facts: keep only sentences that add actionable value; cut any that just take up space.
-2. Remove bloat: filler words, redundant explanations, verbose phrasing. If the text already has no removable bloat, leave it unchanged.
+2. Concise, no-fluff, Terse, technical tone.
 
 ## When to offer an ADR
 

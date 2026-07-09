@@ -1,4 +1,5 @@
-# Brainstorm summary Format
+# Brainstorm ADR Format
+{Writing style: concise, no-fluff, Terse, technical tone.}
 
 ## Template
 
@@ -7,14 +8,18 @@
 
 {1-3 sentences: what's the context, what did we decide, and why.}
 
-## Sections
+```
+
+That's it. A brainstorm ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
+
+## Optional sections
+
+Only include these when they add genuine value. Most ADRs won't need them.
 
 - **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited
-- **Date** YYYY-MM-DD
-- **Considered Options**
+- **Considered Options** — only when the rejected alternatives are worth remembering
 - **Consequences** — only when non-obvious downstream effects need to be called out
 
-```
 
 ### What qualifies
 
