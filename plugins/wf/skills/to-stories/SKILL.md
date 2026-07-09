@@ -1,6 +1,6 @@
 ---
 description: Package a **single requirement** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** — broken down by capability, each carrying a capability reference, stakeholder requirement, functional-requirements list, and acceptance criteria — that map to a production codebase. Use when the user has requirements and wants stories, backlog-ready items, or acceptance criteria.
-name: to-story
+name: to-stories
 ---
 
 Package a **single requirement** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories**, broken down **by capability**. Each story carries four blocks: a **capability reference**, the **stakeholder requirement**, the **functional-requirements list** it covers, and the **acceptance criteria**.
