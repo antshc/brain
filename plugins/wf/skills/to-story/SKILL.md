@@ -48,7 +48,7 @@ Criteria obey the solution-agnostic rule: state an observable outcome, not the c
 - Each rule implies clear code changes. If not, rewrite.
 
 ## Output & Examples
-Write for Product Owners and QA — plain business language, no code, class names, or technical jargon. Each criterion is one clear, testable statement of expected behavior. For the exact output format (single and multiple stories), worked examples, and anti-patterns to reject, see [references/output-and-examples.md](references/output-and-examples.md).
+Write for Product Owners and QA — plain business language, no code, class names, or technical jargon. Each criterion is one clear, testable statement of expected behavior. For the exact output format (single and multiple stories) see [references/output-format.md](references/output-format.md). For worked examples and anti-patterns to reject, see [references/examples.md](references/examples.md).
 
 ## Golden Rule
 A good criterion is written in plain business language a PO can approve and a QA can verify by testing — clear, specific, and unambiguous about the expected outcome. If a QA couldn't confirm it passed or failed, rewrite.
