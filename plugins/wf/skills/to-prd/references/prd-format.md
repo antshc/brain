@@ -8,9 +8,6 @@
 - Requirement format: `- <Behavior> when <condition>.`; one behavior-condition pair per requirement.
 - The list must be extensive and cover all aspects of the feature.
 
-### Implementation Decisions section
-- Preserve integration constraints and assumptions required for implementation.
-- No specific file paths or code snippets (they become outdated quickly).
 
 ### Testing Decisions section
 - Describe what makes a good test (only test external behavior, not implementation details).
@@ -51,6 +48,8 @@ A list of implementation decisions that were made. This can include:
 - API contracts
 - Specific interactions
 - Configuration options that will be added/modified
+
+No specific file paths or code snippets — they become outdated quickly. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts.
 
 ## Testing Decisions
 
