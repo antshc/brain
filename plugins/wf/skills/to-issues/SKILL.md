@@ -1,6 +1,6 @@
 ---
 name: to-issues
-description: Breaks a PRD into tracer-bullet GitHub issues. Accepts an optional plan or plan.md to guide slicing.
+description: Breaks a spec into tracer-bullet GitHub issues. Accepts an optional plan or plan.md to guide slicing.
 argument-hint: "<milestone-title> [<implementation details>, <plan.md>]"
 ---
 
@@ -29,19 +29,19 @@ $REPO = $(git remote get-url origin) `
   -replace '\.git$',''
 ```
 
-Find the PRD issue by milestone and label:
+Find the spec issue by milestone and label:
 ```bash
-gh issue list --repo "$REPO" --milestone "<milestone-title>" --label "prd" --json number,title,body,comments --limit 1
+gh issue list --repo "$REPO" --milestone "<milestone-title>" --label "spec" --json number,title,body,comments --limit 1
 ```
 If no issue is found, ask the user for the GitHub issue number and fetch it:
 ```bash
 gh issue view <number> --repo "$REPO" --json number,title,body,comments
 ```
-Use the issue title, body, and comments as the PRD content.
+Use the issue title, body, and comments as the spec content.
 
 **If `<milestone-title>` and (`<implementation details>` or `<plan.md>`) is provided:**
 
-Use the implementation details as the PRD content instead of a GitHub issue:
+Use the implementation details as the spec content instead of a GitHub issue:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
 - **Inline text** — use directly.
 
@@ -76,7 +76,7 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Title**: short descriptive name
 - **Type**: HITL / AFK
 - **Blocked by**: which other slices (if any) must complete first
-- **Functional Requirements covered**: which functional requirements from the PRD this addresses
+- **Functional Requirements covered**: which functional requirements from the spec this addresses
 
 Ask the user:
 
@@ -93,15 +93,15 @@ For each approved slice, create a GitHub issue using `gh issue create --repo "$R
 
 Use `--label "hitl"` for all issues `HITL` or `AFK` to indicate that user review is required.
 
-The `--milestone "<milestone-title>"` from the PRD is required for each command, if missing ask user. 
+The `--milestone "<milestone-title>"` from the spec is required for each command, if missing ask user. 
 Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
 <issue-template>
-## Parent PRD
+## Parent Spec
 
-#<prd-issue-number>
+#<spec-issue-number>
 
 ## What to build
 
@@ -111,9 +111,9 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 
 ## Acceptance criteria
 <acceptance-criteria-rule>
-- Written for a manual QA tester. Each criterion must be a single, self-contained check the tester can perform and judge as pass or fail without reading code or the PRD.
+- Written for a manual QA tester. Each criterion must be a single, self-contained check the tester can perform and judge as pass or fail without reading code or the spec.
 - Phrase as an observable action and its expected result (e.g. "When <action>, then <observable outcome>").
-- Use the domain language of the PRD or the CONTEXT.md. Never reference file paths, class names,variable names, or other implementation details.
+- Use the domain language of the spec or the CONTEXT.md. Never reference file paths, class names,variable names, or other implementation details.
 - Avoid vague or unverifiable words such as "works", "correctly", "properly", "as expected". State the exact expected outcome instead.
 - If a relevant error condition exists, add a criterion for the expected behavior during that failure (e.g. the message or state the tester should see).
 </acceptance-criteria-rule>
@@ -130,7 +130,7 @@ Or "None - can start immediately" if no blockers.
 
 ## Functional Requirements addressed
 
-Reference by number from the parent PRD:
+Reference by number from the parent spec:
 
 - <3 Functional requirement name>
 - ...
@@ -156,4 +156,4 @@ Do NOT close or modify the parent issue.
 
 ## Troubleshooting
 
-**Label not found** (`hitl` or `prd` label missing): run `setup-gh-labels` to create the required labels, then retry.
+**Label not found** (`hitl` or `spec` label missing): run `setup-gh-labels` to create the required labels, then retry.

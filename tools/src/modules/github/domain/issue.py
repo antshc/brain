@@ -13,7 +13,7 @@ class Issue:
     labels: list[str] = field(default_factory=list)
     comments: list[IssueComment] = field(default_factory=list)
 
-    _BLOCKING_LABELS: ClassVar[frozenset[str]] = frozenset({"hitl", "prd"})
+    _BLOCKING_LABELS: ClassVar[frozenset[str]] = frozenset({"hitl", "spec"})
 
     @property
     def is_actionable(self) -> bool:

@@ -38,14 +38,14 @@ class TestIssueActionability:
         issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["hitl"])
         assert issue.is_actionable is False
 
-    def test_issue_with_prd_label_is_not_actionable(self):
-        # Scenario: Issue with prd label is not actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["prd"])
+    def test_issue_with_spec_label_is_not_actionable(self):
+        # Scenario: Issue with spec label is not actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["spec"])
         assert issue.is_actionable is False
 
-    def test_issue_with_ready_and_prd_labels_is_not_actionable(self):
-        # Scenario: Issue with ready and prd labels is not actionable
-        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "prd"])
+    def test_issue_with_ready_and_spec_labels_is_not_actionable(self):
+        # Scenario: Issue with ready and spec labels is not actionable
+        issue = Issue(number=12, title="Issue", body="", url="https://example.com/issues/12", labels=["ready", "spec"])
         assert issue.is_actionable is False
 
     def test_issue_with_blocked_and_hitl_labels_is_not_actionable(self):
