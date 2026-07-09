@@ -1,6 +1,6 @@
 # Requirement Output Examples
 
-Worked examples of a complete requirement set produced by /to-requirements. Written in plain business language, solution-agnostic, and ready to hand to /to-story.
+Worked examples of a complete requirement set produced by /to-requirements. Written in plain business language, solution-agnostic, and ready to hand to /to-stories.
 
 ## Example — deleted file recovery
 
