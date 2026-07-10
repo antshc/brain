@@ -30,6 +30,11 @@
             "description": "Atlassian workflow skills."
         },
         {
+            "name": "atlm",
+            "source": "./plugins/atlm",
+            "description": "Atlassian MCP workflow skills."
+        },
+        {
             "name": "az",
             "source": "./plugins/az",
             "description": "Azure CLI workflow skills."
