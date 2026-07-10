@@ -156,4 +156,4 @@ Do NOT close or modify the parent issue.
 
 ## Troubleshooting
 
-**Label not found** (`hitl` or `spec` label missing): run `setup-gh-labels` to create the required labels, then retry.
+**Label not found** (`hitl` or `spec` label missing): run `/manage-artifacts` action **Setup labels** to create the required labels, then retry. If the `/manage-artifacts` skill is not available, fall back to saving the tickets to `docs/tickets/` as markdown.

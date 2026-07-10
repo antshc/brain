@@ -1,5 +1,5 @@
 ---
-name: manage-ticket-tracker
+name: manage-artifacts
 description: Configure this repo for the workflow (wf:) skills — set up its ticket tracker, triage label vocabulary. Run once before first use of the other wf skills.
 disable-model-invocation: true
 ---
