@@ -28,7 +28,7 @@ Use a user-provided `.template.md` file when available. Otherwise infer the stru
 
 1. Build the description using the supplied template when available.
 2. Preserve the source wording; restructure only into template sections.
-3. If the description contains Markdown that requires ADF, follow `../markdown-to-adf/SKILL.md` and pass the resulting ADF document with `contentFormat: "adf"`.
+3. If the description contains Markdown that requires ADF, invoke the `markdown-to-adf` skill with the complete description. Use the returned ADF document as the description and set `contentFormat: "adf"`.
 4. Resolve every item in **Blocked by** before creating the current issue:
    - Search by key or summary.
    - Reuse an existing issue without updating it.
