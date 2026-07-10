@@ -7,6 +7,24 @@ description: Create a Jira ticket (Story, Task, Bug, or Epic child) from user-pr
 
 Turn user-provided context into a Jira issue via the Atlassian MCP.
 
+## Atlassian Rovo MCP
+
+When connected to `atlassian-rovo-mcp`, read settings from `.agent.env` in the repo root to avoid discovery calls and reduce token usage.
+
+- If `.agent.env` does not exist, create it in the repo root with the keys below, then ask the user to fill in their values before continuing.
+- Load these values and reuse them for every Atlassian MCP call:
+  - **MUST** use Jira project key from `ATLASSIAN_JIRA_PROJECT_KEY` (e.g. `YOURPROJ`).
+  - **MUST** use Confluence spaceId from `ATLASSIAN_CONFLUENCE_SPACE_ID` (e.g. `123456`).
+  - **MUST** use cloudId from `ATLASSIAN_CLOUD_ID` (e.g. `https://yoursite.atlassian.net`) — do NOT call `getAccessibleAtlassianResources`.
+  - **MUST** use `maxResults: 10` or `limit: 10` for ALL Jira JQL and Confluence CQL search operations.
+
+`.agent.env` template:
+```env
+ATLASSIAN_JIRA_PROJECT_KEY=YOURPROJ
+ATLASSIAN_CONFLUENCE_SPACE_ID=123456
+ATLASSIAN_CLOUD_ID=https://yoursite.atlassian.net
+```
+
 ## Inputs (infer from context; ask only if missing)
 - **projectKey** — e.g. `PROJ`. Required.
 - **issueType** — Story | Task | Bug | Epic. Default `Story`.
@@ -15,7 +33,7 @@ Turn user-provided context into a Jira issue via the Atlassian MCP.
 - **parent** — epic key (e.g. `PROJ-1234`) when the issue belongs under an epic.
 
 ## Steps
-1. Resolve `cloudId`: try the site host (`<site>.atlassian.net`) first; else call `getAccessibleAtlassianResources`.
+1. Resolve `cloudId`: when connected to `atlassian-rovo-mcp`, use `ATLASSIAN_CLOUD_ID` from `.agent.env` (see **Atlassian Rovo MCP**) and skip discovery; otherwise try the site host (`<site>.atlassian.net`) first, else call `getAccessibleAtlassianResources`.
 2. Build the description from the **Output template** below.
 3. If the story has a **Blocked by** section, create those blocking stories first (recurse), then create this one.
 4. Create with `createJiraIssue` — pass `cloudId`, `projectKey`, `issueTypeName`, `summary`, `description`, and `parent` (epic key) when given.
