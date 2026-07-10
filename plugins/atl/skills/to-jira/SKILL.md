@@ -12,16 +12,20 @@ Turn user-provided context into a Jira issue via the Atlassian MCP.
 When connected to `atlassian-rovo-mcp`, read settings from `.agent.env` in the repo root to avoid discovery calls and reduce token usage.
 
 - If `.agent.env` does not exist, create it in the repo root with the keys below, then ask the user to fill in their values before continuing.
+- `ATLASSIAN_JIRA_PROJECT_KEYS` and `ATLASSIAN_CONFLUENCE_SPACE_IDS` are **comma-separated lists** — parse them into arrays (trim whitespace, ignore empty entries).
 - Load these values and reuse them for every Atlassian MCP call:
-  - **MUST** use Jira project key from `ATLASSIAN_JIRA_PROJECT_KEY` (e.g. `YOURPROJ`).
-  - **MUST** use Confluence spaceId from `ATLASSIAN_CONFLUENCE_SPACE_ID` (e.g. `123456`).
+  - **MUST** use a Jira project key from `ATLASSIAN_JIRA_PROJECT_KEYS` (e.g. `YOURPROJ,OTHERPROJ`). If the list has one entry, use it; if it has more, pick the one matching the user's context or ask which to use.
+  - **MUST** use a Confluence spaceId from `ATLASSIAN_CONFLUENCE_SPACE_IDS` (e.g. `123456,789012`). If the list has one entry, use it; if it has more, pick the one matching the user's context or ask which to use.
   - **MUST** use cloudId from `ATLASSIAN_CLOUD_ID` (e.g. `https://yoursite.atlassian.net`) — do NOT call `getAccessibleAtlassianResources`.
   - **MUST** use `maxResults: 10` or `limit: 10` for ALL Jira JQL and Confluence CQL search operations.
 
 `.agent.env` template:
 ```env
-ATLASSIAN_JIRA_PROJECT_KEY=YOURPROJ
-ATLASSIAN_CONFLUENCE_SPACE_ID=123456
+# Comma-separated list of Jira project keys
+ATLASSIAN_JIRA_PROJECT_KEYS=YOURPROJ,OTHERPROJ
+# Comma-separated list of Confluence space IDs
+ATLASSIAN_CONFLUENCE_SPACE_IDS=123456,789012
+# Atlassian site URL used as cloudId
 ATLASSIAN_CLOUD_ID=https://yoursite.atlassian.net
 ```
 
