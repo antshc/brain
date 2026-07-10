@@ -1,11 +1,11 @@
 ---
-name: manage-wf
+name: manage-ticket-tracker
 description: Configure this repo for the workflow (wf:) skills — set up its ticket tracker, triage label vocabulary. Run once before first use of the other wf skills.
 disable-model-invocation: true
 ---
 # Actions
 
-## Setup ticket tracker labels
+## Setup labels
 
 Create missing GitHub issue labels for AFK/HITL task workflow.
 
@@ -33,7 +33,7 @@ Run the `scripts/create-labels.sh` script to create any missing labels.
 
 ### Troubleshooting
 
-**Label not found** (`spec` label missing): run `Setup ticket tracker labels` to create the required labels, then retry.
+**Label not found** (`spec` label missing): run `Setup labels` to create the required labels, then retry.
 
 # Ticket tracker: GitHub
 
