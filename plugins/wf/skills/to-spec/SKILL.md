@@ -1,24 +1,92 @@
 ---
 name: to-spec
-description: Create a spec from codebase context and submit as a GitHub issue. Use when user wants to write a spec or plan a new feature.
-argument-hint: '<feature description>'
+description: Turn the current conversation into a spec and publish it to the project ticket tracker — no interview, just synthesis of what you've already discussed.
+argument-hint: "What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"
 disable-model-invocation: true
 ---
 
-Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_
+This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
 
-You may skip steps if you don't consider them necessary.
+The ticket tracker and triage label vocabulary should have been provided to you — run `/manage-wf` action **Setup ticket tracker labels** if not.
 
-1. Explore the repo to understand the current state of the codebase, if you haven't already. If `grill-design` ran, use the project's domain glossary vocabulary throughout the spec and respect any ADRs, SDRs in the area you're touching.
+## Process
 
-2. Sketch out the major modules you will need to build or modify to complete the implementation. Actively look for opportunities to extract deep modules that can be tested in isolation.
+1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
-A deep module (as opposed to a shallow module) is one which encapsulates a lot of functionality in a simple, testable interface which rarely changes.
+2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
+Check with the user that these seams match their expectations.
 
-3. Write the spec using the template and writing style defined in `references/spec-format.md`.
+3. Write the spec using the template below, then publish it to the project ticket tracker by running `/manage-wf` action **Publish spec**. Apply the `spec` triage label - no need for additional triage.
 
-4. Save to GitHub — see `references/create-github-issue.md`.
+Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
-5. Report the spec location, milestone title, and URLs to the user.
+<spec-template>
+{Writing style: concise, no-fluff, Terse}
+
+**Target Branch:** `<target-branch>`
+**Feature Id:** `<feature-id>`
+
+## Problem Statement
+
+{Writing style: Non-technical}
+
+The problem that the user is facing, from the user's perspective.
+
+## Solution
+
+{Writing style: Non-technical}
+
+The solution to the problem, from the user's perspective.
+
+## Functional Requirements
+{Writing style: Non-technical}
+
+What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
+
+A LONG, numbered list of functional requirements. Each functional requirement should be in the format of:
+
+1. <Behavior> when <condition>.
+
+<functional-requirement-example>
+1. *Retain deleted files for 30 days before permanent deletion.*
+2. *Allow administrators to restore a deleted file to its original location.*
+</functional-requirement-example>
+
+This list of functional requirements should be extremely extensive and cover all aspects of the feature.
+
+## Implementation Decisions
+
+{Writing style: technical tone.}
+
+A list of implementation decisions that were made. This can include:
+
+- The modules that will be built/modified
+- The interfaces of those modules that will be modified
+- Technical clarifications from the developer
+- Architectural decisions
+- Schema changes
+- API contracts
+- Specific interactions
+
+Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+
+Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
+
+## Testing Decisions
+
+A list of testing decisions that were made. Include:
+
+- A description of what makes a good test (only test external behavior, not implementation details)
+- Which modules will be tested
+- Prior art for the tests (i.e. similar types of tests in the codebase)
+
+## Out of Scope
+
+A description of the things that are out of scope for this spec.
+
+## Further Notes
+
+Any further notes about the feature.
+
+</spec-template>
