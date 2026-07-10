@@ -47,6 +47,15 @@ Provide by user as .template.md file, or infer from context.
 - Confirm briefly with key + URL; do not restate the whole description.
 
 ## ADF table skeleton
+
+Markdown input:
+```markdown
+| Col |
+| --- |
+| val |
+```
+
+ADF:
 ```json
 { "type": "table", "attrs": { "isNumberColumnEnabled": false, "layout": "default" },
   "content": [
@@ -61,6 +70,16 @@ Provide by user as .template.md file, or infer from context.
 ```
 
 ## ADF code block skeleton
+
+Markdown input:
+````markdown
+```text
+line1
+line2
+```
+````
+
+ADF:
 ```json
 { "type": "codeBlock", "attrs": { "language": "text" },
   "content": [{ "type": "text", "text": "line1\nline2" }]
@@ -69,7 +88,7 @@ Provide by user as .template.md file, or infer from context.
 
 ## ADF bullet list skeleton
 
-GFM input:
+Markdown input:
 ```markdown
 - Level 1
   - Level 2
@@ -124,7 +143,7 @@ ADF:
 
 ## ADF blockquote skeleton
 
-GFM input:
+Markdown input:
 ```markdown
 > Quote
 >
