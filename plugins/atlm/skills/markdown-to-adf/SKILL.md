@@ -107,6 +107,51 @@ Text with marks:
 }
 ```
 
+## Heading
+
+Markdown:
+
+```markdown
+## Heading
+```
+
+ADF node:
+
+```json
+{
+  "type": "heading",
+  "attrs": {
+    "level": 2
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "Heading"
+    }
+  ]
+}
+```
+
+### Heading mapping
+
+| Markdown | ADF |
+| --- | --- |
+| `#` | `heading` with `attrs.level: 1` |
+| `##` | `heading` with `attrs.level: 2` |
+| `###` | `heading` with `attrs.level: 3` |
+| `####` | `heading` with `attrs.level: 4` |
+| `#####` | `heading` with `attrs.level: 5` |
+| `######` | `heading` with `attrs.level: 6` |
+
+### Heading rules
+
+- Preserve the Markdown heading level exactly.
+- Do not promote or demote headings.
+- Remove the Markdown `#` markers from the emitted text.
+- Emit heading content as inline nodes.
+- Preserve supported inline marks inside headings.
+- Use heading levels `1` through `6` only.
+
 ## Tables
 
 ### Markdown conversion rules
@@ -408,78 +453,6 @@ ADF node:
       "type": "paragraph",
       "content": [
         { "type": "text", "text": "Quote" }
-      ]
-    }
-  ]
-}
-```
-
-## Complete example
-
-Markdown:
-
-````markdown
-## Contract changes
-
-- Add endpoint `POST /jobs`
-- Return:
-
-```json
-{"id":"123"}
-```
-````
-
-ADF:
-
-```json
-{
-  "version": 1,
-  "type": "doc",
-  "content": [
-    {
-      "type": "heading",
-      "attrs": { "level": 2 },
-      "content": [
-        { "type": "text", "text": "Contract changes" }
-      ]
-    },
-    {
-      "type": "bulletList",
-      "content": [
-        {
-          "type": "listItem",
-          "content": [
-            {
-              "type": "paragraph",
-              "content": [
-                { "type": "text", "text": "Add endpoint " },
-                {
-                  "type": "text",
-                  "text": "POST /jobs",
-                  "marks": [{ "type": "code" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "listItem",
-          "content": [
-            {
-              "type": "paragraph",
-              "content": [
-                { "type": "text", "text": "Return:" }
-              ]
-            },
-            {
-              "type": "codeBlock",
-              "attrs": { "language": "json" },
-              "content": [
-                { "type": "text", "text": "{\"id\":\"123\"}" }
-              ]
-            }
-          ]
-        }
       ]
     }
   ]
