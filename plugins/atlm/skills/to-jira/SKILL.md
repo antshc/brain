@@ -166,3 +166,7 @@ ADF:
   ]
 }
 ```
+
+## Resources
+
+- [GitHub Flavored Markdown specification](https://github.github.com/gfm/)
