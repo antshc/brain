@@ -39,6 +39,7 @@ Provide by user as .template.md file, or infer from context.
 - **Tables → always ADF.** When the source does contain a table, markdown/wiki tables do NOT render: set `contentFormat: "adf"` and pass a `doc` with `table`/`tableRow`/`tableHeader`/`tableCell` nodes. Plain prose can stay markdown.
 - **Fenced code → always ADF.** When the source contains a fenced code block (```...```), map it to an ADF `codeBlock` node (set `contentFormat: "adf"`); do not leave it as a markdown fence. Preserve the content verbatim, newlines included.
 - **Bullet lists → always ADF.** Map GFM `-`, `*`, and `+` list markers to nested ADF `bulletList` nodes. Preserve nesting up to level 3. Each `bulletList` contains `listItem` nodes; nested lists belong inside the parent `listItem`, after its paragraph.
+- **Block quotes → always ADF.** Map GFM `>` block quotes to an ADF `blockquote` node. Preserve the quoted content verbatim; do not emit a literal `>` in ADF.
 - Set `parent` to the epic key to attach under an epic (works for company-managed projects).
 - Wrap endpoint paths / identifiers in inline `code` marks in ADF.
 - Do not invent fields, assignees, or priorities — only set what the user provides (use `additional_fields` for labels/priority/components/custom fields).
@@ -116,6 +117,32 @@ ADF:
           ]
         }
       ]
+    }
+  ]
+}
+```
+
+## ADF blockquote skeleton
+
+GFM input:
+```markdown
+> Quote
+>
+> Second paragraph
+```
+
+ADF:
+```json
+{
+  "type": "blockquote",
+  "content": [
+    {
+      "type": "paragraph",
+      "content": [{ "type": "text", "text": "Quote" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [{ "type": "text", "text": "Second paragraph" }]
     }
   ]
 }
