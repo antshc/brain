@@ -1,5 +1,5 @@
 ---
-name: setup-atl-mcp
+name: setup-atlm
 description: Initialize Atlassian Rovo MCP configuration from `.atlmcp.env`. Use when setting up MCP credentials for Jira or Confluence, when `.atlmcp.env` is missing, or before any MCP-based Atlassian skill that needs cloudId, projectKey, or spaceId.
 ---
 
