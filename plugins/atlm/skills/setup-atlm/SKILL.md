@@ -5,13 +5,13 @@ description: Initialize Atlassian Rovo MCP configuration from `.atlmcp.env`. Use
 
 # Setup Atlassian MCP
 
-Resolve cloudId, projectKey, and spaceId from `.atlmcp.env` so MCP-based Atlassian skills can skip discovery calls.
+Resolve cloudId, projectKey, and spaceId from `.atlmcp.env` in the `.env` so MCP-based Atlassian skills can skip discovery calls.
 
 ## Steps
 
 **Step 1 — Check for `.atlmcp.env`**
 
-Look for `.atlmcp.env` in the repo root.
+Look for `.atlmcp.env` in the `.env` directory in the repo root.
 
 - If it does **not** exist, create it with the template below and stop — ask the user to fill in their values before continuing:
 
