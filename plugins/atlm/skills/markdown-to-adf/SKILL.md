@@ -17,15 +17,7 @@ Convert user-provided GitHub Flavored Markdown into a valid Atlassian Document F
 Return:
 
 - `contentFormat: "adf"`
-- a complete ADF root document:
-
-```json
-{
-  "version": 1,
-  "type": "doc",
-  "content": []
-}
-```
+- a complete ADF root document (see [references/adf-skeletons.md](references/adf-skeletons.md))
 
 Return only the converted ADF payload unless the caller requests an explanation.
 
@@ -78,60 +70,15 @@ Return only the converted ADF payload unless the caller requests an explanation.
 
 ## Text node
 
-```json
-{
-  "type": "text",
-  "text": "Text"
-}
-```
-
-Text with marks:
-
-```json
-{
-  "type": "text",
-  "text": "identifier",
-  "marks": [
-    { "type": "code" }
-  ]
-}
-```
+See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ## Paragraph
 
-```json
-{
-  "type": "paragraph",
-  "content": [
-    { "type": "text", "text": "Paragraph text" }
-  ]
-}
-```
+See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ## Heading
 
-Markdown:
-
-```markdown
-## Heading
-```
-
-ADF node:
-
-```json
-{
-  "type": "heading",
-  "attrs": {
-    "level": 2
-  },
-  "content": [
-    {
-      "type": "text",
-      "text": "Heading"
-    }
-  ]
-}
-```
+See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ### Heading mapping
 
@@ -167,65 +114,7 @@ ADF node:
 
 ### Table skeleton
 
-```json
-{
-  "type": "table",
-  "attrs": {
-    "isNumberColumnEnabled": false,
-    "layout": "default",
-    "displayMode": "default"
-  },
-  "content": [
-    {
-      "type": "tableRow",
-      "content": [
-        {
-          "type": "tableHeader",
-          "attrs": {
-            "background": "#F0F1F2",
-            "colspan": 1,
-            "rowspan": 1,
-            "colwidth": [240]
-          },
-          "content": [
-            {
-              "type": "paragraph",
-              "content": [
-                {
-                  "type": "text",
-                  "text": "Header",
-                  "marks": [{ "type": "strong" }]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "tableRow",
-      "content": [
-        {
-          "type": "tableCell",
-          "attrs": {
-            "colspan": 1,
-            "rowspan": 1,
-            "colwidth": [240]
-          },
-          "content": [
-            {
-              "type": "paragraph",
-              "content": [
-                { "type": "text", "text": "Value" }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
+See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ### Supported table nodes
 
@@ -262,27 +151,7 @@ Do not invent non-ADF CSS properties on the table.
 - `rowspan` — number of rows covered vertically.
 - `colwidth` — array of column widths in pixels.
 
-Example merged cell:
-
-```json
-{
-  "type": "tableCell",
-  "attrs": {
-    "background": "#F0F1F2",
-    "colspan": 4,
-    "rowspan": 1,
-    "colwidth": [80, 460, 140, 180]
-  },
-  "content": [
-    {
-      "type": "paragraph",
-      "content": [
-        { "type": "text", "text": "Merged content" }
-      ]
-    }
-  ]
-}
-```
+See the merged cell example in [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ### Table geometry rules
 
@@ -306,37 +175,7 @@ Cells contain block nodes, not bare text nodes. Typical content includes:
 - `blockquote`
 - supported nested block content accepted by the target
 
-Example cell with paragraph and bullet list:
-
-```json
-{
-  "type": "tableCell",
-  "content": [
-    {
-      "type": "paragraph",
-      "content": [
-        { "type": "text", "text": "Summary" }
-      ]
-    },
-    {
-      "type": "bulletList",
-      "content": [
-        {
-          "type": "listItem",
-          "content": [
-            {
-              "type": "paragraph",
-              "content": [
-                { "type": "text", "text": "Item" }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
+See the cell with paragraph and bullet list example in [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ### Unsupported CSS-style table formatting
 
@@ -355,131 +194,19 @@ Jira or Confluence controls these during rendering. Never place CSS strings in `
 
 ## Fenced code block
 
-Markdown:
-
-````markdown
-```text
-line1
-line2
-```
-````
-
-ADF node:
-
-```json
-{
-  "type": "codeBlock",
-  "attrs": {
-    "language": "text"
-  },
-  "content": [
-    {
-      "type": "text",
-      "text": "line1\nline2"
-    }
-  ]
-}
-```
+See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ## Nested bullet list
 
-Markdown:
-
-```markdown
-- Level 1
-  - Level 2
-    - Level 3
-```
-
-ADF node:
-
-```json
-{
-  "type": "bulletList",
-  "content": [
-    {
-      "type": "listItem",
-      "content": [
-        {
-          "type": "paragraph",
-          "content": [
-            { "type": "text", "text": "Level 1" }
-          ]
-        },
-        {
-          "type": "bulletList",
-          "content": [
-            {
-              "type": "listItem",
-              "content": [
-                {
-                  "type": "paragraph",
-                  "content": [
-                    { "type": "text", "text": "Level 2" }
-                  ]
-                },
-                {
-                  "type": "bulletList",
-                  "content": [
-                    {
-                      "type": "listItem",
-                      "content": [
-                        {
-                          "type": "paragraph",
-                          "content": [
-                            { "type": "text", "text": "Level 3" }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
+See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ## Blockquote
 
-```json
-{
-  "type": "blockquote",
-  "content": [
-    {
-      "type": "paragraph",
-      "content": [
-        { "type": "text", "text": "Quote" }
-      ]
-    }
-  ]
-}
-```
+See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ## Expand (details/summary)
 
-Maps `<details><summary>Title</summary>…</details>` to an ADF `expand` node.
-
-```json
-{
-  "type": "expand",
-  "attrs": {
-    "title": "Response"
-  },
-  "content": [
-    {
-      "type": "paragraph",
-      "content": [
-        { "type": "text", "text": "" }
-      ]
-    }
-  ]
-}
-```
+Maps `<details><summary>Title</summary>…</details>` to an ADF `expand` node. See [references/adf-skeletons.md](references/adf-skeletons.md).
 
 ### Expand rules
 
@@ -490,6 +217,7 @@ Maps `<details><summary>Title</summary>…</details>` to an ADF `expand` node.
 
 ## Resources
 
+- [ADF node skeletons](references/adf-skeletons.md)
 - [Atlassian Document Format](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/)
 - [ADF table node](https://developer.atlassian.com/cloud/jira/platform/apis/document/nodes/table/)
 - [ADF table cell node](https://developer.atlassian.com/cloud/jira/platform/apis/document/nodes/table_cell/)
