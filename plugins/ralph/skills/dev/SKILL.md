@@ -89,17 +89,12 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/decisions.jsonl`, and is distinct from `WORKTREE_PATH`. Resolve it once, before invoking the agent, by running the bundled detection script (in this skill's `scripts/` directory). It resolves the outermost enclosing repo, persists it to `.agent.env` at the harness root (gitignored via `*.env`), and is idempotent:
+The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/decisions.jsonl`, and is distinct from `WORKTREE_PATH`. Resolve it once by finding the outermost enclosing git repo:
 
-Linux/macOS:
-```bash
-HARNESS_ROOT=$(bash "<skill-dir>/scripts/detect-env.sh" | sed -n 's/^HARNESS_ROOT=//p')
-```
-
-Windows (PowerShell):
-```powershell
-$HARNESS_ROOT = (pwsh <skill-dir>/scripts/detect-env.ps1 | Select-String '^HARNESS_ROOT=').Line -replace '^HARNESS_ROOT=',''
-```
+1. Find the main working tree of the current repo: `cd "$(git rev-parse --git-common-dir)/.." && pwd`
+2. Walk up parent directories — for each parent, run `git -C <parent> rev-parse --show-toplevel 2>/dev/null`. Stop when it fails. The last directory where it succeeded is `HARNESS_ROOT`.
+3. If `$HARNESS_ROOT/.env/.harness.env` already exists, source it and skip to the next step.
+4. Otherwise, create `.env/` if needed and write `export HARNESS_ROOT="<path>"` to `$HARNESS_ROOT/.env/.harness.env`.
 
 Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`, with the following prompt (substitute actual values). The agent will `cd` into `WORKTREE_PATH` as its very first action:
 
@@ -183,30 +178,7 @@ Run **once** per iteration, after Handle result and after the agent has recorded
 - If nothing is staged, skip the commit (no empty commits).
 - **Emit** the commit SHA, or "nothing to commit".
 
-Linux/macOS:
-```bash
-git -C "$HARNESS_ROOT" add -A
-if git -C "$HARNESS_ROOT" diff --cached --quiet; then
-  echo "nothing to commit"
-else
-  git -C "$HARNESS_ROOT" commit -m "chore(agent): update decision memory"
-  git -C "$HARNESS_ROOT" rev-parse HEAD
-  git -C "$HARNESS_ROOT" push
-fi
-```
-
-Windows (PowerShell):
-```powershell
-git -C $Env:HARNESS_ROOT add -A
-git -C $Env:HARNESS_ROOT diff --cached --quiet
-if ($LASTEXITCODE -eq 0) {
-  Write-Output "nothing to commit"
-} else {
-  git -C $Env:HARNESS_ROOT commit -m "chore(agent): update decision memory"
-  git -C $Env:HARNESS_ROOT rev-parse HEAD
-  git -C $Env:HARNESS_ROOT push
-}
-```
+Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
 
 # CREATE PULL REQUEST
 
