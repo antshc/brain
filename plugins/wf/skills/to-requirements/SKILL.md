@@ -40,7 +40,7 @@ A strong statement encodes:
 Keep it **solution-agnostic**: the sentence names a behavior, never an artifact.
 
 ## Functional Requirements
-Write each as an imperative `<Behavior> when <condition>.` — start with the behavior verb, omit any `The system must`/`The system shall` prefix, and keep it specific, testable, and focused on externally visible behavior. When `ARCHITECTURE.md` is present, use its module layout to find the capability's dependencies and surface the **Integration** and **Degraded behavior** requirements — name the behavior at each boundary, never the component that implements it. Cover, at minimum:
+Write each as an imperative `<Behavior> when <condition>.` — start with the behavior verb, omit any `The system must`/`The system shall` prefix, and keep it specific, testable, and focused on externally visible behavior. Add the expected result or resulting state when multiple outcomes are possible or the outcome is not obvious. When `ARCHITECTURE.md` is present, use its module layout to find the capability's dependencies and surface the **Integration** and **Degraded behavior** requirements — name the behavior at each boundary, never the component that implements it. Cover, at minimum:
 - **Capability** — what actions the system performs and what outcomes it produces.
 - **Integration** — external system interactions the capability depends on.
 - **State** — persistence, retention, and state changes.
@@ -68,4 +68,3 @@ List the boundary and failure conditions the functional requirements must handle
 Follow the template and writing style in [references/output-format.md](references/output-format.md). For worked examples, see [references/examples.md](references/examples.md).
 
 After writing, save the result to `docs/requirements/<slug>.md` where `<slug>` is a short kebab-case identifier derived from the capability title (e.g., `recover-deleted-files`, `real-time-catalog-availability`). Create the `docs/requirements/` directory if it does not exist.
-
