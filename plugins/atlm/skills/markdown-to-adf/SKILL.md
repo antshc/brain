@@ -51,6 +51,7 @@ Return only the converted ADF payload unless the caller requests an explanation.
 | Fenced code block | `codeBlock` |
 | Table | `table` containing `tableRow`, `tableHeader`, and `tableCell` nodes |
 | Horizontal rule | `rule` |
+| `<details>`/`<summary>` | `expand` with `attrs.title` |
 
 ## Inline mapping
 
@@ -458,6 +459,34 @@ ADF node:
   ]
 }
 ```
+
+## Expand (details/summary)
+
+Maps `<details><summary>Title</summary>…</details>` to an ADF `expand` node.
+
+```json
+{
+  "type": "expand",
+  "attrs": {
+    "title": "Response"
+  },
+  "content": [
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "" }
+      ]
+    }
+  ]
+}
+```
+
+### Expand rules
+
+- Use `attrs.title` for the `<summary>` text.
+- `content` must contain at least one block node; use an empty `paragraph` when the body is empty.
+- Use `nestedExpand` instead of `expand` when the node appears inside a `tableCell` or `tableHeader`.
+- Do not nest `expand` inside `expand`; ADF does not support recursive expansion.
 
 ## Resources
 
