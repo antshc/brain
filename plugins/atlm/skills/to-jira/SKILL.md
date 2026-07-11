@@ -5,7 +5,7 @@ description: Create Jira work items from user-provided context using the Atlassi
 
 The `cloudId`, `projectKey`, and `spaceId` should have been loaded from `.atlmcp.env` — run `/atlm:setup-atl-mcp` if not.
 
-# Create Jira work item
+# Create or Update Jira work item
 
 Turn user-provided context into a Jira issue via the Atlassian MCP.
 
