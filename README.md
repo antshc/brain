@@ -33,6 +33,9 @@ gh skill search writing-great-skills --owner mattpocock
 
 ## Install atlassian 
 ```sh
+(copilot plugin uninstall atlm@brain >/dev/null 2>&1 || true) && \
+copilot plugin install atlm@brain
+
 (copilot plugin uninstall atl@brain >/dev/null 2>&1 || true) && \
 copilot plugin install atl@brain
 ```
