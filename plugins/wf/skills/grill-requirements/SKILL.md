@@ -19,7 +19,9 @@ Load glossary from `CONTEXT.md` first use as the glossary of approved entity and
 
 ## Run /grilling
 
-Run `/grilling` — interview one question at a time, giving your recommended answer for each, and keep the coverage checklist below alive until every probe is checked (or explicitly ruled not-applicable, with a reason). If a *fact* can be found in the codebase, look it up rather than asking; the *decisions* are the user's.
+**Facts** to look up (across user-facing, application, integration, and persistence boundaries): Validation rules, Constraints, Domain concepts, Data models, Contracts, Schemas, Relationships, Business logic.
+
+Run `/grilling` — interview one question at a time, giving your recommended answer for each, and keep the *Grilling coverage* checklist below alive until every probe is checked (or explicitly ruled not-applicable, with a reason). If a *fact* can be found in the codebase, look it up rather than asking; the *decisions* are the user's. Explore the existing solution for the **Facts**, then treat each as evidence for discovering implicit requirements, not as an implementation prescription. Use the (directory, solution, project, code) structure and module definitions defined in the docs (check `README.md`, `ARCHITECTURE.md`) during the exploration.
 
 ```
 Grilling coverage:
@@ -39,7 +41,7 @@ Requirements:
 - [ ] Probe degraded behavior — what still works when a dependency is slow or fails
 ```
 
-Use [references/requirement-types.md](references/requirement-types.md) to keep probing until no open ambiguity remains: drive out the actors, functional requirements, business rules, edge cases, and failure paths behind every stated behavior. Explore the existing solution for facts that inform requirements — validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, and business logic across user-facing, application, integration, and persistence boundaries. Treat these as evidence for discovering implicit requirements, not as implementation prescriptions.
+Use [references/requirement-types.md](references/requirement-types.md) to keep probing until no open ambiguity remains: drive out the actors, functional requirements, business rules, edge cases, and failure paths behind every stated behavior. Explore the existing solution for the **facts** listed above and treat them as evidence for discovering implicit requirements, not as implementation prescriptions.
 
 ## Verify
 
