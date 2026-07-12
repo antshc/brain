@@ -1,14 +1,13 @@
 # Solution-Agnostic De-referencing Tables
 
-Catalog of leaked implementation artifacts and the behavior to state instead. Each row maps a concrete artifact teams name in conversation (a column, an endpoint, an access role) to the outcome the actor actually gets, so requirements stay solution-agnostic. Apply these tables directly when scrubbing text — match a leaked term to its category, then restate the line as the behavior in the right-hand column.
+Catalog of leaked implementation artifacts and the behavior to state instead. 
 
 Anchor the intent with a reject/prefer pair:
-- Reject: *Show the alert count in the page header badge.*
-- Prefer: *Surface the count of active alerts, so the operator sees load at a glance.*
+- Reject: *Display a cart badge in the page header.* (names a widget + placement)
+- Prefer: *Keep shoppers aware of the number of items in their cart so they can proceed to purchase without leaving their current view.* (names behavior, entity, scope, value)
 
 ## De-referencing tables
-
-For every artifact, state the behavior it enables in plain language — "let the user …", "keep … so …", "tell the client …". Replace the `…` with the domain entity when applying a row.
+Raise each named artifact to the behavior it enables.
 
 ### UI / presentation
 Screens, components, and placements (badge, banner, dropdown, grid, header, panel, tab). State what the user sees or does, not the control.
@@ -20,45 +19,51 @@ Screens, components, and placements (badge, banner, dropdown, grid, header, pane
 | grid / table / list view | let the user review the set of items |
 | modal / dialog | prompt the user to confirm or supply the missing input |
 | tab / page / screen | give the user access to the behavior (name the behavior, not the placement) |
-
 ### Persistence / data
-Storage shapes (column, row, blob, TTL, table/repository, null). State what is remembered and for how long.
-
 | Leaked artifact | Behavior to state instead |
 | --- | --- |
-| column / field / flag | remember whether the entity is in a given state |
-| TTL / retention window | keep the entity recoverable for the retention period, then release it |
-| soft-delete flag | keep a deleted entity recoverable until its window expires |
-| null / missing value | treat the value as unknown and state the fallback behavior |
+| column / field | keep … recorded so a later read returns the same value |
+| record / row / document | remember one … so it survives restarts and crashes |
+| serialized blob / metadata blob | keep … attached to the operation it describes |
+| TTL / `ExpiresAt` / expiry column | let finished … drop out automatically once they no longer matter |
+| table / DynamoDB / repository | store every … durably so the user never loses it |
+| null / missing value | treat an absent … as "the user gave no value" |
 
 ### API / protocol
 Transport surface (endpoint, HTTP verb, payload, response field, query param, status code, id). State what the client asks for or learns.
 
 | Leaked artifact | Behavior to state instead |
 | --- | --- |
-| endpoint / route | let the client request the behavior or retrieve the entity |
-| response field | tell the client the outcome or current state |
-| status code (4xx/5xx) | tell the client the request was rejected and why |
-| query param / filter | let the client narrow the results by a stated criterion |
+| endpoint / route / URL | let the client ask the system to … |
+| GET / POST / PUT / DELETE | let the client read / start / change / remove a … |
+| request body / payload | let the client hand the system the … it needs to do the work |
+| response field / JSON key | tell the client the resulting … |
+| query parameter / filter | let the client narrow the results down to … |
+| status code / HTTP error | tell the client whether … worked, or why it failed |
+| identifier in response | give the client a handle to come back to the same … later |
 
 ### Domain-state / enum
 Status values, flags, and derived states. State which phase the actor sees or what now needs action.
 
 | Leaked artifact | Behavior to state instead |
 | --- | --- |
-| status enum value | tell the user which phase / state the entity is in |
-| derived / computed flag | tell the user what now needs their action |
-| boolean toggle | let the user see whether the behavior is on or off |
+| status / state enum value | let the user see which phase a … has reached |
+| boolean flag (e.g. `isDismissed`) | let the user tell an active … from one already handled |
+| derived / computed state | surface to the user that a … now needs their action |
+| level / severity value | let the user judge how urgent a … is |
+| completion / outcome value | tell the user how a … ended — success or failure |
 
 ### Process / infrastructure
-Background work and plumbing (worker, queue, retry, lock, cache, cron, metering, license). State what gets done for the user, reliably.
-
 | Leaked artifact | Behavior to state instead |
 | --- | --- |
-| worker / job / cron | get the work done for the user without them waiting |
-| queue / retry | complete the work reliably even when a step first fails |
-| cache | serve the result quickly and keep it current |
-| lock | keep concurrent changes from corrupting the entity |
+| background service / worker | get … done for the user without them waiting |
+| queue / job / task record | run each … reliably and in the right order |
+| retry / backoff | keep trying … until it succeeds |
+| lock / mutex | stop two … from clashing when they run at once |
+| cache | give the user … back fast |
+| scheduled run / cron | do … for the user at the right time, unprompted |
+| usage report / CallHome / metering | account for each customer's usage of … so they can be billed |
+| license / entitlement type | let the user unlock the … they have paid for |
 
 ### Access / identity
 Permissions and cross-account trust (access role, grant, role status, delegated access, account list). State what access the owner grants or the user controls.
@@ -72,11 +77,12 @@ Permissions and cross-account trust (access role, grant, role status, delegated 
 ## Criteria obey solution-agnostic too
 
 A criterion states an observable outcome, not the control that produces it. Write what the user perceives or can do, not what they tap.
-- Reject: *The user clicks the "Restore" button in the Deleted Files grid.*
-- Prefer: *The user can restore a deleted item within its retention window.*
+- Reject: *Selecting the cart badge opens the cart panel.* (names widget + interaction)
+- Prefer: *The shopper can reach the full cart contents in a single step from the notification.*
 
 ## Verb → component hints
 
 Map behavior verbs to the component types they imply, so design can pick up where the requirement stops:
 
 `persist → repository/accessor · validate → validator · create → provisioner · external API → client/gateway · emit alert → alert service · process async → worker · expose API → controller`
+
