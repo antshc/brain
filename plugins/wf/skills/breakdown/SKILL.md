@@ -41,8 +41,6 @@ Run these questions in order on each candidate:
 4. **Several related behaviours, or one tiny output?** Several → it stands alone. One tiny output with no behavioural scope → place it inside a broader capability, not alone.
 5. **Name independent of UI and implementation?** Replace any page, grid, button, endpoint, controller, service, or database name with the domain behaviour. Done when renaming a screen or swapping the technology forces no retitle.
 
-Full reference: https://github.com/antshc/brain/blob/main/plugins/wf/skills/to-requirements/references/capability-detection.md
-
 </capability-detection>
 
 Apply the test to your direction:

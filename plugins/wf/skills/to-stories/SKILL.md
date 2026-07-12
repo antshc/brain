@@ -5,11 +5,11 @@ name: to-stories
 
 Package a **single requirement** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories**, broken down **by capability**. Each story carries four blocks: a **capability reference**, the **stakeholder requirement**, the **functional-requirements list** it covers, and the **acceptance criteria**.
 
-The input is typically the output of /to-requirements — a capability with its stakeholder requirement, functional requirements, business rules, and edge cases. It also works standalone on any requirement text.
+The input is typically a prior requirement set — a capability with its stakeholder requirement, functional requirements, business rules, and edge cases. It also works standalone on any requirement text.
 
 **Input & output shape:**
 - Produce **one story per capability**. A single-capability requirement → one story; a list of requirements, or a requirement covering several distinct capabilities → one story each. Split anything non-atomic; never merge unrelated behaviors into one story.
-- When the /to-requirements output is in context, **copy the capability title, stakeholder requirement, and functional-requirements list verbatim** into the story's reference blocks. When the input is standalone requirement text, derive them from that text.
+- When a prior requirement set is in context, **copy the capability title, stakeholder requirement, and functional-requirements list verbatim** into the story's reference blocks. When the input is standalone requirement text, derive them from that text.
 
 Ground every story in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout.
 
@@ -18,9 +18,9 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 
 ## Workflow
 1. **Analyze input** → identify each distinct capability, its domain/module, actors, inputs, outputs, failure cases. One capability → one story; a list or multi-capability input → one story each.
-2. **Assemble the reference block** per capability → copy the **capability title**, **stakeholder requirement**, and **functional-requirements list** verbatim from the /to-requirements output when it is in context; otherwise derive each from the standalone requirement text.
+2. **Assemble the reference block** per capability → copy the **capability title**, **stakeholder requirement**, and **functional-requirements list** verbatim from the prior requirement set when it is in context; otherwise derive each from the standalone requirement text.
 3. **Derive acceptance criteria** per story as behavior rules (see below).
-4. **Verify** each rule implies concrete code changes and maps to a responsibility.
+4. **Verify** → run `/solution-agnostic` over every story and criterion to scrub implementation artifacts, then confirm each rule implies concrete code changes and maps to a responsibility.
 
 ## Acceptance Criteria
 Write one criterion per observable behavior. Vary the opening to fit the behavior — name the entity, actor, or outcome as the subject, and use "The system …" only where naming the system adds meaning:
@@ -34,14 +34,14 @@ Cover these rule types:
 - **State** — persistence/state changes.
 - **Failure** — error handling.
 
-When the input comes from /to-requirements, its functional requirements, business rules, and edge cases map directly onto these criteria.
+When the input is a prior requirement set, its functional requirements, business rules, and edge cases map directly onto these criteria.
 
-Criteria obey the solution-agnostic rule: state an observable outcome, not the control that produces it. See [../to-requirements/SKILL.md](../to-requirements/SKILL.md) and `SOLUTION-AGNOSTIC-TERMS.md` for the de-referencing tables and verb → component hints.
+Criteria obey the solution-agnostic rule: state an observable outcome, not the control that produces it. Run `/solution-agnostic` to raise any leaked artifact term to the behavior and entity it enables.
 
 ## Quality Check (before output)
 - Story is atomic and behavior-focused, scoped to exactly one capability.
 - Each story names its **capability**, includes the **stakeholder requirement**, and lists the **functional requirements** it covers.
-- When the /to-requirements output is in context, the capability title, stakeholder requirement, and functional-requirements list are copied **verbatim**.
+- When a prior requirement set is in context, the capability title, stakeholder requirement, and functional-requirements list are copied **verbatim**.
 - Capability and stakeholder requirement name a behavior + entity, not a widget, screen, or component. Apply the solution-agnostic rule.
 - Story is solution-agnostic: swapping UI or technology would not force a reword.
 - Each rule = one behavior, exposes data flow + failure handling.

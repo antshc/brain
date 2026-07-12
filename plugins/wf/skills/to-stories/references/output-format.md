@@ -2,7 +2,7 @@
 
 Write for Product Owners and QA — plain business language, no code, class names, or technical jargon. Each criterion is one clear, testable statement of expected behavior.
 
-Each story is broken down by capability and carries four blocks in order: **Capability**, **Stakeholder Requirement**, **Functional Requirements**, then **Acceptance Criteria**. When the /to-requirements output is in context, copy the first three blocks verbatim; otherwise derive them from the requirement text.
+Each story is broken down by capability and carries four blocks in order: **Capability**, **Stakeholder Requirement**, **Functional Requirements**, then **Acceptance Criteria**. When a prior requirement set is in context, copy the first three blocks verbatim; otherwise derive them from the requirement text.
 
 One story:
 ```
