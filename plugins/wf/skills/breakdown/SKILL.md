@@ -1,6 +1,7 @@
 ---
 description: Break down or group a **scope** — user story, ticket, task, or feature design — into smaller or bigger pieces organised by **capability**. Use when the user wants to decompose a scope into capabilities, group several capabilities into one user story, or split a capability into smaller pieces.
 name: breakdown
+disable-model-invocation: true
 ---
 
 Break down or group a **scope** — a user story(s), ticket(s), task(s), or feature design — into smaller or bigger pieces organised by **capability**. A **capability** is behaviour the system provides independently of where it appears, and it survives after the current change ships — never a screen, control, or one-off task.
