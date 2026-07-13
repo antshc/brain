@@ -6,10 +6,10 @@ Most repos have a single context:
 
 ```
 /
-├── ARCHITECTURE.md                      ← also indexes the Solution Design Strategy (SDRs)
+├── ARCHITECTURE.md                      ← also indexes the Solution Strategy (SSRs)
 ├── CONTEXT.md
 ├── docs/
-│   ├── sdr/                             ← Solution Design Records (backbone rules)
+│   ├── ssr/                             ← Solution Strategy Records (backbone rules)
 │   │   └── 0001-persisted-domain-model-repository.md
 │   └── adr/
 │       ├── 0001-event-sourced-orders.md
@@ -24,9 +24,9 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 ├── ARCHITECTURE.md
 ├── CONTEXT-MAP.md
 ├── docs/
-│   ├── sdr/                             ← Solution Design Records (backbone rules)
+│   ├── ssr/                             ← Solution Strategy Records (backbone rules)
 │   │   └── 0001-persisted-domain-model-repository.md
-│   └── adr/                          ← system-wide ADRs (docs/sdr/ holds system-wide SDRs)
+│   └── adr/                          ← system-wide ADRs (docs/ssr/ holds system-wide SSRs)
 ├── src/
 │   ├── ordering/
 │   │   ├── CONTEXT.md
@@ -44,4 +44,4 @@ If no `ARCHITECTURE.md` exists, create one when the first term is resolved.
 
 If no `docs/adr/` exists, create it when the first ADR is needed, then add it to the `## Architecture Decision Records` index in `ARCHITECTURE.md`.
 
-If no `docs/sdr/` exists, create it when the first SDR is needed, then add it to the `## Solution Design Strategy` index in `ARCHITECTURE.md`.
+If no `docs/ssr/` exists, create it when the first SSR is needed, then add it to the `## Solution Strategy` index in `ARCHITECTURE.md`.
