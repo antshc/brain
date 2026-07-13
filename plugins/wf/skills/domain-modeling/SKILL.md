@@ -25,11 +25,11 @@ When the user uses a term that conflicts with the existing language in `CONTEXT.
 
 ### Challenge against the Solution strategy Records (SSRs)
 
-When the user states how something is designed, or which layer owns a responsibility, check it against the SSRs before accepting it. Scan the SSR index in the `ARCHITECTURE.md` `Solution strategy` section, and load only the SSRs relevant to the claim. If you find a contradiction, surface it: "Your SSR mandates that API logic lives in the controller, but you just said it belongs in the service layer — which is right?"
+When the user states how something is designed, or which layer owns a responsibility, check it against the SSRs before accepting it. Scan the SSR index in the `Solution strategy` section, and load only the SSRs relevant to the claim. If you find a contradiction, surface it: "Your SSR mandates that API logic lives in the controller, but you just said it belongs in the service layer — which is right?"
 
 ### Surface design improvements
 
-When you spot a decision that would improve the design, explore the `ARCHITECTURE.md` `Solution strategy` section, for the index of existing decisions. Surface it: "Could this be one deep module with a narrow interface, instead of three shallow modules that leak their internals to each other?"
+When you spot a decision that would improve the design, surface it: "Could this be one deep module with a narrow interface, instead of three shallow modules that leak their internals to each other?"
 
 ### Sharpen fuzzy language
 
@@ -41,7 +41,11 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 ## Validate discovered decisions
 
-When you spot a decision, validate it in the codebase. Explore the `ARCHITECTURE.md` `Building blocks` section, for layers. Walk one real use-case end-to-end and force each step into a layer. Where does each step live, and where do the boundaries — transaction, process, network — fall? "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?"
+When you spot a decision, don't take it at face value — validate it against reality. Check it against two sources of truth: the architecture map (does the intended structure hold?) and the code (does the implementation agree?). Where they diverge, surface the gap.
+
+### Trace through the layers
+
+Explore the `Building blocks` section for the layers. Walk one real use-case end-to-end and force each step into a layer. Where does each step live, and where do the boundaries — transaction, process, network — fall? "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?"
 
 ### Cross-reference with code
 
