@@ -54,7 +54,7 @@ Architecture
 - [ ] Offer ADRs sparingly
 Testing strategy
 - [ ] Locate the testing strategy (SSR or fallback)
-- [ ] Challenge which test categories must cover the change
+- [ ] Challenge against the testing strategy (SSRs): which test categories must cover the change
 ```
 
 ### Line of inquiry: Glossary (CONTEXT.md)
