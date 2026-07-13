@@ -5,6 +5,8 @@
 ```md
 # {Context Name}
 
+Location: <The path to the module directory that is covered by the context, relative to the repo root.>
+
 {One or two sentence description of what this context is and why it exists.}
 
 ## Language
@@ -20,6 +22,12 @@ _Avoid_: Bill, payment request
 **Customer**:
 A person or organization that places orders.
 _Avoid_: Client, buyer, account
+
+# Relationships
+- **{Producer Context Name} → {Consumer Context Name}**: {Producer Context Name}ing emits `<Event name>` events; {Consumer Context Name} consumes them to start picking/processing/etc.
+- **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
+- **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
+- **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
 ```
 
 ## Rules
@@ -27,11 +35,15 @@ _Avoid_: Client, buyer, account
 - **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`.
 - **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does.
 - **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
+- **Single context.** When a project has only one context, organize all terms under that context heading.
+- **Group under context.** Terms should be organized under the relevant context to maintain clarity.
+- **Multiple contexts.** When a project has multiple contexts, organize terms under their respective context headings. The context and its name are defined from the project modules.
 - **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
+- **Relationships.** When a project has multiple contexts, define how different contexts or terms relate to each other.
 
-## Single vs multi-context repos
+## Single file vs multi-context files repos
 
-**Single context (most repos):** One `CONTEXT.md` at the repo root.
+**Single file context (most repos):** One `CONTEXT.md` at the repo root.
 
 **Multiple contexts:** A `CONTEXT-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
 
