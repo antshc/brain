@@ -21,7 +21,7 @@ Load glossary from `CONTEXT.md` first use as the glossary of approved entity and
 
 **Facts** to look up (across user-facing, application, integration, and persistence boundaries): Validation rules, Constraints, Domain concepts, Data models, Contracts, Schemas, Relationships, Business logic.
 
-Run `/grilling` — interview one question at a time, giving your recommended answer for each, and keep the *Grilling coverage* checklist below alive until every probe is checked (or explicitly ruled not-applicable, with a reason). If a *fact* can be found in the codebase, look it up rather than asking; the *decisions* are the user's. Explore the existing solution for the **Facts**, then treat each as evidence for discovering implicit requirements, not as an implementation prescription. Use the (directory, solution, project, code) structure and module definitions defined in the docs (check `README.md`, `ARCHITECTURE.md`) during the exploration.
+Run `/grilling` skill, keep the *Grilling coverage* checklist below alive until every probe is checked (or explicitly ruled not-applicable, with a reason), revisit probe if conflict arises. When exploring the existing solution for the **Facts**, treat each as evidence for discovering implicit requirements, not as an implementation prescription. Use the (directory, solution, project, code) structure and module definitions defined in the  `README.md`, `ARCHITECTURE.md` docs.
 
 ```
 Grilling coverage:
@@ -40,7 +40,53 @@ Requirements:
 - [ ] Probe degraded behavior — what still works when a dependency is slow or fails
 ```
 
-Use [references/requirement-types.md](references/requirement-types.md) to keep probing until no open ambiguity remains: drive out the actors, functional requirements, business rules, edge cases, and failure paths behind every stated behavior. Explore the existing solution for the **facts** listed above and treat them as evidence for discovering implicit requirements, not as implementation prescriptions.
+These are not a batch to run top-to-bottom: they are the branches the interview walks, one question at a time. Do not skip a line of inquiry, and do not skip any probe within one.
+
+### Line of inquiry: Glossary (CONTEXT.md)
+
+**Probe — Challenge terms against CONTEXT.md**
+
+When the user uses a term that conflicts with the approved language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'subscriber' as X, but you seem to mean Y — which is it?"
+
+**Probe — Sharpen fuzzy or overloaded language**
+
+When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
+
+**Probe — Stress-test domain relationships with concrete scenarios**
+
+When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+
+**Probe — Cross-reference stated behavior against the code**
+
+When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
+
+**Probe — Update CONTEXT.md inline**
+
+When a term is resolved, capture it in `CONTEXT.md` right there via `/manage-docs` — don't batch, capture each as it happens. `CONTEXT.md` is a glossary and nothing else.
+
+### Line of inquiry: Requirements
+
+Use [references/requirement-types.md](references/requirement-types.md) to keep probing until no open ambiguity remains. Explore the existing solution for the **facts** listed above and treat them as evidence for discovering implicit requirements, not as implementation prescriptions.
+
+**Probe — Surface every actor and their goal**
+
+Drive out who (or what) initiates each behavior and what they are trying to achieve. "Who triggers this cancellation — the customer, an admin, or a scheduled job? What outcome are they after?"
+
+**Probe — Surface the behaviors the system must perform**
+
+For every stated need, pin down the concrete functional requirement behind it. "When the subscription lapses, what exactly must the system do — block access, send a notice, both? In what order?"
+
+**Probe — Surface the invariants that must always hold**
+
+Force out the business rules that must be true regardless of the path taken. "Can a Customer ever have two active subscriptions at once, or is that an invariant the system must guarantee?"
+
+**Probe — Surface boundary and failure conditions**
+
+Invent edge cases and failure scenarios and make the user rule on each. "What happens if the payment succeeds but the confirmation never arrives? What if the amount is zero, or negative?"
+
+**Probe — Probe degraded behavior**
+
+Challenge what still works when a dependency is slow or unavailable. "If the billing service is down when renewal is due, what happens — retry, queue, fail open, fail closed?"
 
 ## Verify
 
