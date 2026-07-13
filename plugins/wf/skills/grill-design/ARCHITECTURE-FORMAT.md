@@ -50,7 +50,7 @@ first, dependency injection, shared foundation.}
 
 ### Layered Dependency Model
 
-{The layers, top (most volatile) to bottom (least volatile), and the one-directional
+{Optional section. The layers, top (most volatile) to bottom (least volatile), and the one-directional
 dependency arrow. Map each layer onto the project's naming/folder conventions.}
 
 \```mermaid
@@ -62,7 +62,7 @@ dependency arrow. Map each layer onto the project's naming/folder conventions.}
 \```
 
 ### Dependency Rules
-
+{Optional section. The rules that govern how the layers may depend on each other. One line per rule.}
 - **{Layer} → {Layer}** — {what this layer is allowed to call, and how (e.g. through
   `*.Abstractions` interfaces)}.
 - **Never** — {the forbidden upward references and other hard prohibitions}.
