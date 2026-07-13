@@ -7,9 +7,9 @@ disable-model-invocation: true
 
 This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
 
-The ticket tracker and triage label vocabulary should have been provided to you — run `/manage-artifacts` action **Setup labels** if not. 
+The ticket tracker and triage label vocabulary should have been provided to you — run `/manage-backlog` action **Setup labels** if not. 
 
-If the `/manage-artifacts` skill is not available, fall back to saving the spec to `docs/specs/<feature-id-slug>.md` as markdown.
+If the `/manage-backlog` skill is not available, fall back to saving the spec to `docs/specs/<feature-id-slug>.md` as markdown.
 
 ## Process
 
@@ -19,7 +19,7 @@ If the `/manage-artifacts` skill is not available, fall back to saving the spec 
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project ticket tracker by running `/manage-artifacts` action **Publish spec**. Apply the `spec` triage label - no need for additional triage.
+3. Write the spec using the template below, then publish it to the project ticket tracker by running `/manage-backlog` action **Publish spec**. Apply the `spec` triage label - no need for additional triage.
 
 Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
