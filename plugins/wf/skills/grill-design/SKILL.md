@@ -1,25 +1,25 @@
 ---
 name: grill-design
-description: A relentless interview to sharpen a plan or design, which also creates docs (ADRs, SDRs, and glossary) as we go.
+description: A relentless interview to sharpen a plan or design, which also creates docs (ADRs, SSRs, and glossary) as we go.
 disable-model-invocation: true
 ---
 
 # Grill Design
 
-Run a `/grilling` session — interview the user relentlessly, one question at a time, walking every branch of the design tree and giving your recommended answer for each. As decisions crystallise, write them down immediately: sharpen the glossary, challenge the architecture, and pin down the testing strategy, capturing each in the right document (`CONTEXT.md`, `ARCHITECTURE.md`, and `docs/sdr/` or `docs/adr/`) inline.
+Run a `/grilling` session — interview the user relentlessly, one question at a time, walking every branch of the design tree and giving your recommended answer for each. As decisions crystallise, write them down immediately: sharpen the glossary, challenge the architecture, and pin down the testing strategy, capturing each in the right document (`CONTEXT.md`, `ARCHITECTURE.md`, and `docs/ssr/` or `docs/adr/`) inline.
 
 This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.
 
-## SDR vs ADR
+## SSR vs ADR
 
-Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's an SDR. If it explains why **one** thing was done a surprising way, it's an ADR.
+Rule of thumb: if a future engineer should follow it **every time** they build something of this kind, it's an SSR. If it explains why **one** thing was done a surprising way, it's an ADR.
 
-| | **SDR** (`docs/sdr/`) | **ADR** (`docs/adr/`) |
+| | **SSR** (`docs/ssr/`) | **ADR** (`docs/adr/`) |
 |---|---|---|
 | Scope | Top-level decomposition; architectural/design pattern; the backbone | A single, localized decision |
 | Altitude | High-level — a rule the whole system follows | Low-level — often non-obvious to a developer |
 | Reuse | A template every new feature applies | A point-in-time choice for one area |
-| Indexed in `ARCHITECTURE.md` | **Yes** — `## Solution Design Strategy` | **Yes** — `## Architecture Decision Records` |
+| Indexed in `ARCHITECTURE.md` | **Yes** — `## Solution Strategy` | **Yes** — `## Architecture Decision Records` |
 | Example | "Every persisted entity is built as Model → Document → Mapping → Repository → Accessor" | "Task initiator is captured from the Keycloak `preferred_username` claim" |
 
 ## File structure
@@ -50,10 +50,10 @@ Architecture
 - [ ] Probe dependency direction and layering
 - [ ] Hunt for a deeper module
 - [ ] Update ARCHITECTURE.md inline
-- [ ] Offer Solution Design Records (SDRs) for backbone rules
+- [ ] Offer Solution Strategy Records (SSRs) for backbone rules
 - [ ] Offer ADRs sparingly
 Testing strategy
-- [ ] Locate the testing strategy (SDR or fallback)
+- [ ] Locate the testing strategy (SSR or fallback)
 - [ ] Challenge which test categories must cover the change
 ```
 
@@ -81,11 +81,11 @@ When a term is resolved, update `CONTEXT.md` right there. Don't batch these up �
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
-### Line of inquiry: Architecture (ARCHITECTURE.md + SDR/ADR)
+### Line of inquiry: Architecture (ARCHITECTURE.md + SSR/ADR)
 
 **Probe — Challenge against the existing architecture**
 
-Read `ARCHITECTURE.md` in full first. Absorb the codebase structure and the layered dependency model — layering direction and dependency rules — then scan the two index tables (`## Solution Design Strategy` for SDRs, `## Architecture Decision Records` for ADRs). Read only the summary rows in those tables, opening a full record in `docs/sdr/` or `docs/adr/` only when a row is relevant. If the plan conflicts with the documented structure, layering, or any record, call it out immediately: "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that intentional?" If the plan is a deliberate architectural shift, surface it as a candidate for an ADR or an SDR.
+Read `ARCHITECTURE.md` in full first. Absorb the codebase structure and the layered dependency model — layering direction and dependency rules — then scan the two index tables (`## Solution Strategy` for SSRs, `## Architecture Decision Records` for ADRs). Read only the summary rows in those tables, opening a full record in `docs/ssr/` or `docs/adr/` only when a row is relevant. If the plan conflicts with the documented structure, layering, or any record, call it out immediately: "Your architecture says the write model talks to Postgres directly, but your plan routes it through the cache — is that intentional?" If the plan is a deliberate architectural shift, surface it as a candidate for an ADR or an SSR.
 
 **Probe — Trace a concrete flow through the layers**
 
@@ -109,15 +109,15 @@ Push for a deep module — a lot of functionality behind a simple, stable interf
 
 **Probe — Update ARCHITECTURE.md inline**
 
-When the structure or layering changes, update `ARCHITECTURE.md` right there. Don't batch these up — capture them as they happen. When a new SDR is created, add its summary row to the `## Solution Design Strategy` index in the same change. When a new ADR is created, add its summary row to the `## Architecture Decision Records` index in the same change. Use the format in [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+When the structure or layering changes, update `ARCHITECTURE.md` right there. Don't batch these up — capture them as they happen. When a new SSR is created, add its summary row to the `## Solution Strategy` index in the same change. When a new ADR is created, add its summary row to the `## Architecture Decision Records` index in the same change. Use the format in [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
 
-`ARCHITECTURE.md` should describe *shape and rules*, not implementation detail. Do not treat `ARCHITECTURE.md` as a spec, a scratch pad, or a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Solution Design Records. It is the structural map and nothing else.
+`ARCHITECTURE.md` should describe *shape and rules*, not implementation detail. Do not treat `ARCHITECTURE.md` as a spec, a scratch pad, or a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Solution Strategy Records. It is the structural map and nothing else.
 
-**Probe — Offer Solution Design Records (SDRs) for backbone rules**
+**Probe — Offer Solution Strategy Records (SSRs) for backbone rules**
 
-A **Solution Design Record** is different from an ADR. An SDR captures a *backbone* decision: the solution strategy, the top-level decomposition of the system, or a mandated architectural/design pattern that every feature of a given kind must follow. It is a **main architecture rule**.
+A **Solution Strategy Record** is different from an ADR. An SSR captures a *backbone* decision: the solution strategy, the top-level decomposition of the system, or a mandated architectural/design pattern that every feature of a given kind must follow. It is a **main architecture rule**.
 
-Offer an SDR (instead of, or in addition to, an ADR) when all three are true:
+Offer an SSR (instead of, or in addition to, an ADR) when all three are true:
 
 1. **Structural** — it shapes the top-level decomposition or mandates a pattern, rather
    than settling one local question.
@@ -125,8 +125,8 @@ Offer an SDR (instead of, or in addition to, an ADR) when all three are true:
 3. **Backbone-defining** — it belongs in the `ARCHITECTURE.md` index where every
    contributor sees it.
 
-If any of the three is missing, skip the SDR. When you write an SDR: put the full record in `docs/sdr/` and add a one-line summary row to the `## Solution Design Strategy` table in `ARCHITECTURE.md` (the summary must match the SDR's
-`**Summary:**` line). Use the format in [SDR-FORMAT.md](./SDR-FORMAT.md).
+If any of the three is missing, skip the SSR. When you write an SSR: put the full record in `docs/ssr/` and add a one-line summary row to the `## Solution Strategy` table in `ARCHITECTURE.md` (the summary must match the SSR's
+`**Summary:**` line). Use the format in [SSR-FORMAT.md](./SSR-FORMAT.md).
 
 **Probe — Offer ADRs sparingly**
 
@@ -142,10 +142,10 @@ If any of the three is missing, skip the ADR. When you write an ADR: put the ful
 
 ### Line of inquiry: Testing strategy
 
-**Probe — Locate the testing strategy (SDR or fallback)**
+**Probe — Locate the testing strategy (SSR or fallback)**
 
-The testing strategy is usually an SDR — look for it by scanning the `## Solution Design Strategy` index in `ARCHITECTURE.md` for a testing-strategy row and opening that record in `docs/sdr/`. It may not exist; if there's no SDR, fall back to other documented conventions (e.g. `Testing.md`, `README.md`) and the existing tests in the codebase.
+The testing strategy is usually an SSR — look for it by scanning the `## Solution Strategy` index in `ARCHITECTURE.md` for a testing-strategy row and opening that record in `docs/ssr/`. It may not exist; if there's no SSR, fall back to other documented conventions (e.g. `Testing.md`, `README.md`) and the existing tests in the codebase.
 
 **Probe — Challenge which test categories must cover the change**
 
-When the plan adds a new REST API endpoint, external-service integration, persisted entity, or a new module, challenge which documented test categories must cover it — consult the testing-strategy SDR (or fallback) and explore the codebase to find existing tests rather than defaulting to unit tests. "This adds a new repository against the database — your testing strategy mandates an integration-test category for that. Which testing category covers persistence round-trips and queries?"
+When the plan adds a new REST API endpoint, external-service integration, persisted entity, or a new module, challenge which documented test categories must cover it — consult the testing-strategy SSR (or fallback) and explore the codebase to find existing tests rather than defaulting to unit tests. "This adds a new repository against the database — your testing strategy mandates an integration-test category for that. Which testing category covers persistence round-trips and queries?"
