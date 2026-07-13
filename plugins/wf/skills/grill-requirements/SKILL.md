@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Actively build and sharpen the project's domain model as you grilling. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
-Create files lazily using the [references/CONTEXT-FORMAT.md](references/CONTEXT-FORMAT.md) — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved.
+All `CONTEXT.md` reads, creates, and updates go through `/manage-docs`, which owns the glossary template and the lazy-creation rules — create it only when you have something to write, and if no `CONTEXT.md` exists, create one when the first term is resolved.
 
 # Ground the input
 
@@ -30,14 +30,13 @@ Glossary:
 - [ ] Sharpen fuzzy or overloaded language into precise canonical terms
 - [ ] Stress-test domain relationships with concrete scenarios
 - [ ] Cross-reference stated behavior against the actual code
-- [ ] Offer to update it inline as terms sharpen, using the format in [references/CONTEXT-FORMAT.md](references/CONTEXT-FORMAT.md) — capture each resolved term as it happens, never batched.
+- [ ] Offer to update `CONTEXT.md` inline as terms sharpen via `/manage-docs` — capture each resolved term as it happens, never batched.
 
 Requirements:
 - [ ] Surface every actor and their goal
 - [ ] Surface the behaviors the system must perform (functional requirements)
 - [ ] Surface the invariants that must always hold (business rules)
 - [ ] Surface boundary and failure conditions (edge cases)
-- [ ] Probe permissions — who may and may not perform each action
 - [ ] Probe degraded behavior — what still works when a dependency is slow or fails
 ```
 

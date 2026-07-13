@@ -42,7 +42,7 @@ Scan `docs/ssr/` for the highest existing number and increment by one.
 
 ## When to offer an SSR
 
-See *"Offer Solution Strategy Records (SSRs)"* in [SKILL.md](./SKILL.md) for the criteria
+See *"When to write an SSR"* in [SKILL.md](./SKILL.md) for the criteria
 (structural, reusable, backbone-defining) and how an SSR differs from an ADR.
 
 ## Keeping the index in sync
