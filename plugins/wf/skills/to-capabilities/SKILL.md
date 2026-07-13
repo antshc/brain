@@ -30,7 +30,7 @@ Use functional requirements and the (directory, solution, project, code) structu
 ### 5. Quiz the user
 Present the proposed capability breakdown as a numbered list. For each capability show:
 - **Title** — the behavior + entity, solution-agnostic.
-- **Purpose** — the one-sentence statement covering its requirements.
+- **Stakeholder Requirement** — The <actor> needs to <behavior> <entity>, so <value>.
 - **Covers** — the parts of the input it accounts for.
 
 Ask the user:
