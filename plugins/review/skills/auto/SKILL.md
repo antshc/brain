@@ -1,16 +1,15 @@
 ---
 name: 'auto'
 description: 'Perform a GitHub PR code review'
-argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
+argument-hint: '[qa|smells|reqs] <PR URL>'
 ---
 
 # GitHub Code Review Instructions
 
 <role> You are a **seasoned senior developer** performing a thorough code review.</role>
 
-**Step 1 — Parse PR URL**
-Parse the user input: `{{input}}`
-Extract: <owner>, <repo>, and <pr_number> from <pr_url> in the format `https://github.com/{owner}/{repo}/pull/{number}`
+**Step 1 — Parse arguments**
+Parse the user input: `{{input}}`, format `[axes] <PR URL>`. `axes` is an optional comma-separated selector: `qa` (Quality-attributes), `smells` (Code-smells), `reqs` (Requirements-coverage). Omitted = all three (default). Extract <owner>, <repo>, <pr_number> from <pr_url>. Record the resolved axes as <selected_axes> for Step 6.
 
 **Step 2 — Fetch PR details**
 1. Run `gh pr checkout <pr_number> --repo <owner>/<repo>` to check out the PR branch locally.
@@ -59,8 +58,8 @@ Perform mandatory code analysis following the `LSP Progressive Depth Code Analys
 
 Record the result as the **LSP baseline** using the output contract in `<skill-directory>/references/lsp-summary.md` (per-symbol table + risk-flag list). Pass this baseline into every sub-agent in Step 6 to ground their change analysis. Each sub-agent escalates to Level 2/3 as directed by the **LSP focus** section in its own reference file.
 
-**Step 6 — Spawn three review sub-agents in parallel**
-Send a single message with three `runSubagent` (`general-purpose`) calls so the axes don't pollute each other's context. Pass `model` on each call matching your own model. Give **each** sub-agent:
+**Step 6 — Spawn review sub-agents for the selected axes in parallel**
+Spawn only the sub-agents matching <selected_axes> from Step 1 (all three by default). Send a single message with one `runSubagent` (`general-purpose`) call per selected axis so the axes don't pollute each other's context. Pass `model` on each call matching your own model. Give **each** sub-agent:
 - the per-file diffs in `bin/review_diff/` and the changed-symbol list,
 - the existing review comments (dedup context — do not restate them),
 - the **full text** of the shared **LSP baseline** produced in Step 5, pasted into the prompt under a `## LSP baseline` heading,
@@ -68,14 +67,14 @@ Send a single message with three `runSubagent` (`general-purpose`) calls so the 
 - the shared finding format in `<skill-directory>/references/finding-format.md` (every axis returns findings in this schema),
 - the instruction: "Follow the **LSP focus** section in your axis reference file to escalate the shared baseline to Level 2/3 with the `LSP Progressive Depth Code Analysis` framework from `/lsp-depth-guidance`; this is mandatory. Fall back to other tools (`grep`, `view`, `bash`) only if the LSP server is unavailable."
 
-Each sub-agent returns findings only — it does **not** post. Every axis emits findings in the shared schema from `<skill-directory>/references/finding-format.md`. The three axes:
+Each sub-agent returns findings only — it does **not** post. Every axis emits findings in the shared schema from `<skill-directory>/references/finding-format.md`. The three axes (spawn only those in <selected_axes>):
 
-- **Quality-attributes sub-agent** — evaluate the change against `<skill-directory>/references/quality-attributes.md`, following its **LSP focus** section. For each area, conclude confirmed issue / plausible risk / no issue found. Report only net-new findings grounded in code evidence. Under 400 words.
-- **Code-smells sub-agent** — match the diff against the code smell baseline in `<skill-directory>/references/code-smells.md`, following its **LSP focus** section. Name each smell and quote the hunk. These are judgement calls, not hard violations; skip anything CI tooling enforces. Under 400 words.
-- **Requirements-coverage sub-agent** — evaluate the change against `<skill-directory>/references/requirements-coverage.md`, following its **LSP focus** section. Paste the full spec text identified in Step 4 into this sub-agent's prompt under a `## Spec` heading. Report missing/partial requirements, scope creep, and requirements implemented but wrong. Quote the spec line for each finding. If no spec was found in Step 4, pass none and the sub-agent will report "no spec available" and stop. Under 400 words.
+- **`qa` — Quality-attributes sub-agent** — evaluate the change against `<skill-directory>/references/quality-attributes.md`, following its **LSP focus** section. For each area, conclude confirmed issue / plausible risk / no issue found. Report only net-new findings grounded in code evidence. Under 400 words.
+- **`smells` — Code-smells sub-agent** — match the diff against the code smell baseline in `<skill-directory>/references/code-smells.md`, following its **LSP focus** section. Name each smell and quote the hunk. These are judgement calls, not hard violations; skip anything CI tooling enforces. Under 400 words.
+- **`reqs` — Requirements-coverage sub-agent** — evaluate the change against `<skill-directory>/references/requirements-coverage.md`, following its **LSP focus** section. Paste the full spec text identified in Step 4 into this sub-agent's prompt under a `## Spec` heading. Report missing/partial requirements, scope creep, and requirements implemented but wrong. Quote the spec line for each finding. If no spec was found in Step 4, pass none and the sub-agent will report "no spec available" and stop. Under 400 words.
 
 **Step 7 — Aggregate findings**
-Collect the three reports, each in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — keep them separate under `## Quality-attributes`, `## Code-smells`, and `## Requirements-coverage`. Carry forward only net-new, actionable findings.
+Collect the reports from the selected axes, each in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — keep them separate under `## Quality-attributes`, `## Code-smells`, and `## Requirements-coverage` headings (include only the headings for axes that were run). Carry forward only net-new, actionable findings.
 
 **Step 8 — Format findings**
 Each carried-forward finding is already in the shared schema (`<skill-directory>/references/finding-format.md`); map it to a comment following the `/to-review-comment` skill.
