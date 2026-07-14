@@ -23,4 +23,4 @@ Rules:
 - Emit findings only; do not post.
 - Report only net-new, actionable findings grounded in code evidence (see `<skill-directory>/references/review-rules.md`).
 - If an axis has nothing to report, return an empty list for that axis (Requirements-coverage may instead return "no spec available").
-- Keep `FINDING` terse; the label and line rules match `<skill-directory>/references/comment-template.md`.
+- Keep `FINDING` terse; the label and line rules match the comment template in the `/to-review-comment` skill.
