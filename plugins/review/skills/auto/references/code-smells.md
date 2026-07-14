@@ -27,4 +27,16 @@ Each smell reads *what it is* → *how to fix*:
 - **Middle Man** — a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest** — a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
 
+## LSP focus for this axis
+
+Build on the **`LSP baseline`** section of your prompt. Use LSP **relationships**, not contract diffs, following the `LSP Progressive Depth Code Analysis` framework from `/lsp-depth-guidance`:
+
+- Start from the baseline's **Fan-out** column (wide spread hints at Shotgun Surgery, Divergent Change, Feature Envy).
+- **Feature Envy / Message Chains** — run call hierarchy on changed methods to see whose data they reach through.
+- **Shotgun Surgery / wide fan-out** — run find-references across files to measure how far a single change ripples.
+- **Data Clumps / Primitive Obsession** — inspect type usage and parameter groups repeated across the changed symbols.
+- **Divergent Change** — check whether one changed file gathers edits for several unrelated reasons.
+
+Escalate to Level 2/3 only where a structural smell is plausible from the baseline; otherwise stay at Level 1.
+
 > Shared review rules (evidence, scope, deduplication) apply to this axis. See `<skill-directory>/references/review-rules.md`.
