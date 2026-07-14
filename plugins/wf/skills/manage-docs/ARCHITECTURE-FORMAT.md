@@ -80,13 +80,34 @@ See [ADR-FORMAT.md](./ADR-FORMAT.md).}
 
 
 ## Testing Strategy
-{The categories of tests that must be present for any change. Reference this section when designing or grilling a plan.}
+{The test categories that must be present for any change, and — for each — how to detect whether it applies and how to run its tests. **Load the categories from the Testing strategy SSR (`docs/ssr/`) if one exists** and link it here; otherwise fall back to the default list: Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E. Reference this section when designing or grilling a plan.}
 
-- **Database integration** — exercise real schema, queries, and migrations against a live database.
-- **External system integration** — verify contracts with third-party APIs, AWS cloud services, and other outside dependencies.
-- **REST API E2E** — automate end-to-end flows through the system's own HTTP surface.
-- **Frontend E2E** — drive the UI through real user journeys.
-- **Coding agent feedback loop** — the checks (build, lint, tests) an agent runs to self-verify a change before handoff.
+#### {Category name} — e.g. Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E
+
+{One line: what this category verifies, when it applies, and the skip condition.}
+
+- **Prerequisite:** {infra needed, e.g. docker daemon running — or "none".}
+- **Run mode:** {Per changed code | Health-check guard}
+
+**Per changed code** — run only the tests that cover the changed source.
+
+1. Map the change via the trigger table:
+
+   | Changed source folder | Test project |
+   | --- | --- |
+   | `{path/*}` | `{test project}` |
+
+2. Narrow to the covering test class(es) — note each changed file's **area**, then run only those:
+
+   \```
+   dotnet test <project> --filter "Category=<Category>&(FullyQualifiedName~<TestClassA>|FullyQualifiedName~<TestClassB>)"
+   \```
+
+**Health-check guard** — always-on; run the whole suite on every change regardless of which files changed (e.g. the coding agent feedback loop):
+
+\```
+dotnet test <project> --filter "Category=<Category>"
+\```
 ```
 
 ## Rules
