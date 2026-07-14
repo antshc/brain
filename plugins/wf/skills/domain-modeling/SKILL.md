@@ -47,6 +47,12 @@ When the user uses vague or overloaded terms, propose a precise canonical term. 
 
 When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
 
+### Challenge which test categories must cover the change
+
+Read the relevant `Testing strategy` section in `ARCHITECTURE.md`. No Testing strategy? Fall back to documented conventions (`Testing.md`, `README.md`) and existing tests in the codebase.
+
+When the plan adds a REST endpoint, external-service integration, persisted entity, or new module, challenge which documented categories must cover it. Consult the `Testing strategy` (or fallback) and explore existing tests — don't default to unit tests. "This adds a repository against the database — your strategy mandates an integration-test category. Which category covers persistence round-trips and queries?"
+
 ## Validate discovered decisions
 
 When you spot a decision, don't take it at face value — validate it against reality. Check it against two sources of truth: the architecture map (does the intended structure hold?) and the code (does the implementation agree?). Where they diverge, surface the gap.
