@@ -27,4 +27,15 @@ every conclusion using the LSP analysis and in specific code evidence, not on th
 
 For each area, conclude one of: **confirmed issue**, **plausible risk**, or **no issue found**.
 
+## LSP focus for this axis
+
+Build on the **`LSP baseline`** section of your prompt. For every symbol the baseline flags as a **contract change**, escalate to Level 2/3 using the `LSP Progressive Depth Code Analysis` framework from `/lsp-depth-guidance`:
+
+- Start from the baseline's **Contract, Nullability, Overrides** columns (broken assumptions, missing guards, contract drift).
+- **Dependents** — run find-references on the symbol; confirm every caller and implementer still satisfies the new contract.
+- **Behavior** — trace changed return/thrown/error paths, state transitions, and side effects into the callers that consume them.
+- **Polymorphism** — resolve overrides and interface implementations; confirm substitutability still holds.
+
+Prioritize depth on newly introduced nullability, changed thrown/returned/error behavior, and shared-mutable or async state. Stay at Level 1 where the baseline shows a body-only change.
+
 > Shared review rules (evidence, scope, deduplication) apply to this axis. See `<skill-directory>/references/review-rules.md`.

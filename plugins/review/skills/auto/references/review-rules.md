@@ -4,7 +4,7 @@ These rules apply to **every** review axis. They govern how findings are grounde
 smell an axis is looking for.
 
 - Review the changes as a whole, including cross-symbol behavior and the likely design intent.
-- Ground conclusions on sufficient and relevant repository-wide evidence gathered via the shared LSP summary, confirm evidences using the `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` skill, not on the patch alone and not on exhaustive exploration.
+- Ground conclusions on sufficient and relevant repository-wide evidence gathered via the shared LSP baseline summary, confirm evidences using the `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` skill, not on the patch alone and not on exhaustive exploration.
 
 - Do not report speculative issues. Report only findings supported by specific code evidence.
 - Treat existing review comments as already-covered review context for deduplication. Do not restate or rephrase them.
