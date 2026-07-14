@@ -30,8 +30,8 @@ Use the `HARNESS_ROOT` value provided to you by the agent (substitute its litera
 
 ### Fallback
 
-- **LSP diagnostics**: run `get_errors` on all changed files.
-- **Build**: run `dotnet build <project-dir> --no-incremental` for each unique affected project (do not build the same project twice). A passing `get_errors` does NOT replace a build — StyleCop and analyzers only fire during a real build.
+- **LSP diagnostics**: run `get diagnostics` on all changed files.
+- **Build**: run `dotnet build <project-dir> --no-incremental` for each unique affected project (do not build the same project twice). A passing `get diagnostics` does NOT replace a build — StyleCop and analyzers only fire during a real build.
 - **Tests**: run `dotnet test <test-project> --filter <relevant-classes>` for each unique affected test project, filtering by the classes that correspond to changed files in that test project's scope.
 
 ## Step 2: Refactoring review
