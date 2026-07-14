@@ -9,7 +9,7 @@ Use this framework to inspect changed symbols before drawing review conclusions.
 
 ## Before exploring
 
-Before exploring, confirm the project builds and check whether an LSP is available to assist exploration. Look at the Readme.md or ARCHITECTURE.md for build instructions. If the build fails, report this, fallback to other tools.
+Before exploring, check whether the LSP is available (e.g. try `hover` or `documentSymbol` on a known file). If it doesn't work, build the project — check the Readme.md or ARCHITECTURE.md for build instructions — then retry LSP. If it still fails, report this and fall back to other tools.
 
 ## Level 1 — Baseline (always required)
 
