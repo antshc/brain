@@ -61,7 +61,7 @@ Go deeper (Level 2/3) on symbols that raise a **risk signal**: broken or narrowe
 Record the result as the **LSP summary** using the output contract in `<skill-directory>/references/lsp-summary.md` (per-symbol table + risk-flag list). Pass this summary into every sub-agent in Step 6 to ground their change analysis.
 
 **Step 6 — Spawn three review sub-agents in parallel**
-Send a single message with three `runSubagent` (`general-purpose`) calls so the axes don't pollute each other's context. Give **each** sub-agent:
+Send a single message with three `runSubagent` (`general-purpose`) calls so the axes don't pollute each other's context. Pass `model` on each call matching your own model. Give **each** sub-agent:
 - the per-file diffs in `bin/review_diff/` and the changed-symbol list,
 - the existing review comments (dedup context — do not restate them),
 - the shared **LSP summary** from Step 5,
