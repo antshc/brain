@@ -13,20 +13,22 @@ Before exploring, confirm the project builds and check whether an LSP is availab
 
 ## Level 1 — Baseline (always required)
 
-- `goToDefinition`: inspect declaration and contract
-- `hover`: verify signature, type, generics, nullability, and modifiers
-- `findReferences`: understand usage shape (do NOT inspect all references)
+- List all symbols in a file (`documentSymbol`): get an overview of a file's structure before diving in
+- Search symbols by name across the workspace (`workspaceSymbol`): locate a symbol when its file location is unknown
+- Find where a symbol is defined (`goToDefinition`): inspect declaration and contract
+- Get type info and documentation for a symbol (`hover`): verify signature, type, generics, nullability, and modifiers
+- Find all usages of a symbol (`findReferences`): understand usage shape (do NOT inspect all references)
 
 ## Level 2 — Conditional (when behavior may be impacted)
 
 - Inspect a **small set of representative callers** (3–5 max)
-- `goToImplementation`: only when polymorphism or overrides are relevant
+- Find implementations of an interface/abstract type (`goToImplementation`): only when polymorphism or overrides are relevant
 - Inspect key downstream dependencies if side effects are involved
 
 ## Level 3 — Deep analysis (only when evidence suggests risk, callable symbols only)
 
-- `incomingCalls`: trace upstream callers when behavior change is significant
-- `outgoingCalls`: trace downstream effects when correctness depends on it
+- Find what calls a given function (`incomingCalls`): trace upstream callers when behavior change is significant
+- Find what a given function calls (`outgoingCalls`): trace downstream effects when correctness depends on it
 - Do NOT automatically expand full call chains; prefer representative and high-risk paths first
 - Use only when needed to understand behavior changes, side effects, or contract impact
 
