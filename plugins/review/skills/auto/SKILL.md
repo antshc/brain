@@ -46,7 +46,7 @@ Look for the originating spec, in this order:
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
 
 **Step 5 — Run the shared LSP analysis pass**
-For every changed symbol, perform mandatory code analysis following `<skill-directory>/references/lsp-analysis.md`. This runs **once, before the sub-agents**, and its result is shared with all of them.
+For every changed symbol, perform mandatory code analysis following `<skill-directory>/../lsp-navigation/SKILL.md`. This runs **once, before the sub-agents**, and its result is shared with all of them.
 
 **This is a hard gate — do not skip it.** `grep`, `view`, and `bash` are NOT substitutes for LSP. You must make actual LSP tool calls for each changed symbol before forming any conclusions. If the LSP server is unavailable, state that explicitly; do not silently fall back to text search.
 
@@ -67,7 +67,7 @@ Send a single message with three `runSubagent` (`general-purpose`) calls so the 
 - the shared **LSP summary** from Step 5,
 - the shared review rules in `<skill-directory>/references/review-rules.md` (evidence, scope, and deduplication rules that bind every axis),
 - the shared finding format in `<skill-directory>/references/finding-format.md` (every axis returns findings in this schema),
-- the instruction: "Use `<skill-directory>/references/lsp-analysis.md` as your **preferred** way to navigate code; fall back to other tools (`grep`, `view`, `bash`) only if the LSP server is unavailable."
+- the instruction: "Use `/lsp-navigation` skill as your **preferred** way to navigate code; fall back to other tools (`grep`, `view`, `bash`) only if the LSP server is unavailable."
 
 Each sub-agent returns findings only — it does **not** post. Every axis emits findings in the shared schema from `<skill-directory>/references/finding-format.md`. The three axes:
 
