@@ -1,7 +1,6 @@
 # Shared Review Rules
 
-These rules apply to **every** review axis (Correctness, Standards, Spec). They govern how
-findings are grounded, scoped, and deduplicated — independent of which quality attribute or
+These rules apply to **every** review axis. They govern how findings are grounded, scoped, and deduplicated — independent of which quality attribute or
 smell an axis is looking for.
 
 - Ground conclusions on sufficient and relevant repository-wide evidence gathered via the shared LSP summary, confirm evidences using the `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` skill, not on the patch alone and not on exhaustive exploration.
