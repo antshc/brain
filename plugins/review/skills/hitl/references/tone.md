@@ -12,12 +12,14 @@ Tone of voice is **how your message feels**, not just what it says. In code revi
 
 ## Rules
 Good review comments include:
-- One issue per comment.
+- Prefer one concrete finding per comment.
+- Concise, terse comment text.
+- Ground every comment in verified code evidence, not guesswork.
 - Always explain why it matters.
 - Prefer minimal fix over redesign.
 - the exact problem
 - the concrete impact
-- the smallest reasonable fix
+- Use the narrowest fix that solves the problem.
 - optional test guidance only when coverage is materially missing
 
 Avoid:
@@ -30,7 +32,7 @@ If the evidence is weak or the right fix is unclear, ask follow-up questions bef
 
 ## Tone Templates
 
-{Select the appropriate tone based on the context of the found issue.}
+{Select the appropriate tone based on the context of the finding.}
 
 **Asking a question (non-blocking):**
 - "Question: how does this behave when the cache is empty?"
