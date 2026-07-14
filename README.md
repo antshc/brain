@@ -12,6 +12,12 @@ copilot plugin install ralph@brain && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true) && \
 copilot plugin install review@brain
 ```
+## Install dotnet skill 
+```sh
+copilot plugin list
+copilot plugin marketplace add dotnet/skills
+copilot plugin install dotnet@dotnet-agent-skills
+```
 
 ## Install mattpocock skills
 ### Productivity
