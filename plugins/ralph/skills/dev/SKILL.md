@@ -89,7 +89,7 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/decisions.jsonl`, and is distinct from `WORKTREE_PATH`. Resolve it once by finding the outermost enclosing git repo:
+The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/decisions.jsonl`, and is distinct from `WORKTREE_PATH` or can be the same. Resolve it once by finding the outermost enclosing git repo:
 
 1. Find the main working tree of the current repo: `cd "$(git rev-parse --git-common-dir)/.." && pwd`
 2. Walk up parent directories — for each parent, run `git -C <parent> rev-parse --show-toplevel 2>/dev/null`. Stop when it fails. The last directory where it succeeded is `HARNESS_ROOT`.
