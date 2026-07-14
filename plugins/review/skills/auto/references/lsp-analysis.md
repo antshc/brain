@@ -2,6 +2,10 @@
 
 Use this framework to inspect changed symbols before drawing review conclusions. Do not rely on the diff alone.
 
+## Before exploring
+
+Before exploring, confirm the project builds and check whether an LSP is available to assist exploration. Look the Readme.md or ARCHITECTURE.md for build instructions. If the build fails, report this, fallback to other tools.
+
 ## Level 1 — Baseline (always required)
 
 - `goToDefinition`: inspect declaration and contract
@@ -34,3 +38,4 @@ Do NOT exhaustively inspect all references or implementations if usage is repeti
   - shared services
   - async flows
   - error handling paths
+
