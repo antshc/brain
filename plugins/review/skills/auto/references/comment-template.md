@@ -7,7 +7,7 @@ Use this template for every review comment. Keep it actionable and grounded in c
 ```
 FILE_PATH: <repo-relative file path>
 LINE_NUMBER: <new-file line number>
-COMMENT_BODY: <label> <clear statement of the issue>. <why it matters>. <minimal change requested>.
+COMMENT_BODY: <label>: <clear statement of the issue>. <why it matters>. <minimal change requested>.
 ```
 
 Optional minimal snippet:
@@ -24,6 +24,7 @@ Optional minimal snippet:
 
 ## Comment-Writing Rules
 
+- `COMMENT_BODY` must be concise, terse
 - Ground every comment in verified code evidence, not guesswork.
 - Prefer one concrete finding per comment.
 - State the impact in practical terms.
