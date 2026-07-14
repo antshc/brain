@@ -11,11 +11,22 @@ Tone of voice is **how your message feels**, not just what it says. In code revi
 5. **Balance critique with recognition** — Quick positive notes make change requests easier to receive.
 
 ## Rules
-
+Good review comments include:
 - One issue per comment.
 - Always explain why it matters.
 - Prefer minimal fix over redesign.
-- Ground every comment in verified code evidence, not speculation.
+- the exact problem
+- the concrete impact
+- the smallest reasonable fix
+- optional test guidance only when coverage is materially missing
+
+Avoid:
+- speculative concerns without code evidence
+- style-only feedback unless explicitly requested
+- broad redesign advice when a local fix is enough
+- combining multiple unrelated issues into one comment
+
+If the evidence is weak or the right fix is unclear, ask follow-up questions before posting. If the concern still cannot be verified, do not draft or post a review comment.
 
 ## Tone Templates
 
