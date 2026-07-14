@@ -1,5 +1,5 @@
 ---
-name: 'lsp-navigation'
+name: 'lsp-depth-navigation'
 description: 'Navigate and inspect changed code with LSP tools at progressive depth before drawing review conclusions.'
 ---
 
