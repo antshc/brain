@@ -46,9 +46,10 @@ Look for the originating spec, in this order:
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
 
 **Step 5 — Run the shared LSP analysis pass**
-For every changed symbol, perform mandatory code analysis following `lsp-depth-guidance`. This runs **once, before the sub-agents**, and its result is shared with all of them.
 
-**This is a hard gate — do not skip it.** `grep`, `view`, and `bash` are NOT substitutes for LSP.
+**This is a hard gate — do not skip it.** `grep`, `view`, and `bash` are NOT substitutes for LSP. This runs **once, before the sub-agents**, and its result is shared with all of them.
+
+Perform mandatory code analysis following `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` to inspect changed symbols before drawing review conclusions. Do not rely on the diff alone. 
 
 **What to look for** — for every changed symbol, answer these fixed questions:
 - **Contract** — what are the signature, return type, generics, nullability, and modifiers, and did the change alter the contract or only the body?
@@ -56,7 +57,7 @@ For every changed symbol, perform mandatory code analysis following `lsp-depth-g
 - **Behavior** — do return/thrown/error paths, state transitions, or side effects change?
 - **Polymorphism** — are overrides or interface implementations affected?
 
-Go deeper (Level 2/3) on symbols that raise a **risk signal**: broken or narrowed caller contract, newly introduced nullability, changed thrown/returned/error behavior, wide cross-file fan-out, or shared-mutable/async state. Stay shallow (Level 1) where none of these apply.
+Go deeper (Level 2/3) using `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` on symbols that raise a **risk signal**: broken or narrowed caller contract, newly introduced nullability, changed thrown/returned/error behavior, wide cross-file fan-out, or shared-mutable/async state. Stay shallow (Level 1) where none of these apply.
 
 Record the result as the **LSP summary** using the output contract in `<skill-directory>/references/lsp-summary.md` (per-symbol table + risk-flag list). Pass this summary into every sub-agent in Step 6 to ground their change analysis.
 
@@ -67,7 +68,7 @@ Send a single message with three `runSubagent` (`general-purpose`) calls so the 
 - the shared **LSP summary** from Step 5,
 - the shared review rules in `<skill-directory>/references/review-rules.md` (evidence, scope, and deduplication rules that bind every axis),
 - the shared finding format in `<skill-directory>/references/finding-format.md` (every axis returns findings in this schema),
-- the instruction: "Use `/lsp-depth-guidance` skill as your **preferred** way to navigate code; fall back to other tools (`grep`, `view`, `bash`) only if the LSP server is unavailable."
+- the instruction: "Use `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` skill as your **preferred** way to navigate code; fall back to other tools (`grep`, `view`, `bash`) only if the LSP server is unavailable."
 
 Each sub-agent returns findings only — it does **not** post. Every axis emits findings in the shared schema from `<skill-directory>/references/finding-format.md`. The three axes:
 
