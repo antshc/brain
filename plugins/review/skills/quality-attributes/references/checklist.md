@@ -1,7 +1,7 @@
 # Correctness Evaluation Checklist
 
-Use this checklist to evaluate the changes. Ground
-every conclusion using the LSP analysis and in specific code evidence, not on the patch alone.
+Use this checklist to evaluate the changes. Ground every conclusion using the LSP
+summary and specific code evidence, not the patch alone.
 
 ## Quality attributes
 
@@ -27,4 +27,4 @@ every conclusion using the LSP analysis and in specific code evidence, not on th
 
 For each area, conclude one of: **confirmed issue**, **plausible risk**, or **no issue found**.
 
-> Shared review rules (evidence, scope, deduplication) apply to this axis. See `<skill-directory>/references/review-rules.md`.
+> Axis review rules (evidence, scope, deduplication, filtering) apply. See `<skill-directory>/references/review-rules.md`.

@@ -1,10 +1,10 @@
 # Code Smell Baseline (Fowler)
 
-Use this checklist to evaluate the changes. Ground
-every conclusion using the LSP analysis and in specific code evidence, not on the patch alone.
+Use this checklist to evaluate the changes. Ground every conclusion using the LSP summary and
+specific code evidence, not the patch alone.
 
-A fixed set of Martin Fowler code smells (_Refactoring_, ch. 3) used by the Standards
-axis. Match each against the diff. Two rules bind this baseline:
+A fixed set of Martin Fowler code smells (_Refactoring_, ch. 3). Match each against the diff.
+Two rules bind this baseline:
 
 - **Always a judgement call.** Each smell is a labelled heuristic ("possible Feature Envy"),
   never a hard violation. Report it as a suggestion, not a defect.
@@ -27,4 +27,4 @@ Each smell reads *what it is* → *how to fix*:
 - **Middle Man** — a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest** — a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
 
-> Shared review rules (evidence, scope, deduplication) apply to this axis. See `<skill-directory>/references/review-rules.md`.
+> Axis review rules (evidence, scope, deduplication, filtering) apply. See `<skill-directory>/references/review-rules.md`.

@@ -59,28 +59,32 @@ Perform mandatory code analysis following `LSP Progressive Depth Code Analysis` 
 
 Go deeper (Level 2/3) using `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` on symbols that raise a **risk signal**: broken or narrowed caller contract, newly introduced nullability, changed thrown/returned/error behavior, wide cross-file fan-out, or shared-mutable/async state. Stay shallow (Level 1) where none of these apply.
 
-Record the result as the **LSP summary** using the output contract in `<skill-directory>/references/lsp-summary.md` (per-symbol table + risk-flag list). Pass this summary into every sub-agent in Step 6 to ground their change analysis.
+Record the result as the **LSP summary** using the output contract in `<skill-directory>/references/lsp-summary.md` (per-symbol table + risk-flag list). It feeds the shared input payload in Step 6.
 
-**Step 6 — Spawn three review sub-agents in parallel**
-Send a single message with three `runSubagent` (`general-purpose`) calls so the axes don't pollute each other's context. Pass `model` on each call matching your own model. Give **each** sub-agent:
-- the per-file diffs in `bin/review_diff/` and the changed-symbol list,
-- the existing review comments (dedup context — do not restate them),
-- the shared **LSP summary** from Step 5,
-- the shared review rules in `<skill-directory>/references/review-rules.md` (evidence, scope, and deduplication rules that bind every axis),
-- the shared finding format in `<skill-directory>/references/finding-format.md` (every axis returns findings in this schema),
-- the instruction: "Use `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` skill as your **preferred** way to navigate code; fall back to other tools (`grep`, `view`, `bash`) only if the LSP server is unavailable."
+**Step 6 — Build the shared input payload and spawn the three axis agents in parallel**
+Assemble one shared **input JSON payload** matching `<skill-directory>/references/io-schema.md` from:
+- `pr` (owner, repo, number, url),
+- `diff_dir` = `bin/review_diff/` and `changed_symbols` (Step 2/3),
+- `existing_comments` (Step 3 — dedup context, do not restate),
+- `lsp_summary` (Step 5),
+- `spec` (Step 4; `null` if none found).
 
-Each sub-agent returns findings only — it does **not** post. Every axis emits findings in the shared schema from `<skill-directory>/references/finding-format.md`. The three axes:
+Send a single message with three `runSubagent` calls so the axes don't pollute each other's context. Pass `model` on each call matching your own model. Each sub-agent runs one of the axis skills in **spawned mode**, receiving the shared input JSON payload as its input:
 
-- **Quality-attributes sub-agent** — evaluate the change against `<skill-directory>/references/quality-attributes.md`. For each area, conclude confirmed issue / plausible risk / no issue found. Report only net-new findings grounded in code evidence. Under 400 words.
-- **Code-smells sub-agent** — match the diff against the code smell baseline in `<skill-directory>/references/code-smells.md`. Name each smell and quote the hunk. These are judgement calls, not hard violations; skip anything CI tooling enforces. Under 400 words.
-- **Requirements-coverage sub-agent** — using the spec from Step 4, report: (a) requirements that are missing or partial; (b) behavior in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but wrong. Quote the spec line for each finding. If no spec was found, report "no spec available" and stop. Under 400 words.
+- **quality-attributes** — run the `/quality-attributes` skill.
+- **code-smells** — run the `/code-smells` skill.
+- **requirements-coverage** — run the `/requirements-coverage` skill.
 
-**Step 7 — Aggregate findings**
-Collect the three reports, each in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — keep them separate under `## Quality-attributes`, `## Code-smells`, and `## Requirements-coverage`. Carry forward only net-new, actionable findings.
+Each axis agent evaluates its own checklist, applies its own axis-specific review rules (which produce the two counts — total candidates vs. after-filter), and returns an **output JSON payload** with `violations`, `passed`, and `counts`. In spawned mode the agents return the payload only — they do **not** display or post.
 
-**Step 8 — Format findings**
-Each carried-forward finding is already in the shared schema (`<skill-directory>/references/finding-format.md`); map it to a comment following the `/to-review-comment` skill.
+**Step 7 — Aggregate the three output payloads**
+Collect the three output JSON payloads and aggregate them following `<skill-directory>/references/aggregation.md`: keep axes separate, dedup violations against existing review comments (`file_path` + `line_number` + `label`), and roll up per-axis and total counts.
 
-**Step 9 — Post findings**
-Post each finding as an **inline pull-request review comment** following `<skill-directory>/references/posting.md`.
+**Step 8 — Display both lists to the user**
+Display the aggregated result to the user per `<skill-directory>/references/aggregation.md` — for each axis show its **violations** and its **passed** list, then the combined **counts** roll-up. The passed lists are display-only.
+
+**Step 9 — Format violations**
+For each carried-forward **violation**, map it to a comment body following the `/to-review-comment` skill. The `passed` lists are never posted.
+
+**Step 10 — Post violations**
+Post the violations as **inline pull-request review comments** by invoking the `/post-review-comment` skill with `{ pr, comments }` (one `comments` entry per violation: `file_path`, `line_number`, `body`).
