@@ -63,7 +63,7 @@ For code analysis:
 - `semantic_search` - Search codebase semantically
 - `grep_search` - Fast text/regex search across files
 - `read_file` - Read file contents for full context
-- `get_errors` - Check for compile/lint errors in modified files
+- `get diagnostics` - Check for compile/lint errors in modified files
 
 For parallel operations:
 - When analyzing multiple files, read them in parallel when they're independent
