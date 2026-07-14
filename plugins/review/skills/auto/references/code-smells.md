@@ -1,5 +1,8 @@
 # Code Smell Baseline (Fowler)
 
+Use this checklist to evaluate the changes. Ground
+every conclusion using the LSP analysis and in specific code evidence, not on the patch alone.
+
 A fixed set of Martin Fowler code smells (_Refactoring_, ch. 3) used by the Standards
 axis. Match each against the diff. Two rules bind this baseline:
 
