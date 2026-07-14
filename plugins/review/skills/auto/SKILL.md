@@ -80,7 +80,7 @@ Each sub-agent returns findings only — it does **not** post. Every axis emits 
 Collect the three reports, each in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — keep them separate under `## Quality-attributes`, `## Code-smells`, and `## Requirements-coverage`. Carry forward only net-new, actionable findings.
 
 **Step 8 — Format findings**
-Each carried-forward finding is already in the shared schema (`<skill-directory>/references/finding-format.md`); map it to a comment following `<skill-directory>/references/comment-template.md` and `<skill-directory>/references/tone.md`.
+Each carried-forward finding is already in the shared schema (`<skill-directory>/references/finding-format.md`); map it to a comment following the `/to-review-comment` skill.
 
 **Step 9 — Post findings**
 Post each finding as an **inline pull-request review comment** following `<skill-directory>/references/posting.md`.

@@ -29,5 +29,3 @@ Optional minimal snippet:
 ````language
 <tiny inline snippet or diff showing the smallest safe fix>
 ````
-
-

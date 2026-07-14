@@ -35,7 +35,7 @@ Ask the user: *"Please paste the code change, feedback, or context you'd like re
 4. Keep it concise — short, direct sentences, no unnecessary wording.
 5. Explore code if needed — if the issue depends on external context, run `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` skill to inspect related code, usages, or callers before commenting; otherwise rely on the provided snippet.
 
-**Step 3b. Human approval** — draft the comment following `<skill-directory>/references/comment-template.md`, then present it with this menu and wait for the user to select:
+**Step 3b. Human approval** — draft the comment following the `/to-review-comment` skill, then present it with this menu and wait for the user to select:
 
 > Please review the comment above. What would you like to do?
 > 1. Approve & review another code change
