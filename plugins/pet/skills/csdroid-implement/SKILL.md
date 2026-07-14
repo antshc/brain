@@ -10,14 +10,15 @@ Implement the requested C# task using the rules below.
 Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given). Then locate docs `ARCHITECTURE.md`, `CODE.md` at `$HARNESS_ROOT`. For each that exists:
 
 1. Read it. You **must not** skip a file that is present.
-2. `ARCHITECTURE.md` indexes ADRs (`docs/adr/`) and SDRs (`docs/sdr/`) as a table of one-line summaries. Scan that table, pick the rows whose summary relates to the current task, and read **only those** ADR/SDR files in full.
+2. `ARCHITECTURE.md` indexes `Architecture Decision Records` (`docs/adr/`) and `Solution Strategy` (`docs/ssr/`) as a table of one-line summaries. Scan that table, pick the rows whose summary relates to the current task, and read **only those** ADR/SSR files in full.
 3. Apply the rules, decisions, and strategies you found during implementation.
 
 **Emit**: "Loaded docs: [list]. Missing (fallback): [list]."
 
 ## Rules
 
-- Place classes per `Source Code Structure` and `Layers Dependency` from `ARCHITECTURE.md` if present; else infer placement from neighboring files and conventions found during EXPLORATION.
-- Apply `Solution Design Strategy` and `Architecture Decision Records` from `ARCHITECTURE.md` if present; else follow the design choices established in existing code.
-- Write code using the `CODE.md` conventions if present; else match the style of surrounding code. Prefer deep modules, avoid speculative features.
-- Write tests when: adding a new public method, changing existing behavior, or touching conditional logic. Follow rules in `CODE.md` if present; else match the existing test patterns found during EXPLORATION.
+- **Fallback:** when a referenced doc is absent, match the conventions of the code you touched during EXPLORATION. Never invent conventions.
+- **Placement** — put classes where `Building blocks` and `Layers Dependency` (in `ARCHITECTURE.md`) dictate.
+- **Design** — follow `Solution Strategy` and the ADRs (in `ARCHITECTURE.md`). Prefer deep modules; add no speculative features.
+- **Style** — write code to `CODE.md` conventions.
+- **Tests** — write tests to `CODE.md` conventions whenever you add a public method, change existing behavior, or add/alter conditional logic.
