@@ -47,17 +47,17 @@ Explore the repo to understand code for the task:
 
 **This step is mandatory. Do not proceed to implementation until complete.**
 
-Follow the Read Workflow in the `csdroid-memory` skill, passing `HARNESS_ROOT` so it searches the `*.md` and decision `$HARNESS_ROOT/*.jsonp` files under `HARNESS_ROOT` (never the worktree cwd). Emit the matching decision IDs, List IDs you are applying or "No prior decisions apply" before continuing.
+Follow the Read Workflow in the `csdroid-memory` skill, passing `HARNESS_ROOT` so it searches the `*.md` and `decisions.jsonl` files under `HARNESS_ROOT` (never the worktree cwd). Emit the matching decision IDs, List IDs you are applying or "No prior decisions apply" before continuing.
 
 Apply matching decisions during implementation. Do not contradict them without superseding first.
 
 ## IMPLEMENTATION
 
-Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules, passing `HARNESS_ROOT` so it searches the `*.md` convention files (e.g. `$HARNESS_ROOT/ARCHITECTURE.md`) under `HARNESS_ROOT` (never the worktree cwd) and the decisions `*.jsonp` files.
+Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules, passing `HARNESS_ROOT` so it searches the `*.md` convention files (e.g. `$HARNESS_ROOT/ARCHITECTURE.md`) under `HARNESS_ROOT` (never the worktree cwd) and the decisions `*.jsonl` files.
 
 ## FEEDBACK LOOPS
 
-Run the `csdroid-feedback` skill, after IMPLEMENTATION completes, passing `HARNESS_ROOT` so it searches the `*.md` files (e.g. `$HARNESS_ROOT/VERIFY.md`, decisions `$HARNESS_ROOT/*.jsonp`) under `HARNESS_ROOT` (never the worktree cwd).
+Run the `csdroid-feedback` skill, after IMPLEMENTATION completes, passing `HARNESS_ROOT` so it searches the `*.md` files (e.g. `ARCHITECTURE.md`, `VERIFY.md`, decisions `decisions*.jsonl`) under `HARNESS_ROOT` (never the worktree cwd).
 
 ## RECORD DECISIONS
 
