@@ -17,19 +17,27 @@ All doc reads, creates, and updates go through `/manage-docs` — it owns the te
 - `docs/ssr/` — Solution Strategy Records: the backbone rules.
 - `docs/adr/` — Architecture Decision Records: localized decisions.
 
+## Load strategy guardrails
+
+Before designing or grilling:
+
+1. Read the `Solution Strategy` index in `ARCHITECTURE.md`.
+2. Load only SSRs relevant to the current scope.
+3. Extract:
+   * **Mandates** — required patterns and boundaries.
+   * **Prohibitions** — explicitly rejected approaches.
+   * **Open space** — unconstrained choices.
+4. Use these guardrails to frame questions, scenarios, and alternatives.
+
+Do not present an SSR-violating option as equally valid. Cite the SSR and surface the conflict.
+
+Re-scope when the building block, boundary, integration, or responsibility changes.
+
 ## During the session
 
 ### Challenge against the glossary
 
 When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
-
-### Challenge against the Solution strategy Records (SSRs)
-
-When the user states how something is designed, or which layer owns a responsibility, check it against the SSRs before accepting it. Scan the SSR index in the `Solution strategy` section, and load only the SSRs relevant to the claim. If you find a contradiction, surface it: "Your SSR mandates that API logic lives in the controller, but you just said it belongs in the service layer — which is right?"
-
-### Surface design improvements
-
-When you spot a decision that would improve the design, surface it: "Could this be one deep module with a narrow interface, instead of three shallow modules that leak their internals to each other?"
 
 ### Sharpen fuzzy language
 
@@ -43,9 +51,26 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 When you spot a decision, don't take it at face value — validate it against reality. Check it against two sources of truth: the architecture map (does the intended structure hold?) and the code (does the implementation agree?). Where they diverge, surface the gap.
 
+### Surface design improvements
+
+When you spot a decision that would improve the design, surface it: "Could this be one deep module with a narrow interface, instead of three shallow modules that leak their internals to each other?"
+
+### Surface strategy drift
+
+Treat SSRs as intended architecture and code as implemented architecture.
+
+When they conflict, classify the gap:
+
+* **Violation** — the proposal breaks the strategy.
+* **Drift** — the implementation diverges.
+* **Supersession** — the SSR is outdated.
+* **Out of scope** — the SSR does not apply.
+
 ### Trace through the layers
 
-Explore the `Building blocks` section for the layers. Walk one real use-case end-to-end and force each step into a layer. Where does each step live, and where do the boundaries — transaction, process, network — fall? "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?"
+Read the relevant `Building blocks` section in `ARCHITECTURE.md`, then select one representative scenario and trace it end-to-end. Walk one real scenario end-to-end and force each step into a layer. Where does each step live, and where do the boundaries — transaction, process, network — fall? "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?"
+
+Validate the trace against the loaded SSR guardrails, architecture map, and code, then classify any mismatch using `Surface strategy drift`.
 
 ### Cross-reference with code
 
