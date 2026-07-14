@@ -77,6 +77,16 @@ See [ADR-FORMAT.md](./ADR-FORMAT.md).}
 | # | Decision | Summary |
 |---|----------|---------|
 | [{NNNN}](docs/adr/{NNNN}-{slug}.md) | {Decision title} | {One-sentence summary of the decision.} |
+
+
+## Testing Strategy
+{The categories of tests that must be present for any change. Reference this section when designing or grilling a plan.}
+
+- **Database integration** — exercise real schema, queries, and migrations against a live database.
+- **External system integration** — verify contracts with third-party APIs, AWS cloud services, and other outside dependencies.
+- **REST API E2E** — automate end-to-end flows through the system's own HTTP surface.
+- **Frontend E2E** — drive the UI through real user journeys.
+- **Coding agent feedback loop** — the checks (build, lint, tests) an agent runs to self-verify a change before handoff.
 ```
 
 ## Rules
