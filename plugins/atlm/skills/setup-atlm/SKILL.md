@@ -58,7 +58,7 @@ Ensure `.github/copilot-instructions.md` exists in the repo root (create it and 
 ```markdown
 ## Atlassian Rovo MCP
 
-When connected to Atlassian-Rovo-MCP, read the values from `.atlmcp.env` at the repo root:
+When connected to Atlassian-Rovo-MCP, read the values from `.env/.atlmcp.env` (relative to the reporoot — do NOT search outside the reporoot for this file):
 - **MUST** use Jira project keys from `ATLASSIAN_JIRA_PROJECT_KEYS` (comma-separated; first = default).
 - **MUST** use cloudId from `ATLASSIAN_CLOUD_ID` (do NOT call getAccessibleAtlassianResources).
 - **MUST** use Confluence space IDs from `ATLASSIAN_CONFLUENCE_SPACE_IDS` (comma-separated; first = default, confirm if ambiguous).
