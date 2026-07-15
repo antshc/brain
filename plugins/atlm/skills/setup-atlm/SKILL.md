@@ -11,7 +11,7 @@ Resolve cloudId, projectKey, and spaceId from `.atlmcp.env` in the `.env` so MCP
 
 **Step 1 — Check for `.atlmcp.env`**
 
-Look for `.atlmcp.env` in the `.env` directory in the repo root.
+Look for `.atlmcp.env` in the repo root or it subdirectories recursively.
 
 - If it does **not** exist, create it with the template below and stop — ask the user to fill in their values before continuing:
 
@@ -58,7 +58,7 @@ Ensure `.github/copilot-instructions.md` exists in the repo root (create it and 
 ```markdown
 ## Atlassian Rovo MCP
 
-When connected to Atlassian-Rovo-MCP, read the values from `.env/.atlmcp.env` (relative to the reporoot — do NOT search outside the reporoot for this file):
+Look for `.atlmcp.env` in the repo root or it subdirectories recursively:
 - **MUST** use Jira project keys from `ATLASSIAN_JIRA_PROJECT_KEYS` (comma-separated; first = default).
 - **MUST** use cloudId from `ATLASSIAN_CLOUD_ID` (do NOT call getAccessibleAtlassianResources).
 - **MUST** use Confluence space IDs from `ATLASSIAN_CONFLUENCE_SPACE_IDS` (comma-separated; first = default, confirm if ambiguous).
