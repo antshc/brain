@@ -41,12 +41,6 @@ For each area, conclude one of: **confirmed issue**, **plausible risk**, or **no
 
 **Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow.
 
-**Speed Principles** - Adapt search strategy based on the requested thoroughness level.
-
-**Bias for speed** — return findings as quickly as possible:
-- Parallelize independent tool calls (multiple greps, multiple reads)
-- Stop searching once you have sufficient context
-
 **Deepen on contract changes.** For each symbol whose contract changed:
 
 - **Dependents** — "search for all references to the symbol" to enumerate callers, then read **3–5 representative callers** (not all) and confirm each still satisfies the new contract.

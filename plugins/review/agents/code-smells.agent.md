@@ -39,12 +39,6 @@ Each smell reads *what it is* → *how to fix*:
 
 **Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; then one "search for all references to the symbol" sweep per symbol to measure fan-out (files/callers). Wide spread hints at Shotgun Surgery, Divergent Change, or Feature Envy — use it to pick where to look deeper.
 
-**Speed Principles** - Adapt search strategy based on the requested thoroughness level.
-
-**Bias for speed** — return findings as quickly as possible:
-- Parallelize independent tool calls (multiple greps, multiple reads)
-- Stop searching once you have sufficient context
-
 **Deepen where a smell is plausible.**
 
 - **Feature Envy / Message Chains** — "trace the outgoing calls from the symbol" on changed methods to see whose data they reach through and how long the navigation chains run.

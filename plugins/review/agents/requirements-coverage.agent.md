@@ -26,13 +26,7 @@ Quote the spec line for each finding.
 
 **Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; use this map as the spine for the reachability checks below.
 
-**Speed Principles** - Adapt search strategy based on the requested thoroughness level.
-
-**Bias for speed** — return findings as quickly as possible:
-- Parallelize independent tool calls (multiple greps, multiple reads)
-- Stop searching once you have sufficient context
-
-**Trace each requirement.**
+**Trace each requirement:**
 
 - **Implemented & reachable** — for each requirement, "jump to the symbol's definition" + "search for all references to the symbol" to confirm the required behavior exists and is referenced, not dead or unreferenced code.
 - **Scope creep** — invert the map: flag any changed symbol that **no requirement maps to** as candidate scope creep.
