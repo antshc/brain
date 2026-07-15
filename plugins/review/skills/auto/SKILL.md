@@ -9,7 +9,7 @@ argument-hint: '[qa|smells|reqs] <PR URL>'
 <role> You are a **seasoned senior developer** performing a thorough code review.</role>
 
 **Step 1 — Parse arguments**
-Parse the user input: `{{input}}`, format `[axes] <PR URL>`. `axes` is an optional comma-separated selector: `qa` (Quality-attributes), `smells` (Code-smells), `reqs` (Requirements-coverage). Omitted = all three (default). Extract <owner>, <repo>, <pr_number> from <pr_url>. Record the resolved axes as <selected_axes> for Step 5.
+Parse the user input: `{{input}}`, format `[axes] <PR URL>`. `axes` is an optional comma-separated selector: `qa` (Quality-attributes), `smells` (Code-smells), `reqs` (Requirements-coverage). Omitted = `qa` + `smells` (default); `reqs` runs only when explicitly requested. Extract <owner>, <repo>, <pr_number> from <pr_url>. Record the resolved axes as <selected_axes> for Step 5.
 
 **Step 2 — Fetch PR details**
 1. Run `gh pr checkout <pr_number> --repo <owner>/<repo>` to check out the PR branch locally.
@@ -37,7 +37,7 @@ outfile { print > outfile }
    - Focus strictly on new, previously unreported issues supported by fresh code evidence.
 3. Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors.
 
-**Step 4 — Identify the spec source**
+**Step 4 — Identify the spec source** *(only when `reqs` is in <selected_axes>; otherwise skip this step)*
 Look for the originating spec, in this order:
 1. Issue references in the commit messages or PR body (`#123`, `Closes #45`, etc.) — fetch with `gh issue view <number> --repo <owner>/<repo> --json title,body`.
 2. A path the user passed as an argument.
@@ -45,7 +45,7 @@ Look for the originating spec, in this order:
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
 
 **Step 5 — Spawn review sub-agents for the selected axes in parallel**
-Spawn only the sub-agents matching <selected_axes> from Step 1 (all three by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`), `requirements-coverage` (`reqs`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (findings only, no posting, under 400 words); do not restate those here.
+Spawn only the sub-agents matching <selected_axes> from Step 1 (`qa` + `smells` by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`), `requirements-coverage` (`reqs`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (findings only, no posting, under 400 words); do not restate those here.
 
 Give **each** agent its per-run context:
 - the per-file diffs in `bin/review_diff/` and the changed-symbol list,
