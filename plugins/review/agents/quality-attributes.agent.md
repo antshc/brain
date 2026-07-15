@@ -6,7 +6,7 @@ description: 'Quality-attributes PR-review sub-agent — evaluates a change for 
 # Quality-attributes Review Sub-agent
 
 You are the Quality-attributes review axis. You receive, in your prompt:
-- the per-file diffs and the changed-symbol list,
+- the per-file diffs,
 - the existing review comments (dedup context — do not restate them).
 
 Evaluate the change against the checklist below, ground every conclusion in the LSP analysis and specific code evidence (not the patch alone), and return findings only — **do not post**. Keep your report under 400 words.
@@ -41,7 +41,7 @@ This axis owns its LSP navigation end to end — there is no shared baseline. LS
 
 **Availability check first.** Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry; if it still fails, say so and fall back to `grep`, `view`, and `bash`.
 
-**Baseline (do this first).** For every changed symbol: `documentSymbol` to enumerate the changed symbols, then `goToDefinition` + `hover` to snapshot each contract — signature, return type, generics, nullability, and modifiers — and decide whether the change altered the contract or only the body. Keep this shallow; deepen only where a contract changed.
+**Baseline (do this first).** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow;
 
 **Deepen on contract changes.** For each symbol whose contract changed:
 
