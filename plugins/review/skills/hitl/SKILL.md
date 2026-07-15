@@ -35,7 +35,12 @@ Ask the user: *"Please paste the code change, feedback, or context you'd like re
 4. Keep it concise — short, direct sentences, no unnecessary wording.
 5. Explore code if needed — if the issue depends on external context, run `LSP Progressive Depth Code Analysis` framework from the `/lsp-depth-guidance` skill to inspect related code, usages, or callers before commenting; otherwise rely on the provided snippet.
 
-**Step 3b. Human approval** — draft the comment following the `/to-review-comment` skill, then present it with this menu and wait for the user to select:
+**Step 3b. Human approval** — emit the finding following the `/to-review-finding` skill, invoking it with the `hitl` axis. Choose the `LABEL` by reviewer judgment:
+> - `bug` — a confirmed correctness or compatibility issue in the change.
+> - `suggest` — an improvement or likely risk worth fixing.
+> - `nit` — a minor note or polish.
+
+Format the finding body via the `/to-review-tone` skill, then prefix the `LABEL` to form the `FINDING_BODY` (`<label>: <formatted body>`) and anchor `FILE_PATH` / `LINE_NUMBER` to the diff. Present the resulting `FINDING_BODY` with this menu and wait for the user to select:
 
 > Please review the comment above. What would you like to do?
 > 1. Approve & review another code change
@@ -44,7 +49,7 @@ Ask the user: *"Please paste the code change, feedback, or context you'd like re
 
 - If the user replies **3** or provides revision feedback, revise the comment and repeat 3b.
 
-**Step 3c. Post** — if the user replied **1** or **2**, post the comment following `<skill-directory>/references/posting.md`.
+**Step 3c. Post** — if the user replied **1** or **2**, post the comment following the `/posting` skill.
 
 **Step 3d. Continue** — after posting:
 - If the user replied **1**, return to 3a.
