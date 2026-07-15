@@ -45,25 +45,23 @@ Look for the originating spec, in this order:
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
 
 **Step 5 — Spawn review sub-agents for the selected axes in parallel**
-Spawn only the sub-agents matching <selected_axes> from Step 1 (all three by default). Send a single message with one `runSubagent` (`general-purpose`) call per selected axis so the axes don't pollute each other's context. Pass `model` on each call matching your own model. 
-Give **each** sub-agent:
+Spawn only the sub-agents matching <selected_axes> from Step 1 (all three by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`), `requirements-coverage` (`reqs`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (findings only, no posting, under 400 words); do not restate those here.
+
+Give **each** agent its per-run context:
 - the per-file diffs in `bin/review_diff/` and the changed-symbol list,
-- the existing review comments (dedup context — do not restate them),
-- the shared review rules in `<skill-directory>/references/review-rules.md` (evidence, scope, and deduplication rules that bind every axis),
-- the shared finding format in `<skill-directory>/references/finding-format.md` (every axis returns findings in this schema),
-- the instruction: "Run the **LSP workflow** section in your axis reference file end to end — it is self-contained: enumerate the changed symbols, snapshot their contracts, then deepen with the axis-specific LSP operations listed there. LSP analysis is mandatory and is NOT substitutable by `grep`, `view`, or `bash`; do not rely on the diff alone. Fall back to those tools only if the LSP server is unavailable."
+- the existing review comments (dedup context — do not restate them).
 
-Each sub-agent returns findings only — it does **not** post. Every axis emits findings in the shared schema from `<skill-directory>/references/finding-format.md`. The three axes (spawn only those in <selected_axes>):
+Axis-specific per-run handoff (spawn only those in <selected_axes>):
 
-- **`qa` — Quality-attributes sub-agent** — evaluate the change against `<skill-directory>/references/quality-attributes.md`, following its **LSP workflow** section. For each area, conclude confirmed issue / plausible risk / no issue found. Report only net-new findings grounded in code evidence. Under 400 words.
-- **`smells` — Code-smells sub-agent** — match the diff against the code smell baseline in `<skill-directory>/references/code-smells.md`, following its **LSP workflow** section. Name each smell and quote the hunk. These are judgement calls, not hard violations; skip anything CI tooling enforces. Under 400 words.
-- **`reqs` — Requirements-coverage sub-agent** — evaluate the change against `<skill-directory>/references/requirements-coverage.md`, following its **LSP workflow** section. Paste the full spec text identified in Step 4 into this sub-agent's prompt under a `## Spec` heading. Report missing/partial requirements, scope creep, and requirements implemented but wrong. Quote the spec line for each finding. If no spec was found in Step 4, pass none and the sub-agent will report "no spec available" and stop. Under 400 words.
+- **`qa` — `quality-attributes` agent** — pass the per-run context above; the agent owns the rest.
+- **`smells` — `code-smells` agent** — pass the per-run context above; the agent owns the rest.
+- **`reqs` — `requirements-coverage` agent** — pass the per-run context above, plus the full spec text identified in Step 4 under a `## Spec` heading. If no spec was found in Step 4, pass none and the agent will report "no spec available" and stop.
 
 **Step 6 — Aggregate findings**
 Collect the reports from the selected axes, each in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — keep them separate under `## Quality-attributes`, `## Code-smells`, and `## Requirements-coverage` headings (include only the headings for axes that were run). Carry forward only net-new, actionable findings.
 
 **Step 7 — Format findings**
-Each carried-forward finding is already in the shared schema (`<skill-directory>/references/finding-format.md`); map it to a comment following the `/to-review-comment` skill.
+Each carried-forward finding is already in the shared schema emitted per the `/to-review-finding` skill, its `FINDING_BODY` ready to post; confirm each conforms to that schema before posting.
 
 **Step 8 — Post findings**
-Post each finding as an **inline pull-request review comment** following `<skill-directory>/references/posting.md`.
+Post each finding's `FINDING_BODY` as an **inline pull-request review comment** following the `/posting` skill.

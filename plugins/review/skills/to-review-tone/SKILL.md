@@ -1,8 +1,24 @@
-# Tone of Voice in Code Reviews
+---
+name: 'to-review-tone'
+description: 'Format a raw code-review finding body into the review tone of voice. Invoked by review sub-agents and review skills before emitting a finding.'
+argument-hint: '<raw finding body: issue, why it matters, minimal fix>'
+---
+
+# Review Tone
+
+Format one raw finding body into the code-review tone of voice.
+
+**Step 1 — Get the raw finding**
+`{{input}}` is the raw finding body: `<the issue>. <why it matters>. <smallest safe fix>.` If it is missing, ask: *"Paste the raw finding body you'd like formatted in the review tone."* and wait for the response.
+
+**Step 2 — Format**
+Rewrite the finding in the **Tone of Voice** below. Keep it one finding — the exact problem, the concrete impact, and the minimal change requested — concise and grounded. Return only the formatted body.
+
+## Tone of Voice in Code Reviews
 
 Tone of voice is **how your message feels**, not just what it says. In code reviews, tone decides whether your comment is received as helpful guidance or personal criticism.
 
-## Tone Principles
+### Tone Principles
 
 1. **Aim for clarity, not superiority** — State what you see. Avoid implying the author is wrong or careless.
 2. **Target the code, never the person** — Prefer "this method" over "your method." Prefer "this logic creates risk" over "you forgot…"
@@ -10,7 +26,7 @@ Tone of voice is **how your message feels**, not just what it says. In code revi
 4. **Keep curiosity high and ego low** — Prefer "Could we simplify this by…?" over "Why would you do it like this?"
 5. **Balance critique with recognition** — Quick positive notes make change requests easier to receive.
 
-## Rules
+### Rules
 Good review comments include:
 - Prefer one concrete finding per comment.
 - Concise, terse comment text.
@@ -30,7 +46,7 @@ Avoid:
 
 If the evidence is weak or the right fix is unclear, ask follow-up questions before posting. If the concern still cannot be verified, do not draft or post a review comment.
 
-## Tone Templates
+### Tone Templates
 
 {Select the appropriate tone based on the context of the finding.}
 
@@ -46,7 +62,7 @@ If the evidence is weak or the right fix is unclear, ask follow-up questions bef
 - "The current implementation may create a race condition. Could we guard the shared state?"
 - "This loop is O(n²). Is that acceptable for the expected dataset size?"
 
-## Pitfalls to Avoid
+### Pitfalls to Avoid
 
 - **Imperatives**: "Fix this", "Rewrite this."
 - **Absolutes**: "Always", "Never."
@@ -54,7 +70,7 @@ If the evidence is weak or the right fix is unclear, ask follow-up questions bef
 - **Unanchored judgment**: "This is bad code."
 - **Personal attribution**: "You wrote this wrong", "You forgot error checks."
 
-## Good vs Bad Examples
+### Good vs Bad Examples
 
 | Bad (avoid) | Good (use instead) |
 |---|---|
