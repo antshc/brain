@@ -59,8 +59,5 @@ Axis-specific per-run handoff (spawn only those in <selected_axes>):
 **Step 6 — Aggregate findings**
 Collect the reports from the selected axes, each in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — keep them separate under `## Quality-attributes`, `## Code-smells`, and `## Requirements-coverage` headings (include only the headings for axes that were run). Carry forward only net-new, actionable findings.
 
-**Step 7 — Format findings**
-Each carried-forward finding is already in the shared schema emitted per the `/to-review-finding` skill, its `FINDING_BODY` ready to post; confirm each conforms to that schema before posting.
-
-**Step 8 — Post findings**
+**Step 7 — Post findings**
 Post each finding's `FINDING_BODY` as an **inline pull-request review comment** following the `/posting` skill.
