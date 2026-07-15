@@ -37,7 +37,7 @@ Each smell reads *what it is* → *how to fix*:
 
 **Availability check.** The `/auto` skill reports LSP availability as `<lsp_status>` in your per-run context. If it is `unavailable`, fall back to `grep`, `view`, and `bash` for this workflow instead of re-checking.
 
-**Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; then one `findReferences` sweep per symbol to measure fan-out (files/callers). Wide spread hints at Shotgun Surgery, Divergent Change, or Feature Envy — use it to pick where to look deeper.
+**Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; then one "search for all references to the symbol" sweep per symbol to measure fan-out (files/callers). Wide spread hints at Shotgun Surgery, Divergent Change, or Feature Envy — use it to pick where to look deeper.
 
 **Speed Principles** - Adapt search strategy based on the requested thoroughness level.
 
@@ -47,10 +47,10 @@ Each smell reads *what it is* → *how to fix*:
 
 **Deepen where a smell is plausible.**
 
-- **Feature Envy / Message Chains** — `outgoingCalls` (call hierarchy) on changed methods to see whose data they reach through and how long the navigation chains run.
-- **Shotgun Surgery / wide fan-out** — the `findReferences` sweep across files shows how far a single change ripples.
-- **Data Clumps / Primitive Obsession** — `hover` + `findReferences` on the changed types and parameters to spot the same field/param groups travelling together.
-- **Divergent Change** — inspect the changed symbols in one file (`documentSymbol`) to check whether it gathers edits for several unrelated reasons.
+- **Feature Envy / Message Chains** — "trace the outgoing calls from the symbol" on changed methods to see whose data they reach through and how long the navigation chains run.
+- **Shotgun Surgery / wide fan-out** — the "search for all references to the symbol" sweep across files shows how far a single change ripples.
+- **Data Clumps / Primitive Obsession** — "hover over the symbol to inspect its type and documentation" + "search for all references to the symbol" on the changed types and parameters to spot the same field/param groups travelling together.
+- **Divergent Change** — inspect the changed symbols in one file ("list all symbols defined in the document") to check whether it gathers edits for several unrelated reasons.
 
 **Depth rule.** Escalate to call hierarchy / cross-file references only where a structural smell is plausible from the fan-out sweep; otherwise stay at the shallow relationship snapshot. Prefer representative sampling over exhaustive inspection, and stop once the smell is confirmed or ruled out.
 

@@ -44,7 +44,7 @@ Look for the originating spec, in this order:
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
 
 **Step 5 — Check LSP availability**
-Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry. Record the outcome as <lsp_status>: `available`, or `unavailable — fall back to grep, view, and bash` if it still fails after the retry. Do this once here; sub-agents rely on the reported <lsp_status> instead of re-checking.
+Confirm LSP responds (try "hover over the symbol to inspect its type and documentation" or "list all symbols defined in the document" on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry. Record the outcome as <lsp_status>: `available`, or `unavailable — fall back to grep, view, and bash` if it still fails after the retry. Do this once here; sub-agents rely on the reported <lsp_status> instead of re-checking.
 
 **Step 6 — Spawn review sub-agents for the selected axes in parallel**
 Spawn only the sub-agents matching <selected_axes> from Step 1 (`qa` + `smells` by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`), `requirements-coverage` (`reqs`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (findings only, no posting, under 400 words); do not restate those here.

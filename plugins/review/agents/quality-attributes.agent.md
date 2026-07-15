@@ -49,9 +49,9 @@ For each area, conclude one of: **confirmed issue**, **plausible risk**, or **no
 
 **Deepen on contract changes.** For each symbol whose contract changed:
 
-- **Dependents** — `findReferences` to enumerate callers, then read **3–5 representative callers** (not all) and confirm each still satisfies the new contract.
-- **Polymorphism** — `goToImplementation` on changed interfaces/abstracts to resolve overrides and implementers; confirm substitutability still holds.
-- **Behavior** — `incomingCalls`/`outgoingCalls` to trace changed thrown/returned/error paths, state transitions, and shared-mutable or async state into the callers that consume them.
+- **Dependents** — "search for all references to the symbol" to enumerate callers, then read **3–5 representative callers** (not all) and confirm each still satisfies the new contract.
+- **Polymorphism** — "jump to the symbol's implementations" on changed interfaces/abstracts to resolve overrides and implementers; confirm substitutability still holds.
+- **Behavior** — "trace the incoming calls into the symbol"/"trace the outgoing calls from the symbol" to trace changed thrown/returned/error paths, state transitions, and shared-mutable or async state into the callers that consume them.
 
 **Depth rule.** Go deep (callers, implementers, call hierarchy) only on newly introduced nullability, changed thrown/returned/error behavior, or shared-mutable/async state. Stay at the contract snapshot where the change is body-only. Do not expand the full call graph or read every reference — prefer representative, high-risk paths and stop once the contract impact is clear.
 
