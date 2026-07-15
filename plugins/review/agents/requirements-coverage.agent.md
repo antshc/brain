@@ -34,9 +34,9 @@ Quote the spec line for each finding.
 
 **Trace each requirement.**
 
-- **Implemented & reachable** — for each requirement, `goToDefinition` + `findReferences` to confirm the required behavior exists and is referenced, not dead or unreferenced code.
+- **Implemented & reachable** — for each requirement, "jump to the symbol's definition" + "search for all references to the symbol" to confirm the required behavior exists and is referenced, not dead or unreferenced code.
 - **Scope creep** — invert the map: flag any changed symbol that **no requirement maps to** as candidate scope creep.
-- **End-to-end path** — where a requirement spans multiple symbols, follow `outgoingCalls`/`incomingCalls` to confirm the full behavior path exists from entry point to effect.
+- **End-to-end path** — where a requirement spans multiple symbols, follow "trace the outgoing calls from the symbol"/"trace the incoming calls into the symbol" to confirm the full behavior path exists from entry point to effect.
 
 **Depth rule.** Trace only far enough to confirm each requirement is implemented, reachable, and wired; stop once reachability is established. Prefer representative call paths over exhaustive expansion of the call graph.
 
