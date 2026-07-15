@@ -37,11 +37,15 @@ For each area, conclude one of: **confirmed issue**, **plausible risk**, or **no
 
 ## LSP workflow for this axis
 
-This axis owns its LSP navigation end to end — there is no shared baseline. LSP analysis is mandatory; `grep`, `view`, and `bash` are NOT substitutes. Trace **contracts** — whether callers, overrides, and error/async paths still hold after the change.
+**Availability check.** The `/auto` skill reports LSP availability as `<lsp_status>` in your per-run context. If it is `unavailable`, fall back to `grep`, `view`, and `bash` for this workflow instead of re-checking.
 
-**Availability check first.** Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry; if it still fails, say so and fall back to `grep`, `view`, and `bash`.
+**Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow.
 
-**Baseline (do this first).** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow;
+**Speed Principles** - Adapt search strategy based on the requested thoroughness level.
+
+**Bias for speed** — return findings as quickly as possible:
+- Parallelize independent tool calls (multiple greps, multiple reads)
+- Stop searching once you have sufficient context
 
 **Deepen on contract changes.** For each symbol whose contract changed:
 

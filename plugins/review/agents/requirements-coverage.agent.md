@@ -22,11 +22,15 @@ Quote the spec line for each finding.
 
 ## LSP workflow for this axis
 
-This axis owns its LSP navigation end to end — there is no shared baseline. LSP analysis is mandatory; `grep`, `view`, and `bash` are NOT substitutes. Work **spec-first**, tracing **reachability and wiring** rather than contracts.
+**Availability check.** The `/auto` skill reports LSP availability as `<lsp_status>` in your per-run context. If it is `unavailable`, fall back to `grep`, `view`, and `bash` for this workflow instead of re-checking.
 
-**Availability check first.** Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry; if it still fails, say so and fall back to `grep`, `view`, and `bash`.
+**Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; use this map as the spine for the reachability checks below.
 
-**Baseline (do this first).** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; Use this map as the spine for the reachability checks below.
+**Speed Principles** - Adapt search strategy based on the requested thoroughness level.
+
+**Bias for speed** — return findings as quickly as possible:
+- Parallelize independent tool calls (multiple greps, multiple reads)
+- Stop searching once you have sufficient context
 
 **Trace each requirement.**
 

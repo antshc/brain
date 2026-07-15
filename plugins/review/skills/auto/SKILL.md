@@ -9,7 +9,7 @@ argument-hint: '[qa|smells|reqs] <PR URL>'
 <role> You are a **seasoned senior developer** performing a thorough code review.</role>
 
 **Step 1 — Parse arguments**
-Parse the user input: `{{input}}`, format `[axes] <PR URL>`. `axes` is an optional comma-separated selector: `qa` (Quality-attributes), `smells` (Code-smells), `reqs` (Requirements-coverage). Omitted = `qa` + `smells` (default); `reqs` runs only when explicitly requested. Extract <owner>, <repo>, <pr_number> from <pr_url>. Record the resolved axes as <selected_axes> for Step 5.
+Parse the user input: `{{input}}`, format `[axes] <PR URL>`. `axes` is an optional comma-separated selector: `qa` (Quality-attributes), `smells` (Code-smells), `reqs` (Requirements-coverage). Omitted = `qa` + `smells` (default); `reqs` runs only when explicitly requested. Extract <owner>, <repo>, <pr_number> from <pr_url>. Record the resolved axes as <selected_axes> for Step 6.
 
 **Step 2 — Fetch PR details**
 1. Run `gh pr checkout <pr_number> --repo <owner>/<repo>` to check out the PR branch locally.
@@ -43,12 +43,16 @@ Look for the originating spec, in this order:
 3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
 
-**Step 5 — Spawn review sub-agents for the selected axes in parallel**
+**Step 5 — Check LSP availability**
+Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry. Record the outcome as <lsp_status>: `available`, or `unavailable — fall back to grep, view, and bash` if it still fails after the retry. Do this once here; sub-agents rely on the reported <lsp_status> instead of re-checking.
+
+**Step 6 — Spawn review sub-agents for the selected axes in parallel**
 Spawn only the sub-agents matching <selected_axes> from Step 1 (`qa` + `smells` by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`), `requirements-coverage` (`reqs`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (findings only, no posting, under 400 words); do not restate those here.
 
 Give **each** agent its per-run context:
 - the per-file diffs in `bin/review_diff/` (each agent enumerates changed symbols itself via its LSP workflow),
-- the existing review comments (dedup context — do not restate them).
+- the existing review comments (dedup context — do not restate them),
+- the <lsp_status> recorded in Step 5.
 
 Axis-specific per-run handoff (spawn only those in <selected_axes>):
 
@@ -56,8 +60,8 @@ Axis-specific per-run handoff (spawn only those in <selected_axes>):
 - **`smells` — `code-smells` agent** — pass the per-run context above; the agent owns the rest.
 - **`reqs` — `requirements-coverage` agent** — pass the per-run context above, plus the full spec text identified in Step 4 under a `## Spec` heading. If no spec was found in Step 4, pass none and the agent will report "no spec available" and stop.
 
-**Step 6 — Aggregate findings**
+**Step 7 — Aggregate findings**
 Collect the reports from the selected axes, each in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — keep them separate under `## Quality-attributes`, `## Code-smells`, and `## Requirements-coverage` headings (include only the headings for axes that were run). Carry forward only net-new, actionable findings.
 
-**Step 7 — Post findings**
+**Step 8 — Post findings**
 Post each finding's `FINDING_BODY` as an **inline pull-request review comment** following the `/posting` skill.
