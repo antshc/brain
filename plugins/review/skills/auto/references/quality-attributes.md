@@ -27,15 +27,20 @@ every conclusion using the LSP analysis and in specific code evidence, not on th
 
 For each area, conclude one of: **confirmed issue**, **plausible risk**, or **no issue found**.
 
-## LSP focus for this axis
+## LSP workflow for this axis
 
-Build on the **`LSP baseline`** section of your prompt. For every symbol the baseline flags as a **contract change**, escalate to Level 2/3 using the `LSP Progressive Depth Code Analysis` framework from `/lsp-depth-guidance`:
+This axis owns its LSP navigation end to end — there is no shared baseline. LSP analysis is mandatory; `grep`, `view`, and `bash` are NOT substitutes. Trace **contracts** — whether callers, overrides, and error/async paths still hold after the change.
 
-- Start from the baseline's **Contract, Nullability, Overrides** columns (broken assumptions, missing guards, contract drift).
-- **Dependents** — run find-references on the symbol; confirm every caller and implementer still satisfies the new contract.
-- **Behavior** — trace changed return/thrown/error paths, state transitions, and side effects into the callers that consume them.
-- **Polymorphism** — resolve overrides and interface implementations; confirm substitutability still holds.
+**Availability check first.** Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry; if it still fails, say so and fall back to `grep`, `view`, and `bash`.
 
-Prioritize depth on newly introduced nullability, changed thrown/returned/error behavior, and shared-mutable or async state. Stay at Level 1 where the baseline shows a body-only change.
+**Baseline (do this first).** For every changed symbol: `documentSymbol` to enumerate the changed symbols, then `goToDefinition` + `hover` to snapshot each contract — signature, return type, generics, nullability, and modifiers — and decide whether the change altered the contract or only the body. Keep this shallow; deepen only where a contract changed.
+
+**Deepen on contract changes.** For each symbol whose contract changed:
+
+- **Dependents** — `findReferences` to enumerate callers, then read **3–5 representative callers** (not all) and confirm each still satisfies the new contract.
+- **Polymorphism** — `goToImplementation` on changed interfaces/abstracts to resolve overrides and implementers; confirm substitutability still holds.
+- **Behavior** — `incomingCalls`/`outgoingCalls` to trace changed thrown/returned/error paths, state transitions, and shared-mutable or async state into the callers that consume them.
+
+**Depth rule.** Go deep (callers, implementers, call hierarchy) only on newly introduced nullability, changed thrown/returned/error behavior, or shared-mutable/async state. Stay at the contract snapshot where the change is body-only. Do not expand the full call graph or read every reference — prefer representative, high-risk paths and stop once the contract impact is clear.
 
 > Shared review rules (evidence, scope, deduplication) apply to this axis. See `<skill-directory>/references/review-rules.md`.

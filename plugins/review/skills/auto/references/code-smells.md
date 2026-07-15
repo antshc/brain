@@ -27,16 +27,21 @@ Each smell reads *what it is* → *how to fix*:
 - **Middle Man** — a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest** — a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
 
-## LSP focus for this axis
+## LSP workflow for this axis
 
-Build on the **`LSP baseline`** section of your prompt. Use LSP **relationships**, not contract diffs, following the `LSP Progressive Depth Code Analysis` framework from `/lsp-depth-guidance`:
+This axis owns its LSP navigation end to end — there is no shared baseline. LSP analysis is mandatory; `grep`, `view`, and `bash` are NOT substitutes. Use LSP **relationships** (call hierarchy, references, type usage) — not contract diffs — to surface structural smells.
 
-- Start from the baseline's **Fan-out** column (wide spread hints at Shotgun Surgery, Divergent Change, Feature Envy).
-- **Feature Envy / Message Chains** — run call hierarchy on changed methods to see whose data they reach through.
-- **Shotgun Surgery / wide fan-out** — run find-references across files to measure how far a single change ripples.
-- **Data Clumps / Primitive Obsession** — inspect type usage and parameter groups repeated across the changed symbols.
-- **Divergent Change** — check whether one changed file gathers edits for several unrelated reasons.
+**Availability check first.** Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry; if it still fails, say so and fall back to `grep`, `view`, and `bash`.
 
-Escalate to Level 2/3 only where a structural smell is plausible from the baseline; otherwise stay at Level 1.
+**Baseline (do this first).** `documentSymbol` to enumerate the changed symbols, then one `findReferences` sweep per symbol to measure fan-out (files/callers). Wide spread hints at Shotgun Surgery, Divergent Change, or Feature Envy — use it to pick where to look deeper.
+
+**Deepen where a smell is plausible.**
+
+- **Feature Envy / Message Chains** — `outgoingCalls` (call hierarchy) on changed methods to see whose data they reach through and how long the navigation chains run.
+- **Shotgun Surgery / wide fan-out** — the `findReferences` sweep across files shows how far a single change ripples.
+- **Data Clumps / Primitive Obsession** — `hover` + `findReferences` on the changed types and parameters to spot the same field/param groups travelling together.
+- **Divergent Change** — inspect the changed symbols in one file (`documentSymbol`) to check whether it gathers edits for several unrelated reasons.
+
+**Depth rule.** Escalate to call hierarchy / cross-file references only where a structural smell is plausible from the fan-out sweep; otherwise stay at the shallow relationship snapshot. Prefer representative sampling over exhaustive inspection, and stop once the smell is confirmed or ruled out.
 
 > Shared review rules (evidence, scope, deduplication) apply to this axis. See `<skill-directory>/references/review-rules.md`.

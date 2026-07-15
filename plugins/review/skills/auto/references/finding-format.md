@@ -1,6 +1,6 @@
 # Finding Format
 
-Every review sub-agent (Quality-attributes, Code-smells, Requirements-coverage) returns findings in this shared schema. Uniform findings make Step 7 deduplication and Step 8 formatting mechanical — do not invent per-axis shapes.
+Every review sub-agent (Quality-attributes, Code-smells, Requirements-coverage) returns findings in this shared schema. Uniform findings make Step 6 deduplication and Step 7 formatting mechanical — do not invent per-axis shapes.
 
 Each finding is one block:
 

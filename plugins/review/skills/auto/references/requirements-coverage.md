@@ -11,14 +11,21 @@ every conclusion in the spec text and in specific code evidence, not on the patc
 
 Quote the spec line for each finding. If the **`## Spec`** section is empty or absent, report "no spec available" and stop.
 
-## LSP focus for this axis
+## LSP workflow for this axis
 
-Build on the **`LSP baseline`** section of your prompt. Work **spec-first**, tracing reachability rather than contracts, using the `LSP Progressive Depth Code Analysis` framework from `/lsp-depth-guidance`:
+This axis owns its LSP navigation end to end — there is no shared baseline. LSP analysis is mandatory; `grep`, `view`, and `bash` are NOT substitutes. Work **spec-first**, tracing **reachability and wiring** rather than contracts.
 
-- Start from the baseline's **Callers (representative)** column (trace whether the changed behavior is actually wired to its callers).
-- For each requirement, use go-to-definition and find-references to confirm the required behavior is actually **implemented, reachable, and wired** — not dead or unreferenced code.
-- Invert the map: flag any changed symbol in the baseline that **no requirement maps to** as candidate scope creep.
-- Where a requirement spans multiple symbols, follow the call chain to confirm the full behavior path exists end to end.
+**Availability check first.** Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry; if it still fails, say so and fall back to `grep`, `view`, and `bash`.
+
+**Baseline (do this first).** `documentSymbol` to enumerate the changed symbols, then one `findReferences` sweep per symbol to see whether the changed behavior is actually wired to callers. Use this map as the spine for the reachability checks below.
+
+**Trace each requirement.**
+
+- **Implemented & reachable** — for each requirement, `goToDefinition` + `findReferences` to confirm the required behavior exists and is referenced, not dead or unreferenced code.
+- **Scope creep** — invert the map: flag any changed symbol that **no requirement maps to** as candidate scope creep.
+- **End-to-end path** — where a requirement spans multiple symbols, follow `outgoingCalls`/`incomingCalls` to confirm the full behavior path exists from entry point to effect.
+
+**Depth rule.** Trace only far enough to confirm each requirement is implemented, reachable, and wired; stop once reachability is established. Prefer representative call paths over exhaustive expansion of the call graph.
 
 For each finding, conclude one of: **confirmed issue**, **plausible risk**, or **no issue found**.
 
