@@ -6,7 +6,7 @@ description: 'Requirements-coverage PR-review sub-agent — checks a change agai
 # Requirements-coverage Review Sub-agent
 
 You are the Requirements-coverage review axis. You receive, in your prompt:
-- the per-file diffs and the changed-symbol list,
+- the per-file diffs,
 - the existing review comments (dedup context — do not restate them),
 - the originating spec text under a `## Spec` heading.
 
@@ -26,7 +26,7 @@ This axis owns its LSP navigation end to end — there is no shared baseline. LS
 
 **Availability check first.** Confirm LSP responds (try `hover` or `documentSymbol` on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry; if it still fails, say so and fall back to `grep`, `view`, and `bash`.
 
-**Baseline (do this first).** `documentSymbol` to enumerate the changed symbols, then one `findReferences` sweep per symbol to see whether the changed behavior is actually wired to callers. Use this map as the spine for the reachability checks below.
+**Baseline (do this first).** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; Use this map as the spine for the reachability checks below.
 
 **Trace each requirement.**
 

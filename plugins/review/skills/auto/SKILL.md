@@ -29,13 +29,12 @@ outfile { print > outfile }
 ```
 
 **Step 3 — Load review context**
-1. Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_number>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`, Retrieve PR title, description - `gh pr view <pr_number> --json title,body --repo <owner>/<repo>`:
-   - Check PR title and description for 'What has been done?', `What files affected?`, `What is outof scope?` use during the review.
-   - Treat existing review comments as already reviewed findings.
-   - Do NOT re-validate, repeat, restate, or re-report existing comments.
-   - Use existing comments only as context to avoid duplication and to understand already-covered areas.
-   - Focus strictly on new, previously unreported issues supported by fresh code evidence.
-3. Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors.
+Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_number>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`, Retrieve PR title, description - `gh pr view <pr_number> --json title,body --repo <owner>/<repo>`:
+1. Check PR title and description for 'What has been done?', `What files affected?`, `What is out of scope?` use during the review.
+2. Treat existing review comments as already reviewed findings.
+3. Do NOT re-validate, repeat, restate, or re-report existing comments.
+4. Use existing comments only as context to avoid duplication and to understand already-covered areas.
+5. Focus strictly on new, previously unreported issues supported by fresh code evidence.
 
 **Step 4 — Identify the spec source** *(only when `reqs` is in <selected_axes>; otherwise skip this step)*
 Look for the originating spec, in this order:
@@ -48,7 +47,7 @@ Look for the originating spec, in this order:
 Spawn only the sub-agents matching <selected_axes> from Step 1 (`qa` + `smells` by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`), `requirements-coverage` (`reqs`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (findings only, no posting, under 400 words); do not restate those here.
 
 Give **each** agent its per-run context:
-- the per-file diffs in `bin/review_diff/` and the changed-symbol list,
+- the per-file diffs in `bin/review_diff/` (each agent enumerates changed symbols itself via its LSP workflow),
 - the existing review comments (dedup context — do not restate them).
 
 Axis-specific per-run handoff (spawn only those in <selected_axes>):
