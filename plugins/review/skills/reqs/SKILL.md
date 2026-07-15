@@ -38,7 +38,9 @@ Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_numbe
 
 **Step 4 — Identify the spec source**
 Look for the originating spec, in this order:
-1. Issue references in the commit messages or PR body (`#123`, `Closes #45`, etc.) — fetch with `gh issue view <number> --repo <owner>/<repo> --json title,body`.
+1. Issue references in the PR body:
+  - Github issue (`#123`, `Closes #45` etc.) — fetch with `gh issue view <number> --repo <owner>/<repo> --json title,body`.
+  - Jira issue (`PROJ-1234`) — fetch with atlassian mcp.
 2. A path the user passed as an argument.
 3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
