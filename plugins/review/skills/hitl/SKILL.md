@@ -61,6 +61,6 @@ Before drafting, spawn the `explore` agent to inspect the referenced code, its u
 
 ## Step 3. Handle the reply
 Do **NOT** post on approval of a single comment; accumulate a **pending queue** of approved review comments instead. Each queued item is `<review_comment>` with its `<file_path>` and `<line_number>`.
-- If the user replied **1**, add the approved item to the pending queue **without posting**, then ask *"Please paste the next code change, feedback, or context you'd like reviewed."*, wait for the response, and return to Step 1.
+- If the user replied **1**, add the approved item to the pending queue **without posting**, display the current queue as a numbered list (`<file_path>:<line_number> — <review_comment>` per item), then ask *"Please paste the next code change, feedback, or context you'd like reviewed."*, wait for the response, and return to Step 1.
 - If the user replied **2** (or **done**), add the current approved item to the queue, then post **every** queued comment following the `/posting` skill (map `<file_path>` → `FILE_PATH`, `<line_number>` → `LINE_NUMBER`, `<review_comment>` → `REVIEW_COMMENT`), and end the session.
 - If the user replied **3** or provides revision feedback, revise the **current** comment using the feedback and re-present it at Step 2.
