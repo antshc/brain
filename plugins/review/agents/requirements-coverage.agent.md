@@ -22,8 +22,6 @@ Quote the spec line for each review comment.
 
 ## LSP workflow for this axis
 
-**Availability check.** The `/auto` skill reports LSP availability as `<lsp_status>` in your per-run context. If it is `unavailable`, fall back to `grep`, `view`, and `bash` for this workflow instead of re-checking.
-
 **Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; use this map as the spine for the reachability checks below.
 
 **Trace each requirement:**

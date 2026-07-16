@@ -45,20 +45,16 @@ Look for the originating spec, in this order:
 3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
 4. If nothing is found, the **Requirements-coverage** sub-agent will skip and report "no spec available".
 
-**Step 5 — Check LSP availability**
-Confirm LSP responds (try "hover over the symbol to inspect its type and documentation" or "list all symbols defined in the document" on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry. Record the outcome as <lsp_status>: `available`, or `unavailable — fall back to grep, view, and bash` if it still fails after the retry.
-
-**Step 6 — Spawn the requirements-coverage sub-agent**
+**Step 5 — Spawn the requirements-coverage sub-agent**
 Invoke the `requirements-coverage` agent via `runSubagent` (or `general-purpose` if the named agent is unavailable), passing `model` matching your own model. The agent owns its own analysis checklist, LSP workflow, review rules, and output contract (review comments only, no posting, under 400 words); do not restate those here.
 
 Give the agent its per-run context:
 - the per-file diffs in `bin/review_diff/` (the agent enumerates changed symbols itself via its LSP workflow),
 - the existing review comments (dedup context — do not restate them),
-- the <lsp_status> recorded in Step 5,
 - the full spec text identified in Step 4 under a `## Spec` heading. If no spec was found in Step 4, pass none and the agent will report "no spec available" and stop.
 
-**Step 7 — Aggregate review comments**
+**Step 6 — Aggregate review comments**
 Collect the report in the shared review-comment schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Present the report under a `## Requirements-coverage` heading. Carry forward only net-new, actionable review comments.
 
-**Step 8 — Post review comments**
+**Step 7 — Post review comments**
 Post each review comment's `REVIEW_COMMENT` body as an **inline pull-request review comment** following the `/posting` skill.
