@@ -36,7 +36,7 @@ Explore code using the `explore` agent in background if needed — to inspect re
 1. Identify the issue — what is wrong, risky, or unclear? Be specific and factual.
 2. Explain why it matters (<explanation>: { impact on correctness, readability, performance, maintainability, etc.}).
 3. Suggest an improvement (<improvement>: { provide a concrete fix or direction. Format via `/to-review-comment`}).
-4. Choose the label (<label>: { confirmed correctness or compatibility issue → `bug`; improvement or likely risk worth fixing → `suggest`; minor note or polish → `nit`}).
+4. Choose the label (<label>: { confirmed issue severe enough it must be fixed before merge → `blocking`; other confirmed correctness or compatibility issue → `bug`; improvement or likely risk worth fixing → `suggest`; minor note or polish → `nit`}).
 5. Resolve the anchor for posting:
    - <FILE_PATH>: the changed file the snippet belongs to — match it against a file in `bin/review_diff/`; if ambiguous, ask the user.
    - <LINE_NUMBER>: the line on the PR's new side (`RIGHT`) the comment attaches to; if it cannot be determined from the diff, ask the user.
