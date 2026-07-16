@@ -31,7 +31,7 @@ outfile { print > outfile }
 **Step 3 — Load review context**
 Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_number>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`, Retrieve PR title, description - `gh pr view <pr_number> --json title,body --repo <owner>/<repo>`:
 1. Check PR title and description for 'What has been done?', `What files affected?`, `What is out of scope?` use during the review.
-2. Treat existing review comments as already reviewed findings.
+2. Treat existing review comments as already-reviewed comments.
 3. Do NOT re-validate, repeat, restate, or re-report existing comments.
 4. Use existing comments only as context to avoid duplication and to understand already-covered areas.
 5. Focus strictly on new, previously unreported issues supported by fresh code evidence.
@@ -49,7 +49,7 @@ Look for the originating spec, in this order:
 Confirm LSP responds (try "hover over the symbol to inspect its type and documentation" or "list all symbols defined in the document" on a changed file). If it fails, build the project (see `Readme.md` / `ARCHITECTURE.md`) and retry. Record the outcome as <lsp_status>: `available`, or `unavailable — fall back to grep, view, and bash` if it still fails after the retry.
 
 **Step 6 — Spawn the requirements-coverage sub-agent**
-Invoke the `requirements-coverage` agent via `runSubagent` (or `general-purpose` if the named agent is unavailable), passing `model` matching your own model. The agent owns its own analysis checklist, LSP workflow, review rules, and output contract (findings only, no posting, under 400 words); do not restate those here.
+Invoke the `requirements-coverage` agent via `runSubagent` (or `general-purpose` if the named agent is unavailable), passing `model` matching your own model. The agent owns its own analysis checklist, LSP workflow, review rules, and output contract (review comments only, no posting, under 400 words); do not restate those here.
 
 Give the agent its per-run context:
 - the per-file diffs in `bin/review_diff/` (the agent enumerates changed symbols itself via its LSP workflow),
@@ -57,8 +57,8 @@ Give the agent its per-run context:
 - the <lsp_status> recorded in Step 5,
 - the full spec text identified in Step 4 under a `## Spec` heading. If no spec was found in Step 4, pass none and the agent will report "no spec available" and stop.
 
-**Step 7 — Aggregate findings**
-Collect the report in the shared finding schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Present the report under a `## Requirements-coverage` heading. Carry forward only net-new, actionable findings.
+**Step 7 — Aggregate review comments**
+Collect the report in the shared review-comment schema. Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Present the report under a `## Requirements-coverage` heading. Carry forward only net-new, actionable review comments.
 
-**Step 8 — Post findings**
-Post each finding's `FINDING_BODY` as an **inline pull-request review comment** following the `/posting` skill.
+**Step 8 — Post review comments**
+Post each review comment's `REVIEW_COMMENT` body as an **inline pull-request review comment** following the `/posting` skill.

@@ -1,13 +1,13 @@
 ---
 name: hitl
-description: Draft a clear, actionable code review comment.
+description: Interactive, human-approved PR code review — draft one comment at a time, get approval, queue it, then post all as inline PR comments.
 argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 ---
-**Step 1 — PR URL**
+## Input
 If `{{input}}` contains a GitHub PR URL <pr_url> in the format `https://github.com/{owner}/{repo}/pull/{number}`, extract `<owner>`, `<repo>`, and `<pr_number>` from it.
 Otherwise, ask the user: *"Please provide the GitHub PR URL (https://github.com/{owner}/{repo}/pull/{number})."* and wait for the response before continuing.
 
-**Step 2 — Fetch PR details**
+## Fetch PR details
 1. Run `gh pr checkout <pr_number> --repo <owner>/<repo>` to check out the PR branch locally.
 2. Run the following command to fetch the diff per file into `bin/review_diff/` in the repository root.
 ```
@@ -24,33 +24,40 @@ outfile { print > outfile }
 '
 ```
 
-**Step 3 — Review loop**
 **STOP. Do not analyse any code yet.**
 Ask the user: *"Please paste the code change, feedback, or context you'd like reviewed."* and wait for the response before continuing.
 
-**Step 3a. Review process** — analyse the input:
+## Review loop
+
+Explore code using the `explore` agent in background if needed — to inspect related code, usages, or callers before commenting; otherwise rely on the provided snippet.
+
+## Step 1. Analyse the input and suggest an improvement
+
 1. Identify the issue — what is wrong, risky, or unclear? Be specific and factual.
-2. Explain why it matters — impact on correctness, readability, performance, or maintainability.
-3. Suggest improvement — provide a concrete fix or direction. Keep it practical.
-4. Keep it concise — short, direct sentences, no unnecessary wording.
-5. Explore code using the `explore` agent in background if needed — to inspect related code, usages, or callers before commenting; otherwise rely on the provided snippet.
+2. Explain why it matters (<explanation>: { impact on correctness, readability, performance, maintainability, etc.}).
+3. Suggest an improvement (<improvement>: { provide a concrete fix or direction. Format via `/to-review-comment`}).
+4. Choose the label (<label>: { confirmed correctness or compatibility issue → `bug`; improvement or likely risk worth fixing → `suggest`; minor note or polish → `nit`}).
+5. Resolve the anchor for posting:
+   - <FILE_PATH>: the changed file the snippet belongs to — match it against a file in `bin/review_diff/`; if ambiguous, ask the user.
+   - <LINE_NUMBER>: the line on the PR's new side (`RIGHT`) the comment attaches to; if it cannot be determined from the diff, ask the user.
+   - <REVIEW_COMMENT>: the posting body, composed as `<label>: <improvement>`.
 
-**Step 3b. Human approval** — emit the finding following the `/to-review-finding` skill, invoking it with the `hitl` axis. Choose the `LABEL` by reviewer judgment:
-> - `bug` — a confirmed correctness or compatibility issue in the change.
-> - `suggest` — an improvement or likely risk worth fixing.
-> - `nit` — a minor note or polish.
+## Step 2. Human approval — present the resulting comment with this menu and wait for the user to select:
+- Show user for review using the format:
 
-Format the finding body via the `/to-review-tone` skill, then prefix the `LABEL` to form the `FINDING_BODY` (`<label>: <formatted body>`) and anchor `FILE_PATH` / `LINE_NUMBER` to the diff. Present the resulting `FINDING_BODY` with this menu and wait for the user to select:
+**Explanation:**
+<explanation>
+
+**Review comment:**
+<label>: <improvement>
 
 > Please review the comment above. What would you like to do?
 > 1. Approve & review another code change
 > 2. Approve & finish
 > 3. Provide feedback to revise
 
-- If the user replies **3** or provides revision feedback, revise the comment and repeat 3b.
-
-**Step 3c. Post** — if the user replied **1** or **2**, post the comment following the `/posting` skill.
-
-**Step 3d. Continue** — after posting:
-- If the user replied **1**, return to 3a.
-- If the user replied **2** or **done**, end the session.
+## Step 3. Handle the reply
+Do **NOT** post on approval of a single comment; accumulate a **pending queue** of approved review comments instead. Each queued item is `<review_comment>` with its `<file_path>` and `<line_number>`.
+- If the user replied **1**, add the approved item to the pending queue **without posting**, then ask *"Please paste the next code change, feedback, or context you'd like reviewed."*, wait for the response, and return to Step 1.
+- If the user replied **2** (or **done**), add the current approved item to the queue, then post **every** queued comment following the `/posting` skill (map `<file_path>` → `FILE_PATH`, `<line_number>` → `LINE_NUMBER`, `<review_comment>` → `REVIEW_COMMENT`), and end the session.
+- If the user replied **3** or provides revision feedback, revise the **current** comment using the feedback and re-present it at Step 2.
