@@ -29,11 +29,11 @@ Ask the user: *"Please paste the code change, feedback, or context you'd like re
 
 ## Review loop
 
-Explore code using the `explore` agent in background if needed — to inspect related code, usages, or callers before commenting; otherwise rely on the provided snippet.
+Before drafting, spawn the `explore` agent to inspect the referenced code, its usages, and callers, and confirm the issue is real. Skip only when the snippet proves the issue on its own.
 
 ## Step 1. Analyse the input and suggest an improvement
 
-1. Identify the issue — what is wrong, risky, or unclear? Be specific and factual.
+1. Identify the issue — specific, factual, grounded in the gathered evidence, not the snippet alone. No evidence → don't draft; report it couldn't be confirmed.
 2. Explain why it matters (<explanation>: { impact on correctness, readability, performance, maintainability, etc.}).
 3. Suggest an improvement (<improvement>: { provide a concrete fix or direction. Format via `/to-review-comment`}).
 4. Choose the label (<label>: { confirmed issue severe enough it must be fixed before merge → `blocking`; other confirmed correctness or compatibility issue → `bug`; improvement or likely risk worth fixing → `suggest`; minor note or polish → `nit`}).
