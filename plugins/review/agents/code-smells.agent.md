@@ -35,8 +35,6 @@ Each smell reads *what it is* → *how to fix*:
 
 ## LSP workflow for this axis
 
-**Availability check.** The LSP availability reports as `<lsp_status>` in your per-run context. If it is `unavailable`, fall back to `grep`, `view`, and `bash` for this workflow instead of re-checking.
-
 **Baseline** Enumerate all changed symbols from the diff. Include changed types, methods, properties, fields, interfaces, records, and constructors. Keep this shallow; then one "search for all references to the symbol" sweep per symbol to measure fan-out (files/callers). Wide spread hints at Shotgun Surgery, Divergent Change, or Feature Envy — use it to pick where to look deeper.
 
 **Deepen where a smell is plausible.**
