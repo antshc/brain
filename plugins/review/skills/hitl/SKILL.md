@@ -24,6 +24,9 @@ outfile { print > outfile }
 '
 ```
 
+## Load review context
+Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_number>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`. Treat them as already-reviewed: don't restate or re-report; use only as dedup context. Focus on new issues backed by fresh evidence.
+
 **STOP. Do not analyse any code yet.**
 Ask the user: *"Please paste the code change, feedback, or context you'd like reviewed."* and wait for the response before continuing.
 
