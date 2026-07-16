@@ -56,7 +56,7 @@ Emit each review comment as a JSON array of objects:
   "AXIS": "requirements-coverage",
   "FILE_PATH": "{from the diff; repo-relative header path}",
   "LINE_NUMBER": "{from the diff (new-file line on the right side; last line of a multi-line range). These anchor the review comment to the pull-request change; the LSP trace grounds the conclusion but is never the anchor.}",
-  "LABEL": "{missing or implemented-but-wrong (confirmed) → `bug`; plausible risk → `suggest`; scope creep → `suggest`}",
+  "LABEL": "{missing or implemented-but-wrong that must be fixed before merge → `blocking`; other missing or implemented-but-wrong (confirmed) → `bug`; plausible risk → `suggest`; scope creep → `suggest`}",
   "REVIEW_COMMENT": "{the LABEL value}: {a self-contained review comment that quotes the spec requirement and states the gap and fix — formatted via `/to-review-comment`}"
 }
 ```
