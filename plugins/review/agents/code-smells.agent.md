@@ -32,6 +32,7 @@ Each smell reads *what it is* → *how to fix*:
 - **Message Chains** — long `a.b().c().d()` navigation the caller shouldn't depend on. → hide the walk behind one method on the first object.
 - **Middle Man** — a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest** — a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
+- **Shallow Module** — a public surface that grows without matching depth: redundant near-twin entry points, thin pass-through wrappers, leaked stream/disposable ownership, classitis/dead surface, or upward/cross-module reach. → narrow the surface, merge twins, do the work internally, or drop the layer.
 
 ## LSP workflow for this axis
 
@@ -43,6 +44,7 @@ Each smell reads *what it is* → *how to fix*:
 - **Shotgun Surgery / wide fan-out** — the "search for all references to the symbol" sweep across files shows how far a single change ripples.
 - **Data Clumps / Primitive Obsession** — "hover over the symbol to inspect its type and documentation" + "search for all references to the symbol" on the changed types and parameters to spot the same field/param groups travelling together.
 - **Divergent Change** — inspect the changed symbols in one file ("list all symbols defined in the document") to check whether it gathers edits for several unrelated reasons.
+- **Shallow Module** — fires when the diff grows a public surface: a new interface/public member, added params, a widened return type (especially `Stream`, `IDisposable`, collections, internal types), or visibility widened to public. Per changed member: "list all symbols in the document" (worklist) → "hover over the symbol" for signature/surface cost → "go to the implementation" then "trace the outgoing calls from the symbol" (rich fan-out = depth; single forwarded call = pass-through/middle-man) → "search for all references to the symbol" (zero in-repo callers = dead surface; lifecycle-owning returns whose callers must dispose/null-check = leaked ownership) → "search the workspace for symbols by name" for near-twins that converge on the same private helper (redundant entry points) → "go to the definition" of reached dependencies (reach up a layer or into another feature module's concrete project = boundary breach). Judge every worklist member; deep member (small surface, self-contained depth, no leak, clean boundary) = nothing to flag.
 
 **Depth rule.** Escalate to call hierarchy / cross-file references only where a structural smell is plausible from the fan-out sweep; otherwise stay at the shallow relationship snapshot. Prefer representative sampling over exhaustive inspection, and stop once the smell is confirmed or ruled out.
 
