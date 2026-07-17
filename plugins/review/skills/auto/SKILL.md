@@ -1,7 +1,7 @@
 ---
 name: 'auto'
 description: 'Perform a GitHub PR code review'
-argument-hint: '[qa|smells] <PR URL>'
+argument-hint: '[qa|smells] <PR_URL>'
 ---
 
 # GitHub Code Review Instructions
@@ -12,14 +12,14 @@ argument-hint: '[qa|smells] <PR URL>'
 - **Review comment** — the improvement an axis discovered and returns, anchored to the change (`AXIS`, `FILE_PATH`, `LINE_NUMBER`, `LABEL`), with its body in `REVIEW_COMMENT` phrased `issue → impact → fix`.
 
 **Step 1 — Parse arguments**
-Parse the user input: `{{input}}`, format `[axes] <PR URL>`. `axes` is an optional comma-separated selector: `qa` (Quality-attributes), `smells` (Code-smells). Omitted = `qa` + `smells` (default). Extract <owner>, <repo>, <pr_number> from <pr_url>. Record the resolved axes as <selected_axes> for Step 5.
+Parse the user input: `{{input}}`, format `[SELECTED_AXES] <PR_URL>`. `SELECTED_AXES` is an optional comma-separated selector: `qa` (Quality-attributes), `smells` (Code-smells). Omitted = `qa` + `smells` (default). Extract <OWNER>, <REPO>, <PR_NUMBER> from <PR_URL>. Record the resolved axes as <SELECTED_AXES> for Step 5.
 
 **Step 2 — Fetch PR details**
-1. Run `gh pr checkout <pr_number> --repo <owner>/<repo>` to check out the PR branch locally.
+1. Run `gh pr checkout <PR_NUMBER> --repo <OWNER>/<REPO>` to check out the PR branch locally.
 2. Run the following command to fetch the diff per file into `bin/review_diff/` in the repository root.
 ```
 rm -rf bin/review_diff && mkdir -p bin/review_diff &&
-gh pr diff "<pr_url>" | awk -v outdir="bin/review_diff/" '
+gh pr diff "<PR_URL>" | awk -v outdir="bin/review_diff/" '
 /^diff --git / {
   if (outfile) close(outfile)
   match($0, /b\/(.+)$/, arr)
@@ -32,7 +32,7 @@ outfile { print > outfile }
 ```
 
 **Step 3 — Load review context**
-Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_number>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`, Retrieve PR title, description - `gh pr view <pr_number> --json title,body --repo <owner>/<repo>`:
+Retrieve existing review comments - `gh api repos/<OWNER>/<REPO>/pulls/<PR_NUMBER>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`, Retrieve PR title, description - `gh pr view <PR_NUMBER> --json title,body --repo <OWNER>/<REPO>`:
 1. Check PR title and description for 'What has been done?', `What files affected?`, `What is out of scope?` use during the review.
 2. Treat existing review comments as already-reviewed comments.
 3. Do NOT re-validate, repeat, restate, or re-report existing comments.
@@ -40,13 +40,13 @@ Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_numbe
 5. Focus strictly on new, previously unreported issues supported by fresh code evidence.
 
 **Step 4 — Spawn review sub-agents for the selected axes in parallel**
-Spawn only the sub-agents matching <selected_axes> from Step 1 (`qa` + `smells` by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (review comments only, no posting, under 400 words); do not restate those here.
+Spawn only the sub-agents matching <SELECTED_AXES> from Step 1 (`qa` + `smells` by default). Send a single message with one `runSubagent` call per selected axis so the axes don't pollute each other's context. Invoke the named agent for each axis — `quality-attributes` (`qa`), `code-smells` (`smells`) — or `general-purpose` if the named agent is unavailable. Pass `model` on each call matching your own model. Each agent owns its own analysis checklist, LSP workflow, review rules, and output contract (review comments only, no posting, under 400 words); do not restate those here.
 
 Give **each** agent its per-run context:
 - the per-file diffs in `bin/review_diff/` (each agent enumerates changed symbols itself via its LSP workflow),
 - the existing review comments (dedup context — do not restate them).
 
-Axis-specific per-run handoff (spawn only those in <selected_axes>):
+Axis-specific per-run handoff (spawn only those in <SELECTED_AXES>):
 
 - **`qa` — `quality-attributes` agent** — pass the per-run context above; the agent owns the rest.
 - **`smells` — `code-smells` agent** — pass the per-run context above; the agent owns the rest.
