@@ -42,7 +42,7 @@ Before drafting, spawn the `explore` agent to inspect the referenced code, its u
 1. Identify the issue — specific, factual, grounded in the gathered evidence, not the snippet alone. No evidence → don't draft; report it couldn't be confirmed.
 2. Explain why it matters (`EXPLANATION`: impact on correctness, readability, performance, maintainability, etc.).
 3. Suggest an improvement (`IMPROVEMENT`: provide a concrete fix or direction. Format via `/to-review-comment`).
-4. Choose the label (`LABEL`: confirmed issue severe enough it must be fixed before merge → `blocking`; other confirmed correctness or compatibility issue → `bug`; improvement or likely risk worth fixing → `suggest`; minor note or polish → `nit`).
+4. Choose the label (`LABEL`: confirmed issue or likely risk worth fixing → `suggest`; minor note or polish → `nit`).
 5. Resolve the anchor for posting:
    - `FILE_PATH`: the changed file the snippet belongs to — match it against a file in `bin/review_diff/`; if ambiguous, ask the user.
    - `LINE_NUMBER`: from the diff (new-file line on the right side; last line of a multi-line range). These anchor the review comment to the pull-request change; the LSP trace grounds the conclusion but is never the anchor. if it cannot be determined from the diff, ask the user.
