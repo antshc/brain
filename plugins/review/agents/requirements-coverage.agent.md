@@ -50,13 +50,20 @@ Internal grounding only — used to confirm the review comment, never emitted to
 
 ## Output
 
-Emit each review comment as a JSON array of objects:
+Emit each review comment as a JSON array of objects.
+- Each object MUST represent one issue.
+- The array MUST contain at most five objects.
+- Output MUST contain JSON only, with no Markdown fences, prose, or unresolved placeholders.
+- Results SHOULD order `suggest` before `nit`, then by file and line.
+- The agent MUST return `[]` when no actionable, net-new smell is found.
+
+
 ```json
-{
+[{
   "AXIS": "requirements-coverage",
-  "FILE_PATH": "{from the diff; repo-relative header path}",
-  "LINE_NUMBER": "{from the diff (new-file line on the right side; last line of a multi-line range). These anchor the review comment to the pull-request change; the LSP trace grounds the conclusion but is never the anchor.}",
-  "LABEL": "{missing or implemented-but-wrong that must be fixed before merge → `blocking`; other missing or implemented-but-wrong (confirmed) → `bug`; plausible risk → `suggest`; scope creep → `suggest`}",
-  "REVIEW_COMMENT": "{the LABEL value}: {a self-contained review comment that quotes the spec requirement and states the gap and fix — formatted via `/to-review-comment`}"
-}
+  "FILE_PATH": "<from the diff; repo-relative header path>",
+  "LINE_NUMBER": "<from the diff (new-file line on the right side; last line of a multi-line range). These anchor the review comment to the pull-request change; the LSP trace grounds the conclusion but is never the anchor.>",
+  "LABEL": "<missing or implemented-but-wrong that must be fixed before merge → `blocking`; other missing or implemented-but-wrong (confirmed) → `bug`; plausible risk → `suggest`; scope creep → `suggest`>",
+  "REVIEW_COMMENT": "<the LABEL value>: <a self-contained review comment that quotes the spec requirement and states the gap and fix — formatted via `/to-review-comment`>"
+}]
 ```
