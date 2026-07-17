@@ -41,7 +41,7 @@ Each time the user pastes a code change, feedback, or context, run the steps bel
 
 1. Identify the issue from the input. Spawn the `explore` agent (pass the input and `FILE_PATH`) to cross-reference it against the actual code — definitions, usages, callers — and confirm the issue is real. Ground the finding in that evidence, not the input alone. No evidence → don't draft; report it couldn't be confirmed.
 2. Explain why it matters (`EXPLANATION`: impact on correctness, readability, performance, maintainability, etc.).
-3. Suggest an improvement (`IMPROVEMENT`: provide a concrete fix or direction. Format via `/to-review-comment`).
+3. Suggest an improvement (`IMPROVEMENT`: provide a concrete fix or direction. **MUST** format via `/to-review-comment`).
 4. Choose the label (`LABEL`: confirmed issue or likely risk worth fixing → `suggest`; minor note or polish → `nit`).
 5. Resolve the anchor for posting:
    - `FILE_PATH`: the changed file the input belongs to — match it against a file in `bin/review_diff/`; if ambiguous, ask the user.
@@ -66,4 +66,4 @@ Each time the user pastes a code change, feedback, or context, run the steps bel
 On approval, post the approved comment **immediately** via the `/posting` skill using the `FILE_PATH`, `LINE_NUMBER`, and `REVIEW_COMMENT` set in Step 1, capture the returned `COMMENT_ID`, and add it to a running **posted queue**. Each queued item is `REVIEW_COMMENT` with its `FILE_PATH`, `LINE_NUMBER`, and `COMMENT_ID` — the `COMMENT_ID` can be used later to update the posted comment.
 - If the user replied **1**, post the approved item immediately, capture its `COMMENT_ID`, add it to the posted queue, display the current queue as a numbered list (`FILE_PATH:LINE_NUMBER — REVIEW_COMMENT (COMMENT_ID)` per item), then ask *"Please paste the next code change, feedback, or context you'd like reviewed."*, wait for the response, and return to Step 1 (run the `explore` agent again for the new input).
 - If the user replied **2** (or **done**), post the approved item immediately, capture its `COMMENT_ID`, add it to the posted queue, and end the session.
-- If the user replied **3** or provides revision feedback, revise the **current** comment using the feedback and re-present it at Step 2.
+- If the user replied **3** or provides revision feedback, revise the **current** comment per Step 1, then re-present at Step 2.
