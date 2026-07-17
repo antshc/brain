@@ -71,7 +71,7 @@ Emit each review comment as a JSON array of objects.
   "AXIS": "quality-attributes",
   "FILE_PATH": "<from the diff; repo-relative header path>",
   "LINE_NUMBER": "<from the diff (new-file line on the right side; last line of a multi-line range). These anchor the review comment to the pull-request change; the LSP trace grounds the conclusion but is never the anchor.>",
-  "LABEL": "<confirmed issue severe enough it must be fixed before merge → `blocking`; other confirmed issue → `bug`; plausible risk → `suggest`; no issue found → not emitted>",
+  "LABEL": "<confirmed issue or plausible risk → `suggest`; no issue found → not emitted>",
   "REVIEW_COMMENT": "<the LABEL value>: <a self-contained review comment that describes the issue  you discovered and proposes the fix — formatted via `/to-review-comment`>"
 }
 ```
