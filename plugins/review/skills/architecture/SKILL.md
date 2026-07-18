@@ -1,47 +1,86 @@
 ---
 name: architecture
-description: Audit architecture drift between ARCHITECTURE.md (excluding ADRs) plus the SSR docs and the actual codebase. Use when the user wants to check whether the code still matches the documented architecture, audit SSR compliance, or find where the implementation has diverged from a documented decision.
+description: Audit architecture drift between ARCHITECTURE.md (excluding ADRs) plus the SSR docs and the actual codebase. Use when the user wants to check whether the code still matches the documented architecture, audit SSR compliance, or find where the implementation has diverged from a documented decision. Argument: `auto` (default, non-interactive, log-only) or `human` (interactive, may edit docs).
 disable-model-invocation: true
 ---
 
-Scope: the codebase vs `ARCHITECTURE.md` (non-ADR sections only) + `docs/ssr/*.md`. ADRs (table + linked files) out of scope. Codebase facts: verify yourself via `explore` agent, never ask. Drift verdict + resolution: user's call, always confirm. Docs-only — never edit code.
+Scope: codebase vs `ARCHITECTURE.md` (non-ADR) + `docs/ssr/*.md`. ADRs out of scope. Verify codebase facts via `explore` agent, never ask. Exclude claims already in `docs/architecture-drift-log.md` (any status). Docs-only — never edit code.
 
-## Step 1: Claims
+## Mode
 
-- Read every non-ADR `ARCHITECTURE.md` section + full text of every SSR in its index table (index line alone is insufficient).
+Argument hint: `auto` (default) | `human`.
+
+- Detect explicit mode word in invocation (e.g. "human", "interactively"); else **auto**.
+- State resolved mode at run start.
+- Discovery Step 0–2: shared setup, run once. Discovery Step 3: hand off — `auto` → Auto mode Step 1, `human` → Human mode Step 1.
+
+## Discovery
+
+### Step 0: Prior findings
+
+- Read `docs/architecture-drift-log.md` (empty if missing).
+- Set of already-recorded (Source, Documented) pairs, any Status.
+
+### Step 1: Claims
+
+- Read every non-ADR `ARCHITECTURE.md` section + full text of every SSR in its index table.
 - Extract atomic, checkable claims: folder structure, naming rule, layering/reference direction, wiring pattern.
-- Skip non-verifiable prose (overview, glossary pointers).
-- Done when: every section/SSR → claims, or tagged "no verifiable claim."
+- Skip non-verifiable prose.
+- Drop claims matching Discovery Step 0 pairs.
 
-## Step 2: Legwork
+### Step 2: Legwork
 
-- Per claim (or claim group): spawn `explore` agent (`runSubagent`) with the claim; instruct it to prefer LSP (usages/definitions/implementations) for layering/reference-direction/wiring claims, grep/semantic search/`list_dir` otherwise; require verdict + supporting path(s) back.
-- Never verify inline yourself.
-- Verdict per claim: `Aligned` | `Drifted` | `Unverifiable` (drop `Unverifiable` — not drift).
-- Done when: every claim has a verdict; every `Drifted` cites the contradicting path(s).
+- Per claim/claim group: spawn `explore` agent (`runSubagent`); prefer LSP (usages/definitions/implementations) for layering/reference-direction/wiring claims, else grep/semantic search/`list_dir`; require verdict + supporting path(s).
+- Never verify inline.
+- Verdict: `Aligned` | `Drifted` | `Unverifiable` (drop `Unverifiable`).
 
-## Step 3: Confirm
+### Step 3: Log drift process
 
-- One `Drifted` claim per question: claim, evidence, your recommended verdict (real drift vs. search miss). Wait for answer before the next.
-- No batching.
-- Done when: every `Drifted` claim confirmed or dismissed.
+- Hand off per Mode: `auto` → Auto mode Step 1; `human` → Human mode Step 1.
+- Sub-flow logs/resolves drift (own Step 1–3), loops back to Discovery Step 2 for next unverdicted claim.
+- Terminal when every Discovery Step 1 claim resolved.
 
-## Step 4: Resolve
+## Auto mode
 
-- Per confirmed drift, offer + recommend one:
+Entered via Discovery Step 3. Autonomous — no user interaction, never touch `ARCHITECTURE.md`/`docs/ssr/*.md`.
+
+### Step 1: Accept
+
+- Auto-confirm every `Drifted` verdict from Discovery Step 2.
+
+### Step 2: Log
+
+- Append one row per confirmed `Drifted` claim to `docs/architecture-drift-log.md` (create with table format below if missing), Status `Open`.
+- Append immediately, don't batch.
+
+### Step 3: Loop
+
+- Return to Discovery Step 2 for next unverdicted claim; re-enter Auto mode Step 1 per verdict.
+- On terminal state (all Discovery Step 1 claims resolved): report full drift summary, new vs. already-recorded.
+
+## Human mode
+
+Entered via Discovery Step 3. Interactive — confirm with user, apply resolution immediately.
+
+### Step 1: Confirm
+
+- One `Drifted` claim per question: claim, evidence, recommended verdict. Wait for answer before next. No batching.
+
+### Step 2: Resolve
+
+- Per confirmed drift, recommend one:
   1. **Update `ARCHITECTURE.md`** — rewrite to match code.
   2. **Update the SSR** — rewrite the record.
   3. **Log it** — append row to `docs/architecture-drift-log.md` (create with table below if missing).
-- User clarifies/amends: fold into the edit before applying.
-- User disagrees with the verdict: revert claim to unconfirmed, return to Step 3.
-- Apply directly. Edits confined to `ARCHITECTURE.md`, `docs/ssr/*.md`, `docs/architecture-drift-log.md` — never the source codebase.
-- Done when: every confirmed drift has exactly one resolution applied.
+- Fold user clarifications into the edit before applying.
+- User disagrees with verdict: revert to unconfirmed, return to Human mode Step 1.
+- Apply immediately, never batch to end of run.
+- Edits confined to `ARCHITECTURE.md`, `docs/ssr/*.md`, `docs/architecture-drift-log.md` — never source code.
 
-## Step 5: Loop
+### Step 3: Loop
 
-- Go back to Step 2 for the next unverdicted claim. Repeat Steps 2–4 claim by claim.
-- Never stop after one claim or one batch.
-- Done when: every claim from Step 1 has reached a terminal state (`Aligned`, `Unverifiable`, dismissed, or resolved) — only then report the full drift summary.
+- Return to Discovery Step 2 for next unverdicted claim; re-enter Human mode Step 1 per verdict.
+- On terminal state (all Discovery Step 1 claims resolved): report full drift summary, new vs. already-recorded.
 
 ### `docs/architecture-drift-log.md` format
 
