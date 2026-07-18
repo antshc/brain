@@ -2,6 +2,7 @@
 name: 'reqs'
 description: 'Perform a GitHub PR requirements-coverage review'
 argument-hint: '<PR URL>'
+disable-model-invocation: true
 ---
 
 # GitHub Requirements-coverage Review Instructions

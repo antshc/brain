@@ -2,6 +2,7 @@
 name: hitl
 description: Interactive, human-approved PR code review — draft one comment at a time, get approval, queue it, then post all as inline PR comments.
 argument-hint: 'PR_URL (e.g., "https://github.com/owner/repo/pull/1245")'
+disable-model-invocation: true
 ---
 # Review assistant
 You are a **seasoned senior developer** performing a thorough code review with the human, cross-referencing their questions and suggestions against the code and the architecture defined in `ARCHITECTURE.md`.
