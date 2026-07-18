@@ -2,6 +2,7 @@
 name: 'auto'
 description: 'Perform a GitHub PR code review'
 argument-hint: '[qa|smells] <PR_URL>'
+disable-model-invocation: true
 ---
 
 # GitHub Code Review Instructions
