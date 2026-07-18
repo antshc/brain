@@ -13,25 +13,25 @@ All doc reads, creates, and updates go through `/manage-docs` — it owns the te
 
 **Documents**:
 - `CONTEXT.md` — the glossary (the *language*).
-- `ARCHITECTURE.md` — the structural map, and the index of SSRs and ADRs.
-- `docs/ssr/` — Solution Strategy Records: the backbone rules.
-- `docs/adr/` — Architecture Decision Records: localized decisions.
+- `ARCHITECTURE.md` — the structural map, and the index of Concepts and ADRs.
+- `docs/concepts/` — Crosscutting Concepts: the backbone rules.
+- `docs/adr/` — Architecture Decision Records: fundamental or localized decisions.
 
 ## Load strategy guardrails
 
 Before designing or grilling:
 
-1. Read the `Solution Strategy` index in `ARCHITECTURE.md`.
-2. Load only SSRs relevant to the current scope.
+1. Read the `Building blocks`, `Crosscutting Concepts` and the `Architecture Decision Records` indexies in `ARCHITECTURE.md`.
+2. Load only Building blocks, Concepts and ADRs relevant to the current scope.
 3. Extract:
-   * **Mandates** — required patterns and boundaries.
-   * **Prohibitions** — explicitly rejected approaches.
+   * **Mandates** — required concepts, patterns and boundaries.
+   * **Prohibitions** — explicitly rejected approaches, rejected concidered options.
    * **Open space** — unconstrained choices.
 4. Use these guardrails to frame questions, scenarios, and alternatives.
+* A Concept-violating option must not be presented as equally valid — cite the Concept and surface the conflict.
+* An option that contradicts a considered-and-rejected ADR alternative must not be presented as equally valid.
 
-Do not present an SSR-violating option as equally valid. Cite the SSR and surface the conflict.
-
-Re-scope when the building block, boundary, integration, or responsibility changes.
+Re-scope when the module, boundary, integration, or responsibility changes.
 
 ## During the session
 
@@ -63,20 +63,20 @@ When you spot a decision that would improve the design, surface it: "Could this 
 
 ### Surface strategy drift
 
-Treat SSRs as intended architecture and code as implemented architecture.
+Treat Concepts as intended architecture and code as implemented architecture.
 
 When they conflict, classify the gap:
 
-* **Violation** — the proposal breaks the strategy.
+* **Violation** — the proposal breaks the fundamental concepts.
 * **Drift** — the implementation diverges.
-* **Supersession** — the SSR is outdated.
-* **Out of scope** — the SSR does not apply.
+* **Supersession** — the Concept is outdated.
+* **Out of scope** — the Concept does not apply.
 
 ### Trace through the layers
 
 Read the relevant `Building blocks` section in `ARCHITECTURE.md`, then select one representative scenario and trace it end-to-end. Walk one real scenario end-to-end and force each step into a layer. Where does each step live, and where do the boundaries — transaction, process, network — fall? "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?"
 
-Validate the trace against the loaded SSR guardrails, architecture map, and code, then classify any mismatch using `Surface strategy drift`.
+Validate the trace against the loaded Concept guardrails, architecture map, and code, then classify any mismatch using `Surface strategy drift`.
 
 ### Cross-reference with code
 
@@ -88,9 +88,9 @@ When a term is resolved, capture it in `CONTEXT.md` right there via `/manage-doc
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
-### Update ADRs and SSRs inline
+### Update ADRs and Concepts inline
 
-When an ADR or SSR is resolved, capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
+When an ADR or Concept is resolved, capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
 
 ### Offer ADRs sparingly
 
@@ -102,12 +102,12 @@ Only offer to create an ADR when all three are true:
 
 If any of the three is missing, skip the ADR. Capture it via `/manage-docs` skill `Inline-update discipline`, which owns the ADR template.
 
-## Offer SSRs sparingly
+### Offer Concepts sparingly
 
-An SSR captures a *backbone* decision: the solution strategy, the top-level decomposition, or a mandated architectural/design pattern that every feature of a given kind must follow. Write one (instead of, or in addition to, an ADR) only when all three are true:
+A Concept captures a *backbone* decision: the top-level decomposition, or a mandated architectural/design pattern that every feature of a given kind must follow. Write one (instead of, or in addition to, an ADR) only when all three are true:
 
 1. **Structural** — it shapes the top-level decomposition or mandates a pattern, rather than settling one local question.
 2. **Reusable** — future features of the same kind are expected to follow it every time.
 3. **Backbone-defining** — it is the set of foundational decisions that hold the architecture together and constrain everything built on top of them.
 
-If any of the three is missing, skip the SSR. When you write one: use the `manage-docs` skill `Inline-update discipline` section.
+If any of the three is missing, skip the Concept. When you write one: use the `manage-docs` skill `Inline-update discipline` section.
