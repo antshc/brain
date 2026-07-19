@@ -1,6 +1,26 @@
-# Copilot Instructions
+# Writing or updating the skill, templates, agents standards
+## Writing style
+be terse, concise, no fillers
 
-## Project Overview
+## Syntax
+use syntax when 
+
+| Syntax | Meaning | Example |
+|---|---|---|
+| **bold**|Emphasis in prose, labels, warnings, required rules|**Required:** Run tests before commit.|
+| `` `camelCase` `` | Conceptual value resolved and maintained by the agent | Resolve `repositoryRoot` from Git. |
+| `UPPER_SNAKE_CASE := instruction` | Runtime assignment evaluated by the agent | `NAME := generate a unique kebab-case name` |
+| `{{UPPER_SNAKE_CASE}}` | Placeholder replaced with a resolved runtime value | `reports/{{NAME}}.md` |
+| `<!-- ... -->` | Hidden template instruction not rendered in Markdown preview | `<!-- Remove this comment after population. -->` |
+| `[optional]` | Optional input or argument | `[target-path]` |
+| `value1 \| value2` | Allowed values | `completed \| failed \| blocked` |
+| `` `literal` `` | Fixed command, path, identifier, or value | Run `dotnet test`. |
+| `$VARIABLE` | Shell environment variable | `cd "$REPOSITORY_ROOT"` |
+| `${VARIABLE}` | Braced shell environment variable | `${REPOSITORY_ROOT}/src` |
+| `VARIABLE=value command` | Assign a variable for one command | `CONFIGURATION=Release dotnet build` |
+
+
+# Project Overview
 
 ---
 
