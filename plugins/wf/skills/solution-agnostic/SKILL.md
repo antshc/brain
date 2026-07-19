@@ -1,7 +1,6 @@
 ---
 name: solution-agnostic
 description: Rewrite requirements, capabilities, and stories to remove implementation artifacts (widget, screen, table, endpoint, flag, worker, access role), raising each to the behavior and entity it enables. Use to scrub requirement or story text of leaked design before it is written down.
-disable-model-invocation: true
 ---
 
 # Solution-Agnostic

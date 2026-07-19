@@ -45,14 +45,14 @@ Use the implementation details as the spec content instead of a GitHub issue:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
 - **Inline text** — use directly.
 
-### 2. Explore the codebase and scan ADRs/SDRs
+### 2. Explore the codebase and scan ADRs/Concepts
 
 If you have not already explored the codebase, do so to understand the current state of the code. 
 Issue titles and descriptions should use the project's domain glossary vocabulary (CONTEXT.md).
-Read the ADR and SDR indexes in `ARCHITECTURE.md`, then open every ADR under `docs/adr/` and every SDR under `docs/sdr/` that touches the area you're changing.
-- **SDRs** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to them.
+Read the ADR and Concept indexes in `ARCHITECTURE.md`, then open every ADR under `docs/adr/` and every Concept under `docs/concepts/` that touches the area you're changing.
+- **Concepts** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to them. See `manage-docs/CONCEPT-FORMAT.md`.
 - **ADRs** capture localized decisions — respect and reference the relevant ones in the issue body.
-- Confirm you have scanned both `docs/adr/` and `docs/sdr/` before moving on; if either directory is absent, note that and continue.
+- Confirm you have scanned both `docs/adr/` and `docs/concepts/` before moving on; if either directory is absent, note that and continue.
 
 Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 

@@ -67,13 +67,13 @@ The top-level folders and what each contains, one line per folder, with nested m
 
 ## Architecture Decision Records *(optional)*
 
-An ADR records a point-in-time decision — hard to reverse, non-obvious, and the result of a real trade-off — tagged **Cornerstone** (shapes the system's overall structure/communication model, or affects multiple building blocks or key quality attributes) or **Local** (confined to one component, concern, or implementation area). See [ADR-FORMAT.md](./ADR-FORMAT.md).
+An ADR records a point-in-time, localized decision — hard to reverse, non-obvious, and the result of a real trade-off. See [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-<!-- The index of ADRs. One row per ADR: {{nnnn}} is the sequential ADR number, {{slug}} its slug, {{decisionTitle}} its short title, {{summary}} a 1-3 sentence agent-optimized summary that may reference related Concepts or other ADRs. Scan this table during design and modeling; open the full record only when relevant. -->
+<!-- The index of ADRs. One row per ADR: {{nnnn}} is the sequential ADR number, {{slug}} its slug, {{decisionTitle}} its short title, {{triggerCondition}} one or more short phrases (comma-separated in the same cell if the ADR applies to more than one surface) naming the entity/data shape, endpoint, folder, or change type this row applies to (e.g. "new field on Task entity, new field on Order entity", "POST /orders/**", "src/payments/") — describe the structural condition(s) to match against the plan's touched surface, not a keyword the conversation must happen to say, {{summary}} a 1-3 sentence agent-optimized summary that may reference related Concepts or other ADRs. Scan this table during design and modeling; open the full record only when its Trigger condition matches the kind of change in scope. -->
 
-| # | Decision | Summary |
-|---|----------|---------|
-| [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) | {{decisionTitle}} | {{summary}} |
+| # | Decision | Trigger condition | Summary |
+|---|----------|--------------------|---------|
+| [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) | {{decisionTitle}} | {{triggerCondition}} | {{summary}} |
 
 ## Crosscutting Concepts *(optional)*
 
@@ -83,11 +83,11 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{nnnn}} is the sequential Concept number, {{slug}} its slug, {{conceptTitle}} its title, {{summary}} a terse, agent-optimized summary — enough to decide whether to open the full record, and may reference related concepts or ADRs. Scan this table during design and modeling; open the full record only when relevant. See [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md). -->
+<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{nnnn}} is the sequential Concept number, {{slug}} its slug, {{conceptTitle}} its title, {{triggerCondition}} one or more short phrases (comma-separated in the same cell if the Concept applies to more than one surface) naming the entity/data shape, endpoint, folder, or change type this row applies to, same style as the ADR table's Trigger condition (optional — Concepts are presumed in-scope by default since every feature is expected to follow them; fill this in only to narrow a Concept that applies under specific conditions), {{summary}} a terse, agent-optimized summary — enough to decide whether to open the full record, and may reference related concepts or ADRs. Scan this table during design and modeling; open the full record only when relevant. See [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md). -->
 
-| # | Concept | Summary |
-|---|----------|---------|
-| [{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md) | {{conceptTitle}} | {{summary}} |
+| # | Concept | Trigger condition | Summary |
+|---|----------|--------------------|---------|
+| [{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md) | {{conceptTitle}} | {{triggerCondition}} | {{summary}} |
 
 ## Testing Strategy *(optional)*
 
@@ -125,9 +125,9 @@ dotnet test {{project}} --filter "Category={{category}}"
 
 - **Shape, not steps.** Describe how the system is decomposed and the rules that hold it together. Step-by-step "how to build X" guidance belongs in a Concept (`docs/concepts/`) or the code, not here.
 - **One directional layering.** State the dependency direction explicitly and the prohibited references. The arrows are the contract.
-- **Index every concept.** The `Crosscutting Concepts` table is the entry point a reader (or agent) scans before designing. Every record in `docs/concepts/` appears here with a matching summary; nothing is added or retired without updating this table.
+- **Index every concept.** The `Crosscutting Concepts` table is the entry point a reader (or agent) scans before designing. Every record in `docs/concepts/` appears here with a matching Trigger condition and summary; nothing is added or retired without updating this table.
 - **Link, don't inline.** Backbone decisions live in `docs/concepts/` and are *linked* from the index — keep their full content out of `ARCHITECTURE.md` so the map stays scannable.
-- **Index every ADR.** The `## Architecture Decision Records` table is the entry point a reader (or agent) scans before designing. Every record in `docs/adr/` appears here with a  matching summary; nothing is added or retired without updating this table.
+- **Index every ADR.** The `## Architecture Decision Records` table is the entry point a reader (or agent) scans before designing. Every record in `docs/adr/` appears here with a matching Trigger condition and summary; nothing is added or retired without updating this table.
 - **Link, don't inline.** Localized decisions live in `docs/adr/` and are *linked* from the index — keep their full content out of `ARCHITECTURE.md` so the map stays scannable.
 - **Keep it current.** When the structure or layering changes, update this file in the same change; a stale architecture map is worse than none.
 
@@ -135,4 +135,4 @@ dotnet test {{project}} --filter "Category={{category}}"
 
 - **`CONTEXT.md`** — the glossary (the *language*). `ARCHITECTURE.md` is the *structure*.
 - **`docs/concepts/` (Concepts)** — the backbone concepts, indexed in the `Crosscutting Concepts` section. Use [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md).
-- **`docs/adr/` (ADRs)** — a fundamental architectural direction, backbone decisions or localized, often non-obvious decisions, indexed in the `Architecture Decision Records` table. Use [ADR-FORMAT.md](./ADR-FORMAT.md).
+- **`docs/adr/` (ADRs)** — localized, often non-obvious decisions, indexed in the `Architecture Decision Records` table. Use [ADR-FORMAT.md](./ADR-FORMAT.md).

@@ -1,7 +1,6 @@
 ---
 name: manage-docs
 description: Create and update the project's domain-model documentation — the glossary (CONTEXT.md), the architecture map (ARCHITECTURE.md), and the decision records (Concepts and ADRs). Owns the doc templates and the rules for where each file lives, when to create it, and how to keep the indexes in sync. Called by the grill-* skills to set up and update docs as decisions crystallise.
-disable-model-invocation: true
 ---
 
 # Manage Docs
@@ -51,9 +50,10 @@ qualifies as a Concept or ADR, write the record and update the matching index in
 ## Keeping the indexes in sync
 
 `ARCHITECTURE.md` is the entry point a reader (or agent) scans before designing. Every record in
-`docs/concepts/` and `docs/adr/` must appear in its index table with a matching summary; nothing is
-added, superseded, or retired without updating the table in the same change. Link, don't inline —
-keep the full record content out of `ARCHITECTURE.md` so the map stays scannable.
+`docs/concepts/` and `docs/adr/` must appear in its index table with a matching Trigger condition
+and summary; nothing is added, superseded, or retired without updating the table in the same
+change. Link, don't inline — keep the full record content out of `ARCHITECTURE.md` so the map
+stays scannable.
 
 ## Repo topology (documentation repository)
 
