@@ -3,11 +3,11 @@
 ## Template
 
 ```md
-{Writing style: concise, no-fluff, Terse, technical tone.}
+<!-- Writing style: concise, no-fluff, terse, technical tone. -->
 
-# Brainstorm: {Short title of the decision}
+# Brainstorm: {{decisionTitle}}
 
-{1-3 sentences: what's the context, what did we decide, and why.}
+{{decisionSummary}} <!-- 1-3 sentences: what's the context, what did we decide, and why -->
 
 ```
 

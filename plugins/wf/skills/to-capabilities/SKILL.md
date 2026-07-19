@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 **Capability** - a **scoping unit**, not a requirement type. It exists to prevent requirement sprawl — each set stays focused on one behavior rather than bundling several unrelated behaviors under one title.
 
-**Functional requirement** - imperative `<Behavior> when <condition>.` statements — specific, testable, externally visible. Cover, at minimum: **Capability** (actions and outcomes), **Integration** (external interactions), **State** (persistence and state changes), **Permissions** (who may and may not act), **Degraded behavior** (what still works when a dependency is slow or fails).
+**Functional requirement** - imperative `{{behavior}} when {{condition}}.` statements — specific, testable, externally visible. Cover, at minimum: **Capability** (actions and outcomes), **Integration** (external interactions), **State** (persistence and state changes), **Permissions** (who may and may not act), **Degraded behavior** (what still works when a dependency is slow or fails).
 
 # To Capabilities
 
@@ -30,7 +30,7 @@ Use functional requirements and the (directory, solution, project, code) structu
 ### 5. Quiz the user
 Present the proposed capability breakdown as a numbered list. For each capability show:
 - **Title** — the behavior + entity, solution-agnostic.
-- **Stakeholder Requirement** — The <actor> needs to <behavior> <entity>, so <value>.
+- **Stakeholder Requirement** — The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
 - **Covers** — the parts of the input it accounts for.
 
 Ask the user:
@@ -47,4 +47,4 @@ Iterate until the user approves the breakdown.
 - Every edge case traces to a functional requirement or business rule.
 
 ### 7. Write the output
-Write **all** capability blocks into **one** file `docs/requirements/<slug>.md`, following the template and writing style in [references/output-format.md](references/output-format.md). `<slug>` is a short kebab-case identifier derived from the input or lead capability (e.g., `reinstate-cancelled-orders`, `real-time-catalog-availability`). Create the `docs/requirements/` directory if it does not exist.
+Write **all** capability blocks into **one** file `docs/requirements/{{slug}}.md`, following the template and writing style in [references/output-format.md](references/output-format.md). `{{slug}}` is a short kebab-case identifier derived from the input or lead capability (e.g., `reinstate-cancelled-orders`, `real-time-catalog-availability`). Create the `docs/requirements/` directory if it does not exist.

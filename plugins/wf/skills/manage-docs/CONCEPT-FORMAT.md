@@ -12,7 +12,7 @@ Every Concept is **indexed in `ARCHITECTURE.md`** under a `Crosscutting Concepts
 ## Template
 
 ```md
-# {{CONCEPT_TITLE}}
+# {{conceptTitle}}
 
 **Status:** Draft | Accepted | Deprecated
 

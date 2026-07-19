@@ -3,17 +3,18 @@
 ## Structure
 
 ```md
-# {Context Name}
+# {{contextName}}
 
-Location: {Optional, only if multiple contexts in the Context.md file. The path to the module directory that is covered by the context, relative to the repo root.}
+<!-- Location: optional, only if multiple contexts in the CONTEXT.md file. Path to the module directory covered by the context, relative to the repo root. -->
+Location: {{modulePath}}
 
-{One or two sentence description of what this context is and why it exists.}
+{{contextDescription}} <!-- one or two sentence description of what this context is and why it exists -->
 
 ## Language
 
-**Order**:
-{A one or two sentence description of the term}
-_Avoid_: Purchase, transaction
+**{{term}}**:
+{{termDescription}} <!-- one or two sentence description of the term -->
+_Avoid_: {{synonymsToAvoid}}
 
 **Invoice**:
 A request for payment sent to a customer after delivery.
@@ -24,8 +25,8 @@ A person or organization that places orders.
 _Avoid_: Client, buyer, account
 
 # Relationships
-{exist only if multiple contexts in the Context.md}
-- **{Producer Context Name} → {Consumer Context Name}**: {Producer Context Name}ing emits `<Event name>` events; {Consumer Context Name} consumes them to start picking/processing/etc.
+<!-- exists only if multiple contexts in the CONTEXT.md -->
+- **{{producerContext}} → {{consumerContext}}**: {{producerContext}} emits `{{eventName}}` events; {{consumerContext}} consumes them to start picking/processing/etc.
 - **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
 - **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
 - **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`

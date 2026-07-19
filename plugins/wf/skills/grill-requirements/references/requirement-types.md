@@ -10,13 +10,13 @@ A **capability title** names the behavior and entity:
 Capability is a **scoping unit**, not a requirement type. It exists to prevent requirement sprawl — each set stays focused on one behavior rather than bundling several unrelated behaviors under one title.
 
 ## Stakeholder/User requirement
-one sentence: `The <actor> needs to <behavior> <entity> for <scope>, so <value>.` Names a behavior, never an artifact.
+one sentence: `The {{actor}} needs to {{behavior}} {{entity}} for {{scope}}, so {{value}}.` Names a behavior, never an artifact.
 
 ## Functional requirements
-Imperative `<Behavior> when <condition>.` statements — specific, testable, externally visible. Cover, at minimum: **Capability** (actions and outcomes), **Integration** (external interactions), **State** (persistence and state changes), **Permissions** (who may and may not act), **Degraded behavior** (what still works when a dependency is slow or fails). When `ARCHITECTURE.md` is present, use its module layout to surface Integration and Degraded-behavior requirements at each boundary.
+Imperative `{{behavior}} when {{condition}}.` statements — specific, testable, externally visible. Cover, at minimum: **Capability** (actions and outcomes), **Integration** (external interactions), **State** (persistence and state changes), **Permissions** (who may and may not act), **Degraded behavior** (what still works when a dependency is slow or fails). When `ARCHITECTURE.md` is present, use its module layout to surface Integration and Degraded-behavior requirements at each boundary.
 
 ## Business rules
-Invariants that must always hold: `If <condition>, <the invariant that must be true>.` A functional requirement says a capability must exist; a business rule says what must always be true.
+Invariants that must always hold: `If {{condition}}, {{invariant}}.` A functional requirement says a capability must exist; a business rule says what must always be true.
 
 ## Edge cases
 Boundary and failure conditions: missing or unknown data, expired windows, absent permissions, unavailable dependencies, entities that no longer exist. Each edge case traces to a functional requirement or business rule.

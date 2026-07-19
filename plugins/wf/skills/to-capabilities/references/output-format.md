@@ -5,34 +5,32 @@
 - **Solution-agnostic**: every sentence names a behavior and entity, never a widget, table, endpoint, or access role.
 
 ## Template
-{Emit one block per capability.}
+<!-- Emit one block per capability. -->
 
 ```markdown
-## <Capability title — behavior + entity, no surface or placement>
+## {{capabilityTitle|behavior + entity, no surface or placement}}
 
-> **Priority**: <Importance of the requirement: MVP/Should have/Nice to have. If not applicable, use MVP as default> | **Risk**: <Complexity: Low/Medium/High. If not applicable, use Low as default>
+> **Priority**: {{priority|(One of (MVP|Should have|Nice to have); default MVP)}} | **Risk**: {{risk|(One of (Low|Medium|High); default Low)}}
 
 ### Stakeholder Requirement
-The <actor> needs to <behavior> <entity>, so <value>.
+The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
 
 ### Functional Requirements
-- <Behavior> when <condition>.
+- {{behavior}} when {{condition}}.
 - ...
 
 ### Business Rules
-{Optional section — if no business rules exist, omit this section.}
+<!-- Optional section — if no business rules exist, omit this section. -->
 
-- If <condition>, <invariant>.
+- If {{condition}}, {{invariant}}.
 - ...
 
 ### Edge Cases
-{Optional section — if no edge cases exist, omit this section.}
+<!-- Optional section — if no edge cases exist, omit this section. -->
 
-- <boundary/failure condition> → <expected handling>.
+- {{boundaryCondition}} → {{expectedHandling}}.
 - ...
 ```
-
-## Example
 
 ## Example — reinstate cancelled orders
 
