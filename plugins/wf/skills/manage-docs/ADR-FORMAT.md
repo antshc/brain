@@ -21,17 +21,12 @@ session, and open the full ADR only when a decision is relevant to the work at h
 
 That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
 
-## Considered Options
-
-<!-- List of considered alternatives. -->
-
-- **{{alternativeTitle}}** - 1-3 sentences: what it is, why it was considered, and why it was rejected.
-
 ## Optional sections
 
 Only include these when they add genuine value. Most ADRs won't need them.
 
 - **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited
+- **Considered Options** — only when the rejected alternatives are worth remembering
 - **Consequences** — only when non-obvious downstream effects need to be called out
 
 ## Numbering
