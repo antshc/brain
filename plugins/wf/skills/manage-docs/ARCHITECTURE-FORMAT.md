@@ -19,111 +19,86 @@ Building Blocks
 -->
 
 ```md
-# {System Name} Architecture Overview
+# {{SYSTEM_NAME}} Overview
 
-## Project Overview
-
-<!-- 1-3 sentences: what the system is, the architectural style (e.g. modular monolith,
-volatility-based layering), and the core stack. -->
+A 1-3 sentence summary of what the system is, its architectural style (e.g. modular monolith, volatility-based layering), and the core tech stack.
 
 ## Context
 
-<!-- Reference the `CONTEXT.md` file(s) that define the language of the system. -->
+References the `CONTEXT.md` file that defines the shared language (terms and domain concepts) used throughout this document.
 
+## Building blocks *(optional)*
 
-## Building blocks
+Documents the system's components/services and their responsibilities, how they interact, and the top-level codebase layout.
 
 [Building blocks](https://docs.arc42.org/section-5/)
 
-### High-Level Architecture Overview 
-The section provides a high-level overview of the system's architecture, including its main components, their interactions, and the overall structure. It should include a diagram that illustrates the relationships between the building blocks.
+### High-Level Architecture Overview
+
+High-level overview of the system's architecture: main components, their interactions, and overall structure, illustrated with a diagram.
 
 \```mermaid
 graph TD
-    {Building Block} --> {Building Block}
-    {Building Block} --> {Building Block}
+    {{BUILDING_BLOCK}} --> {{BUILDING_BLOCK}}
+    {{BUILDING_BLOCK}} --> {{BUILDING_BLOCK}}
 \```
+#### Services
 
-- **<[Building Block](reference to building block details md page)> (`<mermaid component name>`)** — <terse, concise, optimized for agent short description of the building blocks purpose and responsibilities. Reference to the API (swagger), configuration doc, etc.>
+Bullet list of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. A link to a full doc (built from [BUILDING-BLOCK-SERVICE-FORMAT.md](./BUILDING-BLOCK-SERVICE-FORMAT.md)) is optional — add it only for non-trivial services.
+
+- **{{BUILDING_BLOCK_NAME}}** (`{{MERMAID_COMPONENT_NAME}}`) — {{SHORT_DESCRIPTION}} <!-- terse, concise, optimized for agent navigation -->. {{OPTIONAL_LINK_TO_FULL_DOC}}
 - **[Order Service](docs/services/order-service.md)** (`orders`) - Order API: cart, checkout, fulfillment. [API Contracts](docs/services/order-service.swagger.json). Reports checkout and inventory analytics to Google Analytics.
 
-#### Interactions
+#### Interactions *(optional)*
 
-{Optional section. The Interactions, the one-directional, surface communication between the building blocks. One line per
-dependency arrow. Map each to building blocks.}
+One-directional, surface communication between the building blocks — one line per dependency arrow, mapped to building blocks.
 
 \```mermaid
-{Building Block} --> {Building Block}   ← {what maps onto it}
+{{BUILDING_BLOCK}} --> {{BUILDING_BLOCK}}   ← {{WHAT_MAPS_ONTO_IT}}
 \```
 
 ### Codebase Structure
 
-{The top-level folders and what each contains. One line per folder. Group nested modules
-under their parent.}
+The top-level folders and what each contains, one line per folder, with nested modules grouped under their parent.
 
-- `{folder}/` — {what lives here}
-- `{folder}/` — {what lives here}
-  - `{folder}/{module}/` — {what this module is responsible for}
-
-{Optionally, per major area, a short "follows these principles" list — e.g. abstractions
-first, dependency injection, shared foundation.}
+- `{{FOLDER}}/` — {{WHAT_LIVES_HERE}}
+- `{{FOLDER}}/` — {{WHAT_LIVES_HERE}}
+  - `{{FOLDER}}/{{MODULE}}/` — {{WHAT_THIS_MODULE_IS_RESPONSIBLE_FOR}}
 
 ## Architecture Decision Records
-A short document that records an important architectural decision, its context, considered options.
 
-**Cornerstone ADR**: Defines a fundamental architectural direction and belongs in the Crosscutting Concepts. Test questions: Does it shape the system’s overall structure or communication model? Does it affect multiple building blocks or key quality attributes?
+An ADR records a point-in-time decision — hard to reverse, non-obvious, and the result of a real trade-off — tagged **Cornerstone** (shapes the system's overall structure/communication model, or affects multiple building blocks or key quality attributes) or **Local** (confined to one component, concern, or implementation area). See [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-**Local ADR**: Records a localized, often non-obvious decisions to one component, concern, or implementation area. Test questions: Is its impact confined to a small part of the system? Can it change without altering the overall Crosscutting Concepts?
-
-<!--
-The index of Architecture Decision Records (ADRs). One row per ADR. State that this table is the index: scan it during design and modeling, and open the full record only when a decision is relevant to the work at hand.
-See [ADR-FORMAT.md](./ADR-FORMAT.md).}
--->
+<!-- The index of ADRs. One row per ADR: {{NNNN}} is the sequential ADR number, {{SLUG}} its slug, {{DECISION_TITLE}} its short title, {{SUMMARY}} a 1-3 sentence agent-optimized summary that may reference related Concepts or other ADRs. Scan this table during design and modeling; open the full record only when relevant. -->
 
 | # | Decision | Summary |
 |---|----------|---------|
-| [{NNNN}](docs/adr/<NNNN>-<slug>.md) | <Decision title> | <1-3 sentences summary of the decision, optimized for the agents. Relations to the crosscutting concepts, other ADRs.> |
+| [{{NNNN}}](docs/adr/{{NNNN}}-{{SLUG}}.md) | {{DECISION_TITLE}} | {{SUMMARY}} |
 
-## Crosscutting Concepts
+## Crosscutting Concepts *(optional)*
 
-This section describes crosscutting concepts (practices, patterns, regulations, recurring approaches). They preserve architectural consistency. 
+This section describes crosscutting concepts (practices, patterns, regulations, recurring approaches). They preserve architectural consistency.
 
-<!-- 
-Topics:
-- Architecture Patterns
-- Design & Coding Patterns
-- Logging & Tracing
-- Authorization & Authentication
-- Configuration
-- Integration & Communication
-- Exception & Error Handling
-- Parallel/Batch Processing
-
-Examples:
-- REST API Design: Common rules for versioning, authentication, errors, pagination, and idempotency.
-- Module and Interface Design: Shared rules for dependency injection, small interfaces, and observable results.
-- Logging and Observability: Common log format, correlation identifiers, metrics, tracing, and destinations.
+<!--
+Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-->
-{The index of Concepts — the backbone rules of the solution.
-One row per concept. The Summary cell must be terse, concise, optimized for agents, must be enough to understand the concept and make a decision to read the whole concept. State
-that this table is the index: scan it during design and modeling, and open the full record only when a concept is relevant to the work at hand. See [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md).}
--->
+<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{NNNN}} is the sequential Concept number, {{SLUG}} its slug, {{CONCEPT_TITLE}} its title, {{SUMMARY}} a terse, agent-optimized summary — enough to decide whether to open the full record, and may reference related concepts or ADRs. Scan this table during design and modeling; open the full record only when relevant. See [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md). -->
 
 | # | Concept | Summary |
 |---|----------|---------|
-| [{NNNN}](docs/concepts/<NNNN>-<slug>.md) | <Concept title> | <1-3 sentences summary of the concept, optimized for the agents. Relations to other concepts.> |
+| [{{NNNN}}](docs/concepts/{{NNNN}}-{{SLUG}}.md) | {{CONCEPT_TITLE}} | {{SUMMARY}} |
 
-## Testing Strategy
-{The test categories that must be present for any change, and — for each — how to detect whether it applies and how to run its tests. **Load the categories from the Testing strategy Concept (`docs/concepts/`) if one exists** and link it here; otherwise fall back to the default list: Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E. Reference this section when designing or grilling a plan.}
+## Testing Strategy *(optional)*
 
-#### {Category name} — e.g. Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E
+The test categories that must be present for any change, and — for each — how to detect whether it applies and how to run its tests. Load categories from the Testing strategy Concept (`docs/concepts/`) if one exists; otherwise fall back to the default list: Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E.
 
-{One line: what this category verifies, when it applies, and the skip condition.}
+#### {{CATEGORY_NAME}}
 
-- **Prerequisite:** {infra needed, e.g. docker daemon running — or "none".}
-- **Run mode:** {Per changed code | Health-check guard}
+One line: what this category verifies, when it applies, and the skip condition (e.g. Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E).
+
+- **Prerequisite:** {{INFRA_NEEDED}} <!-- e.g. docker daemon running — or "none" -->
+- **Run mode:** Per changed code | Health-check guard
 
 **Per changed code** — run only the tests that cover the changed source.
 
@@ -131,18 +106,18 @@ that this table is the index: scan it during design and modeling, and open the f
 
    | Changed source folder | Test project |
    | --- | --- |
-   | `{path/*}` | `{test project}` |
+   | `{{PATH}}` | `{{TEST_PROJECT}}` |
 
 2. Narrow to the covering test class(es) — note each changed file's **area**, then run only those:
 
    \```
-   dotnet test <project> --filter "Category=<Category>&(FullyQualifiedName~<TestClassA>|FullyQualifiedName~<TestClassB>)"
+   dotnet test {{PROJECT}} --filter "Category={{CATEGORY}}&(FullyQualifiedName~{{TEST_CLASS_A}}|FullyQualifiedName~{{TEST_CLASS_B}})"
    \```
 
 **Health-check guard** — always-on; run the whole suite on every change regardless of which files changed (e.g. the coding agent feedback loop):
 
 \```
-dotnet test <project> --filter "Category=<Category>"
+dotnet test {{PROJECT}} --filter "Category={{CATEGORY}}"
 \```
 ```
 

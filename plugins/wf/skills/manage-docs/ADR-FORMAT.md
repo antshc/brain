@@ -14,16 +14,18 @@ session, and open the full ADR only when a decision is relevant to the work at h
 ## Template
 
 ```md
-# {Short title of the decision}
+# {{DECISION_TITLE}}
 
-{1-3 sentences: what's the context, what did we decide, and why.}
+<!-- 1-3 sentences: what's the context, what did we decide, and why. -->
 ```
 
 That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
 
 ## Considered Options
-List of consider alternatives: 
-- **<Consider alternative title>** - 1-3 sentences: what it is, why it was considered, and why it was rejected.
+
+<!-- List of considered alternatives. -->
+
+- **{{ALTERNATIVE_TITLE}}** - 1-3 sentences: what it is, why it was considered, and why it was rejected.
 
 ## Optional sections
 
