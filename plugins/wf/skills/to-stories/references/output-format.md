@@ -6,21 +6,21 @@ Each story is broken down by capability and carries four blocks in order: **Capa
 
 One story:
 ```
-## <Capability title>
+## {{capabilityTitle}}
 
-<capability title — behavior + entity, no surface or placement>
+{{capabilityTitle|behavior + entity, no surface or placement}}
 
-The <actor> needs to <behavior> <entity>, so <value>.
+The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
 
 ### Acceptance Criteria
-Each criterion states one observable outcome bound to a condition (`<outcome> when/if <condition>`). Vary the opening to fit the behavior — do not force "The system" every time:
-- <entity/outcome> <is/becomes/does> ... when <condition>.
-- The <actor> <sees/receives/is prompted> ... when <condition>.
-- The system <does observable outcome> when <condition>.
-- If <failure condition>, <what the user/operator sees>.
+Each criterion states one observable outcome bound to a condition (`{{outcome}} when/if {{condition}}`). Vary the opening to fit the behavior — do not force "The system" every time:
+- {{entityOrOutcome}} {{is|becomes|does}} ... when {{condition}}.
+- The {{actor}} {{sees|receives|is prompted}} ... when {{condition}}.
+- The system {{observableOutcome}} when {{condition}}.
+- If {{failureCondition}}, {{whatUserOperatorSees}}.
 
 **Functional Requirements:**
-- <Behavior> when <condition>.
+- {{behavior}} when {{condition}}.
 - ...
 
 
@@ -28,11 +28,11 @@ Each criterion states one observable outcome bound to a condition (`<outcome> wh
 
 Multiple stories — repeat the block, one per capability, under a numbered heading:
 ```
-## Story 1 — <Capability title>
+## Story 1 — {{capabilityTitle}}
 
-<capability title — behavior + entity, no surface or placement>
+{{capabilityTitle|behavior + entity, no surface or placement}}
 
-The <actor> needs to <behavior> <entity>, so <value>.
+The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
 
 ### Acceptance Criteria
 - ...

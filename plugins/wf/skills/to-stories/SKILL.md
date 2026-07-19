@@ -24,8 +24,8 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 
 ## Acceptance Criteria
 Write one criterion per observable behavior. Vary the opening to fit the behavior — name the entity, actor, or outcome as the subject, and use "The system …" only where naming the system adds meaning:
-- `<entity/outcome> <is/becomes/does> ... when <condition>.`
-- `If <condition>, the <actor> must <result>.`
+- `{{entityOrOutcome}} {{isBecomesDoes}} ... when {{condition}}.`
+- `If {{condition}}, the {{actor}} must {{result}}.`
 
 Cover these rule types:
 - **Input** — what the system accepts.

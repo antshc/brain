@@ -21,17 +21,17 @@ The skill accepts one of:
 Each requirement block in the Markdown requirements file follows this structure:
 
 ```
-## <Capability title>
+## {{capabilityTitle}}
 
-> **Priority**: <Priority> | **Risk**: <Risk>
+> **Priority**: {{priority}} | **Risk**: {{risk}}
 
 ### Stakeholder Requirement
-<Stakeholder Requirement>
+{{stakeholderRequirement}}
 
 ### Functional Requirements
 
-- <criterion 1>
-- <criterion 2>
+- {{criterion1}}
+- {{criterion2}}
 ...
 ```
 

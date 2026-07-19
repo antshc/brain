@@ -19,7 +19,7 @@ Building Blocks
 -->
 
 ```md
-# {{SYSTEM_NAME}} Overview
+# {{systemName}} Overview
 
 A 1-3 sentence summary of what the system is, its architectural style (e.g. modular monolith, volatility-based layering), and the core tech stack.
 
@@ -39,14 +39,14 @@ High-level overview of the system's architecture: main components, their interac
 
 \```mermaid
 graph TD
-    {{BUILDING_BLOCK}} --> {{BUILDING_BLOCK}}
-    {{BUILDING_BLOCK}} --> {{BUILDING_BLOCK}}
+    {{buildingBlock1}} --> {{buildingBlock2}}
+    {{buildingBlock2}} --> {{buildingBlock3}}
 \```
 #### Services
 
 Bullet list of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. A link to a full doc (built from [BUILDING-BLOCK-SERVICE-FORMAT.md](./BUILDING-BLOCK-SERVICE-FORMAT.md)) is optional — add it only for non-trivial services.
 
-- **{{BUILDING_BLOCK_NAME}}** (`{{MERMAID_COMPONENT_NAME}}`) — {{SHORT_DESCRIPTION}} <!-- terse, concise, optimized for agent navigation -->. {{OPTIONAL_LINK_TO_FULL_DOC}}
+- **{{buildingBlockName}}** (`{{mermaidComponentName}}`) — {{shortDescription}} <!-- terse, concise, optimized for agent navigation -->. {{optionalLinkToFullDoc}}
 - **[Order Service](docs/services/order-service.md)** (`orders`) - Order API: cart, checkout, fulfillment. [API Contracts](docs/services/order-service.swagger.json). Reports checkout and inventory analytics to Google Analytics.
 
 #### Interactions *(optional)*
@@ -54,26 +54,26 @@ Bullet list of the system's services/building blocks, each with a short descript
 One-directional, surface communication between the building blocks — one line per dependency arrow, mapped to building blocks.
 
 \```mermaid
-{{BUILDING_BLOCK}} --> {{BUILDING_BLOCK}}   ← {{WHAT_MAPS_ONTO_IT}}
+{{buildingBlock1}} --> {{buildingBlock2}}   ← {{whatMapsOntoIt}}
 \```
 
 ### Codebase Structure
 
 The top-level folders and what each contains, one line per folder, with nested modules grouped under their parent.
 
-- `{{FOLDER}}/` — {{WHAT_LIVES_HERE}}
-- `{{FOLDER}}/` — {{WHAT_LIVES_HERE}}
-  - `{{FOLDER}}/{{MODULE}}/` — {{WHAT_THIS_MODULE_IS_RESPONSIBLE_FOR}}
+- `{{folder}}/` — {{whatLivesHere}}
+- `{{folder}}/` — {{whatLivesHere}}
+  - `{{folder}}/{{module}}/` — {{whatThisModuleIsResponsibleFor}}
 
-## Architecture Decision Records
+## Architecture Decision Records *(optional)*
 
 An ADR records a point-in-time decision — hard to reverse, non-obvious, and the result of a real trade-off — tagged **Cornerstone** (shapes the system's overall structure/communication model, or affects multiple building blocks or key quality attributes) or **Local** (confined to one component, concern, or implementation area). See [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-<!-- The index of ADRs. One row per ADR: {{NNNN}} is the sequential ADR number, {{SLUG}} its slug, {{DECISION_TITLE}} its short title, {{SUMMARY}} a 1-3 sentence agent-optimized summary that may reference related Concepts or other ADRs. Scan this table during design and modeling; open the full record only when relevant. -->
+<!-- The index of ADRs. One row per ADR: {{nnnn}} is the sequential ADR number, {{slug}} its slug, {{decisionTitle}} its short title, {{summary}} a 1-3 sentence agent-optimized summary that may reference related Concepts or other ADRs. Scan this table during design and modeling; open the full record only when relevant. -->
 
 | # | Decision | Summary |
 |---|----------|---------|
-| [{{NNNN}}](docs/adr/{{NNNN}}-{{SLUG}}.md) | {{DECISION_TITLE}} | {{SUMMARY}} |
+| [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) | {{decisionTitle}} | {{summary}} |
 
 ## Crosscutting Concepts *(optional)*
 
@@ -83,21 +83,21 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{NNNN}} is the sequential Concept number, {{SLUG}} its slug, {{CONCEPT_TITLE}} its title, {{SUMMARY}} a terse, agent-optimized summary — enough to decide whether to open the full record, and may reference related concepts or ADRs. Scan this table during design and modeling; open the full record only when relevant. See [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md). -->
+<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{nnnn}} is the sequential Concept number, {{slug}} its slug, {{conceptTitle}} its title, {{summary}} a terse, agent-optimized summary — enough to decide whether to open the full record, and may reference related concepts or ADRs. Scan this table during design and modeling; open the full record only when relevant. See [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md). -->
 
 | # | Concept | Summary |
 |---|----------|---------|
-| [{{NNNN}}](docs/concepts/{{NNNN}}-{{SLUG}}.md) | {{CONCEPT_TITLE}} | {{SUMMARY}} |
+| [{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md) | {{conceptTitle}} | {{summary}} |
 
 ## Testing Strategy *(optional)*
 
 The test categories that must be present for any change, and — for each — how to detect whether it applies and how to run its tests. Load categories from the Testing strategy Concept (`docs/concepts/`) if one exists; otherwise fall back to the default list: Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E.
 
-#### {{CATEGORY_NAME}}
+#### {{categoryName}}
 
 One line: what this category verifies, when it applies, and the skip condition (e.g. Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E).
 
-- **Prerequisite:** {{INFRA_NEEDED}} <!-- e.g. docker daemon running — or "none" -->
+- **Prerequisite:** {{infraNeeded}} <!-- e.g. docker daemon running — or "none" -->
 - **Run mode:** Per changed code | Health-check guard
 
 **Per changed code** — run only the tests that cover the changed source.
@@ -106,18 +106,18 @@ One line: what this category verifies, when it applies, and the skip condition (
 
    | Changed source folder | Test project |
    | --- | --- |
-   | `{{PATH}}` | `{{TEST_PROJECT}}` |
+   | `{{path}}` | `{{testProject}}` |
 
 2. Narrow to the covering test class(es) — note each changed file's **area**, then run only those:
 
    \```
-   dotnet test {{PROJECT}} --filter "Category={{CATEGORY}}&(FullyQualifiedName~{{TEST_CLASS_A}}|FullyQualifiedName~{{TEST_CLASS_B}})"
+   dotnet test {{project}} --filter "Category={{category}}&(FullyQualifiedName~{{testClassA}}|FullyQualifiedName~{{testClassB}})"
    \```
 
 **Health-check guard** — always-on; run the whole suite on every change regardless of which files changed (e.g. the coding agent feedback loop):
 
 \```
-dotnet test {{PROJECT}} --filter "Category={{CATEGORY}}"
+dotnet test {{project}} --filter "Category={{category}}"
 \```
 ```
 

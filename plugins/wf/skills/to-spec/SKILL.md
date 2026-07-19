@@ -9,7 +9,7 @@ This skill takes the current conversation context and codebase understanding and
 
 The ticket tracker and triage label vocabulary should have been provided to you — run `/manage-backlog` action **Setup labels** if not. 
 
-If the `/manage-backlog` skill is not available, fall back to saving the spec to `docs/specs/<feature-id-slug>.md` as markdown.
+If the `/manage-backlog` skill is not available, fall back to saving the spec to `docs/specs/{{featureIdSlug}}.md` as markdown.
 
 ## Process
 
@@ -24,31 +24,31 @@ Check with the user that these seams match their expectations.
 Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
 <spec-template>
-{Writing style: concise, no-fluff, Terse}
+<!-- Writing style: concise, no-fluff, terse -->
 
-**Target Branch:** `<target-branch>`
-**Feature Id:** `<feature-id>`
+**Target Branch:** `{{targetBranch}}`
+**Feature Id:** `{{featureId}}`
 
 ## Problem Statement
 
-{Writing style: Non-technical}
+<!-- Writing style: non-technical -->
 
 The problem that the user is facing, from the user's perspective.
 
 ## Solution
 
-{Writing style: Non-technical}
+<!-- Writing style: non-technical -->
 
 The solution to the problem, from the user's perspective.
 
 ## Functional Requirements
-{Writing style: Non-technical}
+<!-- Writing style: non-technical -->
 
 What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
 
 A LONG, numbered list of functional requirements. Each functional requirement should be in the format of:
 
-1. <Behavior> when <condition>.
+1. {{behavior}} when {{condition}}.
 
 <functional-requirement-example>
 1. *Retain deleted files for 30 days before permanent deletion.*
@@ -61,7 +61,7 @@ Before outputting the Functional Requirements list, verify using the `/solution-
 
 ## Implementation Decisions
 
-{Writing style: technical tone.}
+<!-- Writing style: technical tone -->
 
 A list of implementation decisions that were made. This can include:
 

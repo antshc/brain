@@ -1,7 +1,7 @@
 ---
 name: to-tickets
 description: Breaks a spec into tracer-bullet GitHub tickets. Accepts an optional plan or plan.md to guide slicing.
-argument-hint: "<milestone-title> [<implementation details>, <plan.md>]"
+argument-hint: "{{milestoneTitle}} [{{implementationDetails}}, `plan.md`]"
 ---
 
 # Implementation details to Issues
@@ -10,9 +10,9 @@ argument-hint: "<milestone-title> [<implementation details>, <plan.md>]"
 
 ### 1. Gather inputs
 
-`<milestone-title>` is **required**. If not provided as argument, ask the user.
+`{{milestoneTitle}}` is **required**. If not provided as argument, ask the user.
 
-**If only `<milestone-title>` is provided:**
+**If only `{{milestoneTitle}}` is provided:**
 
 Resolve the target repo once.
 
@@ -31,15 +31,15 @@ $REPO = $(git remote get-url origin) `
 
 Find the spec issue by milestone and label:
 ```bash
-gh issue list --repo "$REPO" --milestone "<milestone-title>" --label "spec" --json number,title,body,comments --limit 1
+gh issue list --repo "$REPO" --milestone "{{milestoneTitle}}" --label "spec" --json number,title,body,comments --limit 1
 ```
 If no issue is found, ask the user for the GitHub issue number and fetch it:
 ```bash
-gh issue view <number> --repo "$REPO" --json number,title,body,comments
+gh issue view {{issueNumber}} --repo "$REPO" --json number,title,body,comments
 ```
 Use the issue title, body, and comments as the spec content.
 
-**If `<milestone-title>` and (`<implementation details>` or `<plan.md>`) is provided:**
+**If `{{milestoneTitle}}` and (`{{implementationDetails}}` or `plan.md`) is provided:**
 
 Use the implementation details as the spec content instead of a GitHub issue:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
@@ -74,7 +74,7 @@ Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an
 Present the proposed breakdown as a numbered list. For each slice, show:
 
 - **Title**: short descriptive name
-- **Type**: HITL / AFK
+- **Type**: HITL | AFK
 - **Blocked by**: which other slices (if any) must complete first
 - **Functional Requirements covered**: which functional requirements from the spec this addresses
 
@@ -89,11 +89,11 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue using `gh issue create --repo "$REPO" --milestone "<milestone-title>" --label "hitl"`.
+For each approved slice, create a GitHub issue using `gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "hitl"`.
 
 Use `--label "hitl"` for all issues `HITL` or `AFK` to indicate that user review is required.
 
-The `--milestone "<milestone-title>"` from the spec is required for each command, if missing ask user. 
+The `--milestone "{{milestoneTitle}}"` from the spec is required for each command, if missing ask user. 
 Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
@@ -101,7 +101,7 @@ Create issues in dependency order (blockers first) so you can reference real iss
 <issue-template>
 ## Parent Spec
 
-#<spec-issue-number>
+#{{specIssueNumber}}
 
 ## What to build
 
@@ -112,7 +112,7 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 ## Acceptance criteria
 <acceptance-criteria-rule>
 - Written for a manual QA tester. Each criterion must be a single, self-contained check the tester can perform and judge as pass or fail without reading code or the spec.
-- Phrase as an observable action and its expected result (e.g. "When <action>, then <observable outcome>").
+- Phrase as an observable action and its expected result (e.g. "When {{action}}, then {{observableOutcome}}").
 - Use the domain language of the spec or the CONTEXT.md. Never reference file paths, class names,variable names, or other implementation details.
 - Avoid vague or unverifiable words such as "works", "correctly", "properly", "as expected". State the exact expected outcome instead.
 - If a relevant error condition exists, add a criterion for the expected behavior during that failure (e.g. the message or state the tester should see).
@@ -124,7 +124,7 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 
 ## Blocked by
 
-- Blocked by #<issue-number> (if any)
+- Blocked by #{{issueNumber}} (if any)
 
 Or "None - can start immediately" if no blockers.
 
@@ -132,7 +132,7 @@ Or "None - can start immediately" if no blockers.
 
 Reference by number from the parent spec:
 
-- <3 Functional requirement name>
+- {{functionalRequirementName}}
 - ...
 
 ## Implementation Decisions
