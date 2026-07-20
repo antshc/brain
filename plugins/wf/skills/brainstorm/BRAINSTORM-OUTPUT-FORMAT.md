@@ -7,11 +7,11 @@
 
 # Brainstorm: {{decisionTitle}}
 
+{{decisionSummary}} <!-- 1-3 sentences: what did we decide, and why -->
+
 ## Context
 
 {{decisionContext}} <!-- 1-3 sentences: problem, goal, and decisive constraints -->
-
-{{decisionSummary}} <!-- 1-3 sentences: what did we decide, and why -->
 ```
 
 Keep the record compact. The value is in recording the context, what was decided, and why — not in filling out sections.
