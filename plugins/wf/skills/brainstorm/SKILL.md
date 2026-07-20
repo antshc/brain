@@ -15,4 +15,4 @@ Present list of approaches as bullets with terse, concise sumamry, then give you
 
 Ask the user to approve, or present other approach.
 
-On approval, summarize using [BRAINSTORM-FORMAT.md](./BRAINSTORM-FORMAT.md).
+On approval, summarize using [BRAINSTORM-OUTPUT-FORMAT.md](./BRAINSTORM-OUTPUT-FORMAT.md).
