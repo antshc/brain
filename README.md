@@ -51,3 +51,8 @@ copilot plugin install atl@brain
 (copilot plugin uninstall az@brain >/dev/null 2>&1 || true) && \
 copilot plugin install az@brain
 ```
+
+## Install brain skills
+```sh
+gh skill install antshc/brain skills/be-terse --agent github-copilot --scope user -f
+```
