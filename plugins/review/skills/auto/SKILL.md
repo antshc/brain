@@ -17,7 +17,7 @@ Parse the user input: `{{input}}`, format `[SELECTED_AXES] <PR_URL>`. `SELECTED_
 
 **Step 2 — Fetch PR details**
 1. Run `gh pr checkout <PR_NUMBER> --repo <OWNER>/<REPO>` to check out the PR branch locally.
-2. Run the following command to fetch the diff per file into `bin/review_diff/` in the repository root.
+2. Run the following command to fetch the diff per file into `bin/review_diff/` in the repository root. It also writes `bin/review_diff/_manifest.tsv` (`REAL_PATH<TAB>SANITIZED_FILENAME`), preserving the exact repo-relative path (as GitHub expects for `FILE_PATH`) before it gets flattened for the local filename — never reconstruct or guess this path later (e.g. via search); always read it from the manifest.
 ```
 rm -rf bin/review_diff && mkdir -p bin/review_diff &&
 gh pr diff "<PR_URL>" | awk -v outdir="bin/review_diff/" '
@@ -25,8 +25,10 @@ gh pr diff "<PR_URL>" | awk -v outdir="bin/review_diff/" '
   if (outfile) close(outfile)
   match($0, /b\/(.+)$/, arr)
   filepath = arr[1]
-  gsub("/", "_", filepath)
-  outfile = outdir "/" filepath
+  sanitized = filepath
+  gsub("/", "_", sanitized)
+  outfile = outdir "/" sanitized
+  print filepath "\t" sanitized >> (outdir "/_manifest.tsv")
 }
 outfile { print > outfile }
 '
@@ -45,6 +47,7 @@ Spawn only the sub-agents matching <SELECTED_AXES> from Step 1 (`qa` + `smells` 
 
 Give **each** agent its per-run context:
 - the per-file diffs in `bin/review_diff/` (each agent enumerates changed symbols itself via its LSP workflow),
+- `bin/review_diff/_manifest.tsv`, mapping each diff filename back to its real repo-relative path — instruct the agent to report `FILE_PATH` from this manifest, never from a guessed or locally-resolved path,
 - the existing review comments (dedup context — do not restate them).
 
 Axis-specific per-run handoff (spawn only those in <SELECTED_AXES>):
@@ -56,4 +59,4 @@ Axis-specific per-run handoff (spawn only those in <SELECTED_AXES>):
 Collect each selected axis's report — a JSON array of review-comment objects (`AXIS`, `FILE_PATH`, `LINE_NUMBER`, `LABEL`, `REVIEW_COMMENT`). Deduplicate against existing review comments and drop anything already covered — match on `FILE_PATH` + `LINE_NUMBER` + `LABEL`. Do NOT merge or rerank across axes — group review comments by their `AXIS` under `## Quality-attributes` and `## Code-smells` headings (include only the headings for axes that were run). Carry forward only net-new, actionable review comments.
 
 **Step 6 — Post review comments**
-Post each review comment's `REVIEW_COMMENT` body as an **inline pull-request review comment** following the `/posting` skill.
+Post each review comment's `REVIEW_COMMENT` body as an **inline pull-request review comment** following the `/posting` skill, using the `FILE_PATH` exactly as recorded in `bin/review_diff/_manifest.tsv`.
