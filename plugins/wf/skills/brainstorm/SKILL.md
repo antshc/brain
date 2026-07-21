@@ -11,8 +11,8 @@ Run a `/grilling` session on the idea, problem, or design.
 
 Once clear, spawn 1-3 `general-purpose` subagents in parallel, each exploring a different approach under a distinct constraint (e.g., simplest, most flexible, optimized for the common case). Each subagent returns: the approach, trade-offs, pros/cons, and reasoning.
 
-Present list of approaches as bullets with terse, concise sumamry, then give your own recommendation — the strongest approach, presented in full. Propose a hybrid if elements from different approaches combine well.
+Present the single strongest approach using [BRAINSTORM-PROPOSAL-FORMAT.md](./BRAINSTORM-PROPOSAL-FORMAT.md). Propose a hybrid if elements from different approaches combine well.
 
-Ask the user to approve, or present other approach.
+Ask the user to approve, or present another approach.
 
-On approval, summarize using [BRAINSTORM-FORMAT.md](./BRAINSTORM-FORMAT.md).
+On approval, summarize using [BRAINSTORM-OUTPUT-FORMAT.md](./BRAINSTORM-OUTPUT-FORMAT.md).

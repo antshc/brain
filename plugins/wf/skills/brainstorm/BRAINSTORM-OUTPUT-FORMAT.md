@@ -1,4 +1,4 @@
-# Brainstorm ADR Format
+# Brainstorm Output Format
 
 ## Template
 
@@ -7,21 +7,25 @@
 
 # Brainstorm: {{decisionTitle}}
 
-{{decisionSummary}} <!-- 1-3 sentences: what's the context, what did we decide, and why -->
+{{decisionSummary}} <!-- 1-3 sentences: what did we decide, and why -->
 
+## Context
+
+{{decisionContext}} <!-- 1-3 sentences: problem, goal, and decisive constraints -->
 ```
 
-That's it. A brainstorm ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
+Keep the record compact. The value is in recording the context, what was decided, and why — not in filling out sections.
 
 ## Considered Options
 <!-- note rejected alternatives -->
 
 ## Optional sections
 
-Only include these when they add genuine value. Most ADRs won't need them.
+Only include these when they add genuine value. Most records won't need them.
 
 - **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited
 - **Consequences** — only when non-obvious downstream effects need to be called out
+- **Open Questions** — unresolved questions that do not block the decision
 
 
 ### What qualifies
