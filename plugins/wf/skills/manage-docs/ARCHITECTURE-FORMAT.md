@@ -65,6 +65,12 @@ The top-level folders and what each contains, one line per folder, with nested m
 - `{{folder}}/` — {{whatLivesHere}}
   - `{{folder}}/{{module}}/` — {{whatThisModuleIsResponsibleFor}}
 
+## Deployment View *(optional)*
+
+Documents where the building blocks run (environments, hosts, containers) and the infrastructure elements connecting them, illustrated with a diagram.
+
+[Deployment view](https://docs.arc42.org/section-7/)
+
 ## Architecture Decision Records *(optional)*
 
 An ADR records a point-in-time, localized decision — hard to reverse, non-obvious, and the result of a real trade-off. See [ADR-FORMAT.md](./ADR-FORMAT.md).
