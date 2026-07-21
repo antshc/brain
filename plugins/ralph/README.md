@@ -2,34 +2,40 @@
 
 ## Agents
 
-### `ralphy-coder`
+### `csdroid` (from the `pet` plugin)
 
-Autonomous implementation agent. Explores repo, implements via TDD, builds, tests, commits, updates the issue.
+Autonomous C# implementation agent. Explores repo, implements via TDD, builds, tests, records decisions. Defined in [`plugins/pet/agents/csdroid.agent.md`](../pet/agents/csdroid.agent.md); invoked by `/dev` and `/worktree` (merge-conflict resolution) via `runSubagent`.
 
-**Direct invocation** (via `@ralphy-coder` in chat):
+**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 4):
 
 ```
-Implement the following GitHub issue.
+## HARNESS_ROOT
+<absolute path to the harness repo>
+
+## WORKTREE_PATH
+<absolute path to the worktree — cd here as your very first action>
 
 ## TASK
-- Issue: #42
-- Title: Add retry logic to payment client
-- Body: <paste issue body>
+- Title: <title>
+- Body: <body>
+- Comments: <comments>
 
-## RECENT COMMITS
-<last 5 commits for context>
+## RECENT CHANGES
+<last 5 commits>
 ```
 
-**Via `/dev` skill** (fully automated — fetches spec, picks tasks, loops):
+**Invoked by `/worktree`** (merge-conflict resolution, smaller prompt — see `worktree/SKILL.md` step 2).
+
+**Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
 
 ```
-/dev
+/dev <milestone-title>
 ```
 
 ## Skills
 
 | Skill | Description |
 |-------|-------------|
-| `/dev` | AFK loop — picks next issue, invokes `ralphy-coder`, pushes |
+| `/dev` | AFK loop — picks next issue, invokes `csdroid`, pushes |
 | `/fix` | Apply PR review comments |
 | `/worktree` | Resolve the source repo (workspace source repo when present, else current repo) and create/reuse an isolated git worktree |

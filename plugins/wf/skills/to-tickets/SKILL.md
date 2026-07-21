@@ -141,10 +141,21 @@ Reference by number from the parent spec:
 - Use short technical statements and implementation-oriented language.
 - No specific file paths or code snippets (they become outdated quickly).
 
+### Relevant Concepts
+
+*Mandatory whenever step 2 opened at least one Concept or ADR for this slice.* One bullet per constraining Concept/ADR, with **both**:
+- The link (`docs/concepts/{{nnnn}}-{{slug}}.md` or `docs/adr/{{nnnn}}-{{slug}}.md`).
+- An inline summary of the rule(s) bearing on this slice — enough to act without opening the file.
+
+Summary is a shortcut, not a replacement: open the linked record if insufficient. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code. If the slice belongs to a specific service, also scan the `Services` bullet list (under `Building blocks` in `ARCHITECTURE.md`) and load the matching service's doc (`docs/services/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules. Ticket + links must be self-explanatory — no further repo exploration needed.
+
+- [{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md) — {{ruleSummaryAsItAppliesToThisSlice}}
+- [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) — {{ruleSummaryAsItAppliesToThisSlice}}
+
 ### Verify section
 
-This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes. 
-- *Mandatory*: The Verify section must be present in every issue. It is used to verify the code changes. if the Code changes verification strategy or the Testing strategy from the `ARCHITECTURE.md` present use them to guide the verification. Include the commands what will be use to run the integration, REST API automation tests for the verification.
+This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes.
+- *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. Include the commands that will be used to run the integration, REST API automation tests for the verification.
 - Only test external behavior, not implementation details.
 - List which modules will be tested and prior art for the tests.
 

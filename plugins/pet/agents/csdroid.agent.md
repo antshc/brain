@@ -14,7 +14,7 @@ You may be given an optional **`HARNESS_ROOT`** argument — the absolute path t
 
 You may also be given an optional **`WORKTREE_PATH`** argument — the absolute path to the git worktree where all code, git, build, and test commands must run. **If provided, your very first action must be `cd $WORKTREE_PATH` before any exploration, tool call, or command.** After that cd, all commands run there — no path prefix, no `git -C`. If not provided, your workspace is your current working directory.
 
-- Convention/decision/verify files are located **under `HARNESS_ROOT`** (e.g. `$HARNESS_ROOT/agent/decisions.jsonl`, `$HARNESS_ROOT/VERIFY.md`, `$HARNESS_ROOT/ARCHITECTURE.md`, `$HARNESS_ROOT/README.md`). Do not detect or derive any other paths yourself.
+- `VERIFY.md`, `ARCHITECTURE.md`, `CODE.md` may live in any subfolder under `HARNESS_ROOT` — recursive scan, never outside it. Exceptions: `README.md` at `$HARNESS_ROOT/README.md`; decision store at fixed `$HARNESS_ROOT/agent/decisions.jsonl` (per `csdroid-memory`). Derive no other paths.
 - **Your workspace is `WORKTREE_PATH` (if provided) or your current working directory.** Run **all** code, git, build, test, and exploration commands there — no path prefix, no `git -C`.
 - Substitute the resolved `HARNESS_ROOT` value literally wherever `$HARNESS_ROOT` appears, and pass it to every skill you invoke.
 
@@ -34,7 +34,7 @@ Before exploring, confirm the project builds and check whether an LSP is availab
 ## EXPLORATION
 
 Explore the repo to understand code for the task:
-- Use the `Source Code Structure` and `Layers Dependency` sections from `$HARNESS_ROOT/ARCHITECTURE.md` if present to orient project structure and layer placement
+- Use the `Codebase Structure` section from `ARCHITECTURE.md`, the matching service doc (`docs/services/{{slug}}.md`), and the matching Concepts (recursively located under `HARNESS_ROOT`) if present to orient project structure and layer placement
 - Read at least the file(s) being modified and one neighboring file in the same folder to confirm conventions
 - Project structure
 - Code conventions
@@ -53,11 +53,11 @@ Apply matching decisions during implementation. Do not contradict them without s
 
 ## IMPLEMENTATION
 
-Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules, passing `HARNESS_ROOT` so it searches the `*.md` convention files (e.g. `$HARNESS_ROOT/ARCHITECTURE.md`) under `HARNESS_ROOT` (never the worktree cwd) and the decisions `*.jsonl` files.
+Follow the `csdroid-implement` skill for code style, layer placement, design principles, and test rules, passing `HARNESS_ROOT` so it recursively searches the `*.md` convention files (e.g. `ARCHITECTURE.md`, `CODE.md`) under `HARNESS_ROOT` (never the worktree cwd) and the decisions `*.jsonl` files.
 
 ## FEEDBACK LOOPS
 
-Run the `csdroid-feedback` skill, after IMPLEMENTATION completes, passing `HARNESS_ROOT` so it searches the `*.md` files (e.g. `ARCHITECTURE.md`, `VERIFY.md`, decisions `decisions*.jsonl`) under `HARNESS_ROOT` (never the worktree cwd).
+Run the `csdroid-feedback` skill, after IMPLEMENTATION completes, passing `HARNESS_ROOT` so it recursively searches for `VERIFY.md` under `HARNESS_ROOT` (never the worktree cwd).
 
 ## RECORD DECISIONS
 

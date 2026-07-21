@@ -6,8 +6,8 @@ A C# autonomous coding harness. One agent (`csdroid`) orchestrates a fixed pipel
 
 - [agents/csdroid.agent.md](agents/csdroid.agent.md) — the orchestrator. Fixed phases: INPUT → EXPLORATION → DECISION CONTEXT → IMPLEMENTATION → FEEDBACK LOOPS → RECORD DECISIONS → STATUS REPORT. Takes an optional `HARNESS_ROOT` argument (defaults to cwd) and detects nothing itself.
 - [skills/to-droid/SKILL.md](skills/to-droid/SKILL.md) — entry point. Resolves a task (`<description>` | `@plan` | issue URL), gathers recent git changes, invokes `csdroid` via `runSubagent`. Does not pass `HARNESS_ROOT` — the agent defaults it to cwd.
-- [skills/csdroid-implement/SKILL.md](skills/csdroid-implement/SKILL.md) — implementation rules; loads `ARCHITECTURE.md`, `CODE.md`, `TESTS.md` + selected ADR/SDR from `$HARNESS_ROOT`.
-- [skills/csdroid-feedback/SKILL.md](skills/csdroid-feedback/SKILL.md) — verify loop (LSP/build/test/refactor); loads `VERIFY.md` from `$HARNESS_ROOT`; runs all commands in cwd.
+- [skills/csdroid-implement/SKILL.md](skills/csdroid-implement/SKILL.md) — implementation rules; loads `ARCHITECTURE.md`, `CODE.md` + selected ADR/Concept, recursively under `$HARNESS_ROOT`.
+- [skills/csdroid-feedback/SKILL.md](skills/csdroid-feedback/SKILL.md) — verify loop (LSP/build/test/refactor); loads `VERIFY.md`, recursively under `$HARNESS_ROOT`; runs all commands in cwd.
 - [skills/csdroid-memory/SKILL.md](skills/csdroid-memory/SKILL.md) — durable decision store `agent/decisions.jsonl` at `$HARNESS_ROOT`.
 - [skills/to-commit/SKILL.md](skills/to-commit/SKILL.md) — commits with a `dcode:` prefix, post-task.
 
@@ -17,7 +17,7 @@ The `csdroid` agent takes an **optional `HARNESS_ROOT` argument** — the absolu
 that owns the convention docs and the decision store. **If omitted, the agent defaults it to its
 current working directory (cwd).** The agent detects nothing; it only substitutes the resolved value.
 
-- `HARNESS_ROOT` — outermost enclosing repo; owns `agent/decisions.jsonl` and **all** convention docs (`ARCHITECTURE.md`, `CODE.md`, `TESTS.md`, ADR/SDR, `VERIFY.md`). Skills derive their paths from it (e.g. `$HARNESS_ROOT/agent/decisions.jsonl`).
+- `HARNESS_ROOT` — outermost enclosing repo; owns `agent/decisions.jsonl` and **all** convention docs (`ARCHITECTURE.md`, `CODE.md`, ADR/Concept, `VERIFY.md`). Test conventions live in `CODE.md` (no separate `TESTS.md`). `ARCHITECTURE.md`, `CODE.md`, and `VERIFY.md` may live in any subfolder — skills locate them via a recursive scan under `HARNESS_ROOT`, never outside it. `agent/decisions.jsonl` is the exception: it stays at the fixed path `$HARNESS_ROOT/agent/decisions.jsonl`.
 - **Workspace = cwd** — all code, git, build, test, and exploration commands run in the agent's current working directory. There is no separate workspace variable; callers launch the agent with cwd set to the code repo/worktree.
 
 Detection lives **only in the caller** (`ralph:dev`), which bundles the detection scripts in its own
@@ -44,8 +44,8 @@ graph TD
     AG -.HARNESS_ROOT arg or cwd default.-> IMP
     AG -.HARNESS_ROOT arg or cwd default.-> FB
 
-    IMP -.reads.-> DOCS[ARCHITECTURE.md / CODE.md / TESTS.md / docs adr,sdr @ HARNESS_ROOT]
-    FB -.reads.-> VER[VERIFY.md @ HARNESS_ROOT]
+    IMP -.reads.-> DOCS[ARCHITECTURE.md / CODE.md / docs/adr, docs/concepts — anywhere under HARNESS_ROOT]
+    FB -.reads.-> VER[VERIFY.md — anywhere under HARNESS_ROOT]
     MEM -.read/write.-> STORE[(agent/decisions.jsonl @ HARNESS_ROOT)]
 ```
 
@@ -54,7 +54,7 @@ graph TD
 - **Hard control-flow**: `to-droid` / `ralph:dev` → `csdroid` → the `csdroid-*` skills (named literally in the agent prose). Harness-root detection lives in `ralph:dev` (its `scripts/detect-env.{sh,ps1}`), not in the agent.
 - **Soft/implicit**: `to-commit` depends on the agent's STATUS REPORT format (the `dcode:` convention couples them, but nothing enforces it).
 - **Argument contract**: the agent receives `HARNESS_ROOT` (or defaults it to cwd) and passes it to `csdroid-memory`, `csdroid-implement`, and `csdroid-feedback`; they derive their file paths from it.
-- **External file contracts**: `csdroid-implement` and `csdroid-feedback` depend on convention docs living at `$HARNESS_ROOT` (`ARCHITECTURE.md` etc.), each with its own fallback. `csdroid-memory` keeps the store at `$HARNESS_ROOT/agent/decisions.jsonl`.
+- **External file contracts**: `csdroid-implement` and `csdroid-feedback` depend on convention docs found via a recursive scan under `$HARNESS_ROOT` (`ARCHITECTURE.md` etc.), each with its own fallback. `csdroid-memory` keeps the store at `$HARNESS_ROOT/agent/decisions.jsonl`.
 
 ## Execution sequence
 
