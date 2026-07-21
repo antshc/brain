@@ -63,18 +63,18 @@ When a domain relationship, boundary, or invariant is stated as fact — not jus
 
 ### Challenge which test categories must cover the change
 
-Read the relevant `Testing strategy` section in `ARCHITECTURE.md`. No Testing strategy? Fall back to documented conventions (`Testing.md`, `README.md`) and existing tests in the codebase.
+Always runs, every change. Check `Crosscutting Concepts` index in `ARCHITECTURE.md` for a testing/verification Concept. Match found → cross-reference it against existing tests and test conventions in the code; propose add/update/delete. No match → use the code alone.
 
-When the plan adds a REST endpoint, external-service integration, persisted entity, or new module, challenge which documented categories must cover it. Consult the `Testing strategy` (or fallback) and explore existing tests — don't default to unit tests. "This adds a repository against the database — your strategy mandates an integration-test category. Which category covers persistence round-trips and queries?"
+"This adds a repository against the database — your testing Concept mandates an integration-test category. Which category covers persistence round-trips and queries?"
 
 ### Continuously validate against Concepts and ADRs
 
-After every user answer — not just at session start — re-run step 3's Trigger-condition match (split each row's cell into clauses, check literally against what the answer just touched) against every Concept/ADR row already known from Load strategy guardrails' index read — or, once *Track opened records*' compression threshold has kicked in, against that compressed summary plus the ledger instead. An answer can newly touch a surface a clause names even if that row wasn't relevant before — re-checking is mandatory, not optional. Open a full record the first time an entry becomes relevant this way, logging the matched clause in the ledger per step 3; log a checked-but-no-match row the same way step 3 requires — this logging obligation doesn't lapse once you're past initial load. Re-read the full index tables only when re-scoping (per *Track opened records*) or right after a Concept/ADR is authored/edited — not on every turn. Where a proposal or decision conflicts, classify the gap:
-* **Violation** — the proposal breaks a Concept, or repeats an ADR's rejected alternative. Do not present a Concept-violating or rejected-alternative option as equally valid — cite the Concept or ADR by number and surface the conflict.
-* **Supersession** — the Concept/ADR is outdated and should be revised.
-* **Out of scope** — the Concept/ADR does not apply here.
+After every user answer, re-run step 3's Trigger-condition match against every known Concept/ADR row (index read, or compressed summary + ledger once threshold hit) — mandatory, not optional; a later answer can newly touch a clause a row names. First time a row becomes relevant this way: open it, log the matched clause per step 3. No match: log checked-no-match per step 3. Re-read full index tables only on re-scope (per *Track opened records*) or right after authoring/editing a Concept/ADR — not every turn. Classify conflicts:
+* **Violation** — breaks a Concept or repeats an ADR's rejected alternative. Never present as equally valid — cite the Concept/ADR number, surface the conflict.
+* **Supersession** — Concept/ADR is outdated, needs revision.
+* **Out of scope** — Concept/ADR doesn't apply.
 
-(Drift — implementation vs. Concept/ADR — is not classified here; it belongs to *Cross-reference with code* below, which already checks the code independently.)
+(Drift — code vs. Concept/ADR — handled by *Cross-reference with code* below, not here.)
 
 ### Surface design improvements
 

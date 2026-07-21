@@ -12,7 +12,7 @@ Run the feedback loop below against all files changed during the IMPLEMENTATION.
 ```
 Task Progress:
 - [ ] Step 0: Collect changed files
-- [ ] Step 1: Verify — diagnostics, build, tests, and any project-specific checks (from VERIFY.md if present, else fallback)
+- [ ] Step 1: Verify — diagnostics, build, tests, and any project-specific checks (from VERIFY.md if found, else fallback)
 - [ ] Step 2: Refactoring review (all changed files)
 ```
 
@@ -26,7 +26,7 @@ Gather the full list of files changed during implementation. For each changed fi
 
 ## Step 1: Verify (diagnostics, build, tests)
 
-Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given). Look for  `VERIFY.md` or `ARCHITECTURE.md` at `$HARNESS_ROOT` with the `Testing strategy` section for a Coding agent feedback loop instructions. If it exists, follow **all** of its steps in order — it may define more steps than the fallback, and may add project-specific checks (linting, formatting, integration tests, etc.). Otherwise, use the fallback below and emit: "Verify steps: fallback".
+Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given). Recursively scan **under** `$HARNESS_ROOT` (any subfolder) for `VERIFY.md` — never search outside `$HARNESS_ROOT`. If found, follow **all** of its steps in order — it may define more steps than the fallback, and may add project-specific checks (linting, formatting, integration tests, etc.). Otherwise, use the fallback below and emit: "Verify steps: fallback".
 
 ### Fallback
 

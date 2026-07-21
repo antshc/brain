@@ -114,43 +114,37 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 <last 5 commits from step 1>
 ```
 
-The agent reads convention docs, `VERIFY.md`, and `agent/decisions.jsonl` from `HARNESS_ROOT`, and runs all code/git/test commands in `WORKTREE_PATH` (which it cds into on startup).
+The agent locates `ARCHITECTURE.md`, `CODE.md`, and `VERIFY.md` via a recursive scan of any subfolder under `HARNESS_ROOT` (never outside it), while `agent/decisions.jsonl` stays at the fixed path `$HARNESS_ROOT/agent/decisions.jsonl`. All code/git/test commands run in `WORKTREE_PATH` (which it cds into on startup).
 
 ## 5. Distill
 
-Distill the agent's SUMMARY into two outputs. Use both in step 6 (commit body) and step 7 (spec update).
+Distill the agent's SUMMARY into Implementation Decisions. Use this in step 6 (commit body) and step 7 (spec update).
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-**Functional Requirements** — observable external behavior statements:
-- No implementation details — requirements describe externally visible behavior, not internals.
-- Plain words only — no backticks, type names, or code formatting.
-- Single-responsibility — one scenario or transition per requirement.
-- Requirement format: `- <Behavior> when <condition>.`
-
 ## 6. Commit
 
 Build the commit from the agent's report fields and the distilled outputs from step 5:
 - **SUBJECT** → Use **dcode:** prefix, than one line commit summary
-- **SUMMARY** → commit body (two labelled blocks: Functional Requirements, then Implementation Decisions)
+- **SUMMARY** → commit body (Implementation Decisions block)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
 ## 7. Update Spec
 
-Using the Implementation Decisions and Functional Requirements from step 5, update both sections of the spec issue.
+Using the Implementation Decisions from step 5, update the spec issue.
 
 1. Fetch the open spec issue:
    ```bash
    gh issue list --repo $repo --milestone "<milestone-title>" --label "spec" --state open --json number,body --jq '.[0]'
    ```
 2. If no spec issue is found, skip this step and continue.
-3. For each section — `## Implementation Decisions` and `## Functional Requirements` — apply the same merge logic:
-   - Replace any entry that conflicts with or is superseded by a new decision/requirement.
-   - Append decisions/requirements that are additive.
+3. For the `## Implementation Decisions` section, apply the merge logic:
+   - Replace any entry that conflicts with or is superseded by a new decision.
+   - Append decisions that are additive.
 4. Write the updated body back:
    ```bash
    gh issue edit <spec-number> --body "<updated-body>"

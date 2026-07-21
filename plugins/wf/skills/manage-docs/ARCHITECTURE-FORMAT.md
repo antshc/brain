@@ -94,37 +94,6 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 | # | Concept | Trigger condition | Summary |
 |---|----------|--------------------|---------|
 | [{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md) | {{conceptTitle}} | {{triggerCondition}} | {{summary}} |
-
-## Testing Strategy *(optional)*
-
-The test categories that must be present for any change, and — for each — how to detect whether it applies and how to run its tests. Load categories from the Testing strategy Concept (`docs/concepts/`) if one exists; otherwise fall back to the default list: Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E.
-
-#### {{categoryName}}
-
-One line: what this category verifies, when it applies, and the skip condition (e.g. Coding agent feedback loop, Database integration, External system / cloud integration, REST API E2E, Frontend E2E).
-
-- **Prerequisite:** {{infraNeeded}} <!-- e.g. docker daemon running — or "none" -->
-- **Run mode:** Per changed code | Health-check guard
-
-**Per changed code** — run only the tests that cover the changed source.
-
-1. Map the change via the trigger table:
-
-   | Changed source folder | Test project |
-   | --- | --- |
-   | `{{path}}` | `{{testProject}}` |
-
-2. Narrow to the covering test class(es) — note each changed file's **area**, then run only those:
-
-   \```
-   dotnet test {{project}} --filter "Category={{category}}&(FullyQualifiedName~{{testClassA}}|FullyQualifiedName~{{testClassB}})"
-   \```
-
-**Health-check guard** — always-on; run the whole suite on every change regardless of which files changed (e.g. the coding agent feedback loop):
-
-\```
-dotnet test {{project}} --filter "Category={{category}}"
-\```
 ```
 
 ## Rules
