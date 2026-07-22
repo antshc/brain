@@ -73,4 +73,4 @@ stays scannable.
 
 ## Repo topology (documentation repository)
 
-When the docs live in a dedicated documentation/context repository (separate from the codebase), seed its `copilot-instructions.md` from [instructions.template](./instructions.template). It defines where `CONTEXT.md`, `ARCHITECTURE.md`, `docs/adr/`, and `docs/concepts/` live at the reporoot and where the source code and worktrees live.
+When the docs live in a dedicated documentation/context repository (separate from the codebase), use the `copilot-instructions.md` to define where `CONTEXT.md`, `ARCHITECTURE.md`, `docs/adr/`, and `docs/concepts/` live at the reporoot and where the source code and worktrees live.
