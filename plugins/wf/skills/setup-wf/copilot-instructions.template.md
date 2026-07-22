@@ -90,3 +90,15 @@ Use text search only for literals, configuration, generated files, or when the L
 ## 8. Skills
 
 <!-- List repo-specific skills available here, one bullet each: `skill-name` — when to use it. Include any remote-lookup or recovery skills referenced in sections 4-5 above. -->
+
+## 9. Tools
+
+<!-- List CLIs, MCP servers, and other external tooling this repo's skills depend on. One row per tool, with a command/step to verify it's installed and authenticated. -->
+
+| Tool | Purpose | Verify |
+| --- | --- | --- |
+| `gh` CLI | Ticket tracker (`/manage-backlog`), PRs | `gh auth status` |
+| `{{cliToolName}}` (e.g. `aws`, `az`) | {{cliToolPurpose}} | `{{cliToolVerifyCommand}}` (e.g. `aws sts get-caller-identity`) |
+| `{{mcpServerName}}` MCP server | {{mcpServerPurpose}} | Configured in `{{mcpConfigLocation}}` |
+
+Before first use of a tool in a session, run its **Verify** command. If it fails, tell the user which tool is missing/unauthenticated instead of silently falling back or failing.
