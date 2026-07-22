@@ -50,11 +50,14 @@ Ask the user: *"Please paste the code change, feedback, or context you'd like re
 1. Resolve the anchor from the input:
    - `FILE_PATH`: the changed file the input belongs to — match it against a file in `bin/review_diff/`; if ambiguous, ask the user.
    - `LINE_NUMBER`: from the diff (new-file line on the right side; last line of a multi-line range). If it can't be determined from the diff, ask the user.
-2. Gather evidence: spawn the `explore` agent (pass the input and `FILE_PATH`) to cross-reference the input against the actual code — definitions, usages, callers — and confirm the issue is real.
-   - **Architecture lens (only when `ARCHITECTURE` is loaded; scoped to the input, never a proactive scan):** check the input against `ARCHITECTURE`. Flag documented-rule violations (e.g. layering direction, module isolation, folder placement).
+2. Gather evidence — definitions, usages, callers — to cross-reference the input against the actual code and confirm the issue is real. **Default to the `explore` agent; reserve direct reads for anchor-precision.** Every turn resends the whole transcript, so raw tool output pulled into *this* context gets re-billed on every later turn — `explore` runs in a separate context window and returns only a condensed verdict, keeping that growth off the main thread.
+   - **Default — broad-sweep confirmation → `explore`:** for any wide or throwaway check (pattern/exception/route exists elsewhere? who calls this? is the concern real across files?). Pass the input and `FILE_PATH`; consume only its summary — don't re-`view`/`grep` files it already reported.
+   - **Exception — anchor-precision → direct reads:** read files yourself (targeted `view` with `view_range`, or `grep`) only for exact lines/signatures/type hierarchy to quote or anchor the comment, when evidence lives in a small known set of files, or when iterating on those same files across turns. Never whole-file `view` when a range suffices.
+   - **Architecture lens (only when `ARCHITECTURE` is loaded; scoped to the input, never a proactive scan):** check the input against `ARCHITECTURE`. Flag documented-rule violations (e.g., layering direction, module isolation, folder placement).
+   - **Concepts lens (only when `ARCHITECTURE` is loaded; scoped to the input, never a proactive scan):** scan the `Crosscutting Concepts` index table in `ARCHITECTURE` for rows whose Trigger condition matches the input's touched surface; open only the matched concept doc(s) under `docs/concepts/` and check the input against them. Flag violations of the concept's stated rule.
 3. Gate — decide whether to draft:
    - No evidence → don't draft; report it couldn't be confirmed.
-   - Change conforms to `ARCHITECTURE` → don't draft; report "conforms to the documented architecture — nothing to flag" and let the user decide.
+   - Change conforms to `ARCHITECTURE` and any matched Concepts → don't draft; report "conforms to the documented architecture — nothing to flag" and let the user decide.
 
 ## Step 2. Draft
 
