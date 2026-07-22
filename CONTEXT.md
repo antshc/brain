@@ -33,6 +33,16 @@ The git worktree the agent executes all code, git, build, and test commands in. 
 _Avoid_: working directory, checkout
 _Plugins_set_: ralph, pet, wf
 
+**Ledger**:
+A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
+_Avoid_: log, history
+_Plugins_set_: wf
+
+**Trigger Indexer**:
+The mechanism that owns an index table end to end — abstract over any table with a Trigger condition column (not limited to Concepts/ADRs): keeps each record's row in sync with its Trigger condition and summary on add/supersede/retire, and on the read side scans the table, matches its Trigger condition clauses against the current change's touched surface, and opens only the matching full records before they inform generation.
+_Avoid_: local RAG, index scanner, retrieval index
+_Plugins_set_: wf
+
 ## ralph
 ### Language
 
@@ -50,11 +60,6 @@ _Avoid_: decisions, durable decisions
 ## wf
 
 ### Language
-
-**Ledger**:
-A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
-_Avoid_: log, history
-_Plugins_set_: wf
 
 **Completeness sweep**:
 A closing check, run before concluding a session that opened at least one full Concept/ADR record, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts and Architecture Decision Records index tables.
