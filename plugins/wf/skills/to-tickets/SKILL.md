@@ -29,14 +29,11 @@ $REPO = $(git remote get-url origin) `
   -replace '\.git$',''
 ```
 
-Find the spec issue by milestone and label:
-```bash
-gh issue list --repo "$REPO" --milestone "{{milestoneTitle}}" --label "spec" --json number,title,body,comments --limit 1
-```
+Find the spec issue by milestone: via `/manage-backlog` **Find spec ticket**.
+
 If no issue is found, ask the user for the GitHub issue number and fetch it:
-```bash
-gh issue view {{issueNumber}} --repo "$REPO" --json number,title,body,comments
-```
+via `/manage-backlog` **Read ticket**.
+
 Use the issue title, body, and comments as the spec content.
 
 **If `{{milestoneTitle}}` and (`{{implementationDetails}}` or `plan.md`) is provided:**
@@ -89,11 +86,11 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue using `gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "hitl"`.
+For each approved slice, create a GitHub issue: via `/manage-backlog` **Create ticket**, passing the milestone `{{milestoneTitle}}` and label `hitl`.
 
-Use `--label "hitl"` for all issues `HITL` or `AFK` to indicate that user review is required.
+Use `hitl` as the label for all issues `HITL` or `AFK` to indicate that user review is required.
 
-The `--milestone "{{milestoneTitle}}"` from the spec is required for each command, if missing ask user. 
+The `{{milestoneTitle}}` from the spec is required for each call, if missing ask user.
 Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
@@ -171,4 +168,4 @@ Do NOT close or modify the parent issue.
 
 ## Troubleshooting
 
-**Label not found** (`hitl` or `spec` label missing): run `/manage-backlog` action **Setup labels** to create the required labels, then retry. If the `/manage-backlog` skill is not available, fall back to saving the tickets to `docs/tickets/` as markdown.
+**Label not found** (`hitl` or `spec` label missing): run `/manage-backlog` **Setup labels** to create the required labels, then retry. If the `/manage-backlog` skill is not available, fall back to saving the tickets to `docs/tickets/` as markdown.
