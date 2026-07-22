@@ -92,6 +92,14 @@ When the user states how something works, check whether the code agrees. If you 
 
 When the code disagrees with a loaded Concept or ADR, classify it as **Drift** and surface the gap.
 
+### Cross-reference with external source
+
+If the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue) at session start, track it for the rest of the session.
+
+When a user statement, decision, or resolved term contradicts that source, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?"
+
+Once resolved, offer to fix the source immediately — never batch it. Detect whether a write-capable tool for that source type is available; if so, apply the fix after the user confirms wording; if not, tell the user the source is now stale and let them update it.
+
 ### Update CONTEXT.md inline
 
 When a term is resolved, capture it in `CONTEXT.md` right there via `/manage-docs` — don't batch these up, capture them as they happen.
