@@ -12,6 +12,7 @@ Retrieval here means tool-calling retrieval (`grep_search`, `semantic_search`, `
 | **Classification over free-form judgment** | Violation / Supersession / Out of scope / Drift taxonomy for conflicts |
 | **Persistent structured indexes** | `marketplace.json`, `ARCHITECTURE.md` index tables act as a manifest/retrieval scaffold |
 | **Tiered long-term memory** | `memory` tool's user/session/repo scopes — retrieval across conversations, not just within one |
+| **Coverage taxonomy/checklist over happy-path bias** | to-stories' acceptance-criteria rule sweeps input/processing/integration/state/failure categories so failure/edge criteria aren't skipped when the source text never states them explicitly — different from a relevance rubric (below): it doesn't gate *whether* a rule applies, it ensures *exhaustiveness* of what's generated (`plugins/wf/skills/to-stories/SKILL.md`) |
 
 ## 2. Core RAG practices → agentic tool-calling equivalent
 
