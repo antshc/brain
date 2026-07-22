@@ -1,6 +1,7 @@
 ---
 name: setup-wf
 description: One-time wf-plugin setup — confirms single-repo vs. wrapping/harness-repo topology, seeds `.github/copilot-instructions.md` accordingly, and creates the ticket-tracker labels. Run once before first use of the other wf skills.
+disable-model-invocation: true
 ---
 
 # Setup WF
