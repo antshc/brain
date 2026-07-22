@@ -13,11 +13,8 @@ One story:
 The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
 
 ### Acceptance Criteria
-Each criterion states one observable outcome bound to a condition (`{{outcome}} when/if {{condition}}`). Vary the opening to fit the behavior — do not force "The system" every time:
-- {{entityOrOutcome}} {{is|becomes|does}} ... when {{condition}}.
-- The {{actor}} {{sees|receives|is prompted}} ... when {{condition}}.
-- The system {{observableOutcome}} when {{condition}}.
-- If {{failureCondition}}, {{whatUserOperatorSees}}.
+- {{outcome}} when {{condition}}.
+- If {{condition}}, {{actor}} must {{outcome}}.
 
 **Functional Requirements:**
 - {{behavior}} when {{condition}}.

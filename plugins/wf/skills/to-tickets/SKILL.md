@@ -48,8 +48,8 @@ Use the implementation details as the spec content instead of a GitHub issue:
 ### 2. Explore the codebase and scan ADRs/Concepts
 
 If you have not already explored the codebase, do so to understand the current state of the code. 
-Issue titles and descriptions should use the project's domain glossary vocabulary (CONTEXT.md).
-Read the ADR and Concept indexes in `ARCHITECTURE.md`, then open every ADR under `docs/adr/` and every Concept under `docs/concepts/` that touches the area you're changing.
+Issue titles and descriptions should use the project's domain glossary vocabulary `CONTEXT.md`.
+Scan the *Architecture Decision Records (ADR)* and *Crosscutting Concepts (Concept)* indexes in `ARCHITECTURE.md`, then open every ADR under `docs/adr/` and every Concept under `docs/concepts/` that touches the area you're changing.
 - **Concepts** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to them. See `manage-docs/CONCEPT-FORMAT.md`.
 - **ADRs** capture localized decisions — respect and reference the relevant ones in the issue body.
 - Confirm you have scanned both `docs/adr/` and `docs/concepts/` before moving on; if either directory is absent, note that and continue.
@@ -111,11 +111,11 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 
 ## Acceptance criteria
 <acceptance-criteria-rule>
-- Written for a manual QA tester. Each criterion must be a single, self-contained check the tester can perform and judge as pass or fail without reading code or the spec.
-- Phrase as an observable action and its expected result (e.g. "When {{action}}, then {{observableOutcome}}").
-- Use the domain language of the spec or the CONTEXT.md. Never reference file paths, class names,variable names, or other implementation details.
-- Avoid vague or unverifiable words such as "works", "correctly", "properly", "as expected". State the exact expected outcome instead.
-- If a relevant error condition exists, add a criterion for the expected behavior during that failure (e.g. the message or state the tester should see).
+- Each criterion is a single, self-contained pass/fail check, verifiable without reading code or the spec.
+- Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions.
+- Use the domain language of the spec or `CONTEXT.md`; apply the solution-agnostic rule — no file paths, class/variable names, or other implementation details.
+- State the exact expected outcome — never vague words like "works", "correctly", "properly", "as expected".
+- Fold every applicable Business Rule (`If {{condition}}, {{invariant}}`), Edge Case (`{{boundaryCondition}} → {{expectedHandling}}`), and relevant error condition into its own criterion here, rephrased per the format above — do not create separate sections for them.
 </acceptance-criteria-rule>
 
 - [ ] Acceptance criteria 1

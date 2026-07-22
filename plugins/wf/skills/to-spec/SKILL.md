@@ -57,6 +57,21 @@ A LONG, numbered list of functional requirements. Each functional requirement sh
 
 This list of functional requirements should be extremely extensive and cover all aspects of the feature.
 
+## Business Rules
+
+<!-- Writing style: non-technical, solution agnostic. Omit this section if no business rules exist. -->
+
+Invariants that must always hold, independent of any single user action. Each rule should be in the format of:
+
+- If {{condition}}, {{invariant}}.
+
+## Edge Cases
+
+<!-- Writing style: non-technical, solution agnostic. Omit this section if no edge cases exist. -->
+
+Boundary conditions and their expected handling. Each edge case should be in the format of:
+
+- {{boundaryCondition}} → {{expectedHandling}}.
 
 ## Implementation Decisions
 
