@@ -4,13 +4,20 @@ description: Configure this repo for the workflow (wf:) skills — set up its ti
 ---
 # Actions
 
+Find the heading matching the requested operation and follow its steps exactly — do not skip steps or improvise an alternative command. Each action reads its inputs as `{{placeholder}}` variables already in the caller's context and states what it returns.
+
+
 ## Setup labels
 
 Create missing GitHub issue labels for AFK/HITL task workflow.
 
 Run the `scripts/create-labels.sh` script to create any missing labels.
 
+**Returns:** nothing.
+
 ## Publish spec
+
+Reads `{{featureId}}`, `{{specTitle}}`, `{{targetBranch}}` from context.
 
 1. Create a milestone:
    ```
@@ -30,13 +37,91 @@ Run the `scripts/create-labels.sh` script to create any missing labels.
    gh issue edit {{issueNumber}} --milestone "{{featureId}}: {{specTitle}}"
    ```
 
-### Troubleshooting
+**Returns:** the spec ticket's number.
 
-**Label not found** (`spec` label missing): run `Setup labels` to create the required labels, then retry.
+## Find spec ticket
+
+Reads `{{milestoneTitle}}` from context.
+
+```bash
+gh issue list --repo "$REPO" --milestone "{{milestoneTitle}}" --label "spec" --json number,title,body,comments --limit 1
+```
+
+If no issue is found, ask the user for the GitHub issue number and fetch it with **Read ticket**.
+
+**Returns:** the spec ticket's number, title, body, and comments.
+
+## Create ticket
+
+Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}` from context.
+
+```bash
+gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "{{label}}" --title "{{title}}" --body "{{body}}"
+```
+
+Use a heredoc for a multi-line `{{body}}`.
+
+**Returns:** the new ticket's number.
+
+## Read ticket
+
+Reads `{{issueNumber}}` from context.
+
+```bash
+gh issue view {{issueNumber}} --repo "$REPO" --json number,title,body,labels,comments
+```
+
+**Returns:** the ticket's `number`, `title`, `body`, `labels`, and `comments`.
+
+## List tickets
+
+Reads `{{state}}`, `{{label}}` from context.
+
+```bash
+gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'
+```
+
+**Returns:** an array of tickets, each with number, title, body, labels, and comments.
+
+## Comment on ticket
+
+Reads `{{issueNumber}}`, `{{body}}` from context.
+
+```bash
+gh issue comment {{issueNumber}} --repo "$REPO" --body "{{body}}"
+```
+
+**Returns:** nothing.
+
+## Label ticket
+
+Reads `{{issueNumber}}`, `{{addLabels}}`, `{{removeLabels}}` from context. Either may be empty.
+
+```bash
+gh issue edit {{issueNumber}} --repo "$REPO" --add-label "{{addLabels}}" --remove-label "{{removeLabels}}"
+```
+
+**Returns:** nothing.
+
+## Close ticket
+
+Reads `{{issueNumber}}`, `{{comment}}` from context.
+
+```bash
+gh issue close {{issueNumber}} --repo "$REPO" --comment "{{comment}}"
+```
+
+**Returns:** nothing.
+
+## Troubleshooting (all actions)
+
+**Label not found** (`hitl` or `spec` label missing when any other action runs): via `/manage-backlog` **Setup labels** first, then retry the other action.
+
+---
 
 # Ticket tracker: GitHub
 
-Tickets and Specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+Tickets and Specs for this repo live as GitHub issues. Use the `gh` CLI for all operations. This section holds the vendor-specific knowledge (labels, repo resolution) the actions above rely on — callers should invoke the actions above, not this section's commands, directly.
 
 ## Labels
 
@@ -45,16 +130,7 @@ Tickets and Specs for this repo live as GitHub issues. Use the `gh` CLI for all 
 | `hitl` | `fbca04` | Requires human implementation |
 | `spec` | `5319e7` | Spec task with implementation context |
 
-## Conventions
-
-- **Create a ticket**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-- **Read a ticket**: `gh issue view {{issueNumber}} --comments`, filtering comments by `jq` and also fetching labels.
-- **List tickets**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
-- **Comment on a ticket**: `gh issue comment {{issueNumber}} --body "..."`
-- **Apply / remove labels on a ticket**: `gh issue edit {{issueNumber}} --add-label "..."` / `--remove-label "..."`
-- **Close a ticket**: `gh issue close {{issueNumber}} --comment "..."`
-
-Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
+Infer the repo (`$REPO`) from `git remote -v` — `gh` does this automatically when run inside a clone.
 
 ## Pull requests as a triage surface
 
@@ -67,12 +143,4 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 - **Comment / label / close**: `gh pr comment`, `gh pr edit --add-label`/`--remove-label`, `gh pr close`.
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either — resolve with `gh pr view 42` and fall back to `gh issue view 42`.
-
-## When a skill says "publish to the issue tracker"
-
-Create a GitHub issue.
-
-## When a skill says "fetch the relevant ticket"
-
-Run `gh issue view {{issueNumber}} --comments`.
 
