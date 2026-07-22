@@ -24,24 +24,24 @@ Check with the user that these seams match their expectations.
 Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
 <spec-template>
-<!-- Writing style: concise, no-fluff, terse -->
 
 **Target Branch:** `{{targetBranch}}`
 **Feature Id:** `{{featureId}}`
 
 ## Problem Statement
 
-<!-- Writing style: non-technical -->
+<!-- Writing style: terse, concise, non-technical -->
 
 The problem that the user is facing, from the user's perspective.
 
 ## Solution
 
-<!-- Writing style: non-technical -->
+<!-- Writing style: terse, concise, non-technical -->
 
 The solution to the problem, from the user's perspective.
 
 ## Functional Requirements
+
 <!-- Writing style: non-technical -->
 
 What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
@@ -61,8 +61,6 @@ Before outputting the Functional Requirements list, verify using the `/solution-
 
 ## Implementation Decisions
 
-<!-- Writing style: technical tone -->
-
 A list of implementation decisions that were made. This can include:
 
 - The modules that will be built/modified
@@ -73,7 +71,7 @@ A list of implementation decisions that were made. This can include:
 - API contracts
 - Specific interactions
 
-Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+MUST NOT include specific file paths or code snippets. They may end up being outdated very quickly.
 
 Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 
