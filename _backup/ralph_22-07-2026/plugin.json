@@ -1,0 +1,6 @@
+{
+  "name": "ralph",
+  "version": "1.0.0",
+  "description": "ralph AFK PR review automation skills.",
+  "skills": ["./skills"]
+}
