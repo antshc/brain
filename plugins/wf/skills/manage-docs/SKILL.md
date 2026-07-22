@@ -41,7 +41,7 @@ session, every time a term, structural rule, Concept, or ADR is about to be capt
 it just because the file didn't exist at session start.
 
 - No `CONTEXT.md` → create one when the first term is resolved.
-- No `ARCHITECTURE.md` → create one when the first structural rule is captured.
+- No `ARCHITECTURE.md` → **don't wait.** Offer to create it the moment its absence is noticed, regardless of whether a structural rule, Concept, or ADR is ready yet. Fill in its required sections (`# {{systemName}} Overview`, `## Context`) from what's already known about the codebase; leave the optional sections (`Deployment View`, the ADR/Concepts indexes) out until there's content for them.
 - No `docs/concepts/` → create it when the first Concept is needed, then add it to the `Crosscutting Concepts` index in `ARCHITECTURE.md`.
 - No `docs/adr/` → create it when the first ADR is needed, then add it to the `Architecture Decision Records` index in `ARCHITECTURE.md`.
 

@@ -30,28 +30,9 @@ use syntax when
 
 ## Architecture
 
-### Folder Structure
-
 Vertical Slice Architecture — each feature owns all the logic it needs. Cross-cutting concerns live in `shared/`; external adapters in `infrastructure/`.
 
-```
-brain/
-├── .githooks/pre-commit            # Syncs modules into plugins/skills before each commit
-├── pyproject.toml
-├── plugins/                        # Copilot agent plugins
-├── skills/                         # Copilot agent skills
-├── tools/
-│   ├── src/
-│   │   ├── modules/                # Shared Python modules — source of truth
-│   │   │   └── github/             # GitHub domain + infrastructure (domain/, features/, infrastructure/, shared/)
-│   │   └── ralph/                  # ralph CLI tool
-│   │       ├── main.py             # Orchestrator: arg parsing, delegates to features
-│   │       └── features/           # review_pull_request/, review_pull_requests/
-│   └── tests/
-│       ├── unit/                   # Unit tests mirroring src/ structure
-│       └── integration/            # Integration tests
-└── logs/                           # Runtime logs (daily JSON per repo)
-```
+See [ARCHITECTURE.md](../ARCHITECTURE.md) for the codebase structure.
 
 ### Plugin Marketplace
 

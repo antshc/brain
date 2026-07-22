@@ -1,83 +1,25 @@
 ---
 name: csdroid-memory
-description: C# decision memory — read, look up, add, update, and bump confidence on durable decisions stored in decisions.jsonl. Apply during DECISION CONTEXT and RECORD DECISIONS steps.
+description: C# agent guardrails — reads MEMORY.md, the curated list of directives distilled from past session problems. Apply during the GUARDRAILS step, before implementation.
 ---
 
-# Decision Memory
+# Agent Memory
 
 ## Store
 
-The `decisions.jsonl` store file in JSONL format, kept inside the harness root repository at `agent/decisions.jsonl`.
+Curated guardrails live in `MEMORY.md`, kept inside the harness root at the fixed path `$HARNESS_ROOT/agent/MEMORY.md` — never recursively scanned, never the worktree cwd.
 
-### Resolve repo
+## Read Workflow (mandatory before implementation)
 
-The store always lives at `$HARNESS_ROOT/agent/decisions.jsonl` — the harness root, never a worktree. Use the `HARNESS_ROOT` value provided by the agent (it defaults to the current working directory when no argument was given): substitute its literal absolute value wherever `$HARNESS_ROOT` appears below.
+Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given).
 
-Linux/macOS:
-```bash
-STORE="$HARNESS_ROOT/agent/decisions.jsonl"
-```
+- Read `$HARNESS_ROOT/agent/MEMORY.md` in full.
+- If the file doesn't exist or is empty → "No guardrails recorded yet."
+- Apply every directive found during implementation — do not contradict one without reporting the conflict.
 
-Windows (PowerShell):
-```powershell
-$STORE = Join-Path $HARNESS_ROOT "agent\decisions.jsonl"
-```
-
-Initialize the `decisions.jsonl` store if missing:
-- Linux/macOS: `mkdir -p "$HARNESS_ROOT/agent" && touch "$STORE"`
-- Windows (PowerShell): `md -Force (Split-Path $STORE) | Out-Null; if(!(Test-Path $STORE)){New-Item $STORE | Out-Null}`
-
-## Usage
-
-### 1. Read Workflow (mandatory before implementation)
-
-- Read `decisions.jsonl` in full from the repo-resolved store path
-- Filter all entries where `scope`, `tags`, or `topic` overlap with the current task
-- **Emit** the matching decision IDs: "Applying decisions: [dec-XXX, dec-YYY]" or "No prior decisions apply"
-- If the file doesn't exist or is empty → "No prior decisions"
-- Apply matching decisions during implementation — do not contradict them without superseding first
-
-### 2. Lookup Workflow (before recording)
-
-- Search all lines for entries where `topic`, `scope`, or `tags` overlap with the candidate decision
-- If a match is found and still applies → reuse it, do not duplicate
-- If the existing decision needs updating → follow Update workflow
-
-### 3. Add Workflow
-
-- Append exactly one JSON object line to `decisions.jsonl`
-- Set `confidence` per the **Confidence** rules
-- Do not record transient notes, temporary experiments, or routine steps
-
-### 4. Update Workflow
-
-- Append a new JSON object line with `supersedes` set to the older entry's `id`
-- Never edit or delete old lines when the decision content changes (a confidence bump is the only exception — see step 5)
-
-### 5. Confidence Bump (after successful reuse)
-
-- If you applied an existing decision during implementation AND feedback loops passed → check its current confidence
-- If currently `low` → edit that record's line in place: change only `confidence` from `low` to `medium` and refresh its `timestamp`. Do NOT append a new record and do NOT set `supersedes`.
-- If currently `medium` or `high` → no action needed
-
-## Record Schema
-
-Required: `id`, `timestamp`, `agent`, `topic`, `decision`, `rationale`, `scope`, `tags[]`
-Optional: `supersedes`, `related[]`, `confidence` (`low` → `medium` → `high`)
-
-## Confidence
-
-- `low`: first reusable observation
-- `medium`: independently confirmed across sessions/agents
-- `high`: repeatedly validated and established
-
-Increase only after independent successful validation. Never decrease.
+**Emit**: "Guardrails loaded: [summary]" or "No guardrails recorded yet."
 
 ## Hard Constraints
 
-- Write only to the repo-resolved store path defined in **Store**. Never use any other location.
-- Do not record transient notes, temporary experiments, or routine execution steps.
-- On every append, set `confidence` according to the **Confidence** rules above.
-- A confidence bump is the only edit-in-place operation: it changes `confidence` (and `timestamp`) on the existing line. All other changes must append a superseding record — never edit or delete old lines.
-- **Must-emit after reading**: emit the list of decision IDs being applied (or "none"). This is observable output — do not skip silently.
-- **Must-emit after recording**: emit the new decision ID (or "No new decisions to record"). This is observable output — do not skip silently.
+- Read only — never write to `MEMORY.md`. Curation is a manual human step performed outside this workflow, distilled from `agent/LOG.md` (per `csdroid-log`).
+- Read the repo-resolved fixed path only. Never derive or search any other location.

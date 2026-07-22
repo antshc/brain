@@ -27,7 +27,7 @@ A 1-3 sentence summary of what the system is, its architectural style (e.g. modu
 
 References the `CONTEXT.md` file that defines the shared language (terms and domain concepts) used throughout this document.
 
-## Building blocks *(optional)*
+## Building blocks
 
 Documents the system's components/services and their responsibilities, how they interact, and the top-level codebase layout.
 
