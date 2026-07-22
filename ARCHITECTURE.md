@@ -22,3 +22,9 @@ See [CONTEXT.md](CONTEXT.md) for the shared language — currently the Ralph Age
   - `tools/tests/unit/` — unit tests mirroring `tools/src/`
   - `tools/tests/integration/` — integration tests
 - `logs/` — runtime logs (daily JSON per repo)
+
+## Crosscutting Concepts
+
+| # | Concept | Trigger condition | Summary |
+|---|----------|--------------------|---------|
+| [0001](docs/concepts/0001-resource-access-skill.md) | Resource Access Skill | skill encapsulating access to a ticket tracker, docs backend, or other external infra | Encapsulates access to one infra category behind a skill's documented actions so the backend can be swapped without affecting callers. Examples: `manage-backlog` (GitHub), `manage-docs` (local files). |
