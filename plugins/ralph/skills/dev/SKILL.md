@@ -89,7 +89,7 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/decisions.jsonl`, and is distinct from `WORKTREE_PATH` or can be the same. Resolve it once by finding the outermost enclosing git repo:
+The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/LOG.md`/`agent/MEMORY.md`, and is distinct from `WORKTREE_PATH` or can be the same. Resolve it once by finding the outermost enclosing git repo:
 
 1. Find the main working tree of the current repo: `cd "$(git rev-parse --git-common-dir)/.." && pwd`
 2. Walk up parent directories — for each parent, run `git -C <parent> rev-parse --show-toplevel 2>/dev/null`. Stop when it fails. The last directory where it succeeded is `HARNESS_ROOT`.
@@ -114,7 +114,7 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 <last 5 commits from step 1>
 ```
 
-The agent locates `ARCHITECTURE.md`, `CODE.md`, and `VERIFY.md` via a recursive scan of any subfolder under `HARNESS_ROOT` (never outside it), while `agent/decisions.jsonl` stays at the fixed path `$HARNESS_ROOT/agent/decisions.jsonl`. All code/git/test commands run in `WORKTREE_PATH` (which it cds into on startup).
+The agent locates `CODE.md` and `VERIFY.md` via a recursive scan of any subfolder under `HARNESS_ROOT` (never outside it), while `agent/MEMORY.md` and `agent/LOG.md` stay at their fixed paths. All code/git/test commands run in `WORKTREE_PATH` (which it cds into on startup).
 
 ## 5. Distill
 
@@ -166,7 +166,7 @@ git push -u origin "$branch" 2>/dev/null || git push
 
 ## 9. Commit harness root
 
-Run **once** per iteration, after Handle result and after the agent has recorded any decisions to `agent/decisions.jsonl`. Operate in `$HARNESS_ROOT` (resolved in step 4) — never the worktree.
+Run **once** per iteration, after Handle result and after the agent has appended any problems to `agent/LOG.md`. Operate in `$HARNESS_ROOT` (resolved in step 4) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
