@@ -5,3 +5,5 @@ disable-model-invocation: true
 ---
 
 Run a `/grilling` session, using the `/domain-modeling` skill.
+
+*MUST* not enact the plan until I confirm we have reached a shared understanding.
