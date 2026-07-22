@@ -42,7 +42,7 @@ The solution to the problem, from the user's perspective.
 
 ## Functional Requirements
 
-<!-- Writing style: non-technical -->
+<!-- Writing style: non-technical, solution agnostic -->
 
 What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
 
@@ -57,7 +57,6 @@ A LONG, numbered list of functional requirements. Each functional requirement sh
 
 This list of functional requirements should be extremely extensive and cover all aspects of the feature.
 
-Before outputting the Functional Requirements list, verify using the `/solution-agnostic` skill to check compliance that every requirement is **solution-agnostic** — swapping UI or technology would not force a reword.
 
 ## Implementation Decisions
 
