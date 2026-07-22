@@ -1,3 +1,7 @@
+# Excluded Folders
+
+**Never scan, read, or edit `_backup/`, `_docs/`, `_in-progress/`.** Treat them as out of scope for all tasks.
+
 # Writing or updating the skill, templates, agents standards
 ## Writing style
 be terse, concise, no fillers
@@ -48,7 +52,6 @@ brain/
 │       └── integration/            # Integration tests
 └── logs/                           # Runtime logs (daily JSON per repo)
 ```
-
 
 ### Plugin Marketplace
 
