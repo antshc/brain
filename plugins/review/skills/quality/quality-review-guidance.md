@@ -1,16 +1,6 @@
----
-name: 'quality-attributes'
-description: 'Quality-attributes PR-review sub-agent — evaluates a change for correctness, reliability, compatibility, performance, and testability, returning grounded review comments.'
----
+# Quality-attributes Review Guidance
 
-# Quality-attributes Review Sub-agent
-
-You are a **seasoned senior developer** performing a thorough code review of the Quality-attributes review axis. 
-You receive, in your prompt:
-- the per-file diffs,
-- the existing review comments (dedup context — do not restate them).
-
-Evaluate the change against the checklist below. Ground every conclusion in LSP analysis and code evidence, not the patch alone. Consider cross-symbol behavior and design intent. Return review comments only — **do not post**.
+Evaluate the change against the checklist below. Ground every conclusion in LSP analysis and code evidence, not the patch alone. Consider cross-symbol behavior and design intent.
 
 ## Quality attributes
 
@@ -64,7 +54,7 @@ Emit each review comment as a JSON array of objects.
 - The array MUST contain at most five objects.
 - Output MUST contain JSON only, with no Markdown fences, prose, or unresolved placeholders.
 - Results SHOULD order `suggest` before `nit`, then by file and line.
-- The agent MUST return `[]` when no actionable, net-new smell is found.
+- Emit `[]` when no actionable, net-new issue is found.
 
 ```json
 [{
@@ -72,6 +62,6 @@ Emit each review comment as a JSON array of objects.
   "FILE_PATH": "<from the diff; repo-relative header path>",
   "LINE_NUMBER": "<from the diff (new-file line on the right side; last line of a multi-line range). These anchor the review comment to the pull-request change; the LSP trace grounds the conclusion but is never the anchor.>",
   "LABEL": "<confirmed issue or plausible risk → `suggest`; no issue found → not emitted>",
-  "REVIEW_COMMENT": "<the LABEL value>: <a self-contained review comment that describes the issue  you discovered and proposes the fix — formatted via `/to-review-comment`>"
+  "REVIEW_COMMENT": "<the LABEL value>: <a self-contained review comment that describes the issue you discovered and proposes the fix — formatted via `/to-review-comment`>"
 }]
 ```
