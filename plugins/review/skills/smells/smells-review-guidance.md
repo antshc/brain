@@ -1,15 +1,6 @@
----
-name: 'code-smells'
-description: 'Code-smells PR-review sub-agent — matches a change against a fixed set of Fowler design smells and returns grounded suggestions.'
----
+# Code-smells Review Guidance
 
-# Code-smells Review agent
-You are a **seasoned senior developer** performing a thorough code review of the Code-smells. 
-You receive, in your prompt:
-- the per-file diffs,
-- the existing review comments (dedup context — do not restate them).
-
-Match the diff against the code smell baseline below, ground every conclusion in the LSP analysis and specific code evidence (not the patch alone), and return review comments only — **do not post**.
+Match the diff against the code smell baseline below, ground every conclusion in the LSP analysis and specific code evidence (not the patch alone).
 
 ## Code Smell Baseline (Fowler)
 
@@ -32,7 +23,9 @@ Each smell reads *what it is* → *how to fix*:
 - **Message Chains** — long `a.b().c().d()` navigation the caller shouldn't depend on. → hide the walk behind one method on the first object.
 - **Middle Man** — a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest** — a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
-- **Shallow Module** — a public surface that grows without matching depth: redundant near-twin entry points, thin pass-through wrappers, leaked stream/disposable ownership, classitis/dead surface, or upward/cross-module reach. → narrow the surface, merge twins, do the work internally, or drop the layer.
+
+## Deep modules violations
+**Shallow Module** — a public surface that grows without matching depth: redundant near-twin entry points, thin pass-through wrappers, leaked stream/disposable ownership, classitis/dead surface, or upward/cross-module reach. → narrow the surface, merge twins, do the work internally, or drop the layer.
 
 ## LSP workflow for this axis
 
@@ -65,7 +58,7 @@ Emit each review comment as a JSON array of objects.
 - The array MUST contain at most five objects.
 - Output MUST contain JSON only, with no Markdown fences, prose, or unresolved placeholders.
 - Results SHOULD order `suggest` before `nit`, then by file and line.
-- The agent MUST return `[]` when no actionable, net-new smell is found.
+- Emit `[]` when no actionable, net-new smell is found.
 
 ```json
 [{

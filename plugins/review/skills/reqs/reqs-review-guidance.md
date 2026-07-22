@@ -1,17 +1,6 @@
----
-name: 'requirements-coverage'
-description: 'Requirements-coverage PR-review sub-agent — checks a change against its spec for missing, extra, or wrong behavior, returning grounded review comments.'
----
+# Requirements-coverage Review Guidance
 
-# Requirements-coverage Review Sub-agent
-
-You are a **seasoned senior developer** performing a thorough code review of the Requirements-coverage review axis.
-You receive, in your prompt:
-- the per-file diffs,
-- the existing review comments (dedup context — do not restate them),
-- the originating spec text under a **Spec** heading.
-
-Evaluate the change against the spec in the **Spec** section, ground every conclusion in the spec text and specific code evidence (not the patch alone), and return review comments only — **do not post**. If the **Spec** section is empty or absent, report "no spec available" and stop.
+Evaluate the change against the spec identified in Step 4. Ground every conclusion in the spec text and specific code evidence (not the patch alone). If no spec was found, report "no spec available" and stop.
 
 ## What to report
 
@@ -47,7 +36,7 @@ These rules govern how review comments are grounded, scoped, and deduplicated:
 
 ## Evidence anchor
 
-Internal grounding only — used to confirm the review comment, never emitted to the skill or placed in `REVIEW_COMMENT`. For this axis, the evidence anchor is: **the quoted spec line the review comment maps to**.
+Internal grounding only — used to confirm the review comment, never emitted or placed in `REVIEW_COMMENT`. For this axis, the evidence anchor is: **the quoted spec line the review comment maps to**.
 
 ## Output
 
@@ -56,8 +45,7 @@ Emit each review comment as a JSON array of objects.
 - The array MUST contain at most five objects.
 - Output MUST contain JSON only, with no Markdown fences, prose, or unresolved placeholders.
 - Results SHOULD order `suggest` before `nit`, then by file and line.
-- The agent MUST return `[]` when no actionable, net-new smell is found.
-
+- Emit `[]` when no actionable, net-new issue is found.
 
 ```json
 [{
