@@ -85,3 +85,22 @@ Use `python3` — `python` is not available in this environment.
   - Keep both sides in sync when changing a test or scenario.
 - Run all tests: `python3 -m pytest tools/` from repo root.
 - Run a specific file: `python3 -m pytest tools/tests/unit/domain/thread_label_test.py -v`.
+
+## Domain modeling (wf plugin)
+
+Single repo — docs and codebase live together, no `workspace/` split.
+
+### Authoritative sources
+
+- **Domain glossary:** `CONTEXT.md` — domain terminology and concepts.
+- **Architecture:** `ARCHITECTURE.md` — ADR/Concept indexes, high-level source structure.
+
+### Documentation conventions
+
+- Author `CONTEXT.md`, `ARCHITECTURE.md`, ADRs (`docs/adr/`), and Crosscutting Concepts (`docs/concepts/`) at the repo root.
+- Keep `CONTEXT.md` and `ARCHITECTURE.md` high-level — no implementation details, specs, or scratch notes.
+- These docs, their templates, and their lazy-creation rules are owned by the `wf` plugin's `/manage-docs` skill — don't hand-author them outside it. Capture each resolved term, rule, Concept, or ADR the moment it crystallises — never batch documentation updates.
+
+### Ticket tracker
+
+Tickets live as GitHub issues in this repo (`gh issue` commands). Labels `hitl` and `spec` are set up per `/manage-backlog`.
