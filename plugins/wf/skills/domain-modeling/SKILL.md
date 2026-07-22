@@ -49,6 +49,10 @@ Once the ledger grows large, stop re-scanning everything on every re-scope: comp
 
 Every probe below stays live for the whole session: re-check its trigger after each user answer, not just once — a later answer can retroactively put an earlier one in conflict.
 
+### Delegate code lookups to `explore`
+
+Every turn resends the whole transcript — raw tool output pulled into this context gets re-billed on every later turn. Default broad-sweep code checks (does this pattern/behavior exist elsewhere? who calls this? is the code's claim true across files/layers?) to the `explore` agent (`runSubagent`); consume only its condensed verdict, don't re-`view`/`grep` files it already reported. Reserve direct reads (targeted `view`/`grep`) for anchor-precision — the exact line, signature, or assertion needed to quote back to the user. Governs *Cross-reference with code*, *Trace through the layers*, and *Challenge which test categories must cover the change* below.
+
 ### Challenge against the glossary
 
 When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
@@ -63,7 +67,7 @@ When a domain relationship, boundary, or invariant is stated as fact — not jus
 
 ### Challenge which test categories must cover the change
 
-Always runs, every change. Check `Crosscutting Concepts` index in `ARCHITECTURE.md` for a testing/verification Concept. Match found → cross-reference it against existing tests and test conventions in the code; propose add/update/delete. No match → use the code alone.
+Always runs, every change. Check `Crosscutting Concepts` index in `ARCHITECTURE.md` for a testing/verification Concept. Match found → cross-reference it against existing tests and test conventions via `explore` (per *Delegate code lookups* above), reserving direct reads for citing the exact test file/assertion; propose add/update/delete. No match → use the code alone.
 
 "This adds a repository against the database — your testing Concept mandates an integration-test category. Which category covers persistence round-trips and queries?"
 
@@ -84,11 +88,13 @@ When a proposed structure has a narrower/deeper alternative implied by a loaded 
 
 When a new flow crosses a layer or a transaction/process/network boundary defined by a loaded Concept, read the relevant `Building blocks` section in `ARCHITECTURE.md` (and the specific service's full doc if one is open, per Load strategy guardrails), then select one representative scenario and trace it end-to-end, naming each layer from the loaded Concept as you go: "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?" If a shortcut would skip a mandated layer, cite the Concept and surface the conflict rather than presenting the shortcut as equally valid.
 
+When the trace needs to confirm what the code actually does at a layer (not just what `ARCHITECTURE.md` says), default that confirmation to `explore` (per *Delegate code lookups* above); reserve direct reads for anchoring the exact boundary line.
+
 Then re-run *Continuously validate against Concepts and ADRs* against the trace.
 
 ### Cross-reference with code
 
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?", "Must every persisted username be between 3 and 50 characters?". Look up (across user-facing, application, integration, and persistence boundaries): Validation rules, Constraints, Domain concepts, Data models, Contracts, Schemas, Relationships, Business logic.
+When the user states how something works, check whether the code agrees. Default that lookup to `explore` (per *Delegate code lookups* above); reserve direct reads for the exact contradicting line to quote. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?", "Must every persisted username be between 3 and 50 characters?". Look up (across user-facing, application, integration, and persistence boundaries): Validation rules, Constraints, Domain concepts, Data models, Contracts, Schemas, Relationships, Business logic.
 
 When the code disagrees with a loaded Concept or ADR, classify it as **Drift** and surface the gap.
 
