@@ -40,7 +40,7 @@ When a term is resolved, update `CONTEXT.md` right there.
 ### ARCHITECTURE.md
 
 When the structure or layering changes, update `ARCHITECTURE.md` right there. When a decision
-qualifies as a Concept or ADR, write the record and update the matching index in the same change.
+qualifies as a Concept or ADR, write the record and update the matching index using the *Keeping the indexes in sync* in the same change.
 
 ## Keep each document in its lane
 
