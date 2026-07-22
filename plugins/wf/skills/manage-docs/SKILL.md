@@ -16,13 +16,29 @@ The documents:
 - `docs/concepts/` — Crosscutting Concepts: the backbone rules. Use [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md).
 - `docs/adr/` — Architecture Decision Records: localized decisions. Use [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-## Where the files live
+## Lazy creation
 
-Read [FILE-STRUCTURE.md](./FILE-STRUCTURE.md) once when setting up the domain-model files for a repo that doesn't have them yet, or when deciding where a new file belongs. It covers the repo layout and the lazy-creation rules.
+Read this once when setting up the domain-model files for a repo that doesn't have them yet, or
+when deciding where a new file belongs.
 
-## When to create them
+Repo structure:
 
-**Create files lazily — only when you have something to write.**
+```
+/
+├── ARCHITECTURE.md                      ← also indexes the Crosscutting Concepts
+├── CONTEXT.md
+├── docs/
+│   ├── concepts/                        ← Crosscutting Concepts (backbone rules)
+│   │   └── 0001-persisted-domain-model-repository.md
+│   └── adr/
+│       ├── 0001-event-sourced-orders.md
+│       └── 0002-postgres-for-write-model.md
+└── src/
+```
+
+**Create files lazily — only when you have something to write.** This rule applies for the whole
+session, every time a term, structural rule, Concept, or ADR is about to be captured — never skip
+it just because the file didn't exist at session start.
 
 - No `CONTEXT.md` → create one when the first term is resolved.
 - No `ARCHITECTURE.md` → create one when the first structural rule is captured.

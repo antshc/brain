@@ -5,26 +5,26 @@ description: Build and sharpen a project's domain model. Use when the user wants
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md`, `ARCHITECTURE.md`, Concepts, or ADRs for guardrails is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## Managing the docs
 
-All doc reads, creates, and updates go through `/manage-docs` — it owns the templates for **documents**, and the rules for where each file lives, when to create it (lazily), and how to keep the `ARCHITECTURE.md` indexes in sync. **Read `manage-docs/SKILL.md`** (and the relevant `*-FORMAT.md`) before creating or editing any of these documents, if it isn't already loaded this session — don't rely on recalling its rules from memory.
+All doc reads, creates, and updates go through `/manage-docs` — it owns document templates, file locations, lazy-creation rules, and `ARCHITECTURE.md` index sync. **Invoke `/manage-docs`** (and the relevant `*-FORMAT.md`) before touching any of these documents, if not already loaded this session — don't recall its rules from memory.
 
 **Documents**:
-- `CONTEXT.md` — the glossary (the *language*).
-- `ARCHITECTURE.md` — the structural map, and the index of Concepts and ADRs.
-- `docs/concepts/` — Crosscutting Concepts: the backbone rules.
-- `docs/adr/` — Architecture Decision Records: localized decisions.
+- `CONTEXT.md` — glossary (the *language*).
+- `ARCHITECTURE.md` — structural map + Concepts/ADRs index.
+- `docs/concepts/` — Crosscutting Concepts: backbone rules.
+- `docs/adr/` — ADRs: localized decisions.
 
 ## Load strategy guardrails
 
 Before designing or grilling:
 
-1. If `ARCHITECTURE.md` doesn't exist yet, skip this load strategy — that's "not yet created" (see `/manage-docs` lazy-creation), not a gap to fill.
-2. Read `ARCHITECTURE.md` in full: the `Building blocks` → Services list, and the *complete* `Crosscutting Concepts` and `Architecture Decision Records` index tables — every row, not a sample. All three sections are optional in the format (`ARCHITECTURE-FORMAT.md`) — skip gracefully if a section is absent rather than treating it as a gap. If a section spans more than one comfortable read, issue multiple ranged reads covering all of it — never stop at a partial read.
+1. If `ARCHITECTURE.md` doesn't exist yet, skip *this load step only* — nothing to load. Creation still applies once a term, rule, Concept, or ADR is ready to capture (`/manage-docs`'s `Lazy creation` rule; see *Update CONTEXT.md inline*, *Update ADRs and Concepts inline*, *Offer ADRs/Concepts sparingly*).
+2. Read `ARCHITECTURE.md` in full: `Building blocks` → Services list, and the complete `Crosscutting Concepts`/`Architecture Decision Records` index tables — every row. All three sections are optional (`ARCHITECTURE-FORMAT.md`) — skip gracefully if absent, don't treat as a gap. Multi-part sections need multiple ranged reads — never stop at a partial read.
 3. **Match Concepts/ADRs mechanically via the Trigger condition column** — indexing alone never implies relevance. Blank cell = documentation gap, not universal coverage. Per row: split the cell on commas into clauses; check literally against the current change's touched surface (entity/data shape, endpoint, folder, change type); any single clause match opens the full record (`docs/concepts/{{n}}-{{slug}}.md` or `docs/adr/{{n}}-{{slug}}.md`). Never substitute the title/summary for this test. Apply the same test to a Building-block service's full doc if one is linked (`BUILDING-BLOCK-SERVICE-FORMAT.md`) — unlinked services are trivial, the one-line bullet suffices. Non-matching rows stay index-only. Log every check in the session ledger (*Track opened records*): matches as `{{n}} — opened, trigger matched: "{{clause}}"`; non-matches as `{{n}} — skipped, checked "{{clause1}}", "{{clause2}}": neither touched`.
-4. Sections inside an opened record are themselves optional (a Concept's Exceptions/Examples; an ADR's Status/Considered Options/Consequences; a service doc's API Contracts/Tweaks/Persisted data/Key features) — a missing one means "not documented," not a gap to fill in during grilling.
+4. Sections inside an opened record are themselves optional (a Concept's Exceptions/Examples; an ADR's Status/Considered Options/Consequences; a service doc's API Contracts/Tweaks/Persisted data/Key features) — a missing one means "not documented."
 5. Extract:
    * **Mandates** — required concepts, patterns and boundaries.
    * **Prohibitions** — explicitly rejected approaches, rejected considered options.
@@ -108,13 +108,13 @@ Once resolved, offer to fix the source immediately — never batch it. Detect wh
 
 ### Update CONTEXT.md inline
 
-When a term is resolved, capture it in `CONTEXT.md` right there via `/manage-docs` — don't batch these up, capture them as they happen.
+When a term is resolved: if `CONTEXT.md` doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule), then capture the term right there — don't batch these up, capture them as they happen.
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
 ### Update ADRs and Concepts inline
 
-When an ADR or Concept is resolved, capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
+When an ADR or Concept is resolved: if `ARCHITECTURE.md` (or `docs/adr/` / `docs/concepts/`) doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule) first, then capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
 
 ### Offer ADRs sparingly
 
@@ -124,7 +124,7 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via `/manage-docs` skill `Inline-update discipline` (which owns the ADR template) once the user explicitly responds to that specific offer.
+If any of the three is missing, skip the ADR; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via `/manage-docs` skill `Inline-update discipline` (which owns the ADR template) once the user explicitly responds to that specific offer. If `docs/adr/` (or `ARCHITECTURE.md`) doesn't exist yet, that capture step creates it first, per `/manage-docs`' `## Lazy creation` rule.
 
 ### Offer Concepts sparingly
 
@@ -134,7 +134,7 @@ A Concept captures a *backbone* decision: the top-level decomposition, or a mand
 2. **Reusable** — future features of the same kind are expected to follow it every time.
 3. **Backbone-defining** — it is the set of foundational decisions that hold the architecture together and constrain everything built on top of them.
 
-If any of the three is missing, skip the Concept; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via the `manage-docs` skill `Inline-update discipline` section once the user explicitly responds to that specific offer.
+If any of the three is missing, skip the Concept; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via the `manage-docs` skill `Inline-update discipline` section once the user explicitly responds to that specific offer. If `docs/concepts/` (or `ARCHITECTURE.md`) doesn't exist yet, that capture step creates it first, per `/manage-docs`' `## Lazy creation` rule.
 
 ### Closing completeness sweep
 
