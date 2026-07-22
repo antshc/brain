@@ -4,6 +4,6 @@ description: A relentless interview to sharpen a plan or design, which also crea
 disable-model-invocation: true
 ---
 
-When no more questions, output list of decisions for approval. You **MUST not** enact the plan until I confirm we have reached a shared understanding.
+Run a `/grilling` session, using the `Domain Modeling` section in the `/domain-modeling` skill.
 
-Run a `/grilling` session, using the `Domain Modeling` in the `/domain-modeling` skill.
+When no more questions, output list of decisions for approval. You **MUST NOT enact** the plan until I confirm we have reached a shared understanding.
