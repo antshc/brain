@@ -128,11 +128,15 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 
 Or "None - can start immediately" if no blockers.
 
-## Functional Requirements addressed
+## Requirements addressed
 
-Reference by number from the parent spec:
+Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subsection if the spec has none of that kind, or none apply to this slice.
 
-- {{functionalRequirementName}}
+**Functional Requirements:**
+
+- FR{{n}} — {{functionalRequirementName}}
+- BR{{n}} — {{businessRuleName}}
+- EC{{n}} — {{edgeCaseName}}
 - ...
 
 ## Implementation Decisions

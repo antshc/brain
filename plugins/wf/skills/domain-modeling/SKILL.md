@@ -124,7 +124,7 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Capture it via `/manage-docs` skill `Inline-update discipline`, which owns the ADR template.
+If any of the three is missing, skip the ADR; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via `/manage-docs` skill `Inline-update discipline` (which owns the ADR template) once the user explicitly responds to that specific offer.
 
 ### Offer Concepts sparingly
 
@@ -134,7 +134,7 @@ A Concept captures a *backbone* decision: the top-level decomposition, or a mand
 2. **Reusable** — future features of the same kind are expected to follow it every time.
 3. **Backbone-defining** — it is the set of foundational decisions that hold the architecture together and constrain everything built on top of them.
 
-If any of the three is missing, skip the Concept. When you write one: use the `manage-docs` skill `Inline-update discipline` section.
+If any of the three is missing, skip the Concept; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via the `manage-docs` skill `Inline-update discipline` section once the user explicitly responds to that specific offer.
 
 ### Closing completeness sweep
 
