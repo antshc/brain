@@ -46,13 +46,13 @@ The solution to the problem, from the user's perspective.
 
 What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
 
-A LONG, numbered list of functional requirements, prefixed `FR` so it can be referenced unambiguously alongside Business Rules and Edge Cases. Each functional requirement should be in the format of:
+A LONG, numbered list of functional requirements. Each functional requirement should be in the format of:
 
-FR{{n}}. {{behavior}} when {{condition}}.
+{{n}}. {{behavior}} when {{condition}}.
 
 <functional-requirement-example>
-FR1. *Retain deleted files for 30 days before permanent deletion.*
-FR2. *Allow administrators to restore a deleted file to its original location.*
+1. *Retain deleted files for 30 days before permanent deletion.*
+2. *Allow administrators to restore a deleted file to its original location.*
 </functional-requirement-example>
 
 This list of functional requirements should be extremely extensive and cover all aspects of the feature.
@@ -61,17 +61,17 @@ This list of functional requirements should be extremely extensive and cover all
 
 <!-- Writing style: non-technical, solution agnostic. Omit this section if no business rules exist. -->
 
-Invariants that must always hold, independent of any single user action. A numbered list prefixed `BR`. Each rule should be in the format of:
+Invariants that must always hold, independent of any single user action. Each rule should be in the format of:
 
-BR{{n}}. If {{condition}}, {{invariant}}.
+{{n}}. If {{condition}}, {{invariant}}.
 
 ## Edge Cases
 
 <!-- Writing style: non-technical, solution agnostic. Omit this section if no edge cases exist. -->
 
-Boundary conditions and their expected handling. A numbered list prefixed `EC`. Each edge case should be in the format of:
+Boundary conditions and their expected handling. Each edge case should be in the format of:
 
-EC{{n}}. {{boundaryCondition}} → {{expectedHandling}}.
+{{n}}. {{boundaryCondition}} → {{expectedHandling}}.
 
 ## Implementation Decisions
 

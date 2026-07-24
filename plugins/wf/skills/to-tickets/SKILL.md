@@ -131,10 +131,18 @@ Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subse
 
 **Functional Requirements:**
 
-- FR{{n}} — {{functionalRequirementName}}
-- BR{{n}} — {{businessRuleName}}
-- EC{{n}} — {{edgeCaseName}}
-- ...
+1. {{functionalRequirementName}}
+2. ...
+
+**Business Rule:**
+
+1. {{businessRuleName}}
+2. ...
+
+**Edge cases:**
+
+1. {{edgeCaseName}}
+2. ...
 
 ## Implementation Decisions
 
