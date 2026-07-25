@@ -145,21 +145,32 @@ Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subse
 2. ...
 
 ## Implementation Decisions
+<implementation-decisions-rule>
+A list of implementation decisions that were made. This can include:
 
-- Preserve integration constraints and assumptions required for implementation.
-- Use short technical statements and implementation-oriented language.
-- No specific file paths or code snippets (they become outdated quickly).
+- The modules that will be built/modified
+- The interfaces of those modules that will be modified
+- Technical clarifications from the developer
+- Schema changes
+- API contracts
+- Specific interactions
+
+MUST NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+</implementation-decisions-rule>
+
+- {{implementationDecision1}}
+- {{implementationDecision2}}
 
 ### Relevant Concepts
+<relevant-concepts-rule>
+- Mandatory whenever step 2 opened at least one Concept or ADR for this slice.
+- One bullet per constraining Concept/ADR. The inline summary is mandatory and must carry enough detail to implement the rule without opening the file — the link back to the record is optional supporting context, not a substitute for the summary.
+- Open the linked record if the summary alone is insufficient. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code. If the slice belongs to a specific service, also scan the `Services` bullet list (under `Building blocks` in `ARCHITECTURE.md`) and load the matching service's doc (`docs/services/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
+- Ticket must be self-explanatory — no further repo exploration needed to implement.
+</relevant-concepts-rule>
 
-*Mandatory whenever step 2 opened at least one Concept or ADR for this slice.* One bullet per constraining Concept/ADR, with **both**:
-- The link (`docs/concepts/{{nnnn}}-{{slug}}.md` or `docs/adr/{{nnnn}}-{{slug}}.md`).
-- An inline summary of the rule(s) bearing on this slice — enough to act without opening the file.
-
-Summary is a shortcut, not a replacement: open the linked record if insufficient. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code. If the slice belongs to a specific service, also scan the `Services` bullet list (under `Building blocks` in `ARCHITECTURE.md`) and load the matching service's doc (`docs/services/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules. Ticket + links must be self-explanatory — no further repo exploration needed.
-
-- [{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md) — {{ruleSummaryAsItAppliesToThisSlice}}
-- [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) — {{ruleSummaryAsItAppliesToThisSlice}}
+- ([{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md)) {{ruleSummaryAsItAppliesToThisSlice}} 
+- ([{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md)) {{ruleSummaryAsItAppliesToThisSlice}}
 
 ### Verify section
 
