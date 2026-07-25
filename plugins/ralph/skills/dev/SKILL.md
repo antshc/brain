@@ -96,14 +96,11 @@ The **harness root** is the current (harness) repository `dev` runs in — the r
 3. If `$HARNESS_ROOT/.env/.harness.env` already exists, source it and skip to the next step.
 4. Otherwise, create `.env/` if needed and write `export HARNESS_ROOT="<path>"` to `$HARNESS_ROOT/.env/.harness.env`.
 
-Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`, with the following prompt (substitute actual values). The agent will `cd` into `WORKTREE_PATH` as its very first action:
+After changing to `WORKTREE_PATH`, invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path argument. Use the following prompt (substitute actual values):
 
 ```
 ## HARNESS_ROOT
 <absolute path to the harness repo>
-
-## WORKTREE_PATH
-<absolute path to the worktree — cd here as your very first action>
 
 ## TASK
 - Title: <title>
@@ -113,8 +110,6 @@ Invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagen
 ## RECENT CHANGES
 <last 5 commits from step 1>
 ```
-
-The agent locates `CODE.md` and `VERIFY.md` via a recursive scan of any subfolder under `HARNESS_ROOT` (never outside it), while `agent/MEMORY.md` and `agent/LOG.md` stay at their fixed paths. All code/git/test commands run in `WORKTREE_PATH` (which it cds into on startup).
 
 ## 5. Distill
 

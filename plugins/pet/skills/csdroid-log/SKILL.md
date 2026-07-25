@@ -7,17 +7,11 @@ description: C# agent problem log — appends session problems (conflicting conv
 
 ## Store
 
-Problems are appended to `LOG.md`, kept inside the harness root at the fixed path `$HARNESS_ROOT/agent/LOG.md` — never recursively scanned, never the worktree cwd.
+Problems are appended to the `LOG_PATH` resolved by the agent during INPUT.
 
-### Resolve repo
+### Resolved path
 
-Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given).
-
-```bash
-STORE="$HARNESS_ROOT/agent/LOG.md"
-```
-
-Initialize if missing: `mkdir -p "$HARNESS_ROOT/agent" && touch "$STORE"`.
+Use the `LOG_PATH` value provided by the agent. INPUT guarantees it exists before this workflow runs.
 
 ## Write Workflow (runs once per invocation, after feedback loops pass)
 
@@ -41,5 +35,5 @@ For each problem found during this invocation — conflicting conventions, direc
 ## Hard Constraints
 
 - Append only — never edit or delete existing entries.
-- Write only to the repo-resolved fixed path. Never derive or use any other location.
+- Write only to the supplied `LOG_PATH`. Never derive or use any other location.
 - Do not record transient notes, one-off errors already fixed on retry, or routine execution steps.

@@ -26,7 +26,7 @@ Gather the full list of files changed during implementation. For each changed fi
 
 ## Step 1: Verify (diagnostics, build, tests)
 
-Use the `HARNESS_ROOT` value provided to you by the agent (substitute its literal absolute value for `$HARNESS_ROOT`; it defaults to the current working directory when no argument was given). Recursively scan **under** `$HARNESS_ROOT` (any subfolder) for `VERIFY.md` — never search outside `$HARNESS_ROOT`. If found, follow **all** of its steps in order — it may define more steps than the fallback, and may add project-specific checks (linting, formatting, integration tests, etc.). Otherwise, use the fallback below and emit: "Verify steps: fallback".
+Use the optional `VERIFY_PATH` value resolved by the agent during INPUT. When it is provided, follow all steps in that `VERIFY.md` in order; it may define more steps than the fallback and may add project-specific checks. When it is unresolved, use the fallback below and emit: "Verify steps: fallback".
 
 ### Fallback
 

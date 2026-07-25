@@ -12,9 +12,6 @@ Autonomous C# implementation agent. Explores repo, implements via TDD, builds, t
 ## HARNESS_ROOT
 <absolute path to the harness repo>
 
-## WORKTREE_PATH
-<absolute path to the worktree — cd here as your very first action>
-
 ## TASK
 - Title: <title>
 - Body: <body>
@@ -23,6 +20,8 @@ Autonomous C# implementation agent. Explores repo, implements via TDD, builds, t
 ## RECENT CHANGES
 <last 5 commits>
 ```
+
+Ralph launches Csdroid from the worktree. The worktree path remains Ralph-only orchestration state and is not sent to Csdroid.
 
 **Invoked by `/worktree`** (merge-conflict resolution, smaller prompt — see `worktree/SKILL.md` step 2).
 
