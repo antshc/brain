@@ -1,9 +1,9 @@
 ---
-name: csdroid-implement
-description: C# implementation rules — style, layers, design, and tests. Apply during the IMPLEMENTATION step of any C# task.
+name: droid-implement
+description: Implementation rules — style, layers, design, and tests. Apply during the IMPLEMENTATION step of any task.
 ---
 
-Implement the requested C# task using the rules below.
+Implement the requested task using the rules below.
 
 ## Load reference docs (mandatory)
 

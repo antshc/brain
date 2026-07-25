@@ -1,6 +1,6 @@
 ---
-name: csdroid-feedback
-description: C# feedback loop — run LSP, build, test, and refactoring review against all changed files after implementation.
+name: droid-feedback
+description: Technology-agnostic feedback loop — run LSP, build, test, and refactoring review against all changed files after implementation.
 ---
 
 Run the feedback loop below against all files changed during the IMPLEMENTATION. All steps must pass.
@@ -18,21 +18,15 @@ Task Progress:
 
 ## Step 0: Collect changed files
 
-Gather the full list of files changed during implementation. For each changed file, walk up to its `.csproj` to identify the affected project. Deduplicate:
-- **Projects**: unique set of `.csproj` directories containing changed files.
-- **Test projects**: for each affected project, find the sibling/child `.csproj` ending in `.Tests` that references it.
+Gather the full list of files changed during implementation. For each changed file, walk up to its nearest **Module** (the unit of code plus its build config — discovered from the repo's own structure, never assumed) to identify the affected Module. Deduplicate:
+- **Modules**: unique set of Module directories containing changed files.
+- **Verification counterparts**: for each affected Module, find its sibling/child **Verification counterpart** (the unit that verifies it — tests, specs, whatever the repo calls it).
 
-**Emit**: "Changed files: [list]. Affected projects: [list]. Test projects: [list]."
+**Emit**: "Changed files: [list]. Affected Modules: [list]. Verification counterparts: [list]."
 
 ## Step 1: Verify (diagnostics, build, tests)
 
-Use the optional `VERIFY_PATH` value resolved by the agent during INPUT. When it is provided, follow all steps in that `VERIFY.md` in order; it may define more steps than the fallback and may add project-specific checks. When it is unresolved, use the fallback below and emit: "Verify steps: fallback".
-
-### Fallback
-
-- **LSP diagnostics**: run `get diagnostics` on all changed files.
-- **Build**: run `dotnet build <project-dir> --no-incremental` for each unique affected project (do not build the same project twice). A passing `get diagnostics` does NOT replace a build — StyleCop and analyzers only fire during a real build.
-- **Tests**: run `dotnet test <test-project> --filter <relevant-classes>` for each unique affected test project, filtering by the classes that correspond to changed files in that test project's scope.
+Use the optional `VERIFY_PATH` value resolved by the agent during INPUT. When it is provided, follow all steps in that `VERIFY.md` in order; it may define more steps than the fallback and may add project-specific checks. When it is unresolved, follow `FALLBACK.md` and emit: "Verify steps: fallback".
 
 ## Step 2: Refactoring review
 
@@ -54,7 +48,7 @@ If none apply, emit: "Refactoring review: no candidates." and proceed.
 ### Environment blockers — stop immediately
 
 If any step fails with an **environment or access error**, do NOT attempt to fix it. Stop execution and report `STATUS: blocked`. Examples:
-- NuGet source unreachable or authentication failure
+- Package source unreachable or authentication failure
 - File/directory permission denied
 - SDK or runtime not installed
 - Docker/container not running

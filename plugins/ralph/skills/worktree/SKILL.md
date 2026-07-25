@@ -50,7 +50,7 @@ If the merge exits non-zero (conflicts detected):
    ```bash
    git diff --name-only --diff-filter=U
    ```
-2. Invoke the `csdroid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path or harness-settings argument. Csdroid resolves its own Harness Settings. Pass the following prompt:
+2. Invoke the `droid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Pass the following prompt:
    ```
    ## Resolve Merge Conflicts
    The following files have merge conflicts after merging origin/<target-branch> into <feature-branch>.

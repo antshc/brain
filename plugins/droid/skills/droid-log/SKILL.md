@@ -1,6 +1,6 @@
 ---
-name: csdroid-log
-description: C# agent problem log — appends session problems (conflicting conventions, directory/filesystem access, tool access) to LOG.md. Apply during the LOG PROBLEMS step, after feedback loops pass.
+name: droid-log
+description: Agent problem log — appends session problems (conflicting conventions, directory/filesystem access, tool access) to LOG.md. Apply during the LOG PROBLEMS step, after feedback loops pass.
 ---
 
 # Problem Log
@@ -15,7 +15,7 @@ Use the `LOG_PATH` value provided by the agent. INPUT guarantees it exists befor
 
 ## Write Workflow (runs once per invocation, after feedback loops pass)
 
-For each problem found during this invocation — conflicting conventions, directory/filesystem access issues, tool access issues, or a `STATUS: blocked` environment error surfaced by `csdroid-feedback`'s "Environment blockers" section — append an entry:
+For each problem found during this invocation — conflicting conventions, directory/filesystem access issues, tool access issues, or a `STATUS: blocked` environment error surfaced by `droid-feedback`'s "Environment blockers" section — append an entry:
 
 ```md
 ## <task-id-or-title> — <date>
