@@ -33,7 +33,7 @@ This repo's "code" is skills, agent instructions, and templates. The droid autho
 
 Copy this checklist and check off items as you complete them:
 \```
-Task Progress:
+<Task name> Progress:
 - [ ] Step 1: <action> (run <script>)
 - [ ] Step 2: <action> (edit <file>)
 - [ ] Step 3: <action> (run <script>)
