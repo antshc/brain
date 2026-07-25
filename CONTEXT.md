@@ -25,6 +25,11 @@ Existing tests in the codebase of the same type as the ones being planned for a 
 _Avoid_: existing tests, precedent
 _Plugins_set_: wf
 
+**Verbatim**:
+Copied exactly as written, with no paraphrasing, summarizing, or restructuring — used to mark content (a template, a settings block) that must be reproduced word-for-word rather than reinterpreted.
+_Avoid_: as-is, unmodified
+_Plugins_set_: wf
+
 # Contexts
 ## Shared
 
