@@ -5,7 +5,7 @@ description: Resolve Harness Settings from the nearest ancestor .harness.env fil
 
 # Resolve Harness
 
-Run from cwd:
+Run from cwd. `<skill-directory>` is the directory containing this SKILL.md file — you already know this path from where the skill was loaded; never search the filesystem for it (e.g. do not run `find`):
 
 ```bash
 python3 <skill-directory>/scripts/resolve_harness.py
