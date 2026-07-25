@@ -55,21 +55,12 @@ When a term is resolved, update `CONTEXT.md` right there.
 
 ### ARCHITECTURE.md
 
-When the structure or layering changes, update `ARCHITECTURE.md` right there. When a decision
-qualifies as a Concept or ADR, write the record and update the matching index using the *Keeping the indexes in sync* in the same change.
+When the structure or layering changes, update `ARCHITECTURE.md` right there. Whenever a Concept or ADR is added, superseded, or retired, call `/trigger-indexer` **Keeping the indexes in sync** in the same change to keep its index row current — not just when writing a brand-new record. Pass `{{indexFile}}`=`ARCHITECTURE.md`, `{{indexSection}}`=`Crosscutting Concepts` or `Architecture Decision Records`, and `{{recordDirectory}}`=`docs/concepts/` or `docs/adr/` explicitly in context — `/trigger-indexer` never assumes these.
 
 ## Keep each document in its lane
 
 - `CONTEXT.md` is a **glossary only** — totally devoid of implementation details. Not a spec, not a scratch pad, not a repository for implementation decisions.
 - `ARCHITECTURE.md` describes **shape and rules**, not implementation detail. Not a spec, not a scratch pad, not a place to inline backbone decisions — the step-by-step detail lives in the code and in the linked Concepts.
-
-## Keeping the indexes in sync
-
-`ARCHITECTURE.md` is the entry point a reader (or agent) scans before designing. Every record in
-`docs/concepts/` and `docs/adr/` must appear in its index table with a matching Trigger condition
-and summary; nothing is added, superseded, or retired without updating the table in the same
-change. Link, don't inline — keep the full record content out of `ARCHITECTURE.md` so the map
-stays scannable.
 
 ## Repo topology (documentation repository)
 

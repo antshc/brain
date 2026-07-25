@@ -46,7 +46,7 @@ Use the implementation details as the spec content instead of a GitHub issue:
 
 If you have not already explored the codebase, do so to understand the current state of the code. 
 Issue titles and descriptions should use the project's domain glossary vocabulary `CONTEXT.md`.
-Scan the *Architecture Decision Records (ADR)* and *Crosscutting Concepts (Concept)* indexes in `ARCHITECTURE.md`, then open every ADR under `docs/adr/` and every Concept under `docs/concepts/` that touches the area you're changing.
+Via `/trigger-indexer` **Scan and match**, passing `ARCHITECTURE.md`'s *Architecture Decision Records (ADR)* and *Crosscutting Concepts (Concept)* index sections and the area you're changing as the touched surface, then open every matched record it returns.
 - **Concepts** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to them. See `manage-docs/CONCEPT-FORMAT.md`.
 - **ADRs** capture localized decisions — respect and reference the relevant ones in the issue body.
 - Confirm you have scanned both `docs/adr/` and `docs/concepts/` before moving on; if either directory is absent, note that and continue.

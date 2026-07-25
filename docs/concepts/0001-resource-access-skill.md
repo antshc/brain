@@ -13,3 +13,7 @@ A feature skill that needs infrastructure (a ticket tracker, a docs backend, an 
 - An action reads its inputs as `{{placeholder}}` variables already in the caller's context (the same way the action's own steps reference them internally), rather than declaring a formal call-site argument list. An action documents its return shape (what it hands back to the caller) alongside its steps, so a caller can invoke it without reading the skill's internals.
 - The skill's set of actions is its stable interface. Swapping the backend (e.g. GitHub → Jira) means rewriting the skill's internals only; callers and their invocation style stay unchanged.
 - Examples in this repo: `manage-backlog` (ticket tracker, currently GitHub issues, swappable for Jira) and `manage-docs` (docs backend, currently local markdown files).
+
+## Exceptions
+
+- `trigger-indexer` writes directly to the file containing an index table (e.g. `ARCHITECTURE.md`), even when that file is otherwise owned by another Resource Access Skill (`manage-docs`). It is not itself an instance of this Concept — there is no swappable vendor backend involved, only index-table mechanics — so this carve-out does not weaken the Concept's ownership boundary for any other file content.
