@@ -64,4 +64,5 @@ copilot plugin install az@brain
 ## Install brain skills
 ```sh
 gh skill install antshc/brain skills/be-terse --agent github-copilot --scope user -f
+gh skill install antshc/brain skills/suggest --agent github-copilot --scope user -f
 ```
