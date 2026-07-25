@@ -24,6 +24,29 @@ This repo's "code" is skills, agent instructions, and templates. The droid autho
 | `$VARIABLE` | Shell environment variable | `cd "$REPOSITORY_ROOT"` |
 | `${VARIABLE}` | Braced shell environment variable | `${REPOSITORY_ROOT}/src` |
 
+## Workflow styles
+
+**Checklist-driven workflow** — for a skill with a sequential, resumable, multi-step procedure, embed a literal Markdown checklist the agent copies into its working notes and checks off step by step; pair each item with its own subsection giving the exact command/artifact, and state the failure/retry path explicitly. See [Checklist-Driven Workflow](../docs/concepts/0005-checklist-workflow.md). Example shape:
+
+```
+## <Task name> workflow
+
+Copy this checklist and check off items as you complete them:
+\```
+Task Progress:
+- [ ] Step 1: <action> (run <script>)
+- [ ] Step 2: <action> (edit <file>)
+- [ ] Step 3: <action> (run <script>)
+\```
+**Step 1: <action>**
+
+Run: `<command>`
+
+<what it produces>
+
+If <step N> fails, return to Step <M>.
+```
+
 ## Layer placement
 
 - Plugin skills: `plugins/<plugin>/skills/<skill>/SKILL.md`.
