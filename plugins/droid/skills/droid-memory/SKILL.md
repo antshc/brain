@@ -1,6 +1,6 @@
 ---
-name: csdroid-memory
-description: C# agent guardrails — reads MEMORY.md, the curated list of directives distilled from past session problems. Apply during the GUARDRAILS step, before implementation.
+name: droid-memory
+description: Agent guardrails — reads MEMORY.md, the curated list of directives distilled from past session problems. Apply during the GUARDRAILS step, before implementation.
 ---
 
 # Agent Memory
@@ -19,5 +19,5 @@ Curated guardrails live in the optional `MEMORY_PATH` resolved by the agent duri
 
 ## Hard Constraints
 
-- Read only — never write to `MEMORY.md`. Curation is a manual human step performed outside this workflow, distilled from `agent/LOG.md` (per `csdroid-log`).
+- Read only — never write to `MEMORY.md`. Curation is a manual human step performed outside this workflow, distilled from `agent/LOG.md` (per `droid-log`).
 - Read only the supplied `MEMORY_PATH`. Never derive or search for another location.

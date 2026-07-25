@@ -45,9 +45,9 @@
             "description": "Azure CLI workflow skills."
         },
         {
-            "name": "pet",
-            "source": "./plugins/pet",
-            "description": "pet C# autonomous coding agent and conventions."
+            "name": "droid",
+            "source": "./plugins/droid",
+            "description": "Technology-agnostic autonomous coding agent and conventions."
         },
         {
             "name": "learn-ms",

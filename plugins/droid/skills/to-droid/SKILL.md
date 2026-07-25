@@ -1,10 +1,10 @@
 ---
 name: to-droid
-description: Run the csdroid subagent for a C# implementation task. Use when the task comes from plan.md/session memory or user-provided implementation text.
+description: Run the droid subagent for an implementation task. Use when the task comes from plan.md/session memory or user-provided implementation text.
 argumentHint: "<description> | @plan | <github-issue-url>"
 ---
 
-Execute the commands below and substitute their output into the prompt before passing it to the subagent via `runSubagent`:`csdroid`:
+Execute the commands below and substitute their output into the prompt before passing it to the subagent via `runSubagent`:`droid`:
 
 ```
 ## TASK

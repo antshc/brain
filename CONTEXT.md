@@ -24,24 +24,24 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 
 ### Language
 **Harness Root**:
-The repository that owns the milestone/issues, convention docs, and agent state files. Csdroid resolves `CODE.md`, `VERIFY.md`, `MEMORY.md`, and `LOG.md` recursively beneath it once during INPUT; when no log exists, it creates `agent/LOG.md`. Distinct from the `Worktree Path`, though it can be the same repo.
+The repository that owns the milestone/issues, convention docs, and agent state files. Droid resolves `CODE.md`, `VERIFY.md`, `MEMORY.md`, and `LOG.md` recursively beneath it once during INPUT; when no log exists, it creates `agent/LOG.md`. Distinct from the `Worktree Path`, though it can be the same repo.
 _Avoid_: repo root, home repo
-_Plugins_set_: ralph, pet, wf
+_Plugins_set_: ralph, droid, wf
 
 **Harness Configuration File**:
 The optional `.harness.env` file at a repository root that must declare its `HARNESS_ROOT` and may declare additional harness settings. A resolver searches ancestor directories for the nearest file without changing the filesystem; when none exists, the caller uses its documented fallback.
 _Avoid_: environment file, repo configuration
-_Plugins_set_: harness, ralph, pet
+_Plugins_set_: harness, ralph, droid
 
 **Harness Settings**:
 The complete set of `KEY=VALUE` entries returned verbatim by `resolve-harness` from the nearest Harness Configuration File. A caller retains the set for its invocation; without a resolver or configuration file, it uses only its current directory as `HARNESS_ROOT`.
 _Avoid_: environment variables, process environment
-_Plugins_set_: harness, ralph, pet
+_Plugins_set_: harness, ralph, droid
 
 **Worktree Path**:
-The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Csdroid from it when applicable; Csdroid treats its invocation directory as its workspace and does not receive this path.
+The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Droid from it when applicable; Droid treats its invocation directory as its workspace and does not receive this path.
 _Avoid_: working directory, checkout
-_Plugins_set_: ralph, pet, wf
+_Plugins_set_: ralph, droid, wf
 
 **Ledger**:
 A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
@@ -56,7 +56,7 @@ _Plugins_set_: wf
 ## ralph
 ### Language
 
-## pet
+## droid
 ### Language
 
 **Problem Log**:
@@ -66,6 +66,14 @@ _Avoid_: decision log, decisions.jsonl
 **Guardrails**:
 Curated, human-reviewed directives stored in the `MEMORY.md` resolved during INPUT, distilled from recurring entries in the Problem Log. Read-only from the agent's perspective — applied before implementation, never written by the agent.
 _Avoid_: decisions, durable decisions
+
+**Module**:
+The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — discovered from the repo's own structure during `droid-feedback`, never assumed or named by the skill.
+_Avoid_: project, package
+
+**Verification counterpart**:
+The sibling/child unit that verifies a Module (tests, specs, or whatever the repo calls it), discovered the same way as its Module during `droid-feedback`.
+_Avoid_: test project, test suite
 
 ## wf
 
@@ -94,6 +102,6 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → pet**: `ralph` creates the `Worktree Path` and launches the `pet` plugin's `csdroid` agent from that directory. Csdroid independently resolves `Harness Settings` during INPUT, then resolves its convention/state file paths under the resulting `Harness Root`.
-- **pet ↔ Shared**: `pet` resolves `Guardrails` (`MEMORY.md`) and the `Problem Log` (`LOG.md`) under `Harness Root` during INPUT; it creates `agent/LOG.md` only when no existing log is found.
+- **ralph → droid**: `ralph` creates the `Worktree Path` and launches the `droid` plugin's `droid` agent from that directory. Droid independently resolves `Harness Settings` during INPUT, then resolves its convention/state file paths under the resulting `Harness Root`.
+- **droid ↔ Shared**: `droid` resolves `Guardrails` (`MEMORY.md`) and the `Problem Log` (`LOG.md`) under `Harness Root` during INPUT; it creates `agent/LOG.md` only when no existing log is found.
 

@@ -27,8 +27,8 @@ See [CONTEXT.md](CONTEXT.md) for the shared language — currently the Ralph Age
 
 | # | Decision | Trigger condition | Summary |
 |---|----------|-------------------|---------|
-| [0001](docs/adr/0001-ralph-launches-csdroid-from-worktree.md) | Ralph launches Csdroid from the worktree | `ralph` to `csdroid` invocation, Ralph worktree setup | Every Ralph caller launches Csdroid from its worktree without passing harness settings; Csdroid independently resolves them and operates in its invocation directory without a worktree-specific contract. |
-| [0002](docs/adr/0002-csdroid-uses-its-invocation-directory.md) | Csdroid uses its invocation directory | `csdroid` workspace behavior, `csdroid` command execution | Csdroid runs in the directory from which it is launched, has no `WORKTREE_PATH` interface, and stays agnostic about whether that directory is a worktree. |
+| [0001](docs/adr/0001-ralph-launches-droid-from-worktree.md) | Ralph launches Droid from the worktree | `ralph` to `droid` invocation, Ralph worktree setup | Every Ralph caller launches Droid from its worktree without passing harness settings; Droid independently resolves them and operates in its invocation directory without a worktree-specific contract. |
+| [0002](docs/adr/0002-droid-uses-its-invocation-directory.md) | Droid uses its invocation directory | `droid` workspace behavior, `droid` command execution | Droid runs in the directory from which it is launched, has no `WORKTREE_PATH` interface, and stays agnostic about whether that directory is a worktree. |
 | [0003](docs/adr/0003-droid-is-technology-agnostic.md) | Droid is technology-agnostic | agent/skill naming, `droid-feedback` fallback behavior, adding language/toolchain-specific wording to the agent or its skills | The agent and its `droid-*` skills carry no language/toolchain-specific knowledge; all technology specifics live only in `CODE.md`/`VERIFY.md`/`MEMORY.md`. The `droid-feedback` fallback discovers the toolchain via README + code exploration instead of hardcoding one. |
 
 ## Crosscutting Concepts
