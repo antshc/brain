@@ -28,6 +28,16 @@ The repository that owns the milestone/issues, convention docs, and agent state 
 _Avoid_: repo root, home repo
 _Plugins_set_: ralph, pet, wf
 
+**Harness Configuration File**:
+The optional `.harness.env` file at a repository root that must declare its `HARNESS_ROOT` and may declare additional harness settings. A resolver searches ancestor directories for the nearest file without changing the filesystem; when none exists, the caller uses its documented fallback.
+_Avoid_: environment file, repo configuration
+_Plugins_set_: harness, ralph, pet
+
+**Harness Settings**:
+The complete set of `KEY=VALUE` entries returned verbatim by `resolve-harness` from the nearest Harness Configuration File. A caller retains the set for its invocation; without a resolver or configuration file, it uses only its current directory as `HARNESS_ROOT`.
+_Avoid_: environment variables, process environment
+_Plugins_set_: harness, ralph, pet
+
 **Worktree Path**:
 The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Csdroid from it when applicable; Csdroid treats its invocation directory as its workspace and does not receive this path.
 _Avoid_: working directory, checkout
@@ -84,6 +94,6 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → pet**: `ralph` resolves `Harness Root`, creates the `Worktree Path`, and launches the `pet` plugin's `csdroid` agent from that directory. Csdroid receives `Harness Root` and resolves its convention/state file paths during INPUT.
+- **ralph → pet**: `ralph` creates the `Worktree Path` and launches the `pet` plugin's `csdroid` agent from that directory. Csdroid independently resolves `Harness Settings` during INPUT, then resolves its convention/state file paths under the resulting `Harness Root`.
 - **pet ↔ Shared**: `pet` resolves `Guardrails` (`MEMORY.md`) and the `Problem Log` (`LOG.md`) under `Harness Root` during INPUT; it creates `agent/LOG.md` only when no existing log is found.
 
