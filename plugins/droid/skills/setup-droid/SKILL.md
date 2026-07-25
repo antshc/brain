@@ -30,11 +30,17 @@ For each of the four files below, check whether it already exists at its target 
 
 Substitute `HARNESS_ROOT` literally wherever `$HARNESS_ROOT` appears. Create the `.droid/` directory if it doesn't exist yet.
 
+## Pin resolved paths in `.harness.env`
+
+Only when `resolve-harness` found an existing `.harness.env` (never when the cwd fallback fired):
+
+For each of `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, `LOG_PATH`, if that key is **not already present** in the retained Harness Settings, append a line to `.harness.env` setting it to that file's resolved path from the table above (its `$HARNESS_ROOT`-substituted target path), regardless of whether the file itself was just created or already existed. **Never overwrite or remove a key already present** — an existing entry is a deliberate override and wins. **Never create `.harness.env` itself** — if the fallback used cwd because no file was found, skip this step entirely.
+
 ## Hard rules
 
 - Manual invocation only — do not wire this into `droid.agent.md`'s INPUT step; that step's own rule ("do not create missing `CODE.md`, `VERIFY.md`, or `MEMORY.md`") stays in force.
 - Never overwrite, merge, or prompt about a file that already exists.
-- Never create or modify `.harness.env`.
+- Never create `.harness.env`. May append missing `*_PATH` keys to an existing one (see above), but never overwrite or remove a key already present.
 - Templates are skeletons only — section headings and instructional comments. Do not fill them with invented, technology-specific example content.
 
-**Emit**: "HARNESS_ROOT=<path> (resolver | fallback cwd). Created: [list]. Skipped (already exist): [list]. Templates: <plugin-relative dir>."
+**Emit**: "HARNESS_ROOT=<path> (resolver | fallback cwd). Created: [list]. Skipped (already exist): [list]. Templates: <plugin-relative dir>. Harness env: [keys added] | unchanged | not found (fallback)."
