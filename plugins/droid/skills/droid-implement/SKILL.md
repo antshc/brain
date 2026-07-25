@@ -5,6 +5,7 @@ description: Implementation rules — style, layers, design, and tests. Apply du
 
 # Implementation
 
+Copy this checklist and check off items as you complete them:
 ```
 Implementation Progress:
 - [ ] Step 1: Load CODE.md, then explore
