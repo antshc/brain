@@ -8,6 +8,15 @@ argument-hint: '<milestone-title>'
 
 Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
+## 0. Resolve harness settings
+
+If `/resolve-harness` is available, invoke it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
+
+- If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
+- If the available skill exits non-zero, **exit** and report its error.
+
+Use `HARNESS_ROOT` for all harness repository operations. Change to `HARNESS_ROOT` before invoking `/worktree`.
+
 ## 1. Resolve milestone
 
 A `<milestone-title>` argument is **required**. If not provided, **exit** and report `Usage: /dev <milestone-title>`.
@@ -15,11 +24,11 @@ A `<milestone-title>` argument is **required**. If not provided, **exit** and re
 Fetch the milestone by title:
 
 ```bash
-repo=$(git remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+repo=$(git -C "$HARNESS_ROOT" remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
 gh api "repos/$repo/milestones?per_page=100&state=all" | jq '.[] | select(.title == "<milestone-title>")'
 ```
 
-Tasks live in the **current (harness) repository**, so `repo` always resolves the harness `origin` remote. Run this while the working directory is still the harness root — before the worktree is created.
+Tasks live in the **harness repository**, so `repo` always resolves the `HARNESS_ROOT` `origin` remote. Run this before the worktree is created.
 
 If no milestone matches, **exit** and report "Milestone not found: `<milestone-title>`".
 
@@ -89,19 +98,9 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-The **harness root** is the current (harness) repository `dev` runs in — the repo that owns the milestone/issues, the convention docs, and `agent/LOG.md`/`agent/MEMORY.md`, and is distinct from `WORKTREE_PATH` or can be the same. Resolve it once by finding the outermost enclosing git repo:
-
-1. Find the main working tree of the current repo: `cd "$(git rev-parse --git-common-dir)/.." && pwd`
-2. Walk up parent directories — for each parent, run `git -C <parent> rev-parse --show-toplevel 2>/dev/null`. Stop when it fails. The last directory where it succeeded is `HARNESS_ROOT`.
-3. If `$HARNESS_ROOT/.env/.harness.env` already exists, source it and skip to the next step.
-4. Otherwise, create `.env/` if needed and write `export HARNESS_ROOT="<path>"` to `$HARNESS_ROOT/.env/.harness.env`.
-
-After changing to `WORKTREE_PATH`, invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path argument. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, invoke the `csdroid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path or harness-settings argument. Csdroid resolves its own Harness Settings. Use the following prompt (substitute actual values):
 
 ```
-## HARNESS_ROOT
-<absolute path to the harness repo>
-
 ## TASK
 - Title: <title>
 - Body: <body>
@@ -161,7 +160,7 @@ git push -u origin "$branch" 2>/dev/null || git push
 
 ## 9. Commit harness root
 
-Run **once** per iteration, after Handle result and after the agent has appended any problems to `agent/LOG.md`. Operate in `$HARNESS_ROOT` (resolved in step 4) — never the worktree.
+Run **once** per iteration, after Handle result and after the agent has appended any problems to `agent/LOG.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
@@ -202,5 +201,5 @@ If the PR creation fails, **exit** and report the error.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
-- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 9), always from `$HARNESS_ROOT` (never the worktree), and always pushes. Skip only when nothing is staged.
+- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 9), always from `$HARNESS_ROOT` (resolved in step 0, never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.

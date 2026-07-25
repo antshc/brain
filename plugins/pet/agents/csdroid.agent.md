@@ -10,16 +10,28 @@ You are an autonomous implementation agent. You implement the **Task** given to 
 
 ## INPUT
 
-You may be given an optional **`HARNESS_ROOT`** argument — the absolute path to the repo that owns the convention docs, the guardrails, and the problem log. **If it is not provided, default `HARNESS_ROOT` to your current working directory.**
+Resolve Harness Settings first:
 
-- **Your workspace is your current working directory.** Run **all** code, Git, build, test, and exploration commands there. Do not determine whether it is a worktree and do not change directories to establish a workspace.
-- Recursively scan only under `HARNESS_ROOT`, once, for `CODE.md`, `VERIFY.md`, `MEMORY.md`, and `LOG.md`. Assume at most one match exists for each filename; do not resolve duplicates.
-- Record the resolved paths as `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, and `LOG_PATH`. A missing `CODE.md`, `VERIFY.md`, or `MEMORY.md` leaves its path unresolved; do not create it.
-- When no `LOG.md` exists under `HARNESS_ROOT`, create an empty `$HARNESS_ROOT/agent/LOG.md` and use that as `LOG_PATH`.
-- When one or more of `CODE.md`, `VERIFY.md`, or `MEMORY.md` is missing, append one discovery-gap entry to `LOG_PATH` before later phases using the `csdroid-log` schema: category `other`, severity `note`, and a problem value that names every missing file. Do not write this entry when all three exist. This is separate from the end-of-run problem log.
-- Substitute the resolved `HARNESS_ROOT` value literally wherever `$HARNESS_ROOT` appears. Pass `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, and `LOG_PATH` to the applicable skill; do not pass a workspace-path value to any skill.
+1. If `/resolve-harness` is available, invoke it from cwd; retain emitted `KEY=value` lines as invocation-scoped `HARNESS_SETTINGS`; set `HARNESS_ROOT` from its value.
+2. If unavailable or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to cwd.
+3. If available but exits non-zero, stop as blocked.
 
-**Emit**: "HARNESS_ROOT=<path> (argument | default cwd). Workspace=<cwd>. Resolved: CODE=<path | missing>, VERIFY=<path | missing>, MEMORY=<path | missing>, LOG=<path>."
+- **Workspace = cwd.** Run all code, Git, build, test, and exploration commands there; do not determine whether it is a worktree or change directories to establish a workspace.
+
+```text
+CODE_PATH, VERIFY_PATH, MEMORY_PATH, LOG_PATH := matching HARNESS_SETTINGS values
+scan HARNESS_ROOT once only for each missing path: CODE.md, VERIFY.md, MEMORY.md, LOG.md
+use matching discovered paths  # at most one per filename; do not resolve duplicates
+if LOG_PATH is missing: create $HARNESS_ROOT/agent/LOG.md; LOG_PATH := that path
+if CODE_PATH, VERIFY_PATH, or MEMORY_PATH is missing:
+  append one pre-phase csdroid-log discovery-gap entry to LOG_PATH
+  category := other; severity := note; problem := every missing filename
+pass each resolved *_PATH only to its applicable skill; never pass a workspace path
+```
+
+Do not create missing `CODE.md`, `VERIFY.md`, or `MEMORY.md`. The discovery-gap entry is separate from the end-of-run problem log. Substitute `HARNESS_ROOT` literally wherever `$HARNESS_ROOT` appears.
+
+**Emit**: "HARNESS_ROOT=<path> (resolver | fallback cwd). Workspace=<cwd>. Resolved: CODE=<path | missing>, VERIFY=<path | missing>, MEMORY=<path | missing>, LOG=<path>."
 
 ## BUILD & LSP CHECK
 

@@ -25,6 +25,11 @@
             "description": "ralph AFK PR review automation skills."
         },
         {
+            "name": "harness",
+            "source": "./plugins/harness",
+            "description": "Harness configuration setup and resolution skills."
+        },
+        {
             "name": "atl",
             "source": "./plugins/atl",
             "description": "Atlassian workflow skills."

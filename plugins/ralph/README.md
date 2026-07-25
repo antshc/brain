@@ -9,9 +9,6 @@ Autonomous C# implementation agent. Explores repo, implements via TDD, builds, t
 **Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 4):
 
 ```
-## HARNESS_ROOT
-<absolute path to the harness repo>
-
 ## TASK
 - Title: <title>
 - Body: <body>
@@ -21,7 +18,7 @@ Autonomous C# implementation agent. Explores repo, implements via TDD, builds, t
 <last 5 commits>
 ```
 
-Ralph launches Csdroid from the worktree. The worktree path remains Ralph-only orchestration state and is not sent to Csdroid.
+Ralph launches Csdroid from the worktree. The worktree path and Harness Settings remain outside the prompt; Csdroid independently resolves Harness Settings from its invocation directory.
 
 **Invoked by `/worktree`** (merge-conflict resolution, smaller prompt — see `worktree/SKILL.md` step 2).
 
