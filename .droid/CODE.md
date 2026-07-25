@@ -2,18 +2,42 @@
 
 <!-- Read in full by droid-implement during IMPLEMENTATION. Describe this repo's own conventions — never invent or copy example values from another repo. -->
 
+This repo's "code" is skills, agent instructions, and templates. The droid authors and edits them.
+
 ## Style
 
-<!-- Naming, formatting, and file organization conventions. -->
+**Writing style:** be terse, concise, no fillers.
+
+**Syntax legend** — use when writing or updating skills, templates, and agent instruction files:
+
+| Syntax | Meaning | Example |
+|---|---|---|
+| **bold**|Emphasis in prose, labels, warnings, required rules|**Required:** Run tests before commit.|
+| `camelCase` | Conceptual value resolved and maintained by the agent | Resolve `camelCase` from Git; reference it as `$camelCase`. |
+| `camelCase := instruction` | Runtime assignment evaluated by the agent | `NAME := generate a unique kebab-case name` |
+| `{{camelCase}}` | Placeholder in input, a markdown template, in prose, an inline template, replaced with a resolved runtime value | `{{input}}`, `Your name {{userName}}`, `reports/{{camelCase}}.md` |
+| `{{camelCase\|(hint|inline one-liner instruction applicable to camelCase)}}` | Bracketed placeholder with an inline default/hint, pipe-delimited, when the hint is short | `{{priority\| One of (MVP|Should have) }}`, `summary| one-liner` |
+| `<!-- ... -->` | Hidden template instruction not rendered in Markdown preview | `<!-- Remove this comment after population. -->` |
+| `[optional]` | Optional input or argument | `[target-path]` |
+| `value1 \| value2` | Allowed values | `completed \| failed \| blocked` |
+| `` `literal` `` | Fixed command, path, identifier, or value | Run `dotnet test`. |
+| `$VARIABLE` | Shell environment variable | `cd "$REPOSITORY_ROOT"` |
+| `${VARIABLE}` | Braced shell environment variable | `${REPOSITORY_ROOT}/src` |
 
 ## Layer placement
 
-<!-- Where different kinds of code belong (folders/layers/modules) and how to decide placement for new code. -->
+- Plugin skills: `plugins/<plugin>/skills/<skill>/SKILL.md`.
+- Plugin agents: `plugins/<plugin>/agents/<name>.agent.md`.
+- Standalone (non-plugin) skills: `skills/<skill>/SKILL.md`.
+- Repo-wide agent instructions: `.github/copilot-instructions.md`.
+- Shared writing/syntax conventions: this file, `.droid/CODE.md`.
 
 ## Design principles
 
-<!-- Design rules this repo expects (e.g. module depth, dependency direction, allowed/forbidden patterns). -->
+- One skill/agent = one responsibility — don't merge concerns.
+- Reference this file's syntax legend instead of duplicating it inside individual skills.
+- Keep skill/instruction/template files terse — no filler prose.
 
 ## Tests
 
-<!-- When tests are required, where they live, and how they're structured/named. -->
+N/A — no automated tests for markdown files. Validate changes with the `verify-instructions` skill before committing.

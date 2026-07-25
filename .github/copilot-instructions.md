@@ -3,25 +3,8 @@
 **Never scan, read, or edit `_backup/`, `_docs/`, `_in-progress/`.** Treat them as out of scope for all tasks.
 
 # Writing or updating the skill, templates, agents standards
-## Writing style
-be terse, concise, no fillers
 
-## Syntax
-use syntax when 
-
-| Syntax | Meaning | Example |
-|---|---|---|
-| **bold**|Emphasis in prose, labels, warnings, required rules|**Required:** Run tests before commit.|
-| `camelCase` | Conceptual value resolved and maintained by the agent | Resolve `camelCase` from Git; reference it as `$camelCase`. |
-| `camelCase := instruction` | Runtime assignment evaluated by the agent | `NAME := generate a unique kebab-case name` |
-| `{{camelCase}}` | Placeholder in input, a markdown template, in prose, an inline template, replaced with a resolved runtime value | `{{input}}`, `Your name {{userName}}`, `reports/{{camelCase}}.md` |
-| `{{camelCase\|(hint|inline one-liner instruction applicable to camelCase)}}` | Bracketed placeholder with an inline default/hint, pipe-delimited, when the hint is short | `{{priority\| One of (MVP|Should have) }}`, `summary| one-liner` |
-| `<!-- ... -->` | Hidden template instruction not rendered in Markdown preview | `<!-- Remove this comment after population. -->` |
-| `[optional]` | Optional input or argument | `[target-path]` |
-| `value1 \| value2` | Allowed values | `completed \| failed \| blocked` |
-| `` `literal` `` | Fixed command, path, identifier, or value | Run `dotnet test`. |
-| `$VARIABLE` | Shell environment variable | `cd "$REPOSITORY_ROOT"` |
-| `${VARIABLE}` | Braced shell environment variable | `${REPOSITORY_ROOT}/src` |
+See [CODE.md](../.droid/CODE.md) for writing style and syntax conventions.
 
 
 # Project Overview
