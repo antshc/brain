@@ -11,6 +11,17 @@ Use the optional `CODE_PATH` value resolved by the agent during INPUT. When it i
 
 **Emit**: "Loaded docs: [list]. Missing (fallback): [list]."
 
+## EXPLORATION
+
+Explore the repo to understand code for the task:
+- Read at least the file(s) being modified and one neighboring file in the same folder to confirm conventions
+- Project structure
+- Code conventions
+- Relevant existing code for the task
+- Test patterns in use
+
+**Emit**: "Explored files: [list]. Conventions found: [list]. Layer placement: [layer]."
+
 ## Rules
 
 - **Fallback:** when `CODE.md` is absent, match the conventions of the code you touched during EXPLORATION. Never invent conventions.

@@ -44,17 +44,6 @@ Before exploring, confirm the project builds and check whether an LSP is availab
 
 **Emit**: "Build: pass | fail. LSP: available (using for exploration) | unavailable (skipped)."
 
-## EXPLORATION
-
-Explore the repo to understand code for the task:
-- Read at least the file(s) being modified and one neighboring file in the same folder to confirm conventions
-- Project structure
-- Code conventions
-- Relevant existing code for the task
-- Test patterns in use
-
-**Emit**: "Explored files: [list]. Conventions found: [list]. Layer placement: [layer]."
-
 ## GUARDRAILS
 
 **This step is mandatory. Do not proceed to implementation until complete.**
