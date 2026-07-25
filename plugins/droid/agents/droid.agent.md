@@ -20,9 +20,9 @@ Resolve Harness Settings first:
 
 ```text
 CODE_PATH, VERIFY_PATH, MEMORY_PATH, LOG_PATH := matching HARNESS_SETTINGS values
-scan HARNESS_ROOT once only for each missing path: CODE.md, VERIFY.md, MEMORY.md, LOG.md
+scan HARNESS_ROOT recursively once only for each missing path: CODE.md, VERIFY.md, MEMORY.md, LOG.md
 use matching discovered paths  # at most one per filename; do not resolve duplicates
-if LOG_PATH is missing: create $HARNESS_ROOT/.droid/LOG.md; LOG_PATH := that path
+if LOG_PATH is missing: create $HARNESS_ROOT/LOG.md; LOG_PATH := that path
 if CODE_PATH, VERIFY_PATH, or MEMORY_PATH is missing:
   append one pre-phase droid-log discovery-gap entry to LOG_PATH
   category := other; severity := note; problem := every missing filename
