@@ -1,6 +1,7 @@
 ---
 name: setup-harness
 description: Create a Harness Configuration File in the current directory without overwriting an existing file.
+disable-model-invocation: true
 ---
 
 # Setup Harness
