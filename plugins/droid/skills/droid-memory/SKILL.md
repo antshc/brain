@@ -5,6 +5,7 @@ description: Agent guardrails — reads MEMORY.md, the curated list of directive
 
 # Guardrails
 
+Copy this checklist and check off items as you complete them:
 ```
 Guardrails Progress:
 - [ ] Step 1: Read MEMORY_PATH in full (or note "No guardrails recorded yet")

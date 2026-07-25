@@ -10,6 +10,7 @@ A multi-step skill or agent task with sequential, resumable steps — where skip
 
 - Use for skills with 3+ sequential steps where skipping/reordering breaks correctness, or where a step can fail and require returning to an earlier step.
 - Emit the checklist as literal, fenced Markdown (`- [ ] Step N: ...`) that the agent is instructed to copy and check off — not just prose describing the order.
+- Precede the fenced checklist with the literal instruction line `Copy this checklist and check off items as you complete them:` — this is required, not optional prose; a checklist without it risks being read as reference material instead of copied into working notes.
 - Name the checklist header after the task/section it belongs to (`<Task name> Progress:`), not a generic `Task Progress:` or `Progress:` label — this keeps multiple checklists (e.g. an agent's own plus each of its skills') distinguishable when copied into working notes together.
 - Pair each checklist item with its own numbered subsection giving the exact command/action and expected artifact, so the agent executes directly without re-deriving the step.
 - Name concrete inputs/outputs/scripts per step, not generic descriptions.

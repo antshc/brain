@@ -5,6 +5,7 @@ description: Agent problem log — appends session problems (conflicting convent
 
 # Log Problems
 
+Copy this checklist and check off items as you complete them:
 ```
 Log Problems Progress:
 - [ ] Step 1: Identify problems from this invocation

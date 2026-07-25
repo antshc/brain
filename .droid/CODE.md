@@ -26,7 +26,7 @@ This repo's "code" is skills, agent instructions, and templates. The droid autho
 
 ## Workflow styles
 
-**Checklist-driven workflow** — for a skill with a sequential, resumable, multi-step procedure, embed a literal Markdown checklist the agent copies into its working notes and checks off step by step; pair each item with its own subsection giving the exact command/artifact, and state the failure/retry path explicitly. See [Checklist-Driven Workflow](../docs/concepts/0005-checklist-workflow.md). Example shape:
+**Checklist-driven workflow** — for a skill with a sequential, resumable, multi-step procedure, embed a literal Markdown checklist the agent copies into its working notes and checks off step by step; pair each item with its own subsection giving the exact command/artifact, and state the failure/retry path explicitly. Always precede the fenced checklist with the literal line `Copy this checklist and check off items as you complete them:`. See [Checklist-Driven Workflow](../docs/concepts/0005-checklist-workflow.md). Example shape:
 
 ```
 ## <Task name> workflow

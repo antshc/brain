@@ -5,6 +5,7 @@ description: Build the project and check LSP availability. Apply during the BUIL
 
 # Build & LSP Check
 
+Copy this checklist and check off items as you complete them:
 ```
 Build & LSP Check Progress:
 - [ ] Step 1: Build the project

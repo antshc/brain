@@ -5,6 +5,7 @@ description: Resolve Harness Settings and the CODE/VERIFY/MEMORY/LOG paths. Appl
 
 # Input
 
+Copy this checklist and check off items as you complete them:
 ```
 Input Progress:
 - [ ] Step 1: Resolve Harness Settings

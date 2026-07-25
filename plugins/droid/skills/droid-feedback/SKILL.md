@@ -9,6 +9,7 @@ Run the feedback loop below against all files changed during the IMPLEMENTATION.
 
 # Feedback Loops
 
+Copy this checklist and check off items as you complete them:
 ```
 Feedback Loops Progress:
 - [ ] Step 0: Collect changed files
