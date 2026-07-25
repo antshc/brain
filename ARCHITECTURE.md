@@ -23,6 +23,13 @@ See [CONTEXT.md](CONTEXT.md) for the shared language — currently the Ralph Age
   - `tools/tests/integration/` — integration tests
 - `logs/` — runtime logs (daily JSON per repo)
 
+## Architecture Decision Records
+
+| # | Decision | Trigger condition | Summary |
+|---|----------|-------------------|---------|
+| [0001](docs/adr/0001-ralph-launches-csdroid-from-worktree.md) | Ralph launches Csdroid from the worktree | `ralph` to `csdroid` invocation, Ralph worktree setup | Every Ralph caller launches Csdroid from its worktree; Csdroid operates in its invocation directory without a worktree-specific contract. |
+| [0002](docs/adr/0002-csdroid-uses-its-invocation-directory.md) | Csdroid uses its invocation directory | `csdroid` workspace behavior, `csdroid` command execution | Csdroid runs in the directory from which it is launched, has no `WORKTREE_PATH` interface, and stays agnostic about whether that directory is a worktree. |
+
 ## Crosscutting Concepts
 
 | # | Concept | Trigger condition | Summary |
