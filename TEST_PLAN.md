@@ -647,6 +647,46 @@ Scenario: PR URL with numeric owner/repo
 
 ---
 
+## Feature: Main Harness
+
+> Resolver unit test; setup manual test
+
+```gherkin
+Scenario: Nearest Harness Configuration File is resolved
+  Given nested directories with Harness Configuration Files in two ancestor directories
+  When the resolver runs from the nested directory
+  Then it emits settings from the nearest configuration only
+
+Scenario: All Harness Settings are emitted verbatim
+  Given a Harness Configuration File with values containing additional equals signs and empty values
+  When the resolver runs
+  Then it emits every configured KEY=value line unchanged
+
+Scenario: No Harness Configuration File returns an empty Harness Root
+  Given no ancestor directory has a Harness Configuration File
+  When the resolver runs
+  Then it exits successfully with HARNESS_ROOT= on stdout and a current-directory fallback explanation on stderr
+
+Scenario: Missing Harness Root fails resolution
+  Given a discovered Harness Configuration File without HARNESS_ROOT
+  When the resolver runs
+  Then it exits with an error
+
+Scenario: Setup creates Harness Configuration File in current directory
+  Given the current directory has no Harness Configuration File
+  When harness setup runs
+  Then it creates a configuration with the current directory as HARNESS_ROOT
+
+Scenario: Setup preserves existing Harness Configuration File
+  Given the current directory has an existing Harness Configuration File
+  When harness setup runs
+  Then it leaves the file unchanged and reports its settings
+```
+
+**Coverage:** Resolver unit test; setup manual test
+
+---
+
 ## Feature: Execution Log
 
 > Unit: `ExecutionLog`

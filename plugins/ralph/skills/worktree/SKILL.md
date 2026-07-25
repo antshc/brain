@@ -12,15 +12,19 @@ Create or reuse an isolated git worktree for a feature branch based off a target
 
 ## 0. Resolve source repo
 
-The current repository is the harness root. The actual source code may live in a separate repo under `workspace/`. Resolve which repo to develop in **before** any branch or worktree operation.
+If `/resolve-harness` is available, invoke it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
+
+- If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
+- If the available skill exits non-zero, **exit** and report its error.
+
+The actual source code may live in a separate repo under `workspace/` in `HARNESS_ROOT`. Resolve which repo to develop in **before** any branch or worktree operation.
 
 ```bash
-harness_root=$(git rev-parse --show-toplevel)
-src_git=$(find "$harness_root/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
+src_git=$(find "$HARNESS_ROOT/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
 if [ -n "$src_git" ]; then
   SOURCE_REPO=$(dirname "$src_git")
 else
-  SOURCE_REPO=$harness_root
+  SOURCE_REPO=$HARNESS_ROOT
 fi
 cd "$SOURCE_REPO"
 ```
@@ -46,11 +50,8 @@ If the merge exits non-zero (conflicts detected):
    ```bash
    git diff --name-only --diff-filter=U
    ```
-2. Invoke the `csdroid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path argument. Pass the harness root and the following prompt:
+2. Invoke the `csdroid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path or harness-settings argument. Csdroid resolves its own Harness Settings. Pass the following prompt:
    ```
-  ## HARNESS_ROOT
-  <absolute path to the harness root>
-
    ## Resolve Merge Conflicts
    The following files have merge conflicts after merging origin/<target-branch> into <feature-branch>.
    Resolve each conflict, preserving the intent of both sides.

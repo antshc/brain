@@ -4,8 +4,8 @@ A C# autonomous coding harness. One agent (`csdroid`) orchestrates a fixed pipel
 
 ## Components
 
-- [agents/csdroid.agent.md](agents/csdroid.agent.md) — the orchestrator. Fixed phases: INPUT → EXPLORATION → DECISION CONTEXT → IMPLEMENTATION → FEEDBACK LOOPS → RECORD DECISIONS → STATUS REPORT. Takes an optional `HARNESS_ROOT` argument (defaults to cwd), resolves convention/state files once during INPUT, and works in its invocation directory.
-- [skills/to-droid/SKILL.md](skills/to-droid/SKILL.md) — entry point. Resolves a task (`<description>` | `@plan` | issue URL), gathers recent git changes, invokes `csdroid` via `runSubagent`. Does not pass `HARNESS_ROOT` — the agent defaults it to cwd.
+- [agents/csdroid.agent.md](agents/csdroid.agent.md) — the orchestrator. Fixed phases: INPUT → EXPLORATION → DECISION CONTEXT → IMPLEMENTATION → FEEDBACK LOOPS → RECORD DECISIONS → STATUS REPORT. Resolves Harness Settings and convention/state files once during INPUT, and works in its invocation directory.
+- [skills/to-droid/SKILL.md](skills/to-droid/SKILL.md) — entry point. Resolves a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `csdroid` via `runSubagent`.
 - [skills/csdroid-implement/SKILL.md](skills/csdroid-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during INPUT.
 - [skills/csdroid-feedback/SKILL.md](skills/csdroid-feedback/SKILL.md) — verify loop (LSP/build/test/refactor); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd.
 - [skills/csdroid-memory/SKILL.md](skills/csdroid-memory/SKILL.md) — durable decision store `agent/decisions.jsonl` at `$HARNESS_ROOT`.
@@ -13,23 +13,20 @@ A C# autonomous coding harness. One agent (`csdroid`) orchestrates a fixed pipel
 
 ## Environment
 
-The `csdroid` agent takes an **optional `HARNESS_ROOT` argument** — the absolute path to the repo
-that owns the convention docs and the decision store. **If omitted, the agent defaults it to its
-current working directory (cwd).** During INPUT, the agent resolves its convention and state files once.
+During INPUT, Csdroid independently resolves Harness Settings through `/resolve-harness` when available. When the skill is unavailable or finds no configuration, it uses its current working directory (cwd) as `HARNESS_ROOT`. A failing available resolver blocks the invocation. Csdroid retains the complete emitted settings only for that invocation, then resolves its convention and state files once.
 
-- `HARNESS_ROOT` — outermost enclosing repo; owns `agent/decisions.jsonl` and all convention/state files. INPUT recursively scans only beneath it for `CODE.md`, `VERIFY.md`, `MEMORY.md`, and `LOG.md`, then passes the resolved paths to the relevant sub-skills. When no `LOG.md` exists, INPUT creates `agent/LOG.md`; missing CODE, VERIFY, and MEMORY files use their documented fallbacks.
+- `HARNESS_ROOT` — the Harness Settings value that owns `agent/decisions.jsonl` and all convention/state files. Optional `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, and `LOG_PATH` settings override discovery; INPUT scans only for missing paths, then passes the resolved paths to the relevant sub-skills. When no `LOG.md` exists, INPUT creates `agent/LOG.md`; missing CODE, VERIFY, and MEMORY files use their documented fallbacks.
 - **Workspace = cwd** — all code, git, build, test, and exploration commands run in the agent's current working directory. There is no separate workspace variable; callers launch the agent with cwd set to the code repo/worktree.
 
-Harness-root detection lives only in the caller. `ralph:dev` resolves and persists `HARNESS_ROOT` before launching Csdroid; `to-droid` does not resolve it, so Csdroid defaults to cwd.
+Harness discovery lives in Csdroid. Neither `ralph:dev` nor `to-droid` passes Harness Settings to the agent.
 
 ## Dependencies
 
 ```mermaid
 graph TD
     U[User / plan.md / issue URL] --> TD[to-droid skill]
-    DEV[ralph:dev skill] -->|resolves HARNESS_ROOT| AG
-    TD -->|runSubagent, no HARNESS_ROOT| AG[csdroid agent]
-    DEV -->|runSubagent + HARNESS_ROOT arg, cwd=worktree| AG
+    DEV[ralph:dev skill] -->|runSubagent, cwd=worktree| AG
+    TD -->|runSubagent| AG[csdroid agent]
     AG -->|DECISION CONTEXT & RECORD| MEM[csdroid-memory skill]
     AG -->|IMPLEMENTATION| IMP[csdroid-implement skill]
     AG -->|FEEDBACK LOOPS| FB[csdroid-feedback skill]
@@ -45,9 +42,9 @@ graph TD
 
 **Nature of each edge**
 
-- **Hard control-flow**: `to-droid` / `ralph:dev` → `csdroid` → the `csdroid-*` skills (named literally in the agent prose). Harness-root detection lives in `ralph:dev`, not in the agent.
+- **Hard control-flow**: `to-droid` / `ralph:dev` → `csdroid` → the `csdroid-*` skills (named literally in the agent prose). Harness discovery lives in Csdroid, not its callers.
 - **Soft/implicit**: `to-commit` depends on the agent's STATUS REPORT format (the `dcode:` convention couples them, but nothing enforces it).
-- **Argument contract**: the agent receives `HARNESS_ROOT` (or defaults it to cwd), resolves the four paths during INPUT, and passes each path to the relevant `csdroid-*` skill.
+- **Resolution contract**: the agent resolves Harness Settings (or falls back to cwd), resolves the four paths during INPUT, and passes each path to the relevant `csdroid-*` skill.
 - **External file contracts**: each `csdroid-*` skill consumes only the resolved path the agent supplies; INPUT owns discovery, fallback `LOG.md` creation, and discovery-gap logging.
 
 ## Execution sequence
@@ -69,7 +66,7 @@ sequenceDiagram
     TD->>AG: runSubagent(csdroid, task + recent changes)
 
     rect rgba(160, 190, 255, 0.08)
-    note over AG: INPUT — HARNESS_ROOT arg (or default cwd); resolve paths; workspace = cwd
+    note over AG: INPUT — resolve Harness Settings (or fallback cwd); resolve paths; workspace = cwd
     end
 
     note over AG: EXPLORATION — read changed + neighboring files, conventions
