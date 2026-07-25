@@ -39,4 +39,4 @@ If <step N> fails, return to Step <M>.
 
 ## Exceptions
 
-- None recorded yet.
+- An agent/skill family that wants uniform structure across every step (e.g. `droid` and its `droid-*` skills) may embed a literal checklist even for 1-2 step skills, trading minor ceremony for consistency across the whole family. The 3+/order-sensitive bar remains the default for skills outside such a family.

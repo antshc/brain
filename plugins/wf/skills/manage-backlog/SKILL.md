@@ -23,7 +23,7 @@ The milestone represents the capability behind `{{featureId}}` and may be reused
 
 1. Look up an existing milestone for this capability:
    ```
-   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{featureId}}:")) | .title' | head -1
+   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{featureId}}")) | .title' | head -1
    ```
    Set `{{milestoneTitle}}` to the matched title if found.
 
