@@ -101,10 +101,12 @@ Create issues in dependency order (blockers first) so you can reference real iss
 #{{specIssueNumber}}
 
 ## What to build
-
-A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation.
-
-Avoid specific file paths or code snippets — they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
+<what-to-build-rule>
+- Self-contained: describe enough of the end-to-end behavior that an implementing agent needs no further repo exploration to understand what to build.
+- Describe behavior across all integration layers touched by this slice, not a layer-by-layer breakdown.
+- Avoid specific file paths or code snippets — they go stale fast.
+- Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
+</what-to-build-rule>
 
 ## Acceptance criteria
 <acceptance-criteria-rule>
@@ -144,6 +146,15 @@ Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subse
 1. {{edgeCaseName}}
 2. ...
 
+## Affected layers & modules
+<affected-layers-rule>
+- State which layers/modules this slice touches and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
+- Source layer headings and Cross-Module Dependency Rules from the Concept/ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
+- If the slice belongs to a specific service, also scan the `Services` bullet list (under `Building blocks` in `ARCHITECTURE.md`) and load the matching service's doc (`docs/services/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
+</affected-layers-rule>
+
+- {{layerOrModuleName}}: {{crossModuleDependencyRule}}
+
 ## Implementation Decisions
 <implementation-decisions-rule>
 - Preserve integration constraints and assumptions required for implementation.
@@ -158,12 +169,13 @@ Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subse
 <relevant-concepts-rule>
 - Mandatory whenever step 2 opened at least one Concept or ADR for this slice.
 - One bullet per constraining Concept/ADR. The inline summary is mandatory and must carry enough detail to implement the rule without opening the file — the link back to the record is optional supporting context, not a substitute for the summary.
-- Open the linked record if the summary alone is insufficient. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code. If the slice belongs to a specific service, also scan the `Services` bullet list (under `Building blocks` in `ARCHITECTURE.md`) and load the matching service's doc (`docs/services/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
 - Ticket must be self-explanatory — no further repo exploration needed to implement.
 </relevant-concepts-rule>
 
 - {{ruleSummaryAsItAppliesToThisSlice}} ([{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md))
 - {{ruleSummaryAsItAppliesToThisSlice}} ([{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md))
+
+If a summary above isn't enough to implement its rule, open the linked record for full detail before implementing.
 
 ### Verify section
 
