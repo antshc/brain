@@ -24,9 +24,9 @@ For each of the four files below, check whether it already exists at its target 
 
 | File | Target path | Template |
 |---|---|---|
-| `CODE.md` | `$HARNESS_ROOT/CODE.md` | `templates/CODE.template.md` |
-| `VERIFY.md` | `$HARNESS_ROOT/VERIFY.md` | `templates/VERIFY.template.md` |
-| `MEMORY.md` | `$HARNESS_ROOT/MEMORY.md` | `templates/MEMORY.template.md` |
+| `CODE.md` | `$HARNESS_ROOT/.droid/CODE.md` | `templates/CODE.template.md` |
+| `VERIFY.md` | `$HARNESS_ROOT/.droid/VERIFY.md` | `templates/VERIFY.template.md` |
+| `MEMORY.md` | `$HARNESS_ROOT/.droid/MEMORY.md` | `templates/MEMORY.template.md` |
 | `LOG.md` | `$HARNESS_ROOT/.droid/LOG.md` | `templates/LOG.template.md` |
 
 Substitute `HARNESS_ROOT` literally wherever `$HARNESS_ROOT` appears. Create the `.droid/` directory if it doesn't exist yet.
