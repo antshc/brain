@@ -10,7 +10,7 @@ Run the feedback loop below against all files changed during the IMPLEMENTATION.
 # Feedback Loops
 
 ```
-Task Progress:
+Feedback Loops Progress:
 - [ ] Step 0: Collect changed files
 - [ ] Step 1: Verify — diagnostics, build, tests, and any project-specific checks (from VERIFY.md if found, else fallback)
 - [ ] Step 2: Refactoring review (all changed files)

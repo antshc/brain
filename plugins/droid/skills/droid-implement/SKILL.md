@@ -3,6 +3,14 @@ name: droid-implement
 description: Implementation rules — style, layers, design, and tests. Apply during the IMPLEMENTATION step of any task.
 ---
 
+# Implementation
+
+```
+Implementation Progress:
+- [ ] Step 1: Load CODE.md, then explore
+- [ ] Step 2: Implement the change
+```
+
 Implement the task. Do not skip any step below.
 
 ## Step 1: Load CODE.md, then explore (mandatory, always)

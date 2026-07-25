@@ -3,7 +3,13 @@ name: droid-log
 description: Agent problem log — appends session problems (conflicting conventions, directory/filesystem access, tool access) to LOG.md. Apply during the LOG PROBLEMS step, after feedback loops pass.
 ---
 
-# Problem Log
+# Log Problems
+
+```
+Log Problems Progress:
+- [ ] Step 1: Identify problems from this invocation
+- [ ] Step 2: Append one entry per problem to LOG_PATH (or skip silently if none)
+```
 
 ## Store
 
@@ -13,9 +19,21 @@ Problems are appended to the `LOG_PATH` resolved by the agent during INPUT.
 
 Use the `LOG_PATH` value provided by the agent. INPUT guarantees it exists before this workflow runs.
 
-## Write Workflow (runs once per invocation, after feedback loops pass)
+## Step 1: Identify problems (runs once per invocation, after feedback loops pass)
 
-For each problem found during this invocation — conflicting conventions, directory/filesystem access issues, tool access issues, or a `STATUS: blocked` environment error surfaced by `droid-feedback`'s "Environment blockers" section — append an entry:
+List the files changed during this invocation. For each file or group of files, check whether a problem arose:
+- A conflicting or ambiguous convention encountered
+- A directory/filesystem access issue (permissions, missing paths, wrong cwd)
+- A tool access issue (missing CLI, auth failure, unreachable service) — including any `STATUS: blocked` "Environment blockers" surfaced by `droid-feedback`
+- Any other friction that cost time or blocked progress
+
+**Discard** if it is: a one-off typo, a transient blip resolved on first retry, or a routine execution step. Only what a human reviewer would want to see, and possibly promote to `MEMORY.md`, qualifies.
+
+**Emit**: "Files changed: [list]. Problem candidates: [list or 'none — reason per file']."
+
+## Step 2: Append entries to LOG_PATH
+
+For each problem found during this invocation, append an entry:
 
 ```md
 ## <task-id-or-title> — <date>
