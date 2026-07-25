@@ -19,22 +19,31 @@ Run the `scripts/create-labels.sh` script to create any missing labels.
 
 Reads `{{featureId}}`, `{{specTitle}}`, `{{targetBranch}}` from context.
 
-1. Create a milestone:
+The milestone represents the capability behind `{{featureId}}` and may be reused by many specs. Its title is set only once, on first creation — never renamed by a later spec.
+
+1. Look up an existing milestone for this capability:
+   ```
+   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{featureId}}:")) | .title' | head -1
+   ```
+   Set `{{milestoneTitle}}` to the matched title if found.
+
+2. If no milestone was found, create one and set `{{milestoneTitle}}` to the title just created:
    ```
    gh api repos/$REPO/milestones \
      --method POST \
      --field title="{{featureId}}: {{specTitle}}" \
      --field description="**Feature ID:** \`{{featureId}}\`\n**Target Branch:** \`{{targetBranch}}\`"
    ```
+   If a milestone was already found in step 1, skip this step — do not create or rename it, even if `{{specTitle}}` differs.
 
-2. Create the issue:
+3. Create the issue:
    ```
    gh issue create --label spec --title "{{featureId}}: {{specTitle}}"
    ```
 
-3. Assign the issue to the milestone:
+4. Assign the issue to the milestone, using the resolved `{{milestoneTitle}}` (not a newly derived title):
    ```
-   gh issue edit {{issueNumber}} --milestone "{{featureId}}: {{specTitle}}"
+   gh issue edit {{issueNumber}} --milestone "{{milestoneTitle}}"
    ```
 
 **Returns:** the spec ticket's number.
