@@ -1,6 +1,6 @@
 ---
 name: manage-docs
-description: Create and update the project's domain-model documentation — the glossary (CONTEXT.md), the architecture map (ARCHITECTURE.md), and the decision records (Concepts and ADRs). Owns the doc templates and the rules for where each file lives, when to create it, and how to keep the indexes in sync. Called by the grill-* skills to set up and update docs as decisions crystallise.
+description: Create and update the project's domain-model documentation — the glossary (CONTEXT.md), the Crosscutting Concept (Concept), the ADR, the architecture map (ARCHITECTURE.md), and the decision records (Crosscutting Concepts in docs/concepts/ and ADRs in docs/adr/). Owns the doc templates and the rules for where each file lives, when to create it, and how to keep the indexes in sync. Use when creating a new Crosscutting Concept or ADR, not just when updating an existing one. Called by the grill-* skills to set up and update docs as decisions crystallise.
 ---
 
 # Manage Docs
