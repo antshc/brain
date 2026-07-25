@@ -22,7 +22,7 @@ Resolve Harness Settings first:
 CODE_PATH, VERIFY_PATH, MEMORY_PATH, LOG_PATH := matching HARNESS_SETTINGS values
 scan HARNESS_ROOT once only for each missing path: CODE.md, VERIFY.md, MEMORY.md, LOG.md
 use matching discovered paths  # at most one per filename; do not resolve duplicates
-if LOG_PATH is missing: create $HARNESS_ROOT/agent/LOG.md; LOG_PATH := that path
+if LOG_PATH is missing: create $HARNESS_ROOT/.droid/LOG.md; LOG_PATH := that path
 if CODE_PATH, VERIFY_PATH, or MEMORY_PATH is missing:
   append one pre-phase droid-log discovery-gap entry to LOG_PATH
   category := other; severity := note; problem := every missing filename
@@ -81,7 +81,7 @@ List the files you changed. For each file or group of files, check whether a pro
 - A tool access issue (missing CLI, auth failure, unreachable service) — including any `STATUS: blocked` "Environment blockers" surfaced by `droid-feedback`
 - Any other friction that cost time or blocked progress
 
-**Discard** if it is: a one-off typo, a transient blip resolved on first retry, or a routine execution step. Only what a human reviewer would want to see, and possibly promote to `agent/MEMORY.md`, qualifies.
+**Discard** if it is: a one-off typo, a transient blip resolved on first retry, or a routine execution step. Only what a human reviewer would want to see, and possibly promote to `MEMORY.md`, qualifies.
 
 **Emit**: "Files changed: [list]. Problem candidates: [list or 'none — reason per file']."
 

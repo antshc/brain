@@ -19,5 +19,5 @@ Curated guardrails live in the optional `MEMORY_PATH` resolved by the agent duri
 
 ## Hard Constraints
 
-- Read only — never write to `MEMORY.md`. Curation is a manual human step performed outside this workflow, distilled from `agent/LOG.md` (per `droid-log`).
+- Read only — never write to `MEMORY.md`. Curation is a manual human step performed outside this workflow, distilled from `.droid/LOG.md` (per `droid-log`).
 - Read only the supplied `MEMORY_PATH`. Never derive or search for another location.

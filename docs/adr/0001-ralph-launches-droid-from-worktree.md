@@ -1,3 +1,5 @@
 # Ralph launches Droid from the worktree
 
 Ralph owns worktree creation and launches Droid with the worktree as its invocation directory on every Ralph-to-Droid handoff. Droid receives the task but no harness-root argument: it independently resolves Harness Settings through `/resolve-harness`, or falls back to its invocation directory when that skill or configuration is unavailable. Droid has no `WORKTREE_PATH` contract and does not determine whether its current directory is a worktree; `to-droid` likewise launches it from its own current directory. This keeps execution-location policy with the caller that owns it and harness discovery with the agent that consumes it.
+
+`setup-droid` is another caller of this same `resolve-harness`-or-fallback-to-cwd contract, invoked manually rather than as part of a Ralph-to-Droid handoff. No caller in this chain — Droid, `setup-droid`, or any other `droid-*` skill — creates or modifies the Harness Configuration File (`.harness.env`); `resolve-harness`'s own "never modify the filesystem" rule extends to every caller that consumes its resolution.
