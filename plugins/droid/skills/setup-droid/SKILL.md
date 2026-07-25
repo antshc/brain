@@ -1,6 +1,7 @@
 ---
 name: setup-droid
 description: Manual, user-invoked bootstrap that scaffolds Droid's convention/state files (CODE.md, VERIFY.md, MEMORY.md, LOG.md) from skeleton templates under the resolved Harness Root. Only creates files that don't already exist; never called by the droid agent itself.
+disable-model-invocation: true
 ---
 
 # Setup Droid
