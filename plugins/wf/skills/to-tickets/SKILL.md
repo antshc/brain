@@ -146,16 +146,9 @@ Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subse
 
 ## Implementation Decisions
 <implementation-decisions-rule>
-A list of implementation decisions that were made. This can include:
-
-- The modules that will be built/modified
-- The interfaces of those modules that will be modified
-- Technical clarifications from the developer
-- Schema changes
-- API contracts
-- Specific interactions
-
-MUST NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+- Preserve integration constraints and assumptions required for implementation.
+- Use short technical statements and implementation-oriented language.
+- No specific file paths or code snippets (they become outdated quickly).
 </implementation-decisions-rule>
 
 - {{implementationDecision1}}
@@ -169,8 +162,8 @@ MUST NOT include specific file paths or code snippets. They may end up being out
 - Ticket must be self-explanatory — no further repo exploration needed to implement.
 </relevant-concepts-rule>
 
-- ([{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md)) {{ruleSummaryAsItAppliesToThisSlice}} 
-- ([{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md)) {{ruleSummaryAsItAppliesToThisSlice}}
+- {{ruleSummaryAsItAppliesToThisSlice}} ([{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md))
+- {{ruleSummaryAsItAppliesToThisSlice}} ([{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md))
 
 ### Verify section
 
