@@ -3,28 +3,28 @@ name: droid-implement
 description: Implementation rules — style, layers, design, and tests. Apply during the IMPLEMENTATION step of any task.
 ---
 
-Implement the requested task using the rules below.
+Implement the task. Do not skip any step below.
 
-## Load reference docs (mandatory)
+## Step 1: Load CODE.md (mandatory)
 
-Use the optional `CODE_PATH` value resolved by the agent during INPUT. When it is provided, read that `CODE.md` in full. When it is unresolved, use the fallback below.
+Read `CODE_PATH` (resolved by the agent during INPUT) in full when set. Never skip this check, even for trivial tasks.
 
-**Emit**: "Loaded: CODE.md" or "CODE.md not found — using EXPLORATION fallback."
+**Emit**: "Loaded: CODE.md" or "CODE.md not found — EXPLORATION is the fallback."
 
-## Exploration
+## Step 2: Explore (mandatory, always — not just when CODE.md is missing)
 
-Run exploration via the `Explore` subagent (thoroughness: medium) — do not explore ad hoc. Pass it the task, the file(s) being modified, and the full contents of `CODE.md` when loaded. Instruct it to:
-- Read at least the file(s) being modified and one neighboring file in the same folder to confirm conventions
-- Report project structure, code conventions, relevant existing code, and test patterns in use
-- Cross-check every convention listed in `CODE.md` against the code it reads, and report which `CODE.md` conventions it could **not** confirm/observe in the explored code
+Delegate to the `Explore` subagent (thoroughness: medium). Never explore ad hoc. Give it the task, the file(s) being modified, and the full `CODE.md` contents when loaded. Require it to:
+- Read every file being modified plus one neighboring file per folder to confirm conventions
+- Report project structure, code conventions, relevant existing code, and test patterns
+- Cross-check each `CODE.md` convention against the code read; flag every convention it could **not** confirm
 
 **Emit**: "Explored files: [list]. Conventions found: [list]. CODE.md conventions not observed: [list or none]. Layer placement: [layer]."
 
-## Rules
+## Step 3: Implement
 
-When `CODE.md` is unresolved or silent on a topic, match the conventions of the code touched during EXPLORATION instead — never invent conventions.
+Write the code change now. `CODE.md` wins when it speaks. When it is missing or silent on a topic, EXPLORATION's observed conventions are the fallback — never invent conventions, never guess.
 
-- **Placement** — existing folder/layer/module structure; never invent a new placement scheme.
-- **Design** — prefer deep modules; add no speculative features.
-- **Style** — `CODE.md` conventions.
-- **Tests** — `CODE.md` conventions whenever you add a public method, change existing behavior, or add/alter conditional logic.
+- **Placement** — reuse the existing folder/layer/module structure only. Inventing a new placement scheme is forbidden.
+- **Design** — deep modules only. No speculative features.
+- **Style** — follow `CODE.md`.
+- **Tests** — required per `CODE.md` whenever you add a public method, change existing behavior, or add/alter conditional logic. Do not skip tests to save time.
