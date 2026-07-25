@@ -15,6 +15,16 @@ A resolved choice that is the user's call, not derivable from the codebase — p
 _Avoid_: fact, assumption
 _Plugins_set_: wf
 
+**Seam**:
+A place in the codebase where a test can observe or alter behavior without changing the code at that point. Existing seams are preferred over new ones, and the highest seam through which a feature can still be verified is preferred over a lower one — the fewer seams a change introduces, the better.
+_Avoid_: test point, hook, injection point
+_Plugins_set_: wf
+
+**Prior art**:
+Existing tests in the codebase of the same type as the ones being planned for a change — surfaced and followed as the pattern for new tests instead of inventing a new testing style.
+_Avoid_: existing tests, precedent
+_Plugins_set_: wf
+
 # Contexts
 ## Shared
 
