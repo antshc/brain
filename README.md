@@ -5,8 +5,8 @@ copilot plugin marketplace add antshc/brain
 ```sh
 (copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) && \
 copilot plugin install wf@brain && \
-(copilot plugin uninstall pet@brain >/dev/null 2>&1 || true) && \
-copilot plugin install pet@brain && \
+(copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
+copilot plugin install droid@brain && \
 (copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
 copilot plugin install ralph@brain && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true) && \
@@ -14,6 +14,7 @@ copilot plugin install review@brain
 
 (copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) &&  \
 (copilot plugin uninstall pet@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true)
 ```
