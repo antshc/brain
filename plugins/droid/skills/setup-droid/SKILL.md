@@ -31,6 +31,17 @@ For each of the four files below, check whether it already exists at its target 
 
 Substitute `HARNESS_ROOT` literally wherever `$HARNESS_ROOT` appears. Create the `.droid/` directory if it doesn't exist yet.
 
+## Fill CODE.md from the repo
+
+After creating `CODE.md` from its template (only when it was just created, never for a pre-existing file), invoke the `Explore` agent to scan `HARNESS_ROOT` and populate each section with this repo's actual, observed conventions:
+
+- **Style** — naming, formatting, and file organization conventions actually used in the codebase.
+- **Layer placement** — where different kinds of code live (folders/layers/modules) and how placement is decided, based on the existing structure.
+- **Design principles** — design rules the repo demonstrably follows (module depth, dependency direction, allowed/forbidden patterns).
+- **Tests** — where tests live, how they're structured/named, and when they're required, based on existing test files.
+
+Ground every line in files the `Explore` agent actually found — never invent conventions, never copy examples from another repo. If a section has no discoverable convention, leave its comment placeholder as-is rather than guessing.
+
 ## Pin resolved paths in `.harness.env`
 
 Only when `resolve-harness` found an existing `.harness.env` (never when the cwd fallback fired):
@@ -42,6 +53,6 @@ For each of `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, `LOG_PATH`, if that key i
 - Manual invocation only — do not wire this into `droid.agent.md`'s INPUT step; that step's own rule ("do not create missing `CODE.md`, `VERIFY.md`, or `MEMORY.md`") stays in force.
 - Never overwrite, merge, or prompt about a file that already exists.
 - Never create `.harness.env`. May append missing `*_PATH` keys to an existing one (see above), but never overwrite or remove a key already present.
-- Templates are skeletons only — section headings and instructional comments. Do not fill them with invented, technology-specific example content.
+- Templates are skeletons only — section headings and instructional comments. Do not fill them with invented, technology-specific example content. The sole exception is a freshly created `CODE.md`, whose sections are filled with real conventions found by the `Explore` agent scan above.
 
 **Emit**: "HARNESS_ROOT=<path> (resolver | fallback cwd). Created: [list]. Skipped (already exist): [list]. Templates: <plugin-relative dir>. Harness env: [keys added] | unchanged | not found (fallback)."
