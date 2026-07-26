@@ -35,7 +35,7 @@ gh skill install mattpocock/skills skills/productivity/writing-great-skills --ag
 gh skill install mattpocock/skills skills/productivity/handoff --agent github-copilot --scope user -f && \
 gh skill install mattpocock/skills skills/productivity/teach --agent github-copilot --scope user -f
 
-gh skill install github/awesome-copilot skills/mini-context-graph --agent agents --scope user -f
+gh skill install github/awesome-copilot skills/mini-context-graph --agent universal --scope user -f
 
 ```
 ### Engineering
