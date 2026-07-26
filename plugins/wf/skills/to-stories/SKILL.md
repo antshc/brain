@@ -21,15 +21,16 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 2. **Assemble the reference block** per capability → copy the **capability title**, **stakeholder requirement**, and **functional-requirements list** verbatim from the prior requirement set when it is in context; otherwise derive each from the standalone requirement text.
 3. **Derive acceptance criteria** per story as behavior rules (see below).
 4. **Verify** → run `/solution-agnostic` over every story and criterion to scrub implementation artifacts, then confirm each rule implies concrete code changes and maps to a responsibility.
+5. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, run `/to-delta` once per touched contract kind and append the result as the story's optional Contracts Delta appendix. This appendix is technical and not part of the Capability/Acceptance Criteria body — it is exempt from the solution-agnostic scrub in step 4.
 
 ## Acceptance Criteria
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code.
 - Phrase as: `{{outcome}} when {{condition}}` for behaviors; `If {{condition}}, {{actor}} must {{outcome}}` for invariants/edge cases. Vary the subject (entity, actor, outcome) — don't force "The system" every time.
 - Cover: input, processing, integration, state, failure — one criterion each, not a labeled section.
-- Use domain language (`CONTEXT.md`); apply the solution-agnostic rule — no widget/screen/code terms. Run `/solution-agnostic` to raise any leaked artifact to the behavior and entity it enables.
+- Use domain language (`CONTEXT.md`); apply the solution-agnostic rule — no file paths, class/variable names, widget/screen, or other implementation details. Run `/solution-agnostic` to raise any leaked artifact to the behavior and entity it enables.
 - State the exact outcome — never "works", "correctly", "properly", "as expected".
-- Fold every applicable Business Rule and Edge Case from the source requirement into its own criterion here — do not create separate sections for them.
+- Fold every applicable Business Rule, Edge Case, and relevant error condition from the source requirement into its own criterion here — do not create separate sections for them.
 </acceptance-criteria-rule>
 
 ## Quality Check (before output)
@@ -39,5 +40,30 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 - Capability and stakeholder requirement name a behavior + entity, not a widget, screen, or component. Apply the solution-agnostic rule.
 - Each criterion implies clear code changes and a QA could confirm pass/fail by testing. If not, rewrite.
 
-## Output & Examples
-For the exact output format (single and multiple stories) see [references/output-format.md](references/output-format.md). For worked examples and anti-patterns to reject, see [references/examples.md](references/examples.md).
+## Output Format
+
+Each story carries three required blocks in order: **Capability**, **Stakeholder Requirement**, then **Acceptance Criteria** — plus two optional, technical appendices (**Implementation Decisions**, **Contracts Delta**). Write the three required blocks for Product Owners and QA — plain business language, no code, class names, or technical jargon; each criterion is one clear, testable statement of expected behavior. The two optional appendices are exempt from this rule — they're explicitly technical. When a prior requirement set is in context, copy the capability title and stakeholder requirement verbatim; otherwise derive them from the requirement text.
+
+Use the template below for every story. For a single story, the heading is `{{capabilityTitle}}`. For multiple stories, repeat the block once per capability, numbering each heading `Story {{n}} — {{capabilityTitle}}`.
+
+```
+## {{capabilityTitle}}
+
+{{capabilityTitle|behavior + entity, no surface or placement}}
+
+The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
+
+### Acceptance Criteria
+- {{outcome}} when {{condition}}.
+- If {{condition}}, {{actor}} must {{outcome}}.
+- ...
+
+---
+### Implementation Decisions *(optional, technical — omit unless this capability requires a specific implementation decision)*
+- {{implementationDecision1}}
+- ...
+
+### Contracts Delta *(optional, technical — omit unless this capability changes an API, Database, or Resource contract)*
+
+{{contractsDeltaOutput| output of `/to-delta`, once per touched contract kind (API, Database, Resource)}}
+```
