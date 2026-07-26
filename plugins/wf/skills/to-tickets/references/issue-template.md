@@ -72,6 +72,11 @@ Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subse
 
 If a summary above isn't enough to implement its rule, open the linked record for full detail before implementing.
 
+## Contracts Delta
+<!-- Omit this section entirely if this slice touches no API, Database, or Resource contract. -->
+
+Run `/to-delta` once per touched contract kind (API, Database, Resource) and inline its output verbatim here, one block per kind.
+
 ## Affected layers & modules
 <affected-layers-rule>
 - State which layers/modules this slice touches and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
