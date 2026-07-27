@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use as extension of the grilling session. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
+description: Actively build and sharpen a project's domain model — glossary, ADRs, Crosscutting Concepts, ARCHITECTURE.md — running alongside every grilling session to capture terms, decisions, and assumptions the moment they crystallise. Use when pinning down domain terminology or a ubiquitous language, recording an architectural decision or assumption, or when another skill needs to maintain the domain model.
 ---
 
 # Domain Modeling
@@ -45,6 +45,15 @@ Before discussing any module, boundary, or service, check the ledger:
 
 Once the ledger grows large, stop re-scanning everything on every re-scope: compress resolved terms and decisions into a short summary, rely on that plus the ledger, and re-open a full record only when a specific detail is needed again.
 
+### Stage assumptions in the ledger
+
+The moment grilling records a decision as an *assumption* (its evidence checklist is met, so no question asked), log it in the same session ledger — one line per assumption: `{{decision}} — assumed, evidence: "{{source}}", pending veto`. Every assumption-sourced write happens immediately, marked provisional, regardless of destination document:
+
+* **ADRs/Concepts** — write immediately with `Status: proposed` (per `ADR-FORMAT.md`/`CONCEPT-FORMAT.md` — both share the same `proposed | accepted | deprecated | superseded` vocabulary).
+* **`CONTEXT.md` glossary terms** — write immediately, same as any other term — the ledger entry is the pending-veto record, no inline marker needed.
+
+Do not treat any assumption-sourced entry as final until grilling's end-of-session assumption-veto list clears it (see *Closing completeness sweep*): cleared entries promote (`Status` → `accepted` for ADRs/Concepts; glossary terms need no further action); vetoed entries are reverted — ADR/Concept status change undone or the record retired, and the glossary term entry deleted from `CONTEXT.md`.
+
 ## During the session
 
 Every probe below stays live for the whole session: re-check its trigger after each user answer, not just once — a later answer can retroactively put an earlier one in conflict.
@@ -80,17 +89,11 @@ After every user answer, re-run `/trigger-indexer` **Scan and match** against ev
 
 (Drift — code vs. Concept/ADR — handled by *Cross-reference with code* below, not here.)
 
-### Surface design improvements
-
-When a proposed structure has a narrower/deeper alternative implied by a loaded Concept, name that Concept and surface it: "This Concept mandates deep modules — could this be one deep module with a narrow interface, instead of three shallow modules that leak their internals to each other?" Once a Concept rules an option out, don't present it as equally valid alongside the compliant one.
-
-### Trace through the layers
-
-When a new flow crosses a layer or a transaction/process/network boundary defined by a loaded Concept, read the relevant `Building blocks` section in `ARCHITECTURE.md` (and the specific service's full doc if one is open, per Load strategy guardrails), then select one representative scenario and trace it end-to-end, naming each layer from the loaded Concept as you go: "Trace 'place order' from the API down to persistence: which layer owns validation, which owns pricing, and where does the transaction boundary sit?" If a shortcut would skip a mandated layer, cite the Concept and surface the conflict rather than presenting the shortcut as equally valid.
-
-When the trace needs to confirm what the code actually does at a layer (not just what `ARCHITECTURE.md` says), default that confirmation to `explore` (per *Delegate code lookups* above); reserve direct reads for anchoring the exact boundary line.
-
 Then re-run *Continuously validate against Concepts and ADRs* against the trace.
+
+### Source-authority precedence
+
+Resolve authority disagreements — including the evidence checklist's *single authoritative source* test — in this order: `CONTEXT.md`/`ARCHITECTURE.md`/ADR/Concept > code > external sources. A lower-ranked source never outweighs a higher-ranked one; conflict against a higher-ranked source must be asked, not assumed.
 
 ### Cross-reference with code
 
@@ -108,13 +111,17 @@ Once resolved, offer to fix the source immediately — never batch it. Detect wh
 
 ### Update CONTEXT.md inline
 
-When a term is resolved: if `CONTEXT.md` doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule), then capture the term right there — don't batch these up, capture them as they happen.
+When a term is resolved by explicit user answer: if `CONTEXT.md` doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule), then capture the term right there — don't batch these up, capture them as they happen.
+
+When resolved by a recorded assumption instead, follow *Stage assumptions in the ledger*: write the term immediately — the ledger entry tracks it as pending, and only treat it as finalized once the closing veto sweep clears it.
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
 ### Update ADRs and Concepts inline
 
-When an ADR or Concept is resolved: if `ARCHITECTURE.md` (or `docs/adr/` / `docs/concepts/`) doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule) first, then capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
+When an ADR or Concept is resolved by explicit user answer: if `ARCHITECTURE.md` (or `docs/adr/` / `docs/concepts/`) doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule) first, then capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
+
+When resolved by a recorded assumption instead, follow *Stage assumptions in the ledger*: write with `Status: proposed` immediately, and only treat it as finalized once the closing veto sweep clears it.
 
 ### Offer ADRs sparingly
 
@@ -139,5 +146,7 @@ If any of the three is missing, skip the Concept; otherwise the offer itself is 
 ### Closing completeness sweep
 
 Before concluding a session that opened at least one full Concept/ADR record, output one disposition line per row in the `Crosscutting Concepts` and `Architecture Decision Records` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so every row gets an explicit verdict instead of silent omission. Skip this sweep for trivial sessions that only touched `CONTEXT.md` glossary terms and never opened a full Concept/ADR record.
+
+Also resolve every pending entry logged under *Stage assumptions in the ledger* against grilling's end-of-session assumption-veto list: cleared entries promote (`Status` → `accepted`; glossary terms need no further action); vetoed entries are reverted — ADR/Concept status/record undone, glossary term entry deleted from `CONTEXT.md`.
 
 Per row, also check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, blank cell). If found, refine the clause and apply it via `/trigger-indexer` **Keeping the indexes in sync**.
