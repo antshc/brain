@@ -5,17 +5,9 @@
 A leading word serves **predictability** twice. In the body it anchors **execution** — the agent reaches for the same behaviour every time the concept appears, and inside flat reference it focuses attention on a class of thing to look for, recruiting the right checks each run. In the **description** it anchors **invocation** — and not only within the skill: when the same word lives in your prompts, your docs, and your codebase, the agent links that shared language to the skill and fires it more reliably. Word a description with the leading words you actually use when you want the skill.
 -->
 
-**Facet**
-one particular aspect, side, or feature of something.
-
-**Fact**:
-Information discoverable by exploring the codebase (validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic) — looked up directly during grilling, never asked of the user.
-_Avoid_: assumption, guess
-_Plugins_set_: wf
-
-**Decision**:
-A resolved choice that is the user's call, not derivable from the codebase — put to the user during grilling and captured only once they confirm it.
-_Avoid_: fact, assumption
+**Facet**:
+One distinct aspect of a thing that has several such aspects — naming one dimension on its own so it can be discussed or changed without conflating it with the whole or with the thing's other dimensions.
+_Avoid_: aspect, side
 _Plugins_set_: wf
 
 **Seam**:
@@ -32,6 +24,12 @@ _Plugins_set_: wf
 Copied exactly as written, with no paraphrasing, summarizing, or restructuring — used to mark content (a template, a settings block) that must be reproduced word-for-word rather than reinterpreted.
 _Avoid_: as-is, unmodified
 _Plugins_set_: wf
+
+**Completeness sweep**:
+A closing check, run before concluding a session that opened at least one full Concept/ADR record, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts and Architecture Decision Records index tables.
+_Avoid_: final review, wrap-up
+_Plugins_set_: wf
+
 
 # Contexts
 ## Shared
@@ -97,10 +95,27 @@ _Avoid_: test project, test suite
 
 ### Language
 
-**Completeness sweep**:
-A closing check, run before concluding a session that opened at least one full Concept/ADR record, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts and Architecture Decision Records index tables.
-_Avoid_: final review, wrap-up
+**Vetoed**:
+The outcome for an assumption-sourced entry, checked against grilling's end-of-session assumption-veto list, when the user rejects it: the ADR/Concept status change is undone or the record retired, and the glossary term entry is deleted from `CONTEXT.md`. The opposite outcome, cleared, instead promotes `Status` → `accepted` for ADRs/Concepts, with no further action needed for glossary terms.
+_Avoid_: rejected, reverted
 _Plugins_set_: wf
+
+**Fact**:
+Information discoverable by exploring the codebase (validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic) — looked up directly during grilling, never asked of the user.
+_Avoid_: assumption, guess
+_Plugins_set_: wf
+
+**Decision**:
+A resolved choice that is the user's call, not derivable from the codebase — put to the user during grilling and captured only once they confirm it.
+_Avoid_: fact, assumption
+_Plugins_set_: wf
+
+**Assumption**:
+A decision resolved silently instead of being put to the user, because it meets the evidence checklist (single authoritative source, direct answer, no genuine alternative) — written immediately but provisional, staged in the session Ledger as `pending veto` until grilling's closing veto sweep clears or vetoes it.
+_Avoid_: guess, inference
+_Plugins_set_: wf
+
+**Evidence** — the role a fact plays once found: input for reasoning, not an answer in itself. SKILL.md:24 is explicit that discovered facts are "evidence for discovering implicit requirements, not as an implementation prescription" — i.e. a fact like "the code currently caps usernames at 50 chars" is evidence suggesting a possible requirement, not proof that 50 is the correct or intended rule. It still needs to be validated/confirmed, often by turning it into a question or a scenario for the user.
 
 ## review
 
