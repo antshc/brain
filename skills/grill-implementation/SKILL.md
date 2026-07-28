@@ -14,7 +14,7 @@ Do not invoke implementation skills, write code, scaffold projects, modify files
 
 ## 1. Reach shared understanding
 
-Run the `/grilling` skill on the requested implementation.
+Interview the user relentlessly about the requested implementation until reaching a shared understanding.
 
 Resolve decisions one at a time. Ask only one question at a time and wait for the user's answer before continuing.
 

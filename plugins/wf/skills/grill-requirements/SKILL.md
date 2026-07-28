@@ -17,11 +17,13 @@ Load glossary from `CONTEXT.md` first use as the glossary of approved entity and
 
 # During the session
 
-## Run /grilling
+## Run the interview
 
 **Facts** to look up (across user-facing, application, integration, and persistence boundaries): Validation rules, Constraints, Domain concepts, Data models, Contracts, Schemas, Relationships, Business logic.
 
-Run `/grilling` skill, keep the *Grilling coverage* checklist below alive until every probe is checked (or explicitly ruled not-applicable, with a reason), revisit probe if conflict arises. When exploring the existing solution for the **Facts**, treat each as evidence for discovering implicit requirements, not as an implementation prescription. Use the (directory, solution, project, code) structure and module definitions defined in the  `README.md`, `ARCHITECTURE.md` docs.
+Interview the user relentlessly about every aspect of this until reaching a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. For each question, provide a recommended answer, ask one at a time, and wait for feedback before continuing — asking multiple questions at once is bewildering. If a fact can be found by exploring the environment (filesystem, tools, etc.), look it up rather than asking. Before confirming shared understanding, list every decision and assumption made this session for the user to veto.
+
+Keep the *Grilling coverage* checklist below alive until every probe is checked (or explicitly ruled not-applicable, with a reason), revisit probe if conflict arises. When exploring the existing solution for the **Facts**, treat each as evidence for discovering implicit requirements, not as an implementation prescription. Use the (directory, solution, project, code) structure and module definitions defined in the  `README.md`, `ARCHITECTURE.md` docs.
 
 ```
 Grilling coverage:

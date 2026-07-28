@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A long-running grilling/domain-modeling session risks re-opening or re-scanning the same Concept, ADR, or service record repeatedly, or losing track of what has already been validated once the transcript grows past what fits usefully in context. A Ledger is a session-scoped, externally persisted record of every record opened so far — checked before any re-scope decision instead of relying on recall over a long context window.
+A long-running `grill-design` session risks re-opening or re-scanning the same Concept, ADR, or service record repeatedly, or losing track of what has already been validated once the transcript grows past what fits usefully in context. A Ledger is a session-scoped, externally persisted record of every record opened so far — checked before any re-scope decision instead of relying on recall over a long context window.
 
 ## Design Guidance
 
@@ -14,7 +14,7 @@ A long-running grilling/domain-modeling session risks re-opening or re-scanning 
   - **Already listed** — its full record is loaded; don't re-open or re-scan the index for it.
   - **Not listed** — this is a re-scope: re-read the index, re-apply the relevance test, and append the result to the ledger.
 - Once the ledger grows large, stop re-scanning everything on every re-scope — compress resolved terms and decisions into a short summary, rely on that plus the ledger, and re-open a full record only when a specific detail is needed again.
-- The Ledger belongs to the caller holding the session (e.g. `domain-modeling`), not to `trigger-indexer` — the indexer only returns match verdicts; tracking what is already open is the caller's own state.
+- The Ledger belongs to the caller holding the session (e.g. `grill-design`), not to `trigger-indexer` — the indexer only returns match verdicts; tracking what is already open is the caller's own state.
 
 ## Exceptions
 

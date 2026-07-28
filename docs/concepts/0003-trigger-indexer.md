@@ -12,7 +12,7 @@ Any markdown table with a Trigger condition column risks two failure modes if ev
 - **Generation:** trigger conditions are concise, comma-separated, domain-specific phrases chosen from the record, glossary, and grilling context so they sound natural in the session. The generation requirement is guidance, not literal row text.
 - **Read side ("Scan and match"):** trigger clauses are split on commas and matched semantically against the supplied touched surface and grilling context. Blank cells never match; row titles and summaries do not substitute for a missing clause.
 - **Write side ("Keeping the indexes in sync"):** add/supersede/retire the supplied row in the same change that adds, changes, or retires the underlying record, preserving unknown columns and unspecified cells.
-- Callers (`manage-docs`, `domain-modeling`, `to-tickets`, and any skill needing to decide whether an indexed record applies) invoke the skill's actions rather than re-implementing generation, scan/match, or sync logic inline.
+- Callers (`manage-docs`, `grill-design`, `to-tickets`, and any skill needing to decide whether an indexed record applies) invoke the skill's actions rather than re-implementing generation, scan/match, or sync logic inline.
 - Does not own: document templates, file locations, table creation, or lazy-creation rules — that stays with the owning document skill. Does not own a caller's session ledger or closing completeness sweeps — see the `Ledger` Concept.
 
 ## Exceptions
