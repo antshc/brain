@@ -21,7 +21,7 @@ Do not act on it until I confirm we have reached a shared understanding.
 
 ## Domain Modeling
 
-Actively build and sharpen the project's domain model as you design — this runs alongside the interview above, challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md`, `ARCHITECTURE.md`, Concepts, or ADRs for guardrails is not this — that's a one-line habit any skill can do. This is for when you're changing the model, not just consuming it.)
+Alongside the interview, actively build and sharpen the project's domain model as you design — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. Merely *reading* `CONTEXT.md`, `ARCHITECTURE.md`, Concepts, or ADRs for guardrails isn't enough here: grill-design changes the model, not just consumes it.
 
 ### Managing the docs
 
