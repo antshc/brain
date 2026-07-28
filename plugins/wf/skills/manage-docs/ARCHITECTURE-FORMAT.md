@@ -44,10 +44,11 @@ graph TD
 \```
 #### Services
 
-Bullet list of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. A link to a full doc (built from [BUILDING-BLOCK-SERVICE-FORMAT.md](./BUILDING-BLOCK-SERVICE-FORMAT.md)) is optional — add it only for non-trivial services.
+Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. A link to a full doc (built from [BUILDING-BLOCK-SERVICE-FORMAT.md](./BUILDING-BLOCK-SERVICE-FORMAT.md)) is optional — add it only for non-trivial services.
 
-- **{{buildingBlockName}}** (`{{mermaidComponentName}}`) — {{shortDescription}} <!-- terse, concise, optimized for agent navigation -->. {{optionalLinkToFullDoc}}
-- **[Order Service](docs/services/order-service.md)** (`orders`) - Order API: cart, checkout, fulfillment. [API Contracts](docs/services/order-service.swagger.json). Reports checkout and inventory analytics to Google Analytics.
+| Service | Trigger condition | Summary |
+|---------|-------------------|---------|
+| **[{{buildingBlockName}}](docs/services/{{buildingBlockName}}-service.md)** ({{mermaidComponentName}}) | {{triggerCondition}} | {{shortDescription}} <!-- terse, concise, optimized for agent navigation -->. Appendixes: [{{buildingBlockName}} API Contracts](docs/services/{{buildingBlockName}}-service.swagger.json) |
 
 #### Interactions *(optional)*
 
