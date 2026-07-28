@@ -46,10 +46,10 @@ Use the implementation details as the spec content instead of a GitHub issue:
 
 If you have not already explored the codebase, do so to understand the current state of the code. 
 Issue titles and descriptions should use the project's domain glossary vocabulary `CONTEXT.md`.
-Via `/trigger-indexer` **Scan and match**, passing `ARCHITECTURE.md`'s *Architecture Decision Records (ADR)* and *Crosscutting Concepts (Concept)* index sections and the area you're changing as the touched surface, then open every matched record it returns.
-- **Concepts** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to them. See `manage-docs/CONCEPT-FORMAT.md`.
-- **ADRs** capture localized decisions — respect and reference the relevant ones in the issue body.
-- Confirm you have scanned both `docs/adr/` and `docs/concepts/` before moving on; if either directory is absent, note that and continue.
+Via `/trigger-indexer` **Scan and match**, pass the metadata for each applicable index table, the area you're changing as the touched surface, the current grilling context, and the glossary; then open every matched record it returns. This applies equally to Service, ADR, Concept, and custom markdown tables. Do not assume an architecture file, section, record directory, or Summary column.
+- **Concepts** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to matched records. See `manage-docs/CONCEPT-FORMAT.md`.
+- **ADRs** capture localized decisions — respect and reference matched records in the issue body.
+- If a conventional ADR or Concept table is present, scan it; if it is absent, continue with the applicable tables supplied by the caller.
 
 Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 

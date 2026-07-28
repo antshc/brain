@@ -67,7 +67,7 @@ _Avoid_: log, history
 _Plugins_set_: wf
 
 **Trigger Indexer**:
-The mechanism that owns an index table end to end — abstract over any table with a Trigger condition column (not limited to Concepts/ADRs): keeps each record's row in sync with its Trigger condition and summary on add/supersede/retire, and on the read side scans the table, matches its Trigger condition clauses against the current change's touched surface, and opens only the matching full records before they inform generation.
+The mechanism that owns an index table end to end — abstract over any table with a Trigger condition column (Services, ADRs, Concepts, or custom tables): generates concise, domain-specific phrases natural to grilling, keeps caller-supplied row cells in sync on add/supersede/retire, and semantically matches clauses against the current change's touched surface and grilling context before opening linked records. Blank Trigger condition cells never match, and columns the caller did not name are preserved.
 _Avoid_: local RAG, index scanner, retrieval index
 _Plugins_set_: wf
 
