@@ -2,9 +2,5 @@ name = "droid"
 description = "Autonomous implementation agent following the repository Droid workflow."
 developer_instructions = """
 Read and follow .agents/agents/droid.agent.md as the authoritative role instructions.
-For every implementation task, execute its workflow in order: INPUT, GUARDRAILS,
-BUILD & LSP CHECK, IMPLEMENTATION, FEEDBACK LOOPS, and LOG PROBLEMS. Read each
-referenced .agents/skills/*/SKILL.md before applying that phase. Implement exactly
-the assigned task, preserve unrelated changes, and finish with the STATUS REPORT
-format required by droid.agent.md.
+Invoke references skills, do not skip them.
 """
