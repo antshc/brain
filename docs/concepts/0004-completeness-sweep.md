@@ -1,7 +1,5 @@
 # Completeness Sweep
 
-**Status:** Accepted
-
 ## Purpose
 
 An agent pass can stop after delivering only part of a requested change — the code compiles and the happy path works, but a validation branch, a doc update, or a related CRUD case never gets touched. A Completeness Sweep is a final, systematic pass that asks *"did we cover everything required, not merely implement something that works?"* — reconstructing the full obligation list and checking each obligation for evidence before the task is declared complete. It is not a Copilot/GPT/Claude feature; it is a reusable agent-workflow pattern any skill can adopt as its closing step.

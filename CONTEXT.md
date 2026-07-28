@@ -60,7 +60,7 @@ _Avoid_: working directory, checkout
 _Plugins_set_: ralph, droid, wf
 
 **Ledger**:
-A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
+A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far, the touched surface accumulated so far, and every Decision, Feature Decision, and Feature Assumption taken so far in the session — checked before any re-scope decision or conflict classification instead of relying on recall over a long context window.
 _Avoid_: log, history
 _Plugins_set_: wf
 
@@ -96,7 +96,7 @@ _Avoid_: test project, test suite
 ### Language
 
 **Vetoed**:
-The outcome for an assumption-sourced entry, checked against grilling's end-of-session assumption-veto list, when the user rejects it: the ADR/Concept status change is undone or the record retired, and the glossary term entry is deleted from `CONTEXT.md`. The opposite outcome, cleared, instead promotes `Status` → `accepted` for ADRs/Concepts, with no further action needed for glossary terms.
+The outcome for a Feature Assumption, checked against grilling's end-of-session veto list, when the user rejects it: its Ledger line is deleted and nothing else changes, because a Feature Assumption is never written to a durable repository document. The opposite outcome, cleared, makes it a user-approved Decision. A Recorded decision is not vetoable — the user approved it before it was written.
 _Avoid_: rejected, reverted
 _Plugins_set_: wf
 
@@ -110,9 +110,19 @@ A resolved choice that is the user's call, not derivable from the codebase — p
 _Avoid_: fact, assumption
 _Plugins_set_: wf
 
-**Assumption**:
-A decision resolved silently instead of being put to the user, because it meets the evidence checklist (single authoritative source, direct answer, no genuine alternative) — written immediately but provisional, staged in the session Ledger as `pending veto` until grilling's closing veto sweep clears or vetoes it.
-_Avoid_: guess, inference
+**Feature Assumption**:
+A choice scoped to the current feature that the model resolves from the sources instead of putting it to the user, because it meets all four criteria of the evidence checklist (single authoritative source, direct answer, no genuine alternative, reversible if wrong) — held in the session Ledger only, never written to a durable repository document, until grilling's closing veto sweep clears it or vetoes it.
+_Avoid_: assumption, guess, inference, implementation choice
+_Plugins_set_: wf
+
+**Feature Decision**:
+A Decision scoped to the current feature, grounded on `ARCHITECTURE.md`, ADRs, Concepts, and existing code, that passes neither the ADR nor the Concept gate and resolves no glossary term — the session Ledger is its only home, the same durability as a Feature Assumption.
+_Avoid_: feature-local decision, local decision, implementation detail, implementation choice, implementation decision
+_Plugins_set_: wf
+
+**Recorded decision**:
+A user-approved Decision written to a durable repository document — an ADR, a Crosscutting Concept, or a `CONTEXT.md` term — whose Ledger line carries a `recorded:` pointer to that document instead of restating it. A Feature Assumption becomes eligible only once the closing veto sweep clears it.
+_Avoid_: promoted decision, published decision, architectural decision
 _Plugins_set_: wf
 
 **Evidence** — the role a fact plays once found: input for reasoning, not an answer in itself. SKILL.md:24 is explicit that discovered facts are "evidence for discovering implicit requirements, not as an implementation prescription" — i.e. a fact like "the code currently caps usernames at 50 chars" is evidence suggesting a possible requirement, not proof that 50 is the correct or intended rule. It still needs to be validated/confirmed, often by turning it into a question or a scenario for the user.

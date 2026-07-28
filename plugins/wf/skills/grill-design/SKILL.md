@@ -13,9 +13,13 @@ Ask the questions one at a time, waiting for feedback on each question before co
 
 If a *fact* can be found by exploring the environment (filesystem, tools, etc.), look it up rather than asking me.
 
-For *decisions*: evaluate against the evidence checklist — single authoritative source, direct answer (no analogy), no genuine alternative. All met → record as *assumption*. Otherwise → put to me, wait for answer.
+For *decisions*: evaluate against the evidence checklist — single authoritative source, direct answer (no analogy), no genuine alternative, reversible if wrong. All four met → record as *feature assumption*. If any one fails, it's not strong enough — put it to me, wait for answer.
 
-Before confirming we've reached a shared understanding, list every *decision* and *assumption* made this session for me to *veto*.
+A Feature Assumption (model-resolved) and a Feature Decision (user-approved but feature-scoped) are both held in the session Ledger only — never written to `CONTEXT.md`, an ADR, or a Concept; only a Decision destined for a durable document is.
+
+Before confirming we've reached a shared understanding, list every Feature Decision and Feature Assumption made this session for me to *veto*. Authoring/editorial choices made while writing docs (synonym lists, term placement, section names, prose wording) are neither and don't belong on this list.
+
+Output format: one bullet per item, each a 1-3 sentence explanation of what was decided/assumed and why — `- {{item}}: {{explanation}}`.
 
 Do not act on it until I confirm we have reached a shared understanding.
 
@@ -39,8 +43,8 @@ Before designing or grilling:
 
 1. If `ARCHITECTURE.md` doesn't exist yet, offer to create it right away, per `/manage-docs`'s `Lazy creation` rule — don't wait for a term, rule, Concept, or ADR to be ready to capture (that's a separate trigger; see *Update CONTEXT.md inline*, *Update ADRs and Concepts inline*, *Offer ADRs/Concepts sparingly*). Once created, skip *this load step only* — nothing beyond the required sections exists yet to read.
 2. Read `ARCHITECTURE.md` in full: `Building blocks` → Services list, and the complete `Crosscutting Concepts`/`Architecture Decision Records` index tables — every row. All three sections are optional (`ARCHITECTURE-FORMAT.md`) — skip gracefully if absent, don't treat as a gap. Multi-part sections need multiple ranged reads — never stop at a partial read.
-3. **Match applicable records via `/trigger-indexer` Scan and match** — indexing alone never implies relevance; delegate semantic Trigger-condition matching to `/trigger-indexer`, passing the caller-supplied table metadata, the current change's touched surface, grilling context, and glossary. Use it for Services, ADRs, Concepts, or any other indexed table; open a linked full record only when the returned verdict matches. Log every returned verdict in the session ledger (*Track opened records*): matches as `{{n}} — opened, trigger matched: "{{clause}}"`; non-matches as `{{n}} — skipped, checked "{{clause1}}", "{{clause2}}": no semantic match`.
-4. Sections inside an opened record are themselves optional (a Concept's Exceptions/Examples; an ADR's Status/Considered Options/Consequences; a service doc's API Contracts/Tweaks/Persisted data/Key features) — a missing one means "not documented."
+3. **Match applicable records via `/trigger-indexer` Scan and match** — indexing alone never implies relevance; delegate semantic Trigger-condition matching to `/trigger-indexer`, passing the caller-supplied table metadata, the current change's touched surface, grilling context, and glossary. Use it for Services, ADRs, Concepts, or any other indexed table; open a linked full record only when the returned verdict matches. Log every returned verdict in the session ledger's `Opened records` section (*Track opened records*): matches as `{{path}} — opened, trigger matched: "{{clause}}"`; non-matches as `{{path}} — skipped, checked "{{clause1}}", "{{clause2}}": no semantic match`.
+4. Sections inside an opened record are themselves optional (a Concept's Exceptions/Examples; an ADR's Considered Options/Consequences; a service doc's API Contracts/Tweaks/Persisted data/Key features) — a missing one means "not documented."
 5. Extract:
    * **Mandates** — required concepts, patterns and boundaries.
    * **Prohibitions** — explicitly rejected approaches, rejected considered options.
@@ -53,22 +57,32 @@ These rules stay active for the whole session, not just at load time — see *Co
 
 #### Track opened records
 
-Persist a session ledger of every Concept/ADR/service doc opened so far via the memory tool, at `/memories/session/domain-model-ledger.md` — create it lazily on first open, one line per record (`{{path}} — opened for {{topic}}`).
+Persist a session ledger via the memory tool, at `/memories/session/domain-model-ledger.md` — create it lazily on the first write of any kind. It has three sections; this subsection covers `Opened records` only.
+
+One line per record, path-anchored (never a row number — numbers renumber on index sync and collide across tables), no ranges:
+* `{{path}} — opened, trigger matched: "{{clause}}"`
+* `{{path}} — opened, direct: {{topic}}`
+* `{{path}} — skipped, checked "{{clause1}}", "{{clause2}}": no match`
 
 Before discussing any module, boundary, or service, check the ledger:
 * **Already listed** — its full record is loaded; don't re-open or re-scan the index for it.
-* **Not listed** — this is a re-scope: re-run step 2's full index read (the in-context index may now be out of date), re-apply step 3's relevance test, and append the result to the ledger.
+* **Not listed** — see *Track the touched surface* below; whether this is a re-scope depends on whether the discussion introduces a new surface term.
 
 Once the ledger grows large, stop re-scanning everything on every re-scope: compress resolved terms and decisions into a short summary, rely on that plus the ledger, and re-open a full record only when a specific detail is needed again.
 
-#### Stage assumptions in the ledger
+#### Track the touched surface
 
-The moment grilling records a decision as an *assumption* (its evidence checklist is met, so no question asked), log it in the same session ledger — one line per assumption: `{{decision}} — assumed, evidence: "{{source}}", pending veto`. Every assumption-sourced write happens immediately, marked provisional, regardless of destination document:
+The ledger's `Touched surface` section accumulates surface terms extracted from user answers: module, boundary, service, entity, data shape, behavior, interface, change type. This is the cache key that makes a `skipped` verdict re-checkable — it was only ever valid for the surface known at that turn.
 
-* **ADRs/Concepts** — write immediately with `Status: proposed` (per `ADR-FORMAT.md`/`CONCEPT-FORMAT.md` — both share the same `proposed | accepted | deprecated | superseded` vocabulary).
-* **`CONTEXT.md` glossary terms** — write immediately, same as any other term — the ledger entry is the pending-veto record, no inline marker needed.
+On each triggering turn (user answer / new fact):
+* **No new surface term** — reason over the in-context index copy; no scan, no write.
+* **New term(s)** — append them to `Touched surface`, then run `/trigger-indexer` **Scan and match** passing only the new terms, against the not-yet-`opened` rows only. Update existing row lines in place; never append a duplicate.
 
-Do not treat any assumption-sourced entry as final until grilling's end-of-session assumption-veto list clears it (see *Closing completeness sweep*): cleared entries promote (`Status` → `accepted` for ADRs/Concepts; glossary terms need no further action); vetoed entries are reverted — ADR/Concept status change undone or the record retired, and the glossary term entry deleted from `CONTEXT.md`.
+#### Stage decisions and assumptions in the ledger
+
+The moment grilling resolves a decision as a *feature assumption* (its evidence checklist is met, so no question asked), log it in the ledger's `Decisions / assumptions` section — `{{item}} — assumed, evidence: "{{source}}"`. This is its only home: a Feature Assumption is never written to `CONTEXT.md`, an ADR, or a Concept. It stays ledger-only until grilling's end-of-session veto list clears or vetoes it (see *Closing completeness sweep*) — clearing is what turns it into a Decision and triggers the durable write, not the feature assumption itself.
+
+A user-approved Decision that is feature-scoped (a Feature Decision — fails the ADR/Concept gate, resolves no glossary term) is also ledger-only, permanently: log it `{{item}} — decided by user, feature decision, grounded: "{{source}}"`. A user-approved Decision destined for a durable document is logged and written the same turn it's approved: `{{item}} — decided by user, recorded: {{path}}` (per *Update CONTEXT.md inline* / *Update ADRs and Concepts inline* below). A rejected option is logged `{{item}} — rejected, reason: "{{source}}"`.
 
 ### During the session
 
@@ -96,16 +110,23 @@ Always runs, every change. Check `Crosscutting Concepts` index in `ARCHITECTURE.
 
 "This adds a repository against the database — your testing Concept mandates an integration-test category. Which category covers persistence round-trips and queries?"
 
-#### Continuously validate against Concepts and ADRs
+#### Scan and match (surface-driven)
 
-After every user answer, re-run `/trigger-indexer` **Scan and match** against every applicable indexed row (index read, or compressed table summary + ledger once threshold hit) — mandatory, not optional; a later answer can newly touch a clause's meaning. First time a row becomes relevant this way: open it, log the matched clause per step 3. No match: log checked-no-match per step 3. Re-read full index tables only on re-scope (per *Track opened records*) or right after authoring/editing an indexed record — not every turn. Classify conflicts:
+Driven entirely by *Track the touched surface* above: a `/trigger-indexer` **Scan and match** call happens only when the touched surface gains a new term, scoped to that term, against not-yet-`opened` rows. This verdict is **monotonic** — once a row matches, it stays matched as the surface only grows; there's no need to re-check an already-`opened` row here.
+
+#### Classify conflicts
+
+Distinct from *Scan and match*: this operates on the full text of already-`opened` records already in context — no tool call — and re-runs every triggering turn, because it is **non-monotonic**: a later answer can retroactively put an earlier design in conflict with a Concept or ADR that matched turns ago.
+
 * **Violation** — breaks a Concept or repeats an ADR's rejected alternative. Never present as equally valid — cite the Concept/ADR number, surface the conflict.
 * **Supersession** — Concept/ADR is outdated, needs revision.
 * **Out of scope** — Concept/ADR doesn't apply.
 
 (Drift — code vs. Concept/ADR — handled by *Cross-reference with code* below, not here.)
 
-Then re-run *Continuously validate against Concepts and ADRs* against the trace.
+#### Re-fetch rule
+
+Applies to every durable artifact (`ARCHITECTURE.md`, an ADR, a Concept, `CONTEXT.md`): fetch when you first need it, or when you need it and cannot quote the needed part verbatim from context. Never on a schedule, never "just in case," and never right after your own write — every write path already returns its result.
 
 #### Source-authority precedence
 
@@ -129,7 +150,7 @@ Once resolved, offer to fix the source immediately — never batch it. Detect wh
 
 When a term is resolved by explicit user answer: if `CONTEXT.md` doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule), then capture the term right there — don't batch these up, capture them as they happen.
 
-When resolved by a recorded assumption instead, follow *Stage assumptions in the ledger*: write the term immediately — the ledger entry tracks it as pending, and only treat it as finalized once the closing veto sweep clears it.
+When resolved by a feature assumption instead, follow *Stage decisions and assumptions in the ledger*: it stays ledger-only, not written here, until the closing veto sweep clears it into a Decision — that clearing is the write trigger.
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
@@ -137,7 +158,7 @@ When resolved by a recorded assumption instead, follow *Stage assumptions in the
 
 When an ADR or Concept is resolved by explicit user answer: if `ARCHITECTURE.md` (or `docs/adr/` / `docs/concepts/`) doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule) first, then capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
 
-When resolved by a recorded assumption instead, follow *Stage assumptions in the ledger*: write with `Status: proposed` immediately, and only treat it as finalized once the closing veto sweep clears it.
+When resolved by a feature assumption instead, follow *Stage decisions and assumptions in the ledger*: it stays ledger-only until the closing veto sweep clears it into a Decision — that clearing is the write trigger, not the feature assumption itself.
 
 #### Offer ADRs sparingly
 
@@ -163,6 +184,10 @@ If any of the three is missing, skip the Concept; otherwise the offer itself is 
 
 Before concluding a session that opened at least one full Concept/ADR record, output one disposition line per row in the `Crosscutting Concepts` and `Architecture Decision Records` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so every row gets an explicit verdict instead of silent omission. Skip this sweep for trivial sessions that only touched `CONTEXT.md` glossary terms and never opened a full Concept/ADR record.
 
-Also resolve every pending entry logged under *Stage assumptions in the ledger* against the Interview section's end-of-session assumption-veto list: cleared entries promote (`Status` → `accepted`; glossary terms need no further action); vetoed entries are reverted — ADR/Concept status/record undone, glossary term entry deleted from `CONTEXT.md`.
+Also resolve every entry logged under *Stage decisions and assumptions in the ledger* against the Interview section's end-of-session veto list:
+* **Cleared** — it becomes a user-approved Decision; write it to its durable document now (per *Update CONTEXT.md inline* / *Update ADRs and Concepts inline*) and update its ledger line to `decided by user, recorded: {{path}}`.
+* **Vetoed** — delete its ledger line; nothing changes on disk, because a Feature Assumption was never written to a durable document.
+
+A Recorded decision is not vetoable — the user approved it before it was written.
 
 Per row, also check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, blank cell). If found, refine the clause and apply it via `/trigger-indexer` **Keeping the indexes in sync**.

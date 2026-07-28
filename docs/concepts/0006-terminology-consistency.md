@@ -1,7 +1,5 @@
 # Terminology Consistency
 
-**Status:** accepted
-
 ## Purpose
 
 A term, once defined at its authoritative source (a skill's own wording, a Concept, an ADR, a glossary entry), gets referenced from many other places — other skills, later turns in the same session, future sessions. If a reference paraphrases or invents its own label instead of reusing the source's exact wording, that reference becomes unverifiable: nothing greps back to a definition, and the model can drift into treating one idea as two different things, or lose track that two mentions point to the same thing.

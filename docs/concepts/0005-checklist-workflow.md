@@ -1,7 +1,5 @@
 # Checklist-Driven Workflow
 
-**Status:** Accepted
-
 ## Purpose
 
 A multi-step skill or agent task with sequential, resumable steps — where skipping a step, losing progress after a context reset, or not returning to an earlier step after a failure would break correctness — needs an explicit anchor for progress. A Checklist-Driven Workflow embeds a literal Markdown checklist in the skill instructions that the agent copies into its own working notes at task start, checks off one item at a time as it executes, and re-consults before declaring the task done. It is not a Copilot/GPT/Claude feature; it is a reusable skill-authoring pattern any skill with an ordered, multi-step procedure can adopt.

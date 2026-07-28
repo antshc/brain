@@ -14,7 +14,6 @@ Every Concept is **indexed in `ARCHITECTURE.md`** under a `Crosscutting Concepts
 ```md
 # {{conceptTitle}}
 
-**Status:** proposed | accepted | deprecated | superseded by CONCEPT-NNNN
 
 ## Purpose
 <!-- 1-3 sentences.-->

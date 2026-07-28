@@ -1,7 +1,5 @@
 # Trigger Indexer
 
-**Status:** Accepted
-
 ## Purpose
 
 Any markdown table with a Trigger condition column risks two failure modes if every caller re-implements its own logic: inconsistent scan/match behavior between callers, and rows drifting out of sync with the records they list. This concept centralizes trigger generation, semantic scan/match, and row synchronization behind one skill so every caller can use the same table contract and every record add/supersede/retire updates its row in the same change.

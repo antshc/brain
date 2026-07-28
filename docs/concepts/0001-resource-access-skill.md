@@ -1,7 +1,5 @@
 # Resource Access Skill
 
-**Status:** Accepted
-
 ## Purpose
 
 A feature skill that needs infrastructure (a ticket tracker, a docs backend, an external API) risks coupling its callers directly to a specific vendor or tool. A Resource Access Skill encapsulates access to one category of infrastructure — similar to the iDesign Resource Access layer — so the backend can be replaced without affecting its callers.
