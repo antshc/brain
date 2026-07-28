@@ -4,7 +4,7 @@ A collection of GitHub Copilot agent plugins, skills, and Python tooling that au
 
 ## Context
 
-See [CONTEXT.md](CONTEXT.md) for the shared language — currently the Ralph Agent Workflow terms (`Harness Root`, `Worktree Path`, `Guardrails`, `Problem Log`).
+See [CONTEXT.md](CONTEXT.md) for the shared language;
 
 ## Building blocks
 
