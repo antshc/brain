@@ -33,10 +33,10 @@ Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{grillingContext}}`,
 
 1. If the table is absent or empty, return no matches.
 2. If the Trigger condition column is absent, return a table-contract error.
-3. For each row, read only its Trigger condition cell. A blank cell never matches.
+3. Read each row, especially its Trigger condition cell. A blank cell never matches.
 4. Split non-blank cells on commas. Match each clause semantically against the touched
    surface and grilling context, using the glossary for domain terms and paraphrases.
-5. Do not use a title or summary as a trigger. Open a linked record only when its locator is supplied and resolvable.
+5. Open a linked record only when its locator is supplied and resolvable.
 6. For matches, report the matched clauses and rationale. For non-matches, report the checked clauses and rationale.
 
 ### Keeping the indexes in sync

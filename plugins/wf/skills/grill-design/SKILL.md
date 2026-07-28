@@ -90,7 +90,7 @@ Every probe below stays live for the whole session: re-check its trigger after e
 
 #### Delegate code lookups to `explore`
 
-Every turn resends the whole transcript — raw tool output pulled into this context gets re-billed on every later turn. Default broad-sweep code checks (does this pattern/behavior exist elsewhere? who calls this? is the code's claim true across files/layers?) to the `explore` agent (`runSubagent`); consume only its condensed verdict, don't re-`view`/`grep` files it already reported. Reserve direct reads (targeted `view`/`grep`) for anchor-precision — the exact line, signature, or assertion needed to quote back to the user. Governs *Cross-reference with code*, *Trace through the layers*, and *Challenge which test categories must cover the change* below.
+Raw tool output re-bills every later turn. Default broad-sweep code checks (pattern exists elsewhere? who calls this? is the claim true across layers?) to the `explore` agent (`runSubagent`); consume only its verdict — don't re-`view`/`grep` files it reported. Reserve direct `view`/`grep` for anchor-precision: the exact line/signature/assertion to quote back. Governs *Cross-reference with code* and *Challenge which test categories must cover the change* below.
 
 #### Challenge against the glossary
 
