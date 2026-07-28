@@ -55,7 +55,7 @@ When a term is resolved, update `CONTEXT.md` right there.
 
 ### ARCHITECTURE.md
 
-When the structure or layering changes, update `ARCHITECTURE.md` right there. Whenever a Concept or ADR is added, superseded, or retired, call `/trigger-indexer` **Keeping the indexes in sync** in the same change to keep its index row current — not just when writing a brand-new record. Pass `{{indexFile}}`=`ARCHITECTURE.md`, `{{indexSection}}`=`Crosscutting Concepts` or `Architecture Decision Records`, and `{{recordDirectory}}`=`docs/concepts/` or `docs/adr/` explicitly in context — `/trigger-indexer` never assumes these.
+When the structure or layering changes, update `ARCHITECTURE.md` right there. Whenever an indexed record is added, superseded, or retired, call `/trigger-indexer` **Keeping the indexes in sync** in the same change to keep its row current — not just when writing a brand-new record. Pass the owning table's `{{tableMetadata}}` (file/section or table boundary, headers, Trigger condition column, and row locator rules), `{{rowMetadata}}` (row identity and explicit cell values), and `{{action}}` explicitly in context. `/trigger-indexer` never assumes a record type, path, directory, Summary column, or table shape.
 
 ## Keep each document in its lane
 
