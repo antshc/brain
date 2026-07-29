@@ -5,7 +5,7 @@ description: Hand a codebase lookup to the Explore subagent instead of reading f
 
 # Delegate Explore
 
-Run the `Explore` subagent for codebase lookups — it reads in its own context and returns a verdict, so the caller's context stays clean. The call blocks until the verdict returns; state the thoroughness (`quick`, `medium`, `thorough`) with the question.
+Spawn the `Explore` subagents for codebase lookups — it reads in its own context and returns a verdict, so the caller's context stays clean. The call blocks until the verdict returns; state the thoroughness (`quick`, `medium`, `thorough`) with the question.
 
 ## What to delegate
 
