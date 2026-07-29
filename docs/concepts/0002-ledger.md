@@ -30,8 +30,8 @@ Durable artifacts (`ARCHITECTURE.md`, ADRs, Concepts, `CONTEXT.md`) are the oppo
   - A Feature Assumption and a Feature Decision both live here **only** — never written to `ARCHITECTURE.md`, an ADR, a Concept, or `CONTEXT.md`. A Feature Assumption becomes eligible for a durable write only once the user clears it at the closing veto sweep, at which point it is a Decision and is written then (its line switches to `decided by user, recorded: {{path}}`).
 
 - Once any section grows large, stop re-scanning everything on every re-scope — compress resolved terms and decisions into a short summary, rely on that plus the Ledger, and re-open a full record only when a specific detail is needed again.
-- The Ledger belongs to the caller holding the session (e.g. `grill-design`), not to `trigger-indexer` — the indexer only returns match verdicts; tracking what is already open, what surface has been touched, and what has been decided is the caller's own state.
+- The Ledger belongs to the caller holding the session (e.g. `grill-design`), not to `index-docs` — it only returns match verdicts; tracking what is already open, what surface has been touched, and what has been decided is the caller's own state.
 
 ## Exceptions
 
-- A record retired mid-session is only reflected on the *next* index scan — content the caller already opened earlier in the same session is not retroactively invalidated by the Ledger; that is a scan/match concern (see the `Trigger Indexer` Concept), not the Ledger's own.
+- A record retired mid-session is only reflected on the *next* index scan — content the caller already opened earlier in the same session is not retroactively invalidated by the Ledger; that is a scan/match concern (see `index-docs`' Scan and match action), not the Ledger's own.

@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Actively build and sharpen the project's domain model as you grilling. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
-All `CONTEXT.md` reads, creates, and updates go through `/manage-docs`, which owns the glossary template and the lazy-creation rules — create it only when you have something to write, and if no `CONTEXT.md` exists, create one when the first term is resolved.
+All `CONTEXT.md` reads and updates go through `record-term`, which owns the glossary template and its content. `CONTEXT.md`'s existence is mandatory, not lazy: check whether it exists at session start; if not, call `bootstrap-docs` to create it immediately — don't wait for the first term to be ready.
 
 # Ground the input
 
@@ -32,7 +32,7 @@ Glossary:
 - [ ] Sharpen fuzzy or overloaded language into precise canonical terms
 - [ ] Stress-test domain relationships with concrete scenarios
 - [ ] Cross-reference stated behavior against the actual code
-- [ ] Offer to update `CONTEXT.md` inline as terms sharpen via `/manage-docs` — capture each resolved term as it happens, never batched.
+- [ ] Offer to update `CONTEXT.md` inline as terms sharpen via `record-term` — capture each resolved term as it happens, never batched.
 
 Requirements:
 - [ ] Surface every actor and their goal
@@ -64,7 +64,7 @@ When the user states how something works, check whether the code agrees. If you 
 
 **Probe — Update CONTEXT.md inline**
 
-When a term is resolved, capture it in `CONTEXT.md` right there via `/manage-docs` — don't batch, capture each as it happens. `CONTEXT.md` is a glossary and nothing else.
+When a term is resolved, capture it in `CONTEXT.md` right there via `record-term` — don't batch, capture each as it happens. `CONTEXT.md` is a glossary and nothing else.
 
 ### Line of inquiry: Requirements
 

@@ -45,6 +45,7 @@ _Avoid_: Client, buyer, account
 
 ## CONTEXT.md file
 
-A `CONTEXT.md` lives at the repo root. If it doesn't exist, create it lazily when the first term is resolved.
+A `CONTEXT.md` lives at the repo root, created mandatorily by `bootstrap-docs` at session start if
+it doesn't exist yet.
 
 When `CONTEXT.md` covers multiple contexts, infer which one the current topic relates to. If unclear, ask.

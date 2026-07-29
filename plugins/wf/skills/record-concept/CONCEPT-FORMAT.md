@@ -44,6 +44,4 @@ See *"When to write a Concept"* in [SKILL.md](./SKILL.md) for the criteria
 
 ## Keeping the index in sync
 
-When you add, supersede, or retire a Concept, update the `Crosscutting Concepts` table in `ARCHITECTURE.md` in the same change.
-
-
+When you add, supersede, or retire a Concept, call `index-docs`' **Sync index row** in the same change to update the `Crosscutting Concepts` table in `ARCHITECTURE.md`.

@@ -66,7 +66,7 @@ Single repo — docs and codebase live together, no `workspace/` split.
 
 - Author `CONTEXT.md`, `ARCHITECTURE.md`, ADRs (`docs/adr/`), and Crosscutting Concepts (`docs/concepts/`) at the repo root.
 - Keep `CONTEXT.md` and `ARCHITECTURE.md` high-level — no implementation details, specs, or scratch notes.
-- These docs, their templates, and their lazy-creation rules are owned by the `wf` plugin's `/manage-docs` skill — don't hand-author them outside it. Capture each resolved term, rule, Concept, or ADR the moment it crystallises — never batch documentation updates.
+- These docs, their templates, and their lazy-creation rules are owned by the `wf` plugin's `bootstrap-docs`/`record-term`/`index-docs`/`record-adr`/`record-concept`/`record-service` skills — don't hand-author them outside those. Capture each resolved term, rule, Concept, or ADR the moment it crystallises — never batch documentation updates.
 
 ### Ticket tracker
 

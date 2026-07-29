@@ -5,6 +5,10 @@ description: A relentless interview that sharpens a plan or design while activel
 
 # Grill Design
 
+## Managing the docs
+
+Missing `ARCHITECTURE.md`/`CONTEXT.md` → create immediately via `bootstrap-docs` **Mandatory creation**; skip if both exist.
+
 ## Interview
 
 Interview me relentlessly about every aspect of this until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
@@ -25,31 +29,20 @@ Do not act on it until I confirm we have reached a shared understanding.
 
 ## Domain Modeling
 
-Alongside the interview, actively build and sharpen the project's domain model as you design — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. Merely *reading* `CONTEXT.md`, `ARCHITECTURE.md`, Concepts, or ADRs for guardrails isn't enough here: grill-design changes the model, not just consumes it.
-
-### Managing the docs
-
-All doc reads, creates, and updates go through `/manage-docs` — it owns document templates, file locations, lazy-creation rules, and `ARCHITECTURE.md` index sync. **Invoke `/manage-docs`** (and the relevant `*-FORMAT.md`) before touching any of these documents, if not already loaded this session — don't recall its rules from memory.
-
-**Documents**:
-- `CONTEXT.md` — glossary (the *language*).
-- `ARCHITECTURE.md` — structural map + Concepts/ADRs index.
-- `docs/concepts/` — Crosscutting Concepts: backbone rules.
-- `docs/adr/` — ADRs: localized decisions.
+Alongside the interview, actively build and sharpen the project's domain model as you design — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. Merely *reading* `CONTEXT.md`, `ARCHITECTURE.md`, Concepts, or ADRs for guardrails isn't enough here: Domain Modeling changes the model, not just consumes it.
 
 ### Load strategy guardrails
 
 Before designing or grilling:
 
-1. If `ARCHITECTURE.md` doesn't exist yet, offer to create it right away, per `/manage-docs`'s `Lazy creation` rule — don't wait for a term, rule, Concept, or ADR to be ready to capture (that's a separate trigger; see *Update CONTEXT.md inline*, *Update ADRs and Concepts inline*, *Offer ADRs/Concepts sparingly*). Once created, skip *this load step only* — nothing beyond the required sections exists yet to read.
-2. Read `ARCHITECTURE.md` in full: `Building blocks` → Services list, and the complete `Crosscutting Concepts`/`Architecture Decision Records` index tables — every row. All three sections are optional (`ARCHITECTURE-FORMAT.md`) — skip gracefully if absent, don't treat as a gap. Multi-part sections need multiple ranged reads — never stop at a partial read.
-3. **Match applicable records via `/trigger-indexer` Scan and match** — indexing alone never implies relevance; delegate semantic Trigger-condition matching to `/trigger-indexer`, passing the caller-supplied table metadata, the current change's touched surface, grilling context, and glossary. Use it for Services, ADRs, Concepts, or any other indexed table; open a linked full record only when the returned verdict matches. Log every returned verdict in the session ledger's `Opened records` section (*Track opened records*): matches as `{{path}} — opened, trigger matched: "{{clause}}"`; non-matches as `{{path}} — skipped, checked "{{clause1}}", "{{clause2}}": no semantic match`.
-4. Sections inside an opened record are themselves optional (a Concept's Exceptions/Examples; an ADR's Considered Options/Consequences; a service doc's API Contracts/Tweaks/Persisted data/Key features) — a missing one means "not documented."
-5. Extract:
+1. Read `ARCHITECTURE.md` in full: `Building blocks` → Services list, and the complete `Crosscutting Concepts`/`Architecture Decision Records` index tables — every row. All three sections are optional skip gracefully if absent, don't treat as a gap. Multi-part sections need multiple ranged reads — never stop at a partial read.
+2. **Match applicable records via `index-docs`' Scan and match** — indexing alone never implies relevance; delegate semantic Trigger-condition matching to `index-docs`, passing the touched surface, grilling context, and glossary. Covers Services, ADRs, and Concepts; open a linked full record only when the returned verdict matches. Log every returned verdict in the session ledger's `Opened records` section (*Track opened records*): matches as `{{path}} — opened, trigger matched: "{{clause}}"`; non-matches as `{{path}} — skipped, checked "{{clause1}}", "{{clause2}}": no semantic match`.
+3. Sections inside an opened record are themselves optional (a Concept's Exceptions/Examples; an ADR's Considered Options/Consequences; a service doc's API Contracts/Tweaks/Persisted data/Key features) — a missing one means "not documented."
+4. Extract:
    * **Mandates** — required concepts, patterns and boundaries.
    * **Prohibitions** — explicitly rejected approaches, rejected considered options.
    * **Open space** — unconstrained choices.
-6. Use these guardrails to frame questions, scenarios, and alternatives.
+5. Use these guardrails to frame questions, scenarios, and alternatives.
 * A Concept-violating option must not be presented as equally valid — cite the Concept and surface the conflict.
 * An option that contradicts a considered-and-rejected ADR alternative must not be presented as equally valid.
 
@@ -76,7 +69,7 @@ The ledger's `Touched surface` section accumulates surface terms extracted from 
 
 On each triggering turn (user answer / new fact):
 * **No new surface term** — reason over the in-context index copy; no scan, no write.
-* **New term(s)** — append them to `Touched surface`, then run `/trigger-indexer` **Scan and match** passing only the new terms, against the not-yet-`opened` rows only. Update existing row lines in place; never append a duplicate.
+* **New term(s)** — append them to `Touched surface`, then run `index-docs`' **Scan and match** passing only the new terms, against the not-yet-`opened` rows only. Update existing row lines in place; never append a duplicate.
 
 #### Stage decisions and assumptions in the ledger
 
@@ -112,7 +105,7 @@ Always runs, every change. Check `Crosscutting Concepts` index in `ARCHITECTURE.
 
 #### Scan and match (surface-driven)
 
-Driven entirely by *Track the touched surface* above: a `/trigger-indexer` **Scan and match** call happens only when the touched surface gains a new term, scoped to that term, against not-yet-`opened` rows. This verdict is **monotonic** — once a row matches, it stays matched as the surface only grows; there's no need to re-check an already-`opened` row here.
+Driven entirely by *Track the touched surface* above: an `index-docs` **Scan and match** call happens only when the touched surface gains a new term, scoped to that term, against not-yet-`opened` rows. This verdict is **monotonic** — once a row matches, it stays matched as the surface only grows; there's no need to re-check an already-`opened` row here.
 
 #### Classify conflicts
 
@@ -148,37 +141,19 @@ Once resolved, offer to fix the source immediately — never batch it. Detect wh
 
 #### Update CONTEXT.md inline
 
-When a term is resolved by explicit user answer: if `CONTEXT.md` doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule), then capture the term right there — don't batch these up, capture them as they happen.
+When a term is resolved by explicit user answer, call `record-term` immediately — don't batch these up, capture them as they happen. `CONTEXT.md` already exists (created mandatorily by `bootstrap-docs` at session start, per *Load strategy guardrails*); `record-term` owns the write and the glossary-only guardrail.
 
 When resolved by a feature assumption instead, follow *Stage decisions and assumptions in the ledger*: it stays ledger-only, not written here, until the closing veto sweep clears it into a Decision — that clearing is the write trigger.
 
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
-
 #### Update ADRs and Concepts inline
 
-When an ADR or Concept is resolved by explicit user answer: if `ARCHITECTURE.md` (or `docs/adr/` / `docs/concepts/`) doesn't exist yet, create it via `/manage-docs` (per its `## Lazy creation` rule) first, then capture it in `ARCHITECTURE.md` right there via `/manage-docs` skill `Inline-update discipline` — don't batch these up, capture them as they happen.
+When an ADR or Concept is resolved by explicit user answer, call `record-adr` or `record-concept` immediately — the explicit answer is the approval, so it writes right away rather than as an offer. Don't batch these up, capture them as they happen.
 
 When resolved by a feature assumption instead, follow *Stage decisions and assumptions in the ledger*: it stays ledger-only until the closing veto sweep clears it into a Decision — that clearing is the write trigger, not the feature assumption itself.
 
-#### Offer ADRs sparingly
+#### Offer ADRs and Concepts sparingly
 
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse** — the cost of changing your mind later is meaningful
-2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
-
-If any of the three is missing, skip the ADR; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via `/manage-docs` skill `Inline-update discipline` (which owns the ADR template) once the user explicitly responds to that specific offer. If `docs/adr/` (or `ARCHITECTURE.md`) doesn't exist yet, that capture step creates it first, per `/manage-docs`' `## Lazy creation` rule.
-
-#### Offer Concepts sparingly
-
-A Concept captures a *backbone* decision: the top-level decomposition, or a mandated architectural/design pattern that every feature of a given kind must follow. Write one (instead of, or in addition to, an ADR) only when all three are true:
-
-1. **Structural** — it shapes the top-level decomposition or mandates a pattern, rather than settling one local question.
-2. **Reusable** — future features of the same kind are expected to follow it every time.
-3. **Backbone-defining** — it is the set of foundational decisions that hold the architecture together and constrain everything built on top of them.
-
-If any of the three is missing, skip the Concept; otherwise the offer itself is the approval gate — draft it, present it, and only capture it via the `manage-docs` skill `Inline-update discipline` section once the user explicitly responds to that specific offer. If `docs/concepts/` (or `ARCHITECTURE.md`) doesn't exist yet, that capture step creates it first, per `/manage-docs`' `## Lazy creation` rule.
+Whether a decision warrants an ADR or a Concept is `record-adr`/`record-concept`'s own gate — not restated here. Before offering either, check that skill's "when to write" criteria; if it doesn't clear the gate, don't offer it. If it does, the offer itself is the approval gate — draft it, present it, and only invoke `record-adr`/`record-concept` to write once the user explicitly responds to that specific offer.
 
 #### Closing completeness sweep
 
@@ -190,4 +165,4 @@ Also resolve every entry logged under *Stage decisions and assumptions in the le
 
 A Recorded decision is not vetoable — the user approved it before it was written.
 
-Per row, also check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, blank cell). If found, refine the clause and apply it via `/trigger-indexer` **Keeping the indexes in sync**.
+Per row, also check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, blank cell). If found, refine the clause and apply it via `index-docs`' **Sync index row**.

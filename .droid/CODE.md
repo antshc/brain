@@ -63,4 +63,4 @@ If <step N> fails, return to Step <M>.
 
 ## Tests
 
-N/A — no automated tests for markdown files. Validate changes with the `verify-instructions` skill before committing.
+N/A — no automated tests for markdown files.

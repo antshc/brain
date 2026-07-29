@@ -85,7 +85,7 @@ Use text search only for literals, configuration, generated files, or when the L
 - MUST author all docs (`CONTEXT.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts) at the reporoot; MUST NOT author docs inside `workspace/`.
 - MUST keep `CONTEXT.md` and `ARCHITECTURE.md` high-level — no implementation details, specs, or scratch notes.
 - SHOULD cross-reference plans against code under `workspace/{{codeRepoName}}`.
-- These docs, their templates, and their lazy-creation rules are owned by the `wf` plugin's `/manage-docs` skill — don't hand-author them outside it. Capture each resolved term, rule, Concept, or ADR the moment it crystallises — never batch documentation updates.
+- These docs, their templates, and their lazy-creation rules are owned by the `wf` plugin's `bootstrap-docs`/`record-term`/`index-docs`/`record-adr`/`record-concept`/`record-service` skills — don't hand-author them outside those. Capture each resolved term, rule, Concept, or ADR the moment it crystallises — never batch documentation updates.
 
 ## 8. Skills
 

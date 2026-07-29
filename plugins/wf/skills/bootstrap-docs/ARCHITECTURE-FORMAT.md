@@ -44,7 +44,7 @@ graph TD
 \```
 #### Services
 
-Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. The Trigger condition is a concise, comma-separated set of domain phrases that may be used during grilling; `/trigger-indexer` matches it semantically against the caller's touched surface and grilling context. A link to a full doc (built from [BUILDING-BLOCK-SERVICE-FORMAT.md](./BUILDING-BLOCK-SERVICE-FORMAT.md)) is optional — add it only for non-trivial services.
+Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. The Trigger condition is a concise, comma-separated set of domain phrases that may be used during grilling; `index-docs` matches it semantically against the caller's touched surface and grilling context. A link to a full doc (built by the `record-service` skill) is optional — add it only for non-trivial services.
 
 | Service | Trigger condition | Summary |
 |---------|-------------------|---------|
@@ -74,9 +74,9 @@ Documents where the building blocks run (environments, hosts, containers) and th
 
 ## Architecture Decision Records *(optional)*
 
-An ADR records a point-in-time, localized decision — hard to reverse, non-obvious, and the result of a real trade-off. See [ADR-FORMAT.md](./ADR-FORMAT.md).
+An ADR records a point-in-time, localized decision — hard to reverse, non-obvious, and the result of a real trade-off. See the `record-adr` skill.
 
-<!-- The index of ADRs. One row per ADR: {{nnnn}} is the sequential ADR number, {{slug}} its slug, {{decisionTitle}} its short title, {{triggerCondition}} a concise, comma-separated set of domain phrases that would naturally arise while grilling the change, {{summary}} a 1-3 sentence agent-optimized summary. Callers pass this table's headers, Trigger condition column, row metadata, touched surface, grilling context, and glossary to /trigger-indexer; matching is semantic and does not depend on exact wording. -->
+<!-- The index of ADRs. One row per ADR: {{nnnn}} is the sequential ADR number, {{slug}} its slug, {{decisionTitle}} its short title, {{triggerCondition}} a concise, comma-separated set of domain phrases that would naturally arise while grilling the change, {{summary}} a 1-3 sentence agent-optimized summary. Callers pass this table's headers, Trigger condition column, row metadata, touched surface, grilling context, and glossary to `index-docs`; matching is semantic and does not depend on exact wording. -->
 
 | # | Decision | Trigger condition | Summary |
 |---|----------|--------------------|---------|
@@ -90,7 +90,7 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{nnnn}} is the sequential Concept number, {{slug}} its slug, {{conceptTitle}} its title, {{triggerCondition}} a concise, comma-separated set of domain phrases that would naturally arise while grilling the change, {{summary}} a terse, agent-optimized summary. Callers pass this table's headers, Trigger condition column, row metadata, touched surface, grilling context, and glossary to /trigger-indexer; blank cells never match. See [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md). -->
+<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{nnnn}} is the sequential Concept number, {{slug}} its slug, {{conceptTitle}} its title, {{triggerCondition}} a concise, comma-separated set of domain phrases that would naturally arise while grilling the change, {{summary}} a terse, agent-optimized summary. Callers pass this table's headers, Trigger condition column, row metadata, touched surface, grilling context, and glossary to `index-docs`; blank cells never match. See the `record-concept` skill. -->
 
 | # | Concept | Trigger condition | Summary |
 |---|----------|--------------------|---------|
@@ -109,6 +109,6 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 
 ## Relationship to the other documents
 
-- **`CONTEXT.md`** — the glossary (the *language*). `ARCHITECTURE.md` is the *structure*.
-- **`docs/concepts/` (Concepts)** — the backbone concepts, indexed in the `Crosscutting Concepts` section. Use [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md).
-- **`docs/adr/` (ADRs)** — localized, often non-obvious decisions, indexed in the `Architecture Decision Records` table. Use [ADR-FORMAT.md](./ADR-FORMAT.md).
+- **`CONTEXT.md`** — the glossary (the *language*). `ARCHITECTURE.md` is the *structure*. Owned by the `record-term` skill.
+- **`docs/concepts/` (Concepts)** — the backbone concepts, indexed in the `Crosscutting Concepts` section. Owned by the `record-concept` skill.
+- **`docs/adr/` (ADRs)** — localized, often non-obvious decisions, indexed in the `Architecture Decision Records` table. Owned by the `record-adr` skill.

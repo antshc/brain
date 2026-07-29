@@ -54,6 +54,6 @@ If a decision is easy to reverse, skip it — you'll just reverse it. If it's no
 
 ## Keeping the index in sync
 
-When you add, supersede, or retire an ADR, update the `## Architecture Decision Records` table in
-`ARCHITECTURE.md` in the same change. The index summary must match the ADR's `**Summary:**`
-line.
+When you add, supersede, or retire an ADR, call `index-docs`' **Sync index row** in the
+same change to update the `## Architecture Decision Records` table in `ARCHITECTURE.md`. The index
+summary must match the ADR's `**Summary:**` line.
