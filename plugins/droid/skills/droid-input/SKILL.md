@@ -24,7 +24,8 @@ Input Progress:
 ## Step 2: Resolve CODE_PATH, VERIFY_PATH, MEMORY_PATH, LOG_PATH
 
 ```text
-CODE_PATH, VERIFY_PATH, MEMORY_PATH, LOG_PATH := matching HARNESS_SETTINGS values for each still-unset path: use $HARNESS_ROOT/.droid/<FILE> when that file exists CODE.md, VERIFY.md, MEMORY.md, LOG.md
+CODE_PATH, VERIFY_PATH, MEMORY_PATH, LOG_PATH := matching HARNESS_SETTINGS valuesfor each still-unset path: use $HARNESS_ROOT/.droid/<FILE> when that file exists
+  # FILE = CODE.md, VERIFY.md, MEMORY.md, LOG.md
 ```
 
 `$HARNESS_ROOT/.droid/` is the only location checked — never scan or search elsewhere. Substitute `HARNESS_ROOT` literally wherever `$HARNESS_ROOT` appears. Harness Settings values are deliberate overrides and always win; without them the agent runs directly against `.droid/` under cwd.
