@@ -44,7 +44,7 @@ graph TD
 \```
 #### Services
 
-Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. The Trigger condition is a concise, comma-separated set of domain phrases that may be used during grilling; `index-docs` matches it semantically against the caller's touched surface and grilling context. A link to a full doc (built by the `record-service` skill) is optional — add it only for non-trivial services.
+Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. The Trigger condition is a concise, comma-separated set of domain phrases that may be used during grilling; `index-docs` matches it semantically against the caller's touched surface and grilling context. A link to a full doc is optional — `record-service` owns when one is written.
 
 | Service | Trigger condition | Summary |
 |---------|-------------------|---------|
@@ -103,7 +103,7 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 - **One directional layering.** State the dependency direction explicitly and the prohibited references. The arrows are the contract.
 - **Index every concept.** The `Crosscutting Concepts` table is the entry point a reader (or agent) scans before designing. Every record in `docs/concepts/` appears here with a matching Trigger condition and summary; nothing is added or retired without updating this table.
 - **Link, don't inline.** Backbone decisions live in `docs/concepts/` and are *linked* from the index — keep their full content out of `ARCHITECTURE.md` so the map stays scannable.
-- **Index every ADR.** The `## Architecture Decision Records` table is the entry point a reader (or agent) scans before designing. Every record in `docs/adr/` appears here with a matching Trigger condition and summary; nothing is added or retired without updating this table.
+- **Index every ADR.** The `Architecture Decision Records` table is the entry point a reader (or agent) scans before designing. Every record in `docs/adr/` appears here with a matching Trigger condition and summary; nothing is added or retired without updating this table.
 - **Link, don't inline.** Localized decisions live in `docs/adr/` and are *linked* from the index — keep their full content out of `ARCHITECTURE.md` so the map stays scannable.
 - **Keep it current.** When the structure or layering changes, update this file in the same change; a stale architecture map is worse than none.
 

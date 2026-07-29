@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Actively build and sharpen the project's domain model as you grilling. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
-All `CONTEXT.md` reads and updates go through `record-term`, which owns the glossary template and its content. `CONTEXT.md`'s existence is mandatory, not lazy: check whether it exists at session start; if not, call `bootstrap-docs` to create it immediately — don't wait for the first term to be ready.
+All `CONTEXT.md` reads and updates go through `record-term`, which owns the glossary template and its content. `CONTEXT.md`'s existence is mandatory, not lazy: check whether it exists at session start; if not, run `/bootstrap-docs`' **Mandatory creation** immediately — don't wait for the first term to be ready.
 
 # Ground the input
 

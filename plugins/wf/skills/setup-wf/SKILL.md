@@ -1,6 +1,6 @@
 ---
 name: setup-wf
-description: One-time wf-plugin setup — confirms single-repo vs. wrapping/harness-repo topology, seeds `.github/copilot-instructions.md` accordingly, and creates the ticket-tracker labels. Run once before first use of the other wf skills.
+description: One-time wf-plugin setup — confirms single-repo vs. wrapping/harness-repo topology, seeds `.github/copilot-instructions.md` accordingly, bootstraps ARCHITECTURE.md/CONTEXT.md, and creates the ticket-tracker labels. Run once before first use of the other wf skills.
 disable-model-invocation: true
 ---
 
@@ -32,7 +32,12 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 - Create `.github/copilot-instructions.md` if missing. If present, append only missing sections — no duplicate headings, no overwriting unrelated content.
 - Resolve every `{{placeholder}}` (e.g. `{{boardRepoName}}`, `{{codeRepoName}}`, `{{codeRepoSlug}}`) before writing — never leave a raw `{{...}}`. Drop sections 4/5/8/9 rows if no matching tooling/dependencies/skills exist beyond `gh`. For a single repo, drop/adjust `workspace/`-specific wording (sections 1, 2, 6).
 
-## 3. Set up the ticket tracker
+## 3. Bootstrap the docs
+
+Run `/bootstrap-docs`' **Mandatory creation** at the docs root (reporoot for a wrapping repo).
+This is the once-per-repo firing of that guarantee;
+
+## 4. Set up the ticket tracker
 
 Run `/manage-backlog` action **Setup labels**.
 
@@ -40,4 +45,5 @@ Run `/manage-backlog` action **Setup labels**.
 
 - Topology confirmed; `workspace/` split (if any) set up.
 - Copilot instructions seeded in `.github/copilot-instructions.md`, placeholders resolved, no duplicate sections.
+- `ARCHITECTURE.md` and `CONTEXT.md` exist.
 - `/manage-backlog` **Setup labels** ran without error.

@@ -90,7 +90,7 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
-**Record inline** — resolved by explicit user answer → call `/record-term`, `/record-adr`, `/record-concept`, or `/record-service` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*). Proposing an ADR or Concept unprompted → check the target skill's own gate first, then *offer*, and invoke it only once the user explicitly responds to that offer.
+**Record inline** — resolved by explicit user answer → run `/record-term`, `/record-adr`, `/record-concept`, or `/record-service` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*). Proposing an ADR or Concept unprompted → check the target skill's own gate first, then *offer*, and run it only once the user explicitly responds to that offer.
 
 ## Closing sweep
 

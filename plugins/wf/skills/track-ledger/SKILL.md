@@ -26,7 +26,7 @@ Returns the written line.
 
 ## Append surface term
 
-Writes into `## Touched surface` — the accumulated surface terms (module, boundary, service,
+Writes into `Touched surface` — the accumulated surface terms (module, boundary, service,
 entity, data shape, behavior, interface, change type) extracted from the session so far. This is
 the cache key that makes a `skipped` verdict re-checkable: a `skipped` line is only valid for the
 surface known at the turn it was written.

@@ -25,7 +25,7 @@ skill's own mechanics.
 
 ## Keeping the index in sync
 
-When an ADR is added, superseded, or retired, call `index-docs`' **Sync index row** in
-the same change — never edit the `Architecture Decision Records` table in `ARCHITECTURE.md`
-directly. The index summary must match the ADR's own content.
+When an ADR is added, superseded, or retired, run `/index-docs`' **Ensure section exists** for
+`Architecture Decision Records`, then its **Sync index row** in the same change — never edit the
+table in `ARCHITECTURE.md` directly. The index summary must match the ADR's own content.
 

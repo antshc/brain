@@ -1,6 +1,6 @@
-# {{serviceName}}
+# {{buildingBlockName}}
 
-<!-- Purpose/Responsibility: 1-3 sentences on what the service is (container/process name, deployment type — e.g. feature module vs. independent service) and its core responsibility. The `{{serviceName}}` placeholder appears only in this top heading; all section headings below are plain. -->
+<!-- Purpose/Responsibility: 1-3 sentences on what the building block is (container/process name, deployment type — e.g. feature module vs. independent service) and its core responsibility. -->
 
 ## API Contracts
 
@@ -16,11 +16,11 @@
 
 ## Source code folder structure
 
-<!-- A tree of the service's source folders with a one-line description per folder/layer. Number of layers varies per service (e.g. main application layer, platform integration layer, core layer). -->
+<!-- A tree of the building block's source folders with a one-line description per folder. -->
 
 ### Layers (`{{location}}/` folder)
 
-*(optional)* <!-- A tree of the service's source folders with a one-line description per folder/layer. Number of layers varies per service (e.g. main application layer, platform integration layer, core layer). -->
+*(optional)* <!-- One subsection per layer when a single tree isn't enough; the number of layers varies (e.g. main application layer, platform integration layer, core layer). -->
 
 ## Concepts
 

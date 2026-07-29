@@ -39,6 +39,7 @@ are all this skill's own mechanics.
 
 ## Keeping the index in sync
 
-When a Concept is added, superseded, or retired, call `index-docs`' **Sync index row**
-in the same change — never edit the `Crosscutting Concepts` table in `ARCHITECTURE.md` directly.
+When a Concept is added, superseded, or retired, run `/index-docs`' **Ensure section exists** for
+`Crosscutting Concepts`, then its **Sync index row** in the same change — never edit the table in
+`ARCHITECTURE.md` directly.
 

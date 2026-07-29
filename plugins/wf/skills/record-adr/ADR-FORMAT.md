@@ -7,7 +7,7 @@ ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slu
 
 Create the `docs/adr/` directory lazily — only when the first ADR is needed.
 
-Every ADR is **indexed in `ARCHITECTURE.md`** under a `## Architecture Decision Records` section with a
+Every ADR is **indexed in `ARCHITECTURE.md`** under an `Architecture Decision Records` section with a
 one-line summary and a link. The index is the entry point: read it during a modeling
 session, and open the full ADR only when a decision is relevant to the work at hand.
 
@@ -57,6 +57,6 @@ If a decision is easy to reverse, skip it — you'll just reverse it. If it's no
 
 ## Keeping the index in sync
 
-When you add, supersede, or retire an ADR, call `index-docs`' **Sync index row** in the
-same change to update the `## Architecture Decision Records` table in `ARCHITECTURE.md`. The index
+When you add, supersede, or retire an ADR, run `/index-docs`' **Sync index row** in the
+same change to update the `Architecture Decision Records` table in `ARCHITECTURE.md`. The index
 summary must match the ADR's `**Summary:**` line.

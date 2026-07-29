@@ -1,6 +1,6 @@
 ---
 name: index-docs
-description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, Deployment View), host ARCHITECTURE-FORMAT.md, and own the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Services, ADR, Concept, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
+description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, Deployment View), host ARCHITECTURE-FORMAT.md, insert missing section skeletons into ARCHITECTURE.md, and own the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Services, ADR, Concept, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
 ---
 
 # Index Docs
@@ -19,7 +19,14 @@ Update `ARCHITECTURE.md` in the same change as the structure/layering shift it r
 
 ## Existence and sections
 
-`bootstrap-docs` handles mandatory creation of `ARCHITECTURE.md` and, via its *Ensure section exists* mechanic, inserts the `Building blocks`, `Architecture Decision Records`, or `Crosscutting Concepts` skeleton on first need. `index-docs` supplies the skeleton content; `bootstrap-docs` only inserts it.
+`bootstrap-docs` mandatorily creates `ARCHITECTURE.md` with its required sections only. Everything inside the file is this skill's: the structural prose, the three indexes, and the section skeletons.
+
+## Ensure section exists
+
+Inputs: `{{sectionAnchor}}` (e.g. `Architecture Decision Records`, `Crosscutting Concepts`, the `Services` table under `Building blocks`); optionally `{{skeletonContent}}`.
+
+1. If `{{sectionAnchor}}` already exists in `ARCHITECTURE.md`, do nothing.
+2. Otherwise insert its skeleton — `{{skeletonContent}}` when the caller supplies one (custom tables), else the skeleton for that section from [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md) — at the position the template gives it.
 
 ## Generate trigger condition
 
