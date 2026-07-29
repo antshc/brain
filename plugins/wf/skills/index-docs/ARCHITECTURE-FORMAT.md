@@ -1,10 +1,5 @@
 # ARCHITECTURE.md Format
-<!--
-`ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it
-follows, and the index of backbone Crosscutting Concepts. It is the structural counterpart to
-`CONTEXT.md` (which is the glossary). Keep it about *shape and rules*, not implementation
-detail — the detail lives in the code and in the Crosscutting Concepts it links to.
--->
+<!-- `ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it follows, and the index of backbone Crosscutting Concepts. It is the structural counterpart to `CONTEXT.md` (which is the glossary). Keep it about *shape and rules*, not implementation detail — the detail lives in the code and in the Crosscutting Concepts it links to. -->
 
 ## Structure
 <!--
@@ -44,7 +39,7 @@ graph TD
 \```
 #### Services
 
-Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. The Trigger condition is a concise, comma-separated set of domain phrases that may be used during grilling; `index-docs` matches it semantically against the caller's touched surface and grilling context. A link to a full doc is optional — `record-service` owns when one is written.
+Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. The Trigger condition is a concise, comma-separated set of domain phrases matched semantically against the caller's touched surface. The link to a full doc is optional — `record-service` owns when one is written.
 
 | Service | Trigger condition | Summary |
 |---------|-------------------|---------|
@@ -76,7 +71,7 @@ Documents where the building blocks run (environments, hosts, containers) and th
 
 An ADR records a point-in-time, localized decision — hard to reverse, non-obvious, and the result of a real trade-off. See the `record-adr` skill.
 
-<!-- The index of ADRs. One row per ADR: {{nnnn}} is the sequential ADR number, {{slug}} its slug, {{decisionTitle}} its short title, {{triggerCondition}} a concise, comma-separated set of domain phrases that would naturally arise while grilling the change, {{summary}} a 1-3 sentence agent-optimized summary. Callers pass this table's headers, Trigger condition column, row metadata, touched surface, grilling context, and glossary to `index-docs`; matching is semantic and does not depend on exact wording. -->
+<!-- One row per ADR. {{nnnn}}/{{slug}}: file identity. {{decisionTitle}}: short title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while grilling the change. {{summary}}: 1-3 agent-optimized sentences. See the `record-adr` skill. -->
 
 | # | Decision | Trigger condition | Summary |
 |---|----------|--------------------|---------|
@@ -90,7 +85,7 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- The index of Concepts — the backbone rules of the solution. One row per concept: {{nnnn}} is the sequential Concept number, {{slug}} its slug, {{conceptTitle}} its title, {{triggerCondition}} a concise, comma-separated set of domain phrases that would naturally arise while grilling the change, {{summary}} a terse, agent-optimized summary. Callers pass this table's headers, Trigger condition column, row metadata, touched surface, grilling context, and glossary to `index-docs`; blank cells never match. See the `record-concept` skill. -->
+<!-- One row per Concept — the backbone rules of the solution. {{nnnn}}/{{slug}}: file identity. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while grilling the change; a blank cell never matches. {{summary}}: terse, agent-optimized. See the `record-concept` skill. -->
 
 | # | Concept | Trigger condition | Summary |
 |---|----------|--------------------|---------|
@@ -101,14 +96,5 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 
 - **Shape, not steps.** Describe how the system is decomposed and the rules that hold it together. Step-by-step "how to build X" guidance belongs in a Concept (`docs/concepts/`) or the code, not here.
 - **One directional layering.** State the dependency direction explicitly and the prohibited references. The arrows are the contract.
-- **Index every concept.** The `Crosscutting Concepts` table is the entry point a reader (or agent) scans before designing. Every record in `docs/concepts/` appears here with a matching Trigger condition and summary; nothing is added or retired without updating this table.
-- **Link, don't inline.** Backbone decisions live in `docs/concepts/` and are *linked* from the index — keep their full content out of `ARCHITECTURE.md` so the map stays scannable.
-- **Index every ADR.** The `Architecture Decision Records` table is the entry point a reader (or agent) scans before designing. Every record in `docs/adr/` appears here with a matching Trigger condition and summary; nothing is added or retired without updating this table.
-- **Link, don't inline.** Localized decisions live in `docs/adr/` and are *linked* from the index — keep their full content out of `ARCHITECTURE.md` so the map stays scannable.
-- **Keep it current.** When the structure or layering changes, update this file in the same change; a stale architecture map is worse than none.
-
-## Relationship to the other documents
-
-- **`CONTEXT.md`** — the glossary (the *language*). `ARCHITECTURE.md` is the *structure*. Owned by the `record-term` skill.
-- **`docs/concepts/` (Concepts)** — the backbone concepts, indexed in the `Crosscutting Concepts` section. Owned by the `record-concept` skill.
-- **`docs/adr/` (ADRs)** — localized, often non-obvious decisions, indexed in the `Architecture Decision Records` table. Owned by the `record-adr` skill.
+- **Index everything.** Every record in `docs/concepts/` and `docs/adr/` appears in its table with a matching Trigger condition and summary. The tables are the entry point an agent scans before designing; nothing is added or retired without updating them.
+- **Link, don't inline.** Full record content stays in `docs/concepts/`/`docs/adr/` and is *linked* from the index, so the map stays scannable.

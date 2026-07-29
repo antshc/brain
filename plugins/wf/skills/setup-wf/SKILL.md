@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Setup WF
 
-Sets up the environment for wf's domain-modeling skills: **single repo** (docs + codebase together) or **wrapping/harness repo** (multi-root workspace; reporoot tracks docs/decisions, codebase in a separate git-ignored `workspace/` repo). Self-contained — no dependency on notes from the current environment.
+Sets up the environment for wf's domain-modeling skills: **single repo** (docs + codebase together) or **wrapping/harness repo** (multi-root workspace; reporoot tracks docs/decisions, codebase in a separate git-ignored `workspace/` repo).
 
 ## 1. Confirm topology
 
@@ -34,8 +34,7 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 3. Bootstrap the docs
 
-Run `/bootstrap-docs`' **Mandatory creation** at the docs root (reporoot for a wrapping repo).
-This is the once-per-repo firing of that guarantee;
+Run `/bootstrap-docs`' **Mandatory creation** at the docs root (reporoot for a wrapping repo) — the once-per-repo firing of that guarantee.
 
 ## 4. Set up the ticket tracker
 

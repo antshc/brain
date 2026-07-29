@@ -37,15 +37,5 @@ _Avoid_: Client, buyer, account
 - **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`.
 - **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does.
 - **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
-- **Single context.** When a project has only one context, organize all terms under that context heading.
-- **Group under context.** Terms should be organized under the relevant context to maintain clarity.
-- **Multiple contexts in the Context.md file.** When a project has multiple contexts, organize terms under their respective context headings. The context and its name are defined from the project modules.
-- **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
-- **Relationships.** When a project has multiple contexts, define how different contexts or terms relate to each other.
-
-## CONTEXT.md file
-
-A `CONTEXT.md` lives at the repo root, created mandatorily by `bootstrap-docs` at session start if
-it doesn't exist yet.
-
-When `CONTEXT.md` covers multiple contexts, infer which one the current topic relates to. If unclear, ask.
+- **Group under context.** Every term sits under a context heading — one heading for a single-context project, one per context otherwise, named after the project modules. When the current topic's context is unclear, ask. Add subheadings when natural clusters emerge; a flat list is fine when the terms form one cohesive area.
+- **Relationships.** With multiple contexts, define how they relate to each other.
