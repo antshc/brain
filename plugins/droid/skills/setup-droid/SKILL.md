@@ -42,17 +42,11 @@ After creating `CODE.md` from its template (only when it was just created, never
 
 Ground every line in files the `Explore` agent actually found — never invent conventions, never copy examples from another repo. If a section has no discoverable convention, leave its comment placeholder as-is rather than guessing.
 
-## Pin resolved paths in `.harness.env`
-
-Only when `resolve-harness` found an existing `.harness.env` (never when the cwd fallback fired):
-
-For each of `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, `LOG_PATH`, if that key is **not already present** in the retained Harness Settings, append a line to `.harness.env` setting it to that file's resolved path from the table above (its `$HARNESS_ROOT`-substituted target path), regardless of whether the file itself was just created or already existed. **Never overwrite or remove a key already present** — an existing entry is a deliberate override and wins. **Never create `.harness.env` itself** — if the fallback used cwd because no file was found, skip this step entirely.
-
 ## Hard rules
 
 - Manual invocation only — do not wire this into `droid.agent.md`'s INPUT step; that step's own rule ("do not create missing `CODE.md`, `VERIFY.md`, or `MEMORY.md`") stays in force.
 - Never overwrite, merge, or prompt about a file that already exists.
-- Never create `.harness.env`. May append missing `*_PATH` keys to an existing one (see above), but never overwrite or remove a key already present.
+- Never create or modify `.harness.env`. `HARNESS_ROOT` alone is enough — INPUT resolves every file at `$HARNESS_ROOT/.droid/<FILE>` by default; the `*_PATH` keys exist only to point a file somewhere else.
 - Templates are skeletons only — section headings and instructional comments. Do not fill them with invented, technology-specific example content. The sole exception is a freshly created `CODE.md`, whose sections are filled with real conventions found by the `Explore` agent scan above.
 
-**Emit**: "HARNESS_ROOT=<path> (resolver | fallback cwd). Created: [list]. Skipped (already exist): [list]. Templates: <plugin-relative dir>. Harness env: [keys added] | unchanged | not found (fallback)."
+**Emit**: "HARNESS_ROOT=<path> (resolver | fallback cwd). Created: [list]. Skipped (already exist): [list]. Templates: <plugin-relative dir>."
