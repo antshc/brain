@@ -7,16 +7,16 @@ A technology-agnostic autonomous coding harness. One agent (`droid`) orchestrate
 - [agents/droid.agent.md](agents/droid.agent.md) — the orchestrator. Fixed phases: INPUT → EXPLORATION → DECISION CONTEXT → IMPLEMENTATION → FEEDBACK LOOPS → RECORD DECISIONS → STATUS REPORT. Resolves Harness Settings and convention/state files once during INPUT, and works in its invocation directory.
 - [skills/to-droid/SKILL.md](skills/to-droid/SKILL.md) — entry point. Resolves a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `droid` via `runSubagent`.
 - [skills/droid-implement/SKILL.md](skills/droid-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during INPUT.
-- [skills/droid-feedback/SKILL.md](skills/droid-feedback/SKILL.md) — verify loop (LSP/build/test/refactor); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd.
+- [skills/droid-feedback/SKILL.md](skills/droid-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd.
 - [skills/droid-memory/SKILL.md](skills/droid-memory/SKILL.md) — reads curated guardrails from `MEMORY.md` at `$HARNESS_ROOT/.droid`.
 - [skills/to-commit/SKILL.md](skills/to-commit/SKILL.md) — commits with a `dcode:` prefix, post-task.
-- [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) — manual, user-invoked bootstrap that scaffolds missing `CODE.md`/`VERIFY.md`/`MEMORY.md`/`LOG.md` from templates. Not part of the agent's pipeline.
+- [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) — manual, user-invoked bootstrap that scaffolds missing `CODE.md`/`VERIFY.md`/`MEMORY.md`/`LOG.md` from templates into `$HARNESS_ROOT/.droid/`. Never touches `.harness.env`. Not part of the agent's pipeline.
 
 ## Environment
 
 During INPUT, Droid independently resolves Harness Settings through `/resolve-harness` when available. When the skill is unavailable or finds no configuration, it uses its current working directory (cwd) as `HARNESS_ROOT`. A failing available resolver blocks the invocation. Droid retains the complete emitted settings only for that invocation, then resolves its convention and state files once.
 
-- `HARNESS_ROOT` — the Harness Settings value that owns all convention/state files, all of which live under `$HARNESS_ROOT/.droid/`. Optional `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, and `LOG_PATH` settings override discovery; INPUT scans only for missing paths, then passes the resolved paths to the relevant sub-skills. When no `LOG.md` exists, INPUT creates `.droid/LOG.md`; missing CODE, VERIFY, and MEMORY files use their documented fallbacks. INPUT itself never creates missing `CODE.md`, `VERIFY.md`, or `MEMORY.md` — run [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) manually to scaffold them from templates instead.
+- `HARNESS_ROOT` — the Harness Settings value that owns all convention/state files, all of which live under `$HARNESS_ROOT/.droid/`. INPUT looks for each file at `$HARNESS_ROOT/.droid/<FILE>` and nowhere else, so running the agent directly (no `.harness.env`, `HARNESS_ROOT` = cwd) reads `.droid/` in the repo it was launched in. `HARNESS_ROOT` is therefore the only key `.harness.env` needs; nothing writes the path keys back to it. Optional `CODE_PATH`, `VERIFY_PATH`, `MEMORY_PATH`, and `LOG_PATH` settings exist only to point a file outside `.droid/` — set by hand, they override the default and are passed to the relevant sub-skills. When no `LOG.md` exists, INPUT creates `.droid/LOG.md`; missing CODE, VERIFY, and MEMORY files use their documented fallbacks. INPUT itself never creates missing `CODE.md`, `VERIFY.md`, or `MEMORY.md` — run [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) manually to scaffold them from the templates the droid plugin owns at [skills/setup-droid/templates](skills/setup-droid/templates).
 - **Workspace = cwd** — all code, git, build, test, and exploration commands run in the agent's current working directory. There is no separate workspace variable; callers launch the agent with cwd set to the code repo/worktree.
 
 Harness discovery lives in Droid. Neither `ralph:dev` nor `to-droid` passes Harness Settings to the agent.
@@ -38,7 +38,7 @@ graph TD
     AG -.VERIFY_PATH.-> FB
 
     AG -.LOG_PATH.-> LOG[droid-log skill]
-    AG -.resolves once under HARNESS_ROOT.-> DOCS[CODE.md / VERIFY.md / MEMORY.md / LOG.md]
+    AG -.resolves once from $HARNESS_ROOT/.droid/.-> DOCS[CODE.md / VERIFY.md / MEMORY.md / LOG.md]
 ```
 
 **Nature of each edge**
@@ -86,7 +86,7 @@ sequenceDiagram
 
     rect rgba(160, 190, 255, 0.08)
     note over AG,FB: FEEDBACK LOOPS
-    AG->>FB: verify (LSP / build / test / refactor)
+    AG->>FB: verify (LSP / build / test)
     FB-->>AG: pass or issues to fix
     end
 
