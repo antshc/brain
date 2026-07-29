@@ -7,7 +7,7 @@ A technology-agnostic autonomous coding harness. One agent (`droid`) orchestrate
 - [agents/droid.agent.md](agents/droid.agent.md) — the orchestrator. Fixed phases: INPUT → EXPLORATION → DECISION CONTEXT → IMPLEMENTATION → FEEDBACK LOOPS → RECORD DECISIONS → STATUS REPORT. Resolves Harness Settings and convention/state files once during INPUT, and works in its invocation directory.
 - [skills/to-droid/SKILL.md](skills/to-droid/SKILL.md) — entry point. Resolves a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `droid` via `runSubagent`.
 - [skills/droid-implement/SKILL.md](skills/droid-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during INPUT.
-- [skills/droid-feedback/SKILL.md](skills/droid-feedback/SKILL.md) — verify loop (LSP/build/test/refactor); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd.
+- [skills/droid-feedback/SKILL.md](skills/droid-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd.
 - [skills/droid-memory/SKILL.md](skills/droid-memory/SKILL.md) — reads curated guardrails from `MEMORY.md` at `$HARNESS_ROOT/.droid`.
 - [skills/to-commit/SKILL.md](skills/to-commit/SKILL.md) — commits with a `dcode:` prefix, post-task.
 - [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) — manual, user-invoked bootstrap that scaffolds missing `CODE.md`/`VERIFY.md`/`MEMORY.md`/`LOG.md` from templates into `$HARNESS_ROOT/.droid/`. Never touches `.harness.env`. Not part of the agent's pipeline.
@@ -86,7 +86,7 @@ sequenceDiagram
 
     rect rgba(160, 190, 255, 0.08)
     note over AG,FB: FEEDBACK LOOPS
-    AG->>FB: verify (LSP / build / test / refactor)
+    AG->>FB: verify (LSP / build / test)
     FB-->>AG: pass or issues to fix
     end
 
