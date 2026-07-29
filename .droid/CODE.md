@@ -12,6 +12,8 @@ This repo's "code" is skills, agent instructions, and templates. The droid autho
 
 **Skill invocation:** every step that runs another skill reads ``Run `/{{skillName}}` `` — slash-prefixed, backticked, verb always *run*, never "call" or "invoke". Target a named section as ``Run `/index-docs`' **Sync index row** ``. Naming a skill as an owner rather than running it takes the plain backticked name.
 
+**Line wrapping:** one physical line per paragraph/bullet/table cell, however long — no fixed-column hard-wrap, keeps grep and diffs clean. Rejoin any line an editor's auto-rewrap splits.
+
 **Syntax legend** — use when writing or updating skills, templates, and agent instruction files:
 
 | Syntax | Meaning | Example |
