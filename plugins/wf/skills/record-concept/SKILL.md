@@ -24,26 +24,21 @@ instead.
 
 ## Lazy creation
 
-Ask `bootstrap-docs` whether `docs/concepts/` exists; if absent, create it when the **first
-Concept is ready** — not before. Number sequentially: scan `docs/concepts/` for the highest
-existing `NNNN` and increment by one.
+Create `docs/concepts/` when the **first Concept is ready** — not before: create the directory if
+it's missing, do nothing if it exists. Number the file per this skill's own **Next record number**
+(see [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md)). The timing gate, directory creation, and numbering
+are all this skill's own mechanics.
 
 ## Approval gate
 
+<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
+
 - **Explicit direct request** ("record a Concept for X") — approval is already given; draft and
   write immediately.
-- **Offered by an interview-style caller** (`grill-design`) — the offer itself is the approval
-  gate: draft it, present it, and only write once the user explicitly responds to that specific
-  offer.
+- **Offered by an interview-style caller** (`grill-design`) — the offer itself is the approval gate: draft it, present it, and only write once the user explicitly responds to that specific offer.
 
 ## Keeping the index in sync
 
 When a Concept is added, superseded, or retired, call `index-docs`' **Sync index row**
 in the same change — never edit the `Crosscutting Concepts` table in `ARCHITECTURE.md` directly.
 
-## Ownership
-
-- Owns: `CONCEPT-FORMAT.md`'s template, the "when to write a Concept" gate, numbering, and the
-  approval-gate distinction.
-- Does **not** own: file/directory existence-and-creation mechanics (`bootstrap-docs`' job), or the
-  `Crosscutting Concepts` table's row sync (`index-docs`' job).

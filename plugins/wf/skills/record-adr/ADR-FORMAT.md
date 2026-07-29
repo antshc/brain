@@ -28,9 +28,12 @@ Only include these when they add genuine value. Most ADRs won't need them.
 - **Considered Options** — only when the rejected alternatives are worth remembering
 - **Consequences** — only when non-obvious downstream effects need to be called out
 
-## Numbering
+## Next record number
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
+
+Scan `docs/adr/` for filenames starting with a four-digit `NNNN` prefix, take the highest, and
+return `NNNN + 1`, zero-padded to four digits. An empty or absent directory returns `0001`.
 
 ## When to offer an ADR
 

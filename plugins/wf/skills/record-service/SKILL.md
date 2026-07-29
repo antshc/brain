@@ -31,8 +31,9 @@ Otherwise, skip the full doc — the row and its summary are enough.
 
 ## Lazy creation
 
-Ask `bootstrap-docs` whether `docs/services/` exists; if absent, create it only when the full doc
-is warranted (per the non-trivial gate above) — not on every row addition.
+Create `docs/services/` only when the full doc is warranted (per the non-trivial gate above) — not
+on every row addition: create the directory if it's missing, do nothing if it exists. Services are
+not numbered — see **No numbering** above.
 
 ## Keeping the index in sync
 
@@ -40,8 +41,3 @@ Call `index-docs`' **Sync index row** for the `Services` table row every time a 
 is added or updated — regardless of whether the full doc is written — never edit the table in
 `ARCHITECTURE.md` directly.
 
-## Ownership
-
-- Owns: `BUILDING-BLOCK-SERVICE-FORMAT.md`'s template and the "non-trivial" gate for the full doc.
-- Does **not** own: file/directory existence-and-creation mechanics (`bootstrap-docs`' job), or the
-  `Services` table's row sync (`index-docs`' job).

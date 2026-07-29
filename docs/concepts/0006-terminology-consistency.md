@@ -14,5 +14,5 @@ A term, once defined at its authoritative source (a skill's own wording, a Conce
 
 ## Examples
 
-- `grill-design/SKILL.md`'s `Interview` section names its three decision criteria "the evidence checklist." Its `Domain Modeling` section references "the evidence checklist" verbatim in multiple places rather than restating the three criteria or inventing a different label (an earlier draft used the invented, unverifiable label "evidence-checklist" before the term existed at its source — corrected once the term was named).
+- `grill-design/SKILL.md`'s `Interview` section names its four decision criteria "the evidence checklist." Its `Domain Modeling` section references "the evidence checklist" verbatim in multiple places rather than restating the four criteria or inventing a different label (an earlier draft used the invented, unverifiable label "evidence-checklist" before the term existed at its source — corrected once the term was named).
 

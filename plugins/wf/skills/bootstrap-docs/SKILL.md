@@ -1,17 +1,16 @@
 ---
 name: bootstrap-docs
-description: Own the existence-and-creation mechanics for the domain-model documents — mandatorily create ARCHITECTURE.md and CONTEXT.md the moment either is missing, report (never create) whether docs/adr/, docs/concepts/, docs/services/ exist, and insert a skeleton section into ARCHITECTURE.md on request. Hosts ARCHITECTURE-FORMAT.md and CONTEXT-FORMAT.md — the two mandatory docs' templates — but owns only their top-level file skeleton; the index-table shapes and term-writing rules inside them stay owned by index-docs/record-term. Owns no templates, prose, or "when is it appropriate to create" criteria for the lazy docs — that stays with the owning skill. Invoked only when a caller's own existence check finds something missing.
+description: Own the existence-and-creation mechanics for ARCHITECTURE.md and CONTEXT.md — mandatorily create either the moment it's missing, and insert a caller-supplied skeleton section into ARCHITECTURE.md on request. Owns no templates, no prose, no directory creation for docs/adr, docs/concepts, or docs/services (each owned by the skill that writes into it), and no "when is it appropriate to create" criteria — that stays with the owning skill. Invoked only when a caller's own existence check finds ARCHITECTURE.md or CONTEXT.md missing, or when a caller needs a section inserted.
 ---
 
 # Bootstrap Docs
 
-Own the *mechanics* of document/directory existence and creation, and host
-[ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md) / [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md) — the
-templates for the two mandatory docs. Owning the file is not owning all of its content: this skill
-only owns each template's top-level file skeleton (the mandatory headings created at bootstrap
-time); the judgment call of *when* it's appropriate to write index rows or terms, and the shape of
-those sections, belongs to the skill that owns that content (`record-term`, `index-docs`,
-`record-adr`, `record-concept`, `record-service`).
+Own the *mechanics* of `ARCHITECTURE.md`/`CONTEXT.md` existence, creation, and section-skeleton
+insertion. Directory creation for `docs/adr/`, `docs/concepts/`, `docs/services/` belongs to the
+skill that writes into that directory (`record-adr`, `record-concept`, `record-service`). Every
+template, every piece of prose, and every "is now the right time?" judgment belongs to the skill
+that owns that content — `record-term` (`CONTEXT-FORMAT.md`), `index-docs`
+(`ARCHITECTURE-FORMAT.md`).
 
 ## When to call this skill
 
@@ -21,28 +20,25 @@ not this skill). Invoke `bootstrap-docs` only when that check finds one of them 
 directory's existence needs reporting, or a section needs to be inserted — never "just in case"
 every session. The mandatory-creation guarantee only needs to fire once per repo.
 
-## Mandatory creation — ARCHITECTURE.md and CONTEXT.md
+## Mandatory creation
 
 If `ARCHITECTURE.md` and/or `CONTEXT.md` don't exist, create them **immediately** — don't wait for
 a term, structural rule, ADR, Concept, or service to be ready to capture.
 
 - **`ARCHITECTURE.md`** is the index hub every other document links into. Fill in only the
   required sections (`# {{systemName}} Overview`, `## Context`) from what's already known about
-  the codebase. Leave the optional sections (`Building blocks`, `Deployment View`, the
+  the codebase, using [ARCHITECTURE-FORMAT.md](../index-docs/ARCHITECTURE-FORMAT.md) (`index-docs`'
+  template). Leave the optional sections (`Building blocks`, `Deployment View`, the
   `Architecture Decision Records` / `Crosscutting Concepts` indexes) out until there's content for
   them — `index-docs` adds those via *Ensure section exists* below.
 - **`CONTEXT.md`** is the glossary every other document assumes as shared vocabulary. Create it
   with its `# {{contextName}}` heading and an empty `## Language` section — leave individual terms
-  out until `record-term` captures the first one.
+  out until `record-term` captures the first one, using
+  [CONTEXT-FORMAT.md](../record-term/CONTEXT-FORMAT.md) (`record-term`'s template).
 
 These are the **two non-lazy cases**. Every other document (`docs/adr/`, `docs/concepts/`,
-`docs/services/`) stays genuinely lazy.
-
-## Existence reporting — everything else
-
-For `docs/adr/`, `docs/concepts/`, `docs/services/`: report present/absent only. Never create
-these — return the answer to the caller (the owning skill), which decides whether *now* is the
-right time to create, per its own trigger ("first ADR ready," "non-trivial service").
+`docs/services/`) stays genuinely lazy — and each is created directly by the skill that writes
+into it, not by `bootstrap-docs`.
 
 ## Ensure section exists
 
@@ -55,15 +51,3 @@ the caller, mirroring `index-docs`' own "never assume a schema" stance for the t
 syncs. `bootstrap-docs` doesn't know what an ADR or Concept table looks like; it only inserts what
 it's given.
 
-## Ownership
-
-- Owns: `ARCHITECTURE.md`/`CONTEXT.md`'s mandatory creation, existence reporting for the other
-  lazy docs, inserting a caller-supplied section skeleton, and the top-level file skeleton inside
-  the hosted `ARCHITECTURE-FORMAT.md`/`CONTEXT-FORMAT.md` templates.
-- Does **not** own: the Services/ADR/Concepts index-table shapes inside `ARCHITECTURE-FORMAT.md`
-  (`index-docs`' job), the term-writing rules inside `CONTEXT-FORMAT.md` (`record-term`'s
-  job), prose content, the "when is it appropriate to create" criteria for the lazy docs, or
-  index-row content/sync (`record-adr`/`record-concept`/`record-service`/`index-docs`' job).
-- Called by `grill-design` (or another grilling/modeling skill) only when its own existence check
-  finds `ARCHITECTURE.md` or `CONTEXT.md` missing — never by `manage-backlog` or a separate setup
-  skill.

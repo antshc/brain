@@ -30,7 +30,22 @@ Durable artifacts (`ARCHITECTURE.md`, ADRs, Concepts, `CONTEXT.md`) are the oppo
   - A Feature Assumption and a Feature Decision both live here **only** — never written to `ARCHITECTURE.md`, an ADR, a Concept, or `CONTEXT.md`. A Feature Assumption becomes eligible for a durable write only once the user clears it at the closing veto sweep, at which point it is a Decision and is written then (its line switches to `decided by user, recorded: {{path}}`).
 
 - Once any section grows large, stop re-scanning everything on every re-scope — compress resolved terms and decisions into a short summary, rely on that plus the Ledger, and re-open a full record only when a specific detail is needed again.
-- The Ledger belongs to the caller holding the session (e.g. `grill-design`), not to `index-docs` — it only returns match verdicts; tracking what is already open, what surface has been touched, and what has been decided is the caller's own state.
+- The Ledger's line grammar, section names, file location, and compression rule are owned by the `track-ledger` skill. The *session* itself belongs to the caller holding it (e.g. `grill-design`): deciding when to log, what counts as evidence, and whether a staged item survives the veto sweep is the caller's own state. `index-docs` owns neither — it only returns match verdicts.
+
+## Context economy
+
+The Ledger exists because raw tool output re-bills every later turn of a long session. The same
+economics govern how the session reads anything else:
+
+- Default broad-sweep lookups — does this pattern exist elsewhere? who calls this? is the claim
+  true across layers? — to the `explore` agent, and consume only its verdict. Do not re-read the
+  files it already reported on.
+- Reserve a direct read or grep for anchor precision: the exact line, signature, or assertion to
+  quote back.
+- Fetch a durable artifact (`ARCHITECTURE.md`, an ADR, a Concept, `CONTEXT.md`) when you first
+  need it, or when you need it and cannot quote the needed part verbatim from context. Never on a
+  schedule, never "just in case", and never right after your own write — every write path already
+  returns its result.
 
 ## Exceptions
 

@@ -1,13 +1,13 @@
 ---
 name: index-docs
-description: Owns ARCHITECTURE.md end to end — structural map (Overview, Building blocks, Deployment View) plus Services/ADR/Concept indexes — and the generic trigger-generation, scan/match, row-sync mechanic for any markdown table with a Trigger condition column (Service, ADR, Concept, or custom), driven by caller-supplied table/row metadata, not a fixed schema. Called by grill-design and the record-* skills.
+description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, Deployment View), host ARCHITECTURE-FORMAT.md, and own the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Services, ADR, Concept, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
 ---
 
 # Index Docs
 
-Own `ARCHITECTURE.md` as a single, continuously-revised living document: its structural prose and
-the three indexes it hosts (`Services`, `Architecture Decision Records`, `Crosscutting Concepts`).
-Template: [ARCHITECTURE-FORMAT.md](../bootstrap-docs/ARCHITECTURE-FORMAT.md).
+Own `ARCHITECTURE.md`'s structural prose and the three indexes it hosts (`Services`,
+`Architecture Decision Records`, `Crosscutting Concepts`).
+Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
 
 ## Inline-update discipline
 
@@ -45,7 +45,7 @@ rules). Callers (`grill-design`) supply the touched surface, grilling context, g
 5. Open a linked record only when its locator is supplied and resolvable.
 6. Report matched clauses and rationale for matches; checked clauses and rationale for non-matches.
 
-## Keeping the indexes in sync
+## Sync index row
 
 Inputs: `{{tableMetadata}}`, `{{rowMetadata}}`, `{{action}}` (`add`, `supersede`, `retire`). `{{tableMetadata}}` supplies the table boundary, headers, Trigger condition column, row locator rules. `{{rowMetadata}}` supplies row identity and explicit cell values. Callers (`record-adr`, `record-concept`, `record-service`) supply `{{rowMetadata}}` and `{{action}}`; this skill applies the change.
 
@@ -62,3 +62,4 @@ Return the updated row or a concise synchronization report.
 - Missing or empty table: no matches for **Scan and match**.
 - Missing Trigger condition column: table-contract error.
 - Missing or ambiguous synchronization metadata: report the issue without changing the row.
+

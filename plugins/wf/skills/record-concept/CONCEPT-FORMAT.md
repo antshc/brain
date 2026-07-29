@@ -5,7 +5,8 @@ an architectural or design pattern that every feature is expected to follow. A C
 *main architecture rule*, not a one-off.
 
 Concepts live in `docs/concepts/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`,
-etc. Create the `docs/concepts/` directory lazily — only when the first Concept is needed.
+etc. Create the `docs/concepts/` directory lazily — only when the first Concept is needed; this is
+`record-concept`'s own mechanic (see [SKILL.md](./SKILL.md)'s **Lazy creation**).
 
 Every Concept is **indexed in `ARCHITECTURE.md`** under a `Crosscutting Concepts` section with a summary and a link. The index is the entry point: read it during a modeling or grilling session, and open the full Concept only when a concept is relevant to the work at hand.
 
@@ -33,9 +34,12 @@ Only include these when they add genuine value.
 - **Exceptions** - Document permitted deviations and their conditions.
 - **Examples** - Provide one or two concise examples of correct application.
 
-## Numbering
+## Next record number
 
-Scan `docs/concepts/` for the highest existing number and increment by one.
+<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
+
+Scan `docs/concepts/` for filenames starting with a four-digit `NNNN` prefix, take the highest, and
+return `NNNN + 1`, zero-padded to four digits. An empty or absent directory returns `0001`.
 
 ## When to offer a Concept
 
