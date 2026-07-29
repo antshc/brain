@@ -5,7 +5,7 @@ description: Own the session ledger at /memories/session/domain-model-ledger.md 
 
 # Track Ledger
 
-Own the session ledger at `/memories/session/domain-model-ledger.md`. Persist via the memory tool. Create it **lazily**, on the first write of any kind — never up front.
+Own the session ledger at `domain-model-ledger.md` — use the memory session folder, never a shell/filesystem path. Create it **lazily**, on the first write of any kind — never up front.
 
 Three sections, each with its own line grammar. Callers decide *when* to write; this skill decides *how* the line reads.
 
