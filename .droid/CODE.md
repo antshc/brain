@@ -8,6 +8,12 @@ This repo's "code" is skills, agent instructions, and templates. The droid autho
 
 **Writing style:** be terse, concise, no fillers.
 
+**Section references:** name a section by its title only — drop the `#` heading markers. Write `Building blocks`, not `## Building blocks`.
+
+**Skill invocation:** every step that runs another skill reads ``Run `/{{skillName}}` `` or ``Follow `/{{skillName}}` `` — backticked, slash-prefixed skill name, verb is *run* or *follow*, never "call" or "invoke". Target a named section as ``Run `/index-docs`' **Sync index row** `` or ``Follow `/droid-gotchas`' **Read Workflow** ``. Naming a skill as an owner rather than running it takes the plain backticked name.
+
+**Line wrapping:** one physical line per paragraph/bullet/table cell, however long — no fixed-column hard-wrap, keeps grep and diffs clean. Rejoin any line an editor's auto-rewrap splits.
+
 **Syntax legend** — use when writing or updating skills, templates, and agent instruction files:
 
 | Syntax | Meaning | Example |
@@ -23,29 +29,6 @@ This repo's "code" is skills, agent instructions, and templates. The droid autho
 | `` `literal` `` | Fixed command, path, identifier, or value | Run `dotnet test`. |
 | `$VARIABLE` | Shell environment variable | `cd "$REPOSITORY_ROOT"` |
 | `${VARIABLE}` | Braced shell environment variable | `${REPOSITORY_ROOT}/src` |
-
-## Workflow styles
-
-**Checklist-driven workflow** — for a skill with a sequential, resumable, multi-step procedure, embed a literal Markdown checklist the agent copies into its working notes and checks off step by step; pair each item with its own subsection giving the exact command/artifact, and state the failure/retry path explicitly. Always precede the fenced checklist with the literal line `Copy this checklist and check off items as you complete them:`. See [Checklist-Driven Workflow](../docs/concepts/0005-checklist-workflow.md). Example shape:
-
-```
-## <Task name> workflow
-
-Copy this checklist and check off items as you complete them:
-\```
-<Task name> Progress:
-- [ ] Step 1: <action> (run <script>)
-- [ ] Step 2: <action> (edit <file>)
-- [ ] Step 3: <action> (run <script>)
-\```
-**Step 1: <action>**
-
-Run: `<command>`
-
-<what it produces>
-
-If <step N> fails, return to Step <M>.
-```
 
 ## Layer placement
 
@@ -63,4 +46,4 @@ If <step N> fails, return to Step <M>.
 
 ## Tests
 
-N/A — no automated tests for markdown files. Validate changes with the `verify-instructions` skill before committing.
+N/A — no automated tests for markdown files.

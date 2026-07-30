@@ -26,23 +26,23 @@ If FEEDBACK LOOPS fails after its retry cap, report `STATUS: partial` rather tha
 
 ## INPUT
 
-Follow the `droid-input` skill.
+Follow `/droid-input`.
 
 ## GOTCHAS
 
 **This step is mandatory. Do not proceed to implementation until complete.**
 
-Follow the Read Workflow in the `droid-gotchas` skill, passing `GOTCHAS_PATH`. Emit the gotchas loaded, or "No gotchas recorded yet" before continuing.
+Follow `/droid-gotchas`' **Read Workflow**, passing `GOTCHAS_PATH`. Emit the gotchas loaded, or "No gotchas recorded yet" before continuing.
 
 Apply every directive during implementation. Do not contradict one without reporting the conflict.
 
 ## BUILD & LSP CHECK
 
-Follow the `droid-build-check` skill.
+Follow `/droid-build-check`.
 
 ## IMPLEMENTATION
 
-Follow the `droid-implement` skill for code style, layer placement, design principles, and test rules, passing `CODE_PATH`.
+Follow `/droid-implement` for code style, layer placement, design principles, and test rules, passing `CODE_PATH`.
 
 ## FEEDBACK LOOPS
 
@@ -52,7 +52,7 @@ Run the `droid-feedback` skill, after IMPLEMENTATION completes, passing `VERIFY_
 
 **This step is mandatory. Runs after feedback loops pass.**
 
-Follow the `droid-log` skill, passing `LOG_PATH`.
+Follow `/droid-log`, passing `LOG_PATH`.
 
 ## HARD RULES
 
