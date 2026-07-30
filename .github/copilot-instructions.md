@@ -1,21 +1,13 @@
 # Excluded Folders
 
-**Never scan, read, or edit `_backup/`, `_docs/`, `_in-progress/`.** Treat them as out of scope for all tasks.
+**Never scan, read, or edit `_backup/`, `docs/kbs`, `_in-progress/`.** Treat them as out of scope for all tasks.
 
 # Writing or updating the skill, templates, agents standards
 
 See [CODE.md](../.droid/CODE.md) for writing style and syntax conventions.
 
+See **Skills best practices** fetch `https://agentskills.io/skill-creation/best-practices` for How to write skills that are well-scoped and calibrated to the task.
 
-# Project Overview
-
----
-
-## Architecture
-
-Vertical Slice Architecture — each feature owns all the logic it needs. Cross-cutting concerns live in `shared/`; external adapters in `infrastructure/`.
-
-See [ARCHITECTURE.md](../ARCHITECTURE.md) for the codebase structure.
 
 ### Plugin Marketplace
 
@@ -62,11 +54,6 @@ Single repo — docs and codebase live together, no `workspace/` split.
 - **Domain glossary:** `CONTEXT.md` — domain terminology and concepts.
 - **Architecture:** `ARCHITECTURE.md` — ADR/Concept indexes, high-level source structure.
 
-### Documentation conventions
-
-- Author `CONTEXT.md`, `ARCHITECTURE.md`, ADRs (`docs/adr/`), and Crosscutting Concepts (`docs/concepts/`) at the repo root.
-- Keep `CONTEXT.md` and `ARCHITECTURE.md` high-level — no implementation details, specs, or scratch notes.
-- These docs, their templates, and their lazy-creation rules are owned by the `wf` plugin's `/manage-docs` skill — don't hand-author them outside it. Capture each resolved term, rule, Concept, or ADR the moment it crystallises — never batch documentation updates.
 
 ### Ticket tracker
 
