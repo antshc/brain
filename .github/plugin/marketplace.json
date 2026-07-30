@@ -15,11 +15,6 @@
             "description": "Common everyday workflow automation skills. Expected to be useful to all developers."
         }, 
         {
-            "name": "wf-v1",
-            "source": "./plugins/wf-v1",
-            "description": "Common everyday workflow automation skills. Expected to be useful to all developers."
-        },
-        {
             "name": "ralph",
             "source": "./plugins/ralph",
             "description": "ralph AFK PR review automation skills."
