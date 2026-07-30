@@ -35,9 +35,6 @@ Five plugins registered:
 - All current plugins use only SKILL.md files
 
 ### Agents (.agent.md)
-- **ONLY FOUND**: One agent file in the entire workspace
-  - [/brain/plugins/ralph/skills/dev/ralphy-coder.agent.md]
-  - Also: [/brain/plugins/ralph/skills/dev/ralph-impl.agent.md]
 - Companion files to skills, providing autonomous agent specifications
 - Named in YAML frontmatter: `name: <agent-name>`
 - **Key difference**: Agents are invoked via `runSubagent` tool, NOT direct skill invocation
@@ -48,18 +45,11 @@ Five plugins registered:
 **Pattern**: Agents appear to be discovered automatically based on `.agent.md` file presence
 - File naming: `<name>.agent.md` where name matches the `name:` field in YAML frontmatter
 - Location: Any skill directory within a plugin's `./skills/` path
-- Auto-discovery: VS Code agent system appears to scan for these files when indexing plugin skills
+- Auto-discovery: agent system appears to scan for these files when indexing plugin skills
 
 ### Agent vs Skill Registration
 - **Skills**: Directly exposed in agent mode selection (immediate invocation)
 - **Agents**: Referenced by other skills via `runSubagent` tool; not directly selectable by user
-
-### Example: dev Skill's Nested Agent
-The `dev` skill ([/brain/plugins/ralph/skills/dev/SKILL.md]) invokes the nested agent:
-```
-Invoke the `ralphy-coder` agent via `runSubagent` with the following prompt
-```
-The `ralphy-coder` agent is defined in [/brain/plugins/ralph/skills/dev/ralphy-coder.agent.md]
 
 ## Key Rules
 
@@ -76,5 +66,3 @@ Based on patterns observed:
 2. Use YAML frontmatter with matching `name:` and `description:`
 3. Agent will be auto-discovered by VS Code plugin system
 4. Agent becomes available for selection in agent mode
-
-**Note**: Current workspace only shows `ralphy-coder` and `ralph-impl` as agents available for `runSubagent` invocation within dev skill context. Other agents may not be directly selectable—they are accessible only through skills that invoke them.
