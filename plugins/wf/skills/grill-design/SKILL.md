@@ -31,6 +31,7 @@ Evidence checklist — all four → Feature Assumption; any miss → ask: single
 |---|---|---|---|
 | Feature Assumption | model, via the checklist | ledger only | only after the veto sweep clears it — it is then a Decision |
 | Feature Decision | user, feature-scoped (fails the ADR/Concept gate, resolves no term) | ledger only | never |
+| Offered record | you, pending the user's reply to a specific offer | ledger only | on the user's yes, same turn |
 | Decision | user | ledger + document | same turn it's approved |
 | Rejected option | user | ledger only | never |
 
@@ -73,7 +74,9 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
-**Record inline** — resolved by explicit user answer → run `/record-term`, `/record-adr`, `/record-concept`, or `/record-service` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*). Proposing an ADR or Concept unprompted → check the target skill's own gate first, then *offer*, and run it only once the user explicitly responds to that offer.
+**Record inline** — resolved by explicit user answer → run `/record-term`, `/record-adr`, `/record-concept`, or `/record-service` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*).
+
+**Offer a record** — you spot an ADR- or Concept-worthy decision no user answer asked you to record. Run the target skill's own gate; it passes → offer that same turn, before your next interview question, as one bullet: `Offer — {{ADR|Concept}} "{{title}}": {{one sentence on what it pins down}}. Record it now?`. Draft nothing until the reply. **Yes** → run `/record-adr` or `/record-concept` immediately. **Not yet / no** → log it via `/track-ledger`' **Log decision** and move on. One open offer at a time — wait for the reply, same as interview questions. Never carry a candidate past the turn it crystallised, never bundle two offers, never make a first-time offer in the closing sweep.
 
 ## Closing sweep
 
@@ -85,6 +88,6 @@ Three parts, each with its own trigger.
 * **Cleared** — it is now a Decision: write it to its durable document and update its ledger line via `/track-ledger`' **Log decision**.
 * **Vetoed** — delete its ledger line via `/track-ledger`' **Log decision**; nothing changes on disk.
 
-A recorded Decision is not vetoable — the user approved it before it was written.
+A recorded Decision is not vetoable — the user approved it before it was written. An offer never made inline is a miss, not an agenda item — the sweep may re-raise a *deferred* offer, never introduce a new one.
 
 **3. Trigger-condition refinement.** Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
