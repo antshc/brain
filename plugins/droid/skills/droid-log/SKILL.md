@@ -28,7 +28,7 @@ List the files changed during this invocation. For each file or group of files, 
 - A tool access issue (missing CLI, auth failure, unreachable service) — including any `STATUS: blocked` "Environment blockers" surfaced by `droid-feedback`
 - Any other friction that cost time or blocked progress
 
-**Discard** if it is: a one-off typo, a transient blip resolved on first retry, or a routine execution step. Only what a human reviewer would want to see, and possibly promote to `MEMORY.md`, qualifies.
+**Discard** if it is: a one-off typo, a transient blip resolved on first retry, or a routine execution step. Only what a human reviewer would want to see, and possibly promote to `GOTCHAS.md`, qualifies.
 
 **Emit**: "Files changed: [list]. Problem candidates: [list or 'none — reason per file']."
 
@@ -46,7 +46,7 @@ For each problem found during this invocation, append an entry:
 ```
 
 - One entry per problem. Multiple problems in the same invocation → multiple entries.
-- **Discard** if it is: a one-off typo, a transient blip resolved on first retry, or a routine execution step. Only what a human reviewer would want to see, and possibly promote to `MEMORY.md`, qualifies.
+- **Discard** if it is: a one-off typo, a transient blip resolved on first retry, or a routine execution step. Only what a human reviewer would want to see, and possibly promote to `GOTCHAS.md`, qualifies.
 - **Zero problems found** → skip silently, write nothing.
 
 **Emit**: "Problems logged: [count/categories]" or "No problems to log."

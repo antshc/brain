@@ -15,7 +15,7 @@ Copy this checklist into your working notes at task start and check off items as
 ```
 Workflow Progress:
 - [ ] Step 1: INPUT
-- [ ] Step 2: GUARDRAILS
+- [ ] Step 2: GOTCHAS
 - [ ] Step 3: BUILD & LSP CHECK
 - [ ] Step 4: IMPLEMENTATION
 - [ ] Step 5: FEEDBACK LOOPS
@@ -28,11 +28,11 @@ If FEEDBACK LOOPS fails after its retry cap, report `STATUS: partial` rather tha
 
 Follow the `droid-input` skill.
 
-## GUARDRAILS
+## GOTCHAS
 
 **This step is mandatory. Do not proceed to implementation until complete.**
 
-Follow the Read Workflow in the `droid-memory` skill, passing `MEMORY_PATH`. Emit the guardrails loaded, or "No guardrails recorded yet" before continuing.
+Follow the Read Workflow in the `droid-gotchas` skill, passing `GOTCHAS_PATH`. Emit the gotchas loaded, or "No gotchas recorded yet" before continuing.
 
 Apply every directive during implementation. Do not contradict one without reporting the conflict.
 
