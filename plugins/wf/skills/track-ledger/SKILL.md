@@ -37,6 +37,8 @@ Writes into `Decisions / assumptions` — one line per item; position in the sec
 * `{{item}} — decided by user, feature decision, grounded: "{{source}}"`
 * `{{item}} — decided by user, recorded: {{path}}`
 * `{{item}} — rejected, reason: "{{source}}"`
+* `{{item}} — offered {{ADR|Concept}}, deferred: "{{reason}}"`
+* `{{item}} — offered {{ADR|Concept}}, declined: "{{reason}}"`
 
 Also rewrites or deletes an existing line, located by `{{item}}` — used when a staged item is cleared or vetoed at the end of a session.
 
