@@ -5,11 +5,13 @@ description: Resolve Harness Settings from the nearest ancestor .harness.env fil
 
 # Resolve Harness
 
-Run from cwd. `<skill-directory>` is the directory containing this SKILL.md file — you already know this path from where the skill was loaded; never search the filesystem for it (e.g. do not run `find`):
+Run from cwd. `<skill-directory>` is the directory containing this SKILL.md file: take the absolute path you used to read this file and strip the trailing `/SKILL.md`. Never derive it any other way, and never search the filesystem for it (e.g. do not run `find`, `ls -R`, or similar).
 
 ```bash
 python3 <skill-directory>/scripts/resolve_harness.py
 ```
+
+If you cannot confidently identify `<skill-directory>` from the path you read, treat this skill as unavailable — do not search the filesystem to locate it. Callers already define the fallback for an unavailable skill (use cwd as `HARNESS_ROOT`).
 
 Search cwd and ancestors for the nearest `.harness.env`; do not use Git or modify the filesystem.
 
