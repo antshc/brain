@@ -12,3 +12,5 @@ skill, instructions, agent, codex, copilot
 
 ## Decisions / assumptions
 
+plugins/<plugin>/agents/ is source of truth — decided by user, feature decision, grounded: "plugins/droid is the only agent with dual coverage; .agents/ and .codex/ are deployment copies"
+Sync mechanism: concept-only (manual authoring discipline, no tooling) — decided by user, feature decision, grounded: "user chose option 2 explicitly"
