@@ -687,6 +687,41 @@ Scenario: Setup preserves existing Harness Configuration File
 
 ---
 
+## Feature: Droid Runtime Guidance
+
+> Manual plugin verification
+
+```gherkin
+Scenario: Droid remains in the caller-selected location
+  Given Droid starts in a source repository checkout or worktree path
+  When it explores, modifies, builds, tests, or runs Git commands
+  Then every operation remains in the invocation directory
+    And it does not resolve Harness Settings or ancestor repository declarations
+
+Scenario: Present skill-owned guidance is loaded
+  Given sibling CODE.md, VERIFY.md, and GOTCHAS.md references exist beside their consuming Droid skills
+  When Droid reaches implementation, feedback, and Gotchas phases
+  Then each consuming skill reports its reference as loaded
+
+Scenario: Missing skill-owned guidance uses bundled defaults
+  Given a sibling CODE.md, VERIFY.md, or GOTCHAS.md reference is absent
+  When Droid reaches that consuming skill
+  Then the skill reports the missing reference
+    And it uses its technology-agnostic FALLBACK.md
+    And Droid continues the invocation
+
+Scenario: Gotchas are persisted only after successful feedback
+  Given sibling GOTCHAS.md exists and reusable friction occurs
+  When feedback loops pass
+  Then droid-gotchas writes one deduplicated directive to GOTCHAS.md
+  When feedback loops fail or are blocked
+  Then Droid does not claim a Gotchas update
+```
+
+**Coverage:** Manual plugin verification
+
+---
+
 ## Feature: Execution Log
 
 > Unit: `ExecutionLog`

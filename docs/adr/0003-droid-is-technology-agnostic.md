@@ -1,6 +1,6 @@
 # Droid is technology-agnostic
 
-The agent (renamed from Csdroid to Droid) and its `droid-*` skills carry no language- or toolchain-specific knowledge: no hardcoded build/test commands, project-file conventions, or language names in the agent or skill prose. All technology specifics — style, build/verify commands, layer conventions — live only in the per-repo `CODE.md`, `VERIFY.md`, and `GOTCHAS.md` files the agent resolves during INPUT. When `VERIFY.md` is absent, `droid-feedback`'s fallback discovers the toolchain by reading the repo's own `README.md` and exploring its project files, instead of falling back to a specific language's tooling.
+The agent (renamed from Csdroid to Droid) and its `droid-*` skills carry no language- or toolchain-specific knowledge: no hardcoded build/test commands, project-file conventions, or language names in the agent or skill prose. Coding, verification, and Gotchas guidance live in mutable references beside their consuming skills. When a reference is absent, its consuming skill reports the absence and uses a bundled technology-agnostic fallback; verification discovers the toolchain from the invocation directory's `README.md` and project files instead of falling back to a specific language's tooling.
 
 ## Considered Options
 

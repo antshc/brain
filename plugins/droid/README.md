@@ -4,23 +4,20 @@ A technology-agnostic autonomous coding harness. One agent (`droid`) orchestrate
 
 ## Components
 
-- [agents/droid.agent.md](agents/droid.agent.md) — the orchestrator. Fixed phases: INPUT → GOTCHAS → BUILD & LSP CHECK → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS → STATUS REPORT. Resolves Harness Settings and convention/state files once during INPUT, and works in its invocation directory.
+- [agents/droid.agent.md](agents/droid.agent.md) — the orchestrator. Fixed phases: INPUT → GOTCHAS → BUILD & LSP CHECK → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS → STATUS REPORT. Works exclusively in its invocation directory.
 - [skills/to-droid/SKILL.md](skills/to-droid/SKILL.md) — entry point. Resolves a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `droid` via `runSubagent`.
 - [skills/droid-build-check/SKILL.md](skills/droid-build-check/SKILL.md) — builds the project and checks LSP availability before implementation.
-- [skills/droid-implement/SKILL.md](skills/droid-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during INPUT.
-- [skills/droid-feedback/SKILL.md](skills/droid-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd.
-- [skills/droid-gotchas/SKILL.md](skills/droid-gotchas/SKILL.md) — reads gotchas from `GOTCHAS.md` at `$HARNESS_ROOT/.droid` before implementation, then distills session friction into new or extended directives and writes them back after feedback loops pass.
+- [skills/droid-implement/SKILL.md](skills/droid-implement/SKILL.md) — implementation rules; loads sibling `CODE.md` or bundled `FALLBACK.md` when the reference is absent.
+- [skills/droid-feedback/SKILL.md](skills/droid-feedback/SKILL.md) — verify loop (LSP/build/test); loads sibling `VERIFY.md` or bundled `FALLBACK.md` when the reference is absent and runs all commands in cwd.
+- [skills/droid-gotchas/SKILL.md](skills/droid-gotchas/SKILL.md) — reads sibling `GOTCHAS.md` or bundled `FALLBACK.md` before implementation, then distills session friction into new or extended directives and writes them back after feedback loops pass when the reference is present.
 - [skills/to-commit/SKILL.md](skills/to-commit/SKILL.md) — commits with a `dcode:` prefix, post-task.
-- [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) — manual, user-invoked bootstrap that scaffolds missing `CODE.md`/`VERIFY.md`/`GOTCHAS.md` from templates into `$HARNESS_ROOT/.droid/`. Never touches `.harness.env`. Not part of the agent's pipeline.
+- [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) — manual, user-invoked restoration of missing skill-owned guidance references from bundled fallbacks. Not part of the agent's pipeline.
 
-## Environment
+## Runtime Guidance
 
-During INPUT, Droid independently resolves Harness Settings through `/resolve-harness` when available. When the skill is unavailable or finds no configuration, it uses its current working directory (cwd) as `HARNESS_ROOT`. A failing available resolver blocks the invocation. Droid retains the complete emitted settings only for that invocation, then resolves its convention and state files once.
+**Workspace = cwd** — all code, Git, build, test, and exploration commands run in the agent's invocation directory. There is no Harness Root, repository-location discovery, workspace variable, or ancestor declaration lookup.
 
-- `HARNESS_ROOT` — the Harness Settings value that owns all convention/state files, all of which live under `$HARNESS_ROOT/.droid/`. INPUT looks for each file at `$HARNESS_ROOT/.droid/<FILE>` and nowhere else, so running the agent directly (no `.harness.env`, `HARNESS_ROOT` = cwd) reads `.droid/` in the repo it was launched in. `HARNESS_ROOT` is therefore the only key `.harness.env` needs; nothing writes the path keys back to it. Optional `CODE_PATH`, `VERIFY_PATH`, and `GOTCHAS_PATH` settings exist only to point a file outside `.droid/` — set by hand, they override the default and are passed to the relevant sub-skills. When no `GOTCHAS.md` exists, INPUT creates `.droid/GOTCHAS.md`; missing CODE and VERIFY files use their documented fallbacks. INPUT itself never creates missing `CODE.md` or `VERIFY.md` — run [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) manually to scaffold them (and optionally pre-seed `GOTCHAS.md`) from the templates the droid plugin owns at [skills/setup-droid/templates](skills/setup-droid/templates).
-- **Workspace = cwd** — all code, git, build, test, and exploration commands run in the agent's current working directory. There is no separate workspace variable; callers launch the agent with cwd set to the code repo/worktree.
-
-Harness discovery lives in Droid. Neither `ralph:dev` nor `to-droid` passes Harness Settings to the agent.
+Each consuming skill owns a mutable reference and a bundled fallback in its own directory: `droid-implement/CODE.md`, `droid-feedback/VERIFY.md`, and `droid-gotchas/GOTCHAS.md`. A missing reference is reported before its fallback is used; only a present `GOTCHAS.md` can receive newly observed reusable friction after successful feedback loops.
 
 ## Dependencies
 
@@ -35,19 +32,17 @@ graph TD
     AG -->|FEEDBACK LOOPS| FB[droid-feedback skill]
     TC[to-commit skill] -.->|reads STATUS REPORT| AG
 
-    AG -.GOTCHAS_PATH read+write.-> GOT
-    AG -.CODE_PATH.-> IMP
-    AG -.VERIFY_PATH.-> FB
-
-    AG -.resolves once from $HARNESS_ROOT/.droid/.-> DOCS[CODE.md / VERIFY.md / GOTCHAS.md]
+    GOT -.owns.-> DOCS[GOTCHAS.md / FALLBACK.md]
+    IMP -.owns.-> CODE[CODE.md / FALLBACK.md]
+    FB -.owns.-> VERIFY[VERIFY.md / FALLBACK.md]
 ```
 
 **Nature of each edge**
 
-- **Hard control-flow**: `to-droid` / `ralph:dev` → `droid` → the `droid-*` skills (named literally in the agent prose). Harness discovery lives in Droid, not its callers.
+- **Hard control-flow**: `to-droid` / `ralph:dev` → `droid` → the `droid-*` skills (named literally in the agent prose). Callers establish the invocation directory.
 - **Soft/implicit**: `to-commit` depends on the agent's STATUS REPORT format (the `dcode:` convention couples them, but nothing enforces it).
-- **Resolution contract**: the agent resolves Harness Settings (or falls back to cwd), resolves the three paths during INPUT, and passes each path to the relevant `droid-*` skill.
-- **External file contracts**: each `droid-*` skill consumes only the resolved path the agent supplies; INPUT owns discovery and fallback `GOTCHAS.md` creation.
+- **Guidance contract**: each consuming skill resolves only its sibling reference and reports when it uses a bundled fallback.
+- **Gotchas persistence**: `droid-gotchas` writes only to a present sibling `GOTCHAS.md` after feedback loops pass.
 
 ## Execution sequence
 
@@ -69,7 +64,7 @@ sequenceDiagram
     TD->>AG: runSubagent(droid, task + recent changes)
 
     rect rgba(160, 190, 255, 0.08)
-    note over AG: INPUT — resolve Harness Settings (or fallback cwd); resolve paths; workspace = cwd
+    note over AG: INPUT — workspace = invocation directory
     end
 
     rect rgba(160, 190, 255, 0.08)

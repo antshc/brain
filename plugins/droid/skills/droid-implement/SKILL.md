@@ -14,11 +14,11 @@ Implementation Progress:
 
 Implement the task. Do not skip any step below.
 
-## Step 1: Load CODE.md, then explore (mandatory, always)
+## Step 1: Load coding guidance, then explore (mandatory, always)
 
-Read `CODE_PATH` (resolved by the agent during INPUT) in full when set.
+Read the sibling `CODE.md` reference in full. When it is absent, report the missing reference and read sibling `FALLBACK.md` instead.
 
-**Emit**: "Loaded: CODE.md" or "CODE.md not found."
+**Emit**: "Coding guidance: CODE.md" or "Coding guidance: CODE.md missing; using FALLBACK.md."
 
 Delegate to the `Explore` subagent (thoroughness: medium) regardless of whether `CODE.md` was loaded. Never explore ad hoc. Give it the task, the file(s) being modified, and the full `CODE.md` contents when loaded. 
 Require it to:

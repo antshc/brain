@@ -14,7 +14,7 @@ Build & LSP Check Progress:
 
 ## Step 1: Build the project
 
-Build the project in your workspace using the "Build the solution" instructions in `$HARNESS_ROOT/README.md` (located under `HARNESS_ROOT`). If it fails, report the failure and stop — do not explore a broken build.
+Build the project in the invocation directory using its `README.md` "Build the solution" instructions. If it fails, report the failure and stop — do not explore a broken build.
 
 ## Step 2: Check LSP availability
 
