@@ -8,14 +8,11 @@ argument-hint: '<milestone-title>'
 
 Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
-## 0. Resolve harness settings
+## 0. Set Harness Root
 
-If `/resolve-harness` is available, invoke it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
+Set `HARNESS_ROOT` to the current directory.
 
-- If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
-- If the available skill exits non-zero, **exit** and report its error.
-
-Use `HARNESS_ROOT` for all harness repository operations. Change to `HARNESS_ROOT` before invoking `/worktree`.
+Use `HARNESS_ROOT` for all Harness Root repository operations. Change to `HARNESS_ROOT` before invoking `/worktree`.
 
 ## 1. Resolve milestone
 
@@ -34,7 +31,7 @@ If no milestone matches, **exit** and report "Milestone not found: `<milestone-t
 
 Extract from `milestone.description`:
 - **Feature ID** — value inside backticks after `**Feature ID:**` (e.g. `PROJ-1234`)
-- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`). This branch lives in the **source repository** the worktree is created from (the `workspace/` source repo when present, otherwise the harness repo), not necessarily the harness repo.
+- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`). This branch lives in the **Source Repository** the worktree is created from (the `workspace/` source repository when present, otherwise the Harness Root), not necessarily the Harness Root.
 
 If either field is missing, **exit** and report "Milestone is missing required metadata."
 
@@ -98,7 +95,7 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the Worktree Path; do not provide a workspace-path argument. Droid uses its invocation directory as its workspace. Use the following prompt (substitute actual values):
 
 ```
 ## TASK

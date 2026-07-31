@@ -51,6 +51,6 @@ Emit this deterministic summary in reference-table order: "Populated from eviden
 ## Hard rules
 
 - Manual invocation only — do not wire this into `droid.agent.md`'s INPUT step.
-- Do not create or modify repository files, Harness Settings, or `.droid/`.
+- Do not create or modify repository files or `.droid/`.
 - Write only the listed Droid references and only when their content is absent, empty, or placeholder-only.
 - Keep generated detail in these references; do not expand Droid's core skill or agent bodies with repository-specific guidance.
