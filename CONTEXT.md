@@ -42,19 +42,14 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 
 ### Language
 **Harness Root**:
-The repository that owns the milestone/issues, convention docs, and agent state files. Droid resolves `CODE.md`, `VERIFY.md`, and `GOTCHAS.md` recursively beneath it once during INPUT; when no `GOTCHAS.md` exists, it creates `.droid/GOTCHAS.md`. Distinct from the `Worktree Path`, though it can be the same repo.
+The repository that owns the milestone/issues and hosts the repo-local development workflow. Distinct from the `Source Repository` and `Worktree Path`, though one repository can serve all three roles.
 _Avoid_: repo root, home repo
 _Plugins_set_: ralph, droid, wf
 
-**Harness Configuration File**:
-The optional `.harness.env` file at a repository root that must declare its `HARNESS_ROOT` and may declare additional harness settings. A resolver searches ancestor directories for the nearest file without changing the filesystem; when none exists, the caller uses its documented fallback.
-_Avoid_: environment file, repo configuration
-_Plugins_set_: harness, ralph, droid
-
-**Harness Settings**:
-The complete set of `KEY=VALUE` entries returned verbatim by `resolve-harness` from the nearest Harness Configuration File. A caller retains the set for its invocation; without a resolver or configuration file, it uses only its current directory as `HARNESS_ROOT`.
-_Avoid_: environment variables, process environment
-_Plugins_set_: harness, ralph, droid
+**Source Repository**:
+The Git repository containing the source code Ralph develops. Distinct from the `Harness Root` and `Worktree Path`, though it can also be the Harness Root.
+_Avoid_: codebase, source checkout
+_Plugins_set_: ralph, wf
 
 **Worktree Path**:
 The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Droid from it when applicable; Droid treats its invocation directory as its workspace and does not receive this path.
@@ -78,7 +73,7 @@ _Plugins_set_: wf
 ### Language
 
 **Gotchas**:
-Reusable directives stored in the `GOTCHAS.md` resolved during INPUT. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
+Reusable directives stored with the `droid-gotchas` skill. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
@@ -116,6 +111,6 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → droid**: `ralph` creates the `Worktree Path` and launches the `droid` plugin's `droid` agent from that directory. Droid independently resolves `Harness Settings` during INPUT, then resolves its convention/state file paths under the resulting `Harness Root`.
-- **droid ↔ Shared**: `droid` resolves `Gotchas` (`GOTCHAS.md`) under `Harness Root` during INPUT; it creates `.droid/GOTCHAS.md` only when no existing file is found, reads it before implementation, and writes distilled directives back into it after feedback loops pass.
+- **ralph → droid**: Consumers install `ralph` in the `Harness Root` to use its development workflow. Ralph resolves the `Source Repository`, creates the `Worktree Path`, and launches the repo-local `droid` agent from that directory when available, otherwise its general-purpose fallback. Droid treats its invocation directory as its workspace.
+- **droid ↔ Shared**: `droid` reads skill-owned implementation and verification guidance before changing code, then writes distilled `Gotchas` back to the reference owned by `droid-gotchas` after feedback loops pass.
 
