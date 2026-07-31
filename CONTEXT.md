@@ -44,7 +44,7 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 **Harness Root**:
 The repository that owns the milestone/issues and hosts the repo-local development workflow. Distinct from the `Source Repository` and `Worktree Path`, though one repository can serve all three roles.
 _Avoid_: repo root, home repo
-_Plugins_set_: ralph, droid, wf
+_Plugins_set_: ralph, wf
 
 **Source Repository**:
 The Git repository containing the source code Ralph develops. Distinct from the `Harness Root` and `Worktree Path`, though it can also be the Harness Root.
@@ -52,9 +52,9 @@ _Avoid_: codebase, source checkout
 _Plugins_set_: ralph, wf
 
 **Worktree Path**:
-The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Droid from it when applicable; Droid treats its invocation directory as its workspace and does not receive this path.
+The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Codey and Chorey from it; each agent treats its invocation directory as its workspace and does not receive this path.
 _Avoid_: working directory, checkout
-_Plugins_set_: ralph, droid, wf
+_Plugins_set_: ralph, wf
 
 **Ledger**:
 A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
@@ -69,20 +69,30 @@ _Plugins_set_: wf
 ## ralph
 ### Language
 
-## droid
-### Language
+**Codey**:
+Ralph's technology-agnostic implementation agent.
+_Avoid_: Droid, coding agent
+_Plugins_set_: ralph
+
+**Chorey**:
+Ralph's technology-agnostic refactoring agent.
+_Avoid_: review agent, cleanup agent
+_Plugins_set_: ralph
 
 **Gotchas**:
-Reusable directives stored with the `droid-gotchas` skill. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
+Reusable directives shared by Codey and Chorey through the `ralph-gotchas` skill.
 _Avoid_: decisions, durable decisions, problem log
+_Plugins_set_: ralph
 
 **Module**:
-The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — discovered from the repo's own structure during `droid-feedback`, never assumed or named by the skill.
+The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — discovered from the repo's own structure during `ralph-feedback`, never assumed or named by the skill.
 _Avoid_: project, package
+_Plugins_set_: ralph
 
 **Verification counterpart**:
-The sibling/child unit that verifies a Module (tests, specs, or whatever the repo calls it), discovered the same way as its Module during `droid-feedback`.
+The sibling or child unit that verifies a Module, discovered with its Module during `ralph-feedback`.
 _Avoid_: test project, test suite
+_Plugins_set_: ralph
 
 ## wf
 
@@ -111,6 +121,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → droid**: Consumers install `ralph` in the `Harness Root` to use its development workflow. Ralph resolves the `Source Repository`, creates the `Worktree Path`, and launches the repo-local `droid` agent from that directory when available, otherwise its general-purpose fallback. Droid treats its invocation directory as its workspace.
-- **droid ↔ Shared**: `droid` reads skill-owned implementation and verification guidance before changing code, then writes distilled `Gotchas` back to the reference owned by `droid-gotchas` after feedback loops pass.
+- **ralph ↔ Shared**: Ralph resolves the `Source Repository` and `Worktree Path`; Codey and Chorey treat their invocation directory as the workspace and share skill-owned guidance and `Gotchas`.
 

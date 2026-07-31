@@ -1,0 +1,3 @@
+# Ralph agents are technology-agnostic
+
+Codey, Chorey, and their supporting skills carry no language- or toolchain-specific knowledge. Repository-specific coding and verification guidance lives in mutable references beside the consuming skills; when a reference is absent, the skill reports that absence and uses a bundled technology-agnostic fallback that discovers the toolchain from repository evidence.
