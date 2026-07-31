@@ -1,8 +1,8 @@
 # GOTCHAS
 
-<!-- Read-only gotchas, loaded by droid-gotchas during GOTCHAS. Curated by a human from recurring entries in .droid/LOG.md — never written to by the agent itself. -->
+<!-- Reusable directives, loaded by droid-gotchas before implementation and distilled/written directly by the agent after each session (extends an existing line when the same rule recurs). -->
 
 ## Gotchas
 
-<!-- One directive per line, distilled from .droid/LOG.md. Example shape (replace with real, curated gotchas): -->
+<!-- One directive per line. Example shape (replace with real, agent-written gotchas): -->
 <!-- - <directive> -->

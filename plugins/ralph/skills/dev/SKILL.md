@@ -160,7 +160,7 @@ git push -u origin "$branch" 2>/dev/null || git push
 
 ## 9. Commit harness root
 
-Run **once** per iteration, after Handle result and after the agent has appended any problems to `.droid/LOG.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
+Run **once** per iteration, after Handle result and after the agent has recorded any gotchas to `.droid/GOTCHAS.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).

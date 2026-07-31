@@ -42,7 +42,7 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 
 ### Language
 **Harness Root**:
-The repository that owns the milestone/issues, convention docs, and agent state files. Droid resolves `CODE.md`, `VERIFY.md`, `GOTCHAS.md`, and `LOG.md` recursively beneath it once during INPUT; when no log exists, it creates `.droid/LOG.md`. Distinct from the `Worktree Path`, though it can be the same repo.
+The repository that owns the milestone/issues, convention docs, and agent state files. Droid resolves `CODE.md`, `VERIFY.md`, and `GOTCHAS.md` recursively beneath it once during INPUT; when no `GOTCHAS.md` exists, it creates `.droid/GOTCHAS.md`. Distinct from the `Worktree Path`, though it can be the same repo.
 _Avoid_: repo root, home repo
 _Plugins_set_: ralph, droid, wf
 
@@ -77,13 +77,9 @@ _Plugins_set_: wf
 ## droid
 ### Language
 
-**Problem Log**:
-An append-only `LOG.md` record of conflicts, access failures, or other friction an agent hit during a session (convention conflicts, directory/tool access issues). Its path is resolved during INPUT; it is written by the agent at the end of a session and curated by a human into Gotchas.
-_Avoid_: decision log, decisions.jsonl
-
 **Gotchas**:
-Curated, human-reviewed directives stored in the `GOTCHAS.md` resolved during INPUT, distilled from recurring entries in the Problem Log. Read-only from the agent's perspective — applied before implementation, never written by the agent.
-_Avoid_: decisions, durable decisions
+Reusable directives stored in the `GOTCHAS.md` resolved during INPUT. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
+_Avoid_: decisions, durable decisions, problem log
 
 **Module**:
 The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — discovered from the repo's own structure during `droid-feedback`, never assumed or named by the skill.
@@ -121,5 +117,5 @@ _Avoid_: checklist.md, agent instructions
 # Relationships
 
 - **ralph → droid**: `ralph` creates the `Worktree Path` and launches the `droid` plugin's `droid` agent from that directory. Droid independently resolves `Harness Settings` during INPUT, then resolves its convention/state file paths under the resulting `Harness Root`.
-- **droid ↔ Shared**: `droid` resolves `Gotchas` (`GOTCHAS.md`) and the `Problem Log` (`LOG.md`) under `Harness Root` during INPUT; it creates `.droid/LOG.md` only when no existing log is found.
+- **droid ↔ Shared**: `droid` resolves `Gotchas` (`GOTCHAS.md`) under `Harness Root` during INPUT; it creates `.droid/GOTCHAS.md` only when no existing file is found, reads it before implementation, and writes distilled directives back into it after feedback loops pass.
 
