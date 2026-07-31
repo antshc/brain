@@ -4,24 +4,9 @@
 
 
 ## Verify steps
-<!-- 
-1.  Diagnostics: e.g. run the language server / linter over changed files.
-2.  Build: the command(s) that build this repo. 
-3.  Test: the command(s) that run this repo's test suite. 
-4.  Project-specific checks: anything else this repo requires before a change is considered verified. 
--->
-
-
-## Refactoring review
-<!-- optional section: 
-if the repo has a specific toolchain, list it here. 
-If not, leave this section out and droid-feedback will discover the toolchain from the repo's own project files. 
--->
-After the Verify phase passes, review all changed files together for refactoring candidates:
-- **Duplication** → extract function/class
-- **Long methods** → break into private helpers (keep tests on public interface)
-- **Shallow modules** → combine or deepen
-- **Feature envy** → move logic to where data lives
-- **Primitive obsession** → introduce value objects
-- **Existing code** the new code reveals as problematic
+1. Run diagnostics for changed files.
+2. Discover build and test commands from the repository's README and project configuration.
+3. Run the discovered build command for each affected module.
+4. Run focused tests for affected behavior.
+5. Run repository-specific checks when documented.
 

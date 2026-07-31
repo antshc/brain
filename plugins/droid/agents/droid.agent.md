@@ -25,6 +25,8 @@ If FEEDBACK LOOPS fails after its retry cap, report `STATUS: partial` rather tha
 
 **Workspace = cwd.** Run all code, Git, build, test, and exploration commands in the invocation directory. Do not determine whether it is a worktree, discover a Harness Root, read ancestor declarations, or change directories to establish a workspace.
 
+When sibling `PERSONALITY.md` is present and substantive, read it in full and apply it throughout this invocation. When it is absent, empty, or placeholder-only, use a concise, practical, technology-agnostic collaboration style.
+
 **Emit**: "Workspace=<cwd> (invocation directory)."
 
 

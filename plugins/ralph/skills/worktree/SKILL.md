@@ -12,10 +12,7 @@ Create or reuse an isolated git worktree for a feature branch based off a target
 
 ## 0. Resolve Harness Root
 
-If `/resolve-harness` is available, invoke it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
-
-- If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
-- If the available skill exits non-zero, **exit** and report its error.
+Set `HARNESS_ROOT` to the current directory.
 
 ## 1. Prepare worktree
 
@@ -41,7 +38,7 @@ If `worktree_status` is `3`, parse `WORKTREE_PATH` and the conflicting files fro
    ```bash
   cd "$WORKTREE_PATH"
    ```
-2. Invoke the `droid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Pass the following prompt:
+2. Invoke the `droid` agent (or `general-purpose` if unavailable) from the current Worktree Path. Do not provide a workspace-path argument. Droid uses its invocation directory as its workspace. Pass the following prompt:
    ```
    ## Resolve Merge Conflicts
    The following files have merge conflicts after merging origin/<target-branch> into <feature-branch>.

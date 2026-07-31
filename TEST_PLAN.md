@@ -647,43 +647,38 @@ Scenario: PR URL with numeric owner/repo
 
 ---
 
-## Feature: Main Harness
+## Feature: Deterministic Source Repository development
 
-> Resolver unit test; setup manual test
+> Unit: `prepare_worktree.sh`
 
 ```gherkin
-Scenario: Nearest Harness Configuration File is resolved
-  Given nested directories with Harness Configuration Files in two ancestor directories
-  When the resolver runs from the nested directory
-  Then it emits settings from the nearest configuration only
+Scenario: Direct-source Harness Root selects itself
+  Given a Harness Root without a workspace directory
+  When prepare_worktree.sh runs
+  Then it selects the Harness Root as the Source Repository and creates its Worktree Path
 
-Scenario: All Harness Settings are emitted verbatim
-  Given a Harness Configuration File with values containing additional equals signs and empty values
-  When the resolver runs
-  Then it emits every configured KEY=value line unchanged
+Scenario: Wrapped Harness Root selects its sole direct child repository
+  Given a Harness Root whose workspace directory contains one direct-child Git repository
+  When prepare_worktree.sh runs
+  Then it selects that repository as the Source Repository and creates its Worktree Path
 
-Scenario: No Harness Configuration File returns an empty Harness Root
-  Given no ancestor directory has a Harness Configuration File
-  When the resolver runs
-  Then it exits successfully with HARNESS_ROOT= on stdout and a current-directory fallback explanation on stderr
+Scenario: Wrapped Harness Root without a source repository fails closed
+  Given a Harness Root whose workspace directory has no direct-child Git repository
+  When prepare_worktree.sh runs
+  Then it fails with the missing Source Repository error
 
-Scenario: Missing Harness Root fails resolution
-  Given a discovered Harness Configuration File without HARNESS_ROOT
-  When the resolver runs
-  Then it exits with an error
+Scenario: Wrapped Harness Root with multiple source repositories is ambiguous
+  Given a Harness Root whose workspace directory contains multiple direct-child Git repositories
+  When prepare_worktree.sh runs
+  Then it fails with the ambiguous Source Repository error
 
-Scenario: Setup creates Harness Configuration File in current directory
-  Given the current directory has no Harness Configuration File
-  When harness setup runs
-  Then it creates a configuration with the current directory as HARNESS_ROOT
-
-Scenario: Setup preserves existing Harness Configuration File
-  Given the current directory has an existing Harness Configuration File
-  When harness setup runs
-  Then it leaves the file unchanged and reports its settings
+Scenario: Existing feature worktree is reused and merged with its target branch
+  Given a direct-source Harness Root with an existing feature Worktree Path and a target-branch update
+  When prepare_worktree.sh runs
+  Then it reuses the Worktree Path and merges the target branch update
 ```
 
-**Coverage:** Resolver unit test; setup manual test
+**Coverage:** Unit test
 
 ---
 
@@ -696,7 +691,7 @@ Scenario: Droid remains in the caller-selected location
   Given Droid starts in a source repository checkout or worktree path
   When it explores, modifies, builds, tests, or runs Git commands
   Then every operation remains in the invocation directory
-    And it does not resolve Harness Settings or ancestor repository declarations
+    And it ignores legacy repository-location declarations
 
 Scenario: Present skill-owned guidance is loaded
   Given sibling CODE.md, VERIFY.md, and GOTCHAS.md references exist beside their consuming Droid skills

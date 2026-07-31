@@ -18,7 +18,7 @@ Autonomous, technology-agnostic implementation agent. Explores repo, implements 
 <last 5 commits>
 ```
 
-Ralph launches Droid from the worktree. The worktree path and Harness Settings remain outside the prompt; Droid independently resolves Harness Settings from its invocation directory.
+Ralph launches Droid from the Worktree Path. The Worktree Path remains outside the prompt; Droid uses its invocation directory as its workspace.
 
 **Invoked by `/worktree`** (merge-conflict resolution, smaller prompt — see `worktree/SKILL.md` step 2).
 
