@@ -4,20 +4,20 @@ A technology-agnostic autonomous coding harness. One agent (`droid`) orchestrate
 
 ## Components
 
-- [agents/droid.agent.md](agents/droid.agent.md) — the orchestrator. Fixed phases: INPUT → GOTCHAS → BUILD & LSP CHECK → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS → STATUS REPORT. Works exclusively in its invocation directory.
+- [agents/droid.agent.md](agents/droid.agent.md) — the orchestrator. Fixed phases: INPUT → GOTCHAS → BUILD & LSP CHECK → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS → STATUS REPORT. Works exclusively in its invocation directory and optionally applies sibling `PERSONALITY.md`.
 - [skills/to-droid/SKILL.md](skills/to-droid/SKILL.md) — entry point. Resolves a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `droid` via `runSubagent`.
 - [skills/droid-build-check/SKILL.md](skills/droid-build-check/SKILL.md) — builds the project and checks LSP availability before implementation.
 - [skills/droid-implement/SKILL.md](skills/droid-implement/SKILL.md) — implementation rules; loads sibling `CODE.md` or bundled `FALLBACK.md` when the reference is absent.
 - [skills/droid-feedback/SKILL.md](skills/droid-feedback/SKILL.md) — verify loop (LSP/build/test); loads sibling `VERIFY.md` or bundled `FALLBACK.md` when the reference is absent and runs all commands in cwd.
 - [skills/droid-gotchas/SKILL.md](skills/droid-gotchas/SKILL.md) — reads sibling `GOTCHAS.md` or bundled `FALLBACK.md` before implementation, then distills session friction into new or extended directives and writes them back after feedback loops pass when the reference is present.
 - [skills/to-commit/SKILL.md](skills/to-commit/SKILL.md) — commits with a `dcode:` prefix, post-task.
-- [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) — manual, user-invoked restoration of missing skill-owned guidance references from bundled fallbacks. Not part of the agent's pipeline.
+- [skills/setup-droid/SKILL.md](skills/setup-droid/SKILL.md) — manual, user-invoked tailoring of missing skill-owned guidance and personality references from repository evidence and bundled defaults. Not part of the agent's pipeline.
 
 ## Runtime Guidance
 
 **Workspace = cwd** — all code, Git, build, test, and exploration commands run in the agent's invocation directory. There is no Harness Root, repository-location discovery, workspace variable, or ancestor declaration lookup.
 
-Each consuming skill owns a mutable reference and a bundled fallback in its own directory: `droid-implement/CODE.md`, `droid-feedback/VERIFY.md`, and `droid-gotchas/GOTCHAS.md`. A missing reference is reported before its fallback is used; only a present `GOTCHAS.md` can receive newly observed reusable friction after successful feedback loops.
+Each consuming skill owns a mutable reference and a bundled fallback in its own directory: `droid-implement/CODE.md`, `droid-feedback/VERIFY.md`, and `droid-gotchas/GOTCHAS.md`. The Droid agent optionally reads sibling `agents/PERSONALITY.md`. A missing guidance reference is reported before its fallback is used; an absent personality uses the agent's technology-agnostic behavior; only a present `GOTCHAS.md` can receive newly observed reusable friction after successful feedback loops.
 
 ## Dependencies
 
@@ -35,6 +35,7 @@ graph TD
     GOT -.owns.-> DOCS[GOTCHAS.md / FALLBACK.md]
     IMP -.owns.-> CODE[CODE.md / FALLBACK.md]
     FB -.owns.-> VERIFY[VERIFY.md / FALLBACK.md]
+    AG -.owns.-> PERSONALITY[PERSONALITY.md]
 ```
 
 **Nature of each edge**

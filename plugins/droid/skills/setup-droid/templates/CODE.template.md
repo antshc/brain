@@ -4,16 +4,16 @@
 
 ## Style
 
-<!-- Naming, formatting, and file organization conventions. -->
+- Follow observed repository naming, formatting, and file-organization conventions.
 
 ## Layer placement
 
-<!-- Where different kinds of code belong (folders/layers/modules) and how to decide placement for new code. -->
+- Place changes with the existing owning module and reuse its local structure.
 
 ## Design principles
 
-<!-- Design rules this repo expects (e.g. module depth, dependency direction, allowed/forbidden patterns). -->
+- Make the smallest coherent change, preserve unrelated behavior, and avoid speculative abstractions.
 
 ## Tests
 
-<!-- When tests are required, where they live, and how they're structured/named. -->
+- Add or update focused checks when behavior changes, using the repository's existing test structure.
