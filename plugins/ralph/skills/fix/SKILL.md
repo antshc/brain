@@ -13,7 +13,7 @@ Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://githu
    ```
    /worktree <branch> <branch>
    ```
-   Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the current repo) and creates the worktree there.
+  Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/worktree` skill runs the executable Source Repository contract and creates or reuses the worktree there.
 3. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:

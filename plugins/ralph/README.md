@@ -34,4 +34,4 @@ Ralph launches Droid from the worktree. The worktree path and Harness Settings r
 |-------|-------------|
 | `/dev` | AFK loop — picks next issue, invokes `droid`, pushes |
 | `/fix` | Apply PR review comments |
-| `/worktree` | Resolve the source repo (workspace source repo when present, else current repo) and create/reuse an isolated git worktree |
+| `/worktree` | Run the deterministic Source Repository contract and create/reuse an isolated git worktree |
