@@ -13,7 +13,7 @@ Copy this checklist and check off items as you complete them:
 ```
 Feedback Loops Progress:
 - [ ] Step 0: Collect changed files
-- [ ] Step 1: Verify — diagnostics, build, tests, and any project-specific checks (from VERIFY.md if resolved, else inline default)
+- [ ] Step 1: Verify — diagnostics, build, tests, and any project-specific checks (from sibling VERIFY.md, else sibling FALLBACK.md)
 ```
 
 ## Step 0: Collect changed files
@@ -26,13 +26,7 @@ Gather the full list of files changed during implementation. For each changed fi
 
 ## Step 1: Verify (diagnostics, build, tests)
 
-Use the optional `VERIFY_PATH` value resolved by the agent during INPUT. When it is resolved, follow all steps in that `VERIFY.md` in order — it may define more steps than the default and may add project-specific checks; emit "Verify steps: VERIFY.md". When it is unresolved, run the **Default** below and emit "Verify steps: default".
-
-**Default** — never hardcode a language or toolchain; discover it per repo:
-- **LSP diagnostics**: run `get diagnostics` on all changed files.
-- **Discover the toolchain**: read `HARNESS_ROOT/README.md` for documented build/verify instructions (same source the agent's own `BUILD & LSP CHECK` phase uses), and explore the repo's own project/config files (manifests, build files, lockfiles) to identify the build and test tooling in use. A passing `get diagnostics` does NOT replace a build — many analyzers only fire during a real build.
-- **Build**: run the discovered build command for each unique affected Module (do not build the same Module twice).
-- **Tests**: run the discovered test command for each unique affected Verification counterpart, scoped to the classes/specs that correspond to changed files in that Verification counterpart's scope.
+Read the sibling `VERIFY.md` reference. When it is present, follow all steps in order and emit "Verify guidance: VERIFY.md". When it is absent, report the missing reference, follow sibling `FALLBACK.md`, and emit "Verify guidance: VERIFY.md missing; using FALLBACK.md."
 
 If the Verify phase surfaces any issues or requires changes, apply fixes and re-run Step 1 over the updated full set of changed files.
 

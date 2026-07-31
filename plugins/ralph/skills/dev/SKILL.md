@@ -56,7 +56,7 @@ Invoke the `/worktree` skill:
 /worktree <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. The `/worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the harness repo) and creates the worktree there. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
+Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. The `/worktree` skill runs the executable Source Repository contract: an absent `workspace/` selects Harness Root, while a present `workspace/` must contain exactly one direct-child Git repository. All subsequent code, Git, push, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the Harness Root `repo`.
 
 If the worktree skill exits with an error, **exit**.
 
