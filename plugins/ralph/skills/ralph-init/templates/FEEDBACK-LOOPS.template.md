@@ -1,6 +1,6 @@
-# VERIFY
+# FEEDBACK LOOPS
 
-<!-- Followed in order by ralph-feedback. List every repository-specific verification step. -->
+<!-- Followed in order by ralph-feedback-loops. List every repository-specific changed-file verification step. -->
 
 ## Verify steps
 

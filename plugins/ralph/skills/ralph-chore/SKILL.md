@@ -16,11 +16,11 @@ Maintainability Review Progress:
 
 ## Step 1: Inspect the reviewed change set
 
-Inspect staged, unstaged, and untracked files in the current invocation directory. Read each changed file and only the directly required neighboring code needed to establish behavior.
+Read sibling `CHORE.md` in full. Inspect staged, unstaged, and untracked files in the current invocation directory. Read each changed file and only the directly required neighboring code needed to establish behavior.
 
 ## Step 2: Identify justified refactors
 
-Consider duplication, unclear boundaries, avoidable complexity, stale comments, and inconsistent local conventions. Do not report speculative redesigns or concerns outside the reviewed change set.
+`CHORE.md` wins when it speaks. Otherwise consider duplication, unclear boundaries, avoidable complexity, stale comments, and inconsistent local conventions. Do not report speculative redesigns or concerns outside the reviewed change set.
 
 ## Step 3: Apply or report findings
 

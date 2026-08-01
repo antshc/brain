@@ -34,6 +34,28 @@ Generate this exact block for both agents, replacing `<role>` with the confirmed
 
 When an agent already contains a generated persona block that differs, ask before replacing it. Preserve all content outside the generated block. When no block exists, insert it after the title and before the workflow.
 
+## Decide Build Gate
+
+Inspect `sourceRepository` for documented build commands and build-system evidence. Present the evidence, or state that none was found, then ask whether Codey needs the early Build & LSP Check step. Do not infer the answer from the evidence.
+
+When the user confirms the build gate, generate these exact `ralph-init`-owned blocks in Codey, replacing prior generated build blocks without changing content outside the markers. Renumber Codey's remaining checklist items to accommodate the BUILD step.
+
+```md
+<!-- ralph-init:build-checklist:start -->
+- [ ] Step 3: BUILD & LSP CHECK
+<!-- ralph-init:build-checklist:end -->
+```
+
+```md
+<!-- ralph-init:build-section:start -->
+## BUILD & LSP CHECK
+
+Follow `/ralph-build` skill.
+<!-- ralph-init:build-section:end -->
+```
+
+When the user declines the build gate, remove both generated blocks, including their markers. Renumber Codey's remaining checklist items to stay consecutive. Preserve all content outside the generated blocks.
+
 ## Inspect References
 
 Classify each reference before writing:
@@ -46,24 +68,29 @@ Classify each reference before writing:
 | Reference | Target path | Template |
 |---|---|---|
 | `CODE.md` | `../ralph-implement/CODE.md` | `templates/CODE.template.md` |
-| `VERIFY.md` | `../ralph-verify/VERIFY.md` | `templates/VERIFY.template.md` |
-| `GOTCHAS.md` | `../ralph-gotchas/GOTCHAS.md` | `templates/GOTCHAS.template.md` |
+| `FEEDBACK-LOOPS.md` | `../ralph-feedback-loops/FEEDBACK-LOOPS.md` | `templates/FEEDBACK-LOOPS.template.md` |
+| `CHORE.md` | `../ralph-chore/CHORE.md` | `templates/CHORE.template.md` |
+| `BUILD.md` | `../ralph-build/BUILD.md` | `templates/BUILD.template.md` |
+
+Classify `BUILD.md` only when the user confirms the build gate. Do not create, classify, or report it when the user declines.
 
 ## Gather Evidence
 
 Explore `sourceRepository` before populating coding or verification guidance.
 
 - For `CODE.md`, inspect implementation, tests, and repository instructions for style, placement, design, and testing conventions.
-- For `VERIFY.md`, inspect documented commands, CI, manifests, and test configuration for diagnostics, build, tests, and repository checks.
+- For `FEEDBACK-LOOPS.md`, inspect documented commands, CI, manifests, and test configuration for diagnostics, build, tests, and repository checks.
+- For `CHORE.md`, inspect repository instructions and changed-code conventions for review rules that are supported by evidence.
+- For `BUILD.md`, inspect documented build commands, CI, manifests, and project configuration.
 - Record only evidence supported by the repository. Retain the technology-agnostic template default for unsupported sections.
 
 ## Populate Missing References
 
-Start each populated reference from its matching template. Initialize `GOTCHAS.md` from its template with no directives; never infer Gotchas from setup evidence. `VERIFY.md` is required guidance for `/ralph-verify` and must be present after successful initialization.
+Start each populated reference from its matching template. Enrich `CHORE.md` only with review rules supported by repository evidence. `FEEDBACK-LOOPS.md` is required guidance for `/ralph-feedback-loops` and must be present after successful initialization. `/ralph-gotchas` initializes `GOTCHAS.md` on its first run; never infer Gotchas from setup evidence.
 
 ## Report
 
-Emit: "Persona: [confirmed role]. Agents: [created | replaced | unchanged]. Populated from evidence: [list]. Filled from defaults: [list]. Initialized empty: [list]. Preserved: [list]." Include every reference in Initialized empty or Preserved when applicable.
+Emit: "Persona: [confirmed role]. Build gate: [enabled | declined]. Agents: [created | replaced | unchanged]. Populated from evidence: [list]. Filled from defaults: [list]. Preserved: [list]." Include every classified reference in Filled from defaults or Preserved when applicable.
 
 ## Hard Rules
 

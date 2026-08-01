@@ -1,6 +1,6 @@
 ---
 name: ralph-build
-description: Build the current repository and check LSP availability before implementation.
+description: Use when the initialized Build & LSP Check gate needs repository-specific BUILD.md guidance.
 ---
 
 # Build & LSP Check
@@ -13,9 +13,9 @@ Build & LSP Check Progress:
 - [ ] Step 2: Check LSP availability
 ```
 
-## Step 1: Build the project
+## Step 1: Run build guidance
 
-Build the project in the invocation directory using its `README.md` Build the solution instructions. If it fails, report the failure and stop; do not explore a broken build.
+Read sibling `BUILD.md` in full and follow its build steps in order. If it fails, report the failure and stop; do not explore a broken build.
 
 ## Step 2: Check LSP availability
 

@@ -15,9 +15,8 @@ Copy this checklist and check off items as you complete them:
 Chorey Progress:
 - [ ] Step 1: INPUT
 - [ ] Step 2: READ GOTCHAS
-- [ ] Step 3: VERIFY CURRENT CHANGES
-- [ ] Step 4: REVIEW AND REFACTOR
-- [ ] Step 5: REVERIFY EDITS
+- [ ] Step 3: REVIEW AND REFACTOR
+- [ ] Step 4: FEEDBACK LOOPS
 ```
 
 ## INPUT
@@ -38,7 +37,7 @@ Follow the `/ralph-chore` skill. Apply only behavior-preserving refactors within
 
 ## FEEDBACK LOOPS
 
-When REVIEW AND REFACTOR changes a file, run the `/ralph-verify` skill against the complete final changed-file set. When it changes no files, skip this step and report that the Codey baseline or direct verification remains valid.
+When REVIEW AND REFACTOR changes a file, run `/ralph-feedback-loops` skill against the complete final changed-file set. When it changes no files, skip this step and report that the Codey baseline or direct verification remains valid.
 
 If verification exposes a code error, fix it and repeat this step for the complete changed-file set. After three failed retries for the same error, report `STATUS: partial`.
 
