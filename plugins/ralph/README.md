@@ -27,6 +27,14 @@ Maintainability reviewer. It uses the persona confirmed by `/ralph-init`, verifi
 
 ## Local initialization
 
-Run `/ralph-init` from a Git repository root with `gh` available and an immutable Ralph source revision. It confirms a technology-specific persona, independently offers Build and Feedback, installs selected skills in `.github/skills`, and creates Codey and Chorey in `.github/agents`.
+Install the `ralph-init` skill before using it in a repository:
+
+```bash
+gh skill install antshc/brain plugins/ralph/skills/ralph-init --agent github-copilot --dir .github/skills
+```
+
+Then open the repository in VS Code and run `/ralph-init` from its Git root.
+
+Run `/ralph-init` from a Git repository root with `gh` available. It confirms a technology-specific persona, independently offers Build and Feedback, installs selected skills in `.github/skills`, and creates Codey and Chorey in `.github/agents`.
 
 Core installation contains `ralph-init`, `ralph-implement`, `ralph-gotchas`, and `ralph-chore`; Build adds `ralph-build` and Feedback adds `ralph-feedback`. Initialization never overwrites an existing local Ralph skill, agent, or guidance file.

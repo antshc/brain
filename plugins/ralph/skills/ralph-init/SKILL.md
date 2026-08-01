@@ -10,7 +10,7 @@ Run only when a person explicitly invokes this skill. Never run it as part of Co
 
 ## Resolve target and source
 
-Set `repositoryRoot` to the invocation directory and require it to be a Git repository root. Require `gh` and an immutable `sourceRef` for the initiating Ralph source; resolve `sourceRef` from source-tracking metadata or installed-plugin provenance. When either prerequisite is unavailable, report it and stop without writing files.
+Set `repositoryRoot` to the invocation directory and require it to be a Git repository root. Require `gh`; when it is unavailable, report it and stop without writing files.
 
 Use `antshc/brain` as `sourceRepository`. Install skills in `$repositoryRoot/.github/skills` and agents in `$repositoryRoot/.github/agents`.
 
@@ -29,7 +29,7 @@ Create `$repositoryRoot/.github/skills` and `$repositoryRoot/.github/agents` whe
 For each selected skill absent from `$repositoryRoot/.github/skills/<skillName>`, run:
 
 ```bash
-gh skill install antshc/brain plugins/ralph/skills/<skillName> --agent github-copilot --dir "$repositoryRoot/.github/skills" --pin "$sourceRef"
+gh skill install antshc/brain plugins/ralph/skills/<skillName> --agent github-copilot --dir "$repositoryRoot/.github/skills"
 ```
 
 Never use `--force`. When a selected local skill already exists, preserve it and report it as unchanged.
