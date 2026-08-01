@@ -42,17 +42,17 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 
 ### Language
 **Harness Root**:
-The repository that owns the milestone/issues and hosts the repo-local development workflow. Distinct from the `Source Repository` and `Worktree Path`, though one repository can serve all three roles.
+The repository the loop is invoked from — it owns the milestone and issues, the docs, and the installed Ralph skills. When it contains no `workspace/` folder it is also the `Source Repository`, and development happens in it directly. When `workspace/` exists, the Harness Root holds only the harness and delegates all code to the `Source Repository` beneath it.
 _Avoid_: repo root, home repo
 _Plugins_set_: ralph, wf
 
 **Source Repository**:
-The Git repository containing the source code Ralph develops. Distinct from the `Harness Root` and `Worktree Path`, though it can also be the Harness Root.
+The Git repository holding the codebase Ralph develops, and the parent of its worktrees. It is the repository under `workspace/` when that folder exists (e.g. `workspace/ecom/.git`, with worktrees at `workspace/ecom.worktrees/`), otherwise the `Harness Root` itself. Never the location of milestones, issues, or installed skills unless it is also the Harness Root.
 _Avoid_: codebase, source checkout
 _Plugins_set_: ralph, wf
 
 **Worktree Path**:
-The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Codey and Chorey from it; each agent treats its invocation directory as its workspace and does not receive this path.
+The git worktree Ralph uses for code, Git, build, test, and PR operations, created as a sibling of the `Source Repository` under `<Source Repository>.worktrees/<feature-branch>`. Ralph launches Codey and Chorey from it; each agent treats its invocation directory as its workspace and does not receive this path.
 _Avoid_: working directory, checkout
 _Plugins_set_: ralph, wf
 
