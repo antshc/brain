@@ -32,17 +32,15 @@ When the invoking prompt includes a complete `## CODEY OUTCOME` with `STATUS: co
 
 Follow the `/ralph-gotchas` skill's **Read Workflow**. Apply every directive during review.
 
-## VERIFY CURRENT CHANGES
-
-When Codey's verification baseline is available, reuse it and do not run feedback before review. Otherwise, run the `/ralph-verify` skill against the current uncommitted changes. If direct verification fails, report `STATUS: partial` or `STATUS: blocked` according to that skill and do not review.
-
 ## REVIEW AND REFACTOR
 
 Follow the `/ralph-chore` skill. Apply only behavior-preserving refactors within reviewed changes and directly required neighbors.
 
-## REVERIFY EDITS
+## FEEDBACK LOOPS
 
 When REVIEW AND REFACTOR changes a file, run the `/ralph-verify` skill against the complete final changed-file set. When it changes no files, skip this step and report that the Codey baseline or direct verification remains valid.
+
+If verification exposes a code error, fix it and repeat this step for the complete changed-file set. After three failed retries for the same error, report `STATUS: partial`.
 
 ## STATUS REPORT
 

@@ -17,9 +17,7 @@ Gotchas Progress:
 
 ## Read Workflow
 
-- When sibling `GOTCHAS.md` is present, read it in full.
-- When it is absent, report the missing reference, read sibling `FALLBACK.md`, and emit "Gotchas guidance: GOTCHAS.md missing; using FALLBACK.md."
-- When the loaded reference is empty, emit "No Gotchas recorded yet."
+- When sibling `GOTCHAS.md` is present, read it in full. When it is absent, create new.
 - Apply every directive found during work. Do not contradict one without reporting the conflict.
 
 **Emit**: "Gotchas loaded: [summary]" or "No Gotchas recorded yet."

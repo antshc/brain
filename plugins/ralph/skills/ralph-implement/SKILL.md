@@ -15,11 +15,11 @@ Implementation Progress:
 
 ## Step 1: Load coding guidance and explore
 
-Read sibling `CODE.md` in full. When it is absent, report the missing reference and read sibling `FALLBACK.md`.
+Read sibling `CODE.md` in full.
+Explore every file being modified and one neighboring file per folder. 
+Report project structure, observed conventions, relevant implementation and test patterns, and guidance conventions not observed in the files read.
 
-Explore every file being modified and one neighboring file per folder. Report project structure, observed conventions, relevant implementation and test patterns, and guidance conventions not observed in the files read.
-
-**Emit**: "Coding guidance: CODE.md" or "Coding guidance: CODE.md missing; using FALLBACK.md."
+**Emit**: "Combined conventions from CODE.md and from the exploration, use them for task implementation."
 
 ## Step 2: Implement the task
 

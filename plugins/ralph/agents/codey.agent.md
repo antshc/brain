@@ -37,7 +37,7 @@ Follow the `/ralph-gotchas` skill's **Read Workflow**. Emit the Gotchas loaded, 
 
 Apply every directive during implementation. Do not contradict one without reporting the conflict.
 
-## BUILD & LSP CHECK
+## BUILD
 
 Follow the `/ralph-build` skill.
 
@@ -48,6 +48,8 @@ Follow the `/ralph-implement` skill for code style, layer placement, design prin
 ## FEEDBACK LOOPS
 
 Run the `/ralph-verify` skill after IMPLEMENTATION completes.
+
+If verification exposes a code error, fix it and repeat this step for the complete changed-file set. After three failed retries for the same error, report `STATUS: partial`.
 
 ## UPDATE GOTCHAS
 
