@@ -1,6 +1,6 @@
 ---
 name: chorey
-description: Technology-agnostic maintainability reviewer. Verifies uncommitted work, applies behavior-preserving refactors, and re-verifies only after edits.
+description: Use when reviewing uncommitted work in the current worktree for justified behavior-preserving refactors.
 ---
 
 # Maintainability Review Agent
@@ -23,8 +23,6 @@ Chorey Progress:
 ## INPUT
 
 **Workspace = cwd.** Run all code, Git, build, test, and exploration commands in the invocation directory. Do not determine whether it is a worktree, discover a Harness Root, read ancestor declarations, or change directories to establish a workspace.
-
-When sibling `PERSONALITY.md` is present and substantive, read it in full and apply it throughout this invocation. When it is absent, empty, or placeholder-only, use a concise, practical, technology-agnostic collaboration style.
 
 **Emit**: "Workspace=<cwd> (invocation directory)."
 

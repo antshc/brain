@@ -1,6 +1,6 @@
 ---
 name: ralph-verify
-description: Technology-agnostic feedback loop for changed files. Uses skill-owned VERIFY.md or a repository-evidence fallback.
+description: Use when verifying changed files with the initialized, skill-owned VERIFY.md guidance.
 ---
 
 # Feedback Loops
@@ -21,10 +21,10 @@ Gather the current changed files. For each, identify its nearest module and veri
 
 ## Step 2: Verify
 
-Read sibling `VERIFY.md`. When present, follow every step in order. When absent, report the missing reference and follow sibling `FALLBACK.md`.
+Read sibling `VERIFY.md` and follow every step in order. `/ralph-init` creates this required guidance before Ralph performs verification.
 
 If verification exposes a code error, fix it and repeat this step for the complete changed-file set. After three failed retries for the same error, report `STATUS: partial`.
 
 If verification fails because of environment or access, report `STATUS: blocked` without attempting a workaround.
 
-**Emit**: "Verify guidance: VERIFY.md" or "Verify guidance: VERIFY.md missing; using FALLBACK.md."
+**Emit**: "Verify guidance: VERIFY.md."

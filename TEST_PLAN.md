@@ -24,6 +24,56 @@ Whenever a test or scenario is added, renamed, or removed, the mapping must be u
 
 ---
 
+## Feature: Deterministic Source Repository development
+
+> Unit: `prepare_worktree.sh` and `resolve_source_repository.sh`
+
+```gherkin
+Scenario: Direct-source Harness Root selects itself
+  Given a Harness Root Git repository without a workspace directory
+  When worktree preparation resolves its Source Repository
+  Then the Harness Root is selected
+
+Scenario: Source Repository resolver selects the Harness Root without a workspace
+  Given a Harness Root Git repository without a workspace directory
+  When the Source Repository resolver runs
+  Then the Harness Root is selected without creating a worktree
+
+Scenario: Wrapped Harness Root selects its sole direct child repository
+  Given a Harness Root whose workspace directory contains one direct Git repository
+  When worktree preparation resolves its Source Repository
+  Then the direct child repository is selected
+
+Scenario: Source Repository resolver selects the sole direct workspace child
+  Given a Harness Root whose workspace directory contains one direct Git repository
+  When the Source Repository resolver runs
+  Then the direct child repository is selected without creating a worktree
+
+Scenario: Wrapped Harness Root without a source repository fails closed
+  Given a Harness Root whose workspace directory has no direct Git repository
+  When worktree preparation resolves its Source Repository
+  Then it reports no Source Repository found
+
+Scenario: Source Repository resolver rejects a workspace without a direct child repository
+  Given a Harness Root whose workspace directory has no direct Git repository
+  When the Source Repository resolver runs
+  Then it reports no Source Repository found
+
+Scenario: Wrapped Harness Root with multiple source repositories is ambiguous
+  Given a Harness Root whose workspace directory contains multiple direct Git repositories
+  When worktree preparation resolves its Source Repository
+  Then it reports ambiguous Source Repository selection
+
+Scenario: Source Repository resolver rejects an ambiguous workspace
+  Given a Harness Root whose workspace directory contains multiple direct Git repositories
+  When the Source Repository resolver runs
+  Then it reports ambiguous Source Repository selection
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: Comment Label Detection
 
 > Unit: `Comment.get_label()`
