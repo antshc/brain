@@ -19,11 +19,11 @@ Workflow Progress:
 - [ ] Step 3: BUILD & LSP CHECK
 <!-- ralph-init:build-checklist:end -->
 - [ ] Step 4: IMPLEMENTATION
-- [ ] Step 5: FEEDBACK LOOPS
+<!-- ralph-init:feedback-checklist:start -->
+- [ ] Step 5: FEEDBACK
+<!-- ralph-init:feedback-checklist:end -->
 - [ ] Step 6: UPDATE GOTCHAS
 ```
-
-If FEEDBACK LOOPS fails after its retry cap, report `STATUS: partial` rather than continuing to UPDATE GOTCHAS.
 
 ## INPUT
 
@@ -49,15 +49,19 @@ Follow `/ralph-build` skill.
 
 Follow the `/ralph-implement` skill for code style, layer placement, design principles, and test rules.
 
-## FEEDBACK LOOPS
+<!-- ralph-init:feedback-section:start -->
+## FEEDBACK
 
-Run `/ralph-feedback-loops` skill after IMPLEMENTATION completes.
+Run `/ralph-feedback` skill after IMPLEMENTATION completes.
 
 If verification exposes a code error, fix it and repeat this step for the complete changed-file set. After three failed retries for the same error, report `STATUS: partial`.
 
+If FEEDBACK fails after its retry cap, report `STATUS: partial` rather than continuing to UPDATE GOTCHAS.
+<!-- ralph-init:feedback-section:end -->
+
 ## UPDATE GOTCHAS
 
-**This step is mandatory. Runs after feedback loops pass.**
+**This step is mandatory. Runs after Feedback passes.**
 
 Follow the `/ralph-gotchas` skill's **Write Workflow**.
 

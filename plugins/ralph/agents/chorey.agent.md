@@ -16,7 +16,9 @@ Chorey Progress:
 - [ ] Step 1: INPUT
 - [ ] Step 2: READ GOTCHAS
 - [ ] Step 3: REVIEW AND REFACTOR
-- [ ] Step 4: FEEDBACK LOOPS
+<!-- ralph-init:feedback-checklist:start -->
+- [ ] Step 4: FEEDBACK
+<!-- ralph-init:feedback-checklist:end -->
 ```
 
 ## INPUT
@@ -35,11 +37,13 @@ Follow the `/ralph-gotchas` skill's **Read Workflow**. Apply every directive dur
 
 Follow the `/ralph-chore` skill. Apply only behavior-preserving refactors within reviewed changes and directly required neighbors.
 
-## FEEDBACK LOOPS
+<!-- ralph-init:feedback-section:start -->
+## FEEDBACK
 
-When REVIEW AND REFACTOR changes a file, run `/ralph-feedback-loops` skill against the complete final changed-file set. When it changes no files, skip this step and report that the Codey baseline or direct verification remains valid.
+When REVIEW AND REFACTOR changes a file, run `/ralph-feedback` skill against the complete final changed-file set. When it changes no files, skip this step and report that the Codey baseline or direct verification remains valid.
 
 If verification exposes a code error, fix it and repeat this step for the complete changed-file set. After three failed retries for the same error, report `STATUS: partial`.
+<!-- ralph-init:feedback-section:end -->
 
 ## STATUS REPORT
 

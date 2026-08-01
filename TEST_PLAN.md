@@ -743,23 +743,33 @@ Scenario: Codey and Chorey remain in the caller-selected location
   Then every operation remains in the invocation directory
     And it ignores legacy repository-location declarations
 
-Scenario: Present skill-owned guidance is loaded
-  Given sibling CODE.md, VERIFY.md, and GOTCHAS.md references exist beside their consuming Ralph skills
+Scenario: Installed skill-owned guidance is loaded
+  Given CODE.md, FEEDBACK.md, and GOTCHAS.md exist beside their consuming Ralph skills under .github/skills
   When Codey reaches implementation, feedback, and Gotchas phases
   Then each consuming skill reports its reference as loaded
 
-Scenario: Missing skill-owned guidance uses bundled defaults
-  Given a sibling CODE.md, VERIFY.md, or GOTCHAS.md reference is absent
-  When Codey or Chorey reaches that consuming skill
-  Then the skill reports the missing reference
-    And it uses its technology-agnostic FALLBACK.md
-    And the agent continues the invocation
+Scenario: Initialization installs only selected dependencies
+  Given ralph-init runs from a Git repository root with a pinned Ralph source revision
+  When the user enables Build and declines Feedback
+  Then it installs ralph-init, ralph-implement, ralph-gotchas, ralph-chore, and ralph-build under .github/skills
+    And it does not install ralph-feedback, ralph-dev, ralph-fix, ralph-worktree, to-codey, or to-chorey
+    And it creates Codey and Chorey under .github/agents without Feedback phases
+
+Scenario: Initialization seeds missing selected guidance
+  Given a selected installed Ralph skill has absent, empty, or template-only sibling guidance
+  When ralph-init configures that skill from repository evidence
+  Then it creates the guidance from the skill-owned template
+    And it preserves substantive sibling guidance
+  Given Build is declined
+  Then it does not create BUILD.md
+  Given Feedback is enabled
+  Then it creates FEEDBACK.md for ralph-feedback
 
 Scenario: Gotchas are persisted only after successful feedback
   Given sibling GOTCHAS.md exists and reusable friction occurs
-  When feedback loops pass
+  When feedback passes
   Then ralph-gotchas writes one deduplicated directive to GOTCHAS.md
-  When feedback loops fail or are blocked
+  When feedback fails or is blocked
   Then Codey does not claim a Gotchas update
 
 Scenario: Chorey avoids redundant verification
@@ -805,10 +815,16 @@ Scenario: Unavailable direct agent blocks clearly
   Then it reports STATUS blocked naming that agent
 
 Scenario: Manual initialization preserves guidance
-  Given a Ralph guidance reference contains substantive content
-  When init-ralph runs
-  Then it preserves that reference
-    And it initializes an absent GOTCHAS.md with no directives
+  Given an installed local Ralph skill, agent, or guidance file already exists
+  When ralph-init runs
+  Then it preserves the existing resource without reconfiguring it
+    And it reports the resource as preserved
+
+Scenario: Feedback uses its canonical names
+  Given Ralph is installed with Feedback enabled
+  Then Codey and Chorey run /ralph-feedback
+    And ralph-feedback reads FEEDBACK.md
+    And no installed resource uses a retired feedback identifier
 ```
 
 **Coverage:** Manual plugin verification

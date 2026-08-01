@@ -13,6 +13,10 @@ Build & LSP Check Progress:
 - [ ] Step 2: Check LSP availability
 ```
 
+## Initialize guidance
+
+When `/ralph-init` requests setup after Build is enabled, preserve substantive sibling `BUILD.md`; otherwise create it from `templates/BUILD.template.md` and add only repository-evidenced early build steps.
+
 ## Step 1: Run build guidance
 
 Read sibling `BUILD.md` in full and follow its build steps in order. If it fails, report the failure and stop; do not explore a broken build.

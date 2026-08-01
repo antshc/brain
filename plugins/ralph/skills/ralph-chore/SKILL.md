@@ -14,6 +14,10 @@ Maintainability Review Progress:
 - [ ] Step 3: Apply or report findings
 ```
 
+## Initialize guidance
+
+When `/ralph-init` requests setup, preserve substantive sibling `CHORE.md`; otherwise create it from `templates/CHORE.template.md` and add only repository-evidenced review rules.
+
 ## Step 1: Inspect the reviewed change set
 
 Read sibling `CHORE.md` in full. Inspect staged, unstaged, and untracked files in the current invocation directory. Read each changed file and only the directly required neighboring code needed to establish behavior.

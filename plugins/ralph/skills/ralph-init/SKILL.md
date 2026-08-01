@@ -1,6 +1,6 @@
 ---
 name: ralph-init
-description: Use when explicitly asked to initialize Ralph guidance and confirmed agent personas from repository evidence.
+description: Use when explicitly asked to install and configure Ralph skills and agents in a repository.
 disable-model-invocation: true
 ---
 
@@ -8,19 +8,37 @@ disable-model-invocation: true
 
 Run only when a person explicitly invokes this skill. Never run it as part of Codey or Chorey.
 
-## Resolve persona
+## Resolve target and source
 
-Set `HARNESS_ROOT` to the invocation directory. Resolve `sourceRepository` without creating a worktree:
+Set `repositoryRoot` to the invocation directory and require it to be a Git repository root. Require `gh` and an immutable `sourceRef` for the initiating Ralph source; resolve `sourceRef` from source-tracking metadata or installed-plugin provenance. When either prerequisite is unavailable, report it and stop without writing files.
+
+Use `antshc/brain` as `sourceRepository`. Install skills in `$repositoryRoot/.github/skills` and agents in `$repositoryRoot/.github/agents`.
+
+## Confirm configuration
+
+Inspect `repositoryRoot` manifests, configuration, and documented commands to rank technologies. Propose `Senior <technology> developer` for the highest-ranked evidence; ask the user to choose when evidence ties, to provide a role when no technology is inferred, and to confirm the selected role. When declined, stop without writing files.
+
+Present build-system evidence and ask whether to enable the early Build & LSP Check gate. Ask independently whether to enable Feedback. Do not infer either answer from evidence.
+
+## Install selected resources
+
+Always select `ralph-init`, `ralph-implement`, `ralph-gotchas`, and `ralph-chore`. Select `ralph-build` only when Build is enabled and `ralph-feedback` only when Feedback is enabled. Do not select `ralph-dev`, `ralph-fix`, `ralph-worktree`, `to-codey`, or `to-chorey`.
+
+Create `$repositoryRoot/.github/skills` and `$repositoryRoot/.github/agents` when absent.
+
+For each selected skill absent from `$repositoryRoot/.github/skills/<skillName>`, run:
 
 ```bash
-sourceRepository=$(<ralph-worktree-skill-directory>/scripts/resolve_source_repository.sh "$HARNESS_ROOT")
+gh skill install antshc/brain plugins/ralph/skills/<skillName> --agent github-copilot --dir "$repositoryRoot/.github/skills" --pin "$sourceRef"
 ```
 
-Inspect `sourceRepository` to infer a primary technology. Prefer manifests and configuration files over source-file extensions. Record evidence for each inferred technology. Examples: `*.csproj` or `*.sln` infers C#, `pyproject.toml` infers Python, and `package.json` infers TypeScript or JavaScript from its configured source and tooling.
+Never use `--force`. When a selected local skill already exists, preserve it and report it as unchanged.
 
-Propose `Senior <technology> developer` for the highest-ranked evidence. When equally ranked evidence identifies multiple technologies, ask the user to choose one proposed role. When no technology is inferred, ask the user to provide a role. Ask the user to confirm the selected role. When the user declines, exit without writing any reference or agent file.
+For each absent agent, copy the initiating Ralph `codey.agent.md` and `chorey.agent.md` into `$repositoryRoot/.github/agents`. Preserve an existing local agent unchanged and report that it could not be configured.
 
-Generate this exact block for both agents, replacing `<role>` with the confirmed role:
+## Configure new agents
+
+Apply the following generated block to each newly created local agent after its title and before Workflow:
 
 ```md
 <!-- ralph-init:persona:start -->
@@ -32,69 +50,18 @@ Generate this exact block for both agents, replacing `<role>` with the confirmed
 <!-- ralph-init:persona:end -->
 ```
 
-When an agent already contains a generated persona block that differs, ask before replacing it. Preserve all content outside the generated block. When no block exists, insert it after the title and before the workflow.
+When Build is enabled, retain Codey's `ralph-init:build-*` blocks; otherwise remove both blocks and their markers. When Feedback is enabled, retain each agent's `ralph-init:feedback-*` blocks; otherwise remove those blocks and their markers. After each removal, renumber the local agent checklist consecutively.
 
-## Decide Build Gate
+## Configure selected skills
 
-Inspect `sourceRepository` for documented build commands and build-system evidence. Present the evidence, or state that none was found, then ask whether Codey needs the early Build & LSP Check step. Do not infer the answer from the evidence.
-
-When the user confirms the build gate, generate these exact `ralph-init`-owned blocks in Codey, replacing prior generated build blocks without changing content outside the markers. Renumber Codey's remaining checklist items to accommodate the BUILD step.
-
-```md
-<!-- ralph-init:build-checklist:start -->
-- [ ] Step 3: BUILD & LSP CHECK
-<!-- ralph-init:build-checklist:end -->
-```
-
-```md
-<!-- ralph-init:build-section:start -->
-## BUILD & LSP CHECK
-
-Follow `/ralph-build` skill.
-<!-- ralph-init:build-section:end -->
-```
-
-When the user declines the build gate, remove both generated blocks, including their markers. Renumber Codey's remaining checklist items to stay consecutive. Preserve all content outside the generated blocks.
-
-## Inspect References
-
-Classify each reference before writing:
-
-- **Preserve**: substantive content exists.
-- **Populate**: the reference is absent, empty, or only contains bundled template comments or placeholders.
-- Treat headings, blank lines, and bundled template comments or placeholders as non-substantive.
-- Never overwrite, merge, prompt about, or reorder substantive content.
-
-| Reference | Target path | Template |
-|---|---|---|
-| `CODE.md` | `../ralph-implement/CODE.md` | `templates/CODE.template.md` |
-| `FEEDBACK-LOOPS.md` | `../ralph-feedback-loops/FEEDBACK-LOOPS.md` | `templates/FEEDBACK-LOOPS.template.md` |
-| `CHORE.md` | `../ralph-chore/CHORE.md` | `templates/CHORE.template.md` |
-| `BUILD.md` | `../ralph-build/BUILD.md` | `templates/BUILD.template.md` |
-
-Classify `BUILD.md` only when the user confirms the build gate. Do not create, classify, or report it when the user declines.
-
-## Gather Evidence
-
-Explore `sourceRepository` before populating coding or verification guidance.
-
-- For `CODE.md`, inspect implementation, tests, and repository instructions for style, placement, design, and testing conventions.
-- For `FEEDBACK-LOOPS.md`, inspect documented commands, CI, manifests, and test configuration for diagnostics, build, tests, and repository checks.
-- For `CHORE.md`, inspect repository instructions and changed-code conventions for review rules that are supported by evidence.
-- For `BUILD.md`, inspect documented build commands, CI, manifests, and project configuration.
-- Record only evidence supported by the repository. Retain the technology-agnostic template default for unsupported sections.
-
-## Populate Missing References
-
-Start each populated reference from its matching template. Enrich `CHORE.md` only with review rules supported by repository evidence. `FEEDBACK-LOOPS.md` is required guidance for `/ralph-feedback-loops` and must be present after successful initialization. `/ralph-gotchas` initializes `GOTCHAS.md` on its first run; never infer Gotchas from setup evidence.
+For every newly installed selected skill, follow its Initialize guidance. Inspect `repositoryRoot` before populating `CODE.md`, `FEEDBACK.md`, `CHORE.md`, or `BUILD.md`; use only repository-supported conventions and commands. Do not create `BUILD.md` unless Build is enabled. Do not infer Gotchas; `/ralph-gotchas` creates `GOTCHAS.md` on first use.
 
 ## Report
 
-Emit: "Persona: [confirmed role]. Build gate: [enabled | declined]. Agents: [created | replaced | unchanged]. Populated from evidence: [list]. Filled from defaults: [list]. Preserved: [list]." Include every classified reference in Filled from defaults or Preserved when applicable.
+Emit: "Persona: [confirmed role]. Build: [enabled | declined]. Feedback: [enabled | declined]. Skills: [installed | preserved]. Agents: [created | preserved]. Guidance: [populated | defaults | preserved]. Omitted: [list]."
 
 ## Hard Rules
 
 - Manual invocation only.
-- Write references only when content is absent, empty, or placeholder-only.
-- Write only the generated persona block in Codey and Chorey.
-- Keep repository-specific detail in these references, not in Ralph's core agent or skill bodies.
+- Never overwrite or reconfigure an existing local Ralph skill, agent, or guidance file.
+- Keep repository-specific detail in skill-owned guidance files, not in core Ralph skills or agents.

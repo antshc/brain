@@ -13,6 +13,10 @@ Implementation Progress:
 - [ ] Step 2: Implement the task
 ```
 
+## Initialize guidance
+
+When `/ralph-init` requests setup, preserve substantive sibling `CODE.md`; otherwise create it from `templates/CODE.template.md` and add only repository-evidenced conventions.
+
 ## Step 1: Load coding guidance and explore
 
 Read sibling `CODE.md` in full.

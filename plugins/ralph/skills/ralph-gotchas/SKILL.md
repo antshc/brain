@@ -15,7 +15,7 @@ Gotchas Progress:
 - [ ] Step 4: Deduplicate and persist directives
 ```
 
-When sibling `GOTCHAS.md` is absent, create it from `../ralph-init/templates/GOTCHAS.template.md` before following either workflow.
+When sibling `GOTCHAS.md` is absent, create it from `templates/GOTCHAS.template.md` before following either workflow.
 
 ## Read Workflow
 
