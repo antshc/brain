@@ -2,8 +2,6 @@
 
 <!-- Followed in order by ralph-feedback. List every repository-specific changed-file verification step. -->
 
-<!-- C# .NET
-
 1. Run `get diagnostics` on all changed files.
 
 2. **Collect changed files**
@@ -22,5 +20,3 @@ For each changed file, walk up to its `.csproj` to identify the affected project
 5. **Unit Tests** — Run `dotnet test {{solution}}.sln --no-build`.
 
    Reuses the step 4 build (`--no-build`); runs the whole solution's unit tests.
-
--->
