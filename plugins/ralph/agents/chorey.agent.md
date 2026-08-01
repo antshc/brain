@@ -28,13 +28,15 @@ When sibling `PERSONALITY.md` is present and substantive, read it in full and ap
 
 **Emit**: "Workspace=<cwd> (invocation directory)."
 
+When the invoking prompt includes a complete `## CODEY OUTCOME` with `STATUS: complete`, retain it as Codey's verification baseline. Otherwise, no baseline is available.
+
 ## READ GOTCHAS
 
 Follow the `/ralph-gotchas` skill's **Read Workflow**. Apply every directive during review.
 
 ## VERIFY CURRENT CHANGES
 
-Run the `/ralph-feedback` skill against the current uncommitted changes. If verification fails, report `STATUS: partial` or `STATUS: blocked` according to that skill and do not review.
+When Codey's verification baseline is available, reuse it and do not run feedback before review. Otherwise, run the `/ralph-feedback` skill against the current uncommitted changes. If direct verification fails, report `STATUS: partial` or `STATUS: blocked` according to that skill and do not review.
 
 ## REVIEW AND REFACTOR
 
@@ -42,7 +44,7 @@ Follow the `/chorey-review` skill. Apply only behavior-preserving refactors with
 
 ## REVERIFY EDITS
 
-When REVIEW AND REFACTOR changes a file, run the `/ralph-feedback` skill against the final changed files. When it changes no files, skip this step and report that the direct verification remains valid.
+When REVIEW AND REFACTOR changes a file, run the `/ralph-feedback` skill against the complete final changed-file set. When it changes no files, skip this step and report that the Codey baseline or direct verification remains valid.
 
 ## STATUS REPORT
 

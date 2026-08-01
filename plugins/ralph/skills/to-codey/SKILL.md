@@ -13,7 +13,7 @@ Resolve `{{input}}` into exactly one task:
 - `<github-issue-url>`: fetch the issue title, body, and comments; if unavailable or invalid, report `STATUS: blocked` with that reason.
 - Missing input: report `STATUS: blocked` because a task is required.
 
-Collect current uncommitted changes and the five most recent `dcode:` commits, then run the `codey` agent directly via `runSubagent` in the invocation directory with:
+Collect current uncommitted changes and the five most recent `rcode:` commits, then run the `codey` agent directly via `runSubagent` in the invocation directory with:
 
 ```
 ## TASK

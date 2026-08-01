@@ -718,6 +718,37 @@ Scenario: Chorey avoids redundant verification
   Then it reports no changes
     And it does not run a second verification pass
 
+Scenario: Dev orchestrates a successful Codey-to-Chorey task
+  Given dev selects one actionable task in the requested milestone
+  When Codey reports STATUS complete
+  Then dev invokes Chorey in the same Worktree Path with the original task and Codey's five-field outcome
+    And Chorey reads the live uncommitted Git state
+    And Chorey reuses Codey's verification baseline when it makes no changes
+    And Chorey runs feedback over the complete changed-file set when it does make changes
+
+Scenario: Dev stops after a partial or blocked Codey result
+  Given dev selects one actionable task
+  When Codey reports STATUS partial or blocked
+  Then dev does not invoke Chorey
+    And it uses Codey's outcome as the final result
+
+Scenario: Dev publishes progress before handling the selected task
+  Given the final Codey-to-Chorey outcome is complete, partial, or blocked with Git changes
+  When dev finalizes the selected task
+  Then it creates and pushes one rcode history entry before issue handling
+    And its final five-field report combines both agent decisions with Git-derived changed files
+  Given the final outcome has no Git changes
+  Then dev creates no empty commit
+
+Scenario: Dev routes unavailable agents and final statuses correctly
+  Given Codey or required Chorey is unavailable
+  When dev finalizes the selected task
+  Then it reports STATUS blocked naming that agent
+    And labels the selected task hitl
+  Given the final status is complete, partial, or blocked
+  Then dev closes, comments on, or labels the selected task respectively
+    And it leaves the spec issue open
+
 Scenario: Unavailable direct agent blocks clearly
   Given Codey or Chorey is unavailable
   When its direct command runs
