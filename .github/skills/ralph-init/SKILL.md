@@ -53,11 +53,11 @@ When Build is enabled, retain Codey's `ralph-init:build-*` blocks; otherwise rem
 
 ## Configure selected skills
 
-For every newly installed selected skill, inspect its sibling `*.template.md` files after installation and follow its Initialize guidance. Select the template that matches the confirmed role and repository evidence; for example, select `CODE.skills.template.md` for skills, agents, and instruction work, or `CODE.<technology>.template.md` for a confirmed technology. When the canonical target guidance file named by the Initialize guidance is absent, copy the selected template to it; for example, both `CODE.skills.template.md` and `CODE.<technology>.template.md` produce `CODE.md`. Then add only repository-supported conventions and commands. Preserve a substantive existing guidance file unchanged. Do not create `BUILD.md` unless Build is enabled or `FEEDBACK.md` unless Feedback is enabled. Do not infer Gotchas; `/ralph-gotchas` creates `GOTCHAS.md` on first use.
+For every newly installed selected skill, inspect its sibling `*.template.md` files after installation and follow its Initialize guidance. Select the template that matches the confirmed role and repository evidence; for example, select `CODE.skills.template.md` for skills, agents, and instruction work, or `CODE.<technology>.template.md` for a confirmed technology. When the canonical target guidance file named by the Initialize guidance is absent, copy the selected template to it; for example, both `CODE.skills.template.md` and `CODE.<technology>.template.md` produce `CODE.md`. Then add only repository-supported conventions and commands. Preserve a substantive existing guidance file unchanged. Do not create `BUILD.md` unless Build is enabled or `FEEDBACK.md` unless Feedback is enabled. Create `GOTCHAS.md` from its template without adding directives; `/ralph-gotchas` records grounded directives after use.
 
 ## Finalize configuration
 
-After configuring a newly installed skill, delete its sibling `*.template.md` files only after its canonical guidance file has been created or preserved. Retain `ralph-gotchas` templates because its first-use workflow requires them. Retain `ralph-build` or `ralph-feedback` templates when their respective gates are declined. Never delete templates from a preserved existing local skill.
+After configuring a newly installed skill, delete its sibling `*.template.md` files only after its canonical guidance file has been created or preserved. Retain `ralph-build` or `ralph-feedback` templates when their respective gates are declined. Never delete templates from a preserved existing local skill.
 
 ## Report
 
