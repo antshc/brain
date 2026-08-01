@@ -1,0 +1,2 @@
+- Diff every changed Markdown file and confirm each touched paragraph/bullet/table cell is still one physical line per CODE.md's **Line wrapping** rule. Rejoin any line an editor's auto-format/rewrap split mid-sentence.
+- Run `python3 -m pytest tools/` for changes to Python code or tests.

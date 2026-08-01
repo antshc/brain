@@ -1,0 +1,45 @@
+---
+description: Shared agent Gotchas guidance. Reads skill-owned GOTCHAS.md before work and distills reusable one-line directives after successful implementation.
+metadata:
+    github-path: plugins/ralph/skills/ralph-gotchas
+    github-ref: refs/tags/v0.1.0-479
+    github-repo: https://github.com/antshc/brain
+    github-tree-sha: 8c44b2053487a897a06ae74a9c5ccc1d3ea1f4e7
+name: ralph-gotchas
+---
+# Gotchas
+
+Copy this checklist and check off items as you complete them:
+
+```
+Gotchas Progress:
+- [ ] Step 1: Initialize and read sibling GOTCHAS.md in full
+- [ ] Step 2: Apply every directive during work
+- [ ] Step 3: Identify reusable problem candidates after successful implementation
+- [ ] Step 4: Deduplicate and persist directives
+```
+
+When sibling `GOTCHAS.md` is absent, create it from `templates/GOTCHAS.template.md` before following either workflow.
+
+## Read Workflow
+
+- Read sibling `GOTCHAS.md` in full.
+- Apply every directive found during work. Do not contradict one without reporting the conflict.
+
+**Emit**: "Gotchas loaded: [summary]" or "No Gotchas recorded yet."
+
+## Write Workflow
+
+Identify friction from the invocation that would help a future run avoid a recurring mistake. Discard routine steps, one-off typos, and transient issues fixed on first retry.
+
+For each kept candidate, distill one directive in the form `- <directive>`. Extend a clearly matching existing directive; otherwise append it under `## Gotchas`.
+
+When no candidates exist, write nothing.
+
+**Emit**: "Gotchas updated: [count added/extended]" or "No Gotchas to record."
+
+## Hard Constraints
+
+- Write only sibling `GOTCHAS.md`.
+- Never fabricate a directive that is not grounded in this invocation.
+- Never delete or contradict unrelated guidance.
