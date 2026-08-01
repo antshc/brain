@@ -38,7 +38,7 @@ If `worktree_status` is `3`, parse `WORKTREE_PATH` and the conflicting files fro
    ```bash
   cd "$WORKTREE_PATH"
    ```
-2. Invoke the `droid` agent (or `general-purpose` if unavailable) from the current Worktree Path. Do not provide a workspace-path argument. Droid uses its invocation directory as its workspace. Pass the following prompt:
+2. Invoke the `codey` agent directly via `runSubagent` from the current Worktree Path. Do not provide a workspace-path argument. Codey uses its invocation directory as its workspace. If Codey is unavailable, report `STATUS: blocked` naming Codey; do not substitute another agent. Pass the following prompt:
    ```
    ## Resolve Merge Conflicts
    The following files have merge conflicts after merging origin/<target-branch> into <feature-branch>.

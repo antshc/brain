@@ -682,35 +682,52 @@ Scenario: Existing feature worktree is reused and merged with its target branch
 
 ---
 
-## Feature: Droid Runtime Guidance
+## Feature: Ralph Runtime Guidance
 
 > Manual plugin verification
 
 ```gherkin
-Scenario: Droid remains in the caller-selected location
-  Given Droid starts in a source repository checkout or worktree path
+Scenario: Codey and Chorey remain in the caller-selected location
+  Given Codey or Chorey starts in a source repository checkout or worktree path
   When it explores, modifies, builds, tests, or runs Git commands
   Then every operation remains in the invocation directory
     And it ignores legacy repository-location declarations
 
 Scenario: Present skill-owned guidance is loaded
-  Given sibling CODE.md, VERIFY.md, and GOTCHAS.md references exist beside their consuming Droid skills
-  When Droid reaches implementation, feedback, and Gotchas phases
+  Given sibling CODE.md, VERIFY.md, and GOTCHAS.md references exist beside their consuming Ralph skills
+  When Codey reaches implementation, feedback, and Gotchas phases
   Then each consuming skill reports its reference as loaded
 
 Scenario: Missing skill-owned guidance uses bundled defaults
   Given a sibling CODE.md, VERIFY.md, or GOTCHAS.md reference is absent
-  When Droid reaches that consuming skill
+  When Codey or Chorey reaches that consuming skill
   Then the skill reports the missing reference
     And it uses its technology-agnostic FALLBACK.md
-    And Droid continues the invocation
+    And the agent continues the invocation
 
 Scenario: Gotchas are persisted only after successful feedback
   Given sibling GOTCHAS.md exists and reusable friction occurs
   When feedback loops pass
-  Then droid-gotchas writes one deduplicated directive to GOTCHAS.md
+  Then ralph-gotchas writes one deduplicated directive to GOTCHAS.md
   When feedback loops fail or are blocked
-  Then Droid does not claim a Gotchas update
+  Then Codey does not claim a Gotchas update
+
+Scenario: Chorey avoids redundant verification
+  Given current uncommitted work passes direct verification
+  When Chorey finds no behavior-preserving refactor
+  Then it reports no changes
+    And it does not run a second verification pass
+
+Scenario: Unavailable direct agent blocks clearly
+  Given Codey or Chorey is unavailable
+  When its direct command runs
+  Then it reports STATUS blocked naming that agent
+
+Scenario: Manual initialization preserves guidance
+  Given a Ralph guidance reference contains substantive content
+  When init-ralph runs
+  Then it preserves that reference
+    And it initializes an absent GOTCHAS.md with no directives
 ```
 
 **Coverage:** Manual plugin verification

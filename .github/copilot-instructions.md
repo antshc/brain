@@ -4,7 +4,7 @@
 
 # Writing or updating the skill, templates, agents standards
 
-See [CODE.md](../.droid/CODE.md) for writing style and syntax conventions.
+See [Ralph implementation guidance](../plugins/ralph/skills/ralph-implement/SKILL.md) for writing style and syntax conventions.
 
 See **Skills best practices** fetch `https://agentskills.io/skill-creation/best-practices` for How to write skills that are well-scoped and calibrated to the task.
 

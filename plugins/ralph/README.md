@@ -2,36 +2,21 @@
 
 ## Agents
 
-### `droid` (from the `droid` plugin)
+### `codey`
 
-Autonomous, technology-agnostic implementation agent. Explores repo, implements via TDD, builds, tests, records decisions. Defined in [`plugins/droid/agents/droid.agent.md`](../droid/agents/droid.agent.md); invoked by `/dev` and `/worktree` (merge-conflict resolution) via `runSubagent`.
+Autonomous, technology-agnostic implementation agent. It works only in its invocation directory and reports `STATUS`, `SUMMARY`, `FILES`, `GOTCHAS UPDATED`, and `NOTES`.
 
-**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 4):
+### `chorey`
 
-```
-## TASK
-- Title: <title>
-- Body: <body>
-- Comments: <comments>
-
-## RECENT CHANGES
-<last 5 commits>
-```
-
-Ralph launches Droid from the Worktree Path. The Worktree Path remains outside the prompt; Droid uses its invocation directory as its workspace.
-
-**Invoked by `/worktree`** (merge-conflict resolution, smaller prompt — see `worktree/SKILL.md` step 2).
-
-**Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
-
-```
-/dev <milestone-title>
-```
+Technology-agnostic maintainability reviewer. It verifies current uncommitted work before review, applies behavior-preserving refactors only when justified, and re-verifies only after edits.
 
 ## Skills
 
 | Skill | Description |
-|-------|-------------|
-| `/dev` | AFK loop — picks next issue, invokes `droid`, pushes |
+|---|---|
+| `/to-codey <task>` | Run Codey directly for one task |
+| `/to-chorey` | Review current uncommitted work with Chorey |
+| `/init-ralph` | Manually initialize absent Ralph guidance from repository evidence |
+| `/dev` | AFK loop that invokes Codey then Chorey |
 | `/fix` | Apply PR review comments |
-| `/worktree` | Run the deterministic Source Repository contract and create/reuse an isolated git worktree |
+| `/worktree` | Prepare a deterministic worktree and use Codey for merge conflicts |

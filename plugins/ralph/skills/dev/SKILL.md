@@ -95,7 +95,7 @@ Pick the next task. Prioritize in this order (first match wins):
 
 ## 4. Invoke implementation agent
 
-After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the Worktree Path; do not provide a workspace-path argument. Droid uses its invocation directory as its workspace. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, invoke the `codey` agent directly via `runSubagent`. Its invocation directory is the Worktree Path; do not provide a workspace-path argument. Codey uses its invocation directory as its workspace. If Codey is unavailable, report `STATUS: blocked` naming Codey; do not substitute another agent. Use the following prompt (substitute actual values):
 
 ```
 ## TASK
@@ -106,6 +106,8 @@ After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose
 ## RECENT CHANGES
 <last 5 commits from step 1>
 ```
+
+After Codey completes, invoke the `chorey` agent directly via `runSubagent` in the same Worktree Path to review Codey's uncommitted changes. If Chorey is unavailable, report `STATUS: blocked` naming Chorey; do not substitute another agent.
 
 ## 5. Distill
 
@@ -157,7 +159,7 @@ git push -u origin "$branch" 2>/dev/null || git push
 
 ## 9. Commit harness root
 
-Run **once** per iteration, after Handle result and after the agent has recorded any gotchas to `.droid/GOTCHAS.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
+Run **once** per iteration, after Handle result and after Codey has recorded any Gotchas to its skill-owned reference. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
