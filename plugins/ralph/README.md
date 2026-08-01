@@ -38,6 +38,7 @@ Maintainability reviewer. It uses the persona confirmed by `/ralph-init`, verifi
 | `/ralph-chore` | Review changes using initialized `CHORE.md` rules |
 | `/ralph-dev` | AFK loop that invokes Codey then Chorey |
 | `/ralph-fix` | Apply PR review comments |
+| `/ralph-harness` | Resolve the Harness Root and Source Repository |
 | `/ralph-worktree` | Prepare a deterministic worktree and use Codey for merge conflicts |
 
 ## `/ralph-dev` workflow

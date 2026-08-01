@@ -8,9 +8,9 @@ argument-hint: '<milestone-title>'
 
 Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
-## 0. Set Harness Root
+## 0. Resolve repos
 
-Set `HARNESS_ROOT` to the current directory.
+Invoke the `/ralph-harness` skill to resolve `HARNESS_ROOT` and `SOURCE_REPO`.
 
 Use `HARNESS_ROOT` for all Harness Root repository operations. Change to `HARNESS_ROOT` before invoking `/ralph-worktree`.
 
@@ -47,13 +47,13 @@ Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1
 
 ## 3. Create worktree
 
-Invoke the `/ralph-worktree` skill:
+Invoke the `/ralph-worktree` skill, passing the resolved `SOURCE_REPO` so it skips re-detection:
 
 ```
-/ralph-worktree <target-branch> <feature-branch>
+/ralph-worktree <target-branch> <feature-branch> "$SOURCE_REPO"
 ```
 
-Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. The `/ralph-worktree` skill runs the executable Source Repository contract: an absent `workspace/` selects Harness Root, while a present `workspace/` must contain exactly one direct-child Git repository. All subsequent code, Git, push, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the Harness Root `repo`.
+Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. All subsequent code, Git, push, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the Harness Root `repo`.
 
 If the worktree skill exits with an error, **exit**.
 
@@ -139,7 +139,13 @@ Distill the combined summaries into Implementation Decisions for the history ent
 
 Before any issue handling, inspect `FINAL_FILES`:
 
-- When non-empty, stage the complete worktree change with `git add -A`, commit it with an `rcode:` subject and the Implementation Decisions block as its body, then push the feature branch.
+- When non-empty, stage the complete worktree change with `git add -A`, commit it with an `rcode:` subject and the Implementation Decisions block as its body, then push the feature branch:
+  ```bash
+  cd "$WORKTREE_PATH"
+  git add -A
+  git commit -m "rcode: <subject>" -m "<Implementation Decisions>"
+  git push origin "$BRANCH"
+  ```
 - When empty, do not create or push an empty commit.
 
 This applies to complete, partial, and blocked final outcomes alike; preserving non-empty work takes precedence over issue handling.
@@ -173,13 +179,18 @@ Never close the `spec`-labeled issue.
 
 ## 9. Commit harness root
 
-Run **once** per iteration, after Handle result and after the agent has recorded any gotchas to `.droid/GOTCHAS.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
+Run **once** per iteration, after Handle result. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
 
-- Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
+- Stage **any** change in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
+- Otherwise, commit and push:
+  ```bash
+  cd "$HARNESS_ROOT"
+  git add -A
+  git commit -m "<summary>"
+  git push
+  ```
 - **Emit** the commit SHA, or "nothing to commit".
-
-Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
 
 ## CREATE PULL REQUEST
 

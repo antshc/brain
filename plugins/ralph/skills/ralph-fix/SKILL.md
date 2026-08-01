@@ -9,12 +9,13 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
 1. Get PR branch name: `branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)`
-2. Invoke the `/ralph-worktree` skill:
+2. Invoke the `/ralph-harness` skill to resolve `HARNESS_ROOT` and `SOURCE_REPO`.
+3. Invoke the `/ralph-worktree` skill, passing the resolved `SOURCE_REPO`:
    ```
-  /ralph-worktree <branch> <branch>
+  /ralph-worktree <branch> <branch> "$SOURCE_REPO"
    ```
-  Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/ralph-worktree` skill runs the executable Source Repository contract and creates or reuses the worktree there.
-3. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
+  Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/ralph-worktree` skill creates or reuses the worktree there.
+4. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:
 

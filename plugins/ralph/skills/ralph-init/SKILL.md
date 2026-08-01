@@ -22,7 +22,7 @@ Present build-system evidence and ask whether to enable the early Build & LSP Ch
 
 ## Install selected resources
 
-Always select every Ralph-plugin skill: `ralph-build`, `ralph-chore`, `ralph-dev`, `ralph-feedback`, `ralph-fix`, `ralph-gotchas`, `ralph-implement`, `ralph-init`, `ralph-worktree`, `to-chorey`, and `to-codey`.
+Always select every Ralph-plugin skill: `ralph-build`, `ralph-chore`, `ralph-dev`, `ralph-feedback`, `ralph-fix`, `ralph-gotchas`, `ralph-harness`, `ralph-implement`, `ralph-init`, `ralph-worktree`, `to-chorey`, and `to-codey`.
 
 Create `$repositoryRoot/.github/skills` and `$repositoryRoot/.github/agents` when absent.
 

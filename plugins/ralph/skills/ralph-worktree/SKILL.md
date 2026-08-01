@@ -1,33 +1,24 @@
 ---
 name: ralph-worktree
 description: Resolve the source repo (workspace source repo when present, else current repo) and create or reuse an isolated git worktree for a feature branch based off origin/<target-branch>. Branch detection is the caller's responsibility — this skill only resolves which repo to operate in.
-argument-hint: '<target-branch> <feature-branch>'
+argument-hint: '<target-branch> <feature-branch> [source-repo]'
 ---
 
 # Worktree Setup
 
 Create or reuse an isolated git worktree for a feature branch based off a target branch.
 
-**Arguments:** `<target-branch> <feature-branch>`
+**Arguments:** `<target-branch> <feature-branch> [source-repo]`
 
-## 0. Resolve source repo
+## 0. Resolve repos
 
-Set `HARNESS_ROOT` to the current directory.
+If the optional `<source-repo>` argument is given, the caller already resolved it — set `SOURCE_REPO` to that value directly and skip detection.
 
-The actual source code may live in a separate repo under `workspace/` in `HARNESS_ROOT`. Resolve which repo to develop in **before** any branch or worktree operation.
+Otherwise, invoke the `/ralph-harness` skill to resolve `HARNESS_ROOT` and `SOURCE_REPO`.
 
 ```bash
-src_git=$(find "$HARNESS_ROOT/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
-if [ -n "$src_git" ]; then
-  SOURCE_REPO=$(dirname "$src_git")
-else
-  SOURCE_REPO=$HARNESS_ROOT
-fi
 cd "$SOURCE_REPO"
 ```
-
-- If a `.git` directory is found under `workspace/` (including one subfolder level), develop in that source repo.
-- Otherwise, fall back to the current (harness) repo.
 
 All subsequent commands run inside `SOURCE_REPO`. Worktrees are created as `<SOURCE_REPO>.worktrees/<feature-branch>`.
 
@@ -47,7 +38,7 @@ If the merge exits non-zero (conflicts detected):
    ```bash
    git diff --name-only --diff-filter=U
    ```
-2. Invoke the `droid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Pass the following prompt:
+2. Invoke the `codey` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path argument. Codey uses its invocation directory as its workspace. Pass the following prompt:
    ```
    ## Resolve Merge Conflicts
    The following files have merge conflicts after merging origin/<target-branch> into <feature-branch>.
