@@ -171,17 +171,42 @@ Read the final combined `STATUS` field:
 
 Never close the `spec`-labeled issue.
 
-## 9. Final report
+## 9. Commit harness root
 
-Report exactly these five fields using the combined outcome and the pre-commit `FINAL_FILES`:
+Run **once** per iteration, after Handle result and after the agent has recorded any gotchas to `.droid/GOTCHAS.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
+
+- Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
+- If nothing is staged, skip the commit (no empty commits).
+- **Emit** the commit SHA, or "nothing to commit".
+
+Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
+
+## CREATE PULL REQUEST
+
+Once all tasks are complete and the loop exits, check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
 
 ```bash
-STATUS: <complete | partial | blocked>
-SUMMARY: <combined Codey and Chorey decisions>
-FILES: <FINAL_FILES | none>
-GOTCHAS UPDATED: <Codey result | none>
-NOTES: <combined verification and blocker context>
+existing_pr=$(gh pr list \
+  --head "$branch" \
+  --base "<target-branch>" \
+  --state open \
+  --json url \
+  --jq '.[0].url' 2>/dev/null)
 ```
+
+**If `existing_pr` is non-empty**, a PR already exists — print `"PR already exists: $existing_pr"` and skip creation.
+
+**Otherwise**, open a draft PR from inside `WORKTREE_PATH`:
+
+```bash
+gh pr create --draft \
+  --title "[<feature-id>]: <spec-title>" \
+  --body "**Feature ID:** \`<feature-id>\`" \
+  --base "<target-branch>" \
+  --head "$branch"
+```
+
+If the PR creation fails, **exit** and report the error.
 
 # RULES
 
