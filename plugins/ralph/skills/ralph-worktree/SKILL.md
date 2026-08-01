@@ -1,6 +1,6 @@
 ---
 name: ralph-worktree
-description: Resolve the deterministic Source Repository contract and create or reuse an isolated git worktree for a feature branch based off origin/<target-branch>.
+description: Resolve the source repo (workspace source repo when present, else current repo) and create or reuse an isolated git worktree for a feature branch based off origin/<target-branch>. Branch detection is the caller's responsibility — this skill only resolves which repo to operate in.
 argument-hint: '<target-branch> <feature-branch>'
 ---
 
@@ -10,35 +10,44 @@ Create or reuse an isolated git worktree for a feature branch based off a target
 
 **Arguments:** `<target-branch> <feature-branch>`
 
-## 0. Resolve Harness Root
+## 0. Resolve source repo
 
 Set `HARNESS_ROOT` to the current directory.
 
-## 1. Prepare worktree
-
-Run the executable contract before any branch operation:
+The actual source code may live in a separate repo under `workspace/` in `HARNESS_ROOT`. Resolve which repo to develop in **before** any branch or worktree operation.
 
 ```bash
-set +e
-worktree_output=$(<worktree-skill-directory>/scripts/prepare_worktree.sh "$HARNESS_ROOT" <target-branch> <feature-branch>)
-worktree_status=$?
-set -e
+src_git=$(find "$HARNESS_ROOT/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
+if [ -n "$src_git" ]; then
+  SOURCE_REPO=$(dirname "$src_git")
+else
+  SOURCE_REPO=$HARNESS_ROOT
+fi
+cd "$SOURCE_REPO"
 ```
 
-- An absent `workspace/` selects `HARNESS_ROOT` as `SOURCE_REPO`.
-- A present `workspace/` must contain exactly one direct-child Git repository. Zero candidates report `No Source Repository found in workspace: <workspace-path>` and multiple candidates report `Source Repository selection is ambiguous in workspace: <workspace-path>`.
-- Selection uses only this filesystem topology; ignore editor organization and legacy repository-location configuration.
-- On success, parse `SOURCE_REPO`, `WORKTREE_PATH`, `BRANCH`, and `TARGET_BRANCH` from `worktree_output`. All source code, Git, push, and PR operations run in `WORKTREE_PATH`.
-- The executable creates a new worktree at `<SOURCE_REPO>.worktrees/<feature-branch>` or reuses and actualizes the requested existing worktree.
-- If `worktree_status` is neither `0` nor `3`, **exit** and report the executable output.
+- If a `.git` directory is found under `workspace/` (including one subfolder level), develop in that source repo.
+- Otherwise, fall back to the current (harness) repo.
 
-If `worktree_status` is `3`, parse `WORKTREE_PATH` and the conflicting files from `worktree_output`, then:
+All subsequent commands run inside `SOURCE_REPO`. Worktrees are created as `<SOURCE_REPO>.worktrees/<feature-branch>`.
+
+## Actualize Branch
+
+Bring the current branch up to date with the latest remote changes and the target branch. Run whenever entering an existing branch.
+
+```bash
+git fetch --all --prune
+git pull
+git merge origin/<target-branch>
+```
+
+If the merge exits non-zero (conflicts detected):
 
 1. Collect the list of conflicting files:
    ```bash
-  cd "$WORKTREE_PATH"
+   git diff --name-only --diff-filter=U
    ```
-2. Invoke the `codey` agent directly via `runSubagent` from the current Worktree Path. Do not provide a workspace-path argument. Codey uses its invocation directory as its workspace. If Codey is unavailable, report `STATUS: blocked` naming Codey; do not substitute another agent. Pass the following prompt:
+2. Invoke the `droid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Pass the following prompt:
    ```
    ## Resolve Merge Conflicts
    The following files have merge conflicts after merging origin/<target-branch> into <feature-branch>.
@@ -50,15 +59,51 @@ If `worktree_status` is `3`, parse `WORKTREE_PATH` and the conflicting files fro
    git add .
    git merge --continue --no-edit
    ```
-4. If the merge still fails, **exit** and report the unresolved files as blockers. Otherwise, remove `MERGE_CONFLICTS:` and following lines from `worktree_output` before Output.
+4. If the merge still fails, **exit** and report the unresolved files as blockers.
+
+## 1. Check current branch
+
+```bash
+current_branch=$(git branch --show-current)
+```
+
+If `current_branch` equals `<feature-branch>`:
+
+```bash
+WORKTREE_PATH=$(pwd)
+BRANCH=$current_branch
+```
+
+Run **Actualize Branch**, then jump to **Output**.
+
+## 2. Create worktree
+
+```bash
+repo_root=$SOURCE_REPO
+mkdir -p "$repo_root.worktrees"
+git fetch --all --prune
+git worktree add -b <feature-branch> "$repo_root.worktrees/<feature-branch>" "origin/<target-branch>"
+```
+
+- If the worktree already exists (exit code 128), `cd` into it and run **Actualize Branch**:
+  ```bash
+  cd "$repo_root.worktrees/<feature-branch>"
+  ```
+- If creation fails for any other reason, **exit** and report the error.
+
+## 3. Switch into worktree
+
+```bash
+cd "$repo_root.worktrees/<feature-branch>"
+```
 
 ## Output
 
-Report the success output from the executable unchanged:
+Report the result:
 
 ```
 SOURCE_REPO: $SOURCE_REPO
-WORKTREE_PATH: $WORKTREE_PATH
+WORKTREE_PATH: $repo_root.worktrees/<feature-branch>
 BRANCH: <feature-branch>
 TARGET_BRANCH: <target-branch>
 ```
