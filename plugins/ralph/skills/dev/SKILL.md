@@ -59,7 +59,9 @@ If the worktree skill exits with an error, **exit**.
 
 ---
 
-# ORCHESTRATE ONE TASK
+# ORCHESTRATOR LOOP
+
+Repeat the following loop until no tasks remain.
 
 ## 1. Read state
 
@@ -76,7 +78,7 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 
 ## 2. Exit conditions
 
-- If no tasks are available, **exit**.
+- If all tasks are complete, **exit**. The `spec` -labeled issue is owned by the user — do not close it.
 
 > `spec`, `hitl`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
 
