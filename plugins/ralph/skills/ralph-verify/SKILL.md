@@ -1,5 +1,5 @@
 ---
-name: ralph-feedback
+name: ralph-verify
 description: Technology-agnostic feedback loop for changed files. Uses skill-owned VERIFY.md or a repository-evidence fallback.
 ---
 

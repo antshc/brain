@@ -16,7 +16,7 @@ Technology-agnostic maintainability reviewer. It verifies current uncommitted wo
 |---|---|
 | `/to-codey <task>` | Run Codey directly for one task |
 | `/to-chorey` | Review current uncommitted work with Chorey |
-| `/init-ralph` | Manually initialize absent Ralph guidance from repository evidence |
-| `/dev` | AFK loop that invokes Codey then Chorey |
-| `/fix` | Apply PR review comments |
-| `/worktree` | Prepare a deterministic worktree and use Codey for merge conflicts |
+| `/ralph-init` | Manually initialize absent Ralph guidance from repository evidence |
+| `/ralph-dev` | AFK loop that invokes Codey then Chorey |
+| `/ralph-fix` | Apply PR review comments |
+| `/ralph-worktree` | Prepare a deterministic worktree and use Codey for merge conflicts |

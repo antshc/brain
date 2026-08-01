@@ -1,5 +1,5 @@
 ---
-name: ralph-build-check
+name: ralph-build
 description: Build the current repository and check LSP availability before implementation.
 ---
 

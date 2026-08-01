@@ -1,5 +1,5 @@
 ---
-name: init-ralph
+name: ralph-init
 description: Manually initialize absent Ralph coding, verification, Gotchas, and collaboration guidance from repository evidence without overwriting substantive guidance.
 disable-model-invocation: true
 ---
@@ -20,7 +20,7 @@ Classify each reference before writing:
 | Reference | Target path | Template |
 |---|---|---|
 | `CODE.md` | `../ralph-implement/CODE.md` | `templates/CODE.template.md` |
-| `VERIFY.md` | `../ralph-feedback/VERIFY.md` | `templates/VERIFY.template.md` |
+| `VERIFY.md` | `../ralph-verify/VERIFY.md` | `templates/VERIFY.template.md` |
 | `GOTCHAS.md` | `../ralph-gotchas/GOTCHAS.md` | `templates/GOTCHAS.template.md` |
 | `PERSONALITY.md` | `../../agents/PERSONALITY.md` | `templates/PERSONALITY.template.md` |
 

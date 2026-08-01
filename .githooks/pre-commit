@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 SRC="$REPO_ROOT/tools/src/modules/github/"
-DEST="$REPO_ROOT/plugins/ralph/skills/fix/github/"
+DEST="$REPO_ROOT/plugins/ralph/skills/ralph-fix/github/"
 
 rsync -a --delete "$SRC" "$DEST"
 git add "$DEST"

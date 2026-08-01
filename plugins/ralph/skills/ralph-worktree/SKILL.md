@@ -1,5 +1,5 @@
 ---
-name: worktree
+name: ralph-worktree
 description: Resolve the deterministic Source Repository contract and create or reuse an isolated git worktree for a feature branch based off origin/<target-branch>.
 argument-hint: '<target-branch> <feature-branch>'
 ---

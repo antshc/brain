@@ -1,5 +1,5 @@
 ---
-name: dev
+name: ralph-dev
 description: AFK autonomous development loop — picks the next open issue, implements it, and commits the result.
 argument-hint: '<milestone-title>'
 ---
@@ -12,11 +12,11 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 Set `HARNESS_ROOT` to the current directory.
 
-Use `HARNESS_ROOT` for all Harness Root repository operations. Change to `HARNESS_ROOT` before invoking `/worktree`.
+Use `HARNESS_ROOT` for all Harness Root repository operations. Change to `HARNESS_ROOT` before invoking `/ralph-worktree`.
 
 ## 1. Resolve milestone
 
-A `<milestone-title>` argument is **required**. If not provided, **exit** and report `Usage: /dev <milestone-title>`.
+A `<milestone-title>` argument is **required**. If not provided, **exit** and report `Usage: /ralph-dev <milestone-title>`.
 
 Fetch the milestone by title:
 
@@ -47,13 +47,13 @@ Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1
 
 ## 3. Create worktree
 
-Invoke the `/worktree` skill:
+Invoke the `/ralph-worktree` skill:
 
 ```
-/worktree <target-branch> <feature-branch>
+/ralph-worktree <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. The `/worktree` skill runs the executable Source Repository contract: an absent `workspace/` selects Harness Root, while a present `workspace/` must contain exactly one direct-child Git repository. All subsequent code, Git, push, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the Harness Root `repo`.
+Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. The `/ralph-worktree` skill runs the executable Source Repository contract: an absent `workspace/` selects Harness Root, while a present `workspace/` must contain exactly one direct-child Git repository. All subsequent code, Git, push, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the Harness Root `repo`.
 
 If the worktree skill exits with an error, **exit**.
 

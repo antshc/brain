@@ -41,7 +41,7 @@ Apply every directive during implementation. Do not contradict one without repor
 
 ## BUILD & LSP CHECK
 
-Follow the `/ralph-build-check` skill.
+Follow the `/ralph-build` skill.
 
 ## IMPLEMENTATION
 
@@ -49,7 +49,7 @@ Follow the `/ralph-implement` skill for code style, layer placement, design prin
 
 ## FEEDBACK LOOPS
 
-Run the `/ralph-feedback` skill after IMPLEMENTATION completes.
+Run the `/ralph-verify` skill after IMPLEMENTATION completes.
 
 ## UPDATE GOTCHAS
 

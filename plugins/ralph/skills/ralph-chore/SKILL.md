@@ -1,5 +1,5 @@
 ---
-name: chorey-review
+name: ralph-chore
 description: Review verified uncommitted changes for behavior-preserving maintainability refactors.
 ---
 
