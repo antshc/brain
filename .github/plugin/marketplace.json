@@ -35,11 +35,6 @@
             "description": "Azure CLI workflow skills."
         },
         {
-            "name": "droid",
-            "source": "./plugins/droid",
-            "description": "Technology-agnostic autonomous coding agent and conventions."
-        },
-        {
             "name": "learn-ms",
             "source": "./plugins/learn-ms",
             "description": "Microsoft Learn skills for querying official Microsoft documentation and code references."

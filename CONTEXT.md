@@ -71,7 +71,7 @@ _Plugins_set_: wf
 
 **Codey**:
 Ralph's technology-agnostic implementation agent.
-_Avoid_: Droid, coding agent
+_Avoid_: coding agent
 _Plugins_set_: ralph
 
 **Chorey**:

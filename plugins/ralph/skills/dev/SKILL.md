@@ -78,8 +78,7 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 
 ## 2. Exit conditions
 
-- If no tasks are available, **exit**.
-- If all tasks are complete, **exit**. The `spec`-labeled issue is owned by the user — do not close it.
+- If all tasks are complete, **exit**. The `spec` -labeled issue is owned by the user — do not close it.
 
 > `spec`, `hitl`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
 
@@ -93,9 +92,9 @@ Pick the next task. Prioritize in this order (first match wins):
 4. Polish and quick wins
 5. Refactors
 
-## 4. Invoke implementation agent
+## 4. Run Codey, then conditionally run Chorey
 
-After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the Worktree Path; do not provide a workspace-path argument. Droid uses its invocation directory as its workspace. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, invoke the `codey` agent directly via `runSubagent`. Its invocation directory is the Worktree Path; do not provide a workspace-path argument. Codey uses its invocation directory as its workspace. If Codey is unavailable, report `STATUS: blocked` naming Codey; do not substitute another agent. Use the following prompt (substitute actual values):
 
 ```
 ## TASK
@@ -107,24 +106,45 @@ After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose
 <last 5 commits from step 1>
 ```
 
-## 5. Distill
+Capture Codey's complete five-field report as `CODEY_OUTCOME`. If Codey is unavailable, synthesize its blocked five-field report and continue to step 5 so the selected issue receives human attention.
 
-Distill the agent's SUMMARY into Implementation Decisions. Use this in step 6 (commit body) and step 7 (spec update).
+Only when `CODEY_OUTCOME` contains `STATUS: complete`, invoke the `chorey` agent directly via `runSubagent` in the same Worktree Path. Do not provide a workspace-path argument. Chorey reads the live uncommitted Git state itself. Pass the original task and the complete Codey outcome:
+
+```
+## TASK
+- Title: <title>
+- Body: <body>
+- Comments: <comments>
+
+## CODEY OUTCOME
+<CODEY_OUTCOME>
+```
+
+If Chorey is unavailable, synthesize a blocked five-field report naming Chorey. If Codey is partial or blocked, do not invoke Chorey; use `CODEY_OUTCOME` as the final agent outcome.
+
+## 5. Combine outcomes and derive changed files
+
+When Chorey ran, combine its report with Codey's report: Chorey's `STATUS` controls the final status, their `SUMMARY` and `NOTES` are combined, and Codey's `GOTCHAS UPDATED` is preserved. Otherwise, the Codey report is the final outcome.
+
+Derive `FINAL_FILES` from the current worktree's staged, unstaged, and untracked Git changes. This Git-derived list is authoritative over either agent's `FILES` field and must be retained for the final report before any commit is created.
+
+Distill the combined summaries into Implementation Decisions for the history entry and spec update.
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-## 6. Commit
+## 6. Publish non-empty progress
 
-Build the commit from the agent's report fields and the distilled outputs from step 5:
-- **SUBJECT** → Use **dcode:** prefix, than one line commit summary
-- **SUMMARY** → commit body (Implementation Decisions block)
-- **FILES** → list of files changed
-- **NOTES** → blockers or context for the next iteration
+Before any issue handling, inspect `FINAL_FILES`:
 
-## 7. Update Spec
+- When non-empty, stage the complete worktree change with `git add -A`, commit it with an `rcode:` subject and the Implementation Decisions block as its body, then push the feature branch.
+- When empty, do not create or push an empty commit.
+
+This applies to complete, partial, and blocked final outcomes alike; preserving non-empty work takes precedence over issue handling.
+
+## 7. Update spec
 
 Using the Implementation Decisions from step 5, update the spec issue.
 
@@ -143,17 +163,13 @@ Using the Implementation Decisions from step 5, update the spec issue.
 
 ## 8. Handle result
 
-Read the agent's `STATUS` field:
+Read the final combined `STATUS` field:
 
-- **complete**: Close the issue with `gh issue close <number>`, push the branch, and loop back to step 1.
-- **partial**: Comment on the issue with the agent's SUMMARY using `gh issue comment <number> --body "..."`, push the branch, and loop back to step 1.
-- **blocked**: Add `hitl` label to the issue with `gh issue edit <number> --add-label "hitl"`, then loop back to step 1 to pick the next task.
+- **complete**: Close the selected task with `gh issue close <number>`.
+- **partial**: Comment on the selected task with the combined summary using `gh issue comment <number> --body "..."`.
+- **blocked**: Add the `hitl` label to the selected task with `gh issue edit <number> --add-label "hitl"`.
 
-After **complete** or **partial**, push the feature branch:
-
-```bash
-git push -u origin "$branch" 2>/dev/null || git push
-```
+Never close the `spec`-labeled issue.
 
 ## 9. Commit harness root
 
@@ -165,7 +181,7 @@ Run **once** per iteration, after Handle result and after the agent has recorded
 
 Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
 
-# CREATE PULL REQUEST
+## CREATE PULL REQUEST
 
 Once all tasks are complete and the loop exits, check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
 
@@ -194,9 +210,8 @@ If the PR creation fails, **exit** and report the error.
 
 # RULES
 
-- ONE TASK AT A TIME. The agent handles one task per invocation.
-- ALWAYS re-read state before selecting the next task — context changes after each commit.
+- ONE TASK ONLY. The agent handles one selected task per invocation.
 - IF NO TASKS ARE AVAILABLE, EXIT.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
-- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 9), always from `$HARNESS_ROOT` (resolved in step 0, never the worktree), and always pushes. Skip only when nothing is staged.
+- PUBLISH NON-EMPTY WORKTREE PROGRESS BEFORE ISSUE HANDLING. Never create an empty commit.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.

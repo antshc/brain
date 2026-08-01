@@ -1,6 +1,6 @@
 # CODE
 
-<!-- Read in full by droid-implement during IMPLEMENTATION. Describe this repo's own conventions — never invent or copy example values from another repo. -->
+<!-- Read in full by ralph-implement. Describe this repository's conventions from evidence. -->
 
 ## Style
 
