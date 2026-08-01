@@ -1,0 +1,7 @@
+{
+  "name": "droid",
+  "version": "1.0.0",
+  "description": "Technology-agnostic autonomous coding agent and conventions.",
+  "skills": ["./skills"],
+  "agents": ["./agents"]
+}
