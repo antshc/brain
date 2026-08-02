@@ -147,17 +147,6 @@ If the push fails, **exit** and report the error.
 
 If `STATUS` is **blocked**, commit and push.
 
-## 7. Handle task result
-
-Maintain a per-issue attempt counter for this session, keyed by issue number.
-
-Read the agent's `STATUS` field:
-
-- **complete**: Close the issue with `gh issue close <number> --repo "$repo"`.
-- **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
-- **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
-
-Continue to step 8.
 
 ## 8. Update Spec
 
@@ -178,6 +167,19 @@ Using the Implementation Decisions from step 4, update the spec issue.
    ```
 
 Return to step 1 (Read state).
+
+
+## 7. Handle task result
+
+Maintain a per-issue attempt counter for this session, keyed by issue number.
+
+Read the agent's `STATUS` field:
+
+- **complete**: Close the issue with `gh issue close <number> --repo "$repo"`.
+- **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
+- **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
+
+Continue to step 8.
 
 # CREATE PULL REQUEST
 
@@ -206,7 +208,7 @@ gh pr create --draft \
 
 If the PR creation fails, **exit** and report the error.
 
-# Commit & push harness repo
+# COMMIT & PUSH HARNESS REPO
 
 Run **once** per iteration, immediately after committing to the source repo (step 5) and after the agent has recorded any gotchas. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
 
