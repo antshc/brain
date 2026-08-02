@@ -97,7 +97,7 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 4. Polish and quick wins
 5. Refactors
 
-**Emit** the selected `#<number> — <title>` before step 3.
+**Emit** the selected `#<number> — <title>` before **Invoke implementation agent**.
 
 ## 3. Invoke implementation agent
 
@@ -115,7 +115,7 @@ After changing to `WORKTREE_PATH`, run the `droid` agent (or `general-purpose` i
 
 ## 4. Distill
 
-Distill the agent's SUMMARY into Implementation Decisions. Use this in step 5 (commit body) and step 8 (spec update).
+Distill the agent's SUMMARY into Implementation Decisions. Use this in **Commit & push (source repo)** (commit body) and **Update Spec** (spec update).
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
@@ -124,7 +124,7 @@ Distill the agent's SUMMARY into Implementation Decisions. Use this in step 5 (c
 
 ## 5. Commit & push (source repo)
 
-Operate in `WORKTREE_PATH`. Build the commit from the agent's report fields and the distilled outputs from step 4:
+Operate in `WORKTREE_PATH`. Build the commit from the agent's report fields and the distilled outputs from **Distill**:
 - **SUBJECT** → Use **dcode:** prefix, than one line commit summary
 - **SUMMARY** → commit body (Implementation Decisions block)
 - **FILES** → list of files changed
@@ -148,9 +148,20 @@ If the push fails, **exit** and report the error.
 If `STATUS` is **blocked**, commit and push.
 
 
+## 7. Handle task result
+
+Maintain a per-issue attempt counter for this session, keyed by issue number.
+
+Read the agent's `STATUS` field:
+
+- **complete**: Close the issue with `gh issue close <number> --repo "$repo"`.
+- **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
+- **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
+
+
 ## 8. Update Spec
 
-Using the Implementation Decisions from step 4, update the spec issue.
+Using the Implementation Decisions from **Distill**, update the spec issue.
 
 1. Fetch the open spec issue:
    ```bash
@@ -166,20 +177,7 @@ Using the Implementation Decisions from step 4, update the spec issue.
    gh issue edit <spec-number> --repo "$repo" --body "<updated-body>"
    ```
 
-Return to step 1 (Read state).
-
-
-## 7. Handle task result
-
-Maintain a per-issue attempt counter for this session, keyed by issue number.
-
-Read the agent's `STATUS` field:
-
-- **complete**: Close the issue with `gh issue close <number> --repo "$repo"`.
-- **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
-- **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
-
-Continue to step 8.
+Return to **Read state**.
 
 # CREATE PULL REQUEST
 
@@ -210,7 +208,7 @@ If the PR creation fails, **exit** and report the error.
 
 # COMMIT & PUSH HARNESS REPO
 
-Run **once** per iteration, immediately after committing to the source repo (step 5) and after the agent has recorded any gotchas. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
+Run **once**, after **Create Pull Request** completes. Operate in `$HARNESS_ROOT` (resolved in **Resolve harness settings**) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
@@ -225,7 +223,7 @@ Stage all changes, commit if anything is staged, and push — using the appropri
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT. IF ALL TASKS ARE COMPLETE, EXIT — the `spec`-labeled issue is owned by the user; do not close it.
 - ITERATION CAP: exit after 2x the initial open-task count if tasks still remain, to guard against a stuck loop.
-- AN ISSUE FAILING `partial` TWICE IN A ROW IS ESCALATED TO `hitl` (step 7) rather than retried indefinitely.
+- AN ISSUE FAILING `partial` TWICE IN A ROW IS ESCALATED TO `hitl` (**Handle task result**) rather than retried indefinitely.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
-- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 6), always from `$HARNESS_ROOT` (resolved in step 0, never the worktree), and always pushes. Skip only when nothing is staged.
+- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER `/dev` INVOCATION (**Commit & push harness repo**), after **Create Pull Request**, always from `$HARNESS_ROOT` (resolved in **Resolve harness settings**, never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.
