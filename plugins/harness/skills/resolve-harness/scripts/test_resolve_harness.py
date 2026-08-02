@@ -26,26 +26,26 @@ class TestMainHarness:
 
     def test_nearest_harness_configuration_is_resolved(self, tmp_path: Path):
         # Scenario: Nearest Harness Configuration File is resolved
-        (tmp_path / ".harness.env").write_text('HARNESS_ROOT="/outer"\nOUTER=value\n')
+        (tmp_path / ".harness.env").write_text('HARNESS_REPO_PATH="/outer"\nOUTER=value\n')
         nested_directory = tmp_path / "project" / "nested"
         nested_directory.mkdir(parents=True)
-        (tmp_path / "project" / ".harness.env").write_text('HARNESS_ROOT="/inner"\nINNER=value\n')
+        (tmp_path / "project" / ".harness.env").write_text('HARNESS_REPO_PATH="/inner"\nINNER=value\n')
 
         result = run_script(RESOLVER_SCRIPT, nested_directory)
 
         assert result.returncode == 0
-        assert result.stdout == 'HARNESS_ROOT="/inner"\nINNER=value\n'
+        assert result.stdout == 'HARNESS_REPO_PATH="/inner"\nINNER=value\n'
         assert result.stderr == ""
 
     def test_all_harness_settings_are_emitted_verbatim(self, tmp_path: Path):
         # Scenario: All Harness Settings are emitted verbatim
         config_path = tmp_path / ".harness.env"
-        config_path.write_text('HARNESS_ROOT="/harness"\nVALUE=first=second\nEMPTY=\n')
+        config_path.write_text('HARNESS_REPO_PATH="/harness"\nVALUE=first=second\nEMPTY=\n')
 
         result = run_script(RESOLVER_SCRIPT, tmp_path)
 
         assert result.returncode == 0
-        assert result.stdout == 'HARNESS_ROOT="/harness"\nVALUE=first=second\nEMPTY=\n'
+        assert result.stdout == 'HARNESS_REPO_PATH="/harness"\nVALUE=first=second\nEMPTY=\n'
         assert result.stderr == ""
 
     def test_no_harness_configuration_returns_empty_root(self, tmp_path: Path):
@@ -53,7 +53,7 @@ class TestMainHarness:
         result = run_script(RESOLVER_SCRIPT, tmp_path)
 
         assert result.returncode == 0
-        assert result.stdout == "HARNESS_ROOT=\n"
+        assert result.stdout == "HARNESS_REPO_PATH=\n"
         assert result.stderr == "No .harness.env found; fall back to the current directory.\n"
 
     def test_missing_harness_root_fails_resolution(self, tmp_path: Path):
@@ -64,4 +64,4 @@ class TestMainHarness:
 
         assert result.returncode == 1
         assert result.stdout == ""
-        assert "HARNESS_ROOT is required" in result.stderr
+        assert "HARNESS_REPO_PATH is required" in result.stderr

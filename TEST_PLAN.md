@@ -662,25 +662,25 @@ Scenario: All Harness Settings are emitted verbatim
   When the resolver runs
   Then it emits every configured KEY=value line unchanged
 
-Scenario: No Harness Configuration File returns an empty Harness Root
+Scenario: No Harness Configuration File returns an empty Harness Repo Path
   Given no ancestor directory has a Harness Configuration File
   When the resolver runs
-  Then it exits successfully with HARNESS_ROOT= on stdout and a current-directory fallback explanation on stderr
+  Then it exits successfully with HARNESS_REPO_PATH= on stdout and a current-directory fallback explanation on stderr
 
-Scenario: Missing Harness Root fails resolution
-  Given a discovered Harness Configuration File without HARNESS_ROOT
+Scenario: Missing Harness Repo Path fails resolution
+  Given a discovered Harness Configuration File without HARNESS_REPO_PATH
   When the resolver runs
   Then it exits with an error
 
 Scenario: Setup creates Harness Configuration File in current directory
   Given the current directory has no Harness Configuration File
   When harness setup runs
-  Then it creates a configuration with the current directory as HARNESS_ROOT
+  Then it creates a configuration with the current directory as HARNESS_REPO_PATH and the probed workspace/ repo (or the current directory) as CODEBASE_REPO_PATH
 
-Scenario: Setup preserves existing Harness Configuration File
-  Given the current directory has an existing Harness Configuration File
+Scenario: Setup merges managed keys into an existing Harness Configuration File
+  Given the current directory has an existing Harness Configuration File with a legacy HARNESS_ROOT line and a custom key
   When harness setup runs
-  Then it leaves the file unchanged and reports its settings
+  Then it sets HARNESS_REPO_PATH and CODEBASE_REPO_PATH, drops the legacy HARNESS_ROOT line, and preserves the custom key unchanged
 ```
 
 **Coverage:** Resolver unit test; setup manual test

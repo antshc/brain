@@ -1,21 +1,21 @@
 ---
 name: delete-worktree
 description: Remove a git worktree and delete its local feature branch once development on it is finished. Never touches the remote branch or an open PR.
-argument-hint: '<source-repo-path> <worktree-path> <branch>'
+argument-hint: '<codebase-repo-path> <worktree-path> <branch>'
 ---
 
 # Delete Worktree
 
 Remove the local worktree and delete the local feature branch. Run this once development on the branch is finished for the invocation (e.g. after a PR is created/pushed) — never mid-loop while more commits on the branch are still expected.
 
-**Arguments:** `<source-repo-path> <worktree-path> <branch>`
+**Arguments:** `<codebase-repo-path> <worktree-path> <branch>`
 
 ## 1. Remove worktree
 
 Worktree removal must run from the main working tree, not from inside the worktree itself:
 
 ```bash
-cd "<source-repo-path>"
+cd "<codebase-repo-path>"
 git worktree remove "<worktree-path>" --force
 ```
 

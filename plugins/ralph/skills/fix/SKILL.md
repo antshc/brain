@@ -8,13 +8,17 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
-1. Get PR branch name: `branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)`
-2. Run the `/create-worktree` skill:
+1. Resolve harness settings: if `/resolve-harness` is available, run it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
+   - If the skill is unavailable, or it emits `HARNESS_REPO_PATH=`, set `HARNESS_REPO_PATH` to the current directory.
+   - If the available skill exits non-zero, **exit** and report its error.
+   - If `CODEBASE_REPO_PATH` is missing, **exit** and tell the user to run `/setup-harness`.
+2. Get PR branch name: `branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)`
+3. Run the `/create-worktree` skill:
    ```
-   /create-worktree <branch> <branch>
+   /create-worktree $HARNESS_REPO_PATH $CODEBASE_REPO_PATH <branch> <branch>
    ```
-   Parse the output to capture `SOURCE_REPO` and `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/create-worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the current repo) and creates the worktree there.
-3. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
+   Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/create-worktree` skill creates the worktree in `CODEBASE_REPO_PATH`.
+4. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:
 
@@ -75,7 +79,7 @@ Do not resolve threads.
 Run `/delete-worktree` skill:
 
 ```
-/delete-worktree $SOURCE_REPO $WORKTREE_PATH $branch
+/delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $branch
 ```
 
 This removes the local worktree and local branch only; `origin/$branch` and the PR are untouched, so a later `/fix` run on the same PR reuses them via `/create-worktree`.

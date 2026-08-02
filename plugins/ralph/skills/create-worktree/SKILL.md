@@ -1,38 +1,23 @@
 ---
 name: create-worktree
-description: Resolve the source repo (workspace source repo when present, else current repo) and create or reuse an isolated git worktree for a feature branch, based off the existing origin/<feature-branch> when one exists, otherwise off origin/<target-branch>. Branch detection is the caller's responsibility — this skill only resolves which repo to operate in.
-argument-hint: '<target-branch> <feature-branch>'
+description: Create or reuse an isolated git worktree for a feature branch in the given codebase repo path, based off the existing origin/<feature-branch> when one exists, otherwise off origin/<target-branch>. Branch detection is the caller's responsibility.
+argument-hint: '<codebase-repo-path> <target-branch> <feature-branch>'
 ---
 
 # Create Worktree
 
 Create or reuse an isolated git worktree for a feature branch based off a target branch.
 
-**Arguments:** `<target-branch> <feature-branch>`
+**Arguments:** `<codebase-repo-path> <target-branch> <feature-branch>`
 
-## 0. Resolve source repo
-
-If `/resolve-harness` is available, invoke it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
-
-- If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
-- If the available skill exits non-zero, **exit** and report its error.
-
-The actual source code may live in a separate repo under `workspace/` in `HARNESS_ROOT`. Resolve which repo to develop in **before** any branch or worktree operation.
+The path is supplied by the caller — this skill performs no resolution of its own.
 
 ```bash
-src_git=$(find "$HARNESS_ROOT/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
-if [ -n "$src_git" ]; then
-  SOURCE_REPO=$(dirname "$src_git")
-else
-  SOURCE_REPO=$HARNESS_ROOT
-fi
-cd "$SOURCE_REPO"
+CODEBASE_REPO_PATH=<codebase-repo-path>
+cd "$CODEBASE_REPO_PATH"
 ```
 
-- If a `.git` directory is found under `workspace/` (including one subfolder level), develop in that source repo.
-- Otherwise, fall back to the current (harness) repo.
-
-All subsequent commands run inside `SOURCE_REPO`. Worktrees are created as `<SOURCE_REPO>.worktrees/<feature-branch>`.
+All subsequent commands run inside `CODEBASE_REPO_PATH`. Worktrees are created as `<CODEBASE_REPO_PATH>.worktrees/<feature-branch>`.
 
 ## Actualize Branch
 
@@ -50,14 +35,8 @@ If the merge exits non-zero (conflicts detected):
    ```bash
    git diff --name-only --diff-filter=U
    ```
-2. Invoke the `droid` agent (or `general-purpose` if unavailable) from the current worktree directory. Do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Pass the following prompt:
-   ```
-   ## Resolve Merge Conflicts
-   The following files have merge conflicts after merging origin/<target-branch> into <feature-branch>.
-   Resolve each conflict, preserving the intent of both sides.
-   Files: <conflict-file-list>
-   ```
-3. After the agent resolves the conflicts:
+2. Resolve each conflict directly in the current context, preserving the intent of both sides.
+3. After resolving the conflicts:
    ```bash
    git add .
    git merge --continue --no-edit
@@ -82,7 +61,7 @@ Run **Actualize Branch**, then jump to **Output**.
 ## 2. Create worktree
 
 ```bash
-repo_root=$SOURCE_REPO
+repo_root=$CODEBASE_REPO_PATH
 mkdir -p "$repo_root.worktrees"
 git fetch --all --prune
 if git rev-parse --verify --quiet "origin/<feature-branch>" > /dev/null; then
@@ -112,7 +91,7 @@ cd "$repo_root.worktrees/<feature-branch>"
 Report the result:
 
 ```
-SOURCE_REPO: $SOURCE_REPO
+CODEBASE_REPO_PATH: $CODEBASE_REPO_PATH
 WORKTREE_PATH: $repo_root.worktrees/<feature-branch>
 BRANCH: <feature-branch>
 TARGET_BRANCH: <target-branch>
