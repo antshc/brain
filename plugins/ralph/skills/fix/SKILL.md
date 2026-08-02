@@ -9,11 +9,11 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
 1. Get PR branch name: `branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)`
-2. Invoke the `/worktree` skill:
+2. Run the `/create-worktree` skill:
    ```
-   /worktree <branch> <branch>
+   /create-worktree <branch> <branch>
    ```
-   Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the current repo) and creates the worktree there.
+   Parse the output to capture `SOURCE_REPO` and `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/create-worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the current repo) and creates the worktree there.
 3. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:
@@ -70,9 +70,19 @@ gh api graphql -f query='
 
 Do not resolve threads.
 
+## 6. Cleanup
+
+Run `/delete-worktree` skill:
+
+```
+/delete-worktree $SOURCE_REPO $WORKTREE_PATH $branch
+```
+
+This removes the local worktree and local branch only; `origin/$branch` and the PR are untouched, so a later `/fix` run on the same PR reuses them via `/create-worktree`.
+
 # Rules
 
-- Never push to base branches (`main`, `master`); always push only to the PR branch. Never force-push, delete branches, or rebase/amend pushed commits.
+- Never push to base branches (`main`, `master`); always push only to the PR branch. Never force-push, delete the remote branch, or rebase/amend pushed commits. The local worktree and local branch are removed in **Cleanup** — that never touches the remote branch.
 - If `git push` to the PR branch is rejected, stop and report.
 - If unclear, reply `question:` — don't guess. Next run auto-skips threads with `question:`.
 - Don't skip actionable threads without a reason.

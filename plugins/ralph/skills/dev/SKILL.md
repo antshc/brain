@@ -15,7 +15,7 @@ If `/resolve-harness` is available, run it from the current directory and retain
 - If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
 - If the available skill exits non-zero, **exit** and report its error.
 
-Use `HARNESS_ROOT` for all harness repository operations. Change to `HARNESS_ROOT` before running `/worktree`.
+Use `HARNESS_ROOT` for all harness repository operations. Change to `HARNESS_ROOT` before running `/create-worktree`.
 
 ## 1. Resolve milestone
 
@@ -56,15 +56,15 @@ Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1
 
 ## 3. Create worktree
 
-Run `/worktree` skill:
+Run `/create-worktree` skill:
 
 ```
-/worktree <target-branch> <feature-branch>
+/create-worktree <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. The `/worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the harness repo) and creates the worktree there. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
+Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. The `/create-worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the harness repo) and creates the worktree there. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
 
-If the worktree skill exits with an error, **exit**.
+If the `/create-worktree` skill exits with an error, **exit**.
 
 ---
 
@@ -215,6 +215,19 @@ Run **once**, after **Create Pull Request** completes. Operate in `$HARNESS_ROOT
 - **Emit** the commit SHA, or "nothing to commit".
 
 Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
+
+# CLEANUP WORKTREE
+
+This removes the local worktree and local branch only.
+
+Run **once**, after **Commit & Push Harness Repo** completes — development on `$branch` is finished for this invocation.
+
+Run `/delete-worktree` skill:
+
+```
+/delete-worktree $SOURCE_REPO $WORKTREE_PATH $branch
+```
+
 
 
 # RULES
