@@ -79,14 +79,9 @@ echo "=== TASKS ==="; echo "$(gh issue list --repo $repo --state open --mileston
 
 Parse the `TASKS` json array. Review `COMMITS` to understand what work has already been done.
 
-## 2. Exit conditions
-
-- If no tasks are available, **exit**.
-- If all tasks are complete, **exit**. The `spec`-labeled issue is owned by the user — do not close it.
-
 > `spec`, `hitl`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
 
-## 3. Select next task
+## 2. Select next task
 
 Pick the next task. Prioritize in this order (first match wins):
 
@@ -96,7 +91,7 @@ Pick the next task. Prioritize in this order (first match wins):
 4. Polish and quick wins
 5. Refactors
 
-## 4. Invoke implementation agent
+## 3. Invoke implementation agent
 
 After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Use the following prompt (substitute actual values):
 
@@ -110,63 +105,65 @@ After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose
 <last 5 commits from step 1>
 ```
 
-## 5. Distill
+## 4. Distill
 
-Distill the agent's SUMMARY into Implementation Decisions. Use this in step 6 (commit body) and step 7 (spec update).
+Distill the agent's SUMMARY into Implementation Decisions. Use this in step 5 (commit body) and step 8 (spec update).
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-## 6. Commit
+## 5. Commit & push (source repo)
 
-Build the commit from the agent's report fields and the distilled outputs from step 5:
+Operate in `WORKTREE_PATH`. Build the commit from the agent's report fields and the distilled outputs from step 4:
 - **SUBJECT** → Use **dcode:** prefix, than one line commit summary
 - **SUMMARY** → commit body (Implementation Decisions block)
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
-## 7. Update Spec
-
-Using the Implementation Decisions from step 5, update the spec issue.
-
-1. Fetch the open spec issue:
-   ```bash
-   gh issue list --repo $repo --milestone "<milestone-title>" --label "spec" --state open --json number,body --jq '.[0]'
-   ```
-2. If no spec issue is found, skip this step and continue.
-3. For the `## Implementation Decisions` section, apply the merge logic:
-   - Replace any entry that conflicts with or is superseded by a new decision.
-   - Append decisions that are additive.
-4. Write the updated body back:
-   ```bash
-   gh issue edit <spec-number> --body "<updated-body>"
-   ```
-
-## 8. Handle result
-
-Read the agent's `STATUS` field:
-
-- **complete**: Close the issue with `gh issue close <number>`, push the branch, and loop back to step 1.
-- **partial**: Comment on the issue with the agent's SUMMARY using `gh issue comment <number> --body "..."`, push the branch, and loop back to step 1.
-- **blocked**: Add `hitl` label to the issue with `gh issue edit <number> --add-label "hitl"`, then loop back to step 1 to pick the next task.
-
-After **complete** or **partial**, push the feature branch:
+If the agent's `STATUS` is **complete** or **partial**, push the feature branch:
 
 ```bash
 git push -u origin "$branch" 2>/dev/null || git push
 ```
 
-## 9. Commit harness root
+If `STATUS` is **blocked**, do not push.
 
-Run **once** per iteration, after Handle result and after the agent has recorded any gotchas to `.droid/GOTCHAS.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
+## 6. Commit & push (harness repo)
+
+Run **once** per iteration, immediately after committing to the source repo (step 5) and after the agent has recorded any gotchas to `.droid/GOTCHAS.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
 - **Emit** the commit SHA, or "nothing to commit".
 
 Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
+
+## 7. Handle task result
+
+Read the agent's `STATUS` field:
+
+- **complete**: Close the issue with `gh issue close <number>`, and loop back to step 1.
+- **partial**: Comment on the issue with the agent's SUMMARY using `gh issue comment <number> --body "..."`, and loop back to step 1.
+- **blocked**: Add `hitl` label to the issue with `gh issue edit <number> --add-label "hitl"`, then loop back to step 1 to pick the next task.
+
+## 8. Update Spec
+
+Using the Implementation Decisions from step 4, update the spec issue.
+
+1. Fetch the open spec issue:
+   ```bash
+   gh issue list --repo $repo --milestone "<milestone-title>" --label "spec" --state open --json number,body --jq '.[0]'
+   ```
+2. If no spec issue is found, skip this step and continue.
+3. For the `Implementation Decisions` section, apply the merge logic:
+   - Replace any entry that conflicts with or is superseded by a new decision.
+   - Append decisions that are additive.
+4. Write the updated body back:
+   ```bash
+   gh issue edit <spec-number> --body "<updated-body>"
+   ```
 
 # CREATE PULL REQUEST
 
@@ -199,7 +196,7 @@ If the PR creation fails, **exit** and report the error.
 
 - ONE TASK AT A TIME. The agent handles one task per invocation.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
-- IF NO TASKS ARE AVAILABLE, EXIT.
+- IF NO TASKS ARE AVAILABLE, EXIT. IF ALL TASKS ARE COMPLETE, EXIT — the `spec`-labeled issue is owned by the user; do not close it.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
-- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 9), always from `$HARNESS_ROOT` (resolved in step 0, never the worktree), and always pushes. Skip only when nothing is staged.
+- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 6), always from `$HARNESS_ROOT` (resolved in step 0, never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.
