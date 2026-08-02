@@ -10,27 +10,33 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-If `/resolve-harness` is available, invoke it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
+If `/resolve-harness` is available, run it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
 
 - If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
 - If the available skill exits non-zero, **exit** and report its error.
 
-Use `HARNESS_ROOT` for all harness repository operations. Change to `HARNESS_ROOT` before invoking `/worktree`.
+Use `HARNESS_ROOT` for all harness repository operations. Change to `HARNESS_ROOT` before running `/worktree`.
 
 ## 1. Resolve milestone
 
 A `<milestone-title>` argument is **required**. If not provided, **exit** and report `Usage: /dev <milestone-title>`.
 
+Assign it once and reuse everywhere as `$milestone`:
+
+```bash
+milestone="<milestone-title>"
+```
+
 Fetch the milestone by title:
 
 ```bash
 repo=$(git -C "$HARNESS_ROOT" remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
-gh api "repos/$repo/milestones?per_page=100&state=all" | jq '.[] | select(.title == "<milestone-title>")'
+gh api "repos/$repo/milestones?per_page=100&state=all" | jq --arg title "$milestone" '.[] | select(.title == $title)'
 ```
 
-Tasks live in the **harness repository**, so `repo` always resolves the `HARNESS_ROOT` `origin` remote. Run this before the worktree is created.
+`repo` is resolved once here and reused for every subsequent harness-repo command in this skill. Tasks live in the **harness repository**, so `repo` always resolves the `HARNESS_ROOT` `origin` remote. Run this before the worktree is created.
 
-If no milestone matches, **exit** and report "Milestone not found: `<milestone-title>`".
+If no milestone matches, **exit** and report "Milestone not found: `$milestone`".
 
 Extract from `milestone.description`:
 - **Feature ID** — value inside backticks after `**Feature ID:**` (e.g. `PROJ-1234`)
@@ -50,13 +56,13 @@ Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1
 
 ## 3. Create worktree
 
-Invoke the `/worktree` skill:
+Run `/worktree` skill:
 
 ```
 /worktree <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`. The `/worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the harness repo) and creates the worktree there. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
+Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. The `/worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the harness repo) and creates the worktree there. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
 
 If the worktree skill exits with an error, **exit**.
 
@@ -74,7 +80,7 @@ Run the following commands from the `WORKTREE_PATH` and print their output so it
 echo "=== COMMITS ==="; 
 echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
 echo ""
-echo "=== TASKS ==="; echo "$(gh issue list --repo $repo --state open --milestone "<milestone-title>" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["spec"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
+echo "=== TASKS ==="; echo "$(gh issue list --repo "$repo" --state open --milestone "$milestone" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["spec"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
 ```
 
 Parse the `TASKS` json array. Review `COMMITS` to understand what work has already been done.
@@ -83,7 +89,7 @@ Parse the `TASKS` json array. Review `COMMITS` to understand what work has alrea
 
 ## 2. Select next task
 
-Pick the next task. Prioritize in this order (first match wins):
+Pick the next task. Prioritize in this order (first match wins); break ties within a tier by lowest issue number:
 
 1. Critical bugfixes
 2. Development infrastructure — tests, types, dev scripts are precursors to features
@@ -91,9 +97,11 @@ Pick the next task. Prioritize in this order (first match wins):
 4. Polish and quick wins
 5. Refactors
 
+**Emit** the selected `#<number> — <title>` before step 3.
+
 ## 3. Invoke implementation agent
 
-After changing to `WORKTREE_PATH`, invoke the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, run the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Use the following prompt (substitute actual values):
 
 ```
 ## TASK
@@ -122,31 +130,34 @@ Operate in `WORKTREE_PATH`. Build the commit from the agent's report fields and 
 - **FILES** → list of files changed
 - **NOTES** → blockers or context for the next iteration
 
+Stage and commit:
+
+```bash
+git add -A
+git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
+```
+
 If the agent's `STATUS` is **complete** or **partial**, push the feature branch:
 
 ```bash
-git push -u origin "$branch" 2>/dev/null || git push
+git push -u origin "$branch"
 ```
 
-If `STATUS` is **blocked**, do not push.
+If the push fails, **exit** and report the error.
 
-## 6. Commit & push (harness repo)
-
-Run **once** per iteration, immediately after committing to the source repo (step 5) and after the agent has recorded any gotchas to `.droid/GOTCHAS.md`. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
-
-- Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
-- If nothing is staged, skip the commit (no empty commits).
-- **Emit** the commit SHA, or "nothing to commit".
-
-Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
+If `STATUS` is **blocked**, commit and push.
 
 ## 7. Handle task result
 
+Maintain a per-issue attempt counter for this session, keyed by issue number.
+
 Read the agent's `STATUS` field:
 
-- **complete**: Close the issue with `gh issue close <number>`, and loop back to step 1.
-- **partial**: Comment on the issue with the agent's SUMMARY using `gh issue comment <number> --body "..."`, and loop back to step 1.
-- **blocked**: Add `hitl` label to the issue with `gh issue edit <number> --add-label "hitl"`, then loop back to step 1 to pick the next task.
+- **complete**: Close the issue with `gh issue close <number> --repo "$repo"`.
+- **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
+- **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
+
+Continue to step 8.
 
 ## 8. Update Spec
 
@@ -154,16 +165,19 @@ Using the Implementation Decisions from step 4, update the spec issue.
 
 1. Fetch the open spec issue:
    ```bash
-   gh issue list --repo $repo --milestone "<milestone-title>" --label "spec" --state open --json number,body --jq '.[0]'
+   gh issue list --repo "$repo" --milestone "$milestone" --label "spec" --state open --json number,body --jq '.[0]'
    ```
-2. If no spec issue is found, skip this step and continue.
+2. If no spec issue is found, skip steps 3-4 below.
 3. For the `Implementation Decisions` section, apply the merge logic:
+   - If the section is absent from the spec body, append it.
    - Replace any entry that conflicts with or is superseded by a new decision.
    - Append decisions that are additive.
 4. Write the updated body back:
    ```bash
-   gh issue edit <spec-number> --body "<updated-body>"
+   gh issue edit <spec-number> --repo "$repo" --body "<updated-body>"
    ```
+
+Return to step 1 (Read state).
 
 # CREATE PULL REQUEST
 
@@ -184,7 +198,7 @@ existing_pr=$(gh pr list \
 
 ```bash
 gh pr create --draft \
-  --title "[<feature-id>]: <spec-title>" \
+  --title "[<feature-id>]: <milestone-title>" \
   --body "**Feature ID:** \`<feature-id>\`" \
   --base "<target-branch>" \
   --head "$branch"
@@ -192,11 +206,24 @@ gh pr create --draft \
 
 If the PR creation fails, **exit** and report the error.
 
+# Commit & push harness repo
+
+Run **once** per iteration, immediately after committing to the source repo (step 5) and after the agent has recorded any gotchas. Operate in `$HARNESS_ROOT` (resolved in step 0) — never the worktree.
+
+- Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
+- If nothing is staged, skip the commit (no empty commits).
+- **Emit** the commit SHA, or "nothing to commit".
+
+Stage all changes, commit if anything is staged, and push — using the appropriate shell syntax for the current platform.
+
+
 # RULES
 
 - ONE TASK AT A TIME. The agent handles one task per invocation.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT. IF ALL TASKS ARE COMPLETE, EXIT — the `spec`-labeled issue is owned by the user; do not close it.
+- ITERATION CAP: exit after 2x the initial open-task count if tasks still remain, to guard against a stuck loop.
+- AN ISSUE FAILING `partial` TWICE IN A ROW IS ESCALATED TO `hitl` (step 7) rather than retried indefinitely.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
 - HARNESS ROOT COMMIT & PUSH RUNS ONCE PER ITERATION (step 6), always from `$HARNESS_ROOT` (resolved in step 0, never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.
