@@ -46,7 +46,7 @@ The repository that owns the milestone/issues and hosts the docs. Separate from 
 **Harness Repo Path**:
 The repository that owns the milestone/issues and hosts the repo-local development workflow, resolved once by the entry-point skill (`resolve-harness`/`setup-harness`) and passed explicitly downstream rather than re-derived by each component. Distinct from the `Codebase Repo Path` and `Worktree Path`, though one repository can serve all three roles.
 _Avoid_: repo root, home repo, harness root
-_Plugins_set_: ralph, droid, wf
+_Plugins_set_: ralph, crew, wf
 
 **Codebase Repo Path**:
 The Git repository containing the source code Ralph develops, resolved once alongside the `Harness Repo Path` by the entry-point skill and supplied explicitly to `/create-worktree`. Distinct from the `Harness Repo Path` and `Worktree Path`, though it can also be the Harness Repo Path.
@@ -54,9 +54,9 @@ _Avoid_: codebase, source checkout, source repository
 _Plugins_set_: ralph, wf
 
 **Worktree Path**:
-The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches Droid from it when applicable; Droid treats its invocation directory as its workspace and does not receive this path.
+The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches the crew agents from it when applicable; each agent treats its invocation directory as its workspace and does not receive this path.
 _Avoid_: working directory, checkout
-_Plugins_set_: ralph, droid, wf
+_Plugins_set_: ralph, crew, wf
 
 **Ledger**:
 A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
@@ -71,19 +71,31 @@ _Plugins_set_: wf
 ## ralph
 ### Language
 
-## droid
+## crew
 ### Language
 
+**Codey**:
+The implementation agent. Implements one task in its invocation directory and returns the five-field report that alone governs `ralph:dev`'s distill, commit, and issue-handling steps.
+_Avoid_: droid, implementer, coder
+
+**Chorey**:
+The maintainability-review agent. Reviews Codey's uncommitted result for behavior-preserving refactors, runs only behind a Codey `STATUS: complete` gate, reports informationally, and discards its own refactors when its verification cannot pass.
+_Avoid_: reviewer, refactorer, cleanup agent
+
+**Convention folder**:
+The per-repo `.crew/` directory under the `Harness Repo Path` holding `CODE.md`, `VERIFY.md`, `CHORE.md`, and `GOTCHAS.md` — the single location a crew agent resolves them from, never discovered or searched for.
+_Avoid_: .droid, config folder, settings directory
+
 **Gotchas**:
-Reusable directives stored with the `droid-gotchas` skill. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
+Reusable directives stored with the `crew-gotchas` skill. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
-The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — discovered from the repo's own structure during `droid-feedback`, never assumed or named by the skill.
+The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — discovered from the repo's own structure during `crew-feedback`, never assumed or named by the skill.
 _Avoid_: project, package
 
 **Verification counterpart**:
-The sibling/child unit that verifies a Module (tests, specs, or whatever the repo calls it), discovered the same way as its Module during `droid-feedback`.
+The sibling/child unit that verifies a Module (tests, specs, or whatever the repo calls it), discovered the same way as its Module during `crew-feedback`.
 _Avoid_: test project, test suite
 
 ## wf
@@ -113,6 +125,6 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → droid**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches the repo-local `droid` agent from that directory when available, otherwise its general-purpose fallback, handing it `HARNESS_REPO_PATH` through a trusted `## HARNESS` prompt section. Droid treats its invocation directory as its workspace and validates the supplied path rather than discovering it.
-- **droid ↔ Shared**: `droid` reads skill-owned implementation and verification guidance before changing code, then writes distilled `Gotchas` back to the reference owned by `droid-gotchas` after feedback loops pass.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable — handing it `HARNESS_REPO_PATH` through a trusted `## HARNESS` prompt section. `Chorey` follows only on a Codey `STATUS: complete`, and is skipped when unavailable. Each agent treats its invocation directory as its workspace and validates the supplied path rather than discovering it.
+- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance from the `Convention folder` before changing code, then write distilled `Gotchas` back to the reference owned by `crew-gotchas` after feedback loops pass.
 
