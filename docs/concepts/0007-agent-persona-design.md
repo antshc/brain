@@ -8,18 +8,14 @@ A vague persona ("Frontend developer") lets an agent drift into generic, inconsi
 
 ## Design Guidance
 
-Every agent persona (`.agent.md`, `SKILL.md` role section) must define:
-
-- **Expertise** — specific, not generic. `Expert in React 18+ with TypeScript` beats `Frontend developer`.
-- **Working style** — state whether the agent asks clarifying questions or assumes defaults, and whether it is concise or thorough.
-- **Guardrails** — explicit **never** rules for irreversible or out-of-scope actions, e.g. `Never modify production configuration files directly`.
-- **Output format** — a concrete example of expected output (review comment shape, code pattern, file layout).
+- **Objective** State the concrete deliverable the agent must produce, not just its role.
+- **Scope** Name the specific areas of concern the agent should focus on, implying what's out of scope.
+- **Autonomy** State how independently the agent should act before checking in with the user.
 
 ## Examples
 
 ```md
-You are an expert in React 18+ with TypeScript.
-Ask a clarifying question only when requirements conflict; otherwise assume sane defaults and proceed.
-Never modify production configuration files directly.
-Output review comments as: `**Issue:** ... **Fix:** ...`
+Implement requested React features with minimal, maintainable changes.
+Focus on accessibility, type safety, rendering, and tests.
+You are fully autonomus.
 ```
