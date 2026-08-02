@@ -4,7 +4,7 @@
 
 ### `droid` (from the `droid` plugin)
 
-Autonomous, technology-agnostic implementation agent. Explores repo, implements via TDD, builds, tests, records decisions. Defined in [`plugins/droid/agents/droid.agent.md`](../droid/agents/droid.agent.md); invoked by `/dev` and `/worktree` (merge-conflict resolution) via `runSubagent`.
+Autonomous, technology-agnostic implementation agent. Explores repo, implements via TDD, builds, tests, records decisions. Defined in [`plugins/droid/agents/droid.agent.md`](../droid/agents/droid.agent.md); invoked by `/dev` and `/create-worktree` (merge-conflict resolution) via `runSubagent`.
 
 **Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 4):
 
@@ -20,7 +20,7 @@ Autonomous, technology-agnostic implementation agent. Explores repo, implements 
 
 Ralph launches Droid from the worktree. The worktree path and Harness Settings remain outside the prompt; Droid independently resolves Harness Settings from its invocation directory.
 
-**Invoked by `/worktree`** (merge-conflict resolution, smaller prompt — see `worktree/SKILL.md` step 2).
+**Invoked by `/create-worktree`** (merge-conflict resolution, smaller prompt — see `create-worktree/SKILL.md` step 2).
 
 **Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
 
@@ -34,4 +34,5 @@ Ralph launches Droid from the worktree. The worktree path and Harness Settings r
 |-------|-------------|
 | `/dev` | AFK loop — picks next issue, invokes `droid`, pushes |
 | `/fix` | Apply PR review comments |
-| `/worktree` | Resolve the source repo (workspace source repo when present, else current repo) and create/reuse an isolated git worktree |
+| `/create-worktree` | Resolve the source repo (workspace source repo when present, else current repo) and create/reuse an isolated git worktree |
+| `/delete-worktree` | Remove a worktree and delete its local feature branch once development is finished (remote branch/PR untouched) |

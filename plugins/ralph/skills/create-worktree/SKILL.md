@@ -1,10 +1,10 @@
 ---
-name: worktree
-description: Resolve the source repo (workspace source repo when present, else current repo) and create or reuse an isolated git worktree for a feature branch based off origin/<target-branch>. Branch detection is the caller's responsibility — this skill only resolves which repo to operate in.
+name: create-worktree
+description: Resolve the source repo (workspace source repo when present, else current repo) and create or reuse an isolated git worktree for a feature branch, based off the existing origin/<feature-branch> when one exists, otherwise off origin/<target-branch>. Branch detection is the caller's responsibility — this skill only resolves which repo to operate in.
 argument-hint: '<target-branch> <feature-branch>'
 ---
 
-# Worktree Setup
+# Create Worktree
 
 Create or reuse an isolated git worktree for a feature branch based off a target branch.
 
@@ -85,8 +85,15 @@ Run **Actualize Branch**, then jump to **Output**.
 repo_root=$SOURCE_REPO
 mkdir -p "$repo_root.worktrees"
 git fetch --all --prune
-git worktree add -b <feature-branch> "$repo_root.worktrees/<feature-branch>" "origin/<target-branch>"
+if git rev-parse --verify --quiet "origin/<feature-branch>" > /dev/null; then
+  base_ref="origin/<feature-branch>"
+else
+  base_ref="origin/<target-branch>"
+fi
+git worktree add -b <feature-branch> "$repo_root.worktrees/<feature-branch>" "$base_ref"
 ```
+
+Preferring an existing `origin/<feature-branch>` preserves commits from a prior run on the same branch; falling back to `origin/<target-branch>` is the fresh-branch case.
 
 - If the worktree already exists (exit code 128), `cd` into it and run **Actualize Branch**:
   ```bash
