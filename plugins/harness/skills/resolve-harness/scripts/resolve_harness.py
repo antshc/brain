@@ -6,7 +6,7 @@ import sys
 
 
 CONFIG_FILE_NAME = ".harness.env"
-HARNESS_ROOT_KEY = "HARNESS_ROOT"
+HARNESS_ROOT_KEY = "HARNESS_REPO_PATH"
 
 
 def find_config_path(start_directory: Path) -> Path | None:
@@ -49,7 +49,7 @@ def main() -> int:
 
     harness_root = next((value for key, value in settings if key == HARNESS_ROOT_KEY), None)
     if harness_root is None or not harness_root:
-        print(f"Invalid harness configuration {config_path}: HARNESS_ROOT is required.", file=sys.stderr)
+        print(f"Invalid harness configuration {config_path}: HARNESS_REPO_PATH is required.", file=sys.stderr)
         return 1
 
     for key, value in settings:

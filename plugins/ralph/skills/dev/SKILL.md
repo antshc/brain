@@ -10,12 +10,12 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-If `/resolve-harness` is available, run it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_ROOT` value.
+If `/resolve-harness` is available, run it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
 
-- If the skill is unavailable, or it emits `HARNESS_ROOT=`, set `HARNESS_ROOT` to the current directory.
+- If the skill is unavailable, or it emits `HARNESS_REPO_PATH=`, set `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` to the current directory.
 - If the available skill exits non-zero, **exit** and report its error.
 
-Use `HARNESS_ROOT` for all harness repository operations. Change to `HARNESS_ROOT` before running `/create-worktree`.
+Use `HARNESS_REPO_PATH` for all harness repository operations.
 
 ## 1. Resolve milestone
 
@@ -30,11 +30,11 @@ milestone="<milestone-title>"
 Fetch the milestone by title:
 
 ```bash
-repo=$(git -C "$HARNESS_ROOT" remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+repo=$(git -C "$HARNESS_REPO_PATH" remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
 gh api "repos/$repo/milestones?per_page=100&state=all" | jq --arg title "$milestone" '.[] | select(.title == $title)'
 ```
 
-`repo` is resolved once here and reused for every subsequent harness-repo command in this skill. Tasks live in the **harness repository**, so `repo` always resolves the `HARNESS_ROOT` `origin` remote. Run this before the worktree is created.
+`repo` is resolved once here and reused for every subsequent harness-repo command in this skill. Tasks live in the **harness repository**, so `repo` always resolves the `HARNESS_REPO_PATH` `origin` remote. Run this before the worktree is created.
 
 If no milestone matches, **exit** and report "Milestone not found: `$milestone`".
 
@@ -59,10 +59,10 @@ Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1
 Run `/create-worktree` skill:
 
 ```
-/create-worktree <target-branch> <feature-branch>
+/create-worktree $CODEBASE_REPO_PATH <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `SOURCE_REPO`, `WORKTREE_PATH`, and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. The `/create-worktree` skill resolves the source repo (the `workspace/` source repo when it has a `.git`, otherwise the harness repo) and creates the worktree there. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
+Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. The `/create-worktree` skill creates the worktree in `CODEBASE_REPO_PATH`. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
 
 If the `/create-worktree` skill exits with an error, **exit**.
 
@@ -101,9 +101,12 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 
 ## 3. Invoke implementation agent
 
-After changing to `WORKTREE_PATH`, run the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree; do not provide a workspace-path or harness-settings argument. Droid resolves its own Harness Settings. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, run the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. Use the following prompt (substitute actual values):
 
 ```
+## HARNESS
+HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
+
 ## TASK
 - Title: <title>
 - Body: <body>
@@ -208,7 +211,7 @@ If the PR creation fails, **exit** and report the error.
 
 # COMMIT & PUSH HARNESS REPO
 
-Run **once**, after **Create Pull Request** completes. Operate in `$HARNESS_ROOT` (resolved in **Resolve harness settings**) — never the worktree.
+Run **once**, after **Create Pull Request** completes. Operate in `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
@@ -225,7 +228,7 @@ Run **once**, after **Commit & Push Harness Repo** completes — development on 
 Run `/delete-worktree` skill:
 
 ```
-/delete-worktree $SOURCE_REPO $WORKTREE_PATH $branch
+/delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $branch
 ```
 
 
@@ -238,5 +241,5 @@ Run `/delete-worktree` skill:
 - ITERATION CAP: exit after 2x the initial open-task count if tasks still remain, to guard against a stuck loop.
 - AN ISSUE FAILING `partial` TWICE IN A ROW IS ESCALATED TO `hitl` (**Handle task result**) rather than retried indefinitely.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
-- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER `/dev` INVOCATION (**Commit & push harness repo**), after **Create Pull Request**, always from `$HARNESS_ROOT` (resolved in **Resolve harness settings**, never the worktree), and always pushes. Skip only when nothing is staged.
+- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER `/dev` INVOCATION (**Commit & push harness repo**), after **Create Pull Request**, always from `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**, never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.

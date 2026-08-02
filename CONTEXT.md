@@ -41,14 +41,16 @@ Location: plugins/
 Terms used across more than one plugin — not owned by a single plugin's context.
 
 ### Language
-**Harness Root**:
-The repository that owns the milestone/issues and hosts the repo-local development workflow. Distinct from the `Source Repository` and `Worktree Path`, though one repository can serve all three roles.
-_Avoid_: repo root, home repo
+**Harness environment**:
+The repository that owns the milestone/issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
+**Harness Repo Path**:
+The repository that owns the milestone/issues and hosts the repo-local development workflow, resolved once by the entry-point skill (`resolve-harness`/`setup-harness`) and passed explicitly downstream rather than re-derived by each component. Distinct from the `Codebase Repo Path` and `Worktree Path`, though one repository can serve all three roles.
+_Avoid_: repo root, home repo, harness root
 _Plugins_set_: ralph, droid, wf
 
-**Source Repository**:
-The Git repository containing the source code Ralph develops. Distinct from the `Harness Root` and `Worktree Path`, though it can also be the Harness Root.
-_Avoid_: codebase, source checkout
+**Codebase Repo Path**:
+The Git repository containing the source code Ralph develops, resolved once alongside the `Harness Repo Path` by the entry-point skill and supplied explicitly to `/create-worktree`. Distinct from the `Harness Repo Path` and `Worktree Path`, though it can also be the Harness Repo Path.
+_Avoid_: codebase, source checkout, source repository
 _Plugins_set_: ralph, wf
 
 **Worktree Path**:
@@ -111,6 +113,6 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → droid**: Consumers install `ralph` in the `Harness Root` to use its development workflow. Ralph resolves the `Source Repository`, creates the `Worktree Path`, and launches the repo-local `droid` agent from that directory when available, otherwise its general-purpose fallback. Droid treats its invocation directory as its workspace.
+- **ralph → droid**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches the repo-local `droid` agent from that directory when available, otherwise its general-purpose fallback, handing it `HARNESS_REPO_PATH` through a trusted `## HARNESS` prompt section. Droid treats its invocation directory as its workspace and validates the supplied path rather than discovering it.
 - **droid ↔ Shared**: `droid` reads skill-owned implementation and verification guidance before changing code, then writes distilled `Gotchas` back to the reference owned by `droid-gotchas` after feedback loops pass.
 
