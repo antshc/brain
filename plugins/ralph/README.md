@@ -22,19 +22,22 @@ Ralph launches Codey from the worktree, passing `HARNESS_REPO_PATH` via a `## HA
 
 ### `chorey` (from the `crew` plugin)
 
-Maintainability-review agent. Reviews Codey's uncommitted result for behavior-preserving cleanup. Defined in [`plugins/crew/agents/chorey.agent.md`](../crew/agents/chorey.agent.md); invoked by `/dev` via `runSubagent`.
+Maintainability-review agent. Reviews Codey's checkpoint commit for behavior-preserving cleanup. Defined in [`plugins/crew/agents/chorey.agent.md`](../crew/agents/chorey.agent.md); invoked by `/dev` via `runSubagent`.
 
-**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 4, only when Codey reports `STATUS: complete`):
+**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 6, only when Codey reports `STATUS: complete`, after Codey's checkpoint commit lands):
 
 ```
 ## HARNESS
 HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
 
-## UNCOMMITTED WORK
-<uncommitted diff in the worktree>
+## DIFF
+<checkpoint commit diff>
+
+## BASELINE_COMMIT
+<checkpoint commit sha>
 ```
 
-Skipped entirely when Codey's `STATUS` is `partial`/`blocked`, or when `chorey` is unavailable — the run's outcome is unchanged either way. Chorey's own `STATUS` never changes the outcome the loop records; its findings surface in the commit body only.
+Skipped entirely when Codey's `STATUS` is `partial`/`blocked`, or when `chorey` is unavailable — the run's outcome is unchanged either way. Chorey's own `STATUS` never changes the outcome the loop records; its findings surface in its own follow-up commit body only, never Codey's.
 
 **Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
 

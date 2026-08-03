@@ -116,45 +116,33 @@ HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
 <last 5 commits from step 1>
 ```
 
-## 4. Review (Chorey)
+## 4. Distill
 
-Run only when Codey's `STATUS` from **Invoke implementation agent** is **complete** — reviewing unverified or broken work cannot preserve behavior that was never established. Skip this step entirely (continue to **Distill**) when `STATUS` is **partial** or **blocked**, or when `chorey` is unavailable — the run's outcome is unchanged either way.
-
-After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Use the following prompt (substitute actual values):
-
-```
-## HARNESS
-HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
-
-## UNCOMMITTED WORK
-<uncommitted diff in the worktree>
-```
-
-Retain Chorey's report as `$chorey_report` for use in **Commit & push (source repo)**. Chorey's `STATUS` is informational only — it never changes the `STATUS` recorded in **Handle task result**, which always reflects Codey's report from **Invoke implementation agent**.
-
-## 5. Distill
-
-Distill the agent's SUMMARY into Implementation Decisions. Use this in **Commit & push (source repo)** (commit body) and **Update Spec** (spec update).
+Distill Codey's SUMMARY into Implementation Decisions. Use this in **Commit & push Codey's checkpoint** (commit body) and **Update Spec** (spec update).
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-## 6. Commit & push (source repo)
+## 5. Commit & push Codey's checkpoint (source repo)
 
-Operate in `WORKTREE_PATH`. Build the commit from Codey's report fields and the distilled outputs from **Distill**:
+Operate in `WORKTREE_PATH`. This commit is the safe baseline **Review (Chorey)** reviews and reverts against, so it must land before Chorey touches anything. Build it from Codey's report fields and the distilled outputs from **Distill**:
 - **SUBJECT** → Use **ccode:** prefix, than one line commit summary
 - **SUMMARY** → commit body (Implementation Decisions block)
 - **FILES** → list of files changed
-- **NOTES** → blockers or context for the next iteration; when **Review (Chorey)** ran and reported findings, append them as a `Findings:` line
+- **NOTES** → blockers or context for the next iteration
 
 Stage and commit:
 
 ```bash
 git add -A
 git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
+checkpoint_sha=$(git rev-parse HEAD)
+diff=$(git show "$checkpoint_sha")
 ```
+
+Retain `$checkpoint_sha` and `$diff` for use in **Review (Chorey)**.
 
 If Codey's `STATUS` is **complete** or **partial**, push the feature branch:
 
@@ -164,10 +152,48 @@ git push -u origin "$branch"
 
 If the push fails, **exit** and report the error.
 
-If `STATUS` is **blocked**, commit and push.
+If `STATUS` is **blocked**, commit and push too.
 
+## 6. Review (Chorey)
 
-## 7. Handle task result
+Run only when Codey's `STATUS` from **Invoke implementation agent** is **complete** — reviewing unverified or broken work cannot preserve behavior that was never established. Skip this step entirely (continue to **Handle task result**) when `STATUS` is **partial** or **blocked**, or when `chorey` is unavailable — the run's outcome is unchanged either way.
+
+After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Use the following prompt (substitute actual values):
+
+```
+## HARNESS
+HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
+
+## DIFF
+<$diff>
+
+## BASELINE_COMMIT
+<$checkpoint_sha>
+```
+
+`$checkpoint_sha` is the commit **Commit & push Codey's checkpoint** just made — Chorey reviews the change it introduced and, if its own edits fail verification, reverts against it. Retain Chorey's report for use in **Commit & push Chorey's cleanup**. Chorey's `STATUS` is informational only — it never changes the `STATUS` recorded in **Handle task result**, which always reflects Codey's report from **Invoke implementation agent**.
+
+## 7. Commit & push Chorey's cleanup (source repo)
+
+Run only when **Review (Chorey)** ran and applied changes (its `FILES` field is not "none"). Skip this step when Chorey was skipped or reports `FILES: none` — Codey's checkpoint already stands as the final result.
+
+Operate in `WORKTREE_PATH`. Build a second commit from Chorey's own report fields:
+- **SUBJECT** → Use **ccode: review —** prefix, then one line summary of what Chorey cleaned up
+- **SUMMARY** → commit body (Chorey's SUMMARY)
+- **FILES** → Chorey's list of files changed
+- **NOTES** → Chorey's findings not applied, or blockers
+
+Stage, commit, and push:
+
+```bash
+git add -A
+git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
+git push -u origin "$branch"
+```
+
+If the push fails, **exit** and report the error.
+
+## 8. Handle task result
 
 Maintain a per-issue attempt counter for this session, keyed by issue number.
 
@@ -178,7 +204,7 @@ Read Codey's `STATUS` field from **Invoke implementation agent** — never Chore
 - **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
 
 
-## 8. Update Spec
+## 9. Update Spec
 
 Using the Implementation Decisions from **Distill**, update the spec issue.
 
@@ -256,7 +282,8 @@ Run `/delete-worktree` skill:
 - IF NO TASKS ARE AVAILABLE, EXIT. IF ALL TASKS ARE COMPLETE, EXIT — the `spec`-labeled issue is owned by the user; do not close it.
 - ITERATION CAP: exit after 2x the initial open-task count if tasks still remain, to guard against a stuck loop.
 - AN ISSUE FAILING `partial` TWICE IN A ROW IS ESCALATED TO `hitl` (**Handle task result**) rather than retried indefinitely.
-- CHOREY NEVER CHANGES THE RECORDED OUTCOME. **Handle task result** always reads Codey's `STATUS`, never Chorey's — Chorey's findings surface in the commit body only.
+- CHOREY NEVER CHANGES THE RECORDED OUTCOME. **Handle task result** always reads Codey's `STATUS`, never Chorey's — Chorey's findings surface in its own follow-up commit body only.
+- CODEY'S CHECKPOINT COMMIT LANDS BEFORE CHOREY RUNS. Chorey reviews and, if needed, reverts against that commit — never edit code ahead of **Commit & push Codey's checkpoint**. A task yields one source-repo commit when Chorey applies nothing, two when it does.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
 - HARNESS ROOT COMMIT & PUSH RUNS ONCE PER `/dev` INVOCATION (**Commit & push harness repo**), after **Create Pull Request**, always from `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**, never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.

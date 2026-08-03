@@ -11,7 +11,7 @@ Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://githu
 1. Resolve harness settings: if `/resolve-harness` is available, run it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
    - If the skill is unavailable, or it emits `HARNESS_REPO_PATH=`, set `HARNESS_REPO_PATH` to the current directory.
    - If the available skill exits non-zero, **exit** and report its error.
-   - If `CODEBASE_REPO_PATH` is missing, **exit** and tell the user to run `/setup-harness`.
+   - If `CODEBASE_REPO_PATH` is missing, set it to the current directory.
 2. Get PR branch names:
   ```bash
   branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)
