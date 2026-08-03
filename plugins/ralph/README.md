@@ -2,42 +2,12 @@
 
 ## Agents
 
-### `codey` (from the `crew` plugin)
+Both agents are from the `crew` plugin and are invoked by `/dev` via `runSubagent`; see [dev/SKILL.md](skills/dev/SKILL.md) steps 3 and 6 for their prompts and gating.
 
-Autonomous, technology-agnostic implementation agent. Explores repo, implements via TDD, builds, tests, records decisions. Defined in [`plugins/crew/agents/codey.agent.md`](../crew/agents/codey.agent.md); invoked by `/dev` via `runSubagent`.
-
-**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 3):
-
-```
-## TASK
-- Title: <title>
-- Body: <body>
-- Comments: <comments>
-
-## RECENT CHANGES
-<last 5 commits>
-```
-
-Ralph launches Codey from the worktree, passing `HARNESS_REPO_PATH` via a `## HARNESS` prompt section. The worktree path stays outside the prompt. Codey's `STATUS` alone governs the loop's distill, commit, and issue-handling steps; falls back to the `general-purpose` agent when Codey is unavailable.
-
-### `chorey` (from the `crew` plugin)
-
-Maintainability-review agent. Reviews Codey's checkpoint commit for behavior-preserving cleanup. Defined in [`plugins/crew/agents/chorey.agent.md`](../crew/agents/chorey.agent.md); invoked by `/dev` via `runSubagent`.
-
-**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 6, only when Codey reports `STATUS: complete`, after Codey's checkpoint commit lands):
-
-```
-## HARNESS
-HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
-
-## DIFF
-<checkpoint commit diff>
-
-## BASELINE_COMMIT
-<checkpoint commit sha>
-```
-
-Skipped entirely when Codey's `STATUS` is `partial`/`blocked`, or when `chorey` is unavailable — the run's outcome is unchanged either way. Chorey's own `STATUS` never changes the outcome the loop records; its findings surface in its own follow-up commit body only, never Codey's.
+| Agent | Role | Defined in |
+|-------|------|-----------|
+| `codey` | Autonomous, technology-agnostic implementation agent (explores, implements via TDD, builds, tests) — invoked per task in step 3; falls back to `general-purpose` when unavailable | [`plugins/crew/agents/codey.agent.md`](../crew/agents/codey.agent.md) |
+| `chorey` | Maintainability-review agent — reviews Codey's checkpoint commit in step 6, gated on `STATUS: complete`; its own `STATUS` never overrides Codey's recorded outcome | [`plugins/crew/agents/chorey.agent.md`](../crew/agents/chorey.agent.md) |
 
 **Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
 

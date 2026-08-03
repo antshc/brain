@@ -10,12 +10,9 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-If `/resolve-harness` is available, run it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
+Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values for all harness repository operations.
 
-- If the skill is unavailable, or it emits `HARNESS_REPO_PATH=`, set `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` to the current directory.
-- If the available skill exits non-zero, **exit** and report its error.
-
-Use `HARNESS_REPO_PATH` for all harness repository operations.
+Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Non-zero exit → **exit** and report.
 
 ## 1. Resolve milestone
 
@@ -34,7 +31,7 @@ repo=$(git -C "$HARNESS_REPO_PATH" remote get-url origin | sed -E 's#^git@[^:]+:
 gh api "repos/$repo/milestones?per_page=100&state=all" | jq --arg title "$milestone" '.[] | select(.title == $title)'
 ```
 
-`repo` is resolved once here and reused for every subsequent harness-repo command in this skill. Tasks live in the **harness repository**, so `repo` always resolves the `HARNESS_REPO_PATH` `origin` remote. Run this before the worktree is created.
+`repo` resolves the harness remote (tasks live there) and is reused for all harness-repo commands below. Run this before the worktree is created.
 
 If no milestone matches, **exit** and report "Milestone not found: `$milestone`".
 
@@ -62,9 +59,7 @@ Run `/create-worktree` skill:
 /create-worktree $CODEBASE_REPO_PATH <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. The `/create-worktree` skill creates the worktree in `CODEBASE_REPO_PATH`. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
-
-If the `/create-worktree` skill exits with an error, **exit**.
+Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
 
 ---
 
@@ -144,19 +139,15 @@ diff=$(git show "$checkpoint_sha")
 
 Retain `$checkpoint_sha` and `$diff` for use in **Review (Chorey)**.
 
-If Codey's `STATUS` is **complete** or **partial**, push the feature branch:
+Push the feature branch regardless of Codey's `STATUS` (**complete**, **partial**, or **blocked**):
 
 ```bash
 git push -u origin "$branch"
 ```
 
-If the push fails, **exit** and report the error.
-
-If `STATUS` is **blocked**, commit and push too.
-
 ## 6. Review (Chorey)
 
-Run only when Codey's `STATUS` from **Invoke implementation agent** is **complete** — reviewing unverified or broken work cannot preserve behavior that was never established. Skip this step entirely (continue to **Handle task result**) when `STATUS` is **partial** or **blocked**, or when `chorey` is unavailable — the run's outcome is unchanged either way.
+Run only when Codey's `STATUS` is **complete** and `chorey` is available; otherwise continue to **Handle task result** — reviewing unverified or broken work cannot preserve behavior that was never established.
 
 After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Use the following prompt (substitute actual values):
 
@@ -175,7 +166,7 @@ HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
 
 ## 7. Commit & push Chorey's cleanup (source repo)
 
-Run only when **Review (Chorey)** ran and applied changes (its `FILES` field is not "none"). Skip this step when Chorey was skipped or reports `FILES: none` — Codey's checkpoint already stands as the final result.
+Run only when **Review (Chorey)** ran and its `FILES` field is not "none" — otherwise Codey's checkpoint already stands as the final result.
 
 Operate in `WORKTREE_PATH`. Build a second commit from Chorey's own report fields:
 - **SUBJECT** → Use **ccode: review —** prefix, then one line summary of what Chorey cleaned up
@@ -190,8 +181,6 @@ git add -A
 git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
 git push -u origin "$branch"
 ```
-
-If the push fails, **exit** and report the error.
 
 ## 8. Handle task result
 
@@ -249,8 +238,6 @@ gh pr create --draft \
   --head "$branch"
 ```
 
-If the PR creation fails, **exit** and report the error.
-
 # COMMIT & PUSH HARNESS REPO
 
 Run **once**, after **Create Pull Request** completes. Operate in `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**) — never the worktree.
@@ -263,17 +250,11 @@ Stage all changes, commit if anything is staged, and push — using the appropri
 
 # CLEANUP WORKTREE
 
-This removes the local worktree and local branch only.
-
 Run **once**, after **Commit & Push Harness Repo** completes — development on `$branch` is finished for this invocation.
-
-Run `/delete-worktree` skill:
 
 ```
 /delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $branch
 ```
-
-
 
 # RULES
 
@@ -281,9 +262,4 @@ Run `/delete-worktree` skill:
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
 - IF NO TASKS ARE AVAILABLE, EXIT. IF ALL TASKS ARE COMPLETE, EXIT — the `spec`-labeled issue is owned by the user; do not close it.
 - ITERATION CAP: exit after 2x the initial open-task count if tasks still remain, to guard against a stuck loop.
-- AN ISSUE FAILING `partial` TWICE IN A ROW IS ESCALATED TO `hitl` (**Handle task result**) rather than retried indefinitely.
-- CHOREY NEVER CHANGES THE RECORDED OUTCOME. **Handle task result** always reads Codey's `STATUS`, never Chorey's — Chorey's findings surface in its own follow-up commit body only.
-- CODEY'S CHECKPOINT COMMIT LANDS BEFORE CHOREY RUNS. Chorey reviews and, if needed, reverts against that commit — never edit code ahead of **Commit & push Codey's checkpoint**. A task yields one source-repo commit when Chorey applies nothing, two when it does.
-- ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
-- HARNESS ROOT COMMIT & PUSH RUNS ONCE PER `/dev` INVOCATION (**Commit & push harness repo**), after **Create Pull Request**, always from `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**, never the worktree), and always pushes. Skip only when nothing is staged.
-- NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.
+- ANY FAILED SKILL INVOCATION, `git push`, OR `gh` CALL: **exit** and report the error.
