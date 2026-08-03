@@ -12,10 +12,14 @@ Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://githu
    - If the skill is unavailable, or it emits `HARNESS_REPO_PATH=`, set `HARNESS_REPO_PATH` to the current directory.
    - If the available skill exits non-zero, **exit** and report its error.
    - If `CODEBASE_REPO_PATH` is missing, **exit** and tell the user to run `/setup-harness`.
-2. Get PR branch name: `branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)`
+2. Get PR branch names:
+  ```bash
+  branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)
+  target_branch=$(gh pr view <number> --repo <owner>/<repo> --json baseRefName -q .baseRefName)
+  ```
 3. Run the `/create-worktree` skill:
    ```
-   /create-worktree $HARNESS_REPO_PATH $CODEBASE_REPO_PATH <branch> <branch>
+  /create-worktree $CODEBASE_REPO_PATH $target_branch $branch
    ```
    Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/create-worktree` skill creates the worktree in `CODEBASE_REPO_PATH`.
 4. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
