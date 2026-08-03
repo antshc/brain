@@ -9,7 +9,7 @@ Copy this checklist and check off items as you complete them:
 ```
 Review Progress:
 - [ ] Step 0: Identify the change set to review and establish a revert baseline
-- [ ] Step 1: Review for behavior-preserving cleanup (CHORE.md if resolved, else FALLBACK.md)
+- [ ] Step 1: Review for behavior-preserving cleanup (CHORE.md if resolved, else no rules file)
 - [ ] Step 2: Apply safe fixes; record unsafe candidates as findings without touching them
 ```
 
@@ -23,7 +23,7 @@ Review Progress:
 
 ## Step 1: Review
 
-Use the optional `CHORE_PATH` value resolved by the agent during INPUT. When it is resolved, follow that `CHORE.md`'s review rules in place of the default; emit "Review rules: CHORE.md". When it is unresolved, follow `FALLBACK.md` (in this skill's directory) and emit "Review rules: default".
+Use the optional `CHORE_PATH` value resolved by the agent during INPUT. When it is resolved, follow that `CHORE.md`'s review rules; emit "Review rules: CHORE.md". When it is unresolved, review without a rules file, applying only the **Hard rules** below; emit "Review rules: none".
 
 Review every file identified in Step 0 for behavior-preserving cleanup candidates only — never a behavior change, a new feature, or a scope expansion beyond cleanup.
 
