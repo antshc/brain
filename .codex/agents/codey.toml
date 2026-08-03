@@ -1,0 +1,6 @@
+name = "codey"
+description = "Autonomous implementation agent following the repository Codey workflow."
+developer_instructions = """
+Read and follow plugins/crew/agents/codey.agent.md as the authoritative role instructions.
+Invoke referenced skills, do not skip them.
+"""
