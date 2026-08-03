@@ -101,7 +101,7 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 
 ## 3. Invoke implementation agent
 
-After changing to `WORKTREE_PATH`, run the `droid` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, run the `codey` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. Use the following prompt (substitute actual values):
 
 ```
 ## HARNESS
@@ -116,7 +116,23 @@ HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
 <last 5 commits from step 1>
 ```
 
-## 4. Distill
+## 4. Review (Chorey)
+
+Run only when Codey's `STATUS` from **Invoke implementation agent** is **complete** — reviewing unverified or broken work cannot preserve behavior that was never established. Skip this step entirely (continue to **Distill**) when `STATUS` is **partial** or **blocked**, or when `chorey` is unavailable — the run's outcome is unchanged either way.
+
+After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Use the following prompt (substitute actual values):
+
+```
+## HARNESS
+HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
+
+## UNCOMMITTED WORK
+<uncommitted diff in the worktree>
+```
+
+Retain Chorey's report as `$chorey_report` for use in **Commit & push (source repo)**. Chorey's `STATUS` is informational only — it never changes the `STATUS` recorded in **Handle task result**, which always reflects Codey's report from **Invoke implementation agent**.
+
+## 5. Distill
 
 Distill the agent's SUMMARY into Implementation Decisions. Use this in **Commit & push (source repo)** (commit body) and **Update Spec** (spec update).
 
@@ -125,13 +141,13 @@ Distill the agent's SUMMARY into Implementation Decisions. Use this in **Commit 
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-## 5. Commit & push (source repo)
+## 6. Commit & push (source repo)
 
-Operate in `WORKTREE_PATH`. Build the commit from the agent's report fields and the distilled outputs from **Distill**:
-- **SUBJECT** → Use **dcode:** prefix, than one line commit summary
+Operate in `WORKTREE_PATH`. Build the commit from Codey's report fields and the distilled outputs from **Distill**:
+- **SUBJECT** → Use **ccode:** prefix, than one line commit summary
 - **SUMMARY** → commit body (Implementation Decisions block)
 - **FILES** → list of files changed
-- **NOTES** → blockers or context for the next iteration
+- **NOTES** → blockers or context for the next iteration; when **Review (Chorey)** ran and reported findings, append them as a `Findings:` line
 
 Stage and commit:
 
@@ -140,7 +156,7 @@ git add -A
 git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
 ```
 
-If the agent's `STATUS` is **complete** or **partial**, push the feature branch:
+If Codey's `STATUS` is **complete** or **partial**, push the feature branch:
 
 ```bash
 git push -u origin "$branch"
@@ -155,7 +171,7 @@ If `STATUS` is **blocked**, commit and push.
 
 Maintain a per-issue attempt counter for this session, keyed by issue number.
 
-Read the agent's `STATUS` field:
+Read Codey's `STATUS` field from **Invoke implementation agent** — never Chorey's:
 
 - **complete**: Close the issue with `gh issue close <number> --repo "$repo"`.
 - **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
@@ -240,6 +256,7 @@ Run `/delete-worktree` skill:
 - IF NO TASKS ARE AVAILABLE, EXIT. IF ALL TASKS ARE COMPLETE, EXIT — the `spec`-labeled issue is owned by the user; do not close it.
 - ITERATION CAP: exit after 2x the initial open-task count if tasks still remain, to guard against a stuck loop.
 - AN ISSUE FAILING `partial` TWICE IN A ROW IS ESCALATED TO `hitl` (**Handle task result**) rather than retried indefinitely.
+- CHOREY NEVER CHANGES THE RECORDED OUTCOME. **Handle task result** always reads Codey's `STATUS`, never Chorey's — Chorey's findings surface in the commit body only.
 - ALL WORK HAPPENS INSIDE THE WORKTREE. Never commit to the base branch directly.
 - HARNESS ROOT COMMIT & PUSH RUNS ONCE PER `/dev` INVOCATION (**Commit & push harness repo**), after **Create Pull Request**, always from `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**, never the worktree), and always pushes. Skip only when nothing is staged.
 - NEVER IMPLEMENT `spec`, `hitl`-LABELED ISSUES. They define the work; the user owns their lifecycle.

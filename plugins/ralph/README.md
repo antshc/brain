@@ -2,11 +2,11 @@
 
 ## Agents
 
-### `droid` (from the `droid` plugin)
+### `codey` (from the `crew` plugin)
 
-Autonomous, technology-agnostic implementation agent. Explores repo, implements via TDD, builds, tests, records decisions. Defined in [`plugins/droid/agents/droid.agent.md`](../droid/agents/droid.agent.md); invoked by `/dev` and `/create-worktree` (merge-conflict resolution) via `runSubagent`.
+Autonomous, technology-agnostic implementation agent. Explores repo, implements via TDD, builds, tests, records decisions. Defined in [`plugins/crew/agents/codey.agent.md`](../crew/agents/codey.agent.md); invoked by `/dev` via `runSubagent`.
 
-**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 4):
+**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 3):
 
 ```
 ## TASK
@@ -18,9 +18,23 @@ Autonomous, technology-agnostic implementation agent. Explores repo, implements 
 <last 5 commits>
 ```
 
-Ralph launches Droid from the worktree, passing `HARNESS_REPO_PATH` via a `## HARNESS` prompt section. The worktree path stays outside the prompt.
+Ralph launches Codey from the worktree, passing `HARNESS_REPO_PATH` via a `## HARNESS` prompt section. The worktree path stays outside the prompt. Codey's `STATUS` alone governs the loop's distill, commit, and issue-handling steps; falls back to the `general-purpose` agent when Codey is unavailable.
 
-**Invoked by `/create-worktree`** (merge-conflict resolution, smaller prompt — see `create-worktree/SKILL.md` step 2).
+### `chorey` (from the `crew` plugin)
+
+Maintainability-review agent. Reviews Codey's uncommitted result for behavior-preserving cleanup. Defined in [`plugins/crew/agents/chorey.agent.md`](../crew/agents/chorey.agent.md); invoked by `/dev` via `runSubagent`.
+
+**Invoked by `/dev`** (per task, prompt built in `dev/SKILL.md` step 4, only when Codey reports `STATUS: complete`):
+
+```
+## HARNESS
+HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
+
+## UNCOMMITTED WORK
+<uncommitted diff in the worktree>
+```
+
+Skipped entirely when Codey's `STATUS` is `partial`/`blocked`, or when `chorey` is unavailable — the run's outcome is unchanged either way. Chorey's own `STATUS` never changes the outcome the loop records; its findings surface in the commit body only.
 
 **Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
 
@@ -32,7 +46,7 @@ Ralph launches Droid from the worktree, passing `HARNESS_REPO_PATH` via a `## HA
 
 | Skill | Description |
 |-------|-------------|
-| `/dev` | AFK loop — picks next issue, invokes `droid`, pushes |
+| `/dev` | AFK loop — picks next issue, invokes `codey` then (gated) `chorey`, pushes |
 | `/fix` | Apply PR review comments |
 | `/create-worktree` | Create/reuse an isolated git worktree in the caller-supplied codebase repo path |
 | `/delete-worktree` | Remove a worktree and delete its local feature branch once development is finished (remote branch/PR untouched) |
