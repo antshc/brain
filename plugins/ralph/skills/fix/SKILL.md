@@ -22,7 +22,7 @@ Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://githu
    Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
 4. Run the `/ralph-build $HARNESS_REPO_PATH $WORKTREE_PATH` skill:
    A non-pass build → **exit** and report. Never fix threads on a broken build.
-5. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
+5. Run thread fetch from inside the worktree: `python <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:
 
