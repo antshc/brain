@@ -16,7 +16,7 @@ copilot plugin install review@brain
 copilot plugin install harness@brain
 
 (copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) &&  \
-(copilot plugin uninstall pet@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true)
