@@ -32,7 +32,7 @@ Or "None - can start immediately" if no blockers.
 
 ## Requirements addressed
 
-Reference by number from the parent spec (`FR`/`BR`/`EC` prefixes). Omit a subsection if the spec has none of that kind, or none apply to this slice.
+Reference by number from the parent spec. Omit a subsection if the spec has none of that kind, or none apply to this slice.
 
 **Functional Requirements:**
 
