@@ -13,7 +13,7 @@ A technology-agnostic autonomous coding crew. Two agents — `codey` (implemente
 - [agents/chorey.agent.md](agents/chorey.agent.md) — the reviewer. Fixed phases: INPUT → GOTCHAS → REVIEW → VERIFY → UPDATE GOTCHAS. Resolves the same per-repo settings folder as Codey, reviews the checkpoint commit named by an optional caller-supplied `BASELINE_COMMIT` (falling back to the uncommitted work already in its workspace when absent), and self-reverts any cleanup it cannot verify.
 - [skills/to-codey/SKILL.md](skills/to-codey/SKILL.md) — Codey's entry point. Resolves Harness Settings, a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `codey` via `runSubagent` with a `## HARNESS` section carrying `HARNESS_REPO_PATH`.
 - [skills/to-chorey/SKILL.md](skills/to-chorey/SKILL.md) — Chorey's standalone entry point. Resolves Harness Settings, gathers uncommitted work into a `## DIFF` section, and invokes `chorey` via `runSubagent` — never supplies `BASELINE_COMMIT`, so Chorey stays on the manual-snapshot revert path.
-- [skills/crew-build-check/SKILL.md](skills/crew-build-check/SKILL.md) — builds the project and checks LSP availability before implementation (Codey only).
+- [skills/crew-build/SKILL.md](skills/crew-build/SKILL.md) — builds the project and checks LSP availability before implementation (Codey only).
 - [skills/crew-implement/SKILL.md](skills/crew-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during Codey's INPUT.
 - [skills/crew-feedback/SKILL.md](skills/crew-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd. Shared by both agents.
 - [skills/crew-review/SKILL.md](skills/crew-review/SKILL.md) — Chorey's review procedure; consumes the `CHORE_PATH` and optional `BASELINE_COMMIT` resolved during Chorey's INPUT, applies only behavior-preserving fixes, and owns the revert mechanics Chorey uses when its own edits fail verification — a git-native rollback against `BASELINE_COMMIT` when supplied, otherwise the manual snapshot/restore fallback.
@@ -42,7 +42,7 @@ graph TD
     DEV -->|runSubagent, gated on Codey STATUS:complete, after checkpoint commit, HARNESS_REPO_PATH + DIFF + BASELINE_COMMIT| CH
 
     CO -->|GOTCHAS read + UPDATE GOTCHAS write| GOT[crew-gotchas skill]
-    CO -->|BUILD & LSP CHECK| BC[crew-build-check skill]
+    CO -->|BUILD & LSP CHECK| BC[crew-build skill]
     CO -->|IMPLEMENTATION| IMP[crew-implement skill]
     CO -->|FEEDBACK LOOPS| FB[crew-feedback skill]
 
@@ -82,7 +82,7 @@ sequenceDiagram
     participant TC as to-codey skill
     participant CO as codey agent
     participant GOT as crew-gotchas skill
-    participant BC as crew-build-check skill
+    participant BC as crew-build skill
     participant IMP as crew-implement skill
     participant FB as crew-feedback skill
     participant TCM as to-commit skill
