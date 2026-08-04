@@ -9,11 +9,10 @@ A technology-agnostic autonomous coding crew. Two agents — `codey` (implemente
 
 ## Components
 
-- [agents/codey.agent.md](agents/codey.agent.md) — the implementer. Fixed phases: INPUT → GOTCHAS → BUILD → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS. Resolves convention/state files once during INPUT from a caller-supplied `HARNESS_REPO_PATH`, and works in its invocation directory.
+- [agents/codey.agent.md](agents/codey.agent.md) — the implementer. Fixed phases: INPUT → GOTCHAS → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS. Resolves convention/state files once during INPUT from a caller-supplied `HARNESS_REPO_PATH`, and works in its invocation directory.
 - [agents/chorey.agent.md](agents/chorey.agent.md) — the reviewer. Fixed phases: INPUT → GOTCHAS → REVIEW → VERIFY → UPDATE GOTCHAS. Resolves the same per-repo settings folder as Codey (including `CODE.md`, so its own fixes obey repo style), reviews the checkpoint commit named by an optional caller-supplied `BASELINE_COMMIT` (falling back to the uncommitted work already in its workspace when absent), and self-reverts any cleanup it cannot verify.
 - [skills/to-codey/SKILL.md](skills/to-codey/SKILL.md) — Codey's entry point. Resolves Harness Settings, a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `codey` via `runSubagent` with a `## HARNESS` section carrying `HARNESS_REPO_PATH`.
 - [skills/to-chorey/SKILL.md](skills/to-chorey/SKILL.md) — Chorey's standalone entry point. Resolves Harness Settings, gathers uncommitted work into a `## DIFF` section, and invokes `chorey` via `runSubagent` — never supplies `BASELINE_COMMIT`, so Chorey stays on the manual-snapshot revert path.
-- [skills/crew-build/SKILL.md](skills/crew-build/SKILL.md) — builds the project before implementation (Codey only).
 - [skills/crew-implement/SKILL.md](skills/crew-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during Codey's INPUT.
 - [skills/crew-feedback/SKILL.md](skills/crew-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd. Shared by both agents.
 - [skills/crew-review/SKILL.md](skills/crew-review/SKILL.md) — Chorey's review procedure; consumes the `CHORE_PATH`, `CODE_PATH`, and optional `BASELINE_COMMIT` resolved during Chorey's INPUT, applies only behavior-preserving fixes, and owns the revert mechanics Chorey uses when its own edits fail verification — a git-native rollback against `BASELINE_COMMIT` when supplied, otherwise the manual snapshot/restore fallback.
@@ -42,7 +41,6 @@ graph TD
     DEV -->|runSubagent, gated on Codey STATUS:complete, after checkpoint commit, HARNESS_REPO_PATH + DIFF + BASELINE_COMMIT| CH
 
     CO -->|GOTCHAS read + UPDATE GOTCHAS write| GOT[crew-gotchas skill]
-    CO -->|BUILD| BC[crew-build skill]
     CO -->|IMPLEMENTATION| IMP[crew-implement skill]
     CO -->|FEEDBACK LOOPS| FB[crew-feedback skill]
 
@@ -92,7 +90,6 @@ sequenceDiagram
     participant TC as to-codey skill
     participant CO as codey agent
     participant GOT as crew-gotchas skill
-    participant BC as crew-build skill
     participant IMP as crew-implement skill
     participant FB as crew-feedback skill
     participant TCM as to-commit skill
@@ -109,12 +106,6 @@ sequenceDiagram
     note over CO,GOT: GOTCHAS
     CO->>GOT: Read Workflow (load curated directives)
     GOT-->>CO: gotchas loaded or "none recorded yet"
-    end
-
-    rect rgba(160, 190, 255, 0.08)
-    note over CO,BC: BUILD
-    CO->>BC: build project
-    BC-->>CO: pass or blocked
     end
 
     rect rgba(160, 190, 255, 0.08)
