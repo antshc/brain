@@ -61,6 +61,12 @@ Run `/create-worktree` skill:
 
 Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
 
+## 4. Build
+
+Run `/ralph-build $HARNESS_REPO_PATH $WORKTREE_PATH` skill:
+
+A non-pass build → **exit** and report. Never enter the orchestrator loop on a broken build.
+
 ---
 
 # ORCHESTRATOR LOOP
