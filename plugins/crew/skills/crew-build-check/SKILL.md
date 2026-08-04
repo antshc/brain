@@ -5,21 +5,8 @@ description: Build the project and check LSP availability. Apply during the BUIL
 
 # Build & LSP Check
 
-Copy this checklist and check off items as you complete them:
-```
-Build & LSP Check Progress:
-- [ ] Step 1: Build the project
-- [ ] Step 2: Check LSP availability
-```
+**1. Build** the project in your workspace using the "Build the solution" instructions in `$HARNESS_REPO_PATH/README.md`. On failure, report and stop — never explore a broken build.
 
-## Step 1: Build the project
-
-Build the project in your workspace using the "Build the solution" instructions in `$HARNESS_REPO_PATH/README.md` (located under `HARNESS_REPO_PATH`). If it fails, report the failure and stop — do not explore a broken build.
-
-## Step 2: Check LSP availability
-
-Check whether an LSP (language server) is available for this workspace.
-- **If available**, use it for exploration (symbol lookup, go-to-definition, references) instead of raw text search.
-- **If not available**, skip LSP usage and fall back to grep/glob/file reads during exploration.
+**2. Check LSP availability** for this workspace. Available → use it for exploration (symbol lookup, go-to-definition, references) instead of raw text search. Unavailable → fall back to grep/glob/file reads.
 
 **Emit**: "Build: pass | fail. LSP: available (using for exploration) | unavailable (skipped)."
