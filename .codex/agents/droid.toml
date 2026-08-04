@@ -1,6 +1,0 @@
-name = "droid"
-description = "Autonomous implementation agent following the repository Droid workflow."
-developer_instructions = """
-Read and follow .agents/agents/droid.agent.md as the authoritative role instructions.
-Invoke references skills, do not skip them.
-"""

@@ -40,9 +40,9 @@
             "description": "Azure CLI workflow skills."
         },
         {
-            "name": "droid",
-            "source": "./plugins/droid",
-            "description": "Technology-agnostic autonomous coding agent and conventions."
+            "name": "crew",
+            "source": "./plugins/crew",
+            "description": "Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions."
         },
         {
             "name": "learn-ms",

@@ -8,20 +8,18 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
-1. Resolve harness settings: if `/resolve-harness` is available, run it from the current directory and retain every emitted `KEY=value` line as `HARNESS_SETTINGS` for this invocation. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
-   - If the skill is unavailable, or it emits `HARNESS_REPO_PATH=`, set `HARNESS_REPO_PATH` to the current directory.
-   - If the available skill exits non-zero, **exit** and report its error.
-   - If `CODEBASE_REPO_PATH` is missing, **exit** and tell the user to run `/setup-harness`.
+1. Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
+   - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Non-zero exit → **exit** and report.
 2. Get PR branch names:
   ```bash
-  branch=$(gh pr view <number> --repo <owner>/<repo> --json headRefName -q .headRefName)
-  target_branch=$(gh pr view <number> --repo <owner>/<repo> --json baseRefName -q .baseRefName)
+  eval "$(gh pr view <number> --repo <owner>/<repo> --json headRefName,baseRefName \
+    -q '"branch=\(.headRefName)\ntarget_branch=\(.baseRefName)"')"
   ```
 3. Run the `/create-worktree` skill:
    ```
   /create-worktree $CODEBASE_REPO_PATH $target_branch $branch
    ```
-   Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`. The `/create-worktree` skill creates the worktree in `CODEBASE_REPO_PATH`.
+   Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
 4. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:
@@ -80,17 +78,13 @@ Do not resolve threads.
 
 ## 6. Cleanup
 
-Run `/delete-worktree` skill:
-
 ```
 /delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $branch
 ```
 
-This removes the local worktree and local branch only; `origin/$branch` and the PR are untouched, so a later `/fix` run on the same PR reuses them via `/create-worktree`.
-
 # Rules
 
-- Never push to base branches (`main`, `master`); always push only to the PR branch. Never force-push, delete the remote branch, or rebase/amend pushed commits. The local worktree and local branch are removed in **Cleanup** — that never touches the remote branch.
+- Never push to base branches (`main`, `master`); always push only to the PR branch. Never force-push, delete the remote branch, or rebase/amend pushed commits.
 - If `git push` to the PR branch is rejected, stop and report.
 - If unclear, reply `question:` — don't guess. Next run auto-skips threads with `question:`.
 - Don't skip actionable threads without a reason.
