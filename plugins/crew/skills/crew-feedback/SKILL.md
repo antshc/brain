@@ -27,7 +27,7 @@ List every file changed during this invocation. For each, walk up to its nearest
 
 `VERIFY_PATH` resolved by the agent during INPUT → follow all steps in that `VERIFY.md` in order; it may add steps and project-specific checks. **Emit**: "Verify steps: VERIFY.md".
 
-`VERIFY_PATH` unresolved → follow `FALLBACK.md` in this skill's directory. **Emit**: "Verify steps: default".
+`VERIFY_PATH` unresolved → explore the tests affected by the changes and run them.
 
 If Verify surfaces issues or requires changes, apply fixes and re-run this step over the updated full set of changed files.
 
