@@ -884,6 +884,125 @@ Scenario: CLI invocation with invalid PR URL
 
 ---
 
+## Feature: Actualize Branch
+
+> Unit: `actualize_branch` handler (`modules.git_worktree.features.actualize_branch.handler`)
+
+```gherkin
+Scenario: Fetches, pulls, and merges the target branch on success
+  Given a branch checked out at some directory
+  When actualize_branch() is called with a target branch
+  Then it fetches all remotes, pulls, and merges origin/<target-branch>
+
+Scenario: Pull conflict surfaces conflicting files
+  Given git pull fails
+  When actualize_branch() is called
+  Then it raises MergeConflictError with the list of conflicting files
+    And it does not attempt the merge step
+
+Scenario: Merge conflict surfaces conflicting files
+  Given git pull succeeds but git merge fails
+  When actualize_branch() is called
+  Then it raises MergeConflictError with the list of conflicting files
+
+Scenario: Pull failure without conflicted files raises git command failed error
+  Given git pull fails
+    And no conflicted files are present afterward (e.g. no upstream tracking, network, or auth failure)
+  When actualize_branch() is called
+  Then it raises GitCommandFailedError with the command name "pull" and the real stderr
+    And it does not attempt the merge step
+
+Scenario: Merge failure without conflicted files raises git command failed error
+  Given git pull succeeds but git merge fails
+    And no conflicted files are present afterward
+  When actualize_branch() is called
+  Then it raises GitCommandFailedError with the command name "merge" and the real stderr
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Create Or Reuse Worktree
+
+> Unit: `create_or_reuse_worktree` handler (`modules.git_worktree.features.create_or_reuse_worktree.handler`)
+
+```gherkin
+Scenario: Current branch already matches feature branch skips creation
+  Given the current branch already equals the feature branch
+  When create_or_reuse_worktree() is called
+  Then no worktree is created
+    And the branch is actualized in place
+    And the reported worktree path is the codebase repo path itself
+
+Scenario: Current branch matches feature branch surfaces merge conflict
+  Given the current branch already equals the feature branch
+    And branch actualization hits a merge conflict
+  When create_or_reuse_worktree() is called
+  Then it raises MergeConflictError with the conflicting files
+
+Scenario: Fresh feature branch creates worktree from existing origin feature branch
+  Given the current branch differs from the feature branch
+    And origin/<feature-branch> exists
+  When create_or_reuse_worktree() is called
+  Then a worktree is created at <codebase-repo-path>.worktrees/<feature-branch> based on origin/<feature-branch>
+
+Scenario: Fresh feature branch falls back to target branch when no origin feature branch
+  Given the current branch differs from the feature branch
+    And origin/<feature-branch> does not exist
+  When create_or_reuse_worktree() is called
+  Then a worktree is created based on origin/<target-branch>
+
+Scenario: Existing worktree is reused and branch is actualized
+  Given a worktree already exists at the target path
+  When create_or_reuse_worktree() is called
+  Then worktree creation is not treated as a failure
+    And the branch is actualized inside the existing worktree
+
+Scenario: Existing worktree reuse surfaces merge conflict
+  Given a worktree already exists at the target path
+    And branch actualization hits a merge conflict
+  When create_or_reuse_worktree() is called
+  Then it raises MergeConflictError with the conflicting files
+
+Scenario: Worktree creation failure for other reason raises error
+  Given git worktree add fails for a reason other than the worktree already existing
+  When create_or_reuse_worktree() is called
+  Then it raises WorktreeCreationError with the underlying error message
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Create Worktree CLI
+
+> Subprocess-level CLI test spawning the script against a real temporary git repository
+
+```gherkin
+Scenario: Fresh feature branch creates new worktree
+  Given a codebase repo cloned from an origin with a main branch
+  When create_worktree.py is invoked with a fresh feature branch
+  Then it exits with code 0
+    And it prints CODEBASE_REPO_PATH, WORKTREE_PATH, BRANCH, and TARGET_BRANCH
+    And the worktree directory exists on disk
+
+Scenario: Existing worktree is reused instead of failing
+  Given create_worktree.py already created a worktree for a feature branch
+  When create_worktree.py is invoked again with the same feature branch
+  Then it exits with code 0
+    And it reports the same WORKTREE_PATH
+
+Scenario: Worktree creation failure for non existing reason reports error
+  Given a target branch that does not exist on origin
+  When create_worktree.py is invoked with a fresh feature branch
+  Then it exits with code 3 and prints a worktree-creation error to stderr
+```
+
+**Coverage:** Integration test
+
+---
+
 ## Feature: CLI Argument Parsing (main.py)
 
 > Manual testing
