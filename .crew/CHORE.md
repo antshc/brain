@@ -1,23 +1,17 @@
 # CHORE
 
-Review rules for Chorey's REVIEW step in this repo — skills, agents, and templates are the "code" being reviewed for behavior-preserving cleanup.
+Chorey's REVIEW step: after VERIFY passes, review all changed skills, agents, and templates together as one unit for behavior-preserving refactors.
 
-## Review rules
+## Rules
 
-After VERIFY passes, review all changed skills, agents, and templates together for refactoring candidates:
-
-- **Mixed responsibilities** → split into one skill per responsibility
-- **Duplicated rules across skills** → extract to one owning skill, run it by name
-- **Rationale that is the decision criterion** → keep it as one clause on the rule's own line — it tells the agent how to resolve a case the rule didn't cover
-- **Known failure mode** → keep as one counterexample line — it blocks a wrong behaviour the positive rule doesn't
-- **History ("we used to…"), benefits aimed at a human reviewer, rationale that restates the rule** → delete
-- **Hedging and filler** ("you may want to", "it's important to") → imperative verb
-- **Vague step** → verifiable action with a stated done condition
-- **Synonyms for one concept** → single canonical term
-- **Example that only restates the rule** → drop it; keep one minimal example at most
-- **`description` frontmatter without a trigger** → rewrite as "Use when …"
-- **Existing skill text** the new content reveals as stale or contradictory
-
-## Never
-
-- Never change the meaning of an existing rule while "cleaning it up" — a wording fix must leave the rule's behavior identical.
+- Mixed responsibilities → split into one skill per responsibility.
+- Duplicated rule across skills → extract to the owning skill; others reference it by name.
+- Rationale that is a decision criterion (resolves a case the rule doesn't cover) → keep, one clause on the rule's line.
+- Known failure mode (blocks a wrong behavior the positive rule doesn't) → keep, one counterexample line.
+- Rationale that restates the rule, history, or human-reviewer justification → delete.
+- Hedging/filler ("you may want to", "it's important to") → imperative verb.
+- Vague step → verifiable action with a stated done condition.
+- Synonyms for one concept → single canonical term.
+- Example that restates the rule → drop; keep at most one minimal example.
+- `description` frontmatter without a trigger → rewrite as "Use when …".
+- Existing skill text contradicted or made stale by new content → update or flag.
