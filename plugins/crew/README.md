@@ -9,16 +9,16 @@ A technology-agnostic autonomous coding crew. Two agents — `codey` (implemente
 
 ## Components
 
-- [agents/codey.agent.md](agents/codey.agent.md) — the implementer. Fixed phases: INPUT → GOTCHAS → BUILD & LSP CHECK → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS. Resolves convention/state files once during INPUT from a caller-supplied `HARNESS_REPO_PATH`, and works in its invocation directory.
-- [agents/chorey.agent.md](agents/chorey.agent.md) — the reviewer. Fixed phases: INPUT → GOTCHAS → REVIEW → VERIFY → UPDATE GOTCHAS. Resolves the same per-repo settings folder as Codey, reviews the checkpoint commit named by an optional caller-supplied `BASELINE_COMMIT` (falling back to the uncommitted work already in its workspace when absent), and self-reverts any cleanup it cannot verify.
+- [agents/codey.agent.md](agents/codey.agent.md) — the implementer. Fixed phases: INPUT → GOTCHAS → BUILD → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS. Resolves convention/state files once during INPUT from a caller-supplied `HARNESS_REPO_PATH`, and works in its invocation directory.
+- [agents/chorey.agent.md](agents/chorey.agent.md) — the reviewer. Fixed phases: INPUT → GOTCHAS → REVIEW → VERIFY → UPDATE GOTCHAS. Resolves the same per-repo settings folder as Codey (including `CODE.md`, so its own fixes obey repo style), reviews the checkpoint commit named by an optional caller-supplied `BASELINE_COMMIT` (falling back to the uncommitted work already in its workspace when absent), and self-reverts any cleanup it cannot verify.
 - [skills/to-codey/SKILL.md](skills/to-codey/SKILL.md) — Codey's entry point. Resolves Harness Settings, a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `codey` via `runSubagent` with a `## HARNESS` section carrying `HARNESS_REPO_PATH`.
 - [skills/to-chorey/SKILL.md](skills/to-chorey/SKILL.md) — Chorey's standalone entry point. Resolves Harness Settings, gathers uncommitted work into a `## DIFF` section, and invokes `chorey` via `runSubagent` — never supplies `BASELINE_COMMIT`, so Chorey stays on the manual-snapshot revert path.
-- [skills/crew-build/SKILL.md](skills/crew-build/SKILL.md) — builds the project and checks LSP availability before implementation (Codey only).
+- [skills/crew-build/SKILL.md](skills/crew-build/SKILL.md) — builds the project before implementation (Codey only).
 - [skills/crew-implement/SKILL.md](skills/crew-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during Codey's INPUT.
 - [skills/crew-feedback/SKILL.md](skills/crew-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd. Shared by both agents.
-- [skills/crew-review/SKILL.md](skills/crew-review/SKILL.md) — Chorey's review procedure; consumes the `CHORE_PATH` and optional `BASELINE_COMMIT` resolved during Chorey's INPUT, applies only behavior-preserving fixes, and owns the revert mechanics Chorey uses when its own edits fail verification — a git-native rollback against `BASELINE_COMMIT` when supplied, otherwise the manual snapshot/restore fallback.
+- [skills/crew-review/SKILL.md](skills/crew-review/SKILL.md) — Chorey's review procedure; consumes the `CHORE_PATH`, `CODE_PATH`, and optional `BASELINE_COMMIT` resolved during Chorey's INPUT, applies only behavior-preserving fixes, and owns the revert mechanics Chorey uses when its own edits fail verification — a git-native rollback against `BASELINE_COMMIT` when supplied, otherwise the manual snapshot/restore fallback.
 - [skills/crew-gotchas/SKILL.md](skills/crew-gotchas/SKILL.md) — reads gotchas from `GOTCHAS.md` at `$HARNESS_REPO_PATH/.crew` before implementation/review, then distills session friction into new or extended directives and writes them back after feedback loops pass. Shared by both agents.
-- [skills/to-commit/SKILL.md](skills/to-commit/SKILL.md) — commits with a `ccode:` prefix, post-task.
+- [skills/to-commit/SKILL.md](skills/to-commit/SKILL.md) — commits with a `ccode:` prefix, post-task; requires confirmation on a `partial` or `blocked` report.
 - [skills/setup-crew/SKILL.md](skills/setup-crew/SKILL.md) — manual, user-invoked bootstrap that scaffolds missing `CODE.md`/`VERIFY.md`/`CHORE.md`/`GOTCHAS.md` from templates into `$HARNESS_REPO_PATH/.crew/`. Never touches `.harness.env`, never migrates an existing `.droid/` folder. Not part of either agent's pipeline.
 
 ## Environment
@@ -42,7 +42,7 @@ graph TD
     DEV -->|runSubagent, gated on Codey STATUS:complete, after checkpoint commit, HARNESS_REPO_PATH + DIFF + BASELINE_COMMIT| CH
 
     CO -->|GOTCHAS read + UPDATE GOTCHAS write| GOT[crew-gotchas skill]
-    CO -->|BUILD & LSP CHECK| BC[crew-build skill]
+    CO -->|BUILD| BC[crew-build skill]
     CO -->|IMPLEMENTATION| IMP[crew-implement skill]
     CO -->|FEEDBACK LOOPS| FB[crew-feedback skill]
 
@@ -57,11 +57,11 @@ graph TD
     CO -.CODE_PATH.-> IMP
     CO -.VERIFY_PATH.-> FB
     CH -.GOTCHAS_PATH read+write.-> GOT
-    CH -.CHORE_PATH.-> REV
+    CH -.CHORE_PATH + CODE_PATH.-> REV
     CH -.VERIFY_PATH.-> FB
 
     CO -.resolves once from $HARNESS_REPO_PATH/.crew/.-> DOCS[CODE.md / VERIFY.md / GOTCHAS.md]
-    CH -.resolves once from $HARNESS_REPO_PATH/.crew/.-> DOCS2[VERIFY.md / CHORE.md / GOTCHAS.md]
+    CH -.resolves once from $HARNESS_REPO_PATH/.crew/.-> DOCS2[VERIFY.md / CHORE.md / CODE.md / GOTCHAS.md]
 ```
 
 **Nature of each edge**
@@ -71,6 +71,16 @@ graph TD
 - **Resolution contract**: the caller resolves Harness Settings via `/resolve-harness` (or falls back to cwd) and passes `HARNESS_REPO_PATH` via a `## HARNESS` section; each agent validates it, resolves its own set of paths during INPUT, and passes each path to the relevant `crew-*` skill.
 - **External file contracts**: each `crew-*` skill consumes only the resolved path the calling agent supplies; each agent's INPUT owns validation and fallback `GOTCHAS.md` creation.
 - **Outcome governance**: Codey's `STATUS` alone governs `ralph:dev`'s distill/commit/issue-handling steps. Chorey's `STATUS` never reaches that decision — its findings surface in its own follow-up commit body only, never Codey's.
+
+## Caller contract
+
+Neither agent enforces the loop gate; the caller must. A loop driver (`ralph:dev`) must:
+
+1. Call `/resolve-harness` and pass the result in a `## HARNESS` section — or omit the section entirely so the agent falls back to cwd.
+2. Launch each agent with cwd set to the code repo/worktree.
+3. Read Codey's `STATUS` before gating: `partial`/`blocked` → do not invoke Chorey (`ralph:dev` still commits its checkpoint to an isolated worktree branch; an interactive caller confirms with the user first).
+4. On `complete` only: commit the checkpoint, then invoke `chorey` directly with `## HARNESS` + `## DIFF` + `## BASELINE_COMMIT` (that checkpoint's SHA).
+5. Treat Chorey's report as informational — never let it override Codey's `STATUS`.
 
 ## Execution sequence
 
@@ -102,8 +112,8 @@ sequenceDiagram
     end
 
     rect rgba(160, 190, 255, 0.08)
-    note over CO,BC: BUILD & LSP CHECK
-    CO->>BC: build project + check LSP availability
+    note over CO,BC: BUILD
+    CO->>BC: build project
     BC-->>CO: pass or blocked
     end
 
@@ -157,7 +167,7 @@ sequenceDiagram
 
     rect rgba(255, 200, 160, 0.08)
     note over CH,REV: REVIEW
-    CH->>REV: identify change set (BASELINE_COMMIT's diff, or uncommitted work) + revert baseline, apply safe fixes, record unsafe findings
+    CH->>REV: identify change set (BASELINE_COMMIT's diff, or uncommitted work) + revert baseline, apply safe fixes under CHORE.md/CODE.md, record unsafe findings
     REV-->>CH: files changed (or none) + findings
     end
 
