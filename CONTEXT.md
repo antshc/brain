@@ -79,7 +79,7 @@ The implementation agent. Implements one task in its invocation directory and re
 _Avoid_: droid, implementer, coder
 
 **Chorey**:
-The maintainability-review agent. Reviews Codey's uncommitted result for behavior-preserving refactors, runs only behind a Codey `STATUS: complete` gate, reports informationally, and discards its own refactors when its verification cannot pass.
+The maintainability-review agent. Reviews the change set for behavior-preserving refactors — Codey's checkpoint commit (named by a trusted `BASELINE_COMMIT`) inside the loop, or uncommitted work standalone — runs only behind a Codey `STATUS: complete` gate, reports informationally, and discards its own refactors (git-native revert against the checkpoint, or a manual snapshot standalone) when its verification cannot pass.
 _Avoid_: reviewer, refactorer, cleanup agent
 
 **Convention folder**:
