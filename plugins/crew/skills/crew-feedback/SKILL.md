@@ -16,18 +16,23 @@ Copy this checklist and check off each item as you complete it:
 
 ## 0. Collect changed files
 
-List every file changed during this invocation. For each, walk up to its nearest **Module** (the unit of code plus its build config — discovered from the repo's own structure, never assumed). Deduplicate:
+Source: `git status --porcelain` (uncommitted), or `git show --stat <BASELINE_COMMIT>` (checkpoint). None → emit "No changed files; nothing to verify", skip Step 1.
 
-- **Modules**: unique set of Module directories containing changed files.
-- **Verification counterparts**: each affected Module's *seams*.
+Per file, walk up to nearest **Module** (code unit + build config; discover from repo structure, never assume). Nested Modules → keep innermost only. Dedupe:
 
-**Emit**: "Changed files: [list]. Affected Modules: [list]. Verification counterparts: [list]."
+- **Modules**: unique Module dirs containing changed files.
+- **Verification counterparts**: each Module's *seams* — existing tests/checks, discovered from `CODE.md`/`VERIFY.md`/convention. None found → nearest enclosing dir with a runnable check (test config, build file).
+
+**Emit**:
+- Changed files: [list]
+- Affected Modules: [list]
+- Verification counterparts: [list]
 
 ## 1. Verify (diagnostics, build, tests)
 
-`VERIFY_PATH` resolved by the agent during INPUT → follow all steps in that `VERIFY.md` in order; it may add steps and project-specific checks. **Emit**: "Verify steps: VERIFY.md".
+`VERIFY_PATH` resolved → run its steps in order; scope file/path-targeted commands to Step 0's Modules/counterparts, not the whole repo. **Emit**: "Verify steps: VERIFY.md".
 
-`VERIFY_PATH` unresolved → explore the tests affected by the changes and run them.
+`VERIFY_PATH` unresolved → run Step 0's verification counterparts.
 
 If Verify surfaces issues or requires changes, apply fixes and re-run this step over the updated full set of changed files.
 
