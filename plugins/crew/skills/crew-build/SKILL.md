@@ -1,6 +1,6 @@
 ---
 name: crew-build
-description: Build the project and check LSP availability. Apply during the BUILD step, before implementation.
+description: Build the project. Apply during the BUILD step, before implementation.
 ---
 
 # Build

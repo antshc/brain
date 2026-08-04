@@ -25,6 +25,8 @@ Copy this checklist and check off each item as you complete it:
 
 `CHORE_PATH` resolved by the agent during INPUT → follow that `CHORE.md`'s review rules; emit "Review rules: CHORE.md". Unresolved → review under the **Hard rules** below only; emit "Review rules: none".
 
+`CODE_PATH` resolved → read it in full; every fix you apply must obey its conventions, and a cleanup that would violate one is a finding, not an edit. Emit "Style rules: CODE.md | none".
+
 Review every file from Step 0 for behavior-preserving cleanup candidates only — never a behavior change, a new feature, or scope beyond cleanup.
 
 ## 2. Apply safe fixes; record unsafe candidates as findings
