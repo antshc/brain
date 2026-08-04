@@ -1003,6 +1003,50 @@ Scenario: Worktree creation failure for non existing reason reports error
 
 ---
 
+## Feature: Staged Diff With Fallback
+
+> Unit: `get_staged_diff_with_fallback` helper (`modules.staged_diff.staged_diff`), shared by to-codey, to-chorey, and to-commit
+
+```gherkin
+Scenario: Uncommitted changes stages everything and returns the cached diff
+  Given a git repository with staged or unstaged changes
+  When get_staged_diff_with_fallback() is called
+  Then it stages all changes
+    And it returns the cached diff
+
+Scenario: No uncommitted changes returns the fallback message
+  Given a git repository with no staged or unstaged changes
+  When get_staged_diff_with_fallback() is called
+  Then it returns "No uncommitted changes"
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Staged Diff CLI
+
+> Subprocess-level CLI test spawning the script against a real temporary git repository
+
+```gherkin
+Scenario: Uncommitted changes prints the cached diff
+  Given a git repository with an unstaged change
+  When staged_diff.py is invoked
+  Then it exits with code 0
+    And it prints the cached diff to stdout
+    And the change is staged
+
+Scenario: No uncommitted changes prints the fallback message
+  Given a git repository with no uncommitted changes
+  When staged_diff.py is invoked
+  Then it exits with code 0
+    And it prints "No uncommitted changes" to stdout
+```
+
+**Coverage:** Integration test
+
+---
+
 ## Feature: CLI Argument Parsing (main.py)
 
 > Manual testing

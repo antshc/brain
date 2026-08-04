@@ -7,7 +7,9 @@ Commit all uncommitted changes using the format below.
 
 **Gate:** a status report of `partial` or `blocked` means the work is unverified. Surface the status and its NOTES, and commit only after the user confirms. (`ralph:dev` makes its own checkpoint commit on an isolated worktree branch instead — it never routes through this skill.)
 
-**Source:** Use the agent's status report if available. Otherwise run `git add -A 2>/dev/null; DIFF=$(git diff --cached 2>/dev/null); [ -n "$DIFF" ] && echo "$DIFF" || echo "No uncommitted changes"` and derive the message from the diff.
+`<skill-directory>` is the directory containing this SKILL.md file: take the absolute path you used to read this file and strip the trailing `/SKILL.md`. Never derive it any other way, and never search the filesystem for it.
+
+**Source:** Use the agent's status report if available. Otherwise run `python <skill-directory>/scripts/staged_diff.py` and derive the message from the diff.
 
 **Format:**
 ```

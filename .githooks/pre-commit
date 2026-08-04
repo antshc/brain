@@ -12,3 +12,6 @@ sync_module() {
 
 sync_module "tools/src/modules/github/" "plugins/ralph/skills/fix/github/"
 sync_module "tools/src/modules/git_worktree/" "plugins/ralph/skills/create-worktree/scripts/"
+sync_module "tools/src/modules/staged_diff/" "plugins/crew/skills/to-codey/scripts/"
+sync_module "tools/src/modules/staged_diff/" "plugins/crew/skills/to-chorey/scripts/"
+sync_module "tools/src/modules/staged_diff/" "plugins/crew/skills/to-commit/scripts/"
