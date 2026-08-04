@@ -1003,6 +1003,320 @@ Scenario: Worktree creation failure for non existing reason reports error
 
 ---
 
+## Feature: Setup Labels
+
+> Unit: `setup_labels` handler (`modules.github_tracker.features.setup_labels.handler`)
+
+```gherkin
+Scenario: Missing label is created with catalog name, color, and description
+  Given a repo with none of the catalog's labels present
+  When setup_labels() is called
+  Then each missing label is created with its documented name, color, and description
+    And each is reported as created
+
+Scenario: Existing label is left unchanged and reported as existing
+  Given a repo where all catalog labels already exist
+  When setup_labels() is called
+  Then no label is created
+    And each is reported as existing
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Setup Labels CLI
+
+> Subprocess-level CLI test spawning the script against a fake/stubbed `gh` binary
+
+```gherkin
+Scenario: Missing labels are created
+  Given a fake `gh` reporting no existing labels
+  When setup_labels.py is invoked
+  Then it exits with code 0
+    And it prints "created: hitl" and "created: spec"
+    And the fake `gh` records both labels as created
+
+Scenario: Already existing labels are left unchanged
+  Given a fake `gh` reporting both catalog labels already exist
+  When setup_labels.py is invoked
+  Then it exits with code 0
+    And it prints "exists:  hitl" and "exists:  spec"
+    And the fake `gh` records no label creation
+```
+
+**Coverage:** Integration test
+
+---
+
+## Feature: Publish Spec
+
+> Unit: `publish_spec` handler (`modules.github_tracker.features.publish_spec.handler`)
+
+```gherkin
+Scenario: Existing matching milestone is reused unchanged
+  Given an open milestone whose title starts with the feature ID
+  When publish_spec() is called
+  Then no new milestone is created
+    And the spec issue is assigned to the existing milestone's unchanged title
+    And the spec ticket's issue number is returned
+
+Scenario: No matching milestone creates one and assigns the new issue
+  Given no open milestone matches the feature ID
+  When publish_spec() is called
+  Then a new milestone is created titled "<feature-id>: <spec-title>"
+    And the spec issue is assigned to that new milestone
+    And the spec ticket's issue number is returned
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Find Spec Ticket
+
+> Unit: `find_spec_ticket` handler (`modules.github_tracker.features.find_spec_ticket.handler`)
+
+```gherkin
+Scenario: Matching spec ticket returns number, title, body, and comments
+  Given an open spec-labeled issue assigned to the milestone
+  When find_spec_ticket() is called
+  Then it returns the ticket's number, title, body, and comments
+
+Scenario: No matching spec ticket reports not found
+  Given no open spec-labeled issue is assigned to the milestone
+  When find_spec_ticket() is called
+  Then it returns None instead of raising
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Create Ticket
+
+> Unit: `create_ticket` handler (`modules.github_tracker.features.create_ticket.handler`)
+
+```gherkin
+Scenario: New ticket returns its issue number
+  Given a title, body, milestone title, and label
+  When create_ticket() is called
+  Then the issue is created with those fields
+    And the new ticket's issue number is returned
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Read Ticket
+
+> Unit: `read_ticket` handler (`modules.github_tracker.features.read_ticket.handler`)
+
+```gherkin
+Scenario: Ticket returns number, title, body, labels, and comments
+  Given an issue number
+  When read_ticket() is called
+  Then it returns the ticket's number, title, body, labels, and comments
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: List Tickets
+
+> Unit: `list_tickets` handler (`modules.github_tracker.features.list_tickets.handler`)
+
+```gherkin
+Scenario: Matching tickets return number, title, body, labels, and comments
+  Given issues matching a state and label
+  When list_tickets() is called
+  Then it returns each ticket's number, title, body, labels, and comments
+
+Scenario: No matching tickets returns empty array
+  Given no issues match the given state and label
+  When list_tickets() is called
+  Then it returns an empty array
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Comment Ticket
+
+> Unit: `comment_ticket` handler (`modules.github_tracker.features.comment_ticket.handler`)
+
+```gherkin
+Scenario: Comment is added to the resolved repo and issue
+  Given an issue number and a comment body
+  When comment_ticket() is called
+  Then the comment is posted to the resolved repo's issue
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Label Ticket
+
+> Unit: `label_ticket` handler (`modules.github_tracker.features.label_ticket.handler`)
+
+```gherkin
+Scenario: Add and remove labels are both applied
+  Given non-empty add-labels and remove-labels
+  When label_ticket() is called
+  Then both are passed to the issue edit call
+
+Scenario: Empty add or remove labels is omitted
+  Given an empty add-labels or remove-labels
+  When label_ticket() is called
+  Then the empty side is omitted from the issue edit call
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Close Ticket
+
+> Unit: `close_ticket` handler (`modules.github_tracker.features.close_ticket.handler`)
+
+```gherkin
+Scenario: Close with comment passes the comment
+  Given a closing comment
+  When close_ticket() is called
+  Then the issue is closed with that comment
+
+Scenario: Close without comment omits the comment
+  Given an empty comment
+  When close_ticket() is called
+  Then the issue is closed without a comment
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: GhCli Repo Resolution
+
+> Unit: `GhCli.resolve_repo()` (`modules.github_tracker.infrastructure.gh_cli`)
+
+```gherkin
+Scenario: resolve_repo uses gh repo view --json
+  Given gh repo view --json nameWithOwner prints "owner/repo"
+  When resolve_repo() is called
+  Then subprocess.run() is invoked with `gh repo view --json nameWithOwner -q .nameWithOwner`
+    And "owner/repo" is returned
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: GhCli Label Commands
+
+> Unit: `GhCli.label_names()`/`GhCli.label_create()` (`modules.github_tracker.infrastructure.gh_cli`)
+
+```gherkin
+Scenario: label_names parses JSON name list
+  Given gh label list --json name prints a JSON array of label objects
+  When label_names() is called
+  Then the label names are returned as a flat list
+
+Scenario: label_create passes name, color, and description
+  Given a label name, color, and description
+  When label_create() is called
+  Then subprocess.run() is invoked with `gh label create <name> --color <color> --description <description>`
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: GhCli Milestone Commands
+
+> Unit: `GhCli.milestone_create_raw()` (`modules.github_tracker.infrastructure.gh_cli`)
+
+```gherkin
+Scenario: milestone_create_raw posts title and description fields
+  Given a milestone title and description
+  When milestone_create_raw() is called
+  Then subprocess.run() is invoked with `gh api repos/<repo>/milestones --method POST` and both fields
+    And the created milestone JSON is returned
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: GhCli Issue Create Command
+
+> Unit: `GhCli.issue_create()` (`modules.github_tracker.infrastructure.gh_cli`)
+
+```gherkin
+Scenario: issue_create omits optional flags when not given
+  Given only a repo and title
+  When issue_create() is called
+  Then subprocess.run() is invoked without --body, --label, or --milestone flags
+    And the printed issue URL is returned
+
+Scenario: issue_create includes body, label, and milestone when given
+  Given a repo, title, body, label, and milestone
+  When issue_create() is called
+  Then subprocess.run() is invoked with --body, --label, and --milestone flags
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Issue Number Parsing
+
+> Unit: `parse_issue_number()` (`modules.github_tracker.shared.raw_mapping`)
+
+```gherkin
+Scenario: Issue create URL yields the trailing number
+  Given a `gh issue create`-style URL ending in a number
+  When parse_issue_number() is called
+  Then it returns that trailing number as an int
+
+Scenario: Unparseable URL raises ValueError
+  Given a string with no trailing number
+  When parse_issue_number() is called
+  Then it raises ValueError
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Label And Comment Normalization
+
+> Unit: `normalize_labels()`/`normalize_comments()`/`ticket_from_raw()` (`modules.github_tracker.shared.raw_mapping`)
+
+```gherkin
+Scenario: Label objects are flattened to names
+  Given a list of {"name": ...} label objects
+  When normalize_labels() is called
+  Then it returns the plain list of names
+
+Scenario: Comment objects are flattened to bodies
+  Given a list of {"body": ...} comment objects
+  When normalize_comments() is called
+  Then it returns the plain list of comment bodies
+
+Scenario: ticket_from_raw maps all documented fields
+  Given a raw gh issue JSON object with number, title, body, labels, and comments
+  When ticket_from_raw() is called
+  Then it returns the ticket's number, title, body, labels, and comments in the documented shape
+```
+
+**Coverage:** Unit test
+
+---
+
 ## Feature: Staged Diff With Fallback
 
 > Unit: `get_staged_diff_with_fallback` helper (`modules.staged_diff.staged_diff`), shared by to-codey, to-chorey, and to-commit

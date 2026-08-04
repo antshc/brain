@@ -15,3 +15,4 @@ sync_module "tools/src/modules/git_worktree/" "plugins/ralph/skills/create-workt
 sync_module "tools/src/modules/staged_diff/" "plugins/crew/skills/to-codey/scripts/"
 sync_module "tools/src/modules/staged_diff/" "plugins/crew/skills/to-chorey/scripts/"
 sync_module "tools/src/modules/staged_diff/" "plugins/crew/skills/to-commit/scripts/"
+sync_module "tools/src/modules/github_tracker/" "plugins/wf/skills/manage-backlog/scripts/"

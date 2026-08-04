@@ -6,12 +6,19 @@ description: Configure this repo for the workflow (wf:) skills — set up its ti
 
 Find the heading matching the requested operation and follow its steps exactly — do not skip steps or improvise an alternative command. Each action reads its inputs as `{{placeholder}}` variables already in the caller's context and states what it returns.
 
+`<skill-directory>` is the directory containing this SKILL.md file: take the absolute path you used to read this file and strip the trailing `/SKILL.md`. Never derive it any other way, and never search the filesystem for it.
+
+Every action below runs a `python <skill-directory>/scripts/<name>.py <args>` script. Each script resolves the target repo itself (`gh repo view --json nameWithOwner`) — never pass or rely on a `$REPO` shell variable.
 
 ## Setup labels
 
 Create missing GitHub issue labels for AFK/HITL task workflow.
 
-Run the `scripts/create-labels.sh` script to create any missing labels.
+```bash
+python <skill-directory>/scripts/setup_labels.py
+```
+
+Prints one `exists:  <name>` or `created: <name>` line per label.
 
 **Returns:** nothing.
 
@@ -21,40 +28,23 @@ Reads `{{featureId}}`, `{{specTitle}}`, `{{targetBranch}}` from context.
 
 The milestone represents the capability behind `{{featureId}}` and may be reused by many specs. Its title is set only once, on first creation — never renamed by a later spec.
 
-1. Look up an existing milestone for this capability:
-   ```
-   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{featureId}}")) | .title' | head -1
-   ```
-   Set `{{milestoneTitle}}` to the matched title if found.
+```bash
+python <skill-directory>/scripts/publish_spec.py "{{featureId}}" "{{specTitle}}" "{{targetBranch}}"
+```
 
-2. If no milestone was found, create one and set `{{milestoneTitle}}` to the title just created:
-   ```
-   gh api repos/$REPO/milestones \
-     --method POST \
-     --field title="{{featureId}}: {{specTitle}}" \
-     --field description="**Feature ID:** \`{{featureId}}\`\n**Target Branch:** \`{{targetBranch}}\`"
-   ```
-   If a milestone was already found in step 1, skip this step — do not create or rename it, even if `{{specTitle}}` differs.
+This looks up an existing milestone whose title starts with `{{featureId}}` and reuses it unchanged if found; otherwise it creates one titled `{{featureId}}: {{specTitle}}`. It then creates the spec issue (labeled `spec`, titled `{{featureId}}: {{specTitle}}`) and assigns it to the resolved milestone.
 
-3. Create the issue:
-   ```
-   gh issue create --label spec --title "{{featureId}}: {{specTitle}}"
-   ```
-
-4. Assign the issue to the milestone, using the resolved `{{milestoneTitle}}` (not a newly derived title):
-   ```
-   gh issue edit {{issueNumber}} --milestone "{{milestoneTitle}}"
-   ```
-
-**Returns:** the spec ticket's number.
+**Returns:** the spec ticket's number, printed to stdout.
 
 ## Find spec ticket
 
 Reads `{{milestoneTitle}}` from context.
 
 ```bash
-gh issue list --repo "$REPO" --milestone "{{milestoneTitle}}" --label "spec" --json number,title,body,comments --limit 1
+python <skill-directory>/scripts/find_spec_ticket.py "{{milestoneTitle}}"
 ```
+
+Prints a JSON object (`number`, `title`, `body`, `comments`) if a matching open `spec`-labeled issue is found, else prints `null`.
 
 If no issue is found, ask the user for the GitHub issue number and fetch it with **Read ticket**.
 
@@ -65,20 +55,22 @@ If no issue is found, ask the user for the GitHub issue number and fetch it with
 Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}` from context.
 
 ```bash
-gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "{{label}}" --title "{{title}}" --body "{{body}}"
+python <skill-directory>/scripts/create_ticket.py "{{title}}" "{{body}}" "{{milestoneTitle}}" "{{label}}"
 ```
 
-Use a heredoc for a multi-line `{{body}}`.
+Pass a multi-line `{{body}}` as a single quoted argument (e.g. `"$(cat <<'EOF' ... EOF)"`).
 
-**Returns:** the new ticket's number.
+**Returns:** the new ticket's number, printed to stdout.
 
 ## Read ticket
 
 Reads `{{issueNumber}}` from context.
 
 ```bash
-gh issue view {{issueNumber}} --repo "$REPO" --json number,title,body,labels,comments
+python <skill-directory>/scripts/read_ticket.py {{issueNumber}}
 ```
+
+Prints a JSON object with the ticket's `number`, `title`, `body`, `labels`, and `comments`.
 
 **Returns:** the ticket's `number`, `title`, `body`, `labels`, and `comments`.
 
@@ -87,8 +79,10 @@ gh issue view {{issueNumber}} --repo "$REPO" --json number,title,body,labels,com
 Reads `{{state}}`, `{{label}}` from context.
 
 ```bash
-gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'
+python <skill-directory>/scripts/list_tickets.py "{{state}}" "{{label}}"
 ```
+
+Prints a JSON array of tickets, each with `number`, `title`, `body`, `labels`, and `comments`.
 
 **Returns:** an array of tickets, each with number, title, body, labels, and comments.
 
@@ -97,7 +91,7 @@ gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number
 Reads `{{issueNumber}}`, `{{body}}` from context.
 
 ```bash
-gh issue comment {{issueNumber}} --repo "$REPO" --body "{{body}}"
+python <skill-directory>/scripts/comment_ticket.py {{issueNumber}} "{{body}}"
 ```
 
 **Returns:** nothing.
@@ -107,7 +101,7 @@ gh issue comment {{issueNumber}} --repo "$REPO" --body "{{body}}"
 Reads `{{issueNumber}}`, `{{addLabels}}`, `{{removeLabels}}` from context. Either may be empty.
 
 ```bash
-gh issue edit {{issueNumber}} --repo "$REPO" --add-label "{{addLabels}}" --remove-label "{{removeLabels}}"
+python <skill-directory>/scripts/label_ticket.py {{issueNumber}} "{{addLabels}}" "{{removeLabels}}"
 ```
 
 **Returns:** nothing.
@@ -117,7 +111,7 @@ gh issue edit {{issueNumber}} --repo "$REPO" --add-label "{{addLabels}}" --remov
 Reads `{{issueNumber}}`, `{{comment}}` from context.
 
 ```bash
-gh issue close {{issueNumber}} --repo "$REPO" --comment "{{comment}}"
+python <skill-directory>/scripts/close_ticket.py {{issueNumber}} "{{comment}}"
 ```
 
 **Returns:** nothing.
@@ -139,7 +133,7 @@ Tickets and Specs for this repo live as GitHub issues. Use the `gh` CLI for all 
 | `hitl` | `fbca04` | Requires human implementation |
 | `spec` | `5319e7` | Spec task with implementation context |
 
-Infer the repo (`$REPO`) from `git remote -v` — `gh` does this automatically when run inside a clone.
+Resolve the repo via `gh repo view --json nameWithOwner` — `gh` infers it from the clone's remote automatically.
 
 ## Pull requests as a triage surface
 
