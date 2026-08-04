@@ -20,7 +20,6 @@ Exit codes:
 """
 
 import subprocess
-import sys
 from typing import Callable
 
 NO_CHANGES_MESSAGE = "No uncommitted changes"
