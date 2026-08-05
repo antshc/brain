@@ -10,9 +10,22 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values for all harness repository operations.
+1. Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use `HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues) and `CODEBASE_REPO_PATH` for codebase/worktree operations.
 
-Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Non-zero exit → **exit** and report.
+2. Bring `HARNESS_REPO_PATH` up to date with its remote before any reads or the final push depend on it.
+**GUARD**:  Run only when `/resolve-harness` found `.harness.env` and emitted a non-empty `HARNESS_REPO_PATH`.
+```bash
+git -C "$HARNESS_REPO_PATH" fetch --all --prune
+git -C "$HARNESS_REPO_PATH" pull
+```
+
+If the pull exits non-zero (conflicts detected), discard local state in favor of the remote — the harness repo is only ever read from, so it is safe to reset:
+
+```bash
+git -C "$HARNESS_REPO_PATH" reset --hard "@{upstream}"
+```
+
+`/resolve-harness` unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. `/resolve-harness` exiting non-zero → **exit** and report.
 
 ## 1. Resolve milestone
 
