@@ -12,7 +12,7 @@ A technology-agnostic autonomous coding crew. Two agents — `codey` (implemente
 - [agents/codey.agent.md](agents/codey.agent.md) — the implementer. Fixed phases: INPUT → GOTCHAS → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS. Resolves convention/state files once during INPUT from a caller-supplied `HARNESS_REPO_PATH`, and works in its invocation directory.
 - [agents/chorey.agent.md](agents/chorey.agent.md) — the reviewer. Fixed phases: INPUT → GOTCHAS → REVIEW → VERIFY → UPDATE GOTCHAS. Resolves the same per-repo settings folder as Codey (including `CODE.md`, so its own fixes obey repo style), reviews the checkpoint commit named by an optional caller-supplied `BASELINE_COMMIT` (falling back to the uncommitted work already in its workspace when absent), and self-reverts any cleanup it cannot verify.
 - [skills/to-codey/SKILL.md](skills/to-codey/SKILL.md) — Codey's entry point. Resolves Harness Settings, a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `codey` via `runSubagent` with a `## HARNESS` section carrying `HARNESS_REPO_PATH`.
-- [skills/to-chorey/SKILL.md](skills/to-chorey/SKILL.md) — Chorey's standalone entry point. Resolves Harness Settings, gathers uncommitted work into a `## DIFF` section, and invokes `chorey` via `runSubagent` — never supplies `BASELINE_COMMIT`, so Chorey stays on the manual-snapshot revert path.
+- [skills/to-chorey/SKILL.md](skills/to-chorey/SKILL.md) — Chorey's standalone entry point. Resolves Harness Settings and invokes `chorey` via `runSubagent` with only `## HARNESS` — never computes or embeds a diff (Chorey's own `crew-review` Step 0 gathers uncommitted work itself), and never supplies `BASELINE_COMMIT`, so Chorey stays on the manual-snapshot revert path.
 - [skills/crew-implement/SKILL.md](skills/crew-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during Codey's INPUT.
 - [skills/crew-feedback/SKILL.md](skills/crew-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd. Shared by both agents.
 - [skills/crew-review/SKILL.md](skills/crew-review/SKILL.md) — Chorey's review procedure; consumes the `CHORE_PATH`, `CODE_PATH`, and optional `BASELINE_COMMIT` resolved during Chorey's INPUT, applies only behavior-preserving fixes, and owns the revert mechanics Chorey uses when its own edits fail verification — a git-native rollback against `BASELINE_COMMIT` when supplied, otherwise the manual snapshot/restore fallback.
@@ -37,8 +37,8 @@ graph TD
     U2[User / uncommitted work] --> TH[to-chorey skill]
     DEV[ralph:dev skill] -->|runSubagent, cwd=worktree, HARNESS_REPO_PATH| CO
     TC -->|runSubagent, HARNESS_REPO_PATH| CO[codey agent]
-    TH -->|runSubagent, HARNESS_REPO_PATH + DIFF, no BASELINE_COMMIT| CH[chorey agent]
-    DEV -->|runSubagent, gated on Codey STATUS:complete, after checkpoint commit, HARNESS_REPO_PATH + DIFF + BASELINE_COMMIT| CH
+    TH -->|runSubagent, HARNESS_REPO_PATH, no BASELINE_COMMIT| CH[chorey agent]
+    DEV -->|runSubagent, gated on Codey STATUS:complete, after checkpoint commit, HARNESS_REPO_PATH + BASELINE_COMMIT| CH
 
     CO -->|GOTCHAS read + UPDATE GOTCHAS write| GOT[crew-gotchas skill]
     CO -->|IMPLEMENTATION| IMP[crew-implement skill]
@@ -77,7 +77,7 @@ Neither agent enforces the loop gate; the caller must. A loop driver (`ralph:dev
 1. Call `/resolve-harness` and pass the result in a `## HARNESS` section — or omit the section entirely so the agent falls back to cwd.
 2. Launch each agent with cwd set to the code repo/worktree.
 3. Read Codey's `STATUS` before gating: `partial`/`blocked` → do not invoke Chorey (`ralph:dev` still commits its checkpoint to an isolated worktree branch; an interactive caller confirms with the user first).
-4. On `complete` only: commit the checkpoint, then invoke `chorey` directly with `## HARNESS` + `## DIFF` + `## BASELINE_COMMIT` (that checkpoint's SHA).
+4. On `complete` only: commit the checkpoint, then invoke `chorey` directly with `## HARNESS` + `## BASELINE_COMMIT` (that checkpoint's SHA) — never a caller-computed diff; Chorey's own `crew-review` Step 0 derives the change set from `BASELINE_COMMIT` itself.
 5. Treat Chorey's report as informational — never let it override Codey's `STATUS`.
 
 ## Execution sequence
@@ -130,7 +130,7 @@ sequenceDiagram
     TCM-->>CO: reads STATUS REPORT (ccode: commit, post-task)
 ```
 
-Chorey follows only when Codey reports `STATUS: complete` (behind the loop's checkpoint-commit gate) or runs standalone via `to-chorey` with no prior Codey run. Both entry points supply `## HARNESS` + `## DIFF`; they differ in whether a `BASELINE_COMMIT` is supplied — `ralph:dev` invokes `chorey` directly (bypassing `to-chorey`) right after committing Codey's checkpoint, passing that commit's SHA alongside its diff; `to-chorey` never supplies one, so Chorey reviews the uncommitted work already in the workspace instead:
+Chorey follows only when Codey reports `STATUS: complete` (behind the loop's checkpoint-commit gate) or runs standalone via `to-chorey` with no prior Codey run. Both entry points supply only `## HARNESS`; neither computes or embeds a diff — Chorey's own `crew-review` Step 0 always derives the change set itself, in its own context. They differ in whether a `BASELINE_COMMIT` is supplied — `ralph:dev` invokes `chorey` directly (bypassing `to-chorey`) right after committing Codey's checkpoint, passing that commit's SHA; `to-chorey` never supplies one, so Chorey reviews the uncommitted work already in the workspace instead:
 
 ```mermaid
 sequenceDiagram
@@ -142,9 +142,10 @@ sequenceDiagram
     participant FB as crew-feedback skill
 
     User->>TH: standalone (no prior Codey run)
-    TH->>TH: resolve Harness Settings + gather uncommitted work
-    TH->>CH: runSubagent(chorey, ## HARNESS + ## DIFF (uncommitted work), no BASELINE_COMMIT)
-    note over CH: ralph:dev instead invokes chorey directly, right after committing Codey's checkpoint,<br/>passing ## HARNESS + ## DIFF (the checkpoint commit's diff) + ## BASELINE_COMMIT (the checkpoint commit's SHA)
+    TH->>TH: resolve Harness Settings
+    TH->>CH: runSubagent(chorey, ## HARNESS only, no BASELINE_COMMIT)
+    note over CH: ralph:dev instead invokes chorey directly, right after committing Codey's checkpoint,<br/>passing ## HARNESS + ## BASELINE_COMMIT (the checkpoint commit's SHA) — never a caller-computed diff
+    note over CH,REV: crew-review Step 0 always derives the change set itself (git show --stat BASELINE_COMMIT, or its own git status/diff when absent) — never from a caller-supplied diff
 
     rect rgba(255, 200, 160, 0.08)
     note over CH: INPUT — validate supplied HARNESS_REPO_PATH (or fallback cwd); resolve paths incl. optional BASELINE_COMMIT; workspace = cwd

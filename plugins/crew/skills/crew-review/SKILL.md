@@ -17,7 +17,7 @@ Copy this checklist and check off each item as you complete it:
 
 **`BASELINE_COMMIT` supplied** → identify the files that commit changed (`git show --stat <BASELINE_COMMIT>`). The commit itself is the pre-review state; **Revert** restores against it directly — no snapshot needed.
 
-**`BASELINE_COMMIT` absent** → gather every uncommitted change in the workspace (staged and unstaged). Before changing any file, record its exact current content so it can be restored verbatim.
+**`BASELINE_COMMIT` absent** → gather every uncommitted change in the workspace yourself, by running your own git commands (e.g. `git status --porcelain`, `git diff`). Cover staged, unstaged, and untracked files. Before changing any file, record its exact current content so it can be restored verbatim.
 
 **Emit**: "Reviewing commit <sha>: [files]", "Reviewing uncommitted files: [list]", or "No work to review."
 
