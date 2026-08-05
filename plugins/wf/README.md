@@ -9,7 +9,9 @@ Some skills (e.g. `to-tickets`, `to-spec`) need to target a GitHub repo that is 
 The pattern below registers it temporarily as a `board` remote, extracts the `owner/repo` slug
 for use in API calls, then removes the remote when done.
 
-```bash
+Runs unmodified on Linux, macOS, and Windows (no bash- or PowerShell-only syntax):
+
+```
 # 1. Add the target repository as a remote named "board"
 git remote add board git@github.com:acme-org/my-project-board.git
 
@@ -17,12 +19,19 @@ git remote add board git@github.com:acme-org/my-project-board.git
 git remote -v
 
 # 3. Extract the owner/repo slug
-git remote get-url board | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##'
+python3 -c 'import re,subprocess,sys; url=subprocess.run(["git","remote","get-url",sys.argv[1]],capture_output=True,text=True,check=True).stdout.strip(); print(re.sub(r"\.git$","",re.sub(r"^(git@[^:]+:|https?://[^/]+/)","",url)))' board
 # → acme-org/my-project-board
 
 # 4. Use "board" if it exists, otherwise fall back to "origin"
-( git remote get-url board 2>/dev/null || git remote get-url origin ) \
-  | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##'
+python3 -c '
+import re, subprocess
+for remote in ("board", "origin"):
+    result = subprocess.run(["git", "remote", "get-url", remote], capture_output=True, text=True)
+    if result.returncode == 0:
+        url = result.stdout.strip()
+        print(re.sub(r"\.git$", "", re.sub(r"^(git@[^:]+:|https?://[^/]+/)", "", url)))
+        break
+'
 
 # 5. Clean up — remove the board remote
 git remote remove board
@@ -47,7 +56,9 @@ my-project-board/            # root-level "board" repo (the harness) — git-tra
         └── .git/
 ```
 
-```bash
+Runs unmodified on Linux, macOS, and Windows (no bash- or PowerShell-only syntax):
+
+```
 # 1. From the root-level board repo, ignore the nested source workspace
 echo "workspace/" >> .gitignore
 
@@ -59,8 +70,7 @@ git -C my-project-board status --short
 #    while the project source in workspace/ remains untouched.
 
 # 4. Extract the board owner/repo slug from the harness "origin"
-git -C my-project-board remote get-url origin \
-  | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##'
+python3 -c 'import re,subprocess; url=subprocess.run(["git","-C","my-project-board","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); print(re.sub(r"\.git$","",re.sub(r"^(git@[^:]+:|https?://[^/]+/)","",url)))'
 # → acme-org/my-project-board
 
 # 5. Work on the source inside the nested workspace using its own git
