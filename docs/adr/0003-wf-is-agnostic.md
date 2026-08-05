@@ -1,6 +1,6 @@
 # wf plugin is operating-system-agnostic
 
-`wf` skills must not embed OS-specific shell syntax (bash-only or PowerShell-only) in their commands or helper scripts. Wherever a skill needs logic beyond a bare cross-platform CLI invocation (e.g. `gh`, `git`), that logic is written in Python so the same instruction runs unmodified on Linux, macOS, and Windows, instead of asking the agent to pick and maintain a per-OS variant.
+`wf` skills must not embed OS-specific shell syntax (bash-only or PowerShell-only) in their commands or helper scripts. A step prefers a bare, pure cross-platform CLI invocation (e.g. `gh`, `git`) written inline in the instruction; only once the logic exceeds a single pure command — branching, parsing, multi-step state — is it moved to a Python script, so the same instruction runs unmodified on Linux, macOS, and Windows, instead of asking the agent to pick and maintain a per-OS variant.
 
 ## Considered Options
 
