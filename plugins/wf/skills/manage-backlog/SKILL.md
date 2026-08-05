@@ -11,7 +11,7 @@ Find the heading matching the requested operation and follow its steps exactly â
 
 Create missing GitHub issue labels for AFK/HITL task workflow.
 
-Run the `scripts/create-labels.sh` script to create any missing labels.
+Run `python scripts/create_labels.py` to create any missing labels.
 
 **Returns:** nothing.
 

@@ -14,20 +14,13 @@ argument-hint: "{{milestoneTitle}} [{{implementationDetails}}, `plan.md`]"
 
 **If only `{{milestoneTitle}}` is provided:**
 
-Resolve the target repo once.
+Resolve the target repo once (runs unmodified on Linux, macOS, and Windows — no bash- or PowerShell-only syntax):
 
-**bash:**
-```bash
-REPO=$(git remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
+```
+python -c 'import re,subprocess; url=subprocess.run(["git","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); print(re.sub(r"\.git$","",re.sub(r"^(git@[^:]+:|https?://[^/]+/)","",url)))'
 ```
 
-**PowerShell:**
-```powershell
-$REPO = $(git remote get-url origin) `
-  -replace '^git@[^:]+:','' `
-  -replace '^https?://[^/]+/','' `
-  -replace '\.git$',''
-```
+Set `$REPO` to the printed value for use in later steps (e.g. `/manage-backlog` actions that read `$REPO`).
 
 Find the spec issue by milestone: via `/manage-backlog` **Find spec ticket**.
 
