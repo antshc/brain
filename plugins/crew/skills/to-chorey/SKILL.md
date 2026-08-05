@@ -10,9 +10,6 @@ Run `/resolve-harness` skill and retain its emitted `HARNESS_REPO_PATH`. If it i
 ```
 ## HARNESS
 HARNESS_REPO_PATH=<resolved path>
-
-## DIFF
-`git add -A 2>/dev/null; DIFF=$(git diff --cached 2>/dev/null); [ -n "$DIFF" ] && echo "$DIFF" || echo "No uncommitted changes"`
 ```
 
 Invoke Chorey even with no uncommitted work — it reports `STATUS: complete` with no files changed rather than being skipped.

@@ -140,10 +140,9 @@ Stage and commit:
 git add -A
 git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
 checkpoint_sha=$(git rev-parse HEAD)
-diff=$(git show "$checkpoint_sha")
 ```
 
-Retain `$checkpoint_sha` and `$diff` for use in **Review (Chorey)**.
+Retain `$checkpoint_sha` for use in **Review (Chorey)**.
 
 Push the feature branch regardless of Codey's `STATUS` (**complete**, **partial**, or **blocked**):
 
@@ -160,9 +159,6 @@ After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the 
 ```
 ## HARNESS
 HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
-
-## DIFF
-<$diff>
 
 ## BASELINE_COMMIT
 <$checkpoint_sha>
