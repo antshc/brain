@@ -1,7 +1,6 @@
 ---
 name: to-capabilities
-description: Break an idea or grilled requirement input into **capabilities**, each with a stakeholder requirement, functional requirements, business rules, and edge cases — solution-agnostic. Use to author structured requirement sets from a feature idea or the output of /grill-requirements.
-disable-model-invocation: true
+description: Break an idea or grilled requirement input into **capabilities**, each with a stakeholder requirement, functional requirements, business rules, and edge cases — solution-agnostic. Use to author structured requirement sets from a feature idea.
 ---
 
 **Capability** — a single, focused area of system behavior, defined by verifiable requirements and scenarios. It is behavior the system provides *independently of where it appears* and *survives after the current change completes* — never a one-off task. It names what the system *does* and the outcome the actor gets. Each capability scopes exactly one requirement set (stakeholder requirement + functional requirements + business rules + edge cases); an idea spanning several unrelated behaviors yields one set per capability, never merged.
