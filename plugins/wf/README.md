@@ -4,7 +4,7 @@ Everyday workflow automation skills that carry a feature from an open-ended idea
 
 ## Skill flow
 
-1. **Discovery loop** — [Wayfinder](https://github.com/mattpocock/skills/tree/main/skills/engineering/wayfinder) explores the codebase and surfaces unknowns; `/to-spec` synthesizes the conversation into a spec. The two hand off to each other until no unknowns remain.
+1. **Discovery loop** — [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets (grilled via `/grill-design`, investigated via `/research`, sanity-checked via `/prototype`) until the destination — a spec — is clear; `/to-spec` then synthesizes it.
 2. **Requirements capture** — `/to-capabilities` splits the spec into capabilities and adds them as requirements to the feature design doc; `/record-adr` pulls any architectural decisions out of the spec and adds them to the same doc.
 3. **Story slicing** — `/to-stories` breaks the feature design doc down into one atomic story per capability.
 4. **Story hardening** — `/grill-design` interviews and sharpens each story, run once per story.
@@ -12,7 +12,7 @@ Everyday workflow automation skills that carry a feature from an open-ended idea
 
 ```mermaid
 flowchart TD
-    W[Wayfinder<br/>explore codebase, surface unknowns] --> S[to-spec<br/>synthesize spec from conversation]
+    W{wayfinder<br/>chart & work a map of decision tickets<br/>via grill-design/research/prototype} -->|destination clear| S[to-spec<br/>synthesize spec from resolved decisions]
     S -->|unknowns remain| W
     S -->|no unknowns left| SPEC[(Spec)]
 
