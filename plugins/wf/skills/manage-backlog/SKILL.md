@@ -60,6 +60,21 @@ If no issue is found, ask the user for the GitHub issue number and fetch it with
 
 **Returns:** the spec ticket's number, title, body, and comments.
 
+## Find or create milestone
+
+Reads `{{milestoneTitle}}` from context. Use this instead of **Publish spec**'s inline steps when the caller isn't a spec (e.g. a `/wayfinder` map) — the title is taken verbatim, with no feature-id formatting.
+
+1. Look for an existing milestone with this exact title:
+   ```bash
+   gh api repos/$REPO/milestones --jq '.[] | select(.title == "{{milestoneTitle}}") | .number' | head -1
+   ```
+2. If none found, create it:
+   ```bash
+   gh api repos/$REPO/milestones --method POST --field title="{{milestoneTitle}}"
+   ```
+
+**Returns:** the milestone's number and title.
+
 ## Create ticket
 
 Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}` from context.
@@ -84,13 +99,23 @@ gh issue view {{issueNumber}} --repo "$REPO" --json number,title,body,labels,com
 
 ## List tickets
 
-Reads `{{state}}`, `{{label}}` from context.
+Reads `{{state}}`, `{{label}}` from context. Add `--milestone "{{milestoneTitle}}"` too when scoping to one milestone (e.g. one `/wayfinder` map).
 
 ```bash
-gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'
+gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number,title,body,labels,comments,assignees --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body], assignees: [.assignees[].login]}]'
 ```
 
-**Returns:** an array of tickets, each with number, title, body, labels, and comments.
+**Returns:** an array of tickets, each with number, title, body, labels, comments, and assignees.
+
+## Assign ticket
+
+Reads `{{issueNumber}}` from context. Claims the ticket for the current session.
+
+```bash
+gh issue edit {{issueNumber}} --repo "$REPO" --add-assignee "@me"
+```
+
+**Returns:** nothing.
 
 ## Comment on ticket
 
@@ -138,6 +163,11 @@ Tickets and Specs for this repo live as GitHub issues. Use the `gh` CLI for all 
 |---|---:|---|
 | `hitl` | `fbca04` | Requires human implementation |
 | `spec` | `5319e7` | Spec task with implementation context |
+| `wayfinder:map` | `0e8a16` | Marks the map issue itself |
+| `wayfinder:research` | `1d76db` | Research-type decision ticket |
+| `wayfinder:prototype` | `5319e7` | Prototype-type decision ticket |
+| `wayfinder:grilling` | `fbca04` | Grilling-type decision ticket (default case, drives `/grill-design`) |
+| `wayfinder:task` | `d93f0b` | Manual-work decision ticket |
 
 Infer the repo (`$REPO`) from `git remote -v` — `gh` does this automatically when run inside a clone.
 

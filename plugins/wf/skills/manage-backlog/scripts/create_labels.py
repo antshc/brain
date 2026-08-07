@@ -7,6 +7,11 @@ import sys
 LABELS: list[tuple[str, str, str]] = [
     ("hitl", "fbca04", "Requires human implementation"),
     ("spec", "5319e7", "Spec task with implementation context"),
+    ("wayfinder:map", "0e8a16", "Marks the map issue itself"),
+    ("wayfinder:research", "1d76db", "Research-type decision ticket"),
+    ("wayfinder:prototype", "5319e7", "Prototype-type decision ticket"),
+    ("wayfinder:grilling", "fbca04", "Grilling-type decision ticket"),
+    ("wayfinder:task", "d93f0b", "Manual-work decision ticket"),
 ]
 
 
