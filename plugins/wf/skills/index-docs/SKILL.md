@@ -24,13 +24,16 @@ Default key→column mapping, overridable by `{{tableMetadata}}`:
 | `id` | `#`, rendered as a link to the record path |
 | `title` | the record-name column (`Concept`, `Decision`, `Service`) |
 | `trigger` | `Trigger condition` |
-| `summary` | `Summary` |
+| `summary` | `Summary`, preceded by `default` |
+| `default` | `Summary`, as a leading `**Default:** {{default}}` sentence before `summary` |
 | `status` | not a column by default; drives `supersede`/`retire` markers |
+| `owns` | not a column; read by callers from the frontmatter |
 
 Rules:
 
-- Read frontmatter with a YAML parse of the block between the leading `---` fences. `trigger` and `summary` are commonly folded block scalars (`>-`) — fold them to a single line before writing the cell, and collapse runs of whitespace.
-- **Reading frontmatter is not opening the record.** The block is bounded and cheap, so it may always be read once a row's locator resolves. "Open" elsewhere in this skill means loading the record **body**, which stays gated on a matching verdict.
+- Read frontmatter with a YAML parse of the block between the leading `---` fences. `trigger`, `summary`, and `default` are commonly folded block scalars (`>-`) — fold them to a single line before writing the cell, and collapse runs of whitespace.
+- The `Summary` cell is the concatenation `**Default:** {{default}} {{summary}}` — a `default` edit forces a row resync just as a `summary` edit does. A record with no `default` yields the summary alone.
+- **Reading frontmatter is not opening the record.** The block is bounded and cheap, so it may always be read once a row's locator resolves. "Open" elsewhere in this skill means loading the record **body**, which stays gated on a matching verdict. A row's `default` therefore reaches a caller without opening anything.
 - A record without frontmatter falls back to caller-supplied `{{rowValues}}`; never invent the missing keys.
 - Never edit a cell to resolve a mismatch with its record. Resync the row from frontmatter, or fix the record's frontmatter — never both independently.
 
