@@ -25,7 +25,11 @@ Before confirming we've reached a shared understanding, list every Feature Decis
 
 ## Decision states
 
-Evidence checklist — all four → Feature Assumption; any miss → ask: single authoritative source; direct answer (no analogy); no genuine alternative; reversible if wrong.
+Evidence checklist — all three → Feature Assumption; any miss → ask.
+
+* **Single authoritative source** — exactly one matched record's `owns` covers the decision area. Zero owners, or two or more, → ask.
+* **Direct answer (no analogy)** — a matched record carries a `default` for this decision, or a `Rules` line that answers it normatively. A `Reference:` / "follow its shape" pointer never clears this gate.
+* **No genuine alternative** — the record's `default` names the choice to take when the design doesn't state one. Alternatives listed without a default don't clear it.
 
 | State | Resolved by | Home | Durable write |
 |---|---|---|---|
@@ -35,7 +39,7 @@ Evidence checklist — all four → Feature Assumption; any miss → ask: single
 | Decision | user | ledger + document | same turn it's approved |
 | Rejected option | user | ledger only | never |
 
-Log every state and every change of state via `/track-ledger`' **Log decision**, the turn it happens. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
+Log every state and every change of state via `/track-ledger`' **Log decision**, the turn it happens. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input, and an unlogged miss is a lost repair. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
 
 ## Context economy
 
@@ -63,14 +67,14 @@ Every probe stays live for the whole session: re-check its trigger after each us
 
 This verdict is **monotonic** — once a row matches it stays matched as the surface only grows; never re-check an already-`opened` row here. A match earned from `applies_to` rather than a trigger clause is a signal the row's Trigger condition cell has a gap — carry it to the closing sweep's *Trigger-condition refinement*.
 
-**Open and extract** — open a linked record's **body** only on a matching verdict; indexing alone never implies relevance. Log every record you open or skip via `/track-ledger`' **Log opened record**, and check the ledger before discussing any module, boundary, or service — listed means its full record is already loaded, don't re-open or re-scan for it. A section absent from an opened record means "not documented", never "not applicable". Extract **mandates** (required concepts, patterns, boundaries), **prohibitions** (explicitly rejected approaches and considered options), **open space** (unconstrained choices) — and frame every question, scenario, and alternative against them.
+**Open and extract** — open a linked record's **body** only on a matching verdict; indexing alone never implies relevance. (Its frontmatter is not gated — `/index-docs` reads that during the scan itself.) Log every record you open or skip via `/track-ledger`' **Log opened record**, and check the ledger before discussing any module, boundary, or service — listed means its full record is already loaded, don't re-open or re-scan for it. A section absent from an opened record means "not documented", never "not applicable". Extract **mandates** (required concepts, patterns, boundaries), **prohibitions** (explicitly rejected approaches and considered options), **open space** (unconstrained choices), **defaults** (the `default` and `owns` frontmatter keys — the choice to take when the design doesn't state one, and the decision areas this record has sole authority over) — and frame every question, scenario, and alternative against them.
 
 **Classify conflicts** — over the full text of already-`opened` records in context; no tool call; re-runs every triggering turn because it is **non-monotonic**: a later answer can retroactively put an earlier design in conflict with a Concept or ADR that matched turns ago.
 * **Violation** — breaks a Concept or repeats an ADR's rejected alternative. Never present as equally valid — cite the Concept/ADR number, surface the conflict.
 * **Supersession** — the Concept/ADR is outdated, needs revision.
 * **Out of scope** — the Concept/ADR doesn't apply.
 
-**Code cross-reference** — when the user states how something works, check whether the code agrees, across user-facing, application, integration, and persistence boundaries: validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic. Contradicts the user → surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?" Contradicts a loaded Concept or ADR → classify it as **Drift** and surface the gap.
+**Code cross-reference** — when the user states how something works, check whether the code agrees, across user-facing, application, integration, and persistence boundaries: validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic. Contradicts the user → surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?" Contradicts a loaded Concept or ADR — its rules, or its `default`/`owns` keys — → classify it as **Drift**, log it via `/track-ledger`' drift form, and surface the gap.
 
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
@@ -80,14 +84,21 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 ## Closing sweep
 
-Three parts, each with its own trigger.
+Four parts, each with its own trigger.
 
 **1. Per-row disposition.** If the session opened at least one full Concept/ADR record, emit one verdict per row in the `Crosscutting Concepts` and `Architecture Decision Records` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so no row is silently omitted. Skip for trivial sessions that only touched glossary terms.
 
-**2. Veto resolution.** Resolve every staged item against the Interview's end-of-session veto list:
+**2. Veto resolution.** Never skipped — it is the only check on an assumption before it reaches disk, and part 3 reads its outcome. Resolve every staged item against the Interview's end-of-session veto list:
 * **Cleared** — it is now a Decision: write it to its durable document and update its ledger line via `/track-ledger`' **Log decision**.
-* **Vetoed** — delete its ledger line via `/track-ledger`' **Log decision**; nothing changes on disk.
+* **Vetoed** — nothing changes on disk. Rewrite its ledger line via `/track-ledger`' **Log decision**: the veto form when the assumption stood on a record's `default`/`owns` (part 3 repairs that key), a deletion otherwise.
 
 A recorded Decision is not vetoable — the user approved it before it was written. An offer never made inline is a miss, not an agenda item — the sweep may re-raise a *deferred* offer, never introduce a new one.
 
-**3. Trigger-condition refinement.** Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
+**3. Assumption-gap harvest.** Runs after part 2, so it sees its outcomes. Every question asked, wrong default, and drifted key marks a gap in the source behind it — close it now, or the next session asks the same question. Repair the record behind each of the ledger's three gap forms:
+* **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → new-record candidate.
+* **Veto** (`vetoed, evidence was:`) — a `default`/`owns` produced an assumption you struck; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
+* **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
+
+Write the fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. Everything else — a new record, or a key change no answer covers — goes through *Offer a record*'s one-open-offer rule. Apply each write via `/record-concept` or `/record-adr`, resync the row via `/index-docs`' **Sync index row**, and mark the ledger line resolved.
+
+**4. Trigger-condition refinement.** Runs last, so it also covers any row part 3 just created or resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.

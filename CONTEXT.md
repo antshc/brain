@@ -33,6 +33,9 @@ Copied exactly as written, with no paraphrasing, summarizing, or restructuring �
 _Avoid_: as-is, unmodified
 _Plugins_set_: wf
 
+**Flywheel**:
+A self-reinforcing cycle in which each turn closes a gap in the source, producing better outputs that in turn close further gaps — improvement compounds automatically rather than depending on external intervention.
+
 # Contexts
 ## Shared
 
@@ -105,6 +108,11 @@ _Avoid_: test project, test suite
 **Completeness sweep**:
 A closing check, run before concluding a session that opened at least one full Concept/ADR record, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts and Architecture Decision Records index tables.
 _Avoid_: final review, wrap-up
+_Plugins_set_: wf
+
+**Assumption-gap harvest**:
+The final closing-sweep step that reads every logged gate-miss, vetoed assumption, and drift entry from the session ledger and repairs the record behind each — adding missing `default`/`owns` keys, correcting wrong ones, or flagging drifted anchors — so the next session is not forced to ask the same question again.
+_Avoid_: gap repair, assumption cleanup
 _Plugins_set_: wf
 
 ## review
