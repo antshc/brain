@@ -1,87 +1,27 @@
-# WF Skills
+# wf plugin
 
-## ~~Ad Hoc: Use an external GitHub repository as a board remote~~ (Outdated)
+Everyday workflow automation skills that carry a feature from an open-ended idea to agent-executable GitHub issues.
 
-> **Outdated.** Superseded by the root-level board repository harness pattern below.
-> Kept for reference only.
+## Skill flow
 
-Some skills (e.g. `to-tickets`, `to-spec`) need to target a GitHub repo that is not the current `origin`.
-The pattern below registers it temporarily as a `board` remote, extracts the `owner/repo` slug
-for use in API calls, then removes the remote when done.
+1. **Discovery loop** — [Wayfinder](https://github.com/mattpocock/skills/tree/main/skills/engineering/wayfinder) explores the codebase and surfaces unknowns; `/to-spec` synthesizes the conversation into a spec. The two hand off to each other until no unknowns remain.
+2. **Requirements capture** — `/to-capabilities` splits the spec into capabilities and adds them as requirements to the feature design doc; `/record-adr` pulls any architectural decisions out of the spec and adds them to the same doc.
+3. **Story slicing** — `/to-stories` breaks the feature design doc down into one atomic story per capability.
+4. **Story hardening** — `/grill-design` interviews and sharpens each story, run once per story.
+5. **Ticket cut** — `/to-tickets` slices each hardened story into agent-executable GitHub issues.
 
-Runs unmodified on Linux, macOS, and Windows (no bash- or PowerShell-only syntax):
+```mermaid
+flowchart TD
+    W[Wayfinder<br/>explore codebase, surface unknowns] --> S[to-spec<br/>synthesize spec from conversation]
+    S -->|unknowns remain| W
+    S -->|no unknowns left| SPEC[(Spec)]
 
+    SPEC --> CAP[to-capabilities<br/>split spec into capabilities]
+    CAP -->|requirements| DESIGN[(Feature design doc)]
+    SPEC --> ADR[record-adr<br/>capture architectural decisions from the spec]
+    ADR -->|decisions| DESIGN
+
+    DESIGN --> STORIES[to-stories<br/>break design into per-capability stories]
+    STORIES --> GRILL{grill-design<br/>interview & sharpen, one story at a time}
+    GRILL --> TICKETS[to-tickets<br/>cut each story into agent-ready GitHub issues]
 ```
-# 1. Add the target repository as a remote named "board"
-git remote add board git@github.com:acme-org/my-project-board.git
-
-# 2. Verify it was registered
-git remote -v
-
-# 3. Extract the owner/repo slug
-python3 -c 'import re,subprocess,sys; url=subprocess.run(["git","remote","get-url",sys.argv[1]],capture_output=True,text=True,check=True).stdout.strip(); print(re.sub(r"\.git$","",re.sub(r"^(git@[^:]+:|https?://[^/]+/)","",url)))' board
-# → acme-org/my-project-board
-
-# 4. Use "board" if it exists, otherwise fall back to "origin"
-python3 -c '
-import re, subprocess
-for remote in ("board", "origin"):
-    result = subprocess.run(["git", "remote", "get-url", remote], capture_output=True, text=True)
-    if result.returncode == 0:
-        url = result.stdout.strip()
-        print(re.sub(r"\.git$", "", re.sub(r"^(git@[^:]+:|https?://[^/]+/)", "", url)))
-        break
-'
-
-# 5. Clean up — remove the board remote
-git remote remove board
-```
-
-## Ad Hoc: Use the root-level board repository as a harness around the project source
-
-When AI artifacts (plans, PRDs, tickets, specs, notes) must never leak into the source
-project's history, wrap the project in a **root-level board repository**. The parent/root
-repo is the *harness environment*: it tracks all AI-generated artifacts, while the actual
-project source lives in a nested workspace folder that the harness **ignores**. Nothing the
-agent produces at the harness level can reach the source project's commits.
-
-```
-my-project-board/            # root-level "board" repo (the harness) — git-tracked
-├── .git/                    # harness history: holds AI artifacts only
-├── .gitignore               # ignores the nested workspace/ source folder
-├── plans/                   # AI artifacts (plans, PRDs, tickets, specs)
-├── specs/
-└── workspace/               # nested project source — ignored by the harness
-    └── my-project/          # has its own .git; never sees AI artifacts
-        └── .git/
-```
-
-Runs unmodified on Linux, macOS, and Windows (no bash- or PowerShell-only syntax):
-
-```
-# 1. From the root-level board repo, ignore the nested source workspace
-echo "workspace/" >> .gitignore
-
-# 2. Confirm the harness does NOT see the project source as changes
-git -C my-project-board status --short
-# → workspace/ must not appear (it is ignored)
-
-# 3. Run board skills at the harness level; artifacts stay in the board repo
-#    while the project source in workspace/ remains untouched.
-
-# 4. Extract the board owner/repo slug from the harness "origin"
-python3 -c 'import re,subprocess; url=subprocess.run(["git","-C","my-project-board","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); print(re.sub(r"\.git$","",re.sub(r"^(git@[^:]+:|https?://[^/]+/)","",url)))'
-# → acme-org/my-project-board
-
-# 5. Work on the source inside the nested workspace using its own git
-git -C my-project-board/workspace/my-project status
-```
-
-Key points:
-
-- The **root/parent repo is the harness** — it isolates AI artifacts from the project source.
-- The **nested `workspace/` folder is git-ignored** by the harness, so source code and AI
-  artifacts never cross-contaminate.
-- The nested project keeps its **own `.git`**; commits there stay free of AI artifacts.
-- Use the harness `origin` slug (see the section above) as the `board` target for skills
-  like `to-tickets` and `to-spec`.
