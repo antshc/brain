@@ -12,7 +12,7 @@ Own the interview and the session's design state — *when* to look up, log, ask
 1. **Docs exist** — existence check only on `ARCHITECTURE.md` and `CONTEXT.md`; either missing → run `/bootstrap-docs`' **Mandatory creation**.
 2. **Load the index** — read `ARCHITECTURE.md` in full: `Building blocks` services and every row of the `Crosscutting Concepts` / `Architecture Decision Records` tables. All three sections are optional — absent is not a gap. Multi-part sections need multiple ranged reads; never stop at a partial read.
 3. **Claim the ledger** — read `/track-ledger`'s ledger if it exists and confirm it belongs to this session; otherwise start fresh. An inherited `opened` line suppresses a guardrail re-scan for the rest of the session.
-4. **Seed the surface** — extract the touched surface from the initial request and run *Scan and match* once; its normal trigger — a user answer — doesn't exist yet.
+4. **Seed the surface** — extract the touched surface from the initial request — terms **and** any concrete file/folder paths it names — and run *Scan and match* once; its normal trigger — a user answer — doesn't exist yet.
 5. **Interview.**
 
 ## Interview
@@ -57,13 +57,13 @@ Every probe stays live for the whole session: re-check its trigger after each us
 
 **Test coverage** — runs on every change. Check the `Crosscutting Concepts` index for a testing/verification Concept. Match → cross-reference it against existing tests and test conventions via `/delegate-explore`, propose add/update/delete. No match → use the code alone. "This adds a repository against the database — your testing Concept mandates an integration-test category. Which category covers persistence round-trips and queries?"
 
-**Scan and match** — on each triggering turn (user answer / new fact), run `/track-ledger`' **Append surface term** with any new surface terms.
-* **No new term** — reason over the in-context index copy; no scan, no write.
-* **New term(s)** — run `/index-docs`' **Scan and match** passing only those terms, against the not-yet-`opened` rows only.
+**Scan and match** — on each triggering turn (user answer / new fact), run `/track-ledger`' **Append surface term** with any new surface terms **and any concrete file/folder paths** newly surfaced — by the user, by *Code cross-reference*, or by a `/delegate-explore` result. Paths go in verbatim and repo-relative; they are what lets a record's `applies_to` globs participate in the verdict.
+* **Nothing new** — reason over the in-context index copy; no scan, no write.
+* **New term(s) or path(s)** — run `/index-docs`' **Scan and match** passing only those, against the not-yet-`opened` rows only.
 
-This verdict is **monotonic** — once a row matches it stays matched as the surface only grows; never re-check an already-`opened` row here.
+This verdict is **monotonic** — once a row matches it stays matched as the surface only grows; never re-check an already-`opened` row here. A match earned from `applies_to` rather than a trigger clause is a signal the row's Trigger condition cell has a gap — carry it to the closing sweep's *Trigger-condition refinement*.
 
-**Open and extract** — open a linked full record only on a matching verdict; indexing alone never implies relevance. Log every record you open or skip via `/track-ledger`' **Log opened record**, and check the ledger before discussing any module, boundary, or service — listed means its full record is already loaded, don't re-open or re-scan for it. A section absent from an opened record means "not documented", never "not applicable". Extract **mandates** (required concepts, patterns, boundaries), **prohibitions** (explicitly rejected approaches and considered options), **open space** (unconstrained choices) — and frame every question, scenario, and alternative against them.
+**Open and extract** — open a linked record's **body** only on a matching verdict; indexing alone never implies relevance. Log every record you open or skip via `/track-ledger`' **Log opened record**, and check the ledger before discussing any module, boundary, or service — listed means its full record is already loaded, don't re-open or re-scan for it. A section absent from an opened record means "not documented", never "not applicable". Extract **mandates** (required concepts, patterns, boundaries), **prohibitions** (explicitly rejected approaches and considered options), **open space** (unconstrained choices) — and frame every question, scenario, and alternative against them.
 
 **Classify conflicts** — over the full text of already-`opened` records in context; no tool call; re-runs every triggering turn because it is **non-monotonic**: a later answer can retroactively put an earlier design in conflict with a Concept or ADR that matched turns ago.
 * **Violation** — breaks a Concept or repeats an ADR's rejected alternative. Never present as equally valid — cite the Concept/ADR number, surface the conflict.
@@ -90,4 +90,4 @@ Three parts, each with its own trigger.
 
 A recorded Decision is not vetoable — the user approved it before it was written. An offer never made inline is a miss, not an agenda item — the sweep may re-raise a *deferred* offer, never introduce a new one.
 
-**3. Trigger-condition refinement.** Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
+**3. Trigger-condition refinement.** Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
