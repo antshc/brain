@@ -90,7 +90,7 @@ Every ticket is either HITL — human in the loop, worked with a human who speak
 
 - **Research** (AFK): Reading documentation, third-party APIs, or local resources like knowledge bases to surface a fact a decision waits on. Resolved by `/research`. Use when knowledge outside the current working directory is required.
 - **Prototype** (HITL): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to via `/prototype`. Links the prototype as an asset. Use when "does this call/logic behave as expected" is the key question.
-- **Grilling** (HITL): Conversation. The default case. Always invoke `/grill-design`.
+- **Grilling** (HITL): Conversation. The default case. Always invoke `/grill-design`. Resolving one may surface decisions narrower than the question itself — child-scoped to it rather than independent frontier items; ticket those as sub-tickets of the grilling ticket (see Tracker operations) via GitHub's native sub-issue relationship, not a fresh body-text field.
 - **Task** (HITL or AFK): Manual work that must happen before a decision can be made — nothing to decide, prototype, or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that does rather than decides — and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
 
 ## Fog of war
@@ -120,10 +120,11 @@ Use these instead of raw `gh` calls; each name below is a `/manage-backlog` acti
 
 - **Create the map**: **Find or create milestone** with `{{milestoneTitle}}` = the destination's short name, then **Create ticket** with that milestone, label `wayfinder:map`, and the map body template above.
 - **Create a ticket**: **Create ticket** with the map's milestone, label `wayfinder:<type>`, body = Question + Blocked by + Part of.
+- **Create a sub-ticket**: **Create sub-ticket** with `parentIssueNumber` = the ticket it's narrower than, same milestone as the map, label `wayfinder:<type>`, body = Question + Blocked by + Part of. Use when a resolution surfaces a decision that's child-scoped to the ticket just worked, not a fresh frontier item.
 - **Claim a ticket**: **Assign ticket**.
-- **Find the frontier**: **List tickets** with `{{state}}=open` scoped to the map's milestone, once per `wayfinder:<type>` label; drop any ticket that's assigned, or whose `Blocked by` section names a still-open ticket.
+- **Find the frontier**: **List tickets** with `{{state}}=open` scoped to the map's milestone, once per `wayfinder:<type>` label; drop any ticket that's assigned, or whose `Blocked by` section names a still-open ticket. Sub-tickets share the milestone, so this already surfaces them — no separate query needed.
 - **Resolve a ticket**: **Comment on ticket** with the answer, then **Close ticket**.
-- **Read the map / a ticket**: **Read ticket**.
+- **Read the map / a ticket**: **Read ticket**. **Read a ticket's sub-tickets**: **List sub-tickets**.
 
 **Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, or `wayfinder:task` missing): run `/manage-backlog` **Setup labels**, then retry.
 
@@ -150,6 +151,6 @@ User invokes with a map (URL or number). A ticket is optional — without one, y
 2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. Claim it (**Claim a ticket** above) before any work.
 3. Resolve it — zoom as needed: fetch the full body of any related or closed ticket on demand; invoke the skill the ticket's type names: `/research`, `/prototype`, or `/grill-design`. If in doubt, use `/grill-design`.
 4. Record the resolution (**Resolve a ticket** above); append a context pointer to the map's Decisions-so-far.
-5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from Not yet specified so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, rule it out of scope rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
+5. Add newly-surfaced tickets. For each: if it's child-scoped to the ticket just resolved — narrower than that question, not a fresh frontier item — create it as a sub-ticket (**Create a sub-ticket** above, `parentIssueNumber` = the ticket just resolved); otherwise create it as an independent ticket (**Create a ticket** above). Either way, graduate any fog the answer has made specifiable, clearing each graduated patch from Not yet specified so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, rule it out of scope rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.

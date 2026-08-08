@@ -87,6 +87,29 @@ Use a heredoc for a multi-line `{{body}}`.
 
 **Returns:** the new ticket's number.
 
+## Create sub-ticket
+
+Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}`, `{{parentIssueNumber}}` from context. Creates a ticket and links it to `{{parentIssueNumber}}` via GitHub's native sub-issue relationship, so it shows as a child on the parent issue — use this instead of **Create ticket** whenever the new ticket belongs under another ticket rather than standing alone on the milestone.
+
+1. Create the ticket, same as **Create ticket**:
+   ```bash
+   gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "{{label}}" --title "{{title}}" --body "{{body}}"
+   ```
+   Set `{{childIssueNumber}}` to the number in the returned URL.
+
+2. Resolve the internal `id` the sub-issues API needs for each side — distinct from the issue `number`:
+   ```bash
+   gh api repos/$REPO/issues/{{parentIssueNumber}} --jq .id
+   gh api repos/$REPO/issues/{{childIssueNumber}} --jq .id
+   ```
+
+3. Link the child as a sub-issue of the parent, using `-F` (typed) so `sub_issue_id` is sent as a number, not a string:
+   ```bash
+   gh api repos/$REPO/issues/{{parentIssueNumber}}/sub_issues --method POST -F sub_issue_id={{childIssueId}}
+   ```
+
+**Returns:** the new ticket's number.
+
 ## Read ticket
 
 Reads `{{issueNumber}}` from context.
@@ -106,6 +129,16 @@ gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number
 ```
 
 **Returns:** an array of tickets, each with number, title, body, labels, comments, and assignees.
+
+## List sub-tickets
+
+Reads `{{issueNumber}}` from context.
+
+```bash
+gh api repos/$REPO/issues/{{issueNumber}}/sub_issues --jq '[.[] | {number, title, state, labels: [.labels[].name]}]'
+```
+
+**Returns:** an array of sub-tickets, each with number, title, state, and labels.
 
 ## Assign ticket
 
