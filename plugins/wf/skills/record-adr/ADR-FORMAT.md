@@ -10,7 +10,7 @@ Files live in `docs/adr/` as `{{nnnn}}-{{slug}}.md`.
 ---
 id: "{{nnnn}}"
 title: {{decisionTitle}}
-status: Accepted
+status: {{status}}
 trigger: >-
   {{comma-separated trigger clauses}}
 summary: >-
