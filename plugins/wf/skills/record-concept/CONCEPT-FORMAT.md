@@ -10,7 +10,7 @@ Files live in `docs/concepts/` as `{{nnnn}}-{{slug}}.md`.
 ---
 id: "{{nnnn}}"
 title: {{conceptTitle}}
-status: Accepted
+status: {{status}}
 trigger: >-
   {{comma-separated trigger clauses}}
 summary: >-
