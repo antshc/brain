@@ -39,7 +39,7 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 | Decision | user | ledger + document | same turn it's approved |
 | Rejected option | user | ledger only | never |
 
-Log every state and every change of state via `/track-ledger`' **Log decision**, the turn it happens. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input, and an unlogged miss is a lost repair. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
+Log every state and every change of state via `/track-ledger`' **Log decision**, the turn it happens. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input, and an unlogged miss is a lost repair. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question MUST get a gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line and never replaces it: a feature-scoped decision that no record `owns` is *both* a Feature Decision *and* a `gate miss: single-authoritative-source, nearest source: none` (a new-record candidate), so log both lines. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
 
 ## Context economy
 
@@ -94,7 +94,11 @@ Four parts, each with its own trigger.
 
 A recorded Decision is not vetoable — the user approved it before it was written. An offer never made inline is a miss, not an agenda item — the sweep may re-raise a *deferred* offer, never introduce a new one.
 
-**3. Assumption-gap harvest.** Runs after part 2, so it sees its outcomes. Every question asked, wrong default, and drifted key marks a gap in the source behind it — close it now, or the next session asks the same question. Repair the record behind each of the ledger's three gap forms:
+**3. Assumption-gap harvest.** Never skipped, and never reported "no gaps" without the reconciliation below — it runs after part 2, so it sees its outcomes. Every question asked, wrong default, and drifted key marks a gap in the source behind it — close it now, or the next session asks the same question.
+
+**Reconciliation first (the anti-skip guard).** Before repairing anything, enumerate *every* user-answered question logged this session and map each to exactly one of: (a) a checklist-cleared Feature Assumption you never asked — no gap; (b) a question an existing record's `default`/`owns` answered directly — cite `path#key`, no gap; (c) a logged gate-miss line. Any question that lands in none of the three is an **unlogged miss** (the ask-time gate-miss line was dropped) — reconstruct its gate-miss line now, then repair it like the rest. An empty gap-form list is a valid outcome only *after* this enumeration confirms every question is an (a) or (b); reaching "no repairs" without enumerating the questions is itself the skip this step exists to prevent.
+
+Then repair the record behind each of the ledger's three gap forms:
 * **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → new-record candidate.
 * **Veto** (`vetoed, evidence was:`) — a `default`/`owns` produced an assumption you struck; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
 * **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
