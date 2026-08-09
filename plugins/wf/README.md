@@ -16,6 +16,8 @@ flowchart TD
     S -->|unknowns remain| W
     S -->|no unknowns left| SPEC[(Spec)]
 
+    SPEC -->|direct| TICKETS
+
     SPEC --> CAP[to-capabilities<br/>split spec into capabilities]
     CAP -->|requirements| DESIGN[(Feature design doc)]
     SPEC --> ADR[record-adr<br/>capture architectural decisions from the spec]
