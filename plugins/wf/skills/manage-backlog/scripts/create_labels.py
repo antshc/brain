@@ -15,25 +15,24 @@ LABELS: list[tuple[str, str, str]] = [
 ]
 
 
-def resolve_repo() -> str:
+def run_gh(args: list[str]) -> str:
     result = subprocess.run(
-        ["gh", "repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"],
+        ["gh", *args],
         capture_output=True,
         text=True,
-        check=True,
     )
-    return result.stdout.strip()
+    if result.returncode != 0:
+        raise RuntimeError(f"gh {' '.join(args)} failed: {result.stderr.strip()}")
+    return result.stdout
+
+
+def resolve_repo() -> str:
+    return run_gh(["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"]).strip()
 
 
 def label_exists(repo: str, name: str) -> bool:
-    result = subprocess.run(
-        ["gh", "label", "list", "--repo", repo, "--json", "name", "-q", ".[].name"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    existing_names = result.stdout.splitlines()
-    return name in existing_names
+    output = run_gh(["label", "list", "--repo", repo, "--json", "name", "-q", ".[].name"])
+    return name in output.splitlines()
 
 
 def create_label_if_missing(repo: str, name: str, color: str, description: str) -> None:
@@ -41,22 +40,23 @@ def create_label_if_missing(repo: str, name: str, color: str, description: str) 
         print(f"exists:  {name}")
         return
 
-    subprocess.run(
-        [
-            "gh", "label", "create", name,
-            "--repo", repo,
-            "--color", color,
-            "--description", description,
-        ],
-        check=True,
-    )
+    run_gh([
+        "label", "create", name,
+        "--repo", repo,
+        "--color", color,
+        "--description", description,
+    ])
     print(f"created: {name}")
 
 
 def main() -> int:
-    repo = resolve_repo()
-    for name, color, description in LABELS:
-        create_label_if_missing(repo, name, color, description)
+    try:
+        repo = resolve_repo()
+        for name, color, description in LABELS:
+            create_label_if_missing(repo, name, color, description)
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     return 0
 
 
