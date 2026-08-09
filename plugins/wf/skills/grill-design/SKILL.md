@@ -1,6 +1,6 @@
 ---
 name: grill-design
-description: A relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, decisions, and assumptions the moment they crystallise. Use when the user wants to stress-test a plan or design, get grilled, pin down domain terminology, record an architectural decision or assumption, or uses any 'grill design' trigger phrases.
+description: A relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, decisions, and assumptions the moment they crystallise. Use when the user wants to stress-test a plan or design, get grilled, pin down domain terminology, record an architectural decision or assumption, or uses any 'grill', 'grilling' trigger phrases.
 ---
 
 # Grill Design
