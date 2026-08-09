@@ -33,7 +33,7 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 
 | State | Resolved by | Home | Durable write |
 |---|---|---|---|
-| Feature Assumption | model, via the checklist | ledger only | only after the veto sweep clears it — it is then a Decision |
+| Feature Assumption | model, via the checklist | ledger only | only after the veto sweep clears it — it is then a Decision. Never a *new* ADR/Concept: the record whose `owns`/`default` cleared the checklist already covers it |
 | Feature Decision | user, feature-scoped (fails the ADR/Concept gate, resolves no term) | ledger only | never |
 | Offered record | you, pending the user's reply to a specific offer | ledger only | on the user's yes, same turn |
 | Decision | user | ledger + document | same turn it's approved |
@@ -84,7 +84,7 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 ## Closing sweep
 
-Four parts, each with its own trigger.
+Four parts, each with its own trigger. The sweep **repairs** existing records; it never authors a design record — those are written inline the turn they crystallise, and a candidate that never got its inline offer is a miss, not sweep work.
 
 **1. Per-row disposition.** If the session opened at least one full Concept/ADR record, emit one verdict per row in the `Crosscutting Concepts` and `Architecture Decision Records` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so no row is silently omitted. Skip for trivial sessions that only touched glossary terms.
 
@@ -99,10 +99,10 @@ A recorded Decision is not vetoable — the user approved it before it was writt
 **Reconciliation first (the anti-skip guard).** Before repairing anything, enumerate *every* user-answered question logged this session and map each to exactly one of: (a) a checklist-cleared Feature Assumption you never asked — no gap; (b) a question an existing record's `default`/`owns` answered directly — cite `path#key`, no gap; (c) a logged gate-miss line. Any question that lands in none of the three is an **unlogged miss** (the ask-time gate-miss line was dropped) — reconstruct its gate-miss line now, then repair it like the rest. An empty gap-form list is a valid outcome only *after* this enumeration confirms every question is an (a) or (b); reaching "no repairs" without enumerating the questions is itself the skip this step exists to prevent.
 
 Then repair the record behind each of the ledger's three gap forms:
-* **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → new-record candidate.
+* **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → log it via `/track-ledger`' **Log decision** as a next-session candidate and stop — authoring it here is the first-time offer *Offer a record* forbids.
 * **Veto** (`vetoed, evidence was:`) — a `default`/`owns` produced an assumption you struck; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
 * **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
 
-Write the fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. Everything else — a new record, or a key change no answer covers — goes through *Offer a record*'s one-open-offer rule. Apply each write via `/record-concept` or `/record-adr`, resync the row via `/index-docs`' **Sync index row**, and mark the ledger line resolved.
+Write the fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. Everything else — a key change no answer covers — goes through *Offer a record*'s one-open-offer rule, which here may only re-raise an offer deferred inline. Apply each write via `/record-concept` or `/record-adr`, resync the row via `/index-docs`' **Sync index row**, and mark the ledger line resolved.
 
-**4. Trigger-condition refinement.** Runs last, so it also covers any row part 3 just created or resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
+**4. Trigger-condition refinement.** Runs last, so it also covers any row part 3 just resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
