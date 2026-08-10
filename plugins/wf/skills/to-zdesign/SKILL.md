@@ -2,7 +2,6 @@
 name: to-zdesign
 description: Synthesize Wayfinder decisions and one or more specs into an authoritative feature design, or merge stronger evidence into an existing design without losing resolved content.
 argument-hint: "{{sourceReference}} [{{sourceReference}} ...]"
-disable-model-invocation: true
 ---
 
 # To ZDesign
