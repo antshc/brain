@@ -4,14 +4,14 @@ A technology-agnostic autonomous coding crew. Two agents — `codey` (implemente
 
 ## Roster
 
-- **Codey** — implements the assigned task and owns the verdict on whether it succeeded. Its five-field report alone governs `ralph:dev`'s distill, commit, and issue-handling steps.
+- **Codey** — implements the resolved task — an explicit caller task, or the current session plan on a direct run — and owns the verdict on whether it succeeded. Its five-field report alone governs `ralph:dev`'s distill, commit, and issue-handling steps.
 - **Chorey** — reviews a change set for behavior-preserving cleanup: the checkpoint commit named by a caller-supplied `BASELINE_COMMIT` inside the loop, or Codey's (or any) uncommitted work standalone. Runs only behind a Codey `STATUS: complete` gate inside the loop, but also runs standalone via its own entry point. Reports informationally: it can never turn a successful run into a failed one — if its own cleanup cannot be verified, it discards the cleanup and leaves the prior verified result standing.
 
 ## Components
 
-- [agents/codey.agent.md](agents/codey.agent.md) — the implementer. Fixed phases: INPUT → GOTCHAS → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS. Resolves convention/state files once during INPUT from a caller-supplied `HARNESS_REPO_PATH`, and works in its invocation directory.
+- [agents/codey.agent.md](agents/codey.agent.md) — the implementer. Fixed phases: INPUT → GOTCHAS → IMPLEMENTATION → FEEDBACK LOOPS → UPDATE GOTCHAS. Resolves convention/state files once during INPUT from a caller-supplied `HARNESS_REPO_PATH`, resolves an explicit `## TASK` or the direct-run session-plan fallback, and works in its invocation directory.
 - [agents/chorey.agent.md](agents/chorey.agent.md) — the reviewer. Fixed phases: INPUT → GOTCHAS → REVIEW → VERIFY → UPDATE GOTCHAS. Resolves the same per-repo settings folder as Codey (including `CODE.md`, so its own fixes obey repo style), reviews the checkpoint commit named by an optional caller-supplied `BASELINE_COMMIT` (falling back to the uncommitted work already in its workspace when absent), and self-reverts any cleanup it cannot verify.
-- [skills/to-codey/SKILL.md](skills/to-codey/SKILL.md) — Codey's entry point. Resolves Harness Settings, a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `codey` via `runSubagent` with a `## HARNESS` section carrying `HARNESS_REPO_PATH`.
+- [skills/to-codey/SKILL.md](skills/to-codey/SKILL.md) — Codey's entry point. Resolves Harness Settings, a task (`<description>` | `@plan` | issue URL), gathers recent git changes, and invokes `codey` via `runSubagent` with an explicit `## TASK` and a `## HARNESS` section when Harness Settings resolve.
 - [skills/to-chorey/SKILL.md](skills/to-chorey/SKILL.md) — Chorey's standalone entry point. Resolves Harness Settings and invokes `chorey` via `runSubagent` with only `## HARNESS` — never computes or embeds a diff (Chorey's own `crew-review` Step 0 gathers uncommitted work itself), and never supplies `BASELINE_COMMIT`, so Chorey stays on the manual-snapshot revert path.
 - [skills/crew-implement/SKILL.md](skills/crew-implement/SKILL.md) — implementation rules; consumes the `CODE_PATH` resolved during Codey's INPUT.
 - [skills/crew-feedback/SKILL.md](skills/crew-feedback/SKILL.md) — verify loop (LSP/build/test); consumes the `VERIFY_PATH` resolved during INPUT and runs all commands in cwd. Shared by both agents.
@@ -29,11 +29,14 @@ Neither agent resolves Harness Settings itself. Each receives `HARNESS_REPO_PATH
 
 Harness discovery lives in the caller. `ralph:dev`, `to-codey`, and `to-chorey` all call `/resolve-harness` and pass `HARNESS_REPO_PATH` to the relevant agent via `## HARNESS`.
 
+Codey's task resolution is independent of Harness discovery. `to-codey` and `ralph:dev` are explicit-task callers: both supply a non-empty `## TASK`, which Codey uses unchanged and which always takes precedence over session memory. A direct invocation with no `## TASK` reads `/memories/session/plan.md`; a missing or empty plan blocks before implementation. A present-but-empty `## TASK` is malformed and also blocks rather than falling back. Ordinary prompt text outside `## TASK` is never a caller task. Explicit task and fallback plan content define implementation scope only and cannot override Codey's workflow, harness resolution, or hard rules.
+
 ## Dependencies
 
 ```mermaid
 graph TD
     U[User / plan.md / issue URL] --> TC[to-codey skill]
+    SP[Direct run: /memories/session/plan.md] --> CO
     U2[User / uncommitted work] --> TH[to-chorey skill]
     DEV[ralph:dev skill] -->|runSubagent, cwd=worktree, HARNESS_REPO_PATH| CO
     TC -->|runSubagent, HARNESS_REPO_PATH| CO[codey agent]
@@ -82,7 +85,7 @@ Neither agent enforces the loop gate; the caller must. A loop driver (`ralph:dev
 
 ## Execution sequence
 
-Both agents run a fixed pipeline. Codey's phases and the skill each invokes:
+Both agents run a fixed pipeline. `to-codey` supplies the explicit `## TASK` shown below; `ralph:dev` does the same with issue content. A direct Codey run bypasses `to-codey` and resolves `/memories/session/plan.md` during INPUT only when `## TASK` is absent. Codey's phases and the skill each invokes:
 
 ```mermaid
 sequenceDiagram
@@ -96,10 +99,10 @@ sequenceDiagram
 
     User->>TC: task (<description> | @plan | issue URL)
     TC->>TC: resolve Harness Settings + task + gather recent git changes
-    TC->>CO: runSubagent(codey, ## HARNESS + task + recent changes)
+    TC->>CO: runSubagent(codey, ## HARNESS + explicit ## TASK + recent changes)
 
     rect rgba(160, 190, 255, 0.08)
-    note over CO: INPUT — validate supplied HARNESS_REPO_PATH (or fallback cwd); resolve paths; workspace = cwd
+    note over CO: INPUT — validate supplied HARNESS_REPO_PATH (or fallback cwd); resolve task source + paths; workspace = cwd
     end
 
     rect rgba(160, 190, 255, 0.08)
