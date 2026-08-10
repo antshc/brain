@@ -101,9 +101,13 @@ sequenceDiagram
 
 ## Decisions
 
-<!-- List the implementation decisions that shape the proposed solution. Include Considered Options only when rejected alternatives are worth recording. -->
+<!-- {{decisionTitle}} names the overall design choice. {{decisionDescription}} gives its context and rationale. Each {{decisionName}} names one supporting implementation decision in the bullet list. -->
 
-- **{{decision name}}** - {{description}}. **Considered Options** : {{optional alternatives and why they were not selected}}
+### {{decisionTitle}}
+
+{{decisionDescription}}
+
+- **{{decisionName}}:** {{decision and rationale}}
 
 # Testing Guidelines
 
