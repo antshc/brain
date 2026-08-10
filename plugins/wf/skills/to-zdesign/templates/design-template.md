@@ -99,6 +99,12 @@ sequenceDiagram
     Boundary-->>User: Response
 ```
 
+## Decisions
+
+<!-- List the implementation decisions that shape the proposed solution. Include Considered Options only when rejected alternatives are worth recording. -->
+
+- **{{decision name}}** - {{description}}. **Considered Options** : {{optional alternatives and why they were not selected}}
+
 # Testing Guidelines
 
 ## Testing by Dev
