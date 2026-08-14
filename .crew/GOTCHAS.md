@@ -18,3 +18,4 @@
 - When changed files are untracked, `git diff HEAD` and `git diff --check` omit them — use `git diff --no-index /dev/null <file>` to review them without staging user work.
 - Direct Codey invocations must place the implementation request under a trusted `## TASK` heading — shorthand such as `implement` cannot inherit a task from conversation or session memory and is blocked before implementation.
 - Skills with `context: fork` produce editor errors when `github.copilot.chat.skillTool.enabled` is disabled — omit `context` unless the plugin explicitly requires and enables that tool.
+- When `apply_patch` reports a successful file deletion, verify the path is absent immediately — if repeated `Delete File` patches leave it intact, remove only that exact file and its empty directory with scoped filesystem commands.

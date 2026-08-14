@@ -5,7 +5,7 @@ description: A relentless interview and domain-modeling probe set that sharpens 
 
 # Grill Design
 
-Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-adr`, `/record-concept`, `/record-service`; codebase lookups → `/delegate-explore`. Call them; never restate their rules.
+Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-adr`, `/record-concept`, `/record-service`; codebase lookups → `/explore-codebase`. Call them; never restate their rules.
 
 ## Session start
 
@@ -43,7 +43,7 @@ Log every state and every change of state via `/track-ledger`' **Log decision**,
 
 ## Context economy
 
-- Broad-sweep code and test lookups → run `/delegate-explore`; direct reads only to quote an exact line.
+- Broad-sweep code and test lookups → Run `/explore-codebase` skill; direct reads only to quote an exact line.
 - Re-fetch a durable artifact when you first need it, or when you need it and can't quote it verbatim from context — never on a schedule, never "just in case", never right after your own write.
 - Authority order: `CONTEXT.md`/`ARCHITECTURE.md`/ADR/Concept > code > external sources. A conflict against a higher-ranked source is asked, never assumed.
 
@@ -59,9 +59,9 @@ Every probe stays live for the whole session: re-check its trigger after each us
 
 **Concrete scenarios** — when a domain relationship, boundary, or invariant is stated as fact — not just discussed in the abstract — invent edge-case scenarios that force precision about the boundaries between concepts.
 
-**Test coverage** — runs on every change. Check the `Crosscutting Concepts` index for a testing/verification Concept. Match → cross-reference it against existing tests and test conventions via `/delegate-explore`, propose add/update/delete. No match → use the code alone. "This adds a repository against the database — your testing Concept mandates an integration-test category. Which category covers persistence round-trips and queries?"
+**Test coverage** — runs on every change. Check the `Crosscutting Concepts` index for a testing/verification Concept. Match → Run `/explore-codebase` skill to cross-reference it against existing tests and test conventions, then propose add/update/delete. No match → use the code alone. "This adds a repository against the database — your testing Concept mandates an integration-test category. Which category covers persistence round-trips and queries?"
 
-**Scan and match** — on each triggering turn (user answer / new fact), run `/track-ledger`' **Append surface term** with any new surface terms **and any concrete file/folder paths** newly surfaced — by the user, by *Code cross-reference*, or by a `/delegate-explore` result. Paths go in verbatim and repo-relative; they are what lets a record's `applies_to` globs participate in the verdict.
+**Scan and match** — on each triggering turn (user answer / new fact), run `/track-ledger`' **Append surface term** with any new surface terms **and any concrete file/folder paths** newly surfaced — by the user, by *Code cross-reference*, or by an `/explore-codebase` result. Paths go in verbatim and repo-relative; they are what lets a record's `applies_to` globs participate in the verdict.
 * **Nothing new** — reason over the in-context index copy; no scan, no write.
 * **New term(s) or path(s)** — run `/index-docs`' **Scan and match** passing only those, against the not-yet-`opened` rows only.
 
