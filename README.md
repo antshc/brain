@@ -59,10 +59,12 @@ copilot plugin install atlm@brain
 copilot plugin install atl@brain
 ```
 
-## Install az cli plugins
+## Install Azure platform plugin
 ```sh
 (copilot plugin uninstall az@brain >/dev/null 2>&1 || true) && \
-copilot plugin install az@brain
+(copilot plugin uninstall learn-ms@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true) && \
+copilot plugin install azure-platform@brain
 ```
 
 ## Install brain skills

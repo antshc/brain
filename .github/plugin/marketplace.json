@@ -35,19 +35,14 @@
             "description": "Atlassian MCP workflow skills."
         },
         {
-            "name": "az",
-            "source": "./plugins/az",
-            "description": "Azure CLI workflow skills."
-        },
-        {
             "name": "crew",
             "source": "./plugins/crew",
             "description": "Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions."
         },
         {
-            "name": "learn-ms",
-            "source": "./plugins/learn-ms",
-            "description": "Microsoft Learn skills for querying official Microsoft documentation and code references."
+            "name": "azure-platform",
+            "source": "./plugins/azure-platform",
+            "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills."
         },
         {
             "name": "learn-aws",
