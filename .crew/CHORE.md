@@ -1,6 +1,6 @@
 # CHORE
 
-Chorey's REVIEW step: after VERIFY passes, review all changed skills, agents, and templates together as one unit for behavior-preserving refactors.
+Review all changed skills, agents, and templates together as one unit for behavior-preserving refactors.
 
 ## Rules
 
