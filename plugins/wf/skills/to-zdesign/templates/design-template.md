@@ -62,9 +62,9 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 - {{actor}} {{usesCapability}} when {{circumstance}}.
 
-## Component / Architecture / System Diagram
+## Solution Diagram
 
-<!-- Illustrate the solution's parts. Boxes may represent entities, code areas, components, or other architectural elements. Mention IDesign components when applicable. This diagram is mandatory when the solution involves multiple components and teams across the organization. Exactly one solution-level component diagram is required. Replace the sample labels and edges. -->
+<!-- Illustrate the solution at the granularity its scope requires: component, architecture, system, or a combined view. Boxes may represent entities, code areas, components, services, systems, or other architectural elements. Do not include every granularity unless it clarifies the feature. Mention IDesign components when applicable. Exactly one solution-level flowchart is required. Replace the sample labels and edges. -->
 
 ```mermaid
 flowchart LR
