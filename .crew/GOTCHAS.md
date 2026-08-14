@@ -16,3 +16,5 @@
 - When a task requires an "identical stdout contract" with a bash script being replaced, verify exact spacing byte-for-byte with `cat -A` (or equivalent) rather than eyeballing — e.g. `create-labels.sh`'s `echo "exists:  $name"` has two spaces vs. `echo "created: $name"`'s one.
 - When a Markdown output template contains fenced code examples, wrap the template in a longer fence than its examples and verify both opening/closing counts after patching — a broad fence replacement can close the outer template at the first inner example.
 - When changed files are untracked, `git diff HEAD` and `git diff --check` omit them — use `git diff --no-index /dev/null <file>` to review them without staging user work.
+- Direct Codey invocations must place the implementation request under a trusted `## TASK` heading — shorthand such as `implement` cannot inherit a task from conversation or session memory and is blocked before implementation.
+- Skills with `context: fork` produce editor errors when `github.copilot.chat.skillTool.enabled` is disabled — omit `context` unless the plugin explicitly requires and enables that tool.

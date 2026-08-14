@@ -2,6 +2,6 @@
   "microsoft-learn": {
     "type": "http",
     "url": "https://learn.microsoft.com/api/mcp",
-      "disabled": true
+    "disabled": true
   }
 }

@@ -81,4 +81,4 @@ source ~/.profile
 ```
 
 **Step 7 — Authorize**
-Invoke `/az:auth-principal`.
+Run `/azure-platform:auth-principal` skill.
