@@ -1,18 +1,10 @@
 ---
-name: azure-cli
+name: query-azure
 description: Discover, inspect, create, update, and delete real Azure resources with Azure CLI. Use whenever the user asks to list, show, provision, change, or remove Azure resources with `az`, even if they do not explicitly ask for this skill.
 compatibility: Requires Azure CLI (`az`) to be installed and authenticated with access to the target Azure subscription.
 ---
 
 # Azure CLI Operations
-
-## Prerequisites
-
-1. Run `az --version`. If Azure CLI is missing, run `/azure-platform:setup-cli` skill.
-2. Run `az account show --query '{subscriptionId:id,subscriptionName:name,tenantId:tenantId,user:user.name}' --output json`. If authentication is missing or expired, run `/azure-platform:auth-principal` skill.
-3. Use the active subscription unless the user names another subscription. If the requested and active subscriptions differ, resolve the intended subscription before executing commands.
-
-Never print, echo, log, or include credential values in commands shown to the user.
 
 ## Resource Operations
 
