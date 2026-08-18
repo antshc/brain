@@ -5,7 +5,14 @@ description: Delegate read-only codebase questions to a general-purpose subagent
 
 # Explore Codebase
 
-Delegate every lookup through `runSubagent`; omit `agentName` so the general-purpose subagent inherits execution, skill, search, LSP, and read tools. The caller supplies the question and `quick | medium | thorough`. The call blocks until one verdict returns.
+Delegate every lookup through `runSubagent`; omit `agentName` so the general-purpose subagent inherits execution, skill, search, LSP, and read tools. The caller supplies the question and `quick | medium | thorough`.
+
+## Choose delegation shape
+
+- Use one subagent for a focused question with one likely evidence path.
+- Spawn multiple independent subagents in parallel when the question has distinct, non-overlapping exploration tracks, such as separate services, symbol and configuration evidence, or architecture and test coverage. Give each agent a bounded subquestion and the same read-only contract.
+- Do not split a question when one agent must discover the answer before another can proceed; make that dependency sequential.
+- Consolidate all agent results into one concise verdict, resolve conflicts with targeted evidence, and state any remaining uncertainty.
 
 ## Read-only contract
 
