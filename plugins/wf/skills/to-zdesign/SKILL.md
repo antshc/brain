@@ -1,81 +1,135 @@
 ---
 name: to-zdesign
-description: Synthesize Wayfinder decisions and one or more specs into an authoritative feature design, or merge stronger evidence into an existing design without losing resolved content.
-argument-hint: "{{sourceReference}} [{{sourceReference}} ...]"
+description: Create or incrementally extend an authoritative feature design from spec files, confirmed grill-design conversation context, Wayfinder maps or decision issues, and existing designs. Use for first-pass design synthesis, adding later specs, capturing a completed design conversation, or merging resolved GitHub decisions without losing existing content.
 ---
 
 # To ZDesign
 
-Create or update `docs/designs/{{featureSlug}}.md` from one or more source references. Do not interview the user during generation; produce a coherent draft and put unresolved decisions in `Open Questions`.
+Create or update one `docs/designs/{{featureSlug}}.md`. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
 
-Copy this checklist and check off items as you complete them:
+## 1. Resolve inputs
 
-```markdown
-To ZDesign Progress:
-- [ ] 1. Resolve sources and identity
-- [ ] 2. Ground the design
-- [ ] 3. Reconcile capabilities
-- [ ] 4. Synthesize the solution
-- [ ] 5. Merge and write
-- [ ] 6. Run the completeness sweep
-```
+Accept these forms:
 
-## 1. Resolve sources and identity
+- `/to-zdesign {{sources}}`
+- `/to-zdesign {{sources}} into {{designPath}}`
+- `/to-zdesign` after a completed `/grill-design` session
+- `/to-zdesign {{wayfinderIssue}}`
 
-Require at least one source reference. A source may be a Wayfinder map or decision ticket, a spec ticket, or a repository file. For ticket references, Run `/manage-backlog`'s skill **Read ticket**, then read every linked resolution needed to understand the feature; read repository files directly.
+Normalize every source:
 
-Infer `featureName` from the sources' shared destination or title and derive one stable kebab-case `featureSlug`. Conflicting identities go to `Open Questions`; choose the narrowest title supported by every source rather than asking the user.
-
-## 2. Ground the design
-
-Read `CONTEXT.md`, `ARCHITECTURE.md`, and the code areas named by the sources. Use glossary terms, obey matching Concepts and ADRs, and derive current boundaries, contracts, data ownership, failure behavior, and testing seams from code rather than guessing.
-
-If `docs/designs/{{featureSlug}}.md` exists, read it in full and treat it as an input. Authority, strongest first: explicit decisions in the current request; resolved Wayfinder decisions; resolved content in the existing design; specs. A stronger source may update weaker content. Otherwise preserve existing human-authored and resolved content.
-
-## 3. Reconcile capabilities
-
-Draft `Requirements` as the numbered table in [design-template.md](templates/design-template.md): each top-level row is one capability and its `N.x` rows are functional requirements. The row numbers express document hierarchy, not capability IDs; use `Source` for the PO / Dev team category, not source provenance.
-
-Match a capability by semantic purpose and independent change boundary, never by title alone. Merge requirements when one purpose statement covers both and their actors, rules, permissions, lifecycle, failures, contracts, ownership, and rate of change do not diverge. Otherwise add or split the capability.
-
-Design discoveries may add behavior or clarify an existing requirement. Never silently remove or weaken sourced behavior without an explicit current-request or resolved Wayfinder decision. Preserve incompatible statements and add the conflict to `Open Questions`.
-
-Keep capability titles and requirements solution-agnostic: name behavior and domain entities, not screens, controls, endpoints, classes, services, or storage. Every functional requirement is externally visible and testable; keep invariants under `Business Rules` and boundary handling under `Edge Cases`.
-
-## 4. Synthesize the solution
-
-Read [design-template.md](templates/design-template.md) and populate every core section. Write `Not applicable — {{reason}}` when a core section does not apply; omit only optional flow, sequence, and implementation appendix sections.
-
-Keep `Solution Overview` at architecture level: components or modules, responsibilities, interfaces, data ownership, cross-boundary flows, failure handling, and testing implications. Always include one solution-level Mermaid `flowchart`; add flow or sequence diagrams only for materially distinct actors or decision paths.
-
-Keep code-level detail in `Detailed Design: Implementation Appendix`. Select appendices from source evidence:
-
-| Appendix | Include when | Template |
+| Source | Canonical identifier | Read |
 | --- | --- | --- |
-| REST API Delta | HTTP methods, paths, headers, query parameters, request or response fields, statuses, validation, or behavior change. | [rest-api-delta-template.md](templates/rest-api-delta-template.md) |
-| GUI Design Delta | User experiences, controls, visible states, permissions, validation, loading, empty, error, or interaction behavior change. | [gui-delta-template.md](templates/gui-delta-template.md) |
-| Database Schema Delta | Persisted fields, types, nullability, defaults, keys, indexes, constraints, or relationships change. | [database-schema-delta-template.md](templates/database-schema-delta-template.md) |
-| Class Diagram | Class responsibilities or relationships are design decisions. | [class-diagram-template.md](templates/class-diagram-template.md) |
+| Repository file | Repo-relative path | File in full |
+| GitHub issue | Canonical issue URL | `/manage-backlog` **Read ticket** |
+| Grill conversation | `{{originatingCanonicalSource}}#grill-design`; else `grill-design:{{featureId}}`; else `grill-design:name:{{inputSlug}}` | Confirmed decisions and cleared assumptions only |
+| Wayfinder map | Canonical map URL | Map, closed linked decision tickets, and their resolution comments |
 
-Read only each applicable template, instantiate it from grounded evidence, and place the complete sections in `implementationAppendices` in table order. Omit an inapplicable appendix entirely. Reuse the delta semantics established by `/to-delta`, but do not run it; this skill owns appendix composition.
+For a repository file, resolve the real path inside the repository. Store its repo-relative path with `/` separators and filesystem casing. Collapse `.` and `..`. Reject paths outside the repository.
 
-## 5. Merge and write
+For a Wayfinder decision ticket, read its linked map. Use the final comment returned by **Read ticket** as the resolution; Wayfinder writes the answer last when closing. If no comment exists, use the map gist as context and add the missing resolution to `Open Questions`. If the final comment conflicts with the map gist, add the conflict to `Open Questions`.
 
-For a new design, instantiate the template at `docs/designs/{{featureSlug}}.md`. For an existing design, merge section by section: preserve untouched prose and diagrams, update only content supported by stronger evidence, union non-conflicting additions, and remove content only when the strongest source explicitly supersedes it.
+For a map, run `/manage-backlog` **List sub-tickets**, then **Read ticket** for every closed child regardless of `wayfinder:*` label. Treat `wayfinder:grilling` and `wayfinder:prototype` resolutions as decisions. Treat `wayfinder:research` findings and `wayfinder:task` completion facts as factual constraints, not product decisions.
 
-Merge each existing implementation appendix under the same authority ordering. Preserve unsupported existing appendix content, update only lines supported by stronger evidence, and add new applicable appendices in the fixed order without regenerating existing appendices wholesale.
+Do not read open child bodies. Add each open child to `Open Questions` as `{{canonicalIssueUrl}} — {{title}}`. On a later run, remove that entry when the issue closes and consume its resolution. Deduplicate by canonical URL. Do not add open children to `Source Material`.
 
-Never regenerate an existing design wholesale. Keep unresolved contradictions visible in `Open Questions` and write the useful remainder of the draft without pausing for answers.
+Exclude unanswered questions, vetoed assumptions, rejected options, and superseded statements from conversation input. If no explicit source and no confirmed conversation outcome exist, stop without writing and request a source.
 
-## 6. Run the completeness sweep
+For a source-less grill conversation, derive `inputSlug` from its explicit feature ID or agreed feature name, in that order. If neither exists, stop without writing and request a target path or feature ID. A name-only grill identifier may create a new design but MUST NOT match an existing design; require an explicit target or feature ID to extend one.
 
-Before completion:
+## 2. Select the design
 
-1. Map every source obligation to one capability, solution element, testing decision, and relevant diagram or appendix.
-2. Verify every core template section is populated or says `Not applicable — {{reason}}`.
-3. Verify exactly one solution-level Mermaid `flowchart` exists and every additional diagram represents a materially distinct flow or decision; an appendix `classDiagram` does not replace the solution-level diagram.
-4. Verify every selected appendix has triggering evidence, every persistence change maps to a Database Schema Delta, and no omitted appendix leaves an empty heading.
-5. Verify every instantiated appendix contains only changed content and has no hidden instruction or unresolved placeholder.
-6. Verify every unresolved conflict appears in `Open Questions` and no sourced behavior was silently weakened or removed.
-7. Compare an updated design with its pre-merge content and restore any unsupported loss.
-8. Fix every uncovered obligation before reporting completion; while `Open Questions` is non-empty, describe the artifact as a draft, never final.
+Select the target in order:
+
+1. Use explicit `into {{designPath}}`.
+2. Use exactly one design path linked by a source. If several are linked, stop.
+3. Use exactly one design with a stable feature match. If several match, stop.
+4. Infer a new `docs/designs/{{featureSlug}}.md` from the shared feature identity.
+
+A stable match requires a shared feature ID, Wayfinder map, canonical source, or explicit backlink. NEVER match by title similarity alone.
+
+For a new target, derive identity in order: explicit feature ID, Wayfinder destination, shared exact source identity, single-source identity. For a file, use its explicit feature ID, then first H1, then basename. For an issue, use its explicit feature ID, then map Destination, then issue title. For a source-less grill, use `inputSlug`. Convert the result to kebab-case. Do not strip or rewrite suffixes heuristically.
+
+Before creating an inferred path, verify it does not exist. If it exists without a stable match, stop without writing and request an explicit path. Never merge because an inferred filename happens to exist.
+
+Read the selected existing design in full. Do not redirect an explicit target.
+
+## 3. Ground and rank evidence
+
+Read `CONTEXT.md`, `ARCHITECTURE.md`, matching Concepts and ADRs, and source-named code. Derive current boundaries, contracts, ownership, failures, and test seams from code.
+
+Treat repository documentation and code as constraints and current-state evidence, not product requirements.
+
+Treat resolved research and task facts the same way. A spec cannot override a factual constraint; add a contradiction to `Open Questions`.
+
+Apply authority in order:
+
+1. Confirmed decisions in the current request or grill conversation.
+2. Resolved Wayfinder decisions.
+3. Resolved content in the existing design.
+4. Specs.
+
+Treat existing content outside `Open Questions` as resolved unless marked draft, tentative, or assumed.
+
+Let stronger evidence update weaker content. Preserve equal-authority conflicts and add them to `Open Questions`. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
+
+## 4. Reconcile capabilities
+
+A capability is stable, solution-agnostic behavior with one purpose. It is not a UI, implementation detail, or one-off task.
+
+Assign every sourced requirement to one capability. Match by purpose and change boundary, not title. Merge only when purpose, actors, rules, permissions, lifecycle, failures, contracts, ownership, and rate of change remain shared. Otherwise split.
+
+Draft `Requirements` from [design-template.md](templates/design-template.md): one row per capability. Put the title, stakeholder requirement, and functional requirements in `Requirement`; put business rules and edge cases in `Details`. Use `Source` only for PO or Dev team.
+
+Name capabilities with behavior and domain entities. Keep functional requirements externally visible and testable. Add design-discovered behavior only when evidence supports it.
+
+## 5. Synthesize the solution
+
+Read [design-template.md](templates/design-template.md). Populate every core section. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
+
+Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications. Include exactly one solution-level Mermaid `flowchart`. Add other diagrams only for distinct flows or decisions.
+
+Select implementation appendices from evidence:
+
+| Appendix | Include for | Template |
+| --- | --- | --- |
+| REST API Delta | HTTP contract or behavior changes | [rest-api-delta-template.md](templates/rest-api-delta-template.md) |
+| GUI Design Delta | User-visible state or interaction changes | [gui-delta-template.md](templates/gui-delta-template.md) |
+| Database Schema Delta | Persistence contract changes | [database-schema-delta-template.md](templates/database-schema-delta-template.md) |
+| Class Diagram | Decided class responsibilities or relationships | [class-diagram-template.md](templates/class-diagram-template.md) |
+
+Read only applicable templates. Insert complete appendices in table order. Include changed content only. Do not run `/to-delta`; this skill owns appendix composition.
+
+## 6. Merge incrementally
+
+For a new design, instantiate the template. For an existing design, merge section by section.
+
+- Preserve untouched prose, diagrams, and appendices.
+- Add non-conflicting obligations once.
+- Update only content supported by stronger evidence.
+- Update matching capability rows instead of duplicating them.
+- NEVER regenerate an existing design wholesale.
+
+Maintain `Source Material`:
+
+- Use the canonical identifier in `Source`.
+- Set `Kind` to `Spec`, `GitHub issue`, `Wayfinder map`, `Wayfinder decision`, `Wayfinder evidence`, or `Grill conversation`.
+- Use `Wayfinder evidence` for research findings and task completion facts.
+- Keep `Contribution` as a cumulative summary of still-valid consumed evidence.
+- Update an existing canonical source row on re-run. Do not duplicate it.
+- Add one row for each consumed Wayfinder map and closed child issue.
+- Merge later grill sessions into the same canonical row. Preserve prior confirmed outcomes unless current equal-or-stronger evidence explicitly supersedes them. Remove superseded text; deduplicate retained text.
+- Do not invent sources for legacy content.
+
+## 7. Verify before writing
+
+1. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
+2. Populate every core section or mark it not applicable.
+3. Keep exactly one solution-level `flowchart`.
+4. Include every evidence-triggered appendix and no empty appendix heading.
+5. Remove template instructions and unresolved placeholders.
+6. Put every unresolved conflict in `Open Questions`.
+7. Compare an update with the pre-merge design. Restore unsupported loss.
+8. Remove duplicate requirements, capabilities, and source rows.
+
+Write the result. Call it a draft while `Open Questions` is non-empty.
