@@ -59,7 +59,7 @@ The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
 - ...
 
 ---
-### Implementation Decisions *(optional, technical — omit unless this capability requires a specific implementation decision)*
+### Implementation Decisions *(technical — omit unless this capability requires a specific implementation decision)*
 - {{implementationDecision1}}
 - ...
 
