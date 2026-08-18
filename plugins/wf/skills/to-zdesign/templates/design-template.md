@@ -23,9 +23,8 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 | **#** | **Requirement** | **Priority** | **Details** | **Source** |
 | --- | --- | --- | --- | --- |
-|   | **{{capabilityTitle|behavior + entity}}**<br>**Stakeholder requirement:** The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.<br>- {{functionalRequirement|behavior when condition}}<br>- {{functionalRequirement|behavior when condition}} | {{priority|MVP / Should have / Nice to have}} | **Risk:** {{risk|Low / Medium / High}}. **Business rules:** {{businessRules|State invariants, or None.}} **Edge cases:** {{edgeCases|State boundary handling, or None.}} | {{requirementSource|PO / Dev team}} |
-|   | **{{nextCapabilityTitle|behavior + entity}}**<br>**Stakeholder requirement:** {{stakeholderRequirement}} | {{priority|MVP / Should have / Nice to have}} | **Risk:** {{risk|Low / Medium / High}}. **Business rules:** {{businessRules|State invariants, or None.}} **Edge cases:** {{edgeCases|State boundary handling, or None.}} | {{requirementSource|PO / Dev team}} |
-
+|  | **{{capabilityTitle\|behavior + entity}}** | {{priority\|MVP / Should have / Nice to have}} | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{businessRules\|State invariants, or None.}}<br>- {{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+|  | **{{nextCapabilityTitle\|behavior + entity}}** | {{priority\|MVP / Should have / Nice to have}} | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{businessRules\|State invariants, or None.}}<br>- {{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
 # Assumptions and Limitations
 
 <!-- List limitations: requirements the solution cannot meet because of constraints or drawbacks, such as high memory consumption or uncovered use cases. List assumptions: criteria that must be fully met for the solution to remain valid. -->
@@ -175,3 +174,12 @@ sequenceDiagram
 
 {{implementationAppendices}}
 ````
+
+# Source Material
+
+<!-- Record each consumed source once. Use a repository-relative path or canonical issue URL. Update the matching row when reprocessing a source. Do not infer provenance for legacy content. -->
+
+| **Source** | **Kind** | **Contribution** |
+| --- | --- | --- |
+| {{canonicalSource}} | {{sourceKind|Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
+
