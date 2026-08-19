@@ -7,13 +7,13 @@ Standalone Copilot agent skills. Each folder contains a `SKILL.md` and optional 
 Preview before installing:
 
 ```bash
-gh skill preview antshc/brain <skill-name>
+gh skill preview antshc/brain engineering/<skill-name>
 ```
 
 Install a specific skill:
 
 ```bash
-gh skill install antshc/brain <skill-name>
+gh skill install antshc/brain engineering/<skill-name>
 ```
 
 Install all skills interactively:
