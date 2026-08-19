@@ -77,7 +77,7 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, ask whether to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
-**Record inline** — resolved by explicit user answer → run `/record-term`, `/record-adr`, `/record-concept`, or `/record-service` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*).
+**Record inline — mandatory.** An explicit user answer that resolves or changes a Term or ADR is approval: run `/record-term` or `/record-adr` that same turn, before the next interview question. Never defer or batch approved writes into the closing sweep — later discussion can obscure the exact decision and leave the durable model stale. If a later answer clarifies or supersedes a record written earlier this session, run its owning skill again immediately; the latest explicit answer controls. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*).
 
 ## Closing sweep
 
