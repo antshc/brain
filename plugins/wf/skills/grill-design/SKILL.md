@@ -35,7 +35,6 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 |---|---|---|---|
 | Feature Assumption | model, via the checklist | ledger only | only after the veto sweep clears it — it is then a Decision. Never a *new* ADR/Concept: the record whose `owns`/`default` cleared the checklist already covers it |
 | Feature Decision | user, feature-scoped (fails the ADR/Concept gate, resolves no term) | ledger only | never |
-| Offered record | you, pending the user's reply to a specific offer | ledger only | on the user's yes, same turn |
 | Decision | user | ledger + document | same turn it's approved |
 | Rejected option | user | ledger only | never |
 
@@ -76,15 +75,13 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **Code cross-reference** — when the user states how something works, check whether the code agrees, across user-facing, application, integration, and persistence boundaries: validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic. Contradicts the user → surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?" Contradicts a loaded Concept or ADR — its rules, or its `default`/`owns` keys — → classify it as **Drift**, log it via `/track-ledger`' drift form, and surface the gap.
 
-**External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
+**External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, ask whether to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
 **Record inline** — resolved by explicit user answer → run `/record-term`, `/record-adr`, `/record-concept`, or `/record-service` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*).
 
-**Offer a record** — you spot an ADR- or Concept-worthy decision no user answer asked you to record. Run the target skill's own gate; it passes → offer that same turn, before your next interview question, as one bullet: `Offer — {{ADR|Concept}} "{{title}}": {{one sentence on what it pins down}}. Record it now?`. Draft nothing until the reply. **Yes** → run `/record-adr` or `/record-concept` immediately. **Not yet / no** → log it via `/track-ledger`' **Log decision** and move on. One open offer at a time — wait for the reply, same as interview questions. Never carry a candidate past the turn it crystallised, never bundle two offers, never make a first-time offer in the closing sweep.
-
 ## Closing sweep
 
-Four parts, each with its own trigger. The sweep **repairs** existing records; it never authors a design record — those are written inline the turn they crystallise, and a candidate that never got its inline offer is a miss, not sweep work.
+Four parts, each with its own trigger. The sweep **repairs** existing records; it never authors a design record — those are written inline from explicit user answers, and unapproved candidates remain ledger-only.
 
 **1. Per-row disposition.** If the session opened at least one full Concept/ADR record, emit one verdict per row in the `Crosscutting Concepts` and `Architecture Decision Records` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so no row is silently omitted. Skip for trivial sessions that only touched glossary terms.
 
@@ -92,17 +89,17 @@ Four parts, each with its own trigger. The sweep **repairs** existing records; i
 * **Cleared** — it is now a Decision: write it to its durable document and update its ledger line via `/track-ledger`' **Log decision**.
 * **Vetoed** — nothing changes on disk. Rewrite its ledger line via `/track-ledger`' **Log decision**: the veto form when the assumption stood on a record's `default`/`owns` (part 3 repairs that key), a deletion otherwise.
 
-A recorded Decision is not vetoable — the user approved it before it was written. An offer never made inline is a miss, not an agenda item — the sweep may re-raise a *deferred* offer, never introduce a new one.
+A recorded Decision is not vetoable — the user approved it before it was written. Unapproved candidates are not agenda items.
 
 **3. Assumption-gap harvest.** Never skipped, and never reported "no gaps" without the reconciliation below — it runs after part 2, so it sees its outcomes. Every question asked, wrong default, and drifted key marks a gap in the source behind it — close it now, or the next session asks the same question.
 
 **Reconciliation first (the anti-skip guard).** Before repairing anything, enumerate *every* user-answered question logged this session and map each to exactly one of: (a) a checklist-cleared Feature Assumption you never asked — no gap; (b) a question an existing record's `default`/`owns` answered directly — cite `path#key`, no gap; (c) a logged gate-miss line. Any question that lands in none of the three is an **unlogged miss** (the ask-time gate-miss line was dropped) — reconstruct its gate-miss line now, then repair it like the rest. An empty gap-form list is a valid outcome only *after* this enumeration confirms every question is an (a) or (b); reaching "no repairs" without enumerating the questions is itself the skip this step exists to prevent.
 
 Then repair the record behind each of the ledger's three gap forms:
-* **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → log it via `/track-ledger`' **Log decision** as a next-session candidate and stop — authoring it here is the first-time offer *Offer a record* forbids.
+* **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → log it via `/track-ledger`' **Log decision** as a next-session candidate and stop.
 * **Veto** (`vetoed, evidence was:`) — a `default`/`owns` produced an assumption you struck; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
 * **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
 
-Write the fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. Everything else — a key change no answer covers — goes through *Offer a record*'s one-open-offer rule, which here may only re-raise an offer deferred inline. Apply each write via `/record-concept` or `/record-adr`, resync the row via `/index-docs`' **Sync index row**, and mark the ledger line resolved.
+Write the fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. A key change no answer covers remains ledger-only. Apply each write via `/record-concept` or `/record-adr`, resync the row via `/index-docs`' **Sync index row**, and mark the ledger line resolved.
 
 **4. Trigger-condition refinement.** Runs last, so it also covers any row part 3 just resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
