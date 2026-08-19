@@ -71,4 +71,5 @@ copilot plugin install azure-platform@brain
 ```sh
 gh skill install antshc/brain skills/be-terse --agent github-copilot --scope user -f
 gh skill install antshc/brain skills/suggest --agent github-copilot --scope user -f
+gh skill install antshc/brain skills/render-mermaid-png/SKILL.md --agent github-copilot --scope user -f
 ```
