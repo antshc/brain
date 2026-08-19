@@ -42,7 +42,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 
 ## Output Format
 
-Each story carries three required blocks in order: **Capability**, **Stakeholder Requirement**, then **Acceptance Criteria** — plus two optional, technical appendices (**Implementation Decisions**, **Contracts Delta**). Write the three required blocks for Product Owners and QA — plain business language, no code, class names, or technical jargon; each criterion is one clear, testable statement of expected behavior. The two optional appendices are exempt from this rule — they're explicitly technical. When a prior requirement set is in context, copy the capability title and stakeholder requirement verbatim; otherwise derive them from the requirement text.
+Each story starts with its capability title and stakeholder requirement, followed by **Acceptance Criteria**. It may also include optional technical appendices: **Implementation Decisions** and **Contracts Delta**. Write the story content for Product Owners and QA in plain business language, without code, class names, or technical jargon; each criterion must be a clear, testable statement of expected behavior. The optional appendices are explicitly technical. When a prior requirement set is in context, copy the capability title and stakeholder requirement verbatim; otherwise derive them from the requirement text.
 
 Use the template below for every story. For a single story, the heading is `{{capabilityTitle}}`. For multiple stories, repeat the block once per capability, numbering each heading `Story {{n}} — {{capabilityTitle}}`.
 
@@ -51,7 +51,7 @@ Use the template below for every story. For a single story, the heading is `{{ca
 
 {{capabilityTitle|behavior + entity, no surface or placement}}
 
-The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
+{{stakeholderRequirement| The <actor> needs to <behavior> <entity>, so <value>}}
 
 ### Acceptance Criteria
 - {{outcome}} when {{condition}}.
@@ -59,11 +59,12 @@ The {{actor}} needs to {{behavior}} {{entity}}, so {{value}}.
 - ...
 
 ---
-### Implementation Decisions *(technical — omit unless this capability requires a specific implementation decision)*
+### Implementation Decisions 
+<!-- technical tone, optional - omit unless this capability requires a specific implementation decision -->
 - {{implementationDecision1}}
 - ...
 
-### Contracts Delta *(optional, technical — omit unless this capability changes an API, Database, or Resource contract)*
-
-{{contractsDeltaOutput| output of `/to-delta`, once per touched contract kind (API, Database, Resource)}}
+### Contracts Delta
+<!-- optional - omit unless this capability changes an API, Database, or Resource contract. use the `/to-delta` skill to format the section, once per touched contract kind (API, Database, Resource) -->
+{{contractsDeltaOutput| sections}}
 ```
