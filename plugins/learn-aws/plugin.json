@@ -2,6 +2,6 @@
   "name": "learn-aws",
   "version": "1.0.0",
   "description": "AWS documentation skills for querying official AWS docs, API references, and regional availability.",
-  "skills": ["./aws-docs"],
+  "skills": ["./search-aws-docs"],
   "mcpServers": ".mcp.json"
 }
