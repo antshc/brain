@@ -59,6 +59,12 @@ copilot plugin install atlm@brain
 copilot plugin install atl@brain
 ```
 
+## Install aws skills
+```
+gh skill install antshc/brain plugins/learn-aws/aws-docs --agent github-copilot --scope project -f
+```
+
+
 ## Install Azure platform plugin
 ```sh
 (copilot plugin uninstall az@brain >/dev/null 2>&1 || true) && \
