@@ -1,5 +1,5 @@
 ---
-name: aws-docs
+name: search-aws-docs
 description: Understand AWS services and find API references by querying official documentation. Use whenever the user asks how something works, wants API references or code-relevant parameter/signature details, needs configuration options, limits, quotas, regional availability, or best practices for any AWS service (EC2, S3, Lambda, EKS, IAM, etc.)—even if they don't mention "docs." Covers both conceptual understanding and code-adjacent lookups (there is no separate AWS code-reference skill).
 context: fork
 compatibility: Requires AWS Documentation MCP Server (https://knowledge-mcp.global.api.aws)
