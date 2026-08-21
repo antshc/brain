@@ -22,7 +22,7 @@ Verify the target repo before any **code/build** `git`/`gh pr` command by checki
 Runs unmodified on Linux, macOS, and Windows (no bash- or PowerShell-only syntax):
 
 ```
-python3 -c 'import re,subprocess,sys; url=subprocess.run(["git","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); slug=re.sub(r"\.git$","",re.sub(r"^(git@github\.com:|https://github\.com/)","",url)); sys.exit(0 if slug=="{{codeRepoSlug}}" else 1)'
+python -c 'import re,subprocess,sys; url=subprocess.run(["git","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); slug=re.sub(r"\.git$","",re.sub(r"^(git@github\.com:|https://github\.com/)","",url)); sys.exit(0 if slug=="{{codeRepoSlug}}" else 1)'
 ```
 
 Also confirm the repo root for filesystem operations:
