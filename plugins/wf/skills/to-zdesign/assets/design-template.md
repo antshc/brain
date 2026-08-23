@@ -21,7 +21,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 # Problem Statement and Goals
 
-<!-- Detail the motivation for the change, the issue or enhancement being addressed, and its business context. The PO must review and approve this section. -->
+<!-- The problem that the user is facing, from the user's perspective, detail the motivation for the change, the issue or enhancement being addressed. Writing style: terse, concise, non-technical -->
 
 {{problemAndGoals}}
 
@@ -71,9 +71,9 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 # Solution Overview
 
-<!-- Outline the planned solution to the problem presented in the epic. This is the main content for the design meeting and should not exceed eight pages as a best practice. -->
+<!-- The solution to the problem, from the user's perspective. Writing style: terse, concise, non-technical -->
 
-{{architectureLevelSolution}}
+{{solutionOverview}}
 
 ## Use cases
 
@@ -83,7 +83,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 ## Solution Diagram
 
-<!-- Read templates/c4-container-diagram-template.md for the full element reference and mermaid gotchas. Exactly one solution-level C4Container diagram is required, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. -->
+<!-- Read templates/c4-container-diagram-template.md for the full element reference and mermaid gotchas. Exactly one solution-level C4Container diagram is required, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility described under the diagram using the bullets. The container name is bold. -->
 
 <details>
 <summary>Solution Diagram</summary>
