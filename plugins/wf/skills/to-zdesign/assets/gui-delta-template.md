@@ -65,7 +65,9 @@ Fill this template to document the GUI **delta** a feature introduces. Copy only
 <!-- Cross-cutting GUI rules the feature adds, modifies, or removes (e.g. polling cadence, client-side pagination, grid-state persistence). Include ONLY changed conventions; delete the section otherwise. -->
 
 <details>
-<summary><Convention name title></summary>
+<summary>Conventions</summary>
+
+**<Convention name title>**
 
 <Describe the added, modified, or removed convention — e.g. a new polling cadence, no server-side pagination, grid state stored in local storage.>
 
