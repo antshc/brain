@@ -13,6 +13,14 @@ def test_em():
     assert parse_inline("*italic*") == [{"type": "text", "text": "italic", "marks": [{"type": "em"}]}]
 
 
+def test_em_underscore():
+    assert parse_inline("_italic_") == [{"type": "text", "text": "italic", "marks": [{"type": "em"}]}]
+
+
+def test_strong_underscore():
+    assert parse_inline("__bold__") == [{"type": "text", "text": "bold", "marks": [{"type": "strong"}]}]
+
+
 def test_code():
     assert parse_inline("`code`") == [{"type": "text", "text": "code", "marks": [{"type": "code"}]}]
 
