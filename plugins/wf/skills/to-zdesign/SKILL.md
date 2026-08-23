@@ -7,6 +7,8 @@ description: Create or incrementally extend an authoritative feature design from
 
 Create or update one `docs/designs/{{featureSlug}}.md`. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
 
+**Mandatory asset read (non-negotiable):** this skill's `assets/` folder holds the only valid document structure — `design-template.md` plus every delta/diagram template it references. You MUST open each applicable template file with the file-reading tool, in full, before drafting or merging any corresponding section — never rely on remembered structure, a prior run, or the description of a template in this file. Skipping this read is a failure condition, not a shortcut: it produces a document with missing sections, wrong headings, or non-compliant tables. Re-read `design-template.md` on every run, including merges into an existing design, because section instructions live only in that file's hidden comments.
+
 ## 1. Resolve inputs
 
 Accept these forms:
@@ -73,19 +75,21 @@ Treat existing content outside `Open Questions` as resolved unless marked draft,
 
 Let stronger evidence update weaker content. Preserve equal-authority conflicts and add them to `Open Questions`. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
 
+**Provenance stays out of the body.** ADRs, Concepts, `ARCHITECTURE.md`, and Jira tickets are grounding evidence, not citable content — never name or link them anywhere in the document body (`Requirements`, `Current State`, `Solution Overview`, `Decisions`, appendices, etc.). Absorb what they establish as plain, self-contained statements instead of attributing it to the source document. The only place any of these four may be named or linked is a row in `Source Material`.
+
 ## 4. Reconcile capabilities
 
 A capability is stable, solution-agnostic behavior with one purpose. It is not a UI, implementation detail, or one-off task.
 
 Assign every sourced requirement to one capability. Match by purpose and change boundary, not title. Merge only when purpose, actors, rules, permissions, lifecycle, failures, contracts, ownership, and rate of change remain shared. Otherwise split.
 
-Draft `Requirements` from [design-template.md](assets/design-template.md): one row per capability. Put the title, stakeholder requirement, and functional requirements in `Requirement`; put business rules and edge cases in `Details`. Use `Source` only for PO or Dev team.
+Open [design-template.md](assets/design-template.md) with the file-reading tool and draft `Requirements` from its exact table shape: one row per capability. Put the title, stakeholder requirement, and functional requirements in `Requirement`; put business rules and edge cases in `Details`. Use `Source` only for PO or Dev team.
 
 Name capabilities with behavior and domain entities. Keep functional requirements externally visible and testable. Add design-discovered behavior only when evidence supports it.
 
 ## 5. Synthesize the solution
 
-Read [design-template.md](assets/design-template.md). Populate every core section. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
+Open [design-template.md](assets/design-template.md) with the file-reading tool now, even if it was read earlier in this session — do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
@@ -99,7 +103,7 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 If merging into an existing design that already contains a diagram, NEVER modify, regenerate, or remove it silently. Stop and ask the user for confirmation before changing or removing any existing diagram.
 
-Select implementation appendices from evidence. The two diagram appendices (Class Diagram, Sequence Diagram) are optional — include one only when the user explicitly asks for it, even if the triggering evidence is present. Never add a Flowchart appendix — a flowchart is `Solution Overview`-only:
+Select implementation appendices from evidence. The two diagram appendices (Class Diagram, Sequence Diagram) are optional — include one only when the user explicitly asks for it, even if the triggering evidence is present. Never add a Flowchart appendix — a flowchart is `Solution Overview`-only. Before drafting any appendix, open its template file from the table below — do not compose an appendix from recollection of its shape:
 
 | Appendix | Include for | Template |
 | --- | --- | --- |
@@ -109,7 +113,7 @@ Select implementation appendices from evidence. The two diagram appendices (Clas
 | Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | [class-diagram-delta-template.md](assets/class-diagram-delta-template.md) |
 | Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | [sequence-diagram-delta-template.md](assets/sequence-diagram-delta-template.md) |
 
-Read only applicable templates. Insert complete appendices in table order. Include changed content only. Do not run `/to-delta`; this skill owns appendix composition.
+Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Do not run `/to-delta`; this skill owns appendix composition.
 
 ## 6. Merge incrementally
 
@@ -135,14 +139,16 @@ Maintain `Source Material`:
 
 ## 7. Verify before writing
 
-1. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
-2. Populate every core section or mark it not applicable.
-3. Keep at most the diagrams the user explicitly requested; do not add, change, or remove any diagram without asking first. Never place a flowchart in an appendix — it belongs only in `Solution Overview`.
-4. Include every evidence-triggered appendix and no empty appendix heading.
-5. Remove template instructions and unresolved placeholders. Preserve `<!-- confluence:toc -->`, `<!-- confluence:wide-table -->`, and `<!-- confluence:ignore:start -->`/`<!-- confluence:ignore:end -->` verbatim — they are structural Confluence markers, not model placeholders.
-6. Put every unresolved conflict in `Open Questions`.
-7. Compare an update with the pre-merge design. Restore unsupported loss.
-8. Remove duplicate requirements, capabilities, and source rows.
-9. Every included REST API Delta Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
+1. Confirm every template file used in steps 4–5 was actually opened this run — an assumed or remembered structure fails this check.
+2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
+3. Populate every core section, in the template's section order, or mark it not applicable.
+4. Keep at most the diagrams the user explicitly requested; do not add, change, or remove any diagram without asking first. Never place a flowchart in an appendix — it belongs only in `Solution Overview`.
+5. Include every evidence-triggered appendix and no empty appendix heading.
+6. Remove template instructions and unresolved placeholders. Preserve `<!-- confluence:toc -->`, `<!-- confluence:wide-table -->`, and `<!-- confluence:ignore:start -->`/`<!-- confluence:ignore:end -->` verbatim — they are structural Confluence markers, not model placeholders.
+7. Put every unresolved conflict in `Open Questions`.
+8. Compare an update with the pre-merge design. Restore unsupported loss.
+9. Remove duplicate requirements, capabilities, and source rows.
+10. Every included REST API Delta Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
+11. Scan the full body (everything outside `Source Material`) for any ADR, Concept, `ARCHITECTURE.md`, or Jira reference (link, ID like `ADR NNNN`/`ZIC-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
 
 Write the result. Call it a draft while `Open Questions` is non-empty.

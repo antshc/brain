@@ -7,8 +7,10 @@ _INLINE_RE = re.compile(
     r"`(?P<code_txt>[^`]+)`"
     r"|\[(?P<link_txt>[^\]]*)\]\((?P<link_href>[^)\s]+)\)"
     r"|\*\*(?P<strong_txt>.+?)\*\*"
+    r"|__(?P<strong_u_txt>.+?)__"
     r"|~~(?P<strike_txt>.+?)~~"
     r"|\*(?P<em_txt>.+?)\*"
+    r"|_(?P<em_u_txt>.+?)_"
 )
 
 
@@ -29,10 +31,14 @@ def _parse_inline_marks(text: str) -> list[dict]:
             )
         elif m.group("strong_txt") is not None:
             nodes.append({"type": "text", "text": m.group("strong_txt"), "marks": [{"type": "strong"}]})
+        elif m.group("strong_u_txt") is not None:
+            nodes.append({"type": "text", "text": m.group("strong_u_txt"), "marks": [{"type": "strong"}]})
         elif m.group("strike_txt") is not None:
             nodes.append({"type": "text", "text": m.group("strike_txt"), "marks": [{"type": "strike"}]})
         elif m.group("em_txt") is not None:
             nodes.append({"type": "text", "text": m.group("em_txt"), "marks": [{"type": "em"}]})
+        elif m.group("em_u_txt") is not None:
+            nodes.append({"type": "text", "text": m.group("em_u_txt"), "marks": [{"type": "em"}]})
         pos = m.end()
     if pos < len(text):
         remainder = text[pos:]
