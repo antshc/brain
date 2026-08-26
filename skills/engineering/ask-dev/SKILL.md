@@ -41,8 +41,10 @@ You are done gathering when every group has reported and every artifact in its r
 
 ## 3. Answer in the tester's currency
 
+- **Plain words.** Write for someone who has never opened the repo, and explain any unavoidable technical term in half a sentence the first time it appears.
+- **Manual steps.** Number every action the tester performs by hand — where to go, what to enter, what to press — one action per step.
 - Trade in requests, records, settings, and observable outcomes.
-- Name the environment each instruction runs against, and address the deployed instance by its URL, endpoint, or console.
+- Name the environment each step runs against, and address the deployed instance by its URL, endpoint, or console.
 - Call each thing what the product calls it — the endpoint, the table, the setting — not what the code calls it.
 - Put real values in every example so the tester can copy, adjust, and run it.
 - Say how to tell pass from fail, and where the evidence shows up.
