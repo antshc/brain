@@ -102,6 +102,7 @@ Prefer the front door: when an endpoint writes the same record, give that reques
 
 ````
 **Where it lives:** {{deployed environment}} → {{store}} → {{table or collection}} — {{what one record represents}}
+**Open:** {{the console or client to use, and how to get to the table in it}}
 
 **Find your record**
 ```{{sql | json}}
@@ -124,6 +125,7 @@ These are the settings a tester can set to make the application behave different
 
 ````
 **Settings you can change in {{deployed environment}}** — {{config file path}}
+**Open:** {{how to get to the file — the machine, container, or portal page it sits on}}
 
 | Setting | Now | Set to | What it makes the application do |
 |---|---|---|---|
