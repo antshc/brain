@@ -31,7 +31,7 @@ Spawn one `runSubagent` with `agentName: Explore` **per group, all in a single p
 | API surface | Method, full path, base URL per deployed environment, auth header, required and optional fields with allowed values, success status, error statuses and their causes |
 | Data | Store, table or collection name per environment, the format it is edited in (SQL, JSON item), key attributes, one real record's field names and value shapes, and any endpoint or job that writes the same record |
 | Config | Config file path and format per environment, setting names with their current and default values, what each one controls, and the settings that make the application behave differently for a test — flags, toggles, thresholds, timeouts, sandbox and stub modes — with what each one simulates and when it takes effect |
-| Behaviour | The trigger that drives the behaviour, the conditions that change the outcome, the side effects it leaves behind (records, messages, emails, log lines), and the observable result |
+| Behaviour | The trigger that drives the behaviour, the conditions that change the outcome, the side effects it leaves behind (records, messages, emails), the message templates of the log lines it writes with their placeholders intact and the log group or file they land in, and the observable result |
 
 Give each agent the tester's question verbatim, its own row from the group table, `quick | medium | thorough`, and this contract: exploration is strictly read-only, and it reports exact names and values it has read, not summaries of them. Keep each agent inside its group so their work does not overlap.
 

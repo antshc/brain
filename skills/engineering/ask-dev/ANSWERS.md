@@ -49,7 +49,7 @@ UPDATE subscriptions SET status = 'cancelled' WHERE customer_id = 'CUS-4821';
 
 ## Test it
 
-```
+````
 **What you're checking:** {{the behaviour, in product words}}
 **Where:** {{deployed environment}} — {{URL or console to reach it}}
 
@@ -63,11 +63,17 @@ UPDATE subscriptions SET status = 'cancelled' WHERE customer_id = 'CUS-4821';
 - {{observable outcome — status code, field value, message, record, file}}
 
 **Where to look**
-- {{where the evidence lands — response body, table or collection, log, queue, email}}
+- {{where the evidence lands — response body, table or collection, queue, email}}
+
+**In the log** — include when the outcome shows up there
+```log
+{{the message template as the application writes it, placeholders left in — e.g. Alert {alertId} dispatched to {channel}}}
+```
+- Search {{log group, file, or console}} for the part that never changes: `{{fixed words}}`
 
 **Also worth trying**
 - {{edge or negative case}} → {{what should happen}}
-```
+````
 
 ## Call it
 
