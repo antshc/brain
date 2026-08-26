@@ -28,7 +28,7 @@ Search only inside the resolved folder(s):
 find "<cache>" -maxdepth 1 -iname '<packageid>*'
 ```
 
-Layout: `<id>/<version>/lib/<tfm>/<Id>.dll`, the sibling `<Id>.xml`, and `<id>.nuspec`. The `.nupkg` is not there and is not needed.
+Layout: `<id>/<version>/lib/<tfm>/<Id>.dll`, the sibling `<Id>.xml`, and `<id>.nuspec`. The `.nupkg` is not there and is not needed. A `<id>/<version>/decompiled/` folder, if present, is output from a previous run of step 3 — reuse it.
 
 Widen to a full-disk search (`find / -iname '<packageid>*' 2>/dev/null`) only as a last resort, and say so in your answer.
 
@@ -46,12 +46,28 @@ Stop here if it answers the question. Docs state intent, not behavior — go to 
 
 ## 3. Decompile
 
-```bash
-command -v ilspycmd || dotnet tool install -g ilspycmd
-ilspycmd -p -o /tmp/<packageid>-decompiled "<lib-path>/<Id>.dll"
+Decompiled source lives next to the package, in a `decompiled/<tfm>/` folder inside the package's version directory:
+
+```
+<cache>/<id>/<version>/decompiled/<tfm>/
 ```
 
-Read what you need, then discard. Throwaway output — never committed, cached, or documented.
+**Reuse before you decompile.** Check for a previous run first, and read it instead of re-running:
+
+```bash
+find "<cache>/<packageid>/<version>/decompiled" -name '*.cs' -print -quit
+```
+
+If that prints a file, the package is already decompiled — grep/read it and skip the rest of this step.
+
+Otherwise decompile into that folder:
+
+```bash
+command -v ilspycmd || dotnet tool install -g ilspycmd
+ilspycmd -p -o "<cache>/<packageid>/<version>/decompiled/<tfm>" "<lib-path>/<Id>.dll"
+```
+
+Keep the output in place so the next lookup reuses it. It lives in the package cache only — never copy it into the repo, commit it, or document it.
 
 ## 4. Report
 
