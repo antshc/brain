@@ -2,10 +2,56 @@
 
 Fill the shape for the routed branch. Drop any line the question does not need.
 
+## On the wire
+
+Every request in every shape goes in one `http` block, **on the wire** — request, blank line, response — so the tester can read it or paste it straight into their API client:
+
+```http
+GET /api/v2/alerts?top=1000 HTTP/1.1
+Host: zic.example.com
+Authorization: Bearer {{token}}
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "alerts": [ { "...": "..." } ]
+}
+```
+
+Real host, real path, real query and field names. Leave only the secret as `{{token}}`.
+
+## In its own format
+
+Show every record and setting **in the format the tester edits it in**, so they can paste it where it belongs — SQL for a relational store, a JSON item for DynamoDB or a document store, the file's own syntax for config. Always give the current value beside the new one.
+
+```sql
+SELECT status, plan FROM subscriptions WHERE customer_id = 'CUS-4821';
+
+UPDATE subscriptions SET status = 'cancelled' WHERE customer_id = 'CUS-4821';
+```
+
+```json
+{
+  "customerId": "CUS-4821",
+  "sk": "SUBSCRIPTION#2026-01",
+  "status": "cancelled",
+  "plan": "premium"
+}
+```
+
+```json
+"Alerts": {
+  "PollIntervalSeconds": 5,
+  "UseSandboxProvider": true
+}
+```
+
 ## Test it
 
 ```
 **What you're checking:** {{the behaviour, in product words}}
+**Where:** {{deployed environment}} — {{URL or console to reach it}}
 
 **Set up**
 1. {{test data or account state to have in place, with real values}}
@@ -25,53 +71,63 @@ Fill the shape for the routed branch. Drop any line the question does not need.
 
 ## Call it
 
-```
+````
 **{{METHOD}} {{full path}}** — {{what it does}}
 
-- **Base URL:** {{per environment, or where to get it}}
+- **Host:** {{deployed environment}} → {{host}}
 - **Auth:** {{header}} — {{how to get the token}}
 
-{{curl or raw HTTP snippet with real field names and sample values}}
+```http
+{{the exchange, on the wire}}
+```
 
 **Fields**
 | Field | Required | Allowed values | Means |
 |---|---|---|---|
 
-**Success:** {{status}} — {{response shape with a sample value}}
-
 **Errors**
 | Status | Happens when |
 |---|---|
-```
+````
 
 ## Change the data
 
 Prefer the front door: when an endpoint writes the same record, give that request instead of a direct write, and say why.
 
-```
-**Where it lives:** {{store}} → {{table or collection}} — {{what one record represents}}
+````
+**Where it lives:** {{deployed environment}} → {{store}} → {{table or collection}} — {{what one record represents}}
 
-**Find your record by:** {{key fields}}, e.g. {{real example values}}
+**Find your record**
+```{{sql | json}}
+{{the lookup, in the store's own format, with real key values}}
+```
 
 **Change it**
-1. {{console or CLI step, one action per step}}
-
-{{CLI command, or the console fields and the values to type}}
+```{{sql | json}}
+{{the write, in the store's own format}}
+```
 
 **Check it worked:** {{what to re-read, and what it should now say}}
-**Put it back:** {{the reverse change}}
+**Put it back:** {{the reverse statement or the original item}}
 **Watch out:** {{what the change knocks over — cached copies, downstream records, a sync job}}
-```
+````
 
 ## Find the setting
 
-```
-| Environment | File | Setting | Controls | Useful for testing |
-|---|---|---|---|---|
+These are the settings a tester can set to make the application behave differently — flags, toggles, thresholds, timeouts, sandbox and stub modes.
 
-**To {{the tester's goal}}:** in {{file}}, set {{setting}} to {{value}} (currently {{current value}}).
+````
+**Settings you can change in {{deployed environment}}** — {{config file path}}
+
+| Setting | Now | Set to | What it makes the application do |
+|---|---|---|---|
+
+**To {{the tester's goal}}**
+```{{json | ini | env}}
+{{the fragment exactly as it appears in the file, with the new value in place}}
+```
 
 - **Takes effect:** {{immediately / on restart / on redeploy}}
 - **Put it back:** {{original value}}
-- **Who applies it:** {{tester locally / a dev / devops}} — the file is unchanged.
-```
+- **Who applies it in {{environment}}:** {{the tester / a dev / devops}} — the file is unchanged.
+````
