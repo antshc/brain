@@ -1,7 +1,0 @@
-{
-  "name": "atlm",
-  "version": "1.0.0",
-  "description": "Atlassian MCP workflow skills.",
-  "skills": ["./skills"],
-  "mcpServers": ".mcp.json"
-}

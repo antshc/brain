@@ -1,3 +1,0 @@
-markdown
-markdownify
-../fetch-jira/pyadf2md
