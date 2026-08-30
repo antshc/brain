@@ -30,11 +30,6 @@
             "description": "Atlassian workflow skills."
         },
         {
-            "name": "atlm",
-            "source": "./plugins/atlm",
-            "description": "Atlassian MCP workflow skills."
-        },
-        {
             "name": "crew",
             "source": "./plugins/crew",
             "description": "Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions."
