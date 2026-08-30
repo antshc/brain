@@ -71,6 +71,25 @@ def test_table(md_to_adf):
     assert len(table["content"]) == 2  # header row + one data row
 
 
+def test_table_recognized_headers_get_colwidth(md_to_adf):
+    doc = md_to_adf("| # | Description | Other |\n| --- | --- | --- |\n| 1 | text | x |")
+    table = doc["content"][0]
+    header_cells = table["content"][0]["content"]
+    hash_width = header_cells[0]["attrs"]["colwidth"][0]
+    description_width = header_cells[1]["attrs"]["colwidth"][0]
+    other_width = header_cells[2]["attrs"]["colwidth"][0]
+    assert hash_width == 60
+    assert description_width > other_width
+
+
+def test_table_generic_headers_omit_colwidth(md_to_adf):
+    doc = md_to_adf("| Foo | Bar |\n| --- | --- |\n| 1 | 2 |")
+    table = doc["content"][0]
+    for row in table["content"]:
+        for cell in row["content"]:
+            assert "attrs" not in cell
+
+
 def test_bullet_list(md_to_adf):
     doc = md_to_adf("- one\n- two")
     block = doc["content"][0]
