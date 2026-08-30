@@ -39,6 +39,13 @@ _DETAILS_OPEN_RE = re.compile(r"^\s*<details>\s*$")
 _DETAILS_CLOSE_RE = re.compile(r"^\s*</details>\s*$")
 _SUMMARY_RE = re.compile(r"^\s*<summary>(.*)</summary>\s*$")
 
+# Column widths (px) for headers this skill recognizes by name, stripped of markdown marks
+# (e.g. "**#**" -> "#"). Only applied when a table has at least one of these headers, so
+# generic tables are left to Confluence's auto-sizing.
+_NARROW_COLWIDTHS = {"#": 60, "no": 60, "priority": 110, "source": 110}
+_WIDE_COLUMN_NAMES = {"details", "description"}
+_TABLE_WIDTH_BUDGET_PX = 1400
+
 
 def split_table_row(row: str) -> list[str]:
     row = row.strip()
@@ -291,17 +298,60 @@ def parse_list(lines: list[str], i: int) -> tuple[dict, int]:
     return {"type": list_type, "content": items}, i
 
 
+def _strip_md_marks(text: str) -> str:
+    return re.sub(r"\*+", "", text).strip().lower()
+
+
+def compute_colwidths(header_cells: list[str]) -> list[int] | None:
+    keys = [_strip_md_marks(h) for h in header_cells]
+    if not any(k in _NARROW_COLWIDTHS for k in keys):
+        return None
+
+    widths: list[int] = [0] * len(keys)
+    remaining_idxs = []
+    fixed_total = 0
+    for idx, k in enumerate(keys):
+        if k in _NARROW_COLWIDTHS:
+            widths[idx] = _NARROW_COLWIDTHS[k]
+            fixed_total += widths[idx]
+        else:
+            remaining_idxs.append(idx)
+
+    remaining_budget = max(_TABLE_WIDTH_BUDGET_PX - fixed_total, 200)
+    wide_idxs = [idx for idx in remaining_idxs if keys[idx] in _WIDE_COLUMN_NAMES]
+    plain_idxs = [idx for idx in remaining_idxs if idx not in wide_idxs]
+
+    if wide_idxs:
+        wide_share = int(remaining_budget * 0.7 / len(wide_idxs))
+        plain_budget = remaining_budget - wide_share * len(wide_idxs)
+        plain_share = int(plain_budget / len(plain_idxs)) if plain_idxs else 0
+        for idx in wide_idxs:
+            widths[idx] = wide_share
+        for idx in plain_idxs:
+            widths[idx] = plain_share
+    elif remaining_idxs:
+        share = int(remaining_budget / len(remaining_idxs))
+        for idx in remaining_idxs:
+            widths[idx] = share
+
+    return widths
+
+
 def build_table(header_cells: list[str], rows: list[list[str]], layout: str = "default") -> dict:
     grid = [[{} for _ in header_cells]] + [[{} for _ in row] for row in rows]
     validate_table_grid(grid, table_label="table")
+    colwidths = compute_colwidths(header_cells)
 
-    def cell(text: str, header: bool) -> dict:
+    def cell(text: str, header: bool, idx: int) -> dict:
         node_type = "tableHeader" if header else "tableCell"
-        return {"type": node_type, "content": [{"type": "paragraph", "content": parse_inline(text)}]}
+        node = {"type": node_type, "content": [{"type": "paragraph", "content": parse_inline(text)}]}
+        if colwidths:
+            node["attrs"] = {"colspan": 1, "rowspan": 1, "colwidth": [colwidths[idx]]}
+        return node
 
-    table_rows = [{"type": "tableRow", "content": [cell(c, True) for c in header_cells]}]
+    table_rows = [{"type": "tableRow", "content": [cell(c, True, idx) for idx, c in enumerate(header_cells)]}]
     for row in rows:
-        table_rows.append({"type": "tableRow", "content": [cell(c, False) for c in row]})
+        table_rows.append({"type": "tableRow", "content": [cell(c, False, idx) for idx, c in enumerate(row)]})
 
     return {
         "type": "table",
