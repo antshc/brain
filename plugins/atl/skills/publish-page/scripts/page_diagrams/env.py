@@ -1,9 +1,8 @@
 """Locate and parse `.atlassian` for the raw `site`/`email`/`token` this skill's attachment
 upload needs — the one thing `preflight-atl`'s public contract deliberately never exposes (it
-reports only `tokenAvailable`, a boolean, and never echoes the value). Bounded to `root`, per
-Concept 0008, mirroring `preflight-atl`'s own config search — but this module is not imported
-across skill folders (Concept 0009); it exists only because the raw secret is out of scope for
-what Preflight may return.
+reports only `tokenAvailable`, a boolean, and never echoes the value). Bounded to `root`,
+mirroring `preflight-atl`'s own config search — but this module is not imported across skill
+folders; it exists only because the raw secret is out of scope for what Preflight may return.
 """
 from __future__ import annotations
 

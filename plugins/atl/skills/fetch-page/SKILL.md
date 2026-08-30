@@ -1,40 +1,31 @@
 ---
 name: fetch-page
-description: Fetch a Confluence page as Markdown from its identifier or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page by ID or URL. No Atlassian config required. Absorbs `fetch-conf`.
+description: Fetch a Confluence page as Markdown from its identifier or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page by ID or URL. No Atlassian config required.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
 # Fetch Page
 
-Return a Confluence **Page** as Markdown, from its identifier or URL, over the MCP alone — no `acli`, no API token.
+Return a Confluence **Page** as Markdown from its identifier or URL. MCP only — no API token.
 
 ## Workflow
 
-**Step 1 — Preflight**
-Run `/preflight-atl`' skill **Action: Resolve**.
+**1 — Preflight.** Run `/preflight-atl` **Action: Resolve**.
 
-**Step 2 — Parse the input**
-Parse `{{input}}`:
-- Full-path URL form `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → extract `<site>` and `<page_id>`.
-- Tiny-link URL form `https://<site>/wiki/x/<tiny_id>` → extract `<site>` and `<tiny_id>` as `<page_id>`.
-- Bare identifier form `<page_id>` (numeric ID or tiny-link token) → `<site>` unknown; pass it straight through — `getConfluencePage`'s `pageId` accepts either form.
+**2 — Parse `{{input}}`.**
+- `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<site>`, `<page_id>`.
+- `https://<site>/wiki/x/<tiny_id>` → `<site>`, `<page_id> := <tiny_id>`.
+- Bare `<page_id>` (numeric or tiny token) → no `<site>`; pass through as-is, `getConfluencePage` accepts either form.
 
-**Step 3 — Resolve `cloudId`**
-- `<site>` extracted from a URL → use it directly as `cloudId`.
-- Else use Preflight's `cloudId`.
-- Still empty → call `getAccessibleAtlassianResources` once and use the matching resource's `cloudId`, per Preflight's standing rule.
+**3 — Resolve `cloudId`.** `<site>` from URL → use it. Else Preflight's `cloudId`. Else `getAccessibleAtlassianResources` once, per Preflight's standing rule.
 
-**Step 4 — Fetch**
-Call `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`.
+**4 — Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`.
 
-**Step 5 — Guard against truncation**
-Save the tool result to `content.json` and parse it with Python — never `read_file` — per Preflight's standing rule, so a long body is never silently truncated.
+**5 — Guard truncation.** Save the tool result to `content.json` and parse with Python — never `read_file`.
 
-**Step 6 — Convert**
-Extract the page body's ADF document from the tool result (the value under `body` matching `contentFormat: "adf"`). Run `/map-markdown-adf`' skill **Action: Convert ADF to Markdown**, piping the extracted document in.
+**6 — Convert.** Extract the ADF body (value under `body` matching `contentFormat: "adf"`); pipe it into `/map-markdown-adf` **Action: Convert ADF to Markdown**.
 
-**Step 7 — Compose and return**
-Return only:
+**7 — Return** only:
 ```
 # <title>
 
@@ -43,4 +34,4 @@ Return only:
 
 ## Degraded mode
 
-No **Atlassian config** file → Preflight's `site`/`cloudId` come back empty; Step 3's `getAccessibleAtlassianResources` fallback supplies `cloudId` instead. Every other step is unchanged.
+No **Atlassian config** → `site`/`cloudId` empty; Step 3's `getAccessibleAtlassianResources` supplies `cloudId`. All other steps unchanged.

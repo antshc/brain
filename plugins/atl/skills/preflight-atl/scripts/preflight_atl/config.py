@@ -1,7 +1,7 @@
 """Locate and parse the `.atlassian` config file, bounded to the Harness Repo Path.
 
 Search descends from `root` only — it never ascends past it and never reaches an
-ancestor directory, per Concept 0008 (Per-Repo Config Resolution).
+ancestor directory.
 """
 from __future__ import annotations
 
