@@ -26,7 +26,7 @@ Infer from context; ask only when required information is missing.
 Run `/preflight-atl`' skill **Action: Resolve**.
 
 **Step 2 — Resolve `cloudId`**
-Use Preflight's `cloudId`. Still empty → call `getAccessibleAtlassianResources` once and use the matching resource's `cloudId`. Never call it again this session once resolved.
+Use Preflight's `cloudId`. Still empty → call `getAccessibleAtlassianResources` once and use the matching resource's `cloudId`, per Preflight's standing rule.
 
 **Step 3 — Convert**
 Run `/map-markdown-adf`' skill **Action: Convert Markdown to ADF**, piping `description` in. Use the resulting ADF document as `description` and set `contentFormat: "adf"` on every downstream call.
