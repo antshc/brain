@@ -111,7 +111,7 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 - You MUST create every skill under `.github/skills/<skill-name>/` at the reporoot — never in the user skills directory (`~/.copilot/skills/`) or inside `workspace/`. Each skill is its own folder holding `SKILL.md` plus any `reference/` files it needs.
 - You MUST NOT reference a skill's own files via bare relative markdown links (e.g. `[memory.md](reference/memory.md)`); such links resolve against the runtime CWD (which may be a worktree, not the skill folder) and silently fail to load. Load reference files via the skill's stated absolute base directory instead.
 ### Available skills:
-`preflight-atl`, `create-jira-bug`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws`, `graphify` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
+`preflight-atl`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws`, `graphify` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
 
 ## 8. Tools
 
