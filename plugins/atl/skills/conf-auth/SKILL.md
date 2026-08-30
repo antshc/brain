@@ -7,7 +7,7 @@ description: 'Authorize acli with Confluence. Use when acli Confluence auth is m
 ```bash
 source ~/.profile
 if [[ -z "$ACLI_API_TOKEN" ]]; then
-  echo "ACLI_API_TOKEN is not set. Run /atl:setup-atl first."
+  echo "ACLI_API_TOKEN is not set. Run /atl:init-atl first."
   exit 1
 fi
 ```
