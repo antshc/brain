@@ -21,11 +21,19 @@ Use `python3` — `python` is not available in this environment.
 
 ### Module Sync (pre-commit hook)
 
-`modules/` contains shared Python code used by skills. The pre-commit hook (`./githooks/pre-commit`) syncs each module into the plugin/skill that consumes it using `rsync`. Paths in the hook are relative to the repo root. Example: `tools/src/modules/github/` → `plugins/ralph/skills/fix/github/`.
+`modules/` contains Python code shared **across plugins**. The pre-commit hook (`./githooks/pre-commit`) syncs each module into the plugin/skill that consumes it using `rsync`. Paths in the hook are relative to the repo root. Example: `tools/src/modules/github/` → `plugins/ralph/skills/fix/github/`.
 
 - **Edit source in `tools/src/modules/<module>/`** — NEVER EDIT the copy inside `plugins/`.
 - Import paths inside a skill use relative imports matching the synced destination folder name.
 - Add new module→destination mappings to `.githooks/pre-commit`.
+
+### Skill-owned Python
+
+A skill may own its own Python code and tests inside its own folder — see [Concept 0009](../docs/concepts/0009-skill-owned-code.md).
+
+- Code with **one** consumer lives in the skill that uses it; no module, no sync mapping.
+- Code shared by several skills in **one** plugin is owned by exactly one of them; siblings invoke that skill rather than importing across skill folders.
+- Promote to `tools/src/modules/` only once a **second plugin** needs the same code.
 
 ### General Python Guidelines
 
@@ -37,8 +45,9 @@ Use `python3` — `python` is not available in this environment.
 
 ### Tests
 
-- Tests live in `tools/tests/unit/` and `tools/tests/integration/`, mirroring `tools/src/`.
-- Every test is traceable to a scenario in `TEST_PLAN.md`:
+- Tests for `tools/src/` live in `tools/tests/unit/` and `tools/tests/integration/`, mirroring `tools/src/`.
+- Tests for skill-owned Python live beside that code, inside the skill folder.
+- Every test under `tools/tests/` is traceable to a scenario in `TEST_PLAN.md`:
   - Test class docstring → Feature name (e.g., `"Feature: Comment Label Detection"`).
   - Test method name → Scenario name in snake_case; add `# Scenario: ...` comment below the def.
   - Keep both sides in sync when changing a test or scenario.
