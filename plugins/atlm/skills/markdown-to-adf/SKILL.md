@@ -5,6 +5,8 @@ description: Convert GitHub Flavored Markdown into Atlassian Document Format (AD
 
 # Convert Markdown to ADF
 
+**Superseded** by `map-markdown-adf` (`plugins/atl/skills/map-markdown-adf/`), which replaces this skill's prose mapping tables with the single, tested, executable ADF implementation in both directions. Use that skill instead.
+
 Convert user-provided GitHub Flavored Markdown into a valid Atlassian Document Format document while preserving the source wording and structure.
 
 ## Inputs
