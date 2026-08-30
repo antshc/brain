@@ -6,24 +6,25 @@ ancestor directory, per Concept 0008 (Per-Repo Config Resolution).
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 CONFIG_FILENAME = ".atlassian"
 
 
 def find_config(root: str) -> str | None:
     """Return the path to the first `.atlassian` file at or beneath root, or None."""
-    root = os.path.abspath(root)
-    for dirpath, dirnames, filenames in os.walk(root):
+    root_path = Path(root).resolve()
+    for dirpath, dirnames, filenames in os.walk(root_path):
         dirnames.sort()
         if CONFIG_FILENAME in filenames:
-            return os.path.join(dirpath, CONFIG_FILENAME)
+            return str(Path(dirpath) / CONFIG_FILENAME)
     return None
 
 
 def parse_config(path: str) -> dict[str, str]:
     """Parse `KEY=VALUE` lines; blank lines, `#` comments, and malformed lines are skipped."""
     values: dict[str, str] = {}
-    with open(path, encoding="utf-8") as f:
+    with Path(path).open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#") or "=" not in line:
