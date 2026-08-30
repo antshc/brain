@@ -6,7 +6,7 @@ from __future__ import annotations
 import re
 
 from .inline import parse_inline
-from .patterns import HEADING_RE
+from .patterns import HEADING_RE, TOC_COMMENT_RE, WIDE_TABLE_MARKER_RE
 from .table_grid import validate_table_grid
 
 CODE_LANG_ALLOWLIST = {
@@ -51,17 +51,51 @@ def split_table_row(row: str) -> list[str]:
     return [c.strip().replace("\\|", "|") for c in cells]
 
 
+def build_toc_extension() -> dict:
+    """A Confluence-native table of contents macro node, for the `<!-- confluence:toc -->` marker."""
+    return {
+        "type": "extension",
+        "attrs": {
+            "layout": "default",
+            "extensionType": "com.atlassian.confluence.macro.core",
+            "extensionKey": "toc",
+            "parameters": {"macroParams": {}},
+        },
+    }
+
+
 def parse_blocks(lines: list[str]) -> list[dict]:
     """Parse a list of Markdown lines into ADF block nodes."""
     blocks: list[dict] = []
     i = 0
     n = len(lines)
+    pending_wide_table = False
     while i < n:
         line = lines[i]
 
         if not line.strip():
             i += 1
             continue
+
+        if TOC_COMMENT_RE.match(line):
+            blocks.append(
+                {
+                    "type": "expand",
+                    "attrs": {"title": "Table of Contents"},
+                    "content": [build_toc_extension()],
+                }
+            )
+            i += 1
+            continue
+
+        if WIDE_TABLE_MARKER_RE.match(line):
+            pending_wide_table = True
+            i += 1
+            continue
+
+        # The marker (if any) only applies to the very next construct; drop it otherwise.
+        apply_wide_table = pending_wide_table
+        pending_wide_table = False
 
         heading_m = HEADING_RE.match(line)
         if heading_m:
@@ -135,7 +169,8 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             while i < n and _TABLE_ROW_RE.match(lines[i]):
                 rows.append(split_table_row(lines[i]))
                 i += 1
-            blocks.append(build_table(header_cells, rows))
+            layout = "wide" if apply_wide_table else "default"
+            blocks.append(build_table(header_cells, rows, layout=layout))
             continue
 
         if _BULLET_RE.match(line) or _ORDERED_RE.match(line):
@@ -256,7 +291,7 @@ def parse_list(lines: list[str], i: int) -> tuple[dict, int]:
     return {"type": list_type, "content": items}, i
 
 
-def build_table(header_cells: list[str], rows: list[list[str]]) -> dict:
+def build_table(header_cells: list[str], rows: list[list[str]], layout: str = "default") -> dict:
     grid = [[{} for _ in header_cells]] + [[{} for _ in row] for row in rows]
     validate_table_grid(grid, table_label="table")
 
@@ -270,6 +305,6 @@ def build_table(header_cells: list[str], rows: list[list[str]]) -> dict:
 
     return {
         "type": "table",
-        "attrs": {"isNumberColumnEnabled": False, "layout": "default"},
+        "attrs": {"isNumberColumnEnabled": False, "layout": layout},
         "content": table_rows,
     }

@@ -29,6 +29,9 @@ def _media_node(media_id: str, page_id: str) -> dict:
 def replace_markers(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[dict, int]:
     """Replace every marker paragraph in `adf["content"]` with its uploaded media node.
 
+    Top-level only — legacy/back-compat; prefer `substitute_media` for markers nested
+    inside other content (e.g. `<details><summary>` -> `expand` nodes).
+
     Mutates and returns the same `adf` dict, plus the number of markers replaced.
     """
     new_content = []
@@ -41,4 +44,41 @@ def replace_markers(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[
         else:
             new_content.append(node)
     adf["content"] = new_content
+    return adf, replaced
+
+
+def _substitute_in_place(nodes: list[dict], media_ids_by_index: dict, page_id: str) -> int:
+    replaced = 0
+    for i, node in enumerate(nodes):
+        index = _marker_index(node)
+        if index is not None:
+            nodes[i] = _media_node(media_ids_by_index[index], page_id)
+            replaced += 1
+        elif isinstance(node.get("content"), list):
+            replaced += _substitute_in_place(node["content"], media_ids_by_index, page_id)
+    return replaced
+
+
+def _verify_no_markers(nodes: list[dict]) -> None:
+    for node in nodes:
+        if node.get("type") == "text":
+            match = MEDIA_MARKER_RE.match(node.get("text", ""))
+            if match:
+                raise RuntimeError(f"leftover marker after substitution: {node['text']!r}")
+        if isinstance(node.get("content"), list):
+            _verify_no_markers(node["content"])
+
+
+def substitute_media(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[dict, int]:
+    """Replace every marker paragraph anywhere in `adf`, at any nesting depth.
+
+    Recursively walks every node with a `content` list (expand/table/list/etc.), not
+    just top-level `adf["content"]`. After substitution, verifies no `\\x00MEDIA:`
+    marker text remains anywhere in the tree — raises `RuntimeError` naming the leftover
+    marker if one does, so a partial publish never happens silently.
+
+    Mutates and returns the same `adf` dict, plus the number of markers replaced.
+    """
+    replaced = _substitute_in_place(adf["content"], media_ids_by_index, page_id)
+    _verify_no_markers(adf["content"])
     return adf, replaced

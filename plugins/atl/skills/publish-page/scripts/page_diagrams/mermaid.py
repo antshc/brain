@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 from .patterns import HEADING_RE, SUMMARY_RE, media_marker
@@ -64,13 +65,17 @@ def render_diagrams(diagrams: list[dict], assets_dir: str, background: str = "wh
         mmd_path = assets_path / f"{d['name']}.mmd"
         png_path = assets_path / f"{d['name']}.png"
         mmd_path.write_text(apply_light_theme(d["code"]) + "\n")
-        subprocess.run(
+        result = subprocess.run(
             [
                 "mmdc", "-i", str(mmd_path), "-o", str(png_path), "-w", "1040", "-s", "2", "-b", background,
                 "--cssFile", str(css_path),
             ],
-            check=True,
+            capture_output=True,
+            text=True,
         )
+        if result.returncode != 0:
+            sys.stderr.write(result.stderr)
+            result.check_returncode()
         d["mmd_path"] = str(mmd_path)
         d["png_path"] = str(png_path)
         d["filename"] = f"{d['name']}.png"

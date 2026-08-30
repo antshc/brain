@@ -1,5 +1,8 @@
 import os
+import subprocess
 from unittest.mock import patch
+
+import pytest
 
 from page_diagrams.mermaid import extract_mermaid, render_diagrams, slugify
 from page_diagrams.theme import LIGHT_THEME_CSS
@@ -52,6 +55,7 @@ def test_render_diagrams_writes_mmd_and_invokes_mmdc(tmp_path):
     assets_dir = tmp_path / "assets"
 
     with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
+        mock_run.return_value.returncode = 0
         render_diagrams(diagrams, str(assets_dir), background="transparent")
 
     assert os.path.isdir(assets_dir)
@@ -67,7 +71,7 @@ def test_render_diagrams_writes_mmd_and_invokes_mmdc(tmp_path):
     assert cmd[2] == str(mmd_path)
     assert "-b" in cmd and cmd[cmd.index("-b") + 1] == "transparent"
     assert "--cssFile" in cmd and cmd[cmd.index("--cssFile") + 1] == str(css_path)
-    assert mock_run.call_args.kwargs == {"check": True}
+    assert mock_run.call_args.kwargs == {"capture_output": True, "text": True}
 
     assert diagrams[0]["mmd_path"] == str(mmd_path)
     assert diagrams[0]["png_path"] == str(assets_dir / "00-title.png")
@@ -77,7 +81,8 @@ def test_render_diagrams_recolors_dark_theme_hexes_in_rendered_mmd(tmp_path):
     diagrams = [{"index": 0, "code": "classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9", "name": "00-title"}]
     assets_dir = tmp_path / "assets"
 
-    with patch("page_diagrams.mermaid.subprocess.run"):
+    with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
+        mock_run.return_value.returncode = 0
         render_diagrams(diagrams, str(assets_dir))
 
     mmd_path = assets_dir / "00-title.mmd"
@@ -96,3 +101,17 @@ def test_render_diagrams_raises_file_not_found_when_mmdc_missing(tmp_path):
             pass
         else:
             raise AssertionError("expected FileNotFoundError to propagate")
+
+
+def test_render_diagrams_surfaces_stderr_and_raises_on_nonzero_exit(tmp_path, capsys):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
+        mock_run.return_value.returncode = 1
+        mock_run.return_value.stderr = "mmdc failed: boom\n"
+        mock_run.return_value.check_returncode.side_effect = subprocess.CalledProcessError(1, ["mmdc"])
+        with pytest.raises(subprocess.CalledProcessError):
+            render_diagrams(diagrams, str(assets_dir))
+
+    assert "mmdc failed: boom" in capsys.readouterr().err

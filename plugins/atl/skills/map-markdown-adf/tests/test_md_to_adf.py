@@ -99,6 +99,36 @@ def test_bullet_list_then_ordered_list_stay_separate(md_to_adf):
     assert len(doc["content"][1]["content"]) == 2
 
 
+def test_parse_blocks_toc_comment_becomes_expand(md_to_adf):
+    doc = md_to_adf("<!-- confluence:toc -->\n\n# Section")
+    blocks = doc["content"]
+    assert blocks[0]["type"] == "expand"
+    assert blocks[0]["attrs"]["title"] == "Table of Contents"
+    assert blocks[0]["content"][0]["attrs"]["extensionKey"] == "toc"
+    assert blocks[1]["type"] == "heading"
+
+
+def test_parse_blocks_wide_table_marker_sets_wide_layout(md_to_adf):
+    doc = md_to_adf("<!-- confluence:wide-table -->\n\n| a | b |\n| --- | --- |\n| 1 | 2 |")
+    blocks = doc["content"]
+    assert len(blocks) == 1
+    assert blocks[0]["type"] == "table"
+    assert blocks[0]["attrs"]["layout"] == "wide"
+
+
+def test_parse_blocks_no_marker_keeps_default_layout(md_to_adf):
+    doc = md_to_adf("| a | b |\n| --- | --- |\n| 1 | 2 |")
+    assert doc["content"][0]["attrs"]["layout"] == "default"
+
+
+def test_parse_blocks_wide_table_marker_dropped_if_not_followed_by_table(md_to_adf):
+    doc = md_to_adf("<!-- confluence:wide-table -->\nJust a paragraph.\n\n| a | b |\n| --- | --- |\n| 1 | 2 |")
+    blocks = doc["content"]
+    assert blocks[0]["type"] == "paragraph"
+    table_block = next(b for b in blocks if b["type"] == "table")
+    assert table_block["attrs"]["layout"] == "default"
+
+
 @pytest.mark.parametrize(
     "markdown_span,expected",
     [

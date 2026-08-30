@@ -113,6 +113,20 @@ def test_expand(adf_to_md):
     assert adf_to_md(doc) == "<details>\n<summary>Click me</summary>\n\nhidden text\n</details>"
 
 
+def test_expand_with_toc_extension_renders_toc_comment(adf_to_md):
+    toc_extension = {
+        "type": "extension",
+        "attrs": {
+            "layout": "default",
+            "extensionType": "com.atlassian.confluence.macro.core",
+            "extensionKey": "toc",
+            "parameters": {"macroParams": {}},
+        },
+    }
+    doc = _doc({"type": "expand", "attrs": {"title": "Table of Contents"}, "content": [toc_extension]})
+    assert adf_to_md(doc) == "<!-- confluence:toc -->"
+
+
 def test_table(adf_to_md):
     doc = _doc(
         {
@@ -183,3 +197,29 @@ def test_table_colspan(adf_to_md):
         "| row 1 col 0 | row 1 col 1-2 |\n"
         "| row 2 col 0-2 |"
     )
+
+
+def test_wide_table_layout_renders_prefixed_comment(adf_to_md):
+    doc = _doc(
+        {
+            "type": "table",
+            "attrs": {"isNumberColumnEnabled": False, "layout": "wide"},
+            "content": [
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {"type": "tableHeader", "content": [_p(_t("a"))]},
+                        {"type": "tableHeader", "content": [_p(_t("b"))]},
+                    ],
+                },
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {"type": "tableCell", "content": [_p(_t("1"))]},
+                        {"type": "tableCell", "content": [_p(_t("2"))]},
+                    ],
+                },
+            ],
+        }
+    )
+    assert adf_to_md(doc) == "<!-- confluence:wide-table -->\n\n| a | b |\n| --- | --- |\n| 1 | 2 |"
