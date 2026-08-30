@@ -22,7 +22,7 @@ Parse `{{input}}`:
 **Step 3 — Resolve `cloudId`**
 - `<site>` extracted from a URL → use it directly as `cloudId`.
 - Else use Preflight's `cloudId`.
-- Still empty → call `getAccessibleAtlassianResources` once and use the matching resource's `cloudId`. Never call it again this session once resolved.
+- Still empty → call `getAccessibleAtlassianResources` once and use the matching resource's `cloudId`, per Preflight's standing rule.
 
 **Step 4 — Fetch**
 Call `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`.
