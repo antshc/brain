@@ -44,4 +44,4 @@ flowchart TD
 ```
 </details>
 
-<!-- `added` = solid green border, new node. `removed` = solid red border, deleted node. `subgraph` groups existing nodes into a labeled box, matching `namespace` in class diagrams. Delete unused example nodes/classDefs/subgraphs. -->
+<!-- `added` = solid green border, new node. `removed` = solid red border, deleted node. `subgraph` groups existing nodes into a labeled box. Delete unused example nodes/classDefs/subgraphs. -->

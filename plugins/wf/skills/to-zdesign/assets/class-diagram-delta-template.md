@@ -22,20 +22,18 @@ Delete this instruction. -->
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 classDiagram
     direction LR
-    namespace {{namespace}} {
-        class {{boundaryClass}}
-        class {{capabilityOwnerClass}}
-        class {{dependencyInterface}} {
-            +method(type) type
-        }
-        class {{newClass}}:::added {
-            +field : type
-            +method(type) type
-        }
-        class {{deletedClass}}:::removed
-        class {{changedClass}}:::memberChanged {
-            +[add] newMethod(type) type
-        }
+    class {{boundaryClass}}
+    class {{capabilityOwnerClass}}
+    class {{dependencyInterface}} {
+        +method(type) type
+    }
+    class {{newClass}}:::added {
+        +field : type
+        +method(type) type
+    }
+    class {{deletedClass}}:::removed
+    class {{changedClass}}:::memberChanged {
+        +[add] newMethod(type) type
     }
 
     {{boundaryClass}} --> {{capabilityOwnerClass}}
