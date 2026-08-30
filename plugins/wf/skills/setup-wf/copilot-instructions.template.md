@@ -71,7 +71,7 @@ Consult these before searching the code:
 | `AWSSDK.*` / `AWS.Logger.*` packages | `search-aws-sdk-nuget` skill |
 | AWS service behavior, limits, quotas, APIs | `search-aws-docs` skill |
 | Live AWS resource state | `query-aws` skill |
-| Jira / Confluence | `configure-atlassian-mcp` skill |
+| Jira / Confluence | `preflight-atl` skill |
 
 Each skill's frontmatter carries its full trigger conditions; do not restate them here.
 
@@ -111,11 +111,11 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 - You MUST create every skill under `.github/skills/<skill-name>/` at the reporoot — never in the user skills directory (`~/.copilot/skills/`) or inside `workspace/`. Each skill is its own folder holding `SKILL.md` plus any `reference/` files it needs.
 - You MUST NOT reference a skill's own files via bare relative markdown links (e.g. `[memory.md](reference/memory.md)`); such links resolve against the runtime CWD (which may be a worktree, not the skill folder) and silently fail to load. Load reference files via the skill's stated absolute base directory instead.
 ### Available skills:
-`configure-atlassian-mcp`, `create-jira-bug`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws`, `graphify` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
+`preflight-atl`, `create-jira-bug`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws`, `graphify` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
 
 ## 8. Tools
 
 - **AWS CLI** — configured; see the `query-aws` skill for profiles, account IDs, and usage. Always pass `--profile` explicitly and confirm before running any mutating command.
-- **Atlassian Rovo MCP** — Jira/Confluence access; config read from `.env/.atlmcp.env`. See the `configure-atlassian-mcp` skill for setup, confidentiality, and query-limit rules.
+- **Atlassian Rovo MCP** — Jira/Confluence access; config read from `.atlassian`. See the `preflight-atl` skill for setup, confidentiality, and query-limit rules.
 - **AWS Documentation MCP Server** (`aws-knowledge-mcp-server`) — read-only official AWS docs lookup; see the `search-aws-docs` skill.
 - **`mmdc` (`@mermaid-js/mermaid-cli`)** — renders Mermaid diagrams (e.g. from docs) to images/SVG/PDF; installed globally via `npm install -g @mermaid-js/mermaid-cli`. Verify with `mmdc --version`.
