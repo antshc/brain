@@ -36,18 +36,18 @@ Reference by number from the parent spec. Omit a subsection if the spec has none
 
 **Functional Requirements:**
 
-1. {{functionalRequirementName}}
-2. ...
+{{functionalRequirementName}}
+...
 
 **Business Rule:**
 
-1. {{businessRuleName}}
-2. ...
+{{businessRuleName}}
+...
 
 **Edge cases:**
 
-1. {{edgeCaseName}}
-2. ...
+{{edgeCaseName}}
+...
 
 ## Implementation Decisions
 <implementation-decisions-rule>
