@@ -1,7 +1,9 @@
 """Round-trip: Markdown -> ADF -> Markdown preserves wording word for word."""
 import re
 
-_ORIGINAL_MD = """# Heading One
+_ORIGINAL_MD = """<!-- confluence:toc -->
+
+# Heading One
 
 A paragraph with **bold**, *italic*, `inline code`, a [link](https://example.com/page), and ~~strikethrough~~ text.
 
@@ -21,6 +23,12 @@ x = 1
 | --- | --- |
 | one | two |
 | three | four |
+
+<!-- confluence:wide-table -->
+
+| Wide A | Wide B |
+| --- | --- |
+| five | six |
 
 ---
 

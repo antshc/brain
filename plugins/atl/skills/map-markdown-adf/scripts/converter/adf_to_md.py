@@ -38,10 +38,16 @@ def render_block(node: dict) -> str:
         return "---"
     if node_type == "expand":
         title = node.get("attrs", {}).get("title", "")
-        inner = render_blocks(node.get("content", []))
+        content = node.get("content", [])
+        if len(content) == 1 and content[0].get("attrs", {}).get("extensionKey") == "toc":
+            return "<!-- confluence:toc -->"
+        inner = render_blocks(content)
         return f"<details>\n<summary>{title}</summary>\n\n{inner}\n</details>"
     if node_type == "table":
-        return render_table(node)
+        rendered = render_table(node)
+        if node.get("attrs", {}).get("layout") == "wide":
+            return f"<!-- confluence:wide-table -->\n\n{rendered}"
+        return rendered
     raise NotImplementedError(f"unhandled ADF node type '{node_type}'")
 
 

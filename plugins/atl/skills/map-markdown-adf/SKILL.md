@@ -46,6 +46,8 @@ Source wording is never summarized, corrected, or reinterpreted in either direct
 | Table | `table` / `tableRow` / `tableHeader` / `tableCell` |
 | Horizontal rule (`---`) | `rule` |
 | `<details><summary>` | `expand` (`attrs.title`) |
+| `<!-- confluence:toc -->` | `expand` + `toc` extension |
+| `<!-- confluence:wide-table -->` | `table.attrs.layout: "wide"` |
 
 ## Supported marks
 

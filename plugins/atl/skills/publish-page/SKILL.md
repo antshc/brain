@@ -41,6 +41,8 @@ python3 scripts/publish_page_diagrams.py extract < <mdPath>
 
 Prints `{"processedMarkdown": ..., "diagrams": [...]}`. `processedMarkdown` replaces every ```mermaid fence with a `\x00MEDIA:<index>\x00` marker paragraph — feed *this*, not the raw file, into Step 4. `hasDiagrams := len(diagrams) > 0`.
 
+Before extracting diagrams, this step also strips every `<!-- confluence:ignore:start -->` … `<!-- confluence:ignore:end -->` span (tags included) from the Markdown, so ignored content never reaches the published page. An unterminated `confluence:ignore:start` is a hard error — the command exits non-zero naming the mismatch; fix the Markdown and re-run rather than trying to work around it.
+
 **4 — Convert.** Pipe `processedMarkdown` into `/map-markdown-adf` **Action: Convert Markdown to ADF**. The result is `baseAdf`.
 
 **5 — Resolve the publish target.**
@@ -60,19 +62,34 @@ Else → **create**; resolve `spaceId`: supplied → use it. Else Preflight's `d
        --assets-dir <sibling-to-mdPath>/<mdPath-stem>.artifacts \
        --page-id <pageId> \
        --root "$HARNESS_REPO_PATH" \
+       --out <path to an output file> \
        < <path to the temp file>
      ```
      - Exits non-zero naming `mmdc` as the missing prerequisite when the renderer isn't on PATH — report that exact prerequisite, not a generic failure.
-     - On success prints `{"mediaIdsByIndex": {"<index>": "<fileId>", ...}}`.
+     - Prefer `--out`: it writes `{"mediaIdsByIndex": {"<index>": "<fileId>", ...}}` straight to that file instead of stdout, keeping the result out of chat context. Read `mediaIdsByIndex` back from that file for Step 6.3. Omitting `--out` keeps the legacy stdout-print behavior.
   3. Write `{"adf": <baseAdf>, "mediaIdsByIndex": <Step 6.2's output>}` to a temp file — never construct this substitution with an inline Python heredoc in the terminal, which mangles on long or special-character JSON. Then run:
      ```bash
-     python3 scripts/publish_page_diagrams.py replace-markers \
+     python3 scripts/publish_page_diagrams.py substitute-media \
        --page-id <pageId> \
        < <path to the temp file>
      ```
-     Prints `{"adf": ..., "replaced": <count>}` — `finalAdf := adf` from that output.
+     Replaces every marker anywhere in `baseAdf`, at any nesting depth (e.g. inside a `<details><summary>` -> `expand` node) — not just top-level. Verifies no marker paragraph is left afterward and exits non-zero naming the leftover marker if one survives, rather than silently publishing it. Prints `{"adf": ..., "replaced": <count>}` — `finalAdf := adf` from that output.
 
-**7 — Publish.**
+**7 — Publish.** First run the size-based fallback so a large `finalAdf` never gets mangled/truncated by the MCP's inline-body publish tools (roughly 100-300KB is where that starts to bite):
+
+```bash
+python3 scripts/publish_page_diagrams.py publish-adf \
+  --page-id <pageId, when updating> \
+  --space-id <spaceId, when creating> \
+  --title <title> \
+  --root "$HARNESS_REPO_PATH" \
+  < <path to a temp file holding {"adf": <finalAdf>}>
+```
+
+- `{"method": "mcp", ...}` → `finalAdf` is small enough; proceed with the MCP calls below as usual.
+- `{"method": "rest", "pageId": ..., ...}` → the script already published `finalAdf` directly via the REST v2 pages API (`atlassian-python-api`, same credentials as the diagram branch). Skip every MCP publish call below entirely — do not also call `updateConfluencePage`/`createConfluencePage`, which would either duplicate the write or clobber it with a truncated body. Report the page URL built from the returned `pageId`.
+
+When `method` is `mcp`:
 - Update case → `updateConfluencePage` with `cloudId`, `pageId`, `body`: `finalAdf` JSON-stringified, `contentFormat: "adf"`, `title` (if changed).
 - Create case, no diagrams → `createConfluencePage` with `cloudId`, `spaceId`, `title`, `body`: `finalAdf` JSON-stringified, `contentFormat: "adf"`.
 - Create case, diagrams present → the page exists from Step 6; `updateConfluencePage` with `cloudId`, `pageId`, `body`: `finalAdf` JSON-stringified, `contentFormat: "adf"`, `title`.
@@ -85,6 +102,8 @@ Report the page URL from the tool result and, when diagrams were rendered, confi
 - A named `pageId` is always updated in place; a page is created only when none is named.
 - Never choose a space silently.
 - Non-```mermaid diagram formats and bulk publishing are out of scope.
+- Verifying a publish MUST use a read-only call (e.g. fetching the page back) — never re-run `updateConfluencePage`/`createConfluencePage` with placeholder or test content just to check the result, which would overwrite the real publish.
+- Prefer the file-based/script-based paths above (`--out`, temp files piped into the CLI) over reading large diagram or ADF payloads through chat context — it's slower and risks truncation for no benefit.
 
 ## Degraded mode
 
