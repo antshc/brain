@@ -87,3 +87,18 @@ def test_render_attach_with_no_diagrams_skips_render_and_upload(tmp_path, capsys
     mock_upload.assert_not_called()
     out = json.loads(capsys.readouterr().out)
     assert out["mediaIdsByIndex"] == {}
+
+
+def test_replace_markers_prints_final_adf_and_count(capsys):
+    adf = {
+        "content": [
+            {"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]},
+        ]
+    }
+    payload = json.dumps({"adf": adf, "mediaIdsByIndex": {"0": "file-1"}})
+    with patch("sys.stdin.read", return_value=payload):
+        main(["replace-markers", "--page-id", "123"])
+    out = json.loads(capsys.readouterr().out)
+    assert out["replaced"] == 1
+    assert out["adf"]["content"][0]["type"] == "mediaSingle"
+    assert out["adf"]["content"][0]["content"][0]["attrs"]["collection"] == "contentId-123"

@@ -54,27 +54,23 @@ Else → **create**; resolve `spaceId`: supplied → use it. Else Preflight's `d
 - **No token** (`tokenAvailable` false): replace every `\x00MEDIA:<n>\x00` marker in `baseAdf` with a paragraph noting that diagram was not rendered because `ATLASSIAN_API_TOKEN` is not configured; `finalAdf := baseAdf` with those substitutions. After publishing, name the skipped diagrams and the API token as the missing prerequisite.
 - **Token available**: a page must exist before an attachment can be uploaded to it.
   1. `pageId` known (update case) → use it. Else create the page now via `createConfluencePage` (`cloudId`, `spaceId`, `title`, `body`: `baseAdf` JSON-stringified with markers swapped for the no-token note above, `contentFormat: "adf"`) — a placeholder write Step 7 replaces; capture the returned `pageId`.
-  2. Run:
+  2. Write `{"diagrams": [...]}` (Step 3's `diagrams`) to a temp file — never inline it into the terminal command via a heredoc, which mangles on long or special-character JSON. Then run:
      ```bash
      python3 scripts/publish_page_diagrams.py render-attach \
        --assets-dir <sibling-to-mdPath>/<mdPath-stem>.artifacts \
        --page-id <pageId> \
        --root "$HARNESS_REPO_PATH" \
-       < <diagrams JSON from Step 3, as {"diagrams": [...]}>
+       < <path to the temp file>
      ```
      - Exits non-zero naming `mmdc` as the missing prerequisite when the renderer isn't on PATH — report that exact prerequisite, not a generic failure.
      - On success prints `{"mediaIdsByIndex": {"<index>": "<fileId>", ...}}`.
-  3. Replace each `\x00MEDIA:<index>\x00` marker in `baseAdf` with:
-     ```json
-     {
-       "type": "mediaSingle",
-       "attrs": { "layout": "center", "width": 768, "widthType": "pixel" },
-       "content": [
-         { "type": "media", "attrs": { "id": "<mediaIdsByIndex[index]>", "type": "file", "collection": "contentId-<pageId>" } }
-       ]
-     }
+  3. Write `{"adf": <baseAdf>, "mediaIdsByIndex": <Step 6.2's output>}` to a temp file — never construct this substitution with an inline Python heredoc in the terminal, which mangles on long or special-character JSON. Then run:
+     ```bash
+     python3 scripts/publish_page_diagrams.py replace-markers \
+       --page-id <pageId> \
+       < <path to the temp file>
      ```
-     `finalAdf := baseAdf` with every marker replaced.
+     Prints `{"adf": ..., "replaced": <count>}` — `finalAdf := adf` from that output.
 
 **7 — Publish.**
 - Update case → `updateConfluencePage` with `cloudId`, `pageId`, `body`: `finalAdf` JSON-stringified, `contentFormat: "adf"`, `title` (if changed).
