@@ -10,6 +10,7 @@ import argparse
 import json
 import sys
 
+from .adf import replace_markers
 from .env import get_confluence, load_credentials
 from .mermaid import extract_mermaid, render_diagrams
 from .attachments import upload_diagrams
@@ -30,6 +31,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
     render.add_argument("--page-id", required=True, help="Confluence pageId to attach the rendered images to")
     render.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
     render.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
+
+    replace = sub.add_parser(
+        "replace-markers",
+        help="Replace \\x00MEDIA:<index>\\x00 marker paragraphs in an ADF document (stdin: "
+        "{\"adf\": ..., \"mediaIdsByIndex\": {...}}) with their uploaded media nodes. Pure, offline.",
+    )
+    replace.add_argument("--page-id", required=True, help="Confluence pageId the media belongs to")
 
     return parser
 
@@ -69,14 +77,23 @@ def _run_render_attach(args: argparse.Namespace) -> None:
     sys.stdout.write("\n")
 
 
+def _run_replace_markers(args: argparse.Namespace) -> None:
+    payload = json.loads(sys.stdin.read())
+    adf, replaced = replace_markers(payload["adf"], payload["mediaIdsByIndex"], args.page_id)
+    json.dump({"adf": adf, "replaced": replaced}, sys.stdout)
+    sys.stdout.write("\n")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
 
     if args.action == "extract":
         _run_extract()
-    else:
+    elif args.action == "render-attach":
         _run_render_attach(args)
+    else:
+        _run_replace_markers(args)
 
 
 if __name__ == "__main__":
