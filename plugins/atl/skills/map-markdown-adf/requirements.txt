@@ -1,0 +1,1 @@
+pytest>=7  # dev-only: running tests/
