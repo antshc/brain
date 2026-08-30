@@ -1,23 +1,30 @@
-"""CLI orchestration: the diagram source -> image -> attachment-payload test seam for
-`publish-page`'s token branch. Kept thin — its own logic (action dispatch, error framing) is
-what's tested here; the pipeline steps it calls are tested in their own modules. Page creation,
-Markdown<->ADF conversion, and the final MCP publish call are the invoking skill's job (prose,
-not this script) — see ../../SKILL.md.
+"""CLI orchestration: argument parsing, action dispatch, and error framing for every
+publish-page subcommand. `run` (see pipeline.py) chains the full pipeline — extract,
+Markdown<->ADF conversion, attachment upload, marker substitution, and publish; the
+older per-step subcommands (`extract`/`render-attach`/`substitute-media`/`publish-adf`)
+remain for the MCP/degraded fallback and ad-hoc use — see ../../SKILL.md.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import tempfile
+from pathlib import Path
 
 from .adf import replace_markers, substitute_media
 from .env import get_confluence, load_credentials
 from .mermaid import extract_mermaid, render_diagrams
 from .attachments import upload_diagrams
 from .patterns import strip_ignored_sections
+from .pipeline import publish
 from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
 
-DEFAULT_THRESHOLD_BYTES = 200_000
+# Default ceiling above which publish-adf/run switch to REST instead of MCP. The
+# practical limit here is what an agent can safely inline into an MCP tool argument, not
+# a Confluence/MCP transport limit — pass 0 to always force REST.
+DEFAULT_THRESHOLD_BYTES = 50_000
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -57,22 +64,62 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     substitute.add_argument("--page-id", required=True, help="Confluence pageId the media belongs to")
 
-    publish = sub.add_parser(
+    publish_adf = sub.add_parser(
         "publish-adf",
         help="Auto-detect ADF body size (stdin: {\"adf\": ...}) and either publish it directly via "
         "REST v2 (when over threshold) or signal back to use the MCP publish call (when under it).",
     )
-    publish.add_argument("--page-id", help="Confluence pageId to update (update path)")
-    publish.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
-    publish.add_argument("--title", help="Page title (create path, or update path when the title changed)")
-    publish.add_argument("--root", help="Harness Repo Path to bound the `.atlassian` search to")
-    publish.add_argument(
+    publish_adf.add_argument("--page-id", help="Confluence pageId to update (update path)")
+    publish_adf.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
+    publish_adf.add_argument("--title", help="Page title (create path, or update path when the title changed)")
+    publish_adf.add_argument("--root", help="Harness Repo Path to bound the `.atlassian` search to")
+    publish_adf.add_argument(
         "--threshold-bytes",
         type=int,
         default=DEFAULT_THRESHOLD_BYTES,
         help=f"ADF byte-size threshold above which REST publish is used instead of MCP (default: "
-        f"{DEFAULT_THRESHOLD_BYTES})",
+        f"{DEFAULT_THRESHOLD_BYTES}). The practical ceiling here is what an agent can safely inline "
+        f"into an MCP tool argument, not Confluence/MCP transport itself — pass 0 to always force REST.",
     )
+
+    run = sub.add_parser(
+        "run",
+        help="Full pipeline in one call: extract -> md-to-adf -> create/attach -> substitute -> "
+        "publish. Forces a REST publish whenever diagrams are present, regardless of "
+        "--threshold-bytes; falls back to an MCP handback for small, diagram-free bodies.",
+    )
+    run.add_argument("--md-path", required=True, help="Path to the local Markdown file to publish")
+    target = run.add_mutually_exclusive_group(required=True)
+    target.add_argument("--page-id", help="Confluence pageId to update (update path)")
+    target.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
+    run.add_argument("--title", help="Page title (default: the Markdown's first '#' heading)")
+    run.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    run.add_argument(
+        "--assets-dir",
+        help="Directory to write rendered .mmd/.png files into (default: <md sibling>/<md stem>.artifacts)",
+    )
+    run.add_argument("--out", help="Path to write the final ADF to (default: a temp file)")
+    run.add_argument(
+        "--threshold-bytes",
+        type=int,
+        default=DEFAULT_THRESHOLD_BYTES,
+        help=f"ADF byte-size threshold above which a diagram-free body is published via REST instead "
+        f"of MCP (default: {DEFAULT_THRESHOLD_BYTES}); ignored (forced to 0) whenever diagrams are "
+        f"present. Pass 0 to always force REST.",
+    )
+    run.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
+
+    combine = sub.add_parser(
+        "combine",
+        help='Combine an ADF file with an optional mediaIdsByIndex file into the {"adf":..., '
+        '"mediaIdsByIndex":...} shape substitute-media/publish-adf expect on stdin. Pure, offline.',
+    )
+    combine.add_argument("--adf", required=True, help="Path to a JSON file holding the ADF document")
+    combine.add_argument(
+        "--media-ids",
+        help='Path to a JSON file holding {"mediaIdsByIndex": ...} (e.g. render-attach\'s --out), optional',
+    )
+    combine.add_argument("--out", required=True, help="Path to write the combined JSON to")
 
     return parser
 
@@ -171,6 +218,55 @@ def _run_publish_adf(args: argparse.Namespace) -> None:
     sys.stdout.write("\n")
 
 
+def _run_run(args: argparse.Namespace) -> None:
+    md_path = Path(args.md_path)
+    assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.stem}.artifacts")
+    if args.out:
+        out_path = args.out
+    else:
+        fd, out_path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+
+    try:
+        result = publish(
+            md_path=str(md_path),
+            root=args.root,
+            page_id=args.page_id,
+            space_id=args.space_id,
+            title=args.title,
+            assets_dir=assets_dir,
+            out_path=out_path,
+            threshold_bytes=args.threshold_bytes,
+            mermaid_bg=args.mermaid_bg,
+        )
+    except FileNotFoundError:
+        print(
+            "error: mmdc not found on PATH — install @mermaid-js/mermaid-cli "
+            "(npm install -g @mermaid-js/mermaid-cli)",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+    except (ValueError, RuntimeError) as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1)
+
+    json.dump(result, sys.stdout)
+    sys.stdout.write("\n")
+
+
+def _run_combine(args: argparse.Namespace) -> None:
+    with open(args.adf, encoding="utf-8") as f:
+        adf = json.load(f)
+    payload: dict = {"adf": adf}
+    if args.media_ids:
+        with open(args.media_ids, encoding="utf-8") as f:
+            media_payload = json.load(f)
+        payload["mediaIdsByIndex"] = media_payload["mediaIdsByIndex"]
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(payload, f)
+        f.write("\n")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
@@ -183,6 +279,10 @@ def main(argv: list[str] | None = None) -> None:
         _run_substitute_media(args)
     elif args.action == "publish-adf":
         _run_publish_adf(args)
+    elif args.action == "run":
+        _run_run(args)
+    elif args.action == "combine":
+        _run_combine(args)
     else:
         _run_replace_markers(args)
 

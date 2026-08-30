@@ -1,7 +1,11 @@
-"""ADF marker substitution: swap each \\x00MEDIA:<index>\\x00 marker paragraph for its
-uploaded media node. Pure, offline — no I/O; tested directly.
+"""ADF marker substitution: swap each \\x00MEDIA:<index>\\x00 marker paragraph for a
+replacement node built by a caller-supplied callback — the uploaded media node here, or
+(see pipeline.py's `substitute_diagram_notes`) a "not rendered" note when no token is
+configured. Pure, offline — no I/O; tested directly.
 """
 from __future__ import annotations
+
+from typing import Callable
 
 from .patterns import MEDIA_MARKER_RE
 
@@ -47,15 +51,15 @@ def replace_markers(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[
     return adf, replaced
 
 
-def _substitute_in_place(nodes: list[dict], media_ids_by_index: dict, page_id: str) -> int:
+def _substitute_in_place(nodes: list[dict], make_replacement: Callable[[str], dict]) -> int:
     replaced = 0
     for i, node in enumerate(nodes):
         index = _marker_index(node)
         if index is not None:
-            nodes[i] = _media_node(media_ids_by_index[index], page_id)
+            nodes[i] = make_replacement(index)
             replaced += 1
         elif isinstance(node.get("content"), list):
-            replaced += _substitute_in_place(node["content"], media_ids_by_index, page_id)
+            replaced += _substitute_in_place(node["content"], make_replacement)
     return replaced
 
 
@@ -69,8 +73,13 @@ def _verify_no_markers(nodes: list[dict]) -> None:
             _verify_no_markers(node["content"])
 
 
-def substitute_media(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[dict, int]:
-    """Replace every marker paragraph anywhere in `adf`, at any nesting depth.
+def substitute_markers(adf: dict, make_replacement: Callable[[str], dict]) -> tuple[dict, int]:
+    """Replace every marker paragraph anywhere in `adf`, at any nesting depth, building
+    each replacement node via `make_replacement(index)`.
+
+    Shared traversal for `substitute_media` (uploaded media nodes) and
+    `pipeline.substitute_diagram_notes` ("not rendered" notes) — both walk the same
+    tree shape, so both go through this one implementation instead of two.
 
     Recursively walks every node with a `content` list (expand/table/list/etc.), not
     just top-level `adf["content"]`. After substitution, verifies no `\\x00MEDIA:`
@@ -79,6 +88,11 @@ def substitute_media(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple
 
     Mutates and returns the same `adf` dict, plus the number of markers replaced.
     """
-    replaced = _substitute_in_place(adf["content"], media_ids_by_index, page_id)
+    replaced = _substitute_in_place(adf["content"], make_replacement)
     _verify_no_markers(adf["content"])
     return adf, replaced
+
+
+def substitute_media(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[dict, int]:
+    """Replace every marker paragraph anywhere in `adf` with its uploaded media node."""
+    return substitute_markers(adf, lambda index: _media_node(media_ids_by_index[index], page_id))
