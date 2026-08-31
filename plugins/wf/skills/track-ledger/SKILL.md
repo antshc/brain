@@ -1,6 +1,6 @@
 ---
 name: track-ledger
-description: Own the session ledger at /memories/session/domain-model-ledger.md — its location, section names, line grammar, and compression rule. Records which Concept/ADR/service records were opened or skipped, the surface terms touched so far, and every decision or assumption staged this session. Called by grill-design; owns the grammar only, never when to log or whether an item survives a veto.
+description: Own the session ledger at /memories/session/domain-model-ledger.md — its location, section names, line grammar, and compression rule. Records which Concept/ADR/service records were opened or skipped, the surface terms touched so far, and every decision or assumption staged this session. Called by grill-design; owns the grammar only, never when to log or whether an item is recorded.
 ---
 
 # Track Ledger
@@ -31,24 +31,23 @@ Returns which of the supplied terms were new — the caller's trigger for a re-s
 
 ## Log decision
 
-Writes into `Decisions / assumptions` — one line per item; position in the section carries pending/cleared status, so no `pending veto` suffix is needed.
+Writes into `Decisions / assumptions` — one line per item.
 
 * `{{item}} — assumed, evidence: "{{source}}"`
+* `{{item}} — assumed, recorded: {{path}}`
 * `{{item}} — decided by user, feature decision, grounded: "{{source}}"`
 * `{{item}} — decided by user, recorded: {{path}}`
 * `{{item}} — rejected, reason: "{{source}}"`
-* `{{item}} — offered {{ADR|Concept}}, deferred: "{{reason}}"`
-* `{{item}} — offered {{ADR|Concept}}, declined: "{{reason}}"`
 
 Three further forms record a **gap in the source** rather than a decision — each names the record and key to repair, and each is resolved by the caller's closing harvest:
 
 * `{{item}} — asked, gate miss: {{gate}}, nearest source: {{path|none}}`
-* `{{item}} — vetoed, evidence was: {{path}}#{{key}}`
+* `{{item}} — corrected, evidence was: {{path}}#{{key}}`
 * `{{item}} — drift, code contradicts: {{path}}#{{key}}`
 
 Append `, repaired: {{path}}#{{key}}` to a gap line once its fix is written; a repaired line is not reproduced under compression.
 
-Also rewrites or deletes an existing line, located by `{{item}}` — used when a staged item is cleared or vetoed at the end of a session.
+Also rewrites or deletes an existing line, located by `{{item}}` — used when the user corrects a staged item.
 
 Returns the written line, or confirmation of the rewrite/deletion.
 

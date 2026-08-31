@@ -1,6 +1,6 @@
 ---
 name: record-adr
-description: Capture one localized, non-obvious architectural decision as an ADR the moment it crystallises. Owns ADR-FORMAT.md, the "when to write an ADR" gate, numbering, and the approval-gate distinction between a direct request and an offer. Called directly by explicit user request, or invoked as an offer by grill-design.
+description: Capture one localized, non-obvious architectural decision as an ADR the moment it crystallises. Owns ADR-FORMAT.md, the "when to write an ADR" gate, numbering, and the choice between extending an existing record and creating a new one. Called directly by explicit user request, or invoked by grill-design.
 ---
 
 # Record ADR
@@ -17,6 +17,16 @@ All three must be true — any miss, skip it:
 
 Qualifies: architectural shape (monorepo, event-sourced write model); integration patterns between contexts (domain events vs. synchronous HTTP); technology choices carrying lock-in (database, bus, auth provider, deployment target — not every library); boundary and ownership decisions, where the explicit no-s matter as much as the yes-s; deliberate deviations from the obvious path, which stop the next engineer "fixing" something intentional; constraints invisible in the code (compliance, latency contracts); rejected alternatives whose rejection is non-obvious.
 
+## Extend or create
+
+<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
+
+Runs before any write. A near-duplicate record is worse than a longer one: it splits authority over a decision area, and the `owns` key can then name only one of them.
+
+1. Run `/index-docs`' **Scan and match** over the `Architecture Decision Records` and `Crosscutting Concepts` tables with this decision's surface — its terms and the paths it governs.
+2. A matched record whose scope or `owns` already covers this decision area → **extend it**: amend the body, and sharpen `default`, `owns`, `trigger`, or `applies_to` to cover the new case. Resync its row via **Sync index row**. Stop here.
+3. No match covers the area → **create** a new ADR. Its `owns` phrases must not collide with any existing record's — a phrase belongs to exactly one record.
+
 ## Lazy creation
 
 Create `docs/adr/` when the first ADR is ready — not before; do nothing if it exists.
@@ -32,7 +42,7 @@ Highest four-digit `NNNN` filename prefix in `docs/adr/`, plus 1, zero-padded to
 <!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
 
 - **Explicit direct request** ("record an ADR for X") — approval is already given; draft and write immediately.
-- **Offered by an interview-style caller** (`grill-design`) — the offer itself is the approval gate: draft it, present it, and only write once the user explicitly responds to that specific offer.
+- **Invoked by an interview-style caller** (`grill-design`) — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.
 
 ## Keeping the index in sync
 

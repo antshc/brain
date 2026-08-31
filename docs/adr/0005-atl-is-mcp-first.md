@@ -1,7 +1,6 @@
 ---
 id: "0005"
 title: atl is MCP-first with Python-owned conversion
-status: Accepted
 trigger: >-
   merging or splitting the Atlassian plugins, adding an `atl` skill, choosing between the Atlassian MCP and a
   Python/REST backend for a Jira or Confluence operation, Markdown-to-ADF or ADF-to-Markdown conversion,
