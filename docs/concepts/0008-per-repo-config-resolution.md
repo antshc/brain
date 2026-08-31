@@ -1,7 +1,6 @@
 ---
 id: "0008"
 title: Per-Repo Config Resolution
-status: Accepted
 trigger: >-
   a skill or agent reading per-repository configuration, adding a dotfile or convention folder under the Harness
   Repo Path, choosing between a fixed config path and a search, config lookup falling back to a second location,

@@ -10,7 +10,6 @@ Files live in `docs/concepts/` as `{{nnnn}}-{{slug}}.md`.
 ---
 id: "{{nnnn}}"
 title: {{conceptTitle}}
-status: {{status}}
 trigger: >-
   {{comma-separated trigger clauses}}
 summary: >-
@@ -49,7 +48,6 @@ YAML frontmatter is **mandatory** and is the machine-readable contract for the r
 |-----|----------|-------|
 | `id` | yes | Quoted four-digit record number, matching the filename prefix. |
 | `title` | yes | Same text as the `# ` heading and the index row's record cell. |
-| `status` | yes | `Accepted`, `Superseded by NNNN`, or `Retired`. Never repeat it as prose in the body. |
 | `trigger` | yes | Comma-separated clauses naming the change types that make this Concept apply. Source of truth for the index's Trigger condition cell. |
 | `summary` | yes | The index row's Summary cell, verbatim. |
 | `default` | yes | One sentence naming the choice to take when the design doesn't state one. Written so a reader can act on it without opening the body — `index-docs` prepends it to the index row's Summary cell, and it is what lets a decision be settled without asking. State the choice, never the reference implementation that happens to embody it. |

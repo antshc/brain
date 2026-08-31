@@ -111,7 +111,7 @@ _Avoid_: final review, wrap-up
 _Plugins_set_: wf
 
 **Assumption-gap harvest**:
-The final closing-sweep step that reads every logged gate-miss, vetoed assumption, and drift entry from the session ledger and repairs the record behind each — adding missing `default`/`owns` keys, correcting wrong ones, or flagging drifted anchors — so the next session is not forced to ask the same question again.
+The final closing-sweep step that reads every logged gate-miss, corrected assumption, and drift entry from the session ledger and repairs the record behind each — adding missing `default`/`owns` keys, correcting wrong ones, or flagging drifted anchors — so the next session is not forced to ask the same question again.
 _Avoid_: gap repair, assumption cleanup
 _Plugins_set_: wf
 

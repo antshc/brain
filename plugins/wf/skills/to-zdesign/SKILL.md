@@ -24,7 +24,7 @@ Normalize every source:
 | --- | --- | --- |
 | Repository file | Repo-relative path | File in full |
 | GitHub issue | Canonical issue URL | `/manage-backlog` **Read ticket** |
-| Grill conversation | `{{originatingCanonicalSource}}#grill-design`; else `grill-design:{{featureId}}`; else `grill-design:name:{{inputSlug}}` | Confirmed decisions and cleared assumptions only |
+| Grill conversation | `{{originatingCanonicalSource}}#grill-design`; else `grill-design:{{featureId}}`; else `grill-design:name:{{inputSlug}}` | Confirmed decisions and recorded assumptions only |
 | Wayfinder map | Canonical map URL | Map, closed linked decision tickets, and their resolution comments |
 
 For a repository file, resolve the real path inside the repository. Store its repo-relative path with `/` separators and filesystem casing. Collapse `.` and `..`. Reject paths outside the repository.
@@ -35,7 +35,7 @@ For a map, run `/manage-backlog` **List sub-tickets**, then **Read ticket** for 
 
 Do not read open child bodies. Add each open child to `Open Questions` as `{{canonicalIssueUrl}} — {{title}}`. On a later run, remove that entry when the issue closes and consume its resolution. Deduplicate by canonical URL. Do not add open children to `Source Material`.
 
-Exclude unanswered questions, vetoed assumptions, rejected options, and superseded statements from conversation input. If no explicit source and no confirmed conversation outcome exist, stop without writing and request a source.
+Exclude unanswered questions, corrected assumptions, rejected options, and superseded statements from conversation input. If no explicit source and no confirmed conversation outcome exist, stop without writing and request a source.
 
 For a source-less grill conversation, derive `inputSlug` from its explicit feature ID or agreed feature name, in that order. If neither exists, stop without writing and request a target path or feature ID. A name-only grill identifier may create a new design but MUST NOT match an existing design; require an explicit target or feature ID to extend one.
 

@@ -5,7 +5,7 @@ description: A relentless interview and domain-modeling probe set that sharpens 
 
 # Grill Design
 
-Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-adr`, `/record-concept`, `/record-service`; codebase lookups → `/explore-codebase`. Call them; never restate their rules.
+Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-adr`, `/record-concept`; codebase lookups → `/explore-codebase`. Call them; never restate their rules.
 
 ## Session start
 
@@ -21,7 +21,7 @@ Interview me relentlessly about every aspect of this until we reach a shared und
 
 If a *fact* is discoverable in the environment (filesystem, tools), look it up rather than asking. If a *decision* clears the evidence checklist below, take it as a Feature Assumption rather than asking; if any part fails, put it to me and wait.
 
-Before confirming we've reached a shared understanding, list every Feature Decision and Feature Assumption made this session for me to *veto* — one bullet each, 1-3 sentences on what was decided/assumed and why: `- {{item}}: {{explanation}}`. Do not act until I confirm.
+Before confirming we've reached a shared understanding, report every Feature Decision and Feature Assumption made this session — one bullet each, 1-3 sentences on what was decided/assumed and why, tagged so the two are never confused: `- [decided] {{item}}: {{explanation}}` / `- [assumed] {{item}}: {{explanation}}`. This is a **report, not a gate**: nothing waits on it, everything recorded is already on disk, and `git diff` is the review surface.
 
 ## Decision states
 
@@ -33,12 +33,13 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 
 | State | Resolved by | Home | Durable write |
 |---|---|---|---|
-| Feature Assumption | model, via the checklist | ledger only | only after the veto sweep clears it — it is then a Decision. Never a *new* ADR/Concept: the record whose `owns`/`default` cleared the checklist already covers it |
+| Feature Assumption | model, via the checklist | ledger only | never a *new* ADR/Concept — the record whose `owns`/`default` cleared the checklist already covers it; a gap in that record is closing-sweep work |
+| Assumed record | model, no user answer asked for it, target skill's gate passes | ledger + document | same turn it crystallises — write it, no offer, no permission; reported `[assumed]` |
 | Feature Decision | user, feature-scoped (fails the ADR/Concept gate, resolves no term) | ledger only | never |
 | Decision | user | ledger + document | same turn it's approved |
 | Rejected option | user | ledger only | never |
 
-Log every state and every change of state via `/track-ledger`' **Log decision**, the turn it happens. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input, and an unlogged miss is a lost repair. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question MUST get a gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line and never replaces it: a feature-scoped decision that no record `owns` is *both* a Feature Decision *and* a `gate miss: single-authoritative-source, nearest source: none` (a new-record candidate), so log both lines. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
+Log every state and every change of state via `/track-ledger`' **Log decision**, the turn it happens. When I correct an assumption you made — at any point in the session — rewrite its ledger line that turn: the correction form when it stood on a record's `default`/`owns` (the closing sweep repairs that key), a deletion otherwise; if it had already reached a record, fix that record the same turn too. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input, and an unlogged miss is a lost repair. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question MUST get a gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line and never replaces it: a feature-scoped decision that no record `owns` is *both* a Feature Decision *and* a `gate miss: single-authoritative-source, nearest source: none` (a new-record candidate), so log both lines. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
 
 ## Context economy
 
@@ -75,31 +76,27 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **Code cross-reference** — when the user states how something works, check whether the code agrees, across user-facing, application, integration, and persistence boundaries: validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic. Contradicts the user → surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?" Contradicts a loaded Concept or ADR — its rules, or its `default`/`owns` keys — → classify it as **Drift**, log it via `/track-ledger`' drift form, and surface the gap.
 
-**External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, ask whether to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
+**External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
-**Record inline — mandatory.** An explicit user answer that resolves or changes a Term or ADR is approval: run `/record-term` or `/record-adr` that same turn, before the next interview question. Never defer or batch approved writes into the closing sweep — later discussion can obscure the exact decision and leave the durable model stale. If a later answer clarifies or supersedes a record written earlier this session, run its owning skill again immediately; the latest explicit answer controls. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*).
+**Record inline** — nothing is ever batched to the end of the session. Resolved by explicit user answer → run `/record-term`, `/record-adr`, or `/record-concept` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption; ledger only when a matched record already covers it, otherwise *Record without asking* (see *Decision states*). Every ADR/Concept write runs the target skill's **Extend or create** step first — sharpening an existing record beats spawning a near-duplicate.
+
+**Record without asking** — you spot an ADR- or Concept-worthy decision no user answer asked you to record. Run the target skill's own gate; it passes → run `/record-adr` or `/record-concept` that same turn, before your next interview question. Don't offer it, don't ask permission, don't defer — log it via `/track-ledger`' **Log decision** assumed-record form and report it in the closing `[assumed]` list, where `git diff` is the review. Never carry a candidate past the turn it crystallised.
 
 ## Closing sweep
 
-Four parts, each with its own trigger. The sweep **repairs** existing records; it never authors a design record — those are written inline from explicit user answers, and unapproved candidates remain ledger-only.
+Three parts, each with its own trigger. The sweep **repairs** existing records; it never authors a design record — those are written inline the turn they crystallise, and a candidate never written inline is a miss, not sweep work.
 
 **1. Per-row disposition.** If the session opened at least one full Concept/ADR record, emit one verdict per row in the `Crosscutting Concepts` and `Architecture Decision Records` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so no row is silently omitted. Skip for trivial sessions that only touched glossary terms.
 
-**2. Veto resolution.** Never skipped — it is the only check on an assumption before it reaches disk, and part 3 reads its outcome. Resolve every staged item against the Interview's end-of-session veto list:
-* **Cleared** — it is now a Decision: write it to its durable document and update its ledger line via `/track-ledger`' **Log decision**.
-* **Vetoed** — nothing changes on disk. Rewrite its ledger line via `/track-ledger`' **Log decision**: the veto form when the assumption stood on a record's `default`/`owns` (part 3 repairs that key), a deletion otherwise.
-
-A recorded Decision is not vetoable — the user approved it before it was written. Unapproved candidates are not agenda items.
-
-**3. Assumption-gap harvest.** Never skipped, and never reported "no gaps" without the reconciliation below — it runs after part 2, so it sees its outcomes. Every question asked, wrong default, and drifted key marks a gap in the source behind it — close it now, or the next session asks the same question.
+**2. Assumption-gap harvest.** Never skipped, and never reported "no gaps" without the reconciliation below. Every question asked, wrong default, and drifted key marks a gap in the source behind it — close it now, or the next session asks the same question.
 
 **Reconciliation first (the anti-skip guard).** Before repairing anything, enumerate *every* user-answered question logged this session and map each to exactly one of: (a) a checklist-cleared Feature Assumption you never asked — no gap; (b) a question an existing record's `default`/`owns` answered directly — cite `path#key`, no gap; (c) a logged gate-miss line. Any question that lands in none of the three is an **unlogged miss** (the ask-time gate-miss line was dropped) — reconstruct its gate-miss line now, then repair it like the rest. An empty gap-form list is a valid outcome only *after* this enumeration confirms every question is an (a) or (b); reaching "no repairs" without enumerating the questions is itself the skip this step exists to prevent.
 
 Then repair the record behind each of the ledger's three gap forms:
-* **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → log it via `/track-ledger`' **Log decision** as a next-session candidate and stop.
-* **Veto** (`vetoed, evidence was:`) — a `default`/`owns` produced an assumption you struck; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
+* **Gap miss** (`asked, gate miss:`) — the answer had no source. Fix: add the missing `default` or `owns` to the record named as nearest source; no record can host it → log it via `/track-ledger`' **Log decision** as a next-session candidate and stop — authoring a brand-new record here breaks *Record without asking*'s inline-only rule.
+* **Correction** (`corrected, evidence was:`) — a `default`/`owns` produced an assumption the user corrected mid-session; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
 * **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
 
-Write the fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. A key change no answer covers remains ledger-only. Apply each write via `/record-concept` or `/record-adr`, resync the row via `/index-docs`' **Sync index row**, and mark the ledger line resolved.
+Write the fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. A key change no answer covers is your own call: write it, log it, and report it in the closing `[assumed]` list. Apply each write via `/record-concept` or `/record-adr`, resync the row via `/index-docs`' **Sync index row**, and mark the ledger line resolved.
 
-**4. Trigger-condition refinement.** Runs last, so it also covers any row part 3 just resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.
+**3. Trigger-condition refinement.** Runs last, so it also covers any row part 2 just resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, summary-based match, `applies_to`-only match, blank cell). If found, refine the clause and apply it via `/index-docs`' **Sync index row**.

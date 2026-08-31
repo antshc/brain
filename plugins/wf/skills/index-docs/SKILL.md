@@ -26,7 +26,6 @@ Default key→column mapping, overridable by `{{tableMetadata}}`:
 | `trigger` | `Trigger condition` |
 | `summary` | `Summary`, preceded by `default` |
 | `default` | `Summary`, as a leading `**Default:** {{default}}` sentence before `summary` |
-| `status` | not a column by default; drives `supersede`/`retire` markers |
 | `owns` | not a column; read by callers from the frontmatter |
 
 Rules:

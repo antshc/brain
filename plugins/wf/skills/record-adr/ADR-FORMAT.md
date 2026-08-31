@@ -10,7 +10,6 @@ Files live in `docs/adr/` as `{{nnnn}}-{{slug}}.md`.
 ---
 id: "{{nnnn}}"
 title: {{decisionTitle}}
-status: {{status}}
 trigger: >-
   {{comma-separated trigger clauses}}
 summary: >-
@@ -36,7 +35,6 @@ The **body** can be a single paragraph. The value is recording *that* a decision
 |-----|----------|-------|
 | `id` | yes | Quoted four-digit record number, matching the filename prefix. |
 | `title` | yes | Same text as the `# ` heading and the index row's Decision cell. |
-| `status` | yes | `Proposed`, `Accepted`, `Superseded by NNNN`, or `Retired`. Never repeat it as prose in the body. |
 | `trigger` | yes | Comma-separated clauses naming the change types that make this decision apply. Source of truth for the index's Trigger condition cell. |
 | `summary` | yes | The index row's Summary cell, verbatim. |
 | `default` | yes | One sentence naming the choice to take when the design doesn't state one. `index-docs` prepends it to the index row's Summary cell; it is what lets the decision be reapplied without asking. State the choice, never the reference implementation that embodies it. |

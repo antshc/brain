@@ -1,6 +1,6 @@
 ---
 name: record-concept
-description: Capture one structural, reusable, backbone-defining architectural rule as a Crosscutting Concept the moment it crystallises. Owns CONCEPT-FORMAT.md, the "when to write a Concept" gate, numbering, and the approval-gate distinction between a direct request and an offer. Called directly by explicit user request, or invoked as an offer by grill-design.
+description: Capture one structural, reusable, backbone-defining architectural rule as a Crosscutting Concept the moment it crystallises. Owns CONCEPT-FORMAT.md, the "when to write a Concept" gate, numbering, and the choice between extending an existing record and creating a new one. Called directly by explicit user request, or invoked by grill-design.
 ---
 
 # Record Concept
@@ -17,6 +17,16 @@ Write one (instead of, or in addition to, an ADR) only when all three are true:
 
 If any of the three is missing, skip the Concept — an ADR (see `record-adr`) may be the better fit instead.
 
+## Extend or create
+
+<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
+
+Runs before any write. A near-duplicate record is worse than a longer one: it splits authority over a decision area, and the `owns` key can then name only one of them.
+
+1. Run `/index-docs`' **Scan and match** over the `Crosscutting Concepts` and `Architecture Decision Records` tables with this rule's surface — its terms and the paths it governs.
+2. A matched record whose scope or `owns` already covers this decision area → **extend it**: add the `Rules` line or guidance to the body, and sharpen `default`, `owns`, `trigger`, or `applies_to` to cover the new case. Resync its row via **Sync index row**. Stop here.
+3. No match covers the area → **create** a new Concept. Its `owns` phrases must not collide with any existing record's — a phrase belongs to exactly one record.
+
 ## Lazy creation
 
 Create `docs/concepts/` when the first Concept is ready — not before; do nothing if it exists.
@@ -31,11 +41,10 @@ Highest four-digit `NNNN` filename prefix in `docs/concepts/`, plus 1, zero-padd
 
 Every Concept opens with the YAML frontmatter block defined in [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md#frontmatter). It is the machine-readable contract for the record, and the source of truth for its `ARCHITECTURE.md` index row.
 
-1. Author `id`, `title`, `status`, `trigger`, `summary`, `applies_to` before writing the body — they force the "does this apply to me?" decision up front.
+1. Author `id`, `title`, `trigger`, `summary`, `applies_to` before writing the body — they force the "does this apply to me?" decision up front.
 2. Derive `trigger` with `/index-docs`' **Generate trigger condition**, then write the returned value into frontmatter — not straight into the table.
-3. `status` lives in frontmatter only. Never restate it as a `**Status:**` line in the body.
-4. `related` is bidirectional: adding `related: ["0009"]` here means adding this record's id to `0009`'s `related` in the same change. A one-directional link is lost to any reader arriving from the other side.
-5. Superseding or retiring a Concept updates its frontmatter `status` first; the index row follows from it.
+3. `related` is bidirectional: adding `related: ["0009"]` here means adding this record's id to `0009`'s `related` in the same change. A one-directional link is lost to any reader arriving from the other side.
+4. Superseding or retiring a Concept applies the marker to its index row via `/index-docs`' **Sync index row**; the record itself carries no status field.
 
 ## Keeping the index in sync
 
@@ -57,5 +66,5 @@ If a row and its record disagree, the frontmatter wins — resync the row, don't
 <!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
 
 - **Explicit direct request** ("record a Concept for X") — approval is already given; draft and write immediately.
-- **Offered by an interview-style caller** (`grill-design`) — the offer itself is the approval gate: draft it, present it, and only write once the user explicitly responds to that specific offer.
+- **Invoked by an interview-style caller** (`grill-design`) — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.
 

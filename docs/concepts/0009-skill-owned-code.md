@@ -1,7 +1,6 @@
 ---
 id: "0009"
 title: Skill-Owned Code
-status: Accepted
 trigger: >-
   a skill needing a helper script, deciding where a skill's Python lives, adding a module to
   `tools/src/modules/`, adding a mapping to the pre-commit sync hook, two skills needing the same logic,
