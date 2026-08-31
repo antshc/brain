@@ -21,7 +21,6 @@ Delete this instruction. -->
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 classDiagram
-    direction LR
     class {{boundaryClass}}
     class {{capabilityOwnerClass}}
     class {{dependencyInterface}} {
