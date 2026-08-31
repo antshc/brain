@@ -1,6 +1,6 @@
 # Contracts Delta (embedded)
 
-Use to assemble the optional **Contracts Delta** appendix inside a story's Implementation notes, once per touched contract kind (API, Database, Resource, or other). Document contract changes as a terse diff — never restate untouched contract; look up facts yourself (swagger.json, codebase, DB schema).
+Use to assemble the optional **Contracts Delta** appendix inside a story's Implementation notes, once per touched contract kind (API, Database, Resource, or other). Document contract changes as a terse diff — never restate untouched contract; look up facts yourself (swagger.json, codebase, DB schema). GUI changes are not a contract kind here — they use [gui-delta.md](gui-delta.md) and its own format, never these diff lines.
 
 ## Assemble the delta
 Instantiate one copy of the template below per contract kind touched; delete unused copies. Per contract kind, in order:
