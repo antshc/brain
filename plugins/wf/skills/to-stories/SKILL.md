@@ -13,7 +13,7 @@ The input is typically a prior requirement set — a capability with its stakeho
 
 Ground every story in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout.
 
-This skill is self-contained: capability identification and the solution-agnostic/contracts-delta/gui-delta rules it needs live below and in [references/](references/) — it never has to invoke another skill to produce a story.
+This skill is self-contained: capability identification and the solution-agnostic/contracts-delta rules it needs live below and in [references/](references/) — it never has to invoke another skill to produce a story.
 
 ## Principle
 Describe system behavior, not implementation. Name the **entity and behavior**, never a widget, screen element, or technical artifact. If the input requirement already leaks a solution, raise it to the behavior it enables before writing the story (see the solution-agnostic rule).
@@ -33,7 +33,7 @@ Before assembling a story, confirm each candidate is one **capability** — beha
 4. **Attach sync metadata** → immediately under each story heading, add the Jira ID / Epic ID / Blocked-by metadata block (see Output Format). Values are placeholders only (`TBD`); Blocked-by lists only stories from this same batch. This block sits outside the story body — never scrubbed, never counted as a criterion.
 5. **Derive acceptance criteria** per story as behavior rules (see below).
 6. **Verify** → apply the scrub in [references/solution-agnostic.md](references/solution-agnostic.md) over the capability title, stakeholder requirement, functional requirements, and acceptance criteria only — never the sync-metadata block or the Implementation notes appendix — then confirm each rule implies concrete code changes and maps to a responsibility.
-7. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, follow [references/contracts-delta.md](references/contracts-delta.md) once per touched contract kind and append the result as the story's optional Contracts Delta appendix. For an `[FE]` story that adds or changes a surface, sub-component, grid, or interaction, also follow [references/gui-delta.md](references/gui-delta.md) and append its output as the **GUI delta** block at the end of that same appendix — a `[BE]` story never carries one. This appendix is technical and not part of the Capability/Acceptance Criteria body — it is exempt from the scrub in step 6.
+7. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, follow [references/contracts-delta.md](references/contracts-delta.md) **Assemble the contract delta** once per touched contract kind and append the result as the story's optional Contracts Delta appendix. For an `[FE]` story that adds or changes a surface, GUI component, or interaction, also follow that file's **Assemble the GUI delta** and append its output as the **GUI delta** block at the end of that same appendix — a `[BE]` story never carries one. This appendix is technical and not part of the Capability/Acceptance Criteria body — it is exempt from the scrub in step 6.
 
 ## Acceptance Criteria
 <acceptance-criteria-rule>
@@ -55,7 +55,7 @@ Before assembling a story, confirm each candidate is one **capability** — beha
 - The FE/BE breakdown table was presented and explicitly approved by the user before any story was drafted.
 - Jira ID, Epic ID, and Blocked-by sit in a metadata block directly under the heading, outside the scrubbed body; Blocked-by lists only `(Story n, Jira ID placeholder)` pairs from this batch, or `None`.
 - Implementation notes may name classes, types, objects, or endpoints for navigation, but never a file path or line number.
-- Every `[FE]` story that changes a surface or interaction carries a GUI delta block at the end of Contracts Delta, with a consolidated `**Scenarios:**` block showing request and response for each distinct call it fires; a `[BE]` story carries neither.
+- Every `[FE]` story that changes a surface or interaction carries a GUI delta block at the end of Contracts Delta, with an `**API calls**` block closing each changed surface entry and showing request and response for each distinct call it fires; a `[BE]` story carries neither.
 - The `[SLUG]` feature tag is present in the heading only if the user asked for it, is SCREAMING_SNAKE_CASE, and — if already present on a story being edited — is kept unchanged.
 
 ## Output Format
@@ -92,7 +92,7 @@ Use the template below for every story. For a single story, the heading is `## [
 - ...
 
 ### Contracts Delta
-<!-- optional - omit unless this capability changes an API, Database, or Resource contract, or (FE stories only) a GUI surface. Follow references/contracts-delta.md once per touched contract kind (API, Database, Resource), then references/gui-delta.md for the GUI block. Order: API → Database → Resource → other → GUI. -->
+<!-- optional - omit unless this capability changes an API, Database, or Resource contract, or (FE stories only) a GUI surface. Follow references/contracts-delta.md: Assemble the contract delta once per touched contract kind (API, Database, Resource), then Assemble the GUI delta for the GUI block. Order: API → Database → Resource → other → GUI. -->
 {{contractsDeltaOutput| sections}}
 {{guiDeltaOutput| FE stories only; omit for BE}}
 
