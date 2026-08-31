@@ -64,7 +64,7 @@ Each story starts with a heading tagging its **technology layer** (`FE` or `BE`)
 
 The heading may carry an optional feature slug, formatted `[SLUG]` in SCREAMING_SNAKE_CASE (uppercase words joined by underscores, e.g. `[NOTIFICATIONS]`), appended after the capability title. Add it **only when the user explicitly asks for a feature slug** — never by default. Once a slug is present in a title, preserve it verbatim on any later edit to that story; never strip or rename it.
 
-Use the template below for every story. For a single story, the heading is `## [{{technology}}] {{capabilityTitle}}{{ [SLUG]|optional}}`. For multiple stories, repeat the block once per capability/technology pair, numbering each heading `Story {{n}} — [{{technology}}] {{capabilityTitle}}{{ [SLUG]|optional}}`; `{{technology}}` is `FE` or `BE`.
+Use the template below for every story. For a single story, the heading is `## {{ [SLUG]|optional}} [{{technology}}] {{capabilityTitle}}`. For multiple stories, repeat the block once per capability/technology pair, numbering each heading `Story {{n}} — {{ [SLUG]|optional}} [{{technology}}] {{capabilityTitle}}`; `{{technology}}` is `FE` or `BE`.
 
 ```
 ## Story {{n}} — [{{technology|FE|BE}}] {{capabilityTitle}}{{ [SLUG]|optional, SCREAMING_SNAKE_CASE, only when user asked for it}}
