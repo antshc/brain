@@ -33,10 +33,9 @@ Describe the recurring architectural problem this concept solves.
 - MUST / MUST NOT / SHOULD statements, each independently checkable against a diff.
 
 ## Design Guidance
-<!-- be terse, concise, factual -->
+<!-- terse, concise, factual — and complete on its own: a reader applies this section without opening anything it points at -->
 
-Design Guidance explains how to apply the concept’s rules in normal design and implementation work. It gives practical direction and judgment criteria without becoming a low-level coding standard.
-May include:diagrams and schemas; reference flows or sequences; recommended patterns and structures; etc..
+How to apply the rules in normal design and implementation work: judgment criteria, decision tables, diagrams and schemas, reference flows or sequences, recommended patterns and structures. State the pattern in its own general terms, not as a tour of one place it already appears.
 
 ```
 
@@ -65,18 +64,29 @@ Fixed heading set, always `##`, always in this order. Omit an optional section e
 |---------|----------|---------|
 | `Purpose` | yes | 1–3 sentences on the recurring problem. No rules here. |
 | `Rules` | yes | Atomic normative lines (MUST / MUST NOT / SHOULD), one obligation each. |
-| `Design Guidance` | yes | How to apply the rules: tables, diagrams, reference flows, resolvable code anchors. |
+| `Design Guidance` | yes | How to apply the rules, complete in itself: judgment criteria, decision tables, diagrams, reference flows. See `Design Guidance is self-contained`. |
 | `Violation signals` | no | 2–4 observable, greppable patterns that indicate a breach. |
 | `Exceptions` | no | Permitted deviations and their conditions. |
 | `Examples` | no | One or two concise examples of correct application. |
 | `Consequences` | no | Trade-offs accepted. Never nest this under `Design Guidance`. |
 
+## Design Guidance is self-contained
+
+`Design Guidance` carries the whole judgment call in its own text. A reader with no access to this codebase — or arriving after the file it once pointed at was renamed — still applies the rule from the section alone.
+
+- **State the pattern, not the tour.** Write the shape, its parts, and how they relate. An existing file, module, or record is evidence the pattern is real; it is never the explanation of it.
+- **Key the criteria on the situation.** Name the condition a reader can recognise from their own change ("the same failure repeats across unrelated tasks"), not the artefact that happens to embody it ("what the X record does").
+- **Prefer a table or diagram to a pointer.** Columns for the situation, the choice, and the reason travel to any project; a path does not.
+- **Illustrate after explaining.** When a concrete case genuinely helps, put it under `Examples` and keep it short — `Design Guidance` reads complete without it.
+- **Paths only where they are governed.** A repo-relative glob belongs in `applies_to`, or inside a rule that dictates where something must live — never standing in for a definition.
+
 ## Writing rules
 
 - **One obligation per `Rules` line.** Never bundle a naming rule, a placement rule, and a visibility rule into one bullet — each must be citable and checkable on its own.
 - **Normative verbs.** MUST / MUST NOT / SHOULD, consistently. Avoid "prefer", "try to", bare present tense for obligations.
-- **Resolvable anchors only.** Every "where" reference is a path glob or a symbol name a language server can resolve — never a vague label like "the repository layer". Mark deliberately non-canonical pointers "verify — may drift".
-- **References corroborate, never instruct.** A `Reference:` or "follow its shape" pointer may appear in `Design Guidance` or `Examples` as evidence for a rule; it must never be the only statement of that rule. A reader who can't see the referenced code must still be able to act.
+- **Resolvable anchors only.** A rule naming *where* something lives uses a path glob or a symbol name a language server can resolve — never a vague label like "the repository layer". Mark deliberately non-canonical pointers "verify — may drift".
+- **References corroborate, never instruct.** A `Reference:` or "follow its shape" pointer is evidence for a rule already stated in full. Strip every pointer from the record and it must still be actionable.
+- **`Design Guidance` is self-contained.** Write it so a reader who knows nothing about this repo's skills, agents, or plugins can apply the rule. Name path globs and file types, never a specific skill, agent, or module as the carrier of the rule — a named instance dates the record and starts reading as the rule itself once that instance is renamed or retired. Concrete instances belong in `Examples`; a carve-out that genuinely turns on one component belongs in `Exceptions`.
 - **No embedded volatile lists.** Enumerations that grow with the codebase (collection names, module lists, test-project maps) belong in code or a runbook, linked from here.
 - **Stable rule, not a runbook.** Commands, environment variables, and step-by-step invocations are operational content; a Concept states the rule they implement.
 - **Escape wildcards.** Write `` `*Manager` ``, not `*Manager` — unescaped asterisks form Markdown emphasis spans and silently drop the wildcard.
