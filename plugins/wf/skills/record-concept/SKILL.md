@@ -46,6 +46,10 @@ Every Concept opens with the YAML frontmatter block defined in [CONCEPT-FORMAT.m
 3. `related` is bidirectional: adding `related: ["0009"]` here means adding this record's id to `0009`'s `related` in the same change. A one-directional link is lost to any reader arriving from the other side.
 4. Superseding or retiring a Concept applies the marker to its index row via `/index-docs`' **Sync index row**; the record itself carries no status field.
 
+## Body
+
+Write `Purpose`, `Rules`, and `Design Guidance` per [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md#section-skeleton). `Design Guidance` states the pattern in general terms and stands on its own — a reader applies it without opening any file it points at ([Design Guidance is self-contained](./CONCEPT-FORMAT.md#design-guidance-is-self-contained)).
+
 ## Keeping the index in sync
 
 When a Concept is added, superseded, or retired, run `/index-docs`' **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** in the same change — never edit the table in `ARCHITECTURE.md` directly.

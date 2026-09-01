@@ -60,18 +60,17 @@ Divide by counting callers, not by size:
 | a human only | a user-invoked skill, no `description` | the human typing its name |
 
 A skill extends itself the same way it shares: when the behaviour it needs sits outside its own single purpose,
-it invokes the skill that owns that purpose instead of growing a second responsibility. `record-adr` reaching
-`/index-docs` to sync its row is the shape — the row mechanics stay owned by one skill, and every record-writing
-sibling gets them by calling rather than copying.
+it invokes the skill that owns that purpose instead of growing a second responsibility. The owned mechanics stay
+in one place, and every sibling that needs them gets them by calling rather than copying.
 
 Invocation is the second cut, and it is paid for in different currencies. A model-invoked skill spends context
 on every turn for a description that may never fire; a user-invoked skill spends nothing there but makes you the
 index that has to remember it exists. Split off a model-invoked skill only when you have a trigger word you
 actually type, or when another skill must reach it.
 
-`codey` is the reference shape: its body carries the workflow and the status verdict, and delegates every
-specialised procedure — `/crew-gotchas`, `/crew-implement`, `/crew-feedback` — passing each resolved path.
-`chorey` reaches the same three skills, so neither agent carries a second copy.
+An agent body holds its objective, its ordered workflow, and the verdict it returns; every procedure that could
+be stated without knowing which agent is running it belongs in a skill the body invokes by name. Two agents
+needing the same procedure is the clearest signal it was never the agent's to hold.
 
 Two related records own adjacent areas: [0001](0001-resource-access-skill.md) owns *what* a skill encapsulates
 when its purpose is infrastructure access, and [0009](0009-skill-owned-code.md) owns where a skill's code and

@@ -59,9 +59,9 @@ Placement follows the number of consumers, not the size of the code:
 Cross-skill invocation uses the call style owned by [0010](0010-skill-composition.md) — run `` `/{{skillName}}` `` **{{ActionName}}** —
 so the owning skill's documented actions stay the interface and its internals stay private.
 
-`map-markdown-adf` is the reference shape: it owns the only ADF implementation in the `atl` plugin, in both
-directions, with its tests beside it, and `fetch-page`, `fetch-work`, `publish-page`, and `publish-work` all reach
-conversion by invoking the skill.
+A capability with two directions — a conversion to and from some format, an encode paired with a decode — counts
+as one consumer set, not two: both directions live in the single skill that owns the capability, and every
+sibling reaches either by invoking it.
 
 ## Violation signals
 
