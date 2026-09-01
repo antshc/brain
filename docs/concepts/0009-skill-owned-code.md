@@ -22,7 +22,7 @@ applies_to:
   - skills/**
   - tools/src/modules/**
   - .githooks/pre-commit
-related: ["0001", "0005"]
+related: ["0001", "0005", "0010"]
 ---
 
 # Skill-Owned Code
@@ -56,9 +56,8 @@ Placement follows the number of consumers, not the size of the code:
 | several skills, one plugin | the one skill that owns the capability; siblings invoke it | none |
 | more than one plugin | `tools/src/modules/<module>/`, tests under `tools/tests/` | pre-commit mapping per destination |
 
-Cross-skill invocation uses the Resource Access Skill call style — run `` `/{{skillName}}` `` **{{ActionName}}** —
-so the owning skill's documented actions stay the interface and its internals stay private
-([0001](0001-resource-access-skill.md)).
+Cross-skill invocation uses the call style owned by [0010](0010-skill-composition.md) — run `` `/{{skillName}}` `` **{{ActionName}}** —
+so the owning skill's documented actions stay the interface and its internals stay private.
 
 `map-markdown-adf` is the reference shape: it owns the only ADF implementation in the `atl` plugin, in both
 directions, with its tests beside it, and `fetch-page`, `fetch-work`, `publish-page`, and `publish-work` all reach
