@@ -25,6 +25,10 @@ Per deployment node, choose exactly one detail block from the template — **Vir
 
 Fill only what's established. An unknown port, image tag, or host path is left as a `{{placeholder}}` or omitted — never invented.
 
+## Record how each block reads config
+
+Building blocks rarely share one scheme — one reads only `appsettings.json`, another only environment variables, a third layers both. Fill the template's `Configuration sources` section per block: the sources in precedence order, where each lives at runtime, and what injects it. A block with exactly one source says so explicitly, so a reader doesn't hunt for a file that isn't there.
+
 ## Keep ARCHITECTURE.md pointing here
 
 Run `/index-docs`' skill **Ensure section exists** for `Deployment View`, passing `{{skeletonContent}}` = the link to `DEPLOYMENT.md` plus 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies — enough for an agent to decide whether to load the full document. Never edit `ARCHITECTURE.md` directly.

@@ -95,6 +95,22 @@ C4Deployment
 - **Attached storage:** {{mountedShareOrBucket}} → `{{mountPath}}`
 - **Scaling:** {{minInstances}}–{{maxInstances}} on {{scalingSignal}}
 
+## Configuration sources
+
+<!-- How each building block reads its configuration at runtime. Containers differ: one reads only `appsettings.json`, another only environment variables, a third layers both. One subsection per building block whose sources differ from its neighbours; group the ones that share a scheme. -->
+
+### {{mermaidComponentName}} — {{buildingBlockName}}
+
+<!-- Sources in precedence order, lowest first — later rows override earlier ones. Location is the path inside the container/host or the mechanism that injects it. Mark "only source" explicitly when there is exactly one, so a reader doesn't go looking for a file that isn't there. -->
+
+| # | Source | Location | Supplied by | Overrides |
+|---|--------|----------|-------------|-----------|
+| 1 | {{sourceKind\| e.g. appsettings.json, per-environment appsettings overlay, environment variables, mounted secret file, key vault, command-line args }} | `{{pathOrVariablePrefix}}` | {{whoSuppliesIt\| e.g. baked into the image, compose environment:, ConfigMap, systemd EnvironmentFile }} | {{previousRowOrNone}} |
+
+- **Environment selector:** {{selectorVariable\| e.g. ASPNETCORE_ENVIRONMENT=Production }} — {{whatItSwitches}}
+- **Secrets:** {{secretSourceAndInjection}} — never committed; {{whereTheyLand}}
+- **Reload behaviour:** {{restartRequiredOrHotReload}}
+
 ## Connections
 
 <!-- One row per Rel in the diagram, plus anything reaching the system from outside. -->
