@@ -7,6 +7,8 @@ description: Capture one localized, non-obvious architectural decision as an ADR
 
 Capture **one point-in-time, localized decision** into `docs/adr/` the moment it crystallises. Template: [ADR-FORMAT.md](./ADR-FORMAT.md).
 
+A rule that turns out to constrain what gets built, to define a term, or to say how a file is worded belongs in another home — run `/record-concept`' **Where the rule belongs** to route it.
+
 ## When to write an ADR
 
 All three must be true — any miss, skip it:

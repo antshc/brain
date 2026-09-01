@@ -7,6 +7,27 @@ description: Capture one structural, reusable, backbone-defining architectural r
 
 Capture **one backbone rule** — the top-level decomposition, or a pattern every feature of a given kind must follow — into `docs/concepts/` the moment it crystallises. Use [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md) for the template.
 
+## Where the rule belongs
+
+Runs first, before the Concept gate. Most rules that reach this skill belong somewhere else, and a rule filed in the wrong home is read at the wrong moment — a wording rule buried in a Concept fires during design and stays silent while the file is being written.
+
+Split on **when the rule is needed**:
+
+| The rule answers | Home | Written by |
+|---|---|---|
+| which building block to reach for, what shape the system takes | Concept, `docs/concepts/` | this skill — continue below |
+| which option was chosen here, and why the others were not | ADR, `docs/adr/` | `/record-adr` |
+| how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
+| what a contested term means | glossary, `CONTEXT.md` | `/record-term` |
+| which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
+
+Two tests settle most cases:
+
+- **Would the sentence still be true in another repo, with different tooling?** Yes, and it constrains what gets built → a record. No, it names one project's command, path, or setting → a convention file.
+- **Is it needed while deciding, or while typing?** Deciding → a record. Typing → write-time guidance, which loads automatically through `applyTo` at the moment it applies.
+
+A rule can be genuinely structural *and* have a write-time counterpart. Record the rule once as a Concept, and let the instructions file carry only the wording, naming, or layout that follows from it.
+
 ## When to write a Concept
 
 Write one (instead of, or in addition to, an ADR) only when all three are true:
@@ -15,7 +36,7 @@ Write one (instead of, or in addition to, an ADR) only when all three are true:
 2. **Reusable** — future features of the same kind are expected to follow it every time.
 3. **Backbone-defining** — it is one of the foundational decisions that hold the architecture together and constrain everything built on top of it.
 
-If any of the three is missing, skip the Concept — an ADR (see `record-adr`) may be the better fit instead.
+If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above; an ADR (see `record-adr`) is the usual next fit.
 
 ## Extend or create
 
