@@ -63,7 +63,9 @@ The top-level folders and what each contains, one line per folder, with nested m
 
 ## Deployment View *(optional)*
 
-Documents where the building blocks run (environments, hosts, containers) and the infrastructure elements connecting them, illustrated with a diagram.
+References the `DEPLOYMENT.md` file that documents where the building blocks run — nodes, containers, host paths, and the connections between them. `{{deploymentTriggerSummary}}` is 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies, so an agent can decide whether to load the full document. `record-deployment-view` owns the content; this section is only the pointer.
+
+[Deployment View](DEPLOYMENT.md) — {{deploymentTriggerSummary}}
 
 [Deployment view](https://docs.arc42.org/section-7/)
 

@@ -1,6 +1,6 @@
 ---
 name: index-docs
-description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, Deployment View), host ARCHITECTURE-FORMAT.md, and insert its missing section skeletons. Owns the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Services, ADR, Concept, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
+description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, and the Deployment View reference stub whose content comes from record-deployment-view), host ARCHITECTURE-FORMAT.md, and insert its missing section skeletons. Owns the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Services, ADR, Concept, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
 ---
 
 # Index Docs
