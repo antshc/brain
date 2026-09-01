@@ -29,6 +29,12 @@ Fill only what's established. An unknown port, image tag, or host path is left a
 
 Building blocks rarely share one scheme — one reads only `appsettings.json`, another only environment variables, a third layers both. Fill the template's `Configuration sources` section per block: the sources in precedence order, where each lives at runtime, and what injects it. A block with exactly one source says so explicitly, so a reader doesn't hunt for a file that isn't there.
 
+## Trace auth and signals end to end
+
+Fill `Authentication` with the deployment facts of the user's sign-in path only — issuer, flow, token carrier, which blocks validate it and against what material, where TLS terminates. Role and permission modelling is a Concept, not a deployment fact.
+
+Fill `Observability` by following each signal from the process that emits it to the store an operator queries: log file path or stdout, the shipper, the sink, retention. A log that stops at "writes to stdout" is half a row — name what collects it, or state that nothing does.
+
 ## Keep ARCHITECTURE.md pointing here
 
 Run `/index-docs`' skill **Ensure section exists** for `Deployment View`, passing `{{skeletonContent}}` = the link to `DEPLOYMENT.md` plus 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies — enough for an agent to decide whether to load the full document. Never edit `ARCHITECTURE.md` directly.

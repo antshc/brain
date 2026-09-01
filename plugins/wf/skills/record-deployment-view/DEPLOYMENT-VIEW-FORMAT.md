@@ -119,10 +119,54 @@ C4Deployment
 |------|----|----------|------|-----------|------|
 | {{fromAlias}} | {{toAlias}} | {{protocol}} | {{port}} | {{oneWayOrBidirectional}} | {{authMechanism}} |
 
+## Authentication
+
+<!-- How a user proves who they are and how that identity reaches the building blocks at runtime. Deployment facts only — issuer, token flow, where keys and callbacks live. Role and permission modelling belongs in a Concept, not here. -->
+
+- **Identity provider:** {{issuer\| e.g. Entra ID tenant, Keycloak realm, Cognito user pool, in-house identity service }} — {{hostedWhere}}
+- **Flow:** {{authFlow\| e.g. OIDC authorization code + PKCE, SAML, cookie session, API key }} — entry point `{{loginEndpoint}}`, callback `{{redirectUri}}`
+- **Token / session carrier:** {{carrier\| e.g. JWT bearer header, encrypted cookie, session store }} — lifetime {{lifetime}}, refresh {{refreshMechanism}}
+- **Validated by:** {{whichBuildingBlocksValidate}} — {{validationMaterial\| e.g. JWKS endpoint, signing certificate, shared secret }} at `{{keyLocation}}`
+- **Terminated at:** {{terminationPoint\| e.g. reverse proxy, ingress, the application itself }}
+- **Service-to-service:** {{internalAuth\| e.g. managed identity, mTLS, client credentials, none — network-isolated }}
+- **TLS:** {{certificateSourceAndRenewal}} — certificate at `{{certPath}}`
+
+## Observability
+
+<!-- Where signals are produced and where they end up. Follow each signal from the process that emits it to the store an operator queries. -->
+
+### Logs
+
+<!-- One row per log stream. Destination is where an operator actually reads it, not just the first hop. -->
+
+| Producer | Format | Local location | Shipped by | Destination | Retention |
+|----------|--------|----------------|------------|-------------|-----------|
+| {{mermaidComponentName}} | {{format\| e.g. structured JSON, plain text }} | `{{pathOrStdout}}` | {{shipper\| e.g. Promtail, Fluent Bit, Docker logging driver, agent sidecar, none }} | {{sink\| e.g. Loki, Elasticsearch, CloudWatch, Application Insights }} | {{retentionPeriod}} |
+
+- **Rotation:** {{rotationPolicy\| e.g. logrotate daily ×7, Docker max-size/max-file }}
+- **Levels:** {{defaultLevelAndHowToChangeIt}}
+- **Correlation:** {{correlationIdMechanism}}
+
+### Metrics
+
+*(optional)* <!-- What exposes metrics, on which endpoint/port, what scrapes or receives them, and where they're visualised. -->
+
+- **Exposed by:** {{mermaidComponentName}} on `{{metricsEndpoint}}`
+- **Collected by:** {{collector\| e.g. Prometheus scrape, OTLP push, provider agent }}
+- **Dashboards:** {{dashboardToolAndLocation\| e.g. Grafana, folder or dashboard link }}
+
+### Traces
+
+*(optional)* <!-- Instrumentation, exporter endpoint, backend, and sampling rate. -->
+
+### Health and alerting
+
+*(optional)* <!-- Health endpoints and who probes them; alert rules, where they live, and the channel they page. -->
+
 ## External dependencies
 
 *(optional)* <!-- Managed data stores, queues, identity providers, and third-party endpoints the system depends on but doesn't deploy. One bullet each: what it is, endpoint or region, and how access is granted. -->
 
 ## Operational notes
 
-*(optional)* <!-- Startup order, schema migrations, backup targets and retention, and where logs and metrics land. -->
+*(optional)* <!-- Startup order, schema migrations, and backup targets and retention. -->
