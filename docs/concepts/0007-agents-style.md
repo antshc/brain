@@ -4,7 +4,8 @@ title: Agent Design
 trigger: >-
   writing or reviewing an `.agent.md`, composing an agent from skills, a vague or generic persona description,
   an agent owning specialized complexity, an agent drifting into inconsistent behavior across invocations,
-  deciding how autonomous an agent should be, an agent with no stated output format
+  deciding how autonomous an agent should be, an agent with no stated output format, declaring which files or
+  areas an agent covers, a family of related agents, one agent overriding another's phase
 summary: >-
   Every agent defines a concrete objective, bounded scope, autonomy, specific expertise, a working style,
   explicit **never** guardrails, and a concrete output format. Complex agents delegate specialized procedures
@@ -31,7 +32,7 @@ stays predictable and reviewable.
 ## Rules
 
 - An agent MUST state the concrete deliverable it produces, not only its role.
-- An agent MUST name the specific areas of concern it covers.
+- An agent MUST name the specific areas of concern it covers, in the form a caller can match against — globs where the areas are files.
 - An agent MUST state how independently it acts before checking in.
 - An agent MUST define specific expertise and a working style rather than a generic role.
 - An agent MUST state explicit **never** rules for irreversible or out-of-scope actions.

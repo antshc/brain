@@ -115,11 +115,16 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 
 ## 3. Invoke implementation agent
 
-After changing to `WORKTREE_PATH`, run the `codey` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. Use the following prompt (substitute actual values):
+Run `/crew-select` skill **Resolve From Task Text**, passing the selected task's title + body as `TASK_TEXT`. Retain its `Matched Stacks`/`Primary agent`. **Emit**: "Matched Stacks: [...] or none. Primary agent: <agent>."
+
+After changing to `WORKTREE_PATH`, run the `<primary agent from crew-select, or codey when none matched>` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. Use the following prompt (substitute actual values):
 
 ```
 ## HARNESS
 HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
+
+## STACKS
+MATCHED=<comma-separated matched Stack ids>
 
 ## TASK
 - Title: <title>
@@ -129,6 +134,8 @@ HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
 ## RECENT CHANGES
 <last 5 commits from step 1>
 ```
+
+Omit the `## STACKS` section entirely when no Stack matched.
 
 ## 4. Distill
 
