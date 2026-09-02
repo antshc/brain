@@ -54,7 +54,7 @@ Mandatory before REVIEW. Follow `/crew-gotchas`' skill **Read Workflow**, passin
 
 Follow `/crew-review` skill, passing `CHORE_PATHS`, `CODE_PATHS`, and `BASELINE_COMMIT` (when resolved). It identifies the change set, establishes the matching revert baseline, applies only behavior-preserving fixes, and records anything unsafe as a finding without touching it.
 
-Never read the change set ad hoc — delegate reading it to the `Explore` subagent (thoroughness: medium), giving it the file list from `crew-review` Step 0 and the full `CHORE.md`/`CODE.md` contents when loaded.
+Never read the change set ad hoc — delegate reading it to the `Explore` subagent (thoroughness: medium), giving it the file list from `crew-review` Step 0 and the full contents of every loaded `CHORE_PATHS`/`CODE_PATHS` file.
 
 Never review before INPUT and GOTCHAS are complete. When in doubt whether a change is behavior-preserving, it is a finding, not an edit.
 

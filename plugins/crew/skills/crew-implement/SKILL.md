@@ -8,11 +8,11 @@ description: Implementation rules — style, layers, design, and tests. Apply du
 Copy this checklist and check off each item as you complete it:
 
 ```
-- [ ] 1 Load CODE.md, then explore
+- [ ] 1 Load CODE_PATHS, then explore
 - [ ] 2 Implement
 ```
 
-## 1. Load CODE.md, then explore (mandatory, always)
+## 1. Load CODE_PATHS, then explore (mandatory, always)
 
 Read every path in `CODE_PATHS` (resolved by the agent during INPUT, one per matched Stack) in full. **Emit**: "Loaded: [list of CODE-<stack>.md paths]" or "No CODE.md resolved — no Stack matched, or every matched Stack's file is absent."
 
