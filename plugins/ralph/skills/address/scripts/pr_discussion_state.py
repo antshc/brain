@@ -12,6 +12,9 @@ question per remaining thread: is its *last* comment authored by the acting user
 The whole discussion coming back `answered` is what makes the calling skill rerunnable:
 the run stops at the gate without reading a single comment body.
 
+Comments still attached to an unsubmitted (`PENDING`) review are ignored entirely, so
+draft-only activity never makes a thread pending and never reopens an already-answered one.
+
 Usage:
     python3 pr_discussion_state.py <PR URL | owner/repo#N> [--json-out PATH] [--pretty]
 
@@ -52,7 +55,7 @@ query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
           comments(first: 100) {
             totalCount
             pageInfo { hasNextPage }
-            nodes { id author { login } body createdAt diffHunk }
+            nodes { id author { login } body createdAt diffHunk pullRequestReview { state } }
           }
         }
       }
@@ -139,6 +142,12 @@ def resolve_anchor(thread: dict[str, Any]) -> dict[str, Any]:
     return {"path": thread["path"], "startLine": None, "line": None, "side": thread.get("diffSide"), "basis": "unknown"}
 
 
+def is_pending_review_comment(comment: dict[str, Any]) -> bool:
+    """True for a comment still attached to an unsubmitted (draft) review."""
+    review = comment.get("pullRequestReview")
+    return bool(review) and review.get("state") == "PENDING"
+
+
 def flatten_comments(thread: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         {
@@ -148,11 +157,14 @@ def flatten_comments(thread: dict[str, Any]) -> list[dict[str, Any]]:
             "createdAt": comment.get("createdAt"),
         }
         for comment in thread["comments"]["nodes"]
+        if not is_pending_review_comment(comment)
     ]
 
 
-def classify(thread: dict[str, Any], login: str) -> dict[str, Any]:
+def classify(thread: dict[str, Any], login: str) -> dict[str, Any] | None:
     comments = flatten_comments(thread)
+    if not comments:
+        return None
     truncated = thread["comments"]["pageInfo"]["hasNextPage"]
     anchor = resolve_anchor(thread)
     first_hunk = next((c.get("diffHunk") for c in thread["comments"]["nodes"] if c.get("diffHunk")), None)
@@ -206,7 +218,8 @@ def build_state(pr_ref: str) -> tuple[dict[str, Any], int]:
 
     raw_threads = fetch_threads(owner, repo, number)
     resolved = [t for t in raw_threads if t["isResolved"]]
-    live = [classify(t, login) for t in raw_threads if not t["isResolved"]]
+    classified = (classify(t, login) for t in raw_threads if not t["isResolved"])
+    live = [record for record in classified if record is not None]
 
     answered = [t for t in live if t["state"] == "answered"]
     first_pass = [t for t in live if t.get("mode") == "first-pass"]
