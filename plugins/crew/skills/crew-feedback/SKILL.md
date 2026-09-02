@@ -21,7 +21,7 @@ Source: `git status --porcelain` (uncommitted), or `git show --stat <BASELINE_CO
 Per file, walk up to nearest **Module** (code unit + build config; discover from repo structure, never assume). Nested Modules → keep innermost only. Dedupe:
 
 - **Modules**: unique Module dirs containing changed files.
-- **Verification counterparts**: each Module's *seams* — existing tests/checks, discovered from `CODE.md`/`VERIFY.md`/convention. None found → nearest enclosing dir with a runnable check (test config, build file).
+- **Verification counterparts**: each Module's *seams* — existing tests/checks, discovered from the loaded `CODE_PATHS`/`VERIFY_PATHS` files/convention. None found → nearest enclosing dir with a runnable check (test config, build file).
 
 **Emit**:
 - Changed files: [list]
@@ -30,9 +30,9 @@ Per file, walk up to nearest **Module** (code unit + build config; discover from
 
 ## 1. Verify (diagnostics, build, tests)
 
-`VERIFY_PATH` resolved → run its steps in order; scope file/path-targeted commands to Step 0's Modules/counterparts, not the whole repo. **Emit**: "Verify steps: VERIFY.md".
+`VERIFY_PATHS` non-empty → run each file's steps in order; scope file/path-targeted commands to Step 0's Modules/counterparts, not the whole repo. **Emit**: "Verify steps: [list of VERIFY-<stack>.md paths]".
 
-`VERIFY_PATH` unresolved → run Step 0's verification counterparts.
+`VERIFY_PATHS` empty → run Step 0's verification counterparts.
 
 If Verify surfaces issues or requires changes, apply fixes and re-run this step over the updated full set of changed files.
 

@@ -23,9 +23,9 @@ Copy this checklist and check off each item as you complete it:
 
 ## 1. Review
 
-`CHORE_PATH` resolved by the agent during INPUT → follow that `CHORE.md`'s review rules; emit "Review rules: CHORE.md". Unresolved → review under the **Hard rules** below only; emit "Review rules: none".
+`CHORE_PATHS` non-empty → follow each loaded `CHORE-<stack>.md`'s review rules; emit "Review rules: [list]". Empty → review under the **Hard rules** below only; emit "Review rules: none".
 
-`CODE_PATH` resolved → read it in full; every fix you apply must obey its conventions, and a cleanup that would violate one is a finding, not an edit. Emit "Style rules: CODE.md | none".
+`CODE_PATHS` non-empty → read each in full; every fix you apply must obey their conventions, and a cleanup that would violate one is a finding, not an edit. Emit "Style rules: [list] | none".
 
 Review every file from Step 0 for behavior-preserving cleanup candidates only — never a behavior change, a new feature, or scope beyond cleanup.
 
