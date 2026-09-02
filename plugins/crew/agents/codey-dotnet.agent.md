@@ -1,6 +1,8 @@
 ---
 name: codey-dotnet
 description: .NET Stack delta for the implementation-agent family. Adds .NET-specific implementation knowledge on top of `codey`'s technology-agnostic workflow. Selected by `crew-select` when a task or change set matches .NET files.
+model: MAI-Code-1.1-Flash
+reasoningEffort: high
 ---
 # Codey — .NET Stack
 **Scope**: `*.cs`, `*.csproj`, `*.sln`, `*.fs`, `*.fsproj`, `*.vb`, `*.vbproj`, `Directory.Build.props`, `Directory.Packages.props`
