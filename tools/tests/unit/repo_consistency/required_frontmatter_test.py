@@ -39,7 +39,7 @@ class TestAgentAndSkillFrontmatterCompleteness:
 
 
 class TestRepositoryFrontmatterConsistency:
-    """Feature: Repository Consistency Check (Real Repo)"""
+    """Feature: Agent And Skill Frontmatter Completeness"""
 
     def test_current_repositorys_agents_and_skills_carry_required_frontmatter(self, repo_root):
         # Scenario: Current repository's agents and skills carry required frontmatter
