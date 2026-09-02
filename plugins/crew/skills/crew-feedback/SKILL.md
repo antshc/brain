@@ -18,21 +18,13 @@ Copy this checklist and check off each item as you complete it:
 
 Source: `git status --porcelain` (uncommitted), or `git show --stat <BASELINE_COMMIT>` (checkpoint). None → emit "No changed files; nothing to verify", skip Step 1.
 
-Per file, walk up to nearest **Module** (code unit + build config; discover from repo structure, never assume). Nested Modules → keep innermost only. Dedupe:
-
-- **Modules**: unique Module dirs containing changed files.
-- **Verification counterparts**: each Module's *seams* — existing tests/checks, discovered from the loaded `CODE_PATHS`/`VERIFY_PATHS` files/convention. None found → nearest enclosing dir with a runnable check (test config, build file).
-
-**Emit**:
-- Changed files: [list]
-- Affected Modules: [list]
-- Verification counterparts: [list]
+**Emit**: "Changed files: [list]".
 
 ## 1. Verify (diagnostics, build, tests)
 
-`VERIFY_PATHS` non-empty → run each file's steps in order; scope file/path-targeted commands to Step 0's Modules/counterparts, not the whole repo. **Emit**: "Verify steps: [list of VERIFY-<stack>.md paths]".
+`VERIFY_PATHS` non-empty → run every loaded `VERIFY-<stack>.md` in sequence, not only the primary Stack's when several matched. Each file owns its own Stack's walk-up from a changed file to its nearest Module and the mapping to that Module's Verification counterparts, in that Stack's own vocabulary, and scopes its commands to what that walk-up reaches — never the whole repo. **Emit**: "Verify steps: [list of VERIFY-<stack>.md paths]".
 
-`VERIFY_PATHS` empty → run Step 0's verification counterparts.
+`VERIFY_PATHS` empty (no matched Stack's verification steps resolved) → **unscoped fallback**: discover the toolchain from the repo's own README and project/build files (manifests, CI config — never assume a specific tool), and run it once across the whole repository. **Emit**: "Verify steps: unscoped — discovered <tool/command> from <source>", and state plainly that the run was unscoped.
 
 If Verify surfaces issues or requires changes, apply fixes and re-run this step over the updated full set of changed files.
 
@@ -44,4 +36,4 @@ If Verify surfaces issues or requires changes, apply fixes and re-run this step 
 
 **Retry cap**: if the same error persists after 3 retry cycles, stop and report `STATUS: partial` — unless the calling agent documents an override (Chorey self-reverts instead; see `chorey.agent.md`). Do not continue past the cap.
 
-Do not report completion until all steps pass with 0 errors and 0 warnings.
+Do not report completion until every Verify step — scoped or unscoped — passes with 0 errors and 0 warnings; a partially-passed run never reports completion.
