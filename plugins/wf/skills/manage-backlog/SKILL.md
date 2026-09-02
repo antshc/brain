@@ -206,7 +206,7 @@ Infer the repo (`$REPO`) from `git remote -v` — `gh` does this automatically w
 
 ## Pull requests as a triage surface
 
-**PRs as a request surface:** `no` (`yes | no`). Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.
+**PRs as a request surface:** `no` (`yes | no`). Set to `yes` if this repo treats external PRs as feature requests.
 
 When set to `yes`, PRs run through the same labels and states as issues, using the `gh pr` equivalents:
 

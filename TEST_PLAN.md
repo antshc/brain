@@ -926,3 +926,78 @@ Scenario: max-executions is not a valid integer
 ```
 
 **Coverage:** Manual test
+
+---
+
+## Feature: Skill Invocation Resolution
+
+> Unit: `modules.repo_consistency.skill_invocations.find_dangling_skill_invocations()`
+
+```gherkin
+Scenario: Skill invocation naming an existing skill is not reported
+  Given a SKILL.md invoking `/target`, and a `target` skill folder exists
+  When find_dangling_skill_invocations() is called
+  Then the result has no violations
+
+Scenario: Skill invocation naming a nonexistent skill is reported
+  Given a SKILL.md invoking `/ghost-skill`, and no such skill folder exists
+  When find_dangling_skill_invocations() is called
+  Then the result names the offending file and the unresolved skill name
+
+Scenario: Current repository has no dangling skill invocations
+  Given this repository's actual `plugins/`/`skills/` trees
+  When find_dangling_skill_invocations() is called against the repo root
+  Then the result has no violations
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Agent And Skill Frontmatter Completeness
+
+> Unit: `modules.repo_consistency.required_frontmatter.find_frontmatter_violations()`
+
+```gherkin
+Scenario: File with all required frontmatter fields is not reported
+  Given a SKILL.md with `name` and `description` frontmatter fields
+  When find_frontmatter_violations() is called
+  Then the result has no violations
+
+Scenario: File missing a required frontmatter field is reported
+  Given a SKILL.md with only a `name` frontmatter field
+  When find_frontmatter_violations() is called
+  Then the result names the offending file and the missing field
+
+Scenario: Current repository's agents and skills carry required frontmatter
+  Given this repository's actual `plugins/`/`skills/` trees
+  When find_frontmatter_violations() is called against the repo root
+  Then the result has no violations
+```
+
+**Coverage:** Unit test
+
+---
+
+## Feature: Architecture Index Consistency
+
+> Unit: `modules.repo_consistency.architecture_index.find_architecture_index_violations()`
+
+```gherkin
+Scenario: Index row matching its record's filename and heading is not reported
+  Given an ARCHITECTURE.md ADR row whose id and title match its linked record file
+  When find_architecture_index_violations() is called
+  Then the result has no violations
+
+Scenario: Index row with a stale title is reported
+  Given an ARCHITECTURE.md ADR row whose title no longer matches its linked record's heading
+  When find_architecture_index_violations() is called
+  Then the result names the mismatched row
+
+Scenario: Current repository's architecture index matches its records
+  Given this repository's actual ARCHITECTURE.md and docs/adr, docs/concepts records
+  When find_architecture_index_violations() is called against the repo root
+  Then the result has no violations
+```
+
+**Coverage:** Unit test
