@@ -12,6 +12,32 @@ This file is **write-time** guidance — how to word the file in front of you. *
 building block to reach for, how skills compose) are answered by the Crosscutting Concepts indexed in
 [ARCHITECTURE.md](../../ARCHITECTURE.md).
 
+## Style
+
+**Writing style:** be terse, concise, no fillers.
+
+**Section references:** name a section by its title only — drop the `#` heading markers. Write `Building blocks`, not `## Building blocks`.
+
+**Skill invocation:** every step that runs another skill reads ``Run `/{{skillName}}` skill `` or ``Follow `/{{skillName}}` skill `` — backticked, slash-prefixed skill name, verb is *run* or *follow*, never "call" or "invoke". Target a named section as ``Run `/index-docs`' skill **Sync index row** `` or ``Follow `/crew-gotchas`' skill **Read Workflow** ``. Naming a skill as an owner rather than running it takes the plain backticked name.
+
+**Line wrapping:** one physical line per paragraph/bullet/table cell, however long — no fixed-column hard-wrap, keeps grep and diffs clean. Rejoin any line an editor's auto-rewrap splits.
+
+**Syntax legend** — use when writing or updating skills, templates, and agent instruction files:
+
+| Syntax | Meaning | Example |
+|---|---|---|
+| **bold**|Emphasis in prose, labels, warnings, required rules|**Required:** Run tests before commit.|
+| `camelCase` | Conceptual value resolved and maintained by the agent | Resolve `camelCase` from Git; reference it as `$camelCase`. |
+| `camelCase := instruction` | Runtime assignment evaluated by the agent | `NAME := generate a unique kebab-case name` |
+| `{{camelCase}}` | Placeholder in input, a markdown template, in prose, an inline template, replaced with a resolved runtime value | `{{input}}`, `Your name {{userName}}`, `reports/{{camelCase}}.md` |
+| `{{camelCase\|(hint|inline one-liner instruction applicable to camelCase)}}` | Bracketed placeholder with an inline default/hint, pipe-delimited, when the hint is short | `{{priority\| One of (MVP|Should have) }}`, `summary| one-liner` |
+| `<!-- ... -->` | Hidden template instruction not rendered in Markdown preview | `<!-- Remove this comment after population. -->` |
+| `[optional]` | Optional input or argument | `[target-path]` |
+| `value1 \| value2` | Allowed values | `completed \| failed \| blocked` |
+| `` `literal` `` | Fixed command, path, identifier, or value | Run `dotnet test`. |
+| `$VARIABLE` | Shell environment variable | `cd "$REPOSITORY_ROOT"` |
+| `${VARIABLE}` | Braced shell environment variable | `${REPOSITORY_ROOT}/src` |
+
 ## Frontmatter
 
 | Key | Required | Value |
@@ -64,8 +90,7 @@ Bundle resources by how the agent uses them:
 One or two files in a category live directly in the skill folder; more than that earns a subfolder.
 
 Write commands in Python rather than bash- or PowerShell-only syntax, so they run unmodified on every OS
-([ADR 0003](../../docs/adr/0003-wf-is-agnostic.md)). Use `python3`; `python` is not available here. A skill's
-own code and its tests live in the skill folder ([Concept 0009](../../docs/concepts/0009-skill-owned-code.md)).
+ Use  `python` is not available here.
 
 ## Steps and completion criteria
 
@@ -75,18 +100,6 @@ where "produce a list" does not.
 
 Reserve numbered steps for procedures where the sequence genuinely matters. For open-ended work (debugging,
 review, refactoring) give decision criteria instead, so the agent can adapt.
-
-## Invoking another skill
-
-Reach a skill's documented action by name, and pass the values that action reads:
-
-```md
-Follow `/crew-implement` skill, passing `CODE_PATH`.
-Run `/track-ledger`' **Log decision**.
-```
-
-The rule behind this shape — one purpose per skill, shared behaviour owned once and invoked — is
-[Concept 0010](../../docs/concepts/0010-skill-composition.md).
 
 ## Wording
 
