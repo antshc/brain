@@ -42,7 +42,7 @@ class TestSkillInvocationResolution:
 
 
 class TestRepositorySkillInvocationConsistency:
-    """Feature: Repository Consistency Check (Real Repo)"""
+    """Feature: Skill Invocation Resolution"""
 
     def test_current_repository_has_no_dangling_skill_invocations(self, repo_root):
         # Scenario: Current repository has no dangling skill invocations

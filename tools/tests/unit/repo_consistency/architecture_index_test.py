@@ -55,7 +55,7 @@ class TestArchitectureIndexConsistency:
 
 
 class TestRepositoryArchitectureIndexConsistency:
-    """Feature: Repository Consistency Check (Real Repo)"""
+    """Feature: Architecture Index Consistency"""
 
     def test_current_repositorys_architecture_index_matches_its_records(self, repo_root):
         # Scenario: Current repository's architecture index matches its records
