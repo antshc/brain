@@ -5,18 +5,22 @@ trigger: >-
   a skill or agent reading per-repository configuration, adding a dotfile or convention folder under the Harness
   Repo Path, choosing between a fixed config path and a search, config lookup falling back to a second location,
   a config file holding a secret, deciding whether config is committed or gitignored, a component re-deriving a
-  caller-supplied path
+  caller-supplied path, one config file per variant or stack, telling a shared config file from a per-variant one
 summary: >-
   Per-repository configuration is resolved from exactly one declared root — the Harness Repo Path — using exactly
   one strategy, either a fixed path or a search bounded to that root; a second fallback location is never added,
-  because its failure mode is silent degradation rather than an error. Configuration is split by lifecycle rather
+  because its failure mode is silent degradation rather than an error. Where the same config exists once per
+  variant, the variant is encoded in the filename and an unsuffixed name means shared, so one lookup still
+  answers the question. Configuration is split by lifecycle rather
   than by topic: secrets are gitignored and per-developer, team conventions are committed, and the two never share
   a file.
 default: >-
-  Resolve a per-repo config file at a fixed path under the Harness Repo Path; use a search bounded to that root
+  Resolve a per-repo config file at a fixed path under the Harness Repo Path, encoding any per-variant split in
+  the filename rather than in a second lookup; use a search bounded to that root
   only when the file is user-authored and may legitimately live in a nested workspace folder.
 owns:
   - "per-repository config file resolution"
+  - "per-variant versus shared config file naming"
   - "config secret versus committed-convention placement"
 applies_to:
   - plugins/**
@@ -39,6 +43,10 @@ runs with no conventions at all. This Concept fixes how such a file is located a
 - A resolution strategy MUST NOT search above its declared root, and MUST NOT reach the filesystem root.
 - A record MUST name exactly one strategy — fixed path or bounded search — and MUST NOT add a second lookup path
   as a fallback to the first.
+- A config that exists once per variant MUST encode the variant in the filename, and an unsuffixed name MUST mean
+  shared across variants.
+- A missing variant file MUST be treated as absent; reading the unsuffixed name instead is the second lookup path
+  under another spelling.
 - A path supplied by a caller through a trusted channel MUST be used as given; a component MUST NOT re-derive,
   guess, or search for it.
 - A supplied-but-invalid path MUST stop the caller as blocked rather than trigger a search.
@@ -53,7 +61,12 @@ Choose the strategy from where the file comes from, not from convenience:
 | Strategy | Use when | Reference |
 |----------|----------|-----------|
 | Fixed path | a setup skill scaffolds the file, so its location is guaranteed | `$HARNESS_REPO_PATH/.crew/<FILE>` ([0002](../adr/0002-crew-is-agnostic.md)) |
+| Fixed path, variant-suffixed | the same config exists once per variant, and one root still holds them all | `$HARNESS_REPO_PATH/.crew/CODE-<stack>.md` ([0002](../adr/0002-crew-is-agnostic.md)) |
 | Bounded search | the file is user-authored and may sit in a nested workspace folder | `.atlassian`, searched from the Harness Repo Path downward ([0005](../adr/0005-atl-is-mcp-first.md)) |
+
+A variant split belongs in the filename rather than a subfolder: the folder encodes the same fact while making
+"shared by every variant" a position in a tree instead of a visible property of the name, and it tempts a reader
+to treat the parent directory as a fallback.
 
 Split by lifecycle, because the two halves have different readers and different homes:
 
@@ -68,6 +81,7 @@ empty, not fatal — rather than refusing wholesale or inventing a discovery cal
 ## Violation signals
 
 - A lookup that tries a second directory after the first misses.
+- A variant file missing, and the unsuffixed file read in its place.
 - A search whose termination condition is the filesystem root rather than a declared root.
 - An API token and a committed convention table in the same file.
 - A component calling a discovery API for a value its config file already carries.
