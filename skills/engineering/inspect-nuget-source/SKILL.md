@@ -1,6 +1,6 @@
 ---
 name: inspect-nuget-source
-description: Verify a fact about a NuGet package's real API or behavior when the answer is not in local source — during code review, feature design, or code exploration. Find the referenced version across Directory.Packages.props, Directory.Build.props, Directory.Build.targets, Directory.Solution.targets, and *.csproj, locate the restored package on disk, read its shipped XML docs first, and decompile the assembly only when the docs are missing or insufficient. Never search the filesystem root. Trigger proactively — even without the words "nuget", "package", or "decompile" — whenever a claim about a type or member that lives in a package must be confirmed, and before any unscoped disk-wide `find`/`grep`.
+description: When checking if the NuGet packages are restored. Verify a fact about a NuGet package's real API or behavior when the answer is not in local source — during code review, feature design, or code exploration. Find the referenced version across Directory.Packages.props, Directory.Build.props, Directory.Build.targets, Directory.Solution.targets, and *.csproj, locate the restored package on disk, read its shipped XML docs first, and decompile the assembly only when the docs are missing or insufficient. Never search the filesystem root. Trigger proactively — even without the words "nuget", "package", or "decompile" — whenever a claim about a type or member that lives in a package must be confirmed, and before any unscoped disk-wide `find`/`grep`.
 ---
 
 # Inspect NuGet package source
