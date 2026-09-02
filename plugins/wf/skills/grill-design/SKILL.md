@@ -7,6 +7,16 @@ description: A relentless interview and domain-modeling probe set that sharpens 
 
 Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-adr`, `/record-concept`; codebase lookups → `/explore-codebase`. Call them; never restate their rules.
 
+## Scope
+
+The grill produces exactly two things: **questions** and **records**. Writable surface for the whole session — `CONTEXT.md`, `ARCHITECTURE.md`, `docs/adr/**`, `docs/concepts/**`, `docs/services/**`, and the ledger. Source code, tests, configuration, and scaffolding are **read-only** for the entire session: reading them is the job (`/explore-codebase`), changing them is a different session.
+
+**A finished record is not a finished session.** A term, ADR, Concept, or service row resolves one branch of the decision tree and nothing more. The turn a write lands, return to the interview — the write is a side effect of the interview, never its exit.
+
+**Only the user ends the grill.** An empty candidate list, a clean closing sweep, and a full doc set are mid-session states, not stop conditions. When you believe the tree is resolved, say so, ask, and wait for the answer.
+
+**Implementation is a handoff, not a next step.** The user asks to build it → state that the grill is closing, run the closing sweep, then hand off: `/to-tickets` for backlog items, `/to-zdesign` for a design doc, `/prototype` for a throwaway spike. Inside a grill turn, production code stays untouched — including the one-line change the answer you just got seems to imply.
+
 ## Session start
 
 1. **Docs exist** — existence check only on `ARCHITECTURE.md` and `CONTEXT.md`; either missing → run `/bootstrap-docs`' **Mandatory creation**.
@@ -18,6 +28,8 @@ Own the interview and the session's design state — *when* to look up, log, ask
 ## Interview
 
 Interview me relentlessly about every aspect of this until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. Ask **one question at a time** and wait for the answer — multiple questions at once are bewildering. Give your recommended answer with each question.
+
+**Turn shape** — every turn ends on one of two moves: the next question, or the explicit ask to close the session. Lookups, ledger lines, and record writes are the middle of a turn; a turn that ends on a write is unfinished, so name the branch it opened or closed and ask the next question in that same turn.
 
 If a *fact* is discoverable in the environment (filesystem, tools), look it up rather than asking. If a *decision* clears the evidence checklist below, take it as a Feature Assumption rather than asking; if any part fails, put it to me and wait.
 
