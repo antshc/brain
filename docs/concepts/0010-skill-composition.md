@@ -5,17 +5,22 @@ trigger: >-
   splitting one skill into two, a procedure needed by more than one skill, an agent body restating a skill's
   steps, deciding whether a skill is model- or user-invoked, choosing what a new skill is responsible for, one
   skill reaching another skill's behaviour, a skill accumulating unrelated responsibilities, the same steps
-  appearing in two skills
+  appearing in two skills, a family of related agents sharing a workflow, one agent extending or overriding
+  another, an agent file pointing at another agent file
 summary: >-
   A skill is responsible for one purpose, and behaviour needed by more than one caller is owned by exactly one
-  skill that the others reach by name rather than restate. Invocation is a design choice, not a formatting one:
+  skill that the others reach by name rather than restate. A family of agents sharing a workflow follows the same
+  rule: the workflow becomes a flow skill each member invokes, and a member carries only what it overrides — an
+  agent file never points at another agent file. Invocation is a design choice, not a formatting one:
   a skill keeps a description only when an agent or another skill must reach it unprompted, because that
   description is loaded on every turn whether or not it fires.
 default: >-
   Give each skill one purpose and invoke a sibling skill's documented action by name instead of restating its
-  steps; keep a skill model-invoked only when an agent or another skill must reach it unprompted.
+  steps; give a family of agents one flow skill they each invoke, leaving each member only its overrides; keep a
+  skill model-invoked only when an agent or another skill must reach it unprompted.
 owns:
   - "division of a capability across skills"
+  - "composition of a family of related agents"
   - "skill-to-skill and agent-to-skill invocation style"
   - "model- versus user-invocation choice"
 applies_to:
@@ -48,6 +53,10 @@ agent never needs to find. This Concept fixes how a capability is divided and ho
   MUST set `disable-model-invocation: true`.
 - An agent body MUST carry only its objective, workflow, and verdict, and MUST delegate every specialised
   procedure to a skill it invokes by name.
+- A workflow shared by a family of agents MUST live in one flow skill each member invokes.
+- A member of such a family MUST carry only the phases it overrides, and MUST NOT restate the shared workflow.
+- An agent file MUST NOT point at another agent file: a skill name resolves, an agent's install path does not.
+- One flow skill MUST NOT serve two families whose steps differ, because it then branches on its caller.
 
 ## Design Guidance
 
@@ -71,6 +80,14 @@ actually type, or when another skill must reach it.
 An agent body holds its objective, its ordered workflow, and the verdict it returns; every procedure that could
 be stated without knowing which agent is running it belongs in a skill the body invokes by name. Two agents
 needing the same procedure is the clearest signal it was never the agent's to hold.
+
+A family of agents — one general member and several specialised ones — is the same cut seen from the agent side.
+The temptation is to copy the general member and edit it, or to have each specialist read the general one as a
+parent. Copies drift on every base change; the parent pointer has no addressing mechanism behind it, because an
+agent knows neither its own install path nor a way to name a sibling file. Both dissolve once the shared workflow
+moves into a **flow skill**: each member is then frontmatter, a flow-skill invocation, and only the phases it
+overrides — a delta, not a copy. Two families with genuinely different steps get two flow skills, because one
+skill serving both would branch on its caller, which is worse than the duplication it avoids.
 
 Two related records own adjacent areas: [0001](0001-resource-access-skill.md) owns *what* a skill encapsulates
 when its purpose is infrastructure access, and [0009](0009-skill-owned-code.md) owns where a skill's code and
