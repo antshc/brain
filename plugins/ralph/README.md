@@ -21,6 +21,7 @@ Both agents are from the `crew` plugin and are invoked by `/dev` via `runSubagen
 |-------|-------------|
 | `/dev` | AFK loop — picks next issue, invokes `codey` then (gated) `chorey`, pushes |
 | `/fix` | Apply PR review comments |
+| `/address` | Address a PR's review discussion — group into issues, investigate, fix, reply; rerunnable |
 | `/ralph-build` | Build the project in a caller-supplied workspace, using the harness repo's README build instructions |
 | `/create-worktree` | Create/reuse an isolated git worktree in the caller-supplied codebase repo path |
 | `/delete-worktree` | Remove a worktree and delete its local feature branch once development is finished (remote branch/PR untouched) |

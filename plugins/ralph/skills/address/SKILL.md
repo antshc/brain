@@ -18,7 +18,7 @@ The first action of the run, before any checkout and before reading a single com
 python3 {{skillDir}}/scripts/pr_discussion_state.py "{{input}}" --pretty
 ```
 
-The script resolves `$actingLogin`, fetches every review thread, discards the resolved ones, and reports each survivor as `answered` (its last comment is `$actingLogin`'s) or `pending`. Its JSON is the only source of the discussion this run; `pr` gives `{{owner}}`, `{{repo}}`, `{{number}}`, and `headRef` gives `$headRef`.
+The script resolves `$actingLogin`, fetches every review thread, discards the resolved ones, and reports each survivor as `answered` (its last comment is `$actingLogin`'s) or `pending`. Its JSON is the only source of the discussion this run; `pr` gives `{{owner}}`, `{{repo}}`, `{{number}}`, and `headRef`/`baseRef` give `$headRef`/`$baseRef`.
 
 | `action` | Do |
 |---|---|
@@ -32,12 +32,12 @@ Done when `action` is `proceed` and the working set is in hand.
 
 **Load `references/github-api.md` now.** Every `gh` invocation in this run is copied from it, and nothing below restates one.
 
-- `git status --porcelain` must come back empty. Output means uncommitted work is present → stop and report, leaving the user's work theirs.
-- `git remote get-url origin` must point at `{{owner}}/{{repo}}`. A different repo → stop and report.
-- `git fetch origin`, then check out `$headRef` with `git pull --ff-only`.
-- `git rev-list --count origin/$headRef..HEAD` must be `0`. Local commits ahead of the remote → stop and report; an interrupted earlier run left work unpushed.
+1. Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
+   - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Non-zero exit → **exit** and report.
+2. Run the `/create-worktree` skill: `/create-worktree $CODEBASE_REPO_PATH $baseRef $headRef`. Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
+3. Run the `/ralph-build $HARNESS_REPO_PATH $WORKTREE_PATH` skill. A non-pass build → **exit** and report. Never fix threads on a broken build.
 
-Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef`.
+Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef` and the build gate has passed.
 
 ## 2. Learn how this repo verifies itself
 
@@ -112,7 +112,13 @@ Name the exact type, method, or file. Cite the package, pinned version, and wher
 
 Done when every thread in the working set carries exactly one new comment authored by `$actingLogin` — which is exactly what makes the next run's gate return `skip`. Leave every thread open for the reviewer to close.
 
-## 9. Report
+## 9. Cleanup
+
+Run `/delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $headRef`.
+
+Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is gone; the remote branch and the PR are untouched.
+
+## 10. Report
 
 | Section | Contents |
 |---|---|
