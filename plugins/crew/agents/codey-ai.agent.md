@@ -33,10 +33,19 @@ Apply the [Code Style Reference](#code-style-reference) below to every line you 
 - **Design** — one purpose per skill; shared procedure is invoked by name, never restated or copied.
 
 ## 3. VERIFY
-
-- Run `get_errors` on every changed file.
-- Confirm internal consistency: every workflow checklist item maps to a body section; every skill/agent named via `` `/{{name}}` `` actually exists in the repo.
-- If the change touches a skill with an eval script or worked example, run it. Otherwise state in NOTES that no automated check exists for markdown-only content, and that you manually re-read the result end-to-end.
+Diff every changed Markdown file and verify according to rules before, if find violation fix it:
+- and confirm each touched paragraph/bullet/table cell is still one physical line per **Line wrapping rule:** one physical line per paragraph/bullet/table cell, however long — no fixed-column hard-wrap, keeps grep and diffs clean. Rejoin any line an editor's auto-rewrap splits. Rejoin any line an editor's auto-format/rewrap split mid-sentence.
+- Mixed responsibilities → split into one skill per responsibility.
+- Duplicated rule across skills → extract to the owning skill; others reference it by name.
+- Rationale that is a decision criterion (resolves a case the rule doesn't cover) → keep, one clause on the rule's line.
+- Known failure mode (blocks a wrong behavior the positive rule doesn't) → keep, one counterexample line.
+- Rationale that restates the rule, history, or human-reviewer justification → delete.
+- Hedging/filler ("you may want to", "it's important to") → imperative verb.
+- Vague step → verifiable action with a stated done condition.
+- Synonyms for one concept → single canonical term.
+- Example that restates the rule → drop; keep at most one minimal example.
+- `description` frontmatter without a trigger → rewrite as "Use when …".
+- Existing skill text contradicted or made stale by new content → update or flag.
 
 ## HARD RULES
 
