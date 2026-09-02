@@ -24,7 +24,7 @@ List the files changed during this invocation. For each file or group, check whe
 - A conflicting or ambiguous convention
 - A directory/filesystem access issue (permissions, missing paths, wrong cwd)
 - A tool access issue (missing CLI, auth failure, unreachable service) — including any environment blocker surfaced by `crew-feedback`
-- A missing `CODE_PATH`/`VERIFY_PATH`/`CHORE_PATH` discovery-gap noted during INPUT
+- A missing `CODE_PATHS`/`VERIFY_PATHS`/`CHORE_PATHS` entry (a matched Stack's suffixed file, or no Stack matched) noted during INPUT
 - Any other friction that cost time or blocked progress
 
 **Discard** one-off typos, transient blips resolved on first retry, and routine execution steps. Only friction that would help a future run avoid the same mistake qualifies.
