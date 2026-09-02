@@ -23,11 +23,24 @@ Copy this checklist and check off each item as you complete it:
 
 ## 1. Review
 
-`CHORE_PATHS` non-empty → follow each loaded `CHORE-<stack>.md`'s review rules; emit "Review rules: [list]". Empty → review under the **Hard rules** below only; emit "Review rules: none".
+`CHORE_PATHS` empty → review every file from Step 0 under the **Default review checklist** below; emit "Review rules: default checklist".
+
+`CHORE_PATHS` non-empty → run `/crew-select`' skill's **Resolve From Changed Files** action over Step 0's files to learn each file's matched Stack — never re-implement that match. Per file: its matched Stack's `CHORE-<stack>.md` is loaded → follow that file's review rules for it, never another Stack's rules. Its matched Stack has no loaded `CHORE-<stack>.md`, or the file matched no Stack → review it under the **Default review checklist** below instead — never an invented repo-specific rule. Emit "Review rules: [list of CHORE-<stack>.md paths applied] + default checklist for <files, or 'none'>".
 
 `CODE_PATHS` non-empty → read each in full; every fix you apply must obey their conventions, and a cleanup that would violate one is a finding, not an edit. Emit "Style rules: [list] | none".
 
 Review every file from Step 0 for behavior-preserving cleanup candidates only — never a behavior change, a new feature, or scope beyond cleanup.
+
+### Default review checklist
+
+Used for any file whose matched Stack has no `CHORE-<stack>.md`, or that matched no Stack:
+
+- **Duplication** → extract function/class
+- **Long methods** → break into private helpers (keep tests on public interface)
+- **Shallow modules** → combine or deepen
+- **Feature envy** → move logic to where data lives
+- **Primitive obsession** → introduce value objects
+- **Existing code** the new code reveals as problematic
 
 ## 2. Apply safe fixes; record unsafe candidates as findings
 
