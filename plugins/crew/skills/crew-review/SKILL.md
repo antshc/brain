@@ -25,7 +25,7 @@ Copy this checklist and check off each item as you complete it:
 
 `CHORE_PATHS` empty → review every file from Step 0 under the **Default review checklist** below; emit "Review rules: default checklist".
 
-`CHORE_PATHS` non-empty → run `/crew-select`' skill's **Resolve From Changed Files** action over Step 0's files to learn each file's matched Stack — never re-implement that match. Per file: its matched Stack's `CHORE-<stack>.md` is loaded → follow that file's review rules for it, never another Stack's rules. Its matched Stack has no loaded `CHORE-<stack>.md`, or the file matched no Stack → review it under the **Default review checklist** below instead — never an invented repo-specific rule. Emit "Review rules: [list of CHORE-<stack>.md paths applied] + default checklist for <files, or 'none'>".
+`CHORE_PATHS` non-empty → run `/crew-select` skill **Resolve From Changed Files** over Step 0's files to learn each file's matched Stack — never re-implement that match. Per file: its matched Stack's `CHORE-<stack>.md` is loaded → follow that file's review rules for it, never another Stack's rules. Its matched Stack has no loaded `CHORE-<stack>.md`, or the file matched no Stack → review it under the **Default review checklist** below instead — never an invented repo-specific rule. Emit "Review rules: [list of CHORE-<stack>.md paths applied] + default checklist for <files, or 'none'>".
 
 `CODE_PATHS` non-empty → read each in full; every fix you apply must obey their conventions, and a cleanup that would violate one is a finding, not an edit. Emit "Style rules: [list] | none".
 
