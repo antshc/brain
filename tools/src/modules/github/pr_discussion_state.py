@@ -9,6 +9,9 @@ question per remaining thread: is its *last* comment authored by the acting user
              `first-pass`  - the acting user has never commented in the thread.
              `follow-up`   - the acting user replied and someone commented after that.
 
+An acting user's own last comment containing `fix!:` bypasses the `answered` state — it's
+treated as a self-note that still needs work, not as an answer already given.
+
 The whole discussion coming back `answered` is what makes the calling skill rerunnable:
 the run stops at the gate without reading a single comment body.
 
@@ -35,6 +38,7 @@ from typing import Any
 
 PR_URL_RE = re.compile(r"^https?://[^/]+/(?P<owner>[^/]+)/(?P<repo>[^/]+)/pull/(?P<number>\d+)")
 PR_SHORT_RE = re.compile(r"^(?P<owner>[^/\s]+)/(?P<repo>[^/#\s]+)#(?P<number>\d+)$")
+FIX_KEYWORD_RE = re.compile(r"fix!:")
 
 THREADS_QUERY = """
 query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
@@ -179,12 +183,20 @@ def classify(thread: dict[str, Any], login: str) -> dict[str, Any] | None:
         "lastCommentAt": comments[-1]["createdAt"] if comments else None,
     }
 
+    last_index = len(comments) - 1
+    self_fix_bypass = comments[-1]["author"] == login and bool(FIX_KEYWORD_RE.search(comments[-1]["body"]))
+
     # A truncated thread cannot prove its last comment is ours, so treat it as unanswered.
-    if comments and comments[-1]["author"] == login and not truncated:
+    if comments and comments[-1]["author"] == login and not truncated and not self_fix_bypass:
         record["state"] = "answered"
         return record
 
-    mine = [index for index, comment in enumerate(comments) if comment["author"] == login]
+    # The fix!: note itself doesn't count as "my answer already given" — it's new work to surface.
+    mine = [
+        index
+        for index, comment in enumerate(comments)
+        if comment["author"] == login and not (self_fix_bypass and index == last_index)
+    ]
     record["state"] = "pending"
     record["mode"] = "follow-up" if mine else "first-pass"
     record["diffHunk"] = first_hunk
