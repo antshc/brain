@@ -18,7 +18,7 @@ The first action of the run, before any checkout and before reading a single com
 python3 {{skillDir}}/scripts/pr_discussion_state.py "{{input}}" --pretty
 ```
 
-The script resolves `$actingLogin`, fetches every review thread, discards the resolved ones and any comment still attached to an unsubmitted (`PENDING`) review, and reports each survivor as `answered` (its last comment is `$actingLogin`'s) or `pending`. Its JSON is the only source of the discussion this run; `pr` gives `{{owner}}`, `{{repo}}`, `{{number}}`, and `headRef`/`baseRef` give `$headRef`/`$baseRef`.
+The script resolves `$actingLogin`, fetches every review thread, discards the resolved ones and any comment still attached to an unsubmitted (`PENDING`) review, and reports each survivor as `answered` (its last comment is `$actingLogin`'s) or `pending`. A `fix!:` in that last comment of `$actingLogin`'s own keeps the thread `pending` — a self-note that still needs work, not an answer. Its JSON is the only source of the discussion this run; `pr` gives `{{owner}}`, `{{repo}}`, `{{number}}`, and `headRef`/`baseRef` give `$headRef`/`$baseRef`.
 
 | `action` | Do |
 |---|---|

@@ -101,6 +101,41 @@ class TestReviewThreadClassification:
         # Scenario: The GraphQL query selects the parent review state for each comment
         assert "pullRequestReview { state }" in pr_discussion_state.THREADS_QUERY
 
+    def test_self_fix_keyword_note_is_not_treated_as_answered(self):
+        # Scenario: The acting user's own last comment containing fix!: stays pending
+        thread = _thread([
+            _comment("bob", "t1", review_state="COMMENTED"),
+            _comment("alice", "t2", review_state="COMMENTED", body="fix!: still needs work"),
+        ])
+
+        result = pr_discussion_state.classify(thread, "alice")
+
+        assert result["state"] == "pending"
+
+    def test_self_fix_keyword_note_after_real_reply_surfaces_as_new_comment(self):
+        # Scenario: A fix!: note after an earlier real reply is surfaced, not swallowed as the answer
+        thread = _thread([
+            _comment("bob", "t1", review_state="COMMENTED"),
+            _comment("alice", "t2", review_state="COMMENTED", body="Fixed."),
+            _comment("alice", "t3", review_state="COMMENTED", body="fix!: still needs work"),
+        ])
+
+        result = pr_discussion_state.classify(thread, "alice")
+
+        assert result["mode"] == "follow-up"
+        assert result["myLastReply"]["body"] == "Fixed."
+        assert [c["body"] for c in result["newComments"]] == ["fix!: still needs work"]
+
+    def test_self_fix_keyword_note_as_only_comment_is_first_pass(self):
+        # Scenario: A fix!: note with no prior reply from the acting user is a first-pass thread
+        thread = _thread([
+            _comment("alice", "t1", review_state="COMMENTED", body="fix!: still needs work"),
+        ])
+
+        result = pr_discussion_state.classify(thread, "alice")
+
+        assert result["mode"] == "first-pass"
+
 
 class TestBuildStateDraftFiltering:
     """Feature: Build State Excludes Draft-Only Threads"""
