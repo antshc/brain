@@ -13,6 +13,7 @@
 <- data binding
 *  default item
 @  shared component
+match: existing implementation anchor
 ```
 
 Rules:
@@ -20,6 +21,8 @@ Rules:
 - A surface is a full page or route family.
 - Describe only changed UI. Do not repeat untouched components.
 - Indentation defines ownership and scope.
+- Use `match:` as optional metadata to anchor an existing surface or component to its implementation; it is not itself a UI change and has no delta prefix.
+- Prefer a stable route for `match:`; use an existing component name or visible label when a route is not enough to locate the implementation.
 - Use `Component: Name` for named components; omit `: Name` when the label is enough.
 - Use `key: value` for simple properties.
 - Use `->` for navigation, actions, and opening another component.
@@ -76,12 +79,25 @@ Scenario: <intent>
 
 ## Changes to an existing component
 
+Use `match:` when the implementation needs an explicit discovery anchor:
+
 ```text
+## Alerts
+match: /alerts
+
 ~ Table: Alerts
   + Owner <- ownerName
   ~ Name <- name -> displayName
   - Legacy ID
   ~ sort: Updated desc -> Severity desc
+```
+
+`match:` may also identify an existing component when a route is not specific enough:
+
+```text
+match: AlertsTable
+~ Table: Alerts
+  + Owner <- ownerName
 ```
 
 ## Tables
