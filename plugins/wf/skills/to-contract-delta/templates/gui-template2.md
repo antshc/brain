@@ -33,7 +33,7 @@ Rules:
 - Avoid qualified names such as `Table.Column`, `tabs.nav`, `tabs.content`, `table.hd`, `table.col`, or `table.sort`.
 - Add visible text explicitly only when it differs from the component/item name or when the text itself is important to the contract.
 - Use `Behaviour:` only for rules that cannot be expressed naturally on the owning component.
-- Use `Scenario:` only for non-trivial multi-step flows.
+- Use Gherkin `Scenario:` with `Given` / `When` / `Then` only for important multi-step flows.
 
 ## Skeleton
 
@@ -74,7 +74,9 @@ Behaviour:
 + <rule>
 
 Scenario: <intent>
-<action> -> <effect> -> <effect>
+  Given <context>
+  When <action>
+  Then <result>
 ```
 
 ## Changes to an existing component
@@ -191,11 +193,14 @@ Behaviour:
 
 ## Scenarios
 
-Use only for important multi-step flows:
+Use Gherkin only for important multi-step flows. Keep scenarios focused on observable behaviour; do not repeat UI structure already described above.
 
-```text
+```gherkin
 Scenario: Delete alerts
-select rows -> Delete -> confirmation -> DELETE requests -> reload table
+  Given alerts are selected
+  When the user deletes and confirms them
+  Then the delete requests are sent
+  And the Alerts table reloads
 ```
 
 ## Example
@@ -251,7 +256,10 @@ Behaviour:
 + Failed delete keeps the modal open and shows the error.
 
 Scenario: Delete alert
-row.Actions.Delete -> Modal: Delete alert -> Delete -> DELETE /api/alerts/{id} -> reload
+  Given an alert is shown in Alerts
+  When the user deletes and confirms it
+  Then DELETE /api/alerts/{id} is called
+  And Alerts reloads
 ```
 
 ## Shared
