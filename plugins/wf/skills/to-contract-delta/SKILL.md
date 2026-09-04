@@ -1,7 +1,6 @@
 ---
 argument-hint: Which feature design document, and which contract(s) changed (API, database, resource, other, GUI)?
 description: Write an API, database, resource, other contract, or GUI delta into a feature design document as a terse diff — only what each resource or surface adds, modifies, or removes. Use whenever documenting REST endpoint changes, DynamoDB/table schema changes, swagger/OpenAPI diffs, queue/topic/bucket/IAM role/Terraform resource changes, a "Contract changes"/"Endpoints" section, a breaking-changes list, user-visible GUI state or interaction changes, or any "what changed in the API/DB/resource contract/UI" write-up for a design doc, spec, or PR description — even if the user just says "document the API changes", "add the endpoint delta", or "document the GUI changes" without naming this skill.
-disable-model-invocation: true
 name: to-contract-delta
 ---
 
