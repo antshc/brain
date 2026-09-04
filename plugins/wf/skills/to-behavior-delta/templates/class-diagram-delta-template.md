@@ -12,6 +12,7 @@
 - Comments are `%%` on their own line only. There is no inline `//` or `#` comment syntax inside a class body — text after `//` is parsed as a return-type annotation, not stripped.
 - `cssClass` requires quotes around the node id: `cssClass "ClassName" styleName` — unquoted ids raise a parse error.
 - `classDef` and `cssClass`/`:::` statements must come after the classes they style are declared.
+- `namespace Name { class ... }` groups classes by layer/module — use one per architectural layer the delta touches (e.g. Api, Domain, Infrastructure); a namespace cannot itself carry `classDef`/`:::` styling, only the classes inside it can.
 - Out of scope for zdesign class diagrams: subsystem/system-service boundary boxes and "C# Project assembly" container boxes — these describe deployment/packaging groupings, not class-level design decisions. If one is itself a design decision, describe it in `Solution Overview` prose or the solution-level `flowchart` instead.
 Delete this instruction. -->
 
@@ -21,18 +22,24 @@ Delete this instruction. -->
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 classDiagram
-    class {{boundaryClass}}
-    class {{capabilityOwnerClass}}
-    class {{dependencyInterface}} {
-        +method(type) type
+    namespace {{apiLayer}} {
+        class {{boundaryClass}}
     }
-    class {{newClass}}:::added {
-        +field : type
-        +method(type) type
+    namespace {{domainLayer}} {
+        class {{capabilityOwnerClass}}
+        class {{dependencyInterface}} {
+            +method(type) type
+        }
+        class {{newClass}}:::added {
+            +field : type
+            +method(type) type
+        }
+        class {{deletedClass}}:::removed
     }
-    class {{deletedClass}}:::removed
-    class {{changedClass}}:::memberChanged {
-        +[add] newMethod(type) type
+    namespace {{infrastructureLayer}} {
+        class {{changedClass}}:::memberChanged {
+            +[add] newMethod(type) type
+        }
     }
 
     {{boundaryClass}} --> {{capabilityOwnerClass}}
