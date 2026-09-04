@@ -19,7 +19,7 @@ If the `/manage-backlog` skill is not available, fall back to saving the spec to
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below. If the feature changes an API, Database, or Resource contract, run `/to-delta` once per touched contract kind and inline its output verbatim under **Contracts Delta**. Then publish it to the project ticket tracker by running `/manage-backlog` action **Publish spec**. Apply the `spec` triage label - no need for additional triage.
+3. Write the spec using the template below. If the feature changes an API, Database, or Resource contract, run `/to-contract-delta` once per touched contract kind and inline its output verbatim under **Contracts Delta**. Then publish it to the project ticket tracker by running `/manage-backlog` action **Publish spec**. Apply the `spec` triage label - no need for additional triage.
 
 Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
@@ -91,7 +91,7 @@ Exception: if a prototype produced a snippet that encodes a decision more precis
 
 <!-- Omit this section entirely if no API, Database, or Resource contract changed. -->
 
-Run `/to-delta` once per touched contract kind (API, Database, Resource) and inline its output verbatim here, one block per kind.
+Run `/to-contract-delta` once per touched contract kind (API, Database, Resource) and inline its output verbatim here, one block per kind.
 
 ## Testing Decisions
 

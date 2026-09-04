@@ -83,7 +83,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 ## Solution Diagram
 
-<!-- Read templates/c4-container-diagram-template.md for the full element reference and mermaid gotchas. Exactly one solution-level C4Container diagram is required, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility described under the diagram using the bullets. The container name is bold. -->
+<!-- Read to-behavior-delta/templates/c4-container-diagram-template.md for the full element reference and mermaid gotchas. Exactly one solution-level C4Container diagram is required, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility described under the diagram using the bullets. The container name is bold. -->
 
 <details>
 <summary>Solution Diagram</summary>
