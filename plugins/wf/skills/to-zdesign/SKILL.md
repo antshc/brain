@@ -7,7 +7,7 @@ description: Create or incrementally extend an authoritative feature design from
 
 Create or update one `docs/designs/{{featureSlug}}.md`. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
 
-**Mandatory asset read (non-negotiable):** this skill's `assets/` folder holds the only valid document structure — `design-template.md` plus every delta/diagram template it references. You MUST open each applicable template file with the file-reading tool, in full, before drafting or merging any corresponding section — never rely on remembered structure, a prior run, or the description of a template in this file. Skipping this read is a failure condition, not a shortcut: it produces a document with missing sections, wrong headings, or non-compliant tables. Re-read `design-template.md` on every run, including merges into an existing design, because section instructions live only in that file's hidden comments.
+**Mandatory asset read (non-negotiable):** [design-template.md](design-template.md) holds the only valid document structure. Delta and diagram appendices/sections are owned by `/to-contract-delta` and `/to-behavior-delta` — follow those skills' own templates rather than a local copy. You MUST open `design-template.md` with the file-reading tool, in full, before drafting or merging any corresponding section — never rely on remembered structure, a prior run, or the description of a template in this file. Skipping this read is a failure condition, not a shortcut: it produces a document with missing sections, wrong headings, or non-compliant tables. Re-read it on every run, including merges into an existing design, because section instructions live only in its hidden comments.
 
 ## 1. Resolve inputs
 
@@ -83,13 +83,13 @@ A capability is stable, solution-agnostic behavior with one purpose. It is not a
 
 Assign every sourced requirement to one capability. Match by purpose and change boundary, not title. Merge only when purpose, actors, rules, permissions, lifecycle, failures, contracts, ownership, and rate of change remain shared. Otherwise split.
 
-Open [design-template.md](assets/design-template.md) with the file-reading tool and draft `Requirements` from its exact table shape: one row per capability. Put the title, stakeholder requirement, and functional requirements in `Requirement`; put business rules and edge cases in `Details`. Use `Source` only for PO or Dev team.
+Open [design-template.md](design-template.md) with the file-reading tool and draft `Requirements` from its exact table shape: one row per capability. Put the title, stakeholder requirement, and functional requirements in `Requirement`; put business rules and edge cases in `Details`. Use `Source` only for PO or Dev team.
 
 Name capabilities with behavior and domain entities. Keep functional requirements externally visible and testable. Add design-discovered behavior only when evidence supports it.
 
 ## 5. Synthesize the solution
 
-Open [design-template.md](assets/design-template.md) with the file-reading tool now, even if it was read earlier in this session — do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
+Open [design-template.md](design-template.md) with the file-reading tool now, even if it was read earlier in this session — do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
@@ -97,9 +97,9 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 | Diagram | Include for | Template |
 | --- | --- | --- |
-| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | [c4-container-diagram-template.md](assets/c4-container-diagram-template.md) |
-| Flow Diagram (`flowchart`) | Solution-level process flow, decision path, or component wiring | [flowchart-delta-template.md](assets/flowchart-delta-template.md) |
-| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Sequence Diagram section of [design-template.md](assets/design-template.md) |
+| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/to-behavior-delta` skill's c4-container-diagram-template.md |
+| Flow Diagram (`flowchart`) | Solution-level process flow, decision path, or component wiring | Follow `/to-behavior-delta` skill's flowchart-delta-template.md |
+| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Sequence Diagram section of [design-template.md](design-template.md) |
 
 If merging into an existing design that already contains a diagram, NEVER modify, regenerate, or remove it silently. Stop and ask the user for confirmation before changing or removing any existing diagram.
 
@@ -107,13 +107,14 @@ Select implementation appendices from evidence. The two diagram appendices (Clas
 
 | Appendix | Include for | Template |
 | --- | --- | --- |
-| REST API Delta | HTTP contract or behavior changes | [rest-api-delta-template.md](assets/rest-api-delta-template.md) — include a `Scenarios` subsection per endpoint per the template's rules |
-| GUI Design Delta | User-visible state or interaction changes | [gui-delta-template.md](assets/gui-delta-template.md) |
-| Database Schema Delta | Persistence contract changes | [database-schema-delta-template.md](assets/database-schema-delta-template.md) |
-| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | [class-diagram-delta-template.md](assets/class-diagram-delta-template.md) |
-| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | [sequence-diagram-delta-template.md](assets/sequence-diagram-delta-template.md) |
+| REST API Delta | HTTP contract or behavior changes | Follow `/to-contract-delta` skill's API delta rules — include a `Scenarios` subsection per endpoint per the template's rules |
+| GUI Design Delta | User-visible state or interaction changes | Follow `/to-contract-delta` skill's GUI delta rules — include a `Scenarios` subsection per surface per the template's rules |
+| Database Schema Delta | Persistence contract changes | Follow `/to-contract-delta` skill's Database delta rules |
+| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/to-behavior-delta` skill's class-diagram-delta-template.md |
+| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/to-behavior-delta` skill's sequence-diagram-delta-template.md |
+| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/to-behavior-delta` skill's deployment-view-delta-template.md |
 
-Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Do not run `/to-delta`; this skill owns appendix composition.
+Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/to-behavior-delta` skill for Solution Diagram, Flow Diagram, Class Diagram, Sequence Diagram, and Deployment View Delta — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions (opt-in, never-silently-regenerate, Solution-level vs implementation-level Sequence Diagram distinction, Flowchart-is-Solution-Overview-only rule).
 
 ## 6. Merge incrementally
 
@@ -149,6 +150,7 @@ Maintain `Source Material`:
 8. Compare an update with the pre-merge design. Restore unsupported loss.
 9. Remove duplicate requirements, capabilities, and source rows.
 10. Every included REST API Delta Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
-11. Scan the full body (everything outside `Source Material`) for any ADR, Concept, `ARCHITECTURE.md`, or Jira reference (link, ID like `ADR NNNN`/`ZIC-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
+11. Every included GUI Design Delta Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source. A new Deployment View Delta appendix, if included, is evidence-backed like every other appendix.
+12. Scan the full body (everything outside `Source Material`) for any ADR, Concept, `ARCHITECTURE.md`, or Jira reference (link, ID like `ADR NNNN`/`ZIC-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
 
 Write the result. Call it a draft while `Open Questions` is non-empty.

@@ -88,7 +88,7 @@ Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
-Load `references/issue-template.md` and use it verbatim as the issue body structure — include every section, following each section's `<...-rule>` instructions to draft its content. If a slice touches an API, Database, or Resource contract, run `/to-delta` once per touched contract kind and inline its output verbatim under the issue body's **Contracts Delta** section before creating the issue.
+Load `references/issue-template.md` and use it verbatim as the issue body structure — include every section, following each section's `<...-rule>` instructions to draft its content. If a slice touches an API, Database, or Resource contract, run `/to-contract-delta` once per touched contract kind and inline its output verbatim under the issue body's **Contracts Delta** section before creating the issue.
 
 Do NOT close or modify the parent issue.
 
