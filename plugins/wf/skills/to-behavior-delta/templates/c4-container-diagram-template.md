@@ -20,7 +20,7 @@
 - Declare an element once; reference its `alias` in every `Rel`. Do not redeclare inside more than one boundary.
 - `Container_Boundary` nests only inside a `System_Boundary` (or another `Container_Boundary`) — it cannot appear at the top level next to `Person`/`System_Ext`.
 - Keep relationships pointing in the actual call direction (`Rel(client, server, ...)`); use `BiRel` only for genuinely bidirectional protocols (e.g. websockets), not for request/response pairs.
-- C4 has no `classDef`/`:::` and no diagram-wide `themeVariables` (fixed style per upstream docs). Match the repo's dark palette (docs/designs-styles.md) with one `UpdateElementStyle` per element and one `UpdateRelStyle` per `Rel`: `$bgColor="#2a2a2a"`, `$borderColor="#8b949e"`, `$fontColor="#c9d1d9"` for every element except `Person`/`Person_Ext`, which use `$borderColor="#4a5a8a"` to stay distinguishable when the actor icon doesn't render; every `UpdateRelStyle` uses `$textColor="#c9d1d9"`, `$lineColor="#8b949e"`.
+- C4 has no `classDef`/`:::` and no diagram-wide `themeVariables` (fixed style per upstream docs). Match the repo's dark palette (docs/designs-styles.md) with one `UpdateElementStyle` per element and one `UpdateRelStyle` per `Rel`: `$bgColor="#2a2a2a"`, `$borderColor="#8b949e"`, `$fontColor="#c9d1d9"` for every element except `Person`/`Person_Ext`, which use `$borderColor="#4a5a8a"` to stay distinguishable when the actor icon doesn't render, and `Person_Ext`/`Container_Ext`, which use `$bgColor="#1a1a1a"` (darker grey) to contrast against internal `Person`/`Container`/`ContainerDb` elements' `#2a2a2a`; every `UpdateRelStyle` uses `$textColor="#c9d1d9"`, `$lineColor="#8b949e"`.
 -->
 
 <details>
