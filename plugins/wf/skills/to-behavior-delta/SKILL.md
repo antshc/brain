@@ -1,7 +1,6 @@
 ---
 name: to-behavior-delta
 description: Write a Mermaid diagram delta into a feature design document — a solution-level C4 container/solution diagram, a flowchart delta, or an implementation-level class diagram delta, sequence diagram delta, or deployment view delta. Use whenever a feature design document needs a decision-relevant diagram showing what changed (added/removed/modified nodes, classes, steps, or deployment topology) — even if the user just says "add a diagram" or "show the deployment change" without naming this skill.
-disable-model-invocation: true
 ---
 
 Show only the diagram delta — decision-relevant elements added, modified, or removed for this capability, never a full system inventory. Each template's own hidden comments carry its full Mermaid element reference and gotchas; open the template file before drafting, do not compose from memory.
