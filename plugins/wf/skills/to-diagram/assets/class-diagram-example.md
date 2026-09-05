@@ -22,25 +22,24 @@ classDiagram
             +placeOrder(order) bool
             +getInstance() OrderService$
         }
-        class OrderLineItem:::memberChanged {
+        class OrderLineItem {
             -sku : string
             +getSubtotal() decimal
-            +[add] getTax() decimal
+            +getTax() decimal
         }
         class IOrderRepository {
             +save(order) bool
         }
-        class OrderExportJob:::added {
+        class OrderExportJob {
             +run()
         }
     }
     namespace Infrastructure {
-        class SqlOrderRepository:::memberChanged {
+        class SqlOrderRepository {
             -connectionString : string
-            -[rem] legacyConnectionString : string
             +save(order) bool
         }
-        class LegacyOrderQueue:::removed {
+        class LegacyOrderQueue {
             -queueName : string
         }
     }
@@ -54,8 +53,5 @@ classDiagram
     note for OrderService "Coordinates order use cases; delegates persistence to IOrderRepository"
 
     classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
-    classDef added stroke:#4a7a5a,stroke-width:2px
-    classDef removed stroke:#8a4a4a,stroke-width:2px
-    classDef memberChanged stroke:#8b949e,stroke-width:2px,stroke-dasharray: 4 3
 ```
 </details>
