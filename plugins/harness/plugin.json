@@ -2,5 +2,5 @@
   "name": "harness",
   "version": "1.0.0",
   "description": "Harness configuration setup and resolution skills.",
-  "skills": ["./skills"]
+  "skills": ["../../skills/harness"]
 }

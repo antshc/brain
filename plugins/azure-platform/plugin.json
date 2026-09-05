@@ -2,6 +2,6 @@
   "name": "azure-platform",
   "version": "1.0.0",
   "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills.",
-  "skills": ["./skills"],
+  "skills": ["../../skills/azure-platform"],
   "mcpServers": ".mcp.json"
 }

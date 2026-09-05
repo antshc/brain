@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """CLI: match changed file paths against installed Stack agents, print the result as JSON.
 
-Usage: python3 select.py --agents-dir <path-to-plugins/crew/agents> [<changed-file> ...]
+Usage: python3 select.py --agents-dir <path-to-agents/crew> [<changed-file> ...]
 """
 from __future__ import annotations
 

@@ -10,4 +10,4 @@ git config core.hooksPath .githooks
 
 ### pre-commit
 
-Syncs `tools/src/modules/github/` → `plugins/review/skills/fix/github/` and stages the result before every commit.
+Syncs `tools/src/modules/github/` → `skills/ralph/fix/github/` and stages the result before every commit.

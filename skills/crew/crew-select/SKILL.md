@@ -31,7 +31,7 @@ Semantically judge `TASK_TEXT` against each discovered Stack's own domain — Py
 
 **Reads**: `CHANGED_FILES` — a list of file paths the caller gathers (e.g. `git diff --name-only`, `git status --porcelain`). **Returns**: the same shape as **Output** below.
 
-Run `python3 <skill-directory>/scripts/select.py --agents-dir <skill-directory>/../../agents <changed-file> ...` — deterministic path matching, never judged. Empty `CHANGED_FILES` → no Stack matches.
+Run `python3 <skill-directory>/scripts/select.py --agents-dir <skill-directory>/../../../agents/crew <changed-file> ...` — deterministic path matching, never judged. Empty `CHANGED_FILES` → no Stack matches.
 
 ## Output (both actions)
 
