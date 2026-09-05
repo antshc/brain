@@ -9,6 +9,7 @@
 - Make each lane mean one kind of ownership — one container (Level 1) or one component/module (Level 2). Don't mix ownership kinds (e.g. a team lane next to a status lane) in the same diagram.
 - Node shapes reuse flowchart syntax: `id([Text])` stadium for a start/end step, plain `id[Text]` rectangle for a task/activity, `id{Text}` diamond for a branching decision.
 - Label every cross-lane edge (`A -->|label| B`) with what's handed off — a request, response, or condition. An unlabeled cross-lane arrow hides the handoff that's the point of the diagram.
+- Prefix every edge label with its execution-order step number (for example, `1. request`). For mutually exclusive outcomes from a decision, use the same number plus a branch suffix (for example, `3a. rejected` and `3b. approved`), then retain that suffix for following steps until the branches rejoin.
 - Put a decision node in the lane that owns/makes that decision, then route its labeled outcomes to the lanes that act on them.
 - Split into Level 1 + Level 2 (or multiple Level 2 diagrams, one per container) rather than one large diagram once a single view stops being readable without tracing every arrow twice.
 - Use short, stable node ids; put the descriptive text in the label so relabeling later doesn't break edges.
@@ -41,11 +42,11 @@ swimlane-beta TB
     {{persistStep}}[{{persistLabel}}]
   end
 
-  {{startNode}} -->|{{handoff1}}| {{entryStep}}
-  {{entryStep}} -->|{{handoff2}}| {{decisionNode}}
-  {{decisionNode}} -->|{{noOutcome}}| {{entryStep}}
-  {{decisionNode}} -->|{{yesOutcome}}| {{processStep}}
-  {{processStep}} -->|{{handoff3}}| {{persistStep}}
+  {{startNode}} -->|1. {{handoff1}}| {{entryStep}}
+  {{entryStep}} -->|2. {{handoff2}}| {{decisionNode}}
+  {{decisionNode}} -->|3a. {{noOutcome}}| {{entryStep}}
+  {{decisionNode}} -->|3b. {{yesOutcome}}| {{processStep}}
+  {{processStep}} -->|4b. {{handoff3}}| {{persistStep}}
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
 ```
@@ -74,10 +75,10 @@ swimlane-beta TB
     {{delegateStep}}[{{delegateLabel}}]
   end
 
-  {{receiveStep}} -->|{{handoff1}}| {{validateNode}}
-  {{validateNode}} -->|{{noOutcome}}| {{receiveStep}}
-  {{validateNode}} -->|{{yesOutcome}}| {{moduleStep}}
-  {{moduleStep}} -->|{{handoff2}}| {{delegateStep}}
+  {{receiveStep}} -->|1. {{handoff1}}| {{validateNode}}
+  {{validateNode}} -->|2a. {{noOutcome}}| {{receiveStep}}
+  {{validateNode}} -->|2b. {{yesOutcome}}| {{moduleStep}}
+  {{moduleStep}} -->|3b. {{handoff2}}| {{delegateStep}}
 
   classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
 ```
