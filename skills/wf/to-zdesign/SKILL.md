@@ -3,81 +3,19 @@ name: to-zdesign
 description: Create or incrementally extend an authoritative feature design from spec files, confirmed grill-design conversation context, Wayfinder maps or decision issues, and existing designs. Use for first-pass design synthesis, adding later specs, capturing a completed design conversation, or merging resolved GitHub decisions without losing existing content.
 ---
 
-# To ZDesign
-
-Create or update one `docs/designs/{{featureSlug}}.md`. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
-
-**Mandatory asset read (non-negotiable):** [design-template.md](design-template.md) holds the only valid document structure. Contract deltas are owned by `/to-contract-delta`; all diagrams are owned by `/to-diagram`, using current mode for complete diagrams and delta mode for implementation appendix diagram deltas. Follow those skills' own templates rather than a local copy. You MUST open `design-template.md` with the file-reading tool, in full, before drafting or merging any corresponding section — never rely on remembered structure, a prior run, or the description of a template in this file. Skipping this read is a failure condition, not a shortcut: it produces a document with missing sections, wrong headings, or non-compliant tables. Re-read it on every run, including merges into an existing design, because section instructions live only in its hidden comments.
+This skill takes the current conversation context and codebase understanding and produces or update one `docs/designs/{{featureSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
 
 ## 1. Resolve inputs
+Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the design, and respect any Architecture, concepts, ADRs in the area you're touching.
 
-Accept these forms:
-
-- `/to-zdesign {{sources}}`
-- `/to-zdesign {{sources}} into {{designPath}}`
-- `/to-zdesign` after a completed `/grill-design` session
-- `/to-zdesign {{wayfinderIssue}}`
-
-Normalize every source:
-
-| Source | Canonical identifier | Read |
-| --- | --- | --- |
-| Repository file | Repo-relative path | File in full |
-| GitHub issue | Canonical issue URL | `/manage-backlog` **Read ticket** |
-| Grill conversation | `{{originatingCanonicalSource}}#grill-design`; else `grill-design:{{featureId}}`; else `grill-design:name:{{inputSlug}}` | Confirmed decisions and recorded assumptions only |
-| Wayfinder map | Canonical map URL | Map, closed linked decision tickets, and their resolution comments |
-
-For a repository file, resolve the real path inside the repository. Store its repo-relative path with `/` separators and filesystem casing. Collapse `.` and `..`. Reject paths outside the repository.
-
-For a Wayfinder decision ticket, read its linked map. Use the final comment returned by **Read ticket** as the resolution; Wayfinder writes the answer last when closing. If no comment exists, use the map gist as context and add the missing resolution to `Open Questions`. If the final comment conflicts with the map gist, add the conflict to `Open Questions`.
-
-For a map, Run `/manage-backlog` skill **List sub-tickets**, then **Read ticket** for every closed child regardless of `wayfinder:*` label. Treat `wayfinder:grilling` and `wayfinder:prototype` resolutions as decisions. Treat `wayfinder:research` findings and `wayfinder:task` completion facts as factual constraints, not product decisions.
-
-Do not read open child bodies. Add each open child to `Open Questions` as `{{canonicalIssueUrl}} — {{title}}`. On a later run, remove that entry when the issue closes and consume its resolution. Deduplicate by canonical URL. Do not add open children to `Source Material`.
-
-Exclude unanswered questions, corrected assumptions, rejected options, and superseded statements from conversation input. If no explicit source and no confirmed conversation outcome exist, stop without writing and request a source.
-
-For a source-less grill conversation, derive `inputSlug` from its explicit feature ID or agreed feature name, in that order. If neither exists, stop without writing and request a target path or feature ID. A name-only grill identifier may create a new design but MUST NOT match an existing design; require an explicit target or feature ID to extend one.
-
-## 2. Select the design
-
-Select the target in order:
-
-1. Use explicit `into {{designPath}}`.
-2. Use exactly one design path linked by a source. If several are linked, stop.
-3. Use exactly one design with a stable feature match. If several match, stop.
-4. Infer a new `docs/designs/{{featureSlug}}.md` from the shared feature identity.
-
-A stable match requires a shared feature ID, Wayfinder map, canonical source, or explicit backlink. NEVER match by title similarity alone.
-
-For a new target, derive identity in order: explicit feature ID, Wayfinder destination, shared exact source identity, single-source identity. For a file, use its explicit feature ID, then first H1, then basename. For an issue, use its explicit feature ID, then map Destination, then issue title. For a source-less grill, use `inputSlug`. Convert the result to kebab-case. Do not strip or rewrite suffixes heuristically.
-
-Before creating an inferred path, verify it does not exist. If it exists without a stable match, stop without writing and request an explicit path. Never merge because an inferred filename happens to exist.
-
-Read the selected existing design in full. Do not redirect an explicit target.
-
-## 3. Ground and rank evidence
-
-Read `CONTEXT.md`, `ARCHITECTURE.md`, matching Concepts and ADRs, and source-named code. Derive current boundaries, contracts, ownership, failures, and test seams from code.
-
-Treat repository documentation and code as constraints and current-state evidence, not product requirements.
-
-Treat resolved research and task facts the same way. A spec cannot override a factual constraint; add a contradiction to `Open Questions`.
-
-Apply authority in order:
-
-1. Confirmed decisions in the current request or grill conversation.
-2. Resolved Wayfinder decisions.
-3. Resolved content in the existing design.
-4. Specs.
-
+## 2. Ground and rank evidence
 Treat existing content outside `Open Questions` as resolved unless marked draft, tentative, or assumed.
 
 Let stronger evidence update weaker content. Preserve equal-authority conflicts and add them to `Open Questions`. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
 
-**Provenance stays out of the body.** ADRs, Concepts, `ARCHITECTURE.md`, and Jira tickets are grounding evidence, not citable content — never name or link them anywhere in the document body (`Requirements`, `Current State`, `Solution Overview`, `Decisions`, appendices, etc.). Absorb what they establish as plain, self-contained statements instead of attributing it to the source document. The only place any of these four may be named or linked is a row in `Source Material`.
+**Provenance stays out of the body.** ADRs, Concepts, Architecture, and tickets are grounding evidence, not citable content — never name or link them anywhere in the document body (`Requirements`, `Current State`, `Solution Overview`, `Decisions`, appendices, etc.). Absorb what they establish as plain, self-contained statements instead of attributing it to the source document. The only place any of these four may be named or linked is a row in `Source Material`.
 
-## 4. Reconcile capabilities
+## 3. Reconcile capabilities
 
 A capability is stable, solution-agnostic behavior with one purpose. It is not a UI, implementation detail, or one-off task.
 
@@ -87,9 +25,9 @@ Open [design-template.md](design-template.md) with the file-reading tool and dra
 
 Name capabilities with behavior and domain entities. Keep functional requirements externally visible and testable. Add design-discovered behavior only when evidence supports it.
 
-## 5. Synthesize the solution
+## 4. Synthesize the solution
 
-Open [design-template.md](design-template.md) with the file-reading tool now, even if it was read earlier in this session — do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
+Open [design-template.md](design-template.md) with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
@@ -114,9 +52,9 @@ Select implementation appendices from evidence. The two diagram appendices (Clas
 | Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/to-diagram` skill **Sequence Diagram** in delta mode |
 | Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/to-diagram` skill **Deployment View** in delta mode |
 
-Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/to-diagram` in delta mode for the Class Diagram, Sequence Diagram, and Deployment View content — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions (opt-in, never-silently-regenerate, Solution-level vs implementation-level Sequence Diagram distinction, Flowchart-is-Solution-Overview-only rule).
+Open and read only the templates for appendices that evidence triggers. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/to-diagram` in delta mode for the Class Diagram, Sequence Diagram, and Deployment View content — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions.
 
-## 6. Merge incrementally
+## 5. Merge incrementally
 
 For a new design, instantiate the template. For an existing design, merge section by section.
 
@@ -138,19 +76,23 @@ Maintain `Source Material`:
 - Do not invent sources for legacy content.
 - Keep the section wrapped in `<!-- confluence:ignore:start -->`/`<!-- confluence:ignore:end -->` — it is repo-internal provenance, not Confluence-reader content.
 
-## 7. Verify before writing
+## 6. Verify before writing
 
-1. Confirm every template file used in steps 4–5 was actually opened this run — an assumed or remembered structure fails this check.
+1. Confirm every template file used in steps 3–4 was opened this run, not recalled from memory.
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
 3. Populate every core section, in the template's section order, or mark it not applicable.
-4. Keep at most the diagrams the user explicitly requested; do not add, change, or remove any diagram without asking first. Never place a flowchart in an appendix — it belongs only in `Solution Overview`.
+4. Keep at most the diagrams the user explicitly requested; do not add, change, or remove any diagram without asking first.
 5. Include every evidence-triggered appendix and no empty appendix heading.
-6. Remove template instructions and unresolved placeholders. Preserve `<!-- confluence:toc -->`, `<!-- confluence:wide-table -->`, and `<!-- confluence:ignore:start -->`/`<!-- confluence:ignore:end -->` verbatim — they are structural Confluence markers, not model placeholders.
+6. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
 7. Put every unresolved conflict in `Open Questions`.
 8. Compare an update with the pre-merge design. Restore unsupported loss.
 9. Remove duplicate requirements, capabilities, and source rows.
 10. Every included REST API Delta Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
 11. Every included GUI Design Delta Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source. A new Deployment View Delta appendix, if included, is evidence-backed like every other appendix.
-12. Scan the full body (everything outside `Source Material`) for any ADR, Concept, `ARCHITECTURE.md`, or Jira reference (link, ID like `ADR NNNN`/`ZIC-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
+12. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `ADR NNNN`/`PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
+
+## Gotchas
+
+- **`<!-- confluence:toc -->`, `<!-- confluence:wide-table -->`, and `<!-- confluence:ignore:start -->`/`<!-- confluence:ignore:end -->` are structural Confluence-importer syntax, not model placeholders** — never strip them while clearing template instructions.
 
 Write the result. Call it a draft while `Open Questions` is non-empty.
