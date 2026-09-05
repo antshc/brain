@@ -83,7 +83,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 ## Solution Diagram
 
-<!-- Optional. Include only when the user explicitly asks for a Solution Overview diagram. Follow `/to-behavior-diagram`' skill **Solution Diagram**; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Exactly one solution-level C4Container diagram is required when included, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility is described under the diagram using bullets. The container name is bold. -->
+<!-- Optional. Include only when the user explicitly asks for a Solution Overview diagram. Follow `/to-diagram` skill **Solution Diagram** in current mode; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Exactly one solution-level C4Container diagram is required when included, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility is described under the diagram using bullets. The container name is bold. -->
 
 <details>
 <summary>Solution Diagram</summary>
@@ -96,7 +96,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 <details>
 <summary>Flow Diagram: {{flowTitle}}</summary>
 
-<!-- Optional. Include only when the user explicitly asks for a Solution Overview flow diagram and ownership by container or component is itself a design decision. Follow `/to-behavior-diagram`' skill **Swimlane Diagram**; that skill owns the template read. Do not compose a Mermaid skeleton from this template. -->
+<!-- Optional. Include only when the user explicitly asks for a Solution Overview flow diagram and ownership by container or component is itself a design decision. Follow `/to-diagram` skill **Swimlane Diagram** in current mode; that skill owns the template read. Do not compose a Mermaid skeleton from this template. -->
 
 {{flowDiagram}}
 </details>
@@ -106,7 +106,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 <details>
 <summary>Sequence Diagram: {{sequenceTitle}}</summary>
 
-<!-- Optional. Include only when the user explicitly asks for a Solution Overview sequence diagram. Follow `/to-behavior-diagram`' skill **Sequence Diagram**; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Use a sequence diagram to show high-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) over time to complete a scenario. Omit method-level and low-level implementation detail — that belongs in Detailed Design: Implementation Appendix. -->
+<!-- Optional. Include only when the user explicitly asks for a Solution Overview sequence diagram. Follow `/to-diagram` skill **Sequence Diagram** in current mode; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Use a sequence diagram to show high-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) over time to complete a scenario. Omit method-level and low-level implementation detail — that belongs in Detailed Design: Implementation Appendix. -->
 
 {{sequenceDiagram}}
 </details>
@@ -211,7 +211,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 </details>
 
 # Detailed Design: Implementation Appendix
-<!-- Insert zero or more complete appendix templates in this order: GUI Design Delta, REST API Delta, Database Schema Delta, Class Diagram, Sequence Diagram, Deployment View Delta. Follow `/to-behavior-delta` skill for diagram appendices; do not compose Mermaid skeletons from this template. Remove this comment and the placeholder when none apply. -->
+<!-- Insert zero or more complete appendix templates in this order: GUI Design Delta, REST API Delta, Database Schema Delta, Class Diagram, Sequence Diagram, Deployment View Delta. Follow `/to-diagram` in delta mode for diagram appendices; do not compose Mermaid skeletons from this template. Remove this comment and the placeholder when none apply. -->
 
 {{implementationAppendices}}
 
@@ -282,7 +282,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 | **Component** | **Version** | **License** | **URL** | **Usage** |
 | --- | --- | --- | --- | --- |
-|  |  |  |  |  |
+|  |  |  |  |  |  |
 
 ## External Deliverables Change
 
