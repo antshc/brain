@@ -6,6 +6,7 @@
 
 <!-- Mermaid technical gotchas and good practices (mermaid.ai/open-source/syntax/swimlanes.html#good-practices), consistent with the flowchart conventions:
 - `swimlane-beta` (optionally followed by `TB`/`TD`/`BT`/`LR`/`RL`; defaults to `TB`) starts the diagram. Each top-level `subgraph id [Label] ... end` becomes one lane. Include the container or component type in the lane label separated by a dash (e.g. `[Web Portal - GUI]`, `[Order Service - REST API]`, `[Database Name - Database]`). Do not use parentheses `()` inside the `[Label]` brackets as it can break parsing.
+- Do not use curly braces `{}` inside any node label text (e.g. a placeholder like `{build_number}`) — Mermaid's parser reads `{` as the start of a diamond/decision node and errors even mid-label (e.g. `got 'DIAMOND_START'`). Write placeholders without braces (`build-number`, `build_number value`) instead.
 - Make each lane mean one kind of ownership — one container (Level 1) or one component/module (Level 2). Don't mix ownership kinds (e.g. a team lane next to a status lane) in the same diagram.
 - Node shapes reuse flowchart syntax: `id([Text])` stadium for a start/end step, plain `id[Text]` rectangle for a task/activity, `id{Text}` diamond for a branching decision.
 - Label every cross-lane edge with what's handed off — a request, response, or condition. An unlabeled cross-lane arrow hides the handoff that's the point of the diagram.
