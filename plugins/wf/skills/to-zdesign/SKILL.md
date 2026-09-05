@@ -7,7 +7,7 @@ description: Create or incrementally extend an authoritative feature design from
 
 Create or update one `docs/designs/{{featureSlug}}.md`. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
 
-**Mandatory asset read (non-negotiable):** [design-template.md](design-template.md) holds the only valid document structure. Contract deltas are owned by `/to-contract-delta`; complete Solution Overview diagrams are owned by `/to-behavior-diagram`; implementation appendix diagram deltas are owned by `/to-behavior-delta` — follow those skills' own templates rather than a local copy. You MUST open `design-template.md` with the file-reading tool, in full, before drafting or merging any corresponding section — never rely on remembered structure, a prior run, or the description of a template in this file. Skipping this read is a failure condition, not a shortcut: it produces a document with missing sections, wrong headings, or non-compliant tables. Re-read it on every run, including merges into an existing design, because section instructions live only in its hidden comments.
+**Mandatory asset read (non-negotiable):** [design-template.md](design-template.md) holds the only valid document structure. Contract deltas are owned by `/to-contract-delta`; all diagrams are owned by `/to-diagram`, using current mode for complete diagrams and delta mode for implementation appendix diagram deltas. Follow those skills' own templates rather than a local copy. You MUST open `design-template.md` with the file-reading tool, in full, before drafting or merging any corresponding section — never rely on remembered structure, a prior run, or the description of a template in this file. Skipping this read is a failure condition, not a shortcut: it produces a document with missing sections, wrong headings, or non-compliant tables. Re-read it on every run, including merges into an existing design, because section instructions live only in its hidden comments.
 
 ## 1. Resolve inputs
 
@@ -97,9 +97,9 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 | Diagram | Include for | Template |
 | --- | --- | --- |
-| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/to-behavior-diagram`' skill **Solution Diagram** |
-| Flow Diagram (`swimlane-beta`) | Solution-level process flow where container or component ownership is itself a design decision | Follow `/to-behavior-diagram`' skill **Swimlane Diagram** |
-| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Follow `/to-behavior-diagram`' skill **Sequence Diagram** |
+| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/to-diagram` skill **Solution Diagram** in current mode |
+| Flow Diagram (`swimlane-beta`) | Solution-level process flow where container or component ownership is itself a design decision | Follow `/to-diagram` skill **Swimlane Diagram** in current mode |
+| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Follow `/to-diagram` skill **Sequence Diagram** in current mode |
 
 If merging into an existing design that already contains a diagram, NEVER modify, regenerate, or remove it silently. Stop and ask the user for confirmation before changing or removing any existing diagram.
 
@@ -107,14 +107,14 @@ Select implementation appendices from evidence. The two diagram appendices (Clas
 
 | Appendix | Include for | Template |
 | --- | --- | --- |
-| REST API Delta | HTTP contract or behavior changes | Follow `/to-contract-delta`' skill **API delta rules** — include a `Scenarios` subsection per endpoint per the template's rules |
-| GUI Design Delta | User-visible state or interaction changes | Follow `/to-contract-delta`' skill **GUI delta rules** — include a `Scenarios` subsection per surface per the template's rules |
-| Database Schema Delta | Persistence contract changes | Follow `/to-contract-delta`' skill **Database delta rules** |
-| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/to-behavior-delta`' skill **Class Diagram** overlay |
-| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/to-behavior-delta`' skill **Sequence Diagram** overlay |
-| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/to-behavior-delta`' skill **Deployment View** overlay |
+| REST API Delta | HTTP contract or behavior changes | Follow `/to-contract-delta` skill **API delta rules** — include a `Scenarios` subsection per endpoint per the template's rules |
+| GUI Design Delta | User-visible state or interaction changes | Follow `/to-contract-delta` skill **GUI delta rules** — include a `Scenarios` subsection per surface per the template's rules |
+| Database Schema Delta | Persistence contract changes | Follow `/to-contract-delta` skill **Database delta rules** |
+| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/to-diagram` skill **Class Diagram** in delta mode |
+| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/to-diagram` skill **Sequence Diagram** in delta mode |
+| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/to-diagram` skill **Deployment View** in delta mode |
 
-Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; Follow `/to-behavior-delta` skill for the Class Diagram, Sequence Diagram, and Deployment View content — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions (opt-in, never-silently-regenerate, Solution-level vs implementation-level Sequence Diagram distinction, Flowchart-is-Solution-Overview-only rule).
+Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/to-diagram` in delta mode for the Class Diagram, Sequence Diagram, and Deployment View content — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions (opt-in, never-silently-regenerate, Solution-level vs implementation-level Sequence Diagram distinction, Flowchart-is-Solution-Overview-only rule).
 
 ## 6. Merge incrementally
 
