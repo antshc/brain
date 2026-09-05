@@ -56,6 +56,6 @@ Apply only in delta mode.
 - **Sequence Diagram:** Mermaid sequence diagrams have no `:::` styling mechanism. Mark a new or changed step with a `note over` call-out or a leading `NEW:` / `CHANGED:` label in the message text. Omit lifelines and messages that are unchanged and not needed to connect the delta.
 - **Deployment View:** use `UpdateElementStyle(alias, $borderColor="...")`: added `#4a7a5a`, removed `#8a4a4a`, unchanged context `#8b949e`. Add a `**Behaviour changes**` bullet list using `+` / `-` / `~` for in-place node changes not visible through added/removed elements, such as resized instances, runtime changes, or scaling-policy changes. Omit the list when none exist.
 
-Do not copy delta styling into current mode. Examples may contain delta styling for illustration; current mode follows the template's base color schema only.
+Do not copy delta styling into current mode. Examples use the base palette only.
 
 **Done when:** the matching template was opened this run; current mode uses the template's existing colors; delta mode uses the delta overlay and includes only changed elements plus minimum context; the diagram kind uses its own rules; no unused example element, placeholder, or hidden instruction remains.
