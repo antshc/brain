@@ -17,7 +17,7 @@ Create `DEPLOYMENT.md` from [DEPLOYMENT-VIEW-FORMAT.md](./DEPLOYMENT-VIEW-FORMAT
 
 ## Reuse the building blocks
 
-Every `Container`/`ContainerDb`/`ContainerQueue` alias in the diagram is an existing `Services` row in `ARCHITECTURE.md` — same `{{mermaidComponentName}}`, so the two diagrams line up. An alias with no row is a gap: run `/record-service` skill for it first, then place it here.
+Every `Container`/`ContainerDb`/`ContainerQueue` alias in the diagram is an existing `Services` row in `ARCHITECTURE.md` — same `{{mermaidComponentName}}`, so the two diagrams line up. An alias with no row is a gap: Run `/record-service` skill for it first, then place it here.
 
 ## Pick the hosting-model block
 

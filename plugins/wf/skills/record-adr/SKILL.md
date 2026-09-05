@@ -7,7 +7,7 @@ description: Capture one localized, non-obvious architectural decision as an ADR
 
 Capture **one point-in-time, localized decision** into `docs/adr/` the moment it crystallises. Template: [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-A rule that turns out to constrain what gets built, to define a term, or to say how a file is worded belongs in another home — run `/record-concept`' **Where the rule belongs** to route it.
+A rule that turns out to constrain what gets built, to define a term, or to say how a file is worded belongs in another home — Run `/record-concept`' skill **Where the rule belongs** to route it.
 
 ## When to write an ADR
 
@@ -25,7 +25,7 @@ Qualifies: architectural shape (monorepo, event-sourced write model); integratio
 
 Runs before any write. A near-duplicate record is worse than a longer one: it splits authority over a decision area, and the `owns` key can then name only one of them.
 
-1. Run `/index-docs`' **Scan and match** over the `Architecture Decision Records` and `Crosscutting Concepts` tables with this decision's surface — its terms and the paths it governs.
+1. Run `/index-docs`' skill **Scan and match** over the `Architecture Decision Records` and `Crosscutting Concepts` tables with this decision's surface — its terms and the paths it governs.
 2. A matched record whose scope or `owns` already covers this decision area → **extend it**: amend the body, and sharpen `default`, `owns`, `trigger`, or `applies_to` to cover the new case. Resync its row via **Sync index row**. Stop here.
 3. No match covers the area → **create** a new ADR. Its `owns` phrases must not collide with any existing record's — a phrase belongs to exactly one record.
 
@@ -48,5 +48,5 @@ Highest four-digit `NNNN` filename prefix in `docs/adr/`, plus 1, zero-padded to
 
 ## Keeping the index in sync
 
-When an ADR is added, superseded, or retired, run `/index-docs`' **Ensure section exists** for `Architecture Decision Records`, then its **Sync index row** in the same change — never edit the table in `ARCHITECTURE.md` directly. The index summary must match the ADR's own content.
+When an ADR is added, superseded, or retired, Run `/index-docs`' skill **Ensure section exists** for `Architecture Decision Records`, then its **Sync index row** in the same change — never edit the table in `ARCHITECTURE.md` directly. The index summary must match the ADR's own content.
 

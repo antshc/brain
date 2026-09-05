@@ -31,7 +31,7 @@ For a repository file, resolve the real path inside the repository. Store its re
 
 For a Wayfinder decision ticket, read its linked map. Use the final comment returned by **Read ticket** as the resolution; Wayfinder writes the answer last when closing. If no comment exists, use the map gist as context and add the missing resolution to `Open Questions`. If the final comment conflicts with the map gist, add the conflict to `Open Questions`.
 
-For a map, run `/manage-backlog` **List sub-tickets**, then **Read ticket** for every closed child regardless of `wayfinder:*` label. Treat `wayfinder:grilling` and `wayfinder:prototype` resolutions as decisions. Treat `wayfinder:research` findings and `wayfinder:task` completion facts as factual constraints, not product decisions.
+For a map, Run `/manage-backlog` skill **List sub-tickets**, then **Read ticket** for every closed child regardless of `wayfinder:*` label. Treat `wayfinder:grilling` and `wayfinder:prototype` resolutions as decisions. Treat `wayfinder:research` findings and `wayfinder:task` completion facts as factual constraints, not product decisions.
 
 Do not read open child bodies. Add each open child to `Open Questions` as `{{canonicalIssueUrl}} — {{title}}`. On a later run, remove that entry when the issue closes and consume its resolution. Deduplicate by canonical URL. Do not add open children to `Source Material`.
 
@@ -93,13 +93,13 @@ Open [design-template.md](design-template.md) with the file-reading tool now, ev
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
-`Solution Overview` diagrams are optional — omit all by default; add one only when the user explicitly asks for it. These are the only diagrams `Solution Overview` may hold; each is solution-level, not per-capability, and each is always the complete current diagram — never a delta:
+`design-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons. `Solution Overview` diagrams are optional — omit all by default; add one only when the user explicitly asks for it. These are the only diagrams `Solution Overview` may hold; each is solution-level, not per-capability, and each is always the complete current diagram — never a delta:
 
 | Diagram | Include for | Template |
 | --- | --- | --- |
-| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/to-behavior-diagram` skill's Solution Diagram section |
-| Flow Diagram (`flowchart`) | Solution-level process flow, decision path, or component wiring | Follow `/to-behavior-diagram` skill's Flowchart section |
-| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Sequence Diagram section of [design-template.md](design-template.md) |
+| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/to-behavior-diagram`' skill **Solution Diagram** |
+| Flow Diagram (`swimlane-beta`) | Solution-level process flow where container or component ownership is itself a design decision | Follow `/to-behavior-diagram`' skill **Swimlane Diagram** |
+| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Follow `/to-behavior-diagram`' skill **Sequence Diagram** |
 
 If merging into an existing design that already contains a diagram, NEVER modify, regenerate, or remove it silently. Stop and ask the user for confirmation before changing or removing any existing diagram.
 
@@ -107,14 +107,14 @@ Select implementation appendices from evidence. The two diagram appendices (Clas
 
 | Appendix | Include for | Template |
 | --- | --- | --- |
-| REST API Delta | HTTP contract or behavior changes | Follow `/to-contract-delta` skill's API delta rules — include a `Scenarios` subsection per endpoint per the template's rules |
-| GUI Design Delta | User-visible state or interaction changes | Follow `/to-contract-delta` skill's GUI delta rules — include a `Scenarios` subsection per surface per the template's rules |
-| Database Schema Delta | Persistence contract changes | Follow `/to-contract-delta` skill's Database delta rules |
-| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/to-behavior-delta` skill's Class Diagram overlay |
-| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/to-behavior-delta` skill's Sequence Diagram overlay |
-| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/to-behavior-delta` skill's Deployment View overlay |
+| REST API Delta | HTTP contract or behavior changes | Follow `/to-contract-delta`' skill **API delta rules** — include a `Scenarios` subsection per endpoint per the template's rules |
+| GUI Design Delta | User-visible state or interaction changes | Follow `/to-contract-delta`' skill **GUI delta rules** — include a `Scenarios` subsection per surface per the template's rules |
+| Database Schema Delta | Persistence contract changes | Follow `/to-contract-delta`' skill **Database delta rules** |
+| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/to-behavior-delta`' skill **Class Diagram** overlay |
+| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/to-behavior-delta`' skill **Sequence Diagram** overlay |
+| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/to-behavior-delta`' skill **Deployment View** overlay |
 
-Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/to-behavior-delta` skill for the Class Diagram, Sequence Diagram, and Deployment View content — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions (opt-in, never-silently-regenerate, Solution-level vs implementation-level Sequence Diagram distinction, Flowchart-is-Solution-Overview-only rule).
+Open and read only the templates for appendices that evidence triggers — but for each one that is triggered, the read is mandatory, not optional. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; Follow `/to-behavior-delta` skill for the Class Diagram, Sequence Diagram, and Deployment View content — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions (opt-in, never-silently-regenerate, Solution-level vs implementation-level Sequence Diagram distinction, Flowchart-is-Solution-Overview-only rule).
 
 ## 6. Merge incrementally
 

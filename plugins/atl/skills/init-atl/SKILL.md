@@ -38,7 +38,7 @@ git -C "$HARNESS_REPO_PATH" check-ignore -q "$configPath" || echo "NOT IGNORED"
 ```
 Nothing printed → continue. `NOT IGNORED` → append a `.atlassian` line (with a short comment noting it holds a credential) to `$HARNESS_REPO_PATH/.gitignore`, creating that file if needed. Never leave it un-ignored.
 
-**6 — Resolve the MCP connection.** Run `/preflight-atl` **Action: Resolve**. `mcpConnected` false → name "an Atlassian MCP connection" as the missing prerequisite, skip Step 7, go to Step 8.
+**6 — Resolve the MCP connection.** Run `/preflight-atl` skill **Action: Resolve**. `mcpConnected` false → name "an Atlassian MCP connection" as the missing prerequisite, skip Step 7, go to Step 8.
 
 **7 — Offer a wrapper skill per Jira work item type.**
 1. Resolve `projectKey`: Preflight's `defaultProjectKey` if non-empty. Else `getVisibleJiraProjects` — exactly one → use it; more → ask; zero → name "a visible Jira project" as the missing prerequisite, skip to Step 8.

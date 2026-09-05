@@ -10,7 +10,7 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-1. Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use `HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues) and `CODEBASE_REPO_PATH` for codebase/worktree operations.
+1. Run `/resolve-harness` skill from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use `HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues) and `CODEBASE_REPO_PATH` for codebase/worktree operations.
 
 2. Bring `HARNESS_REPO_PATH` up to date with its remote before any reads or the final push depend on it.
 **GUARD**:  Run only when `/resolve-harness` found `.harness.env` and emitted a non-empty `HARNESS_REPO_PATH`.
@@ -76,7 +76,7 @@ Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `
 
 ## 4. Build
 
-Run `/ralph-build $HARNESS_REPO_PATH $WORKTREE_PATH` skill:
+Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`:
 
 A non-pass build → **exit** and report. Never enter the orchestrator loop on a broken build.
 

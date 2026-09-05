@@ -10,7 +10,7 @@ Return a Confluence **Page** as Markdown from its identifier or URL. MCP only �
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` **Action: Resolve**.
+**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**.
 
 **2 — Parse `{{input}}`.**
 - `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<site>`, `<page_id>`.

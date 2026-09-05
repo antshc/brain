@@ -83,29 +83,12 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 ## Solution Diagram
 
-<!-- Read to-behavior-diagram/templates/c4-container-diagram-template.md for the full element reference and mermaid gotchas. Exactly one solution-level C4Container diagram is required, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility described under the diagram using the bullets. The container name is bold. -->
+<!-- Optional. Include only when the user explicitly asks for a Solution Overview diagram. Follow `/to-behavior-diagram`' skill **Solution Diagram**; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Exactly one solution-level C4Container diagram is required when included, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility is described under the diagram using bullets. The container name is bold. -->
 
 <details>
 <summary>Solution Diagram</summary>
 
-```mermaid
-C4Container
-    title Container diagram for {{featureName}}
-
-    Person(actor, "{{actorName}}", "{{actorDescription}}")
-    System_Boundary(system, "{{systemUnderDesignName}}") {
-        Container(entry, "{{entryContainerName}}", "{{entryTechnology}}", "{{entryDescription}}")
-        Container(owner, "{{capabilityOwnerContainerName}}", "{{ownerTechnology}}", "{{ownerDescription}}")
-    }
-    Rel(actor, entry, "{{actionLabel}}", "{{protocol}}")
-    Rel(entry, owner, "{{callLabel}}")
-
-    UpdateElementStyle(actor, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#4a5a8a")
-    UpdateElementStyle(entry, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
-    UpdateElementStyle(owner, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
-    UpdateRelStyle(actor, entry, $textColor="#c9d1d9", $lineColor="#8b949e")
-    UpdateRelStyle(entry, owner, $textColor="#c9d1d9", $lineColor="#8b949e")
-```
+{{solutionDiagram}}
 </details>
 
 ## Flow Diagram: {{flowTitle}}
@@ -113,14 +96,9 @@ C4Container
 <details>
 <summary>Flow Diagram: {{flowTitle}}</summary>
 
-<!-- Use a flow diagram to visualize the step-by-step process, workflow, and decisions. Include additional diagrams when needed. This section is optional; include it only for a materially distinct decision path. -->
+<!-- Optional. Include only when the user explicitly asks for a Solution Overview flow diagram and ownership by container or component is itself a design decision. Follow `/to-behavior-diagram`' skill **Swimlane Diagram**; that skill owns the template read. Do not compose a Mermaid skeleton from this template. -->
 
-```mermaid
-flowchart TD
-    Start["Start"] --> Decision{"Decision"}
-    Decision -->|Outcome A| A["Outcome A"]
-    Decision -->|Outcome B| B["Outcome B"]
-```
+{{flowDiagram}}
 </details>
 
 ## Sequence Diagram: {{sequenceTitle}}
@@ -128,21 +106,9 @@ flowchart TD
 <details>
 <summary>Sequence Diagram: {{sequenceTitle}}</summary>
 
-<!-- Use a sequence diagram to show high-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) over time to complete a scenario. Omit method-level and low-level implementation detail — that belongs in Detailed Design: Implementation Appendix. Include additional diagrams when needed. This section is optional; include it only for a materially distinct cross-component interaction. -->
+<!-- Optional. Include only when the user explicitly asks for a Solution Overview sequence diagram. Follow `/to-behavior-diagram`' skill **Sequence Diagram**; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Use a sequence diagram to show high-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) over time to complete a scenario. Omit method-level and low-level implementation detail — that belongs in Detailed Design: Implementation Appendix. -->
 
-<!-- `autonumber` is mandatory — it numbers every step so review comments and prose can reference a step by number. Keep it as the first line under `sequenceDiagram`. Delete this instruction. -->
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant Boundary
-    participant Owner
-    User->>Boundary: Request
-    Boundary->>Owner: Delegate
-    Owner-->>Boundary: Result
-    Boundary-->>User: Response
-```
+{{sequenceDiagram}}
 </details>
 
 ## Decisions
@@ -245,7 +211,7 @@ sequenceDiagram
 </details>
 
 # Detailed Design: Implementation Appendix
-<!-- Insert zero or more complete appendix templates in this order:  GUI Design Delta, REST API Delta, Database Schema Delta, Class Diagram. Remove this comment and the placeholder when none apply. -->
+<!-- Insert zero or more complete appendix templates in this order: GUI Design Delta, REST API Delta, Database Schema Delta, Class Diagram, Sequence Diagram, Deployment View Delta. Follow `/to-behavior-delta` skill for diagram appendices; do not compose Mermaid skeletons from this template. Remove this comment and the placeholder when none apply. -->
 
 {{implementationAppendices}}
 

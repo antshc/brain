@@ -13,7 +13,7 @@ disable-model-invocation: true
 Parse the user input: `{{input}}`, format `<PR URL>`. Extract <owner>, <repo>, <pr_number> from <pr_url>.
 
 **Step 2 — Fetch PR diff**
-Run the `/fetch-diff` skill (**MUST**) to check out the PR branch and fetch its diff into `bin/review_diff/` with `bin/review_diff/_manifest.tsv`. Report `FILE_PATH` from the manifest only — never a guessed or locally-resolved path.
+Run `/fetch-diff` skill (**MUST**) to check out the PR branch and fetch its diff into `bin/review_diff/` with `bin/review_diff/_manifest.tsv`. Report `FILE_PATH` from the manifest only — never a guessed or locally-resolved path.
 
 **Step 3 — Load review context**
 Retrieve existing review comments - `gh api repos/<owner>/<repo>/pulls/<pr_number>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`, Retrieve PR title, description - `gh pr view <pr_number> --json title,body --repo <owner>/<repo>`:

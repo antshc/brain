@@ -44,7 +44,7 @@ If any of the three is missing, skip the Concept — route it by *Where the rule
 
 Runs before any write. A near-duplicate record is worse than a longer one: it splits authority over a decision area, and the `owns` key can then name only one of them.
 
-1. Run `/index-docs`' **Scan and match** over the `Crosscutting Concepts` and `Architecture Decision Records` tables with this rule's surface — its terms and the paths it governs.
+1. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` and `Architecture Decision Records` tables with this rule's surface — its terms and the paths it governs.
 2. A matched record whose scope or `owns` already covers this decision area → **extend it**: add the `Rules` line or guidance to the body, and sharpen `default`, `owns`, `trigger`, or `applies_to` to cover the new case. Resync its row via **Sync index row**. Stop here.
 3. No match covers the area → **create** a new Concept. Its `owns` phrases must not collide with any existing record's — a phrase belongs to exactly one record.
 
@@ -63,9 +63,9 @@ Highest four-digit `NNNN` filename prefix in `docs/concepts/`, plus 1, zero-padd
 Every Concept opens with the YAML frontmatter block defined in [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md#frontmatter). It is the machine-readable contract for the record, and the source of truth for its `ARCHITECTURE.md` index row.
 
 1. Author `id`, `title`, `trigger`, `summary`, `applies_to` before writing the body — they force the "does this apply to me?" decision up front.
-2. Derive `trigger` with `/index-docs`' **Generate trigger condition**, then write the returned value into frontmatter — not straight into the table.
+2. Derive `trigger` with `/index-docs`' skill **Generate trigger condition**, then write the returned value into frontmatter — not straight into the table.
 3. `related` is bidirectional: adding `related: ["0009"]` here means adding this record's id to `0009`'s `related` in the same change. A one-directional link is lost to any reader arriving from the other side.
-4. Superseding or retiring a Concept applies the marker to its index row via `/index-docs`' **Sync index row**; the record itself carries no status field.
+4. Superseding or retiring a Concept applies the marker to its index row via `/index-docs`' skill **Sync index row**; the record itself carries no status field.
 
 ## Body
 
@@ -73,7 +73,7 @@ Write `Purpose`, `Rules`, and `Design Guidance` per [CONCEPT-FORMAT.md](./CONCEP
 
 ## Keeping the index in sync
 
-When a Concept is added, superseded, or retired, run `/index-docs`' **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** in the same change — never edit the table in `ARCHITECTURE.md` directly.
+When a Concept is added, superseded, or retired, Run `/index-docs`' skill **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** in the same change — never edit the table in `ARCHITECTURE.md` directly.
 
 Pass `{{rowMetadata}}` **from the record's frontmatter**, so the table stays a projection of the files rather than a hand-maintained duplicate:
 

@@ -34,11 +34,11 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 3. Bootstrap the docs
 
-Run `/bootstrap-docs`' **Mandatory creation** at the docs root (reporoot for a wrapping repo) — the once-per-repo firing of that guarantee.
+Run `/bootstrap-docs`' skill **Mandatory creation** at the docs root (reporoot for a wrapping repo) — the once-per-repo firing of that guarantee.
 
 ## 4. Set up the ticket tracker
 
-Run `/manage-backlog` action **Setup labels**.
+Run `/manage-backlog` skill **Setup labels**.
 
 ## Done when
 

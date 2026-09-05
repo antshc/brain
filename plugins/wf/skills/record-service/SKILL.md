@@ -13,9 +13,9 @@ No approval gate — record a service as soon as it's identified.
 
 ## Sync the Services row — always
 
-1. Run `/index-docs`' **Generate trigger condition** for `{{triggerCondition}}`.
-2. Run `/index-docs`' **Ensure section exists** for the `Services` table under `Building blocks`.
-3. Run `/index-docs`' **Sync index row** with `{{action}}` and `{{rowMetadata}}` = `{{buildingBlockName}}`, `{{mermaidComponentName}}`, `{{triggerCondition}}`, `{{shortDescription}}`, plus a link to the full doc once one exists. Never edit the table directly.
+1. Run `/index-docs`' skill **Generate trigger condition** for `{{triggerCondition}}`.
+2. Run `/index-docs`' skill **Ensure section exists** for the `Services` table under `Building blocks`.
+3. Run `/index-docs`' skill **Sync index row** with `{{action}}` and `{{rowMetadata}}` = `{{buildingBlockName}}`, `{{mermaidComponentName}}`, `{{triggerCondition}}`, `{{shortDescription}}`, plus a link to the full doc once one exists. Never edit the table directly.
 
 ## Write the full doc — only when non-trivial
 

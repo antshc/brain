@@ -62,7 +62,7 @@ Never review before INPUT and GOTCHAS are complete. When in doubt whether a chan
 
 REVIEW applied no changes → skip this step and emit "No changes made — previously verified result stands."
 
-Otherwise follow `/crew-feedback` skill, passing `VERIFY_PATHS` and `HARNESS_REPO_PATH`, scoped to the files REVIEW changed.
+Otherwise, Follow `/crew-feedback` skill, passing `VERIFY_PATHS` and `HARNESS_REPO_PATH`, scoped to the files REVIEW changed.
 
 - **Pass** → keep the changes.
 - **Environment blocker, or a code error past `crew-feedback`'s retry cap** → follow **Revert** instead of reporting `partial`.
