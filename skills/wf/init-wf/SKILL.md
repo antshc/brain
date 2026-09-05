@@ -1,5 +1,5 @@
 ---
-name: setup-wf
+name: init-wf
 description: One-time wf-plugin setup — confirms single-repo vs. wrapping/harness-repo topology, seeds `.github/copilot-instructions.md` accordingly, bootstraps ARCHITECTURE.md/CONTEXT.md, and creates the ticket-tracker labels. Run once before first use of the other wf skills.
 disable-model-invocation: true
 ---

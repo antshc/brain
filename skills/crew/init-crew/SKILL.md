@@ -1,5 +1,5 @@
 ---
-name: setup-crew
+name: init-crew
 description: Manual, user-invoked bootstrap that scaffolds the crew's per-Stack convention files (CODE-<stack>.md, VERIFY-<stack>.md, CHORE-<stack>.md) for a user-chosen subset of the shipped Stack roster, plus a single shared GOTCHAS.md, under the resolved Harness Repo Path. Only creates files that don't already exist; never called by Codey or Chorey themselves.
 disable-model-invocation: true
 ---

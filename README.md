@@ -123,7 +123,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [research](skills/wf/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
 - [record-adr](skills/wf/record-adr/SKILL.md), [record-concept](skills/wf/record-concept/SKILL.md), [record-term](skills/wf/record-term/SKILL.md), [record-service](skills/wf/record-service/SKILL.md), [record-deployment-view](skills/wf/record-deployment-view/SKILL.md): capture ADRs, Concepts, glossary terms, services, and deployment topology into the docs the moment they crystallise.
 - [bootstrap-docs](skills/wf/bootstrap-docs/SKILL.md) / [index-docs](skills/wf/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
-- [manage-backlog](skills/wf/manage-backlog/SKILL.md) / [setup-wf](skills/wf/setup-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
+- [manage-backlog](skills/wf/manage-backlog/SKILL.md) / [init-wf](skills/wf/init-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
 - [track-ledger](skills/wf/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a grilling session.
 
 ### crew
@@ -140,7 +140,7 @@ Agents: [codey](agents/crew/codey.agent.md), [codey-py](agents/crew/codey-py.age
 - [crew-review](skills/crew/crew-review/SKILL.md): behavior-preserving cleanup review of a commit or uncommitted work.
 - [crew-feedback](skills/crew/crew-feedback/SKILL.md): run LSP, build, and test against changed files.
 - [crew-gotchas](skills/crew/crew-gotchas/SKILL.md): read/write per-agent `GOTCHAS.md` friction notes.
-- [setup-crew](skills/crew/setup-crew/SKILL.md): scaffold per-Stack convention files and `GOTCHAS.md`.
+- [init-crew](skills/crew/init-crew/SKILL.md): scaffold per-Stack convention files and `GOTCHAS.md`.
 
 ### ralph
 
@@ -169,7 +169,7 @@ PR code review skills with modular standards and guidance.
 
 Harness configuration setup and resolution skills.
 
-- [setup-harness](skills/harness/setup-harness/SKILL.md): create or update the Harness configuration file, resolving repo paths.
+- [init-harness](skills/harness/init-harness/SKILL.md): create or update the Harness configuration file, resolving repo paths.
 - [resolve-harness](skills/harness/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.env` file.
 
 ### atl
@@ -186,7 +186,7 @@ Atlassian workflow skills.
 
 Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills.
 
-- [setup-cli](skills/azure-platform/setup-cli/SKILL.md) / [auth-principal](skills/azure-platform/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
+- [init-cli](skills/azure-platform/init-cli/SKILL.md) / [auth-principal](skills/azure-platform/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
 - [query-azure](skills/azure-platform/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
 - [search-ms-docs](skills/azure-platform/search-ms-docs/SKILL.md): query official Microsoft documentation.
 - [search-ms-code-samples](skills/azure-platform/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.

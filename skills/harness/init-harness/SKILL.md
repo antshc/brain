@@ -1,5 +1,5 @@
 ---
-name: setup-harness
+name: init-harness
 description: Create or update the Harness Configuration File in the current directory — resolving both the Harness Repo Path and the Codebase Repo Path, merging into an existing file rather than overwriting it.
 disable-model-invocation: true
 ---
