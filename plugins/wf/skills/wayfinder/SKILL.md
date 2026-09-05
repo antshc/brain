@@ -126,7 +126,7 @@ Use these instead of raw `gh` calls; each name below is a `/manage-backlog` acti
 - **Resolve a ticket**: **Comment on ticket** with the answer, then **Close ticket**.
 - **Read the map / a ticket**: **Read ticket**. **Read a ticket's sub-tickets**: **List sub-tickets**.
 
-**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, or `wayfinder:task` missing): run `/manage-backlog` **Setup labels**, then retry.
+**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, or `wayfinder:task` missing): Run `/manage-backlog` skill **Setup labels**, then retry.
 
 ## Invocation
 
@@ -136,11 +136,11 @@ Two modes. Either way, never resolve more than one ticket per session — with t
 
 User invokes with a loose idea.
 
-1. Name the destination. Run `/grill-design` to pin down what this map is finding its way to — the spec, decision, or change. The destination fixes the scope, so it's settled first.
-2. Map the frontier. Run `/grill-design` again, breadth-first this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. If this surfaces no fog — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
+1. Name the destination. Run `/grill-design` skill to pin down what this map is finding its way to — the spec, decision, or change. The destination fixes the scope, so it's settled first.
+2. Map the frontier. Run `/grill-design` skill again, breadth-first this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. If this surfaces no fog — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
 3. Create the map (**Create the map** above): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into Not yet specified.
 4. Create the tickets you can specify now (**Create a ticket** above) — then fill in each ticket's `Blocked by` section in a second pass, once every ticket has a number. Everything you can't yet specify stays in the fog — the Not yet specified section.
-5. Fire the research subagents. For each `research` ticket you just created, run `/research` to resolve it in parallel, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
+5. Fire the research subagents. For each `research` ticket you just created, Run `/research` skill to resolve it in parallel, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
 6. Stop — charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map

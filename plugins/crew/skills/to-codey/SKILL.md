@@ -4,7 +4,7 @@ description: Run the Codey subagent for an implementation task. Use when the tas
 argumentHint: "<description> | @plan | <github-issue-url>"
 ---
 
-Resolve the task from the argument first, then run `/crew-select` skill **Resolve From Task Text**, passing the resolved task content as `TASK_TEXT`. Retain its `Matched Stacks`/`Primary agent`. **Emit**: "Matched Stacks: [...] or none. Primary agent: <agent>."
+Resolve the task from the argument first. Run `/crew-select` skill **Resolve From Task Text**, passing the resolved task content as `TASK_TEXT`. Retain its `Matched Stacks`/`Primary agent`. **Emit**: "Matched Stacks: [...] or none. Primary agent: <agent>."
 
 Run the commands below, substitute their output into the prompt, then pass it to `runSubagent`:`<primary agent from crew-select, or codey when none matched>`.
 

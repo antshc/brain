@@ -9,7 +9,7 @@ compatibility: Requires Azure CLI (`az`) to be installed and authenticated with 
 ## Resource Operations
 
 1. Resolve the resource type, resource name, resource group, location, subscription, and service-specific inputs required by the request. Ask only for values that cannot be discovered or safely inferred.
-2. For unfamiliar commands or flags, run `az <group> <command> --help`. For service behavior, limits, or current guidance, run `/azure-platform:ms-docs` skill.
+2. For unfamiliar commands or flags, run `az <group> <command> --help`. For service behavior, limits, or current guidance: Run `/azure-platform:ms-docs` skill.
 3. Run read and discovery commands directly.
 4. Run requested create and update commands directly once all required inputs and the target subscription are resolved. Do not add a confirmation step.
 5. Validate each create or update with the narrowest matching `show` or `list` command and report the resulting resource ID and subscription without exposing credentials.

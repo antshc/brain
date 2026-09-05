@@ -88,7 +88,7 @@ Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
-Load `references/issue-template.md` and use it verbatim as the issue body structure — include every section, following each section's `<...-rule>` instructions to draft its content. If a slice touches an API, Database, or Resource contract, run `/to-contract-delta` once per touched contract kind and inline its output verbatim under the issue body's **Contracts Delta** section before creating the issue.
+Load `references/issue-template.md` and use it verbatim as the issue body structure — include every section, following each section's `<...-rule>` instructions to draft its content. If a slice touches an API, Database, or Resource contract, Run `/to-contract-delta` skill once per touched contract kind and inline its output verbatim under the issue body's **Contracts Delta** section before creating the issue.
 
 Do NOT close or modify the parent issue.
 
@@ -96,4 +96,4 @@ Do NOT close or modify the parent issue.
 
 ## Troubleshooting
 
-**Label not found** (`hitl` or `spec` label missing): run `/manage-backlog` **Setup labels** to create the required labels, then retry. If the `/manage-backlog` skill is not available, fall back to saving the tickets to `docs/tickets/` as markdown.
+**Label not found** (`hitl` or `spec` label missing): Run `/manage-backlog` skill **Setup labels** to create the required labels, then retry. If the `/manage-backlog` skill is not available, fall back to saving the tickets to `docs/tickets/` as markdown.

@@ -10,7 +10,7 @@ Return a Jira **Work item** as Markdown from its key or URL. MCP only — no API
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` **Action: Resolve**.
+**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**.
 
 **2 — Parse `{{input}}`.**
 - `https://<site>/browse/<key>` → `<site>`, `<key>`.

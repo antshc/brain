@@ -40,7 +40,7 @@ Iterate until the user approves the breakdown.
 
 ### 6. Before output run Quality Check
 - Each capability is atomic; unrelated capabilities are split into separate requirement sets.
-- Every requirement is **solution-agnostic** — swapping UI or technology would not force a reword. Run `/solution-agnostic` to check **capability title**, **functional requirements**, **business rules**, and **edge cases** are **solution-agnostic**.
+- Every requirement is **solution-agnostic** — swapping UI or technology would not force a reword. Run `/solution-agnostic` skill to check **capability title**, **functional requirements**, **business rules**, and **edge cases** are **solution-agnostic**.
 - Every functional requirement is specific, testable, and externally visible.
 - Business rules state invariants, not capabilities.
 - Every edge case traces to a functional requirement or business rule.

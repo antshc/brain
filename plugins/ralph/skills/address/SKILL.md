@@ -32,10 +32,10 @@ Done when `action` is `proceed` and the working set is in hand.
 
 **Load `references/github-api.md` now.** Every `gh` invocation in this run is copied from it, and nothing below restates one.
 
-1. Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
+1. Run `/resolve-harness` skill from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
    - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Non-zero exit → **exit** and report.
-2. Run the `/create-worktree` skill: `/create-worktree $CODEBASE_REPO_PATH $baseRef $headRef`. Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
-3. Run the `/ralph-build $HARNESS_REPO_PATH $WORKTREE_PATH` skill. A non-pass build → **exit** and report. Never fix threads on a broken build.
+2. Run `/create-worktree` skill with `$CODEBASE_REPO_PATH $baseRef $headRef`. Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
+3. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`. A non-pass build → **exit** and report. Never fix threads on a broken build.
 
 Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef` and the build gate has passed.
 
@@ -114,7 +114,7 @@ Done when every thread in the working set carries exactly one new comment author
 
 ## 9. Cleanup
 
-Run `/delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $headRef`.
+Run `/delete-worktree` skill with `$CODEBASE_REPO_PATH $WORKTREE_PATH $headRef`.
 
 Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is gone; the remote branch and the PR are untouched.
 

@@ -8,19 +8,19 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
-1. Run `/resolve-harness` from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
+1. Run `/resolve-harness` skill from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
    - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Non-zero exit → **exit** and report.
 2. Get PR branch names:
   ```bash
   eval "$(gh pr view <number> --repo <owner>/<repo> --json headRefName,baseRefName \
     -q '"branch=\(.headRefName)\ntarget_branch=\(.baseRefName)"')"
   ```
-3. Run the `/create-worktree` skill:
+3. Run `/create-worktree` skill:
    ```
   /create-worktree $CODEBASE_REPO_PATH $target_branch $branch
    ```
    Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
-4. Run the `/ralph-build $HARNESS_REPO_PATH $WORKTREE_PATH` skill:
+4. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`:
    A non-pass build → **exit** and report. Never fix threads on a broken build.
 5. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 

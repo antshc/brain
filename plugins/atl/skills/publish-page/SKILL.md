@@ -29,7 +29,7 @@ Never print, log, quote, or publish `ATLASSIAN_SITE`, `ATLASSIAN_EMAIL`, or `ATL
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` **Action: Resolve**.
+**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**.
 
 **2 — Resolve `cloudId`.** Preflight's `cloudId`; still empty → `getAccessibleAtlassianResources` once, per Preflight's standing rule.
 
