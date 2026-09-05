@@ -5,7 +5,7 @@
 <!-- `swimlane-beta` is a beta/experimental Mermaid diagram type (v11.16.0+) — confirm the rendering toolchain (mmdc, VS Code preview, GitHub) supports it before relying on it. Delete this instruction. -->
 
 <!-- Mermaid technical gotchas and good practices (mermaid.ai/open-source/syntax/swimlanes.html#good-practices), consistent with the flowchart conventions:
-- `swimlane-beta` (optionally followed by `TB`/`TD`/`BT`/`LR`/`RL`; defaults to `TB`) starts the diagram. Each top-level `subgraph id [Label] ... end` becomes one lane.
+- `swimlane-beta` (optionally followed by `TB`/`TD`/`BT`/`LR`/`RL`; defaults to `TB`) starts the diagram. Each top-level `subgraph id [Label] ... end` becomes one lane. Include the container or component type in the lane label separated by a dash (e.g. `[Web Portal - GUI]`, `[Order Service - REST API]`, `[Database Name - Database]`). Do not use parentheses `()` inside the `[Label]` brackets as it can break parsing.
 - Make each lane mean one kind of ownership — one container (Level 1) or one component/module (Level 2). Don't mix ownership kinds (e.g. a team lane next to a status lane) in the same diagram.
 - Node shapes reuse flowchart syntax: `id([Text])` stadium for a start/end step, plain `id[Text]` rectangle for a task/activity, `id{Text}` diamond for a branching decision.
 - Label every cross-lane edge (`A -->|label| B`) with what's handed off — a request, response, or condition. An unlabeled cross-lane arrow hides the handoff that's the point of the diagram.
@@ -16,7 +16,7 @@ Delete this instruction. -->
 
 ### Level 1 — Container Swimlane: {{title}}
 
-<!-- Lanes are containers (the deployable/runnable units from the Solution Diagram — GUI, REST API service, database, queue). Show which container performs each step of the flow. Delete this instruction. -->
+<!-- Lanes are containers (the deployable/runnable units from the Solution Diagram — GUI, REST API service, database, queue). Include the container type or technology in the lane label separated by a dash (e.g. [Web Portal - GUI], [Order API - REST API], [Database Name - Database]). Show which container performs each step of the flow. Delete this instruction. -->
 
 <details>
 <summary>{{title}} — container swimlane</summary>
@@ -24,20 +24,20 @@ Delete this instruction. -->
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 swimlane-beta TB
-  subgraph {{actorLane}} [{{actorLaneLabel}}]
+  subgraph {{actorLane}} [{{actorLaneLabel}} - {{actorType}}]
     {{startNode}}([{{startLabel}}])
   end
 
-  subgraph {{entryContainerLane}} [{{entryContainerName}}]
+  subgraph {{entryContainerLane}} [{{entryContainerName}} - {{entryContainerType}}]
     {{entryStep}}[{{entryStepLabel}}]
   end
 
-  subgraph {{ownerContainerLane}} [{{capabilityOwnerContainerName}}]
+  subgraph {{ownerContainerLane}} [{{capabilityOwnerContainerName}} - {{ownerContainerType}}]
     {{decisionNode}}{{{decisionLabel}}}
     {{processStep}}[{{processStepLabel}}]
   end
 
-  subgraph {{storeContainerLane}} [{{dataStoreContainerName}}]
+  subgraph {{storeContainerLane}} [{{dataStoreContainerName}} - {{storeContainerType}}]
     {{persistStep}}[{{persistLabel}}]
   end
 
@@ -47,13 +47,13 @@ swimlane-beta TB
   {{decisionNode}} -->|{{yesOutcome}}| {{processStep}}
   {{processStep}} -->|{{handoff3}}| {{persistStep}}
 
-  classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
 ```
 </details>
 
 ### Level 2 — Component Swimlane: {{title}} inside {{containerName}}
 
-<!-- Scoped to one container from Level 1. Lanes are the components/modules inside that container (e.g. GUI pages, REST API controllers/modules). Show which component performs each step of the flow inside that container. Include only when internal component wiring, not just the container-level flow, is a design decision. Delete this instruction. -->
+<!-- Scoped to one container from Level 1. Lanes are the components/modules inside that container (e.g. GUI pages, REST API controllers/modules). Include the component type in the lane label separated by a dash (e.g. [OrderController - Controller], [OrderService - Service]). Show which component performs each step of the flow inside that container. Include only when internal component wiring, not just the container-level flow, is a design decision. Delete this instruction. -->
 
 <details>
 <summary>{{title}} — component swimlane ({{containerName}})</summary>
@@ -61,16 +61,16 @@ swimlane-beta TB
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 swimlane-beta TB
-  subgraph {{entryComponentLane}} [{{entryComponentName}}]
+  subgraph {{entryComponentLane}} [{{entryComponentName}} - {{entryComponentType}}]
     {{receiveStep}}([{{receiveLabel}}])
   end
 
-  subgraph {{ownerComponentLane}} [{{capabilityOwnerComponentName}}]
+  subgraph {{ownerComponentLane}} [{{capabilityOwnerComponentName}} - {{ownerComponentType}}]
     {{validateNode}}{{{validateLabel}}}
     {{moduleStep}}[{{moduleStepLabel}}]
   end
 
-  subgraph {{dependencyComponentLane}} [{{dependencyComponentName}}]
+  subgraph {{dependencyComponentLane}} [{{dependencyComponentName}} - {{dependencyComponentType}}]
     {{delegateStep}}[{{delegateLabel}}]
   end
 
