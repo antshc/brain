@@ -2,6 +2,6 @@
   "name": "atl",
   "version": "1.0.0",
   "description": "Atlassian workflow skills.",
-  "skills": ["./skills"],
+  "skills": ["../../skills/atl"],
   "mcpServers": ".mcp.json"
 }

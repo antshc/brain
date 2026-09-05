@@ -137,7 +137,7 @@ _Avoid_: comment, finding, issue
 
 ## atl
 
-Location: plugins/atl/
+Location: plugins/atl/ (config) + skills/atl/ (skills)
 
 ### Language
 

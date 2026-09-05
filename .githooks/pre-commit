@@ -3,13 +3,13 @@ set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 SRC="$REPO_ROOT/tools/src/modules/github/"
-DEST="$REPO_ROOT/plugins/ralph/skills/fix/github/"
+DEST="$REPO_ROOT/skills/ralph/fix/github/"
 
 rsync -a --delete "$SRC" "$DEST"
 git add "$DEST"
 
 PR_STATE_SRC="$REPO_ROOT/tools/src/modules/github/pr_discussion_state.py"
-PR_STATE_DEST="$REPO_ROOT/plugins/ralph/skills/address/scripts/pr_discussion_state.py"
+PR_STATE_DEST="$REPO_ROOT/skills/ralph/address/scripts/pr_discussion_state.py"
 
 rsync -a "$PR_STATE_SRC" "$PR_STATE_DEST"
 git add "$PR_STATE_DEST"

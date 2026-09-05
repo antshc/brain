@@ -48,12 +48,12 @@ Nothing printed → continue. `NOT IGNORED` → append a `.atlassian` line (with
    - `getJiraIssueTypeMetaWithFields` with `projectIdOrKey`, `issueTypeId`, `requiredFieldsOnly: true`.
    - `skillName := pub-<issueType.name, lowercased, spaces → hyphens>` (e.g. `Bug` → `pub-bug`, `Story` → `pub-story`).
    - `$HARNESS_REPO_PATH/.github/skills/<skillName>/` exists → ask before overwriting; never overwrite silently.
-   - Create `$HARNESS_REPO_PATH/.github/skills/<skillName>/SKILL.md` — never under `plugins/atl/` or any other plugin folder — with:
+   - Create `$HARNESS_REPO_PATH/.github/skills/<skillName>/SKILL.md` — never under `plugins/atl/`, `skills/atl/`, or any other plugin folder — with:
      - Frontmatter `name: <skillName>`, `description: Create a <issueType.name> in <projectKey> with this repository's required fields pre-filled. Use when asked to create/open/file a <issueType.name>.`
      - A table of the discovered required fields: field key, field name.
      - A workflow step gathering a value per required field (from the developer, or by mirroring an existing issue), then running `/publish-work` with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additional_fields`. The generated skill never calls `createJiraIssue` itself.
 
-**8 — Report.** Whether `.atlassian` was created or updated and which keys were added (never a value — only whether a token was supplied); which wrapper skills were generated and their `.github/skills/` paths; which capabilities were skipped and the missing prerequisite for each; and that `plugins/atl/` was not touched.
+**8 — Report.** Whether `.atlassian` was created or updated and which keys were added (never a value — only whether a token was supplied); which wrapper skills were generated and their `.github/skills/` paths; which capabilities were skipped and the missing prerequisite for each; and that `plugins/atl/` and `skills/atl/` were not touched.
 
 ## Rules
 
@@ -69,4 +69,4 @@ No MCP connection → Steps 1-5 complete in full; Step 7 is skipped, naming "an 
 
 ## Verification
 
-Config creation and value preservation share the file shape parsed by `/preflight-atl`: `python3 -m pytest plugins/atl/skills/preflight-atl/`. Generated wrapper content and developer prompts are deliberately untested — asserting on generated prose locks in wording; verify manually against a repo with no `.atlassian`, and again against one already carrying values, confirming `plugins/atl/` is byte-identical before and after and that the shell profile and system environment are unchanged.
+Config creation and value preservation share the file shape parsed by `/preflight-atl`: `python3 -m pytest skills/atl/preflight-atl/`. Generated wrapper content and developer prompts are deliberately untested — asserting on generated prose locks in wording; verify manually against a repo with no `.atlassian`, and again against one already carrying values, confirming `plugins/atl/` and `skills/atl/` are byte-identical before and after and that the shell profile and system environment are unchanged.

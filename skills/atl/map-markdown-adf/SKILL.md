@@ -59,4 +59,4 @@ Every table's rows must resolve to one consistent column count once `colspan`/`r
 
 ## Verification
 
-`python3 -m pytest plugins/atl/skills/map-markdown-adf/` (from the repo root). Tests invoke the CLI as a subprocess — the only test seam — and assert only on emitted JSON/Markdown, never on which internal module produced it.
+`python3 -m pytest skills/atl/map-markdown-adf/` (from the repo root). Tests invoke the CLI as a subprocess — the only test seam — and assert only on emitted JSON/Markdown, never on which internal module produced it.

@@ -2,12 +2,12 @@
 
 ## Agents
 
-Both agents are from the `crew` plugin and are invoked by `/dev` via `runSubagent`; see [dev/SKILL.md](skills/dev/SKILL.md) steps 3 and 6 for their prompts and gating.
+Both agents are from the `crew` plugin and are invoked by `/dev` via `runSubagent`; see [dev/SKILL.md](dev/SKILL.md) steps 3 and 6 for their prompts and gating.
 
 | Agent | Role | Defined in |
 |-------|------|-----------|
-| `codey` | Autonomous, technology-agnostic implementation agent (explores, implements via TDD, builds, tests) — invoked per task in step 3; falls back to `general-purpose` when unavailable | [`plugins/crew/agents/codey.agent.md`](../crew/agents/codey.agent.md) |
-| `chorey` | Maintainability-review agent — reviews Codey's checkpoint commit in step 6, gated on `STATUS: complete`; its own `STATUS` never overrides Codey's recorded outcome | [`plugins/crew/agents/chorey.agent.md`](../crew/agents/chorey.agent.md) |
+| `codey` | Autonomous, technology-agnostic implementation agent (explores, implements via TDD, builds, tests) — invoked per task in step 3; falls back to `general-purpose` when unavailable | [`agents/crew/codey.agent.md`](../../agents/crew/codey.agent.md) |
+| `chorey` | Maintainability-review agent — reviews Codey's checkpoint commit in step 6, gated on `STATUS: complete`; its own `STATUS` never overrides Codey's recorded outcome | [`agents/crew/chorey.agent.md`](../../agents/crew/chorey.agent.md) |
 
 **Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
 

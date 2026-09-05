@@ -58,7 +58,7 @@ copilot plugin install atl@brain
 
 ## Install aws skills
 ```
-gh skill install antshc/brain plugins/learn-aws/aws-docs --agent github-copilot --scope project -f
+gh skill install antshc/brain skills/learn-aws/search-aws-docs --agent github-copilot --scope project -f
 ```
 
 
