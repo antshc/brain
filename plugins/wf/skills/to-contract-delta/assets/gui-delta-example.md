@@ -1,6 +1,6 @@
 # GUI delta — worked example
 
-<!-- Referenced from gui-delta-template.md and SKILL.md. Full worked example: a page with tabs, a table, a popover, a modal, and its Shared component declaration. -->
+<!-- Referenced from gui-delta-template.md and SKILL.md. Full worked example: a page with tabs, a table, a popover, a modal, and its Components referenced declaration. -->
 
 #### Alerts
 <details>
@@ -48,12 +48,15 @@
   text: This action cannot be undone.
   Cancel: button -> close
   Delete: button -> DELETE /api/alerts/{id}
-
-Behaviour:
-+ Refresh reloads the active tab.
-+ Successful delete closes the modal and reloads Alerts.
-+ Failed delete keeps the modal open and shows the error.
 ```
+
+**Behaviour changes:**
+
+- + Refresh reloads the active tab.
+- + Successful delete closes the modal and reloads Alerts.
+- + Failed delete keeps the modal open and shows the error.
+
+**Scenarios:**
 
 ```gherkin
 Scenario: Delete alert
@@ -65,7 +68,9 @@ Scenario: Delete alert
 
 </details>
 
-## Shared
+#### Components referenced
+<details>
+<summary>Components referenced</summary>
 
 ```text
 Header
@@ -73,3 +78,4 @@ Header
   Alerts -> /alerts
   Settings -> /settings
 ```
+</details>

@@ -23,19 +23,19 @@ Instantiate one copy of [contract-delta-template.md](templates/contract-delta-te
 
 ## Assemble and write a GUI delta
 
-Instantiate one copy of the Skeleton in [gui-delta-template.md](templates/gui-delta-template.md) per surface (page or route family) touched; delete unused copies. Open the template with the file-reading tool before drafting — do not compose from memory. See [gui-delta-example.md](assets/gui-delta-example.md) for a full worked example. Per surface, in the order the template defines:
+Instantiate one copy of the skeleton in [gui-delta-template.md](templates/gui-delta-template.md) per surface (page or route family) touched; delete unused copies. Open the template with the file-reading tool before drafting — do not compose from memory. See [gui-delta-example.md](assets/gui-delta-example.md) for a full worked example. Per surface, in the order the template defines:
 
 - Give each surface its own `#### <Page>` heading + `<details><summary><Page></summary>` expandable block, mirroring the contract delta's per-resource heading + `<details>`.
 - Describe only changed UI: prefix every added/changed/removed/renamed line with `+`/`~`/`-`/`% old → new`; never repeat untouched components.
 - Use indentation to express ownership and scope instead of qualified names (`Table.Column`, `tabs.nav`, `tabs.content`, `table.hd`, `table.col`, `table.sort`, etc.).
 - Use `match:` as optional metadata only to anchor an existing surface or component to its implementation — it carries no diff prefix; prefer a stable route, falling back to an existing component name or visible label when a route alone can't locate the implementation.
 - Declare a component as `Component: Name` (omit `: Name` when the label alone is enough) and its simple properties as `key: value`.
-- Use `->` for navigation/actions/opening another component, `<-` for API/data binding, `*` for the default tab/item, and `@Name` to reference a shared component declared once under `## Shared`.
+- Use `->` for navigation/actions/opening another component, `<-` for API/data binding, `*` for the default tab/item, and `@Name` to reference a shared component declared once under `#### Components referenced`.
 - Put `data:` beside the component that consumes it rather than hoisting every data call to page level.
 - Use `% old → new` for a rename (same meaning); use `~` only for an in-place modify of a same-named item — never combine the two.
 - Add visible text explicitly only when it differs from the component/item name or is itself important to the contract.
-- `Behaviour:` only for rules that cannot be expressed naturally on the owning component.
-- `Scenario:` (Gherkin `Given`/`When`/`Then`) only for important multi-step flows, in its own fenced `gherkin` block outside the surface's diff block — never nested inside it.
+- `**Behaviour changes**` — rules that cannot be expressed naturally on the owning component, `+|~|-` prefix; nested inside its own surface's `<details>`, outside the fenced diff block, mirroring the contract delta's Behaviour changes; omit entirely when the surface has no such change.
+- `**Scenarios**` — one `Scenario:` (Gherkin `Given`/`When`/`Then`) per important multi-step flow, in its own fenced `gherkin` block outside the surface's diff block — never nested inside it; omit the heading when there are no scenarios.
 
-**Done when:** every touched surface has its own `#### <Page>` heading + `<details>` block; every touched surface contains only changed UI; nesting makes ownership clear; renames use `%` and in-place changes use `~` — never combined; shared components are declared once under `## Shared`; `Scenario:` blocks sit outside the fenced diff block; no component-specific grammar is introduced when indentation plus `key: value`, `->`, or `<-` is sufficient.
+**Done when:** every touched surface has its own `#### <Page>` heading + `<details>` block; every touched surface contains only changed UI; nesting makes ownership clear; renames use `%` and in-place changes use `~` — never combined; shared components are declared once under a `#### Components referenced` + `<details>` block; Behaviour changes and Scenarios sit outside the fenced diff block, headed by `**Behaviour changes:**`/`**Scenarios:**` when present; no component-specific grammar is introduced when indentation plus `key: value`, `->`, or `<-` is sufficient.
 
