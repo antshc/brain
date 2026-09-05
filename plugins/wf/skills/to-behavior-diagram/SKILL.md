@@ -1,9 +1,9 @@
 ---
 name: to-behavior-diagram
-description: Document current behavior with a single Mermaid diagram — a solution-level C4 container/solution diagram, a flowchart, a swimlane diagram, or an implementation-level class diagram, sequence diagram, or deployment view. Use whenever a document needs a diagram showing how a capability, process, or system currently behaves — even if the user just says "add a diagram", "show the deployment", or "diagram this flow" without naming this skill. A caller that needs a *delta* (only what a capability adds/changes/removes) follows `/to-behavior-delta` skill, which applies its own delta-styling overlay on top of the diagram this skill produces.
+description: Document current behavior with a single Mermaid diagram — a solution-level C4 container/solution diagram, a flowchart, a swimlane diagram, or an implementation-level class diagram, sequence diagram, or deployment view. Use whenever a document needs a diagram showing how a capability, process, or system currently behaves — even if the user just says "add a diagram", "show the deployment", or "diagram this flow" without naming this skill.
 ---
 
-Show only the elements relevant to what's being documented — never a full, unrelated system inventory. Each template's own hidden comments carry its full Mermaid element reference and gotchas; open the template file before drafting, do not compose from memory.
+Show only the elements relevant to what's being documented — never a full, unrelated system inventory. Each template's own hidden comments carry its full Mermaid element reference and gotchas; open the template file before drafting, do not compose from memory. This documents *current* behavior — ground every element in the actual codebase; spawn explore subagents for lookups instead of guessing.
 
 ## Solution Diagram
 
