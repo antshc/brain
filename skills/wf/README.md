@@ -12,21 +12,28 @@ Everyday workflow automation skills that carry a feature from an open-ended idea
 6. **Ticket cut** — `/to-tickets` slices each hardened story into agent-executable GitHub issues.
 
 ```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 flowchart TD
-    W{wayfinder<br/>chart & work a map of decision tickets<br/>via grill-design/research/prototype} -->|destination clear| S[to-spec<br/>synthesize spec from resolved decisions]
-    S -->|unknowns remain| W
-    S -->|no unknowns left| SPEC[(Spec)]
+    W{"wayfinder or grill-design<br/>resolve unknowns"}
+    S["to-spec"]
+    SPEC[("Spec")]
+    ZD["to-zdesign<br/>synthesize or merge feature design"]
+    DESIGN[("Feature design")]
+    STORIES["to-stories<br/>break design into per-capability stories"]
+    GRILL{"grill-design<br/>interview & sharpen, one story at a time"}
+    TICKETS["to-tickets<br/>cut each story into agent-ready GitHub issues"]
 
-    SPEC -->|direct| TICKETS
+    W -- no unknowns left --> S
+    S --> SPEC
+    SPEC -- direct --> TICKETS
 
-    SPEC -.-> CAP[to-capabilities<br/>author standalone capability requirements]
-    CAP --> REQS[(Requirements)]
-
-    W -->|resolved decisions| ZD[to-zdesign<br/>synthesize or merge feature design]
+    W -- no unknowns left --> ZD
     SPEC --> ZD
-    ZD --> DESIGN[(Feature design)]
+    ZD --> DESIGN
 
-    DESIGN --> STORIES[to-stories<br/>break design into per-capability stories]
-    STORIES --> GRILL{grill-design<br/>interview & sharpen, one story at a time}
-    GRILL --> TICKETS[to-tickets<br/>cut each story into agent-ready GitHub issues]
+    DESIGN --> STORIES
+    STORIES --> GRILL
+    GRILL --> TICKETS
+
+    classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
 ```
