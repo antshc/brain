@@ -22,7 +22,7 @@ Legend: `+` add · `-` remove · `% old → new` rename · `~` modify (same name
 
 **Scenarios:**
 
-_{{shortScenarioName}}_
+**_{{shortScenarioName}}_**
 
 ```http
 {{method}} {{path}}{{?query}} HTTP/1.1

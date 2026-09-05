@@ -4,7 +4,7 @@
 
 Legend: `+` added · `~` changed · `-` removed · `% old → new` rename (same meaning) · `->` interaction/navigation · `<-` data binding · `*` default item · `@` shared component · `match:` existing implementation anchor.
 
-## Skeleton
+<!-- Skeleton -->
 
 #### <Page>
 <details>
@@ -40,10 +40,13 @@ Legend: `+` added · `~` changed · `-` removed · `% old → new` rename (same 
   text: <visible body>
   Cancel: button -> close
   Confirm: button -> POST /api/resource
-
-Behaviour:
-+ <rule>
 ```
+
+**Behaviour changes:**
+
+- + <rule>
+
+**Scenarios:**
 
 ```gherkin
 Scenario: <intent>
@@ -142,18 +145,21 @@ Tabs do not use special `nav` or `content` syntax. Indent each tab's rendered co
   Created <- createdAt
 ```
 
-## Shared
+## Components referenced
 
 Declare reusable components once:
 
-```text
-## Shared
+#### Components referenced
+<details>
+<summary>Components referenced</summary>
 
+```text
 Header
   Logo -> /
   Alerts -> /alerts
   Settings -> /settings
 ```
+</details>
 
 Reference them from surfaces:
 
@@ -166,10 +172,11 @@ Reference them from surfaces:
 Use only when the rule spans components or cannot be expressed inline:
 
 ```text
-Behaviour:
-+ Selecting rows enables Delete.
-+ Successful delete closes the modal and reloads the table.
-+ Failed delete keeps the modal open and shows the error.
+**Behaviour changes:**
+
+- + Selecting rows enables Delete.
+- + Successful delete closes the modal and reloads the table.
+- + Failed delete keeps the modal open and shows the error.
 ```
 
 ## Scenarios

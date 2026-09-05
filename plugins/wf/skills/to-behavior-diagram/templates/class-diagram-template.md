@@ -42,5 +42,3 @@ classDiagram
 </details>
 
 <!-- `note for ClassName "..."` is optional — add it only for a short explanation that doesn't belong in the class body. Delete unused example classes/notes. -->
-
-<!-- `added` = solid green border, entirely new class. `removed` = solid red border, entirely deleted class. `memberChanged` = dashed gray border, unchanged class with an `[add]`/`[rem]`-prefixed member. `{{dependencyInterface}}` above is an example intermediate/pass-through class: unstyled (not part of the delta), showing only the one member the connection uses. `note for ClassName "..."` is optional — add it only for a short explanation that doesn't belong in the class body. Delete unused example classes/classDefs/notes. -->
