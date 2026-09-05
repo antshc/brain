@@ -1,10 +1,8 @@
-## Sequence Diagrams
+## Sequence Diagram
 
-### {{capabilityTitle}}
+### {{title}}
 
-<!-- Include only when interaction order, cross-boundary calls, or failure branching are design decisions for this capability. Show only the lifelines and messages this capability adds or changes — not a full system trace. Delete this instruction. -->
-
-<!-- This diagram shows the interaction DELTA for this capability. Sequence diagrams have no `:::added`/`:::removed` styling mechanism (unlike class/flowchart diagrams), so mark a new or changed step with a `note over` call-out or a leading `NEW:`/`CHANGED:` label in the message text instead. Omit lifelines and messages that are unchanged and not needed to connect the delta. Delete this instruction. -->
+<!-- Include only when interaction order, cross-boundary calls, or failure branching are design decisions. Show only the lifelines and messages relevant to this scenario — not a full system trace. Delete this instruction. -->
 
 <!-- Mermaid technical gotchas (verified against `mmdc` 11.16.0):
 - `actor` renders a stick figure and is reserved for the human/external initiator; `participant` renders a box for a system component. Use `participant X as ClassName` to alias a short lifeline id to the real class name.
@@ -18,7 +16,7 @@ Delete this instruction. -->
 <!-- `autonumber` is mandatory — it numbers every step so review comments and prose can reference a step by number. Keep it as the first line under `sequenceDiagram`. Delete this instruction. -->
 
 <details>
-<summary>{{capabilityTitle}}</summary>
+<summary>{{title}}</summary>
 
 ```mermaid
 %%{init: {'themeVariables': {
