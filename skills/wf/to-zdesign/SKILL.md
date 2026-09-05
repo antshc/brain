@@ -1,6 +1,7 @@
 ---
 name: to-zdesign
 description: Create or incrementally extend an authoritative feature design from spec files, confirmed grill-design conversation context, Wayfinder maps or decision issues, and existing designs. Use for first-pass design synthesis, adding later specs, capturing a completed design conversation, or merging resolved GitHub decisions without losing existing content.
+disable-model-invocation: true
 ---
 
 This skill takes the current conversation context and codebase understanding and produces or update one `docs/designs/{{featureSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.

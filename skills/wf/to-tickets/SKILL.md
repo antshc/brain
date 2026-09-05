@@ -2,6 +2,7 @@
 name: to-tickets
 description: Breaks a spec into tracer-bullet GitHub tickets. Accepts an optional plan or plan.md to guide slicing.
 argument-hint: "{{milestoneTitle}} [{{implementationDetails}}, `plan.md`]"
+disable-model-invocation: true
 ---
 
 # Implementation details to Issues

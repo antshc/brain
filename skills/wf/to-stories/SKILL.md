@@ -1,6 +1,7 @@
 ---
 description: Package a **single requirement** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories** — broken down by capability and technology layer (FE/BE), each carrying a capability reference, stakeholder requirement, functional-requirements list, acceptance criteria, and Jira-sync metadata (Jira ID, Epic ID, Blocked by) — that map to a production codebase. Use when the user has requirements and wants stories, backlog-ready items, acceptance criteria, or FE/BE-split tickets ready to sync with Jira.
 name: to-stories
+disable-model-invocation: true
 ---
 
 Package a **single requirement** or a **list of requirements** into one or more atomic, testable, implementation-agnostic **user stories**, broken down **by capability and technology layer (FE/BE)**. Each story carries four blocks: a **capability reference**, the **stakeholder requirement**, the **functional-requirements list** it covers, and the **acceptance criteria** — plus a **Jira-sync metadata** line (Jira ID, Epic ID, Blocked by) under its heading.
