@@ -18,7 +18,7 @@ Legend: `+` add · `-` remove · `% old → new` rename · `~` modify (same name
 
 **Behaviour changes:**
 
-- {{changeType| One of (+|-|~)}} {{change| one line}}.
+- `{{changeType| One of (+|-|~)}}` {{change| one line}}.
 
 **Scenarios:**
 
