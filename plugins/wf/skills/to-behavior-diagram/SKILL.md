@@ -7,26 +7,26 @@ Show only the elements relevant to what's being documented — never a full, unr
 
 ## Solution Diagram
 
-Deployable/runnable containers and the actors/external systems around them, solution-level. Render as Mermaid `C4Container`. Template: [c4-container-diagram-template.md](templates/c4-container-diagram-template.md).
+Deployable/runnable containers and the actors/external systems around them, solution-level. Render as Mermaid `C4Container`. Template: [c4-container-diagram-template.md](templates/c4-container-diagram-template.md) | Example: [c4-container-diagram-example.md](assets/c4-container-diagram-example.md).
 
 ## Flowchart
 
-Solution-level process flow, decision path, or component wiring. Template: [flowchart-template.md](templates/flowchart-template.md).
+Solution-level process flow, decision path, or component wiring. Template: [flowchart-template.md](templates/flowchart-template.md) | Example: [flowchart-example.md](assets/flowchart-example.md).
 
 ## Swimlane Diagram
 
-Cross-boundary process flow where ownership is the decision — Level 1 lanes are containers, Level 2 lanes are components/modules inside one container. Template: [swimlane-diagram-template.md](templates/swimlane-diagram-template.md).
+Cross-boundary process flow where ownership is the decision — Level 1 lanes are containers, Level 2 lanes are components/modules inside one container. Template: [swimlane-diagram-template.md](templates/swimlane-diagram-template.md) | Example: [swimlane-diagram-example.md](assets/swimlane-diagram-example.md).
 
 ## Class Diagram
 
-Implementation-level class responsibilities or relationships. Template: [class-diagram-template.md](templates/class-diagram-template.md).
+Implementation-level class responsibilities or relationships. Template: [class-diagram-template.md](templates/class-diagram-template.md) | Example: [class-diagram-example.md](assets/class-diagram-example.md).
 
 ## Sequence Diagram
 
-Implementation-level interaction order, cross-boundary calls, or failure branching. Template: [sequence-diagram-template.md](templates/sequence-diagram-template.md).
+Implementation-level interaction order, cross-boundary calls, or failure branching. Template: [sequence-diagram-template.md](templates/sequence-diagram-template.md) | Example: [sequence-diagram-example.md](assets/sequence-diagram-example.md).
 
 ## Deployment View
 
-Deployment topology, hosting, or infrastructure nodes. Template: [deployment-view-template.md](templates/deployment-view-template.md).
+Deployment topology, hosting, or infrastructure nodes. Template: [deployment-view-template.md](templates/deployment-view-template.md) | Example: [deployment-view-example.md](assets/deployment-view-example.md).
 
 **Done when:** the requested diagram's template was opened this run; the diagram includes only elements relevant to what's being documented (plus the minimum unstyled elements needed to connect them); no unused example element or hidden instruction remains.
