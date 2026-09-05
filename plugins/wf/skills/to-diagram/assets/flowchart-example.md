@@ -10,8 +10,8 @@ flowchart TD
     Api["OrderController"]
     Svc["OrderService"]
     Repo[("IOrderRepository")]
-    Queue["OrderExportJob"]:::added
-    Legacy["LegacyOrderQueue"]:::removed
+    Queue["OrderExportJob"]
+    Legacy["LegacyOrderQueue"]
 
     User --> Api
     Api --> Svc
@@ -25,7 +25,5 @@ flowchart TD
     end
 
     classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
-    classDef added stroke:#4a7a5a,stroke-width:2px
-    classDef removed stroke:#8a4a4a,stroke-width:2px
 ```
 </details>
