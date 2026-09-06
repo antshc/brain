@@ -22,27 +22,27 @@ Each template's hidden comments contain its Mermaid element reference and gotcha
 
 ### Solution / Container Diagram
 
-Deployable/runnable containers and the actors/external systems around them, solution-level. Render as Mermaid `C4Container`. Template: [c4-container-diagram-template.md](templates/c4-container-diagram-template.md) | Current example: [c4-container-diagram-example.md](assets/c4-container-diagram-example.md) | Delta example: [c4-container-diagram-delta-example.md](assets/c4-container-diagram-delta-example.md).
+Deployable/runnable containers and the actors/external systems around them, solution-level. Render as Mermaid `C4Container`. Template: [c4-container-diagram-template.md](templates/c4-container-diagram-template.md).
 
 ### Flowchart
 
-Solution-level process flow, decision path, or component wiring. Template: [flowchart-template.md](templates/flowchart-template.md) | Example: [flowchart-example.md](assets/flowchart-example.md).
+Solution-level process flow, decision path, or component wiring. Template: [flowchart-template.md](templates/flowchart-template.md).
 
 ### Swimlane Diagram
 
-Cross-boundary process flow where ownership is the decision — Level 1 lanes are containers, Level 2 lanes are components/modules inside one container. Template: [swimlane-diagram-template.md](templates/swimlane-diagram-template.md) | Example: [swimlane-diagram-example.md](assets/swimlane-diagram-example.md).
+Cross-boundary process flow where ownership is the decision — Level 1 lanes are containers, Level 2 lanes are components/modules inside one container. Template: [swimlane-diagram-template.md](templates/swimlane-diagram-template.md).
 
 ### Class Diagram
 
-Implementation-level class responsibilities or relationships. Template: [class-diagram-template.md](templates/class-diagram-template.md) | Current example: [class-diagram-example.md](assets/class-diagram-example.md) | Delta example: [class-diagram-delta-example.md](assets/class-diagram-delta-example.md).
+Implementation-level class responsibilities or relationships. Template: [class-diagram-template.md](templates/class-diagram-template.md).
 
 ### Sequence Diagram
 
-Implementation-level interaction order, cross-boundary calls, or failure branching. Template: [sequence-diagram-template.md](templates/sequence-diagram-template.md) | Example: [sequence-diagram-example.md](assets/sequence-diagram-example.md).
+Implementation-level interaction order, cross-boundary calls, or failure branching. Template: [sequence-diagram-template.md](templates/sequence-diagram-template.md).
 
 ### Deployment View
 
-Deployment topology, hosting, or infrastructure nodes. Template: [deployment-view-template.md](templates/deployment-view-template.md) | Example: [deployment-view-example.md](assets/deployment-view-example.md).
+Deployment topology, hosting, or infrastructure nodes. Template: [deployment-view-template.md](templates/deployment-view-template.md).
 
 ## 3. Delta overlay
 
@@ -55,6 +55,6 @@ Apply only in delta mode.
 - **Sequence Diagram:** Mermaid sequence diagrams have no `:::` styling mechanism. Mark a new or changed step with a `note over` call-out or a leading `NEW:` / `CHANGED:` label in the message text. Omit lifelines and messages that are unchanged and not needed to connect the delta.
 - **Deployment View:** use `UpdateElementStyle(alias, $borderColor="...")`: added `#4a7a5a`, removed `#8a4a4a`, unchanged context `#8b949e`. Add a `**Behaviour changes**` bullet list using `+` / `-` / `~` for in-place node changes not visible through added/removed elements, such as resized instances, runtime changes, or scaling-policy changes. Omit the list when none exist.
 
-Do not copy delta styling into current mode. Current examples use the base palette; delta examples use the delta overlay.
+Do not copy delta styling into current mode. Current mode uses the base palette; delta mode uses the delta overlay.
 
-**Done when:** the matching template was opened this run; current mode uses the template's existing colors; delta mode uses the delta overlay and includes only changed elements plus minimum context; the diagram kind uses its own rules; no unused example element, placeholder, or hidden instruction remains.
+**Done when:** the matching template was opened this run; current mode uses the template's existing colors; delta mode uses the delta overlay and includes only changed elements plus minimum context; the diagram kind uses its own rules; no unused placeholder or hidden instruction remains.
