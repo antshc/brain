@@ -9,6 +9,7 @@
 - `flowchart TD` lays out top-down; `flowchart LR` reads better for pipelines with many parallel branches. Pick whichever keeps the diagram narrower than tall (or vice versa).
 - Solid arrow (`-->`) is the default edge; a labeled solid arrow (`-- text -->`) documents the condition for that edge; a dotted arrow (`-.text.->`) marks a deprecated or exceptional path.
 - `subgraph Name ... end` groups existing nodes into a labeled box without redeclaring them; a `subgraph` can itself be the target of an edge.
+- Never name a node id `click` — it's a reserved keyword (the `click nodeId ...` interaction directive) and breaks parsing, often with a confusing "Expecting 'STR', got 'NODE_STRING'" error on a later edge line, not on the `click` node's own line. Use `initiate` or similar instead.
 Delete this instruction. -->
 
 <details>

@@ -14,6 +14,7 @@
 - Put a decision node in the lane that owns/makes that decision, then route its labeled outcomes to the lanes that act on them.
 - Split into Level 1 + Level 2 (or multiple Level 2 diagrams, one per container) rather than one large diagram once a single view stops being readable without tracing every arrow twice.
 - Use short, stable node ids; put the descriptive text in the label so relabeling later doesn't break edges.
+- Never name a node id `click` — it's a reserved keyword (the `click nodeId ...` interaction directive) and breaks parsing, often with a confusing "Expecting 'STR', got 'NODE_STRING'" error on a later edge line, not on the `click` node's own line. Use `initiate` or similar instead.
 Delete this instruction. -->
 
 ### Level 1 — Container Swimlane: {{title}}
