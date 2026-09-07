@@ -16,7 +16,7 @@ The conversion capability shared by every `atl` skill that reads or publishes co
 From the directory holding this `SKILL.md`:
 
 ```bash
-python3 scripts/map_markdown_adf.py md-to-adf < input.md > output.json
+python scripts/map_markdown_adf.py md-to-adf < input.md > output.json
 ```
 
 Stdin Markdown → stdout one ADF document (`{"version": 1, "type": "doc", "content": [...]}`).
@@ -24,7 +24,7 @@ Stdin Markdown → stdout one ADF document (`{"version": 1, "type": "doc", "cont
 ## Action: Convert ADF to Markdown
 
 ```bash
-python3 scripts/map_markdown_adf.py adf-to-md < input.json > output.md
+python scripts/map_markdown_adf.py adf-to-md < input.json > output.md
 ```
 
 Stdin one ADF document → stdout Markdown.
@@ -62,4 +62,4 @@ Every table's rows must resolve to one consistent column count once `colspan`/`r
 
 ## Verification
 
-`python3 -m pytest plugins/atl/skills/map-markdown-adf/` (from the repo root). Tests invoke the CLI as a subprocess — the only test seam — and assert only on emitted JSON/Markdown, never on which internal module produced it.
+`python -m pytest plugins/atl/skills/map-markdown-adf/` (from the repo root). Tests invoke the CLI as a subprocess — the only test seam — and assert only on emitted JSON/Markdown, never on which internal module produced it.

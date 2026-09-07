@@ -40,7 +40,7 @@ Never print, log, quote, or publish `ATLASSIAN_SITE`, `ATLASSIAN_EMAIL`, or `ATL
 **4 — Run the pipeline.** From the directory holding this `SKILL.md`:
 
 ```bash
-python3 scripts/publish_page_diagrams.py run \
+python scripts/publish_page_diagrams.py run \
   --md-path <mdPath> \
   --page-id <pageId> | --space-id <spaceId> \
   --title <title, if named> \
@@ -89,9 +89,9 @@ Report the page URL from the tool result and, when diagrams were rendered, confi
 
 ## Other subcommands
 
-`extract`, `render-attach`, `substitute-media`, `publish-adf`, and `combine` are the pipeline steps `run` chains together; each stays independently invokable for the MCP/degraded fallback above or ad-hoc use — see `python3 scripts/publish_page_diagrams.py --help` and each subcommand's own `--help`. `replace-markers` is a legacy, top-level-only back-compat alias for `substitute-media`.
+`extract`, `render-attach`, `substitute-media`, `publish-adf`, and `combine` are the pipeline steps `run` chains together; each stays independently invokable for the MCP/degraded fallback above or ad-hoc use — see `python scripts/publish_page_diagrams.py --help` and each subcommand's own `--help`. `replace-markers` is a legacy, top-level-only back-compat alias for `substitute-media`.
 
 ## Verification
 
-`python3 -m pytest plugins/atl/skills/publish-page/` (from the repo root) — the full pipeline: extraction, conversion hand-off, attachment upload, marker substitution, and REST/MCP branching, all mocked. Conversion itself is covered at its own seam, `python3 -m pytest plugins/atl/skills/map-markdown-adf/`. When verifying a live publish via `getConfluencePage`, request `body-format: atlas_doc_format` and check the returned body for `"type": "media"` node occurrences matching the diagram count — confirm the actual response shape empirically before asserting specific top-level keys (e.g. `title`/`version`) you haven't verified against the live MCP tool. The MCP-only publish path and token-free degradation are verified manually against this skill's acceptance criteria — MCP transport and this prose are deliberately untested.
+`python -m pytest plugins/atl/skills/publish-page/` (from the repo root) — the full pipeline: extraction, conversion hand-off, attachment upload, marker substitution, and REST/MCP branching, all mocked. Conversion itself is covered at its own seam, `python -m pytest plugins/atl/skills/map-markdown-adf/`. When verifying a live publish via `getConfluencePage`, request `body-format: atlas_doc_format` and check the returned body for `"type": "media"` node occurrences matching the diagram count — confirm the actual response shape empirically before asserting specific top-level keys (e.g. `title`/`version`) you haven't verified against the live MCP tool. The MCP-only publish path and token-free degradation are verified manually against this skill's acceptance criteria — MCP transport and this prose are deliberately untested.
 
