@@ -50,7 +50,7 @@ swimlane-beta TB
   {{decisionNode}} -->|3b. {{yesOutcome}}| {{processStep}}
   {{processStep}} -->|4b. {{handoff3}}| {{persistStep}}
 
-  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 </details>
 
@@ -82,7 +82,7 @@ swimlane-beta TB
   {{validateNode}} -->|2b. {{yesOutcome}}| {{moduleStep}}
   {{moduleStep}} -->|3b. {{handoff2}}| {{delegateStep}}
 
-  classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 </details>
 

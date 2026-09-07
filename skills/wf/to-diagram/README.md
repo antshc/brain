@@ -83,12 +83,14 @@ C4Container
     UpdateRelStyle(service, exportQueue, $textColor="#c9d1d9", $lineColor="#4a7a5a")
     UpdateRelStyle(service, legacyQueue, $textColor="#c9d1d9", $lineColor="#8a4a4a")
 ```
-</details>
 
 **Behaviour changes**
 - `+` Order Export Queue replaces the legacy export path.
 - `-` Legacy Order Queue is removed.
 - `~` Order Service publishes exports through Azure Service Bus.
+
+</details>
+
 
 ## Flowchart Example
 
@@ -116,7 +118,7 @@ flowchart TD
         Legacy
     end
 
-    classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 </details>
 
@@ -152,7 +154,7 @@ swimlane-beta TB
   persistOrder -->|4b. order id| respond200
   respond200 -->|5b. 200 OK with order id| showResult
 
-  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 </details>
 
@@ -210,7 +212,7 @@ classDiagram
 
     note for OrderService "Coordinates order use cases; delegates persistence to IOrderRepository"
 
-    classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 </details>
 
@@ -241,10 +243,10 @@ classDiagram
     OrderService ..> OrderExportJob : Use
     OrderService ..> LegacyOrderQueue : Use
 
-    classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
-    classDef added stroke:#4a7a5a,stroke-width:2px
-    classDef removed stroke:#8a4a4a,stroke-width:2px
-    classDef memberChanged stroke:#8b949e,stroke-width:2px,stroke-dasharray:5 5
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+    classDef added stroke:#4a7a5a,stroke-width:1px
+    classDef removed stroke:#8a4a4a,stroke-width:1px
+    classDef memberChanged stroke:#8b949e,stroke-width:1px,stroke-dasharray:5 5
 ```
 </details>
 

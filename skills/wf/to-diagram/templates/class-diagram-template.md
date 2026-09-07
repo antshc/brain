@@ -37,7 +37,7 @@ classDiagram
 
     note for {{capabilityOwnerClass}} "{{oneLineResponsibilityNote}}"
 
-    classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9,stroke-width:2px
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 </details>
 
