@@ -37,3 +37,7 @@ Render a Mermaid diagram to a high-resolution PNG with a transparent background 
 - Preserve the original Mermaid source `.mmd` alongside the generated PNG so the diagram can be reproduced or updated.
 - If the user specifies a different output width, adjust the Mermaid viewport by adding 16 pixels before multiplying by the scale factor. For example, a 1024-pixel output at 1x uses `-w 1040`; at 2x it produces a 2048-pixel output.
 - Do not use the `-b` option with a color when the requested output needs transparency.
+
+## Mermaid gotchas
+
+- Never name a flowchart/swimlane node id `click` — it's a reserved keyword (the `click nodeId ...` interaction directive) and breaks parsing, often with a confusing "Expecting 'STR', got 'NODE_STRING'" error on a later edge line, not on the `click` node's own line. Use `initiate` or similar instead.
