@@ -28,6 +28,11 @@ Delete this instruction. -->
 <!-- Replace every alias, label, technology, and relationship below with the real deployment topology. Add or remove Container_Boundary/Boundary/Container/ContainerDb/Rel lines to match actual scope; do not keep unused example elements. -->
 
 ```mermaid
+---
+config:
+  c4:
+    c4ShapePadding: 20
+---
 C4Container
     title Deployment diagram for {{title}}
 
