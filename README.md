@@ -94,7 +94,8 @@ gh skill install github/awesome-copilot skills/mini-context-graph --agent univer
 
 ```sh
 gh skill install mattpocock/skills skills/engineering/codebase-design --agent github-copilot --scope user -f && \
-gh skill install mattpocock/skills skills/engineering/research --agent github-copilot --scope user -f
+gh skill install mattpocock/skills skills/engineering/diagnosing-bugs --agent github-copilot --scope user -f
+
 ```
 
 ```sh
