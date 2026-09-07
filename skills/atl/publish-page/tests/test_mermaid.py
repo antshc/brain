@@ -78,7 +78,7 @@ def test_render_diagrams_writes_mmd_and_invokes_mmdc(tmp_path):
 
 
 def test_render_diagrams_recolors_dark_theme_hexes_in_rendered_mmd(tmp_path):
-    diagrams = [{"index": 0, "code": "classDef default fill:#2a2a2a,stroke:#8b949e,color:#c9d1d9", "name": "00-title"}]
+    diagrams = [{"index": 0, "code": "classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9", "name": "00-title"}]
     assets_dir = tmp_path / "assets"
 
     with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
