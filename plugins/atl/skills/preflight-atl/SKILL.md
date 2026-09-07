@@ -26,7 +26,7 @@ Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailabl
 **1 — Config-derived facts (offline).** `cd` to the directory holding the `preflight-atl/SKILL.md` file you loaded to read this skill — never guess or reconstruct that path from a different skill's location — then run:
 
 ```bash
-python3 scripts/preflight.py --root "$HARNESS_REPO_PATH"
+python scripts/preflight.py --root "$HARNESS_REPO_PATH"
 ```
 
 Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here — the script never touches the network; Step 3 sets the live value.
