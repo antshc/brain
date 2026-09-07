@@ -23,7 +23,7 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 
 Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected`. Never echo `ATLASSIAN_EMAIL` or `ATLASSIAN_API_TOKEN` — not in output, logs, or errors.
 
-**1 — Config-derived facts (offline).** From the directory holding this `SKILL.md`:
+**1 — Config-derived facts (offline).** `cd` to the directory holding the `preflight-atl/SKILL.md` file you loaded to read this skill — never guess or reconstruct that path from a different skill's location — then run:
 
 ```bash
 python3 scripts/preflight.py --root "$HARNESS_REPO_PATH"
