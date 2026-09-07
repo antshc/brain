@@ -8,6 +8,11 @@ Presentation examples for the `to-diagram` skill.
 <summary>Solution Diagram — Order Management System</summary>
 
 ```mermaid
+---
+config:
+  c4:
+    c4ShapePadding: 20
+---
 C4Container
     title Container diagram for Order Management System
 
@@ -40,12 +45,12 @@ C4Container
     UpdateElementStyle(email_system, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#8b949e")
     UpdateElementStyle(mainframe, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#8b949e")
     UpdateRelStyle(customer, api, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetY="-10")
-    UpdateRelStyle(api, svc, $textColor="#c9d1d9", $lineColor="#8b949e")
-    UpdateRelStyle(svc, db, $textColor="#c9d1d9", $lineColor="#8b949e")
-    UpdateRelStyle(svc, queue, $textColor="#c9d1d9", $lineColor="#8b949e")
+    UpdateRelStyle(api, svc, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetY="-15")
+    UpdateRelStyle(svc, db, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="70", $offsetY="-50")
+    UpdateRelStyle(svc, queue, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="-20", $offsetY="10")
     UpdateRelStyle(svc, mainframe, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetY="20", $offsetX="-30")
-    UpdateRelStyle(svc, email_system, $textColor="#c9d1d9", $lineColor="#8b949e")
-    UpdateRelStyle(auditor, db, $textColor="#c9d1d9", $lineColor="#8b949e")
+    UpdateRelStyle(svc, email_system, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetY="-20", $offsetX="30")
+    UpdateRelStyle(auditor, db, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetY="15")
 ```
 </details>
 
@@ -55,6 +60,11 @@ C4Container
 <summary>Order Management System — Container Delta</summary>
 
 ```mermaid
+---
+config:
+  c4:
+    c4ShapePadding: 20
+---
 C4Container
     title Container delta for Order Management System
 

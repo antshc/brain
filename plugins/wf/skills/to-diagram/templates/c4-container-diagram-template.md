@@ -29,6 +29,11 @@
 <!-- Replace every alias, label, technology, and relationship below with the real solution. Add or remove Person/System_Ext/Container/ContainerDb lines and Rel lines to match actual scope; do not keep unused example elements. -->
 
 ```mermaid
+---
+config:
+  c4:
+    c4ShapePadding: 20
+---
 C4Container
     title Container diagram for {{featureName}}
 
