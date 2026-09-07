@@ -58,7 +58,7 @@ copilot plugin install azure-platform@brain
 ### AWS skills (learn-aws)
 
 ```sh
-gh skill install antshc/brain skills/learn-aws/search-aws-docs --agent github-copilot --scope project -f
+gh skill install antshc/brain plugins/learn-aws/skills/search-aws-docs --agent github-copilot --scope project -f
 ```
 
 ### Brain engineering skills
@@ -110,22 +110,22 @@ Plugins bundle related skills (and, for `crew`, agents). Follow a link to read a
 
 Common everyday workflow automation skills. Expected to be useful to all developers.
 
-- [grill-design](skills/wf/grill-design/SKILL.md): relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
-- [wayfinder](skills/wf/wayfinder/SKILL.md): plan work larger than one session as a shared map of decision tickets, resolved one at a time.
-- [to-spec](skills/wf/to-spec/SKILL.md): turn the current conversation into a spec and publish it to the ticket tracker.
-- [to-capabilities](skills/wf/to-capabilities/SKILL.md): break an idea or grilled requirement into solution-agnostic capabilities.
-- [to-stories](skills/wf/to-stories/SKILL.md): package requirements into atomic, testable, FE/BE-split user stories with acceptance criteria.
-- [to-tickets](skills/wf/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
-- [to-zdesign](skills/wf/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
-- [to-diagram](skills/wf/to-diagram/SKILL.md) / [to-contract-delta](skills/wf/to-contract-delta/SKILL.md): document behavior as Mermaid diagrams or contract deltas.
-- [solution-agnostic](skills/wf/solution-agnostic/SKILL.md): strip implementation artifacts out of requirement or story text.
-- [explore-codebase](skills/wf/explore-codebase/SKILL.md): delegate read-only codebase questions to a subagent.
-- [prototype](skills/wf/prototype/SKILL.md): build a throwaway prototype to answer a design question.
-- [research](skills/wf/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
-- [record-adr](skills/wf/record-adr/SKILL.md), [record-concept](skills/wf/record-concept/SKILL.md), [record-term](skills/wf/record-term/SKILL.md), [record-service](skills/wf/record-service/SKILL.md), [record-deployment-view](skills/wf/record-deployment-view/SKILL.md): capture ADRs, Concepts, glossary terms, services, and deployment topology into the docs the moment they crystallise.
-- [bootstrap-docs](skills/wf/bootstrap-docs/SKILL.md) / [index-docs](skills/wf/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
-- [manage-backlog](skills/wf/manage-backlog/SKILL.md) / [init-wf](skills/wf/init-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
-- [track-ledger](skills/wf/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a grilling session.
+- [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
+- [wayfinder](plugins/wf/skills/wayfinder/SKILL.md): plan work larger than one session as a shared map of decision tickets, resolved one at a time.
+- [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a spec and publish it to the ticket tracker.
+- [to-capabilities](plugins/wf/skills/to-capabilities/SKILL.md): break an idea or grilled requirement into solution-agnostic capabilities.
+- [to-stories](plugins/wf/skills/to-stories/SKILL.md): package requirements into atomic, testable, FE/BE-split user stories with acceptance criteria.
+- [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
+- [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
+- [to-diagram](plugins/wf/skills/to-diagram/SKILL.md) / [to-contract-delta](plugins/wf/skills/to-contract-delta/SKILL.md): document behavior as Mermaid diagrams or contract deltas.
+- [solution-agnostic](plugins/wf/skills/solution-agnostic/SKILL.md): strip implementation artifacts out of requirement or story text.
+- [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): delegate read-only codebase questions to a subagent.
+- [prototype](plugins/wf/skills/prototype/SKILL.md): build a throwaway prototype to answer a design question.
+- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
+- [record-adr](plugins/wf/skills/record-adr/SKILL.md), [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-service](plugins/wf/skills/record-service/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture ADRs, Concepts, glossary terms, services, and deployment topology into the docs the moment they crystallise.
+- [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
+- [manage-backlog](plugins/wf/skills/manage-backlog/SKILL.md) / [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
+- [track-ledger](plugins/wf/skills/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a grilling session.
 
 ### crew
 
@@ -133,71 +133,71 @@ Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.
 
 Agents: [codey](agents/crew/codey.agent.md), [codey-py](agents/crew/codey-py.agent.md), [codey-dotnet](agents/crew/codey-dotnet.agent.md), [codey-ai](agents/crew/codey-ai.agent.md), [chorey](agents/crew/chorey.agent.md).
 
-- [to-codey](skills/crew/to-codey/SKILL.md) / [to-chorey](skills/crew/to-chorey/SKILL.md): run the Codey or Chorey subagent for an implementation or review task.
-- [to-commit](skills/crew/to-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
-- [crew-select](skills/crew/crew-select/SKILL.md): resolve which Stack(s) apply to a piece of work and name the primary agent.
-- [crew-codey-flow](skills/crew/crew-codey-flow/SKILL.md) / [crew-chorey-flow](skills/crew/crew-chorey-flow/SKILL.md): shared implementation/review workflow (input, gotchas, feedback loops, status-report contract).
-- [crew-implement](skills/crew/crew-implement/SKILL.md): implementation rules — style, layers, design, and tests.
-- [crew-review](skills/crew/crew-review/SKILL.md): behavior-preserving cleanup review of a commit or uncommitted work.
-- [crew-feedback](skills/crew/crew-feedback/SKILL.md): run LSP, build, and test against changed files.
-- [crew-gotchas](skills/crew/crew-gotchas/SKILL.md): read/write per-agent `GOTCHAS.md` friction notes.
-- [init-crew](skills/crew/init-crew/SKILL.md): scaffold per-Stack convention files and `GOTCHAS.md`.
+- [to-codey](plugins/crew/skills/to-codey/SKILL.md) / [to-chorey](plugins/crew/skills/to-chorey/SKILL.md): run the Codey or Chorey subagent for an implementation or review task.
+- [to-commit](plugins/crew/skills/to-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
+- [crew-select](plugins/crew/skills/crew-select/SKILL.md): resolve which Stack(s) apply to a piece of work and name the primary agent.
+- [crew-codey-flow](plugins/crew/skills/crew-codey-flow/SKILL.md) / [crew-chorey-flow](plugins/crew/skills/crew-chorey-flow/SKILL.md): shared implementation/review workflow (input, gotchas, feedback loops, status-report contract).
+- [crew-implement](plugins/crew/skills/crew-implement/SKILL.md): implementation rules — style, layers, design, and tests.
+- [crew-review](plugins/crew/skills/crew-review/SKILL.md): behavior-preserving cleanup review of a commit or uncommitted work.
+- [crew-feedback](plugins/crew/skills/crew-feedback/SKILL.md): run LSP, build, and test against changed files.
+- [crew-gotchas](plugins/crew/skills/crew-gotchas/SKILL.md): read/write per-agent `GOTCHAS.md` friction notes.
+- [init-crew](plugins/crew/skills/init-crew/SKILL.md): scaffold per-Stack convention files and `GOTCHAS.md`.
 
 ### ralph
 
 AFK PR review and autonomous development loop.
 
-- [dev](skills/ralph/dev/SKILL.md): pick the next open issue, implement it, and commit the result.
-- [address](skills/ralph/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
-- [fix](skills/ralph/fix/SKILL.md): apply suggested changes from review comments.
-- [create-worktree](skills/ralph/create-worktree/SKILL.md) / [delete-worktree](skills/ralph/delete-worktree/SKILL.md): create/reuse or remove an isolated git worktree per feature branch.
-- [ralph-build](skills/ralph/ralph-build/SKILL.md): build the project in a worktree before implementation.
+- [dev](plugins/ralph/skills/dev/SKILL.md): pick the next open issue, implement it, and commit the result.
+- [address](plugins/ralph/skills/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
+- [fix](plugins/ralph/skills/fix/SKILL.md): apply suggested changes from review comments.
+- [create-worktree](plugins/ralph/skills/create-worktree/SKILL.md) / [delete-worktree](plugins/ralph/skills/delete-worktree/SKILL.md): create/reuse or remove an isolated git worktree per feature branch.
+- [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
 
 ### review
 
 PR code review skills with modular standards and guidance.
 
-- [hitl](skills/review/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
-- [architecture](skills/review/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
-- [quality](skills/review/quality/SKILL.md): PR review for correctness, reliability, compatibility, performance, testability.
-- [smells](skills/review/smells/SKILL.md): PR review against a fixed set of Fowler design smells.
-- [reqs](skills/review/reqs/SKILL.md): PR requirements-coverage review.
-- [fetch-diff](skills/review/fetch-diff/SKILL.md): check out a PR branch and fetch its diff per file for review skills.
-- [posting](skills/review/posting/SKILL.md): post a review comment as an inline PR comment via the `gh` API.
-- [to-review-comment](skills/review/to-review-comment/SKILL.md): format a raw review comment into the review tone of voice.
+- [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
+- [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
+- [quality](plugins/review/skills/quality/SKILL.md): PR review for correctness, reliability, compatibility, performance, testability.
+- [smells](plugins/review/skills/smells/SKILL.md): PR review against a fixed set of Fowler design smells.
+- [reqs](plugins/review/skills/reqs/SKILL.md): PR requirements-coverage review.
+- [fetch-diff](plugins/review/skills/fetch-diff/SKILL.md): check out a PR branch and fetch its diff per file for review skills.
+- [posting](plugins/review/skills/posting/SKILL.md): post a review comment as an inline PR comment via the `gh` API.
+- [to-review-comment](plugins/review/skills/to-review-comment/SKILL.md): format a raw review comment into the review tone of voice.
 
 ### harness
 
 Harness configuration setup and resolution skills.
 
-- [init-harness](skills/harness/init-harness/SKILL.md): create or update the Harness configuration file, resolving repo paths.
-- [resolve-harness](skills/harness/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.env` file.
+- [init-harness](plugins/harness/skills/init-harness/SKILL.md): create or update the Harness configuration file, resolving repo paths.
+- [resolve-harness](plugins/harness/skills/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.env` file.
 
 ### atl
 
 Atlassian workflow skills.
 
-- [init-atl](skills/atl/init-atl/SKILL.md): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
-- [preflight-atl](skills/atl/preflight-atl/SKILL.md): resolve Atlassian connection facts before any Jira/Confluence operation.
-- [fetch-work](skills/atl/fetch-work/SKILL.md) / [publish-work](skills/atl/publish-work/SKILL.md): fetch or create/update a Jira work item.
-- [fetch-page](skills/atl/fetch-page/SKILL.md) / [publish-page](skills/atl/publish-page/SKILL.md): fetch or create/update a Confluence page.
-- [map-markdown-adf](skills/atl/map-markdown-adf/SKILL.md): convert Markdown to/from Atlassian Document Format.
+- [init-atl](plugins/atl/skills/init-atl/SKILL.md): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
+- [preflight-atl](plugins/atl/skills/preflight-atl/SKILL.md): resolve Atlassian connection facts before any Jira/Confluence operation.
+- [fetch-work](plugins/atl/skills/fetch-work/SKILL.md) / [publish-work](plugins/atl/skills/publish-work/SKILL.md): fetch or create/update a Jira work item.
+- [fetch-page](plugins/atl/skills/fetch-page/SKILL.md) / [publish-page](plugins/atl/skills/publish-page/SKILL.md): fetch or create/update a Confluence page.
+- [map-markdown-adf](plugins/atl/skills/map-markdown-adf/SKILL.md): convert Markdown to/from Atlassian Document Format.
 
 ### azure-platform
 
 Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills.
 
-- [init-cli](skills/azure-platform/init-cli/SKILL.md) / [auth-principal](skills/azure-platform/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
-- [query-azure](skills/azure-platform/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
-- [search-ms-docs](skills/azure-platform/search-ms-docs/SKILL.md): query official Microsoft documentation.
-- [search-ms-code-samples](skills/azure-platform/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.
+- [init-cli](plugins/azure-platform/skills/init-cli/SKILL.md) / [auth-principal](plugins/azure-platform/skills/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
+- [query-azure](plugins/azure-platform/skills/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
+- [search-ms-docs](plugins/azure-platform/skills/search-ms-docs/SKILL.md): query official Microsoft documentation.
+- [search-ms-code-samples](plugins/azure-platform/skills/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.
 
 ### learn-aws
 
 AWS documentation skills for querying official AWS docs, API references, and regional availability.
 
-- [search-aws-docs](skills/learn-aws/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
-- [search-aws-sdk-nuget](skills/learn-aws/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
+- [search-aws-docs](plugins/learn-aws/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
+- [search-aws-sdk-nuget](plugins/learn-aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
 
 ### engineering
 
