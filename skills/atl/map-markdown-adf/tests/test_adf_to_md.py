@@ -98,6 +98,16 @@ def test_blockquote(adf_to_md):
     assert adf_to_md(doc) == "> quoted line"
 
 
+def test_panel(adf_to_md):
+    doc = _doc({"type": "panel", "attrs": {"panelType": "warning"}, "content": [_p(_t("Be careful here."))]})
+    assert adf_to_md(doc) == "> [!WARNING]\n> Be careful here."
+
+
+def test_status(adf_to_md):
+    doc = _doc(_p(_t("Assignee: "), {"type": "status", "attrs": {"text": "In Progress", "color": "blue"}}))
+    assert adf_to_md(doc) == "Assignee: [STATUS:In Progress|blue]"
+
+
 def test_code_block(adf_to_md):
     doc = _doc({"type": "codeBlock", "attrs": {"language": "python"}, "content": [_t("x = 1")]})
     assert adf_to_md(doc) == "```python\nx = 1\n```"

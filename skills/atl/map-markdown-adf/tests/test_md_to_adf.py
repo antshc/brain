@@ -41,6 +41,26 @@ def test_blockquote(md_to_adf):
     assert block["content"][0]["content"][0]["text"] == "quoted line"
 
 
+def test_panel(md_to_adf):
+    doc = md_to_adf("> [!WARNING]\n> Be careful here.")
+    block = doc["content"][0]
+    assert block["type"] == "panel"
+    assert block["attrs"] == {"panelType": "warning"}
+    assert block["content"][0]["content"][0]["text"] == "Be careful here."
+
+
+def test_status(md_to_adf):
+    doc = md_to_adf("Assignee: [STATUS:In Progress|blue]")
+    status = doc["content"][0]["content"][1]
+    assert status == {"type": "status", "attrs": {"text": "In Progress", "color": "blue"}}
+
+
+def test_status_default_color(md_to_adf):
+    doc = md_to_adf("[STATUS:Done]")
+    status = doc["content"][0]["content"][0]
+    assert status == {"type": "status", "attrs": {"text": "Done", "color": "neutral"}}
+
+
 def test_details_expand(md_to_adf):
     md = "<details>\n<summary>Click me</summary>\n\nhidden text\n</details>"
     doc = md_to_adf(md)

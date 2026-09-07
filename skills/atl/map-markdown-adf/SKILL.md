@@ -42,6 +42,7 @@ Source wording is never summarized, corrected, or reinterpreted in either direct
 | Bullet list (`-`, `*`, `+`) | `bulletList` / `listItem` |
 | Ordered list | `orderedList` / `listItem` |
 | Blockquote (`>`) | `blockquote` |
+| `> [!INFO]` / `[!NOTE]` / `[!WARNING]` / `[!SUCCESS]` / `[!ERROR]` blockquote | `panel` (`attrs.panelType`) |
 | Fenced code block | `codeBlock` (`attrs.language` when recognized) |
 | Table | `table` / `tableRow` / `tableHeader` / `tableCell` |
 | Horizontal rule (`---`) | `rule` |
@@ -52,6 +53,8 @@ Source wording is never summarized, corrected, or reinterpreted in either direct
 ## Supported marks
 
 `**strong**`, `*em*`, `` `code` ``, `[link](href)`, `~~strike~~`.
+
+`[STATUS:text|color]` maps to the inline `status` node (`color` one of `neutral`, `purple`, `blue`, `red`, `yellow`, `green`; defaults to `neutral` when omitted).
 
 ## Table validation
 
