@@ -9,7 +9,7 @@ from __future__ import annotations
 # (fill/stroke/text/added/removed/person-accent).
 LIGHT_THEME_COLOR_MAP = {
     "#8b949e": "#57606a",  # stroke / lineColor / signalColor
-    "#2a2a2a": "#f6f8fa",  # fill / actorBkg / noteBkgColor / activationBkgColor
+    "#242424": "#f6f8fa",  # fill / actorBkg / noteBkgColor / activationBkgColor
     "#c9d1d9": "#24292f",  # text
     "#4a7a5a": "#1a7f37",  # added stroke
     "#8a4a4a": "#cf222e",  # removed stroke
