@@ -5,6 +5,7 @@ import re
 
 _INLINE_RE = re.compile(
     r"`(?P<code_txt>[^`]+)`"
+    r"|\[STATUS:(?P<status_text>[^|\]]+?)(?:\|(?P<status_color>[a-zA-Z]+))?\]"
     r"|\[(?P<link_txt>[^\]]*)\]\((?P<link_href>[^)\s]+)\)"
     r"|\*\*(?P<strong_txt>.+?)\*\*"
     r"|__(?P<strong_u_txt>.+?)__"
@@ -24,6 +25,16 @@ def _parse_inline_marks(text: str) -> list[dict]:
                 nodes.append({"type": "text", "text": plain})
         if m.group("code_txt") is not None:
             nodes.append({"type": "text", "text": m.group("code_txt"), "marks": [{"type": "code"}]})
+        elif m.group("status_text") is not None:
+            nodes.append(
+                {
+                    "type": "status",
+                    "attrs": {
+                        "text": m.group("status_text").strip(),
+                        "color": (m.group("status_color") or "neutral").lower(),
+                    },
+                }
+            )
         elif m.group("link_txt") is not None:
             label = m.group("link_txt") or m.group("link_href")
             nodes.append(

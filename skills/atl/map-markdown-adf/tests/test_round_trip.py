@@ -15,6 +15,11 @@ A paragraph with **bold**, *italic*, `inline code`, a [link](https://example.com
 
 > a blockquote line
 
+> [!WARNING]
+> a panel line
+
+Assignee: [STATUS:In Progress|blue]
+
 ```python
 x = 1
 ```

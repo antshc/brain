@@ -30,6 +30,11 @@ def render_block(node: dict) -> str:
     if node_type == "blockquote":
         inner = render_blocks(node.get("content", []))
         return "\n".join(f"> {line}" if line else ">" for line in inner.split("\n"))
+    if node_type == "panel":
+        panel_type = node.get("attrs", {}).get("panelType", "info").upper()
+        inner = render_blocks(node.get("content", []))
+        lines = [f"[!{panel_type}]"] + inner.split("\n")
+        return "\n".join(f"> {line}" if line else ">" for line in lines)
     if node_type == "codeBlock":
         lang = node.get("attrs", {}).get("language", "")
         text = "".join(c.get("text", "") for c in node.get("content", []))
@@ -112,9 +117,18 @@ def render_inline(nodes: list[dict]) -> str:
             parts.append(render_text(node))
         elif node_type == "hardBreak":
             parts.append("  \n")
+        elif node_type == "status":
+            parts.append(render_status(node))
         else:
             raise NotImplementedError(f"unhandled inline node type '{node_type}'")
     return "".join(parts)
+
+
+def render_status(node: dict) -> str:
+    attrs = node.get("attrs", {})
+    text = attrs.get("text", "")
+    color = attrs.get("color", "neutral")
+    return f"[STATUS:{text}|{color}]"
 
 
 def render_text(node: dict) -> str:

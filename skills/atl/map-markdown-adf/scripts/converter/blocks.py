@@ -6,7 +6,7 @@ from __future__ import annotations
 import re
 
 from .inline import parse_inline
-from .patterns import HEADING_RE, TOC_COMMENT_RE, WIDE_TABLE_MARKER_RE
+from .patterns import HEADING_RE, PANEL_MARKER_RE, TOC_COMMENT_RE, WIDE_TABLE_MARKER_RE
 from .table_grid import validate_table_grid
 
 CODE_LANG_ALLOWLIST = {
@@ -140,7 +140,18 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             while i < n and lines[i].startswith(">"):
                 quote_lines.append(re.sub(r"^>\s?", "", lines[i]))
                 i += 1
-            blocks.append({"type": "blockquote", "content": paragraphs_from_lines(quote_lines)})
+            panel_m = quote_lines and PANEL_MARKER_RE.match(quote_lines[0])
+            if panel_m:
+                panel_type = panel_m.group(1).lower()
+                blocks.append(
+                    {
+                        "type": "panel",
+                        "attrs": {"panelType": panel_type},
+                        "content": paragraphs_from_lines(quote_lines[1:]),
+                    }
+                )
+            else:
+                blocks.append({"type": "blockquote", "content": paragraphs_from_lines(quote_lines)})
             continue
 
         if _DETAILS_OPEN_RE.match(line):
