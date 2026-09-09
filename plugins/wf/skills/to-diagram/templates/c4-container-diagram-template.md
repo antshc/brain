@@ -5,7 +5,7 @@
 <!-- C4Container element reference:
 - `Person(alias, "Label", "Description")` / `Person_Ext(alias, "Label", "Description")` — human actor, internal or external.
 - `System(alias, "Label", "Description")` / `System_Ext(alias, "Label", "Description")` — whole system treated as opaque, internal or external.
-- `Container(alias, "Label", "Technology", "Description")` — a deployable/runnable unit inside the system under design (web app, API, service, CLI).
+- `Container(alias, "Label", "Technology", "Description")` — a deployable/runnable unit inside the system under design (web app, API, service, CLI). A container is one deployable operational unit — group co-deployed artifacts that ship and run together (e.g. a Linux service plus its Bash scripts plus the Ansible playbooks that provision/run it) into one `Container` instead of one per file/technology.
 - `ContainerDb(alias, "Label", "Technology", "Description")` / `ContainerQueue(alias, "Label", "Technology", "Description")` — a data-store or queue container.
 - `Container_Ext(alias, "Label", "Technology", "Description")` — a container owned by an external/other team's system.
 - `System_Boundary(alias, "Label") { ... }` / `Container_Boundary(alias, "Label") { ... }` — group containers under the system or a sub-boundary. Use one `System_Boundary` for the system under design; nest at most one level.

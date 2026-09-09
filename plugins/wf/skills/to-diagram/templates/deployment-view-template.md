@@ -9,7 +9,7 @@
 <!-- C4Container element reference (deployment usage):
 - `Container_Boundary(alias, "Label") { ... }` — a top-level deployment host (device, machine, data center). Only top-level hosts use this.
 - `Boundary(alias, "Label", "Technology") { ... }` — a nested host/runtime/process inside a `Container_Boundary` or another `Boundary` (e.g. web browser, Apache Tomcat, OS); the `Technology` arg carries what would otherwise be `Deployment_Node`'s type string.
-- `Container(alias, "Label", "Technology", "Description")` / `ContainerDb(alias, "Label", "Technology", "Description")` — a deployable/runnable unit or data store hosted inside a `Boundary`, matching a Services-table building block.
+- `Container(alias, "Label", "Technology", "Description")` / `ContainerDb(alias, "Label", "Technology", "Description")` — a deployable/runnable unit or data store hosted inside a `Boundary`, matching a Services-table building block. A container is one deployable operational unit — group co-deployed artifacts that ship and run together (e.g. a Linux service plus its Bash scripts plus the Ansible playbooks that provision/run it) into one `Container` instead of one per file/technology.
 - `Container_Ext(alias, "Label", "Technology", "Description")` — a container owned by an external/other team's system, hosted inside its own `Container_Boundary`.
 - `Rel(from, to, "Label", "Technology")` — a call or data flow between hosted containers.
 Delete this instruction. -->
