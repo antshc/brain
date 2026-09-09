@@ -1,7 +1,5 @@
 # Container Diagram Template
 
-Use this template for both **Container Diagram** and **Deployment View** selected by `SKILL.md`.
-
 Official Mermaid C4 syntax: https://mermaid.ai/open-source/syntax/c4.html
 
 ## Drawing rules
@@ -26,8 +24,7 @@ Official Mermaid C4 syntax: https://mermaid.ai/open-source/syntax/c4.html
 - `ContainerDb(alias, "Label", "Technology", "Description")` — data-store container.
 - `ContainerQueue(alias, "Label", "Technology", "Description")` — queue or broker container.
 - `System_Boundary(alias, "Label") { ... }` — system ownership/grouping boundary.
-- `Container_Boundary(alias, "Label") { ... }` — container/deployment grouping boundary.
-- `Boundary(alias, "Label", "Technology") { ... }` — nested generic boundary, especially for deployment/runtime structure.
+- `Container_Boundary(alias, "Label") { ... }` — nested logical grouping boundary.
 - `Rel(from, to, "Label", "Technology")` — directed interaction or data flow.
 - `Rel_Back(from, to, "Label", "Technology")` — reverse-layout relationship when needed for readability.
 - `BiRel(from, to, "Label", "Technology")` — genuinely bidirectional interaction.
@@ -37,7 +34,7 @@ Official Mermaid C4 syntax: https://mermaid.ai/open-source/syntax/c4.html
 ## Boundaries
 
 - Use one primary `System_Boundary` for the system under design when logical ownership is relevant.
-- Use boundaries to communicate architecture or deployment grouping, not directory structure.
+- Use boundaries to communicate architecture ownership/grouping, not directory structure.
 - Avoid excessive nesting.
 - Every alias must be unique and contain no spaces.
 - Declare each element once, then reference its alias.
@@ -48,22 +45,7 @@ Official Mermaid C4 syntax: https://mermaid.ai/open-source/syntax/c4.html
 - Use `BiRel` only for genuinely bidirectional protocols, not ordinary request/response pairs.
 - Prefer meaningful action labels such as `Publishes events`, `Reads configuration`, or `Stores snapshots` over vague labels such as `Uses` when the real interaction is known.
 - Include technology/protocol only when architecturally relevant.
-- Do not draw relationships merely because components share a deployment location.
 - Use `Rel_L`, `Rel_R`, `Rel_U`, or `Rel_D` only to fix layout collisions, not by default.
-
-## Deployment-view rules
-
-When `SKILL.md` selects **Deployment View**:
-
-- Still render as `C4Container`.
-- Emphasize hosting/runtime placement instead of logical capability decomposition.
-- Show only decision-relevant hosts, VMs, clusters, runtimes, containers, stores, and external hosting boundaries.
-- Model a top-level deployment host with `Container_Boundary`.
-- Model nested hosts/runtimes with `Boundary`.
-- Place deployed `Container`, `ContainerDb`, or `Container_Ext` elements inside those boundaries.
-- Group co-deployed artifacts into one operational container.
-- Do not expand into code-level details.
-- Statement order affects placement; declare a boundary immediately before the elements it hosts.
 
 ## Labels and descriptions
 
@@ -117,9 +99,7 @@ For in-place changes not visible through topology, add:
 - ~ modified behavior
 ```
 
-For deployment views, this also covers changes such as runtime replacement, instance resizing, or scaling-policy changes. Omit the list when no such changes exist.
-
-Do not apply delta colors in current mode.
+Omit the list when no such changes exist. Do not apply delta colors in current mode.
 
 ## Mermaid C4 constraints and gotchas
 
@@ -127,7 +107,7 @@ Do not apply delta colors in current mode.
 - Use `UpdateElementStyle` and `UpdateRelStyle` for palette control.
 - Quote all labels, descriptions, and technologies.
 - Declare an element once; do not redeclare it in multiple boundaries.
-- `Container_Boundary` is for C4 container grouping; use generic `Boundary` for deeper deployment/runtime nesting.
+- `Container_Boundary` nests inside a system/container boundary; do not use it as an unrelated top-level grouping.
 - Mermaid C4 layout is statement-order-sensitive; reorder declarations before adding directional relationship variants.
 - Do not rely on diagram-wide `themeVariables` for C4 palette matching.
 
