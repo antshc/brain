@@ -1,6 +1,6 @@
 ## Solution Diagram
 
-<!-- This is the single required solution-level diagram (design-template.md § Solution Diagram). Render it as a Mermaid `C4Container` diagram, not a `flowchart`. Show containers (deployable/runnable units: GUI, API, service, database, queue) and the actors and external systems around them — not classes, methods, or code-level detail. Delete this instruction. -->
+<!-- Render solution/container-level scope as a Mermaid `C4Container` diagram, not a `flowchart`. Show containers (deployable/runnable units: GUI, API, service, database, queue) and the actors and external systems around them — not classes, methods, or code-level detail. Delete this instruction. -->
 
 <!-- C4Container element reference:
 - `Person(alias, "Label", "Description")` / `Person_Ext(alias, "Label", "Description")` — human actor, internal or external.

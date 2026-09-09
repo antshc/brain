@@ -132,6 +132,27 @@ flowchart TD
 ```
 </details>
 
+## Flowchart Delta Example
+
+<details>
+<summary>Order Processing — Flowchart Delta</summary>
+
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+flowchart TD
+    Svc["OrderService"]
+    Fraud["FraudCheckService"]:::added
+    Legacy["LegacyOrderQueue"]:::removed
+
+    Svc -- new check --> Fraud
+    Svc -. deprecated .-> Legacy
+
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+    classDef added stroke:#4a7a5a,stroke-width:1px
+    classDef removed stroke:#8a4a4a,stroke-width:1px
+```
+</details>
+
 ## Swimlane Diagram Example
 
 <details>
@@ -166,6 +187,43 @@ swimlane-beta TB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+</details>
+
+## Swimlane Diagram Delta Example
+
+<details>
+<summary>Order Fulfillment — Swimlane Delta</summary>
+
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+swimlane-beta TB
+  subgraph restApi [Order Service - REST API]
+    placeOrder[OrderService.placeOrder]
+    fraudCheck[OrderService.checkFraud]
+  end
+
+  subgraph database [Order Database - Database]
+    persistOrder[Persist order with state Placed]
+  end
+
+  subgraph legacyQueue [Legacy Order Queue - Queue]
+    notifyLegacy[Notify legacy queue]
+  end
+
+  placeOrder -->|1. new fraud check| fraudCheck
+  fraudCheck -->|2. save order| persistOrder
+  placeOrder -.->|deprecated notify| notifyLegacy
+
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+  classDef added stroke:#4a7a5a,stroke-width:1px
+  classDef removed stroke:#8a4a4a,stroke-width:1px
+  class fraudCheck added
+  class notifyLegacy removed
+```
+
+**Behaviour changes**
+- `-` The entire "Legacy Order Queue" lane is being removed; Mermaid's `subgraph` has no supported border-color hook, so the removal is called out here in prose.
+
 </details>
 
 ## Class Diagram Example
@@ -307,6 +365,46 @@ sequenceDiagram
 ```
 </details>
 
+## Sequence Diagram Delta Example
+
+<details>
+<summary>Order Submission — Sequence Delta</summary>
+
+```mermaid
+%%{init: {'themeVariables': {
+    'lineColor': '#8b949e',
+    'actorBkg': '#2a2a2a', 'actorBorder': '#8b949e', 'actorTextColor': '#c9d1d9', 'actorLineColor': '#8b949e',
+    'signalColor': '#8b949e', 'signalTextColor': '#c9d1d9',
+    'labelBoxBkgColor': '#2a2a2a', 'labelBoxBorderColor': '#8b949e', 'labelTextColor': '#c9d1d9',
+    'loopTextColor': '#c9d1d9',
+    'noteBkgColor': '#2a2a2a', 'noteBorderColor': '#8b949e', 'noteTextColor': '#c9d1d9',
+    'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a',
+    'sequenceNumberColor': '#c9d1d9'
+}}}%%
+sequenceDiagram
+    autonumber
+    actor User
+    participant Api as OrderController
+    participant Svc as OrderService
+    participant Fraud as FraudCheckService
+    participant Legacy as LegacyOrderQueue
+
+    User->>Api: submit(order)
+    activate Api
+    Api->>Svc: placeOrder(order)
+    activate Svc
+    note over Svc,Fraud: NEW: fraud check runs before persistence
+    Svc->>Fraud: check(order)
+    Fraud-->>Svc: riskScore
+    Svc-->>Api: bool
+    deactivate Svc
+    Api-->>User: 200 OK
+    deactivate Api
+
+    note over Svc,Legacy: REMOVED: OrderService no longer notifies LegacyOrderQueue
+```
+</details>
+
 ## Deployment View Example
 
 <details>
@@ -381,4 +479,47 @@ C4Container
     UpdateRelStyle(db, db2, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetY="-10")
     UpdateRelStyle(api, mainframe, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
+</details>
+
+## Deployment View Delta Example
+
+<details>
+<summary>Order Management System — Deployment Delta</summary>
+
+```mermaid
+---
+config:
+  c4:
+    c4ShapePadding: 20
+---
+C4Container
+    title Deployment delta for Order Management System
+
+    Container_Boundary(cluster, "Order Cluster") {
+        Boundary(node1, "order-api*** x4", "Ubuntu 22.04 LTS") {
+            Container(api, "API Application", "ASP.NET Core", "Accepts and validates order submissions")
+        }
+        Boundary(node2, "order-worker*** x2", "Ubuntu 22.04 LTS") {
+            Container(worker, "Fraud Check Worker", "ASP.NET Core", "New background fraud-check process")
+        }
+        Boundary(node3, "order-legacy01", "Ubuntu 18.04 LTS") {
+            Container(legacy, "Legacy Batch Job", ".NET Framework", "Removed nightly export job")
+        }
+    }
+
+    Rel(api, worker, "Publishes order for review", "async")
+    Rel(api, legacy, "Previously exported orders to", "async")
+
+    UpdateElementStyle(api, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
+    UpdateElementStyle(worker, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#4a7a5a")
+    UpdateElementStyle(legacy, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8a4a4a")
+
+    UpdateRelStyle(api, worker, $textColor="#c9d1d9", $lineColor="#4a7a5a")
+    UpdateRelStyle(api, legacy, $textColor="#c9d1d9", $lineColor="#8a4a4a")
+```
+
+**Behaviour changes**
+- `+` Fraud Check Worker node added to run asynchronous fraud review.
+- `-` Legacy Batch Job node and its host are being decommissioned.
+
 </details>
