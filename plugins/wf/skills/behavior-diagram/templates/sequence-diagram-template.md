@@ -1,19 +1,61 @@
-## Sequence Diagram
+# Sequence Diagram Template
 
-### {{title}}
+Official Mermaid sequence diagram syntax: https://mermaid.ai/open-source/syntax/sequenceDiagram.html
 
-<!-- Include only when interaction order, cross-boundary calls, or failure branching are design decisions. Show only the lifelines and messages relevant to this scenario — not a full system trace. Delete this instruction. -->
+## Drawing rules
 
-<!-- Mermaid technical gotchas (verified against `mmdc` 11.16.0):
-- `actor` renders a stick figure and is reserved for the human/external initiator; `participant` renders a box for a system component. Use `participant X as ClassName` to alias a short lifeline id to the real class name.
-- Solid arrow with filled head (`->>`) is a synchronous call; dashed arrow with filled head (`-->>`) is its return. Pair every `->>` with a matching `-->>` from the same target — an unpaired call reads as fire-and-forget.
-- `activate`/`deactivate` (or `+`/`-` shorthand on the arrow) draws the activation bar; nest them to show a call still on the stack while it waits on a downstream call.
-- `alt`/`else`/`end` branches mutually exclusive outcomes (e.g. success vs. failure). Use `opt`/`end` instead when there is only one conditional branch with no alternative.
-- `note over A,B: text` spans a free-text note across two lifelines for a cross-cutting concern that doesn't belong on a single arrow.
-- A literal `;` anywhere in message or note text is parsed as a statement terminator and breaks the parser (`Expecting ... got 'NEWLINE'`). Use `-` or `,` instead of `;` in arrow/note text.
-Delete this instruction. -->
+- Use Mermaid `sequenceDiagram` when interaction order, cross-boundary calls, returns, or failure branching are design decisions.
+- Show only lifelines and messages relevant to the requested scenario, not a full system trace.
+- Ground current-state participants and interactions in repository/code evidence. Do not invent calls.
+- Use `actor` for a human/external initiator and `participant` for a system component.
+- Use `participant X as ClassName` when a short lifeline ID improves readability.
+- Keep `autonumber` as the first line under `sequenceDiagram` so review comments can reference steps by number.
+- Prefer readable scenarios over exhaustive traces.
 
-<!-- `autonumber` is mandatory — it numbers every step so review comments and prose can reference a step by number. Keep it as the first line under `sequenceDiagram`. Delete this instruction. -->
+## Calls, returns, and control flow
+
+- `->>` — synchronous call.
+- `-->>` — return from a synchronous call.
+- Pair every synchronous call with its matching return when the return is relevant; an unpaired call reads as fire-and-forget.
+- Use `activate` / `deactivate` or `+` / `-` shorthand to show active call-stack ownership.
+- Use `alt` / `else` / `end` for mutually exclusive outcomes.
+- Use `opt` / `end` for a single conditional path without an alternative.
+- Use `note over A,B: text` for a short cross-cutting concern that does not belong on one message.
+
+## Current-mode styling
+
+Use the repo dark palette through `themeVariables`, because sequence diagrams do not support the class-style `classDef` palette.
+
+```text
+fill: #2a2a2a
+stroke/line: #8b949e
+text: #c9d1d9
+```
+
+Keep the theme block from the output template in current mode.
+
+## Delta-mode styling
+
+Apply only when `SKILL.md` selects **delta mode**.
+
+Mermaid sequence diagrams have no `:::` / `classDef` mechanism for individual messages.
+
+- Mark a new, changed, or removed step with a `note over` callout or a leading `NEW:`, `CHANGED:`, or `REMOVED:` label in message text.
+- Use `REMOVED:` for a call that no longer happens but must remain visible to explain the delta.
+- Show changed messages plus the minimum unchanged lifelines/messages needed to connect the scenario.
+- Omit unchanged lifelines and messages not needed to understand the delta.
+- Keep the base palette; do not invent unsupported per-message color semantics.
+
+## Mermaid constraints and gotchas
+
+- A literal `;` in message or note text is parsed as a statement terminator and can break parsing. Use `-` or `,` instead.
+- Activation bars should match actual call-stack lifetime.
+- Use `actor` only for a human/external initiator; system lifelines should be `participant`.
+- Delete unused placeholders, lifelines, messages, branches, and notes from the final diagram.
+
+## Output template
+
+Replace all placeholders with real participants and interactions. Add or remove lifelines, calls, branches, activations, and notes to match the actual scenario.
 
 <details>
 <summary>{{title}}</summary>
@@ -53,6 +95,5 @@ sequenceDiagram
 
     note over {{ownerAlias}},{{dependencyAlias}}: {{oneLineCrossCuttingNote}}
 ```
-</details>
 
-<!-- The `themeVariables` block reuses the class diagram's dark palette per property since sequence diagrams have no `classDef`: `#2a2a2a` fill, `#8b949e` stroke/line, `#c9d1d9` text. `note over A,B` is optional — add it only for a short cross-cutting explanation. Delete unused example lifelines/messages/notes. -->
+</details>
