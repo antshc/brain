@@ -31,10 +31,10 @@ copilot plugin install harness@brain
 
 ```sh
 (copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) && \
-copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
-copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
-copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
-copilot plugin uninstall review@brain >/dev/null 2>&1 || true)
+(copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall review@brain >/dev/null 2>&1 || true)
 ```
 
 </details>
@@ -50,8 +50,8 @@ copilot plugin install atl@brain
 
 ```sh
 (copilot plugin uninstall az@brain >/dev/null 2>&1 || true) && \
-copilot plugin uninstall learn-ms@brain >/dev/null 2>&1 || true) && \
-copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall learn-ms@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true) && \
 copilot plugin install azure-platform@brain
 ```
 
