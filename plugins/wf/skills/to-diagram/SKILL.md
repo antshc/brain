@@ -26,11 +26,11 @@ Deployable/runnable containers and the actors/external systems around them, solu
 
 ### Flowchart
 
-Solution-level process flow, decision path, or component wiring. Template: [flowchart-template.md](templates/flowchart-template.md).
+Solution-level process flow, decision path, or component wiring. Use Swimlane Diagram instead when which container/component owns each step is itself the decision; use Sequence Diagram instead when the focus is message order between participants. Template: [flowchart-template.md](templates/flowchart-template.md).
 
 ### Swimlane Diagram
 
-Cross-boundary process flow where ownership is the decision — Level 1 lanes are containers, Level 2 lanes are components/modules inside one container. Template: [swimlane-diagram-template.md](templates/swimlane-diagram-template.md).
+Cross-boundary process flow where ownership is the decision — Level 1 lanes are containers, Level 2 lanes are components/modules inside one container. Use Flowchart instead when ownership doesn't matter and only sequence/branching does; use Sequence Diagram instead when the focus is messages over time between participants. Template: [swimlane-diagram-template.md](templates/swimlane-diagram-template.md).
 
 ### Class Diagram
 
@@ -38,7 +38,7 @@ Implementation-level class responsibilities or relationships. Template: [class-d
 
 ### Sequence Diagram
 
-Implementation-level interaction order, cross-boundary calls, or failure branching. Template: [sequence-diagram-template.md](templates/sequence-diagram-template.md).
+Implementation-level interaction order, cross-boundary calls, or failure branching. Use Swimlane Diagram instead when which container/component owns each step is itself the decision, rather than message order. Template: [sequence-diagram-template.md](templates/sequence-diagram-template.md).
 
 ### Deployment View
 
@@ -51,8 +51,8 @@ Apply only in delta mode.
 - **Solution / Container Diagram:** C4 has no `classDef` / `:::`. Use `UpdateElementStyle(alias, $borderColor="...")`: added `#4a7a5a`, removed `#8a4a4a`, modified or unchanged connection context `#8b949e`. Use the same colors with `UpdateRelStyle(..., $lineColor="...")` for added/removed relationships. Show only changed containers/systems/actors plus minimum context. Add a `**Behaviour changes**` bullet list using `+` / `-` / `~` for modified elements whose change is not visible from added/removed topology.
 - **Class Diagram:** mark added classes `:::added`, removed classes `:::removed`, changed classes `:::memberChanged` with `[add]`/`[rem]`-prefixed members; add `classDef added stroke:#4a7a5a,stroke-width:1px`, `classDef removed stroke:#8a4a4a,stroke-width:1px`, and `classDef memberChanged stroke:#8b949e,stroke-width:1px,stroke-dasharray:5 5`. Show only new, modified, and deleted classes/fields/methods; omit unchanged members of a changed class. Intermediate classes needed only to complete a connection stay unstyled and list only members used by that connection.
 - **Flowchart:** mark added nodes `:::added` and removed nodes `:::removed`; add `classDef added stroke:#4a7a5a,stroke-width:1px` and `classDef removed stroke:#8a4a4a,stroke-width:1px`. There is no `memberChanged` equivalent: restyle a materially changed node as added, or leave it unstyled and describe the change in prose. Omit unchanged nodes not needed to connect the delta.
-- **Swimlane Diagram:** use the same `:::added` / `:::removed` convention and colors as Flowchart. A lane that is itself entirely new or removed has no supported Mermaid border-color hook on `subgraph`; call it out in prose. Omit unchanged nodes and lanes not needed to connect the delta.
-- **Sequence Diagram:** Mermaid sequence diagrams have no `:::` styling mechanism. Mark a new or changed step with a `note over` call-out or a leading `NEW:` / `CHANGED:` label in the message text. Omit lifelines and messages that are unchanged and not needed to connect the delta.
+- **Swimlane Diagram:** style changed nodes with `classDef added ...` / `classDef removed ...` (same colors as Flowchart) plus a separate `class nodeId added;` / `class nodeId removed;` statement per node — swimlane's confirmed styling hook is the `class` statement, not the inline `:::` shorthand. A lane that is itself entirely new or removed has no supported Mermaid border-color hook on `subgraph`; call it out in prose. Omit unchanged nodes and lanes not needed to connect the delta.
+- **Sequence Diagram:** Mermaid sequence diagrams have no `:::` styling mechanism. Mark a new, changed, or removed step with a `note over` call-out or a leading `NEW:` / `CHANGED:` / `REMOVED:` label in the message text — use `REMOVED:` for a call that no longer happens but must stay visible for context. Omit lifelines and messages that are unchanged and not needed to connect the delta.
 - **Deployment View:** use `UpdateElementStyle(alias, $borderColor="...")`: added `#4a7a5a`, removed `#8a4a4a`, unchanged context `#8b949e`. Add a `**Behaviour changes**` bullet list using `+` / `-` / `~` for in-place node changes not visible through added/removed elements, such as resized instances, runtime changes, or scaling-policy changes. Omit the list when none exist.
 
 Do not copy delta styling into current mode. Current mode uses the base palette; delta mode uses the delta overlay.

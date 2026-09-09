@@ -8,7 +8,7 @@
 - Interface box: use the `<<Interface>>` annotation inside the member block, not a naming convention.
 - Comments are `%%` on their own line only. There is no inline `//` or `#` comment syntax inside a class body — text after `//` is parsed as a return-type annotation, not stripped.
 - `namespace Name { class ... }` groups classes by layer/module — use one per architectural layer this diagram touches (e.g. Api, Domain, Infrastructure).
-- Out of scope for zdesign class diagrams: subsystem/system-service boundary boxes and "C# Project assembly" container boxes — these describe deployment/packaging groupings, not class-level design decisions. If one is itself a design decision, describe it in `Solution Overview` prose or the solution-level `flowchart` instead.
+- Out of scope for class diagrams: subsystem/system-service boundary boxes and "C# Project assembly" container boxes — these describe deployment/packaging groupings, not class-level design decisions. If one is itself a design decision, describe it in prose or the solution-level `flowchart`/`C4Container` diagram instead.
 Delete this instruction. -->
 
 <details>

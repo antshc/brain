@@ -1,14 +1,15 @@
 ## Swimlane Diagram
 
-<!-- Include only when "who owns this step" (which container, or which component/module inside one container) is itself a design decision — not merely step order. If ownership doesn't matter, use the flowchart instead; if the focus is messages over time between participants, use the sequence diagram instead. Delete this instruction. -->
+<!-- Include only when "who owns this step" (which container, or which component/module inside one container) is itself a design decision — not merely step order. Delete this instruction. -->
 
-<!-- `swimlane-beta` is a beta/experimental Mermaid diagram type (v11.16.0+) — confirm the rendering toolchain (mmdc, VS Code preview, GitHub) supports it before relying on it. Delete this instruction. -->
+<!-- `swimlane-beta` is a beta/experimental Mermaid diagram type (v11.16.0+) — confirm the rendering toolchain (mmdc, VS Code preview, GitHub) supports it before relying on it. If it doesn't render, fall back to a `flowchart` with one `subgraph` per lane, ordered by handoff sequence. Delete this instruction. -->
 
 <!-- Mermaid technical gotchas and good practices (mermaid.ai/open-source/syntax/swimlanes.html#good-practices), consistent with the flowchart conventions:
 - `swimlane-beta` (optionally followed by `TB`/`TD`/`BT`/`LR`/`RL`; defaults to `TB`) starts the diagram. Each top-level `subgraph id [Label] ... end` becomes one lane. Include the container or component type in the lane label separated by a dash (e.g. `[Web Portal - GUI]`, `[Order Service - REST API]`, `[Database Name - Database]`). Do not use parentheses `()` inside the `[Label]` brackets as it can break parsing.
 - Do not use curly braces `{}` inside any node label text (e.g. a placeholder like `{build_number}`) — Mermaid's parser reads `{` as the start of a diamond/decision node and errors even mid-label (e.g. `got 'DIAMOND_START'`). Write placeholders without braces (`build-number`, `build_number value`) instead.
 - Make each lane mean one kind of ownership — one container (Level 1) or one component/module (Level 2). Don't mix ownership kinds (e.g. a team lane next to a status lane) in the same diagram.
 - Node shapes reuse flowchart syntax: `id([Text])` stadium for a start/end step, plain `id[Text]` rectangle for a task/activity, `id{Text}` diamond for a branching decision.
+- Style a node with a `classDef name stroke:...` plus a separate `class nodeId name;` statement — swimlane nodes take Mermaid's `class` statement for styling, not the inline `id:::class` shorthand used in flowcharts/class diagrams.
 - Label every cross-lane edge with what's handed off — a request, response, or condition. An unlabeled cross-lane arrow hides the handoff that's the point of the diagram.
 - Prefix every edge label with its execution-order step number (for example, `1. request`). For mutually exclusive outcomes from a decision, use the same number plus a branch suffix (for example, `3a. rejected` and `3b. approved`), then retain that suffix for following steps until the branches rejoin.
 - Put a decision node in the lane that owns/makes that decision, then route its labeled outcomes to the lanes that act on them.
