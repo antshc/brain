@@ -1,26 +1,100 @@
-## Swimlane Diagram
+# Swimlane Diagram Template
 
-<!-- Include only when "who owns this step" (which container, or which component/module inside one container) is itself a design decision — not merely step order. Delete this instruction. -->
+Official Mermaid swimlane syntax: https://mermaid.ai/open-source/syntax/swimlanes.html
 
-<!-- `swimlane-beta` is a beta/experimental Mermaid diagram type (v11.16.0+) — confirm the rendering toolchain (mmdc, VS Code preview, GitHub) supports it before relying on it. If it doesn't render, fall back to a `flowchart` with one `subgraph` per lane, ordered by handoff sequence. Delete this instruction. -->
+## Drawing rules
 
-<!-- Mermaid technical gotchas and good practices (mermaid.ai/open-source/syntax/swimlanes.html#good-practices), consistent with the flowchart conventions:
-- `swimlane-beta` (optionally followed by `TB`/`TD`/`BT`/`LR`/`RL`; defaults to `TB`) starts the diagram. Each top-level `subgraph id [Label] ... end` becomes one lane. Include the container or component type in the lane label separated by a dash (e.g. `[Web Portal - GUI]`, `[Order Service - REST API]`, `[Database Name - Database]`). Do not use parentheses `()` inside the `[Label]` brackets as it can break parsing.
-- Do not use curly braces `{}` inside any node label text (e.g. a placeholder like `{build_number}`) — Mermaid's parser reads `{` as the start of a diamond/decision node and errors even mid-label (e.g. `got 'DIAMOND_START'`). Write placeholders without braces (`build-number`, `build_number value`) instead.
-- Make each lane mean one kind of ownership — one container (Level 1) or one component/module (Level 2). Don't mix ownership kinds (e.g. a team lane next to a status lane) in the same diagram.
-- Node shapes reuse flowchart syntax: `id([Text])` stadium for a start/end step, plain `id[Text]` rectangle for a task/activity, `id{Text}` diamond for a branching decision.
-- Style a node with a `classDef name stroke:...` plus a separate `class nodeId name;` statement — swimlane nodes take Mermaid's `class` statement for styling, not the inline `id:::class` shorthand used in flowcharts/class diagrams.
-- Label every cross-lane edge with what's handed off — a request, response, or condition. An unlabeled cross-lane arrow hides the handoff that's the point of the diagram.
-- Prefix every edge label with its execution-order step number (for example, `1. request`). For mutually exclusive outcomes from a decision, use the same number plus a branch suffix (for example, `3a. rejected` and `3b. approved`), then retain that suffix for following steps until the branches rejoin.
-- Put a decision node in the lane that owns/makes that decision, then route its labeled outcomes to the lanes that act on them.
-- Split into Level 1 + Level 2 (or multiple Level 2 diagrams, one per container) rather than one large diagram once a single view stops being readable without tracing every arrow twice.
-- Use short, stable node ids; put the descriptive text in the label so relabeling later doesn't break edges.
-- Never name a node id `click` — it's a reserved keyword (the `click nodeId ...` interaction directive) and breaks parsing, often with a confusing "Expecting 'STR', got 'NODE_STRING'" error on a later edge line, not on the `click` node's own line. Use `initiate` or similar instead.
-Delete this instruction. -->
+- Use Mermaid `swimlane-beta` when ownership of each step is a design decision.
+- Use one ownership kind per diagram: containers at Level 1 or components/modules inside one container at Level 2.
+- Do not mix ownership kinds such as teams, statuses, containers, and components in the same view.
+- Ground current-state lanes, steps, and handoffs in repository/code evidence. Do not invent behavior.
+- Show only decision-relevant lanes and steps.
+- Split a large flow into Level 1 plus one or more Level 2 diagrams when a single view becomes hard to follow.
+- `swimlane-beta` is experimental in Mermaid 11.16.0+. Confirm the target renderer supports it. If not, fall back to a `flowchart` with one `subgraph` per lane.
+
+## Lane levels
+
+### Level 1 — Container swimlane
+
+- Each lane is a deployable/runnable container such as a GUI, REST API, database, queue, or worker.
+- Include container name and type in the lane label, for example `[Order API - REST API]`.
+- Group co-deployed artifacts that form one operational unit into one lane. A Linux service plus Bash scripts plus Ansible playbooks it runs is usually one container, not separate lanes.
+
+### Level 2 — Component swimlane
+
+- Scope the diagram to one Level 1 container.
+- Each lane is a component/module inside that container, such as a controller, service, page, or repository.
+- Include component name and type in the lane label, for example `[OrderController - Controller]`.
+- Include Level 2 only when internal component ownership is decision-relevant.
+
+## Nodes and handoffs
+
+- `id([Text])` — start/end-like stadium node.
+- `id[Text]` — task/activity rectangle.
+- `id{Text}` — decision diamond.
+- Put a decision node in the lane that owns the decision.
+- Label every cross-lane edge with what is handed off: request, response, event, data, or condition.
+- Prefix every edge label with its execution-order number, for example `1. request`.
+- For mutually exclusive branches, use suffixes such as `3a.` and `3b.` and retain the suffix until branches rejoin.
+- Use short, stable node IDs and descriptive labels.
+
+## Current-mode styling
+
+Use the repo dark palette.
+
+```text
+lineColor: #8b949e
+fill: #242424
+stroke: #8b949e
+text: #c9d1d9
+```
+
+Keep this initialization and default class definition in current mode:
+
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
+## Delta-mode styling
+
+Apply only when `SKILL.md` selects **delta mode**.
+
+Define:
+
+```mermaid
+classDef added stroke:#4a7a5a,stroke-width:1px
+classDef removed stroke:#8a4a4a,stroke-width:1px
+```
+
+Then style each changed node with a separate statement:
+
+```mermaid
+class nodeId added;
+class oldNodeId removed;
+```
+
+- Swimlane nodes use `class nodeId className;`; do not rely on the inline `id:::class` shorthand.
+- A lane that is entirely new or removed has no supported Mermaid `subgraph` border-color hook; call out the lane state in prose.
+- Show changed nodes/handoffs plus the minimum unchanged lanes and nodes needed to connect them.
+- Omit unchanged lanes and nodes not needed to understand the delta.
+- Do not apply delta styling in current mode.
+
+## Mermaid constraints and gotchas
+
+- `swimlane-beta` optionally accepts `TB`, `TD`, `BT`, `LR`, or `RL`; it defaults to `TB`.
+- Each top-level `subgraph id [Label] ... end` becomes one lane.
+- Avoid parentheses inside `[Label]` lane labels; they can break parsing.
+- Do not use curly braces inside node label text for placeholders; Mermaid interprets `{` as a decision-node delimiter.
+- Never use `click` as a node ID; it is a reserved Mermaid interaction keyword.
+- Use separate `class` statements for swimlane node styling.
+- Delete unused placeholders, lanes, and nodes from the final diagram.
+
+## Output template
+
+Replace all placeholders with real behavior. Include only the level or levels needed for the requested scope.
 
 ### Level 1 — Container Swimlane: {{title}}
-
-<!-- Lanes are containers (the deployable/runnable units — GUI, REST API service, database, queue, etc ..). Include the container type or technology in the lane label separated by a dash (e.g. [Web Portal - GUI], [Order API - REST API], [Database Name - Database]). Show which container performs each step of the flow. Group co-deployed artifacts that form one operational unit into a single lane instead of splitting per file/technology (e.g. a Linux service plus its Bash scripts plus the Ansible playbooks that provision/run it is usually one container). Delete this instruction. -->
 
 <details>
 <summary>{{title}} — container swimlane</summary>
@@ -53,11 +127,10 @@ swimlane-beta TB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ### Level 2 — Component Swimlane: {{title}} inside {{containerName}}
-
-<!-- Scoped to one container from Level 1. Lanes are the components/modules inside that container (e.g. GUI pages, REST API controllers/modules). Include the component type in the lane label separated by a dash (e.g. [OrderController - Controller], [OrderService - Service]). Show which component performs each step of the flow inside that container. Include only when internal component wiring, not just the container-level flow, is a design decision. Delete this instruction. -->
 
 <details>
 <summary>{{title}} — component swimlane ({{containerName}})</summary>
@@ -85,6 +158,5 @@ swimlane-beta TB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
-</details>
 
-<!-- Delete unused example lanes/nodes. Include only the level(s) that are decision-relevant. -->
+</details>
