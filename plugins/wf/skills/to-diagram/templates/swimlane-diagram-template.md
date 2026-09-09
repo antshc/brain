@@ -19,7 +19,7 @@ Delete this instruction. -->
 
 ### Level 1 — Container Swimlane: {{title}}
 
-<!-- Lanes are containers (the deployable/runnable units from the Solution Diagram — GUI, REST API service, database, queue). Include the container type or technology in the lane label separated by a dash (e.g. [Web Portal - GUI], [Order API - REST API], [Database Name - Database]). Show which container performs each step of the flow. Delete this instruction. -->
+<!-- Lanes are containers (the deployable/runnable units — GUI, REST API service, database, queue, etc ..). Include the container type or technology in the lane label separated by a dash (e.g. [Web Portal - GUI], [Order API - REST API], [Database Name - Database]). Show which container performs each step of the flow. Group co-deployed artifacts that form one operational unit into a single lane instead of splitting per file/technology (e.g. a Linux service plus its Bash scripts plus the Ansible playbooks that provision/run it is usually one container). Delete this instruction. -->
 
 <details>
 <summary>{{title}} — container swimlane</summary>
