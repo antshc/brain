@@ -1,11 +1,25 @@
 ---
 name: architecture-diagram
-description: Document software architecture with a Mermaid solution-level C4 container diagram or deployment view. Use for current-state architecture and architecture deltas, including added, removed, or modified containers, systems, actors, relationships, hosts, runtimes, or deployment nodes.
+description: Document software architecture with a Mermaid solution-level container diagram or deployment view. Use for current-state architecture and architecture deltas, including added, removed, or modified containers, systems, actors, relationships, hosts, runtimes, or deployment nodes.
 ---
 
 # Architecture Diagram
 
-Show only elements relevant to what is being documented. Ground current-state elements in the actual codebase; use repository exploration instead of guessing.
+## When to use
+
+Use this skill to document software architecture as either:
+
+### Container Diagram
+
+Show deployable/runnable containers and the actors or external systems around them at solution level.
+
+### Deployment View
+
+Show deployment topology, hosting, runtime, or infrastructure placement. Render this view with the same Mermaid `C4Container` template, using deployment-specific modeling rules from the template.
+
+## Reference
+
+Official Mermaid C4 syntax: https://mermaid.ai/open-source/syntax/c4.html
 
 ## 1. Select mode
 
@@ -13,33 +27,19 @@ Use **current mode** by default.
 
 Use **delta mode** when the user asks for a delta or change-focused diagram, including requests such as `diagram the delta`, `show what changed`, `show changes`, or `show added/removed/modified elements`.
 
-- **Current mode:** show the relevant current architecture and use the matching template's existing color schema unchanged.
-- **Delta mode:** show only added, modified, or removed elements, plus the minimum unchanged context needed to connect them. Use the matching template's existing base colors plus the delta overlay below.
+- **Current mode:** show the relevant current architecture.
+- **Delta mode:** show only added, modified, or removed elements, plus the minimum unchanged context needed to connect them.
 
-## 2. Select and open the template
+## 2. Select view
 
-Each template's hidden comments contain its Mermaid element reference and gotchas. Open the matching template before drafting; do not compose from memory.
+Select **Container Diagram** for logical solution-level deployable/runnable units.
 
-### Solution / Container Diagram
+Select **Deployment View** for hosting, runtime, or infrastructure topology.
 
-Deployable/runnable containers and the actors/external systems around them, solution-level. Render as Mermaid `C4Container`. Template: [c4-container-diagram-template.md](templates/c4-container-diagram-template.md).
+## 3. Open the drawing template
 
-### Deployment View
+Open [container-diagram-template.md](templates/container-diagram-template.md) before drafting either view. Follow its drawing, styling, delta, and Mermaid rules; do not compose from memory.
 
-Deployment topology, hosting, or infrastructure nodes. Template: [deployment-view-template.md](templates/deployment-view-template.md).
+Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
-## 3. Delta overlay
-
-Apply only in delta mode.
-
-### Solution / Container Diagram
-
-C4 has no `classDef` / `:::`. Use `UpdateElementStyle(alias, $borderColor="...")`: added `#4a7a5a`, removed `#8a4a4a`, modified or unchanged connection context `#8b949e`. Use the same colors with `UpdateRelStyle(..., $lineColor="...")` for added/removed relationships. Show only changed containers/systems/actors plus minimum context. Add a `**Behaviour changes**` bullet list using `+` / `-` / `~` for modified elements whose change is not visible from added/removed topology.
-
-### Deployment View
-
-Use `UpdateElementStyle(alias, $borderColor="...")`: added `#4a7a5a`, removed `#8a4a4a`, unchanged context `#8b949e`. Add a `**Behaviour changes**` bullet list using `+` / `-` / `~` for in-place node changes not visible through added/removed elements, such as resized instances, runtime changes, or scaling-policy changes. Omit the list when none exist.
-
-Do not copy delta styling into current mode. Current mode uses the base palette; delta mode uses the delta overlay.
-
-**Done when:** the matching template was opened this run; current mode uses the template's existing colors; delta mode uses the delta overlay and includes only changed elements plus minimum context; the diagram kind uses its own rules; no unused placeholder or hidden instruction remains.
+**Done when:** the template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context; no unused placeholder or instruction-only comment remains.
