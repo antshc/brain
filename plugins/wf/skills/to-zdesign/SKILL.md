@@ -36,9 +36,9 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 | Diagram | Include for | Template |
 | --- | --- | --- |
-| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/to-diagram` skill **Solution Diagram** in current mode |
-| Flow Diagram (`swimlane-beta`) | Solution-level process flow where container or component ownership is itself a design decision | Follow `/to-diagram` skill **Swimlane Diagram** in current mode |
-| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Follow `/to-diagram` skill **Sequence Diagram** in current mode |
+| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/architecture-diagram` skill **Solution Diagram** in current mode |
+| Flow Diagram (`swimlane-beta`) | Solution-level process flow where container or component ownership is itself a design decision | Follow `/behavior-diagram` skill **Swimlane Diagram** in current mode |
+| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Follow `/behavior-diagram` skill **Sequence Diagram** in current mode |
 
 If merging into an existing design that already contains a diagram, NEVER modify, regenerate, or remove it silently. Stop and ask the user for confirmation before changing or removing any existing diagram.
 
@@ -49,11 +49,11 @@ Select implementation appendices from evidence. The two diagram appendices (Clas
 | REST API Delta | HTTP contract or behavior changes | Follow `/to-contract-delta` skill **API delta rules** — include a `Scenarios` subsection per endpoint per the template's rules |
 | GUI Design Delta | User-visible state or interaction changes | Follow `/to-contract-delta` skill **GUI delta rules** — include a `Scenarios` subsection per surface per the template's rules |
 | Database Schema Delta | Persistence contract changes | Follow `/to-contract-delta` skill **Database delta rules** |
-| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/to-diagram` skill **Class Diagram** in delta mode |
-| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/to-diagram` skill **Sequence Diagram** in delta mode |
-| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/to-diagram` skill **Deployment View** in delta mode |
+| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/code-diagram` skill **Class Diagram** in delta mode |
+| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/behavior-diagram` skill **Sequence Diagram** in delta mode |
+| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/architecture-diagram` skill **Deployment View** in delta mode |
 
-Open and read only the templates for appendices that evidence triggers. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/to-diagram` in delta mode for the Class Diagram, Sequence Diagram, and Deployment View content — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions.
+Open and read only the templates for appendices that evidence triggers. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/code-diagram`, `/behavior-diagram`, or `/architecture-diagram` in delta mode for diagram appendices — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions.
 
 ## 5. Merge incrementally
 
