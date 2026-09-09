@@ -1,31 +1,112 @@
-## Deployment View
+# Deployment View Template
 
-### {{title}}
+Official Mermaid C4 syntax: https://mermaid.ai/open-source/syntax/c4.html
 
-<!-- Include only when deployment topology, hosting, or infrastructure nodes are a design decision. Show decision-relevant nodes and containers, not a full production topology. Delete this instruction. -->
+## Drawing rules
 
-<!-- Modeled as C4Container, not C4Deployment: `C4Deployment` cannot be palette-matched consistently with the rest of this repo's diagrams, so every top-level deployment host becomes a `Container_Boundary` and every nested host/runtime becomes a generic `Boundary` inside it — same pattern as docs/design-styles reference "C4 Deployment view, modeled as C4Container". Delete this instruction. -->
+- Render deployment views as Mermaid `C4Container` to keep styling consistent with the repository palette.
+- Show only decision-relevant deployment topology, hosting, runtimes, and deployed containers.
+- Prefer deployment semantics over exhaustive production topology.
+- Ground current-state elements in repository/code evidence. Do not invent hosts, runtimes, or services.
+- Group artifacts that ship and run together into one deployable container.
 
-<!-- C4Container element reference (deployment usage):
-- `Container_Boundary(alias, "Label") { ... }` — a top-level deployment host (device, machine, data center). Only top-level hosts use this.
-- `Boundary(alias, "Label", "Technology") { ... }` — a nested host/runtime/process inside a `Container_Boundary` or another `Boundary` (e.g. web browser, Apache Tomcat, OS); the `Technology` arg carries what would otherwise be `Deployment_Node`'s type string.
-- `Container(alias, "Label", "Technology", "Description")` / `ContainerDb(alias, "Label", "Technology", "Description")` — a deployable/runnable unit or data store hosted inside a `Boundary`, matching a Services-table building block. A container is one deployable operational unit — group co-deployed artifacts that ship and run together (e.g. a Linux service plus its Bash scripts plus the Ansible playbooks that provision/run it) into one `Container` instead of one per file/technology.
-- `Container_Ext(alias, "Label", "Technology", "Description")` — a container owned by an external/other team's system, hosted inside its own `Container_Boundary`.
-- `Rel(from, to, "Label", "Technology")` — a call or data flow between hosted containers.
-Delete this instruction. -->
+## C4 element reference
 
-<!-- Mermaid technical gotchas for C4Container-as-deployment (consistent with the class/flowchart conventions):
-- No auto-layout — statement order drives placement; declare a boundary immediately before the containers it hosts.
-- `Container_Boundary` only nests inside `C4Container`'s top level; every host beneath it (however many levels deep) uses the generic `Boundary`, since `Boundary` can nest inside `Boundary`.
-- `Rel_L`/`Rel_R`/`Rel_U`/`Rel_D` bias an edge's layout direction when the default collides — use only to fix an overlap, not by default.
-- C4 has no `classDef`/`:::` and no diagram-wide `themeVariables` (fixed style per upstream docs) — apply per-element styling with `UpdateElementStyle(alias, $fontColor="...", $bgColor="...", $borderColor="...")`: `$bgColor="#2a2a2a"`, `$borderColor="#8b949e"`, `$fontColor="#c9d1d9"` for every element, except `Container_Ext` elements, which use `$bgColor="#1a1a1a"` (darker grey) to contrast against internal `Container`/`ContainerDb` elements. Pair every `Rel` with `UpdateRelStyle(from, to, $textColor="#c9d1d9", $lineColor="#8b949e")`.
-- Quote every `Label`, `Description`, and `Technology` argument, even single words — unquoted multi-word text breaks parsing.
-Delete this instruction. -->
+- `Container_Boundary(alias, "Label") { ... }` — top-level deployment host, VM, device, cluster, or environment boundary.
+- `Boundary(alias, "Label", "Technology") { ... }` — nested host/runtime/process inside a deployment boundary.
+- `Container(alias, "Label", "Technology", "Description")` — deployed runnable unit.
+- `ContainerDb(alias, "Label", "Technology", "Description")` — deployed data store.
+- `Container_Ext(alias, "Label", "Technology", "Description")` — externally owned deployed unit.
+- `Rel(from, to, "Label", "Technology")` — runtime call or data flow.
+- `Rel_L`, `Rel_R`, `Rel_U`, `Rel_D` — directional layout variants; use only to fix collisions.
+- `UpdateElementStyle(...)` — per-element styling.
+- `UpdateRelStyle(...)` — per-relationship styling.
+
+## Deployment modeling rules
+
+- Use `Container_Boundary` for top-level hosts or deployment zones.
+- Use `Boundary` for nested hosts, runtimes, OS/process layers, or sub-environments.
+- Place deployed `Container`, `ContainerDb`, or `Container_Ext` elements inside the boundary that actually hosts them.
+- Do not model source files, classes, scripts, or provisioning files as separate containers unless independently deployed/runnable.
+- Do not create relationships solely because elements share the same host.
+- Statement order affects layout; declare a boundary immediately before the elements it hosts.
+- Keep labels explicit enough to show placement, runtime, and responsibility.
+
+## Relationships
+
+- Relationship direction must match the actual runtime interaction or data flow.
+- Include protocol/technology only when architecturally relevant.
+- Prefer meaningful action labels over vague labels such as `Uses`.
+- Use directional relationship variants only for layout correction.
+
+## Labels and descriptions
+
+- Use human-readable deployment labels.
+- Technology should identify runtime/hosting technology when useful.
+- Description should explain responsibility or deployment role, not implementation trivia.
+- Quote every `Label`, `Description`, and `Technology` argument.
+
+## Current-mode styling
+
+Use the repo dark palette.
+
+For internal deployed elements:
+
+```text
+$fontColor="#c9d1d9"
+$bgColor="#2a2a2a"
+$borderColor="#8b949e"
+```
+
+For `Container_Ext`, use `$bgColor="#1a1a1a"`.
+
+Apply one `UpdateElementStyle` per deployed element and one `UpdateRelStyle` per relationship:
+
+```text
+$textColor="#c9d1d9"
+$lineColor="#8b949e"
+```
+
+## Delta-mode styling
+
+Apply only when `SKILL.md` selects **delta mode**.
+
+- added: `#4a7a5a`
+- removed: `#8a4a4a`
+- modified or unchanged connection context: `#8b949e`
+
+Use `UpdateElementStyle(alias, $borderColor="...")` and matching `UpdateRelStyle(..., $lineColor="...")` for changed relationships.
+
+Show changed deployment elements plus the minimum unchanged context needed to connect them.
+
+For in-place changes not visible through topology, add:
+
+```md
+**Behaviour changes**
+- + added behavior
+- - removed behavior
+- ~ modified behavior
+```
+
+Use this for runtime replacements, instance resizing, scaling-policy changes, or other in-place deployment changes. Omit when none exist.
+
+## Mermaid C4 constraints and gotchas
+
+- C4 has no `classDef` / `:::` styling.
+- Use `UpdateElementStyle` and `UpdateRelStyle` for palette control.
+- Quote all labels, descriptions, and technologies.
+- Every alias must be unique and contain no spaces.
+- Declare each element once.
+- `Boundary` can be nested for deeper deployment/runtime structure.
+- Mermaid C4 layout is statement-order-sensitive.
+- Do not rely on diagram-wide `themeVariables` for C4 palette matching.
+
+## Output template
+
+Replace all placeholders with real deployment topology. Add or remove boundaries, containers, stores, and relationships to match the actual scope. Do not retain unused example elements.
 
 <details>
 <summary>{{title}}</summary>
-
-<!-- Replace every alias, label, technology, and relationship below with the real deployment topology. Add or remove Container_Boundary/Boundary/Container/ContainerDb/Rel lines to match actual scope; do not keep unused example elements. -->
 
 ```mermaid
 ---
@@ -51,6 +132,5 @@ C4Container
     UpdateElementStyle({{storeAlias}}, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
     UpdateRelStyle({{componentAlias}}, {{storeAlias}}, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
-</details>
 
-<!-- Delete unused example nodes/containers/Rels. -->
+</details>
