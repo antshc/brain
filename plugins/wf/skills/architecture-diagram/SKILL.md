@@ -15,7 +15,7 @@ Show deployable/runnable containers and the actors or external systems around th
 
 ### Deployment View
 
-Show deployment topology, hosting, runtime, or infrastructure placement. Render this view with the same Mermaid `C4Container` template, using deployment-specific modeling rules from the template.
+Show deployment topology, hosting, runtime, or infrastructure placement. Model the view with Mermaid `C4Container` using the deployment-view template.
 
 ## Reference
 
@@ -30,16 +30,18 @@ Use **delta mode** when the user asks for a delta or change-focused diagram, inc
 - **Current mode:** show the relevant current architecture.
 - **Delta mode:** show only added, modified, or removed elements, plus the minimum unchanged context needed to connect them.
 
-## 2. Select view
+## 2. Select view and open its template
 
-Select **Container Diagram** for logical solution-level deployable/runnable units.
+### Container Diagram
 
-Select **Deployment View** for hosting, runtime, or infrastructure topology.
+Open [container-diagram-template.md](templates/container-diagram-template.md).
 
-## 3. Open the drawing template
+### Deployment View
 
-Open [container-diagram-template.md](templates/container-diagram-template.md) before drafting either view. Follow its drawing, styling, delta, and Mermaid rules; do not compose from memory.
+Open [deployment-view-template.md](templates/deployment-view-template.md). The deployment view is still rendered with Mermaid `C4Container`; the template defines deployment-specific modeling rules.
+
+Open the selected template before drafting. Follow its drawing, styling, delta, and Mermaid rules; do not compose from memory.
 
 Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
-**Done when:** the template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context; no unused placeholder or instruction-only comment remains.
+**Done when:** the selected template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context; no unused placeholder or instruction-only comment remains.
