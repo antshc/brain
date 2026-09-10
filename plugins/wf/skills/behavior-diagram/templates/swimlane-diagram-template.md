@@ -2,13 +2,22 @@
 
 Official Mermaid swimlane syntax: https://mermaid.ai/open-source/syntax/swimlanes.html
 
+## Grounding rules
+
+- Diagram only behavior evidenced by the repository/code, provided documentation, or explicit user input.
+- Every lane, step, decision, and handoff must be traceable to evidence.
+- Never infer missing behavior from naming, architecture conventions, or the skeleton.
+- Do not invent calls, events, responses, data, decisions, failure paths, or ownership.
+- If ownership or behavior is unclear, omit it from the diagram and state the uncertainty outside the diagram when relevant.
+- Prefer a smaller incomplete-but-evidenced diagram over a complete speculative one.
+- Before output, verify that every diagram element has supporting evidence.
+
 ## Drawing rules
 
-- Use Mermaid `swimlane-beta` when responsibility for each step and the handoffs between owners are design-relevant.
+- Use Mermaid `swimlane-beta` when responsibility for each step and handoffs between owners are design-relevant.
 - A lane represents one owner of work: actor, team, system/container, component/module, or phase when phase ownership is the purpose of the view.
 - Prefer one primary responsibility axis per diagram. Do not mix unrelated axes such as teams, statuses, phases, containers, and components in one view.
-- Mixing different owner types is allowed when they participate at the same responsibility level, for example `User`, `Order API`, and `Worker` in one solution flow.
-- Ground current-state lanes, steps, and handoffs in repository/code evidence. Do not invent behavior.
+- Mixing owner types is allowed when they participate at the same responsibility level, for example a user, API, and worker in one solution flow.
 - Show only decision-relevant lanes and steps.
 - Prefer about 3-7 lanes. Split the flow when handoffs become difficult to trace.
 - Split a large flow into a solution-responsibility diagram plus one or more internal-responsibility diagrams when needed.
@@ -23,14 +32,14 @@ Use for responsibility across process participants.
 - Lanes may be actors, teams, systems, or deployable/runnable containers participating in the same flow.
 - Keep lane labels architectural or business-oriented, for example `[Customer]`, `[Order API - REST API]`, `[Fulfillment Worker - Worker]`.
 - Group co-deployed artifacts that form one operational unit into one lane. A Linux service plus Bash scripts plus Ansible playbooks it runs is usually one system/container responsibility, not separate lanes.
-- Do not decompose internal implementation unless it is necessary to explain ownership.
+- Do not decompose internal implementation unless necessary to explain ownership.
 
 ### Internal responsibility
 
 Use when ownership inside one system/container matters.
 
 - Scope the diagram to one system/container.
-- Each lane is a component/module such as a controller, service, page, repository, handler, or subsystem.
+- Each lane is an evidenced component/module such as a controller, service, page, repository, handler, or subsystem.
 - Include component name and type when useful, for example `[OrderController - Controller]`.
 - Use only when internal ownership or handoffs are decision-relevant.
 
@@ -45,7 +54,7 @@ Use when ownership inside one system/container matters.
 - A cross-lane edge represents a responsibility handoff.
 - Label a cross-lane edge when the handoff payload, event, condition, or outcome adds useful meaning; do not label mechanically.
 - Number edges only when execution order would otherwise be ambiguous. If strict temporal ordering is the main concern, use a sequence diagram.
-- For mutually exclusive branches, label outcomes clearly, for example `valid` / `invalid`.
+- For mutually exclusive branches, label evidenced outcomes clearly.
 - Use short, stable node IDs and descriptive labels.
 
 ## Accessibility
@@ -53,11 +62,11 @@ Use when ownership inside one system/container matters.
 Add accessible metadata when producing a standalone diagram:
 
 ```mermaid
-accTitle: Order fulfillment ownership
-accDescr: Shows responsibility moving from customer to order API, database, and fulfillment worker.
+accTitle: Process responsibility
+accDescr: Shows the process steps and responsibility handoffs between participating owners.
 ```
 
-Keep `accTitle` concise. Use `accDescr` to summarize the process and the main responsibility handoffs.
+Keep `accTitle` concise. Use `accDescr` to summarize the process and main responsibility handoffs.
 
 ## Current-mode styling
 
@@ -97,7 +106,7 @@ class oldNodeId removed;
 
 - Swimlane nodes use `class nodeId className;`; do not rely on the inline `id:::class` shorthand.
 - A lane that is entirely new or removed has no supported Mermaid `subgraph` border-color hook; call out the lane state in prose.
-- Show changed nodes/handoffs plus the minimum unchanged lanes and nodes needed to connect them.
+- Show changed nodes/handoffs plus the minimum unchanged context needed to connect them.
 - Omit unchanged lanes and nodes not needed to understand the delta.
 - Do not apply delta styling in current mode.
 
@@ -109,81 +118,27 @@ class oldNodeId removed;
 - Do not use curly braces inside node label text for placeholders; Mermaid interprets `{` as a decision-node delimiter.
 - Never use `click` as a node ID; it is a reserved Mermaid interaction keyword.
 - Use separate `class` statements for swimlane node styling.
-- Delete unused placeholders, lanes, and nodes from the final diagram.
+- Delete unused lanes and nodes from the final diagram.
 
-## Output template
+## Minimal skeleton
 
-Replace all placeholders with real behavior. Include only the responsibility view needed for the requested scope.
-
-### Solution Responsibility: {{title}}
-
-<details>
-<summary>{{title}} — solution responsibility</summary>
+Use this only as a syntax scaffold, never as a content checklist. Remove or replace every element not supported by evidence. Add only evidenced lanes, steps, decisions, and handoffs.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 swimlane-beta TB
-  accTitle: {{accessibilityTitle}}
-  accDescr: {{accessibilityDescription}}
+  accTitle: Process responsibility
+  accDescr: Shows responsibility handoffs in the process.
 
-  subgraph {{actorLane}} [{{actorLaneLabel}}]
-    {{startNode}}([{{startLabel}}])
+  subgraph ownerA [Owner A]
+    stepA[Action]
   end
 
-  subgraph {{entryLane}} [{{entryOwnerName}} - {{entryOwnerType}}]
-    {{entryStep}}[{{entryStepLabel}}]
+  subgraph ownerB [Owner B]
+    stepB[Action]
   end
 
-  subgraph {{ownerLane}} [{{capabilityOwnerName}} - {{ownerType}}]
-    {{decisionNode}}{{{decisionLabel}}}
-    {{processStep}}[{{processStepLabel}}]
-  end
-
-  subgraph {{storeLane}} [{{dataOwnerName}} - {{dataOwnerType}}]
-    {{persistStep}}[{{persistLabel}}]
-  end
-
-  {{startNode}} -->|{{handoff1}}| {{entryStep}}
-  {{entryStep}} --> {{decisionNode}}
-  {{decisionNode}} -->|{{noOutcome}}| {{endOrFailureNode}}
-  {{decisionNode}} -->|{{yesOutcome}}| {{processStep}}
-  {{processStep}} -->|{{handoff2}}| {{persistStep}}
+  stepA -->|handoff| stepB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
-
-</details>
-
-### Internal Responsibility: {{title}} inside {{systemName}}
-
-<details>
-<summary>{{title}} — internal responsibility ({{systemName}})</summary>
-
-```mermaid
-%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
-swimlane-beta TB
-  accTitle: {{accessibilityTitle}}
-  accDescr: {{accessibilityDescription}}
-
-  subgraph {{entryComponentLane}} [{{entryComponentName}} - {{entryComponentType}}]
-    {{receiveStep}}([{{receiveLabel}}])
-  end
-
-  subgraph {{ownerComponentLane}} [{{capabilityOwnerComponentName}} - {{ownerComponentType}}]
-    {{validateNode}}{{{validateLabel}}}
-    {{moduleStep}}[{{moduleStepLabel}}]
-  end
-
-  subgraph {{dependencyComponentLane}} [{{dependencyComponentName}} - {{dependencyComponentType}}]
-    {{delegateStep}}[{{delegateLabel}}]
-  end
-
-  {{receiveStep}} --> {{validateNode}}
-  {{validateNode}} -->|{{noOutcome}}| {{failureStep}}
-  {{validateNode}} -->|{{yesOutcome}}| {{moduleStep}}
-  {{moduleStep}} -->|{{handoff}}| {{delegateStep}}
-
-  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
-```
-
-</details>
