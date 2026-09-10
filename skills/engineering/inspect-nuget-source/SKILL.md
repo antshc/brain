@@ -1,11 +1,15 @@
 ---
 name: inspect-nuget-source
-description: When checking if the NuGet packages are restored. Verify a fact about a NuGet package's real API or behavior when the answer is not in local source — during code review, feature design, or code exploration. Find the referenced version across Directory.Packages.props, Directory.Build.props, Directory.Build.targets, Directory.Solution.targets, and *.csproj, locate the restored package on disk, read its shipped XML docs first, and decompile the assembly only when the docs are missing or insufficient. Never search the filesystem root. Trigger proactively — even without the words "nuget", "package", or "decompile" — whenever a claim about a type or member that lives in a package must be confirmed, and before any unscoped disk-wide `find`/`grep`.
+description: Resolve a C# type or member that has no definition in local source to the NuGet package that owns it, and verify its real API or behavior from the package's XML docs or decompiled assembly. Use when a repo-wide search for a type, interface, base class, or member comes back empty; when a claim about a package type must be confirmed during code review, feature design, or exploration; when checking whether packages are restored; and before any disk-wide `find`/`grep`. Triggers even when the words "nuget", "package", or "decompile" never appear and the owning package is unknown — identifying it is this skill's first step, not a precondition.
 ---
 
 # Inspect NuGet package source
 
 Answer package questions from the restored package itself. Never guess a path; never run an unscoped filesystem-wide search first.
+
+**Entry state — you do not need to know the package.** "A C# type/member has no definition anywhere in the repo" is a sufficient and complete trigger. Identifying the owning package is step 1's job, not a precondition for starting. Never treat "I'm not sure which package it's in" as a reason to keep grepping instead.
+
+**Hard stop.** No command in this workflow, or in any reasoning that leads to it, may be rooted at `/`, `/usr`, `/opt`, `/etc`, or `/home`. `find / -iname '<Type>.cs'` is forbidden outright — including with `2>/dev/null`, `| head`, or "just to locate the file". Permitted roots: the repo root, the resolved global-packages folder, and `$HOME`. Read back the root argument of every recursive command before running it.
 
 ## 1. Find the referenced version
 
