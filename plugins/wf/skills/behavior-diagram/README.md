@@ -56,34 +56,72 @@ flowchart TD
 ## Swimlane Diagram Example
 
 <details>
-<summary>Order Fulfillment Swimlane</summary>
+<summary>Order Fulfillment — Solution Responsibility</summary>
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 swimlane-beta TB
-  subgraph frontend [Web Portal - GUI]
-    submit[Customer clicks Place Order]
-    showResult([Show confirmation / error])
+  accTitle: Order fulfillment ownership
+  accDescr: Shows responsibility moving from the customer to the order API and order database.
+
+  subgraph customer [Customer]
+    submit([Place order])
+    showResult([See confirmation or error])
   end
 
   subgraph restApi [Order Service - REST API]
     validate{Order valid and in stock?}
-    placeOrder[OrderService.placeOrder]
-    respond200[Respond 200 + order id]
-    respond400[Respond 400 + error]
+    createOrder[Create order]
+    respondOk[Return order confirmation]
+    respondError[Return validation error]
   end
 
   subgraph database [Order Database - Database]
-    persistOrder[Persist order with state Placed]
+    persistOrder[Persist placed order]
   end
 
-  submit -->|1. POST orders with order payload| validate
-  validate -->|2a. No| respond400
-  validate -->|2b. Yes| placeOrder
-  respond400 -->|3a. 400 Bad Request| showResult
-  placeOrder -->|3b. save order| persistOrder
-  persistOrder -->|4b. order id| respond200
-  respond200 -->|5b. 200 OK with order id| showResult
+  submit -->|order request| validate
+  validate -->|invalid| respondError
+  validate -->|valid| createOrder
+  respondError --> showResult
+  createOrder -->|order data| persistOrder
+  persistOrder --> respondOk
+  respondOk --> showResult
+
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+</details>
+
+## Swimlane Internal Responsibility Example
+
+<details>
+<summary>Order Processing — Internal Responsibility</summary>
+
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+swimlane-beta TB
+  accTitle: Order service internal ownership
+  accDescr: Shows responsibility moving between controller, service, and repository components inside the order service.
+
+  subgraph controller [OrderController - Controller]
+    receive([Receive order request])
+    returnResult[Return result]
+  end
+
+  subgraph service [OrderService - Service]
+    validate{Order valid?}
+    createOrder[Create order]
+  end
+
+  subgraph repository [OrderRepository - Repository]
+    saveOrder[Save order]
+  end
+
+  receive --> validate
+  validate -->|invalid| returnResult
+  validate -->|valid| createOrder
+  createOrder -->|order| saveOrder
+  saveOrder --> returnResult
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
@@ -97,22 +135,25 @@ swimlane-beta TB
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 swimlane-beta TB
+  accTitle: Order fulfillment responsibility changes
+  accDescr: Adds fraud validation before persistence and removes the legacy queue handoff.
+
   subgraph restApi [Order Service - REST API]
-    placeOrder[OrderService.placeOrder]
-    fraudCheck[OrderService.checkFraud]
+    createOrder[Create order]
+    fraudCheck[Check fraud risk]
   end
 
   subgraph database [Order Database - Database]
-    persistOrder[Persist order with state Placed]
+    persistOrder[Persist placed order]
   end
 
   subgraph legacyQueue [Legacy Order Queue - Queue]
     notifyLegacy[Notify legacy queue]
   end
 
-  placeOrder -->|1. new fraud check| fraudCheck
-  fraudCheck -->|2. save order| persistOrder
-  placeOrder -.->|deprecated notify| notifyLegacy
+  createOrder -->|order| fraudCheck
+  fraudCheck -->|approved order| persistOrder
+  createOrder -.->|legacy notification| notifyLegacy
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
   classDef added stroke:#4a7a5a,stroke-width:1px
