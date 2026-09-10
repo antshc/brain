@@ -4,39 +4,60 @@ Official Mermaid swimlane syntax: https://mermaid.ai/open-source/syntax/swimlane
 
 ## Drawing rules
 
-- Use Mermaid `swimlane-beta` when ownership of each step is a design decision.
-- Use one ownership kind per diagram: containers at Level 1 or components/modules inside one container at Level 2.
-- Do not mix ownership kinds such as teams, statuses, containers, and components in the same view.
+- Use Mermaid `swimlane-beta` when responsibility for each step and the handoffs between owners are design-relevant.
+- A lane represents one owner of work: actor, team, system/container, component/module, or phase when phase ownership is the purpose of the view.
+- Prefer one primary responsibility axis per diagram. Do not mix unrelated axes such as teams, statuses, phases, containers, and components in one view.
+- Mixing different owner types is allowed when they participate at the same responsibility level, for example `User`, `Order API`, and `Worker` in one solution flow.
 - Ground current-state lanes, steps, and handoffs in repository/code evidence. Do not invent behavior.
 - Show only decision-relevant lanes and steps.
-- Split a large flow into Level 1 plus one or more Level 2 diagrams when a single view becomes hard to follow.
+- Prefer about 3-7 lanes. Split the flow when handoffs become difficult to trace.
+- Split a large flow into a solution-responsibility diagram plus one or more internal-responsibility diagrams when needed.
 - `swimlane-beta` is experimental in Mermaid 11.16.0+. Confirm the target renderer supports it. If not, fall back to a `flowchart` with one `subgraph` per lane.
 
-## Lane levels
+## Responsibility views
 
-### Level 1 — Container swimlane
+### Solution responsibility
 
-- Each lane is a deployable/runnable container such as a GUI, REST API, database, queue, or worker.
-- Include container name and type in the lane label, for example `[Order API - REST API]`.
-- Group co-deployed artifacts that form one operational unit into one lane. A Linux service plus Bash scripts plus Ansible playbooks it runs is usually one container, not separate lanes.
+Use for responsibility across process participants.
 
-### Level 2 — Component swimlane
+- Lanes may be actors, teams, systems, or deployable/runnable containers participating in the same flow.
+- Keep lane labels architectural or business-oriented, for example `[Customer]`, `[Order API - REST API]`, `[Fulfillment Worker - Worker]`.
+- Group co-deployed artifacts that form one operational unit into one lane. A Linux service plus Bash scripts plus Ansible playbooks it runs is usually one system/container responsibility, not separate lanes.
+- Do not decompose internal implementation unless it is necessary to explain ownership.
 
-- Scope the diagram to one Level 1 container.
-- Each lane is a component/module inside that container, such as a controller, service, page, or repository.
-- Include component name and type in the lane label, for example `[OrderController - Controller]`.
-- Include Level 2 only when internal component ownership is decision-relevant.
+### Internal responsibility
+
+Use when ownership inside one system/container matters.
+
+- Scope the diagram to one system/container.
+- Each lane is a component/module such as a controller, service, page, repository, handler, or subsystem.
+- Include component name and type when useful, for example `[OrderController - Controller]`.
+- Use only when internal ownership or handoffs are decision-relevant.
 
 ## Nodes and handoffs
 
-- `id([Text])` — start/end-like stadium node.
-- `id[Text]` — task/activity rectangle.
-- `id{Text}` — decision diamond.
-- Put a decision node in the lane that owns the decision.
-- Label every cross-lane edge with what is handed off: request, response, event, data, or condition.
-- Prefix every edge label with its execution-order number, for example `1. request`.
-- For mutually exclusive branches, use suffixes such as `3a.` and `3b.` and retain the suffix until branches rejoin.
+- `id([Text])` — process start/end.
+- `id[Text]` — action/activity.
+- `id{Text}` — decision.
+- Put an action or decision in the lane that owns it.
+- Prefer business/process language for steps, such as `Validate order`, `Create order`, or `Persist order`.
+- Avoid method-level labels such as `OrderService.placeOrder()` unless implementation detail is explicitly requested.
+- A cross-lane edge represents a responsibility handoff.
+- Label a cross-lane edge when the handoff payload, event, condition, or outcome adds useful meaning; do not label mechanically.
+- Number edges only when execution order would otherwise be ambiguous. If strict temporal ordering is the main concern, use a sequence diagram.
+- For mutually exclusive branches, label outcomes clearly, for example `valid` / `invalid`.
 - Use short, stable node IDs and descriptive labels.
+
+## Accessibility
+
+Add accessible metadata when producing a standalone diagram:
+
+```mermaid
+accTitle: Order fulfillment ownership
+accDescr: Shows responsibility moving from customer to order API, database, and fulfillment worker.
+```
+
+Keep `accTitle` concise. Use `accDescr` to summarize the process and the main responsibility handoffs.
 
 ## Current-mode styling
 
@@ -92,52 +113,58 @@ class oldNodeId removed;
 
 ## Output template
 
-Replace all placeholders with real behavior. Include only the level or levels needed for the requested scope.
+Replace all placeholders with real behavior. Include only the responsibility view needed for the requested scope.
 
-### Level 1 — Container Swimlane: {{title}}
+### Solution Responsibility: {{title}}
 
 <details>
-<summary>{{title}} — container swimlane</summary>
+<summary>{{title}} — solution responsibility</summary>
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 swimlane-beta TB
-  subgraph {{actorLane}} [{{actorLaneLabel}} - {{actorType}}]
+  accTitle: {{accessibilityTitle}}
+  accDescr: {{accessibilityDescription}}
+
+  subgraph {{actorLane}} [{{actorLaneLabel}}]
     {{startNode}}([{{startLabel}}])
   end
 
-  subgraph {{entryContainerLane}} [{{entryContainerName}} - {{entryContainerType}}]
+  subgraph {{entryLane}} [{{entryOwnerName}} - {{entryOwnerType}}]
     {{entryStep}}[{{entryStepLabel}}]
   end
 
-  subgraph {{ownerContainerLane}} [{{capabilityOwnerContainerName}} - {{ownerContainerType}}]
+  subgraph {{ownerLane}} [{{capabilityOwnerName}} - {{ownerType}}]
     {{decisionNode}}{{{decisionLabel}}}
     {{processStep}}[{{processStepLabel}}]
   end
 
-  subgraph {{storeContainerLane}} [{{dataStoreContainerName}} - {{storeContainerType}}]
+  subgraph {{storeLane}} [{{dataOwnerName}} - {{dataOwnerType}}]
     {{persistStep}}[{{persistLabel}}]
   end
 
-  {{startNode}} -->|1. {{handoff1}}| {{entryStep}}
-  {{entryStep}} -->|2. {{handoff2}}| {{decisionNode}}
-  {{decisionNode}} -->|3a. {{noOutcome}}| {{entryStep}}
-  {{decisionNode}} -->|3b. {{yesOutcome}}| {{processStep}}
-  {{processStep}} -->|4b. {{handoff3}}| {{persistStep}}
+  {{startNode}} -->|{{handoff1}}| {{entryStep}}
+  {{entryStep}} --> {{decisionNode}}
+  {{decisionNode}} -->|{{noOutcome}}| {{endOrFailureNode}}
+  {{decisionNode}} -->|{{yesOutcome}}| {{processStep}}
+  {{processStep}} -->|{{handoff2}}| {{persistStep}}
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
 </details>
 
-### Level 2 — Component Swimlane: {{title}} inside {{containerName}}
+### Internal Responsibility: {{title}} inside {{systemName}}
 
 <details>
-<summary>{{title}} — component swimlane ({{containerName}})</summary>
+<summary>{{title}} — internal responsibility ({{systemName}})</summary>
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 swimlane-beta TB
+  accTitle: {{accessibilityTitle}}
+  accDescr: {{accessibilityDescription}}
+
   subgraph {{entryComponentLane}} [{{entryComponentName}} - {{entryComponentType}}]
     {{receiveStep}}([{{receiveLabel}}])
   end
@@ -151,10 +178,10 @@ swimlane-beta TB
     {{delegateStep}}[{{delegateLabel}}]
   end
 
-  {{receiveStep}} -->|1. {{handoff1}}| {{validateNode}}
-  {{validateNode}} -->|2a. {{noOutcome}}| {{receiveStep}}
-  {{validateNode}} -->|2b. {{yesOutcome}}| {{moduleStep}}
-  {{moduleStep}} -->|3b. {{handoff2}}| {{delegateStep}}
+  {{receiveStep}} --> {{validateNode}}
+  {{validateNode}} -->|{{noOutcome}}| {{failureStep}}
+  {{validateNode}} -->|{{yesOutcome}}| {{moduleStep}}
+  {{moduleStep}} -->|{{handoff}}| {{delegateStep}}
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
