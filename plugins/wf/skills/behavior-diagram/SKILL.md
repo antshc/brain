@@ -1,6 +1,6 @@
 ---
 name: behavior-diagram
-description: Document software behavior with a Mermaid flowchart, swimlane diagram, or sequence diagram. Use for process flows, decision paths, ownership handoffs, interaction order, cross-boundary calls, failure branching, and their deltas.
+description: Document software behavior with a Mermaid flowchart, swimlane diagram, or sequence diagram. Use for process flows, decision paths, responsibility handoffs, interaction order, cross-boundary calls, failure branching, and their deltas.
 ---
 
 # Behavior Diagram
@@ -15,7 +15,16 @@ Show a process flow, decision path, or component wiring when ownership and messa
 
 ### Swimlane Diagram
 
-Show a cross-boundary process flow when ownership of each step matters. Use container lanes at Level 1 and component/module lanes inside one container at Level 2.
+Show a process divided by responsibility when the key question is: **who owns each step and where does responsibility change?**
+
+Each lane represents one owner of work, such as an actor, team, system/container, component/module, or phase when phase ownership is the purpose of the view. Prefer one primary responsibility axis per diagram.
+
+Use:
+
+- **Solution responsibility** for actors, teams, systems, and containers participating in one process.
+- **Internal responsibility** for components/modules inside one container or system.
+
+Use a sequence diagram instead when message or call ordering over time is the primary concern.
 
 ### Sequence Diagram
 
