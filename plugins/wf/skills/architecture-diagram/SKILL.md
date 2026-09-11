@@ -19,7 +19,7 @@ Show deployable/runnable containers and the actors or external systems around th
 
 ### Deployment View
 
-Show deployment topology, hosting, runtime, or infrastructure placement. Model the view with Mermaid `C4Container` using the deployment-view template.
+Show deployment topology, hosting, runtime, or infrastructure placement. Model the view with Mermaid `C4Deployment` using deployment nodes and deployed containers.
 
 ## Reference
 
@@ -48,10 +48,10 @@ Open [container-diagram-template.md](templates/container-diagram-template.md).
 
 ### Deployment View
 
-Open [deployment-view-template.md](templates/deployment-view-template.md). The deployment view is still rendered with Mermaid `C4Container`; the template defines deployment-specific modeling rules.
+Open [deployment-view-template.md](templates/deployment-view-template.md). Render deployment views with Mermaid `C4Deployment`; use `Deployment_Node`/`Node` for deployment topology and place deployed containers inside the node that hosts them.
 
 Open the selected template before drafting. Follow its drawing, styling, delta, and Mermaid rules; do not compose from memory.
 
 Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
-**Done when:** the selected template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context and was drawn as a Container Diagram or Deployment View, never a System Context Diagram; no unused placeholder or instruction-only comment remains.
+**Done when:** the selected template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context and was drawn as a Container Diagram or Deployment View, never a System Context Diagram; Deployment View uses `C4Deployment`; no unused placeholder or instruction-only comment remains.
