@@ -6,10 +6,12 @@ don't use these specific hex codes.
 from __future__ import annotations
 
 # 1:1 hex swap covering the dark-theme palette used by common diagram templates
-# (fill/stroke/text/added/removed/person-accent).
+# (fill/stroke/text/added/removed/person-accent/C4-ownership).
 LIGHT_THEME_COLOR_MAP = {
     "#8b949e": "#57606a",  # stroke / lineColor / signalColor
-    "#242424": "#f6f8fa",  # fill / actorBkg / noteBkgColor / activationBkgColor
+    "#242424": "#f6f8fa",  # fill / noteBkgColor / activationBkgColor
+    "#2a2a2a": "#f6f8fa",  # C4 internal bgColor / actorBkg / labelBoxBkgColor
+    "#1a1a1a": "#d0d7de",  # C4 external-ownership bgColor — deliberately darker than the internal fill
     "#c9d1d9": "#24292f",  # text
     "#4a7a5a": "#1a7f37",  # added stroke
     "#8a4a4a": "#cf222e",  # removed stroke

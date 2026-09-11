@@ -2,6 +2,50 @@
 
 Presentation examples for the `architecture-diagram` skill.
 
+## System Context Diagram Example
+
+<details>
+<summary>System Context Diagram — Order Management System</summary>
+
+```mermaid
+---
+config:
+  c4:
+    c4ShapePadding: 20
+---
+C4Context
+    title System Context diagram for Order Management System
+
+    Person(customer, "Customer", "Places and tracks orders")
+    Person_Ext(auditor, "External Auditor", "Third-party compliance auditor")
+
+    System(oms, "Order Management System", "Accepts, fulfils, and reports on customer orders")
+
+    System_Ext(mainframe, "Mainframe Banking System", "Processes payments and settlement")
+    System_Ext(email_system, "E-Mail System", "Delivers order confirmations to customers")
+    SystemDb_Ext(catalogue, "Partner Product Catalogue", "Master record for products and pricing")
+
+    Rel(customer, oms, "Submits and tracks orders", "HTTPS")
+    Rel(auditor, oms, "Reviews order records via", "read-only export")
+    Rel(oms, mainframe, "Charges payment via", "sync/async, HTTPS")
+    Rel(oms, email_system, "Sends confirmations via", "SMTP")
+    Rel(oms, catalogue, "Imports products and pricing from", "nightly feed")
+
+    UpdateElementStyle(customer, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#4a5a8a")
+    UpdateElementStyle(auditor, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#4a5a8a")
+    UpdateElementStyle(oms, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
+    UpdateElementStyle(mainframe, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#8b949e")
+    UpdateElementStyle(email_system, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#8b949e")
+    UpdateElementStyle(catalogue, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#8b949e")
+
+    UpdateRelStyle(customer, oms, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="-70", $offsetY="-10")
+    UpdateRelStyle(auditor, oms, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="40", $offsetY="10")
+    UpdateRelStyle(oms, mainframe, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="-80", $offsetY="-20")
+    UpdateRelStyle(oms, email_system, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="30", $offsetY="-20")
+    UpdateRelStyle(oms, catalogue, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="-60", $offsetY="120")
+```
+</details>
+
 ## Solution Diagram Example
 
 <details>
