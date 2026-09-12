@@ -9,6 +9,7 @@ Presentation examples for the `code-diagram` skill.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: order-management-domain-classes
 classDiagram
     namespace Api {
         class BaseController {
@@ -67,6 +68,7 @@ classDiagram
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: order-processing-class-delta
 classDiagram
     namespace Domain {
         class OrderService

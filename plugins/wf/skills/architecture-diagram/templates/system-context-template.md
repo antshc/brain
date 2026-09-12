@@ -105,6 +105,7 @@ config:
   c4:
     c4ShapePadding: 20
 ---
+%% diagram-id: {{diagramId}}
 C4Context
     title System Context diagram for {{systemUnderDesignName}}
 

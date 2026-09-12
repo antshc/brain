@@ -13,6 +13,7 @@ config:
   c4:
     c4ShapePadding: 20
 ---
+%% diagram-id: oms-system-context
 C4Context
     title System Context diagram for Order Management System
 
@@ -57,6 +58,7 @@ config:
   c4:
     c4ShapePadding: 20
 ---
+%% diagram-id: oms-containers
 C4Container
     title Container diagram for Order Management System
 
@@ -109,6 +111,7 @@ config:
   c4:
     c4ShapePadding: 0
 ---
+%% diagram-id: oms-container-delta
 C4Container
     title Container delta for Order Management System
 
@@ -151,6 +154,7 @@ C4Container
 <summary>Internet Banking Deployment Topology</summary>
 
 ```mermaid
+%% diagram-id: internet-banking-deployment
 C4Deployment
     title Deployment diagram for Internet Banking System
 
@@ -232,6 +236,7 @@ config:
   c4:
     c4ShapePadding: 20
 ---
+%% diagram-id: oms-deployment-delta
 C4Deployment
     title Deployment delta for Order Management System
 

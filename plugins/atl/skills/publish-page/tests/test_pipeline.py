@@ -198,9 +198,10 @@ def test_publish_drawio_republish_reuses_the_existing_custom_content(tmp_path):
     md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
     base_adf = {"content": [_marker_paragraph(0)]}
     confluence = MagicMock()
-    confluence.get.return_value = {
-        "results": [{"id": "999", "title": "00-title.drawio", "version": {"number": 1}}]
-    }
+    confluence.get.side_effect = [
+        {"results": [{"id": "999", "title": "00-title.drawio", "version": {"number": 1}}]},
+        {"space": {"key": "SPACE"}},
+    ]
 
     with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
         "page_diagrams.pipeline.get_confluence", return_value=confluence

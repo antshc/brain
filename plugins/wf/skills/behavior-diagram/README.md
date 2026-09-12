@@ -9,6 +9,7 @@ Presentation examples for the `behavior-diagram` skill.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: order-processing-flowchart
 flowchart TD
     User(["User"])
     Api["OrderController"]
@@ -39,6 +40,7 @@ flowchart TD
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: order-processing-flowchart-delta
 flowchart TD
     Svc["OrderService"]
     Fraud["FraudCheckService"]:::added
@@ -60,6 +62,7 @@ flowchart TD
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: order-fulfillment-solution-responsibility
 swimlane-beta TB
   accTitle: Order fulfillment ownership
   accDescr: Shows responsibility moving from the customer to the order API and order database.
@@ -99,6 +102,7 @@ swimlane-beta TB
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: order-processing-internal-responsibility
 swimlane-beta TB
   accTitle: Order service internal ownership
   accDescr: Shows responsibility moving between controller, service, and repository components inside the order service.
@@ -134,6 +138,7 @@ swimlane-beta TB
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: order-fulfillment-swimlane-delta
 swimlane-beta TB
   accTitle: Order fulfillment responsibility changes
   accDescr: Adds fraud validation before persistence and removes the legacy queue handoff.
@@ -183,6 +188,7 @@ swimlane-beta TB
     'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a',
     'sequenceNumberColor': '#c9d1d9'
 }}}%%
+%% diagram-id: order-submission-sequence
 sequenceDiagram
     autonumber
     actor User
@@ -230,6 +236,7 @@ sequenceDiagram
     'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a',
     'sequenceNumberColor': '#c9d1d9'
 }}}%%
+%% diagram-id: order-submission-sequence-delta
 sequenceDiagram
     autonumber
     actor User

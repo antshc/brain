@@ -50,6 +50,14 @@ Unpacks the official AppImage into `~/.local/opt/drawio` and puts a wrapper at `
 
 The wrapper supplies `--no-sandbox --disable-gpu`, and falls back to `xvfb-run` when `DISPLAY` is unset — so a headless machine also needs `apt-get install -y xvfb`. The script verifies the Mermaid import before declaring success, so a green run means `drawio` can actually do the conversion this renderer needs.
 
+## Diagram ids
+
+A mermaid fence claims a stable published identity with a `%% diagram-id: <id>` line — `[a-z0-9-]`, unique within the file, placed after any `---`-delimited frontmatter or `%%{init: …}%%` directive and immediately above the diagram-type line. The id becomes the attachment filename and the Draw.io custom content title, and those are exactly what a republish matches on, so the diagram is replaced in place however the document is reordered or its headings are reworded. `run` strips the line before rendering, so `mmdc` and the Draw.io import never see it. The `/architecture-diagram`, `/behavior-diagram`, and `/code-diagram` skills emit it.
+
+A fence with no id keeps the older `{index}-{nearest-heading-slug}` naming, which travels with the diagram's position and its heading text — reorder the document or reword the heading above it and the next publish attaches a second copy beside the first.
+
+An id is permanent once published: renaming or deleting one leaves its attachment and Draw.io record behind, since `run` only ever creates and updates. Prune those orphans in Confluence by hand.
+
 ## Confidentiality
 
 Never print, log, quote, or publish `ATLASSIAN_SITE`, `ATLASSIAN_EMAIL`, or `ATLASSIAN_API_TOKEN` — not in page content, tool arguments, or output. `run` reads credentials from `.atlassian` itself; never pass them as CLI arguments.
@@ -87,7 +95,7 @@ One call does the rest: strips `<!-- confluence:ignore:start/end -->` spans, ext
 - No diagrams, token configured → REST when the ADF body is over `--threshold-bytes` (default 50KB — the practical ceiling is what an agent can safely inline into an MCP tool argument, not Confluence/MCP transport), otherwise MCP handback.
 - No token → substitutes every marker for a note naming `ATLASSIAN_API_TOKEN` as the missing prerequisite when diagrams are present, then always hands back to MCP (REST needs the same token, so it can't cover this case either).
 
-Failure framing: `mmdc` missing on the REST/diagram path exits non-zero naming `mmdc`, and `drawio` missing in `drawio` mode exits non-zero naming `drawio`; an unsupported or not-yet-usable `ATLASSIAN_DIAGRAM_RENDERER`, or `drawio` mode without `ATLASSIAN_DRAWIO_EXTENSION_KEY`, exits non-zero naming the renderer or the key, before any page is touched; a leftover marker after substitution exits non-zero naming it — fix and re-run rather than working around it.
+Failure framing: `mmdc` missing on the REST/diagram path exits non-zero naming `mmdc`, and `drawio` missing in `drawio` mode exits non-zero naming `drawio`; an unsupported or not-yet-usable `ATLASSIAN_DIAGRAM_RENDERER`, or `drawio` mode without `ATLASSIAN_DRAWIO_EXTENSION_KEY`, exits non-zero naming the renderer or the key, before any page is touched; two fences sharing one `%% diagram-id` exit non-zero naming the id, before any page is touched; a leftover marker after substitution exits non-zero naming it — fix and re-run rather than working around it.
 
 Rendered `.mmd`/`.png`/`.drawio` files and the final ADF default to `<mdPath>.tmp/` beside the source (suffix included, e.g. `docs/design.md` → `docs/design.md.tmp/`, holding `final-adf.json`). Override with `--assets-dir` and `--out`.
 

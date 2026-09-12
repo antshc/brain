@@ -126,6 +126,7 @@ Use this only as a syntax scaffold, never as a content checklist. Remove or repl
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: {{diagramId}}
 swimlane-beta TB
   accTitle: Process responsibility
   accDescr: Shows responsibility handoffs in the process.

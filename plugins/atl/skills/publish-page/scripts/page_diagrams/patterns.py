@@ -7,6 +7,11 @@ MEDIA_MARKER_RE = re.compile(r"^\x00MEDIA:(\d+)\x00$")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)", re.MULTILINE)
 SUMMARY_RE = re.compile(r"^\s*<summary>(.*)</summary>\s*$", re.MULTILINE)
 
+# Matches the whole line so stripping it leaves source `mmdc` and Draw.io can still parse.
+DIAGRAM_ID_RE = re.compile(
+    r"^[ \t]*%%[ \t]*diagram-id:[ \t]*([A-Za-z0-9][A-Za-z0-9._-]*)[ \t]*\n?", re.MULTILINE
+)
+
 IGNORE_START_RE = re.compile(r"^\s*<!--\s*confluence:ignore:start\s*-->\s*$", re.IGNORECASE | re.MULTILINE)
 IGNORE_END_RE = re.compile(r"^\s*<!--\s*confluence:ignore:end\s*-->\s*$", re.IGNORECASE | re.MULTILINE)
 

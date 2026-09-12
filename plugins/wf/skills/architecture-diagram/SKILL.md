@@ -55,3 +55,13 @@ Open the selected template before drafting. Follow its drawing, styling, delta, 
 Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
 **Done when:** the selected template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context and was drawn as a Container Diagram or Deployment View, never a System Context Diagram; Deployment View uses `C4Deployment`; no unused placeholder or instruction-only comment remains.
+
+## 3. Assign a diagram id
+
+`diagramId := kebab-case id naming this diagram's subject and view, unique within the file it lands in, e.g. `oms-system-context``
+
+Write it as `%% diagram-id: {{diagramId}}` on its own line — after the closing `---` of the config frontmatter and immediately above the `C4Context`/`C4Container`/`C4Deployment` line, as the output template shows.
+
+The id is the diagram's published identity: `/publish-page` names its Confluence attachment and Draw.io record after it, so a republish replaces that diagram in place. Redrawing a diagram that already carries an id keeps that id; a fresh id publishes a second copy beside the old one.
+
+**Done when:** the diagram carries exactly one `%% diagram-id` line, reused from the diagram it redraws when there is one, and unique among the ids already in the target file.

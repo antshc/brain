@@ -33,9 +33,10 @@ def test_upsert_diagram_creates_the_record_on_a_first_publish():
 
 def test_upsert_diagram_updates_and_bumps_the_revision_on_republish():
     confluence = MagicMock()
-    confluence.get.return_value = {
-        "results": [{"id": "999", "title": "00-title.drawio", "version": {"number": 3}}]
-    }
+    confluence.get.side_effect = [
+        {"results": [{"id": "999", "title": "00-title.drawio", "version": {"number": 3}}]},
+        {"space": {"key": "SPACE"}},
+    ]
 
     result = upsert_diagram(confluence, "123", "00-title.drawio", "Start Done")
 
@@ -43,6 +44,7 @@ def test_upsert_diagram_updates_and_bumps_the_revision_on_republish():
     confluence.post.assert_not_called()
     assert confluence.put.call_args.args[0] == "/rest/api/content/999"
     payload = confluence.put.call_args.kwargs["data"]
+    assert payload["space"] == {"key": "SPACE"}
     assert payload["version"] == {"number": 4}
     assert json.loads(payload["body"]["raw"]["value"])["revision"] == 4
 

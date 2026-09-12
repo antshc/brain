@@ -9,11 +9,11 @@ The body is search metadata only; the diagram itself never lives here, it lives 
 attachment. Republishing looks the record up by container and title first, so a second
 publish bumps the existing record instead of stacking a duplicate beside it.
 
-A create without `space` is rejected (`Could not create content with type ...drawio-diagram`),
-even though `container` already names the page — hence the extra page read. The type is also
-only addressable per page: the site-wide `GET /rest/api/content?type=<DIAGRAM_TYPE>` answers
-`Cannot find custom content type` on sites where the app is installed and working, so it can't
-be used to probe availability.
+A create or update without `space` is rejected (`Could not create/update Content of type
+...drawio-diagram`), even though `container` already names the page — hence the extra page
+read on both paths. The type is also only addressable per page: the site-wide
+`GET /rest/api/content?type=<DIAGRAM_TYPE>` answers `Cannot find custom content type` on sites
+where the app is installed and working, so it can't be used to probe availability.
 
 Only touches `confluence`; tested by passing a stub with `get`/`post`/`put`.
 """
@@ -88,6 +88,7 @@ def upsert_diagram(confluence: Confluence, page_id: str, diagram_name: str, sear
             "type": DIAGRAM_TYPE,
             "status": "current",
             "title": diagram_name,
+            "space": {"key": page_space_key(confluence, page_id)},
             "container": {"id": page_id, "type": "page"},
             "body": {"raw": {"value": _body(page_id, diagram_name, search, revision), "representation": "raw"}},
             "version": {"number": revision},

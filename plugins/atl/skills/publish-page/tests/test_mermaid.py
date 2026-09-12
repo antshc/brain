@@ -75,6 +75,60 @@ def test_extract_mermaid_two_diagrams_index_independently():
     assert [d["index"] for d in diagrams] == [0, 1]
 
 
+def test_extract_mermaid_names_from_diagram_id_over_heading():
+    md = "# First\n\n```mermaid\n%% diagram-id: oms-system-context\nflowchart TD; A-->B;\n```\n"
+    _, diagrams = extract_mermaid(md)
+    assert diagrams[0]["name"] == "oms-system-context"
+    assert diagrams[0]["code"] == "flowchart TD; A-->B;"
+
+
+def test_extract_mermaid_diagram_id_survives_reorder():
+    first = "```mermaid\n%% diagram-id: order-flow\nflowchart TD; A-->B;\n```\n"
+    second = "## Other\n\n```mermaid\n%% diagram-id: order-classes\nclassDiagram\n```\n"
+    _, forwards = extract_mermaid(f"# Title\n\n{first}\n{second}")
+    _, backwards = extract_mermaid(f"# Retitled\n\n{second}\n{first}")
+    assert {d["name"] for d in forwards} == {d["name"] for d in backwards}
+
+
+def test_extract_mermaid_diagram_id_after_frontmatter():
+    code = "---\nconfig:\n  c4:\n    c4ShapePadding: 20\n---\n%% diagram-id: oms-context\nC4Context"
+    _, diagrams = extract_mermaid(f"```mermaid\n{code}\n```\n")
+    assert diagrams[0]["name"] == "oms-context"
+    assert diagrams[0]["code"].endswith("---\nC4Context")
+
+
+def test_extract_mermaid_diagram_id_after_init_directive():
+    code = "%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%\n%% diagram-id: order-flow\nflowchart TD"
+    _, diagrams = extract_mermaid(f"```mermaid\n{code}\n```\n")
+    assert diagrams[0]["name"] == "order-flow"
+    assert "diagram-id" not in diagrams[0]["code"]
+    assert diagrams[0]["code"].startswith("%%{init:")
+
+
+def test_extract_mermaid_rejects_duplicate_diagram_ids():
+    md = (
+        "```mermaid\n%% diagram-id: order-flow\nflowchart TD; A-->B;\n```\n\n"
+        "```mermaid\n%% diagram-id: order-flow\nflowchart TD; C-->D;\n```\n"
+    )
+    with pytest.raises(ValueError, match="order-flow"):
+        extract_mermaid(md)
+
+
+def test_render_diagrams_keeps_diagram_id_out_of_mmd(tmp_path):
+    md = "# Title\n\n```mermaid\n%% diagram-id: order-flow\ngraph TD; A-->B;\n```\n"
+    _, diagrams = extract_mermaid(md)
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
+        mock_run.return_value.returncode = 0
+        render_diagrams(diagrams, str(assets_dir))
+
+    assert (assets_dir / "order-flow.mmd").read_text() == "graph TD; A-->B;\n"
+    assert diagrams[0]["attachments"] == [
+        {"path": str(assets_dir / "order-flow.png"), "filename": "order-flow.png"}
+    ]
+
+
 def test_render_diagrams_writes_mmd_and_invokes_mmdc(tmp_path):
     diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
     assets_dir = tmp_path / "assets"
