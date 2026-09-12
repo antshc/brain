@@ -335,7 +335,7 @@ def test_combine_without_media_ids_writes_adf_only(tmp_path):
     assert json.loads(out_path.read_text()) == {"adf": adf}
 
 
-def _fake_render_diagrams(diagrams, assets_dir, background="white", renderer="png"):
+def _fake_render_diagrams(diagrams, assets_dir, background="white", renderer="png", swimlane_drawio_enabled=False):
     for d in diagrams:
         d["filename"] = f"{d['name']}.png"
 

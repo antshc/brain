@@ -15,7 +15,14 @@ from pathlib import Path
 from .adf import drawio_node, media_node, substitute_drawio, substitute_markers, substitute_media
 from .attachments import upload_diagrams
 from .custom_content import upsert_diagram
-from .env import get_confluence, load_credentials, load_drawio_extension_key, load_renderer, site_url
+from .env import (
+    get_confluence,
+    load_credentials,
+    load_drawio_extension_key,
+    load_renderer,
+    load_swimlane_drawio_enabled,
+    site_url,
+)
 from .mermaid import extract_mermaid, render_diagrams
 from .patterns import HEADING_RE, strip_ignored_sections
 from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
@@ -115,6 +122,7 @@ def _publish_with_diagrams(
     mermaid_bg: str,
     renderer: str,
     drawio_extension_key: str | None,
+    swimlane_drawio_enabled: bool,
 ) -> tuple[dict, dict]:
     confluence = get_confluence(credentials)
 
@@ -126,7 +134,13 @@ def _publish_with_diagrams(
         created = create_page_adf(confluence, space_id, title, placeholder_adf)
         target_page_id = created["id"]
 
-    render_diagrams(diagrams, assets_dir, background=mermaid_bg, renderer=renderer)
+    render_diagrams(
+        diagrams,
+        assets_dir,
+        background=mermaid_bg,
+        renderer=renderer,
+        swimlane_drawio_enabled=swimlane_drawio_enabled,
+    )
     filename_to_file_id = upload_diagrams(confluence, target_page_id, diagrams)
 
     if renderer == renderers.DRAWIO:
@@ -246,6 +260,7 @@ def publish(
         raise RuntimeError(unavailable)
     # Resolved up front so a missing key fails before any page is created or updated.
     drawio_extension_key = load_drawio_extension_key(root) if renderer == renderers.DRAWIO else None
+    swimlane_drawio_enabled = load_swimlane_drawio_enabled(root)
 
     md_text = Path(md_path).read_text(encoding="utf-8")
     resolved_title = resolve_title(md_text, title)
@@ -267,6 +282,7 @@ def publish(
             mermaid_bg,
             renderer,
             drawio_extension_key,
+            swimlane_drawio_enabled,
         )
     elif credentials:
         result, final_adf = _publish_text_only(

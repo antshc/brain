@@ -91,6 +91,15 @@ def load_renderer(root: str) -> str:
     return renderers.validate(name)
 
 
+def load_swimlane_drawio_enabled(root: str) -> bool:
+    """Whether `ATLASSIAN_SWIMLANE_DRAWIO` opts into the native swimlane-beta-to-drawio
+    converter; defaults to `False` so existing repos keep the PNG fallback until they opt in.
+    """
+    path = find_config(root)
+    config = parse_config(path) if path else {}
+    return config.get("ATLASSIAN_SWIMLANE_DRAWIO", "").strip().lower() in ("1", "true", "yes")
+
+
 def load_drawio_extension_key(root: str) -> str:
     """Return the Draw.io Forge extension key; raise `ValueError` when absent or malformed.
 
