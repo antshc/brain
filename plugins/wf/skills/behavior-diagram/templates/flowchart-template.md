@@ -11,16 +11,30 @@ Official Mermaid flowchart syntax: https://mermaid.ai/open-source/syntax/flowcha
 - Ground current-state nodes and relationships in repository/code evidence. Do not invent behavior.
 - Show only elements relevant to the requested scope.
 - Prefer readable flow over exhaustive detail.
+- Standardize on the shape vocabulary below. Avoid exotic Mermaid shapes unless the user explicitly asks for them.
 
-## Nodes and grouping
+## Standard node vocabulary
 
-- `(["..."])` — external actor/start-like stadium node.
-- `["..."]` — process or component rectangle.
-- `[("...")]` — data store/repository cylinder.
-- `{...}` — decision diamond when a branch is explicit.
+- `id(["Start"])` / `id(["End"])` — process start or end.
+- `id["Process"]` — process/action/activity.
+- `id{"Decision?"}` — decision with explicit branches.
+- `id[["Subprocess"]]` — subprocess whose internal flow is intentionally hidden at this level.
+- `id[("Data store")]` — persistent data store/repository/database.
+- `id[/"Input / Output"/]` — input or output entering/leaving the process.
+
+Use short, stable node IDs and descriptive labels. Never use `click` as a node ID; it is a reserved Mermaid interaction keyword.
+
+## Subprocess rules
+
+- Use a **Process** when the step is fully represented in the current diagram.
+- Use a **Subprocess** when the step has a meaningful child flow that is intentionally hidden to keep the parent diagram at one abstraction level.
+- Do not use a subprocess merely because implementation spans multiple methods, classes, or files.
+- If subprocess internals are relevant, create a separate diagram named after the subprocess and expand only that child flow there.
+- Keep the subprocess label stable between parent and child diagrams so the drill-down relationship is obvious.
+
+## Grouping
+
 - `subgraph Name ... end` — group related existing nodes without redeclaring them.
-- Use short, stable node IDs and descriptive labels.
-- Never use `click` as a node ID; it is a reserved Mermaid interaction keyword.
 
 ## Relationships
 
@@ -69,7 +83,7 @@ Apply only when `SKILL.md` selects **delta mode**.
 
 ## Output template
 
-Replace all placeholders with real behavior. Add or remove nodes, groups, and relationships to match the actual scope.
+Replace all placeholders with real behavior. Add or remove nodes and relationships to match the actual scope.
 
 <details>
 <summary>{{title}}</summary>
@@ -78,19 +92,18 @@ Replace all placeholders with real behavior. Add or remove nodes, groups, and re
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: {{diagramId}}
 flowchart TD
-    {{actor}}(["{{actorLabel}}"])
-    {{boundary}}["{{boundaryClass}}"]
-    {{owner}}["{{capabilityOwnerClass}}"]
-    {{store}}[("{{dependencyRepository}}")]
+    start(["Start"])
+    input[/"{{input}}"/]
+    process["{{process}}"]
+    decision{"{{decision}}?"}
+    subprocess[["{{subprocess}}"]]
+    store[("{{dataStore}}")]
+    output[/"{{output}}"/]
+    endNode(["End"])
 
-    {{actor}} --> {{boundary}}
-    {{boundary}} --> {{owner}}
-    {{owner}} --> {{store}}
-    {{owner}} -- {{condition}} --> {{store}}
-
-    subgraph {{infrastructureGroup}}
-        {{store}}
-    end
+    start --> input --> process --> decision
+    decision -- {{yesOutcome}} --> subprocess --> store --> output --> endNode
+    decision -- {{noOutcome}} --> endNode
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
