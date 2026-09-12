@@ -21,6 +21,7 @@ Official Mermaid swimlane syntax: https://mermaid.ai/open-source/syntax/swimlane
 - Show only decision-relevant lanes and steps.
 - Prefer about 3-7 lanes. Split the flow when handoffs become difficult to trace.
 - Split a large flow into a solution-responsibility diagram plus one or more internal-responsibility diagrams when needed.
+- Standardize on the node vocabulary below. Avoid exotic Mermaid shapes unless the user explicitly asks for them.
 - `swimlane-beta` is experimental in Mermaid 11.16.0+. Confirm the target renderer supports it. If not, fall back to a `flowchart` with one `subgraph` per lane.
 
 ## Responsibility views
@@ -43,12 +44,20 @@ Use when ownership inside one system/container matters.
 - Include component name and type when useful, for example `[OrderController - Controller]`.
 - Use only when internal ownership or handoffs are decision-relevant.
 
-## Nodes and handoffs
+## Standard node vocabulary
 
 - `id([Text])` — process start/end.
-- `id[Text]` — action/activity.
+- `id[Text]` — process/action/activity.
 - `id{Text}` — decision.
-- Put an action or decision in the lane that owns it.
+- `id[[Text]]` — subprocess.
+- `id[(Text)]` — data store.
+- `id[/Text/]` — input/output.
+
+Use a **Process** when the step is fully represented in the current diagram. Use a **Subprocess** when a meaningful child flow is intentionally hidden to keep this diagram at one abstraction level. Do not use subprocess merely because implementation spans multiple methods/classes. If its internals matter, create a separate diagram with the same subprocess label and expand it there.
+
+## Nodes and handoffs
+
+- Put an action, decision, subprocess, data store, or I/O node in the lane that owns it.
 - Prefer business/process language for steps, such as `Validate order`, `Create order`, or `Persist order`.
 - Avoid method-level labels such as `OrderService.placeOrder()` unless implementation detail is explicitly requested.
 - A cross-lane edge represents a responsibility handoff.
@@ -122,7 +131,7 @@ class oldNodeId removed;
 
 ## Minimal skeleton
 
-Use this only as a syntax scaffold, never as a content checklist. Remove or replace every element not supported by evidence. Add only evidenced lanes, steps, decisions, and handoffs.
+Use this only as a syntax scaffold, never as a content checklist. Remove or replace every element not supported by evidence. Add only evidenced lanes, steps, decisions, subprocesses, data stores, I/O, and handoffs.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -131,14 +140,22 @@ swimlane-beta TB
   accDescr: Shows responsibility handoffs in the process.
 
   subgraph ownerA [Owner A]
-    stepA[Action]
+    start([Start])
+    input[/Input/]
+    stepA[Process]
   end
 
   subgraph ownerB [Owner B]
-    stepB[Action]
+    decision{Decision?}
+    child[[Subprocess]]
+    store[(Data store)]
+    output[/Output/]
+    endNode([End])
   end
 
-  stepA -->|handoff| stepB
+  start --> input --> stepA -->|handoff| decision
+  decision -->|yes| child --> store --> output --> endNode
+  decision -->|no| endNode
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
