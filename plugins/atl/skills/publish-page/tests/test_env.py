@@ -102,13 +102,19 @@ def test_load_swimlane_drawio_enabled_returns_true_for_truthy_values(tmp_path, v
     assert load_swimlane_drawio_enabled(str(tmp_path)) is True
 
 
-def test_load_swimlane_drawio_enabled_defaults_to_false_when_key_absent(tmp_path):
+@pytest.mark.parametrize("value", ["false", "False", "0", "no"])
+def test_load_swimlane_drawio_enabled_returns_false_for_falsy_values(tmp_path, value):
+    (tmp_path / ".atlassian").write_text(f"ATLASSIAN_SWIMLANE_DRAWIO={value}\n")
+    assert load_swimlane_drawio_enabled(str(tmp_path)) is False
+
+
+def test_load_swimlane_drawio_enabled_defaults_to_true_when_key_absent(tmp_path):
     (tmp_path / ".atlassian").write_text("ATLASSIAN_SITE=example.atlassian.net\n")
-    assert load_swimlane_drawio_enabled(str(tmp_path)) is False
+    assert load_swimlane_drawio_enabled(str(tmp_path)) is True
 
 
-def test_load_swimlane_drawio_enabled_defaults_to_false_when_config_absent(tmp_path):
-    assert load_swimlane_drawio_enabled(str(tmp_path)) is False
+def test_load_swimlane_drawio_enabled_defaults_to_true_when_config_absent(tmp_path):
+    assert load_swimlane_drawio_enabled(str(tmp_path)) is True
 
 
 def test_load_drawio_extension_key_names_the_key_and_where_to_find_it_when_absent(tmp_path):

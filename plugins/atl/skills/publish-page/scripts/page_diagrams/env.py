@@ -93,11 +93,14 @@ def load_renderer(root: str) -> str:
 
 def load_swimlane_drawio_enabled(root: str) -> bool:
     """Whether `ATLASSIAN_SWIMLANE_DRAWIO` opts into the native swimlane-beta-to-drawio
-    converter; defaults to `False` so existing repos keep the PNG fallback until they opt in.
+    converter; defaults to `True`, opting out only on an explicit falsy value.
     """
     path = find_config(root)
     config = parse_config(path) if path else {}
-    return config.get("ATLASSIAN_SWIMLANE_DRAWIO", "").strip().lower() in ("1", "true", "yes")
+    value = config.get("ATLASSIAN_SWIMLANE_DRAWIO", "").strip().lower()
+    if not value:
+        return True
+    return value not in ("0", "false", "no")
 
 
 def load_drawio_extension_key(root: str) -> str:
