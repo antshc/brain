@@ -12,8 +12,16 @@ CONFIG_FILENAME = ".atlassian"
 
 
 def find_config(root: str) -> str | None:
-    """Return the path to the first `.atlassian` file at or beneath root, or None."""
+    """Return the path to the first `.atlassian` file at or beneath root, or None.
+
+    Raises ValueError for a blank root or one resolving to the filesystem root (`/`) —
+    callers must resolve a real Harness Repo Path first, never walk the whole filesystem.
+    """
+    if not root or not root.strip():
+        raise ValueError("root is required — resolve HARNESS_REPO_PATH before searching for .atlassian")
     root_path = Path(root).resolve()
+    if root_path.parent == root_path:
+        raise ValueError(f"root must not be the filesystem root ({root_path}) — refusing to search from '/'")
     for dirpath, dirnames, filenames in os.walk(root_path):
         dirnames.sort()
         if CONFIG_FILENAME in filenames:

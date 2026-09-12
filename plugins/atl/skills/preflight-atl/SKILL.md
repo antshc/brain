@@ -9,7 +9,7 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 
 ## Configuration
 
-`.atlassian` — a single gitignored dotfile, found by a search bounded to `$HARNESS_REPO_PATH` (never above it). Plain `KEY=VALUE` lines; blank lines and `#` comments ignored.
+`.atlassian` — a single gitignored dotfile, found by a search bounded to `$HARNESS_REPO_PATH` (never above it, and never the filesystem root `/`). Plain `KEY=VALUE` lines; blank lines and `#` comments ignored.
 
 | Key | Meaning |
 |---|---|
@@ -25,13 +25,13 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 
 Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected`. Never echo `ATLASSIAN_EMAIL` or `ATLASSIAN_API_TOKEN` — not in output, logs, or errors.
 
-**1 — Config-derived facts (offline).** `cd` to the directory holding the `preflight-atl/SKILL.md` file you loaded to read this skill — never guess or reconstruct that path from a different skill's location — then run:
+**1 — Config-derived facts (offline).** Resolve `$HARNESS_REPO_PATH` first: non-empty → use it as-is. Empty → resolve the repository root instead (e.g. `git rev-parse --show-toplevel`, falling back to cwd only if that fails) — **never** substitute `/` or leave the value blank, which would walk the whole filesystem. `cd` to the directory holding the `preflight-atl/SKILL.md` file you loaded to read this skill — never guess or reconstruct that path from a different skill's location — then run:
 
 ```bash
-python scripts/preflight.py --root "$HARNESS_REPO_PATH"
+python scripts/preflight.py --root "<resolved repo root>"
 ```
 
-Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here — the script never touches the network; Step 3 sets the live value.
+Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here — the script never touches the network; Step 3 sets the live value. An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
 
 **2 — Discover `cloudId` only when the config supplies none.** `cloudId` empty and an operation needs it → call `getAccessibleAtlassianResources` once, then treat it as cached for the session. Once `cloudId` is known, never call it again.
 
@@ -46,6 +46,7 @@ Apply in every `atl` skill:
 - Every JQL/CQL search MUST use `maxResults: 10` / `limit: 10` — never more.
 - Save large tool results to `content.json` and parse with Python, never `read_file` — long fields get silently truncated otherwise.
 - `getAccessibleAtlassianResources` at most once per session, only while `cloudId` is unknown (Step 2).
+- Never search for `.atlassian` (or anything else) from `/` or any other unbounded root — an empty `$HARNESS_REPO_PATH` is resolved to the repository root first (Step 1), never widened into a filesystem-wide search.
 
 ## Ambiguity
 
