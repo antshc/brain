@@ -9,7 +9,7 @@ Setup skill for the `atl` plugin. Creates or updates `.atlassian` (per `/preflig
 
 ## Workflow
 
-**1 — Locate `.atlassian`.** Search bounded to `$HARNESS_REPO_PATH` (never above it):
+**1 — Locate `.atlassian`.** Resolve `$HARNESS_REPO_PATH` per `/preflight-atl`'s Step 1 (empty → repository root, never `/`). Search bounded to it (never above it):
 ```bash
 find "$HARNESS_REPO_PATH" -name .atlassian
 ```

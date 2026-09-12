@@ -1,8 +1,20 @@
 from preflight_atl.config import find_config, load_config, parse_config
 
+import pytest
+
 
 def test_find_config_returns_none_when_absent(tmp_path):
     assert find_config(str(tmp_path)) is None
+
+
+def test_find_config_raises_on_empty_root():
+    with pytest.raises(ValueError):
+        find_config("")
+
+
+def test_find_config_raises_on_filesystem_root():
+    with pytest.raises(ValueError):
+        find_config("/")
 
 
 def test_load_config_returns_empty_dict_when_absent(tmp_path):
