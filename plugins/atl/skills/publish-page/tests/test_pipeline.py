@@ -155,6 +155,7 @@ def _fake_drawio_render(diagrams, assets_dir, background="white", renderer="png"
         d["diagram_name"] = f"{d['name']}.drawio"
         d["search"] = "Start Done"
         d["width"], d["height"] = 841, 571
+        d["renderer"] = "drawio"
         d["attachments"] = [
             {"path": f"/tmp/{d['name']}.drawio", "filename": f"{d['name']}.drawio"},
             {"path": f"/tmp/{d['name']}.drawio.png", "filename": f"{d['name']}.drawio.png"},
@@ -216,6 +217,31 @@ def test_publish_drawio_republish_reuses_the_existing_custom_content(tmp_path):
     assert guest["custContentId"] == "999"
     assert guest["revision"] == 2
     assert guest["contentVer"] == 2
+
+
+def test_publish_drawio_branch_injects_a_media_node_for_a_diagram_that_fell_back_to_png(tmp_path):
+    md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
+    base_adf = {"content": [_marker_paragraph(0)]}
+
+    def fell_back_to_png(diagrams, assets_dir, background="white", renderer="png"):
+        for d in diagrams:
+            d["renderer"] = "png"
+            d["filename"] = f"{d['name']}.png"
+            d["attachments"] = [{"path": f"/tmp/{d['name']}.png", "filename": d["filename"]}]
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=MagicMock()
+    ), patch("page_diagrams.pipeline.render_diagrams", side_effect=fell_back_to_png), patch(
+        "page_diagrams.pipeline.upload_diagrams", return_value={"00-title.png": "file-1"}
+    ), patch("page_diagrams.pipeline.get_page_version", return_value=1), patch(
+        "page_diagrams.pipeline.update_page_adf", return_value={"id": "123"}
+    ), patch("page_diagrams.pipeline.upsert_diagram") as mock_upsert:
+        _publish(md_path, tmp_path)
+
+    mock_upsert.assert_not_called()
+    node = base_adf["content"][0]
+    assert node["type"] == "mediaSingle"
+    assert node["content"][0]["attrs"]["id"] == "file-1"
 
 
 def test_publish_drawio_without_the_extension_key_fails_before_touching_a_page(tmp_path):

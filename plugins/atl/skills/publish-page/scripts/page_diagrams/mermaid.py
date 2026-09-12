@@ -10,6 +10,10 @@ Every renderer writes the `.mmd` source and runs mmdc; they differ in what they 
 keeps the image and attaches it, `drawio` throws it away and attaches an editable diagram
 plus its preview instead, `mermaid` throws it away and attaches nothing — the macro carries
 the source, so mmdc is only a syntax gate for the latter two.
+
+Draw.io bundles its own, older Mermaid, so it cannot import every diagram mmdc compiles; such
+a diagram falls back to `png` on its own, which is why each diagram records the renderer that
+actually produced it in `renderer`.
 """
 from __future__ import annotations
 
@@ -28,6 +32,9 @@ from .theme import LIGHT_THEME_CSS, apply_light_theme
 _MERMAID_FENCE_RE = re.compile(r"```mermaid\n(.*?)\n```", re.DOTALL)
 _MXCELL_LABEL_RE = re.compile(r'value="([^"]*)"')
 _PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+
+# Diagram types the Draw.io import is known to choke on; they never reach the Draw.io CLI.
+DRAWIO_UNSUPPORTED_TYPES = frozenset({"swimlane-beta"})
 
 
 def slugify(text: str) -> str:
@@ -121,30 +128,69 @@ def _search_text(drawio_xml: str) -> str:
     return " ".join(dict.fromkeys(label for label in labels if label))
 
 
+def diagram_type(code: str) -> str:
+    """The Mermaid diagram keyword, past any frontmatter block, directive, or comment line."""
+    lines = [line.strip() for line in code.splitlines() if line.strip()]
+    if lines and lines[0] == "---" and "---" in lines[1:]:
+        lines = lines[lines.index("---", 1) + 1 :]
+    for line in lines:
+        if line.startswith("%%"):
+            continue
+        return re.split(r"[\s:]", line, maxsplit=1)[0]
+    return ""
+
+
 def _render_png(d: dict, mmd_path: Path, assets_path: Path, css_path: Path, background: str) -> None:
     png_path = assets_path / f"{d['name']}.png"
     _run_mmdc(mmd_path, png_path, css_path, background)
     d["png_path"] = str(png_path)
     d["filename"] = f"{d['name']}.png"
     d["attachments"] = [{"path": str(png_path), "filename": d["filename"]}]
+    d["renderer"] = renderers.PNG
 
 
-def _render_drawio(d: dict, mmd_path: Path, assets_path: Path, css_path: Path, background: str) -> None:
-    _validate_with_mmdc(mmd_path, css_path, background)
+def _import_drawio(d: dict, mmd_path: Path, assets_path: Path) -> bool:
+    """Fill `d` from the Draw.io import; `False` when Draw.io cannot read the diagram.
+
+    An unsupported diagram type does not always fail the CLI — Draw.io can just as well write
+    an empty canvas — so the produced XML is checked for cells, not only for an exit code.
+    """
     drawio_path = assets_path / f"{d['name']}.drawio"
     preview_path = assets_path / f"{d['name']}.drawio.png"
-    # No --mermaid-image, so the import lands as real mxCells rather than a wrapped bitmap.
-    _run_drawio(["-x", "-f", "xml", "-u", "-o", str(drawio_path), str(mmd_path)])
-    _run_drawio(["-x", "-f", "png", "-o", str(preview_path), str(mmd_path)])
+    try:
+        # No --mermaid-image, so the import lands as real mxCells rather than a wrapped bitmap.
+        _run_drawio(["-x", "-f", "xml", "-u", "-o", str(drawio_path), str(mmd_path)])
+        _run_drawio(["-x", "-f", "png", "-o", str(preview_path), str(mmd_path)])
+    except subprocess.CalledProcessError:
+        return False
+    if not preview_path.exists() or not drawio_path.exists():
+        return False
+    drawio_xml = drawio_path.read_text()
+    if "<mxCell" not in drawio_xml:
+        return False
     d["drawio_path"] = str(drawio_path)
     d["preview_path"] = str(preview_path)
     d["diagram_name"] = drawio_path.name
-    d["search"] = _search_text(drawio_path.read_text())
+    d["search"] = _search_text(drawio_xml)
     d["width"], d["height"] = _png_size(preview_path)
     d["attachments"] = [
         {"path": str(drawio_path), "filename": drawio_path.name},
         {"path": str(preview_path), "filename": preview_path.name},
     ]
+    d["renderer"] = renderers.DRAWIO
+    return True
+
+
+def _render_drawio(d: dict, mmd_path: Path, assets_path: Path, css_path: Path, background: str) -> None:
+    _validate_with_mmdc(mmd_path, css_path, background)
+    kind = diagram_type(d["code"])
+    if kind not in DRAWIO_UNSUPPORTED_TYPES and _import_drawio(d, mmd_path, assets_path):
+        return
+    sys.stderr.write(
+        f"warning: Draw.io cannot import the {kind!r} diagram {d['name']!r}; "
+        "publishing it as a PNG instead\n"
+    )
+    _render_png(d, mmd_path, assets_path, css_path, background)
 
 
 def render_diagrams(
@@ -155,10 +201,13 @@ def render_diagrams(
 ) -> None:
     """Write each diagram's `.mmd` source and produce whatever `renderer` needs from it.
 
-    Mutates each diagram dict, adding `mmd_path` and an `attachments` list of
-    `{"path", "filename"}` entries — one PNG for `png`, the editable diagram plus its
-    preview for `drawio`, none for `mermaid`. `drawio` also carries the macro parameters
-    the extension node needs: `diagram_name`, `search`, `width`, and `height`.
+    Mutates each diagram dict, adding `mmd_path`, the `renderer` that produced it, and an
+    `attachments` list of `{"path", "filename"}` entries — one PNG for `png`, the editable
+    diagram plus its preview for `drawio`, none for `mermaid`. `drawio` also carries the macro
+    parameters the extension node needs: `diagram_name`, `search`, `width`, and `height`.
+
+    A diagram Draw.io cannot import falls back to `png` on its own, so under `drawio` the
+    per-diagram `renderer` is what the caller must branch on, not this argument.
     """
     renderers.validate(renderer)
 
@@ -173,6 +222,7 @@ def render_diagrams(
         if renderer == renderers.MERMAID:
             _validate_with_mmdc(mmd_path, css_path, background)
             d["attachments"] = []
+            d["renderer"] = renderers.MERMAID
         elif renderer == renderers.DRAWIO:
             _render_drawio(d, mmd_path, assets_path, css_path, background)
         else:
