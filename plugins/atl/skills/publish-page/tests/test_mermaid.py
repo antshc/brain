@@ -343,6 +343,53 @@ def test_render_diagrams_drawio_mode_skips_drawio_for_an_unsupported_diagram_typ
     assert "swimlane-beta" in capsys.readouterr().err
 
 
+_SWIMLANE_CODE = (
+    "swimlane-beta TB\n"
+    "  subgraph a [A]\n"
+    "    start([Start])\n"
+    "    stepA[Do it]\n"
+    "  end\n"
+    "  start --> stepA\n"
+)
+
+
+def test_render_diagrams_drawio_mode_uses_the_native_swimlane_converter_when_enabled(tmp_path):
+    diagrams = [{"index": 0, "code": _SWIMLANE_CODE, "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=_fake_export) as mock_run:
+        render_diagrams(diagrams, str(assets_dir), renderer="drawio", swimlane_drawio_enabled=True)
+
+    assert diagrams[0]["renderer"] == "drawio"
+    drawio_xml = (assets_dir / "00-title.drawio").read_text()
+    assert 'style="swimlane;html=1;startSize=20;"' in drawio_xml
+    assert "shape=mxgraph.flowchart.start_1" in drawio_xml
+    # No XML import call — only mmdc (validation) and drawio (preview PNG export).
+    assert [call.args[0][0] for call in mock_run.call_args_list] == ["mmdc", "drawio"]
+
+
+def test_render_diagrams_drawio_mode_falls_back_to_png_when_native_conversion_fails(tmp_path, capsys):
+    unsupported_code = "swimlane-beta LR\n  subgraph a [A]\n    start([Start])\n  end\n"
+    diagrams = [{"index": 0, "code": unsupported_code, "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=_fake_export):
+        render_diagrams(diagrams, str(assets_dir), renderer="drawio", swimlane_drawio_enabled=True)
+
+    assert diagrams[0]["renderer"] == "png"
+    assert "swimlane-to-drawio conversion failed" in capsys.readouterr().err
+
+
+def test_render_diagrams_drawio_mode_keeps_png_fallback_for_swimlane_when_toggle_is_off(tmp_path):
+    diagrams = [{"index": 0, "code": _SWIMLANE_CODE, "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=_fake_export):
+        render_diagrams(diagrams, str(assets_dir), renderer="drawio")
+
+    assert diagrams[0]["renderer"] == "png"
+
+
 def test_render_diagrams_drawio_mode_falls_back_to_png_when_the_import_produces_no_cells(tmp_path):
     diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
     assets_dir = tmp_path / "assets"

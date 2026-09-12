@@ -110,7 +110,7 @@ def test_publish_png_branch_passes_the_selected_renderer_through(tmp_path):
     md_path = _write_page(tmp_path)
     base_adf = {"content": [_marker_paragraph(0)]}
 
-    def fake_render(diagrams, assets_dir, background="white", renderer="png"):
+    def fake_render(diagrams, assets_dir, background="white", renderer="png", swimlane_drawio_enabled=False):
         for d in diagrams:
             d["filename"] = f"{d['name']}.png"
 
@@ -150,7 +150,7 @@ def test_publish_rejects_an_unknown_renderer_before_touching_a_page(tmp_path):
     mock_confluence.assert_not_called()
 
 
-def _fake_drawio_render(diagrams, assets_dir, background="white", renderer="png"):
+def _fake_drawio_render(diagrams, assets_dir, background="white", renderer="png", swimlane_drawio_enabled=False):
     for d in diagrams:
         d["diagram_name"] = f"{d['name']}.drawio"
         d["search"] = "Start Done"
@@ -224,7 +224,7 @@ def test_publish_drawio_branch_injects_a_media_node_for_a_diagram_that_fell_back
     md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
     base_adf = {"content": [_marker_paragraph(0)]}
 
-    def fell_back_to_png(diagrams, assets_dir, background="white", renderer="png"):
+    def fell_back_to_png(diagrams, assets_dir, background="white", renderer="png", swimlane_drawio_enabled=False):
         for d in diagrams:
             d["renderer"] = "png"
             d["filename"] = f"{d['name']}.png"

@@ -31,7 +31,7 @@ Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailabl
 python scripts/preflight.py --root "<resolved repo root>"
 ```
 
-Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here — the script never touches the network; Step 3 sets the live value. An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
+This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--root`. Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here — the script never touches the network; Step 3 sets the live value. An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
 
 **2 — Discover `cloudId` only when the config supplies none.** `cloudId` empty and an operation needs it → call `getAccessibleAtlassianResources` once, then treat it as cached for the session. Once `cloudId` is known, never call it again. Step 1's `cloudId` is `https://<site>`, not a UUID — that's expected, not a sign of a missing discovery step: every Atlassian MCP tool's `cloudId` parameter accepts "UUID or site URL", so the site-URL form is valid as-is.
 

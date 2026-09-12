@@ -5,6 +5,7 @@ from page_diagrams.env import (
     load_credentials,
     load_drawio_extension_key,
     load_renderer,
+    load_swimlane_drawio_enabled,
     parse_config,
 )
 
@@ -93,6 +94,21 @@ def test_load_renderer_rejects_unknown_value_naming_the_alternatives(tmp_path):
 def test_load_drawio_extension_key_returns_configured_value(tmp_path):
     (tmp_path / ".atlassian").write_text("ATLASSIAN_DRAWIO_EXTENSION_KEY=app-1/env-1/static/drawio\n")
     assert load_drawio_extension_key(str(tmp_path)) == "app-1/env-1/static/drawio"
+
+
+@pytest.mark.parametrize("value", ["true", "True", "1", "yes"])
+def test_load_swimlane_drawio_enabled_returns_true_for_truthy_values(tmp_path, value):
+    (tmp_path / ".atlassian").write_text(f"ATLASSIAN_SWIMLANE_DRAWIO={value}\n")
+    assert load_swimlane_drawio_enabled(str(tmp_path)) is True
+
+
+def test_load_swimlane_drawio_enabled_defaults_to_false_when_key_absent(tmp_path):
+    (tmp_path / ".atlassian").write_text("ATLASSIAN_SITE=example.atlassian.net\n")
+    assert load_swimlane_drawio_enabled(str(tmp_path)) is False
+
+
+def test_load_swimlane_drawio_enabled_defaults_to_false_when_config_absent(tmp_path):
+    assert load_swimlane_drawio_enabled(str(tmp_path)) is False
 
 
 def test_load_drawio_extension_key_names_the_key_and_where_to_find_it_when_absent(tmp_path):

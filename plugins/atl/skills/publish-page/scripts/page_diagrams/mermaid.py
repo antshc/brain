@@ -27,6 +27,7 @@ from pathlib import Path
 
 from . import renderers
 from .patterns import DIAGRAM_ID_RE, HEADING_RE, SUMMARY_RE, media_marker
+from .swimlane_drawio import convert as convert_swimlane_drawio
 from .theme import LIGHT_THEME_CSS, apply_light_theme
 
 _MERMAID_FENCE_RE = re.compile(r"```mermaid\n(.*?)\n```", re.DOTALL)
@@ -204,9 +205,46 @@ def _import_drawio(d: dict, mmd_path: Path, assets_path: Path) -> bool:
     return True
 
 
-def _render_drawio(d: dict, mmd_path: Path, assets_path: Path, css_path: Path, background: str) -> None:
+def _import_swimlane_drawio(d: dict, assets_path: Path) -> bool:
+    """Fill `d` from our own swimlane-beta converter; `False` when the source doesn't convert
+    (e.g. an unsupported orientation) so the caller can fall back to the Draw.io import/PNG path.
+    """
+    try:
+        drawio_xml = convert_swimlane_drawio(d["code"])
+    except ValueError as e:
+        sys.stderr.write(f"warning: swimlane-to-drawio conversion failed for {d['name']!r}: {e}\n")
+        return False
+    drawio_path = assets_path / f"{d['name']}.drawio"
+    preview_path = assets_path / f"{d['name']}.drawio.png"
+    drawio_path.write_text(drawio_xml)
+    _run_drawio(["-x", "-f", "png", "-o", str(preview_path), str(drawio_path)])
+    if not preview_path.exists():
+        return False
+    d["drawio_path"] = str(drawio_path)
+    d["preview_path"] = str(preview_path)
+    d["diagram_name"] = drawio_path.name
+    d["search"] = _search_text(drawio_xml)
+    d["width"], d["height"] = _png_size(preview_path)
+    d["attachments"] = [
+        {"path": str(drawio_path), "filename": drawio_path.name},
+        {"path": str(preview_path), "filename": preview_path.name},
+    ]
+    d["renderer"] = renderers.DRAWIO
+    return True
+
+
+def _render_drawio(
+    d: dict,
+    mmd_path: Path,
+    assets_path: Path,
+    css_path: Path,
+    background: str,
+    swimlane_drawio_enabled: bool = False,
+) -> None:
     _validate_with_mmdc(mmd_path, css_path, background)
     kind = diagram_type(d["code"])
+    if kind == "swimlane-beta" and swimlane_drawio_enabled and _import_swimlane_drawio(d, assets_path):
+        return
     if kind not in DRAWIO_UNSUPPORTED_TYPES and _import_drawio(d, mmd_path, assets_path):
         return
     sys.stderr.write(
@@ -221,6 +259,7 @@ def render_diagrams(
     assets_dir: str,
     background: str = "white",
     renderer: str = renderers.DEFAULT,
+    swimlane_drawio_enabled: bool = False,
 ) -> None:
     """Write each diagram's `.mmd` source and produce whatever `renderer` needs from it.
 
@@ -247,6 +286,6 @@ def render_diagrams(
             d["attachments"] = []
             d["renderer"] = renderers.MERMAID
         elif renderer == renderers.DRAWIO:
-            _render_drawio(d, mmd_path, assets_path, css_path, background)
+            _render_drawio(d, mmd_path, assets_path, css_path, background, swimlane_drawio_enabled)
         else:
             _render_png(d, mmd_path, assets_path, css_path, background)
