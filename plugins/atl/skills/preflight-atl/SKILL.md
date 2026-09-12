@@ -18,6 +18,8 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 | `ATLASSIAN_API_TOKEN` | Optional — only for what the MCP can't do (e.g. attachment upload) |
 | `ATLASSIAN_JIRA_PROJECT_KEYS` | Comma-separated Jira project keys, first = default |
 | `ATLASSIAN_CONFLUENCE_SPACE_IDS` | Comma-separated Confluence space ids, first = default |
+| `ATLASSIAN_DIAGRAM_RENDERER` | Optional — how `/publish-page` renders mermaid diagrams: `png` (default), `drawio`, or `mermaid` |
+| `ATLASSIAN_DRAWIO_EXTENSION_KEY` | Required only by `ATLASSIAN_DIAGRAM_RENDERER=drawio` — the Draw.io macro's `<appId>/<envId>/static/drawio` key |
 
 ## Action: Resolve
 

@@ -26,9 +26,13 @@ Zero results → `configPath := $HARNESS_REPO_PATH/.atlassian`, not yet created.
 | `ATLASSIAN_JIRA_PROJECT_KEYS` | "Enter your Jira project key(s), comma-separated, first = default:" |
 | `ATLASSIAN_CONFLUENCE_SPACE_IDS` | "Enter your Confluence space id(s), comma-separated, first = default:" |
 | `ATLASSIAN_API_TOKEN` | "Enter an API token (optional — only needed for `/publish-page`'s mermaid-diagram upload), from https://id.atlassian.com/manage-profile/security/api-tokens:" |
+| `ATLASSIAN_DIAGRAM_RENDERER` | "How should `/publish-page` render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |
+| `ATLASSIAN_DRAWIO_EXTENSION_KEY` | "Only for `drawio` — enter the Draw.io macro's extension key, `<appId>/<envId>/static/drawio`. Find it by reading a page that already holds a Draw.io diagram with `contentFormat: "adf"` and copying the diagram node's `attrs.extensionKey`:" |
+
+`drawio` and `mermaid` each need their Confluence app installed. `drawio` additionally needs `ATLASSIAN_DRAWIO_EXTENSION_KEY`, since the app and environment ids differ per site. `mermaid` is declared but not yet usable — `/publish-page` refuses it until its macro shape is captured. Leave both keys empty for `png`.
 
 **4 — Write.**
-- Not yet created → create `$HARNESS_REPO_PATH/.atlassian` with all five keys, one `KEY=VALUE` line each (empty value when declined).
+- Not yet created → create `$HARNESS_REPO_PATH/.atlassian` with all seven keys, one `KEY=VALUE` line each (empty value when declined).
 - Already exists → append only the keys missing from `presentKeys`, one `KEY=VALUE` line each, at the end; every existing line stays untouched and in place.
 - Never print, log, or echo `ATLASSIAN_API_TOKEN`'s value.
 

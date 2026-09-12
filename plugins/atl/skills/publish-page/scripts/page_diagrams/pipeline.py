@@ -12,12 +12,14 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .adf import substitute_markers, substitute_media
+from .adf import drawio_node, substitute_drawio, substitute_markers, substitute_media
 from .attachments import upload_diagrams
-from .env import get_confluence, load_credentials
+from .custom_content import upsert_diagram
+from .env import get_confluence, load_credentials, load_drawio_extension_key, load_renderer, site_url
 from .mermaid import extract_mermaid, render_diagrams
 from .patterns import HEADING_RE, strip_ignored_sections
 from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
+from . import renderers
 
 _CONVERTER_SCRIPT = Path(__file__).resolve().parents[3] / "map-markdown-adf" / "scripts" / "map_markdown_adf.py"
 
@@ -75,6 +77,30 @@ def substitute_diagram_notes(adf: dict, diagrams: list[dict]) -> tuple[dict, int
     return substitute_markers(adf, lambda index: _diagram_note_node(names_by_index[index]))
 
 
+def _drawio_nodes_by_index(
+    confluence, page_id: str, diagrams: list[dict], extension_key: str, base_url: str
+) -> dict[str, dict]:
+    """Register each rendered diagram as custom content and build its macro node.
+
+    Runs after the attachments are uploaded — the macro points at a `.drawio` file that has
+    to already be on the page for the app to have anything to open.
+    """
+    nodes: dict[str, dict] = {}
+    for d in diagrams:
+        content = upsert_diagram(confluence, page_id, d["diagram_name"], d["search"])
+        nodes[str(d["index"])] = drawio_node(
+            extension_key=extension_key,
+            page_id=page_id,
+            cust_content_id=content["id"],
+            diagram_name=d["diagram_name"],
+            width=d["width"],
+            height=d["height"],
+            base_url=base_url,
+            revision=content["revision"],
+        )
+    return nodes
+
+
 def _publish_with_diagrams(
     base_adf: dict,
     diagrams: list[dict],
@@ -84,6 +110,8 @@ def _publish_with_diagrams(
     title: str,
     assets_dir: str,
     mermaid_bg: str,
+    renderer: str,
+    drawio_extension_key: str | None,
 ) -> tuple[dict, dict]:
     confluence = get_confluence(credentials)
 
@@ -95,10 +123,17 @@ def _publish_with_diagrams(
         created = create_page_adf(confluence, space_id, title, placeholder_adf)
         target_page_id = created["id"]
 
-    render_diagrams(diagrams, assets_dir, background=mermaid_bg)
+    render_diagrams(diagrams, assets_dir, background=mermaid_bg, renderer=renderer)
     filename_to_file_id = upload_diagrams(confluence, target_page_id, diagrams)
-    media_ids_by_index = {str(d["index"]): filename_to_file_id[d["filename"]] for d in diagrams}
-    final_adf, _ = substitute_media(base_adf, media_ids_by_index, target_page_id)
+
+    if renderer == renderers.DRAWIO:
+        nodes_by_index = _drawio_nodes_by_index(
+            confluence, target_page_id, diagrams, drawio_extension_key, f"{site_url(credentials)}/wiki"
+        )
+        final_adf, _ = substitute_drawio(base_adf, nodes_by_index)
+    else:
+        media_ids_by_index = {str(d["index"]): filename_to_file_id[d["filename"]] for d in diagrams}
+        final_adf, _ = substitute_media(base_adf, media_ids_by_index, target_page_id)
 
     version = get_page_version(confluence, target_page_id)
     update_page_adf(confluence, target_page_id, title, final_adf, version)
@@ -197,6 +232,13 @@ def publish(
     pretty-printed (`json.dump(..., indent=2)`) so it stays readable through
     line-truncating file readers.
     """
+    renderer = load_renderer(root)
+    unavailable = renderers.unavailable_reason(renderer)
+    if unavailable:
+        raise RuntimeError(unavailable)
+    # Resolved up front so a missing key fails before any page is created or updated.
+    drawio_extension_key = load_drawio_extension_key(root) if renderer == renderers.DRAWIO else None
+
     md_text = Path(md_path).read_text(encoding="utf-8")
     resolved_title = resolve_title(md_text, title)
     processed = strip_ignored_sections(md_text)
@@ -207,7 +249,16 @@ def publish(
 
     if credentials and diagrams:
         result, final_adf = _publish_with_diagrams(
-            base_adf, diagrams, credentials, page_id, space_id, resolved_title, assets_dir, mermaid_bg
+            base_adf,
+            diagrams,
+            credentials,
+            page_id,
+            space_id,
+            resolved_title,
+            assets_dir,
+            mermaid_bg,
+            renderer,
+            drawio_extension_key,
         )
     elif credentials:
         result, final_adf = _publish_text_only(
@@ -219,5 +270,6 @@ def publish(
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(final_adf, f, indent=2)
         f.write("\n")
+    result["renderer"] = renderer
     result["adfPath"] = out_path
     return result

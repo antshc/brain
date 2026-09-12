@@ -1,6 +1,19 @@
 import pytest
 
-from page_diagrams.adf import replace_markers, substitute_media
+from page_diagrams.adf import drawio_node, replace_markers, substitute_drawio, substitute_media
+
+
+def _drawio_node() -> dict:
+    return drawio_node(
+        extension_key="app-1/env-1/static/drawio",
+        page_id="123",
+        cust_content_id="999",
+        diagram_name="00-title.drawio",
+        width=841,
+        height=571,
+        base_url="https://example.atlassian.net/wiki",
+        revision=2,
+    )
 
 
 def _marker_paragraph(index: int) -> dict:
@@ -66,3 +79,54 @@ def test_substitute_media_raises_on_leftover_marker():
     adf = {"content": [_marker_paragraph(0), leftover]}
     with pytest.raises(RuntimeError, match=r"MEDIA:1"):
         substitute_media(adf, {"0": "file-0"}, "123")
+
+
+def test_drawio_node_carries_the_captured_macro_shape():
+    node = _drawio_node()
+    assert node["type"] == "extension"
+    attrs = node["attrs"]
+    assert attrs["extensionType"] == "com.atlassian.ecosystem"
+    assert attrs["extensionKey"] == "app-1/env-1/static/drawio"
+    assert attrs["text"] == "draw.io Diagram"
+    assert attrs["parameters"]["layout"] == "extension"
+    assert attrs["parameters"]["guestParams"] == {
+        "custContentId": "999",
+        "pageId": "123",
+        "diagramName": "00-title.drawio",
+        "diagramDisplayName": "00-title.drawio",
+        "revision": 2,
+        "contentVer": 2,
+        "zoom": 100,
+        "width": 841,
+        "height": 571,
+        "lbox": True,
+        "simple": False,
+        "pCenter": False,
+        "links": "",
+        "tbstyle": "",
+        "baseUrl": "https://example.atlassian.net/wiki",
+    }
+
+
+def test_drawio_node_omits_the_runtime_populated_account_carrying_parameters():
+    attrs = _drawio_node()["attrs"]
+    for key in ("embeddedMacroContext", "extensionId", "extensionTitle", "forgeEnvironment"):
+        assert key not in attrs
+        assert key not in attrs["parameters"]
+
+
+def test_drawio_node_generates_a_fresh_local_id_per_node():
+    assert _drawio_node()["attrs"]["localId"] != _drawio_node()["attrs"]["localId"]
+
+
+def test_substitute_drawio_replaces_markers_at_any_depth():
+    adf = {
+        "content": [
+            _marker_paragraph(0),
+            {"type": "expand", "attrs": {"title": "Details"}, "content": [_marker_paragraph(1)]},
+        ]
+    }
+    result, replaced = substitute_drawio(adf, {"0": _drawio_node(), "1": _drawio_node()})
+    assert replaced == 2
+    assert result["content"][0]["type"] == "extension"
+    assert result["content"][1]["content"][0]["type"] == "extension"

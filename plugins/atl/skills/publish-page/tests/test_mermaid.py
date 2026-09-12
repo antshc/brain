@@ -1,11 +1,36 @@
 import os
+import struct
 import subprocess
-from unittest.mock import patch
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from page_diagrams.mermaid import extract_mermaid, render_diagrams, slugify
 from page_diagrams.theme import LIGHT_THEME_CSS
+
+_DRAWIO_XML = (
+    '<mxfile><root><mxCell id="0"/>'
+    '<mxCell id="1" value="Start" mermaidId="A"/>'
+    '<mxCell id="2" value="Build &amp; Ship" mermaidId="B"/>'
+    '<mxCell id="3" value=""/>'
+    "</root></mxfile>"
+)
+
+
+def _png_bytes(width: int, height: int) -> bytes:
+    return b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR" + struct.pack(">II", width, height)
+
+
+def _fake_export(cmd, **kwargs):
+    """Stand in for both CLIs, writing whatever the real `drawio` export would produce."""
+    if cmd[0] == "drawio":
+        out_path = Path(cmd[cmd.index("-o") + 1])
+        if cmd[cmd.index("-f") + 1] == "png":
+            out_path.write_bytes(_png_bytes(841, 571))
+        else:
+            out_path.write_text(_DRAWIO_XML)
+    return MagicMock(returncode=0)
 
 
 def test_slugify_basic():
@@ -75,6 +100,9 @@ def test_render_diagrams_writes_mmd_and_invokes_mmdc(tmp_path):
 
     assert diagrams[0]["mmd_path"] == str(mmd_path)
     assert diagrams[0]["png_path"] == str(assets_dir / "00-title.png")
+    assert diagrams[0]["attachments"] == [
+        {"path": str(assets_dir / "00-title.png"), "filename": "00-title.png"}
+    ]
 
 
 def test_render_diagrams_recolors_dark_theme_hexes_in_rendered_mmd(tmp_path):
@@ -115,3 +143,116 @@ def test_render_diagrams_surfaces_stderr_and_raises_on_nonzero_exit(tmp_path, ca
             render_diagrams(diagrams, str(assets_dir))
 
     assert "mmdc failed: boom" in capsys.readouterr().err
+
+
+def test_render_diagrams_mermaid_mode_writes_mmd_runs_mmdc_and_keeps_no_png(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
+        mock_run.return_value.returncode = 0
+        render_diagrams(diagrams, str(assets_dir), renderer="mermaid")
+
+    mmd_path = assets_dir / "00-title.mmd"
+    assert mmd_path.read_text() == "graph TD; A-->B;\n"
+    assert not (assets_dir / "00-title.png").exists()
+    mock_run.assert_called_once()
+
+    assert diagrams[0]["mmd_path"] == str(mmd_path)
+    assert diagrams[0]["attachments"] == []
+    assert "png_path" not in diagrams[0]
+
+
+def test_render_diagrams_mermaid_mode_fails_when_source_does_not_compile(tmp_path):
+    diagrams = [{"index": 0, "code": "not a diagram", "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
+        mock_run.return_value.returncode = 1
+        mock_run.return_value.stderr = "parse error\n"
+        mock_run.return_value.check_returncode.side_effect = subprocess.CalledProcessError(1, ["mmdc"])
+        with pytest.raises(subprocess.CalledProcessError):
+            render_diagrams(diagrams, str(assets_dir), renderer="mermaid")
+
+
+def test_render_diagrams_drawio_mode_writes_source_diagram_and_preview(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=_fake_export) as mock_run:
+        render_diagrams(diagrams, str(assets_dir), renderer="drawio")
+
+    assert (assets_dir / "00-title.mmd").read_text() == "graph TD; A-->B;\n"
+    assert (assets_dir / "00-title.drawio").exists()
+    assert (assets_dir / "00-title.drawio.png").exists()
+    assert not (assets_dir / "00-title.png").exists()
+
+    binaries = [call.args[0][0] for call in mock_run.call_args_list]
+    assert binaries == ["mmdc", "drawio", "drawio"]
+
+    xml_cmd, png_cmd = mock_run.call_args_list[1].args[0], mock_run.call_args_list[2].args[0]
+    assert xml_cmd == [
+        "drawio", "-x", "-f", "xml", "-u",
+        "-o", str(assets_dir / "00-title.drawio"), str(assets_dir / "00-title.mmd"),
+    ]
+    assert png_cmd == [
+        "drawio", "-x", "-f", "png",
+        "-o", str(assets_dir / "00-title.drawio.png"), str(assets_dir / "00-title.mmd"),
+    ]
+
+    assert diagrams[0]["attachments"] == [
+        {"path": str(assets_dir / "00-title.drawio"), "filename": "00-title.drawio"},
+        {"path": str(assets_dir / "00-title.drawio.png"), "filename": "00-title.drawio.png"},
+    ]
+    assert diagrams[0]["diagram_name"] == "00-title.drawio"
+
+
+def test_render_diagrams_drawio_mode_measures_the_macro_from_the_preview_png(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=_fake_export):
+        render_diagrams(diagrams, str(tmp_path / "assets"), renderer="drawio")
+
+    assert (diagrams[0]["width"], diagrams[0]["height"]) == (841, 571)
+
+
+def test_render_diagrams_drawio_mode_takes_search_text_from_the_diagram_labels(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=_fake_export):
+        render_diagrams(diagrams, str(tmp_path / "assets"), renderer="drawio")
+
+    assert diagrams[0]["search"] == "Start Build & Ship"
+
+
+def test_render_diagrams_drawio_mode_fails_when_source_does_not_compile(tmp_path):
+    diagrams = [{"index": 0, "code": "not a diagram", "name": "00-title"}]
+
+    with patch("page_diagrams.mermaid.subprocess.run") as mock_run:
+        mock_run.return_value.returncode = 1
+        mock_run.return_value.stderr = "parse error\n"
+        mock_run.return_value.check_returncode.side_effect = subprocess.CalledProcessError(1, ["mmdc"])
+        with pytest.raises(subprocess.CalledProcessError):
+            render_diagrams(diagrams, str(tmp_path / "assets"), renderer="drawio")
+
+    mock_run.assert_called_once()
+
+
+def test_render_diagrams_drawio_mode_names_drawio_as_the_missing_prerequisite(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+
+    def missing_drawio(cmd, **kwargs):
+        if cmd[0] == "drawio":
+            raise FileNotFoundError
+        return MagicMock(returncode=0)
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=missing_drawio):
+        with pytest.raises(RuntimeError, match="drawio not found on PATH"):
+            render_diagrams(diagrams, str(tmp_path / "assets"), renderer="drawio")
+
+
+def test_render_diagrams_rejects_unknown_renderer(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+
+    with pytest.raises(ValueError, match="svg"):
+        render_diagrams(diagrams, str(tmp_path / "assets"), renderer="svg")

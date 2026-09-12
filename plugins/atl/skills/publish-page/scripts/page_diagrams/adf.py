@@ -1,10 +1,11 @@
 """ADF marker substitution: swap each \\x00MEDIA:<index>\\x00 marker paragraph for a
-replacement node built by a caller-supplied callback — the uploaded media node here, or
-(see pipeline.py's `substitute_diagram_notes`) a "not rendered" note when no token is
-configured. Pure, offline — no I/O; tested directly.
+replacement node built by a caller-supplied callback — the uploaded media node here, the
+Draw.io extension node for that renderer, or (see pipeline.py's `substitute_diagram_notes`)
+a "not rendered" note when no token is configured. Pure, offline — no I/O; tested directly.
 """
 from __future__ import annotations
 
+import uuid
 from typing import Callable
 
 from .patterns import MEDIA_MARKER_RE
@@ -96,3 +97,60 @@ def substitute_markers(adf: dict, make_replacement: Callable[[str], dict]) -> tu
 def substitute_media(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[dict, int]:
     """Replace every marker paragraph anywhere in `adf` with its uploaded media node."""
     return substitute_markers(adf, lambda index: _media_node(media_ids_by_index[index], page_id))
+
+
+def drawio_node(
+    extension_key: str,
+    page_id: str,
+    cust_content_id: str,
+    diagram_name: str,
+    width: int,
+    height: int,
+    base_url: str,
+    revision: int,
+) -> dict:
+    """The Draw.io macro node, as captured from a live page (`contentFormat=adf`).
+
+    Deliberately omits `embeddedMacroContext`, `extensionId`, `extensionTitle`, and
+    `forgeEnvironment`: the app populates them at render time, and the first of those carries
+    account and cloud ids that have no business in generated content.
+    """
+    return {
+        "type": "extension",
+        "attrs": {
+            "layout": "default",
+            "extensionType": "com.atlassian.ecosystem",
+            "extensionKey": extension_key,
+            "text": "draw.io Diagram",
+            "parameters": {
+                "layout": "extension",
+                "guestParams": {
+                    "custContentId": cust_content_id,
+                    "pageId": page_id,
+                    "diagramName": diagram_name,
+                    "diagramDisplayName": diagram_name,
+                    "revision": revision,
+                    "contentVer": revision,
+                    "zoom": 100,
+                    "width": width,
+                    "height": height,
+                    "lbox": True,
+                    "simple": False,
+                    "pCenter": False,
+                    "links": "",
+                    "tbstyle": "",
+                    "baseUrl": base_url,
+                },
+            },
+            "localId": str(uuid.uuid4()),
+        },
+    }
+
+
+def substitute_drawio(adf: dict, nodes_by_index: dict[str, dict]) -> tuple[dict, int]:
+    """Replace every marker paragraph anywhere in `adf` with its prebuilt Draw.io node.
+
+    Takes finished nodes rather than building them: each one needs a custom content id that
+    only exists after a REST round trip, which this pure module never makes.
+    """
+    return substitute_markers(adf, lambda index: nodes_by_index[index])
