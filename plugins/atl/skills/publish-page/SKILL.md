@@ -34,6 +34,8 @@ Required by `drawio` mode, and by nothing else. Format `<appId>/<envId>/static/d
 
 `drawio` mode publishes four objects per diagram: the `.drawio` attachment (the editable XML), the `.drawio.png` attachment (the preview), a custom content record of the app's own type, and the ADF extension node pointing at that record. Republishing looks the record up by page and diagram name first, so it bumps the existing one rather than stacking a duplicate.
 
+Draw.io bundles its own, older Mermaid, so it cannot import every diagram `mmdc` compiles — `swimlane-beta` is the known case. Such a diagram falls back to `png` on its own, per diagram: it publishes as a static image with a warning on stderr, while the rest of the page's diagrams stay editable. A newly rejected type needs no code change; an import that fails or returns an empty canvas falls back the same way.
+
 The custom content record must name the page's **space** as well as its container, or the create fails with `Could not create content with type ac:com.mxgraph.confluence.plugins.diagramly:drawio-diagram`. `run` reads the space off the target page, so nothing extra is configured — but that failure text means the payload, not a missing app. To check the app really is installed, read `/rest/api/content/<pageId>/child` and look for the type among `_expandable`; the site-wide `GET /rest/api/content?type=<type>` answers `Cannot find custom content type` even on sites where the app works, so it proves nothing.
 
 ### Installing the Draw.io CLI

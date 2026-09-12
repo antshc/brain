@@ -12,7 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .adf import drawio_node, substitute_drawio, substitute_markers, substitute_media
+from .adf import drawio_node, media_node, substitute_drawio, substitute_markers, substitute_media
 from .attachments import upload_diagrams
 from .custom_content import upsert_diagram
 from .env import get_confluence, load_credentials, load_drawio_extension_key, load_renderer, site_url
@@ -83,10 +83,13 @@ def _drawio_nodes_by_index(
     """Register each rendered diagram as custom content and build its macro node.
 
     Runs after the attachments are uploaded — the macro points at a `.drawio` file that has
-    to already be on the page for the app to have anything to open.
+    to already be on the page for the app to have anything to open. Skips diagrams Draw.io
+    could not import: those fell back to a PNG and have no custom content to register.
     """
     nodes: dict[str, dict] = {}
     for d in diagrams:
+        if d["renderer"] != renderers.DRAWIO:
+            continue
         content = upsert_diagram(confluence, page_id, d["diagram_name"], d["search"])
         nodes[str(d["index"])] = drawio_node(
             extension_key=extension_key,
@@ -130,6 +133,11 @@ def _publish_with_diagrams(
         nodes_by_index = _drawio_nodes_by_index(
             confluence, target_page_id, diagrams, drawio_extension_key, f"{site_url(credentials)}/wiki"
         )
+        for d in diagrams:
+            if d["renderer"] != renderers.DRAWIO:
+                nodes_by_index[str(d["index"])] = media_node(
+                    filename_to_file_id[d["filename"]], target_page_id
+                )
         final_adf, _ = substitute_drawio(base_adf, nodes_by_index)
     else:
         media_ids_by_index = {str(d["index"]): filename_to_file_id[d["filename"]] for d in diagrams}

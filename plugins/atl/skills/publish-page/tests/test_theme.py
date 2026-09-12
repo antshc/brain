@@ -9,7 +9,7 @@ def test_apply_light_theme_swaps_every_known_dark_hex():
     assert "#c9d1d9" not in result and "#24292f" in result
     assert "#4a7a5a" not in result and "#1a7f37" in result
     assert "#8a4a4a" not in result and "#cf222e" in result
-    assert "#4a5a8a" not in result and "#0969da" in result
+    assert "#4a5a8a" in result
     assert "#2a2a2a" not in result
     assert "#1a1a1a" not in result and "#d0d7de" in result
 

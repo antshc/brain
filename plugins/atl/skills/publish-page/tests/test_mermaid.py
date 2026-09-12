@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from page_diagrams.mermaid import extract_mermaid, render_diagrams, slugify
+from page_diagrams.mermaid import diagram_type, extract_mermaid, render_diagrams, slugify
 from page_diagrams.theme import LIGHT_THEME_CSS
 
 _DRAWIO_XML = (
@@ -205,6 +205,7 @@ def test_render_diagrams_drawio_mode_writes_source_diagram_and_preview(tmp_path)
         {"path": str(assets_dir / "00-title.drawio.png"), "filename": "00-title.drawio.png"},
     ]
     assert diagrams[0]["diagram_name"] == "00-title.drawio"
+    assert diagrams[0]["renderer"] == "drawio"
 
 
 def test_render_diagrams_drawio_mode_measures_the_macro_from_the_preview_png(tmp_path):
@@ -256,3 +257,70 @@ def test_render_diagrams_rejects_unknown_renderer(tmp_path):
 
     with pytest.raises(ValueError, match="svg"):
         render_diagrams(diagrams, str(tmp_path / "assets"), renderer="svg")
+
+
+@pytest.mark.parametrize(
+    "code,expected",
+    [
+        ("graph TD; A-->B;", "graph"),
+        ("swimlane-beta\n  lane A", "swimlane-beta"),
+        ("sequenceDiagram\n  A->>B: hi", "sequenceDiagram"),
+        ("%%{init: {'theme':'base'}}%%\nflowchart LR\n  A-->B", "flowchart"),
+        ("---\ntitle: Hello\n---\nclassDiagram\n  A <|-- B", "classDiagram"),
+        ("", ""),
+    ],
+)
+def test_diagram_type_reads_the_keyword_past_frontmatter_and_directives(code, expected):
+    assert diagram_type(code) == expected
+
+
+def test_render_diagrams_drawio_mode_skips_drawio_for_an_unsupported_diagram_type(tmp_path, capsys):
+    diagrams = [{"index": 0, "code": "swimlane-beta\n  lane A", "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=_fake_export) as mock_run:
+        render_diagrams(diagrams, str(assets_dir), renderer="drawio")
+
+    assert [call.args[0][0] for call in mock_run.call_args_list] == ["mmdc", "mmdc"]
+    assert diagrams[0]["renderer"] == "png"
+    assert diagrams[0]["attachments"] == [
+        {"path": str(assets_dir / "00-title.png"), "filename": "00-title.png"}
+    ]
+    assert "swimlane-beta" in capsys.readouterr().err
+
+
+def test_render_diagrams_drawio_mode_falls_back_to_png_when_the_import_produces_no_cells(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+    assets_dir = tmp_path / "assets"
+
+    def empty_import(cmd, **kwargs):
+        if cmd[0] == "drawio" and cmd[cmd.index("-f") + 1] == "xml":
+            Path(cmd[cmd.index("-o") + 1]).write_text("<mxfile><root></root></mxfile>")
+            return MagicMock(returncode=0)
+        return _fake_export(cmd, **kwargs)
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=empty_import):
+        render_diagrams(diagrams, str(assets_dir), renderer="drawio")
+
+    assert diagrams[0]["renderer"] == "png"
+    assert diagrams[0]["filename"] == "00-title.png"
+
+
+def test_render_diagrams_drawio_mode_falls_back_to_png_when_the_import_fails(tmp_path):
+    diagrams = [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+
+    def failing_import(cmd, **kwargs):
+        if cmd[0] == "drawio":
+            return MagicMock(
+                returncode=1,
+                stderr="import failed\n",
+                check_returncode=MagicMock(
+                    side_effect=subprocess.CalledProcessError(1, ["drawio"])
+                ),
+            )
+        return MagicMock(returncode=0)
+
+    with patch("page_diagrams.mermaid.subprocess.run", side_effect=failing_import):
+        render_diagrams(diagrams, str(tmp_path / "assets"), renderer="drawio")
+
+    assert diagrams[0]["renderer"] == "png"

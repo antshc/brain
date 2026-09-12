@@ -21,7 +21,10 @@ def _marker_index(node: dict) -> str | None:
     return match.group(1) if match else None
 
 
-def _media_node(media_id: str, page_id: str) -> dict:
+def media_node(media_id: str, page_id: str) -> dict:
+    """The uploaded-image node — also used one-off under the `drawio` renderer, for a diagram
+    Draw.io could not import.
+    """
     return {
         "type": "mediaSingle",
         "attrs": {"layout": "center", "width": 768, "widthType": "pixel"},
@@ -44,7 +47,7 @@ def replace_markers(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[
     for node in adf["content"]:
         index = _marker_index(node)
         if index is not None:
-            new_content.append(_media_node(media_ids_by_index[index], page_id))
+            new_content.append(media_node(media_ids_by_index[index], page_id))
             replaced += 1
         else:
             new_content.append(node)
@@ -96,7 +99,7 @@ def substitute_markers(adf: dict, make_replacement: Callable[[str], dict]) -> tu
 
 def substitute_media(adf: dict, media_ids_by_index: dict, page_id: str) -> tuple[dict, int]:
     """Replace every marker paragraph anywhere in `adf` with its uploaded media node."""
-    return substitute_markers(adf, lambda index: _media_node(media_ids_by_index[index], page_id))
+    return substitute_markers(adf, lambda index: media_node(media_ids_by_index[index], page_id))
 
 
 def drawio_node(

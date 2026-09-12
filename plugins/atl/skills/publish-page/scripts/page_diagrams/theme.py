@@ -15,14 +15,19 @@ LIGHT_THEME_COLOR_MAP = {
     "#c9d1d9": "#24292f",  # text
     "#4a7a5a": "#1a7f37",  # added stroke
     "#8a4a4a": "#cf222e",  # removed stroke
-    "#4a5a8a": "#0969da",  # C4 Person accent border
+    "#4a5a8a": "#4a5a8a",  # C4 Person accent border
 }
 
 # Override for mermaid's hardcoded `.cluster rect` rule (classDiagram `namespace`, flowchart
 # `subgraph`) — not reachable via `themeVariables`, so it's injected into `mmdc` via `--cssFile`.
+# `swimlane-beta` lanes carry their own hardcoded rule, `#my-svg .swimlane.cluster rect`
+# ("my-svg" is mmdc's fixed default SVG id, from mermaid-cli's `svgId || "my-svg"`) — a plain
+# `.swimlane-body`/`.swimlane-title` class selector loses the specificity fight against it even
+# with `!important`, so this repeats the exact selector to tie specificity and win on source order.
 LIGHT_THEME_CSS = """\
 .cluster rect { fill: #eaeef2 !important; stroke: #8c959f !important; }
 .cluster-label text, .cluster-label span { fill: #24292f !important; color: #24292f !important; }
+#my-svg .swimlane.cluster rect { stroke: #57606a !important; }
 """
 
 
