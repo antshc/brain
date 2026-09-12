@@ -1,9 +1,9 @@
 import subprocess
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from page_diagrams.pipeline import convert_markdown_to_adf, resolve_title, substitute_diagram_notes
+from page_diagrams.pipeline import convert_markdown_to_adf, publish, resolve_title, substitute_diagram_notes
 
 
 def test_resolve_title_from_first_heading():
@@ -77,3 +77,155 @@ def test_substitute_diagram_notes_replaces_marker_nested_inside_expand():
     nested = result["content"][0]["content"][0]
     assert nested["type"] == "paragraph"
     assert "ATLASSIAN_API_TOKEN" in nested["content"][0]["text"]
+
+
+def _write_page(tmp_path, renderer=None, extension_key=None):
+    md_path = tmp_path / "page.md"
+    md_path.write_text("# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n")
+    config = (
+        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
+    )
+    if renderer:
+        config += f"ATLASSIAN_DIAGRAM_RENDERER={renderer}\n"
+    if extension_key:
+        config += f"ATLASSIAN_DRAWIO_EXTENSION_KEY={extension_key}\n"
+    (tmp_path / ".atlassian").write_text(config)
+    return md_path
+
+
+def _publish(md_path, tmp_path):
+    return publish(
+        md_path=str(md_path),
+        root=str(tmp_path),
+        page_id="123",
+        space_id=None,
+        title=None,
+        assets_dir=str(tmp_path / "assets"),
+        out_path=str(tmp_path / "final.json"),
+        threshold_bytes=0,
+    )
+
+
+def test_publish_png_branch_passes_the_selected_renderer_through(tmp_path):
+    md_path = _write_page(tmp_path)
+    base_adf = {"content": [_marker_paragraph(0)]}
+
+    def fake_render(diagrams, assets_dir, background="white", renderer="png"):
+        for d in diagrams:
+            d["filename"] = f"{d['name']}.png"
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=MagicMock()
+    ), patch("page_diagrams.pipeline.render_diagrams", side_effect=fake_render) as mock_render, patch(
+        "page_diagrams.pipeline.upload_diagrams", return_value={"00-title.png": "file-1"}
+    ), patch("page_diagrams.pipeline.get_page_version", return_value=1), patch(
+        "page_diagrams.pipeline.update_page_adf", return_value={"id": "123"}
+    ), patch("page_diagrams.pipeline.substitute_media", return_value=(base_adf, 1)):
+        result = _publish(md_path, tmp_path)
+
+    assert mock_render.call_args.kwargs["renderer"] == "png"
+    assert result["renderer"] == "png"
+
+
+def test_publish_refuses_the_mermaid_renderer_before_touching_a_page(tmp_path):
+    md_path = _write_page(tmp_path, "mermaid")
+
+    with patch("page_diagrams.pipeline.get_confluence") as mock_confluence, patch(
+        "page_diagrams.pipeline.render_diagrams"
+    ) as mock_render:
+        with pytest.raises(RuntimeError, match="section 7"):
+            _publish(md_path, tmp_path)
+
+    mock_confluence.assert_not_called()
+    mock_render.assert_not_called()
+
+
+def test_publish_rejects_an_unknown_renderer_before_touching_a_page(tmp_path):
+    md_path = _write_page(tmp_path, "svg")
+
+    with patch("page_diagrams.pipeline.get_confluence") as mock_confluence:
+        with pytest.raises(ValueError, match="svg"):
+            _publish(md_path, tmp_path)
+
+    mock_confluence.assert_not_called()
+
+
+def _fake_drawio_render(diagrams, assets_dir, background="white", renderer="png"):
+    for d in diagrams:
+        d["diagram_name"] = f"{d['name']}.drawio"
+        d["search"] = "Start Done"
+        d["width"], d["height"] = 841, 571
+        d["attachments"] = [
+            {"path": f"/tmp/{d['name']}.drawio", "filename": f"{d['name']}.drawio"},
+            {"path": f"/tmp/{d['name']}.drawio.png", "filename": f"{d['name']}.drawio.png"},
+        ]
+
+
+def test_publish_drawio_branch_registers_custom_content_and_injects_the_macro(tmp_path):
+    md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
+    base_adf = {"content": [_marker_paragraph(0)]}
+    file_ids = {"00-title.drawio": "file-1", "00-title.drawio.png": "file-2"}
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=MagicMock()
+    ), patch("page_diagrams.pipeline.render_diagrams", side_effect=_fake_drawio_render), patch(
+        "page_diagrams.pipeline.upload_diagrams", return_value=file_ids
+    ), patch("page_diagrams.pipeline.get_page_version", return_value=1), patch(
+        "page_diagrams.pipeline.update_page_adf", return_value={"id": "123"}
+    ), patch(
+        "page_diagrams.pipeline.upsert_diagram", return_value={"id": "999", "revision": 1}
+    ) as mock_upsert:
+        result = _publish(md_path, tmp_path)
+
+    mock_upsert.assert_called_once()
+    assert mock_upsert.call_args.args[1:] == ("123", "00-title.drawio", "Start Done")
+
+    node = base_adf["content"][0]
+    assert node["type"] == "extension"
+    assert node["attrs"]["extensionKey"] == "app-1/env-1/static/drawio"
+    guest = node["attrs"]["parameters"]["guestParams"]
+    assert guest["custContentId"] == "999"
+    assert guest["pageId"] == "123"
+    assert guest["baseUrl"] == "https://example.atlassian.net/wiki"
+    assert (guest["width"], guest["height"]) == (841, 571)
+
+    assert result["renderer"] == "drawio"
+    assert result["attachments"] == 2
+
+
+def test_publish_drawio_republish_reuses_the_existing_custom_content(tmp_path):
+    md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
+    base_adf = {"content": [_marker_paragraph(0)]}
+    confluence = MagicMock()
+    confluence.get.return_value = {
+        "results": [{"id": "999", "title": "00-title.drawio", "version": {"number": 1}}]
+    }
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=confluence
+    ), patch("page_diagrams.pipeline.render_diagrams", side_effect=_fake_drawio_render), patch(
+        "page_diagrams.pipeline.upload_diagrams", return_value={}
+    ), patch("page_diagrams.pipeline.get_page_version", return_value=1), patch(
+        "page_diagrams.pipeline.update_page_adf", return_value={"id": "123"}
+    ):
+        _publish(md_path, tmp_path)
+
+    confluence.post.assert_not_called()
+    assert confluence.put.call_args.args[0] == "/rest/api/content/999"
+    guest = base_adf["content"][0]["attrs"]["parameters"]["guestParams"]
+    assert guest["custContentId"] == "999"
+    assert guest["revision"] == 2
+    assert guest["contentVer"] == 2
+
+
+def test_publish_drawio_without_the_extension_key_fails_before_touching_a_page(tmp_path):
+    md_path = _write_page(tmp_path, "drawio")
+
+    with patch("page_diagrams.pipeline.get_confluence") as mock_confluence, patch(
+        "page_diagrams.pipeline.render_diagrams"
+    ) as mock_render:
+        with pytest.raises(ValueError, match="ATLASSIAN_DRAWIO_EXTENSION_KEY"):
+            _publish(md_path, tmp_path)
+
+    mock_confluence.assert_not_called()
+    mock_render.assert_not_called()

@@ -7,11 +7,17 @@ folders; it exists only because the raw secret is out of scope for what Prefligh
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 from atlassian import Confluence
 
+from . import renderers
+
 CONFIG_FILENAME = ".atlassian"
+DRAWIO_EXTENSION_KEY = "ATLASSIAN_DRAWIO_EXTENSION_KEY"
+
+_EXTENSION_KEY_RE = re.compile(r"\A[^/\s]+/[^/\s]+/static/[^/\s]+\Z")
 
 
 def find_config(root: str) -> str | None:
@@ -56,8 +62,53 @@ def load_credentials(root: str) -> dict[str, str]:
     return {"site": site, "email": email, "token": token}
 
 
-def get_confluence(credentials: dict[str, str]) -> Confluence:
-    site = credentials["site"]
+def site_url(credentials: dict[str, str]) -> str:
+    """The configured site as an absolute URL, defaulting a bare host to `https://`."""
+    site = credentials["site"].rstrip("/")
     if not site.startswith(("http://", "https://")):
         site = f"https://{site}"
-    return Confluence(url=site, username=credentials["email"], password=credentials["token"], cloud=True)
+    return site
+
+
+def get_confluence(credentials: dict[str, str]) -> Confluence:
+    return Confluence(
+        url=site_url(credentials),
+        username=credentials["email"],
+        password=credentials["token"],
+        cloud=True,
+    )
+
+
+def load_renderer(root: str) -> str:
+    """Return the configured diagram renderer, defaulting to `png` when the key is absent.
+
+    Unlike `load_credentials`, a missing `.atlassian` is not an error here — the default keeps
+    existing repos publishing exactly as they did before the key existed.
+    """
+    path = find_config(root)
+    config = parse_config(path) if path else {}
+    name = config.get("ATLASSIAN_DIAGRAM_RENDERER", "").strip() or renderers.DEFAULT
+    return renderers.validate(name)
+
+
+def load_drawio_extension_key(root: str) -> str:
+    """Return the Draw.io Forge extension key; raise `ValueError` when absent or malformed.
+
+    The key embeds the app id and the environment id, both of which differ per site and per
+    install, so it cannot be hard-coded and has no usable default.
+    """
+    path = find_config(root)
+    config = parse_config(path) if path else {}
+    key = config.get(DRAWIO_EXTENSION_KEY, "").strip()
+    if not key:
+        raise ValueError(
+            f"ATLASSIAN_DIAGRAM_RENDERER=drawio needs {DRAWIO_EXTENSION_KEY} in .atlassian; it embeds "
+            "the Draw.io app id and environment id, which differ per site. To find it, read a page "
+            "that already carries a Draw.io diagram with contentFormat=adf and copy the diagram "
+            "node's attrs.extensionKey."
+        )
+    if not _EXTENSION_KEY_RE.match(key):
+        raise ValueError(
+            f"{DRAWIO_EXTENSION_KEY}={key!r} is malformed; expected <appId>/<envId>/static/drawio"
+        )
+    return key

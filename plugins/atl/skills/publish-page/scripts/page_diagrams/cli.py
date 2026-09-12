@@ -8,18 +8,17 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 from .adf import replace_markers, substitute_media
-from .env import get_confluence, load_credentials
+from .env import get_confluence, load_credentials, load_renderer
 from .mermaid import extract_mermaid, render_diagrams
 from .attachments import upload_diagrams
 from .patterns import strip_ignored_sections
 from .pipeline import publish
 from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
+from . import renderers
 
 # Default ceiling above which publish-adf/run switch to REST instead of MCP. The
 # practical limit here is what an agent can safely inline into an MCP tool argument, not
@@ -96,9 +95,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     run.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
     run.add_argument(
         "--assets-dir",
-        help="Directory to write rendered .mmd/.png files into (default: <md sibling>/<md stem>.artifacts)",
+        help="Directory to write rendered .mmd/.png files into (default: <md path>.tmp)",
     )
-    run.add_argument("--out", help="Path to write the final ADF to (default: a temp file)")
+    run.add_argument("--out", help="Path to write the final ADF to (default: <assets dir>/final-adf.json)")
     run.add_argument(
         "--threshold-bytes",
         type=int,
@@ -154,8 +153,19 @@ def _run_render_attach(args: argparse.Namespace) -> None:
         _write_media_ids_by_index({"mediaIdsByIndex": {}}, args.out)
         return
 
+    renderer = load_renderer(args.root)
+    if renderer != renderers.PNG:
+        # This step ends in a mediaIdsByIndex map, which only the png renderer's one-image-per-
+        # diagram output fits; the macro renderers need the custom content `run` creates.
+        print(
+            f"error: render-attach supports ATLASSIAN_DIAGRAM_RENDERER=png only; {renderer!r} "
+            "publishes a macro, so use the `run` subcommand instead",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+
     try:
-        render_diagrams(diagrams, args.assets_dir, background=args.mermaid_bg)
+        render_diagrams(diagrams, args.assets_dir, background=args.mermaid_bg, renderer=renderer)
     except FileNotFoundError:
         print(
             "error: mmdc not found on PATH — install @mermaid-js/mermaid-cli "
@@ -220,12 +230,11 @@ def _run_publish_adf(args: argparse.Namespace) -> None:
 
 def _run_run(args: argparse.Namespace) -> None:
     md_path = Path(args.md_path)
-    assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.stem}.artifacts")
-    if args.out:
-        out_path = args.out
-    else:
-        fd, out_path = tempfile.mkstemp(suffix=".json")
-        os.close(fd)
+    # Artifacts sit beside the source as `<md filename>.tmp`, suffix included, so the folder
+    # stays adjacent to the document it came from and is obvious to gitignore.
+    assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.name}.tmp")
+    Path(assets_dir).mkdir(parents=True, exist_ok=True)
+    out_path = args.out or str(Path(assets_dir) / "final-adf.json")
 
     try:
         result = publish(

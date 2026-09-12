@@ -58,6 +58,22 @@ def test_render_attach_reports_mmdc_missing(tmp_path, capsys):
     assert "mmdc" in err
 
 
+def test_render_attach_refuses_a_macro_renderer_and_points_at_run(tmp_path, capsys):
+    (tmp_path / ".atlassian").write_text("ATLASSIAN_DIAGRAM_RENDERER=drawio\n")
+    payload = json.dumps({"diagrams": [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]})
+
+    with patch("sys.stdin.read", return_value=payload), patch(
+        "page_diagrams.cli.render_diagrams"
+    ) as mock_render:
+        with pytest.raises(SystemExit):
+            main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--root", str(tmp_path)])
+
+    mock_render.assert_not_called()
+    err = capsys.readouterr().err
+    assert "drawio" in err
+    assert "run" in err
+
+
 def test_render_attach_uploads_and_prints_media_ids(tmp_path, capsys):
     (tmp_path / ".atlassian").write_text(
         "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
@@ -319,7 +335,7 @@ def test_combine_without_media_ids_writes_adf_only(tmp_path):
     assert json.loads(out_path.read_text()) == {"adf": adf}
 
 
-def _fake_render_diagrams(diagrams, assets_dir, background="white"):
+def _fake_render_diagrams(diagrams, assets_dir, background="white", renderer="png"):
     for d in diagrams:
         d["filename"] = f"{d['name']}.png"
 
@@ -367,6 +383,7 @@ def test_run_with_diagrams_and_creds_creates_placeholder_then_publishes(tmp_path
     assert out["pageId"] == "789"
     assert out["diagrams"] == 1
     assert out["attachments"] == 1
+    assert out["renderer"] == "png"
     assert out["adfPath"] == str(out_path)
 
     written_adf = json.loads(out_path.read_text())
@@ -520,3 +537,33 @@ def test_run_reports_mmdc_missing(tmp_path, capsys):
             )
     err = capsys.readouterr().err
     assert "mmdc" in err
+
+
+def test_run_defaults_artifacts_to_md_filename_tmp_beside_the_source(tmp_path, capsys):
+    md_path = tmp_path / "design.md"
+    md_path.write_text("# Title\n\nSome text\n")
+    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
+        main(["run", "--md-path", str(md_path), "--page-id", "123", "--root", str(tmp_path)])
+
+    tmp_dir = tmp_path / "design.md.tmp"
+    assert tmp_dir.is_dir()
+    assert (tmp_dir / "final-adf.json").exists()
+    assert json.loads(capsys.readouterr().out)["adfPath"] == str(tmp_dir / "final-adf.json")
+
+
+def test_run_refuses_a_renderer_whose_macro_shape_is_not_captured(tmp_path, capsys):
+    md_path = tmp_path / "page.md"
+    md_path.write_text("# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n")
+    (tmp_path / ".atlassian").write_text(
+        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\n"
+        "ATLASSIAN_API_TOKEN=secret\nATLASSIAN_DIAGRAM_RENDERER=mermaid\n"
+    )
+
+    with patch("page_diagrams.pipeline.get_confluence") as mock_confluence:
+        with pytest.raises(SystemExit):
+            main(["run", "--md-path", str(md_path), "--page-id", "123", "--root", str(tmp_path)])
+
+    mock_confluence.assert_not_called()
+    assert "section 7" in capsys.readouterr().err
