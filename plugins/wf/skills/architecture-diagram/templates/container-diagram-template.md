@@ -124,6 +124,7 @@ config:
   c4:
     c4ShapePadding: 20
 ---
+%% diagram-id: {{diagramId}}
 C4Container
     title {{title}}
 

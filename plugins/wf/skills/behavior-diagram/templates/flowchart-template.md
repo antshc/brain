@@ -76,6 +76,7 @@ Replace all placeholders with real behavior. Add or remove nodes, groups, and re
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: {{diagramId}}
 flowchart TD
     {{actor}}(["{{actorLabel}}"])
     {{boundary}}["{{boundaryClass}}"]

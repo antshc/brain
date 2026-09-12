@@ -88,6 +88,7 @@ Replace all placeholders with real code structure. Add or remove classes, member
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: {{diagramId}}
 classDiagram
     namespace {{apiLayer}} {
         class {{boundaryClass}}

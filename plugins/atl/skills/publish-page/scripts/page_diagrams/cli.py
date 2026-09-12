@@ -126,11 +126,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def _run_extract() -> None:
     md_text = sys.stdin.read()
     try:
-        md_text = strip_ignored_sections(md_text)
+        processed, diagrams = extract_mermaid(strip_ignored_sections(md_text))
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         raise SystemExit(1)
-    processed, diagrams = extract_mermaid(md_text)
     json.dump({"processedMarkdown": processed, "diagrams": diagrams}, sys.stdout)
     sys.stdout.write("\n")
 

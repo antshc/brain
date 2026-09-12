@@ -71,6 +71,7 @@ Replace all placeholders with real participants and interactions. Add or remove 
     'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a',
     'sequenceNumberColor': '#c9d1d9'
 }}}%%
+%% diagram-id: {{diagramId}}
 sequenceDiagram
     autonumber
     actor {{actorAlias}}
