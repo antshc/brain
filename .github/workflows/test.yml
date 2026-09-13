@@ -2,6 +2,12 @@ name: Python tests
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to test
+        required: true
+        default: main
+        type: string
   pull_request:
     branches: [main]
 
@@ -14,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || github.sha }}
 
       - uses: actions/setup-python@v5
         with:
