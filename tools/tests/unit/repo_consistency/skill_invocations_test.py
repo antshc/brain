@@ -40,6 +40,19 @@ class TestSkillInvocationResolution:
         assert violations[0].file.endswith("caller/SKILL.md")
         assert "ghost-skill" in violations[0].message
 
+    def test_backticked_filesystem_paths_are_not_skill_invocations(self, tmp_path):
+        # Scenario: Backticked filesystem paths are not skill invocations
+        _write_skill(
+            tmp_path,
+            "demo",
+            "caller",
+            "Never root a command at `/usr`, `/opt`, `/etc`, or `/home`.",
+        )
+
+        violations = find_dangling_skill_invocations(tmp_path)
+
+        assert violations == []
+
 
 class TestRepositorySkillInvocationConsistency:
     """Feature: Skill Invocation Resolution"""
