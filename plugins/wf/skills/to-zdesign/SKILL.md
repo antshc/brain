@@ -46,14 +46,14 @@ Select implementation appendices from evidence. The two diagram appendices (Clas
 
 | Appendix | Include for | Template |
 | --- | --- | --- |
-| REST API Delta | HTTP contract or behavior changes | Follow `/to-contract-delta` skill **API delta rules** — include a `Scenarios` subsection per endpoint per the template's rules |
-| GUI Design Delta | User-visible state or interaction changes | Follow `/to-contract-delta` skill **GUI delta rules** — include a `Scenarios` subsection per surface per the template's rules |
-| Database Schema Delta | Persistence contract changes | Follow `/to-contract-delta` skill **Database delta rules** |
+| REST API Delta | HTTP contract or behavior changes | Follow `/draft-contract-delta` skill **API delta rules** — include a `Scenarios` subsection per endpoint per the template's rules |
+| GUI Design Delta | User-visible state or interaction changes | Follow `/draft-contract-delta` skill **GUI delta rules** — include a `Scenarios` subsection per surface per the template's rules |
+| Database Schema Delta | Persistence contract changes | Follow `/draft-contract-delta` skill **Database delta rules** |
 | Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/code-diagram` skill **Class Diagram** in delta mode |
 | Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/behavior-diagram` skill **Sequence Diagram** in delta mode |
 | Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/architecture-diagram` skill **Deployment View** in delta mode |
 
-Open and read only the templates for appendices that evidence triggers. Insert complete appendices in table order. Include changed content only. Follow `/to-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/code-diagram`, `/behavior-diagram`, or `/architecture-diagram` in delta mode for diagram appendices — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions.
+Open and read only the templates for appendices that evidence triggers. Insert complete appendices in table order. Include changed content only. Follow `/draft-contract-delta` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/code-diagram`, `/behavior-diagram`, or `/architecture-diagram` in delta mode for diagram appendices — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions.
 
 ## 5. Merge incrementally
 
