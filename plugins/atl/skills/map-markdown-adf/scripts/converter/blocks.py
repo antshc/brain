@@ -64,7 +64,7 @@ def split_table_row(row: str) -> list[str]:
 
 
 def build_toc_extension() -> dict:
-    """A Confluence-native table of contents macro node, for the `<!-- confluence:toc -->` marker."""
+    """A Confluence-native table of contents macro node, for the `<!-- adf:toc -->` marker."""
     return {
         "type": "extension",
         "attrs": {

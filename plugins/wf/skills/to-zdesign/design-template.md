@@ -17,7 +17,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 | PO | |
 </details>
 
-<!-- confluence:toc -->
+<!-- adf:toc -->
 
 # Problem Statement and Goals
 
@@ -29,7 +29,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 <!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; Distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use one row per capability, with its stakeholder requirement and functional requirements in the Details column. Row numbers express capability order. Source is the requirement category (PO / Dev team), not source provenance. -->
 
-<!-- confluence:wide-table -->
+<!-- adf:wide-table -->
 | **#** | **Requirement** | **Priority** | **Details** | **Source** |
 | --- | --- | --- | --- | --- |
 |  | {{capabilityTitle\|behavior + entity}} | {{priority\|MVP / Should have / Nice to have}} | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{businessRules\|State invariants, or None.}}<br>- {{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
@@ -297,7 +297,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 </details>
 ````
-<!-- confluence:ignore:start -->
+<!-- adf:ignore:start -->
 
 # Source Material
 
@@ -306,5 +306,5 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 | **Source** | **Kind** | **Contribution** |
 | --- | --- | --- |
 | {{canonicalSource}} | {{sourceKind|Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
-<!-- confluence:ignore:end -->
+<!-- adf:ignore:end -->
 

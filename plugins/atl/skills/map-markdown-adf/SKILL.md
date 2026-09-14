@@ -59,8 +59,8 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | Table | `table` / `tableRow` / `tableHeader` / `tableCell` |
 | Horizontal rule (`---`) | `rule` |
 | `<details><summary>` | `expand` (`attrs.title`) — **ADF-only** |
-| `<!-- confluence:toc -->` | `expand` + `toc` extension — **ADF-only** |
-| `<!-- confluence:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
+| `<!-- adf:toc -->` | `expand` + `toc` extension — **ADF-only** |
+| `<!-- adf:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
 
 A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `  continues here` is one `listItem`, not a list plus a stray paragraph:
 

@@ -89,7 +89,7 @@ python scripts/publish_page_diagrams.py run \
   --root "$HARNESS_REPO_PATH"
 ```
 
-One call does the rest: strips `<!-- confluence:ignore:start/end -->` spans, extracts ```mermaid fences into markers, converts the Markdown to ADF (shelling out to `/map-markdown-adf`'s CLI, never importing its code), and — depending on what's configured — either publishes directly via REST v2 or hands back an ADF ready for the MCP publish tools:
+One call does the rest: strips `<!-- adf:ignore:start/end -->` spans, extracts ```mermaid fences into markers, converts the Markdown to ADF (shelling out to `/map-markdown-adf`'s CLI, never importing its code), and — depending on what's configured — either publishes directly via REST v2 or hands back an ADF ready for the MCP publish tools:
 
 - Diagrams present and a token is configured → forces REST end to end: ensures the page exists (creating a placeholder when none was named), renders each diagram, uploads it as an attachment, substitutes every marker (at any nesting depth) for its media node, and publishes the final body.
 - No diagrams, token configured → REST when the ADF body is over `--threshold-bytes` (default 50KB — the practical ceiling is what an agent can safely inline into an MCP tool argument, not Confluence/MCP transport), otherwise MCP handback.

@@ -75,7 +75,7 @@ Maintain `Source Material`:
 - Add one row for each consumed Wayfinder map and closed child issue.
 - Merge later grill sessions into the same canonical row. Preserve prior confirmed outcomes unless current equal-or-stronger evidence explicitly supersedes them. Remove superseded text; deduplicate retained text.
 - Do not invent sources for legacy content.
-- Keep the section wrapped in `<!-- confluence:ignore:start -->`/`<!-- confluence:ignore:end -->` — it is repo-internal provenance, not Confluence-reader content.
+- Keep the section wrapped in `<!-- adf:ignore:start -->`/`<!-- adf:ignore:end -->` — it is repo-internal provenance, not Confluence-reader content.
 
 ## 6. Verify before writing
 
@@ -94,6 +94,6 @@ Maintain `Source Material`:
 
 ## Gotchas
 
-- **`<!-- confluence:toc -->`, `<!-- confluence:wide-table -->`, and `<!-- confluence:ignore:start -->`/`<!-- confluence:ignore:end -->` are structural Confluence-importer syntax, not model placeholders** — never strip them while clearing template instructions.
+- **`<!-- adf:toc -->`, `<!-- adf:wide-table -->`, and `<!-- adf:ignore:start -->`/`<!-- adf:ignore:end -->` are structural Confluence-importer syntax, not model placeholders** — never strip them while clearing template instructions.
 
 Write the result. Call it a draft while `Open Questions` is non-empty.
