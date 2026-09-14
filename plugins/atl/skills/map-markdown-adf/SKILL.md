@@ -76,6 +76,8 @@ Marks spanning the join survive, so `- lead **bold` + `  spanning** tail` yields
 
 `**strong**`, `*em*`, `` `code` ``, `[link](href)`, `~~strike~~`.
 
+Marks nest and combine onto one text node, innermost first: `` [`Foo.Bar`](href) `` is a single text node carrying `code` **and** `link`, and `**[label](href)**` carries `link` **and** `strong`. A partly marked label splits into several nodes that all keep the outer mark. Both directions agree — `adf-to-md` re-wraps a combined node in the same order. A code span's content is literal, so nothing nests inside it.
+
 `[STATUS:text|color]` maps to the inline `status` node — **ADF-only** (`color` one of `neutral`, `purple`, `blue`, `red`, `yellow`, `green`; defaults to `neutral` when omitted).
 
 ## Table validation

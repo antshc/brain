@@ -52,3 +52,8 @@ def test_round_trip_preserves_wording(md_to_adf, adf_to_md):
     doc = md_to_adf(_ORIGINAL_MD)
     round_tripped = adf_to_md(doc)
     assert _words(round_tripped) == _words(_ORIGINAL_MD)
+
+
+def test_round_trip_preserves_code_span_inside_link(md_to_adf, adf_to_md):
+    source = "see [`Foo.Bar`](https://example.com) here"
+    assert adf_to_md(md_to_adf(source)).strip() == source

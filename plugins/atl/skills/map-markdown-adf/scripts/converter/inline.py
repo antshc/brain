@@ -17,6 +17,15 @@ _INLINE_RE = re.compile(
 )
 
 
+def _marked(inner: str, mark: dict) -> list[dict]:
+    """Inner spans keep their own marks; the outer mark is appended to each text node."""
+    nodes = _parse_inline_marks(inner)
+    for node in nodes:
+        if node.get("type") == "text":
+            node.setdefault("marks", []).append(mark)
+    return nodes
+
+
 def _parse_inline_marks(text: str) -> list[dict]:
     nodes: list[dict] = []
     pos = 0
@@ -38,20 +47,23 @@ def _parse_inline_marks(text: str) -> list[dict]:
                 }
             )
         elif m.group("link_txt") is not None:
-            label = m.group("link_txt") or m.group("link_href")
-            nodes.append(
-                {"type": "text", "text": label, "marks": [{"type": "link", "attrs": {"href": m.group("link_href")}}]}
-            )
+            href = m.group("link_href")
+            link_mark = {"type": "link", "attrs": {"href": href}}
+            label = m.group("link_txt")
+            if label:
+                nodes.extend(_marked(label, link_mark))
+            else:
+                nodes.append({"type": "text", "text": href, "marks": [link_mark]})
         elif m.group("strong_txt") is not None:
-            nodes.append({"type": "text", "text": m.group("strong_txt"), "marks": [{"type": "strong"}]})
+            nodes.extend(_marked(m.group("strong_txt"), {"type": "strong"}))
         elif m.group("strong_u_txt") is not None:
-            nodes.append({"type": "text", "text": m.group("strong_u_txt"), "marks": [{"type": "strong"}]})
+            nodes.extend(_marked(m.group("strong_u_txt"), {"type": "strong"}))
         elif m.group("strike_txt") is not None:
-            nodes.append({"type": "text", "text": m.group("strike_txt"), "marks": [{"type": "strike"}]})
+            nodes.extend(_marked(m.group("strike_txt"), {"type": "strike"}))
         elif m.group("em_txt") is not None:
-            nodes.append({"type": "text", "text": m.group("em_txt"), "marks": [{"type": "em"}]})
+            nodes.extend(_marked(m.group("em_txt"), {"type": "em"}))
         elif m.group("em_u_txt") is not None:
-            nodes.append({"type": "text", "text": m.group("em_u_txt"), "marks": [{"type": "em"}]})
+            nodes.extend(_marked(m.group("em_u_txt"), {"type": "em"}))
         pos = m.end()
     if pos < len(text):
         remainder = text[pos:]
