@@ -115,10 +115,11 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a spec and publish it to the ticket tracker.
 - [to-capabilities](plugins/wf/skills/to-capabilities/SKILL.md): break an idea or grilled requirement into solution-agnostic capabilities.
 - [to-stories](plugins/wf/skills/to-stories/SKILL.md): package requirements into atomic, testable, FE/BE-split user stories with acceptance criteria.
+- [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one user story in the standard format — capability, stakeholder requirement, acceptance criteria, Jira-sync metadata.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
 - [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
 - [architecture-diagram](plugins/wf/skills/architecture-diagram/SKILL.md), [behavior-diagram](plugins/wf/skills/behavior-diagram/SKILL.md), [code-diagram](plugins/wf/skills/code-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
-- [to-contract-delta](plugins/wf/skills/to-contract-delta/SKILL.md): document contract deltas.
+- [draft-contract-delta](plugins/wf/skills/draft-contract-delta/SKILL.md): document contract deltas.
 - [solution-agnostic](plugins/wf/skills/solution-agnostic/SKILL.md): strip implementation artifacts out of requirement or story text.
 - [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): delegate read-only codebase questions to a subagent.
 - [prototype](plugins/wf/skills/prototype/SKILL.md): build a throwaway prototype to answer a design question.
