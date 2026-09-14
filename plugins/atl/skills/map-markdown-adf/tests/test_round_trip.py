@@ -1,7 +1,7 @@
 """Round-trip: Markdown -> ADF -> Markdown preserves wording word for word."""
 import re
 
-_ORIGINAL_MD = """<!-- confluence:toc -->
+_ORIGINAL_MD = """<!-- adf:toc -->
 
 # Heading One
 
@@ -29,7 +29,7 @@ x = 1
 | one | two |
 | three | four |
 
-<!-- confluence:wide-table -->
+<!-- adf:wide-table -->
 
 | Wide A | Wide B |
 | --- | --- |

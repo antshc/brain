@@ -26,9 +26,9 @@ def test_extract_no_diagrams_returns_empty_list(capsys):
 def test_extract_strips_ignored_sections_before_finding_mermaid(capsys):
     md = (
         "keep this\n\n"
-        "<!-- confluence:ignore:start -->\n"
+        "<!-- adf:ignore:start -->\n"
         "```mermaid\ngraph TD; A-->B;\n```\n"
-        "<!-- confluence:ignore:end -->\n"
+        "<!-- adf:ignore:end -->\n"
     )
     with patch("sys.stdin.read", return_value=md):
         main(["extract"])
@@ -39,7 +39,7 @@ def test_extract_strips_ignored_sections_before_finding_mermaid(capsys):
 
 
 def test_extract_reports_unterminated_ignore_start(capsys):
-    md = "keep\n<!-- confluence:ignore:start -->\nnever closed\n"
+    md = "keep\n<!-- adf:ignore:start -->\nnever closed\n"
     with patch("sys.stdin.read", return_value=md):
         with pytest.raises(SystemExit):
             main(["extract"])

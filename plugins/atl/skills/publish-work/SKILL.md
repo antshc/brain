@@ -54,7 +54,7 @@ Else → **create**:
 
 Jira renders plain CommonMark natively under `contentFormat: "markdown"` — headings, bullet and ordered lists, tables, fenced code, blockquotes, links, `**strong**`, `*em*`, `` `code` ``, `~~strike~~`, and `---` all survive without a conversion step.
 
-The rows `map-markdown-adf` marks **ADF-only** in its Supported structure table — `<details>` expands, `> [!INFO]` panels, `[STATUS:text|color]` lozenges, `<!-- confluence:toc -->`, `<!-- confluence:wide-table -->` — have no Markdown equivalent and arrive as literal text. Step 4's detection gate exists to catch exactly those; it is the single source of truth for the list, so read it there rather than re-deriving it here.
+The rows `map-markdown-adf` marks **ADF-only** in its Supported structure table — `<details>` expands, `> [!INFO]` panels, `[STATUS:text|color]` lozenges, `<!-- adf:toc -->`, `<!-- adf:wide-table -->` — have no Markdown equivalent and arrive as literal text. Step 4's detection gate exists to catch exactly those; it is the single source of truth for the list, so read it there rather than re-deriving it here.
 
 One physical line per bullet and paragraph keeps the two paths identical — `map-markdown-adf` folds soft-wrapped continuations, and Jira's own Markdown parser folds them too, but an unwrapped source removes the question.
 

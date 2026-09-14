@@ -134,7 +134,7 @@ def test_expand_with_toc_extension_renders_toc_comment(adf_to_md):
         },
     }
     doc = _doc({"type": "expand", "attrs": {"title": "Table of Contents"}, "content": [toc_extension]})
-    assert adf_to_md(doc) == "<!-- confluence:toc -->"
+    assert adf_to_md(doc) == "<!-- adf:toc -->"
 
 
 def test_table(adf_to_md):
@@ -232,4 +232,4 @@ def test_wide_table_layout_renders_prefixed_comment(adf_to_md):
             ],
         }
     )
-    assert adf_to_md(doc) == "<!-- confluence:wide-table -->\n\n| a | b |\n| --- | --- |\n| 1 | 2 |"
+    assert adf_to_md(doc) == "<!-- adf:wide-table -->\n\n| a | b |\n| --- | --- |\n| 1 | 2 |"

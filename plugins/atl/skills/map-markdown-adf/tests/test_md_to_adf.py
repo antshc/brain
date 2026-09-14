@@ -176,7 +176,7 @@ def test_continuation_join_preserves_inline_marks(md_to_adf):
         "---",
         "</details>",
         "> quoted",
-        "<!-- confluence:toc -->",
+        "<!-- adf:toc -->",
     ],
 )
 def test_block_start_after_bullet_ends_the_list(md_to_adf, follower):
@@ -196,7 +196,7 @@ def test_nested_list_still_wins_over_continuation(md_to_adf):
 
 
 def test_parse_blocks_toc_comment_becomes_expand(md_to_adf):
-    doc = md_to_adf("<!-- confluence:toc -->\n\n# Section")
+    doc = md_to_adf("<!-- adf:toc -->\n\n# Section")
     blocks = doc["content"]
     assert blocks[0]["type"] == "expand"
     assert blocks[0]["attrs"]["title"] == "Table of Contents"
@@ -205,7 +205,7 @@ def test_parse_blocks_toc_comment_becomes_expand(md_to_adf):
 
 
 def test_parse_blocks_wide_table_marker_sets_wide_layout(md_to_adf):
-    doc = md_to_adf("<!-- confluence:wide-table -->\n\n| a | b |\n| --- | --- |\n| 1 | 2 |")
+    doc = md_to_adf("<!-- adf:wide-table -->\n\n| a | b |\n| --- | --- |\n| 1 | 2 |")
     blocks = doc["content"]
     assert len(blocks) == 1
     assert blocks[0]["type"] == "table"
@@ -218,7 +218,7 @@ def test_parse_blocks_no_marker_keeps_default_layout(md_to_adf):
 
 
 def test_parse_blocks_wide_table_marker_dropped_if_not_followed_by_table(md_to_adf):
-    doc = md_to_adf("<!-- confluence:wide-table -->\nJust a paragraph.\n\n| a | b |\n| --- | --- |\n| 1 | 2 |")
+    doc = md_to_adf("<!-- adf:wide-table -->\nJust a paragraph.\n\n| a | b |\n| --- | --- |\n| 1 | 2 |")
     blocks = doc["content"]
     assert blocks[0]["type"] == "paragraph"
     table_block = next(b for b in blocks if b["type"] == "table")

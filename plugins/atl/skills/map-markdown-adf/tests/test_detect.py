@@ -14,8 +14,8 @@ def test_plain_commonmark_is_markdown_safe(detect_adf_only):
         ("<details>\n<summary>More</summary>\n\nbody\n\n</details>", "expand"),
         ("> [!WARNING]\n> mind the gap", "panel"),
         ("Ticket is [STATUS:Done|green] now.", "status"),
-        ("<!-- confluence:toc -->", "toc"),
-        ("<!-- confluence:wide-table -->\n\n| a |\n| --- |", "wideTable"),
+        ("<!-- adf:toc -->", "toc"),
+        ("<!-- adf:wide-table -->\n\n| a |\n| --- |", "wideTable"),
     ],
 )
 def test_each_adf_only_construct_is_detected(detect_adf_only, markdown_text, kind):
@@ -43,7 +43,7 @@ def test_plain_blockquote_is_not_a_panel(detect_adf_only):
 
 
 def test_multiple_constructs_report_source_order_and_line_numbers(detect_adf_only):
-    markdown_text = "<!-- confluence:toc -->\n\n> [!INFO]\n> note\n\nSee [STATUS:Open|blue].\n"
+    markdown_text = "<!-- adf:toc -->\n\n> [!INFO]\n> note\n\nSee [STATUS:Open|blue].\n"
     report = detect_adf_only(markdown_text)
     assert [(c["kind"], c["line"]) for c in report["constructs"]] == [
         ("toc", 1),
