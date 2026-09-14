@@ -138,6 +138,63 @@ def test_bullet_list_then_ordered_list_stay_separate(md_to_adf):
     assert len(doc["content"][1]["content"]) == 2
 
 
+def test_soft_wrapped_bullet_folds_into_one_item(md_to_adf):
+    doc = md_to_adf("- first line\n  continues here\n- second")
+    assert len(doc["content"]) == 1
+    items = doc["content"][0]["content"]
+    assert len(items) == 2
+    assert items[0]["content"][0]["content"][0]["text"] == "first line continues here"
+    assert items[1]["content"][0]["content"][0]["text"] == "second"
+
+
+def test_soft_wrapped_bullet_at_zero_indent_folds(md_to_adf):
+    doc = md_to_adf("- first line\ncontinues here")
+    assert len(doc["content"]) == 1
+    item = doc["content"][0]["content"][0]
+    assert item["content"][0]["content"][0]["text"] == "first line continues here"
+
+
+def test_soft_wrapped_ordered_item_folds(md_to_adf):
+    doc = md_to_adf("1. first line\n   continues here")
+    item = doc["content"][0]["content"][0]
+    assert item["content"][0]["content"][0]["text"] == "first line continues here"
+
+
+def test_continuation_join_preserves_inline_marks(md_to_adf):
+    doc = md_to_adf("- lead **bold\n  spanning** tail")
+    spans = doc["content"][0]["content"][0]["content"][0]["content"]
+    assert spans[1]["text"] == "bold spanning"
+    assert spans[1]["marks"] == [{"type": "strong"}]
+
+
+@pytest.mark.parametrize(
+    "follower",
+    [
+        "# Heading",
+        "| a | b |\n| --- | --- |",
+        "```python",
+        "---",
+        "</details>",
+        "> quoted",
+        "<!-- confluence:toc -->",
+    ],
+)
+def test_block_start_after_bullet_ends_the_list(md_to_adf, follower):
+    doc = md_to_adf(f"- only item\n{follower}")
+    assert doc["content"][0]["type"] == "bulletList"
+    assert doc["content"][0]["content"][0]["content"][0]["content"][0]["text"] == "only item"
+    assert len(doc["content"]) > 1
+
+
+def test_nested_list_still_wins_over_continuation(md_to_adf):
+    doc = md_to_adf("- parent\n  - child\n  trailing")
+    parent_item = doc["content"][0]["content"][0]
+    nested = [c for c in parent_item["content"] if c.get("type") == "bulletList"]
+    assert len(nested) == 1
+    child_item = nested[0]["content"][0]
+    assert child_item["content"][0]["content"][0]["text"] == "child trailing"
+
+
 def test_parse_blocks_toc_comment_becomes_expand(md_to_adf):
     doc = md_to_adf("<!-- confluence:toc -->\n\n# Section")
     blocks = doc["content"]

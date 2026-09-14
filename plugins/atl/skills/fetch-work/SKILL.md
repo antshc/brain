@@ -20,7 +20,7 @@ Return a Jira **Work item** as Markdown from its key or URL. MCP only — no API
 
 **4 — Fetch.** `getJiraIssue` with `cloudId`, `issueIdOrKey: <key>`, `responseContentFormat: "adf"`. Omit `fields` — the default set already covers summary, description, status, issuetype, priority, labels, components, assignee, reporter, created, updated, resolution, project.
 
-**5 — Guard truncation.** Save the tool result to `content.json` and parse with Python — never `read_file`.
+**5 — Guard truncation.** Save the tool result to `content.json` and read it with Python, per Preflight's standing rule.
 
 **6 — Convert.** Extract `fields.description` (ADF); pipe it into `/map-markdown-adf` **Action: Convert ADF to Markdown**.
 

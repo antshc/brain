@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import re
 
+from .patterns import STATUS_PATTERN
+
 _INLINE_RE = re.compile(
     r"`(?P<code_txt>[^`]+)`"
-    r"|\[STATUS:(?P<status_text>[^|\]]+?)(?:\|(?P<status_color>[a-zA-Z]+))?\]"
+    r"|" + STATUS_PATTERN +
     r"|\[(?P<link_txt>[^\]]*)\]\((?P<link_href>[^)\s]+)\)"
     r"|\*\*(?P<strong_txt>.+?)\*\*"
     r"|__(?P<strong_u_txt>.+?)__"

@@ -43,3 +43,13 @@ def adf_to_md():
         return result.stdout.rstrip("\n")
 
     return _convert
+
+
+@pytest.fixture
+def detect_adf_only():
+    def _detect(markdown_text: str) -> dict:
+        result = _run("detect-adf-only", markdown_text)
+        assert result.returncode == 0, result.stderr
+        return json.loads(result.stdout)
+
+    return _detect

@@ -44,9 +44,21 @@ This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--r
 Apply in every `atl` skill:
 
 - Every JQL/CQL search MUST use `maxResults: 10` / `limit: 10` — never more.
-- Save large tool results to `content.json` and parse with Python, never `read_file` — long fields get silently truncated otherwise.
+- Save a large tool result to `content.json` and read fields out of it with Python — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. `cd` to the file's directory first, then:
+
+  ```bash
+  python3 -c "import json;d=json.load(open('content.json'));print(d['fields']['description'])"
+  ```
+
+  Swap the key path for the field you want; `print(json.dumps(d, indent=2)[:2000])` when the shape is still unknown.
 - `getAccessibleAtlassianResources` at most once per session, only while `cloudId` is unknown (Step 2).
 - Never search for `.atlassian` (or anything else) from `/` or any other unbounded root — an empty `$HARNESS_REPO_PATH` is resolved to the repository root first (Step 1), never widened into a filesystem-wide search.
+
+## Gotchas
+
+**A long absolute path inside `python3 -c "..."` or a heredoc gets corrupted by terminal line-wrapping**, and the command then fails on a path that looks correct in the transcript. `cd` into the directory and use a relative filename; anything longer than one short statement goes into a temp `.py` file that gets run by name.
+
+**`python scripts/preflight.py` resolves against the current directory.** Run from anywhere else it fails with `No such file or directory` naming the script — Step 1's `cd` to the directory holding `preflight-atl/SKILL.md` is the fix, not a formality.
 
 ## Ambiguity
 
