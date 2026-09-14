@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from .table_grid import validate_table_grid
 
-# Applied outermost-last so a single mark renders the same regardless of list order
-# (nested/combined marks on one text node are a known limitation, not exercised here).
+# Applied innermost-first, so combined marks on one text node wrap in a fixed order
+# regardless of the order they appear in `marks` (code+link -> [`text`](href)).
 _MARK_ORDER = ("code", "strike", "em", "strong", "link")
 
 

@@ -255,6 +255,37 @@ def test_link_without_label_uses_href(md_to_adf):
     assert doc["content"][0]["content"][0]["text"] == "https://example.com"
 
 
+def test_code_span_inside_link_merges_both_marks(md_to_adf):
+    doc = md_to_adf("[`Foo.Bar`](https://example.com)")
+    assert doc["content"][0]["content"] == [
+        {
+            "type": "text",
+            "text": "Foo.Bar",
+            "marks": [{"type": "code"}, {"type": "link", "attrs": {"href": "https://example.com"}}],
+        }
+    ]
+
+
+def test_link_inside_strong_merges_both_marks(md_to_adf):
+    doc = md_to_adf("**[label](https://example.com)**")
+    assert doc["content"][0]["content"] == [
+        {
+            "type": "text",
+            "text": "label",
+            "marks": [{"type": "link", "attrs": {"href": "https://example.com"}}, {"type": "strong"}],
+        }
+    ]
+
+
+def test_partly_marked_link_label_splits_and_keeps_link_on_both(md_to_adf):
+    doc = md_to_adf("[**bold** tail](https://example.com)")
+    link_mark = {"type": "link", "attrs": {"href": "https://example.com"}}
+    assert doc["content"][0]["content"] == [
+        {"type": "text", "text": "bold", "marks": [{"type": "strong"}, link_mark]},
+        {"type": "text", "text": " tail", "marks": [link_mark]},
+    ]
+
+
 def test_mixed_marks_and_plain_text(md_to_adf):
     doc = md_to_adf("see **bold** and `code` here")
     assert doc["content"][0]["content"] == [

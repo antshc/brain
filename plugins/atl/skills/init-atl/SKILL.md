@@ -56,6 +56,7 @@ Nothing printed → continue. `NOT IGNORED` → append a `.atlassian` line (with
      - Frontmatter `name: <skillName>`, `description: Create a <issueType.name> in <projectKey> with this repository's required fields pre-filled. Use when asked to create/open/file a <issueType.name>.`
      - A table of the discovered required fields: field key, field name.
      - A workflow step gathering a value per required field (from the developer, or by mirroring an existing issue), then running `/publish-work` with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additional_fields`. The generated skill never calls `createJiraIssue` itself.
+     - A description-fidelity step, because the wrapper is what drafts the description: run `/map-markdown-adf` skill **Action: Detect ADF-only constructs** over the source **before** drafting; mirror the source's headings verbatim, adding no wrapper heading of its own and flattening no `<details>` block; and after an ADF publish, confirm the result by fetching the issue back with `getJiraIssue` rather than trusting the publish response.
 
 **8 — Report.** Whether `.atlassian` was created or updated and which keys were added (never a value — only whether a token was supplied); which wrapper skills were generated and their `.github/skills/` paths; which capabilities were skipped and the missing prerequisite for each; and that `plugins/atl/` and `plugins/atl/skills/` were not touched.
 
