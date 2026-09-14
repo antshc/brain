@@ -51,12 +51,12 @@ Both appendices are optional and live inside the collapsed **Technical notes** b
 - **Implementation Decisions** — omit unless this capability requires a specific implementation decision. Class, type, object, and endpoint names are welcome for navigation; never a file path or line number.
 - **Contracts Delta** — omit unless this capability changes an API, Database, or Resource contract, or (FE stories only) a GUI surface. Order its blocks API → Database → Resource → other → GUI.
 
-The heading may carry an optional feature slug, formatted `[SLUG]` in SCREAMING_SNAKE_CASE (uppercase words joined by underscores, e.g. `[NOTIFICATIONS]`), appended after the capability title. Add it **only when the user explicitly asks for a feature slug** — never by default. Once a slug is present in a title, preserve it verbatim on any later edit to that story; never strip or rename it.
+The heading may carry an optional feature slug, formatted `[SLUG]` in SCREAMING_SNAKE_CASE (uppercase words joined by underscores, e.g. `[NOTIFICATIONS]`), prepended before the `[{{technology}}]` tag. Add it **only when the user explicitly asks for a feature slug** — never by default. Once a slug is present in a title, preserve it verbatim on any later edit to that story; never strip or rename it.
 
 For a standalone story, the heading is `## [{{technology}}] {{capabilityTitle}}`. When the caller supplies a story number, prefix it: `## Story {{n}} — [{{technology}}] {{capabilityTitle}}`. `{{technology}}` is `FE` or `BE`.
 
 ```
-## Story {{n|omit the "Story {{n}} — " prefix for a standalone story}} — [{{technology|FE|BE}}] {{capabilityTitle}}{{ [SLUG]|optional, SCREAMING_SNAKE_CASE, only when user asked for it}}
+## Story {{n|omit the "Story {{n}} — " prefix for a standalone story}} — {{[SLUG]|optional, SCREAMING_SNAKE_CASE, only when user asked for it }}[{{technology|FE|BE}}] {{capabilityTitle}}
 
 **Jira ID:** {{jiraId|TBD}}
 **Epic ID:** {{epicId|TBD}}
