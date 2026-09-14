@@ -1,0 +1,47 @@
+name: Python tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to test
+        required: true
+        default: main
+        type: string
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python tests
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'feat/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || github.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Python dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          while IFS= read -r -d '' requirements_file; do
+            python -m pip install -r "$requirements_file"
+          done < <(
+            find . \
+              -path '*/_backup/*' -prune -o \
+              -path '*/_in-progress/*' -prune -o \
+              -name requirements.txt -type f -print0
+          )
+          python -m pip install -e ".[dev]"
+
+      - name: Run all Python tests
+        run: python -m pytest --import-mode=importlib .

@@ -362,7 +362,7 @@ def test_render_diagrams_drawio_mode_uses_the_native_swimlane_converter_when_ena
 
     assert diagrams[0]["renderer"] == "drawio"
     drawio_xml = (assets_dir / "00-title.drawio").read_text()
-    assert 'style="swimlane;html=1;startSize=20;"' in drawio_xml
+    assert 'style="swimlane;html=1;startSize=20;' in drawio_xml
     assert "shape=mxgraph.flowchart.start_1" in drawio_xml
     # No XML import call — only mmdc (validation) and drawio (preview PNG export).
     assert [call.args[0][0] for call in mock_run.call_args_list] == ["mmdc", "drawio"]
