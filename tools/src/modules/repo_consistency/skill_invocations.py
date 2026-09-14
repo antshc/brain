@@ -6,10 +6,10 @@ from pathlib import Path
 from modules.repo_consistency.discovery import find_skill_and_agent_files, find_skill_names
 from modules.repo_consistency.violation import Violation
 
-# Backtick-wrapped, slash-prefixed, lowercase-hyphen skill name — matches the
-# `` `/name` `` invocation shape only; a path with '/' or '_' inside the
-# backticks (e.g. `` `/memories/session/x.md` ``, `` `/HARNESS_REPO_PATH` ``) doesn't match.
-_INVOCATION = re.compile(r"`(/[a-zA-Z][a-zA-Z0-9-]*)`")
+# A skill invocation uses the repository's documented ``Run `/name` skill`` or
+# ``Follow `/name` skill`` form. Requiring the verb prevents filesystem paths
+# such as `` `/usr` `` and `` `/wiki` `` from being treated as skill names.
+_INVOCATION = re.compile(r"\b(?:Run|Follow)\s+`/([a-zA-Z][a-zA-Z0-9-]*)`")
 
 
 def find_dangling_skill_invocations(repo_root: Path) -> list[Violation]:
@@ -21,7 +21,7 @@ def find_dangling_skill_invocations(repo_root: Path) -> list[Violation]:
         rel = str(doc.relative_to(repo_root))
         reported: set[str] = set()
         for match in _INVOCATION.finditer(text):
-            name = match.group(1)[1:]
+            name = match.group(1)
             if name in known_skills or name in reported:
                 continue
             reported.add(name)

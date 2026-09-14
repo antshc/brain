@@ -1,0 +1,60 @@
+name: Sandbox
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  sandbox:
+    name: Sandbox
+    if: startsWith(github.head_ref, 'sand/')
+    runs-on: ubuntu-latest
+    env:
+      SANDBOX_PATH: ${{ github.head_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Resolve sandbox file
+        id: sandbox
+        shell: bash
+        run: |
+          set -euo pipefail
+          sandbox_file="${SANDBOX_PATH#sand/}"
+
+          if [[ -z "$sandbox_file" || "$sandbox_file" == /* || "$sandbox_file" == ".." || "$sandbox_file" == ../* || "$sandbox_file" == */../* || "$sandbox_file" == */.. || "$sandbox_file" != *.py ]]; then
+            echo "Branch must be named sand/<relative-path-to-python-file>." >&2
+            exit 1
+          fi
+
+          if [[ ! -f "$sandbox_file" ]]; then
+            echo "Missing sandbox Python file: $sandbox_file" >&2
+            exit 1
+          fi
+
+          echo "file=$sandbox_file" >> "$GITHUB_OUTPUT"
+
+      - name: Install repository dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          while IFS= read -r -d '' requirements_file; do
+            python -m pip install -r "$requirements_file"
+          done < <(
+            find . \
+              \( -type d \( -name .git -o -name _backup -o -name _in-progress \) \) -prune -o \
+              -type f -name requirements.txt -print0 | sort -z
+          )
+
+      - name: Run sandbox
+        run: python3 "${{ steps.sandbox.outputs.file }}"
