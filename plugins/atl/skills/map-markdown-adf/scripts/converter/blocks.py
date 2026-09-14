@@ -6,7 +6,15 @@ from __future__ import annotations
 import re
 
 from .inline import parse_inline
-from .patterns import HEADING_RE, PANEL_MARKER_RE, TOC_COMMENT_RE, WIDE_TABLE_MARKER_RE
+from .patterns import (
+    DETAILS_CLOSE_RE,
+    DETAILS_OPEN_RE,
+    HEADING_RE,
+    PANEL_MARKER_RE,
+    SUMMARY_RE,
+    TOC_COMMENT_RE,
+    WIDE_TABLE_MARKER_RE,
+)
 from .table_grid import validate_table_grid
 
 CODE_LANG_ALLOWLIST = {
@@ -35,9 +43,6 @@ _RULE_RE = re.compile(r"^(-{3,}|\*{3,}|_{3,})\s*$")
 _TABLE_ROW_RE = re.compile(r"^\|(.*)\|\s*$")
 _TABLE_SEP_RE = re.compile(r"^\|[\s:|-]+\|\s*$")
 _FENCE_OPEN_RE = re.compile(r"^```(\w*)\s*$")
-_DETAILS_OPEN_RE = re.compile(r"^\s*<details>\s*$")
-_DETAILS_CLOSE_RE = re.compile(r"^\s*</details>\s*$")
-_SUMMARY_RE = re.compile(r"^\s*<summary>(.*)</summary>\s*$")
 
 # Column widths (px) for headers this skill recognizes by name, stripped of markdown marks
 # (e.g. "**#**" -> "#"). Only applied when a table has at least one of these headers, so
@@ -154,20 +159,20 @@ def parse_blocks(lines: list[str]) -> list[dict]:
                 blocks.append({"type": "blockquote", "content": paragraphs_from_lines(quote_lines)})
             continue
 
-        if _DETAILS_OPEN_RE.match(line):
+        if DETAILS_OPEN_RE.match(line):
             i += 1
             title = ""
             if i < n:
-                sm = _SUMMARY_RE.match(lines[i])
+                sm = SUMMARY_RE.match(lines[i])
                 if sm:
                     title = sm.group(1).strip()
                     i += 1
             inner_lines = []
             depth = 1
             while i < n and depth > 0:
-                if _DETAILS_OPEN_RE.match(lines[i]):
+                if DETAILS_OPEN_RE.match(lines[i]):
                     depth += 1
-                elif _DETAILS_CLOSE_RE.match(lines[i]):
+                elif DETAILS_CLOSE_RE.match(lines[i]):
                     depth -= 1
                     if depth == 0:
                         i += 1
@@ -201,6 +206,10 @@ def parse_blocks(lines: list[str]) -> list[dict]:
         while i < n and lines[i].strip() and not _is_block_start(lines[i], lines, i):
             para_lines.append(lines[i])
             i += 1
+        if not para_lines:
+            # A block-start marker no branch above claimed (e.g. a stray `</details>`) is literal text.
+            para_lines.append(lines[i])
+            i += 1
         text = " ".join(l.strip() for l in para_lines)
         blocks.append({"type": "paragraph", "content": parse_inline(text)})
 
@@ -216,7 +225,9 @@ def _is_block_start(line: str, lines: list[str], i: int) -> bool:
         return True
     if line.startswith(">"):
         return True
-    if _DETAILS_OPEN_RE.match(line) or _DETAILS_CLOSE_RE.match(line):
+    if DETAILS_OPEN_RE.match(line) or DETAILS_CLOSE_RE.match(line) or SUMMARY_RE.match(line):
+        return True
+    if TOC_COMMENT_RE.match(line) or WIDE_TABLE_MARKER_RE.match(line):
         return True
     if _TABLE_ROW_RE.match(line) and i + 1 < len(lines) and _TABLE_SEP_RE.match(lines[i + 1]):
         return True
@@ -293,16 +304,25 @@ def parse_list(lines: list[str], i: int) -> tuple[dict, int]:
 
         item_text = m.group(2)
         i += 1
-        item_content = [{"type": "paragraph", "content": parse_inline(item_text)}]
+        item_content: list[dict] = []
 
-        # Continuation: only a deeper-indented nested list is folded into this item.
+        # Fold soft-wrapped continuation lines into the item's paragraph; a deeper-indented
+        # list nests under it instead.
         while i < n and lines[i].strip():
             _, sub_m = _match_list_marker(lines[i])
             if sub_m and len(sub_m.group(1)) > indent:
+                if not item_content:
+                    item_content.append({"type": "paragraph", "content": parse_inline(item_text)})
                 nested_block, i = parse_list(lines, i)
                 item_content.append(nested_block)
                 continue
-            break  # keep list-item parsing simple: one paragraph + optional nested list only
+            if sub_m or item_content or _is_block_start(lines[i], lines, i):
+                break  # keep list-item parsing simple: one paragraph + optional nested list only
+            item_text = f"{item_text} {lines[i].strip()}"
+            i += 1
+
+        if not item_content:
+            item_content.append({"type": "paragraph", "content": parse_inline(item_text)})
 
         items.append({"type": "listItem", "content": item_content})
 

@@ -152,7 +152,7 @@ _Avoid_: document, article, wiki page
 _Plugins_set_: atl
 
 **ADF**:
-Atlassian Document Format — the structured JSON body Jira and Confluence store content in. The only representation `atl` sends over the wire; Markdown is what the user and the agent read, and `map-markdown-adf` is the single boundary between the two, in both directions.
+Atlassian Document Format — the structured JSON body Jira and Confluence store content in. Markdown is what the user and the agent read, and `map-markdown-adf` is the single boundary between the two, in both directions; it also decides which representation goes over the wire, since Jira accepts plain Markdown but only ADF carries panels, expands, status lozenges, and Confluence macros.
 _Avoid_: rich text, Atlassian JSON, doc format
 _Plugins_set_: atl
 

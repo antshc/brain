@@ -1,11 +1,11 @@
 ---
 name: map-markdown-adf
-description: Convert Markdown to Atlassian Document Format (ADF) and back, through the single shared conversion capability for the `atl` plugin. Use when a skill needs to send Markdown to Jira/Confluence as ADF, or needs to read a fetched ADF body back as Markdown. Preserves source wording verbatim — never summarizes, corrects, or reinterprets content.
+description: Convert Markdown to Atlassian Document Format (ADF) and back, and detect the constructs only ADF can express, through the single shared conversion capability for the `atl` plugin. Use when a skill needs to send Markdown to Jira/Confluence as ADF, needs to read a fetched ADF body back as Markdown, or needs to decide whether Markdown alone will carry a document. Preserves source wording verbatim — never summarizes, corrects, or reinterprets content.
 ---
 
 # Map Markdown <-> ADF
 
-The conversion capability shared by every `atl` skill that reads or publishes content. One CLI, both directions, pure and offline — no filesystem, no config, no network.
+The conversion capability shared by every `atl` skill that reads or publishes content. One CLI, both directions plus a detection gate, pure and offline — no filesystem, no config, no network.
 
 ## Setup
 
@@ -29,11 +29,23 @@ python scripts/map_markdown_adf.py adf-to-md < input.json > output.md
 
 Stdin one ADF document → stdout Markdown.
 
+## Action: Detect ADF-only constructs
+
+```bash
+python scripts/map_markdown_adf.py detect-adf-only < input.md > report.json
+```
+
+Stdin Markdown → stdout `{"adfOnly": <bool>, "constructs": [{"kind": ..., "line": <1-based>}]}`, listing every construct marked **ADF-only** in Supported structure, in source order. Kinds are `expand`, `panel`, `status`, `toc`, `wideTable`. Markers inside a fenced code block are literal text and go unreported.
+
+Exits `0` whether or not anything is found — branch on `adfOnly`, not the exit code. `adfOnly: false` means the source is plain CommonMark and a caller may publish it as-is with `contentFormat: "markdown"`; `adfOnly: true` means it must convert first.
+
 ## Preserved verbatim
 
 Source wording is never summarized, corrected, or reinterpreted in either direction — only structure and marks are translated.
 
 ## Supported structure
+
+Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `detect-adf-only` reports them so a caller knows Markdown alone will not carry the document.
 
 | Markdown | ADF |
 | --- | --- |
@@ -42,19 +54,29 @@ Source wording is never summarized, corrected, or reinterpreted in either direct
 | Bullet list (`-`, `*`, `+`) | `bulletList` / `listItem` |
 | Ordered list | `orderedList` / `listItem` |
 | Blockquote (`>`) | `blockquote` |
-| `> [!INFO]` / `[!NOTE]` / `[!WARNING]` / `[!SUCCESS]` / `[!ERROR]` blockquote | `panel` (`attrs.panelType`) |
+| `> [!INFO]` / `[!NOTE]` / `[!WARNING]` / `[!SUCCESS]` / `[!ERROR]` blockquote | `panel` (`attrs.panelType`) — **ADF-only** |
 | Fenced code block | `codeBlock` (`attrs.language` when recognized) |
 | Table | `table` / `tableRow` / `tableHeader` / `tableCell` |
 | Horizontal rule (`---`) | `rule` |
-| `<details><summary>` | `expand` (`attrs.title`) |
-| `<!-- confluence:toc -->` | `expand` + `toc` extension |
-| `<!-- confluence:wide-table -->` | `table.attrs.layout: "wide"` |
+| `<details><summary>` | `expand` (`attrs.title`) — **ADF-only** |
+| `<!-- confluence:toc -->` | `expand` + `toc` extension — **ADF-only** |
+| `<!-- confluence:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
+
+A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `  continues here` is one `listItem`, not a list plus a stray paragraph:
+
+```json
+{"type": "bulletList", "content": [
+  {"type": "listItem", "content": [
+    {"type": "paragraph", "content": [{"type": "text", "text": "first line continues here"}]}]}]}
+```
+
+Marks spanning the join survive, so `- lead **bold` + `  spanning** tail` yields one `strong` span reading `bold spanning`. A deeper-indented marker still nests, and any block start — heading, table, fence, rule, blockquote, `</details>`, or a Confluence marker comment — ends the list instead of folding into it.
 
 ## Supported marks
 
 `**strong**`, `*em*`, `` `code` ``, `[link](href)`, `~~strike~~`.
 
-`[STATUS:text|color]` maps to the inline `status` node (`color` one of `neutral`, `purple`, `blue`, `red`, `yellow`, `green`; defaults to `neutral` when omitted).
+`[STATUS:text|color]` maps to the inline `status` node — **ADF-only** (`color` one of `neutral`, `purple`, `blue`, `red`, `yellow`, `green`; defaults to `neutral` when omitted).
 
 ## Table validation
 
