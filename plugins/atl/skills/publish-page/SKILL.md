@@ -79,7 +79,7 @@ Never print, log, quote, or publish `ATLASSIAN_SITE`, `ATLASSIAN_EMAIL`, or `ATL
 
 `pageId` named → **update**, pass it as `--page-id`. Else → **create**, resolve `spaceId`: supplied → use it. Else Preflight's `defaultSpaceId` if non-empty, reported as resolved. Else `getConfluenceSpaces` with `limit: 10` — exactly one → use it and report it; more than one → ask, never choose silently (Preflight's Ambiguity rule). Pass it as `--space-id`.
 
-**4 — Run the pipeline.** From the directory holding this `SKILL.md`:
+**4 — Run the pipeline.** The script lives at `scripts/publish_page_diagrams.py`, beside this `SKILL.md` — its path is `<directory of this file you just read>/scripts/publish_page_diagrams.py`. Never search the filesystem (e.g. `find /`) for it; the path is already known from wherever this file was loaded from. `cd` into that directory (or prefix the script path with it) and run:
 
 ```bash
 python scripts/publish_page_diagrams.py run \
