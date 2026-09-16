@@ -1,6 +1,6 @@
 ---
 name: inspect-nuget-source
-description: Resolve a C# type or member that has no definition in local source to the NuGet package that owns it, and verify its real API or behavior from the package's XML docs or decompiled assembly. Use when a repo-wide search for a type, interface, base class, or member comes back empty; when a stack frame, exception type, log line, or failing test names a type with no definition in local source; when a claim about a package type must be confirmed during code review, feature design, or exploration; when checking whether packages are restored; and before any disk-wide `find`/`grep`. Triggers even when the words "nuget", "package", or "decompile" never appear and the owning package is unknown — identifying it is this skill's first step, not a precondition.
+description: Resolve a C# type or member that has no definition in local source to the NuGet package that owns it, and verify its real API or behavior from the package's XML docs or decompiled assembly. Use when a repo-wide search for a type, interface, base class, or member comes back empty; when a type is named on a failing stack frame but is not in local source; when a claim about a package type must be confirmed during code review, feature design, or exploration; when checking whether packages are restored; and before any disk-wide `find`/`grep`. Triggers even when the words "nuget", "package", or "decompile" never appear and the owning package is unknown — identifying it is this skill's first step, not a precondition.
 ---
 
 # Inspect NuGet package source
