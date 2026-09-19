@@ -10,8 +10,8 @@ Usage:
     python3 publish_page_diagrams.py run --md-path design.md --page-id <id> \
         --root <Harness Repo Path> --out final_adf.json
 
-Requires `mmdc` (@mermaid-js/mermaid-cli) on PATH and `atlassian-python-api` (see
-../requirements.txt) whenever a REST publish is needed; credentials are read from
+Requires `mmdc` (@mermaid-js/mermaid-cli) on PATH and `atlassian-python-api` (installed
+once by ../../init-atl/requirements.txt via /init-atl) whenever a REST publish is needed; credentials are read from
 `.atlassian` inside the script -- never passed as CLI args or literals.
 
 This file is a thin entrypoint; the pipeline lives in ./page_diagrams/, split along its seams
