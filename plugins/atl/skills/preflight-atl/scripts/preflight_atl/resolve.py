@@ -26,9 +26,11 @@ def derive_cloud_id(site: str) -> str:
 
 
 def resolve(root: str) -> dict:
-    """Return the config-derived subset of the six-field Preflight shape.
+    """Return the config-derived subset of the eight-field Preflight shape.
 
     `mcpConnected` always comes back `False` here — only a live MCP call may set it `True`.
+    `accountId`/`displayName` come from a prior `/init-atl` cache when present, empty otherwise —
+    a live `atlassianUserInfo` call is the only other way to populate them (see SKILL.md Step 3).
     """
     config = load_config(root)
     site = config.get("ATLASSIAN_SITE", "").strip()
@@ -40,4 +42,6 @@ def resolve(root: str) -> dict:
         "defaultSpaceId": _first_entry(config.get("ATLASSIAN_CONFLUENCE_SPACE_IDS", "")),
         "tokenAvailable": bool(token),
         "mcpConnected": False,
+        "accountId": config.get("ATLASSIAN_ACCOUNT_ID", "").strip(),
+        "displayName": config.get("ATLASSIAN_DISPLAY_NAME", "").strip(),
     }

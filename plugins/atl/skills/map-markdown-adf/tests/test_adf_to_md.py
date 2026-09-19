@@ -1,6 +1,7 @@
 """ADF -> Markdown cases, ported from pyadf2md's JSON fixtures and extended for the block/mark
 types pyadf2md never supported (heading, codeBlock, blockquote, rule, expand, strike, code, link).
 """
+import json
 
 
 def _doc(*content):
@@ -233,3 +234,41 @@ def test_wide_table_layout_renders_prefixed_comment(adf_to_md):
         }
     )
     assert adf_to_md(doc) == "<!-- adf:wide-table -->\n\n| a | b |\n| --- | --- |\n| 1 | 2 |"
+
+
+def test_drawio_extension_renders_diagram_placeholder(adf_to_md):
+    doc = _doc(
+        {
+            "type": "extension",
+            "attrs": {
+                "extensionKey": "app-1/env-1/static/drawio",
+                "parameters": {"guestParams": {"diagramName": "order-flow.drawio"}},
+            },
+        }
+    )
+    assert adf_to_md(doc) == '<!-- adf:diagram drawio="order-flow.drawio" -->'
+
+
+def test_media_single_renders_diagram_placeholder(adf_to_md):
+    doc = _doc(
+        {
+            "type": "mediaSingle",
+            "attrs": {"layout": "center"},
+            "content": [{"type": "media", "attrs": {"id": "file-123", "type": "file"}}],
+        }
+    )
+    assert adf_to_md(doc) == '<!-- adf:diagram media-id="file-123" -->'
+
+
+def test_unknown_extension_still_raises(run_cli):
+    doc = _doc({"type": "extension", "attrs": {"extensionKey": "some.other.macro"}})
+    result = run_cli("adf-to-md", json.dumps(doc))
+    assert result.returncode != 0
+    assert "some.other.macro" in result.stderr
+
+
+def test_unknown_node_type_still_raises(run_cli):
+    doc = _doc({"type": "totallyUnknownNode"})
+    result = run_cli("adf-to-md", json.dumps(doc))
+    assert result.returncode != 0
+    assert "totallyUnknownNode" in result.stderr

@@ -53,6 +53,22 @@ def render_block(node: dict) -> str:
         if node.get("attrs", {}).get("layout") == "wide":
             return f"<!-- adf:wide-table -->\n\n{rendered}"
         return rendered
+    if node_type == "extension":
+        extension_key = node.get("attrs", {}).get("extensionKey", "")
+        if "static/drawio" in extension_key:
+            diagram_name = (
+                node.get("attrs", {}).get("parameters", {}).get("guestParams", {}).get("diagramName", "")
+            )
+            return f'<!-- adf:diagram drawio="{diagram_name}" -->'
+        raise NotImplementedError(f"unhandled ADF extension '{extension_key}'")
+    if node_type in ("mediaSingle", "media"):
+        media_node = node if node_type == "media" else next(
+            (c for c in node.get("content", []) if c.get("type") == "media"), None
+        )
+        if media_node is not None:
+            media_id = media_node.get("attrs", {}).get("id", "")
+            return f'<!-- adf:diagram media-id="{media_id}" -->'
+        raise NotImplementedError("unhandled ADF mediaSingle with no media child")
     raise NotImplementedError(f"unhandled ADF node type '{node_type}'")
 
 

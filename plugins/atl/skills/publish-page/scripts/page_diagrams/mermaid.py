@@ -60,11 +60,13 @@ def extract_mermaid(md_text: str) -> tuple[str, list[dict]]:
     """Replace each ```mermaid fence with a \\x00MEDIA:{i}\\x00 marker line.
 
     Returns (processed_markdown, diagrams) where each diagram dict has
-    {"index", "code", "name"}. `name` is the diagram's Confluence identity — the attachment
-    filename and the Draw.io custom content title a republish matches on — so a fence
-    carrying a `%% diagram-id: <id>` line is named after that id and keeps replacing the
+    {"index", "code", "name", "source"}. `name` is the diagram's Confluence identity — the
+    attachment filename and the Draw.io custom content title a republish matches on — so a
+    fence carrying a `%% diagram-id: <id>` line is named after that id and keeps replacing the
     same published diagram however the document is reordered or its headings reworded. The
-    id line is stripped from `code`, leaving `mmdc` and the Draw.io import untouched.
+    id line is stripped from `code`, leaving `mmdc` and the Draw.io import untouched. `source`
+    keeps the fence exactly as written (id line included) so it can be republished verbatim
+    as a round-trip sidecar for `/fetch-page`.
 
     A fence without an id falls back to position-and-prose naming: the nearest preceding
     heading or, inside a `<details><summary>` expand with no heading of its own, the
@@ -77,6 +79,7 @@ def extract_mermaid(md_text: str) -> tuple[str, list[dict]]:
     def _replace(match: re.Match) -> str:
         nonlocal index
         code = match.group(1)
+        source = code
         id_match = DIAGRAM_ID_RE.search(code)
         if id_match:
             diagram_id = id_match.group(1)
@@ -90,7 +93,7 @@ def extract_mermaid(md_text: str) -> tuple[str, list[dict]]:
             name = slugify(diagram_id)
         else:
             name = _heading_name(md_text, match.start(), index)
-        diagrams.append({"index": index, "code": code, "name": name})
+        diagrams.append({"index": index, "code": code, "name": name, "source": source})
         marker = media_marker(index)
         index += 1
         return marker
@@ -267,6 +270,9 @@ def render_diagrams(
     `attachments` list of `{"path", "filename"}` entries — one PNG for `png`, the editable
     diagram plus its preview for `drawio`, none for `mermaid`. `drawio` also carries the macro
     parameters the extension node needs: `diagram_name`, `search`, `width`, and `height`.
+    `png` and `drawio` also attach `{name}.source.mmd`, the verbatim fence (diagram-id line
+    included), so `/fetch-page` can restore the original ```mermaid block; `mermaid` skips it
+    since its macro already carries the source inline.
 
     A diagram Draw.io cannot import falls back to `png` on its own, so under `drawio` the
     per-diagram `renderer` is what the caller must branch on, not this argument.
@@ -285,7 +291,12 @@ def render_diagrams(
             _validate_with_mmdc(mmd_path, css_path, background)
             d["attachments"] = []
             d["renderer"] = renderers.MERMAID
+            continue
         elif renderer == renderers.DRAWIO:
             _render_drawio(d, mmd_path, assets_path, css_path, background, swimlane_drawio_enabled)
         else:
             _render_png(d, mmd_path, assets_path, css_path, background)
+        source_path = assets_path / f"{d['name']}.source.mmd"
+        source_path.write_text(d.get("source", d["code"]) + "\n")
+        d["source_path"] = str(source_path)
+        d["attachments"].append({"path": str(source_path), "filename": source_path.name})

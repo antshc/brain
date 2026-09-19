@@ -14,7 +14,19 @@ def test_resolve_returns_empty_fields_when_config_absent(tmp_path):
         "defaultSpaceId": "",
         "tokenAvailable": False,
         "mcpConnected": False,
+        "accountId": "",
+        "displayName": "",
     }
+
+
+def test_resolve_reports_cached_identity_from_config(tmp_path):
+    write_config(
+        tmp_path,
+        "ATLASSIAN_ACCOUNT_ID=test-account-id\nATLASSIAN_DISPLAY_NAME=Anton Shcherbyna\n",
+    )
+    facts = resolve(str(tmp_path))
+    assert facts["accountId"] == "test-account-id"
+    assert facts["displayName"] == "Anton Shcherbyna"
 
 
 def test_resolve_reports_site_and_default_project_key_from_nested_config(tmp_path):

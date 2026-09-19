@@ -13,6 +13,8 @@ def test_main_prints_empty_fields_as_json_when_config_absent(tmp_path, capsys):
         "defaultSpaceId": "",
         "tokenAvailable": False,
         "mcpConnected": False,
+        "accountId": "",
+        "displayName": "",
     }
 
 

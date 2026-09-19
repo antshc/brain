@@ -35,6 +35,7 @@ Zero results → `configPath := $HARNESS_REPO_PATH/.atlassian`, not yet created.
 - Not yet created → create `$HARNESS_REPO_PATH/.atlassian` with all seven keys, one `KEY=VALUE` line each (empty value when declined).
 - Already exists → append only the keys missing from `presentKeys`, one `KEY=VALUE` line each, at the end; every existing line stays untouched and in place.
 - Never print, log, or echo `ATLASSIAN_API_TOKEN`'s value.
+- `ATLASSIAN_ACCOUNT_ID`/`ATLASSIAN_DISPLAY_NAME` are never part of this step — they're auto-populated from a live call in Step 6, never asked of the developer here.
 
 **5 — Confirm the config file is gitignored.**
 ```bash
@@ -42,7 +43,7 @@ git -C "$HARNESS_REPO_PATH" check-ignore -q "$configPath" || echo "NOT IGNORED"
 ```
 Nothing printed → continue. `NOT IGNORED` → append a `.atlassian` line (with a short comment noting it holds a credential) to `$HARNESS_REPO_PATH/.gitignore`, creating that file if needed. Never leave it un-ignored.
 
-**6 — Resolve the MCP connection.** Run `/preflight-atl` skill **Action: Resolve**. `mcpConnected` false → name "an Atlassian MCP connection" as the missing prerequisite, skip Step 7, go to Step 8.
+**6 — Resolve the MCP connection and cache identity.** Run `/preflight-atl` skill **Action: Resolve**, forcing the live identity/connectivity check — this step is what populates the cache Preflight's Step 3 later reads instead of calling `atlassianUserInfo` again, so its own cache-skip rule does not apply here. `mcpConnected` false → name "an Atlassian MCP connection" as the missing prerequisite, skip Step 7, go to Step 8. `mcpConnected` true and `ATLASSIAN_ACCOUNT_ID`/`ATLASSIAN_DISPLAY_NAME` missing from `presentKeys` → append them to `.atlassian` with Preflight's live `accountId`/`displayName`, one `KEY=VALUE` line each, mirroring Step 4's append-only-missing-keys behavior.
 
 **7 — Offer a wrapper skill per Jira work item type.**
 1. Resolve `projectKey`: Preflight's `defaultProjectKey` if non-empty. Else `getVisibleJiraProjects` — exactly one → use it; more → ask; zero → name "a visible Jira project" as the missing prerequisite, skip to Step 8.
