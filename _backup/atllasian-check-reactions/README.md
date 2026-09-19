@@ -1,5 +1,5 @@
 # check_reactions.py (archived)
-
+Open issue in the atllasian https://jira.atlassian.com/browse/JRACLOUD-78153
 Standalone script that queries Jira's **undocumented internal** endpoint
 `gateway/api/reactions/reactions/view` to read emoji reactions on comments —
 data that `getJiraIssue`'s `comment` field never exposes (see `brief-daily`'s
