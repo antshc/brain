@@ -9,7 +9,7 @@ The conversion capability shared by every `atl` skill that reads or publishes co
 
 ## Setup
 
-`pip install -r requirements.txt` (relative to this skill's directory) — dev-only, for tests. The CLI has no third-party runtime dependencies.
+`pytest` (dev-only, for tests) is installed once by `/init-atl` for the whole `atl` plugin. The CLI itself has no third-party runtime dependencies.
 
 ## Action: Convert Markdown to ADF
 

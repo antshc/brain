@@ -10,7 +10,7 @@ Create or update a Confluence **page** from a local Markdown file, via one `run`
 
 ## Prerequisites
 
-- `pip install -r requirements.txt` (relative to this skill's directory) — needed for every REST-publish path (diagrams present, or a large diagram-free body).
+- `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; it covers every REST-publish path (diagrams present, or a large diagram-free body).
 - A diagram-bearing publish always goes REST, so for that branch `ATLASSIAN_API_TOKEN` (in `.atlassian`) and `mmdc` are **mandatory**, not optional:
   - `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli` (npm, not pip); verify `mmdc --version`.
   - `mmdc` renders via headless Chrome (puppeteer), needing these shared libraries on Debian/Ubuntu (names shown for Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.

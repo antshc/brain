@@ -10,7 +10,7 @@ Return a Confluence **Page** as Markdown from its identifier or URL. MCP only fo
 
 ## Prerequisites
 
-- `pip install -r requirements.txt` (relative to this skill's directory) — needed only when a fetched page turns out to carry a diagram; a diagram-free page never touches it.
+- `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; this skill installs nothing of its own.
 - Restoring a diagram's mermaid source needs `ATLASSIAN_API_TOKEN` (in `.atlassian`), the same credential `/publish-page` uses to upload it. Without it, the diagram comes back as a placeholder note instead of a ```mermaid fence.
 
 ## Workflow
@@ -32,7 +32,7 @@ A `<site>` from the URL wins as `cloudId`; otherwise use Preflight's.
 python scripts/assemble_page.py --page-id <page_id> --root "$HARNESS_REPO_PATH" < content.json > page.md
 ```
 
-from this skill's directory. Internally: converts the ADF body via `/map-markdown-adf` **Action: Convert ADF to Markdown** (a Draw.io or attached-image diagram becomes a `<!-- adf:diagram ... -->` placeholder, never a raw error); then, only when a placeholder survives conversion, resolves it — no token configured → every placeholder becomes a note naming `ATLASSIAN_API_TOKEN`, nothing downloaded, `requirements.txt` not needed; token configured → each placeholder resolves to its `{name}.source.mmd` sidecar and is replaced with the verbatim ```mermaid fence `/publish-page` originally rendered, or a note naming a missing sidecar instead of failing the fetch. A diagram-free page never touches the Confluence REST/attachment path at all. `page.md` already reads `# <title>\n\n<body Markdown>`.
+from this skill's directory. Internally: converts the ADF body via `/map-markdown-adf` **Action: Convert ADF to Markdown** (a Draw.io or attached-image diagram becomes a `<!-- adf:diagram ... -->` placeholder, never a raw error); then, only when a placeholder survives conversion, resolves it — no token configured → every placeholder becomes a note naming `ATLASSIAN_API_TOKEN`, nothing downloaded; token configured → each placeholder resolves to its `{name}.source.mmd` sidecar and is replaced with the verbatim ```mermaid fence `/publish-page` originally rendered, or a note naming a missing sidecar instead of failing the fetch. A diagram-free page never touches the Confluence REST/attachment path at all. `page.md` already reads `# <title>\n\n<body Markdown>`.
 
 **5 — Return** the contents of `page.md` unchanged.
 
