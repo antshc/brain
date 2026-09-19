@@ -17,15 +17,15 @@ Return a Confluence **Page** as Markdown from its identifier or URL. MCP only �
 - `https://<site>/wiki/x/<tiny_id>` → `<site>`, `<page_id> := <tiny_id>`.
 - Bare `<page_id>` (numeric or tiny token) → no `<site>`; pass through as-is, `getConfluencePage` accepts either form.
 
-**3 — Resolve `cloudId`.** `<site>` from URL → use it. Else Preflight's `cloudId`. Else `getAccessibleAtlassianResources` once, per Preflight's standing rule.
+A `<site>` from the URL wins as `cloudId`; otherwise use Preflight's.
 
-**4 — Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`.
+**3 — Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`.
 
-**5 — Guard truncation.** Save the tool result to `content.json` and read it with Python, per Preflight's standing rule.
+**4 — Guard truncation.** Save the tool result to `content.json` and read it with Python, per Preflight's standing rule.
 
-**6 — Convert.** Extract the ADF body (value under `body` matching `contentFormat: "adf"`); pipe it into `/map-markdown-adf` **Action: Convert ADF to Markdown**.
+**5 — Convert.** Extract the ADF body (value under `body` matching `contentFormat: "adf"`); pipe it into `/map-markdown-adf` **Action: Convert ADF to Markdown**.
 
-**7 — Return** only:
+**6 — Return** only:
 ```
 # <title>
 
@@ -34,4 +34,4 @@ Return a Confluence **Page** as Markdown from its identifier or URL. MCP only �
 
 ## Degraded mode
 
-No **Atlassian config** → `site`/`cloudId` empty; Step 3's `getAccessibleAtlassianResources` supplies `cloudId`. All other steps unchanged.
+No **Atlassian config** → `site`/`cloudId` empty; Preflight's Step 2 supplies `cloudId`. All other steps unchanged.
