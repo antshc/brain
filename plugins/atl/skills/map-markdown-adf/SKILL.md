@@ -27,7 +27,7 @@ Stdin Markdown → stdout one ADF document (`{"version": 1, "type": "doc", "cont
 python scripts/map_markdown_adf.py adf-to-md < input.json > output.md
 ```
 
-Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) or attached-image diagram (`mediaSingle`/`media`) becomes a `<!-- adf:diagram ... -->` placeholder comment naming the diagram — recovering the actual diagram is `/fetch-page`'s job, not this converter's. Every other unrecognized node type still raises `NotImplementedError`.
+Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) becomes a `<!-- adf:diagram ... -->` placeholder naming the diagram. A `media`/`mediaSingle`/`mediaGroup` node (a `mediaGroup` can hold more than one file) becomes a neutral `<!-- adf:attachment ... -->` placeholder per file — it could be a diagram, a plain image, or an arbitrary attached file; classifying and resolving it is `/fetch-page`'s job, not this converter's. Every other unrecognized node type still raises `NotImplementedError`.
 
 ## Action: Detect ADF-only constructs
 
@@ -62,7 +62,7 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | `<!-- adf:toc -->` | `expand` + `toc` extension — **ADF-only** |
 | `<!-- adf:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
 | `<!-- adf:diagram drawio="<name>" -->` | `extension` (Draw.io macro) — **ADF-only, `adf-to-md` direction only** |
-| `<!-- adf:diagram media-id="<id>" -->` | `mediaSingle`/`media` — **ADF-only, `adf-to-md` direction only** |
+| `<!-- adf:attachment media-id="<id>" alt="<alt>" -->` | `mediaSingle`/`media`/`mediaGroup` (one placeholder per file) — **ADF-only, `adf-to-md` direction only** |
 
 A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `  continues here` is one `listItem`, not a list plus a stray paragraph:
 
