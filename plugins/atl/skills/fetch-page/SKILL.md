@@ -45,10 +45,10 @@ Detection is a pure, offline, recursive scan of the raw ADF body — no REST cal
 
 Only when the scan matches does every attachment on the page get downloaded and cached under the assets dir (`page.md.tmp/` by default, mirroring `/publish-page`'s own `<mdPath>.tmp/` convention — already covered by this repo's `*.tmp` gitignore pattern). Each placeholder then resolves by rule:
 1. A `{stem}.source.mmd` sidecar is also attached (a `/publish-page`-rendered diagram) → the verbatim ```mermaid fence.
-2. No sidecar, the file is an image → `![<alt or filename>](page.md.tmp/<file>)`.
+2. No sidecar, the file is an image → `![<alt or filename>](page.md.tmp/<file>)`. When the placeholder also carries Confluence's own reported `width`/`height` (see `/map-markdown-adf`'s mapping table — only ever present for an image, never a generic file), a `<!-- media-size: width=<w> height=<h> -->` comment follows on its own line right after, so a later `/publish-page` republish can carry the real size through instead of falling back to a fixed placeholder width.
 3. No sidecar, not an image → a plain link `[<filename>](page.md.tmp/<file>)`.
 
-The relative link is percent-encoded (spaces etc.) and always relative to `page.md`'s own directory. Rule 1 never adds a separate image reference alongside the fence — the mermaid source is the sole publishable artifact for a diagram; republishing via `/publish-page` regenerates its rendered image fresh. Rules 2/3's references are for reading `page.md` (human or Markdown previewer) — `/publish-page` does not currently re-upload a plain image/file reference on republish.
+The relative link is percent-encoded (spaces etc.) and always relative to `page.md`'s own directory. Rule 1 never adds a separate image reference alongside the fence — the mermaid source is the sole publishable artifact for a diagram; republishing via `/publish-page` regenerates its rendered image fresh. Rules 2/3's standalone reference lines are also what `/publish-page` re-uploads as a real attachment on republish — see its own SKILL.md.
 
 ## Degraded mode
 

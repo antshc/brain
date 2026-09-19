@@ -120,7 +120,7 @@ def test_publish_png_branch_passes_the_selected_renderer_through(tmp_path):
         "page_diagrams.pipeline.upload_diagrams", return_value={"00-title.png": "file-1"}
     ), patch("page_diagrams.pipeline.get_page_version", return_value=1), patch(
         "page_diagrams.pipeline.update_page_adf", return_value={"id": "123"}
-    ), patch("page_diagrams.pipeline.substitute_media", return_value=(base_adf, 1)):
+    ), patch("page_diagrams.pipeline.substitute_drawio", return_value=(base_adf, 1)):
         result = _publish(md_path, tmp_path)
 
     assert mock_render.call_args.kwargs["renderer"] == "png"
@@ -256,3 +256,79 @@ def test_publish_drawio_without_the_extension_key_fails_before_touching_a_page(t
 
     mock_confluence.assert_not_called()
     mock_render.assert_not_called()
+
+
+def _write_local_media_page(tmp_path):
+    (tmp_path / "screenshot.png").write_bytes(b"png-bytes")
+    (tmp_path / "notes.pdf").write_bytes(b"pdf-bytes")
+    md_path = tmp_path / "page.md"
+    md_path.write_text(
+        "# Title\n\n"
+        "![screenshot.png](screenshot.png)\n"
+        "<!-- media-size: width=611 height=793 -->\n\n"
+        "[notes.pdf](notes.pdf)\n"
+    )
+    return md_path
+
+
+def test_publish_uploads_local_attachments_with_no_diagrams_present(tmp_path):
+    md_path = _write_local_media_page(tmp_path)
+    (tmp_path / ".atlassian").write_text(
+        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
+    )
+    base_adf = {"content": [_marker_paragraph(0), _marker_paragraph(1)]}
+    file_ids = {"screenshot.png": "file-1", "notes.pdf": "file-2"}
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=MagicMock()
+    ), patch("page_diagrams.pipeline.upload_files", return_value=file_ids) as mock_upload_files, patch(
+        "page_diagrams.pipeline.get_page_version", return_value=1
+    ), patch("page_diagrams.pipeline.update_page_adf", return_value={"id": "123"}):
+        result = _publish(md_path, tmp_path)
+
+    uploaded = mock_upload_files.call_args.args[2]
+    assert {u["filename"] for u in uploaded} == {"screenshot.png", "notes.pdf"}
+
+    image_node, file_node = base_adf["content"]
+    assert image_node["type"] == "mediaSingle"
+    assert image_node["content"][0]["attrs"] == {
+        "id": "file-1",
+        "type": "file",
+        "collection": "contentId-123",
+        "alt": "screenshot.png",
+        "width": 611,
+        "height": 793,
+    }
+    assert file_node["type"] == "mediaGroup"
+    assert file_node["content"][0]["attrs"] == {
+        "id": "file-2",
+        "type": "file",
+        "collection": "contentId-123",
+    }
+
+    assert result["method"] == "rest"
+    assert result["diagrams"] == 0
+    assert result["attachments"] == 2
+
+
+def test_publish_without_credentials_notes_local_media_when_no_diagrams_present(tmp_path):
+    md_path = _write_local_media_page(tmp_path)
+    base_adf = {"content": [_marker_paragraph(0), _marker_paragraph(1)]}
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
+        result = publish(
+            md_path=str(md_path),
+            root=str(tmp_path),
+            page_id="123",
+            space_id=None,
+            title=None,
+            assets_dir=str(tmp_path / "assets"),
+            out_path=str(tmp_path / "final.json"),
+            threshold_bytes=0,
+        )
+
+    assert result["method"] == "mcp"
+    assert result["missingPrerequisite"] == "ATLASSIAN_API_TOKEN"
+    note_texts = [n["content"][0]["text"] for n in base_adf["content"]]
+    assert any("screenshot.png" in t for t in note_texts)
+    assert any("notes.pdf" in t for t in note_texts)

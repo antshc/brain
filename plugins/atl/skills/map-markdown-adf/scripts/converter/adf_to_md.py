@@ -79,10 +79,19 @@ def render_block(node: dict) -> str:
 def _attachment_placeholder(media_node: dict) -> str:
     """A `media` node's neutral placeholder — could be a diagram, a plain image, or a generic
     file; `/fetch-page` classifies and resolves it, this converter only names it.
+
+    Also carries `width`/`height` when the node has both (an image `media` node inside a
+    `mediaSingle`, never a `mediaGroup` generic-file node) — the only place Confluence's own
+    reported pixel size is ever captured, so `/fetch-page` can pass it along.
     """
-    media_id = media_node.get("attrs", {}).get("id", "")
-    alt = media_node.get("attrs", {}).get("alt", "")
-    return f'<!-- adf:attachment media-id="{media_id}" alt="{alt}" -->'
+    attrs = media_node.get("attrs", {})
+    media_id = attrs.get("id", "")
+    alt = attrs.get("alt", "")
+    placeholder = f'<!-- adf:attachment media-id="{media_id}" alt="{alt}"'
+    width, height = attrs.get("width"), attrs.get("height")
+    if width is not None and height is not None:
+        placeholder += f' width="{width}" height="{height}"'
+    return placeholder + " -->"
 
 
 def render_list(node: dict, ordered: bool, depth: int = 0) -> str:

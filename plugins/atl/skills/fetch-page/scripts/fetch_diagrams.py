@@ -30,7 +30,9 @@ from atlassian import Confluence
 from env import get_confluence, load_credentials
 
 _DRAWIO_PLACEHOLDER_RE = re.compile(r'<!-- adf:diagram drawio="([^"]*)" -->')
-_ATTACHMENT_PLACEHOLDER_RE = re.compile(r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)" -->')
+_ATTACHMENT_PLACEHOLDER_RE = re.compile(
+    r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")? -->'
+)
 _ANY_PLACEHOLDER_RE = re.compile(r"<!-- adf:(diagram|attachment) ")
 
 NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set ATLASSIAN_API_TOKEN to restore it -->"
@@ -173,7 +175,7 @@ def restore_diagrams(
         return _fence(text)
 
     def _replace_attachment(match: re.Match) -> str:
-        media_id, alt = match.group(1), match.group(2)
+        media_id, alt, width, height = match.group(1), match.group(2), match.group(3), match.group(4)
         attachment = _find_by_file_id(attachments, media_id)
         if attachment is None:
             return f'<!-- adf:diagram source unavailable: attachment for media-id="{media_id}" not found -->'
@@ -184,7 +186,10 @@ def restore_diagrams(
             return _fence(text)
         link = _relative_link(assets_dir_name, filename)
         if _looks_like_image(filename) or _looks_like_image(alt):
-            return f"![{alt or filename}]({link})"
+            image_line = f"![{alt or filename}]({link})"
+            if width and height:
+                return f"{image_line}\n<!-- media-size: width={width} height={height} -->"
+            return image_line
         return f"[{filename}]({link})"
 
     markdown = _DRAWIO_PLACEHOLDER_RE.sub(_replace_drawio, markdown)

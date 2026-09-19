@@ -304,3 +304,43 @@ def test_restore_diagrams_without_credentials_replaces_every_placeholder_with_a_
 def test_restore_diagrams_without_credentials_leaves_plain_markdown_untouched():
     md = "# Title\n\nJust text.\n"
     assert restore_diagrams_without_credentials(md) == md
+
+
+def test_restore_diagrams_resolves_image_attachment_with_size_to_an_image_plus_media_size_comment():
+    attachments = [
+        {
+            "title": "Screenshot 2026-02-10 113535.png",
+            "extensions": {"fileId": "image-1"},
+            "_links": {"download": "/download/Screenshot.png"},
+        }
+    ]
+    confluence = _confluence(attachments, downloads={})
+    downloaded = {"Screenshot 2026-02-10 113535.png": b"png-bytes"}
+
+    md = (
+        '<!-- adf:attachment media-id="image-1" alt="Screenshot 2026-02-10 113535.png" '
+        'width="611" height="793" -->'
+    )
+    result = restore_diagrams(confluence, "123", md, downloaded, "page.md.tmp")
+
+    assert result == (
+        "![Screenshot 2026-02-10 113535.png](page.md.tmp/Screenshot%202026-02-10%20113535.png)\n"
+        "<!-- media-size: width=611 height=793 -->"
+    )
+
+
+def test_restore_diagrams_resolves_generic_file_attachment_without_a_size_comment_even_if_present():
+    attachments = [
+        {
+            "title": "notes.pdf",
+            "extensions": {"fileId": "file-1"},
+            "_links": {"download": "/download/notes.pdf"},
+        }
+    ]
+    confluence = _confluence(attachments, downloads={})
+    downloaded = {"notes.pdf": b"pdf-bytes"}
+
+    md = '<!-- adf:attachment media-id="file-1" alt="" width="611" height="793" -->'
+    result = restore_diagrams(confluence, "123", md, downloaded, "page.md.tmp")
+
+    assert result == "[notes.pdf](page.md.tmp/notes.pdf)"
