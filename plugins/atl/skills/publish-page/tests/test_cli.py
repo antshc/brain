@@ -12,7 +12,9 @@ def test_extract_prints_processed_markdown_and_diagrams(capsys):
         main(["extract"])
     out = json.loads(capsys.readouterr().out)
     assert "\x00MEDIA:0\x00" in out["processedMarkdown"]
-    assert out["diagrams"] == [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]
+    assert out["diagrams"] == [
+        {"index": 0, "code": "graph TD; A-->B;", "name": "00-title", "source": "graph TD; A-->B;"}
+    ]
 
 
 def test_extract_no_diagrams_returns_empty_list(capsys):

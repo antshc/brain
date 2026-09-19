@@ -18,6 +18,8 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 | `ATLASSIAN_API_TOKEN` | Optional — only for what the MCP can't do (e.g. attachment upload) |
 | `ATLASSIAN_JIRA_PROJECT_KEYS` | Comma-separated Jira project keys, first = default |
 | `ATLASSIAN_CONFLUENCE_SPACE_IDS` | Comma-separated Confluence space ids, first = default |
+| `ATLASSIAN_ACCOUNT_ID` | Cached identity, populated by `/init-atl` from a live `atlassianUserInfo` call — never hand-entered |
+| `ATLASSIAN_DISPLAY_NAME` | Cached identity, same origin as `ATLASSIAN_ACCOUNT_ID` — never hand-entered |
 | `ATLASSIAN_DIAGRAM_RENDERER` | Optional — how `/publish-page` renders mermaid diagrams: `png` (default), `drawio`, or `mermaid` |
 | `ATLASSIAN_DRAWIO_EXTENSION_KEY` | Required only by `ATLASSIAN_DIAGRAM_RENDERER=drawio` — the Draw.io macro's `<appId>/<envId>/static/drawio` key |
 
@@ -31,11 +33,13 @@ Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailabl
 python scripts/preflight.py --root "<resolved repo root>"
 ```
 
-This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--root`. Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here and `accountId`/`displayName` are absent — the script never touches the network; Step 3 sets all three. An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
+This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--root`. Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected` (always `false` here — only a live call sets it `true`), and `accountId`/`displayName` (from a prior `/init-atl` cache when present, empty otherwise). An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
 
 **2 — Discover `cloudId` only when the config supplies none.** `cloudId` empty and an operation needs it → call `getAccessibleAtlassianResources` once, then treat it as cached for the session. Exactly one accessible resource → use it; more than one → ask the developer which site. Once `cloudId` is known, never call it again. Step 1's `cloudId` is `https://<site>`, not a UUID — that's expected, not a sign of a missing discovery step: every Atlassian MCP tool's `cloudId` parameter accepts "UUID or site URL", so the site-URL form is valid as-is.
 
-**3 — MCP connection status and identity.** Call `atlassianUserInfo` once. `mcpConnected := true` on success, `false` on any failure — never raise. On success the same response also settles identity: `accountId := account_id`, `displayName := name`, both cached for the session. Resolve them here and nowhere else — never from a file, a prior report, or by asking the developer. On failure both come back empty.
+**3 — MCP connection status and identity.** Step 1's `accountId` and `displayName` are both non-empty → skip this step: they're already resolved, and `mcpConnected` comes back `false`/unverified rather than guessed — the caller's own next MCP call surfaces a real connectivity failure directly, so nothing downstream needs it pre-checked. Either is empty → call `atlassianUserInfo` once: `mcpConnected := true` on success, `false` on any failure — never raise; on success `accountId := account_id`, `displayName := name`. A caller that specifically needs a guaranteed-fresh `mcpConnected` (today, only `/init-atl`'s own connectivity gate) always calls `atlassianUserInfo` live regardless of the cache.
+
+This reverses an earlier rule that resolved identity fresh on every single call, from this step and nowhere else. It's now resolved once by `/init-atl` (which writes it back to `.atlassian`) and read from the cache everywhere else — a deliberate trade of per-call freshness for one fewer MCP round trip on every `atl` skill invocation. Stale identity (a developer switching Atlassian accounts) is refreshed the same way as any other static config value: re-run `/init-atl`, or hand-edit `.atlassian`.
 
 **4 — Report** the eight fields before the caller's operation runs. Never restate `ATLASSIAN_EMAIL`, the raw token, or the identity response's `email`.
 

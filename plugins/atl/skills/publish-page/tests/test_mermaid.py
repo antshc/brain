@@ -125,8 +125,12 @@ def test_render_diagrams_keeps_diagram_id_out_of_mmd(tmp_path):
 
     assert (assets_dir / "order-flow.mmd").read_text() == "graph TD; A-->B;\n"
     assert diagrams[0]["attachments"] == [
-        {"path": str(assets_dir / "order-flow.png"), "filename": "order-flow.png"}
+        {"path": str(assets_dir / "order-flow.png"), "filename": "order-flow.png"},
+        {"path": str(assets_dir / "order-flow.source.mmd"), "filename": "order-flow.source.mmd"},
     ]
+    assert (assets_dir / "order-flow.source.mmd").read_text() == (
+        "%% diagram-id: order-flow\ngraph TD; A-->B;\n"
+    )
 
 
 def test_render_diagrams_writes_mmd_and_invokes_mmdc(tmp_path):
@@ -155,7 +159,8 @@ def test_render_diagrams_writes_mmd_and_invokes_mmdc(tmp_path):
     assert diagrams[0]["mmd_path"] == str(mmd_path)
     assert diagrams[0]["png_path"] == str(assets_dir / "00-title.png")
     assert diagrams[0]["attachments"] == [
-        {"path": str(assets_dir / "00-title.png"), "filename": "00-title.png"}
+        {"path": str(assets_dir / "00-title.png"), "filename": "00-title.png"},
+        {"path": str(assets_dir / "00-title.source.mmd"), "filename": "00-title.source.mmd"},
     ]
 
 
@@ -257,6 +262,7 @@ def test_render_diagrams_drawio_mode_writes_source_diagram_and_preview(tmp_path)
     assert diagrams[0]["attachments"] == [
         {"path": str(assets_dir / "00-title.drawio"), "filename": "00-title.drawio"},
         {"path": str(assets_dir / "00-title.drawio.png"), "filename": "00-title.drawio.png"},
+        {"path": str(assets_dir / "00-title.source.mmd"), "filename": "00-title.source.mmd"},
     ]
     assert diagrams[0]["diagram_name"] == "00-title.drawio"
     assert diagrams[0]["renderer"] == "drawio"
@@ -338,7 +344,8 @@ def test_render_diagrams_drawio_mode_skips_drawio_for_an_unsupported_diagram_typ
     assert [call.args[0][0] for call in mock_run.call_args_list] == ["mmdc", "mmdc"]
     assert diagrams[0]["renderer"] == "png"
     assert diagrams[0]["attachments"] == [
-        {"path": str(assets_dir / "00-title.png"), "filename": "00-title.png"}
+        {"path": str(assets_dir / "00-title.png"), "filename": "00-title.png"},
+        {"path": str(assets_dir / "00-title.source.mmd"), "filename": "00-title.source.mmd"},
     ]
     assert "swimlane-beta" in capsys.readouterr().err
 
