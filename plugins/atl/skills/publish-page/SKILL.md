@@ -66,20 +66,18 @@ Never print, log, quote, or publish `ATLASSIAN_SITE`, `ATLASSIAN_EMAIL`, or `ATL
 
 - **mdPath** — required, path to the local Markdown file.
 - **pageId** — optional; when named, update that page instead of creating one.
-- **spaceId** — optional; resolved per Step 4 when omitted.
+- **spaceId** — optional; resolved per Step 2 when omitted.
 - **title** — optional; defaults to the Markdown's first `#` heading. The update path writes the resolved title too, so updating a page whose title differs from that heading **renames it** — pass the existing title to keep it.
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**.
+**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**, and use the `cloudId` it returns.
 
-**2 — Resolve `cloudId`.** Preflight's `cloudId`; still empty → `getAccessibleAtlassianResources` once, per Preflight's standing rule.
-
-**3 — Resolve the publish target.**
+**2 — Resolve the publish target.**
 
 `pageId` named → **update**, pass it as `--page-id`. Else → **create**, resolve `spaceId`: supplied → use it. Else Preflight's `defaultSpaceId` if non-empty, reported as resolved. Else `getConfluenceSpaces` with `limit: 10` — exactly one → use it and report it; more than one → ask, never choose silently (Preflight's Ambiguity rule). Pass it as `--space-id`.
 
-**4 — Run the pipeline.** The script lives at `scripts/publish_page_diagrams.py`, beside this `SKILL.md` — its path is `<directory of this file you just read>/scripts/publish_page_diagrams.py`. Never search the filesystem (e.g. `find /`) for it; the path is already known from wherever this file was loaded from. `cd` into that directory (or prefix the script path with it) and run:
+**3 — Run the pipeline.** The script lives at `scripts/publish_page_diagrams.py`, beside this `SKILL.md` — its path is `<directory of this file you just read>/scripts/publish_page_diagrams.py`. Never search the filesystem (e.g. `find /`) for it; the path is already known from wherever this file was loaded from. `cd` into that directory (or prefix the script path with it) and run:
 
 ```bash
 python scripts/publish_page_diagrams.py run \
@@ -101,9 +99,9 @@ Rendered `.mmd`/`.png`/`.drawio` files and the final ADF default to `<mdPath>.tm
 
 Prints one JSON result to stdout:
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` — already published; nothing left to do but report.
-- `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"ATLASSIAN_API_TOKEN"}` (the `missingPrerequisite` key is present only when diagrams were substituted for notes) — proceed to Step 5.
+- `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"ATLASSIAN_API_TOKEN"}` (the `missingPrerequisite` key is present only when diagrams were substituted for notes) — proceed to Step 4.
 
-**5 — When `run` returns `method: mcp`.** Read the ADF from `adfPath` (always written pretty-printed, `json.dump(..., indent=2)`, for exactly the reason below) and publish it:
+**4 — When `run` returns `method: mcp`.** Read the ADF from `adfPath` (always written pretty-printed, `json.dump(..., indent=2)`, for exactly the reason below) and publish it:
 
 - Update case → `updateConfluencePage` with `cloudId`, `pageId`, `body`, `contentFormat: "adf"`, `title` (if changed).
 - Create case → `createConfluencePage` with `cloudId`, `spaceId`, `title`, `body`, `contentFormat: "adf"`.
@@ -126,7 +124,7 @@ Report the page URL from the tool result and, when diagrams were rendered, confi
 
 ## Degraded mode
 
-- No **Atlassian config** → `cloudId`/`defaultSpaceId` empty; Step 2's `getAccessibleAtlassianResources` resolves `cloudId`, Step 3's space-visibility lookup resolves `spaceId` (asking when ambiguous). A diagram-free source publishes identically to full configuration.
+- No **Atlassian config** → `cloudId`/`defaultSpaceId` empty; Preflight's Step 2 resolves `cloudId`, Step 2's space-visibility lookup resolves `spaceId` (asking when ambiguous). A diagram-free source publishes identically to full configuration.
 - No **API token** with diagrams present → `run`'s no-token branch runs; text still publishes over MCP and the result names the unrendered diagrams' missing prerequisite.
 - Token configured but `mmdc` missing → `run` exits non-zero naming `mmdc`; nothing is published (re-run once `mmdc` is installed).
 - `ATLASSIAN_DIAGRAM_RENDERER=drawio` with `drawio` missing or `ATLASSIAN_DRAWIO_EXTENSION_KEY` unset → `run` exits non-zero naming the missing one; nothing is published.

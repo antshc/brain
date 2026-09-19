@@ -23,7 +23,7 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 
 ## Action: Resolve
 
-Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected`. Never echo `ATLASSIAN_EMAIL` or `ATLASSIAN_API_TOKEN` — not in output, logs, or errors.
+Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected`, `accountId`, `displayName`. Never echo `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN`, or the `email` the identity call returns — not in output, logs, or errors.
 
 **1 — Config-derived facts (offline).** Resolve `$HARNESS_REPO_PATH` first: non-empty → use it as-is. Empty → resolve the repository root instead (e.g. `git rev-parse --show-toplevel`, falling back to cwd only if that fails) — **never** substitute `/` or leave the value blank, which would walk the whole filesystem. `cd` to the directory holding the `preflight-atl/SKILL.md` file you loaded to read this skill — never guess or reconstruct that path from a different skill's location — then run:
 
@@ -31,19 +31,19 @@ Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailabl
 python scripts/preflight.py --root "<resolved repo root>"
 ```
 
-This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--root`. Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here — the script never touches the network; Step 3 sets the live value. An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
+This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--root`. Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`. `mcpConnected` is always `false` here and `accountId`/`displayName` are absent — the script never touches the network; Step 3 sets all three. An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
 
-**2 — Discover `cloudId` only when the config supplies none.** `cloudId` empty and an operation needs it → call `getAccessibleAtlassianResources` once, then treat it as cached for the session. Once `cloudId` is known, never call it again. Step 1's `cloudId` is `https://<site>`, not a UUID — that's expected, not a sign of a missing discovery step: every Atlassian MCP tool's `cloudId` parameter accepts "UUID or site URL", so the site-URL form is valid as-is.
+**2 — Discover `cloudId` only when the config supplies none.** `cloudId` empty and an operation needs it → call `getAccessibleAtlassianResources` once, then treat it as cached for the session. Exactly one accessible resource → use it; more than one → ask the developer which site. Once `cloudId` is known, never call it again. Step 1's `cloudId` is `https://<site>`, not a UUID — that's expected, not a sign of a missing discovery step: every Atlassian MCP tool's `cloudId` parameter accepts "UUID or site URL", so the site-URL form is valid as-is.
 
-**3 — MCP connection status.** Call a lightweight tool (e.g. `atlassianUserInfo`). `mcpConnected := true` on success, `false` on any failure — never raise.
+**3 — MCP connection status and identity.** Call `atlassianUserInfo` once. `mcpConnected := true` on success, `false` on any failure — never raise. On success the same response also settles identity: `accountId := account_id`, `displayName := name`, both cached for the session. Resolve them here and nowhere else — never from a file, a prior report, or by asking the developer. On failure both come back empty.
 
-**4 — Report** the six fields before the caller's operation runs. Never restate `ATLASSIAN_EMAIL` or the raw token.
+**4 — Report** the eight fields before the caller's operation runs. Never restate `ATLASSIAN_EMAIL`, the raw token, or the identity response's `email`.
 
 ## Standing MCP usage rules
 
 Apply in every `atl` skill:
 
-- Every JQL/CQL search MUST use `maxResults: 10` / `limit: 10` — never more.
+- Every JQL/CQL search uses `maxResults: 10` / `limit: 10`, unless the calling skill bundles its own extraction script and declares a higher cap in its own text — `/brief-daily` declares 25 on that basis. A skill reading results by hand stays at 10.
 - Save a large tool result to `content.json` and read fields out of it with Python — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. `cd` to the file's directory first, then:
 
   ```bash
@@ -62,4 +62,4 @@ Apply in every `atl` skill:
 
 ## Ambiguity
 
-More than one configured project key or space id could apply → ask the developer which. Never choose silently.
+More than one configured project key or space id could apply → ask the developer which. Never choose silently. Same rule for more than one accessible site in Step 2.

@@ -13,18 +13,16 @@ Return a Jira **Work item** as Markdown from its key or URL. MCP only — no API
 **1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**.
 
 **2 — Parse `{{input}}`.**
-- `https://<site>/browse/<key>` → `<site>`, `<key>`.
-- Bare `<key>` → no `<site>`.
+- `https://<site>/browse/<key>` → `<site>`, `<key>`; `<site>` wins as `cloudId` over Preflight's.
+- Bare `<key>` → use Preflight's `cloudId`.
 
-**3 — Resolve `cloudId`.** `<site>` from URL → use it. Else Preflight's `cloudId`. Else `getAccessibleAtlassianResources` once, per Preflight's standing rule.
+**3 — Fetch.** `getJiraIssue` with `cloudId`, `issueIdOrKey: <key>`, `responseContentFormat: "adf"`. Omit `fields` — the default set already covers summary, description, status, issuetype, priority, labels, components, assignee, reporter, created, updated, resolution, project.
 
-**4 — Fetch.** `getJiraIssue` with `cloudId`, `issueIdOrKey: <key>`, `responseContentFormat: "adf"`. Omit `fields` — the default set already covers summary, description, status, issuetype, priority, labels, components, assignee, reporter, created, updated, resolution, project.
+**4 — Guard truncation.** Save the tool result to `content.json` and read it with Python, per Preflight's standing rule.
 
-**5 — Guard truncation.** Save the tool result to `content.json` and read it with Python, per Preflight's standing rule.
+**5 — Convert.** Extract `fields.description` (ADF); pipe it into `/map-markdown-adf` **Action: Convert ADF to Markdown**.
 
-**6 — Convert.** Extract `fields.description` (ADF); pipe it into `/map-markdown-adf` **Action: Convert ADF to Markdown**.
-
-**7 — Return** only:
+**6 — Return** only:
 ```
 # <key> — <summary>
 **Status:** <status> · **Type:** <issuetype> · **Assignee:** <assignee>
@@ -34,4 +32,4 @@ Return a Jira **Work item** as Markdown from its key or URL. MCP only — no API
 
 ## Degraded mode
 
-No **Atlassian config** → `site`/`cloudId` empty; Step 3's `getAccessibleAtlassianResources` supplies `cloudId`. All other steps unchanged.
+No **Atlassian config** → `site`/`cloudId` empty; Preflight's Step 2 supplies `cloudId`. All other steps unchanged.
