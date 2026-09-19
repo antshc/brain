@@ -66,10 +66,23 @@ def render_block(node: dict) -> str:
             (c for c in node.get("content", []) if c.get("type") == "media"), None
         )
         if media_node is not None:
-            media_id = media_node.get("attrs", {}).get("id", "")
-            return f'<!-- adf:diagram media-id="{media_id}" -->'
+            return _attachment_placeholder(media_node)
         raise NotImplementedError("unhandled ADF mediaSingle with no media child")
+    if node_type == "mediaGroup":
+        media_nodes = [c for c in node.get("content", []) if c.get("type") == "media"]
+        if media_nodes:
+            return "\n\n".join(_attachment_placeholder(m) for m in media_nodes)
+        raise NotImplementedError("unhandled ADF mediaGroup with no media children")
     raise NotImplementedError(f"unhandled ADF node type '{node_type}'")
+
+
+def _attachment_placeholder(media_node: dict) -> str:
+    """A `media` node's neutral placeholder — could be a diagram, a plain image, or a generic
+    file; `/fetch-page` classifies and resolves it, this converter only names it.
+    """
+    media_id = media_node.get("attrs", {}).get("id", "")
+    alt = media_node.get("attrs", {}).get("alt", "")
+    return f'<!-- adf:attachment media-id="{media_id}" alt="{alt}" -->'
 
 
 def render_list(node: dict, ordered: bool, depth: int = 0) -> str:

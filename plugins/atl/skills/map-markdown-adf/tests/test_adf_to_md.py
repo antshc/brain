@@ -249,7 +249,7 @@ def test_drawio_extension_renders_diagram_placeholder(adf_to_md):
     assert adf_to_md(doc) == '<!-- adf:diagram drawio="order-flow.drawio" -->'
 
 
-def test_media_single_renders_diagram_placeholder(adf_to_md):
+def test_media_single_renders_attachment_placeholder(adf_to_md):
     doc = _doc(
         {
             "type": "mediaSingle",
@@ -257,7 +257,46 @@ def test_media_single_renders_diagram_placeholder(adf_to_md):
             "content": [{"type": "media", "attrs": {"id": "file-123", "type": "file"}}],
         }
     )
-    assert adf_to_md(doc) == '<!-- adf:diagram media-id="file-123" -->'
+    assert adf_to_md(doc) == '<!-- adf:attachment media-id="file-123" alt="" -->'
+
+
+def test_media_single_carries_alt_through(adf_to_md):
+    doc = _doc(
+        {
+            "type": "mediaSingle",
+            "attrs": {"layout": "center"},
+            "content": [
+                {"type": "media", "attrs": {"id": "file-456", "type": "file", "alt": "Screenshot.png"}}
+            ],
+        }
+    )
+    assert adf_to_md(doc) == '<!-- adf:attachment media-id="file-456" alt="Screenshot.png" -->'
+
+
+def test_media_group_renders_one_placeholder_per_file(adf_to_md):
+    doc = _doc(
+        {
+            "type": "mediaGroup",
+            "content": [{"type": "media", "attrs": {"id": "file-789", "type": "file"}}],
+        }
+    )
+    assert adf_to_md(doc) == '<!-- adf:attachment media-id="file-789" alt="" -->'
+
+
+def test_media_group_renders_a_placeholder_per_file_when_it_holds_several(adf_to_md):
+    doc = _doc(
+        {
+            "type": "mediaGroup",
+            "content": [
+                {"type": "media", "attrs": {"id": "file-1", "type": "file"}},
+                {"type": "media", "attrs": {"id": "file-2", "type": "file", "alt": "diagram.png"}},
+            ],
+        }
+    )
+    assert adf_to_md(doc) == (
+        '<!-- adf:attachment media-id="file-1" alt="" -->\n\n'
+        '<!-- adf:attachment media-id="file-2" alt="diagram.png" -->'
+    )
 
 
 def test_unknown_extension_still_raises(run_cli):
