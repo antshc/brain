@@ -6,12 +6,12 @@ argument-hint: '<md_file_path>, [pageId], [spaceId]'
 
 # Publish Page
 
-Create or update a Confluence **page** from a local Markdown file, via one `run` command that chains extract -> convert -> attach -> substitute -> publish. Text-only publishes go over the MCP when the body is small; a diagram-bearing publish always forces a REST publish, since attachment upload needs `atlassian-python-api` (an `ATLASSIAN_API_TOKEN`) regardless of body size.
+Create or update a Confluence **page** from a local Markdown file, via one `run` command that chains extract -> convert -> attach -> substitute -> publish. Text-only publishes go over the MCP when the body is small; a diagram- or local-attachment-bearing publish always forces a REST publish, since attachment upload needs `atlassian-python-api` (an `ATLASSIAN_API_TOKEN`) regardless of body size.
 
 ## Prerequisites
 
-- `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; it covers every REST-publish path (diagrams present, or a large diagram-free body).
-- A diagram-bearing publish always goes REST, so for that branch `ATLASSIAN_API_TOKEN` (in `.atlassian`) and `mmdc` are **mandatory**, not optional:
+- `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; it covers every REST-publish path (diagrams or local attachments present, or a large diagram-free body).
+- A diagram- or local-attachment-bearing publish always goes REST, so for that branch `ATLASSIAN_API_TOKEN` (in `.atlassian`) is **mandatory**, not optional; `mmdc` is mandatory too whenever a diagram is present:
   - `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli` (npm, not pip); verify `mmdc --version`.
   - `mmdc` renders via headless Chrome (puppeteer), needing these shared libraries on Debian/Ubuntu (names shown for Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.
 - A diagram-free source needs none of this — it publishes over the MCP alone when small, or REST (still no `mmdc`) when large.
@@ -91,11 +91,11 @@ python scripts/publish_page_diagrams.py run \
   --root "$HARNESS_REPO_PATH"
 ```
 
-One call does the rest: strips `<!-- adf:ignore:start/end -->` spans, extracts ```mermaid fences into markers, converts the Markdown to ADF (shelling out to `/map-markdown-adf`'s CLI, never importing its code), and — depending on what's configured — either publishes directly via REST v2 or hands back an ADF ready for the MCP publish tools:
+One call does the rest: strips `<!-- adf:ignore:start/end -->` spans, extracts ```mermaid fences into markers, extracts every standalone local image/file reference (as `/fetch-page` writes into `page.md`) into a marker the same way, converts the Markdown to ADF (shelling out to `/map-markdown-adf`'s CLI, never importing its code), and — depending on what's configured — either publishes directly via REST v2 or hands back an ADF ready for the MCP publish tools:
 
-- Diagrams present and a token is configured → forces REST end to end: ensures the page exists (creating a placeholder when none was named), renders each diagram, uploads it as an attachment, substitutes every marker (at any nesting depth) for its media node, and publishes the final body.
-- No diagrams, token configured → REST when the ADF body is over `--threshold-bytes` (default 50KB — the practical ceiling is what an agent can safely inline into an MCP tool argument, not Confluence/MCP transport), otherwise MCP handback.
-- No token → substitutes every marker for a note naming `ATLASSIAN_API_TOKEN` as the missing prerequisite when diagrams are present, then always hands back to MCP (REST needs the same token, so it can't cover this case either).
+- Diagrams or local attachments present and a token is configured → forces REST end to end: ensures the page exists (creating a placeholder when none was named), renders each diagram, uploads every diagram and local attachment, substitutes every marker (at any nesting depth) for its media node — a local image becomes a `mediaSingle` node carrying its filename as `alt` (and, when `/fetch-page` recorded Confluence's own reported size, real `width`/`height`), a non-image local file becomes a `mediaGroup` node — and publishes the final body.
+- No diagrams or local attachments, token configured → REST when the ADF body is over `--threshold-bytes` (default 50KB — the practical ceiling is what an agent can safely inline into an MCP tool argument, not Confluence/MCP transport), otherwise MCP handback.
+- No token → substitutes every marker for a note naming `ATLASSIAN_API_TOKEN` as the missing prerequisite when diagrams or local attachments are present, then always hands back to MCP (REST needs the same token, so it can't cover this case either).
 
 Failure framing: `mmdc` missing on the REST/diagram path exits non-zero naming `mmdc`, and `drawio` missing in `drawio` mode exits non-zero naming `drawio`; an unsupported or not-yet-usable `ATLASSIAN_DIAGRAM_RENDERER`, or `drawio` mode without `ATLASSIAN_DRAWIO_EXTENSION_KEY`, exits non-zero naming the renderer or the key, before any page is touched; two fences sharing one `%% diagram-id` exit non-zero naming the id, before any page is touched; a leftover marker after substitution exits non-zero naming it — fix and re-run rather than working around it.
 

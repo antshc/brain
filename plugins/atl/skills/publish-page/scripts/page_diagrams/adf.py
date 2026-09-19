@@ -21,13 +21,41 @@ def _marker_index(node: dict) -> str | None:
     return match.group(1) if match else None
 
 
-def media_node(media_id: str, page_id: str) -> dict:
+def media_node(
+    media_id: str,
+    page_id: str,
+    alt: str | None = None,
+    width_height: tuple[int, int] | None = None,
+) -> dict:
     """The uploaded-image node — also used one-off under the `drawio` renderer, for a diagram
-    Draw.io could not import.
+    Draw.io could not import, and for a local image attachment.
+
+    `alt` and `width_height` are only ever passed for a local image attachment (a diagram
+    never sets them): `alt` carries the original filename, `width_height` the size Confluence
+    reported for it when the page was fetched — set on both `mediaSingle.attrs.width` and the
+    inner `media` node's own `width`/`height`, matching how Confluence represents an image
+    attached by hand. Omitted (a diagram, or a hand-authored image with no known size) keeps
+    today's fixed `768` placeholder width and no `width`/`height` on the inner node.
     """
+    width = width_height[0] if width_height else 768
+    media_attrs = {"id": media_id, "type": "file", "collection": f"contentId-{page_id}"}
+    if alt is not None:
+        media_attrs["alt"] = alt
+    if width_height is not None:
+        media_attrs["width"], media_attrs["height"] = width_height
     return {
         "type": "mediaSingle",
-        "attrs": {"layout": "center", "width": 768, "widthType": "pixel"},
+        "attrs": {"layout": "center", "width": width, "widthType": "pixel"},
+        "content": [{"type": "media", "attrs": media_attrs}],
+    }
+
+
+def attachment_node(media_id: str, page_id: str) -> dict:
+    """A generic (non-image) local file attachment — the `mediaGroup` shape Confluence uses
+    for a plain attached file, distinct from `media_node()`'s `mediaSingle` image shape.
+    """
+    return {
+        "type": "mediaGroup",
         "content": [
             {"type": "media", "attrs": {"id": media_id, "type": "file", "collection": f"contentId-{page_id}"}}
         ],

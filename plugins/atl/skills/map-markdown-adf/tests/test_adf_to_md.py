@@ -299,6 +299,51 @@ def test_media_group_renders_a_placeholder_per_file_when_it_holds_several(adf_to
     )
 
 
+def test_media_single_carries_width_and_height_through(adf_to_md):
+    doc = _doc(
+        {
+            "type": "mediaSingle",
+            "attrs": {"layout": "center"},
+            "content": [
+                {
+                    "type": "media",
+                    "attrs": {
+                        "id": "file-456",
+                        "type": "file",
+                        "alt": "Screenshot.png",
+                        "width": 611,
+                        "height": 793,
+                    },
+                }
+            ],
+        }
+    )
+    assert adf_to_md(doc) == (
+        '<!-- adf:attachment media-id="file-456" alt="Screenshot.png" width="611" height="793" -->'
+    )
+
+
+def test_media_group_omits_width_and_height_when_the_node_has_neither(adf_to_md):
+    doc = _doc(
+        {
+            "type": "mediaGroup",
+            "content": [{"type": "media", "attrs": {"id": "file-789", "type": "file"}}],
+        }
+    )
+    assert "width" not in adf_to_md(doc)
+
+
+def test_media_single_omits_width_and_height_when_only_one_is_present(adf_to_md):
+    doc = _doc(
+        {
+            "type": "mediaSingle",
+            "attrs": {"layout": "center"},
+            "content": [{"type": "media", "attrs": {"id": "file-1", "type": "file", "width": 611}}],
+        }
+    )
+    assert adf_to_md(doc) == '<!-- adf:attachment media-id="file-1" alt="" -->'
+
+
 def test_unknown_extension_still_raises(run_cli):
     doc = _doc({"type": "extension", "attrs": {"extensionKey": "some.other.macro"}})
     result = run_cli("adf-to-md", json.dumps(doc))

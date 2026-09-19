@@ -12,8 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .adf import drawio_node, media_node, substitute_drawio, substitute_markers, substitute_media
-from .attachments import upload_diagrams
+from .adf import attachment_node, drawio_node, media_node, substitute_drawio, substitute_markers
+from .attachments import upload_diagrams, upload_files
 from .custom_content import upsert_diagram
 from .env import (
     get_confluence,
@@ -23,6 +23,7 @@ from .env import (
     load_swimlane_drawio_enabled,
     site_url,
 )
+from .local_media import extract_local_media
 from .mermaid import extract_mermaid, render_diagrams
 from .patterns import HEADING_RE, strip_ignored_sections
 from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
@@ -78,9 +79,13 @@ def _diagram_note_node(name: str) -> dict:
     }
 
 
-def substitute_diagram_notes(adf: dict, diagrams: list[dict]) -> tuple[dict, int]:
+def substitute_diagram_notes(
+    adf: dict, diagrams: list[dict], local_media: list[dict] | None = None
+) -> tuple[dict, int]:
     """Replace every marker paragraph with a note naming the missing token prerequisite."""
     names_by_index = {str(d["index"]): d["name"] for d in diagrams}
+    if local_media:
+        names_by_index.update({str(m["index"]): m["filename"] for m in local_media})
     return substitute_markers(adf, lambda index: _diagram_note_node(names_by_index[index]))
 
 
@@ -114,6 +119,7 @@ def _drawio_nodes_by_index(
 def _publish_with_diagrams(
     base_adf: dict,
     diagrams: list[dict],
+    local_media: list[dict],
     credentials: dict[str, str],
     page_id: str | None,
     space_id: str | None,
@@ -130,18 +136,40 @@ def _publish_with_diagrams(
         target_page_id = page_id
     else:
         placeholder_adf = copy.deepcopy(base_adf)
-        substitute_diagram_notes(placeholder_adf, diagrams)
+        substitute_diagram_notes(placeholder_adf, diagrams, local_media)
         created = create_page_adf(confluence, space_id, title, placeholder_adf)
         target_page_id = created["id"]
 
-    render_diagrams(
-        diagrams,
-        assets_dir,
-        background=mermaid_bg,
-        renderer=renderer,
-        swimlane_drawio_enabled=swimlane_drawio_enabled,
-    )
+    if diagrams:
+        render_diagrams(
+            diagrams,
+            assets_dir,
+            background=mermaid_bg,
+            renderer=renderer,
+            swimlane_drawio_enabled=swimlane_drawio_enabled,
+        )
     filename_to_file_id = upload_diagrams(confluence, target_page_id, diagrams)
+    filename_to_file_id.update(
+        upload_files(
+            confluence,
+            target_page_id,
+            [{"path": m["path"], "filename": m["filename"]} for m in local_media],
+        )
+    )
+
+    local_media_nodes = {
+        str(m["index"]): (
+            media_node(
+                filename_to_file_id[m["filename"]],
+                target_page_id,
+                alt=m["filename"],
+                width_height=(m["width"], m["height"]) if "width" in m else None,
+            )
+            if m["is_image"]
+            else attachment_node(filename_to_file_id[m["filename"]], target_page_id)
+        )
+        for m in local_media
+    }
 
     if renderer == renderers.DRAWIO:
         nodes_by_index = _drawio_nodes_by_index(
@@ -152,10 +180,12 @@ def _publish_with_diagrams(
                 nodes_by_index[str(d["index"])] = media_node(
                     filename_to_file_id[d["filename"]], target_page_id
                 )
-        final_adf, _ = substitute_drawio(base_adf, nodes_by_index)
     else:
-        media_ids_by_index = {str(d["index"]): filename_to_file_id[d["filename"]] for d in diagrams}
-        final_adf, _ = substitute_media(base_adf, media_ids_by_index, target_page_id)
+        nodes_by_index = {
+            str(d["index"]): media_node(filename_to_file_id[d["filename"]], target_page_id) for d in diagrams
+        }
+    nodes_by_index.update(local_media_nodes)
+    final_adf, _ = substitute_drawio(base_adf, nodes_by_index)
 
     version = get_page_version(confluence, target_page_id)
     update_page_adf(confluence, target_page_id, title, final_adf, version)
@@ -215,6 +245,7 @@ def _publish_text_only(
 def _publish_without_credentials(
     base_adf: dict,
     diagrams: list[dict],
+    local_media: list[dict],
     page_id: str | None,
     space_id: str | None,
     title: str,
@@ -226,8 +257,8 @@ def _publish_without_credentials(
         "title": title,
         "diagramsRendered": 0,
     }
-    if diagrams:
-        final_adf, _ = substitute_diagram_notes(base_adf, diagrams)
+    if diagrams or local_media:
+        final_adf, _ = substitute_diagram_notes(base_adf, diagrams, local_media)
         result["missingPrerequisite"] = "ATLASSIAN_API_TOKEN"
     else:
         final_adf = base_adf
@@ -248,32 +279,39 @@ def publish(
 ) -> dict:
     """Run extract -> md-to-adf -> create/attach -> substitute -> publish end to end.
 
-    Forces a REST publish whenever diagrams are present and credentials are configured
-    — attachment upload already needs the REST client, so publishing over it too is
-    free regardless of `threshold_bytes`. Always writes the final ADF to `out_path`,
+    Forces a REST publish whenever diagrams or local attachments are present and credentials
+    are configured — attachment upload already needs the REST client, so publishing over it
+    too is free regardless of `threshold_bytes`. Always writes the final ADF to `out_path`,
     pretty-printed (`json.dump(..., indent=2)`) so it stays readable through
     line-truncating file readers.
     """
     renderer = load_renderer(root)
-    unavailable = renderers.unavailable_reason(renderer)
-    if unavailable:
-        raise RuntimeError(unavailable)
-    # Resolved up front so a missing key fails before any page is created or updated.
-    drawio_extension_key = load_drawio_extension_key(root) if renderer == renderers.DRAWIO else None
     swimlane_drawio_enabled = load_swimlane_drawio_enabled(root)
 
     md_text = Path(md_path).read_text(encoding="utf-8")
     resolved_title = resolve_title(md_text, title)
     processed = strip_ignored_sections(md_text)
     processed, diagrams = extract_mermaid(processed)
+    processed, local_media = extract_local_media(processed, Path(md_path).parent, start_index=len(diagrams))
     base_adf = convert_markdown_to_adf(processed)
+
+    # A page with only local attachments and no mermaid fence must not be blocked by an
+    # unrelated/unusable ATLASSIAN_DIAGRAM_RENDERER setting.
+    drawio_extension_key = None
+    if diagrams:
+        unavailable = renderers.unavailable_reason(renderer)
+        if unavailable:
+            raise RuntimeError(unavailable)
+        # Resolved up front so a missing key fails before any page is created or updated.
+        drawio_extension_key = load_drawio_extension_key(root) if renderer == renderers.DRAWIO else None
 
     credentials = try_load_credentials(root)
 
-    if credentials and diagrams:
+    if credentials and (diagrams or local_media):
         result, final_adf = _publish_with_diagrams(
             base_adf,
             diagrams,
+            local_media,
             credentials,
             page_id,
             space_id,
@@ -289,7 +327,9 @@ def publish(
             base_adf, credentials, page_id, space_id, resolved_title, threshold_bytes
         )
     else:
-        result, final_adf = _publish_without_credentials(base_adf, diagrams, page_id, space_id, resolved_title)
+        result, final_adf = _publish_without_credentials(
+            base_adf, diagrams, local_media, page_id, space_id, resolved_title
+        )
 
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(final_adf, f, indent=2)

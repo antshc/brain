@@ -1,6 +1,13 @@
 import pytest
 
-from page_diagrams.adf import drawio_node, replace_markers, substitute_drawio, substitute_media
+from page_diagrams.adf import (
+    attachment_node,
+    drawio_node,
+    media_node,
+    replace_markers,
+    substitute_drawio,
+    substitute_media,
+)
 
 
 def _drawio_node() -> dict:
@@ -130,3 +137,40 @@ def test_substitute_drawio_replaces_markers_at_any_depth():
     assert replaced == 2
     assert result["content"][0]["type"] == "extension"
     assert result["content"][1]["content"][0]["type"] == "extension"
+
+
+def test_media_node_carries_alt_and_width_height_for_a_local_image():
+    node = media_node("file-1", "123", alt="Screenshot.png", width_height=(611, 793))
+    assert node == {
+        "type": "mediaSingle",
+        "attrs": {"layout": "center", "width": 611, "widthType": "pixel"},
+        "content": [
+            {
+                "type": "media",
+                "attrs": {
+                    "id": "file-1",
+                    "type": "file",
+                    "collection": "contentId-123",
+                    "alt": "Screenshot.png",
+                    "width": 611,
+                    "height": 793,
+                },
+            }
+        ],
+    }
+
+
+def test_media_node_without_alt_or_width_height_keeps_the_default_placeholder_shape():
+    node = media_node("file-1", "123")
+    assert node == {
+        "type": "mediaSingle",
+        "attrs": {"layout": "center", "width": 768, "widthType": "pixel"},
+        "content": [{"type": "media", "attrs": {"id": "file-1", "type": "file", "collection": "contentId-123"}}],
+    }
+
+
+def test_attachment_node_builds_a_media_group_for_a_generic_file():
+    assert attachment_node("file-1", "123") == {
+        "type": "mediaGroup",
+        "content": [{"type": "media", "attrs": {"id": "file-1", "type": "file", "collection": "contentId-123"}}],
+    }

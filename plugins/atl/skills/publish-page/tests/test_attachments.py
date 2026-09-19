@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from page_diagrams.attachments import upload_diagrams
+from page_diagrams.attachments import upload_diagrams, upload_files
 
 
 def make_diagrams():
@@ -70,6 +70,28 @@ def test_upload_diagrams_with_nothing_to_attach_skips_the_round_trip():
     confluence = MagicMock()
 
     result = upload_diagrams(confluence, "12345", [{"attachments": []}, {"attachments": []}])
+
+    assert result == {}
+    confluence.attach_file.assert_not_called()
+    confluence.get.assert_not_called()
+
+
+def test_upload_files_attaches_a_plain_list_of_local_files():
+    confluence = MagicMock()
+    confluence.get.return_value = {
+        "results": [{"title": "notes.pdf", "extensions": {"fileId": "file-1"}}]
+    }
+
+    result = upload_files(confluence, "12345", [{"path": "/tmp/notes.pdf", "filename": "notes.pdf"}])
+
+    confluence.attach_file.assert_called_once_with("/tmp/notes.pdf", name="notes.pdf", page_id="12345")
+    assert result == {"notes.pdf": "file-1"}
+
+
+def test_upload_files_with_an_empty_list_skips_the_round_trip():
+    confluence = MagicMock()
+
+    result = upload_files(confluence, "12345", [])
 
     assert result == {}
     confluence.attach_file.assert_not_called()
