@@ -1,11 +1,13 @@
 ---
 name: research-capability
-description: Investigate how a feature, capability, or flow actually works in the existing codebase, citing every claim to file:line evidence, and produce a Markdown research doc with a mermaid diagram tracing the mechanism end-to-end. Use when asked how something works, to document a capability's mechanism, trace a flow through the code, explain existing behavior, find every entry point that reaches it or every effect it produces, determine which provider, double, or fallback actually serves it, or write an as-built explanation with diagrams.
+description: Investigate how a feature, capability, or flow actually works inside a single deployable, citing every claim to file:line evidence, and produce a Markdown research doc with a mermaid diagram tracing the mechanism. Use when asked how something works, to document a capability's mechanism, trace a flow through the code, explain existing behavior, find every entry point that reaches it or every effect it produces, determine which provider, double, or fallback actually serves it, or write an as-built explanation with diagrams.
 ---
 
 # Research a capability
 
 Source of truth is this repo, not the web. Output: one Markdown file, every claim cited to `path:line`, carrying a mermaid diagram of the confirmed mechanism.
+
+Scope is one deployable: the trace starts at this unit's entry points and stops at the effects leaving it. **Flow crosses a process boundary? Run `/trace-chain` skill instead** — it maps the chain lane by lane and runs this skill for each lane worth depth.
 
 ## Workflow
 
@@ -19,7 +21,7 @@ Source of truth is this repo, not the web. Output: one Markdown file, every clai
 8. **Probe** when static reading can't settle a claim (which branch fires, runtime-computed config, async ordering): run the test, add a temporary log, call the endpoint, query the data it wrote. Discard the probe, keep the result.
 9. **Record on confirmation** — write each Fact with its citation immediately, and prune the branches it rules out.
 
-**Done when** every in-scope entry point reaches a cited convergence point, every step from there to effect carries a citation, every effect and every selectable source with its fallback edge is accounted for, the diagram accounts for every recorded Fact, and the remaining unknowns can't change the answer.
+**Done when** every in-scope entry point reaches a cited convergence point, every step from there to effect carries a citation, every effect and every selectable source with its fallback edge is accounted for, every call leaving the deployable is recorded as an effect carrying its contract, the diagram accounts for every recorded Fact, and the remaining unknowns can't change the answer.
 
 ## Surface map
 
@@ -27,6 +29,7 @@ A capability has many ways in and many ways out; tracing one of each answers a n
 
 - **Entry points** — REST/RPC route, GUI action, client library, CLI, scheduled job, queue or event consumer, webhook. Several usually converge on one core; each can apply its own auth, validation, defaults, and deserialization first. Cite each entry, cite the **convergence point**, then trace once below it and note per-entry differences as Facts.
 - **Effects** — persisted writes, published events, outbound calls, files, cache invalidations, notifications, the response payload, and logs/metrics another system consumes. The returned value is one effect among several; name each and whether it is unconditional, and whether it shares the caller's transaction.
+- **Boundary** — an effect that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by `/trace-chain`.
 
 ## Multiple external sources
 
@@ -64,7 +67,7 @@ Cite `path:line` or `path:startLine-endLine` inline, immediately after the claim
 
 ## Output
 
-Write to `docs/ongoing/<slug>.md` unless the user names a location or the repo documents features elsewhere. Fill [capability-research-template.md](capability-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
+Write to `docs/ongoing/<slug>.md` unless the user names a location or the repo documents features elsewhere. Run as a lane of a chain, write to `docs/ongoing/<chain-slug>/<n>-<deployable>.md` beside the chain document instead. Fill [capability-research-template.md](capability-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
 
 Run `/render-mermaid-png` skill only if the user wants an exported image alongside the Markdown.
 
@@ -76,7 +79,7 @@ Pick the diagram from what the question asks and state it in the words below. Th
 |---|---|
 | the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** |
 | which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** |
-| who owns each step and where responsibility changes — handoffs across services, layers, or teams | a **swimlane diagram** |
+| who owns each step and where responsibility changes — handoffs across layers, modules, or teams | a **swimlane diagram** |
 | which deployable units and external systems the capability spans | a **container diagram** |
 | scope and integration boundary — the actors and external systems around it | a **system context diagram** |
 | where it runs — hosting, runtime, infrastructure placement | a **deployment view** |

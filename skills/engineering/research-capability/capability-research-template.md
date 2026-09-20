@@ -6,9 +6,12 @@
 - Quote the deciding line whenever it is short enough to settle the claim on sight.
 - Executing code proves behavior; tests, comments, and docs state only intent — record any mismatch as a finding.
 - Nothing reaches the diagram, tables, or conclusion without a Fact behind it.
+- Scope is one deployable. The only cross-boundary nodes allowed are this unit's own entry points and the effects leaving it; upstream and downstream internals belong to their own documents.
 
 - Question: {{the exact question being answered — capability, entry point, specific behavior}}
 - Scope: {{repo/service and layers in scope; what's explicitly out, with a link to any doc that owns the excluded area}}
+- Chain: {{link to the chain document and this lane's number, or — when researched standalone}}
+- Inbound: {{the contract this lane receives and its handoff evidence, or — when researched standalone}}
 - Status: investigating | answered
 
 ## Summary
@@ -33,7 +36,7 @@
 
 ## Effects
 
-**Rules:** one row per observable outcome — persisted write, published event, outbound call, file, cache invalidation, notification, response payload, consumed log/metric. `When` says unconditional or names the condition; `Transactional with` names what it commits or rolls back alongside.
+**Rules:** one row per observable outcome — persisted write, published event, outbound call, file, cache invalidation, notification, response payload, consumed log/metric. `When` says unconditional or names the condition; `Transactional with` names what it commits or rolls back alongside. An effect leaving the deployable carries its contract — operation or schema, parameters, error surface — in `Effect`.
 
 | Effect | Kind | When | Transactional with | Evidence |
 |---|---|---|---|---|
