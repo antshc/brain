@@ -1,24 +1,32 @@
 ---
 name: research-capability
-description: Investigate how a feature, capability, or flow actually works in the existing codebase, citing every claim to file:line evidence, and produce a Markdown research doc with a mermaid diagram tracing the mechanism end-to-end. Use when asked how something works, to document a feature's mechanism, trace a flow through the code, explain existing behavior, determine which provider or fallback actually serves a capability, or write an as-built explanation with diagrams.
+description: Investigate how a feature, capability, or flow actually works in the existing codebase, citing every claim to file:line evidence, and produce a Markdown research doc with a mermaid diagram tracing the mechanism end-to-end. Use when asked how something works, to document a capability's mechanism, trace a flow through the code, explain existing behavior, find every entry point that reaches it or every effect it produces, determine which provider, double, or fallback actually serves it, or write an as-built explanation with diagrams.
 ---
 
-# Research a feature
+# Research a capability
 
 Source of truth is this repo, not the web. Output: one Markdown file, every claim cited to `path:line`, carrying a mermaid diagram of the confirmed mechanism.
 
 ## Workflow
 
-1. **Frame** — name the capability, the entry point (route, CLI command, event handler, UI action), and the exact behavior in question. "Where does an expired token get rejected?" beats "how does auth work?".
+1. **Frame** — name the capability, the entry point(s) in question, and the exact behavior. "Where does an expired token get rejected?" beats "how does auth work?".
 2. **Scope** — repo/service and layers in scope (API, domain, persistence, infra), and what is explicitly out.
-3. **Map broad** — grep/semantic-search route tables, command registrations, event subscribers, schedulers, and container/provider registrations for candidate entry points. Collect candidates before reading any of them deeply.
-4. **Hypothesize** — write the mechanism as a testable chain (`OrderController.Create` → `OrderService.Place` → `OrdersRepository.Insert`). Each hypothesis names the next thing to confirm.
-5. **Rank by risk** — confirm in this order: does this path actually execute for the framed case (vs. a dead or superseded lookalike) → which implementation actually serves it when several sit behind one interface, and what it falls back to (see Multiple external sources) → config/feature-flag branching → error and edge cases → async ordering → performance → naming.
-6. **Trace deep, narrow** — go-to-definition, find-references, call hierarchy along that one chain instead of reading whole files. Drop a branch the moment it is irrelevant.
-7. **Probe** when static reading can't settle a claim (which branch fires, runtime-computed config, async ordering): run the test, add a temporary log, call the endpoint, query the data it wrote. Discard the probe, keep the result.
-8. **Record on confirmation** — write each Fact with its citation immediately, and prune the branches it rules out.
+3. **Map surface** — enumerate both ends before tracing either (see Surface map), and say which the question covers.
+4. **Map broad** — grep/semantic-search route tables, command registrations, event subscribers, schedulers, and container/provider registrations for candidate entry points. Collect candidates before reading any of them deeply.
+5. **Hypothesize** — write the mechanism as a testable chain (`OrderController.Create` → `OrderService.Place` → `OrdersRepository.Insert`). Each hypothesis names the next thing to confirm.
+6. **Rank by risk** — confirm in this order: does this path actually execute for the framed case (vs. a dead or superseded lookalike) → which entry points reach it, and what each does differently before they converge → which implementation actually serves it when several sit behind one interface, and what it falls back to (see Multiple external sources) → config/feature-flag branching → error and edge cases → async ordering → performance → naming.
+7. **Trace deep, narrow** — go-to-definition, find-references, call hierarchy along that one chain instead of reading whole files. Drop a branch the moment it is irrelevant.
+8. **Probe** when static reading can't settle a claim (which branch fires, runtime-computed config, async ordering): run the test, add a temporary log, call the endpoint, query the data it wrote. Discard the probe, keep the result.
+9. **Record on confirmation** — write each Fact with its citation immediately, and prune the branches it rules out.
 
-**Done when** every step from entry point to effect carries a citation, every selectable source and its fallback edge is accounted for, the diagram accounts for every recorded Fact, and the remaining unknowns can't change the answer.
+**Done when** every in-scope entry point reaches a cited convergence point, every step from there to effect carries a citation, every effect and every selectable source with its fallback edge is accounted for, the diagram accounts for every recorded Fact, and the remaining unknowns can't change the answer.
+
+## Surface map
+
+A capability has many ways in and many ways out; tracing one of each answers a narrower question than the one asked.
+
+- **Entry points** — REST/RPC route, GUI action, client library, CLI, scheduled job, queue or event consumer, webhook. Several usually converge on one core; each can apply its own auth, validation, defaults, and deserialization first. Cite each entry, cite the **convergence point**, then trace once below it and note per-entry differences as Facts.
+- **Effects** — persisted writes, published events, outbound calls, files, cache invalidations, notifications, the response payload, and logs/metrics another system consumes. The returned value is one effect among several; name each and whether it is unconditional, and whether it shares the caller's transaction.
 
 ## Multiple external sources
 
@@ -33,6 +41,7 @@ Cite each with `path:line`:
 - **Precedence** — the order fallback walks.
 - **Trigger** — what demotes a source: exception, timeout, status code, or the validation that rules a *successful* response invalid.
 - **Terminal** — behavior when every source fails, and whether a fallback result is cached.
+- **Double** — the environment, profile, or flag that swaps a source for a mock, stub, in-memory fake, or recorded response, and where that double is the default. **A trace that ends in a double proves the wiring, not the behavior** — follow the real implementation for behavior claims, and record the double as its own Fact.
 
 Diagram selector and fallback edges, not the winning path alone.
 
@@ -57,7 +66,30 @@ Cite `path:line` or `path:startLine-endLine` inline, immediately after the claim
 
 Write to `docs/ongoing/<slug>.md` unless the user names a location or the repo documents features elsewhere. Fill [capability-research-template.md](capability-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
 
-Diagram: `sequenceDiagram` for a call/message flow, `flowchart` for branching decision logic. Every node or message names the `file:line` that established it, keeping the diagram falsifiable. Run `/render-mermaid-png` skill only if the user wants an exported image alongside the Markdown.
+Run `/render-mermaid-png` skill only if the user wants an exported image alongside the Markdown.
+
+## Diagrams
+
+Pick the diagram from what the question asks and state it in the words below. Those words are the hook: a diagram skill owning that type takes over syntax and styling when one is installed, and when none is, the same words are the instruction to draw it yourself. Research documents as-built — current state, never a delta.
+
+| Research topic | Draw |
+|---|---|
+| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** |
+| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** |
+| who owns each step and where responsibility changes — handoffs across services, layers, or teams | a **swimlane diagram** |
+| which deployable units and external systems the capability spans | a **container diagram** |
+| scope and integration boundary — the actors and external systems around it | a **system context diagram** |
+| where it runs — hosting, runtime, infrastructure placement | a **deployment view** |
+| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** |
+
+A traced capability defaults to the sequence diagram. Grounding stays here whoever draws it — every participant, node, or message names the `file:line` that established it, keeping the diagram falsifiable.
+
+Default to one: entries enter as parallel participants meeting at the convergence point, effects leave from it. Split when a single diagram would misstate or sprawl — each split carries a heading naming the question it answers, and repeats no node the first one already showed:
+
+- **Entries diverge** — they never reach a shared path; diagram each distinct path.
+- **Selection** — selector and fallback edges are branching logic, so they want their own **flowchart** beside the sequence.
+- **Out-of-band effects** — events, background dispatch, or post-commit work whose ordering one sequence would imply wrongly.
+- **Sprawl** — past roughly 12 participants or 25 messages, readability dies.
 
 ## Gotchas
 

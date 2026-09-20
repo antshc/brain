@@ -1,6 +1,6 @@
 ---
 name: code-diagram
-description: Document implementation-level code structure with a Mermaid class diagram. Use for class responsibilities, fields, methods, inheritance, interfaces, dependencies, composition, aggregation, and class-level deltas.
+description: Document implementation-level code structure with a Mermaid class diagram. Use for class responsibilities, fields, methods, inheritance, interfaces, which types implement an interface, dependencies, composition, aggregation, and class-level deltas.
 ---
 
 # Code Diagram

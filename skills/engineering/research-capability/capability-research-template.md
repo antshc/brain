@@ -19,20 +19,33 @@
 
 ## Mechanism
 
-**Rules:** `sequenceDiagram` for a call/message flow, `flowchart` for branching decision logic. Every participant is a real file or component; every message carries the `path:line` that established it. When several sources can serve the flow, the diagram shows the selector and the fallback edges, not only the winning path.
+**Rules:** pick the diagram type from Diagrams in `SKILL.md`; when a diagram skill owns that type, its template governs syntax and styling — do not compose a Mermaid skeleton from this template. Every participant or node is a real file or component; every message or edge carries the `path:line` that established it. One diagram by default — multiple entry points enter as parallel participants meeting at the cited convergence point, effects leave from it. Add a `### {{question this diagram answers}}` subsection per extra diagram only when entries never converge, selection and fallback need their own flowchart, effects fire out of band, or the single diagram sprawls past ~12 participants; an extra diagram repeats no node the first already showed.
 
-```mermaid
-sequenceDiagram
-    {{participants and messages tracing the confirmed call chain, each message noting its file:line}}
-```
+{{diagram}}
+
+## Entry points
+
+**Rules:** one row per in-scope way in — route, GUI action, client library, CLI, scheduled job, queue/event consumer, webhook. `Does differently` records auth, validation, defaults, or deserialization unique to that entry; `Converges at` is the cited symbol where it joins the shared path.
+
+| Entry point | Trigger | Does differently | Converges at | Evidence |
+|---|---|---|---|---|
+| {{entry}} | {{request, user action, schedule, message, call}} | {{auth/validation/defaults, or none}} | {{symbol at path:line}} | {{path:line}} |
+
+## Effects
+
+**Rules:** one row per observable outcome — persisted write, published event, outbound call, file, cache invalidation, notification, response payload, consumed log/metric. `When` says unconditional or names the condition; `Transactional with` names what it commits or rolls back alongside.
+
+| Effect | Kind | When | Transactional with | Evidence |
+|---|---|---|---|---|
+| {{effect}} | {{write, event, outbound call, response, file, cache, notification}} | {{unconditional, or the condition}} | {{shared transaction/unit of work, or independent}} | {{path:line}} |
 
 ## External sources
 
-**Rules:** one row per source reachable for the framed case; keep the section when a single source is confirmed to be the only one, and say so. `Selected when` names the config key, flag, or tweak and the deciding value, including the default when it is absent.
+**Rules:** one row per source reachable for the framed case, doubles included — a mock, stub, in-memory fake, or recorded response is a source whose selector is an environment or profile. Keep the section when a single source is confirmed to be the only one, and say so. `Selected when` names the config key, flag, or tweak and the deciding value, including the default when it is absent.
 
 | Source | Selected when | Falls back to | Demotion trigger | Evidence |
 |---|---|---|---|---|
-| {{client or implementation}} | {{key=value, flag, tweak, or default}} | {{next source, or none}} | {{exception, timeout, status code, invalid-result rule}} | {{path:line}} |
+| {{client or implementation}} | {{key=value, flag, tweak, environment, or default}} | {{next source, or none}} | {{exception, timeout, status code, invalid-result rule}} | {{path:line}} |
 
 **Rules:** state the terminal behavior when every source fails, whether the selector is read per call or once at startup, and whether a fallback result is cached — each cited.
 

@@ -1,6 +1,6 @@
 ---
 name: behavior-diagram
-description: Document software behavior with a Mermaid flowchart, swimlane diagram, or sequence diagram. Use for process flows, decision paths, responsibility handoffs, interaction order, cross-boundary calls, failure branching, and their deltas.
+description: Document software behavior with a Mermaid flowchart, swimlane diagram, or sequence diagram. Use for process flows, decision paths, config or feature-flag branching, provider selection and fallback, responsibility handoffs and who owns each step, call-chain and interaction order, cross-boundary calls, failure branching, and their deltas.
 ---
 
 # Behavior Diagram
