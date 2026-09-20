@@ -215,6 +215,7 @@ Software solution research and design skills.
 - [research-cloud](plugins/solution/skills/research-cloud/SKILL.md): research AWS or Azure implementation constraints with provider evidence.
 - [research-capability](plugins/solution/skills/research-capability/SKILL.md): explain how a capability works inside one deployable, cited to `file:line`, with a sequence diagram.
 - [trace-chain](plugins/solution/skills/trace-chain/SKILL.md): trace a flow across deployables to terminal external systems, with cited handoffs.
+- [review-design](plugins/solution/skills/review-design/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness.
 
 ### engineering
 

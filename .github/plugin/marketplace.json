@@ -47,7 +47,7 @@
         {
             "name": "solution",
             "source": "./plugins/solution",
-            "description": "Software solution research and design skills, including evidence-backed AWS and Azure cloud research."
+            "description": "Software solution research and design review skills, including evidence-backed cloud research and architecture gap detection."
         }
     ]
 }
