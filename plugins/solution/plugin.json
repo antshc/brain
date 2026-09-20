@@ -1,7 +1,9 @@
 {
   "name": "solution",
-  "version": "1.0.0",
-  "description": "Software solution research and design skills, including evidence-backed AWS and Azure cloud research.",
-  "skills": ["./skills"],
+  "version": "1.0.1",
+  "description": "Software solution research skills for cloud constraints, current capability behavior, and cross-deployable flow tracing.",
+  "skills": [
+    "./skills"
+  ],
   "mcpServers": ".mcp.json"
 }
