@@ -22,7 +22,7 @@
 
 ## Mechanism
 
-**Rules:** pick the diagram type from Diagrams in `SKILL.md`; when a diagram skill owns that type, its template governs syntax and styling — do not compose a Mermaid skeleton from this template. Every participant or node is a real file or component; every message or edge carries the `path:line` that established it. One diagram by default — multiple entry points enter as parallel participants meeting at the cited convergence point, effects leave from it. Add a `### {{question this diagram answers}}` subsection per extra diagram only when entries never converge, selection and fallback need their own flowchart, effects fire out of band, or the single diagram sprawls past ~12 participants; an extra diagram repeats no node the first already showed.
+**Rules:** pick the diagram type from Diagrams in `SKILL.md`; when a diagram skill owns that type, its template governs syntax and styling — do not compose a Mermaid skeleton from this template. Label every participant, node, and message with trace keywords — the role or step plus a greppable token (route path, config key, event or queue name, table name, interface name) — never class/method names with `path:line`, unless the user asked for them; the tables below carry the citations. Every node still traces back to a Fact row. One diagram by default — multiple entry points enter as parallel participants meeting at the cited convergence point, effects leave from it. Add a `### {{question this diagram answers}}` subsection per extra diagram only when entries never converge, selection and fallback need their own flowchart, effects fire out of band, or the single diagram sprawls past ~12 participants; an extra diagram repeats no node the first already showed.
 
 {{diagram}}
 

@@ -85,7 +85,9 @@ Pick the diagram from what the question asks and state it in the words below. Th
 | where it runs — hosting, runtime, infrastructure placement | a **deployment view** |
 | which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** |
 
-A traced capability defaults to the sequence diagram. Grounding stays here whoever draws it — every participant, node, or message names the `file:line` that established it, keeping the diagram falsifiable.
+A traced capability defaults to the sequence diagram.
+
+**Label with trace keywords, not class names and line numbers.** A diagram node names the role or step in the flow (`HTTP entry`, `order validation`, `payment provider`, `order persisted`) plus the one literal token an agent can grep to land on it — a route path, config key, event or queue name, table name, or interface name. Keep `path:line` citations out of the diagram; the Facts, Entry points, Effects, and External sources tables carry them, and the diagram stays falsifiable by pairing with those rows. Use real class, method, or file names with exact lines in the diagram **only when the user asks for them**.
 
 Default to one: entries enter as parallel participants meeting at the convergence point, effects leave from it. Split when a single diagram would misstate or sprawl — each split carries a heading naming the question it answers, and repeats no node the first one already showed:
 
