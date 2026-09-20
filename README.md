@@ -164,7 +164,7 @@ AFK PR review and autonomous development loop.
 
 ### review
 
-PR code review skills with modular standards and guidance.
+Code and technical solution review skills with modular standards and guidance.
 
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
@@ -174,6 +174,7 @@ PR code review skills with modular standards and guidance.
 - [fetch-diff](plugins/review/skills/fetch-diff/SKILL.md): check out a PR branch and fetch its diff per file for review skills.
 - [posting](plugins/review/skills/posting/SKILL.md): post a review comment as an inline PR comment via the `gh` API.
 - [to-review-comment](plugins/review/skills/to-review-comment/SKILL.md): format a raw review comment into the review tone of voice.
+- [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
 
 ### harness
 
@@ -210,12 +211,11 @@ AWS documentation skills for querying official AWS docs, API references, and reg
 
 ### solution
 
-Software solution research and design skills.
+Software solution research skills.
 
 - [research-cloud](plugins/solution/skills/research-cloud/SKILL.md): research AWS or Azure implementation constraints with provider evidence.
 - [research-capability](plugins/solution/skills/research-capability/SKILL.md): explain how a capability works inside one deployable, cited to `file:line`, with a sequence diagram.
 - [trace-chain](plugins/solution/skills/trace-chain/SKILL.md): trace a flow across deployables to terminal external systems, with cited handoffs.
-- [review-design](plugins/solution/skills/review-design/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness.
 
 ### engineering
 

@@ -1,7 +1,7 @@
 {
   "name": "solution",
-  "version": "1.1.0",
-  "description": "Software solution research and design review skills for cloud constraints, current behavior, cross-deployable flows, and architecture gaps.",
+  "version": "1.1.1",
+  "description": "Software solution research skills for cloud constraints, current behavior, and cross-deployable flows.",
   "skills": [
     "./skills"
   ],
