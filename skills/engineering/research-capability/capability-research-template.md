@@ -19,12 +19,24 @@
 
 ## Mechanism
 
-**Rules:** `sequenceDiagram` for a call/message flow, `flowchart` for branching decision logic. Every participant is a real file or component; every message carries the `path:line` that established it.
+**Rules:** `sequenceDiagram` for a call/message flow, `flowchart` for branching decision logic. Every participant is a real file or component; every message carries the `path:line` that established it. When several sources can serve the flow, the diagram shows the selector and the fallback edges, not only the winning path.
 
 ```mermaid
 sequenceDiagram
     {{participants and messages tracing the confirmed call chain, each message noting its file:line}}
 ```
+
+## External sources
+
+**Rules:** one row per source reachable for the framed case; keep the section when a single source is confirmed to be the only one, and say so. `Selected when` names the config key, flag, or tweak and the deciding value, including the default when it is absent.
+
+| Source | Selected when | Falls back to | Demotion trigger | Evidence |
+|---|---|---|---|---|
+| {{client or implementation}} | {{key=value, flag, tweak, or default}} | {{next source, or none}} | {{exception, timeout, status code, invalid-result rule}} | {{path:line}} |
+
+**Rules:** state the terminal behavior when every source fails, whether the selector is read per call or once at startup, and whether a fallback result is cached — each cited.
+
+{{sourceSelectionNotes}}
 
 ## Facts
 
