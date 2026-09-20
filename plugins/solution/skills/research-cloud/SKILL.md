@@ -6,7 +6,7 @@ compatibility: Requires the provider MCP configured by the solution plugin.
 
 # Research cloud
 
-Research facts and constraints; leave design decisions to `cloud-design`.
+Research facts and constraints.
 
 ## Sources
 
