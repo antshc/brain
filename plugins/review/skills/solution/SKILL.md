@@ -1,9 +1,9 @@
 ---
-name: review-design
+name: solution
 description: Review a technical design for missing, contradictory, infeasible, unsafe, or untestable decisions. Use when asked to assess design completeness, find architecture gaps, or decide whether a design is ready for implementation or approval.
 ---
 
-# Review design
+# Review solution
 
 Review decisions, not document style. A section may have any name or location. Do not require irrelevant detail.
 
@@ -11,7 +11,7 @@ Review decisions, not document style. A section may have any name or location. D
 
 1. Read the design and its linked requirements, ADRs, diagrams, and constraints.
 2. Identify the change boundary: actors, capabilities, affected components, data, integrations, deployment units, and environments.
-3. Verify material current-system claims against available evidence. Use `/research-capability` for one deployable, `/trace-chain` across deployables, and `/research-cloud` for provider constraints only when the claim affects the verdict.
+3. Verify material current-system claims against available evidence. Use `/solution:research-capability` for one deployable, `/solution:trace-chain` across deployables, and `/solution:research-cloud` for provider constraints only when the claim affects the verdict.
 4. Trace each goal and requirement to architecture, runtime behavior, verification, rollout, and an implementation step. Record broken links.
 5. Evaluate every category below. Use `Covered`, `Gap`, `Unknown`, or `Not applicable`.
 6. Report prioritized, non-duplicated findings. Do not rewrite the design unless asked.

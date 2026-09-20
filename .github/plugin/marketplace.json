@@ -7,7 +7,7 @@
         {
             "name": "review",
             "source": "./plugins/review",
-            "description": "PR code review skills with modular standards and guidance."
+            "description": "Code and technical solution review skills with modular standards and guidance."
         },
         {
             "name": "wf",
@@ -47,7 +47,7 @@
         {
             "name": "solution",
             "source": "./plugins/solution",
-            "description": "Software solution research and design review skills, including evidence-backed cloud research and architecture gap detection."
+            "description": "Software solution research skills, including evidence-backed cloud research and cross-deployable flow tracing."
         }
     ]
 }
