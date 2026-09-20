@@ -74,7 +74,7 @@ The skills do not have to run as a strict sequence. The technical design skill s
 | `integration-design` | Design communication between internal components and external systems. | Solution architecture, API/protocol/SDK research. | API/event contracts, call flows, timeouts, retries, idempotency, ordering, auth, error propagation, fallback behavior. |
 | `data-design` | Design persistence and state changes. | Existing data model, requirements, solution architecture. | Data ownership, schema/model changes, migrations, consistency model, concurrency, retention, backward compatibility. |
 | `runtime-design` | Design in-process/runtime behavior, especially .NET and ASP.NET Core implementation structure. | Solution architecture, .NET/ASP.NET research, current implementation. | Runtime components, services/classes/modules, DI lifetimes, workers, concurrency, cancellation, queues/channels, caching, error handling. |
-| `cloud-design` | Design interaction with AWS/Azure services and their APIs/SDKs. | Cloud requirements, `research-aws-*`, `research-azure-*`, SDK/API research. | Cloud resources, APIs, SDK usage, IAM/RBAC, networking, quotas, throttling, retries, HA, cost-sensitive choices. |
+| `cloud-design` | Design interaction with AWS/Azure services and their APIs/SDKs. | Cloud requirements, `research-cloud` findings. | Cloud resources, APIs, SDK usage, IAM/RBAC, networking, quotas, throttling, retries, HA, cost-sensitive choices. |
 | `deployment-design` | Design how the change is configured, deployed, upgraded and rolled back. | Current deployment, solution architecture, cloud/runtime design. | Deployment topology, containers/services, configuration, secrets, rollout, upgrade, rollback, compatibility and migration. |
 | `reliability-design` | Explicitly define failure behavior and recovery. | Architecture, integration/cloud research, operational requirements. | Failure modes, retries, circuit breakers, recovery, durability, degraded modes, RPO/RTO implications. |
 | `security-design` | Define security boundaries and controls. | Architecture, cloud/runtime research, security requirements. | Trust boundaries, authentication, authorization, IAM/RBAC, secrets, network exposure, sensitive-data handling. |
@@ -92,8 +92,7 @@ Examples:
 ```text
 research-dotnet
 research-aspnet-core
-research-aws-*
-research-azure-*
+research-cloud
 research-sdk
 research-library
 research-protocol
@@ -118,7 +117,7 @@ Typical research outputs:
 Example separation:
 
 ```text
-research-aws-sdk
+research-cloud
     -> DescribeInstances pagination behaves like X
 
 cloud-design
@@ -355,7 +354,7 @@ Error handling:
 
 Turn AWS/Azure research into concrete cloud design decisions.
 
-The skill should orchestrate the appropriate `research-aws-*`, `research-azure-*`, API and SDK research.
+The skill should consume `research-cloud` evidence rather than repeat provider API, SDK, IAM/RBAC, networking, quota, or failure research.
 
 Cover:
 

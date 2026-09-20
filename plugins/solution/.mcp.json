@@ -1,0 +1,18 @@
+{
+  "aws-knowledge-mcp-server": {
+    "url": "https://knowledge-mcp.global.api.aws",
+    "type": "http",
+    "disabled": true
+  },
+  "microsoft-learn": {
+    "type": "http",
+    "url": "https://learn.microsoft.com/api/mcp",
+    "disabled": true
+  },
+  "azure-mcp": {
+    "command": "npx",
+    "args": ["-y", "@azure/mcp@latest", "server", "start"],
+    "type": "stdio",
+    "disabled": true
+  }
+}
