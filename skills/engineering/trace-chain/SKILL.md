@@ -77,9 +77,9 @@ Fill [chain-trace-template.md](chain-trace-template.md), obeying its `**Rules**`
 
 ## Diagrams
 
-The chain diagram is a **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Those words are the hook: a diagram skill owning that type takes over syntax and styling when one is installed, and when none is, the same words are the instruction to draw it yourself. Every lane and every arrow names the evidence that established it.
+The chain diagram is a **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Run `/behavior-diagram` skill for its syntax and styling. Every lane and every arrow names the evidence that established it.
 
-Add a **container diagram** above it only when the lane count passes roughly eight and the reader needs the shape before the sequence of handoffs. Lane internals are never drawn here — they belong to the lane's own sequence diagram.
+Add a **container diagram** above it only when the lane count passes roughly eight and the reader needs the shape before the sequence of handoffs. Run `/architecture-diagram` skill for its syntax and styling. Lane internals are never drawn here — they belong to the lane's own sequence diagram, per `/research-capability` skill **Diagrams**.
 
 ## Gotchas
 

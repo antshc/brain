@@ -73,19 +73,19 @@ Run `/render-mermaid-png` skill only if the user wants an exported image alongsi
 
 ## Diagrams
 
-Pick the diagram from what the question asks and state it in the words below. Those words are the hook: a diagram skill owning that type takes over syntax and styling when one is installed, and when none is, the same words are the instruction to draw it yourself. Research documents as-built — current state, never a delta.
+Pick the diagram from what the question asks, then Run its owning skill for syntax and styling — never compose Mermaid from memory. Research documents as-built — current state, never a delta.
 
-| Research topic | Draw |
-|---|---|
-| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** |
-| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** |
-| who owns each step and where responsibility changes — handoffs across layers, modules, or teams | a **swimlane diagram** |
-| which deployable units and external systems the capability spans | a **container diagram** |
-| scope and integration boundary — the actors and external systems around it | a **system context diagram** |
-| where it runs — hosting, runtime, infrastructure placement | a **deployment view** |
-| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** |
+| Research topic | Draw | Skill |
+|---|---|---|
+| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `/behavior-diagram` |
+| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `/behavior-diagram` |
+| who owns each step and where responsibility changes — handoffs across layers, modules, or teams | a **swimlane diagram** | `/behavior-diagram` |
+| which deployable units and external systems the capability spans | a **container diagram** | `/architecture-diagram` |
+| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `/architecture-diagram` |
+| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `/architecture-diagram` |
+| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `/code-diagram` |
 
-A traced capability defaults to the sequence diagram.
+A traced capability defaults to the sequence diagram; Run `/behavior-diagram` skill before drafting it.
 
 **Label with trace keywords, not class names and line numbers.** A diagram node names the role or step in the flow (`HTTP entry`, `order validation`, `payment provider`, `order persisted`) plus the one literal token an agent can grep to land on it — a route path, config key, event or queue name, table name, or interface name. Keep `path:line` citations out of the diagram; the Facts, Entry points, Effects, and External sources tables carry them, and the diagram stays falsifiable by pairing with those rows. Use real class, method, or file names with exact lines in the diagram **only when the user asks for them**.
 
