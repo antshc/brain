@@ -3,7 +3,8 @@
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
 - Every claim carries `path:line`, or the IaC/config line for a terminal system; a bare service name is not evidence.
-- Every handoff carries an emit-side citation **and** a receive-side citation. One side alone belongs in Assumptions, not in Handoffs.
+- Every boundary records API/event, SDK, protocol, auth, errors, and binding. Use `—` only when an aspect does not apply.
+- Every internal handoff carries an emit-side citation **and** a receive-side citation. One side alone belongs in Assumptions, not in Handoffs.
 - Executing code and a probed correlation id prove the chain; deployment diagrams, READMEs, and team knowledge state only intent — record any mismatch as a finding.
 - Lane internals stay in the lane's own document. Nothing here describes what happens inside a deployable beyond one line.
 
@@ -45,19 +46,19 @@
 
 ## Handoffs
 
-**Rules:** one row per edge between lanes. Both citations required. `Binding` is the IaC, compose, or config line proving both sides address the same real resource.
+**Rules:** one row per internal edge. Both code citations required. `API/event` names the operation or route, parameters, or topic/schema/version. `SDK` names package/version and method. `Errors` includes statuses, exceptions or failure events and relevant timeout/retry/idempotency/DLQ behavior. `Binding` proves both sides address the same resource.
 
-| Edge | Kind | Contract | Emit site | Receive site | Binding |
-|---|---|---|---|---|---|
-| {{1→2}} | {{HTTP, gRPC, queue, topic, shared table, file drop}} | {{schema or operation, with version}} | {{path:line}} | {{path:line}} | {{path:line}} |
+| Edge | API/event | SDK | Protocol | Auth | Errors | Emit site | Receive site | Binding |
+|---|---|---|---|---|---|---|---|---|
+| {{1→2}} | {{operation or schema/version}} | {{package@version; method, or —}} | {{HTTP, gRPC, AMQP, ...}} | {{identity; mechanism; permissions}} | {{error contract and resilience}} | {{path:line}} | {{path:line}} | {{path:line}} |
 
 ## Terminals
 
-**Rules:** one row per edge where research stops. `Why terminal` is `no source access` or `out of framed scope` with its reason — an unresolved reason means the row belongs in Frontier instead. `Real target` cites the IaC or config naming the resource, region, and account actually addressed.
+**Rules:** one row per external or out-of-scope edge. Cite authoritative contract documentation for semantics not encoded in the repository. `Why terminal` is `no source access` or `out of framed scope` with its reason; unresolved edges belong in Frontier. `Real target` cites config or IaC naming the resource, region, and account.
 
-| System | Reached from | Contract | Why terminal | Real target |
-|---|---|---|---|---|
-| {{managed service, database, third-party API}} | {{lane #}} | {{operation, parameters, error surface}} | {{no source access \| out of framed scope — reason}} | {{path:line, or —}} |
+| System | From | API/event | SDK | Protocol | Auth | Errors | Why terminal | Real target |
+|---|---|---|---|---|---|---|---|---|
+| {{managed service, database, third-party API}} | {{lane #}} | {{operation or schema/version}} | {{package@version; method, or —}} | {{transport and serialization}} | {{identity; mechanism; permissions}} | {{error contract and resilience}} | {{no source access \| out of framed scope — reason}} | {{path:line}} |
 
 ## Chain probe
 
