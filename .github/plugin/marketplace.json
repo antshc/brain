@@ -13,7 +13,7 @@
             "name": "wf",
             "source": "./plugins/wf",
             "description": "Common everyday workflow automation skills. Expected to be useful to all developers."
-        }, 
+        },
         {
             "name": "ralph",
             "source": "./plugins/ralph",
@@ -43,6 +43,11 @@
             "name": "learn-aws",
             "source": "./plugins/learn-aws",
             "description": "AWS documentation skills for querying official AWS docs, API references, and regional availability."
+        },
+        {
+            "name": "solution",
+            "source": "./plugins/solution",
+            "description": "Software solution research and design skills, including evidence-backed AWS and Azure cloud research."
         }
     ]
 }

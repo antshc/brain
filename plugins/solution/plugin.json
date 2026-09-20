@@ -1,0 +1,7 @@
+{
+  "name": "solution",
+  "version": "1.0.0",
+  "description": "Software solution research and design skills, including evidence-backed AWS and Azure cloud research.",
+  "skills": ["./skills"],
+  "mcpServers": ".mcp.json"
+}
