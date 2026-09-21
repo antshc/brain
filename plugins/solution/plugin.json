@@ -1,8 +1,0 @@
-{
-  "name": "solution",
-  "version": "2.0.0",
-  "description": "Software solution research skill covering the capability, deployables, and data axes.",
-  "skills": [
-    "./skills"
-  ]
-}
