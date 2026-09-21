@@ -115,9 +115,6 @@ Omit the list when no such changes exist. Do not apply delta colors in current m
 
 Replace all placeholders with real architecture. Add or remove elements and relationships to match actual scope. Do not retain unused example elements.
 
-<details>
-<summary>{{title}}</summary>
-
 ```mermaid
 ---
 config:
@@ -153,5 +150,3 @@ C4Container
     UpdateRelStyle(owner, store, $textColor="#c9d1d9", $lineColor="#8b949e")
     UpdateRelStyle(owner, externalSystem, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
-
-</details>

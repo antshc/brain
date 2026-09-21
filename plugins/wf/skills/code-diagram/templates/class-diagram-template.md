@@ -83,9 +83,6 @@ classDef memberChanged stroke:#8b949e,stroke-width:1px,stroke-dasharray:5 5
 
 Replace all placeholders with real code structure. Add or remove classes, members, namespaces, relationships, and notes to match the actual scope.
 
-<details>
-<summary>{{title}}</summary>
-
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: {{diagramId}}
@@ -113,5 +110,3 @@ classDiagram
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
-
-</details>

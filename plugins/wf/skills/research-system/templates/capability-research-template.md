@@ -26,14 +26,6 @@
 
 {{diagram}}
 
-## Entry points
-
-**Rules:** one row per in-scope way in — route, GUI action, client library, CLI, scheduled job, queue/event consumer, webhook. `Does differently` records auth, validation, defaults, or deserialization unique to that entry; `Converges at` is the cited symbol where it joins the shared path.
-
-| Entry point | Trigger | Does differently | Converges at | Evidence |
-|---|---|---|---|---|
-| {{entry}} | {{request, user action, schedule, message, call}} | {{auth/validation/defaults, or none}} | {{symbol at path:line}} | {{path:line}} |
-
 ## Effects
 
 **Rules:** one row per observable outcome — persisted write, published event, outbound call, file, cache invalidation, notification, response payload, consumed log/metric. `When` says unconditional or names the condition; `Transactional with` names what it commits or rolls back alongside. An effect leaving the deployable carries its contract — operation or schema, parameters, error surface — in `Effect`.
@@ -42,7 +34,15 @@
 |---|---|---|---|---|
 | {{effect}} | {{write, event, outbound call, response, file, cache, notification}} | {{unconditional, or the condition}} | {{shared transaction/unit of work, or independent}} | {{path:line}} |
 
-## External sources
+## Input points
+
+**Rules:** one row per in-scope way in — route, GUI action, client library, CLI, scheduled job, queue/event consumer, webhook. `Does differently` records auth, validation, defaults, or deserialization unique to that entry; `Converges at` is the cited symbol where it joins the shared path.
+
+| Entry point | Trigger | Does differently | Converges at | Evidence |
+|---|---|---|---|---|
+| {{entry}} | {{request, user action, schedule, message, call}} | {{auth/validation/defaults, or none}} | {{symbol at path:line}} | {{path:line}} |
+
+## Output points
 
 **Rules:** one row per source reachable for the framed case, doubles included — a mock, stub, in-memory fake, or recorded response is a source whose selector is an environment or profile. Keep the section when a single source is confirmed to be the only one, and say so. `Selected when` names the config key, flag, or tweak and the deciding value, including the default when it is absent.
 

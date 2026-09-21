@@ -85,9 +85,6 @@ Apply only when `SKILL.md` selects **delta mode**.
 
 Replace all placeholders with real behavior. Add or remove nodes and relationships to match the actual scope.
 
-<details>
-<summary>{{title}}</summary>
-
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: {{diagramId}}
@@ -107,5 +104,3 @@ flowchart TD
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
-
-</details>

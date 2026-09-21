@@ -113,9 +113,6 @@ Use this for runtime replacements, instance resizing, scaling-policy changes, or
 
 Replace all placeholders with real deployment topology. Add or remove deployment nodes, containers, stores, and relationships to match the actual scope. Do not retain unused example elements.
 
-<details>
-<summary>{{title}}</summary>
-
 ```mermaid
 ---
 config:
@@ -143,5 +140,3 @@ C4Deployment
     UpdateElementStyle({{storeAlias}}, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
     UpdateRelStyle({{componentAlias}}, {{storeAlias}}, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
-
-</details>
