@@ -20,7 +20,7 @@
 
 ## Chain
 
-**Rules:** a rendered Mermaid **swimlane** per **Deployables — one chain** in the skill — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract.
+**Rules:** a rendered Mermaid **swimlane** per **Deployables — one chain** in the skill — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. A `contract` or `deep` lane stays one node; a `traced` lane's subgraph shows its major steps as multiple nodes (see Depth dial).
 
 {{diagram}}
 
