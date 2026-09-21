@@ -45,19 +45,19 @@ Render the Mermaid block before declaring the research complete. Run `/render-me
 
 ### Deployables — one chain
 
-The unit is one **deployable** per lane — something independently runnable or deployed in production: a process, service, container, function, or host workload. The chain continues through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. Pick it when the flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
+The unit is one **deployable** per lane — something independently runnable or deployed in production: a process, service, container, function, host workload, or scheduled job. Trace breadth first across every outcome-relevant deployable whose executing source you can open, and end each branch at a system whose source you cannot or whose behavior is outside the framed outcome. Pick it when the flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
 
 - References: [deployables-research.md](references/deployables-research.md)
 - Template: [deployables-research-template.md](templates/deployables-research-template.md)
 - Output: exactly one file, `docs/ongoing/research-{{slug}}-chain.md`. A chain run writes no other document.
 
-**Diagram:** Draw a mandatory **swimlane** with one lane per deployable, terminal systems as edge lanes, and every arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
+**Diagram:** Draw a mandatory **swimlane** with one lane and one node per deployable, terminal systems as edge lanes, and every arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
 
 Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
 
-Keep `path:line` citations in the tables and prose; diagram labels carry contracts, not evidence. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/architecture-diagram` skill for its syntax and styling. Lane internals belong to the lane's own Capability-axis sequence diagram.
+Keep `path:line` citations in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
 
-Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane, every terminal sits at an edge, and no artifact, script, playbook, chart, or library holds a lane.
+Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane and one node, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
 
 ### Data — one item type and its store
 
@@ -71,7 +71,8 @@ The unit is one item type and the store holding it — one writer, many readers,
 
 ### Crossing axes
 
-- A chain run ends at the chain document. Name the lanes worth a deeper trace and offer them as a follow-up; run the Capability axis on one only after the user asks for it, then write `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file and link it from that lane's Frontier row.
+- A chain run ends at the chain document. Add a Capability follow-up only when the framed outcome depends on a lane's internal decision and its boundary contracts do not explain it. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
+- Run the Capability axis only after the user requests a listed follow-up. Write `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the follow-up question verbatim, use its inbound contract as the entry point, use its expected outbound contracts to bound observable outcomes, and link the result from that follow-up row.
 - Provider semantics, quotas, and API parameters behind a managed service belong to the provider, not this repo: Run `/research-aws` skill or `/research-azure` skill.
 
 ## Evidence ladder
