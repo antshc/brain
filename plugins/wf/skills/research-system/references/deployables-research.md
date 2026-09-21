@@ -27,7 +27,7 @@ Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm c
 4. **Classify every edge** — continuable or terminal (see Boundary). A continuable edge extends the chain; a terminal edge closes it with a contract. Keep walking while the next system is outcome-relevant and its executing source opens.
 5. **Probe the chain** (see Chain probe) — one real correlation id beats any amount of static reading for proving the lanes actually connect.
 6. **Rank lanes by depth need** — `contract`, `traced`, or `deep` (see Depth dial). Rank against the framed outcome, not against how interesting the code looks.
-7. **Draw and render the chain** (see Diagrams) — the swimlane is part of the deliverable, not an illustration added afterwards.
+7. **Draw and render the chain** (see **Deployables — one chain** in [SKILL.md](../SKILL.md)) — the swimlane is part of the deliverable, not an illustration added afterwards.
 8. **Offer the deep dives** — list the `deep` lanes and their Frontier questions in the report back to the user, and stop. Run the **Capability** axis on a lane only when the user asks for it, passing that lane's Frontier question verbatim as the framed question and its inbound contract as the entry point.
 
 **Done when** the chain document is the only file written; every entry reaches a lane; every deployable appears exactly once as a lane and every artifact sits inside its executing lane; every lane is `contract`/`traced`/`deep`; the swimlane renders and every terminal sits at a diagram edge; every boundary records its API or event, SDK, protocol, auth, and error contract; every internal handoff has emit- and receive-side citations; every terminal says why research stops; and every deferred lane has a verbatim next frame.
@@ -80,18 +80,6 @@ Depth records how much research a lane earned, not how many files the run writes
 | `deep` | the outcome turns on how it works inside | a Frontier question offered to the user as an optional Capability-axis run |
 
 No depth writes a second file. `deep` marks a lane as *worth* its own document; the user decides whether that document gets written.
-
-## Diagrams
-
-The chain diagram is **mandatory** and it is a **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting; the swimlane type is fixed here and the diagram skill's own type selection does not override it.
-
-Use Mermaid `swimlane-beta`. When the target renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane — the syntax changes, the one-lane-per-deployable semantics do not. **A `sequenceDiagram` is not a chain view**: it orders messages in time and loses the lane ownership this axis exists to show.
-
-Render the Mermaid block and confirm it draws before declaring the research complete. Keep `path:line` citations in the tables and prose; diagram labels carry contracts, not evidence.
-
-Add a **container diagram** above it only when the lane count passes roughly eight and the reader needs the shape before the sequence of handoffs. Run `/architecture-diagram` skill for its syntax and styling. Lane internals are never drawn here — they belong to the lane's own sequence diagram, per the **Capability** axis **Diagrams**.
-
-**Done when** the block renders; each deployable has exactly one lane; every terminal sits at a diagram edge; and no artifact, script, playbook, chart, or library holds a lane of its own.
 
 ## Gotchas
 

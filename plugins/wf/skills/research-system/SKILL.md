@@ -23,6 +23,26 @@ The unit is one symbol chain inside one deployable: the trace starts at this uni
 - Template: [capability-research-template.md](templates/capability-research-template.md)
 - Output: `docs/ongoing/research-{{slug}}.md`, or `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` when the user asks for a lane of an existing chain
 
+**Diagram:** Pick the diagram from what the question asks, then Run its owning skill for syntax and styling — never compose Mermaid from memory.
+
+| Research topic | Draw | Skill |
+|---|---|---|
+| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `/behavior-diagram` |
+| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `/behavior-diagram` |
+| who owns each step and where responsibility changes — handoffs across layers, modules, or teams | a **swimlane diagram** | `/behavior-diagram` |
+| which deployable units and external systems the capability spans | a **container diagram** | `/architecture-diagram` |
+| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `/architecture-diagram` |
+| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `/architecture-diagram` |
+| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `/code-diagram` |
+
+A traced capability defaults to the **sequence diagram**; Run `/behavior-diagram` skill before drafting it.
+
+Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep `path:line` citations in the tables; use class, method, or file names with exact lines in the diagram only when the user asks for them.
+
+Default to one: entries enter as parallel participants meeting at the convergence point, effects leave from it. Diagram selector and fallback edges, not the winning path alone. Split only when entries diverge, selection needs a flowchart, effects fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
+
+Render the Mermaid block before declaring the research complete. Run `/render-mermaid-png` skill only when the user wants an exported image.
+
 ### Deployables — one chain
 
 The unit is one **deployable** per lane — something independently runnable or deployed in production: a process, service, container, function, or host workload. The chain continues through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. Pick it when the flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
@@ -31,6 +51,14 @@ The unit is one **deployable** per lane — something independently runnable or 
 - Template: [deployables-research-template.md](templates/deployables-research-template.md)
 - Output: exactly one file, `docs/ongoing/research-{{slug}}-chain.md`. A chain run writes no other document.
 
+**Diagram:** Draw a mandatory **swimlane** with one lane per deployable, terminal systems as edge lanes, and every arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
+
+Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
+
+Keep `path:line` citations in the tables and prose; diagram labels carry contracts, not evidence. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/architecture-diagram` skill for its syntax and styling. Lane internals belong to the lane's own Capability-axis sequence diagram.
+
+Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane, every terminal sits at an edge, and no artifact, script, playbook, chart, or library holds a lane.
+
 ### Data — one item type and its store
 
 The unit is one item type and the store holding it — one writer, many readers, a boundary cutting across services and often across repos. Pick it when the question turns on key design, who owns a table, whether a read can be stale, how an attribute is migrated, whether concurrent writes are safe, or how records are aged out.
@@ -38,6 +66,8 @@ The unit is one item type and the store holding it — one writer, many readers,
 - References: [data-research.md](references/data-research.md)
 - Template: [data-research-template.md](templates/data-research-template.md)
 - Output: `docs/ongoing/research-{{slug}}-data.md`
+
+**Diagram:** None by default — the store, key, and shape tables carry the answer. When the user asks for one, pick the diagram from the question and Run its owning skill: `/behavior-diagram` for access order or branching, `/architecture-diagram` for ownership or deployment boundaries, and `/code-diagram` for item types and their relationships. Keep evidence in the tables and render the Mermaid block before declaring the research complete.
 
 ### Crossing axes
 
@@ -69,5 +99,6 @@ Static reading settles what the code *can* do; a probe settles what it *does*. R
 
 ## Gotchas
 
+- **A `block` mermaid diagram rejects rhombus/diamond node shapes (`{"label"}`)** — the renderer throws. Use `flowchart` for decision shapes.
 - **A trace that ends in a double proves the wiring, not the behavior** — an environment, profile, or flag that swaps a real dependency for a mock, stub, in-memory fake, or recorded response makes the contract real and the behavior fictional. Record the double as its own Fact and follow the real implementation for behavior claims.
 - **A local development store is not the production store** — an emulator, in-memory fake, or single-node instance answers consistency, lag, and expiry questions differently from the real one, so those claims need production configuration as evidence.
