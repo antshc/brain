@@ -31,7 +31,7 @@ Extract the research responsibilities currently embedded in the design workflow.
 | Skill | Responsibility | Status |
 |---|---|---|
 | `research-capability` | Trace current behavior inside one deployable | Existing |
-| `research-integrations` | Trace cross-deployable flows and integration contracts | Existing |
+| `research-deployables` | Trace cross-deployable flows and integration contracts | Existing |
 | `research-cloud` | Research AWS/Azure implementation constraints | Existing |
 | `research` | Investigate other questions using authoritative primary sources | Existing |
 | `research-dotnet` | Research .NET runtime, BCL, language, async, and concurrency behavior | Proposed |

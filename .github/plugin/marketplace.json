@@ -47,7 +47,7 @@
         {
             "name": "solution",
             "source": "./plugins/solution",
-            "description": "Software solution research skills, including evidence-backed cloud research and cross-deployable flow tracing."
+            "description": "Software solution research skills, including evidence-backed cloud research, cross-deployable flow tracing, and data-model research."
         }
     ]
 }
