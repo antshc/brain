@@ -215,7 +215,7 @@ Software solution research skills.
 
 - [research-cloud](plugins/solution/skills/research-cloud/SKILL.md): research AWS or Azure implementation constraints with provider evidence.
 - [research-capability](plugins/solution/skills/research-capability/SKILL.md): explain how a capability works inside one deployable, cited to `file:line`, with a sequence diagram.
-- [trace-chain](plugins/solution/skills/trace-chain/SKILL.md): trace a flow across deployables to terminal external systems, with cited handoffs.
+- [research-integrations](plugins/solution/skills/research-integrations/SKILL.md): trace a flow across deployables to terminal external systems, with cited handoffs.
 
 ### engineering
 
