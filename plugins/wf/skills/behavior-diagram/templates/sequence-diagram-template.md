@@ -57,9 +57,6 @@ Mermaid sequence diagrams have no `:::` / `classDef` mechanism for individual me
 
 Replace all placeholders with real participants and interactions. Add or remove lifelines, calls, branches, activations, and notes to match the actual scenario.
 
-<details>
-<summary>{{title}}</summary>
-
 ```mermaid
 %%{init: {'themeVariables': {
     'lineColor': '#8b949e',
@@ -96,5 +93,3 @@ sequenceDiagram
 
     note over {{ownerAlias}},{{dependencyAlias}}: {{oneLineCrossCuttingNote}}
 ```
-
-</details>

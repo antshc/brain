@@ -96,9 +96,6 @@ System Context is current-mode only. Diagram a change at container level instead
 
 Replace all placeholders with real architecture. Add or remove elements and relationships to match actual scope. Do not retain unused example elements.
 
-<details>
-<summary>{{title}}</summary>
-
 ```mermaid
 ---
 config:
@@ -133,5 +130,3 @@ C4Context
     UpdateRelStyle(system, externalSystem, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="-45", $offsetY="-45")
     UpdateRelStyle(system, externalStore, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
-
-</details>
