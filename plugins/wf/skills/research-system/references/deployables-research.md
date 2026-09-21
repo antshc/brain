@@ -71,15 +71,15 @@ Issue one real request carrying a correlation id, then collect that id across ev
 
 ## Depth dial
 
-Depth records how much research a lane earned, not how many files the run writes.
+Depth records how much research a lane earned, not how many files the run writes — and it also sets how many nodes that lane draws in the swimlane.
 
 | Depth | Meaning | Costs |
 |---|---|---|
-| `contract` | only its inputs and outputs matter to the outcome | the Lanes row is the whole research |
-| `traced` | its internal mechanism matters in outline | one cited paragraph in this doc |
-| `deep` | the outcome turns on how it works inside | a Frontier question offered to the user as an optional Capability-axis run |
+| `contract` | only its inputs and outputs matter to the outcome | the Lanes row is the whole research; one node in its swimlane subgraph |
+| `traced` | its internal mechanism matters in outline | one cited paragraph in this doc, plus its major steps drawn as multiple nodes inside its swimlane subgraph |
+| `deep` | the outcome turns on how it works inside | a Frontier question offered to the user as an optional Capability-axis run; stays one node in the swimlane until that run draws its own sequence diagram |
 
-No depth writes a second file. `deep` marks a lane as *worth* its own document; the user decides whether that document gets written.
+No depth writes a second file. `deep` marks a lane as *worth* its own document; the user decides whether that document gets written. A `traced` lane's extra nodes stay inside its own subgraph and carry no citation of their own — the citation lives in the lane's cited paragraph, not on the diagram.
 
 ## Gotchas
 
