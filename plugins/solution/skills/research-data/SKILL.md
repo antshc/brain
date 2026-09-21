@@ -9,7 +9,7 @@ Data, not deployables. One item type has one writer and many readers, so the uni
 
 - Mechanism inside one deployable → Run `/research-capability` skill.
 - A flow crossing process boundaries → Run `/research-deployables` skill.
-- Provider semantics, quotas, and API parameters behind the store → Run `/research-cloud` skill.
+- Provider semantics, quotas, and API parameters behind the store → Run `/research-aws` skill or `/research-azure` skill.
 
 Grounding is shared, not restated: follow `/research-capability` skill **Evidence ladder**, **Claim types**, and **Citations** for every claim written here. IaC and migration files are executing code for this skill's purposes; an entity class is a *declaration* of shape, and the serializer that writes it is the *behavior*.
 
