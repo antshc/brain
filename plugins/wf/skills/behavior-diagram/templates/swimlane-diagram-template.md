@@ -22,7 +22,16 @@ Official Mermaid swimlane syntax: https://mermaid.ai/open-source/syntax/swimlane
 - Prefer about 3-7 lanes. Split the flow when handoffs become difficult to trace.
 - Split a large flow into a solution-responsibility diagram plus one or more internal-responsibility diagrams when needed.
 - Standardize on the node vocabulary below. Avoid exotic Mermaid shapes unless the user explicitly asks for them.
-- `swimlane-beta` is experimental in Mermaid 11.16.0+. Confirm the target renderer supports it. If not, fall back to a `flowchart` with one `subgraph` per lane.
+- `swimlane-beta` is experimental in Mermaid 11.16.0+. Confirm the target renderer supports it. If not, fall back to a `flowchart` with one `subgraph` per lane, keeping one lane per owner — the fallback changes syntax, not the responsibility view.
+
+## Validation
+
+Before output, confirm:
+
+- Every owner the caller named has exactly one lane, and no lane is an artifact its owner executes.
+- Every handoff between owners is a visible cross-lane edge.
+- Terminal owners — those the flow ends at — sit at the edge of the diagram.
+- The Mermaid block renders.
 
 ## Responsibility views
 

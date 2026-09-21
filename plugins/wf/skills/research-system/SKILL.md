@@ -13,7 +13,7 @@ Research documents **as-built** — current state, never a delta.
 
 Three axes, one per unit of research. Pick by the unit the question is about, load only that axis's references and template, and leave the other two unread.
 
-Write to the axis's output path unless the user names a location. Fill its template, obeying the `**Rules**` blocks and deleting every one of them from the result.
+Write to the axis's output path unless the user names a location. Every path is flat — one file directly in `docs/ongoing/`, no subfolder. Fill its template, obeying the `**Rules**` blocks and deleting every one of them from the result.
 
 ### Capability — one deployable
 
@@ -21,15 +21,15 @@ The unit is one symbol chain inside one deployable: the trace starts at this uni
 
 - References: [capability-research.md](references/capability-research.md)
 - Template: [capability-research-template.md](templates/capability-research-template.md)
-- Output: `docs/ongoing/{{slug}}.md`, or `docs/ongoing/{{chainSlug}}/{{n}}-{{deployable}}.md` when run as a lane of a chain
+- Output: `docs/ongoing/research-{{slug}}.md`, or `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` when the user asks for a lane of an existing chain
 
 ### Deployables — one chain
 
-The unit is one deployable per lane, and the chain ends at the systems whose source you cannot open. Pick it when the flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
+The unit is one **deployable** per lane — something independently runnable or deployed in production: a process, service, container, function, or host workload. The chain continues through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. Pick it when the flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
 
 - References: [deployables-research.md](references/deployables-research.md)
 - Template: [deployables-research-template.md](templates/deployables-research-template.md)
-- Output: `docs/ongoing/{{slug}}/README.md`, with lane documents as siblings named `{{n}}-{{deployable}}.md`, numbered by lane order
+- Output: exactly one file, `docs/ongoing/research-{{slug}}-chain.md`. A chain run writes no other document.
 
 ### Data — one item type and its store
 
@@ -41,7 +41,7 @@ The unit is one item type and the store holding it — one writer, many readers,
 
 ### Crossing axes
 
-- The Deployables axis runs the Capability axis per lane worth depth, writing the lane document beside the chain document.
+- A chain run ends at the chain document. Name the lanes worth a deeper trace and offer them as a follow-up; run the Capability axis on one only after the user asks for it, then write `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file and link it from that lane's Frontier row.
 - Provider semantics, quotas, and API parameters behind a managed service belong to the provider, not this repo: Run `/research-aws` skill or `/research-azure` skill.
 
 ## Evidence ladder
