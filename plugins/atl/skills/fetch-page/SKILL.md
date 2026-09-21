@@ -1,6 +1,6 @@
 ---
 name: fetch-page
-description: Fetch a Confluence page as Markdown from its identifier or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page by ID or URL. No Atlassian config required; a page whose attachments are referenced from its body (diagrams, images, or files) caches them to a `.tmp` folder alongside the Markdown and references them in it when `ATLASSIAN_API_TOKEN` is configured.
+description: Run when fetch the Confluence page. Fetch a Confluence page as Markdown from its identifier or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page by ID or URL. No Atlassian config required; a page whose attachments are referenced from its body (diagrams, images, or files) caches them to a `.tmp` folder alongside the Markdown and references them in it when `ATLASSIAN_API_TOKEN` is configured.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
