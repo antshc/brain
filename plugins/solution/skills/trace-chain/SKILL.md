@@ -1,6 +1,6 @@
 ---
 name: trace-chain
-description: Trace a flow end-to-end across deployable units — services, containers, queues, databases, managed services — down to the terminal external systems where research cannot continue, and document it as a swimlane whose every handoff is cited on both sides. Use when the question spans more than one service, when asked what happens after a request or message leaves a service, which system finally handles it, where the flow ends, whether an external system can be researched further, or to map the whole chain before researching any single service in depth.
+description: "Trace a flow across deployables and document its internal and external integration contracts: APIs, events, SDKs, protocols, authentication, and errors. Use when a request or message crosses process boundaries, when asked what handles it next or where it ends, or before researching one service in depth."
 ---
 
 # Trace a chain across deployables
@@ -25,13 +25,13 @@ Grounding is shared, not restated: follow `/research-capability` skill **Evidenc
 
 1. **Frame the chain** — name the outcome traced, not the service. "Where does a placed order become reserved stock?" beats "how does ordering work?".
 2. **Find the chain entries** — what originates the flow from outside the whole system: user action, schedule, webhook, upstream system, batch drop. An inbound call from a deployable already in the chain is a handoff, not an entry.
-3. **Walk lane by lane, shallow** — per deployable record only what it receives, what it does in one line, and what it emits. Read the wire, not the internals: client call sites, route registrations, publish/subscribe calls, IaC bindings. Resist opening the first lane deeply — a later lane routinely makes an earlier one irrelevant.
+3. **Walk lane by lane, shallow** — per deployable record what it receives, does in one line, and emits. Read client call sites, routes, publish/subscribe calls, SDK use, auth configuration, error handling, and IaC bindings; leave internals for the lane trace.
 4. **Classify every edge** — continuable or terminal (see Boundary). A continuable edge extends the chain; a terminal edge closes it with a contract.
 5. **Probe the chain** (see Chain probe) — one real correlation id beats any amount of static reading for proving the lanes actually connect.
 6. **Rank lanes by depth need** — `contract`, `traced`, or `deep` (see Depth dial). Rank against the framed outcome, not against how interesting the code looks.
 7. **Deep-dive** — per `deep` lane, Run `/research-capability` skill passing the lane's Frontier question verbatim as its framed question, and the lane's inbound contract as its entry point. Write its doc beside this one and link it from the lane row.
 
-**Done when** every chain entry reaches a lane, every lane is classified `contract`/`traced`/`deep`, every handoff carries emit-side and receive-side citations, every terminal states why research stops, every `deep` lane has its doc, and every untraced lane sits in Frontier with a verbatim next frame.
+**Done when** every entry reaches a lane; every lane is `contract`/`traced`/`deep`; every boundary records its API or event, SDK, protocol, auth, and error contract; every internal handoff has emit- and receive-side citations; every terminal says why research stops; and every deferred lane has a verbatim next frame.
 
 ## Boundary
 
@@ -40,12 +40,25 @@ Two kinds of crossing, with different stop semantics.
 | | Terminal | Continuable |
 |---|---|---|
 | What | managed service reached through an SDK or API (DynamoDB, S3, SQS, Stripe), database engine, third-party API, OS primitive | a deployable whose source you can open — microservice, container, lambda, queue consumer, sibling repo |
-| Record | the contract: operation, parameters, consistency and idempotency, error surface, plus the IaC or config line naming the real resource, region, and account | the wire: the request or message emitted, its schema or topic, and the consuming deployable |
+| Record | the integration contract and the IaC/config naming the real resource, region, and account | the integration contract plus emit site, receive site, and binding |
 | Becomes | a Terminals row | the next Lanes row |
 
 **Stop test** — follow a hop only when its source is reachable **and** the framed outcome depends on what happens there. Either answer is no → terminal, write the contract, stop.
 
 A deployable often emits to several downstreams. Expand only the ones on the path to the framed outcome; record the siblings as terminal by scope with a one-line reason. This is what keeps a mesh from swallowing the research.
+
+## Integration contract
+
+Research integrations at each boundary; do not create a separate integration-research output.
+
+- **API/event** — operation or route; parameters; event/topic and schema; version.
+- **SDK** — package, version, client, and method when used; otherwise `—`.
+- **Protocol** — transport, serialization, and sync/async behavior.
+- **Auth** — caller identity, credential/mechanism, required permissions, and trust/TLS boundary.
+- **Errors** — statuses, exceptions or failure events; timeout, retry, throttling, idempotency, and DLQ behavior when relevant.
+- **Binding** — endpoint, resource, account, and region selected by config or IaC.
+
+For internal boundaries, cite both sides. For external boundaries, cite the call site and binding; cite authoritative provider or protocol documentation for semantics not encoded in the repository. Keep observed configuration distinct from provider guarantees.
 
 ## Handoff evidence
 
