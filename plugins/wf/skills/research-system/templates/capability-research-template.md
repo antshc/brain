@@ -22,7 +22,7 @@
 
 ## Mechanism
 
-**Rules:** pick the diagram type from **Diagrams** in the Capability axis references; when a diagram skill owns that type, its template governs syntax and styling — do not compose a Mermaid skeleton from this template. Label every participant, node, and message with trace keywords — the role or step plus a greppable token (route path, config key, event or queue name, table name, interface name) — never class/method names with `path:line`, unless the user asked for them; the tables below carry the citations. Every node still traces back to a Fact row. One diagram by default — multiple entry points enter as parallel participants meeting at the cited convergence point, effects leave from it. Add a `### {{question this diagram answers}}` subsection per extra diagram only when entries never converge, selection and fallback need their own flowchart, effects fire out of band, or the single diagram sprawls past ~12 participants; an extra diagram repeats no node the first already showed.
+**Rules:** pick, label, and split the diagram per **Capability — one deployable** in the skill; the owning diagram skill's template governs syntax and styling — do not compose a Mermaid skeleton from this template. Every node traces back to a Fact row; the tables below carry the citations. Give each extra diagram a `### {{question this diagram answers}}` subsection.
 
 {{diagram}}
 

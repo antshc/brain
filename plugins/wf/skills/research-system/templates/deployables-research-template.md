@@ -20,7 +20,7 @@
 
 ## Chain
 
-**Rules:** a rendered Mermaid **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Open the swimlane template of the skill owning that type and follow its syntax and styling. Fall back to a `flowchart` with one `subgraph` per lane only when the renderer lacks `swimlane-beta`; a `sequenceDiagram` is not a chain view. Add a container diagram above it only past roughly eight lanes.
+**Rules:** a rendered Mermaid **swimlane** per **Deployables — one chain** in the skill — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract.
 
 {{diagram}}
 
