@@ -55,10 +55,12 @@ copilot plugin install atl@brain
 copilot plugin install azure-platform@brain
 ```
 
-### AWS skills (learn-aws)
+### AWS platform plugin (aws-platform)
 
 ```sh
-gh skill install antshc/brain plugins/learn-aws/skills/search-aws-docs --agent github-copilot --scope project -f
+(copilot plugin uninstall learn-aws@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall aws-platform@brain >/dev/null 2>&1 || true) && \
+copilot plugin install aws-platform@brain
 ```
 
 ### Solution plugin
@@ -195,25 +197,26 @@ Atlassian workflow skills.
 
 ### azure-platform
 
-Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills.
+Microsoft documentation, SDK reference, Azure CLI setup, authentication, resource operation, and implementation-constraint research skills.
 
 - [init-cli](plugins/azure-platform/skills/init-cli/SKILL.md) / [auth-principal](plugins/azure-platform/skills/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
 - [query-azure](plugins/azure-platform/skills/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
 - [search-ms-docs](plugins/azure-platform/skills/search-ms-docs/SKILL.md): query official Microsoft documentation.
 - [search-ms-code-samples](plugins/azure-platform/skills/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.
+- [research-azure](plugins/azure-platform/skills/research-azure/SKILL.md): research Azure implementation constraints — operations, SDK, RBAC, networking, quotas, retries, failures — with provider evidence.
 
-### learn-aws
+### aws-platform
 
-AWS documentation skills for querying official AWS docs, API references, and regional availability.
+AWS documentation, SDK reference, and implementation-constraint research skills.
 
-- [search-aws-docs](plugins/learn-aws/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
-- [search-aws-sdk-nuget](plugins/learn-aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
+- [search-aws-docs](plugins/aws-platform/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
+- [search-aws-sdk-nuget](plugins/aws-platform/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
+- [research-aws](plugins/aws-platform/skills/research-aws/SKILL.md): research AWS implementation constraints — APIs, SDK, IAM, networking, quotas, retries, failures — with provider evidence.
 
 ### solution
 
 Software solution research skills.
 
-- [research-cloud](plugins/solution/skills/research-cloud/SKILL.md): research AWS or Azure implementation constraints with provider evidence.
 - [research-capability](plugins/solution/skills/research-capability/SKILL.md): explain how a capability works inside one deployable, cited to `file:line`, with a sequence diagram.
 - [research-deployables](plugins/solution/skills/research-deployables/SKILL.md): trace a flow across deployables to terminal external systems, with cited handoffs.
 

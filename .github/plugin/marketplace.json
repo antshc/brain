@@ -37,17 +37,17 @@
         {
             "name": "azure-platform",
             "source": "./plugins/azure-platform",
-            "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills."
+            "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, resource operation, and implementation-constraint research skills."
         },
         {
-            "name": "learn-aws",
-            "source": "./plugins/learn-aws",
-            "description": "AWS documentation skills for querying official AWS docs, API references, and regional availability."
+            "name": "aws-platform",
+            "source": "./plugins/aws-platform",
+            "description": "AWS documentation, SDK reference, and implementation-constraint research skills."
         },
         {
             "name": "solution",
             "source": "./plugins/solution",
-            "description": "Software solution research skills, including evidence-backed cloud research, cross-deployable flow tracing, and data-model research."
+            "description": "Software solution research skills, including capability, cross-deployable flow, and data-model research."
         }
     ]
 }
