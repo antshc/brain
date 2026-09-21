@@ -1,7 +1,7 @@
 {
   "name": "solution",
-  "version": "1.3.0",
-  "description": "Software solution research skills for current behavior, cross-deployable flows, and data models.",
+  "version": "2.0.0",
+  "description": "Software solution research skill covering the capability, deployables, and data axes.",
   "skills": [
     "./skills"
   ]

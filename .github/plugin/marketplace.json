@@ -47,7 +47,7 @@
         {
             "name": "solution",
             "source": "./plugins/solution",
-            "description": "Software solution research skills, including capability, cross-deployable flow, and data-model research."
+            "description": "Software solution research skill covering the capability, cross-deployable flow, and data-model axes."
         }
     ]
 }

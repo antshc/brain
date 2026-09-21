@@ -217,8 +217,7 @@ AWS documentation, SDK reference, and implementation-constraint research skills.
 
 Software solution research skills.
 
-- [research-capability](plugins/solution/skills/research-capability/SKILL.md): explain how a capability works inside one deployable, cited to `file:line`, with a sequence diagram.
-- [research-deployables](plugins/solution/skills/research-deployables/SKILL.md): trace a flow across deployables to terminal external systems, with cited handoffs.
+- [research-system](plugins/solution/skills/research-system/SKILL.md): research a system as-built along the capability, deployables, or data axis, cited to `file:line`, with diagrams.
 
 ### engineering
 

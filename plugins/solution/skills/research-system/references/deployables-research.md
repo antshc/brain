@@ -1,25 +1,15 @@
----
-name: research-deployables
-description: "Trace a flow across deployables and document its internal and external integration contracts: APIs, events, SDKs, protocols, authentication, and errors. Use when a request or message crosses process boundaries, when asked what handles it next or where it ends, or before researching one service in depth."
----
+# Deployables axis — one chain
 
-# Research deployables across a chain
-
-Breadth first, depth later. One deployable is one lane; the chain ends at the systems whose source you cannot open. Depth inside a lane belongs to `research-capability`, which this skill runs per lane.
-
-**Single deployable? Run `/research-capability` skill instead** — this skill earns its cost only when the flow crosses a process boundary.
+Breadth first, depth later. One deployable is one lane; the chain ends at the systems whose source you cannot open. Depth inside a lane belongs to the **Capability** axis, which this one runs per lane.
 
 ## Tiers
 
-| | This skill — chain | `research-capability` — lane |
+| | This axis — chain | Capability axis — lane |
 |---|---|---|
 | Unit | one deployable = one lane | one symbol = one participant |
 | Diagram | swimlane | sequence |
 | Evidence | the wire: emit site + receive site + the binding naming the real resource | `path:line` along the call chain |
 | Stops at | terminal external systems | that lane's inbound entry and outbound effects |
-| Output | `docs/ongoing/{{slug}}/README.md` | `docs/ongoing/{{slug}}/{{n}}-{{deployable}}.md` |
-
-Grounding is shared, not restated: follow `/research-capability` skill **Evidence ladder**, **Claim types**, and **Citations** for every claim written here.
 
 ## Workflow
 
@@ -29,7 +19,7 @@ Grounding is shared, not restated: follow `/research-capability` skill **Evidenc
 4. **Classify every edge** — continuable or terminal (see Boundary). A continuable edge extends the chain; a terminal edge closes it with a contract.
 5. **Probe the chain** (see Chain probe) — one real correlation id beats any amount of static reading for proving the lanes actually connect.
 6. **Rank lanes by depth need** — `contract`, `traced`, or `deep` (see Depth dial). Rank against the framed outcome, not against how interesting the code looks.
-7. **Deep-dive** — per `deep` lane, Run `/research-capability` skill passing the lane's Frontier question verbatim as its framed question, and the lane's inbound contract as its entry point. Write its doc beside this one and link it from the lane row.
+7. **Deep-dive** — per `deep` lane, follow the **Capability** axis, passing the lane's Frontier question verbatim as its framed question and the lane's inbound contract as its entry point. Write its doc beside this one and link it from the lane row.
 
 **Done when** every entry reaches a lane; every lane is `contract`/`traced`/`deep`; every boundary records its API or event, SDK, protocol, auth, and error contract; every internal handoff has emit- and receive-side citations; every terminal says why research stops; and every deferred lane has a verbatim next frame.
 
@@ -68,7 +58,7 @@ Guessed topology is the default failure of cross-service tracing, and this rule 
 
 ## Chain probe
 
-Static reading settles what the code *can* do; a probe settles what it *does*. Issue one real request carrying a correlation id, then collect that id across every deployable's logs or distributed trace. Every handoff the id lights up becomes a Fact in one action, and lanes the static read missed surface here. Record the correlation id and the command issued so the trace is re-runnable; handoffs the probe never lit stay assumptions.
+Issue one real request carrying a correlation id, then collect that id across every deployable's logs or distributed trace. Every handoff the id lights up becomes a Fact in one action, and lanes the static read missed surface here. Record the correlation id and the command issued so the trace is re-runnable; handoffs the probe never lit stay assumptions.
 
 ## Depth dial
 
@@ -78,23 +68,16 @@ Not every lane earns its own document.
 |---|---|---|
 | `contract` | only its inputs and outputs matter to the outcome | the Lanes row is the whole research |
 | `traced` | its internal mechanism matters in outline | one cited paragraph in this doc |
-| `deep` | the outcome turns on how it works inside | its own `research-capability` doc |
+| `deep` | the outcome turns on how it works inside | its own Capability-axis doc |
 
 Without this dial a five-lane chain produces five documents when two carry the answer.
-
-## Output
-
-Write the chain to `docs/ongoing/{{slug}}.md` unless the user names a location. Lane documents are siblings named `{{n}}-{{deployable}}.md`, numbered by lane order.
-
-Fill [deployables-research-template.md](deployables-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
 
 ## Diagrams
 
 The chain diagram is a **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Run `/behavior-diagram` skill for its syntax and styling. Every lane and every arrow names the evidence that established it.
 
-Add a **container diagram** above it only when the lane count passes roughly eight and the reader needs the shape before the sequence of handoffs. Run `/architecture-diagram` skill for its syntax and styling. Lane internals are never drawn here — they belong to the lane's own sequence diagram, per `/research-capability` skill **Diagrams**.
+Add a **container diagram** above it only when the lane count passes roughly eight and the reader needs the shape before the sequence of handoffs. Run `/architecture-diagram` skill for its syntax and styling. Lane internals are never drawn here — they belong to the lane's own sequence diagram, per the **Capability** axis **Diagrams**.
 
 ## Gotchas
 
 - **A lane that appears twice is one lane revisited, not two** — a chain that returns to an earlier deployable is a cycle; record the second crossing as a handoff back to the existing lane number and stop, or the walk never terminates.
-- **A trace that ends in a double proves the wiring, not the behavior** — an environment or profile that swaps a lane for a mock, stub, or recorded response makes that lane's contract real and its behavior fictional. Record the double as its own Fact and follow the real deployable for behavior claims.
