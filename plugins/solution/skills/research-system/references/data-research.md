@@ -1,17 +1,6 @@
----
-name: research-data
-description: "Research a system's data as-built: keys, indexes, and the access patterns they serve; the sole writer per item type; read consistency and index lag; attribute-shape evolution and backfill; conditional writes, versioning, and idempotency; retention and expiry. Use when a design or change turns on data shape, key design, who owns a table, whether a read can be stale, how an attribute is migrated, whether concurrent writes are safe, or how records are aged out."
----
-
-# Research a data model
+# Data axis — one item type and its store
 
 Data, not deployables. One item type has one writer and many readers, so the unit here is the **item type** and the store holding it — a boundary that cuts across services and often across repos.
-
-- Mechanism inside one deployable → Run `/research-capability` skill.
-- A flow crossing process boundaries → Run `/research-deployables` skill.
-- Provider semantics, quotas, and API parameters behind the store → Run `/research-aws` skill or `/research-azure` skill.
-
-Grounding is shared, not restated: follow `/research-capability` skill **Evidence ladder**, **Claim types**, and **Citations** for every claim written here. IaC and migration files are executing code for this skill's purposes; an entity class is a *declaration* of shape, and the serializer that writes it is the *behavior*.
 
 ## Workflow
 
@@ -21,7 +10,7 @@ Grounding is shared, not restated: follow `/research-capability` skill **Evidenc
 4. **Attribute every write to its writer** — find-references on the store binding and the grant that permits the write, across every repo that could hold one.
 5. **Read the shape off the write path** — the persisted attribute set is whatever the serializer emits, which drifts from what the model class declares: ignored members, custom converters, nulls dropped on write, and older items written by older code.
 6. **Settle each dimension** — Schemas, Ownership, Consistency, Migrations, Concurrency, Retention. Each section below names what to establish and the failure it catches.
-7. **Probe when static reading can't settle it** — read one real item and diff its attributes against the model, run the query and check whether it scanned, write twice concurrently and see which guard fires. Discard the probe, keep the result.
+7. **Probe when static reading can't settle it** — read one real item and diff its attributes against the model, run the query and check whether it scanned, write twice concurrently and see which guard fires.
 
 **Done when** every access pattern names the key or index that serves it and every key and index names a pattern that needs it; every item type names its sole writer and its readers; every read states its consistency and its lag sources; every in-flight attribute change states its backfill and completion signal; every racing write states its guard; every item type states its retention; and the remaining unknowns can't change the design.
 
@@ -87,14 +76,7 @@ Establish, per item type: how long it lives, what removes it, and what sees the 
 - **Soft versus hard delete** — a tombstone attribute leaves the item visible to every query that forgets to filter it, and to every index that projects it.
 - **Floors and ceilings** — a compliance minimum and a privacy maximum both constrain the number, and they are set outside the code.
 
-## Output
-
-Write `docs/ongoing/research-<slug>-data.md` unless the user names a location.
-
-Fill [data-research-template.md](data-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
-
 ## Gotchas
 
 - **An entity class is a claim about shape, and stored items are the evidence** — items written by earlier code, by a different service, or by a console operator carry attributes no current class declares. Read a real item before describing the shape.
 - **An index name in IaC proves the index exists, not that anything queries it** — pair every index with the access-pattern row that needs it, or record it as unused.
-- **A local development store is not the production store** — an emulator, in-memory fake, or single-node instance answers consistency, lag, and expiry questions differently from the real one, so those claims need production configuration as evidence.

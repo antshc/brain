@@ -90,7 +90,7 @@
 
 ## Frontier
 
-**Rules:** lanes deliberately not traced yet — deferred scope, distinct from Unknowns. `Next question` is the verbatim frame the next `research-capability` run takes as its question, so resuming needs no rethinking.
+**Rules:** lanes deliberately not traced yet — deferred scope, distinct from Unknowns. `Next question` is the verbatim frame the next Capability-axis run takes as its question, so resuming needs no rethinking.
 
 | # | Lane | Not traced because | Next question |
 |---|---|---|---|

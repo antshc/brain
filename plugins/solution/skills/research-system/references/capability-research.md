@@ -1,13 +1,6 @@
----
-name: research-capability
-description: Investigate how a feature, capability, or flow actually works inside a single deployable, citing every claim to file:line evidence, and produce a Markdown research doc with a mermaid diagram tracing the mechanism. Use when asked how something works, to document a capability's mechanism, trace a flow through the code, explain existing behavior, find every entry point that reaches it or every effect it produces, determine which provider, double, or fallback actually serves it, or write an as-built explanation with diagrams.
----
+# Capability axis — one deployable
 
-# Research a capability
-
-Source of truth is this repo, not the web. Output: one Markdown file, every claim cited to `path:line`, carrying a mermaid diagram of the confirmed mechanism.
-
-Scope is one deployable: the trace starts at this unit's entry points and stops at the effects leaving it. **Flow crosses a process boundary? Run `/research-deployables` skill instead** — it maps the chain lane by lane and runs this skill for each lane worth depth.
+The document carries a mermaid diagram of the confirmed mechanism. Scope is one deployable: the trace starts at this unit's entry points and stops at the effects leaving it.
 
 ## Workflow
 
@@ -18,7 +11,7 @@ Scope is one deployable: the trace starts at this unit's entry points and stops 
 5. **Hypothesize** — write the mechanism as a testable chain (`OrderController.Create` → `OrderService.Place` → `OrdersRepository.Insert`). Each hypothesis names the next thing to confirm.
 6. **Rank by risk** — confirm in this order: does this path actually execute for the framed case (vs. a dead or superseded lookalike) → which entry points reach it, and what each does differently before they converge → which implementation actually serves it when several sit behind one interface, and what it falls back to (see Multiple external sources) → config/feature-flag branching → error and edge cases → async ordering → performance → naming.
 7. **Trace deep, narrow** — go-to-definition, find-references, call hierarchy along that one chain instead of reading whole files. Drop a branch the moment it is irrelevant.
-8. **Probe** when static reading can't settle a claim (which branch fires, runtime-computed config, async ordering): run the test, add a temporary log, call the endpoint, query the data it wrote. Discard the probe, keep the result.
+8. **Probe** when static reading can't settle a claim — which branch fires, runtime-computed config, async ordering.
 9. **Record on confirmation** — write each Fact with its citation immediately, and prune the branches it rules out.
 
 **Done when** every in-scope entry point reaches a cited convergence point, every step from there to effect carries a citation, every effect and every selectable source with its fallback edge is accounted for, every call leaving the deployable is recorded as an effect carrying its contract, the diagram accounts for every recorded Fact, and the remaining unknowns can't change the answer.
@@ -29,7 +22,7 @@ A capability has many ways in and many ways out; tracing one of each answers a n
 
 - **Entry points** — REST/RPC route, GUI action, client library, CLI, scheduled job, queue or event consumer, webhook. Several usually converge on one core; each can apply its own auth, validation, defaults, and deserialization first. Cite each entry, cite the **convergence point**, then trace once below it and note per-entry differences as Facts.
 - **Effects** — persisted writes, published events, outbound calls, files, cache invalidations, notifications, the response payload, and logs/metrics another system consumes. The returned value is one effect among several; name each and whether it is unconditional, and whether it shares the caller's transaction.
-- **Boundary** — an effect that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by `/research-deployables`.
+- **Boundary** — an effect that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by the **Deployables** axis.
 
 ## Multiple external sources
 
@@ -44,36 +37,13 @@ Cite each with `path:line`:
 - **Precedence** — the order fallback walks.
 - **Trigger** — what demotes a source: exception, timeout, status code, or the validation that rules a *successful* response invalid.
 - **Terminal** — behavior when every source fails, and whether a fallback result is cached.
-- **Double** — the environment, profile, or flag that swaps a source for a mock, stub, in-memory fake, or recorded response, and where that double is the default. **A trace that ends in a double proves the wiring, not the behavior** — follow the real implementation for behavior claims, and record the double as its own Fact.
+- **Double** — the environment, profile, or flag that swaps a source for a mock, stub, in-memory fake, or recorded response, and where that double is the default.
 
 Diagram selector and fallback edges, not the winning path alone.
 
-## Evidence ladder
-
-Executing source (`path:line`) > passing test exercising this exact path > repo docs (ADR, Concept, README, ARCHITECTURE.md) > config/schema defaults > commit or PR description > code comment > inference.
-
-Tests, comments, and docs state *intent*; only executing code proves *behavior*. When they disagree, record the mismatch as a finding.
-
-## Claim types
-
-- **FACT** — confirmed against code, a test, or a probe; carries a citation.
-- **ASSUMPTION** — plausible, unconfirmed; state why, and what would verify it.
-- **UNKNOWN** — a named gap, stated as a concrete next probe.
-- **CONCLUSION** — the explanation the facts support.
-
-## Citations
-
-Cite `path:line` or `path:startLine-endLine` inline, immediately after the claim it supports — never pooled at the end. Quote the deciding line when short enough to settle the claim on sight. A bare symbol name is not a citation.
-
-## Output
-
-Write to `docs/ongoing/<slug>.md` unless the user names a location or the repo documents features elsewhere. Run as a lane of a chain, write to `docs/ongoing/<chain-slug>/<n>-<deployable>.md` beside the chain document instead. Fill [capability-research-template.md](capability-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
-
-Run `/render-mermaid-png` skill only if the user wants an exported image alongside the Markdown.
-
 ## Diagrams
 
-Pick the diagram from what the question asks, then Run its owning skill for syntax and styling — never compose Mermaid from memory. Research documents as-built — current state, never a delta.
+Pick the diagram from what the question asks, then Run its owning skill for syntax and styling — never compose Mermaid from memory.
 
 | Research topic | Draw | Skill |
 |---|---|---|
@@ -95,6 +65,8 @@ Default to one: entries enter as parallel participants meeting at the convergenc
 - **Selection** — selector and fallback edges are branching logic, so they want their own **flowchart** beside the sequence.
 - **Out-of-band effects** — events, background dispatch, or post-commit work whose ordering one sequence would imply wrongly.
 - **Sprawl** — past roughly 12 participants or 25 messages, readability dies.
+
+Run `/render-mermaid-png` skill only if the user wants an exported image alongside the Markdown.
 
 ## Gotchas
 
