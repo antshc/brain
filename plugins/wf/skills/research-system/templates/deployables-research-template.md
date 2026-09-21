@@ -20,7 +20,7 @@
 
 ## Chain
 
-**Rules:** Draw and render one Mermaid swimlane per **Deployables — one chain** in the skill. Give every deployable one lane and one node, place terminal systems at diagram edges, and label every arrow with its boundary contract. Every node and arrow traces to a Fact; tables below carry citations.
+**Rules:** Draw and render one Mermaid swimlane per **Deployables — one chain** in the skill. Give every deployable one lane and one node, place terminal systems at diagram edges, and label every arrow with its boundary contract. Put all terminal nodes in the titled `Terminal boundaries` lane; label each node with the target name only. Every node and arrow traces to a Fact; tables below carry citations.
 
 {{diagram}}
 
