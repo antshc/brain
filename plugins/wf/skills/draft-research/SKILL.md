@@ -1,36 +1,30 @@
 ---
 name: draft-research
-description: Drafts a decision-ready research request through a focused interview.
+description: Drafts a decision-ready research request through a focused interview. Use when the user wants to frame, scope, or refine a research question before running `/research`.
 disable-model-invocation: true
 ---
 
 # Draft Research
 
-Work **decision-backwards**: identify what the findings must let the user decide, explain, design, or do, then shape the investigation around the evidence needed for that outcome.
+Work **decision-backwards**: identify what the findings must let the user decide, explain, design, or do, then shape the investigation around the evidence needed for that outcome. Produce a confirmed research instruction; run the research only if the user asks after confirmation.
 
-Produce the research instruction, then hand the confirmed request to `/research`.
+## Research tree
 
-## 1. Seed the research tree
+Map the request as a **research tree**: each unresolved choice branches into the choices that depend on it. Seed the tree from everything the user already supplied: outcome, primary question, subject and anchors, boundaries, constraints, suspected answer, comparison criteria, source material, permitted access, audience, deliverable, and completion condition.
 
-Extract what the user has already supplied before asking anything: the desired outcome, subject, known anchors, suspected answer, boundaries, source material, constraints, audience, and requested artifact.
+Keep the tree abstract. Open only branches that can change where the researcher looks, which options remain viable, what evidence settles a claim, what the deliverable contains, or when the investigation stops. Subject-specific details belong only when they can change the conclusion or its applicability; `/research` and its specialists own domain procedures.
 
-Look up facts available from the environment or supplied sources. Ask the user for choices, priorities, access they control, and facts only they can know.
+Rank unresolved branches by decision risk: feasibility and hard limitations first, then performance and scale, reliability, security, operational complexity, and lower-risk usability or presentation details. This ordering decides what must be settled now; it is not a checklist that every request must exhaust.
 
-Map unresolved choices as a dependency tree. Open only branches that can materially change where the researcher looks, what evidence settles the question, or what the deliverable contains:
+## Facts and decisions
 
-- **Outcome** — the decision, explanation, design, or action the findings must support.
-- **Question** — one primary question and the subordinate questions required to answer it.
-- **Subject** — systems, providers, services, capabilities, artifacts, versions, regions, dates, or other greppable anchors.
-- **Boundary** — entry and stopping points, included and excluded concerns, environments, repositories, accounts, and time horizon.
-- **Evidence** — authoritative sources, acceptable secondary sources, freshness requirements, and claims requiring live-state checks or probes.
-- **Challenge** — assumptions, expected conclusions, alternatives, failure paths, and disconfirming evidence the research must test.
-- **Deliverable** — audience, format, location, diagrams or tables, comparison criteria, and completion criterion.
+Finding facts is the agent's job. Use supplied sources, the environment, and available tools before asking; an unresolved lookup blocks only branches that depend on it. When a fact needs runtime evidence the current session cannot safely obtain, preserve it as an unknown with the exact probe that could settle it.
 
-**Done when:** every unresolved item is either discoverable without the user or represented by a question whose answer can change the research instruction.
+Decisions belong to the user: priorities, tradeoffs, boundaries, acceptable evidence, access they control, and the action the findings must support. Ask only when the answer can materially change the research instruction. A preference with a safe, low-consequence default can remain an explicit assumption for confirmation instead of consuming another round.
 
-## 2. Interview the frontier
+## Interview the frontier
 
-The **frontier** is every unresolved question whose prerequisites are settled. Ask up to three independent frontier questions per round, then wait. A question depending on another answer belongs to a later round.
+The **frontier** is every unresolved decision whose prerequisites are settled: the questions that can be answered now without guessing at another answer. Ask at most three independent frontier questions per round, then wait. Three is a ceiling, not a target; draft immediately when the supplied context already settles the material choices.
 
 Use this shape:
 
@@ -38,79 +32,39 @@ Use this shape:
 **Q1 — {{short title}}**
 {{one decision the user must make}}
 
-**Recommended:** {{answer and brief reason}}
+**Recommended:** {{answer and one-sentence reason}}
 ```
 
-Offer concrete options when they expose a real tradeoff. Give a recommendation based on the stated outcome and mark it as an assumption if the user accepts the draft without answering.
+Offer concrete options only when they expose a real tradeoff. Make the recommendation easy to accept in a short reply. If the user accepts the recommendation without elaborating, treat it as their answer; if they skip a non-critical choice, carry the recommendation as an explicit assumption in the draft.
 
-Turn an expected answer into a hypothesis to test. Ask what evidence would overturn it; frame the request to seek confirming and disconfirming evidence.
+Each answer reshapes the tree. Recompute the frontier, open only the branches it unblocks, and never ask a dependent question in the same round as its unresolved prerequisite. Turn expected answers into hypotheses and put disconfirming evidence in the instruction rather than repeatedly asking the user how to test them.
 
-Stop interviewing when another answer would only alter wording, not the investigation. Summarize any assumptions that remain and draft the instruction.
+Stop when the frontier contains no material user decision. Do not prolong the interview for facts the researcher can discover, choices that only alter wording, or details a specialist can resolve without changing scope. Present remaining assumptions with the draft so confirmation closes them together.
 
-**Done when:** the frontier is empty and no material research choice remains silently assumed.
+**Done when:** every material user decision is answered or exposed as an assumption, every discoverable fact is resolved or represented by a concrete probe, and no dependent branch remains silently assumed.
 
-## 3. Calibrate by research domain
+## Draft the instruction
 
-Apply every cross-domain field above, then add only the relevant branch below.
+Write one short, standalone prose instruction per **research unit**. Questions share a unit when they use the same boundaries, evidence, and deliverable; split them when any of those differ. Use one to five sentences without headings or lists unless the user requests a structured format.
 
-### System research
+Use this template. Replace every placeholder, omit any optional sentence that adds nothing, and keep each marker as part of its sentence so the instruction remains scannable prose:
 
-Resolve the unit being investigated, the trace entry point, observable outcome or terminal boundary, important branches, concrete implementations, runtime configuration, and suspected doubles or local-only infrastructure. For cross-process flows, require both sides of each contract. For data questions, identify the item type, store, writers, readers, consistency, concurrency, migration, and retention concerns that matter.
-
-### Cloud research
-
-Resolve provider, service, operation, SDK and API version, region, account or subscription scope, identity and permissions, network path, quotas, retries, failures, and whether the answer needs documented defaults or applied live values. Name commands and environments that are safe to probe.
-
-### Architecture research
-
-Resolve whether the user needs current state, a proposed design, alternatives, or a delta. Name the system boundary, actors and neighboring systems, deployable units, integrations, deployment context, quality attributes, constraints, and tradeoffs the conclusion must settle. Request only views or diagrams that answer a named question.
-
-### External or general research
-
-Resolve the authoritative source classes, publication or version cutoff, geographic or regulatory scope when relevant, comparison set, evaluation criteria, and acceptable evidence age. Prefer primary sources and require each conclusion to trace to the claims supporting it.
-
-**Done when:** every domain-specific detail that can change the conclusion or its applicability is either resolved or explicitly named as an unknown to investigate.
-
-## 4. Draft the instruction
-
-Write one standalone instruction in this shape, removing empty sections and replacing every placeholder:
-
-```markdown
-Research {{subject}} to determine {{primary question}} so that {{decision, explanation, design, or action}}.
-
-## Context
-{{known facts, anchors, and hypotheses to test}}
-
-## Questions to settle
-- {{subquestion whose answer is necessary}}
-
-## Scope
-- Start at: {{entry point, earliest date, or initial boundary}}
-- Stop at: {{observable outcome, terminal boundary, cutoff, or sufficient evidence}}
-- Include: {{branches, environments, alternatives, or concerns}}
-- Exclude: {{explicit non-goals}}
-
-## Evidence
-- Prefer: {{source hierarchy}}
-- Verify live: {{state-dependent claims and permitted probes}}
-- Distinguish: {{documented defaults, configured values, observed behavior, assumptions, and unknowns as relevant}}
-- Challenge: {{expected answer and evidence that would disconfirm it}}
-
-## Deliverable
-{{audience, format, output location, required views, and citation style}}
-
-## Complete when
-{{exhaustive, checkable condition showing the primary question is answered and decision-relevant unknowns are exposed}}
+```text
+Question: Research {{subject and concrete anchors}} to determine {{primary question}} so that {{decision, explanation, design, or action the findings must support}}.
+Scope: Start at {{entry point, earliest date, or initial boundary}}, stop at {{observable outcome, terminal boundary, cutoff, or sufficient evidence}}, include {{decision-relevant branches, options, environments, or concerns}}, and exclude {{explicit non-goals}}.
+Constraints: Evaluate within {{scale, latency, cost, deployment, skills, security, compatibility, freshness, access, or other limits that can change the answer}}, mapping realistic options broadly and testing feasibility and hard limitations before lower-risk detail.
+Hypothesis: Test {{expected answer or assumption}} against {{evidence that would confirm it}} and {{evidence that would disconfirm it}}, using {{safe probe or experiment}} if documentary evidence cannot settle the claim.
+Evidence and output: Prefer {{source hierarchy}}, distinguish {{facts, assumptions, unknowns with next probes, and conclusions as useful}}, deliver {{audience, format, location, views, and citation style}}, and stop when {{critical unknowns are resolved or exposed, viable options are comparable, major risks are understood, and further research is unlikely to change the decision}}.
 ```
 
-Keep one research unit per instruction. Split independent questions when they require different boundaries, evidence, or deliverables.
+Prefer primary evidence: executing source or a safe experiment for observed behavior, then official documentation, specifications, first-party APIs, official issues or design documents, maintainer material, and only then credible secondary sources. Adapt the hierarchy to the subject instead of forcing unavailable source classes.
 
-Present the finished instruction in one fenced Markdown block and ask the user to confirm it.
+The strategy must direct the researcher to map realistic options broadly, test high-risk unknowns before low-risk detail, deepen only viable branches, prune branches after decisive findings, and use a safe probe when documentary evidence cannot settle a decision-relevant claim. Record findings as they are confirmed rather than reconstructing the evidence trail at the end.
 
-**Done when:** the instruction is self-contained; every sentence changes the investigation or output; the primary question, boundaries, evidence standard, deliverable, and completion criterion are explicit; and no placeholder remains.
+Present the instruction with its explicit assumptions and ask the user to confirm or correct it. The draft is ready when it is self-contained; every sentence changes the investigation or output; the primary question, boundaries, strategy, evidence standard, deliverable, and completion criterion are explicit; and no placeholder remains.
 
-## 5. Hand off the research
+## Confirm and hand off
 
-After the user confirms the instruction, Run `/research` skill with the instruction verbatim. Let `/research` select and verify the relevant specialist; keep this skill focused on framing.
+Do not start the investigation before the user confirms shared understanding. After confirmation, ask whether to Run `/research` skill. If the user declines, return the reusable instruction and stop. If the user accepts, pass each confirmed instruction to `/research` verbatim and let it select and verify the relevant specialist.
 
-**Done when:** `/research` has accepted the confirmed instruction and reported its result.
+**Done when:** the user has the confirmed instruction and, when requested, `/research` has reported its result.
