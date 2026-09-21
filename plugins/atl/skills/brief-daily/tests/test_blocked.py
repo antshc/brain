@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from conftest import issue, page
+from conftest import CLOUD_ID, issue, page
 
 from brief_daily.cli import main_blocked
 
@@ -17,7 +17,7 @@ def blocked_issue(key, **fields):
 
 def test_maps_a_node_to_a_report_row(spill, capsys):
     path = spill(page([blocked_issue("ZIC-1", status="Blocked")]))
-    main_blocked(["--content", path])
+    main_blocked(["--content", path, "--cloud-id", CLOUD_ID])
     assert json.loads(capsys.readouterr().out) == {
         "rows": [
             {
@@ -43,7 +43,7 @@ def test_sorts_newest_updated_first(spill, capsys):
             ]
         )
     )
-    main_blocked(["--content", path])
+    main_blocked(["--content", path, "--cloud-id", CLOUD_ID])
     rows = json.loads(capsys.readouterr().out)["rows"]
     assert [row["key"] for row in rows] == ["ZIC-NEW", "ZIC-OLD"]
 
@@ -51,7 +51,7 @@ def test_sorts_newest_updated_first(spill, capsys):
 def test_merges_every_page_and_reports_truncation(spill, capsys):
     first = spill(page([blocked_issue("ZIC-1")], has_next=True))
     second = spill(page([blocked_issue("ZIC-2")], has_next=True))
-    main_blocked(["--content", first, "--content", second])
+    main_blocked(["--content", first, "--content", second, "--cloud-id", CLOUD_ID])
     report = json.loads(capsys.readouterr().out)
     assert {row["key"] for row in report["rows"]} == {"ZIC-1", "ZIC-2"}
     assert report["truncated"] is True
@@ -59,11 +59,11 @@ def test_merges_every_page_and_reports_truncation(spill, capsys):
 
 def test_tolerates_an_issue_without_a_priority(spill, capsys):
     path = spill(page([blocked_issue("ZIC-1", priority=None)]))
-    main_blocked(["--content", path])
+    main_blocked(["--content", path, "--cloud-id", CLOUD_ID])
     assert json.loads(capsys.readouterr().out)["rows"][0]["priority"] is None
 
 
 def test_exits_naming_a_missing_content_file(tmp_path, capsys):
     with pytest.raises(SystemExit):
-        main_blocked(["--content", str(tmp_path / "absent.json")])
+        main_blocked(["--content", str(tmp_path / "absent.json"), "--cloud-id", CLOUD_ID])
     assert "absent.json" in capsys.readouterr().err

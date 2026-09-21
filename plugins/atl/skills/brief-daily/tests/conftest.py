@@ -12,6 +12,7 @@ ME = "63f4d6193ec8aa51d3d20548"
 MY_NAME = "Ada Lovelace"
 THEM = "712020:987e9d71-5a3c-419d-89f7-aeeea9b36723"
 THEIR_NAME = "Grace Hopper"
+CLOUD_ID = "https://example.atlassian.net"
 
 
 def mention(name):
@@ -31,7 +32,6 @@ def comment(created, *, author=THEM, name=THEIR_NAME, body="plain text"):
 def issue(key, *, comments, total=None, summary="A summary", status="New", **fields):
     return {
         "key": key,
-        "webUrl": f"https://example.atlassian.net/browse/{key}",
         "fields": {
             "summary": summary,
             "status": {"name": status},
@@ -47,14 +47,9 @@ def issue(key, *, comments, total=None, summary="A summary", status="New", **fie
 
 
 def page(nodes, *, has_next=False):
-    return {
-        "context": {"atlassianAccountId": ME},
-        "issues": {
-            "nodes": nodes,
-            "pageInfo": {"hasNextPage": has_next, "endCursor": "cursor" if has_next else None},
-            "webUrl": "https://example.atlassian.net/issues?jql=...",
-        },
-    }
+    """Mirrors the live `searchJiraIssuesUsingJql` response: a flat `issues` list, `isLast`
+    signaling pagination, and no per-issue `webUrl`."""
+    return {"issues": nodes, "isLast": not has_next}
 
 
 @pytest.fixture

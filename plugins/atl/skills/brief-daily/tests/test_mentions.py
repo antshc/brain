@@ -1,6 +1,6 @@
 import json
 
-from conftest import ME, MY_NAME, THEIR_NAME, THEM, comment, issue, mention, page
+from conftest import CLOUD_ID, ME, MY_NAME, THEIR_NAME, THEM, comment, issue, mention, page
 
 from brief_daily.cli import main_mentions
 
@@ -16,6 +16,8 @@ def run(capsys, *paths, cutoff_days=3650):
     main_mentions(
         args
         + [
+            "--cloud-id",
+            CLOUD_ID,
             "--account-id",
             ME,
             "--display-name",
@@ -199,7 +201,18 @@ def test_a_display_name_with_regex_characters_is_matched_literally(spill, capsys
     tricky = "A. Lovelace (Dr.)"
     path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=mention(tricky))])]))
     main_mentions(
-        ["--content", path, "--account-id", ME, "--display-name", tricky, "--cutoff-days", "3650"]
+        [
+            "--content",
+            path,
+            "--cloud-id",
+            CLOUD_ID,
+            "--account-id",
+            ME,
+            "--display-name",
+            tricky,
+            "--cutoff-days",
+            "3650",
+        ]
     )
     assert len(json.loads(capsys.readouterr().out)["unanswered"]) == 1
 

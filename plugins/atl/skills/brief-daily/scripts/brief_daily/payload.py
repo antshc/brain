@@ -15,12 +15,31 @@ def load_pages(paths: list[str]) -> list[dict[str, Any]]:
     return [json.loads(Path(path).read_text(encoding="utf-8")) for path in paths]
 
 
-def nodes(pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [node for page in pages for node in page["issues"]["nodes"]]
+def _issue_list(page: dict[str, Any]) -> list[dict[str, Any]]:
+    """`searchJiraIssuesUsingJql` returns a flat `{"issues": [...]}` live; some fixtures
+    still model the older nested `{"issues": {"nodes": [...]}}` envelope."""
+    issues = page["issues"]
+    return issues if isinstance(issues, list) else issues["nodes"]
+
+
+def nodes(pages: list[dict[str, Any]], *, cloud_id: str) -> list[dict[str, Any]]:
+    """The flat response carries no per-issue `webUrl`; synthesize it from `cloudId` + `key`."""
+    result = []
+    for page in pages:
+        for issue in _issue_list(page):
+            issue.setdefault("webUrl", f"{cloud_id}/browse/{issue['key']}")
+            result.append(issue)
+    return result
 
 
 def truncated(pages: list[dict[str, Any]]) -> bool:
-    return bool(pages) and bool(pages[-1]["issues"]["pageInfo"]["hasNextPage"])
+    if not pages:
+        return False
+    last = pages[-1]
+    issues = last["issues"]
+    if isinstance(issues, dict):
+        return bool(issues["pageInfo"]["hasNextPage"])
+    return not last.get("isLast", True)
 
 
 def comments(node: dict[str, Any]) -> list[dict[str, Any]]:

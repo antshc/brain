@@ -21,13 +21,13 @@ Budget: **two searches and two script runs**. Query B projects `comment`, so eve
 
 **4 — Query B: mentions.** `searchJiraIssuesUsingJql` with `cloudId`, `fields: ["summary","status","comment"]`, `jql: 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC'`, `maxResults: 25`. Search by Preflight's `accountId`, never display name — a display-name search both false-positives on comments the user authored and misses real `@mentions`. Issue this in the same turn as Step 3.
 
-**Pagination** (Steps 3 and 4): `maxResults` caps each call, not the result set. Page via `nextPageToken: d["issues"]["pageInfo"]["endCursor"]` until `hasNextPage` is `false` or 5 pages. Keep every page's `content.json` path — the scripts merge them, so pass one `--content` per page rather than merging by hand. Both scripts report `"truncated": true` when the last page still had more.
+**Pagination** (Steps 3 and 4): `maxResults` caps each call, not the result set. Page via `nextPageToken: d["nextPageToken"]` until `d["isLast"]` is `true` or 5 pages. Keep every page's `content.json` path — the scripts merge them, so pass one `--content` per page rather than merging by hand. Both scripts report `"truncated": true` when the last page still had more.
 
 **5 — Extract.** Both searches spill to `content.json` (see Gotchas). `cd` to this skill's `scripts/` directory and run both in one turn:
 
 ```bash
-python3 blocked.py --content <queryA.json>
-python3 mentions.py --content <queryB.json> --account-id <accountId> --display-name "<displayName>" --cutoff-days <N>
+python3 blocked.py --content <queryA.json> --cloud-id <cloudId>
+python3 mentions.py --content <queryB.json> --cloud-id <cloudId> --account-id <accountId> --display-name "<displayName>" --cutoff-days <N>
 ```
 
 `blocked.py` prints `{"rows": [...], "truncated": bool}` for section 1. `mentions.py` prints the buckets below, each row carrying `key`, `url`, `summary`, `status`, `mentionedBy`, `mentionedOn` — plus `answeredOn` and `answeredBy` where they apply. It keeps only comments mentioning `displayName` and `created` on or after the cutoff — JQL has no comment-date operator, so that filter runs after fetch, never in the JQL — then takes each issue's **latest** surviving mention and buckets it by what follows:
@@ -83,7 +83,9 @@ No reply from you is visible via the API for these. Comment reactions are invisi
 
 **Every search and most issue reads spill to a `content.json` path instead of returning inline** — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `/preflight-atl` skill **Standing MCP usage rules**.
 
-**The response nests everything under `issues`** — `d["issues"]["nodes"]` is the issue list (a list even for a single-issue read), `d["issues"]["pageInfo"]` holds `hasNextPage` and `endCursor`, and `d["issues"]["nodes"][i]["fields"]["comment"]["comments"]` is the comment thread. `d["issues"]` is a dict: `d["issues"][0]` raises `KeyError: 0`, and a top-level `d.get("pageInfo")` returns `None`, which reads as "no more pages" and hides truncation.
+**`issues` is a flat list, not a nested `nodes` envelope** — verified against this MCP: `d["issues"]` is the issue list directly (`d["issues"][0]["fields"]["comment"]["comments"]` is the comment thread), and `d["isLast"]` — not `d["issues"]["pageInfo"]["hasNextPage"]` — signals whether more pages remain. Treating `issues` as `{"nodes": [...], "pageInfo": {...}}` raises `TypeError: list indices must be integers or slices, not str` on the first row. `payload.py`'s `nodes()`/`truncated()` detect both shapes, so the scripts themselves never need this distinction.
+
+**No issue carries a `webUrl`** — the flat response gives you `key` and `fields` only; `blocked.py`/`mentions.py` still read `node["webUrl"]`, so `payload.py` synthesizes it as `<cloudId>/browse/<key>` from the `--cloud-id` you pass on the command line. Both scripts now require `--cloud-id`.
 
 **A mention's `data-id` is a positional placeholder, not an `accountId`** — a mention renders as `<custom data-type="mention" data-id="id-0">@Display Name</custom>`, where `id-0`, `id-1`, `id-2` restart per comment and map back to nothing. The comment carries `author.accountId` (a real id) but no legend for the mentioned party, so **matching the mention on `accountId` finds nothing and drops every candidate, producing a falsely empty report**. `mentions.py` matches the mention on `displayName` and reply authorship on `author.accountId`, which is why it needs both.
 
