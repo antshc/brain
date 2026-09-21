@@ -24,7 +24,7 @@ Decisions belong to the user: priorities, tradeoffs, boundaries, acceptable evid
 
 ## Clarify once
 
-Ask one batch of at most three questions, then draft. Questions may cover different topics; select the unresolved decisions whose answers would most improve the instruction's question, scope, constraints, or hypothesis. Three is a ceiling, not a target, and no clarification batch is needed when the supplied context already settles the material choices.
+Ask one batch of at most three questions, then draft. Questions may cover different topics; select the unresolved decisions whose answers would most improve the instruction's question, scope, constraints. Three is a ceiling, not a target, and no clarification batch is needed when the supplied context already settles the material choices.
 
 When the VS Code question tool is available, send the whole batch in one call. Give concrete options for real tradeoffs, mark the recommended option, allow a free-form answer unless the choice must be restricted, and keep each prompt focused on one decision. When the tool is unavailable, use this fallback shape:
 
@@ -47,7 +47,7 @@ Do not ask about facts the researcher can discover, choices that only alter word
 
 Write one short, standalone prose instruction per **research unit**. Questions share a unit when they use the same boundaries and constraints; split them when those differ. Use one to four sentences without headings or lists.
 
-Use this template. **Question** is required; **Scope**, **Constraints**, and **Hypothesis** are optional and appear only when they materially guide the investigation. Replace every placeholder and keep each included marker as part of its sentence so the instruction remains scannable prose:
+Use this template. **Question** is required; **Scope**, **Constraints** are optional and appear only when they materially guide the investigation. Replace every placeholder and keep each included marker as part of its sentence so the instruction remains scannable prose:
 
 ```markdown
 **Question:** Research {{subject and concrete anchors}} to determine {{primary question}} so that {{decision, explanation, design, or action the findings must support}}.
@@ -55,15 +55,13 @@ Use this template. **Question** is required; **Scope**, **Constraints**, and **H
 **Scope:** Start at {{entry point, earliest date, or initial boundary}}, stop at {{observable outcome, terminal boundary, cutoff, or sufficient evidence}}, include {{decision-relevant branches, options, environments, or concerns}}, and exclude {{explicit non-goals}}.
 
 **Constraints:** Evaluate within {{scale, latency, cost, deployment, skills, security, compatibility, freshness, access, or other limits that can change the answer}}, mapping realistic options broadly and testing feasibility and hard limitations before lower-risk detail.
-
-**Hypothesis:** Test {{expected answer or assumption}} against {{evidence that would confirm it}} and {{evidence that would disconfirm it}}, using {{safe probe or experiment}} if documentary evidence cannot settle the claim.
 ```
 
 Do not prescribe source hierarchy, citations, document shape, output location, findings taxonomy, or specialist stopping criteria. `/research` and the selected `research-*` skill own those choices.
 
 The strategy must direct the researcher to map realistic options broadly, test high-risk unknowns before low-risk detail, deepen only viable branches, prune branches after decisive findings, and use a safe probe when documentary evidence cannot settle a decision-relevant claim.
 
-Present the instruction with its explicit assumptions and ask the user to confirm or correct it. The draft is ready when it is self-contained; every sentence changes the investigation; the primary question, boundaries, constraints, and hypothesis are explicit where relevant; and no placeholder remains.
+Present the instruction with its explicit assumptions and ask the user to confirm or correct it. The draft is ready when it is self-contained; every sentence changes the investigation; the primary question, boundaries, constraints are explicit where relevant; and no placeholder remains.
 
 ## Confirm and hand off
 
