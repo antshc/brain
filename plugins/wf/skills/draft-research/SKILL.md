@@ -20,13 +20,13 @@ Rank unresolved branches by decision risk: feasibility and hard limitations firs
 
 Finding facts is the agent's job. Use supplied sources, the environment, and available tools before asking; an unresolved lookup blocks only branches that depend on it. When a fact needs runtime evidence the current session cannot safely obtain, preserve it as an unknown with the exact probe that could settle it.
 
-Decisions belong to the user: priorities, tradeoffs, boundaries, acceptable evidence, access they control, and the action the findings must support. Ask only when the answer can materially change the research instruction. A preference with a safe, low-consequence default can remain an explicit assumption for confirmation instead of consuming another round.
+Decisions belong to the user: priorities, tradeoffs, boundaries, acceptable evidence, access they control, and the action the findings must support. Ask only when the answer can materially change the research instruction. A preference with a safe, low-consequence default can remain an explicit assumption for confirmation instead of consuming a question.
 
-## Interview the frontier
+## Clarify once
 
-The **frontier** is every unresolved decision whose prerequisites are settled: the questions that can be answered now without guessing at another answer. Ask at most three independent frontier questions per round, then wait. Three is a ceiling, not a target; draft immediately when the supplied context already settles the material choices.
+Ask one batch of at most three questions, then draft. Questions may cover different topics; select the unresolved decisions whose answers would most improve the instruction's question, scope, constraints, hypothesis, evidence, or output. Three is a ceiling, not a target, and no clarification batch is needed when the supplied context already settles the material choices.
 
-Use this shape:
+When the VS Code question tool is available, send the whole batch in one call. Give concrete options for real tradeoffs, mark the recommended option, allow a free-form answer unless the choice must be restricted, and keep each prompt focused on one decision. When the tool is unavailable, use this fallback shape:
 
 ```markdown
 **Q1 — {{short title}}**
@@ -35,13 +35,13 @@ Use this shape:
 **Recommended:** {{answer and one-sentence reason}}
 ```
 
-Offer concrete options only when they expose a real tradeoff. Make the recommendation easy to accept in a short reply. If the user accepts the recommendation without elaborating, treat it as their answer; if they skip a non-critical choice, carry the recommendation as an explicit assumption in the draft.
+Make each recommendation easy to accept in a short reply. If the user accepts it without elaborating, treat it as their answer; if they skip a non-critical choice, carry the recommendation as an explicit assumption in the draft.
 
-Each answer reshapes the tree. Recompute the frontier, open only the branches it unblocks, and never ask a dependent question in the same round as its unresolved prerequisite. Turn expected answers into hypotheses and put disconfirming evidence in the instruction rather than repeatedly asking the user how to test them.
+Do not ask a second clarification batch. Resolve dependent or lower-risk details from the answers, available facts, and recommended defaults; expose any decision-relevant inference as an assumption beside the draft. Turn expected answers into hypotheses and put disconfirming evidence in the instruction rather than asking the user how to test them.
 
-Stop when the frontier contains no material user decision. Do not prolong the interview for facts the researcher can discover, choices that only alter wording, or details a specialist can resolve without changing scope. Present remaining assumptions with the draft so confirmation closes them together.
+Do not ask about facts the researcher can discover, choices that only alter wording, or details a specialist can resolve without changing scope. Present remaining assumptions with the draft so confirmation closes them together.
 
-**Done when:** every material user decision is answered or exposed as an assumption, every discoverable fact is resolved or represented by a concrete probe, and no dependent branch remains silently assumed.
+**Done when:** the single batch is answered or unnecessary, every material unresolved choice is exposed as an assumption, and every undiscovered fact is represented by a concrete probe.
 
 ## Draft the instruction
 
