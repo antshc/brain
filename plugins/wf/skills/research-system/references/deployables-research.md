@@ -1,6 +1,6 @@
 # Deployables axis — one chain
 
-Breadth first, depth later. One deployable is one lane; the chain ends at the systems whose source you cannot open. Depth inside a lane belongs to the **Capability** axis, which this one runs per lane.
+Breadth first, depth later. One deployable is one lane; the chain continues through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. **One chain run produces one document.** Depth inside a lane belongs to the **Capability** axis, offered as a follow-up once the chain is complete.
 
 ## Tiers
 
@@ -11,17 +11,26 @@ Breadth first, depth later. One deployable is one lane; the chain ends at the sy
 | Evidence | the wire: emit site + receive site + the binding naming the real resource | `path:line` along the call chain |
 | Stops at | terminal external systems | that lane's inbound entry and outbound effects |
 
+## Deployable eligibility
+
+A lane is a **deployable**: a unit independently runnable or deployed in production — a process, service, container, function, host workload, or scheduled job that the platform starts on its own.
+
+**Eligibility test** — does production start this unit independently? Yes → it earns a lane. No → it is an artifact, and it belongs inside the lane of whatever executes it.
+
+Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm charts, Terraform modules, SQL migrations, and libraries are **artifacts**. Name the executing deployable as the lane and record the artifact as what that lane *does*. A bundle executed by a privileged host agent is one lane — the agent — not two.
+
 ## Workflow
 
 1. **Frame the chain** — name the outcome traced, not the service. "Where does a placed order become reserved stock?" beats "how does ordering work?".
 2. **Find the chain entries** — what originates the flow from outside the whole system: user action, schedule, webhook, upstream system, batch drop. An inbound call from a deployable already in the chain is a handoff, not an entry.
-3. **Walk lane by lane, shallow** — per deployable record what it receives, does in one line, and emits. Read client call sites, routes, publish/subscribe calls, SDK use, auth configuration, error handling, and IaC bindings; leave internals for the lane trace.
-4. **Classify every edge** — continuable or terminal (see Boundary). A continuable edge extends the chain; a terminal edge closes it with a contract.
+3. **Walk lane by lane, shallow** — per deployable record what it receives, does in one line, and emits. Read client call sites, routes, publish/subscribe calls, SDK use, auth configuration, error handling, and IaC bindings; leave internals for a later lane trace.
+4. **Classify every edge** — continuable or terminal (see Boundary). A continuable edge extends the chain; a terminal edge closes it with a contract. Keep walking while the next system is outcome-relevant and its executing source opens.
 5. **Probe the chain** (see Chain probe) — one real correlation id beats any amount of static reading for proving the lanes actually connect.
 6. **Rank lanes by depth need** — `contract`, `traced`, or `deep` (see Depth dial). Rank against the framed outcome, not against how interesting the code looks.
-7. **Deep-dive** — per `deep` lane, follow the **Capability** axis, passing the lane's Frontier question verbatim as its framed question and the lane's inbound contract as its entry point. Write its doc beside this one and link it from the lane row.
+7. **Draw and render the chain** (see Diagrams) — the swimlane is part of the deliverable, not an illustration added afterwards.
+8. **Offer the deep dives** — list the `deep` lanes and their Frontier questions in the report back to the user, and stop. Run the **Capability** axis on a lane only when the user asks for it, passing that lane's Frontier question verbatim as the framed question and its inbound contract as the entry point.
 
-**Done when** every entry reaches a lane; every lane is `contract`/`traced`/`deep`; every boundary records its API or event, SDK, protocol, auth, and error contract; every internal handoff has emit- and receive-side citations; every terminal says why research stops; and every deferred lane has a verbatim next frame.
+**Done when** the chain document is the only file written; every entry reaches a lane; every deployable appears exactly once as a lane and every artifact sits inside its executing lane; every lane is `contract`/`traced`/`deep`; the swimlane renders and every terminal sits at a diagram edge; every boundary records its API or event, SDK, protocol, auth, and error contract; every internal handoff has emit- and receive-side citations; every terminal says why research stops; and every deferred lane has a verbatim next frame.
 
 ## Boundary
 
@@ -33,7 +42,7 @@ Two kinds of crossing, with different stop semantics.
 | Record | the integration contract and the IaC/config naming the real resource, region, and account | the integration contract plus emit site, receive site, and binding |
 | Becomes | a Terminals row | the next Lanes row |
 
-**Stop test** — follow a hop only when its source is reachable **and** the framed outcome depends on what happens there. Either answer is no → terminal, write the contract, stop.
+**Continue test** — keep following a hop while its executing source opens **and** the framed outcome depends on what happens there. Either answer turns no → terminal, write the contract, stop. Unfamiliarity, repository distance, and lane count are not stop conditions.
 
 A deployable often emits to several downstreams. Expand only the ones on the path to the framed outcome; record the siblings as terminal by scope with a one-line reason. This is what keeps a mesh from swallowing the research.
 
@@ -62,22 +71,30 @@ Issue one real request carrying a correlation id, then collect that id across ev
 
 ## Depth dial
 
-Not every lane earns its own document.
+Depth records how much research a lane earned, not how many files the run writes.
 
 | Depth | Meaning | Costs |
 |---|---|---|
 | `contract` | only its inputs and outputs matter to the outcome | the Lanes row is the whole research |
 | `traced` | its internal mechanism matters in outline | one cited paragraph in this doc |
-| `deep` | the outcome turns on how it works inside | its own Capability-axis doc |
+| `deep` | the outcome turns on how it works inside | a Frontier question offered to the user as an optional Capability-axis run |
 
-Without this dial a five-lane chain produces five documents when two carry the answer.
+No depth writes a second file. `deep` marks a lane as *worth* its own document; the user decides whether that document gets written.
 
 ## Diagrams
 
-The chain diagram is a **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Run `/behavior-diagram` skill for its syntax and styling. Every lane and every arrow names the evidence that established it.
+The chain diagram is **mandatory** and it is a **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting; the swimlane type is fixed here and the diagram skill's own type selection does not override it.
+
+Use Mermaid `swimlane-beta`. When the target renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane — the syntax changes, the one-lane-per-deployable semantics do not. **A `sequenceDiagram` is not a chain view**: it orders messages in time and loses the lane ownership this axis exists to show.
+
+Render the Mermaid block and confirm it draws before declaring the research complete. Keep `path:line` citations in the tables and prose; diagram labels carry contracts, not evidence.
 
 Add a **container diagram** above it only when the lane count passes roughly eight and the reader needs the shape before the sequence of handoffs. Run `/architecture-diagram` skill for its syntax and styling. Lane internals are never drawn here — they belong to the lane's own sequence diagram, per the **Capability** axis **Diagrams**.
+
+**Done when** the block renders; each deployable has exactly one lane; every terminal sits at a diagram edge; and no artifact, script, playbook, chart, or library holds a lane of its own.
 
 ## Gotchas
 
 - **A lane that appears twice is one lane revisited, not two** — a chain that returns to an earlier deployable is a cycle; record the second crossing as a handoff back to the existing lane number and stop, or the walk never terminates.
+- **An artifact given its own lane invents a deployable that production never starts** — a bundle, script, playbook, or chart shows up in logs and file trees like a participant, so apply the eligibility test before drawing a lane for anything you cannot point at a process for.
+- **A missing sibling in a code graph is a gap, not a terminal** — graph and index tools cover only the repositories in their manifest, so treat their paths as candidate navigation and confirm the boundary by searching the repository directly before writing a Terminals row.

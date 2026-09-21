@@ -6,7 +6,7 @@
 - Every boundary records API/event, SDK, protocol, auth, errors, and binding. Use `—` only when an aspect does not apply.
 - Every internal handoff carries an emit-side citation **and** a receive-side citation. One side alone belongs in Assumptions, not in Handoffs.
 - Executing code and a probed correlation id prove the chain; deployment diagrams, READMEs, and team knowledge state only intent — record any mismatch as a finding.
-- Lane internals stay in the lane's own document. Nothing here describes what happens inside a deployable beyond one line.
+- This file is the whole deliverable. Lane internals stay out of it — nothing here describes what happens inside a deployable beyond one line — and no second document is written unless the user asks for a lane deep dive.
 
 - Question: {{the exact end-to-end outcome being traced}}
 - Chain: {{first deployable}} → {{…}} → {{terminal system}}
@@ -20,7 +20,7 @@
 
 ## Chain
 
-**Rules:** a swimlane — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. When a diagram skill owns that type, its template governs syntax and styling. Add a container diagram above it only past roughly eight lanes.
+**Rules:** a rendered Mermaid **swimlane** — one lane per deployable, terminal systems as edge lanes, every arrow labelled with its contract. Open the swimlane template of the skill owning that type and follow its syntax and styling. Fall back to a `flowchart` with one `subgraph` per lane only when the renderer lacks `swimlane-beta`; a `sequenceDiagram` is not a chain view. Add a container diagram above it only past roughly eight lanes.
 
 {{diagram}}
 
@@ -34,11 +34,11 @@
 
 ## Lanes
 
-**Rules:** one row per deployable, in chain order. `Does` is one line — the mechanism belongs to the lane document. `Depth` is `contract`, `traced`, or `deep`; only `deep` lanes have a document.
+**Rules:** one row per deployable — something production starts independently — in chain order, each appearing exactly once. Bundles, scripts, playbooks, charts, and libraries belong inside the lane that executes them. `Does` is one line. `Depth` is `contract`, `traced`, or `deep`; `deep` names a lane worth a later Capability-axis run, recorded in Frontier.
 
-| # | Deployable | Receives | Does | Emits | Depth | Doc |
-|---|---|---|---|---|---|---|
-| 1 | {{service, container, lambda, worker}} | {{inbound contract}} | {{one line}} | {{outbound contract}} | {{contract \| traced \| deep}} | {{link, or —}} |
+| # | Deployable | Receives | Does | Emits | Depth |
+|---|---|---|---|---|---|
+| 1 | {{service, container, lambda, worker, host agent}} | {{inbound contract}} | {{one line}} | {{outbound contract}} | {{contract \| traced \| deep}} |
 
 **Rules:** one cited paragraph per `traced` lane, under a `### {{lane}}` subsection. Omit the section when no lane is `traced`.
 
@@ -90,7 +90,7 @@
 
 ## Frontier
 
-**Rules:** lanes deliberately not traced yet — deferred scope, distinct from Unknowns. `Next question` is the verbatim frame the next Capability-axis run takes as its question, so resuming needs no rethinking.
+**Rules:** lanes deliberately not traced yet — deferred scope, distinct from Unknowns. Every `deep` lane appears here as a suggested deep dive. `Next question` is the verbatim frame an optional Capability-axis run takes as its question, so resuming needs no rethinking.
 
 | # | Lane | Not traced because | Next question |
 |---|---|---|---|

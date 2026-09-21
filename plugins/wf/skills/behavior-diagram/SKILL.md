@@ -7,6 +7,8 @@ description: Document software behavior with a Mermaid flowchart, swimlane diagr
 
 ## When to use
 
+A diagram type named by the caller — the user or the skill that ran this one — is **binding**. Draw that type and skip the selection below. A parent workflow asking for a swimlane is asking for responsibility ownership, and message ordering is not grounds to substitute a sequence diagram for it.
+
 Use this skill to document software behavior as one of:
 
 ### Flowchart
@@ -63,9 +65,11 @@ Open [sequence-diagram-template.md](templates/sequence-diagram-template.md).
 
 Open the selected template before drafting. Follow its drawing, styling, delta, and Mermaid rules; do not compose from memory.
 
+A renderer fallback may change syntax, never semantics: a swimlane falls back to a `flowchart` with one `subgraph` per lane, keeping one lane per owner. It never falls back to another diagram type.
+
 Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
-**Done when:** the selected template was opened this run; the selected diagram follows its rules; current mode uses the base palette; delta mode uses the diagram-specific delta rules and minimum context; no unused placeholder or instruction-only comment remains.
+**Done when:** the type drawn is the one the caller named when there was one; the selected template was opened this run; the selected diagram follows its rules; current mode uses the base palette; delta mode uses the diagram-specific delta rules and minimum context; no unused placeholder or instruction-only comment remains.
 
 ## 3. Assign a diagram id
 
