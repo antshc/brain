@@ -51,13 +51,13 @@ The unit is one **deployable** per lane — something independently runnable or 
 - Template: [deployables-research-template.md](templates/deployables-research-template.md)
 - Output: exactly one file, `docs/ongoing/research-{{slug}}-chain.md`. A chain run writes no other document.
 
-**Diagram:** Draw a mandatory **swimlane** with one lane and one node per deployable, terminal systems as edge lanes, and every arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
+**Diagram:** Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
 
 Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
 
 Keep `path:line` citations in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
 
-Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane and one node, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
+Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane containing 1–5 boundary-relevant major-step nodes, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
 
 ### Data — one item type and its store
 

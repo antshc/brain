@@ -6,7 +6,7 @@
 - Summary claims cite numbered Facts; every technical claim elsewhere carries `path:line` or `path:startLine-endLine`. A bare service name is not evidence.
 - Every diagram node, Flow row, boundary claim, and Conclusion statement traces to a Fact. Quote the deciding line whenever it settles a claim on sight.
 - Executing code and a probed correlation id prove the chain; deployment diagrams, READMEs, comments, and team knowledge state only intent. Record mismatches as Facts.
-- Scope is one end-to-end chain. Each deployable appears once as one lane and one node; internal mechanisms belong to optional Capability follow-ups.
+- Scope is one end-to-end chain. Each deployable appears once as one lane with 1–5 ordered major-step nodes; deeper internal mechanisms belong to optional Capability follow-ups.
 
 - Question: {{the exact end-to-end outcome being traced}}
 - Scope: {{the external entry, terminal boundary, named systems, and what's explicitly out}}
@@ -20,17 +20,17 @@
 
 ## Chain
 
-**Rules:** Draw and render one Mermaid swimlane per **Deployables — one chain** in the skill. Give every deployable one lane and one node, place terminal systems at diagram edges, and label every arrow with its boundary contract. Put all terminal nodes in the titled `Terminal boundaries` lane; label each node with the target name only. Every node and arrow traces to a Fact; tables below carry citations.
+**Rules:** Draw and render one Mermaid swimlane per **Deployables — one chain** in the skill. Give every deployable one lane containing 1–5 ordered nodes for its major steps, place terminal systems at diagram edges, and label every cross-lane arrow with its boundary contract. Put all terminal nodes in the titled `Terminal boundaries` lane; label each node with the target name only. Every node and arrow traces to a Fact; tables below carry citations.
 
 {{diagram}}
 
 ## Flow
 
-**Rules:** One row per deployable in chain order. A deployable is a unit production starts independently; artifacts belong in their executor's responsibility. `Receives` names the external entry for the first lane and the boundary contract for later lanes. Keep `Responsibility` to one line and put internal decisions in Capability follow-ups.
+**Rules:** One row per deployable in chain order. A deployable is a unit production starts independently; artifacts belong in their executor's major steps. `Receives` names the external entry for the first lane and the boundary contract for later lanes. `Major steps` lists 1–5 ordered, boundary-relevant responsibilities that explain how the inbound contract becomes the outbound contract; put deeper internal decisions in Capability follow-ups.
 
-| # | Deployable | Receives | Responsibility | Emits | Evidence |
+| # | Deployable | Receives | Major steps | Emits | Evidence |
 |---|---|---|---|---|---|
-| 1 | {{service, container, function, worker, host workload, or scheduled job}} | {{external entry or inbound contract}} | {{one-line responsibility in this chain}} | {{outbound contract or terminal effect}} | {{Fact #; path:line}} |
+| 1 | {{service, container, function, worker, host workload, or scheduled job}} | {{external entry or inbound contract}} | {{1–5 ordered steps, each backed by a Fact}} | {{outbound contract or terminal effect}} | {{Fact #; path:line}} |
 
 ## Boundary contracts
 
