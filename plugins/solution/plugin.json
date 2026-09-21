@@ -1,7 +1,7 @@
 {
   "name": "solution",
-  "version": "1.1.1",
-  "description": "Software solution research skills for cloud constraints, current behavior, and cross-deployable flows.",
+  "version": "1.2.0",
+  "description": "Software solution research skills for cloud constraints, current behavior, cross-deployable flows, and data models.",
   "skills": [
     "./skills"
   ],

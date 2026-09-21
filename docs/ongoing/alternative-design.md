@@ -84,7 +84,7 @@ Wayfinder routes each research ticket to the narrowest applicable skill.
 | Skill | Responsibility |
 |---|---|
 | `research-capability` | Trace current behavior inside one deployable |
-| `research-integrations` | Trace flows and integration contracts across deployables |
+| `research-deployables` | Trace flows and integration contracts across deployables |
 | `research-cloud` | Research AWS/Azure APIs, SDKs, permissions, networking, quotas, retries, and failures |
 | `research-dotnet` | Research .NET runtime, BCL, language, async, and concurrency behavior |
 | `research-aspnet-core` | Research hosting, middleware, DI, configuration, workers, health checks, and lifecycle |
