@@ -17,7 +17,7 @@ Write to the axis's output path unless the user names a location. Every path is 
 
 ### Capability — one deployable
 
-The unit is one symbol chain inside one deployable: the trace starts at this unit's entry points and stops at the effects leaving it. Pick it for how something works, where a decision is made, what a change touches, which implementation or double actually serves a call.
+The unit is one symbol chain inside one deployable: the trace starts at this unit's triggers and stops at its observable outcomes. Pick it for how something works, where a decision is made, what a change touches, which implementation or double actually serves a call.
 
 - References: [capability-research.md](references/capability-research.md)
 - Template: [capability-research-template.md](templates/capability-research-template.md)
@@ -39,7 +39,7 @@ A traced capability defaults to the **sequence diagram**; Run `/behavior-diagram
 
 Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep `path:line` citations in the tables; use class, method, or file names with exact lines in the diagram only when the user asks for them.
 
-Default to one: entries enter as parallel participants meeting at the convergence point, effects leave from it. Diagram selector and fallback edges, not the winning path alone. Split only when entries diverge, selection needs a flowchart, effects fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
+Default to one: triggers enter as parallel participants meeting at the convergence point, observable outcomes leave from it. Diagram selector and fallback edges, not the winning path alone. Split only when triggers diverge, selection needs a flowchart, outcomes fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
 
 Render the Mermaid block before declaring the research complete. Run `/render-mermaid-png` skill only when the user wants an exported image.
 
