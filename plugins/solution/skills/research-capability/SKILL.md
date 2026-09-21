@@ -7,7 +7,7 @@ description: Investigate how a feature, capability, or flow actually works insid
 
 Source of truth is this repo, not the web. Output: one Markdown file, every claim cited to `path:line`, carrying a mermaid diagram of the confirmed mechanism.
 
-Scope is one deployable: the trace starts at this unit's entry points and stops at the effects leaving it. **Flow crosses a process boundary? Run `/research-integrations` skill instead** — it maps the chain lane by lane and runs this skill for each lane worth depth.
+Scope is one deployable: the trace starts at this unit's entry points and stops at the effects leaving it. **Flow crosses a process boundary? Run `/research-deployables` skill instead** — it maps the chain lane by lane and runs this skill for each lane worth depth.
 
 ## Workflow
 
@@ -29,7 +29,7 @@ A capability has many ways in and many ways out; tracing one of each answers a n
 
 - **Entry points** — REST/RPC route, GUI action, client library, CLI, scheduled job, queue or event consumer, webhook. Several usually converge on one core; each can apply its own auth, validation, defaults, and deserialization first. Cite each entry, cite the **convergence point**, then trace once below it and note per-entry differences as Facts.
 - **Effects** — persisted writes, published events, outbound calls, files, cache invalidations, notifications, the response payload, and logs/metrics another system consumes. The returned value is one effect among several; name each and whether it is unconditional, and whether it shares the caller's transaction.
-- **Boundary** — an effect that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by `/research-integrations`.
+- **Boundary** — an effect that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by `/research-deployables`.
 
 ## Multiple external sources
 

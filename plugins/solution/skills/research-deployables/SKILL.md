@@ -1,9 +1,9 @@
 ---
-name: research-integrations
+name: research-deployables
 description: "Trace a flow across deployables and document its internal and external integration contracts: APIs, events, SDKs, protocols, authentication, and errors. Use when a request or message crosses process boundaries, when asked what handles it next or where it ends, or before researching one service in depth."
 ---
 
-# Research integrations across deployables
+# Research deployables across a chain
 
 Breadth first, depth later. One deployable is one lane; the chain ends at the systems whose source you cannot open. Depth inside a lane belongs to `research-capability`, which this skill runs per lane.
 
@@ -86,7 +86,7 @@ Without this dial a five-lane chain produces five documents when two carry the a
 
 Write the chain to `docs/ongoing/{{slug}}.md` unless the user names a location. Lane documents are siblings named `{{n}}-{{deployable}}.md`, numbered by lane order.
 
-Fill [integrations-research-template.md](integrations-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
+Fill [deployables-research-template.md](deployables-research-template.md), obeying its `**Rules**` blocks and deleting every one of them from the result.
 
 ## Diagrams
 
