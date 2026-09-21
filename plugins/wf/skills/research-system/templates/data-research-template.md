@@ -2,7 +2,7 @@
 
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
-- Every claim carries `path:line` — a write call site, a query call site, an IaC/migration line, or a grant. A bare table or attribute name is not evidence.
+- Every repository file mention and claim carries a file reference per **File references** in the skill — a write call site, a query call site, an IaC/migration line, or a grant. A bare table or attribute name is not evidence.
 - Stored items outrank entity classes; IaC and migrations outrank READMEs and diagrams. Record every mismatch as a finding rather than resolving it silently.
 - Access patterns and keys are filled as a pair: every pattern names what serves it, every key and index names a pattern that needs it. Leftovers on either side are findings.
 - Use `—` where a dimension genuinely does not apply to an item type; leave nothing blank.
@@ -23,7 +23,7 @@
 
 | Store | Engine | Model | Item types | Partition key | Sort key | Binding |
 |---|---|---|---|---|---|---|
-| {{table, collection, schema}} | {{engine or managed service}} | {{single-table — discriminator \| per-type}} | {{types held}} | {{attribute, cardinality}} | {{attribute, composite structure, or —}} | {{path:line}} |
+| {{table, collection, schema}} | {{engine or managed service}} | {{single-table — discriminator \| per-type}} | {{types held}} | {{attribute, cardinality}} | {{attribute, composite structure, or —}} | {{file reference}} |
 
 ## Access patterns
 
@@ -31,7 +31,7 @@
 
 | # | Pattern | Op | Served by | Caller | Expected rows | Notes | Evidence |
 |---|---|---|---|---|---|---|---|
-| 1 | {{get X by Y \| list Z for period \| upsert W}} | {{get \| query \| scan \| put \| update \| delete \| transact}} | {{key \| index name \| SCAN}} | {{deployable / handler}} | {{1 \| n \| unbounded}} | {{filter, sort, pagination, cost}} | {{path:line}} |
+| 1 | {{get X by Y \| list Z for period \| upsert W}} | {{get \| query \| scan \| put \| update \| delete \| transact}} | {{key \| index name \| SCAN}} | {{deployable / handler}} | {{1 \| n \| unbounded}} | {{filter, sort, pagination, cost}} | {{file reference}} |
 
 ## Keys and indexes
 
@@ -39,7 +39,7 @@
 
 | Index | Type | Partition key | Sort key | Projection | Serves | Lags base | Evidence |
 |---|---|---|---|---|---|---|---|
-| {{base \| index name}} | {{base \| same-partition \| cross-partition \| relational index}} | {{attribute}} | {{attribute or —}} | {{all \| keys only \| attribute list}} | {{pattern #s \| unused}} | {{yes \| no}} | {{path:line}} |
+| {{base \| index name}} | {{base \| same-partition \| cross-partition \| relational index}} | {{attribute}} | {{attribute or —}} | {{all \| keys only \| attribute list}} | {{pattern #s \| unused}} | {{yes \| no}} | {{file reference}} |
 
 ## Item shapes
 
@@ -49,7 +49,7 @@
 
 | Attribute | Type | Required | Values / format | Source | Evidence |
 |---|---|---|---|---|---|
-| {{name}} | {{type}} | {{yes \| no}} | {{enum, encoding, key prefix grammar}} | {{path:line}} | {{path:line or probed item}} |
+| {{name}} | {{type}} | {{yes \| no}} | {{enum, encoding, key prefix grammar}} | {{file reference}} | {{file reference or probed item}} |
 
 ## Ownership
 
@@ -57,7 +57,7 @@
 
 | Item type | Sole writer | Write grants | Readers | Reader coupling | Evidence |
 |---|---|---|---|---|---|
-| {{type}} | {{deployable}} | {{principals + policy path:line}} | {{deployables}} | {{attributes}} | {{path:line}} |
+| {{type}} | {{deployable}} | {{principals + policy file reference}} | {{deployables}} | {{attributes}} | {{file reference}} |
 
 ## Consistency
 
@@ -65,7 +65,7 @@
 
 | Read | Consistency | Lag source | Stale impact | Evidence |
 |---|---|---|---|---|
-| {{pattern #}} | {{eventual \| strong}} | {{cross-partition index \| replica \| cache \| none}} | {{consequence}} | {{path:line}} |
+| {{pattern #}} | {{eventual \| strong}} | {{cross-partition index \| replica \| cache \| none}} | {{consequence}} | {{file reference}} |
 
 **Rules:** one row per multi-write operation. `Atomic` says whether the writes commit together; `Half-failure state` names the intermediate the system is left in when they don't.
 
@@ -78,7 +78,7 @@
 
 | Change | Old shape | New shape | Read tolerance | Backfill | Completion signal | Rollback | Evidence |
 |---|---|---|---|---|---|---|---|
-| {{add \| rename \| retype \| drop}} | {{shape}} | {{shape}} | {{path:line}} | {{stream \| scan job \| lazy-on-write}} | {{observable}} | {{action while in flight}} | {{path:line}} |
+| {{add \| rename \| retype \| drop}} | {{shape}} | {{shape}} | {{file reference}} | {{stream \| scan job \| lazy-on-write}} | {{observable}} | {{action while in flight}} | {{file reference}} |
 
 ## Concurrency
 
@@ -86,7 +86,7 @@
 
 | Write | Racing with | Guard | On conflict | Idempotency | Evidence |
 |---|---|---|---|---|---|
-| {{pattern #}} | {{concurrent caller or retry source}} | {{condition \| version attribute \| atomic update \| NONE}} | {{error + caller behavior}} | {{key; dedupe store; TTL}} | {{path:line}} |
+| {{pattern #}} | {{concurrent caller or retry source}} | {{condition \| version attribute \| atomic update \| NONE}} | {{error + caller behavior}} | {{key; dedupe store; TTL}} | {{file reference}} |
 
 ## Retention
 
@@ -94,7 +94,7 @@
 
 | Item type | Lifetime | Mechanism | Expiry attribute | Delete latency | Archive | Evidence |
 |---|---|---|---|---|---|---|
-| {{type}} | {{duration or indefinite}} | {{TTL \| sweep job \| explicit delete \| soft delete}} | {{attribute + unit, or —}} | {{bound + reader filtering}} | {{target + confirmation, or —}} | {{path:line}} |
+| {{type}} | {{duration or indefinite}} | {{TTL \| sweep job \| explicit delete \| soft delete}} | {{attribute + unit, or —}} | {{bound + reader filtering}} | {{target + confirmation, or —}} | {{file reference}} |
 
 ## Facts
 
@@ -102,7 +102,7 @@
 
 | # | Fact | Evidence |
 |---|---|---|
-| 1 | {{fact}} | {{path:line — `deciding line quoted`}} |
+| 1 | {{fact}} | {{file reference — `deciding line quoted`}} |
 
 ## Assumptions
 

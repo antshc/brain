@@ -30,7 +30,7 @@ Use the Capability axis for behavior inside one deployable.
 
 **Focused call chain**
 
-> Research how `OrderApi` submits an order. Start at `POST /orders` and stop when the API returns a response or schedules downstream work. Explain validation, payment-provider selection, persistence, failure branches, and which concrete implementations serve the calls. Document the current as-built behavior with inline `path:line` evidence.
+> Research how `OrderApi` submits an order. Start at `POST /orders` and stop when the API returns a response or schedules downstream work. Explain validation, payment-provider selection, persistence, failure branches, and which concrete implementations serve the calls. Document the current as-built behavior with filename-only file links followed by visible line numbers.
 
 **Configuration decision**
 
@@ -79,7 +79,7 @@ Use the Data axis when the answer turns on one item type and its store.
 
 ## It is working if
 
-- Each behavioral claim has nearby `path:line` evidence.
+- Every repository file mention uses `[filename](relative/path#Lstart):Lstart-end`; each behavioral claim has the deciding file reference nearby.
 - Facts, assumptions, unknowns, and conclusions are visibly distinct.
 - The trace has a named entry point and a defensible stopping boundary.
 - Real implementations are separated from mocks, stubs, emulators, and local-only configuration.

@@ -3,7 +3,7 @@
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
 - Question, Scope, and Summary use domain anchors — actor, capability, governed object, outcome, named external system — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
-- Summary claims cite numbered Facts; every technical claim elsewhere carries `path:line` or `path:startLine-endLine`. A bare symbol name is not evidence.
+- Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the skill. A bare symbol name is not evidence.
 - Quote the deciding line whenever it is short enough to settle the claim on sight.
 - Executing code proves behavior; tests, comments, and docs state only intent — record any mismatch as a finding.
 - Nothing reaches the diagram, tables, or conclusion without a Fact behind it.
@@ -33,7 +33,7 @@
 
 | Trigger | Initiated by | Does differently | Converges at | Evidence |
 |---|---|---|---|---|
-| {{route, action, schedule, message, or call}} | {{actor or upstream system}} | {{auth/validation/defaults, or none}} | {{symbol at path:line}} | {{path:line}} |
+| {{route, action, schedule, message, or call}} | {{actor or upstream system}} | {{auth/validation/defaults, or none}} | {{symbol and file reference}} | {{file reference}} |
 
 ## Observable outcomes
 
@@ -41,7 +41,7 @@
 
 | Outcome | Kind | When | Transactional with | Evidence |
 |---|---|---|---|---|
-| {{observable result}} | {{write, event, outbound call, response, file, cache, notification}} | {{unconditional, or the condition}} | {{shared transaction/unit of work, or independent}} | {{path:line}} |
+| {{observable result}} | {{write, event, outbound call, response, file, cache, notification}} | {{unconditional, or the condition}} | {{shared transaction/unit of work, or independent}} | {{file reference}} |
 
 ## Providers and fallback
 
@@ -49,7 +49,7 @@
 
 | Provider | Selected when | Falls back to | Failure trigger | Evidence |
 |---|---|---|---|---|
-| {{client or implementation}} | {{key=value, flag, tweak, environment, or default}} | {{next source, or none}} | {{exception, timeout, status code, invalid-result rule}} | {{path:line}} |
+| {{client or implementation}} | {{key=value, flag, tweak, environment, or default}} | {{next source, or none}} | {{exception, timeout, status code, invalid-result rule}} | {{file reference}} |
 
 **Rules:** state the terminal behavior when every provider fails, whether the selector is read per call or once at startup, and whether a fallback result is cached — each cited.
 
@@ -61,7 +61,7 @@
 
 | # | Fact | Evidence |
 |---|---|---|
-| 1 | {{fact}} | {{path:line — `deciding line quoted`}} |
+| 1 | {{fact}} | {{file reference — `deciding line quoted`}} |
 
 ## Assumptions
 

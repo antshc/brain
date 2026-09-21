@@ -1,11 +1,11 @@
 ---
 name: research-system
-description: "Research a software system as-built and write a Markdown research document citing every claim to path:line. Use when asked how a capability works inside one deployable, to trace a flow across deployables and document its integration contracts, or to settle a question turning on data — keys, ownership, consistency, migration, concurrency, retention."
+description: "Research a software system as-built and write a Markdown research document citing every claim with filename-only file references and visible line numbers. Use when asked how a capability works inside one deployable, to trace a flow across deployables and document its integration contracts, or to settle a question turning on data — keys, ownership, consistency, migration, concurrency, retention."
 ---
 
 # Research a system
 
-Source of truth is this repo, not the web. Output: one Markdown file, every claim cited to `path:line`.
+Source of truth is this repo, not the web. Output: one Markdown file, every claim cited with a filename-only file reference whose line numbers remain visible.
 
 Research documents **as-built** — current state, never a delta.
 
@@ -37,7 +37,7 @@ The unit is one symbol chain inside one deployable: the trace starts at this uni
 
 A traced capability defaults to the **sequence diagram**; Run `/behavior-diagram` skill before drafting it.
 
-Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep `path:line` citations in the tables; use class, method, or file names with exact lines in the diagram only when the user asks for them.
+Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep file references in the tables; use class, method, or file names with exact lines in the diagram only when the user asks for them.
 
 Default to one: triggers enter as parallel participants meeting at the convergence point, observable outcomes leave from it. Diagram selector and fallback edges, not the winning path alone. Split only when triggers diverge, selection needs a flowchart, outcomes fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
 
@@ -55,7 +55,7 @@ The unit is one **deployable** per lane — something independently runnable or 
 
 Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
 
-Keep `path:line` citations in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
+Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
 
 Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane containing 1–5 boundary-relevant major-step nodes, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
 
@@ -77,7 +77,7 @@ The unit is one item type and the store holding it — one writer, many readers,
 
 ## Evidence ladder
 
-Executing source (`path:line`) > passing test exercising this exact path > repo docs (ADR, Concept, README, ARCHITECTURE.md) > config/schema defaults > commit or PR description > code comment > inference.
+Executing source > passing test exercising this exact path > repo docs (ADR, Concept, README, ARCHITECTURE.md) > config/schema defaults > commit or PR description > code comment > inference.
 
 Tests, comments, and docs state *intent*; only executing code proves *behavior*. When they disagree, record the mismatch as a finding.
 
@@ -90,9 +90,9 @@ IaC and migration files are executing code. An entity class is a *declaration* o
 - **UNKNOWN** — a named gap, stated as a concrete next probe.
 - **CONCLUSION** — the explanation the facts support.
 
-## Citations
+## File references
 
-Cite `path:line` or `path:startLine-endLine` inline, immediately after the claim it supports — never pooled at the end. Quote the deciding line when short enough to settle the claim on sight. A bare symbol, table, or service name is not a citation.
+Format every repository file mention in the research document as a filename-only link followed by visible line numbers: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Keep only the start-line anchor inside the target; hide the full relative path there and keep the complete line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply this format in prose, tables, Facts, Gaps, and probes, not only Evidence fields. Place each citation immediately after the claim it supports — never pool citations at the end. Quote the deciding line when short enough to settle the claim on sight. A bare path, symbol, table, or service name is not a citation.
 
 ## Probes
 

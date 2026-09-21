@@ -8,7 +8,7 @@ Breadth first, depth later. One deployable is one lane; the chain continues thro
 |---|---|---|
 | Unit | one deployable = one lane | one symbol = one participant |
 | Diagram | swimlane | sequence |
-| Evidence | the wire: emit site + receive site + the binding naming the real resource | `path:line` along the call chain |
+| Evidence | the wire: emit site + receive site + the binding naming the real resource | file references along the call chain |
 | Stops at | terminal external systems | that lane's inbound entry and outbound effects |
 
 ## Deployable eligibility
