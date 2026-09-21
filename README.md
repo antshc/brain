@@ -34,6 +34,8 @@ copilot plugin install harness@brain
 (copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall solution@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall learn-aws@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true)
 ```
 
@@ -58,7 +60,6 @@ copilot plugin install azure-platform@brain
 ### AWS platform plugin (aws-platform)
 
 ```sh
-(copilot plugin uninstall learn-aws@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall aws-platform@brain >/dev/null 2>&1 || true) && \
 copilot plugin install aws-platform@brain
 ```
