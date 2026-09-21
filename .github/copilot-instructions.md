@@ -6,9 +6,6 @@
 
 See [CODE.md](../.crew/CODE.md) for writing style and syntax conventions.
 
-See **Skills best practices** fetch `https://agentskills.io/skill-creation/best-practices` for How to write skills that are well-scoped and calibrated to the task.
-
-
 ### Plugin Marketplace
 
 All plugins are registered in `.github/plugin/marketplace.json`. **When adding, renaming, or deleting a plugin under `plugins/`, always update `marketplace.json` to match.**
@@ -62,7 +59,7 @@ Single repo — docs and codebase live together, no `workspace/` split.
 
 - **Domain glossary:** `CONTEXT.md` — domain terminology and concepts.
 - **Architecture:** `ARCHITECTURE.md` — ADR/Concept indexes, high-level source structure.
-
+- **Skills best practices** fetch `https://agentskills.io/skill-creation/best-practices` for How to write skills that are well-scoped and calibrated to the task.
 
 ### Ticket tracker
 
