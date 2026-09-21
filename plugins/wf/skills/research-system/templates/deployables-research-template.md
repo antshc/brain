@@ -3,7 +3,7 @@
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
 - Question, Scope, and Summary use domain anchors — actors, outcome, governed object, and named systems — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
-- Summary claims cite numbered Facts; every technical claim elsewhere carries `path:line` or `path:startLine-endLine`. A bare service name is not evidence.
+- Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the skill. A bare service name is not evidence.
 - Every diagram node, Flow row, boundary claim, and Conclusion statement traces to a Fact. Quote the deciding line whenever it settles a claim on sight.
 - Executing code and a probed correlation id prove the chain; deployment diagrams, READMEs, comments, and team knowledge state only intent. Record mismatches as Facts.
 - Scope is one end-to-end chain. Each deployable appears once as one lane with 1–5 ordered major-step nodes; deeper internal mechanisms belong to optional Capability follow-ups.
@@ -30,7 +30,7 @@
 
 | # | Deployable | Receives | Major steps | Emits | Evidence |
 |---|---|---|---|---|---|
-| 1 | {{service, container, function, worker, host workload, or scheduled job}} | {{external entry or inbound contract}} | {{1–5 ordered steps, each backed by a Fact}} | {{outbound contract or terminal effect}} | {{Fact #; path:line}} |
+| 1 | {{service, container, function, worker, host workload, or scheduled job}} | {{external entry or inbound contract}} | {{1–5 ordered steps, each backed by a Fact}} | {{outbound contract or terminal effect}} | {{Fact #; file reference}} |
 
 ## Boundary contracts
 
@@ -40,12 +40,12 @@
 
 | Aspect | Contract | Evidence |
 |---|---|---|
-| API/event | {{operation or route and parameters; event/topic, schema, and version}} | {{Fact #; path:line}} |
-| SDK/protocol | {{package@version; client and method; transport, serialization, sync/async, or —}} | {{Fact #; path:line}} |
-| Auth | {{caller identity; credential/mechanism; permissions; trust/TLS boundary}} | {{Fact #; path:line}} |
-| Failure behavior | {{statuses, exceptions or failure events; timeout, retry, throttling, idempotency, and DLQ behavior}} | {{Fact #; path:line}} |
-| Binding/target | {{endpoint, resource, account, and region; or — when not applicable}} | {{Fact #; path:line}} |
-| Handoff/stop | {{emit site + receive site, or terminal stop reason}} | {{Fact #; emit path:line; receive path:line, or authoritative contract citation}} |
+| API/event | {{operation or route and parameters; event/topic, schema, and version}} | {{Fact #; file reference}} |
+| SDK/protocol | {{package@version; client and method; transport, serialization, sync/async, or —}} | {{Fact #; file reference}} |
+| Auth | {{caller identity; credential/mechanism; permissions; trust/TLS boundary}} | {{Fact #; file reference}} |
+| Failure behavior | {{statuses, exceptions or failure events; timeout, retry, throttling, idempotency, and DLQ behavior}} | {{Fact #; file reference}} |
+| Binding/target | {{endpoint, resource, account, and region; or — when not applicable}} | {{Fact #; file reference}} |
+| Handoff/stop | {{emit site + receive site, or terminal stop reason}} | {{Fact #; emit file reference; receive file reference, or authoritative contract citation}} |
 
 ## Facts
 
@@ -53,7 +53,7 @@
 
 | # | Fact | Evidence |
 |---|---|---|
-| 1 | {{fact}} | {{path:line — `deciding line quoted`}} |
+| 1 | {{fact}} | {{file reference — `deciding line quoted`}} |
 
 ## Gaps
 

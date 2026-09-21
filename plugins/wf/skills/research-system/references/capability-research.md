@@ -30,7 +30,7 @@ A capability may have several providers behind one outcome — picked by config,
 
 Where the wiring hides: implementations of one interface resolved by factory, keyed registration, or injected collection · separate clients chained by an orchestrator or decorator · fallback in a resilience policy, HTTP handler, or gateway, leaving the call site a single call.
 
-Cite each with `path:line`:
+Cite each with a file reference per **File references** in the skill:
 
 - **Registry** — where the set of sources is registered.
 - **Selector** — config key/flag read, value per source, default when absent, and whether it is read per call or once at startup.
