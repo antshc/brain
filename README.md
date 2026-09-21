@@ -61,12 +61,16 @@ copilot plugin install azure-platform@brain
 gh skill install antshc/brain plugins/learn-aws/skills/search-aws-docs --agent github-copilot --scope project -f
 ```
 
+### Solution plugin
+
+```sh
+(copilot plugin uninstall solution@brain >/dev/null 2>&1 || true) && \
+copilot plugin install solution@brain
+```
+
 ### Brain engineering skills
 
 ```sh
-gh skill install antshc/brain engineering/research-capability --agent github-copilot --scope user -f
-gh skill install antshc/brain engineering/trace-chain --agent github-copilot --scope user -f
-
 gh skill install antshc/brain engineering/be-terse --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/suggest --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/render-mermaid-png --agent github-copilot --scope user -f
@@ -160,7 +164,7 @@ AFK PR review and autonomous development loop.
 
 ### review
 
-PR code review skills with modular standards and guidance.
+Code and technical solution review skills with modular standards and guidance.
 
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
@@ -170,6 +174,7 @@ PR code review skills with modular standards and guidance.
 - [fetch-diff](plugins/review/skills/fetch-diff/SKILL.md): check out a PR branch and fetch its diff per file for review skills.
 - [posting](plugins/review/skills/posting/SKILL.md): post a review comment as an inline PR comment via the `gh` API.
 - [to-review-comment](plugins/review/skills/to-review-comment/SKILL.md): format a raw review comment into the review tone of voice.
+- [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
 
 ### harness
 
@@ -204,6 +209,14 @@ AWS documentation skills for querying official AWS docs, API references, and reg
 - [search-aws-docs](plugins/learn-aws/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
 - [search-aws-sdk-nuget](plugins/learn-aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
 
+### solution
+
+Software solution research skills.
+
+- [research-cloud](plugins/solution/skills/research-cloud/SKILL.md): research AWS or Azure implementation constraints with provider evidence.
+- [research-capability](plugins/solution/skills/research-capability/SKILL.md): explain how a capability works inside one deployable, cited to `file:line`, with a sequence diagram.
+- [trace-chain](plugins/solution/skills/trace-chain/SKILL.md): trace a flow across deployables to terminal external systems, with cited handoffs.
+
 ### engineering
 
 General-purpose skills not tied to a specific platform.
@@ -213,8 +226,6 @@ General-purpose skills not tied to a specific platform.
 - [render-mermaid-png](skills/engineering/render-mermaid-png/SKILL.md): render Mermaid diagrams as high-resolution PNGs.
 - [suggest-graphify-improvements](skills/engineering/suggest-graphify-improvements/SKILL.md): audit a Graphify knowledge graph and suggest evidence-backed improvements.
 - [find-root-cause](skills/engineering/find-root-cause/SKILL.md): drive a bug or regression down to its root cause on cited evidence alone.
-- [research-capability](skills/engineering/research-capability/SKILL.md): explain how a capability works inside one deployable, cited to `file:line`, with a sequence diagram.
-- [trace-chain](skills/engineering/trace-chain/SKILL.md): trace a flow across deployables to its terminal external systems, as a swimlane with handoffs cited on both sides.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [inspect-nuget-source](skills/engineering/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.

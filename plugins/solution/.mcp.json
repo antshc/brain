@@ -1,0 +1,10 @@
+{
+  "aws-knowledge-mcp-server": {
+    "url": "https://knowledge-mcp.global.api.aws",
+    "type": "http"
+  },
+  "microsoft-learn": {
+    "type": "http",
+    "url": "https://learn.microsoft.com/api/mcp"
+  }
+}
