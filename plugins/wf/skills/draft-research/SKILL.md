@@ -10,9 +10,9 @@ Work **decision-backwards**: identify what the findings must let the user decide
 
 ## Research tree
 
-Map the request as a **research tree**: each unresolved choice branches into the choices that depend on it. Seed the tree from everything the user already supplied: outcome, primary question, subject and anchors, boundaries, constraints, suspected answer, comparison criteria, source material, permitted access, audience, deliverable, and completion condition.
+Map the request as a **research tree**: each unresolved choice branches into the choices that depend on it. Seed the tree from everything the user already supplied: outcome, primary question, subject and anchors, boundaries, constraints, suspected answer, comparison criteria, source material, and permitted access.
 
-Keep the tree abstract. Open only branches that can change where the researcher looks, which options remain viable, what evidence settles a claim, what the deliverable contains, or when the investigation stops. Subject-specific details belong only when they can change the conclusion or its applicability; `/research` and its specialists own domain procedures.
+Keep the tree abstract. Open only branches that can change where the researcher looks, which options remain viable, or what evidence settles a claim. Subject-specific details belong only when they can change the conclusion or its applicability; `/research` and its specialists own domain procedures.
 
 Rank unresolved branches by decision risk: feasibility and hard limitations first, then performance and scale, reliability, security, operational complexity, and lower-risk usability or presentation details. This ordering decides what must be settled now; it is not a checklist that every request must exhaust.
 
@@ -24,7 +24,7 @@ Decisions belong to the user: priorities, tradeoffs, boundaries, acceptable evid
 
 ## Clarify once
 
-Ask one batch of at most three questions, then draft. Questions may cover different topics; select the unresolved decisions whose answers would most improve the instruction's question, scope, constraints, hypothesis, evidence, or output. Three is a ceiling, not a target, and no clarification batch is needed when the supplied context already settles the material choices.
+Ask one batch of at most three questions, then draft. Questions may cover different topics; select the unresolved decisions whose answers would most improve the instruction's question, scope, constraints, or hypothesis. Three is a ceiling, not a target, and no clarification batch is needed when the supplied context already settles the material choices.
 
 When the VS Code question tool is available, send the whole batch in one call. Give concrete options for real tradeoffs, mark the recommended option, allow a free-form answer unless the choice must be restricted, and keep each prompt focused on one decision. When the tool is unavailable, use this fallback shape:
 
@@ -45,23 +45,25 @@ Do not ask about facts the researcher can discover, choices that only alter word
 
 ## Draft the instruction
 
-Write one short, standalone prose instruction per **research unit**. Questions share a unit when they use the same boundaries, evidence, and deliverable; split them when any of those differ. Use one to five sentences without headings or lists unless the user requests a structured format.
+Write one short, standalone prose instruction per **research unit**. Questions share a unit when they use the same boundaries and constraints; split them when those differ. Use one to four sentences without headings or lists.
 
-Use this template. Replace every placeholder, omit any optional sentence that adds nothing, and keep each marker as part of its sentence so the instruction remains scannable prose:
+Use this template. **Question** is required; **Scope**, **Constraints**, and **Hypothesis** are optional and appear only when they materially guide the investigation. Replace every placeholder and keep each included marker as part of its sentence so the instruction remains scannable prose:
 
-```text
-Question: Research {{subject and concrete anchors}} to determine {{primary question}} so that {{decision, explanation, design, or action the findings must support}}.
-Scope: Start at {{entry point, earliest date, or initial boundary}}, stop at {{observable outcome, terminal boundary, cutoff, or sufficient evidence}}, include {{decision-relevant branches, options, environments, or concerns}}, and exclude {{explicit non-goals}}.
-Constraints: Evaluate within {{scale, latency, cost, deployment, skills, security, compatibility, freshness, access, or other limits that can change the answer}}, mapping realistic options broadly and testing feasibility and hard limitations before lower-risk detail.
-Hypothesis: Test {{expected answer or assumption}} against {{evidence that would confirm it}} and {{evidence that would disconfirm it}}, using {{safe probe or experiment}} if documentary evidence cannot settle the claim.
-Evidence and output: Prefer {{source hierarchy}}, distinguish {{facts, assumptions, unknowns with next probes, and conclusions as useful}}, deliver {{audience, format, location, views, and citation style}}, and stop when {{critical unknowns are resolved or exposed, viable options are comparable, major risks are understood, and further research is unlikely to change the decision}}.
+```markdown
+**Question:** Research {{subject and concrete anchors}} to determine {{primary question}} so that {{decision, explanation, design, or action the findings must support}}.
+
+**Scope:** Start at {{entry point, earliest date, or initial boundary}}, stop at {{observable outcome, terminal boundary, cutoff, or sufficient evidence}}, include {{decision-relevant branches, options, environments, or concerns}}, and exclude {{explicit non-goals}}.
+
+**Constraints:** Evaluate within {{scale, latency, cost, deployment, skills, security, compatibility, freshness, access, or other limits that can change the answer}}, mapping realistic options broadly and testing feasibility and hard limitations before lower-risk detail.
+
+**Hypothesis:** Test {{expected answer or assumption}} against {{evidence that would confirm it}} and {{evidence that would disconfirm it}}, using {{safe probe or experiment}} if documentary evidence cannot settle the claim.
 ```
 
-Prefer primary evidence: executing source or a safe experiment for observed behavior, then official documentation, specifications, first-party APIs, official issues or design documents, maintainer material, and only then credible secondary sources. Adapt the hierarchy to the subject instead of forcing unavailable source classes.
+Do not prescribe source hierarchy, citations, document shape, output location, findings taxonomy, or specialist stopping criteria. `/research` and the selected `research-*` skill own those choices.
 
-The strategy must direct the researcher to map realistic options broadly, test high-risk unknowns before low-risk detail, deepen only viable branches, prune branches after decisive findings, and use a safe probe when documentary evidence cannot settle a decision-relevant claim. Record findings as they are confirmed rather than reconstructing the evidence trail at the end.
+The strategy must direct the researcher to map realistic options broadly, test high-risk unknowns before low-risk detail, deepen only viable branches, prune branches after decisive findings, and use a safe probe when documentary evidence cannot settle a decision-relevant claim.
 
-Present the instruction with its explicit assumptions and ask the user to confirm or correct it. The draft is ready when it is self-contained; every sentence changes the investigation or output; the primary question, boundaries, strategy, evidence standard, deliverable, and completion criterion are explicit; and no placeholder remains.
+Present the instruction with its explicit assumptions and ask the user to confirm or correct it. The draft is ready when it is self-contained; every sentence changes the investigation; the primary question, boundaries, constraints, and hypothesis are explicit where relevant; and no placeholder remains.
 
 ## Confirm and hand off
 
