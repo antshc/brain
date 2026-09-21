@@ -27,7 +27,7 @@ Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm c
 4. **Classify every edge** — continuable or terminal (see Boundary). A continuable edge extends the chain; a terminal edge closes it with a contract. Keep walking while the next system is outcome-relevant and its executing source opens.
 5. **Probe the chain** (see Chain probe) — one real correlation id beats any amount of static reading for proving the lanes actually connect.
 6. **Rank lanes by depth need** — `contract`, `traced`, or `deep` (see Depth dial). Rank against the framed outcome, not against how interesting the code looks.
-7. **Draw and render the chain** (see **Deployables — one chain** in [SKILL.md](../SKILL.md)) — the swimlane is part of the deliverable, not an illustration added afterwards.
+7. **Draw and render the chain** — the swimlane is part of the deliverable, not an illustration added afterwards.
 8. **Offer the deep dives** — list the `deep` lanes and their Frontier questions in the report back to the user, and stop. Run the **Capability** axis on a lane only when the user asks for it, passing that lane's Frontier question verbatim as the framed question and its inbound contract as the entry point.
 
 **Done when** the chain document is the only file written; every entry reaches a lane; every deployable appears exactly once as a lane and every artifact sits inside its executing lane; every lane is `contract`/`traced`/`deep`; the swimlane renders and every terminal sits at a diagram edge; every boundary records its API or event, SDK, protocol, auth, and error contract; every internal handoff has emit- and receive-side citations; every terminal says why research stops; and every deferred lane has a verbatim next frame.

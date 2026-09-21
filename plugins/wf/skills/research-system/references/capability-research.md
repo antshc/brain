@@ -39,4 +39,4 @@ Cite each with `path:line`:
 - **Terminal** — behavior when every source fails, and whether a fallback result is cached.
 - **Double** — the environment, profile, or flag that swaps a source for a mock, stub, in-memory fake, or recorded response, and where that double is the default.
 
-Diagram selector and fallback edges, not the winning path alone — see **Capability — one deployable** in [SKILL.md](../SKILL.md).
+Diagram selector and fallback edges, not the winning path alone.
