@@ -1,26 +1,47 @@
 ---
 name: prototype
-description: Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether an SDK call or integration behaves as expected, or whether a state model or data shape feels right, before committing real code.
+description: Build throwaway prototypes that answer one design or technical question. Use for logic/state, UI/frontend, SDK/API/integration, cloud/resource, message-broker, database, or backend/runtime behavior before committing production code.
 ---
 
 # Prototype
 
-A prototype is throwaway code that answers a question. The question decides the shape.
+Prototype the uncertainty, not the feature. Use the smallest executable artifact that exercises the uncertain part for real.
 
-## Pick a branch
+## Workflow
 
-Identify which question is being answered — from the user's prompt, the surrounding code, or by asking if the user is around:
+1. State the question, assumption, success/observation criteria, and out-of-scope behavior.
+2. Inspect the repository before creating code:
+   - repository/agent instructions
+   - language, runtime, frameworks, package/task runner
+   - test and integration-test projects, fixtures, clients
+   - frontend routing/components/styles
+   - scripts, containers, Compose, infrastructure tooling
+   - AWS/Azure SDKs, CLI usage, IaC and environment conventions
+3. Reuse the repository's stack, dependencies, clients, test infrastructure, scripts, and conventions unless the prototype evaluates an alternative.
+4. Route by uncertainty:
+   - pure logic, state, transitions, data shape -> [LOGIC.md](LOGIC.md)
+   - visual/interaction design -> [UI.md](UI.md)
+   - real external boundary: SDK, REST, cloud, broker, database, service -> [INTEGRATION.md](INTEGRATION.md)
+   - framework/runtime/backend/frontend mechanism -> [RUNTIME.md](RUNTIME.md)
+5. Choose the smallest artifact that answers the question:
+   - REST -> curl or PowerShell; script if repeatability is needed
+   - AWS/Azure API or resource -> cloud CLI when available
+   - SDK semantics -> existing integration-test infrastructure
+   - broker/distributed flow -> smallest producer/consumer/app set
+   - logic/state -> small console/CLI app; standalone HTML only when shareability helps
+   - UI -> existing frontend and route
+   - runtime/framework -> minimal app, script, test host, container, or process set
+6. Exercise the real boundary/mechanism under test. Stub only irrelevant dependencies.
+7. Make it one-command runnable and surface the relevant state/result after each meaningful action.
+8. Run it and record the answer. A failed assumption is a valid result.
+9. Fold the validated decision into production code. Keep prototype code out of main; capture it on a throwaway branch and link the result from the implementation context.
 
-- "Does this SDK call / integration behave as expected?" → [SDK.md](SDK.md). Write a throwaway integration test that exercises the real cloud SDK call and asserts on its actual response shape.
-- "Does this logic / state model / data shape feel right?" → [LOGIC.md](LOGIC.md). Build a small, runnable console app that pushes the model through cases that are hard to reason about on paper.
+## Rules
 
-The two branches produce very different artifacts — getting this wrong wastes the whole prototype. If the question is genuinely ambiguous and the user isn't reachable, default to whichever branch better matches the surrounding code (a repository/proxy wrapping a cloud call → SDK; a pure domain model or data shape → Logic) and state the assumption at the top of the prototype.
-
-## Rules that apply to both
-
-1. Throwaway from day one, and clearly marked as such. Locate the prototype code close to where it will actually be used (next to the module it's prototyping for) so context is obvious — but name it so a casual reader can see it's a prototype, not production.
-2. Trivial to run. One command, no thinking required to start it — `dotnet test` for the SDK branch, `dotnet run` for the Logic branch.
-3. No persistence beyond what the question is checking. If the question is about persistence, hit a scratch/sandbox resource with a clear "PROTOTYPE — wipe me" name, never a real one.
-4. Skip the polish. No unrelated tests, no error handling beyond what makes the prototype runnable, no abstractions. The point is to learn something fast.
-5. Surface the state. After every action, print or render the full relevant state (or response) so the reader can see what changed.
-6. Capture it when done. Fold any validated decision into the real code, then capture the prototype itself as a primary source: commit it to a throwaway branch, out of main, and leave a context pointer to that branch on the implementation issue. Capture the answer too — the verdict and the question it settled — in the issue or a commit. The main branch keeps only the validated decision.
+- One question per prototype.
+- Prefer existing dependencies; add only what the question requires.
+- No production-grade abstractions, unrelated tests, speculative extensibility, or polish.
+- Use in-memory/local/sandbox state unless persistence is the question.
+- Never use destructive operations against production resources.
+- Mark scratch resources and prototype code as disposable.
+- Do not promote prototype code directly to production.
