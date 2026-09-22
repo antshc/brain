@@ -1,17 +1,17 @@
 ---
-name: research-system
-description: "Research a software system as-built and write a Markdown research document citing every claim with filename-only file references and visible line numbers. Use when asked how a capability works inside one deployable, to trace a flow across deployables and document its integration contracts, or to settle a question turning on data — keys, ownership, consistency, migration, concurrency, retention."
+name: inspect-system
+description: "Inspect a software system as-built and write a Markdown research document citing every claim with filename-only file references and visible line numbers. Use when asked how a capability works inside one deployable, to trace a flow across deployables and document its integration contracts, or to settle a question turning on data — keys, ownership, consistency, migration, concurrency, retention."
 ---
 
-# Research a system
+# Inspect a system
 
 Source of truth is this repo, not the web. Output: one Markdown file, every claim cited with a filename-only file reference whose line numbers remain visible.
 
-Research documents **as-built** — current state, never a delta.
+Inspection documents **as-built** — current state, never a delta.
 
 ## Axes
 
-Three axes, one per unit of research. Pick by the unit the question is about, load only that axis's references and template, and leave the other two unread.
+Three axes, one per unit of inspection. Pick by the unit the question is about, load only that axis's references and template, and leave the other two unread.
 
 Write to the axis's output path unless the user names a location. Every path is flat — one file directly in `docs/ongoing/`, no subfolder. Fill its template, obeying the `**Rules**` blocks and deleting every one of them from the result.
 
@@ -25,7 +25,7 @@ The unit is one symbol chain inside one deployable: the trace starts at this uni
 
 **Diagram:** Pick the diagram from what the question asks, then Run its owning skill for syntax and styling — never compose Mermaid from memory.
 
-| Research topic | Draw | Skill |
+| Inspection topic | Draw | Skill |
 |---|---|---|
 | the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `/doc-behavior-diagram` |
 | which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `/doc-behavior-diagram` |
@@ -41,7 +41,7 @@ Label nodes with the role or step plus one greppable trace keyword — a route p
 
 Default to one: triggers enter as parallel participants meeting at the convergence point, observable outcomes leave from it. Diagram selector and fallback edges, not the winning path alone. Split only when triggers diverge, selection needs a flowchart, outcomes fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
 
-Render the Mermaid block before declaring the research complete. Run `/render-mermaid-png` skill only when the user wants an exported image.
+Render the Mermaid block before declaring the inspection complete. Run `/render-mermaid-png` skill only when the user wants an exported image.
 
 ### Deployables — one chain
 
@@ -57,7 +57,7 @@ Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back
 
 Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/doc-architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
 
-Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane containing 1–5 boundary-relevant major-step nodes, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
+Render the Mermaid block before declaring the inspection complete. Done means each deployable has exactly one lane containing 1–5 boundary-relevant major-step nodes, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
 
 ### Data — one item type and its store
 
@@ -67,7 +67,7 @@ The unit is one item type and the store holding it — one writer, many readers,
 - Template: [data-research-template.md](templates/data-research-template.md)
 - Output: `docs/ongoing/research-{{slug}}-data.md`
 
-**Diagram:** None by default — the store, key, and shape tables carry the answer. When the user asks for one, pick the diagram from the question and Run its owning skill: `/doc-behavior-diagram` for access order or branching, `/doc-architecture-diagram` for ownership or deployment boundaries, and `/doc-code-diagram` for item types and their relationships. Keep evidence in the tables and render the Mermaid block before declaring the research complete.
+**Diagram:** None by default — the store, key, and shape tables carry the answer. When the user asks for one, pick the diagram from the question and Run its owning skill: `/doc-behavior-diagram` for access order or branching, `/doc-architecture-diagram` for ownership or deployment boundaries, and `/doc-code-diagram` for item types and their relationships. Keep evidence in the tables and render the Mermaid block before declaring the inspection complete.
 
 ### Crossing axes
 
@@ -92,7 +92,7 @@ IaC and migration files are executing code. An entity class is a *declaration* o
 
 ## File references
 
-Format every repository file mention in the research document as a filename-only link followed by visible line numbers: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Keep only the start-line anchor inside the target; hide the full relative path there and keep the complete line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply this format in prose, tables, Facts, Gaps, and probes, not only Evidence fields. Place each citation immediately after the claim it supports — never pool citations at the end. Quote the deciding line when short enough to settle the claim on sight. A bare path, symbol, table, or service name is not a citation.
+Format every repository file mention in the inspection document as a filename-only link followed by visible line numbers: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Keep only the start-line anchor inside the target; hide the full relative path there and keep the complete line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply this format in prose, tables, Facts, Gaps, and probes, not only Evidence fields. Place each citation immediately after the claim it supports — never pool citations at the end. Quote the deciding line when short enough to settle the claim on sight. A bare path, symbol, table, or service name is not a citation.
 
 ## Probes
 

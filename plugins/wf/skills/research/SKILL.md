@@ -1,6 +1,6 @@
 ---
 name: research
-description: Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo, dispatching to a specialist research skill when one covers the subject. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a subagent.
+description: Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo, dispatching to a specialist research or inspection skill when one covers the subject. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a subagent.
 ---
 
 # Research
@@ -9,9 +9,14 @@ Every path below delegates the investigation to a subagent via `runSubagent` —
 
 ## 1. Dispatch to a specialist
 
-Specialists are named `research-*`, one per subject domain (a cloud provider, this repo's own system, and whatever else is installed). Each owns its sources, evidence rules, template, and output path — richer than anything the generic job below produces.
+Specialists use two families. Each owns its sources, evidence rules, template, and output path — richer than anything the generic job below produces.
 
-Discover them, never hardcode them: scan the available skills roster for every name matching `research-*`, then judge the question against each one's `description`, and against its `compatibility` line where it carries one.
+- `research-*` — research an external/domain subject against authoritative sources.
+- `inspect-*` — inspect a concrete as-built implementation or shipped artifact/dependency.
+
+**Rule:** use `inspect-*` when the question is about what existing code, configuration, or a dependency actually does; use `research-*` when the answer comes from provider, platform, API, SDK, specification, or other authoritative external sources.
+
+Discover both families, never hardcode individual skills: scan the available skills roster for every name matching `research-*` or `inspect-*`, then judge the question against each one's `description`, and against its `compatibility` line where it carries one.
 
 - **One covers the question** → its job is to Run that skill over the question; stop here once the subagent reports back and its output passes Verify the delegated output.
 - **Several cover different parts** → one subagent per specialist, each over the part that specialist owns, each writing its own file.
