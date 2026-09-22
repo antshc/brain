@@ -126,6 +126,26 @@ A user-meaningful product behavior that delivers all or part of a capability. A 
 **Functional slice**:
 A coherent, independently mergeable and testable unit of system behavior. A slice may contribute to multiple features, be invoked through any entry point, and remain hidden behind a feature flag until its feature is complete.
 
+**Inspect**:
+Look at something directly and record what is there.
+_Typical question_: “What does this code/config/system contain?”
+_Typical output_: Facts, inventory, observations.
+
+**Analyze**:
+Break something down and explain its structure, behavior, relationships, or impact.
+_Typical question_: “How does this work, and what does it imply?”
+_Typical output_: Model, explanation, dependencies, findings.
+
+**Investigate**:
+Follow evidence to resolve a specific uncertainty, problem, or question.
+_Typical question_: “Why is this happening?” / “Where is this implemented?”
+_Typical output_: Conclusion backed by evidence, root cause, answer.
+
+**Research**:
+Gather knowledge from multiple sources to understand a topic or support a decision.
+_Typical question_: “What do we need to know about X?”
+_Typical output_: Consolidated knowledge, options, constraints, citations.
+
 **Completeness sweep**:
 A closing check, run before concluding a session that opened at least one full Concept/ADR record, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts and Architecture Decision Records index tables.
 _Avoid_: final review, wrap-up
