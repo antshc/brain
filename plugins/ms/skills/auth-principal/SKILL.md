@@ -1,6 +1,6 @@
 ---
 name: auth-principal
-description: 'Authorize Azure CLI with a service principal on Windows or Linux. Use when Azure CLI authentication is missing or expired, or when the user mentions "/azure-platform:auth-principal".'
+description: 'Authorize Azure CLI with a service principal on Windows or Linux. Use when Azure CLI authentication is missing or expired, or when the user mentions "/ms:auth-principal".'
 ---
 
 **Step 0 — Detect OS**
@@ -13,7 +13,7 @@ Linux:
 source ~/.profile
 for variable in AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID; do
   if [[ -z "${!variable}" ]]; then
-    echo "$variable is not set. Run /azure-platform:init-cli first."
+    echo "$variable is not set. Run /ms:init-cli first."
     exit 1
   fi
 done
@@ -24,7 +24,7 @@ Windows (PowerShell):
 $requiredVariables = 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET', 'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID'
 foreach ($variable in $requiredVariables) {
     if ([string]::IsNullOrWhiteSpace((Get-Item "Env:$variable" -ErrorAction SilentlyContinue).Value)) {
-        throw "$variable is not set. Run /azure-platform:init-cli first."
+        throw "$variable is not set. Run /ms:init-cli first."
     }
 }
 ```

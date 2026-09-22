@@ -1,5 +1,5 @@
 {
-  "name": "azure-platform",
+  "name": "ms",
   "version": "1.1.0",
   "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, resource operation, and implementation-constraint research skills.",
   "skills": ["./skills"],
