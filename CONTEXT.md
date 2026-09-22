@@ -117,6 +117,15 @@ _Avoid_: test project, test suite
 
 ### Language
 
+**Capability**:
+Usually larger; describes what the system can do, not necessarily one mergeable unit. A capability may be realized by multiple features; a feature may contribute to more than one capability.
+
+**Feature**:
+A user-meaningful product behavior that delivers all or part of a capability. A feature may comprise multiple functional slices and can be released only once the slices it requires are complete.
+
+**Functional slice**:
+A coherent, independently mergeable and testable unit of system behavior. A slice may contribute to multiple features, be invoked through any entry point, and remain hidden behind a feature flag until its feature is complete.
+
 **Completeness sweep**:
 A closing check, run before concluding a session that opened at least one full Concept/ADR record, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts and Architecture Decision Records index tables.
 _Avoid_: final review, wrap-up
