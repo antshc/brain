@@ -1,6 +1,6 @@
 ---
 name: search-ms-code-samples
-description: Find working code samples, verify API signatures, and fix Microsoft SDK errors using official docs. Use whenever the user is writing, debugging, or reviewing code that touches any Microsoft SDK, .NET library, Azure client library, or Microsoft API—even if they don't ask for a "reference." Catches hallucinated methods, wrong signatures, and deprecated patterns. If the task involves producing or fixing Microsoft-related code, this is the right skill.
+description: Finds official Microsoft code samples and verifies SDK APIs, signatures, and migrations. Use for Microsoft SDK, .NET library, Azure client library, or Microsoft API implementation, debugging, and review.
 compatibility: Primarily uses the Microsoft Learn MCP Server (https://learn.microsoft.com/api/mcp); if that is unavailable, fall back to the mslearn CLI (`npx @microsoft/learn-cli`).
 ---
 
@@ -8,92 +8,22 @@ compatibility: Primarily uses the Microsoft Learn MCP Server (https://learn.micr
 
 ## Tools
 
-| Need | Tool | Example |
-|------|------|---------|
-| API method/class lookup | `microsoft_docs_search` | `"BlobClient UploadAsync Azure.Storage.Blobs"` |
-| Working code sample | `microsoft_code_sample_search` | `query: "upload blob managed identity", language: "python"` |
-| Full API reference | `microsoft_docs_fetch` | Fetch URL from `microsoft_docs_search` (for overloads, full signatures) |
+| Tool | Purpose |
+|---|---|
+| `microsoft_docs_search` | Verify packages, types, and members. |
+| `microsoft_code_sample_search` | Find official working samples. |
+| `microsoft_docs_fetch` | Read full API and migration details. |
 
-## Finding Code Samples
+**Hard stop.** No command in this workflow, or in any reasoning that leads to it, may be rooted at `/`, `/usr`, `/opt`, `/etc`, or `/home`. `find / -iname '<Type>.cs'` is forbidden outright — including with `2>/dev/null`, `| head`, or "just to locate the file". Permitted roots: the repo root, the resolved global-packages folder, and `$HOME`. Read back the root argument of every recursive command before running it.
 
-Use `microsoft_code_sample_search` to get official, working examples:
+## Version
 
-```
-microsoft_code_sample_search(query: "upload file to blob storage", language: "csharp")
-microsoft_code_sample_search(query: "authenticate with managed identity", language: "python")
-microsoft_code_sample_search(query: "send message service bus", language: "javascript")
-```
+For a NuGet package, search `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `Directory.Solution.targets`, and `*.csproj` in the workspace. If absent, read `obj/project.assets.json` for the resolved transitive version. For another SDK, read its dependency manifest and lockfile. Do not reuse a version from an earlier session.
 
-**When to use:**
-- Before writing code—find a working pattern to follow
-- After errors—compare your code against a known-good sample
-- Unsure of initialization/setup—samples show complete context
+## Workflow
 
-## API Lookups
-
-```
-# Verify method exists (include namespace for precision)
-"BlobClient UploadAsync Azure.Storage.Blobs"
-"GraphServiceClient Users Microsoft.Graph"
-
-# Find class/interface
-"DefaultAzureCredential class Azure.Identity"
-
-# Find correct package
-"Azure Blob Storage NuGet package"
-"azure-storage-blob pip package"
-```
-
-Fetch full page when method has multiple overloads or you need complete parameter details.
-
-## Error Troubleshooting
-
-Use `microsoft_code_sample_search` to find working code samples and compare with your implementation. For specific errors, use `microsoft_docs_search` and `microsoft_docs_fetch`:
-
-| Error Type | Query |
-|------------|-------|
-| Method not found | `"[ClassName] methods [Namespace]"` |
-| Type not found | `"[TypeName] NuGet package namespace"` |
-| Wrong signature | `"[ClassName] [MethodName] overloads"` → fetch full page |
-| Deprecated warning | `"[OldType] migration v12"` |
-| Auth failure | `"DefaultAzureCredential troubleshooting"` |
-| 403 Forbidden | `"[ServiceName] RBAC permissions"` |
-
-## When to Verify
-
-Always verify when:
-- Method name seems "too convenient" (`UploadFile` vs actual `Upload`)
-- Mixing SDK versions (v11 `CloudBlobClient` vs v12 `BlobServiceClient`)
-- Package name doesn't follow conventions (`Azure.*` for .NET, `azure-*` for Python)
-- Using an API for the first time
-
-## Validation Workflow
-
-Before generating code using Microsoft SDKs, verify it's correct:
-
-1. **Confirm method or package exists** — `microsoft_docs_search(query: "[ClassName] [MethodName] [Namespace]")`
-2. **Fetch full details** (for overloads/complex params) — `microsoft_docs_fetch(url: "...")`
-3. **Find working sample** — `microsoft_code_sample_search(query: "[task]", language: "[lang]")`
-
-For simple lookups, step 1 alone may suffice. For complex API usage, complete all three steps.
-
-## CLI Alternative
-
-If the Learn MCP server is not available, use the `mslearn` CLI from the command line instead:
-
-```sh
-# Run directly (no install needed)
-npx @microsoft/learn-cli search "BlobClient UploadAsync Azure.Storage.Blobs"
-
-# Or install globally, then run
-npm install -g @microsoft/learn-cli
-mslearn search "BlobClient UploadAsync Azure.Storage.Blobs"
-```
-
-| MCP Tool | CLI Command |
-|----------|-------------|
-| `microsoft_docs_search(query: "...")` | `mslearn search "..."` |
-| `microsoft_code_sample_search(query: "...", language: "...")` | `mslearn code-search "..." --language ...` |
-| `microsoft_docs_fetch(url: "...")` | `mslearn fetch "..."` |
-
-Pass `--json` to `search` or `code-search` to get raw JSON output for further processing.
+1. For a NuGet, .NET library, or API request, identify the owning package and resolve its version.
+2. Search for the package, resolved version, namespace, type, member, task, and target language.
+3. Fetch complete details for overloads, parameters, migrations, or unclear excerpts.
+4. Find a sample before writing unfamiliar code; compare it with failing code during debugging.
+5. If Learn MCP is unavailable, use the equivalent `mslearn` CLI command.
