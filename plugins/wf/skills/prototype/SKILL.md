@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: Build throwaway prototypes that answer one design or technical question. Use for logic/state, UI/frontend, SDK/API/integration, cloud/resource, message-broker, database, or backend/runtime behavior before committing production code.
+description: Build a minimal throwaway prototype to answer one uncertain technical question by observing actual behavior. Use to validate feasibility, assumptions, or behavior for logic/state, UI/frontend, SDK/API/integration, cloud resources, message brokers, databases, or backend/runtime systems before committing production code.
 ---
 
 # Prototype
