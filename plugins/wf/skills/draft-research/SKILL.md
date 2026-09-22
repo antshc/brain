@@ -22,6 +22,8 @@ Run `/grilling` skill over the user's request and the available context. Treat t
 
 Ask only questions that can change the research scope or plan. Use facts already present in the conversation or discoverable from the environment; preserve unresolved factual claims as unknowns for the research. Keep the six branches after **Frame the Question** optional and close each one as soon as it adds no decision value.
 
+For third-party API or SDK research, inspect manifests, lockfiles, imports, and configuration to resolve the exact version in use. If the codebase does not establish it, ask the user which API or SDK version to research. Record the resolved version in the question or constraints.
+
 **Done when:** the user confirms shared understanding, the question names both subject and intended outcome, and no unresolved branch can materially change the brief.
 
 ## 2. Draft the one-pager
