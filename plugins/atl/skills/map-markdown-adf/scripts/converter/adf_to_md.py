@@ -55,6 +55,8 @@ def render_block(node: dict) -> str:
         return rendered
     if node_type == "extension":
         extension_key = node.get("attrs", {}).get("extensionKey", "")
+        if extension_key == "toc":
+            return "<!-- adf:toc -->"
         if "static/drawio" in extension_key:
             diagram_name = (
                 node.get("attrs", {}).get("parameters", {}).get("guestParams", {}).get("diagramName", "")
@@ -157,9 +159,18 @@ def render_inline(nodes: list[dict]) -> str:
             parts.append("  \n")
         elif node_type == "status":
             parts.append(render_status(node))
+        elif node_type == "inlineCard":
+            parts.append(render_inline_card(node))
         else:
             raise NotImplementedError(f"unhandled inline node type '{node_type}'")
     return "".join(parts)
+
+
+def render_inline_card(node: dict) -> str:
+    url = node.get("attrs", {}).get("url", "")
+    if not url:
+        raise ValueError("inlineCard node is missing a non-empty url")
+    return f"[{url}]({url})"
 
 
 def render_status(node: dict) -> str:

@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
             doc = json.loads(source)
             sys.stdout.write(adf_to_markdown(doc))
             sys.stdout.write("\n")
-    except ValueError as exc:
+    except (ValueError, NotImplementedError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 

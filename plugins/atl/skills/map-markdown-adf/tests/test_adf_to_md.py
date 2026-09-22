@@ -138,6 +138,81 @@ def test_expand_with_toc_extension_renders_toc_comment(adf_to_md):
     assert adf_to_md(doc) == "<!-- adf:toc -->"
 
 
+def _toc_extension():
+    return {
+        "type": "extension",
+        "attrs": {
+            "layout": "default",
+            "extensionType": "com.atlassian.confluence.macro.core",
+            "extensionKey": "toc",
+            "parameters": {"macroParams": {}},
+        },
+    }
+
+
+def test_standalone_toc_extension_renders_toc_comment(adf_to_md):
+    doc = _doc(_toc_extension())
+    assert adf_to_md(doc) == "<!-- adf:toc -->"
+
+
+def test_expand_with_toc_among_other_content_keeps_details_wrapper(adf_to_md):
+    doc = _doc(
+        {
+            "type": "expand",
+            "attrs": {"title": "Overview"},
+            "content": [_toc_extension(), _p(_t("more content"))],
+        }
+    )
+    assert adf_to_md(doc) == (
+        "<details>\n<summary>Overview</summary>\n\n<!-- adf:toc -->\n\nmore content\n</details>"
+    )
+
+
+def test_inline_card_renders_url_as_a_markdown_link(adf_to_md):
+    doc = _doc(_p({"type": "inlineCard", "attrs": {"url": "https://example.atlassian.net/wiki/x/AbCdE"}}))
+    assert adf_to_md(doc) == "[https://example.atlassian.net/wiki/x/AbCdE](https://example.atlassian.net/wiki/x/AbCdE)"
+
+
+def test_inline_card_inside_list_item_and_table_cell(adf_to_md):
+    doc = _doc(
+        {
+            "type": "bulletList",
+            "content": [
+                {
+                    "type": "listItem",
+                    "content": [_p({"type": "inlineCard", "attrs": {"url": "https://example.com/a"}})],
+                }
+            ],
+        },
+        {
+            "type": "table",
+            "attrs": {"isNumberColumnEnabled": False, "layout": "default"},
+            "content": [
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {
+                            "type": "tableCell",
+                            "content": [_p({"type": "inlineCard", "attrs": {"url": "https://example.com/b"}})],
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+    assert adf_to_md(doc) == (
+        "- [https://example.com/a](https://example.com/a)\n\n"
+        "| [https://example.com/b](https://example.com/b) |"
+    )
+
+
+def test_inline_card_without_url_raises(run_cli):
+    doc = _doc(_p({"type": "inlineCard", "attrs": {}}))
+    result = run_cli("adf-to-md", json.dumps(doc))
+    assert result.returncode != 0
+    assert "inlineCard" in result.stderr
+
+
 def test_table(adf_to_md):
     doc = _doc(
         {

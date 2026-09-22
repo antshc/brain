@@ -27,7 +27,7 @@ Stdin Markdown → stdout one ADF document (`{"version": 1, "type": "doc", "cont
 python scripts/map_markdown_adf.py adf-to-md < input.json > output.md
 ```
 
-Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) becomes a `<!-- adf:diagram ... -->` placeholder naming the diagram. A `media`/`mediaSingle`/`mediaGroup` node (a `mediaGroup` can hold more than one file) becomes a neutral `<!-- adf:attachment ... -->` placeholder per file — it could be a diagram, a plain image, or an arbitrary attached file; classifying and resolving it is `/fetch-page`'s job for a Confluence page (matching by `media-id`) and `/fetch-work`'s job for a Jira issue (matching by filename via `alt` — see its own SKILL.md), not this converter's. When the source `media` node carries both `width` and `height` (an image attached through the Confluence/Jira UI, never a generic-file `mediaGroup` node), the placeholder also carries `width="<w>" height="<h>"` so the caller can pass that reported size along. Every other unrecognized node type still raises `NotImplementedError`.
+Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) becomes a `<!-- adf:diagram ... -->` placeholder naming the diagram. A bare `extension` whose `extensionKey` is `toc` (Confluence's table-of-contents macro, standalone or alongside other content — not just as an `expand`'s sole child) becomes `<!-- adf:toc -->`. An `inlineCard` (a Confluence smart link) becomes a normal Markdown link, `[<url>](<url>)`, using its `attrs.url` as both label and destination — the URL is the only stable value a smart card carries; an `inlineCard` with no non-empty `url` raises a clear `ValueError` instead of silently dropping it. A `media`/`mediaSingle`/`mediaGroup` node (a `mediaGroup` can hold more than one file) becomes a neutral `<!-- adf:attachment ... -->` placeholder per file — it could be a diagram, a plain image, or an arbitrary attached file; classifying and resolving it is `/fetch-page`'s job for a Confluence page (matching by `media-id`) and `/fetch-work`'s job for a Jira issue (matching by filename via `alt` — see its own SKILL.md), not this converter's. When the source `media` node carries both `width` and `height` (an image attached through the Confluence/Jira UI, never a generic-file `mediaGroup` node), the placeholder also carries `width="<w>" height="<h>"` so the caller can pass that reported size along. Every other unrecognized node type still raises `NotImplementedError` — republishing an `inlineCard` this way normalizes its presentation to a plain link while preserving the URL; there is no reverse (`md-to-adf`) direction for a smart card, since Markdown has no way to distinguish one from an ordinary link. Every subprocess rejection (a `ValueError` or `NotImplementedError`) is reported on stderr as `error: <reason>` with a non-zero exit and no Python traceback — the CLI is the one place that ever needs to see the raw exception.
 
 ## Action: Detect ADF-only constructs
 
@@ -59,10 +59,11 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | Table | `table` / `tableRow` / `tableHeader` / `tableCell` |
 | Horizontal rule (`---`) | `rule` |
 | `<details><summary>` | `expand` (`attrs.title`) — **ADF-only** |
-| `<!-- adf:toc -->` | `expand` + `toc` extension — **ADF-only** |
+| `<!-- adf:toc -->` | `expand` + `toc` extension (`md-to-adf`); a bare `toc` extension, standalone or alongside other content in an `expand`, also converts back (`adf-to-md`) — **ADF-only** |
 | `<!-- adf:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
 | `<!-- adf:diagram drawio="<name>" -->` | `extension` (Draw.io macro) — **ADF-only, `adf-to-md` direction only** |
 | `<!-- adf:attachment media-id="<id>" alt="<alt>" [width="<w>" height="<h>"] -->` | `mediaSingle`/`media`/`mediaGroup` (one placeholder per file) — **ADF-only, `adf-to-md` direction only** |
+| n/a (no reverse mapping) | `inlineCard` (Confluence smart link) → `[<url>](<url>)` — **ADF-only, `adf-to-md` direction only** |
 
 A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `  continues here` is one `listItem`, not a list plus a stray paragraph:
 
