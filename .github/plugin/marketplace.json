@@ -35,13 +35,13 @@
             "description": "Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions."
         },
         {
-            "name": "azure-platform",
-            "source": "./plugins/azure-platform",
+            "name": "ms",
+            "source": "./plugins/ms",
             "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, resource operation, and implementation-constraint research skills."
         },
         {
-            "name": "aws-platform",
-            "source": "./plugins/aws-platform",
+            "name": "aws",
+            "source": "./plugins/aws",
             "description": "AWS documentation, SDK reference, and implementation-constraint research skills."
         },
         {

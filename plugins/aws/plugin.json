@@ -1,5 +1,5 @@
 {
-  "name": "aws-platform",
+  "name": "aws",
   "version": "1.1.0",
   "description": "AWS documentation, SDK reference, and implementation-constraint research skills.",
   "skills": ["./skills"],

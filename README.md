@@ -48,20 +48,23 @@ copilot plugin install harness@brain
 copilot plugin install atl@brain
 ```
 
-### Azure platform plugin (azure-platform)
+### Microsoft platform plugin (ms)
 
 ```sh
 (copilot plugin uninstall az@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall learn-ms@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true) && \
-copilot plugin install azure-platform@brain
+(copilot plugin uninstall azure@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall ms@brain >/dev/null 2>&1 || true) && \
+copilot plugin install ms@brain
 ```
 
-### AWS platform plugin (aws-platform)
+### AWS plugin (aws)
 
 ```sh
 (copilot plugin uninstall aws-platform@brain >/dev/null 2>&1 || true) && \
-copilot plugin install aws-platform@brain
+(copilot plugin uninstall aws@brain >/dev/null 2>&1 || true) && \
+copilot plugin install aws@brain
 ```
 
 ### Solution plugin
@@ -196,23 +199,23 @@ Atlassian workflow skills.
 - [fetch-page](plugins/atl/skills/fetch-page/SKILL.md) / [publish-page](plugins/atl/skills/publish-page/SKILL.md): fetch or create/update a Confluence page.
 - [map-markdown-adf](plugins/atl/skills/map-markdown-adf/SKILL.md): convert Markdown to/from Atlassian Document Format, and detect the constructs only ADF can express.
 
-### azure-platform
+### ms
 
 Microsoft documentation, SDK reference, Azure CLI setup, authentication, resource operation, and implementation-constraint research skills.
 
-- [init-cli](plugins/azure-platform/skills/init-cli/SKILL.md) / [auth-principal](plugins/azure-platform/skills/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
-- [query-azure](plugins/azure-platform/skills/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
-- [search-ms-docs](plugins/azure-platform/skills/search-ms-docs/SKILL.md): query official Microsoft documentation.
-- [search-ms-code-samples](plugins/azure-platform/skills/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.
-- [research-azure](plugins/azure-platform/skills/research-azure/SKILL.md): research Azure implementation constraints — operations, SDK, RBAC, networking, quotas, retries, failures — with provider evidence.
+- [init-cli](plugins/ms/skills/init-cli/SKILL.md) / [auth-principal](plugins/ms/skills/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
+- [query-azure](plugins/ms/skills/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
+- [search-ms-docs](plugins/ms/skills/search-ms-docs/SKILL.md): query official Microsoft documentation.
+- [search-ms-code-samples](plugins/ms/skills/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.
+- [research-azure](plugins/ms/skills/research-azure/SKILL.md): research Azure implementation constraints — operations, SDK, RBAC, networking, quotas, retries, failures — with provider evidence.
 
-### aws-platform
+### aws
 
 AWS documentation, SDK reference, and implementation-constraint research skills.
 
-- [search-aws-docs](plugins/aws-platform/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
-- [search-aws-sdk-nuget](plugins/aws-platform/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
-- [research-aws](plugins/aws-platform/skills/research-aws/SKILL.md): research AWS implementation constraints — APIs, SDK, IAM, networking, quotas, retries, failures — with provider evidence.
+- [search-aws-docs](plugins/aws/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
+- [search-aws-sdk-nuget](plugins/aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
+- [research-aws](plugins/aws/skills/research-aws/SKILL.md): research AWS implementation constraints — APIs, SDK, IAM, networking, quotas, retries, failures — with provider evidence.
 
 ### solution
 
