@@ -124,7 +124,9 @@ Usually larger; describes what the system can do, not necessarily one mergeable 
 A user-meaningful product behavior that delivers all or part of a capability. A feature may comprise multiple functional slices and can be released only once the slices it requires are complete.
 
 **Functional slice**:
-A coherent, independently mergeable and testable unit of system behavior. A slice may contribute to multiple features, be invoked through any entry point, and remain hidden behind a feature flag until its feature is complete.
+A functional slice is an end-to-end implementation of a distinct system behavior or outcome.
+Its boundaries follow functional responsibility rather than technical layers.
+Its test seams are the observable inputs and outputs where the slice can be tested independently.
 
 **Inspect**:
 Look at something directly and record what is there.
