@@ -20,7 +20,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 3. **Derive acceptance criteria** → apply the Acceptance Criteria rule below. *Done when* every Business Rule, Edge Case, and error condition in the source requirement lands in its own criterion, and each of input, processing, integration, state, and failure is covered.
 4. **Scope to the layer** → a **BE** story's criteria cover API/data/contract/business-rule behavior; an **FE** story's cover presentation/interaction behavior. *Done when* no criterion tests the other layer's behavior.
 5. **Verify** → Run `/solution-agnostic` skill over the capability title, stakeholder requirement, functional requirements, and acceptance criteria only, passing `CONTEXT.md` as the domain glossary — never the sync-metadata block or the Technical notes appendix — then confirm each criterion implies concrete code changes and maps to a responsibility. *Done when* the Quality Check below passes line by line.
-6. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, Run `/draft-contract-delta` skill **Assemble and write a contract delta** once per touched contract kind and append its output as the story's optional Contracts Delta appendix. For an `[FE]` story that adds or changes a surface, GUI component, or interaction, also Run that skill's **Assemble and write a GUI delta** and append its output as the **GUI delta** block closing that same appendix — a `[BE]` story never carries one. This appendix is technical, sits outside the Capability/Acceptance Criteria body, and is exempt from the scrub in step 5.
+6. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, Run `/contract-delta` skill **Assemble and write a contract delta** once per touched contract kind and append its output as the story's optional Contracts Delta appendix. For an `[FE]` story that adds or changes a surface, GUI component, or interaction, also Run that skill's **Assemble and write a GUI delta** and append its output as the **GUI delta** block closing that same appendix — a `[BE]` story never carries one. This appendix is technical, sits outside the Capability/Acceptance Criteria body, and is exempt from the scrub in step 5.
 
 ## Acceptance Criteria
 <acceptance-criteria-rule>
@@ -40,7 +40,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 - Each criterion implies clear code changes and a QA could confirm pass/fail by testing. If not, rewrite.
 - Jira ID, Epic ID, and Blocked-by sit in a metadata block directly under the heading, outside the scrubbed body; Blocked-by lists only `(Story n, Jira ID placeholder)` pairs the caller supplied, or `None`.
 - Implementation Decisions may name classes, types, objects, or endpoints for navigation, but never a file path or line number.
-- An `[FE]` story that changes a surface or interaction carries a GUI delta block closing Contracts Delta, passing `/draft-contract-delta`'s own Done-when checks; a `[BE]` story carries neither.
+- An `[FE]` story that changes a surface or interaction carries a GUI delta block closing Contracts Delta, passing `/contract-delta`'s own Done-when checks; a `[BE]` story carries neither.
 - The `[SLUG]` feature tag is present in the heading only if the user asked for it, is SCREAMING_SNAKE_CASE, and — if already present on a story being edited — is kept unchanged.
 
 ## Output Format
