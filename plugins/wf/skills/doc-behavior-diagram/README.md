@@ -1,6 +1,6 @@
 # Behavior Diagram
 
-Presentation examples for the `behavior-diagram` skill.
+Presentation examples for the `doc-behavior-diagram` skill.
 
 ## Flowchart Example
 

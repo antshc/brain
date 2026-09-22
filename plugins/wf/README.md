@@ -37,3 +37,20 @@ flowchart TD
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
+## Skills
+
+| Group                        | Purpose                                      | Current skills                                                                            |
+| ---------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **discover- / investigate-** | Resolve unknowns                             | `wayfinder`, `grill-design`, `questioning`, `prototype`, `explore-codebase`               |
+| **research-**                | Gather evidence                              | `research`, `research-system`, `define-research`                                          |
+| **to-**                      | Transform one artifact/state into another    | `to-capabilities`, `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
+| **draft-**                   | Author standalone working artifacts          | `draft-story`                                                                             |
+| **record-**                  | Persist established knowledge                | `record-adr`, `record-concept`, `record-service`, `record-term`, `record-deployment-view` |
+| **doc-**                     | Visualize, document existing knowledge       | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`   |
+| **docs- / setup-**           | Workflow plugin documentation infrastructure | `bootstrap-docs`, `index-docs`, `init-wf`                                                 |
+| **manage- / track-**         | Workflow state                               | `manage-backlog`, `track-ledger`                                                          |
+| **transform- / normalize-**  | Rewrite/reshape content                      | `normalize-requirements`                                                                  |
+
+
+

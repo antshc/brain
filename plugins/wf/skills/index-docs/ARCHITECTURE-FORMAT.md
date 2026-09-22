@@ -73,7 +73,7 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 An ADR records a point-in-time, localized decision — hard to reverse, non-obvious, and the result of a real trade-off. See the `record-adr` skill.
 
-<!-- One row per ADR. {{nnnn}}/{{slug}}: file identity. {{decisionTitle}}: short title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while grilling the change. {{summary}}: 1-3 agent-optimized sentences. See the `record-adr` skill. -->
+<!-- One row per ADR. {{nnnn}}/{{slug}}: file identity. {{decisionTitle}}: short title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change. {{summary}}: 1-3 agent-optimized sentences. See the `record-adr` skill. -->
 
 | # | Decision | Trigger condition | Summary |
 |---|----------|--------------------|---------|
@@ -87,7 +87,7 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- One row per Concept — the backbone rules of the solution. {{nnnn}}/{{slug}}: file identity. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while grilling the change; a blank cell never matches. {{summary}}: terse, agent-optimized. See the `record-concept` skill. -->
+<!-- One row per Concept — the backbone rules of the solution. {{nnnn}}/{{slug}}: file identity. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: terse, agent-optimized. See the `record-concept` skill. -->
 
 | # | Concept | Trigger condition | Summary |
 |---|----------|--------------------|---------|

@@ -49,19 +49,19 @@ Inputs: `{{recordContent}}`, `{{rowValues}}`, `{{domainGlossary}}`, `{{grillingC
 
 1. If `{{recordContent}}` already carries a `trigger` frontmatter key, return it unchanged — it is authoritative; do not regenerate.
 2. Extract entities, data shapes, behaviors, boundaries, interfaces, folders, change types, constraints.
-3. Generate concise, comma-separated phrases in domain-specific language likely to arise during grilling.
+3. Generate concise, comma-separated phrases in domain-specific language likely to arise during questioning.
 4. Prefer high-signal phrases and real domain synonyms. Exclude generic phrases, title-only phrases, and the generation requirement itself.
 
 Return one Trigger condition value. The caller writes it into the record's frontmatter; the row is then synced from there.
 
 ## Scan and match
 
-Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{grillingContext}}`, `{{domainGlossary}}`. `{{tableMetadata}}` is the file/section boundary, headers, Trigger condition column, and row locator rules; for this file's own three tables it is implied — the caller passes only the table name (`Services`, `Architecture Decision Records`, `Crosscutting Concepts`). Callers supply the touched surface, grilling context, and glossary — never the table shape. `{{touchedSurface}}` may carry domain terms, file paths, or both; a caller that knows which files a change touches passes them, and one that only has terms passes terms.
+Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{questioningContext}}`, `{{domainGlossary}}`. `{{tableMetadata}}` is the file/section boundary, headers, Trigger condition column, and row locator rules; for this file's own three tables it is implied — the caller passes only the table name (`Services`, `Architecture Decision Records`, `Crosscutting Concepts`). Callers supply the touched surface, questioning context, and glossary — never the table shape. `{{touchedSurface}}` may carry domain terms, file paths, or both; a caller that knows which files a change touches passes them, and one that only has terms passes terms.
 
 1. Absent or empty table: no matches.
 2. Absent Trigger condition column: table-contract error.
 3. Read each row's Trigger condition cell; a blank cell never matches.
-4. Split non-blank cells on commas; match each clause semantically against the touched surface and grilling context, using the glossary for domain terms and paraphrases.
+4. Split non-blank cells on commas; match each clause semantically against the touched surface and questioning context, using the glossary for domain terms and paraphrases.
 5. Where `{{touchedSurface}}` carries file paths, also read the linked record's frontmatter and match those paths against its `applies_to` globs. A glob hit is a match even when no trigger clause fires; a glob **miss never overrides a trigger-clause match** — `applies_to` only widens the verdict, never narrows it. A record with no `applies_to`, or one whose globs are `**`, is decided on trigger clauses alone.
 6. Open the linked record's body only when its locator is supplied and resolvable. Having opened one, treat its `related` ids as candidates and scan their rows too.
 7. Report matched clauses and rationale for matches; checked clauses and rationale for non-matches. Where a match came from `applies_to` rather than a trigger clause, say so — it usually means the Trigger condition cell has a gap worth refining.

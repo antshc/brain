@@ -1,6 +1,6 @@
 # Code Diagram
 
-Presentation examples for the `code-diagram` skill.
+Presentation examples for the `doc-code-diagram` skill.
 
 ## Class Diagram Example
 

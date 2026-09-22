@@ -10,7 +10,7 @@ LABELS: list[tuple[str, str, str]] = [
     ("wayfinder:map", "0e8a16", "Marks the map issue itself"),
     ("wayfinder:research", "1d76db", "Research-type decision ticket"),
     ("wayfinder:prototype", "5319e7", "Prototype-type decision ticket"),
-    ("wayfinder:grilling", "fbca04", "Grilling-type decision ticket"),
+    ("wayfinder:questioning", "fbca04", "Questioning-type decision ticket"),
     ("wayfinder:task", "d93f0b", "Manual-work decision ticket"),
 ]
 
