@@ -29,6 +29,14 @@ The grill produces exactly two things: **questions** and **records**. Writable s
 
 Interview me relentlessly about every aspect of this until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. Ask **one question at a time** and wait for the answer — multiple questions at once are bewildering. Give your recommended answer with each question.
 
+Format each question like so:
+
+```
+❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+
+➡️ <your recommended answer>
+```
+
 **Turn shape** — every turn ends on one of two moves: the next question, or the explicit ask to close the session. Lookups, ledger lines, and record writes are the middle of a turn; a turn that ends on a write is unfinished, so name the branch it opened or closed and ask the next question in that same turn.
 
 If a *fact* is discoverable in the environment (filesystem, tools), look it up rather than asking. If a *decision* clears the evidence checklist below, take it as a Feature Assumption rather than asking; if any part fails, put it to me and wait.
