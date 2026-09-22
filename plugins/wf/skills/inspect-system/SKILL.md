@@ -1,6 +1,6 @@
 ---
 name: inspect-system
-description: "Inspect a software system as-built and write a Markdown research document citing every claim with filename-only file references and visible line numbers. Use when asked how a capability works inside one deployable, to trace a flow across deployables and document its integration contracts, or to settle a question turning on data — keys, ownership, consistency, migration, concurrency, retention."
+description: "Inspect a software system as-built and write a Markdown inspection document citing every claim with filename-only file references and visible line numbers. Use when asked how behavior is implemented inside one deployable, to trace a flow across deployables and document its integration contracts, or to settle a question turning on data — keys, ownership, consistency, migration, concurrency, retention."
 ---
 
 # Inspect a system
@@ -15,12 +15,12 @@ Three axes, one per unit of inspection. Pick by the unit the question is about, 
 
 Write to the axis's output path unless the user names a location. Every path is flat — one file directly in `docs/ongoing/`, no subfolder. Fill its template, obeying the `**Rules**` blocks and deleting every one of them from the result.
 
-### Capability — one deployable
+### Behavior — one deployable
 
-The unit is one symbol chain inside one deployable: the trace starts at this unit's triggers and stops at its observable outcomes. Pick it for how something works, where a decision is made, what a change touches, which implementation or double actually serves a call.
+Inspect how one behavior is implemented inside a deployable. Start from a trigger, follow the executing symbol chain and decisions, and stop at observable outcomes or deployable boundaries. Pick it for how something works, where a decision is made, what a change touches, or which implementation or double actually serves a call.
 
-- References: [capability-research.md](references/capability-research.md)
-- Template: [capability-research-template.md](templates/capability-research-template.md)
+- References: [behavior-inspection.md](references/behavior-inspection.md)
+- Template: [behavior-inspection-template.md](templates/behavior-inspection-template.md)
 - Output: `docs/ongoing/research-{{slug}}.md`, or `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` when the user asks for a lane of an existing chain
 
 **Diagram:** Pick the diagram from what the question asks, then Run its owning skill for syntax and styling — never compose Mermaid from memory.
@@ -35,7 +35,7 @@ The unit is one symbol chain inside one deployable: the trace starts at this uni
 | where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `/doc-architecture-diagram` |
 | which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `/doc-code-diagram` |
 
-A traced capability defaults to the **sequence diagram**; Run `/doc-behavior-diagram` skill before drafting it.
+A traced behavior defaults to the **sequence diagram**; Run `/doc-behavior-diagram` skill before drafting it.
 
 Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep file references in the tables; use class, method, or file names with exact lines in the diagram only when the user asks for them.
 
@@ -43,36 +43,37 @@ Default to one: triggers enter as parallel participants meeting at the convergen
 
 Render the Mermaid block before declaring the inspection complete. Run `/render-mermaid-png` skill only when the user wants an exported image.
 
-### Deployables — one chain
+### Flow — cross-deployable chain
 
-The unit is one **deployable** per lane — something independently runnable or deployed in production: a process, service, container, function, host workload, or scheduled job. Trace breadth first across every outcome-relevant deployable whose executing source you can open, and end each branch at a system whose source you cannot or whose behavior is outside the framed outcome. Pick it when the flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
+Inspect how one system behavior travels across runtime or deployment boundaries. Each lane is one **deployable** — something independently runnable or deployed in production: a process, service, container, function, host workload, or scheduled job — and each crossing identifies its contract. Trace breadth first across every outcome-relevant deployable whose executing source you can open, and end each branch at a system whose source you cannot or whose behavior is outside the framed outcome. Pick it when the behavior crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
 
-- References: [deployables-research.md](references/deployables-research.md)
-- Template: [deployables-research-template.md](templates/deployables-research-template.md)
+- References: [flow-inspection.md](references/flow-inspection.md)
+- Template: [flow-inspection-template.md](templates/flow-inspection-template.md)
 - Output: exactly one file, `docs/ongoing/research-{{slug}}-chain.md`. A chain run writes no other document.
 
 **Diagram:** Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. Follow `/doc-behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
 
 Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
 
-Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/doc-architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
+Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/doc-architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Behavior follow-ups; lane internals belong only to the requested lane's Behavior-axis document.
 
 Render the Mermaid block before declaring the inspection complete. Done means each deployable has exactly one lane containing 1–5 boundary-relevant major-step nodes, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
 
-### Data — one item type and its store
+### Data — one data boundary
 
-The unit is one item type and the store holding it — one writer, many readers, a boundary cutting across services and often across repos. Pick it when the question turns on key design, who owns a table, whether a read can be stale, how an attribute is migrated, whether concurrent writes are safe, or how records are aged out.
+Inspect persistence semantics around one data boundary: the governed item type, its authoritative writer, readers, storage, consistency, concurrency, migration, retention, and deletion behavior. Pick it when the question turns on key design, ownership, stale reads, attribute migration, concurrent writes, retention, or deletion.
 
-- References: [data-research.md](references/data-research.md)
-- Template: [data-research-template.md](templates/data-research-template.md)
+- References: [data-inspection.md](references/data-inspection.md)
+- Template: [data-inspection-template.md](templates/data-inspection-template.md)
 - Output: `docs/ongoing/research-{{slug}}-data.md`
 
 **Diagram:** None by default — the store, key, and shape tables carry the answer. When the user asks for one, pick the diagram from the question and Run its owning skill: `/doc-behavior-diagram` for access order or branching, `/doc-architecture-diagram` for ownership or deployment boundaries, and `/doc-code-diagram` for item types and their relationships. Keep evidence in the tables and render the Mermaid block before declaring the inspection complete.
 
 ### Crossing axes
 
-- A chain run ends at the chain document. Add a Capability follow-up only when the framed outcome depends on a lane's internal decision and its boundary contracts do not explain it. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
-- Run the Capability axis only after the user requests a listed follow-up. Write `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the follow-up question verbatim, use its inbound contract as the entry point, use its expected outbound contracts to bound observable outcomes, and link the result from that follow-up row.
+- A Flow run ends at the chain document. Add a Behavior follow-up only when the framed outcome depends on a lane's internal decision and its boundary contracts do not explain it. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
+- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/ongoing/research-{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the follow-up question verbatim, use its inbound contract as the entry point, use its expected outbound contracts to bound observable outcomes, and link the result from that follow-up row.
+- Run the Data axis when either Flow or Behavior inspection reaches a persistence question whose correctness depends on ownership, keys, consistency, migration, concurrency, retention, or deletion.
 - Provider semantics, quotas, and API parameters behind a managed service belong to the provider, not this repo: Run `/research-aws` skill or `/research-azure` skill.
 
 ## Evidence ladder

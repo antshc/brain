@@ -1,4 +1,4 @@
-# Data Research: {{subject}}
+# Data Inspection: {{subject}}
 
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 

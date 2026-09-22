@@ -12,7 +12,7 @@ Use this shape:
 
 Include the details that materially change the investigation:
 
-- Name the capability, deployable, message, item type, store, route, job, or configuration key you already know.
+- Name the capability, behavior, deployable, message, item type, store, route, job, or configuration key you already know.
 - Ask one concrete question that the inspection must answer, not a broad request to "document the system."
 - State where the trace starts and what observable outcome, process boundary, or external system ends it.
 - Name important branches such as feature flags, provider selection, retries, failures, fallbacks, or asynchronous paths.
@@ -20,13 +20,13 @@ Include the details that materially change the investigation:
 - Mention suspected mocks, emulators, or development-only stores so the inspection can distinguish wiring from production behavior.
 - Request a probe when static code cannot settle a runtime claim, and say which commands or environments are safe to use.
 - Provide an output path only when the default location under `docs/ongoing/` is unsuitable.
-- Keep one inspection unit per instruction. Split unrelated capabilities, chains, or data items into separate requests.
+- Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
 The skill selects the inspection axis and appropriate diagram from the question. Describe what you need to understand rather than prescribing a diagram type.
 
-## Capability instruction examples
+## Behavior instruction examples
 
-Use the Capability axis for behavior inside one deployable.
+Use the Behavior axis for implementation behavior inside one deployable.
 
 **Focused call chain**
 
@@ -42,9 +42,9 @@ Use the Capability axis for behavior inside one deployable.
 
 This leaves the entry point, outcome, deployable, and deciding question undefined, so the result is likely to be broad or based on assumptions.
 
-## Deployable-chain instruction examples
+## Flow instruction examples
 
-Use the Deployables axis when the behavior crosses independently runnable or deployed processes.
+Use the Flow axis when the behavior crosses independently runnable or deployed processes.
 
 **End-to-end message path**
 

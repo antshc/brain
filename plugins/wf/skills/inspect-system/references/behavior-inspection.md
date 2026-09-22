@@ -1,4 +1,4 @@
-# Capability axis — one deployable
+# Behavior axis — one deployable
 
 The document carries a mermaid diagram of the confirmed mechanism. Scope is one deployable: the trace starts at this unit's triggers and stops at its observable outcomes.
 
@@ -18,15 +18,15 @@ The document carries a mermaid diagram of the confirmed mechanism. Scope is one 
 
 ## Surface map
 
-A capability has many triggers and observable outcomes; tracing one of each answers a narrower question than the one asked.
+A behavior can have many triggers and observable outcomes; tracing one of each answers a narrower question than the one asked.
 
 - **Triggers** — REST/RPC route, GUI action, client library, CLI, scheduled job, queue or event consumer, webhook. Several usually converge on one core; each can apply its own auth, validation, defaults, and deserialization first. Cite each trigger and its **convergence point**, then trace once below it and note per-trigger differences as Facts.
 - **Observable outcomes** — independently observable persisted writes, published events, outbound calls, files, cache invalidations, notifications, response payloads, and logs or metrics another system consumes. Reads, validations, branch decisions, internal calls, and calculations stay in Mechanism or Facts unless they themselves create an observable result. Separate outcomes with different timing or transactionality.
-- **Boundary** — an outcome that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by the **Deployables** axis.
+- **Boundary** — an outcome that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by the **Flow** axis.
 
 ## Providers and fallback
 
-A capability may have several providers behind one outcome — picked by config, flag, or tenant tweak, and swapped again when the first fails or answers badly. The first implementation you find is a candidate, not the answer; the provider stays unresolved until selection and fallback both carry citations. Record the outbound call under Observable outcomes and explain why that provider serves it here.
+A behavior may have several providers behind one outcome — picked by config, flag, or tenant tweak, and swapped again when the first fails or answers badly. The first implementation you find is a candidate, not the answer; the provider stays unresolved until selection and fallback both carry citations. Record the outbound call under Observable outcomes and explain why that provider serves it here.
 
 Where the wiring hides: implementations of one interface resolved by factory, keyed registration, or injected collection · separate clients chained by an orchestrator or decorator · fallback in a resilience policy, HTTP handler, or gateway, leaving the call site a single call.
 
