@@ -1,4 +1,4 @@
-# Feature Research: {{featureName}}
+# Behavior Inspection: {{featureName}}
 
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
@@ -23,7 +23,7 @@
 
 ## Mechanism
 
-**Rules:** pick, label, and split the diagram per **Capability — one deployable** in the skill; the owning diagram skill's template governs syntax and styling — do not compose a Mermaid skeleton from this template. Every node traces back to a Fact row; the tables below carry the citations. Give each extra diagram a `### {{question this diagram answers}}` subsection.
+**Rules:** pick, label, and split the diagram per **Behavior — one deployable** in the skill; the owning diagram skill's template governs syntax and styling — do not compose a Mermaid skeleton from this template. Every node traces back to a Fact row; the tables below carry the citations. Give each extra diagram a `### {{question this diagram answers}}` subsection.
 
 {{diagram}}
 
