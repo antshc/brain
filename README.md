@@ -27,16 +27,14 @@ copilot plugin install harness@brain
 ```
 
 <details>
-<summary>Uninstall workflow plugins</summary>
+<summary>Uninstall deprecated plugins</summary>
 
 ```sh
-(copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
-(copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
-(copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall solution@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall learn-aws@brain >/dev/null 2>&1 || true) && \
-(copilot plugin uninstall review@brain >/dev/null 2>&1 || true)
+(copilot plugin uninstall aws-platform@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true)
 ```
 
 </details>

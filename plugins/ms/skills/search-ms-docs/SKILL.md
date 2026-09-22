@@ -1,6 +1,6 @@
 ---
 name: search-ms-docs
-description: Understand Microsoft technologies by querying official documentation. Use whenever the user asks how something works, wants tutorials, needs configuration options, limits, quotas, or best practices for any Microsoft technology (Azure, .NET, M365, Windows, Power Platform, etc.)—even if they don't mention "docs." If the question is about understanding a concept rather than writing code, use the `search-ms-code-samples` skill instead.
+description: Queries official Microsoft documentation for concepts, tutorials, configuration, limits, quotas, and best practices. Use for Microsoft technology questions that do not require implementation samples.
 compatibility: Primarily uses the Microsoft Learn MCP Server (https://learn.microsoft.com/api/mcp); if that is unavailable, fall back to the mslearn CLI (`npx @microsoft/learn-cli`).
 ---
 
@@ -8,49 +8,21 @@ compatibility: Primarily uses the Microsoft Learn MCP Server (https://learn.micr
 
 ## Tools
 
-| Tool | Use For |
-|------|---------|
-| `microsoft_docs_search` | Find documentation—concepts, guides, tutorials, configuration |
-| `microsoft_docs_fetch` | Get full page content (when search excerpts aren't enough) |
+| Tool | Purpose |
+|---|---|
+| `microsoft_docs_search` | Find official documentation. |
+| `microsoft_docs_fetch` | Read a result in full. |
 
-## When to Use
+**Hard stop.** No command in this workflow, or in any reasoning that leads to it, may be rooted at `/`, `/usr`, `/opt`, `/etc`, or `/home`. `find / -iname '<Type>.cs'` is forbidden outright — including with `2>/dev/null`, `| head`, or "just to locate the file". Permitted roots: the repo root, the resolved global-packages folder, and `$HOME`. Read back the root argument of every recursive command before running it.
 
-- **Understanding concepts** — "How does Cosmos DB partitioning work?"
-- **Learning a service** — "Azure Functions overview", "Container Apps architecture"
-- **Finding tutorials** — "quickstart", "getting started", "step-by-step"
-- **Configuration options** — "App Service configuration settings"
-- **Limits & quotas** — "Azure OpenAI rate limits", "Service Bus quotas"
-- **Best practices** — "Azure security best practices"
+## Version
 
-## Query Effectiveness
+For a NuGet package, search `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `Directory.Solution.targets`, and `*.csproj` in the workspace. If absent, read `obj/project.assets.json` for the resolved transitive version. For another SDK, read its dependency manifest and lockfile. Do not reuse a version from an earlier session.
 
-Good queries are specific:
+## Workflow
 
-```
-# ❌ Too broad
-"Azure Functions"
-
-# ✅ Specific
-"Azure Functions Python v2 programming model"
-"Cosmos DB partition key design best practices"
-"Container Apps scaling rules KEDA"
-```
-
-Include context:
-- **Version** when relevant (`.NET 8`, `EF Core 8`)
-- **Task intent** (`quickstart`, `tutorial`, `overview`, `limits`)
-- **Platform** for multi-platform docs (`Linux`, `Windows`)
-
-## When to Fetch Full Page
-
-Fetch after search when:
-- **Tutorials** — need complete step-by-step instructions
-- **Configuration guides** — need all options listed
-- **Deep dives** — user wants comprehensive coverage
-- **Search excerpt is cut off** — full context needed
-
-## Why Use This
-
-- **Accuracy** — live docs, not training data that may be outdated
-- **Completeness** — tutorials have all steps, not fragments
-- **Authority** — official Microsoft documentation
+1. For an SDK, .NET library, or API question, resolve the version from the workspace before searching.
+2. Search with product, feature, intent, platform, and resolved version when applicable.
+3. Fetch the full page for complete tutorials, configurations, limits, or incomplete excerpts.
+4. Route implementation patterns and API signatures to `search-ms-code-samples`.
+5. If Learn MCP is unavailable, use the equivalent `mslearn` CLI command.

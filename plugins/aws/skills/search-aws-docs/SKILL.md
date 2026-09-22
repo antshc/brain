@@ -1,6 +1,6 @@
 ---
 name: search-aws-docs
-description: Understand AWS services and find API references by querying official documentation. Use whenever the user asks how something works, wants API references or code-relevant parameter/signature details, needs configuration options, limits, quotas, regional availability, or best practices for any AWS service (EC2, S3, Lambda, EKS, IAM, etc.)—even if they don't mention "docs." Covers both conceptual understanding and code-adjacent lookups (there is no separate AWS code-reference skill).
+description: Queries official AWS documentation for service concepts, API references, configuration, limits, regional availability, and best practices. Use for AWS questions, including code-adjacent API details.
 context: fork
 compatibility: Requires AWS Documentation MCP Server (https://knowledge-mcp.global.api.aws)
 ---
@@ -9,59 +9,23 @@ compatibility: Requires AWS Documentation MCP Server (https://knowledge-mcp.glob
 
 ## Tools
 
-| Tool | Use For |
-|------|---------|
-| `aws___search_documentation` | Find documentation—concepts, guides, API references, configuration |
-| `aws___read_documentation` | Get full page content (when search excerpts aren't enough) |
-| `aws___recommend` | Discover related docs and best practices |
-| `aws___get_regional_availability` | Check service/feature availability per region |
-| `aws___list_regions` | List all AWS regions |
+| Tool | Purpose |
+|---|---|
+| `aws___search_documentation` | Find official docs. |
+| `aws___read_documentation` | Read a result in full. |
+| `aws___recommend` | Find related docs. |
+| `aws___get_regional_availability` | Verify regional support. |
+| `aws___list_regions` | List regions. |
 
-## When to Use
+**Hard stop.** No command in this workflow, or in any reasoning that leads to it, may be rooted at `/`, `/usr`, `/opt`, `/etc`, or `/home`. `find / -iname '<Type>.cs'` is forbidden outright — including with `2>/dev/null`, `| head`, or "just to locate the file". Permitted roots: the repo root, the resolved global-packages folder, and `$HOME`. Read back the root argument of every recursive command before running it.
 
-- **Understanding concepts** — "How does S3 bucket versioning work?"
-- **API references** — "RunInstances parameters", "PutBucketEncryption"
-- **Configuration options** — "EKS node group settings"
-- **Limits & quotas** — "Lambda concurrency limits", "EBS volume limits"
-- **Regional availability** — "Is Graviton supported in me-central-1?"
-- **Best practices** — "IAM least privilege", "KMS key rotation"
+## Version
 
-## Query Effectiveness
+For a NuGet package, search `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `Directory.Solution.targets`, and `*.csproj` in the workspace. If absent, read `obj/project.assets.json` for the resolved transitive version. For another SDK, read its dependency manifest and lockfile. Do not reuse a version from an earlier session.
 
-Good queries are specific:
+## Workflow
 
-```
-# ❌ Too broad
-"Lambda"
-
-# ✅ Specific
-"Lambda Python runtime environment variables"
-"S3 SSE-KMS bucket policy cross-account"
-"EKS pod security admission controller"
-```
-
-Include context:
-- **Service + feature** when relevant (`EC2 Nitro Enclaves`, `EBS gp3`)
-- **Task intent** (`API reference`, `best practices`, `troubleshooting`)
-- **SDK version** for code-related queries (`AWS SDK for Python v3`)
-
-## When to Read Full Page
-
-Read after search when:
-- **API references** — need complete parameter lists
-- **Tutorials** — need full step-by-step instructions
-- **IAM policies** — need exact permission statements
-- **Search excerpt is cut off** — full context needed
-
-## When to Check Regional Availability
-
-Check before recommending services when:
-- Deploying to newer or opt-in regions
-- Using recently launched features
-- User asks about specific region support
-
-## Why Use This
-
-- **Accuracy** — live docs, not training data that may be outdated
-- **Completeness** — API refs have all parameters, not fragments
-- **Authority** — official AWS documentation
+1. For SDK, library, or API questions, resolve the version from the workspace before searching.
+2. Search with service, feature, intent, platform, and resolved version when applicable.
+3. Read the full page for complete API, policy, configuration, or tutorial details.
+4. Verify regional availability before recommending a regional deployment or feature.
