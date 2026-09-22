@@ -11,21 +11,31 @@ mapping table). This module classifies and resolves each one:
    sidecar" section).
 2. No sidecar, the file looks like an image -> a Markdown image reference.
 3. No sidecar, not an image -> a plain Markdown link.
-Rules 2 and 3 point at the copy `save_attachments` cached under the page's `.tmp/` assets dir.
+Rules 2 and 3 point at the copy `fetch_attachment_snapshot`/`publish_attachment_cache` cached
+under the page's `.tmp/` assets dir.
 
-Every failure mode degrades to a one-line note instead of raising — a missing sidecar/attachment
-(the page predates the sidecar, or was never republished) or a missing token never fails the
-rest of the fetch.
+Attachment metadata and bytes are fetched exactly once per assembly, via
+`fetch_attachment_snapshot`, and reused by both cache publication and placeholder resolution.
+Cache publication is atomic (`publish_attachment_cache`): every download and disk write happens
+into a staging directory first, and only a fully-written staging directory ever replaces the
+live cache, so a failed refresh never leaves a partial cache and never damages a prior complete
+one. Every failure mode raises `AttachmentRetrievalError` carrying only a safe exception
+category (its class name) — never the original exception text, which may hold a signed media
+URL or an auth token; callers degrade to a one-line note instead of failing the whole fetch.
 """
 from __future__ import annotations
 
 import argparse
 import re
+import shutil
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import quote
+from uuid import uuid4
 
 from atlassian import Confluence
+from requests.exceptions import RequestException
 
 from env import get_confluence, load_credentials
 
@@ -36,8 +46,25 @@ _ATTACHMENT_PLACEHOLDER_RE = re.compile(
 _ANY_PLACEHOLDER_RE = re.compile(r"<!-- adf:(diagram|attachment) ")
 
 NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set ATLASSIAN_API_TOKEN to restore it -->"
+SKIPPED_NOTE = "<!-- adf:diagram source unavailable: attachment retrieval skipped (--attachments skip) -->"
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
+
+
+class AttachmentRetrievalError(Exception):
+    """Listing, downloading, or cache-publishing page attachments failed. The message is always
+    a short, safe category (an exception class name, or a fixed reason string) — never the
+    original exception text, which may carry a signed media URL, a query token, or other
+    credential-like material.
+    """
+
+
+@dataclass(frozen=True)
+class AttachmentSnapshot:
+    """Every attachment on the page, listed and downloaded exactly once."""
+
+    attachments: list[dict]
+    downloaded: dict[str, bytes]
 
 
 def _looks_like_image(name: str) -> bool:
@@ -86,41 +113,65 @@ def list_attachments(confluence: Confluence, page_id: str) -> list[dict]:
     return resp.get("results", [])
 
 
-def _find_by_title(attachments: list[dict], title: str) -> dict | None:
-    return next((a for a in attachments if a.get("title") == title), None)
-
-
 def _find_by_file_id(attachments: list[dict], file_id: str) -> dict | None:
     return next((a for a in attachments if a.get("extensions", {}).get("fileId") == file_id), None)
 
 
 def download_attachment_bytes(confluence: Confluence, attachment: dict) -> bytes:
-    """Like `_download_text` but always bytes, so binary attachments (`.png`, `.drawio`) aren't
-    corrupted by a text decode."""
+    """Always bytes, so binary attachments (`.png`, `.drawio`) aren't corrupted by a text decode."""
     content = confluence.get(attachment["_links"]["download"], not_json_response=True)
     return content if isinstance(content, bytes) else content.encode("utf-8")
 
 
-def _download_text(confluence: Confluence, attachment: dict) -> str:
-    content = confluence.get(attachment["_links"]["download"], not_json_response=True)
-    return content.decode("utf-8") if isinstance(content, bytes) else content
-
-
-def save_attachments(confluence: Confluence, page_id: str, assets_dir: str) -> dict[str, bytes]:
-    """Download every attachment on the page once and cache it under `assets_dir` (created only
-    when the page actually has attachments), returning `{title: bytes}` so callers can resolve
-    placeholders from memory instead of a second network round-trip.
+def fetch_attachment_snapshot(confluence: Confluence, page_id: str) -> AttachmentSnapshot:
+    """List every attachment on the page and download every attachment's bytes, once. Any TLS,
+    timeout, HTTP, or connection failure raises `AttachmentRetrievalError` naming only the
+    exception's class.
     """
-    attachments = list_attachments(confluence, page_id)
-    if not attachments:
-        return {}
-    Path(assets_dir).mkdir(parents=True, exist_ok=True)
-    downloaded: dict[str, bytes] = {}
-    for attachment in attachments:
-        content = download_attachment_bytes(confluence, attachment)
-        downloaded[attachment["title"]] = content
-        (Path(assets_dir) / attachment["title"]).write_bytes(content)
-    return downloaded
+    try:
+        attachments = list_attachments(confluence, page_id)
+        downloaded = {a["title"]: download_attachment_bytes(confluence, a) for a in attachments}
+    except RequestException as exception:
+        raise AttachmentRetrievalError(type(exception).__name__) from None
+    return AttachmentSnapshot(attachments=attachments, downloaded=downloaded)
+
+
+def _publish_staged_directory(staging_path: Path, target_path: Path) -> None:
+    """Atomically swap `staging_path` in as `target_path`. A prior `target_path` is renamed aside
+    first and only removed once the swap succeeds; any failure restores it.
+    """
+    backup_path: Path | None = None
+    if target_path.exists():
+        backup_path = target_path.parent / f"{target_path.name}.bak-{uuid4().hex}"
+        target_path.rename(backup_path)
+    try:
+        staging_path.rename(target_path)
+    except OSError:
+        if backup_path is not None:
+            backup_path.rename(target_path)
+        raise
+    else:
+        if backup_path is not None:
+            shutil.rmtree(backup_path, ignore_errors=True)
+
+
+def publish_attachment_cache(snapshot: AttachmentSnapshot, assets_dir: str) -> None:
+    """Write every already-downloaded attachment into a sibling staging directory, then publish
+    it in place of `assets_dir` only once every file is written. On any failure the staging
+    directory is removed and `assets_dir` (a prior complete cache, if any) is left untouched.
+    """
+    if not snapshot.attachments:
+        return
+    assets_path = Path(assets_dir)
+    staging_path = assets_path.parent / f"{assets_path.name}.staging-{uuid4().hex}"
+    try:
+        staging_path.mkdir(parents=True, exist_ok=True)
+        for title, content in snapshot.downloaded.items():
+            (staging_path / title).write_bytes(content)
+        _publish_staged_directory(staging_path, assets_path)
+    except OSError as exception:
+        shutil.rmtree(staging_path, ignore_errors=True)
+        raise AttachmentRetrievalError(type(exception).__name__) from None
 
 
 def _relative_link(assets_dir_name: str, filename: str) -> str:
@@ -140,32 +191,32 @@ def _fence(source: str) -> str:
     return f"```mermaid\n{source.rstrip(chr(10))}\n```"
 
 
-def restore_diagrams(
-    confluence: Confluence,
-    page_id: str,
-    markdown: str,
-    downloaded: dict[str, bytes],
-    assets_dir_name: str,
-) -> str:
+def _failure_note(category: str) -> str:
+    return f"<!-- adf:diagram source unavailable: attachment retrieval failed ({category}) -->"
+
+
+def _replace_all_placeholders(markdown: str, note: str) -> str:
+    markdown = _DRAWIO_PLACEHOLDER_RE.sub(note, markdown)
+    markdown = _ATTACHMENT_PLACEHOLDER_RE.sub(note, markdown)
+    return markdown
+
+
+def restore_diagrams(markdown: str, snapshot: AttachmentSnapshot, assets_dir_name: str) -> str:
     """Substitute every `<!-- adf:diagram ... -->` / `<!-- adf:attachment ... -->` placeholder:
     a mermaid fence when a `{name}.source.mmd` sidecar exists, else a Markdown image or a plain
-    link into `assets_dir_name`. Reuses `downloaded` (from `save_attachments`) instead of
-    re-fetching bytes already in hand; only falls back to a fresh download when a title isn't in
-    it (e.g. a caller that didn't run `save_attachments` first).
+    link into `assets_dir_name`. Resolves entirely from `snapshot` — no REST call of its own.
     """
     if not has_diagram_placeholder(markdown):
         return markdown
 
-    attachments = list_attachments(confluence, page_id)
+    attachments = snapshot.attachments
+    downloaded = snapshot.downloaded
 
     def _sidecar_text(sidecar_title: str) -> str | None:
         content = downloaded.get(sidecar_title)
-        if content is not None:
-            return content.decode("utf-8") if isinstance(content, bytes) else content
-        sidecar = _find_by_title(attachments, sidecar_title)
-        if sidecar is None:
+        if content is None:
             return None
-        return _download_text(confluence, sidecar)
+        return content.decode("utf-8") if isinstance(content, bytes) else content
 
     def _replace_drawio(match: re.Match) -> str:
         sidecar_title = _sidecar_title(match.group(1))
@@ -199,9 +250,17 @@ def restore_diagrams(
 
 def restore_diagrams_without_credentials(markdown: str) -> str:
     """Degraded mode: no token configured, so every placeholder gets a note instead of a fence."""
-    markdown = _DRAWIO_PLACEHOLDER_RE.sub(NO_TOKEN_NOTE, markdown)
-    markdown = _ATTACHMENT_PLACEHOLDER_RE.sub(NO_TOKEN_NOTE, markdown)
-    return markdown
+    return _replace_all_placeholders(markdown, NO_TOKEN_NOTE)
+
+
+def restore_diagrams_skipped(markdown: str) -> str:
+    """`--attachments skip`: retrieval was never attempted, so every placeholder says so."""
+    return _replace_all_placeholders(markdown, SKIPPED_NOTE)
+
+
+def restore_diagrams_failed(markdown: str, category: str) -> str:
+    """`--attachments auto` after a failed retrieval: every placeholder names the safe category."""
+    return _replace_all_placeholders(markdown, _failure_note(category))
 
 
 def main() -> None:
@@ -224,10 +283,13 @@ def main() -> None:
         return
 
     confluence = get_confluence(credentials)
-    downloaded = save_attachments(confluence, args.page_id, args.assets_dir)
-    sys.stdout.write(
-        restore_diagrams(confluence, args.page_id, markdown, downloaded, Path(args.assets_dir).name)
-    )
+    try:
+        snapshot = fetch_attachment_snapshot(confluence, args.page_id)
+        publish_attachment_cache(snapshot, args.assets_dir)
+    except AttachmentRetrievalError as exception:
+        sys.stdout.write(restore_diagrams_failed(markdown, str(exception)))
+        return
+    sys.stdout.write(restore_diagrams(markdown, snapshot, Path(args.assets_dir).name))
 
 
 if __name__ == "__main__":
