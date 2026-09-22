@@ -27,9 +27,9 @@ The grill produces exactly two things: **questions** and **records**. Writable s
 
 ## Interview
 
-Interview me relentlessly about every aspect of this until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. Ask **one question at a time** and wait for the answer — multiple questions at once are bewildering. Give your recommended answer with each question.
+Interview me relentlessly about every aspect of this until we reach a shared understanding. Map the decisions as a tree and work it in rounds. Before each round, find the **frontier**: every decision whose prerequisites are settled. Apply the fact lookup and evidence rules below before asking; decisions resolved as Feature Assumptions never enter the question frontier. Ask the entire remaining frontier in one round, numbering each question and giving your recommended answer. A question whose answer depends on another unresolved question in the same round belongs to a later round. Wait for the user's answers, reshape the tree, and recompute the frontier.
 
-Format each question like so:
+Format every question in the round like so:
 
 ```
 ❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
@@ -37,7 +37,7 @@ Format each question like so:
 ➡️ <your recommended answer>
 ```
 
-**Turn shape** — every turn ends on one of two moves: the next question, or the explicit ask to close the session. Lookups, ledger lines, and record writes are the middle of a turn; a turn that ends on a write is unfinished, so name the branch it opened or closed and ask the next question in that same turn.
+**Turn shape** — every turn ends on one of two moves: the next question round, or the explicit ask to close the session. Lookups, ledger lines, and record writes are the middle of a turn; a turn that ends on a write is unfinished, so name the branches it opened or closed and ask the next question round in that same turn.
 
 If a *fact* is discoverable in the environment (filesystem, tools), look it up rather than asking. If a *decision* clears the evidence checklist below, take it as a Feature Assumption rather than asking; if any part fails, put it to me and wait.
 
@@ -59,7 +59,7 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 | Decision | user | ledger + document | same turn it's approved |
 | Rejected option | user | ledger only | never |
 
-Log every state and every change of state via `/track-ledger`' skill **Log decision**, the turn it happens. When I correct an assumption you made — at any point in the session — rewrite its ledger line that turn: the correction form when it stood on a record's `default`/`owns` (the closing sweep repairs that key), a deletion otherwise; if it had already reached a record, fix that record the same turn too. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input, and an unlogged miss is a lost repair. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question MUST get a gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line and never replaces it: a feature-scoped decision that no record `owns` is *both* a Feature Decision *and* a `gate miss: single-authoritative-source, nearest source: none` (a new-record candidate), so log both lines. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
+Log every state and every change of state via `/track-ledger`' skill **Log decision**, the turn it happens. When I correct an assumption you made — at any point in the session — rewrite its ledger line that turn: the correction form when it stood on a record's `default`/`owns` (the closing sweep repairs that key), a deletion otherwise; if it had already reached a record, fix that record the same turn too. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input, and an unlogged miss is a lost repair. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question in a round MUST get its own gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line and never replaces it: a feature-scoped decision that no record `owns` is *both* a Feature Decision *and* a `gate miss: single-authoritative-source, nearest source: none` (a new-record candidate), so log both lines. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
 
 ## Context economy
 
