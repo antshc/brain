@@ -52,7 +52,7 @@ The wrapper supplies `--no-sandbox --disable-gpu`, and falls back to `xvfb-run` 
 
 ## Diagram ids
 
-A mermaid fence claims a stable published identity with a `%% diagram-id: <id>` line — `[a-z0-9-]`, unique within the file, placed after any `---`-delimited frontmatter or `%%{init: …}%%` directive and immediately above the diagram-type line. The id becomes the attachment filename and the Draw.io custom content title, and those are exactly what a republish matches on, so the diagram is replaced in place however the document is reordered or its headings are reworded. `run` strips the line before rendering, so `mmdc` and the Draw.io import never see it. The `/architecture-diagram`, `/behavior-diagram`, and `/code-diagram` skills emit it.
+A mermaid fence claims a stable published identity with a `%% diagram-id: <id>` line — `[a-z0-9-]`, unique within the file, placed after any `---`-delimited frontmatter or `%%{init: …}%%` directive and immediately above the diagram-type line. The id becomes the attachment filename and the Draw.io custom content title, and those are exactly what a republish matches on, so the diagram is replaced in place however the document is reordered or its headings are reworded. `run` strips the line before rendering, so `mmdc` and the Draw.io import never see it. The `/doc-architecture-diagram`, `/doc-behavior-diagram`, and `/doc-code-diagram` skills emit it.
 
 A fence with no id keeps the older `{index}-{nearest-heading-slug}` naming, which travels with the diagram's position and its heading text — reorder the document or reword the heading above it and the next publish attaches a second copy beside the first.
 

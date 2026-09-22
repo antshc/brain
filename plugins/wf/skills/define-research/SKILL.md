@@ -1,5 +1,5 @@
 ---
-name: draft-research
+name: define-research
 description: Drafts a research brief through a structured interview.
 disable-model-invocation: true
 ---
@@ -10,7 +10,7 @@ Turn an initial topic into a decision-ready, Google-style one-pager. The brief d
 
 ## 1. Grill the scope
 
-Run `/grilling` skill over the user's request and the available context. Treat these as the research tree:
+Run `/questioning` skill over the user's request and the available context. Treat these as the research tree:
 
 - **Frame the Question** — required. Resolve the subject and the decision, explanation, design, or action the findings must support.
 - **Set Constraints** — resolve only limits that can change the answer.
@@ -57,7 +57,7 @@ Write a self-contained Markdown brief of about 500 words or fewer. Use **Researc
 
 Encode the plan in **Ranked Unknowns** rather than adding a separate plan section. Keep evidence strategy out of the brief so `/research` and its selected specialist can choose the appropriate sources and methods.
 
-Present the draft and ask the user to confirm or correct it. Resume `/grilling` when a correction exposes an unresolved branch.
+Present the draft and ask the user to confirm or correct it. Resume `/questioning` when a correction exposes an unresolved branch.
 
 **Done when:** every included section changes the investigation, the brief stays near the one-page limit, no placeholder remains, and the user confirms it.
 

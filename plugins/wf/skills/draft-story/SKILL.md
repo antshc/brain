@@ -19,15 +19,15 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 2. **Attach sync metadata** → directly under the heading, add Jira ID / Epic ID / Blocked by. Values are placeholders (`TBD`) unless the caller supplies real ones; Blocked-by names only stories the caller listed, else `None`. This block sits outside the story body — never scrubbed, never counted as a criterion. *Done when* all three lines are present.
 3. **Derive acceptance criteria** → apply the Acceptance Criteria rule below. *Done when* every Business Rule, Edge Case, and error condition in the source requirement lands in its own criterion, and each of input, processing, integration, state, and failure is covered.
 4. **Scope to the layer** → a **BE** story's criteria cover API/data/contract/business-rule behavior; an **FE** story's cover presentation/interaction behavior. *Done when* no criterion tests the other layer's behavior.
-5. **Verify** → Run `/solution-agnostic` skill over the capability title, stakeholder requirement, functional requirements, and acceptance criteria only, passing `CONTEXT.md` as the domain glossary — never the sync-metadata block or the Technical notes appendix — then confirm each criterion implies concrete code changes and maps to a responsibility. *Done when* the Quality Check below passes line by line.
-6. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, Run `/contract-delta` skill **Assemble and write a contract delta** once per touched contract kind and append its output as the story's optional Contracts Delta appendix. For an `[FE]` story that adds or changes a surface, GUI component, or interaction, also Run that skill's **Assemble and write a GUI delta** and append its output as the **GUI delta** block closing that same appendix — a `[BE]` story never carries one. This appendix is technical, sits outside the Capability/Acceptance Criteria body, and is exempt from the scrub in step 5.
+5. **Verify** → Run `/normalize-requirements` skill over the capability title, stakeholder requirement, functional requirements, and acceptance criteria only, passing `CONTEXT.md` as the domain glossary — never the sync-metadata block or the Technical notes appendix — then confirm each criterion implies concrete code changes and maps to a responsibility. *Done when* the Quality Check below passes line by line.
+6. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, Run `/doc-contracts` skill **Assemble and write a contract delta** once per touched contract kind and append its output as the story's optional Contracts Delta appendix. For an `[FE]` story that adds or changes a surface, GUI component, or interaction, also Run that skill's **Assemble and write a GUI delta** and append its output as the **GUI delta** block closing that same appendix — a `[BE]` story never carries one. This appendix is technical, sits outside the Capability/Acceptance Criteria body, and is exempt from the scrub in step 5.
 
 ## Acceptance Criteria
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code.
 - Phrase as: `{{outcome}} when {{condition}}` for behaviors; `If {{condition}}, {{actor}} must {{outcome}}` for invariants/edge cases. Vary the subject (entity, actor, outcome) — don't force "The system" every time.
 - Cover: input, processing, integration, state, failure — one criterion each, not a labeled section.
-- Use domain language (`CONTEXT.md`); state behavior, not implementation — no file paths, class/variable names, widget/screen, or other implementation details. Run `/solution-agnostic` skill to raise any leaked artifact to the behavior and entity it enables.
+- Use domain language (`CONTEXT.md`); state behavior, not implementation — no file paths, class/variable names, widget/screen, or other implementation details. Run `/normalize-requirements` skill to raise any leaked artifact to the behavior and entity it enables.
 - State the exact outcome — never "works", "correctly", "properly", "as expected".
 - Fold every applicable Business Rule, Edge Case, and relevant error condition from the source requirement into its own criterion here — do not create separate sections for them.
 </acceptance-criteria-rule>
@@ -36,11 +36,11 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 - Story is atomic and behavior-focused, scoped to exactly one capability and one technology layer.
 - The story names its **capability**, includes the **stakeholder requirement**, and lists the **functional requirements** it covers.
 - When a prior requirement set is in context, the capability title, stakeholder requirement, and functional-requirements list are copied **verbatim**.
-- Capability and stakeholder requirement name a behavior + entity, not a widget, screen, or component — `/solution-agnostic` reported no remaining leak.
+- Capability and stakeholder requirement name a behavior + entity, not a widget, screen, or component — `/normalize-requirements` reported no remaining leak.
 - Each criterion implies clear code changes and a QA could confirm pass/fail by testing. If not, rewrite.
 - Jira ID, Epic ID, and Blocked-by sit in a metadata block directly under the heading, outside the scrubbed body; Blocked-by lists only `(Story n, Jira ID placeholder)` pairs the caller supplied, or `None`.
 - Implementation Decisions may name classes, types, objects, or endpoints for navigation, but never a file path or line number.
-- An `[FE]` story that changes a surface or interaction carries a GUI delta block closing Contracts Delta, passing `/contract-delta`'s own Done-when checks; a `[BE]` story carries neither.
+- An `[FE]` story that changes a surface or interaction carries a GUI delta block closing Contracts Delta, passing `/doc-contracts`' own Done-when checks; a `[BE]` story carries neither.
 - The `[SLUG]` feature tag is present in the heading only if the user asked for it, is SCREAMING_SNAKE_CASE, and — if already present on a story being edited — is kept unchanged.
 
 ## Output Format

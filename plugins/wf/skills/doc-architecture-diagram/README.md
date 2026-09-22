@@ -1,6 +1,6 @@
 # Architecture Diagram
 
-Presentation examples for the `architecture-diagram` skill.
+Presentation examples for the `doc-architecture-diagram` skill.
 
 ## System Context Diagram Example
 

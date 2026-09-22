@@ -49,10 +49,6 @@ copilot plugin install atl@brain
 ### Microsoft platform plugin (ms)
 
 ```sh
-(copilot plugin uninstall az@brain >/dev/null 2>&1 || true) && \
-(copilot plugin uninstall learn-ms@brain >/dev/null 2>&1 || true) && \
-(copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true) && \
-(copilot plugin uninstall azure@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall ms@brain >/dev/null 2>&1 || true) && \
 copilot plugin install ms@brain
 ```
@@ -129,16 +125,16 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one user story in the standard format — capability, stakeholder requirement, acceptance criteria, Jira-sync metadata.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
 - [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
-- [architecture-diagram](plugins/wf/skills/architecture-diagram/SKILL.md), [behavior-diagram](plugins/wf/skills/behavior-diagram/SKILL.md), [code-diagram](plugins/wf/skills/code-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
-- [contract-delta](plugins/wf/skills/contract-delta/SKILL.md): document contract deltas.
-- [solution-agnostic](plugins/wf/skills/solution-agnostic/SKILL.md): strip implementation artifacts out of requirement or story text.
+- [doc-architecture-diagram](plugins/wf/skills/doc-architecture-diagram/SKILL.md), [doc-behavior-diagram](plugins/wf/skills/doc-behavior-diagram/SKILL.md), [doc-code-diagram](plugins/wf/skills/doc-code-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
+- [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
+- [normalize-requirements](plugins/wf/skills/normalize-requirements/SKILL.md): strip implementation artifacts out of requirement or story text.
 - [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): delegate read-only codebase questions to a subagent.
 - [prototype](plugins/wf/skills/prototype/SKILL.md): build a throwaway prototype to answer a design question.
 - [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
 - [record-adr](plugins/wf/skills/record-adr/SKILL.md), [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-service](plugins/wf/skills/record-service/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture ADRs, Concepts, glossary terms, services, and deployment topology into the docs the moment they crystallise.
 - [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
 - [manage-backlog](plugins/wf/skills/manage-backlog/SKILL.md) / [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
-- [track-ledger](plugins/wf/skills/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a grilling session.
+- [track-ledger](plugins/wf/skills/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a questioning session.
 
 ### crew
 

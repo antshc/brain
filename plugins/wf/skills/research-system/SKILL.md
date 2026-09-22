@@ -27,15 +27,15 @@ The unit is one symbol chain inside one deployable: the trace starts at this uni
 
 | Research topic | Draw | Skill |
 |---|---|---|
-| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `/behavior-diagram` |
-| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `/behavior-diagram` |
-| who owns each step and where responsibility changes — handoffs across layers, modules, or teams | a **swimlane diagram** | `/behavior-diagram` |
-| which deployable units and external systems the capability spans | a **container diagram** | `/architecture-diagram` |
-| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `/architecture-diagram` |
-| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `/architecture-diagram` |
-| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `/code-diagram` |
+| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `/doc-behavior-diagram` |
+| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `/doc-behavior-diagram` |
+| who owns each step and where responsibility changes — handoffs across layer, modules, or teams | a **swimlane diagram** | `/doc-behavior-diagram` |
+| which deployable units and external systems the capability spans | a **container diagram** | `/doc-architecture-diagram` |
+| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `/doc-architecture-diagram` |
+| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `/doc-architecture-diagram` |
+| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `/doc-code-diagram` |
 
-A traced capability defaults to the **sequence diagram**; Run `/behavior-diagram` skill before drafting it.
+A traced capability defaults to the **sequence diagram**; Run `/doc-behavior-diagram` skill before drafting it.
 
 Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep file references in the tables; use class, method, or file names with exact lines in the diagram only when the user asks for them.
 
@@ -51,11 +51,11 @@ The unit is one **deployable** per lane — something independently runnable or 
 - Template: [deployables-research-template.md](templates/deployables-research-template.md)
 - Output: exactly one file, `docs/ongoing/research-{{slug}}-chain.md`. A chain run writes no other document.
 
-**Diagram:** Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. Follow `/behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
+**Diagram:** Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. Follow `/doc-behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
 
 Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
 
-Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
+Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; Run `/doc-architecture-diagram` skill for its syntax and styling. Finish the chain before identifying Capability follow-ups; lane internals belong only to the requested lane's Capability-axis document.
 
 Render the Mermaid block before declaring the research complete. Done means each deployable has exactly one lane containing 1–5 boundary-relevant major-step nodes, every in-scope branch reaches a terminal at an edge, every internal boundary has emit-, receive-, and binding evidence, and no artifact, script, playbook, chart, or library holds a lane.
 
@@ -67,7 +67,7 @@ The unit is one item type and the store holding it — one writer, many readers,
 - Template: [data-research-template.md](templates/data-research-template.md)
 - Output: `docs/ongoing/research-{{slug}}-data.md`
 
-**Diagram:** None by default — the store, key, and shape tables carry the answer. When the user asks for one, pick the diagram from the question and Run its owning skill: `/behavior-diagram` for access order or branching, `/architecture-diagram` for ownership or deployment boundaries, and `/code-diagram` for item types and their relationships. Keep evidence in the tables and render the Mermaid block before declaring the research complete.
+**Diagram:** None by default — the store, key, and shape tables carry the answer. When the user asks for one, pick the diagram from the question and Run its owning skill: `/doc-behavior-diagram` for access order or branching, `/doc-architecture-diagram` for ownership or deployment boundaries, and `/doc-code-diagram` for item types and their relationships. Keep evidence in the tables and render the Mermaid block before declaring the research complete.
 
 ### Crossing axes
 

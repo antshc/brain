@@ -1,5 +1,5 @@
 ---
-name: architecture-diagram
+name: doc-architecture-diagram
 description: Document software architecture with a Mermaid system context diagram, solution-level container diagram, or deployment view. Use for system landscape and scope questions, current-state architecture, and architecture deltas, including added, removed, or modified containers, systems, actors, relationships, hosts, runtimes, or deployment nodes.
 ---
 
