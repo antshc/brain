@@ -8,7 +8,7 @@ title and ADF body live at `content.nodes[0].title` / `content.nodes[0].body` (a
 confirmed by the tool's own JSON schema). Converts unconditionally; only touches the Confluence
 REST/attachment path when a pure, offline scan of the raw ADF body finds a node that references
 an attached file (see `fetch_diagrams.has_attachment_reference`) — a page with none of those
-never makes a REST call or creates a `.tmp` assets folder, regardless of credentials or
+never makes a REST call or creates an `.assets` folder, regardless of credentials or
 `--attachments`.
 
 `--attachments` controls what happens when a reference is present:
@@ -77,6 +77,10 @@ def _with_title(markdown: str, title: str) -> str:
     return f"# {title}\n\n{markdown}"
 
 
+def default_assets_dir(md_path: Path) -> Path:
+    return md_path.with_suffix(".assets")
+
+
 def assemble(raw: dict, page_id: str, root: str, assets_dir: str, attachments: str = "auto") -> str:
     title, body = extract_title_and_body(raw)
     markdown = convert_adf_to_markdown(body)
@@ -111,6 +115,8 @@ def assemble(raw: dict, page_id: str, root: str, assets_dir: str, attachments: s
     if has_diagram_placeholder(markdown):
         assets_dir_name = Path(assets_dir).name
         markdown = restore_diagrams(markdown, snapshot, assets_dir_name)
+        if attachments == "required" and has_diagram_placeholder(markdown):
+            raise AttachmentRetrievalError("unresolved attachment reference")
     return _with_title(markdown, title)
 
 
@@ -123,7 +129,7 @@ def main() -> None:
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
         "--assets-dir",
-        help="Directory to cache this page's attachments into (default: `<md-path>.tmp`)",
+        help="Directory to cache this page's attachments into (default: `<md-path stem>.assets`)",
     )
     parser.add_argument(
         "--attachments",
@@ -138,7 +144,7 @@ def main() -> None:
     args = parser.parse_args()
 
     md_path = Path(args.md_path)
-    assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.name}.tmp")
+    assets_dir = args.assets_dir or str(default_assets_dir(md_path))
 
     raw = json.loads(sys.stdin.read())
     try:

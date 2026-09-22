@@ -1,9 +1,16 @@
 import json
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
 
-from assemble_page import ConversionError, assemble, convert_adf_to_markdown, extract_title_and_body
+from assemble_page import (
+    ConversionError,
+    assemble,
+    convert_adf_to_markdown,
+    default_assets_dir,
+    extract_title_and_body,
+)
 from fetch_diagrams import AttachmentRetrievalError
 
 
@@ -24,6 +31,10 @@ def _confluence_stub(attachments, downloads):
     confluence.get_attachments_from_content.return_value = {"results": attachments}
     confluence.get.side_effect = lambda link, **kwargs: downloads[link]
     return confluence
+
+
+def test_default_assets_dir_replaces_the_markdown_suffix():
+    assert default_assets_dir(Path("docs/page.md")) == Path("docs/page.assets")
 
 
 def test_extract_title_and_body_reads_the_documented_json_path():
@@ -275,3 +286,36 @@ def test_assemble_required_mode_propagates_attachment_retrieval_failure_and_writ
         assemble(raw, "123", "/repo", str(assets_dir), attachments="required")
 
     assert not assets_dir.exists()
+
+
+def test_assemble_required_mode_raises_when_attachment_placeholder_cannot_be_resolved(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setattr(
+        "assemble_page.convert_adf_to_markdown",
+        lambda body: '<!-- adf:attachment media-id="missing" alt="missing.png" -->',
+    )
+    monkeypatch.setattr(
+        "assemble_page.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"}
+    )
+    monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: MagicMock())
+    monkeypatch.setattr("assemble_page.fetch_attachment_snapshot", lambda confluence, page_id: MagicMock())
+    monkeypatch.setattr("assemble_page.publish_attachment_cache", lambda snapshot, assets_dir: None)
+    monkeypatch.setattr(
+        "assemble_page.restore_diagrams",
+        lambda markdown, snapshot, assets_dir_name: (
+            '<!-- adf:diagram source unavailable: attachment for media-id="missing" not found -->'
+        ),
+    )
+
+    raw = _raw(
+        "Complex Page",
+        {
+            "type": "doc",
+            "version": 1,
+            "content": [{"type": "media", "attrs": {"id": "missing", "type": "file"}}],
+        },
+    )
+
+    with pytest.raises(AttachmentRetrievalError, match="unresolved attachment reference"):
+        assemble(raw, "123", "/repo", str(tmp_path / "page.md.tmp"), attachments="required")

@@ -126,16 +126,35 @@ def render_table(node: dict) -> str:
     for row in rows:
         cells = [c for c in row.get("content", []) if c.get("type") in ("tableHeader", "tableCell")]
         grid.append([c.get("attrs", {}) for c in cells])
-    validate_table_grid(grid, table_label="table")
+    column_count = validate_table_grid(grid, table_label="table")
 
     lines: list[str] = []
+    pending_rowspans: dict[int, int] = {}
     for row in rows:
         cells = [c for c in row.get("content", []) if c.get("type") in ("tableHeader", "tableCell")]
         is_header_row = any(c.get("type") == "tableHeader" for c in cells)
-        rendered = [render_table_cell(c) for c in cells]
+        rendered = [""] * column_count
+        column = 0
+        next_rowspans = {
+            index: remaining - 1
+            for index, remaining in pending_rowspans.items()
+            if remaining > 1
+        }
+        for cell in cells:
+            while column in pending_rowspans:
+                column += 1
+            attrs = cell.get("attrs", {})
+            colspan = int(attrs.get("colspan", 1) or 1)
+            rowspan = int(attrs.get("rowspan", 1) or 1)
+            rendered[column] = render_table_cell(cell)
+            if rowspan > 1:
+                for index in range(column, column + colspan):
+                    next_rowspans[index] = rowspan - 1
+            column += colspan
         lines.append("| " + " | ".join(rendered) + " |")
         if is_header_row:
-            lines.append("| " + " | ".join(["---"] * len(cells)) + " |")
+            lines.append("| " + " | ".join(["---"] * column_count) + " |")
+        pending_rowspans = next_rowspans
     return "\n".join(lines)
 
 

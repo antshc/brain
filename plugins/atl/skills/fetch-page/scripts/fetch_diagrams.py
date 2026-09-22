@@ -12,7 +12,7 @@ mapping table). This module classifies and resolves each one:
 2. No sidecar, the file looks like an image -> a Markdown image reference.
 3. No sidecar, not an image -> a plain Markdown link.
 Rules 2 and 3 point at the copy `fetch_attachment_snapshot`/`publish_attachment_cache` cached
-under the page's `.tmp/` assets dir.
+under the page's `.assets/` directory.
 
 Attachment metadata and bytes are fetched exactly once per assembly, via
 `fetch_attachment_snapshot`, and reused by both cache publication and placeholder resolution.
@@ -176,7 +176,7 @@ def publish_attachment_cache(snapshot: AttachmentSnapshot, assets_dir: str) -> N
 
 def _relative_link(assets_dir_name: str, filename: str) -> str:
     """Percent-encoded path relative to the Markdown file's own directory, e.g.
-    `page.md.tmp/Screenshot%202026-02-10%20113535.png`."""
+    `page.assets/Screenshot%202026-02-10%20113535.png`."""
     return f"{assets_dir_name}/{quote(filename)}"
 
 

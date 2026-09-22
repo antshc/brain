@@ -279,9 +279,45 @@ def test_table_colspan(adf_to_md):
     assert adf_to_md(doc) == (
         "| Column 0 | Column 1 | Column 2 |\n"
         "| --- | --- | --- |\n"
-        "| row 0 col 0-1 | row 0 col 2 |\n"
-        "| row 1 col 0 | row 1 col 1-2 |\n"
-        "| row 2 col 0-2 |"
+        "| row 0 col 0-1 |  | row 0 col 2 |\n"
+        "| row 1 col 0 | row 1 col 1-2 |  |\n"
+        "| row 2 col 0-2 |  |  |"
+    )
+
+
+def test_table_rowspan(adf_to_md):
+    doc = _doc(
+        {
+            "type": "table",
+            "content": [
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {"type": "tableHeader", "content": [_p(_t("Column 0"))]},
+                        {"type": "tableHeader", "content": [_p(_t("Column 1"))]},
+                    ],
+                },
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {"type": "tableCell", "attrs": {"rowspan": 2}, "content": [_p(_t("rows 0-1"))]},
+                        {"type": "tableCell", "content": [_p(_t("row 0"))]},
+                    ],
+                },
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {"type": "tableCell", "content": [_p(_t("row 1"))]},
+                    ],
+                },
+            ],
+        }
+    )
+    assert adf_to_md(doc) == (
+        "| Column 0 | Column 1 |\n"
+        "| --- | --- |\n"
+        "| rows 0-1 | row 0 |\n"
+        "|  | row 1 |"
     )
 
 
