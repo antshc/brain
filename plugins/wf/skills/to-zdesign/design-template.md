@@ -96,45 +96,32 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 - {{actor}} {{usesCapability}} when {{circumstance}}.
 
-## Solution Diagram
+## {{SolutionDiagram|Component / Architecture / System Diagram}}
 
-<!-- Optional. Include only when the user explicitly asks for a Solution Overview diagram. Follow `/doc-architecture-diagram` skill **Solution Diagram** in current mode; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Exactly one solution-level C4Container diagram is required when included, showing containers (deployable/runnable units) and the actors/external systems around them — not classes or flow steps. Each container responsibility is described under the diagram using bullets. The container name is bold. -->
-
-<details>
-<summary>Solution Diagram</summary>
-
-{{solutionDiagram}}
-</details>
-
-## Flow Diagram: {{flowTitle}}
+<!-- This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill in current mode for every representation; that skill owns the template read. Use one or more coordinated representations as needed: System Context (`C4Context`) for landscape and scope, Container Diagram (`C4Container`) for deployable building blocks, and Component Diagram (`C4Component`) for optional decomposition inside one selected deployable. Do not compose a Mermaid skeleton from this template. Beneath each representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
 
 <details>
-<summary>Flow Diagram: {{flowTitle}}</summary>
+<summary>{{SolutionDiagram|Component / Architecture / System Diagram}}</summary>
 
-<!-- Optional. Include only when the user explicitly asks for a Solution Overview flow diagram and ownership by container or component is itself a design decision. Follow `/doc-behavior-diagram` skill **Swimlane Diagram** in current mode; that skill owns the template read. Do not compose a Mermaid skeleton from this template. -->
-
-{{flowDiagram}}
+{{architectureRepresentationsAndResponsibilities}}
 </details>
 
-## Sequence Diagram: {{sequenceTitle}}
+<!-- Repeat the complete functional-slice block below once or many times. Each slice owns one behavior and its decisions. Method-level behavior remains in Detailed Design: Implementation Appendix. -->
+
+## {{functionalSliceTitle}}
 
 <details>
-<summary>Sequence Diagram: {{sequenceTitle}}</summary>
+<summary>{{functionalSliceTitle}}</summary>
 
-<!-- Optional. Include only when the user explicitly asks for a Solution Overview sequence diagram. Follow `/doc-behavior-diagram` skill **Sequence Diagram** in current mode; that skill owns the template read. Do not compose a Mermaid skeleton from this template. Use a sequence diagram to show high-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) over time to complete a scenario. Omit method-level and low-level implementation detail — that belongs in Detailed Design: Implementation Appendix. -->
+<!-- Include exactly one current-mode behavior diagram for this slice. Follow `/doc-behavior-diagram` skill **Flowchart** or **Swimlane Diagram** for process and responsibility ownership, or **Sequence Diagram** for temporal interaction. The diagram title names the behavior without a `Flow Diagram:` or `Sequence Diagram:` prefix. Do not compose a Mermaid skeleton from this template. -->
 
-{{sequenceDiagram}}
+{{functionalSliceBehaviorDiagram}}
+
+**Decisions**
+
+- **{{decisionName}}:** {{decisionContextAndRationale}}
+
 </details>
-
-## Decisions
-
-<!-- {{decisionTitle}} names the overall design choice. {{decisionDescription}} gives its context and rationale. Each {{decisionName}} names one supporting implementation decision in the bullet list. -->
-
-### {{decisionTitle}}
-
-{{decisionDescription}}
-
-- **{{decisionName}}:** {{decision and rationale}}
 
 # Testing Guidelines
 

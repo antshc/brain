@@ -1,6 +1,6 @@
 ---
 name: doc-architecture-diagram
-description: Document software architecture with a Mermaid system context diagram, solution-level container diagram, or deployment view. Use for system landscape and scope questions, current-state architecture, and architecture deltas, including added, removed, or modified containers, systems, actors, relationships, hosts, runtimes, or deployment nodes.
+description: Documents software architecture with a Mermaid system context, container, component, or deployment diagram. Use for system landscape and scope questions, current-state architecture, architecture decomposition within one deployable, and architecture deltas, including added, removed, or modified components, containers, systems, actors, relationships, hosts, runtimes, or deployment nodes.
 ---
 
 # Architecture Diagram
@@ -16,6 +16,10 @@ Show the system under design as a single box with the actors and external system
 ### Container Diagram
 
 Show deployable/runnable containers and the actors or external systems around them at solution level.
+
+### Component Diagram
+
+Decompose one selected deployable into architecturally relevant components and their dependencies. Use when internal responsibilities inside that deployable matter; keep method-level detail out.
 
 ### Deployment View
 
@@ -34,7 +38,7 @@ Use **delta mode** when the user asks for a delta or change-focused diagram, inc
 - **Current mode:** show the relevant current architecture.
 - **Delta mode:** show only added, modified, or removed elements, plus the minimum unchanged context needed to connect them.
 
-System Context is current-mode only; a delta request selects the Container Diagram view.
+System Context is current-mode only; a delta request selects the Container Diagram or Component Diagram view according to whether the change affects deployables or responsibilities inside one deployable.
 
 ## 2. Select view and open its template
 
@@ -46,6 +50,10 @@ Open [system-context-template.md](templates/system-context-template.md).
 
 Open [container-diagram-template.md](templates/container-diagram-template.md).
 
+### Component Diagram
+
+Open [component-diagram-template.md](templates/component-diagram-template.md). Render component diagrams with Mermaid `C4Component`; show one selected deployable boundary and only architecturally relevant components inside it.
+
 ### Deployment View
 
 Open [deployment-view-template.md](templates/deployment-view-template.md). Render deployment views with Mermaid `C4Deployment`; use `Deployment_Node`/`Node` for deployment topology and place deployed containers inside the node that hosts them.
@@ -54,13 +62,13 @@ Open the selected template before drafting. Follow its drawing, styling, delta, 
 
 Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
-**Done when:** the selected template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context and was drawn as a Container Diagram or Deployment View, never a System Context Diagram; Deployment View uses `C4Deployment`; no unused placeholder or instruction-only comment remains.
+**Done when:** the selected template was opened this run; the selected view follows its rules; current mode uses the base palette; delta mode uses the delta rules and minimum context and was drawn as a Container, Component, or Deployment Diagram, never a System Context Diagram; Component Diagram uses `C4Component`; Deployment View uses `C4Deployment`; no unused placeholder or instruction-only comment remains.
 
 ## 3. Assign a diagram id
 
 `diagramId := kebab-case id naming this diagram's subject and view, unique within the file it lands in, e.g. `oms-system-context``
 
-Write it as `%% diagram-id: {{diagramId}}` on its own line — after the closing `---` of the config frontmatter and immediately above the `C4Context`/`C4Container`/`C4Deployment` line, as the output template shows.
+Write it as `%% diagram-id: {{diagramId}}` on its own line — after the closing `---` of the config frontmatter and immediately above the `C4Context`/`C4Container`/`C4Component`/`C4Deployment` line, as the output template shows.
 
 The id is the diagram's published identity: `/publish-page` names its Confluence attachment and Draw.io record after it, so a republish replaces that diagram in place. Redrawing a diagram that already carries an id keeps that id; a fresh id publishes a second copy beside the old one.
 

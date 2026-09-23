@@ -100,6 +100,51 @@ C4Container
 ```
 </details>
 
+## Component Diagram Example
+
+Run `/doc-architecture-diagram` skill **Component Diagram** when one selected deployable needs internal architecture detail. The result is one evidence-grounded `C4Component` view of architecturally relevant components and dependencies inside that deployable; classes such as Managers, Engines, or Accessors appear only when they carry architectural responsibility.
+
+<details>
+<summary>Component Diagram — Order Service</summary>
+
+```mermaid
+---
+config:
+  c4:
+    c4ShapePadding: 20
+---
+%% diagram-id: order-service-components
+C4Component
+    title Component diagram for Order Service
+
+    Container_Ext(api, "Order API", "ASP.NET Core", "Accepts order requests")
+
+    Container_Boundary(orderService, "Order Service") {
+        Component(manager, "Order Manager", "C#", "Validates and coordinates order requests")
+        Component(engine, "Order Engine", "C#", "Applies order processing rules")
+        ComponentDb(accessor, "Order Accessor", "EF Core", "Persists orders")
+    }
+
+    System_Ext(payment, "Payment System", "Authorizes payments")
+
+    Rel(api, manager, "Submits validated orders to", "in-process")
+    Rel(manager, engine, "Delegates processing to")
+    Rel(engine, accessor, "Persists orders through")
+    Rel(engine, payment, "Authorizes payment through", "HTTPS")
+
+    UpdateElementStyle(api, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#8b949e")
+    UpdateElementStyle(manager, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
+    UpdateElementStyle(engine, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
+    UpdateElementStyle(accessor, $fontColor="#c9d1d9", $bgColor="#2a2a2a", $borderColor="#8b949e")
+    UpdateElementStyle(payment, $fontColor="#c9d1d9", $bgColor="#1a1a1a", $borderColor="#8b949e")
+
+    UpdateRelStyle(api, manager, $textColor="#c9d1d9", $lineColor="#8b949e")
+    UpdateRelStyle(manager, engine, $textColor="#c9d1d9", $lineColor="#8b949e")
+    UpdateRelStyle(engine, accessor, $textColor="#c9d1d9", $lineColor="#8b949e")
+    UpdateRelStyle(engine, payment, $textColor="#c9d1d9", $lineColor="#8b949e")
+```
+</details>
+
 ## Container Diagram Delta Example
 
 <details>
