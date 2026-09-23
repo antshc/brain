@@ -36,19 +36,15 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 `design-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons.
 
-The reader-facing architecture-representation section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Every included representation is a complete current view, never a delta. Follow `/doc-architecture-diagram` skill in current mode. Select exactly one representation per section and use its concrete name — `System Context Diagram`, `Container Diagram`, or `Component Diagram` — as both the H2 and `<summary>` text. Repeat the complete section for another coordinated representation when needed. Never emit the template's slash-separated title options.
+The reader-facing architecture-representation section is arc42's Building Block View, embedded inline within `Solution Overview` — not its own H2 or `<summary>`. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill to produce a Container Diagram (`C4Container`) of deployable building blocks, in current mode — never a delta.
 
-| Representation | Include for |
-| --- | --- |
-| System Context (`C4Context`) | Landscape, scope, actors, and external systems when the system boundary needs orientation |
-| Container Diagram (`C4Container`) | Deployable/runnable building blocks and their responsibilities |
-| Component Diagram (`C4Component`) | Optional decomposition of one selected deployable when its internal architectural responsibilities matter |
+Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold.
 
-Beneath each architecture representation, describe every shown building block's responsibility in a bullet with the building block name in bold.
+Include the optional bold `Cross Deployable Flow` section only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram**, one lane per deployable, 1-5 major steps per lane.
 
 A **functional slice** is an end-to-end implementation of a distinct system behavior or outcome. Its boundaries follow functional responsibility rather than technical layers. It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts. Its test seams are the observable inputs and outputs where the slice can be tested independently.
 
-A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, a `<details>` wrapper containing exactly one current-mode behavior diagram, then `**Decisions**` with bold decision names and their context/rationale. Follow `/doc-behavior-diagram` skill **Flowchart** or **Swimlane Diagram** when process or responsibility ownership is primary; follow `/doc-behavior-diagram` skill **Sequence Diagram** when temporal interaction is primary. Keep method-level behavior in `Detailed Design: Implementation Appendix`.
+A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**` with bold decision names and their context/rationale. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for the slice's flow visualization. Keep method-level behavior in `Detailed Design: Implementation Appendix`.
 
 When merging into an existing design, preserve every architecture or functional-slice diagram unless the user confirms its modification, regeneration, or removal.
 
@@ -97,8 +93,8 @@ Maintain `Source Material`:
 1. Confirm every template file used in steps 3–4 was opened this run, not recalled from memory.
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
 3. Populate every core section, in the template's section order, or mark it not applicable. `Current State` is removed entirely, never marked not applicable, unless the user asked for it. `Use cases` has one bold-titled bullet per interaction point.
-4. Include the arc42 Building Block View when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Give each representation its own section whose H2 and `<summary>` use the same concrete representation name; emit no slash-separated title options. Preserve every existing architecture diagram unless the user confirmed a change.
-5. Give every functional slice exactly one current-mode flow, swimlane, or sequence diagram inside its `<details>` wrapper, followed by `**Decisions**` and one or more bold decision names with context/rationale. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
+4. Include the arc42 Building Block View — a Container Diagram embedded inline within `Solution Overview` — when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Preserve every existing architecture diagram unless the user confirmed a change.
+5. Give every functional slice exactly one current-mode sequence diagram, followed by `**Decisions**` and one or more bold decision names with context/rationale. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
 6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
 7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
 8. Put every unresolved conflict in `Open Questions`.
