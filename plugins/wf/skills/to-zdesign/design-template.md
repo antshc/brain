@@ -213,9 +213,20 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 </details>
 
 # Detailed Design: Implementation Appendix
-<!-- Insert zero or more complete appendix templates in this order: GUI Design Delta, REST API Delta, Database Schema Delta, Class Diagram, Sequence Diagram, Deployment View Delta. Follow `/doc-code-diagram`, `/doc-behavior-diagram`, or `/doc-architecture-diagram` in delta mode for diagram appendices; do not compose Mermaid skeletons from this template. Remove this comment and the placeholder when none apply. -->
+<!-- Repeat the complete artifact block below once per independently reviewable implementation artifact, ordered by GUI/visual artifact, contract delta, low-level diagram, prototype finding, then research summary. Preserve source order within a type unless an existing design has a stable order. Remove this instruction and all child blocks when no artifacts apply. Supported content is a supplied GUI mockup, screenshot, or other visual; an API, GUI, database, resource, or other contract delta; an opt-in Class Diagram or implementation-level Sequence Diagram; an evidence-triggered Deployment View Delta; existing prototype findings; or an existing research summary. Embed repository images with useful alt text and repository-relative paths; link supplied non-image or external visuals. Contract and diagram producer skills own their complete artifact-specific output. Prototype content states the question, observed facts, resulting decision, and only the smallest decision-bearing code or configuration snippet, and links the throwaway branch or durable result. Research content states terse findings and consequences and links exactly once to the durable research Markdown artifact without copying its primary-source links. Remove the Artifact line when the block has no link. -->
 
-{{implementationAppendices}}
+## {{artifactTitle}}
+
+<details>
+<summary>{{artifactTitle}}</summary>
+
+**Evidence summary:** {{conciseEvidenceSummary}}
+
+**Artifact:** [{{artifactLinkLabel}}]({{artifactLink}})
+
+{{artifactSpecificContent}}
+
+</details>
 
 # Checklists
 
