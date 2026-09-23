@@ -45,7 +45,7 @@ flowchart TD
 | **discover- / investigate-**              | Resolve unknowns                             | `wayfinder`, `grill-design`, `questioning`, `prototype`, `explore-codebase`               |
 | **research-**                             | Gather external/domain evidence              | `research`, `define-research`                                                             |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-system`, `inspect-nuget-source`                                                  |
-| **to-**                                   | Transform one artifact/state into another    | `to-capabilities`, `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
+| **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
 | **draft-**                                | Author standalone working artifacts          | `draft-story`                                                                             |
 | **record-**                               | Persist established knowledge                | `record-adr`, `record-concept`, `record-service`, `record-term`, `record-deployment-view` |
 | **doc-**                                  | Visualize, document existing knowledge       | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`   |
