@@ -30,7 +30,7 @@ def test_main_writes_markdown_to_md_path_with_default_assets_dir(tmp_path):
     assert result.returncode == 0, result.stderr
     assert md_path.read_text() == "# Simple Page\n\n\n"
     # a page with no attachment reference never creates the default assets folder
-    assert not (tmp_path / "page.assets").exists()
+    assert not (tmp_path / "page.md.assets").exists()
 
 
 def test_main_accepts_an_explicit_assets_dir_override(tmp_path):
@@ -90,7 +90,7 @@ def test_main_attachments_skip_makes_no_credential_or_rest_calls(tmp_path):
 
     assert result.returncode == 0, result.stderr
     assert "skipped" in md_path.read_text()
-    assert not (tmp_path / "page.assets").exists()
+    assert not (tmp_path / "page.md.assets").exists()
 
 
 def test_main_attachments_required_fails_without_writing_when_credentials_are_missing(tmp_path):
@@ -115,7 +115,7 @@ def test_main_attachments_required_fails_without_writing_when_credentials_are_mi
     assert "Attachment retrieval failed:" in result.stderr
     assert "Traceback" not in result.stderr
     assert not md_path.exists()
-    assert not (tmp_path / "page.assets").exists()
+    assert not (tmp_path / "page.md.assets").exists()
 
 
 def test_main_attachments_auto_default_degrades_with_a_missing_credential_note(tmp_path):
@@ -126,7 +126,7 @@ def test_main_attachments_auto_default_degrades_with_a_missing_credential_note(t
 
     assert result.returncode == 0, result.stderr
     assert "ATLASSIAN_API_TOKEN" in md_path.read_text()
-    assert not (tmp_path / "page.assets").exists()
+    assert not (tmp_path / "page.md.assets").exists()
 
 
 def _synthetic_fixture_body() -> dict:
@@ -216,4 +216,4 @@ def test_main_converts_the_synthetic_cross_skill_fixture_with_no_preprocessing(t
     assert "- task one" in markdown
     assert "| Env | Status |" in markdown
     assert "skipped" in markdown
-    assert not (tmp_path / "page.assets").exists()
+    assert not (tmp_path / "page.md.assets").exists()
