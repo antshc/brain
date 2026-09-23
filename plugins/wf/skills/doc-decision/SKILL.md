@@ -1,6 +1,6 @@
 ---
 name: doc-decision
-description: Document architectural decisions in full ADR or compact bullet form. Use when writing a standalone ADR, adding architectural decisions to a document appendix or decision list, or when record-adr needs to render an ADR.
+description: Render established architectural decisions in full ADR or compact bullet form. Use for decision lists, design appendices, and when draft-decision needs an ADR body. Owns formatting, not ADR placement or indexing.
 ---
 
 # Document Decision

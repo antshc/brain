@@ -2,11 +2,11 @@
 
 ## 1. Scope and repository topology
 
-The reporoot itself plays the role of the **harness** for coding agents: context (`CONTEXT.md`, `ARCHITECTURE.md`), decisions (`docs/adr/`, `docs/concepts/`), agent conventions (`.crew/`, `.harness.env`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
+The reporoot itself plays the role of the **harness** for coding agents: context (`CONTEXT.md`, `ARCHITECTURE.md`), architectural Concepts (`docs/concepts/`), agent conventions (`.crew/`, `.harness.env`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
 
 This repo (the **reporoot**) is the **documentation/context repo**, not the codebase.
 
-- **Docs & decisions live at the reporoot:** `CONTEXT.md` (domain glossary) and `ARCHITECTURE.md` (ADR/Concept indexes and the high-level source structure), with ADRs under `docs/adr/` (localized decisions) and Crosscutting Concepts under `docs/concepts/` (architectural backbone).
+- **Docs & decisions live at the reporoot:** `CONTEXT.md` (domain glossary) and `ARCHITECTURE.md` (Concept index and high-level source structure), with Crosscutting Concepts under `docs/concepts/` (architectural backbone). Explicit standalone ADRs may live under `docs/adr/`; they are not indexed by `ARCHITECTURE.md`.
 - **Source code ({{project}}) & git worktrees live in `workspace/`** (git-ignored by the reporoot). The source hierarchy is documented under **Codebase Structure** in `ARCHITECTURE.md`.
 
 Within this file, resolve conflicts in this order: **safety and repository targeting → authoritative sources → navigation → build and validation → documentation conventions.** This ordering scopes only the rules in this file; it does not override `AGENTS.md`, path-scoped instructions, or user instructions. Avoid authoring rules that conflict across instruction files.
@@ -50,7 +50,7 @@ You MUST actually execute the check command above — not merely reference or re
 Consult these before searching the code:
 
 - **Domain glossary:** [`CONTEXT.md`](../CONTEXT.md) — domain terminology and concepts.
-- **Architecture:** [`ARCHITECTURE.md`](../ARCHITECTURE.md) — ADR/Concept indexes, high-level source structure, and Codebase Structure.
+- **Architecture:** [`ARCHITECTURE.md`](../ARCHITECTURE.md) — Concept index, high-level source structure, and Codebase Structure.
 - **{{proejctName}} service overview:** [`{{proejctName}}-service.md`](../docs/services/{{proejctName}}-service.md) — {{proejctName}} service description and `main/src/` application-layer module map.
 - **REST API/contracts:** [`{{proejctName}}-service.swagger.json`](../docs/services/{{proejctName}}-service.swagger.json) — request/response shapes, endpoint paths, status codes, schema definitions.
 - **Support REST API/contracts:** [`support-service.swagger.json`](../docs/services/support-service.swagger.json) — request/response shapes, endpoint paths, status codes, schema definitions for the Support Service.
