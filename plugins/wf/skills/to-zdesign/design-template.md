@@ -21,11 +21,16 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 # Problem Statement and Goals
 
+<details>
+<summary>Problem Statement and Goals</summary>
 <!-- The problem that the user is facing, from the user's perspective, detail the motivation for the change, the issue or enhancement being addressed. Writing style: terse, concise, non-technical -->
 
 {{problemAndGoals}}
 
+</details>
+
 # Requirements
+
 <details>
 <summary>Requirements</summary>
 
@@ -86,34 +91,44 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 # Solution Overview
 
+<details>
+<summary>Solution Overview</summary>
+
 <!-- The solution to the problem, from the user's perspective. Writing style: terse, concise, non-technical -->
 
 {{solutionOverview}}
 
+<!-- An optional diagram section. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill in current mode; that skill owns the template read. Select exactly one representation for this block: System Context Diagram (`C4Context`) for landscape and scope, Container Diagram (`C4Container`) for deployable building blocks, or Component Diagram (`C4Component`) for optional decomposition inside one selected deployable. Keep the H2 and summary titled "Overview"; state the selected representation's exact name in the diagram title itself. Repeat this complete block when coordinated representations are needed. Do not compose a Mermaid skeleton from this template. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
+
+{{architectureRepresentationsAndResponsibilities}}
+
+**{{the flow title| Cross Deployable Flow}}**
+
+<!-- An optional section. Include only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram**; one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
+
+{{crossDeployableFlowDiagram}}
+
+</details>
+
+<!-- Repeat the complete functional-slice block below once or many times. Each slice owns one behavior and its decisions. Method-level behavior, Contracts details remains in Detailed Design. -->
+
 ## Use cases
+
+<details>
+<summary>Use cases</summary>
 
 <!-- Describe where the user interacts with the feature and under what circumstances, such as install, create, upgrade, or undo operations. -->
 
-- {{actor}} {{usesCapability}} when {{circumstance}}.
+- **{{Use case title}}**: {{Use case description}}
 
-## {{architectureRepresentationTitle|Select exactly one: System Context Diagram, Container Diagram, or Component Diagram}}
-
-<!-- This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill in current mode; that skill owns the template read. Select exactly one representation for this block: System Context Diagram (`C4Context`) for landscape and scope, Container Diagram (`C4Container`) for deployable building blocks, or Component Diagram (`C4Component`) for optional decomposition inside one selected deployable. Replace `architectureRepresentationTitle` in both the H2 and summary with that representation's exact name; never emit the placeholder, its hint, or slash-separated title options. Repeat this complete block when coordinated representations are needed. Do not compose a Mermaid skeleton from this template. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
-
-<details>
-<summary>{{architectureRepresentationTitle|Use the same concrete representation name as the H2}}</summary>
-
-{{architectureRepresentationsAndResponsibilities}}
 </details>
-
-<!-- Repeat the complete functional-slice block below once or many times. Each slice owns one behavior and its decisions. Method-level behavior remains in Detailed Design: Implementation Appendix. -->
 
 ## {{functionalSliceTitle}}
 
 <details>
 <summary>{{functionalSliceTitle}}</summary>
 
-<!-- Include exactly one current-mode behavior diagram for this slice. Follow `/doc-behavior-diagram` skill **Flowchart** or **Swimlane Diagram** for process and responsibility ownership, or **Sequence Diagram** for temporal interaction. The diagram title names the behavior without a `Flow Diagram:` or `Sequence Diagram:` prefix. Do not compose a Mermaid skeleton from this template. -->
+<!-- Include exactly one current-mode behavior diagram for this slice. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for flows visualization. The diagram title names the behavior without a `Flow Diagram:` or `Sequence Diagram:` prefix. Do not compose a Mermaid skeleton from this template. -->
 
 {{functionalSliceBehaviorDiagram}}
 
@@ -212,7 +227,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 </details>
 
-# Detailed Design: Implementation Appendix
+# Detailed Design
 <!-- Repeat the complete artifact block below once per independently reviewable implementation artifact, ordered by GUI/visual artifact, contract delta, low-level diagram, prototype finding, then research summary. Preserve source order within a type unless an existing design has a stable order. Remove this instruction and all child blocks when no artifacts apply. Supported content is a supplied GUI mockup, screenshot, or other visual; an API, GUI, database, resource, or other contract delta; an opt-in Class Diagram or implementation-level Sequence Diagram; an evidence-triggered Deployment View Delta; existing prototype findings; or an existing research summary. Embed repository images with useful alt text and repository-relative paths; link supplied non-image or external visuals. Contract and diagram producer skills own their complete artifact-specific output. Prototype content states the question, observed facts, resulting decision, and only the smallest decision-bearing code or configuration snippet, and links the throwaway branch or durable result. Research content states terse findings and consequences and links exactly once to the durable research Markdown artifact without copying its primary-source links. Remove the Artifact line when the block has no link. -->
 
 ## {{artifactTitle}}
