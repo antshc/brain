@@ -1,5 +1,5 @@
 # ARCHITECTURE.md Format
-<!-- `ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it follows, and the index of backbone Crosscutting Concepts. It is the structural counterpart to `CONTEXT.md` (which is the glossary). Keep it about *shape and rules*, not implementation detail — the detail lives in the code and in the Crosscutting Concepts it links to. -->
+<!-- `ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it follows, and the index of Crosscutting Concepts. It is the structural counterpart to `CONTEXT.md` (which is the glossary). Keep it about *shape and rules*, not implementation detail — the detail lives in the code and in the Crosscutting Concepts it links to. -->
 
 ## Structure
 <!--
@@ -74,7 +74,7 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- One row per Concept — the backbone rules of the solution. {{nnnn}}/{{slug}}: file identity. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: terse, agent-optimized. See the `record-concept` skill. -->
+<!-- One row per crosscutting Concept — shared domain, structural, or operational rules. {{nnnn}}/{{slug}}: file identity. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: terse, agent-optimized. See the `record-concept` skill. -->
 
 | # | Concept | Trigger condition | Summary |
 |---|----------|--------------------|---------|

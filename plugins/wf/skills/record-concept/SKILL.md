@@ -1,11 +1,11 @@
 ---
 name: record-concept
-description: Capture one structural, reusable, backbone-defining architectural rule as a Crosscutting Concept the moment it crystallises. Owns CONCEPT-FORMAT.md, the "when to write a Concept" gate, numbering, and the choice between extending an existing record and creating a new one. Called directly by explicit user request, or invoked by grill-design.
+description: Persist a consequential shared domain behavior, structural implementation pattern, or operational policy as a Crosscutting Concept. Own frontmatter, numbering, extend-or-create, file writing, and index synchronization; use doc-concept for the body. Called directly, by define-concept, or by grill-design.
 ---
 
 # Record Concept
 
-Capture **one backbone rule** — the top-level decomposition, or a pattern every feature of a given kind must follow — into `docs/concepts/` the moment it crystallises. Use [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md) for the template.
+Capture **one shared approach** governing multiple building blocks into `docs/concepts/` the moment it crystallises. Use [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md) for the frontmatter; Run `/doc-concept` skill for its body unless the caller supplied a rendered body from that skill.
 
 ## Where the rule belongs
 
@@ -15,7 +15,7 @@ Split on **when the rule is needed**:
 
 | The rule answers | Home | Written by |
 |---|---|---|
-| which building block to reach for, what shape the system takes | Concept, `docs/concepts/` | this skill — continue below |
+| how shared domain behavior, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
 | which option was chosen here, and why the others were not | feature design or standalone ADR | session ledger / `/to-zdesign`; `/draft-decision` on explicit ADR request |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
 | what a contested term means | glossary, `CONTEXT.md` | `/record-term` |
@@ -23,18 +23,18 @@ Split on **when the rule is needed**:
 
 Two tests settle most cases:
 
-- **Would the sentence still be true in another repo, with different tooling?** Yes, and it constrains what gets built → a record. No, it names one project's command, path, or setting → a convention file.
+- **Does it state a transferable approach?** A shared rule may cite this repo's implementation as evidence, but must explain the approach without that example. A command, path, or setting alone → a convention file.
 - **Is it needed while deciding, or while typing?** Deciding → a record. Typing → write-time guidance, which loads automatically through `applyTo` at the moment it applies.
 
-A rule can be genuinely structural *and* have a write-time counterpart. Record the rule once as a Concept, and let the instructions file carry only the wording, naming, or layout that follows from it.
+A rule can be shared across the system *and* have a write-time counterpart. Record the rule once as a Concept, and let the instructions file carry only the wording, naming, or layout that follows from it.
 
 ## When to write a Concept
 
 Write one only when all three are true:
 
-1. **Structural** — it shapes the top-level decomposition or mandates a pattern, rather than settling one local question.
-2. **Reusable** — future features of the same kind are expected to follow it every time.
-3. **Backbone-defining** — it is one of the foundational decisions that hold the architecture together and constrain everything built on top of it.
+1. **Crosscutting** — a domain behavior, structural pattern, or operational policy applies to multiple building blocks or workflows, not just one feature.
+2. **Reusable** — other implementations in its scope should follow the same approach.
+3. **Consequential** — it guides a meaningful design or operational choice and can be checked against behavior, code, tests, or configuration.
 
 If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above. Do not draft an ADR as a side effect.
 
@@ -43,7 +43,7 @@ If any of the three is missing, skip the Concept — route it by *Where the rule
 Runs before any write. A near-duplicate record is worse than a longer one: it splits authority over a decision area, and the `owns` key can then name only one of them.
 
 1. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
-2. A matched record whose scope or `owns` already covers this decision area → **extend it**: add the `Rules` line or guidance to the body, and sharpen `default`, `owns`, `trigger`, or `applies_to` to cover the new case. Resync its row via **Sync index row**. Stop here.
+2. A matched record whose scope or `owns` already covers this decision area → **extend it**: use `/doc-concept` for a body change and sharpen `default`, `owns`, `trigger`, or `applies_to` when needed. Resync its row via **Sync index row**. Stop here.
 3. No match covers the area → **create** a new Concept. Its `owns` phrases must not collide with any existing record's — a phrase belongs to exactly one record.
 
 ## Lazy creation
@@ -65,7 +65,7 @@ Every Concept opens with the YAML frontmatter block defined in [CONCEPT-FORMAT.m
 
 ## Body
 
-Write `Purpose`, `Rules`, and `Design Guidance` per [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md#section-skeleton). `Design Guidance` states the pattern in general terms and stands on its own — a reader applies it without opening any file it points at ([Design Guidance is self-contained](./CONCEPT-FORMAT.md#design-guidance-is-self-contained)).
+Run `/doc-concept` skill to render or revise the body, or accept a body already rendered by it from `/define-concept`. Preserve its required headings and applicable optional sections. This skill alone combines the body with frontmatter and writes the record.
 
 ## Keeping the index in sync
 
@@ -85,4 +85,5 @@ If a row and its record disagree, the frontmatter wins — resync the row, don't
 ## Approval gate
 
 - **Explicit direct request** ("record a Concept for X") — approval is already given; draft and write immediately.
-- **Invoked by an interview-style caller** (`grill-design`) — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.
+- **Invoked by `define-concept`** — its questioning confirmation settled the concept. Write immediately without a second prompt.
+- **Invoked by `grill-design`** — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.
