@@ -16,7 +16,7 @@ Split on **when the rule is needed**:
 | The rule answers | Home | Written by |
 |---|---|---|
 | which building block to reach for, what shape the system takes | Concept, `docs/concepts/` | this skill — continue below |
-| which option was chosen here, and why the others were not | ADR, `docs/adr/` | `/record-adr` |
+| which option was chosen here, and why the others were not | feature design or standalone ADR | session ledger / `/to-zdesign`; `/draft-decision` on explicit ADR request |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
 | what a contested term means | glossary, `CONTEXT.md` | `/record-term` |
 | which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
@@ -30,21 +30,19 @@ A rule can be genuinely structural *and* have a write-time counterpart. Record t
 
 ## When to write a Concept
 
-Write one (instead of, or in addition to, an ADR) only when all three are true:
+Write one only when all three are true:
 
 1. **Structural** — it shapes the top-level decomposition or mandates a pattern, rather than settling one local question.
 2. **Reusable** — future features of the same kind are expected to follow it every time.
 3. **Backbone-defining** — it is one of the foundational decisions that hold the architecture together and constrain everything built on top of it.
 
-If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above; an ADR (see `record-adr`) is the usual next fit.
+If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above. Do not draft an ADR as a side effect.
 
 ## Extend or create
 
-<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
-
 Runs before any write. A near-duplicate record is worse than a longer one: it splits authority over a decision area, and the `owns` key can then name only one of them.
 
-1. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` and `Architecture Decision Records` tables with this rule's surface — its terms and the paths it governs.
+1. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
 2. A matched record whose scope or `owns` already covers this decision area → **extend it**: add the `Rules` line or guidance to the body, and sharpen `default`, `owns`, `trigger`, or `applies_to` to cover the new case. Resync its row via **Sync index row**. Stop here.
 3. No match covers the area → **create** a new Concept. Its `owns` phrases must not collide with any existing record's — a phrase belongs to exactly one record.
 
@@ -53,8 +51,6 @@ Runs before any write. A near-duplicate record is worse than a longer one: it sp
 Create `docs/concepts/` when the first Concept is ready — not before; do nothing if it exists.
 
 ## Next record number
-
-<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
 
 Highest four-digit `NNNN` filename prefix in `docs/concepts/`, plus 1, zero-padded to four digits. An empty or absent directory returns `0001`.
 
@@ -88,8 +84,5 @@ If a row and its record disagree, the frontmatter wins — resync the row, don't
 
 ## Approval gate
 
-<!-- Deliberately duplicated in record-adr and record-concept: each skill must be self-contained. Do not factor out. -->
-
 - **Explicit direct request** ("record a Concept for X") — approval is already given; draft and write immediately.
 - **Invoked by an interview-style caller** (`grill-design`) — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.
-

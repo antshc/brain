@@ -15,7 +15,7 @@ This skill takes the current conversation context and codebase understanding and
 - A **Functional slice** is an end-to-end implementation of one distinct behavior or outcome, bounded by functional responsibility, owned by one Deployable, and independently testable through observable inputs and outputs. Cross-deployable flows connect Functional slices through their contracts.
 
 ## 1. Resolve inputs
-Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the design, and respect any Architecture, concepts, ADRs in the area you're touching.
+Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the design, and respect the Architecture and relevant Concepts; incorporate any ADR explicitly supplied or linked by the inputs.
 
 ## 2. Ground and rank evidence
 Treat existing content outside `Open Questions` as resolved unless marked draft, tentative, or assumed.
