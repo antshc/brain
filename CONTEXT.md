@@ -131,6 +131,26 @@ Its boundaries follow functional responsibility rather than technical layers.
 It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts.
 Its test seams are the observable inputs and outputs where the slice can be tested independently.
 
+```text
+Stakeholder requirement
+	↓
+Functional requirement
+	├── Business rules
+	├── Edge cases
+	└── Acceptance criteria
+```
+
+**Stakeholder requirement**:
+states the desired outcome: *An administrator can control session lifetime.*
+**Functional requirement**: 
+states the required system behavior: *The system lets an administrator configure session lifetime.*
+**Business rule**: 
+states the governing constraint: *Session lifetime must be from one hour through 30 days.*
+**Edge case**: 
+states a boundary, unusual, failure, or exceptional scenario: *A configured session lifetime is zero, absent, expired, or changes while sessions are active.*
+**Acceptance criterion**:
+states observable proof: *When the administrator configures a session lifetime of zero, the system rejects it and explains the validation failure.*
+
 **Inspect**:
 Look at something directly and record what is there.
 _Typical question_: “What does this code/config/system contain?”
