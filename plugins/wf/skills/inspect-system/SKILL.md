@@ -11,13 +11,13 @@ Inspection documents **as-built** — current state, never a delta.
 
 ## Axes
 
-Three axes, one per unit of inspection. Pick by the unit the question is about, load only that axis's references and template, and leave the other two unread.
+Three axes, one per unit of inspection. A capability is the stable product ability in context; its features and functional slices realize it. One functional slice belongs to one deployable: use Behavior to inspect that slice and Flow to trace the contracts connecting related slices across deployables. Pick by the unit the question is about, load only that axis's references and template, and leave the other two unread.
 
 Write to the axis's output path unless the user names a location. Every path is flat — one file directly in `docs/ongoing/`, no subfolder. Fill its template, obeying the `**Rules**` blocks and deleting every one of them from the result.
 
-### Behavior — one deployable
+### Behavior — one deployable's contribution
 
-Inspect how one behavior is implemented inside a deployable. Start from a trigger, follow the executing symbol chain and decisions, and stop at observable outcomes or deployable boundaries. Pick it for how something works, where a decision is made, what a change touches, or which implementation or double actually serves a call.
+Inspect how one deployable fulfills its responsibility in a functional slice. Name the capability and feature the slice realizes, then frame the behavior as an actor performing an action on an object. Start from a trigger, follow the executing symbol chain and decisions, and stop at observable outcomes or deployable boundaries. Pick it for how something works, where a decision is made, what a change touches, or which implementation or double actually serves a call.
 
 - References: [behavior-inspection.md](references/behavior-inspection.md)
 - Template: [behavior-inspection-template.md](templates/behavior-inspection-template.md)
@@ -30,7 +30,7 @@ Inspect how one behavior is implemented inside a deployable. Start from a trigge
 | the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `/doc-behavior-diagram` |
 | which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `/doc-behavior-diagram` |
 | who owns each step and where responsibility changes — handoffs across layer, modules, or teams | a **swimlane diagram** | `/doc-behavior-diagram` |
-| which deployable units and external systems the capability spans | a **container diagram** | `/doc-architecture-diagram` |
+| which deployable-local functional slices and external systems a flow connects | a **container diagram** | `/doc-architecture-diagram` |
 | scope and integration boundary — the actors and external systems around it | a **system context diagram** | `/doc-architecture-diagram` |
 | where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `/doc-architecture-diagram` |
 | which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `/doc-code-diagram` |
@@ -43,9 +43,9 @@ Default to one: triggers enter as parallel participants meeting at the convergen
 
 Render the Mermaid block before declaring the inspection complete. Run `/render-mermaid-png` skill only when the user wants an exported image.
 
-### Flow — cross-deployable chain
+### Flow — cross-deployable slice chain
 
-Inspect how one system behavior travels across runtime or deployment boundaries. Each lane is one **deployable** — something independently runnable or deployed in production: a process, service, container, function, host workload, or scheduled job — and each crossing identifies its contract. Trace breadth first across every outcome-relevant deployable whose executing source you can open, and end each branch at a system whose source you cannot or whose behavior is outside the framed outcome. Pick it when the behavior crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
+Inspect how related functional slices connect across runtime or deployment boundaries. Name the capability and feature they realize. Each functional slice belongs to one **deployable** — something independently runnable or deployed in production: a process, service, container, function, host workload, or scheduled job — and each crossing identifies its contract. Trace breadth first across every outcome-relevant deployable whose executing source you can open, and end each branch at a system whose source you cannot or whose behavior is outside the framed outcome. Pick it when a flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
 
 - References: [flow-inspection.md](references/flow-inspection.md)
 - Template: [flow-inspection-template.md](templates/flow-inspection-template.md)

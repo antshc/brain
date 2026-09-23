@@ -91,7 +91,7 @@ classDiagram
         class {{boundaryClass}}
     }
     namespace {{domainLayer}} {
-        class {{capabilityOwnerClass}}
+        class {{behaviorOwnerClass}}
         class {{dependencyInterface}} {
             <<Interface>>
             +method(type) type
@@ -102,11 +102,11 @@ classDiagram
         }
     }
 
-    {{boundaryClass}} --> {{capabilityOwnerClass}}
-    {{capabilityOwnerClass}} *-- {{relatedClass}}
+    {{boundaryClass}} --> {{behaviorOwnerClass}}
+    {{behaviorOwnerClass}} *-- {{relatedClass}}
     {{relatedClass}} ..|> {{dependencyInterface}}
 
-    note for {{capabilityOwnerClass}} "{{oneLineResponsibilityNote}}"
+    note for {{behaviorOwnerClass}} "{{oneLineResponsibilityNote}}"
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```

@@ -1,11 +1,11 @@
-# Behavior axis — one deployable
+# Behavior axis — one deployable's contribution
 
-The document carries a mermaid diagram of the confirmed mechanism. Scope is one deployable: the trace starts at this unit's triggers and stops at its observable outcomes.
+The document carries a mermaid diagram of the confirmed mechanism. A capability is the stable product ability; a feature and its functional slice realize it. This axis records one deployable's responsibility in that slice, framed as actor + action + object. The trace starts at this unit's triggers and stops at its observable outcomes.
 
 ## Workflow
 
-1. **Frame** — name the capability, trigger(s), and exact behavior in domain language. "When does the system reject an expired session?" beats "how does auth work?".
-2. **Scope** — name the actor, capability, governed object, outcome, and external systems in scope, plus what is explicitly out; keep paths and implementation layers in the technical sections.
+1. **Frame** — name the capability, feature, functional slice, actor, action, object, trigger(s), and exact behavior in domain language. "When does the system reject an expired session?" beats "how does auth work?".
+2. **Scope** — name the capability, feature, functional slice, actor, object, outcome, and external systems in scope, plus what is explicitly out; keep paths and implementation layers in the technical sections.
 3. **Map surface** — enumerate both ends before tracing either (see Surface map), and say which the question covers.
 4. **Map broad** — grep/semantic-search route tables, command registrations, event subscribers, schedulers, and container/provider registrations for candidate triggers. Collect candidates before reading any of them deeply.
 5. **Hypothesize** — write the mechanism as a testable chain (`OrderController.Create` → `OrderService.Place` → `OrdersRepository.Insert`). Each hypothesis names the next thing to confirm.

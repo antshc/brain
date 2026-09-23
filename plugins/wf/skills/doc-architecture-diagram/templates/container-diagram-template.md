@@ -130,7 +130,7 @@ C4Container
 
     System_Boundary(system, "{{systemUnderDesignName}}") {
         Container(entry, "{{entryContainerName}}", "{{entryTechnology}}", "{{entryDescription}}")
-        Container(owner, "{{capabilityOwnerContainerName}}", "{{ownerTechnology}}", "{{ownerDescription}}")
+        Container(owner, "{{responsibilityOwnerContainerName}}", "{{ownerTechnology}}", "{{ownerDescription}}")
         ContainerDb(store, "{{dataStoreName}}", "{{storeTechnology}}", "{{storeDescription}}")
     }
 

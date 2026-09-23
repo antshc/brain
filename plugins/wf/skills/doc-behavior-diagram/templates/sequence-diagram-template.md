@@ -73,7 +73,7 @@ sequenceDiagram
     autonumber
     actor {{actorAlias}}
     participant {{boundaryAlias}} as {{boundaryClass}}
-    participant {{ownerAlias}} as {{capabilityOwnerClass}}
+    participant {{ownerAlias}} as {{behaviorOwnerClass}}
     participant {{dependencyAlias}} as {{dependencyClass}}
 
     {{actorAlias}}->>{{boundaryAlias}}: {{method}}({{args}})
