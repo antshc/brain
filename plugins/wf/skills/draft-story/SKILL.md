@@ -1,5 +1,5 @@
 ---
-description: Draft one atomic, testable, implementation-agnostic **user story** — capability title, stakeholder requirement, functional requirements, acceptance criteria, Jira-sync metadata, and optional Technical notes appendices. Use when the user asks to write, draft, or format a user story, or wants acceptance criteria for a single capability; `/to-stories` runs it to format each story it slices.
+description: Draft one atomic, testable, implementation-agnostic **user story** — capability title, stakeholder requirement, functional requirements, acceptance criteria, Jira-sync metadata, and optional Technical notes appendices. Use when the user asks to write, draft, or format a user story, or wants acceptance criteria for a single capability;
 name: draft-story
 ---
 
