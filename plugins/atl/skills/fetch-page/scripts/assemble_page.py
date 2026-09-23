@@ -78,7 +78,8 @@ def _with_title(markdown: str, title: str) -> str:
 
 
 def default_assets_dir(md_path: Path) -> Path:
-    return md_path.with_suffix(".assets")
+    # keep the `.md.assets` suffix so it sorts next to `<name>.md` alphabetically
+    return md_path.with_name(f"{md_path.name}.assets")
 
 
 def assemble(raw: dict, page_id: str, root: str, assets_dir: str, attachments: str = "auto") -> str:
@@ -129,7 +130,7 @@ def main() -> None:
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
         "--assets-dir",
-        help="Directory to cache this page's attachments into (default: `<md-path stem>.assets`)",
+        help="Directory to cache this page's attachments into (default: `<md-path name>.assets`)",
     )
     parser.add_argument(
         "--attachments",

@@ -33,8 +33,8 @@ def _confluence_stub(attachments, downloads):
     return confluence
 
 
-def test_default_assets_dir_replaces_the_markdown_suffix():
-    assert default_assets_dir(Path("docs/page.md")) == Path("docs/page.assets")
+def test_default_assets_dir_appends_assets_to_the_full_markdown_name():
+    assert default_assets_dir(Path("docs/page.md")) == Path("docs/page.md.assets")
 
 
 def test_extract_title_and_body_reads_the_documented_json_path():
