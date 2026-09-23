@@ -44,7 +44,7 @@ Include the optional bold `Cross Deployable Flow` section only when a flow cross
 
 A **functional slice** is an end-to-end implementation of a distinct system behavior or outcome. Its boundaries follow functional responsibility rather than technical layers. It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts. Its test seams are the observable inputs and outputs where the slice can be tested independently.
 
-A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**` with bold decision names and their context/rationale. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for the slice's flow visualization. Keep method-level behavior in `Detailed Design: Implementation Appendix`.
+A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**` with bold decision names and their context/rationale. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for the slice's flow visualization. Keep method-level behavior in `Detailed Design`.
 
 When merging into an existing design, preserve every architecture or functional-slice diagram unless the user confirms its modification, regeneration, or removal.
 
