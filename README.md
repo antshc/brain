@@ -120,8 +120,8 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
 - [wayfinder](plugins/wf/skills/wayfinder/SKILL.md): plan work larger than one session as a shared map of decision tickets, resolved one at a time.
 - [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a spec and publish it to the ticket tracker.
-- [to-stories](plugins/wf/skills/to-stories/SKILL.md): package requirements into atomic, testable, FE/BE-split user stories with acceptance criteria.
-- [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one user story in the standard format — capability, stakeholder requirement, acceptance criteria, Jira-sync metadata.
+- [to-stories](plugins/wf/skills/to-stories/SKILL.md): turn requirements, `/to-spec` output, or `/to-zdesign` output into an ordered story list, owning numbered headings, dependencies, Jira metadata, and one `/draft-story` run per story.
+- [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one standalone story body with its formatted title, requirements, acceptance criteria, and optional technical notes.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
 - [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
 - [doc-architecture-diagram](plugins/wf/skills/doc-architecture-diagram/SKILL.md), [doc-behavior-diagram](plugins/wf/skills/doc-behavior-diagram/SKILL.md), [doc-code-diagram](plugins/wf/skills/doc-code-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.

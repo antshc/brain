@@ -4,7 +4,15 @@ description: Create or incrementally extend an authoritative feature design from
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces or update one `docs/designs/{{featureSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
+This skill takes the current conversation context and codebase understanding and produces or updates one `docs/designs/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
+
+## Vocabulary
+
+- An **Initiative slug** is the Initiative's stable, filesystem-safe kebab-case identifier.
+- A **Requirement set** groups one Stakeholder requirement with its Functional requirements, Business rules, Edge cases, and Acceptance criteria.
+- A **Spec** packages one or more Requirement sets for planning and handoff.
+- A **Feature design** is the authoritative solution design for one Initiative and may cover multiple Capabilities, Features, and Functional slices.
+- A **Functional slice** is an end-to-end implementation of one distinct behavior or outcome, bounded by functional responsibility, owned by one Deployable, and independently testable through observable inputs and outputs. Cross-deployable flows connect Functional slices through their contracts.
 
 ## 1. Resolve inputs
 Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the design, and respect any Architecture, concepts, ADRs in the area you're touching.
@@ -18,11 +26,9 @@ Let stronger evidence update weaker content. Preserve equal-authority conflicts 
 
 ## 3. Reconcile capabilities
 
-A capability is stable, solution-agnostic behavior with one purpose. It is not a UI, implementation detail, or one-off task.
+Assign every sourced Requirement set to one Capability. Match by purpose and change boundary, not title. Merge only when purpose, actors, rules, permissions, lifecycle, failures, contracts, ownership, and rate of change remain shared. Otherwise split.
 
-Assign every sourced requirement to one capability. Match by purpose and change boundary, not title. Merge only when purpose, actors, rules, permissions, lifecycle, failures, contracts, ownership, and rate of change remain shared. Otherwise split.
-
-Open [design-template.md](design-template.md) with the file-reading tool and draft `Requirements` from its exact table shape: one row per capability. Put the title, stakeholder requirement, and italicized functional sub-requirements in `Requirement`. Leave stakeholder requirement `Details` empty. Only functional sub-requirements have `Details`; render their business rules and edge cases as separate unlabeled bullets. Use `Source` only for PO or Dev team.
+Open [design-template.md](design-template.md) with the file-reading tool and draft `Requirements` from its exact table shape: one top-level row per Stakeholder requirement and one numbered sub-row per Functional requirement. Put the requirement text in `Requirement`; italicize Functional requirements. Leave Stakeholder requirement `Details` empty. Only Functional requirements have `Details`; render their Business rules and Edge cases as separate unlabeled bullets. Use `Source` only for PO or Dev team. Capability is the classification used during reconciliation, not a table row or label.
 
 Name capabilities with behavior and domain entities. Keep functional requirements externally visible and testable. Add design-discovered behavior only when evidence supports it.
 
@@ -30,7 +36,7 @@ Name capabilities with behavior and domain entities. Keep functional requirement
 
 Open [design-template.md](design-template.md) with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit the Building Block View only when its inclusion rule does not apply; omit implementation appendices that evidence does not trigger. `Current State` is the one exception to the `Not applicable` rule: remove it entirely unless the user explicitly asked for it.
 
-Populate `Use cases` with one bold-titled bullet per place the user interacts with the feature (install, create, upgrade, undo, and similar).
+Populate `Use cases` with one bold-titled bullet per actor goal within a Feature. A Feature may have multiple Use cases; an interaction point alone does not define one.
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
@@ -41,8 +47,6 @@ The reader-facing architecture-representation section is arc42's Building Block 
 Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold.
 
 Include the optional bold `Cross Deployable Flow` section only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram**, one lane per deployable, 1-5 major steps per lane.
-
-A **functional slice** is an end-to-end implementation of a distinct system behavior or outcome. Its boundaries follow functional responsibility rather than technical layers. It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts. Its test seams are the observable inputs and outputs where the slice can be tested independently.
 
 A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**`. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for the slice's flow visualization. For every architectural decision owned by the slice, Run `/doc-decision` skill with **compact** format and append its output under `**Decisions**`. Keep method-level behavior in `Detailed Design`.
 
@@ -68,12 +72,20 @@ Populate every `Checklists` subsection. Per the template's own row rule, keep on
 
 For a new design, instantiate the template. For an existing design, merge section by section.
 
+**Design delta.** Compare incoming evidence with the pre-merge design and derive every new or changed design obligation. An obligation may add or change a capability, Feature, Use case, requirement, behavior, decision, constraint, diagram, implementation artifact, or source contribution.
+
+**Coverage map.** Before editing, map each design-delta obligation to the affected Requirements, Problem Statement and Goals, glossary, assumptions or scope, Solution Overview, Use cases, functional slices, testing, rollout, checklists, implementation artifacts, and source rows. Mark a surface unaffected only when the obligation does not change it. Keep the map transient; do not write it into the design.
+
 - Preserve untouched prose, diagrams, and appendices.
 - Preserve existing functional-slice boundaries and diagrams unless confirmed changes require an update.
+- Extend every affected existing section in place.
+- Append a complete functional-slice H2 block when an obligation introduces a distinct behavior. Extend an existing slice only when the behavior, owning Deployable, contracts, and test seams remain coherent; otherwise add a new slice.
+- Append a complete `Detailed Design` artifact H2 block when an obligation introduces an independently reviewable artifact.
 - Preserve existing artifact blocks; update a block matching the same artifact and purpose instead of duplicating it, and remove or supersede one only when stronger evidence supports the change.
 - Add non-conflicting obligations once.
 - Update only content supported by stronger evidence.
-- Update matching capability rows instead of duplicating them.
+- Update matching requirement rows instead of duplicating them.
+- **Idempotency.** Reprocessing the same evidence leaves section count, requirement rows, functional slices, artifact blocks, and source rows unchanged.
 - NEVER regenerate an existing design wholesale.
 
 Maintain `Source Material`:
@@ -92,14 +104,14 @@ Maintain `Source Material`:
 
 1. Confirm every template file used in steps 3–4 was opened this run, not recalled from memory.
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
-3. Populate every core section, in the template's section order, or mark it not applicable. `Current State` is removed entirely, never marked not applicable, unless the user asked for it. `Use cases` has one bold-titled bullet per interaction point.
+3. Populate every core section, in the template's section order, or mark it not applicable. `Current State` is removed entirely, never marked not applicable, unless the user asked for it. `Use cases` has one bold-titled bullet per actor goal within a Feature.
 4. Include the arc42 Building Block View — a Container Diagram embedded inline within `Solution Overview` — when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Preserve every existing architecture diagram unless the user confirmed a change.
 5. Give every functional slice exactly one current-mode sequence diagram, followed by `**Decisions**` and one or more decision bullets rendered by `/doc-decision` with **compact** format. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
 6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
 7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
 8. Put every unresolved conflict in `Open Questions`.
 9. Compare an update with the pre-merge design. Restore unsupported loss.
-10. Remove duplicate requirements, capabilities, and source rows.
+10. Remove duplicate Requirement sets, requirements, and source rows.
 11. Order artifact blocks by GUI/visual, contract delta, low-level diagram, prototype, then research; preserve source order within each type unless the existing design has a stable order. Remove duplicates and restore any unsupported artifact loss from the pre-merge design.
 12. Resolve every embedded image path and artifact link. Use useful image alt text and repository-relative paths for repository images.
 13. Keep prototype snippets minimal and decision-bearing. Give every research block exactly one durable research-artifact link and no copied primary-source link. Exclude Class Diagrams and implementation-level Sequence Diagrams unless explicitly requested, and require evidence for every Deployment View Delta.
@@ -107,6 +119,8 @@ Maintain `Source Material`:
 15. Every included GUI contract Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source.
 16. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `ADR NNNN`/`PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
 17. In `Checklists`, confirm every subsection is present unless its whole category is not applicable (noted in `Details`), and every row keeps only one applicable/not-applicable value.
+18. Verify every design-delta obligation against the coverage map and written design. Every affected existing section is extended, every distinct new behavior has a complete functional-slice H2 block, and every triggered independently reviewable artifact has its own `Detailed Design` H2 block.
+19. Mentally reapply the same inputs and confirm the result would be unchanged; remove any requirement row, slice, artifact, or source-row duplicate that a rerun could create.
 
 ## Gotchas
 

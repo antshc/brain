@@ -1,26 +1,30 @@
 ---
-description: Draft one atomic, testable, implementation-agnostic **user story** — capability title, stakeholder requirement, functional requirements, acceptance criteria, Jira-sync metadata, and optional Technical notes appendices. Use when the user asks to write, draft, or format a user story, or wants acceptance criteria for a single capability;
+description: Draft one standalone, atomic, testable, implementation-agnostic **User story** body beginning with a formatted Title and carrying Requirements, Acceptance Criteria, and optional Technical notes. Use when the user asks to write, draft, or format one User story, or when another skill needs one story's content.
 name: draft-story
 ---
 
-Draft **one** user story for **one capability on one technology layer** (`FE` or `BE`). Owns the story format and the rules every story obeys; callers that slice a requirement set into many stories run this skill once per story.
+Draft and print one standalone **User story** body that advances one **Functional slice**. Own the formatted Title, Requirements, Acceptance Criteria, Implementation Decisions, Contracts Delta, and Technical notes for that body.
 
-**Input:** a capability title, its stakeholder requirement, the functional requirements it covers, and the technology layer. A caller may also supply a story number, a feature slug, and a Blocked-by list. Anything the caller does not supply is derived from the requirement text in context.
+**Input:** an optional Initiative tag, required Deployable kind (`[FE]` or `[BE]`), Feature, Functional slice, verbatim Stakeholder requirement, Functional requirements addressed, and any source Business rules, Edge cases, error conditions, and Acceptance criteria needed to draft the story. Anything absent is derived from the standalone requirement text in context.
 
-**Verbatim rule:** when a prior requirement set is in context, copy the capability title, stakeholder requirement, and functional-requirements list **verbatim**; otherwise derive each from the standalone requirement text.
+**Verbatim rule:** when a prior source artifact supplies a Feature, Functional slice, Stakeholder requirement, or Functional requirement, copy it **verbatim**. Derive only fields the source omits.
 
-Ground the story in the project's own language and structure: read `CONTEXT.md` for the domain glossary and `ARCHITECTURE.md` for the module layout.
+When available, use `CONTEXT.md` for project-specific domain language and `ARCHITECTURE.md` for module placement. The definitions below make this skill independently runnable.
+
+## Vocabulary
+
+- An **Initiative tag** is an optional SCREAMING_SNAKE_CASE label that groups stories under an Initiative.
+- A **Deployable kind** is the `[FE]` or `[BE]` prefix that identifies the Deployable owning a Functional slice.
+- A **Functional slice** is a deployable-local, end-to-end implementation of one distinct behavior or outcome.
 
 ## Principle
-Describe system behavior, not implementation. Name the **entity and behavior**, never a widget, screen element, or technical artifact. If the input requirement already leaks a solution, raise it to the behavior it enables before writing the story — `solution-agnostic` owns that rule.
+Describe system behavior, not implementation. Name the **entity and behavior**, never a widget, screen element, or technical artifact. If the input requirement already leaks a solution, raise it to the behavior it enables before writing the story; `normalize-requirements` skill owns that rule.
 
 ## Workflow
-1. **Assemble the reference block** → capability title, stakeholder requirement, functional-requirements list, under the verbatim rule. *Done when* the story covers exactly one capability on exactly one layer, with nothing from a neighbouring capability folded in.
-2. **Attach sync metadata** → directly under the heading, add Jira ID / Epic ID / Blocked by. Values are placeholders (`TBD`) unless the caller supplies real ones; Blocked-by names only stories the caller listed, else `None`. This block sits outside the story body — never scrubbed, never counted as a criterion. *Done when* all three lines are present.
-3. **Derive acceptance criteria** → apply the Acceptance Criteria rule below. *Done when* every Business Rule, Edge Case, and error condition in the source requirement lands in its own criterion, and each of input, processing, integration, state, and failure is covered.
-4. **Scope to the layer** → a **BE** story's criteria cover API/data/contract/business-rule behavior; an **FE** story's cover presentation/interaction behavior. *Done when* no criterion tests the other layer's behavior.
-5. **Verify** → Run `/normalize-requirements` skill over the capability title, stakeholder requirement, functional requirements, and acceptance criteria only, passing `CONTEXT.md` as the domain glossary — never the sync-metadata block or the Technical notes appendix — then confirm each criterion implies concrete code changes and maps to a responsibility. *Done when* the Quality Check below passes line by line.
-6. **Contracts Delta (optional)** → if the capability changes an API, Database, or Resource contract, Run `/doc-contracts` skill **Assemble and write a contract delta** once per touched contract kind and append its output as the story's optional Contracts Delta appendix. For an `[FE]` story that adds or changes a surface, GUI component, or interaction, also Run that skill's **Assemble and write a GUI delta** and append its output as the **GUI delta** block closing that same appendix — a `[BE]` story never carries one. This appendix is technical, sits outside the Capability/Acceptance Criteria body, and is exempt from the scrub in step 5.
+1. **Assemble the body** → write the exact Title line, then list the verbatim Functional requirements addressed. *Done when* the User story is one Functional slice owned by the named Deployable kind and contains no unrelated behavior.
+2. **Derive Acceptance Criteria** → apply Acceptance Criteria below. *Done when* every applicable Business rule, Edge case, and error condition in the source lands in its own criterion, and input, processing, integration, state, and failure are covered.
+3. **Verify** → Run `/normalize-requirements` skill over the Title, Requirements, and Acceptance Criteria, passing `CONTEXT.md` as the domain glossary when it exists, then confirm each criterion implies concrete code changes and maps to the Functional slice's responsibility. *Done when* Quality Check passes line by line.
+4. **Contracts Delta (optional)** → if the User story changes an API, GUI, Database, Resource, or other contract, Run `/doc-contracts` skill for each touched contract kind and append its output to the optional Contracts Delta appendix. *Done when* every changed contract kind passes `/doc-contracts`' skill own done conditions.
 
 ## Acceptance Criteria
 <acceptance-criteria-rule>
@@ -32,41 +36,35 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 - Fold every applicable Business Rule, Edge Case, and relevant error condition from the source requirement into its own criterion here — do not create separate sections for them.
 </acceptance-criteria-rule>
 
-## Quality Check (before output)
-- Story is atomic and behavior-focused, scoped to exactly one capability and one technology layer.
-- The story names its **capability**, includes the **stakeholder requirement**, and lists the **functional requirements** it covers.
-- When a prior requirement set is in context, the capability title, stakeholder requirement, and functional-requirements list are copied **verbatim**.
-- Capability and stakeholder requirement name a behavior + entity, not a widget, screen, or component — `/normalize-requirements` reported no remaining leak.
-- Each criterion implies clear code changes and a QA could confirm pass/fail by testing. If not, rewrite.
-- Jira ID, Epic ID, and Blocked-by sit in a metadata block directly under the heading, outside the scrubbed body; Blocked-by lists only `(Story n, Jira ID placeholder)` pairs the caller supplied, or `None`.
+## Quality Check
+
+- The first line matches `**Title:** {{[initiativeTag]|optional}}{{deployableKind|[FE] or [BE]}} {{stakeholderRequirement|verbatim Stakeholder requirement}}` exactly.
+- With an Initiative tag, the Title begins like `**Title:** [NOTIFICATIONS][BE] Notify an account owner`; without one, it begins like `**Title:** [FE] Notify an account owner`.
+- The Initiative tag, when supplied, is SCREAMING_SNAKE_CASE and sits immediately before the Deployable kind with no intervening space.
+- The Stakeholder requirement portion of the Title is verbatim.
+- The story is atomic and behavior-focused, constituting exactly one Functional slice owned by one Deployable.
+- Requirements lists the Functional requirements addressed.
+- Supplied Feature, Functional slice, Stakeholder requirement, and Functional requirements remain verbatim.
+- Feature, Functional slice, and Stakeholder requirement name behavior and entities, not widgets, screens, or components; `/normalize-requirements` skill reported no remaining leak.
+- Each criterion implies clear code changes and a QA can confirm pass or fail by testing.
 - Implementation Decisions may name classes, types, objects, or endpoints for navigation, but never a file path or line number.
-- An `[FE]` story that changes a surface or interaction carries a GUI delta block closing Contracts Delta, passing `/doc-contracts`' own Done-when checks; a `[BE]` story carries neither.
-- The `[SLUG]` feature tag is present in the heading only if the user asked for it, is SCREAMING_SNAKE_CASE, and — if already present on a story being edited — is kept unchanged.
+- Every changed contract kind has a complete delta that passes `/doc-contracts`' skill own done conditions.
 
 ## Output Format
 
-Write the story body for Product Owners and QA in plain business language, without code, class names, or technical jargon; each criterion is a clear, testable statement of expected behavior. The sync-metadata block and the optional appendices (**Implementation Decisions**, **Contracts Delta**) are explicitly technical/mechanical and sit outside that plain-language body.
+Write the body for Product Owners and QA in plain business language, without code, class names, or technical jargon; each criterion is a clear, testable statement of expected behavior. The optional appendices are technical and live inside the collapsed **Technical notes** block.
 
-Both appendices are optional and live inside the collapsed **Technical notes** block:
-- **Implementation Decisions** — omit unless this capability requires a specific implementation decision. Class, type, object, and endpoint names are welcome for navigation; never a file path or line number.
-- **Contracts Delta** — omit unless this capability changes an API, Database, or Resource contract, or (FE stories only) a GUI surface. Order its blocks API → Database → Resource → other → GUI.
-
-The heading may carry an optional feature slug, formatted `[SLUG]` in SCREAMING_SNAKE_CASE (uppercase words joined by underscores, e.g. `[NOTIFICATIONS]`), prepended before the `[{{technology}}]` tag. Add it **only when the user explicitly asks for a feature slug** — never by default. Once a slug is present in a title, preserve it verbatim on any later edit to that story; never strip or rename it.
-
-For a standalone story, the heading is `## [{{technology}}] {{capabilityTitle}}`. When the caller supplies a story number, prefix it: `## Story {{n}} — [{{technology}}] {{capabilityTitle}}`. `{{technology}}` is `FE` or `BE`.
+- **Implementation Decisions** — omit unless the story requires a specific implementation decision. Class, type, object, and endpoint names are allowed for navigation; omit file paths and line numbers.
+- **Contracts Delta** — omit unless this User story changes an API, GUI, Database, Resource, or other contract. Order its blocks API → Database → Resource → other → GUI.
 
 ```
-## Story {{n|omit the "Story {{n}} — " prefix for a standalone story}} — {{[SLUG]|optional, SCREAMING_SNAKE_CASE, only when user asked for it }}[{{technology|FE|BE}}] {{capabilityTitle}}
+**Title:** {{[initiativeTag]|optional}}{{deployableKind|[FE] or [BE]}} {{stakeholderRequirement|verbatim Stakeholder requirement}}
 
-**Jira ID:** {{jiraId|TBD}}
-**Epic ID:** {{epicId|TBD}}
-**Blocked by:** {{blockedBy| (Story {{n}}, {{jiraId|TBD}}), (Story {{m}}, {{jiraId|TBD}}) | None}}
+**Requirements:**
+- {{functionalRequirement|verbatim reference or statement}}
+- {{functionalRequirement|verbatim reference or statement}}
 
-{{capabilityTitle|behavior + entity, no surface or placement}}
-
-{{stakeholderRequirement| The <actor> needs to <behavior> <entity>, so <value>}}
-
-### Acceptance Criteria
+**Acceptance Criteria**
 - {{outcome}} when {{condition}}.
 - If {{condition}}, {{actor}} must {{outcome}}.
 - ...
@@ -75,15 +73,13 @@ For a standalone story, the heading is `## [{{technology}}] {{capabilityTitle}}`
 <details>
 <summary>Technical notes</summary>
 
-### Implementation Decisions 
-<!-- technical tone -->
-- {{implementationDecision1}}
-- ...
+**Implementation Decisions** 
+<!-- Omit this section unless an implementation decision is required. -->
+- {{implementationDecision}}
 
-### Contracts Delta
-<!-- technical tone -->
-{{contractsDeltaOutput| sections}}
-{{guiDeltaOutput| FE stories only; omit for BE}}
+**Contracts Delta**
+<!-- Omit this section unless a contract changes. -->
+{{contractsDeltaOutput|sections}}
 
 </details>
 ```

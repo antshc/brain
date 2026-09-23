@@ -1,32 +1,34 @@
 ---
 name: to-spec
 description: Turn the current conversation into a spec and publish it to the project ticket tracker — no interview, just synthesis of what you've already discussed.
-argument-hint: "What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"
+argument-hint: "What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"
 disable-model-invocation: true
 ---
 
 This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
 
+An **Initiative** is a coordinated product change tracked as one planning effort and may encompass multiple Capabilities and Features. A **Requirement set** is one Stakeholder requirement together with its Functional requirements, Business rules, Edge cases, and Acceptance criteria. A **Spec** packages one or more Requirement sets for planning and handoff. These definitions are local because this skill may run without the repository glossary.
+
 The ticket tracker and triage label vocabulary should have been provided to you — Run `/manage-backlog` skill **Setup labels** if not. 
 
-If the `/manage-backlog` skill is not available, fall back to saving the spec to `docs/specs/{{featureIdSlug}}.md` as markdown.
+If the `/manage-backlog` skill is not available, fall back to saving the spec to `docs/specs/{{initiativeIdSlug}}.md` as markdown.
 
 ## Process
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any Concepts and ADRs in the area you're touching.
 
-2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+2. Sketch out the seams at which you're going to test the Initiative. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below. If the feature changes an API, Database, or Resource contract, Run `/doc-contracts` skill once per touched contract kind and inline its output verbatim under **Contracts Delta**. Then Run `/manage-backlog` skill **Publish spec** to publish it to the project ticket tracker. Apply the `spec` triage label - no need for additional triage.
+3. Write the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, Run `/doc-contracts` skill once per touched contract kind and inline its output verbatim under **Contracts Delta**. Then Run `/manage-backlog` skill **Publish spec** to publish it to the project ticket tracker. Apply the `spec` triage label - no need for additional triage.
 
-Ask the user: _"What is the target branch and feature ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
+Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
 <spec-template>
 
 **Target Branch:** `{{targetBranch}}`
-**Feature Id:** `{{featureId}}`
+**Initiative ID:** `{{initiativeId}}`
 
 ## Problem Statement
 
@@ -55,7 +57,7 @@ A LONG, numbered list of functional requirements. Each functional requirement sh
 2. *Allow administrators to restore a deleted file to its original location.*
 </functional-requirement-example>
 
-This list of functional requirements should be extremely extensive and cover all aspects of the feature.
+This list of Functional requirements should cover all relevant behavior in the Initiative.
 
 ## Business Rules
 
@@ -107,6 +109,6 @@ A description of the things that are out of scope for this spec.
 
 ## Further Notes
 
-Any further notes about the feature.
+Any further notes about the Initiative.
 
 </spec-template>

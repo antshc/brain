@@ -1,9 +1,9 @@
 # Design Output Template
 
-Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hidden instruction from the populated document.
+Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every hidden instruction from the populated document.
 
 ````markdown
-# {{featureName}}
+# {{initiativeName}}
 
 <!-- The epic link (JIRA) in format [jira item id: title](link). -->
 
@@ -91,7 +91,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 {{crossDeployableFlowDiagram}}
 
 ## Use cases
-<!-- Describe where the user interacts with the feature and under what circumstances, such as install, create, upgrade, or undo operations. -->
+<!-- Add one bullet per actor goal within a Feature. Include relevant circumstances; an interaction point alone is not a Use case. -->
 
 - **{{Use case title}}**: {{Use case description}}
 
@@ -126,7 +126,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 ## Scale
 
-<!-- Define scale-testing requirements and whether the feature can affect memory consumption, RPO/RTO, or system performance. Include concrete scenarios, quantities, thresholds, and test types such as protected and unprotected VM counts, hosts, volumes, and I/O rate. State whether QA scale regression and feature-specific scale testing are required. -->
+<!-- Define scale-testing requirements and whether the Initiative can affect memory consumption, RPO/RTO, or system performance. Include concrete scenarios, quantities, thresholds, and test types such as protected and unprotected VM counts, hosts, volumes, and I/O rate. State whether QA scale regression and Initiative-specific scale testing are required. -->
 
 {{scaleScenariosAndThresholds}}
 
@@ -146,13 +146,13 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 ## Backward Compatibility
 
-<!-- Describe backward compatibility, whether the feature must be tested against previous versions, and any special compatibility considerations. -->
+<!-- Describe backward compatibility, whether the Initiative must be tested against previous versions, and any special compatibility considerations. -->
 
 {{backwardCompatibility}}
 
 ## Upgrade Considerations
 
-<!-- Describe how the feature affects upgrades, including new or changed database schemas and removed components. -->
+<!-- Describe how the Initiative affects upgrades, including new or changed database schemas and removed components. -->
 
 {{upgradeConsiderations}}
 
