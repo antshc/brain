@@ -50,18 +50,19 @@ A design has one or many functional slices. Synthesize each slice as the templat
 
 When merging into an existing design, preserve every architecture or functional-slice diagram unless the user confirms its modification, regeneration, or removal.
 
-Select implementation appendices from evidence. The two diagram appendices (Class Diagram, Sequence Diagram) are optional — include one only when the user explicitly asks for it, even if the triggering evidence is present. Never add a Flowchart appendix — a flowchart is `Solution Overview`-only. Before drafting any appendix, open its template file from the table below — do not compose an appendix from recollection of its shape:
+Select implementation artifacts from evidence and wrap each independently reviewable artifact in one complete generic block from `design-template.md`. Give every block a unique title that identifies its artifact and purpose, a concise evidence summary, an optional artifact link, and artifact-specific content. Remove all child blocks when no artifacts apply.
 
-| Appendix | Include for | Template |
-| --- | --- | --- |
-| REST API Delta | HTTP contract or behavior changes | Follow `/doc-contracts` skill **API delta rules** — include a `Scenarios` subsection per endpoint per the template's rules |
-| GUI Design Delta | User-visible state or interaction changes | Follow `/doc-contracts` skill **GUI delta rules** — include a `Scenarios` subsection per surface per the template's rules |
-| Database Schema Delta | Persistence contract changes | Follow `/doc-contracts` skill **Database delta rules** |
-| Class Diagram | User explicitly requests it, and evidence shows decided class responsibilities or relationships | Follow `/doc-code-diagram` skill **Class Diagram** in delta mode |
-| Sequence Diagram | User explicitly requests it, and evidence shows decided interaction order, cross-boundary calls, or failure branching, at implementation-level detail | Follow `/doc-behavior-diagram` skill **Sequence Diagram** in delta mode |
-| Deployment View Delta | Deployment topology, hosting, or infrastructure node changes for the feature | Follow `/doc-architecture-diagram` skill **Deployment View** in delta mode |
+Include supported artifacts in this deterministic type order: GUI mockups, screenshots, and other visuals; API, GUI, database, resource, and other contract deltas; low-level diagrams; prototype findings; research summaries. Preserve source order within a type unless the existing design has a stable order.
 
-Open and read only the templates for appendices that evidence triggers. Insert complete appendices in table order. Include changed content only. Follow `/doc-contracts` skill for REST API Delta, GUI Design Delta, and Database Schema Delta; follow `/doc-code-diagram`, `/doc-behavior-diagram`, or `/doc-architecture-diagram` in delta mode for diagram appendices — this skill still owns capability/requirement/solution-overview prose composition and all diagram inclusion/placement decisions.
+Consume supplied GUI assets and existing research and prototype outputs only. Do not generate a missing mockup or run research or a prototype during synthesis. Put genuinely required missing implementation evidence in `Open Questions`.
+
+- **GUI/visual:** Embed a supplied repository image with useful alt text and a repository-relative path; link a supplied non-image or external visual artifact. Summarize the implementation decision or state the visual establishes. Keep visual evidence separate from the GUI contract delta.
+- **Contract:** Follow `/doc-contracts` skill **Assemble and write a contract delta** for each triggered API, database, resource, or other contract kind. Follow `/doc-contracts` skill **Assemble and write a GUI delta** for each triggered GUI contract. Put the complete authoritative output inside its artifact block.
+- **Low-level diagram:** Include a Class Diagram or implementation-level Sequence Diagram only when the user explicitly requests it and evidence supports it. Include a Deployment View Delta when evidence shows deployment topology, hosting, or infrastructure node changes. Follow `/doc-code-diagram` skill **Class Diagram** in delta mode for a Class Diagram. Follow `/doc-behavior-diagram` skill **Sequence Diagram** in delta mode for an implementation-level Sequence Diagram. Follow `/doc-architecture-diagram` skill **Deployment View** in delta mode for a Deployment View Delta. Put the complete Mermaid output inside its artifact block. Keep Flowcharts in `Solution Overview` only.
+- **Prototype:** State the technical question, observed facts, and resulting decision; link the throwaway branch or durable prototype result; include only the smallest decision-bearing code or configuration snippet. Present the snippet as prototype evidence, never production code.
+- **Research:** State terse findings and implementation consequences, then link exactly once to the durable research Markdown artifact. Keep primary-source links in that artifact, not the design body.
+
+GUI assets, prototype result links, and the single research artifact link are implementation evidence or deliverables, not attribution links. The body ban on ADR, Concept, Architecture, and ticket names and links still applies.
 
 ## 5. Merge incrementally
 
@@ -69,6 +70,7 @@ For a new design, instantiate the template. For an existing design, merge sectio
 
 - Preserve untouched prose, diagrams, and appendices.
 - Preserve existing functional-slice boundaries and diagrams unless confirmed changes require an update.
+- Preserve existing artifact blocks; update a block matching the same artifact and purpose instead of duplicating it, and remove or supersede one only when stronger evidence supports the change.
 - Add non-conflicting obligations once.
 - Update only content supported by stronger evidence.
 - Update matching capability rows instead of duplicating them.
@@ -78,7 +80,7 @@ Maintain `Source Material`:
 
 - Use the canonical identifier in `Source`.
 - Set `Kind` to `Spec`, `GitHub issue`, `Wayfinder map`, `Wayfinder decision`, `Wayfinder evidence`, or `Grill conversation`.
-- Use `Wayfinder evidence` for research findings and task completion facts.
+- Record every consumed research or prototype source. Use `Wayfinder evidence` only when the source is Wayfinder evidence; otherwise select the existing source kind that matches its provenance.
 - Keep `Contribution` as a cumulative summary of still-valid consumed evidence.
 - Update an existing canonical source row on re-run. Do not duplicate it.
 - Add one row for each consumed Wayfinder map and closed child issue.
@@ -93,14 +95,17 @@ Maintain `Source Material`:
 3. Populate every core section, in the template's section order, or mark it not applicable.
 4. Include the arc42 Building Block View when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Preserve every existing architecture diagram unless the user confirmed a change.
 5. Give every functional slice exactly one current-mode flow, swimlane, or sequence diagram inside its `<details>` wrapper, followed by `**Decisions**` and one or more bold decision names with context/rationale. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
-6. Include every evidence-triggered appendix and no empty appendix heading.
+6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
 7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
 8. Put every unresolved conflict in `Open Questions`.
 9. Compare an update with the pre-merge design. Restore unsupported loss.
 10. Remove duplicate requirements, capabilities, and source rows.
-11. Every included REST API Delta Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
-12. Every included GUI Design Delta Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source. A new Deployment View Delta appendix, if included, is evidence-backed like every other appendix.
-13. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `ADR NNNN`/`PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
+11. Order artifact blocks by GUI/visual, contract delta, low-level diagram, prototype, then research; preserve source order within each type unless the existing design has a stable order. Remove duplicates and restore any unsupported artifact loss from the pre-merge design.
+12. Resolve every embedded image path and artifact link. Use useful image alt text and repository-relative paths for repository images.
+13. Keep prototype snippets minimal and decision-bearing. Give every research block exactly one durable research-artifact link and no copied primary-source link. Exclude Class Diagrams and implementation-level Sequence Diagrams unless explicitly requested, and require evidence for every Deployment View Delta.
+14. Every included API contract Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
+15. Every included GUI contract Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source.
+16. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `ADR NNNN`/`PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
 
 ## Gotchas
 
