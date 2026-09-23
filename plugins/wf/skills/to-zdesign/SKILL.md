@@ -28,7 +28,9 @@ Name capabilities with behavior and domain entities. Keep functional requirement
 
 ## 4. Synthesize the solution
 
-Open [design-template.md](design-template.md) with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit the Building Block View only when its inclusion rule does not apply; omit implementation appendices that evidence does not trigger.
+Open [design-template.md](design-template.md) with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit the Building Block View only when its inclusion rule does not apply; omit implementation appendices that evidence does not trigger. `Current State` is the one exception to the `Not applicable` rule: remove it entirely unless the user explicitly asked for it.
+
+Populate `Use cases` with one bold-titled bullet per place the user interacts with the feature (install, create, upgrade, undo, and similar).
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
@@ -64,6 +66,8 @@ Consume supplied GUI assets and existing research and prototype outputs only. Do
 
 GUI assets, prototype result links, and the single research artifact link are implementation evidence or deliverables, not attribution links. The body ban on ADR, Concept, Architecture, and ticket names and links still applies.
 
+Populate every `Checklists` subsection. Per the template's own row rule, keep only the applicable/not-applicable value and fill `Details` when relevant; remove a whole subsection only when its entire category is not applicable, and note that in `Details`.
+
 ## 5. Merge incrementally
 
 For a new design, instantiate the template. For an existing design, merge section by section.
@@ -92,7 +96,7 @@ Maintain `Source Material`:
 
 1. Confirm every template file used in steps 3–4 was opened this run, not recalled from memory.
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
-3. Populate every core section, in the template's section order, or mark it not applicable.
+3. Populate every core section, in the template's section order, or mark it not applicable. `Current State` is removed entirely, never marked not applicable, unless the user asked for it. `Use cases` has one bold-titled bullet per interaction point.
 4. Include the arc42 Building Block View when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Give each representation its own section whose H2 and `<summary>` use the same concrete representation name; emit no slash-separated title options. Preserve every existing architecture diagram unless the user confirmed a change.
 5. Give every functional slice exactly one current-mode flow, swimlane, or sequence diagram inside its `<details>` wrapper, followed by `**Decisions**` and one or more bold decision names with context/rationale. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
 6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
@@ -106,6 +110,7 @@ Maintain `Source Material`:
 14. Every included API contract Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
 15. Every included GUI contract Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source.
 16. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `ADR NNNN`/`PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
+17. In `Checklists`, confirm every subsection is present unless its whole category is not applicable (noted in `Details`), and every row keeps only one applicable/not-applicable value.
 
 ## Gotchas
 
