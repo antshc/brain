@@ -34,10 +34,10 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 <!-- adf:wide-table -->
 | **#** | **Requirement** | **Priority** | **Details** | **Source** |
 | --- | --- | --- | --- | --- |
-| 1 | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
-| 1.1 | {{functionalRequirement\|The system performs behavior when condition.}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
-| 1.2 | {{functionalRequirement\|The system performs behavior when condition.}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
-| 2 | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
+| 1 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
+| 1.1 | {{functionalRequirement\|states the required behavior}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 1.2 | {{functionalRequirement\|states the required behavior}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 2 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
 
 </details>
 
