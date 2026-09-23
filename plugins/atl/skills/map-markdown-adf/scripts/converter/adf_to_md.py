@@ -162,7 +162,7 @@ def render_table_cell(cell: dict) -> str:
     parts = []
     for block in cell.get("content", []):
         if block.get("type") == "paragraph":
-            parts.append(render_inline(block.get("content", [])))
+            parts.append(render_inline(block.get("content", [])).replace("  \n", "<br>"))
         else:
             parts.append(render_block(block))
     return " ".join(p.replace("\n", " ") for p in parts if p)

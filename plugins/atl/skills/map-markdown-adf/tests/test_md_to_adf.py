@@ -91,6 +91,25 @@ def test_table(md_to_adf):
     assert len(table["content"]) == 2  # header row + one data row
 
 
+def test_table_cell_preserves_italic_requirement_and_bullet_line_break(md_to_adf):
+    markdown = (
+        "| # | Requirement | Details |\n"
+        "| --- | --- | --- |\n"
+        "| 1.1 | *Required behavior* | • First rule<br>• Boundary case |"
+    )
+    doc = md_to_adf(markdown)
+
+    requirement_cell, details_cell = doc["content"][0]["content"][1]["content"][1:]
+    assert requirement_cell["content"][0]["content"] == [
+        {"type": "text", "text": "Required behavior", "marks": [{"type": "em"}]}
+    ]
+    assert details_cell["content"][0]["content"] == [
+        {"type": "text", "text": "• First rule"},
+        {"type": "hardBreak"},
+        {"type": "text", "text": "• Boundary case"},
+    ]
+
+
 def test_table_recognized_headers_get_colwidth(md_to_adf):
     doc = md_to_adf("| # | Description | Other |\n| --- | --- | --- |\n| 1 | text | x |")
     table = doc["content"][0]
