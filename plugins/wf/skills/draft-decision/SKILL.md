@@ -11,7 +11,7 @@ Draft one point-in-time, localized architectural decision. Run only on an explic
 
 Check whether the decision is hard to reverse, surprising without its context, and a real trade-off between viable alternatives. These are reasons to preserve an ADR rather than a local design decision. Architectural shape, integration patterns, technology lock-in, ownership boundaries, intentional deviations, and invisible constraints can qualify. If a criterion is missing, explain the narrower fit; honor an explicit request to draft the ADR anyway.
 
-Structural rules that future features must follow belong in `/record-concept`; contested terminology belongs in `/record-term`.
+Shared domain, structural, or operational rules that future work must follow belong in `/record-concept`; contested terminology belongs in `/record-term`.
 
 ## Extend or create
 
