@@ -28,19 +28,27 @@ Name capabilities with behavior and domain entities. Keep functional requirement
 
 ## 4. Synthesize the solution
 
-Open [design-template.md](design-template.md) with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit only optional flow, sequence, and implementation appendix sections.
+Open [design-template.md](design-template.md) with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit the Building Block View only when its inclusion rule does not apply; omit implementation appendices that evidence does not trigger.
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
-`design-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons. `Solution Overview` diagrams are optional — omit all by default; add one only when the user explicitly asks for it. These are the only diagrams `Solution Overview` may hold; each is solution-level, not per-capability, and each is always the complete current diagram — never a delta:
+`design-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons.
 
-| Diagram | Include for | Template |
-| --- | --- | --- |
-| Solution Diagram (`C4Container`) | Deployable/runnable containers and the actors/external systems around them | Follow `/doc-architecture-diagram` skill **Solution Diagram** in current mode |
-| Flow Diagram (`swimlane-beta`) | Solution-level process flow where container or component ownership is itself a design decision | Follow `/doc-behavior-diagram` skill **Swimlane Diagram** in current mode |
-| Sequence Diagram (`sequenceDiagram`) | High-level interaction between components, citizen classes, or IDesign-style classes (Manager, Engine, Accessor) — never method-level detail | Follow `/doc-behavior-diagram` skill **Sequence Diagram** in current mode |
+The reader-facing `Component / Architecture / System Diagram` section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Every included representation is a complete current view, never a delta. Follow `/doc-architecture-diagram` skill in current mode and select one or more coordinated representations:
 
-If merging into an existing design that already contains a diagram, NEVER modify, regenerate, or remove it silently. Stop and ask the user for confirmation before changing or removing any existing diagram.
+| Representation | Include for |
+| --- | --- |
+| System Context (`C4Context`) | Landscape, scope, actors, and external systems when the system boundary needs orientation |
+| Container Diagram (`C4Container`) | Deployable/runnable building blocks and their responsibilities |
+| Component Diagram (`C4Component`) | Optional decomposition of one selected deployable when its internal architectural responsibilities matter |
+
+Beneath each architecture representation, describe every shown building block's responsibility in a bullet with the building block name in bold.
+
+A **functional slice** is an end-to-end implementation of a distinct system behavior or outcome. Its boundaries follow functional responsibility rather than technical layers. It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts. Its test seams are the observable inputs and outputs where the slice can be tested independently.
+
+A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, a `<details>` wrapper containing exactly one current-mode behavior diagram, then `**Decisions**` with bold decision names and their context/rationale. Follow `/doc-behavior-diagram` skill **Flowchart** or **Swimlane Diagram** when process or responsibility ownership is primary; follow `/doc-behavior-diagram` skill **Sequence Diagram** when temporal interaction is primary. Keep method-level behavior in `Detailed Design: Implementation Appendix`.
+
+When merging into an existing design, preserve every architecture or functional-slice diagram unless the user confirms its modification, regeneration, or removal.
 
 Select implementation appendices from evidence. The two diagram appendices (Class Diagram, Sequence Diagram) are optional — include one only when the user explicitly asks for it, even if the triggering evidence is present. Never add a Flowchart appendix — a flowchart is `Solution Overview`-only. Before drafting any appendix, open its template file from the table below — do not compose an appendix from recollection of its shape:
 
@@ -60,6 +68,7 @@ Open and read only the templates for appendices that evidence triggers. Insert c
 For a new design, instantiate the template. For an existing design, merge section by section.
 
 - Preserve untouched prose, diagrams, and appendices.
+- Preserve existing functional-slice boundaries and diagrams unless confirmed changes require an update.
 - Add non-conflicting obligations once.
 - Update only content supported by stronger evidence.
 - Update matching capability rows instead of duplicating them.
@@ -82,15 +91,16 @@ Maintain `Source Material`:
 1. Confirm every template file used in steps 3–4 was opened this run, not recalled from memory.
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
 3. Populate every core section, in the template's section order, or mark it not applicable.
-4. Keep at most the diagrams the user explicitly requested; do not add, change, or remove any diagram without asking first.
-5. Include every evidence-triggered appendix and no empty appendix heading.
-6. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
-7. Put every unresolved conflict in `Open Questions`.
-8. Compare an update with the pre-merge design. Restore unsupported loss.
-9. Remove duplicate requirements, capabilities, and source rows.
-10. Every included REST API Delta Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
-11. Every included GUI Design Delta Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source. A new Deployment View Delta appendix, if included, is evidence-backed like every other appendix.
-12. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `ADR NNNN`/`PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
+4. Include the arc42 Building Block View when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Preserve every existing architecture diagram unless the user confirmed a change.
+5. Give every functional slice exactly one current-mode flow, swimlane, or sequence diagram inside its `<details>` wrapper, followed by `**Decisions**` and one or more bold decision names with context/rationale. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
+6. Include every evidence-triggered appendix and no empty appendix heading.
+7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
+8. Put every unresolved conflict in `Open Questions`.
+9. Compare an update with the pre-merge design. Restore unsupported loss.
+10. Remove duplicate requirements, capabilities, and source rows.
+11. Every included REST API Delta Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
+12. Every included GUI Design Delta Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source. A new Deployment View Delta appendix, if included, is evidence-backed like every other appendix.
+13. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `ADR NNNN`/`PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
 
 ## Gotchas
 

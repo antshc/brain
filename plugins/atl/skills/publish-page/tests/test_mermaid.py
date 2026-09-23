@@ -327,6 +327,7 @@ def test_render_diagrams_rejects_unknown_renderer(tmp_path):
         ("sequenceDiagram\n  A->>B: hi", "sequenceDiagram"),
         ("%%{init: {'theme':'base'}}%%\nflowchart LR\n  A-->B", "flowchart"),
         ("---\ntitle: Hello\n---\nclassDiagram\n  A <|-- B", "classDiagram"),
+        ("---\nconfig:\n  c4:\n    c4ShapePadding: 20\n---\nC4Component", "C4Component"),
         ("", ""),
     ],
 )
