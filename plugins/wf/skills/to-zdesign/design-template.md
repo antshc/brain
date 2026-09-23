@@ -29,14 +29,14 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 <details>
 <summary>Requirements</summary>
 
-<!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use a top-level row for each stakeholder requirement and numbered sub-rows for its functional requirements. Put business rules and edge cases in the functional requirement's Details cell. Source is the requirement category (PO / Dev team), not source provenance. -->
+<!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use a top-level row for each stakeholder requirement and numbered sub-rows for its functional requirements. Italicize every functional sub-requirement. Leave Details empty on stakeholder requirement rows; only functional sub-requirement rows have Details. Render business rules as bullets and edge cases as bullets as unlabeled bullets lists in each functional sub-requirement's Details cell. Source is the requirement category (PO / Dev team), not source provenance. -->
 
 <!-- adf:wide-table -->
 | **#** | **Requirement** | **Priority** | **Details** | **Source** |
 | --- | --- | --- | --- | --- |
 | 1 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
-| 1.1 | {{functionalRequirement\|states the required behavior}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
-| 1.2 | {{functionalRequirement\|states the required behavior}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 1.1 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 1.2 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
 | 2 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
 
 </details>
@@ -96,12 +96,12 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 - {{actor}} {{usesCapability}} when {{circumstance}}.
 
-## {{SolutionDiagram|Component / Architecture / System Diagram}}
+## {{architectureRepresentationTitle|Select exactly one: System Context Diagram, Container Diagram, or Component Diagram}}
 
-<!-- This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill in current mode for every representation; that skill owns the template read. Use one or more coordinated representations as needed: System Context (`C4Context`) for landscape and scope, Container Diagram (`C4Container`) for deployable building blocks, and Component Diagram (`C4Component`) for optional decomposition inside one selected deployable. Do not compose a Mermaid skeleton from this template. Beneath each representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
+<!-- This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill in current mode; that skill owns the template read. Select exactly one representation for this block: System Context Diagram (`C4Context`) for landscape and scope, Container Diagram (`C4Container`) for deployable building blocks, or Component Diagram (`C4Component`) for optional decomposition inside one selected deployable. Replace `architectureRepresentationTitle` in both the H2 and summary with that representation's exact name; never emit the placeholder, its hint, or slash-separated title options. Repeat this complete block when coordinated representations are needed. Do not compose a Mermaid skeleton from this template. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
 
 <details>
-<summary>{{SolutionDiagram|Component / Architecture / System Diagram}}</summary>
+<summary>{{architectureRepresentationTitle|Use the same concrete representation name as the H2}}</summary>
 
 {{architectureRepresentationsAndResponsibilities}}
 </details>

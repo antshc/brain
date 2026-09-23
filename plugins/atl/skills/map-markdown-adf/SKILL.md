@@ -75,6 +75,8 @@ A list item's soft-wrapped continuation lines fold into its paragraph, joined by
 
 Marks spanning the join survive, so `- lead **bold` + `  spanning** tail` yields one `strong` span reading `bold spanning`. A deeper-indented marker still nests, and any block start — heading, table, fence, rule, blockquote, `</details>`, or a Confluence marker comment — ends the list instead of folding into it.
 
+Inside a table cell, `<br>` maps to an ADF `hardBreak` and converts back to `<br>`. This preserves multi-line cell content, including separate bullet-glyph lines such as `• first<br>• second`, through publish and fetch.
+
 ## Supported marks
 
 `**strong**`, `*em*`, `` `code` ``, `[link](href)`, `~~strike~~`.

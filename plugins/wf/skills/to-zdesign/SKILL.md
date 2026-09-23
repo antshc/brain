@@ -22,7 +22,7 @@ A capability is stable, solution-agnostic behavior with one purpose. It is not a
 
 Assign every sourced requirement to one capability. Match by purpose and change boundary, not title. Merge only when purpose, actors, rules, permissions, lifecycle, failures, contracts, ownership, and rate of change remain shared. Otherwise split.
 
-Open [design-template.md](design-template.md) with the file-reading tool and draft `Requirements` from its exact table shape: one row per capability. Put the title, stakeholder requirement, and functional requirements in `Requirement`; put business rules and edge cases in `Details`. Use `Source` only for PO or Dev team.
+Open [design-template.md](design-template.md) with the file-reading tool and draft `Requirements` from its exact table shape: one row per capability. Put the title, stakeholder requirement, and italicized functional sub-requirements in `Requirement`. Leave stakeholder requirement `Details` empty. Only functional sub-requirements have `Details`; render their business rules and edge cases as separate unlabeled bullets. Use `Source` only for PO or Dev team.
 
 Name capabilities with behavior and domain entities. Keep functional requirements externally visible and testable. Add design-discovered behavior only when evidence supports it.
 
@@ -34,7 +34,7 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 `design-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons.
 
-The reader-facing `Component / Architecture / System Diagram` section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Every included representation is a complete current view, never a delta. Follow `/doc-architecture-diagram` skill in current mode and select one or more coordinated representations:
+The reader-facing architecture-representation section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Every included representation is a complete current view, never a delta. Follow `/doc-architecture-diagram` skill in current mode. Select exactly one representation per section and use its concrete name — `System Context Diagram`, `Container Diagram`, or `Component Diagram` — as both the H2 and `<summary>` text. Repeat the complete section for another coordinated representation when needed. Never emit the template's slash-separated title options.
 
 | Representation | Include for |
 | --- | --- |
@@ -93,7 +93,7 @@ Maintain `Source Material`:
 1. Confirm every template file used in steps 3–4 was opened this run, not recalled from memory.
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
 3. Populate every core section, in the template's section order, or mark it not applicable.
-4. Include the arc42 Building Block View when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Preserve every existing architecture diagram unless the user confirmed a change.
+4. Include the arc42 Building Block View when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Give each representation its own section whose H2 and `<summary>` use the same concrete representation name; emit no slash-separated title options. Preserve every existing architecture diagram unless the user confirmed a change.
 5. Give every functional slice exactly one current-mode flow, swimlane, or sequence diagram inside its `<details>` wrapper, followed by `**Decisions**` and one or more bold decision names with context/rationale. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
 6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
 7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).

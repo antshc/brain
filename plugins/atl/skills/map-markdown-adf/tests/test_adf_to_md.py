@@ -206,6 +206,51 @@ def test_inline_card_inside_list_item_and_table_cell(adf_to_md):
     )
 
 
+def test_table_cell_preserves_italic_requirement_and_bullet_line_break(adf_to_md):
+    doc = _doc(
+        {
+            "type": "table",
+            "attrs": {"isNumberColumnEnabled": False, "layout": "default"},
+            "content": [
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {"type": "tableHeader", "content": [_p(_t("#"))]},
+                        {"type": "tableHeader", "content": [_p(_t("Requirement"))]},
+                        {"type": "tableHeader", "content": [_p(_t("Details"))]},
+                    ],
+                },
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {"type": "tableCell", "content": [_p(_t("1.1"))]},
+                        {
+                            "type": "tableCell",
+                            "content": [_p({"type": "text", "text": "Required behavior", "marks": [{"type": "em"}]})],
+                        },
+                        {
+                            "type": "tableCell",
+                            "content": [
+                                _p(
+                                    _t("• First rule"),
+                                    {"type": "hardBreak"},
+                                    _t("• Boundary case"),
+                                )
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
+    )
+
+    assert adf_to_md(doc) == (
+        "| # | Requirement | Details |\n"
+        "| --- | --- | --- |\n"
+        "| 1.1 | *Required behavior* | • First rule<br>• Boundary case |"
+    )
+
+
 def test_create_from_template_inline_extension_is_ignored(adf_to_md):
     doc = _doc(
         _p(
