@@ -117,7 +117,22 @@ _Avoid_: test project, test suite
 
 ### Language
 
-Capability -> Feature -> Functional slices -> Stories
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: requirement-to-story-hierarchy
+flowchart TD
+	stakeholderRequirement["Stakeholder requirement: desired outcome"] --> functionalRequirement["Functional requirement: required system behavior"]
+	functionalRequirement --> businessRules["Business rules: governing constraints"]
+	functionalRequirement --> edgeCases["Edge cases: boundary and failure scenarios"]
+	functionalRequirement --> acceptanceCriteria["Acceptance criteria: observable proof"]
+
+	capability["Capability: stable system ability"] --> feature["Feature: user-meaningful behavior"]
+	feature --> functionalSlice["Functional slice: deployable-local end-to-end behavior"]
+	functionalRequirement -. specifies behavior implemented by .-> functionalSlice
+	functionalSlice --> userStory["User story: work toward the slice"]
+
+	classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
 
 **Capability**:
 a stable, high-level ability of the system; relatively coarse-grained what the system can do.. A capability may be realized by multiple features; a feature may contribute to more than one capability.
@@ -130,15 +145,6 @@ A functional slice is an end-to-end implementation of a distinct system behavior
 Its boundaries follow functional responsibility rather than technical layers.
 It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts.
 Its test seams are the observable inputs and outputs where the slice can be tested independently.
-
-```text
-Stakeholder requirement
-	↓
-Functional requirement
-	├── Business rules
-	├── Edge cases
-	└── Acceptance criteria
-```
 
 **Stakeholder requirement**:
 states the desired outcome: *An administrator can control session lifetime.*
