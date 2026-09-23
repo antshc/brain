@@ -1,11 +1,11 @@
 ---
 name: record-adr
-description: Capture one localized, non-obvious architectural decision as an ADR the moment it crystallises. Owns ADR-FORMAT.md, the "when to write an ADR" gate, numbering, and the choice between extending an existing record and creating a new one. Called directly by explicit user request, or invoked by grill-design.
+description: Capture one localized, non-obvious architectural decision as an ADR the moment it crystallises. Owns the "when to write an ADR" gate, numbering, and the choice between extending an existing record and creating a new one; doc-decision renders the record. Called directly by explicit user request, or invoked by grill-design.
 ---
 
 # Record ADR
 
-Capture **one point-in-time, localized decision** into `docs/adr/` the moment it crystallises. Template: [ADR-FORMAT.md](./ADR-FORMAT.md).
+Capture **one point-in-time, localized decision** into `docs/adr/` the moment it crystallises.
 
 A rule that turns out to constrain what gets built, to define a term, or to say how a file is worded belongs in another home — Run `/record-concept`' skill **Where the rule belongs** to route it.
 
@@ -45,6 +45,42 @@ Highest four-digit `NNNN` filename prefix in `docs/adr/`, plus 1, zero-padded to
 
 - **Explicit direct request** ("record an ADR for X") — approval is already given; draft and write immediately.
 - **Invoked by an interview-style caller** (`grill-design`) — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.
+
+## Write the record
+
+Write this frontmatter first:
+
+```md
+---
+id: "{{nnnn}}"
+title: {{decisionTitle}}
+trigger: >-
+	{{comma-separated trigger clauses}}
+summary: >-
+	{{one-paragraph summary}}
+default: >-
+	{{the choice to take when the design doesn't state one}}
+owns: ["{{decision area}}"]
+applies_to:
+	- {{path glob}}
+related: ["{{nnnn}}"]
+---
+```
+
+| Key | Required | Value |
+|-----|----------|-------|
+| `id` | yes | Quoted four-digit record number, matching the filename prefix. |
+| `title` | yes | Same text as the body heading and the index row's Decision cell. |
+| `trigger` | yes | Comma-separated clauses naming the change types that make this decision apply. Source of truth for the index's Trigger condition cell. |
+| `summary` | yes | The index row's Summary cell, verbatim. |
+| `default` | yes | One sentence naming the choice to take when the design doesn't state one. `index-docs` prepends it to the index row's Summary cell. State the choice, never the reference implementation that embodies it. |
+| `owns` | no | Decision-area phrases this record has sole authority over. Add one only where another record could plausibly claim the same area; a phrase may appear in exactly one record. |
+| `applies_to` | no | Repo-relative path globs the decision governs. Widens matching only: a glob miss never overrides a `trigger` clause hit. |
+| `related` | no | Quoted ids of Concepts or ADRs a reader must also load. Keep bidirectional. |
+
+Use folded block scalars (`>-`) for `trigger`, `summary`, and `default`; all three routinely contain `:`, backticks, and `→`.
+
+Run `/doc-decision` skill with **full** format and the established decision context. Append its output after the frontmatter, then write the complete record to `docs/adr/{{nnnn}}-{{slug}}.md`.
 
 ## Keeping the index in sync
 
