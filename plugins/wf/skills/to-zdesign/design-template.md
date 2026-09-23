@@ -105,7 +105,7 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 **Decisions**
 
-- **{{decisionName}}:** {{decisionContextAndRationale}}
+{{compactDecisions| one or more bullets rendered by /doc-decision with **compact** format }}
 
 # Testing Guidelines
 
