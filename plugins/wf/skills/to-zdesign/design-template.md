@@ -21,51 +21,9 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 # Problem Statement and Goals
 
-<details>
-<summary>Problem Statement and Goals</summary>
 <!-- The problem that the user is facing, from the user's perspective, detail the motivation for the change, the issue or enhancement being addressed. Writing style: terse, concise, non-technical -->
 
 {{problemAndGoals}}
-
-</details>
-
-# Requirements
-
-<details>
-<summary>Requirements</summary>
-
-<!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use a top-level row for each stakeholder requirement and numbered sub-rows for its functional requirements. Italicize every functional sub-requirement. Leave Details empty on stakeholder requirement rows; only functional sub-requirement rows have Details. Render business rules as bullets and edge cases as bullets as unlabeled bullets lists in each functional sub-requirement's Details cell. Source is the requirement category (PO / Dev team), not source provenance. -->
-
-<!-- adf:wide-table -->
-| **#** | **Requirement** | **Priority** | **Details** | **Source** |
-| --- | --- | --- | --- | --- |
-| 1 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
-| 1.1 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
-| 1.2 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
-| 2 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
-
-</details>
-
-# Assumptions and Limitations
-
-<details>
-<summary>Assumptions and Limitations</summary>
-
-<!-- List limitations: requirements the solution cannot meet because of constraints or drawbacks, such as high memory consumption or uncovered use cases. List assumptions: criteria that must be fully met for the solution to remain valid. -->
-
-{{assumptionsAndLimitations}}
-
-</details>
-
-# Out of Scope
-
-<details>
-<summary>Out of Scope</summary>
-<!-- List items the proposed solution does not address but that the PO or other stakeholders might reasonably assume are included. -->
-
-{{outOfScope}}
-
-</details>
 
 # Glossary and Abbreviations
 
@@ -77,6 +35,30 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 | {{term}} | {{description}} |
 
 </details>
+
+# Requirements
+
+<!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use a top-level row for each stakeholder requirement and numbered sub-rows for its functional requirements. Italicize every functional sub-requirement. Leave Details empty on stakeholder requirement rows; only functional sub-requirement rows have Details. Render business rules as bullets and edge cases as bullets as unlabeled bullets lists in each functional sub-requirement's Details cell. Source is the requirement category (PO / Dev team), not source provenance. -->
+
+<!-- adf:wide-table -->
+| **#** | **Requirement** | **Priority** | **Details** | **Source** |
+| --- | --- | --- | --- | --- |
+| 1 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
+| 1.1 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 1.2 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 2 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
+
+# Assumptions and Limitations
+
+<!-- List limitations: requirements the solution cannot meet because of constraints or drawbacks, such as high memory consumption or uncovered use cases. List assumptions: criteria that must be fully met for the solution to remain valid. -->
+
+{{assumptionsAndLimitations}}
+
+# Out of Scope
+
+<!-- List items the proposed solution does not address but that the PO or other stakeholders might reasonably assume are included. -->
+
+{{outOfScope}}
 
 # Current State
 
@@ -91,16 +73,16 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 # Solution Overview
 
-<details>
-<summary>Solution Overview</summary>
-
 <!-- The solution to the problem, from the user's perspective. Writing style: terse, concise, non-technical -->
 
 {{solutionOverview}}
 
-<!-- An optional diagram section. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill in current mode; that skill owns the template read. Select exactly one representation for this block: System Context Diagram (`C4Context`) for landscape and scope, Container Diagram (`C4Container`) for deployable building blocks, or Component Diagram (`C4Component`) for optional decomposition inside one selected deployable. Keep the H2 and summary titled "Overview"; state the selected representation's exact name in the diagram title itself. Repeat this complete block when coordinated representations are needed. Do not compose a Mermaid skeleton from this template. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
+<!-- A diagram is optional. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill use the Container Diagram (`C4Container`) for deployable building blocks in current mode; Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
 
-{{architectureRepresentationsAndResponsibilities}}
+{{architectureRepresentationDiagram}}
+
+- **ElementName**: {{DiagramElementResponsibility| 1-3 sentences}}
+- **ElementName**: {{DiagramElementResponsibility| 1-3 sentences}}
 
 **{{the flow title| Cross Deployable Flow}}**
 
@@ -108,25 +90,14 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 {{crossDeployableFlowDiagram}}
 
-</details>
-
-<!-- Repeat the complete functional-slice block below once or many times. Each slice owns one behavior and its decisions. Method-level behavior, Contracts details remains in Detailed Design. -->
-
 ## Use cases
-
-<details>
-<summary>Use cases</summary>
-
 <!-- Describe where the user interacts with the feature and under what circumstances, such as install, create, upgrade, or undo operations. -->
 
 - **{{Use case title}}**: {{Use case description}}
 
-</details>
-
 ## {{functionalSliceTitle}}
 
-<details>
-<summary>{{functionalSliceTitle}}</summary>
+<!-- Repeat the complete functional-slice block once or many times. Each slice owns one behavior and its decisions. Method-level behavior, Contracts details remains in Detailed Design. -->
 
 <!-- Include exactly one current-mode behavior diagram for this slice. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for flows visualization. The diagram title names the behavior without a `Flow Diagram:` or `Sequence Diagram:` prefix. Do not compose a Mermaid skeleton from this template. -->
 
@@ -135,8 +106,6 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 **Decisions**
 
 - **{{decisionName}}:** {{decisionContextAndRationale}}
-
-</details>
 
 # Testing Guidelines
 
@@ -163,54 +132,35 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 </details>
 
-# Backward Compatibility
+# Rollout Considerations
 
 <details>
-<summary>Backward Compatibility</summary>
+<summary>Rollout Considerations</summary>
 
-<!-- Describe backward compatibility, whether the feature must be tested against previous versions, and any special compatibility considerations. -->
-
-{{backwardCompatibility}}
-
-</details>
-
-# Upgrade Considerations
-
-<details>
-<summary>Upgrade Considerations</summary>
-
-<!-- Describe how the feature affects upgrades, including new or changed database schemas and removed components. -->
-
-{{upgradeConsiderations}}
-
-</details>
-
-# Platforms
-
-<details>
-<summary>Platforms</summary>
-
-<!-- List supported platforms, such as VC, VCD, AWS, Azure, AVS, SCVMM, VME, and GCVe. -->
-
-{{supportedPlatforms}}
-
-### Public Cloud Cost Estimation
-
-<!-- Estimate public-cloud development costs in $500 increments to support planning and avoid unexpected charges. Include compute, storage, and other hidden costs; round a lower estimate up to the applicable $500 increment. -->
-
-{{costEstimateInFiveHundredDollarIncrements}}
-
-</details>
-
-# Feature Flag
-
-<details>
-<summary>Feature Flag</summary>
+## Feature Flag
 
 <!-- Contains the decision if the functionality will be disabled using the feature flag or tweak.  -->
 <!-- If configuration tweaks added, modified, deleted during the design, add the table with the columns (Tweak name, Default, Description) -->
 
 {{featureFlagAndReason}}
+
+## Backward Compatibility
+
+<!-- Describe backward compatibility, whether the feature must be tested against previous versions, and any special compatibility considerations. -->
+
+{{backwardCompatibility}}
+
+## Upgrade Considerations
+
+<!-- Describe how the feature affects upgrades, including new or changed database schemas and removed components. -->
+
+{{upgradeConsiderations}}
+
+## {{Platform}} - Public Cloud Cost Estimation
+<!-- List of affected platforms, such as VC, VCD, AWS, Azure, AVS, SCVMM, VME, and GCVe. -->
+<!-- Estimate public-cloud development costs in $500 increments to support planning and avoid unexpected charges. Include compute, storage, and other hidden costs; round a lower estimate up to the applicable $500 increment. -->
+
+{{costEstimateInFiveHundredDollarIncrements}}
 
 </details>
 
