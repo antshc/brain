@@ -121,41 +121,77 @@ _Avoid_: test project, test suite
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: requirement-to-story-hierarchy
 flowchart TD
-	stakeholderRequirement["Stakeholder requirement: desired outcome"] --> functionalRequirement["Functional requirement: required system behavior"]
-	functionalRequirement --> businessRules["Business rules: governing constraints"]
-	functionalRequirement --> edgeCases["Edge cases: boundary and failure scenarios"]
-	functionalRequirement --> acceptanceCriteria["Acceptance criteria: observable proof"]
+	stakeholderRequirement["Stakeholder requirement: desired outcome"] -->|decomposes into| functionalRequirement["Functional requirement: required system behavior"]
+	functionalRequirement -->|governed by| businessRules["Business rules: governing constraints"]
+	functionalRequirement -->|qualified by| edgeCases["Edge cases: boundary and failure scenarios"]
+	functionalRequirement -->|proven by| acceptanceCriteria["Acceptance criteria: observable proof"]
 
-	capability["Capability: stable system ability"] --> feature["Feature: user-meaningful behavior"]
-	feature --> functionalSlice["Functional slice: deployable-local end-to-end behavior"]
-	functionalRequirement -. specifies behavior implemented by .-> functionalSlice
-	functionalSlice --> userStory["User story: work toward the slice"]
+	capability["Capability: stable system ability"] -->|realized by| feature["Feature: user-meaningful behavior"]
+	feature -->|implemented by| functionalSlice["Functional slice: deployable-local end-to-end behavior"]
+	functionalRequirement -.->|specifies| functionalSlice
+	functionalSlice -->|delivered through| userStory["User story: atomic work toward the slice"]
 
 	classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
+Arrows express relationship direction, not cardinality; the definitions below state the allowed cardinality.
+
+**Deployable**:
+An independently runnable or deployed production unit, such as a process, service, container, function, host workload, or scheduled job.
+
 **Capability**:
-a stable, high-level ability of the system; relatively coarse-grained what the system can do.. A capability may be realized by multiple features; a feature may contribute to more than one capability.
+A stable, coarse-grained system ability. A Capability may be realized by multiple Features, and a Feature may contribute to multiple Capabilities.
 
 **Feature**:
-A user-meaningful product behavior that delivers all or part of a capability. A feature may comprise multiple functional slices and can be released only once the slices it requires are complete.
+A user-meaningful product behavior that delivers all or part of a Capability. A Feature may comprise multiple Functional slices and is complete only when its required Functional slices are complete.
 
 **Functional slice**:
-A functional slice is an end-to-end implementation of a distinct system behavior or outcome.
+A deployable-local, end-to-end implementation of a distinct system behavior or outcome.
 Its boundaries follow functional responsibility rather than technical layers.
-It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts.
+It belongs to one deployable; a cross-deployable flow connects Functional slices through their contracts.
 Its test seams are the observable inputs and outputs where the slice can be tested independently.
 
+**User story**:
+An atomic, testable unit of planned work that advances one Functional slice and traces to the Functional requirements and Acceptance criteria it addresses. A Functional slice may require multiple User stories.
+
 **Stakeholder requirement**:
-states the desired outcome: *An administrator can control session lifetime.*
+States the desired outcome: *An administrator can control session lifetime.*
 **Functional requirement**: 
-states the required system behavior: *The system lets an administrator configure session lifetime.*
+States the required system behavior: *The system lets an administrator configure session lifetime.*
 **Business rule**: 
-states the governing constraint: *Session lifetime must be from one hour through 30 days.*
+States the governing constraint: *Session lifetime must be from one hour through 30 days.*
 **Edge case**: 
-states a boundary, unusual, failure, or exceptional scenario: *A configured session lifetime is zero, absent, expired, or changes while sessions are active.*
+States a boundary, unusual, failure, or exceptional scenario: *A configured session lifetime is zero, absent, expired, or changes while sessions are active.*
 **Acceptance criterion**:
-states observable proof: *When the administrator configures a session lifetime of zero, the system rejects it and explains the validation failure.*
+States observable proof: *When the administrator configures a session lifetime of zero, the system rejects it and explains the validation failure.*
+
+**Requirement set**:
+One Stakeholder requirement together with its Functional requirements, Business rules, Edge cases, and Acceptance criteria.
+
+**Specification (Spec)**:
+An artifact that packages one or more Requirement sets for planning and handoff. A Spec is not a level in the behavior hierarchy.
+
+**Initiative**:
+A coordinated product change tracked as one planning effort. An Initiative may encompass multiple Capabilities, Features, Specs, and one Feature design.
+_Avoid_: feature when referring to the whole planning effort
+
+**Initiative slug**:
+A stable, filesystem-safe kebab-case identifier for an Initiative, used in artifact paths.
+_Avoid_: feature slug, Initiative tag
+
+**Initiative tag**:
+An optional SCREAMING_SNAKE_CASE label that groups User stories under an Initiative without changing their Functional-slice scope.
+_Avoid_: feature tag, Initiative slug
+
+**Feature design**:
+The authoritative solution design for one Initiative, potentially covering multiple Capabilities, Features, and Functional slices.
+
+**Use case**:
+An actor-oriented description of one goal within a Feature, including preconditions, a main flow, alternate flows, and postconditions. A Feature may have multiple Use cases.
+
+**Tracer-bullet ticket**:
+An agent-executable planning unit that delivers a narrow, complete, verifiable path through every integration layer needed for one behavior. It may implement part or all of one Functional slice but is not itself a Functional slice.
+_Avoid_: slice, vertical slice
 
 **Inspect**:
 Look at something directly and record what is there.

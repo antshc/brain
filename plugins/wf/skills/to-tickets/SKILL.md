@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: Breaks a spec into tracer-bullet GitHub tickets. Accepts an optional plan or plan.md to guide slicing.
+description: Break a Spec into agent-executable Tracer-bullet functional slices. Accepts optional implementation details or `plan.md` to guide the breakdown.
 argument-hint: "{{milestoneTitle}} [{{implementationDetails}}, `plan.md`]"
 disable-model-invocation: true
 ---

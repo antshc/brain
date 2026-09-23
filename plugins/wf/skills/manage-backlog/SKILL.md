@@ -4,6 +4,8 @@ description: Configure this repo for the workflow (wf:) skills — set up its ti
 ---
 # Actions
 
+An **Initiative** is a coordinated product change tracked as one planning effort and may encompass multiple Capabilities and Features.
+
 Find the heading matching the requested operation and follow its steps exactly — do not skip steps or improvise an alternative command. Each action reads its inputs as `{{placeholder}}` variables already in the caller's context and states what it returns.
 
 
@@ -17,13 +19,13 @@ Run `python scripts/create_labels.py` to create any missing labels.
 
 ## Publish spec
 
-Reads `{{featureId}}`, `{{specTitle}}`, `{{targetBranch}}` from context.
+Reads `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}` from context.
 
-The milestone represents the capability behind `{{featureId}}` and may be reused by many specs. Its title is set only once, on first creation — never renamed by a later spec.
+The milestone represents the Initiative identified by `{{initiativeId}}` and may be reused by many Specs. Its title is set only once, on first creation — never renamed by a later Spec.
 
 1. Look up an existing milestone for this capability:
    ```
-   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{featureId}}")) | .title' | head -1
+   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{initiativeId}}")) | .title' | head -1
    ```
    Set `{{milestoneTitle}}` to the matched title if found.
 
@@ -31,14 +33,14 @@ The milestone represents the capability behind `{{featureId}}` and may be reused
    ```
    gh api repos/$REPO/milestones \
      --method POST \
-     --field title="{{featureId}}: {{specTitle}}" \
-     --field description="**Feature ID:** \`{{featureId}}\`\n**Target Branch:** \`{{targetBranch}}\`"
+   --field title="{{initiativeId}}: {{specTitle}}" \
+   --field description="**Initiative ID:** \`{{initiativeId}}\`\n**Target Branch:** \`{{targetBranch}}\`"
    ```
    If a milestone was already found in step 1, skip this step — do not create or rename it, even if `{{specTitle}}` differs.
 
 3. Create the issue:
    ```
-   gh issue create --label spec --title "{{featureId}}: {{specTitle}}"
+   gh issue create --label spec --title "{{initiativeId}}: {{specTitle}}"
    ```
 
 4. Assign the issue to the milestone, using the resolved `{{milestoneTitle}}` (not a newly derived title):
@@ -62,7 +64,7 @@ If no issue is found, ask the user for the GitHub issue number and fetch it with
 
 ## Find or create milestone
 
-Reads `{{milestoneTitle}}` from context. Use this instead of **Publish spec**'s inline steps when the caller isn't a spec (e.g. a `/wayfinder` map) — the title is taken verbatim, with no feature-id formatting.
+Reads `{{milestoneTitle}}` from context. Use this instead of **Publish spec**'s inline steps when the caller isn't a Spec (e.g. a `/wayfinder` map) — the title is taken verbatim, with no Initiative-ID formatting.
 
 1. Look for an existing milestone with this exact title:
    ```bash

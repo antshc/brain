@@ -40,23 +40,24 @@ Keep the source text at its existing level. Normalize wording; do not promote or
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: requirement-to-story-hierarchy
 flowchart TD
-	stakeholderRequirement["Stakeholder requirement: desired outcome"] --> functionalRequirement["Functional requirement: required system behavior"]
-	functionalRequirement --> businessRules["Business rules: governing constraints"]
-	functionalRequirement --> edgeCases["Edge cases: boundary and failure scenarios"]
-	functionalRequirement --> acceptanceCriteria["Acceptance criteria: observable proof"]
+	stakeholderRequirement["Stakeholder requirement: desired outcome"] -->|decomposes into| functionalRequirement["Functional requirement: required system behavior"]
+	functionalRequirement -->|governed by| businessRules["Business rules: governing constraints"]
+	functionalRequirement -->|qualified by| edgeCases["Edge cases: boundary and failure scenarios"]
+	functionalRequirement -->|proven by| acceptanceCriteria["Acceptance criteria: observable proof"]
 
-	capability["Capability: stable system ability"] --> feature["Feature: user-meaningful behavior"]
-	feature --> functionalSlice["Functional slice: deployable-local end-to-end behavior"]
-	functionalRequirement -. specifies behavior implemented by .-> functionalSlice
-	functionalSlice --> userStory["User story: work toward the slice"]
+	capability["Capability: stable system ability"] -->|realized by| feature["Feature: user-meaningful behavior"]
+	feature -->|implemented by| functionalSlice["Functional slice: deployable-local end-to-end behavior"]
+	functionalRequirement -.->|specifies| functionalSlice
+	functionalSlice -->|delivered through| userStory["User story: atomic work toward the slice"]
 
 	classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-- A **Capability** is a stable, high-level system ability.
+- A **Deployable** is an independently runnable or deployed production unit.
+- A **Capability** is a stable, coarse-grained system ability. A Capability may be realized by multiple Features, and a Feature may contribute to multiple Capabilities.
 - A **Feature** is a user-meaningful product behavior that delivers all or part of a capability.
 - A **Functional slice** is an end-to-end implementation of one distinct behavior or outcome within one deployable; connected deployables own related slices linked by contracts.
-- A **User story** expresses work toward one functional slice; keep its referenced capability, feature, and functional-slice scope unchanged.
+- A **User story** is an atomic, testable unit of planned work that advances one Functional slice and traces to the Functional requirements and Acceptance criteria it addresses.
 
 Do not replace a defined **Feature** or **Functional slice** with a generic capability, requirement, or story. Their names are domain terms when supplied by the glossary; scrub only leaked artifacts within their descriptions.
 
