@@ -117,8 +117,10 @@ _Avoid_: test project, test suite
 
 ### Language
 
+Capability -> Feature -> Functional slices -> Stories
+
 **Capability**:
-Usually larger; describes what the system can do, not necessarily one mergeable unit. A capability may be realized by multiple features; a feature may contribute to more than one capability.
+a stable, high-level ability of the system; relatively coarse-grained what the system can do.. A capability may be realized by multiple features; a feature may contribute to more than one capability.
 
 **Feature**:
 A user-meaningful product behavior that delivers all or part of a capability. A feature may comprise multiple functional slices and can be released only once the slices it requires are complete.
@@ -126,6 +128,7 @@ A user-meaningful product behavior that delivers all or part of a capability. A 
 **Functional slice**:
 A functional slice is an end-to-end implementation of a distinct system behavior or outcome.
 Its boundaries follow functional responsibility rather than technical layers.
+It belongs to one deployable; a cross-deployable flow connects functional slices through their contracts.
 Its test seams are the observable inputs and outputs where the slice can be tested independently.
 
 **Inspect**:

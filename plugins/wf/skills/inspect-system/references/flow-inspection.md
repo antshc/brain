@@ -1,6 +1,6 @@
-# Flow axis — cross-deployable chain
+# Flow axis — cross-deployable slice chain
 
-Breadth first, depth later. One deployable is one lane; the chain continues through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. **One chain run produces one document.** Depth inside a lane belongs to the **Behavior** axis, offered as a follow-up once the chain is complete.
+Breadth first, depth later. One deployable and its functional slice are one lane; the chain connects related slices through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. **One chain run produces one document.** Depth inside a lane belongs to the **Behavior** axis, offered as a follow-up once the chain is complete.
 
 ## Tiers
 

@@ -1,15 +1,18 @@
-# Behavior Inspection: {{featureName}}
+# Behavior Inspection: {{functionalSliceName}}
 
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
-- Question, Scope, and Summary use domain anchors — actor, capability, governed object, outcome, named external system — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
+- Question, Scope, and Summary use domain anchors — capability, feature, functional slice, actor, action, object, outcome, named external system — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
 - Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the skill. A bare symbol name is not evidence.
 - Quote the deciding line whenever it is short enough to settle the claim on sight.
 - Executing code proves behavior; tests, comments, and docs state only intent — record any mismatch as a finding.
 - Nothing reaches the diagram, tables, or conclusion without a Fact behind it.
 - Scope is one deployable. The only cross-boundary nodes allowed are this unit's own triggers and observable outcomes; upstream and downstream internals belong to their own documents.
 
-- Question: {{the exact domain question — actor, capability, governed object, outcome}}
+- Capability: {{stable product ability this slice realizes}}
+- Feature: {{user-meaningful behavior that realizes the capability}}
+- Functional slice: {{end-to-end behavior or outcome inspected here}}
+- Question: {{the exact domain question — actor, action, object, outcome}}
 - Scope: {{the domain boundary, named external systems, and what's explicitly out}}
 - Chain: {{link to the chain document and this lane's number, or — when researched standalone}}
 - Inbound: {{the contract this lane receives and its handoff evidence, or — when researched standalone}}

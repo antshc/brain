@@ -2,13 +2,16 @@
 
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
-- Question, Scope, and Summary use domain anchors — actors, outcome, governed object, and named systems — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
+- Question, Scope, and Summary use domain anchors — capability, feature, functional slices, actor, action, object, outcome, and named systems — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
 - Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the skill. A bare service name is not evidence.
 - Every diagram node, Flow row, boundary claim, and Conclusion statement traces to a Fact. Quote the deciding line whenever it settles a claim on sight.
 - Executing code and a probed correlation id prove the chain; deployment diagrams, READMEs, comments, and team knowledge state only intent. Record mismatches as Facts.
 - Scope is one end-to-end chain. Each deployable appears once as one lane with 1–5 ordered major-step nodes; deeper internal mechanisms belong to optional Behavior follow-ups.
 
-- Question: {{the exact end-to-end outcome being traced}}
+- Capability: {{stable product ability the flow realizes}}
+- Feature: {{user-meaningful behavior that realizes the capability}}
+- Functional slices: {{deployable-local slices connected by this flow}}
+- Question: {{the exact actor, action, object, and end-to-end outcome being traced}}
 - Scope: {{the external entry, terminal boundary, named systems, and what's explicitly out}}
 - Status: investigating | answered
 
@@ -28,9 +31,9 @@
 
 **Rules:** One row per deployable in chain order. A deployable is a unit production starts independently; artifacts belong in their executor's major steps. `Receives` names the external entry for the first lane and the boundary contract for later lanes. `Major steps` lists 1–5 ordered, boundary-relevant responsibilities that explain how the inbound contract becomes the outbound contract; put deeper internal decisions in Behavior follow-ups.
 
-| # | Deployable | Receives | Major steps | Emits | Evidence |
-|---|---|---|---|---|---|
-| 1 | {{service, container, function, worker, host workload, or scheduled job}} | {{external entry or inbound contract}} | {{1–5 ordered steps, each backed by a Fact}} | {{outbound contract or terminal effect}} | {{Fact #; file reference}} |
+| # | Deployable | Functional slice | Receives | Major steps | Emits | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | {{service, container, function, worker, host workload, or scheduled job}} | {{deployable-local end-to-end behavior or outcome}} | {{external entry or inbound contract}} | {{1–5 ordered steps, each backed by a Fact}} | {{outbound contract or terminal effect}} | {{Fact #; file reference}} |
 
 ## Boundary contracts
 
