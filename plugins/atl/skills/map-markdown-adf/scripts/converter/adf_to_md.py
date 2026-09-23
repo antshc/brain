@@ -180,6 +180,8 @@ def render_inline(nodes: list[dict]) -> str:
             parts.append(render_status(node))
         elif node_type == "inlineCard":
             parts.append(render_inline_card(node))
+        elif node_type == "inlineExtension":
+            parts.append(render_inline_extension(node))
         else:
             raise NotImplementedError(f"unhandled inline node type '{node_type}'")
     return "".join(parts)
@@ -190,6 +192,14 @@ def render_inline_card(node: dict) -> str:
     if not url:
         raise ValueError("inlineCard node is missing a non-empty url")
     return f"[{url}]({url})"
+
+
+def render_inline_extension(node: dict) -> str:
+    extension_key = node.get("attrs", {}).get("extensionKey", "")
+    if extension_key == "create-from-template":
+        return ""
+    else:
+        raise NotImplementedError(f"unhandled ADF inline extension '{extension_key}'")
 
 
 def render_status(node: dict) -> str:

@@ -206,6 +206,28 @@ def test_inline_card_inside_list_item_and_table_cell(adf_to_md):
     )
 
 
+def test_create_from_template_inline_extension_is_ignored(adf_to_md):
+    doc = _doc(
+        _p(
+            {
+                "type": "inlineExtension",
+                "attrs": {
+                    "extensionType": "com.atlassian.confluence.macro.core",
+                    "extensionKey": "create-from-template",
+                    "parameters": {
+                        "macroParams": {
+                            "spaceKey": {"value": "Infra"},
+                            "templateId": {"value": "134021445"},
+                            "buttonLabel": {"value": "Create Design Page from template"},
+                        }
+                    },
+                },
+            }
+        )
+    )
+    assert adf_to_md(doc) == ""
+
+
 def test_inline_card_without_url_raises(run_cli):
     doc = _doc(_p({"type": "inlineCard", "attrs": {}}))
     result = run_cli("adf-to-md", json.dumps(doc))
