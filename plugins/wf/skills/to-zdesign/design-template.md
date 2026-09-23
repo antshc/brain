@@ -43,15 +43,24 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 
 # Assumptions and Limitations
 
+<details>
+<summary>Assumptions and Limitations</summary>
+
 <!-- List limitations: requirements the solution cannot meet because of constraints or drawbacks, such as high memory consumption or uncovered use cases. List assumptions: criteria that must be fully met for the solution to remain valid. -->
 
 {{assumptionsAndLimitations}}
 
+</details>
+
 # Out of Scope
 
+<details>
+<summary>Out of Scope</summary>
 <!-- List items the proposed solution does not address but that the PO or other stakeholders might reasonably assume are included. -->
 
 {{outOfScope}}
+
+</details>
 
 # Glossary and Abbreviations
 
