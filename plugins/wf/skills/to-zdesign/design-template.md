@@ -29,13 +29,15 @@ Instantiate this template at `docs/designs/{{featureSlug}}.md`. Remove every hid
 <details>
 <summary>Requirements</summary>
 
-<!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; Distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use one row per capability, with its stakeholder requirement and functional requirements in the Details column. Row numbers express capability order. Source is the requirement category (PO / Dev team), not source provenance. -->
+<!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use a top-level row for each stakeholder requirement and numbered sub-rows for its functional requirements. Put business rules and edge cases in the functional requirement's Details cell. Source is the requirement category (PO / Dev team), not source provenance. -->
 
 <!-- adf:wide-table -->
 | **#** | **Requirement** | **Priority** | **Details** | **Source** |
 | --- | --- | --- | --- | --- |
-|  | {{capabilityTitle\|behavior + entity}} | {{priority\|MVP / Should have / Nice to have}} | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{businessRules\|State invariants, or None.}}<br>- {{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
-|  | {{nextCapabilityTitle\|behavior + entity}} | {{priority\|MVP / Should have / Nice to have}} | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{functionalRequirement\|behavior when condition}}<br>- {{businessRules\|State invariants, or None.}}<br>- {{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 1 | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
+| 1.1 | {{functionalRequirement\|The system performs behavior when condition.}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 1.2 | {{functionalRequirement\|The system performs behavior when condition.}} | {{priority\|MVP / Should have / Nice to have}} | {{businessRules\|State invariants, or None.}}<br>{{edgeCases\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
+| 2 | {{stakeholderRequirement\|The actor needs to perform behavior on an entity, so value is achieved.}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
 
 </details>
 
