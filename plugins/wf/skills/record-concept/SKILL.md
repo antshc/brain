@@ -1,6 +1,6 @@
 ---
 name: record-concept
-description: Persist a consequential shared domain behavior, structural implementation pattern, or operational policy as a Crosscutting Concept. Own frontmatter, numbering, extend-or-create, file writing, and index synchronization; use doc-concept for the body. Called directly, by define-concept, or by grill-design.
+description: Persist a consequential shared business process, structural implementation pattern, or operational policy as a Crosscutting Concept. Own frontmatter, record identity, extend-or-create, file writing, and index synchronization; use doc-concept for the body. Called directly, by define-concept, or by grill-design.
 ---
 
 # Record Concept
@@ -15,7 +15,7 @@ Split on **when the rule is needed**:
 
 | The rule answers | Home | Written by |
 |---|---|---|
-| how shared domain behavior, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
+| how a shared business process, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
 | which option was chosen here, and why the others were not | feature design or standalone ADR | session ledger / `/to-zdesign`; |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
 | what a contested term means | glossary, `CONTEXT.md` | `/record-term` |
@@ -32,7 +32,7 @@ A rule can be shared across the system *and* have a write-time counterpart. Reco
 
 Write one only when all three are true:
 
-1. **Crosscutting** — a domain behavior, structural pattern, or operational policy applies to multiple building blocks or workflows, not just one feature.
+1. **Crosscutting** — a business process, structural pattern, or operational policy applies to multiple building blocks or workflows, not just one feature.
 2. **Reusable** — other implementations in its scope should follow the same approach.
 3. **Consequential** — it guides a meaningful design or operational choice and can be checked against behavior, code, tests, or configuration.
 
@@ -50,9 +50,9 @@ Runs before any write. A near-duplicate record is worse than a longer one: it sp
 
 Create `docs/concepts/` when the first Concept is ready — not before; do nothing if it exists.
 
-## Next record number
+## Record identity
 
-Highest four-digit `NNNN` filename prefix in `docs/concepts/`, plus 1, zero-padded to four digits. An empty or absent directory returns `0001`.
+A record is named `docs/concepts/{{kind}}-{{slug}}.md` and its `id` is that filename stem. `{{kind}}` is the kind of the `/doc-concept` template the body came from — `domain`, `structure`, or `ops` — so the directory listing groups the families; `{{slug}}` is the title in kebab-case. Sharpen the slug when a name is already taken; the identity carries no counter, so nothing has to be renumbered.
 
 ## Frontmatter is mandatory
 
@@ -60,7 +60,7 @@ Every Concept opens with the YAML frontmatter block defined in [CONCEPT-FORMAT.m
 
 1. Author `id`, `title`, `trigger`, `summary`, `applies_to` before writing the body — they force the "does this apply to me?" decision up front.
 2. Derive `trigger` with `/index-docs`' skill **Generate trigger condition**, then write the returned value into frontmatter — not straight into the table.
-3. `related` is bidirectional: adding `related: ["0009"]` here means adding this record's id to `0009`'s `related` in the same change. A one-directional link is lost to any reader arriving from the other side.
+3. `related` is bidirectional: adding `related: ["structure-skill-owned-code"]` here means adding this record's id to that record's `related` in the same change. A one-directional link is lost to any reader arriving from the other side.
 4. Superseding or retiring a Concept applies the marker to its index row via `/index-docs`' skill **Sync index row**; the record itself carries no status field.
 
 ## Body
@@ -75,8 +75,7 @@ Pass `{{rowMetadata}}` **from the record's frontmatter**, so the table stays a p
 
 | Column | Frontmatter key |
 |--------|-----------------|
-| `#` | `id` (linked to the record path) |
-| `Concept` | `title` |
+| `Concept` | `title`, linked to the record path |
 | `Trigger condition` | `trigger` |
 | `Summary` | `summary` |
 

@@ -21,8 +21,8 @@ Default key→column mapping, overridable by `{{tableMetadata}}`:
 
 | Frontmatter key | Column |
 |-----------------|--------|
-| `id` | `#`, rendered as a link to the record path |
-| `title` | the record-name column (`Concept`, `Decision`, `Service`) |
+| `id` | not a column; the record's identity, used to locate its row |
+| `title` | the record-name column (`Concept`, `Decision`, `Service`), rendered as a link to the record path |
 | `trigger` | `Trigger condition` |
 | `summary` | `Summary`, preceded by `default` |
 | `default` | `Summary`, as a leading `**Default:** {{default}}` sentence before `summary` |
