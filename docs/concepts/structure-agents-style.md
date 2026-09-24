@@ -1,26 +1,3 @@
----
-id: "0007"
-title: Agent Design
-trigger: >-
-  writing or reviewing an `.agent.md`, composing an agent from skills, a vague or generic persona description,
-  an agent owning specialized complexity, an agent drifting into inconsistent behavior across invocations,
-  deciding how autonomous an agent should be, an agent with no stated output format, declaring which files or
-  areas an agent covers, a family of related agents, one agent overriding another's phase
-summary: >-
-  Every agent defines a concrete objective, bounded scope, autonomy, specific expertise, a working style,
-  explicit **never** guardrails, and a concrete output format. Complex agents delegate specialized procedures
-  and domain complexity to focused skills with clear inputs and outputs, keeping behavior predictable and
-  reviewable.
-default: >-
-  Give an agent one concrete deliverable, a bounded scope, stated autonomy, explicit never-rules, and a literal
-  output-format block; delegate every specialized procedure to a skill.
-owns:
-  - "agent objective, scope, autonomy, guardrails, and output contract"
-applies_to:
-  - plugins/**/agents/**
-related: ["0005", "0010"]
----
-
 # Agent Design
 
 ## Purpose
@@ -43,7 +20,7 @@ stays predictable and reviewable.
 Keep the agent body on orchestration and its own judgment; everything specialized moves behind a skill with
 documented inputs and outputs. Delegation and the call style that carries it are owned by
 [0010](0010-skill-composition.md), and the ordered-execution mechanism by
-[0005](0005-checklist-workflow.md).
+[structure-checklist-workflow](structure-checklist-workflow.md).
 
 How to word the agent file itself is write-time guidance — see
 [agent-skills.instructions.md](../../.github/instructions/agent-skills.instructions.md).

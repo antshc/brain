@@ -1,34 +1,3 @@
----
-id: "0011"
-title: Improvement Flywheel
-trigger: >-
-  an agent repeating a mistake a previous run already hit, deciding where a fix for agent behaviour is recorded,
-  rewriting a skill for something a memory line would fix, session friction worth keeping, a recurring question
-  the agent should not need to ask, a gotcha discovered mid-run, choosing between memory and a skill edit, an
-  agent using the wrong tool or skipping a validation, a session ending with friction nothing has recorded, a
-  document that misrouted the very run it was steering
-summary: >-
-  An observed agent failure is routed to the cheapest tier that closes it before anything is rewritten: a
-  missing fact becomes a memory or gotcha line, while wrong routing, a missing read-back, or an absent guardrail
-  becomes a change to the skill, instruction file, or agent body — including the document that was steering the
-  failing run, which improves itself rather than waiting for a separate pass. Every session closes by sweeping
-  its own context for failures and recording each fix, so every run makes the next one better without human
-  curation, which is what makes the loop a flywheel rather than a backlog.
-default: >-
-  Sweep the session's own context for observed failures before it closes, and route each to the cheapest tier
-  that fixes it — a memory or gotcha line for a missing fact, a change to the skill, instruction, or agent body
-  that misrouted the run for wrong routing or a missing guardrail.
-owns:
-  - "placement of a fix for observed agent behaviour"
-  - "the end-of-session improvement sweep"
-applies_to:
-  - plugins/**
-  - skills/**
-  - .github/instructions/**
-  - .crew/**
-related: ["0004", "0010"]
----
-
 # Improvement Flywheel
 
 ## Purpose

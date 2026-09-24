@@ -1,30 +1,3 @@
----
-id: "0009"
-title: Skill-Owned Code
-trigger: >-
-  a skill needing a helper script, deciding where a skill's Python lives, adding a module to
-  `tools/src/modules/`, adding a mapping to the pre-commit sync hook, two skills needing the same logic,
-  placing a skill's tests, vendoring a library inside a skill, a skill importing another skill's code
-summary: >-
-  A skill owns the code it needs: its scripts and their tests live inside the skill folder, and
-  `tools/src/modules/` is reserved for code genuinely shared across plugins, which the pre-commit hook syncs into
-  each consumer. Logic needed by several skills in one plugin is owned by exactly one of them and reached by
-  invoking that skill, never by importing across skill folders — so a plugin never carries two copies of the same
-  implementation.
-default: >-
-  Put a skill's Python and its tests inside the skill folder; promote to `tools/src/modules/` only once a second
-  plugin needs the same code.
-owns:
-  - "skill helper-code placement"
-  - "skill test placement"
-applies_to:
-  - plugins/**
-  - skills/**
-  - tools/src/modules/**
-  - .githooks/pre-commit
-related: ["0001", "0005", "0010"]
----
-
 # Skill-Owned Code
 
 ## Purpose

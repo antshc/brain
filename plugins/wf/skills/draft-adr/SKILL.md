@@ -6,6 +6,8 @@ Draft one point-in-time, localized architectural decision. Run only on an explic
 
 Check whether the decision is hard to reverse, surprising without its context, and a real trade-off between viable alternatives. These are reasons to preserve an ADR rather than a local design decision. Architectural shape, integration patterns, technology lock-in, ownership boundaries, intentional deviations, and invisible constraints can qualify. If a criterion is missing, explain the narrower fit; honor an explicit request to draft the ADR anyway.
 
+Shared domain, structural, or operational rules that future work must follow belong in `/record-concept`; contested terminology belongs in `/record-term`.
+
 ## Extend or create
 
 Before writing, inspect existing ADRs in `docs/adr/` and any decision files the caller identifies. If one already owns the same decision area, extend that file and preserve its identity. Otherwise, create one standalone ADR. Do not invoke `/index-docs` or add an `ARCHITECTURE.md` row.
@@ -43,4 +45,4 @@ Add only when explicitly requested, and only when the evidence supports them; do
 - **Considered Options** — rejected alternatives worth preserving.
 - **Consequences** — non-obvious downstream effects.
 
-Write the rendered body after the frontmatter. When the user requests text only, return the rendered draft without creating a file. Never update `ARCHITECTURE.md` as a side effect.
+Write the rendered body. When the user requests text only, return the rendered draft without creating a file. Never update `ARCHITECTURE.md` as a side effect.
