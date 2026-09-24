@@ -22,7 +22,9 @@ Tell the subagent that exploration is strictly read-only. It must not edit sourc
 
 Preserve every repository or service name in the question.
 
-**Codebase index** — optional navigation aid, never a source of truth. Glob for `**/*-codebase-index.md` before declaring a target unresolved; a hit maps a deployable, service, or repository name — or one of its trigger signals — to a local path, a GitHub repository URL, a package owner, or a terminal boundary where tracing stops. No index file is not a gap: resolve against the workspace folders instead. A path the index names but the disk lacks is unresolved, not a licence to guess a neighbouring one.
+Run `/resolve-harness` skill to get `HARNESS_REPO_PATH`; scope the codebase index search to that path (cwd fallback when the skill is unavailable or the path is empty).
+
+**Codebase index** — MUST use for the navigation. Saerch the `**/*-codebase-index.md` in the `HARNESS_REPO_PATH` before declaring a target unresolved; a hit maps a deployable, service, or repository name — or one of its trigger signals — to a local path, a GitHub repository URL, a package owner, or a terminal boundary where tracing stops. No index file is not a gap: resolve against the workspace folders instead. A path the index names but the disk lacks is unresolved, not a licence to guess a neighbouring one.
 
 Report a name that resolves to neither a local checkout nor a GitHub repository as unresolved.
 
