@@ -9,6 +9,48 @@ Source of truth is this repo, not the web. Output: one Markdown file, every clai
 
 Inspection documents **as-built** — current state, never a delta.
 
+## Routing rules
+
+### Contracts first
+
+Before source, inspect the matching material in repository:
+
+- `CONTEXT.md` for terminology.
+- `ARCHITECTURE.md` and `DEPLOYMENT.md` for ownership and runtime boundaries.
+- `docs/**/*.md` for service ownership, for existing researched flows..
+- `**/*.swagger.json` for REST contracts.
+- `**/*.configuration-tweaks.md` for configuration surfaces.
+
+
+### Local checkout
+
+- Exact symbol or refactoring: use language-server definition, references, implementations, or
+  call hierarchy against the owning path.
+- Known behavior without a symbol: use semantic search scoped to the owning path.
+- Literal, package ID, configuration, generated file, image, or route: use scoped text search.
+- Inspect `~/<repository>/graphify-out/manifest.json` before querying Graphify. Use it only
+  for repositories represented in the manifest, then verify decisive behavior and absence claims
+  in source. A missing Graphify node is never evidence of absence.
+- For a C# type absent from local source, use `inspect-nuget-source`; do not broaden disk searches.
+
+### No local checkout
+
+- Load the deferred GitHub tools before use.
+- Use `github_repo` for behavior or architecture in one known repository.
+- Use `github_text_search` for exact symbols, package IDs, image names, or organization-wide
+  ownership discovery.
+- GitHub search reflects indexed branches and can be stale; state branch uncertainty when relevant.
+
+## Axis-specific routing
+
+- **Behavior**: route to one owning deployable and stop at effects leaving it. For an API, start
+  with Swagger, then trace controller, DTO, validation, and outbound calls.
+- **Deployables**: map each handoff to a row, then verify sender, wire contract, receiver, and
+  deployment or configuration binding. Stop at a terminal infrastructure boundary only after
+  recording the operation, protocol, authentication, errors, and relevant configuration.
+- **Data**: identify the item and store first, then route every writer and reader through the map.
+  Verify keys, ownership, consistency, migration, concurrency, and retention in executing source.
+
 ## Axes
 
 Three axes, one per unit of inspection. A capability is the stable product ability in context; its features and functional slices realize it. One functional slice belongs to one deployable: use Behavior to inspect that slice and Flow to trace the contracts connecting related slices across deployables. Pick by the unit the question is about, load only that axis's references and template, and leave the other two unread.
