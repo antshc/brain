@@ -1,6 +1,6 @@
 ---
 name: track-ledger
-description: Own the session ledger at /memories/session/domain-model-ledger.md — its location, section names, line grammar, and compression rule. Records which Concept/service records were opened or skipped, the surface terms touched so far, and every decision or assumption staged this session. Called by grill-design; owns the grammar only, never when to log or whether an item is recorded.
+description: Own the session ledger at /memories/session/domain-model-ledger.md — its location, section names, line grammar, and compression rule. Records which Concept/service records were opened or skipped, the surface terms touched so far, every decision or assumption staged this session, and the inspection evidence a staged Concept candidate stands on. Called by grill-design; owns the grammar only, never when to log or whether an item is recorded.
 ---
 
 # Track Ledger
@@ -51,6 +51,16 @@ For a gate miss that resolves to a feature-scoped decision rather than a reusabl
 Also rewrites or deletes an existing line, located by `{{item}}` — used when the user corrects a staged item.
 
 Returns the written line, or confirmation of the rewrite/deletion.
+
+## Log inspection
+
+Writes into `Decisions / assumptions` — one line per inspected Concept candidate, recording the evidence its gate stands on rather than a decision.
+
+* `{{item}} — inspected, occurrences: {{n}}, counterexamples: {{n|none}}, cite: {{path}}#{{Lstart}}`
+
+Append `, downgraded: assumption` when the occurrence count rests on an unverified claim. Located and rewritten by `{{item}}`, same as the decision forms; a candidate inspected again updates its line in place.
+
+Returns the written line.
 
 ## Compression
 

@@ -1,25 +1,3 @@
----
-id: "0003"
-title: Trigger Indexer
-trigger: >-
-  adding a new indexed table or row type, trigger phrases missing domain language, index rows drifting out of
-  sync with their records, a caller re-implementing scan or match logic inline, deciding whether an indexed
-  record applies to the current change, a blank Trigger condition cell
-summary: >-
-  Generates concise conversational trigger phrases and centralizes semantic scan/match plus add/supersede/retire
-  synchronization for any markdown table with a Trigger condition column, with caller-supplied metadata and
-  preservation of unknown columns.
-default: >-
-  Route trigger generation, scan/match, and row synchronization for any Trigger-condition table through the
-  indexing skill, passing table and row metadata rather than re-implementing the logic in the caller.
-owns:
-  - "index-table trigger generation, matching, and row synchronization"
-applies_to:
-  - plugins/wf/**
-  - ARCHITECTURE.md
-related: ["0001", "0002"]
----
-
 # Trigger Indexer
 
 ## Purpose
@@ -48,7 +26,7 @@ and the grilling context, so they sound natural in the session. That is a genera
 row text.
 
 This record does not own document templates, file locations, table creation, or lazy-creation rules — those stay
-with the owning document skill — nor a caller's session state, which is [0002](0002-ledger.md).
+with the owning document skill — nor a caller's session state, which is [structure-ledger](structure-ledger.md).
 
 ## Exceptions
 

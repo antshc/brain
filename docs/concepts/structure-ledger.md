@@ -1,24 +1,3 @@
----
-id: "0002"
-title: Ledger
-trigger: >-
-  session tracking of opened Concept/service records, grilling or domain-modeling session state, avoiding a
-  duplicate index re-scan, a long session losing track of what was already validated, deciding where
-  session-scoped state is persisted, re-scoping to a module already discussed
-summary: >-
-  A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every
-  record opened so far — checked before any re-scope decision instead of relying on recall over a long context
-  window.
-default: >-
-  Persist session-scoped state via the memory tool under `/memories/session/`, created lazily on first write,
-  and check it before re-opening or re-scanning anything.
-owns:
-  - "session-scoped state persistence for a grilling session"
-applies_to:
-  - plugins/wf/**
-related: ["0003", "0004", "0008"]
----
-
 # Ledger
 
 ## Purpose
@@ -50,4 +29,4 @@ only when a specific detail is needed again.
 
 - A record retired mid-session is only reflected on the *next* index scan — content the caller already opened
   earlier in the same session is not retroactively invalidated by the Ledger; that is a scan/match concern (see
-  [0003](0003-trigger-indexer.md)), not the Ledger's own.
+  [structure-trigger-indexer](structure-trigger-indexer.md)), not the Ledger's own.
