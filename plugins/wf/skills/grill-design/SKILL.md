@@ -32,9 +32,9 @@ Interview me relentlessly about every aspect of this until we reach a shared und
 Format every question in the round like so:
 
 ```
-❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+Q1: <question body, might be multiple paragraphs, including multiple choices>
 
-➡️ <your recommended answer>
+> <your recommended answer>
 ```
 
 **Turn shape** — every turn ends on one of two moves: the next question round, or the explicit ask to close the session. Lookups, ledger lines, and record writes are the middle of a turn; a turn that ends on a write is unfinished, so name the branches it opened or closed and ask the next question round in that same turn.
