@@ -14,29 +14,6 @@ Before writing, inspect existing ADRs in `docs/adr/` and any decision files the 
 
 If writing into `docs/adr/`, create the directory lazily. Assign the next id from the highest four-digit filename prefix plus one (`0001` if empty). Name the file `docs/adr/{{nnnn}}-{{slug}}.md`.
 
-## Draft metadata
-
-For an existing frontmatter-bearing ADR, retain its metadata and update only keys needed to describe the revised decision. For a new ADR, write:
-
-```md
----
-id: "{{nnnn}}"
-title: {{decisionTitle}}
-trigger: >-
-  {{change types that make this decision relevant}}
-summary: >-
-  {{one-paragraph decision summary}}
-default: >-
-  {{choice to take when the design does not state one}}
-owns: ["{{decision area}}"]
-applies_to:
-  - {{repo-relative path glob}}
-related: ["{{related record id}}"]
----
-```
-
-`id` and `title` are required and match the filename and heading. Include `trigger`, `summary`, and `default` when known; omit optional keys rather than inventing values. Keep `owns` distinct from other known records. Use folded scalars for long text. Preserve existing cross-references when extending an ADR.
-
 ## Render the body
 
 Use for the title and body of the ADR:
