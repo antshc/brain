@@ -1,5 +1,5 @@
 ---
-id: "0011"
+id: ops-improvement-flywheel
 title: Improvement Flywheel
 trigger: >-
   an agent repeating a mistake a previous run already hit, deciding where a fix for agent behaviour is recorded,
@@ -26,7 +26,7 @@ applies_to:
   - skills/**
   - .github/instructions/**
   - .crew/**
-related: ["0004", "0010"]
+related: ["ops-completeness-sweep", "structure-skill-composition"]
 ---
 
 # Improvement Flywheel

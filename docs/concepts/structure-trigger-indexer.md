@@ -1,5 +1,5 @@
 ---
-id: "0003"
+id: structure-trigger-indexer
 title: Trigger Indexer
 trigger: >-
   adding a new indexed table or row type, trigger phrases missing domain language, index rows drifting out of
@@ -17,7 +17,7 @@ owns:
 applies_to:
   - plugins/wf/**
   - ARCHITECTURE.md
-related: ["0001", "0002"]
+related: ["structure-resource-access-skill", "structure-ledger"]
 ---
 
 # Trigger Indexer
@@ -48,7 +48,7 @@ and the grilling context, so they sound natural in the session. That is a genera
 row text.
 
 This record does not own document templates, file locations, table creation, or lazy-creation rules — those stay
-with the owning document skill — nor a caller's session state, which is [0002](0002-ledger.md).
+with the owning document skill — nor a caller's session state, which is [structure-ledger](structure-ledger.md).
 
 ## Exceptions
 

@@ -1,5 +1,5 @@
 ---
-id: "0004"
+id: ops-completeness-sweep
 title: Completeness Sweep
 trigger: >-
   designing a skill's closing or completion step, declaring a task complete, reviewing whether a change covers
@@ -18,7 +18,7 @@ owns:
 applies_to:
   - plugins/**
   - skills/**
-related: ["0002", "0005"]
+related: ["structure-ledger", "structure-checklist-workflow"]
 ---
 
 # Completeness Sweep
@@ -65,7 +65,7 @@ Before completion:
 6. Do not declare completion while an obligation lacks evidence.
 ```
 
-Distinct from [0005](0005-checklist-workflow.md): a checklist orders execution *during* the task, this sweep
+Distinct from [structure-checklist-workflow](structure-checklist-workflow.md): a checklist orders execution *during* the task, this sweep
 checks coverage *after* the work is believed done.
 
 ## Exceptions

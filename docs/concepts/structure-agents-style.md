@@ -1,5 +1,5 @@
 ---
-id: "0007"
+id: structure-agents-style
 title: Agent Design
 trigger: >-
   writing or reviewing an `.agent.md`, composing an agent from skills, a vague or generic persona description,
@@ -18,7 +18,7 @@ owns:
   - "agent objective, scope, autonomy, guardrails, and output contract"
 applies_to:
   - plugins/**/agents/**
-related: ["0005", "0010"]
+related: ["structure-checklist-workflow", "structure-skill-composition"]
 ---
 
 # Agent Design
@@ -43,7 +43,7 @@ stays predictable and reviewable.
 Keep the agent body on orchestration and its own judgment; everything specialized moves behind a skill with
 documented inputs and outputs. Delegation and the call style that carries it are owned by
 [0010](0010-skill-composition.md), and the ordered-execution mechanism by
-[0005](0005-checklist-workflow.md).
+[structure-checklist-workflow](structure-checklist-workflow.md).
 
 How to word the agent file itself is write-time guidance — see
 [agent-skills.instructions.md](../../.github/instructions/agent-skills.instructions.md).
