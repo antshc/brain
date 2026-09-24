@@ -61,8 +61,8 @@ Reference by number from the parent spec. Omit a subsection if the spec has none
 
 ## Relevant Concepts
 <relevant-concepts-rule>
-- Mandatory whenever least one Concept or ADR for this slice.
-- One bullet per constraining Concept/ADR. Must carry enough detail to implement the rule without opening the file — the link back to the record is optional supporting context, not a substitute for the summary.
+- Mandatory whenever at least one Concept or explicitly supplied ADR applies to this slice.
+- One bullet per constraining Concept or explicitly supplied ADR. Must carry enough detail to implement the rule without opening the file — the link back to the record is optional supporting context, not a substitute for the summary.
 - Bullet must be self-explanatory — no further repo exploration needed to implement.
 - No specific file paths or code snippets (they become outdated quickly).
 </relevant-concepts-rule>
@@ -80,7 +80,7 @@ Run `/doc-contracts` skill once per touched contract kind (API, Database, Resour
 ## Affected layers & modules
 <affected-layers-rule>
 - State which layers/modules this slice touches and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
-- Source layer headings and Cross-Module Dependency Rules from the Concept/ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
+- Source layer headings and Cross-Module Dependency Rules from the Concept or supplied ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
 - If the slice belongs to a specific service, also scan the `Services` bullet list (under `Building blocks` in `ARCHITECTURE.md`) and load the matching service's doc (`docs/services/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
 </affected-layers-rule>
 

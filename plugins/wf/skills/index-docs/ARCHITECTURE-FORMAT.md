@@ -3,9 +3,6 @@
 
 ## Structure
 <!--
-ADR
-“Why did we choose this approach?”
-        ↓
 Crosscutting Concept
 “How must this approach be applied consistently?”
         ↓
@@ -69,16 +66,6 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 [Deployment view](https://docs.arc42.org/section-7/)
 
-## Architecture Decision Records *(optional)*
-
-An ADR records a point-in-time, localized decision — hard to reverse, non-obvious, and the result of a real trade-off. See the `record-adr` skill.
-
-<!-- One row per ADR. {{nnnn}}/{{slug}}: file identity. {{decisionTitle}}: short title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change. {{summary}}: 1-3 agent-optimized sentences. See the `record-adr` skill. -->
-
-| # | Decision | Trigger condition | Summary |
-|---|----------|--------------------|---------|
-| [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) | {{decisionTitle}} | {{triggerCondition}} | {{summary}} |
-
 ## Crosscutting Concepts *(optional)*
 
 This section describes crosscutting concepts (practices, patterns, regulations, recurring approaches). They preserve architectural consistency.
@@ -98,5 +85,5 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 
 - **Shape, not steps.** Describe how the system is decomposed and the rules that hold it together. Step-by-step "how to build X" guidance belongs in a Concept (`docs/concepts/`) or the code, not here.
 - **One directional layering.** State the dependency direction explicitly and the prohibited references. The arrows are the contract.
-- **Index everything.** Every record in `docs/concepts/` and `docs/adr/` appears in its table with a matching Trigger condition and summary. The tables are the entry point an agent scans before designing; nothing is added or retired without updating them.
-- **Link, don't inline.** Full record content stays in `docs/concepts/`/`docs/adr/` and is *linked* from the index, so the map stays scannable.
+- **Index Concepts.** Every record in `docs/concepts/` appears in its table with a matching Trigger condition and summary. The table is the entry point an agent scans before designing; nothing is added or retired without updating it.
+- **Link, don't inline.** Full Concept content stays in `docs/concepts/` and is *linked* from the index, so the map stays scannable.

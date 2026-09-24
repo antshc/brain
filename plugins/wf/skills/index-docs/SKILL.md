@@ -1,11 +1,11 @@
 ---
 name: index-docs
-description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, and the Deployment View reference stub whose content comes from record-deployment-view), host ARCHITECTURE-FORMAT.md, and insert its missing section skeletons. Owns the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Services, ADR, Concept, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
+description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, and the Deployment View reference stub whose content comes from record-deployment-view), host ARCHITECTURE-FORMAT.md, and insert its missing section skeletons. Owns the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Services, Concepts, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
 ---
 
 # Index Docs
 
-Own `ARCHITECTURE.md`'s structural prose and the three indexes it hosts (`Services`, `Architecture Decision Records`, `Crosscutting Concepts`) — the file itself is created by `bootstrap-docs`. Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+Own `ARCHITECTURE.md`'s structural prose and its two indexes (`Services`, `Crosscutting Concepts`) — the file itself is created by `bootstrap-docs`. Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
 
 ## Rules
 
@@ -15,7 +15,7 @@ Own `ARCHITECTURE.md`'s structural prose and the three indexes it hosts (`Servic
 
 ## Record frontmatter as row source
 
-Records under `docs/concepts/` and `docs/adr/` may open with YAML frontmatter (see the owning `record-*` skill's `*-FORMAT.md`). Where present, it — not the table — is the source of truth for the row.
+Records under `docs/concepts/` may open with YAML frontmatter (see `record-concept`'s `CONCEPT-FORMAT.md`). Where present, it — not the table — is the source of truth for the row.
 
 Default key→column mapping, overridable by `{{tableMetadata}}`:
 
@@ -38,7 +38,7 @@ Rules:
 
 ## Ensure section exists
 
-Inputs: `{{sectionAnchor}}` (e.g. `Architecture Decision Records`, `Crosscutting Concepts`, the `Services` table under `Building blocks`); optionally `{{skeletonContent}}`.
+Inputs: `{{sectionAnchor}}` (e.g. `Crosscutting Concepts`, the `Services` table under `Building blocks`); optionally `{{skeletonContent}}`.
 
 1. If `{{sectionAnchor}}` already exists in `ARCHITECTURE.md`, do nothing.
 2. Otherwise insert its skeleton — `{{skeletonContent}}` when the caller supplies one (custom tables), else the skeleton for that section from [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md) — at the position the template gives it.
@@ -56,7 +56,7 @@ Return one Trigger condition value. The caller writes it into the record's front
 
 ## Scan and match
 
-Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{questioningContext}}`, `{{domainGlossary}}`. `{{tableMetadata}}` is the file/section boundary, headers, Trigger condition column, and row locator rules; for this file's own three tables it is implied — the caller passes only the table name (`Services`, `Architecture Decision Records`, `Crosscutting Concepts`). Callers supply the touched surface, questioning context, and glossary — never the table shape. `{{touchedSurface}}` may carry domain terms, file paths, or both; a caller that knows which files a change touches passes them, and one that only has terms passes terms.
+Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{questioningContext}}`, `{{domainGlossary}}`. `{{tableMetadata}}` is the file/section boundary, headers, Trigger condition column, and row locator rules; for this file's own two tables it is implied — the caller passes only the table name (`Services`, `Crosscutting Concepts`). Callers supply the touched surface, questioning context, and glossary — never the table shape. `{{touchedSurface}}` may carry domain terms, file paths, or both; a caller that knows which files a change touches passes them, and one that only has terms passes terms.
 
 1. Absent or empty table: no matches.
 2. Absent Trigger condition column: table-contract error.
@@ -78,4 +78,3 @@ Inputs: `{{tableMetadata}}`, `{{rowMetadata}}`, `{{action}}` (`add`, `supersede`
 6. Apply the row change with the underlying record change. If metadata is missing or ambiguous, report it — do not guess.
 
 Return the updated row or a concise synchronization report.
-

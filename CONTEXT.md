@@ -62,7 +62,7 @@ _Avoid_: working directory, checkout
 _Plugins_set_: ralph, crew, wf
 
 **Ledger**:
-A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
+A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
 _Avoid_: log, history
 _Plugins_set_: wf
 
@@ -214,7 +214,7 @@ _Typical question_: “What do we need to know about X?”
 _Typical output_: Consolidated knowledge, options, constraints, citations.
 
 **Completeness sweep**:
-A closing check, run before concluding a session that opened at least one full Concept/ADR record, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts and Architecture Decision Records index tables.
+A closing check, run before concluding a session that opened at least one full Concept, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts index table.
 _Avoid_: final review, wrap-up
 _Plugins_set_: wf
 
@@ -284,4 +284,3 @@ _Avoid_: checklist.md, agent instructions
 
 - **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable — handing it `HARNESS_REPO_PATH` through a trusted `## HARNESS` prompt section. `Chorey` follows only on a Codey `STATUS: complete`, and is skipped when unavailable. Each agent treats its invocation directory as its workspace and validates the supplied path rather than discovering it.
 - **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance from the `Convention folder` before changing code, then write distilled `Gotchas` back to the reference owned by `crew-gotchas` after feedback loops pass.
-
