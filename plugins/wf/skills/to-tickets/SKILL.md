@@ -36,13 +36,13 @@ Use the implementation details as the spec content instead of a GitHub issue:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
 - **Inline text** — use directly.
 
-### 2. Explore the codebase and scan ADRs/Concepts
+### 2. Explore the codebase and scan Concepts
 
 If you have not already explored the codebase, do so to understand the current state of the code. 
 Issue titles and descriptions should use the project's domain glossary vocabulary `CONTEXT.md`.
-If `ARCHITECTURE.md` has a `Crosscutting Concepts` or `Architecture Decision Records` index, read it and open any record relevant to the area you're changing.
+If `ARCHITECTURE.md` has a `Crosscutting Concepts` index, read it and open any Concept relevant to the area you're changing. Read a legacy ADR only when the input or an applicable document explicitly links it.
 - **Concepts** capture the architectural backbone (layering, module/interface design, persistence slices, testing strategy) — slices and their acceptance/testing decisions MUST conform to matched records. See the `record-concept` skill.
-- **ADRs** capture localized decisions — respect and reference matched records in the issue body.
+- **ADRs** capture localized decisions — respect and reference any explicitly supplied relevant record in the issue body.
 
 Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 

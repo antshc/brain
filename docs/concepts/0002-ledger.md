@@ -2,7 +2,7 @@
 id: "0002"
 title: Ledger
 trigger: >-
-  session tracking of opened Concept/ADR/service records, grilling or domain-modeling session state, avoiding a
+  session tracking of opened Concept/service records, grilling or domain-modeling session state, avoiding a
   duplicate index re-scan, a long session losing track of what was already validated, deciding where
   session-scoped state is persisted, re-scoping to a module already discussed
 summary: >-
@@ -23,7 +23,7 @@ related: ["0003", "0004", "0008"]
 
 ## Purpose
 
-A long-running grilling or domain-modeling session risks re-opening the same Concept, ADR, or service record
+A long-running grilling or domain-modeling session risks re-opening the same Concept or service record
 repeatedly, or losing track of what has already been validated once the transcript grows past what fits usefully
 in context. A Ledger is a session-scoped, externally persisted record of every record opened so far, checked
 before any re-scope decision instead of relying on recall.
