@@ -1,6 +1,6 @@
 ---
 name: explore-codebase
-description: Delegate read-only codebase questions to a general-purpose subagent and route its lookup by target and question shape. Use when a caller needs architecture, relationship, flow, symbol, reference, implementation, call, literal, configuration, error, test, ownership, or cross-layer evidence from the current or a named external codebase.
+description: Finds code — where a symbol lives, what calls it, how a flow works, which file holds a literal, config, test, or owner — by delegating read-only lookups to subagents. Use for any "where is", "what calls", "how does this work", or "find the code that..." question about the current repo or a named external codebase, and whenever a task must locate code before it can proceed.
 ---
 
 # Explore Codebase
@@ -20,7 +20,7 @@ Tell the subagent that exploration is strictly read-only. It must not edit sourc
 
 ## Resolve the target
 
-Preserve every repository or service name in the question. When the question names an external codebase and a matching installed `search-*` local lookup skill exists, Follow `/{{matchingSearchSkill}}` skill first to resolve its checkout. If no matching skill resolves the named codebase, report it as unresolved; never guess a path.
+Preserve every repository or service name in the question. If a named codebase cannot be resolved to a local checkout, report it as unresolved; never guess a path.
 
 ## Select tools by question shape
 
