@@ -1,34 +1,3 @@
----
-id: ops-per-repo-config-resolution
-title: Per-Repo Config Resolution
-trigger: >-
-  a skill or agent reading per-repository configuration, adding a dotfile or convention folder under the Harness
-  Repo Path, choosing between a fixed config path and a search, config lookup falling back to a second location,
-  a config file holding a secret, deciding whether config is committed or gitignored, a component re-deriving a
-  caller-supplied path, one config file per variant or stack, telling a shared config file from a per-variant one
-summary: >-
-  Per-repository configuration is resolved from exactly one declared root — the Harness Repo Path — using exactly
-  one strategy, either a fixed path or a search bounded to that root; a second fallback location is never added,
-  because its failure mode is silent degradation rather than an error. Where the same config exists once per
-  variant, the variant is encoded in the filename and an unsuffixed name means shared, so one lookup still
-  answers the question. Configuration is split by lifecycle rather
-  than by topic: secrets are gitignored and per-developer, team conventions are committed, and the two never share
-  a file.
-default: >-
-  Resolve a per-repo config file at a fixed path under the Harness Repo Path, encoding any per-variant split in
-  the filename rather than in a second lookup; use a search bounded to that root
-  only when the file is user-authored and may legitimately live in a nested workspace folder.
-owns:
-  - "per-repository config file resolution"
-  - "per-variant versus shared config file naming"
-  - "config secret versus committed-convention placement"
-applies_to:
-  - plugins/**
-  - .crew/**
-  - .atlassian
-related: ["structure-ledger", "structure-checklist-workflow"]
----
-
 # Per-Repo Config Resolution
 
 ## Purpose

@@ -45,4 +45,4 @@ Add only when explicitly requested, and only when the evidence supports them; do
 - **Considered Options** — rejected alternatives worth preserving.
 - **Consequences** — non-obvious downstream effects.
 
-Write the rendered body after the frontmatter. When the user requests text only, return the rendered draft without creating a file. Never update `ARCHITECTURE.md` as a side effect.
+Write the rendered body. When the user requests text only, return the rendered draft without creating a file. Never update `ARCHITECTURE.md` as a side effect.

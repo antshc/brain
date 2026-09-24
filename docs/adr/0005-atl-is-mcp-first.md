@@ -1,33 +1,3 @@
----
-id: "0005"
-title: atl is MCP-first with Python-owned conversion
-trigger: >-
-  merging or splitting the Atlassian plugins, adding an `atl` skill, choosing between the Atlassian MCP and a
-  Python/REST backend for a Jira or Confluence operation, Markdown-to-ADF or ADF-to-Markdown conversion,
-  `ATLASSIAN_API_TOKEN` or `.atlassian` handling, acli usage, Confluence attachment or mermaid-diagram upload,
-  per-repository Jira field or Confluence space overrides, naming a Jira or Confluence access skill
-summary: >-
-  The Atlassian surface is one plugin, `atl`, built on the Rovo MCP for transport and Python for conversion:
-  `map-markdown-adf` owns the only ADF implementation in both directions and every sibling skill invokes it as a
-  skill rather than importing its code. A token is required only for what the MCP cannot do — Confluence
-  attachment upload, and therefore `publish-page`'s mermaid branch — so all seven skills degrade to MCP-only when
-  `.atlassian` is absent. Per-repository specialisation is expressed as `init-atl`-generated wrapper skills under
-  `.github/skills/`, never as item-type skills shipped inside the plugin. acli, `markdown`, and `markdownify` are
-  dropped.
-default: >-
-  Route a new Atlassian operation through the Rovo MCP and put any content conversion in `map-markdown-adf`;
-  reach for `atlassian-python-api` and a token only when the MCP has no endpoint for the operation.
-owns:
-  - "Atlassian transport backend selection"
-  - "Atlassian content conversion ownership"
-  - "Atlassian per-repository override mechanism"
-  - "atl skill roster"
-applies_to:
-  - plugins/atl/**
-  - .atlassian
-related: ["0008", "0009"]
----
-
 # atl is MCP-first with Python-owned conversion
 
 `atl` and `atlm` were two plugins over one vendor, and the split produced three copies of the ADF converter, two

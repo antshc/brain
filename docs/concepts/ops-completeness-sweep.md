@@ -1,26 +1,3 @@
----
-id: ops-completeness-sweep
-title: Completeness Sweep
-trigger: >-
-  designing a skill's closing or completion step, declaring a task complete, reviewing whether a change covers
-  every requirement, a change that compiles but may have missed a branch, deciding what a final pass should
-  check, deferring an obligation
-summary: >-
-  A final, systematic pass run after implementation that maps every explicit and implied obligation
-  (requirements, tests, docs, config/migrations, error/security/observability cases) to implementation evidence,
-  resolving anything without evidence as a fix, a question, or an explicit deferral before completion is
-  declared.
-default: >-
-  Close any task-completing skill with a sweep that maps each obligation to evidence and resolves the gaps as a
-  fix, a question, or an explicit deferral — never silence.
-owns:
-  - "closing completeness check before a task is declared done"
-applies_to:
-  - plugins/**
-  - skills/**
-related: ["structure-ledger", "structure-checklist-workflow"]
----
-
 # Completeness Sweep
 
 ## Purpose

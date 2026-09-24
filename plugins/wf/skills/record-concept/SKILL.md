@@ -1,11 +1,11 @@
 ---
 name: record-concept
-description: Persist a consequential shared business process, structural implementation pattern, or operational policy as a Crosscutting Concept. Own frontmatter, record identity, extend-or-create, file writing, and index synchronization; use doc-concept for the body. Called directly, by define-concept, or by grill-design.
+description: Persist a consequential shared business process, structural implementation pattern, or operational policy as a Crosscutting Concept. Own record identity, extend-or-create, file writing, and index synchronization; use doc-concept for the body. Called directly, by define-concept, or by grill-design.
 ---
 
 # Record Concept
 
-Capture **one shared approach** governing multiple building blocks into `docs/concepts/` the moment it crystallises. Use [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md) for the frontmatter; Run `/doc-concept` skill for its body unless the caller supplied a rendered body from that skill.
+Capture **one shared approach** governing multiple building blocks into `docs/concepts/` the moment it crystallises. Run `/doc-concept` skill for its body unless the caller supplied a rendered body from that skill; `/doc-concept` owns all body templates and writing rules.
 
 ## Where the rule belongs
 
@@ -40,11 +40,11 @@ If any of the three is missing, skip the Concept — route it by *Where the rule
 
 ## Extend or create
 
-Runs before any write. A near-duplicate record is worse than a longer one: it splits authority over a decision area, and the `owns` key can then name only one of them.
+Runs before any write. A near-duplicate record is worse than a longer one: it splits a decision area across two files instead of sharpening one.
 
 1. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
-2. A matched record whose scope or `owns` already covers this decision area → **extend it**: use `/doc-concept` for a body change and sharpen `default`, `owns`, `trigger`, or `applies_to` when needed. Resync its row via **Sync index row**. Stop here.
-3. No match covers the area → **create** a new Concept. Its `owns` phrases must not collide with any existing record's — a phrase belongs to exactly one record.
+2. A matched record's scope already covers this decision area → **extend it**: use `/doc-concept` for a body change and sharpen its `default` or `trigger` when needed. Resync its row via **Sync index row**. Stop here.
+3. No match covers the area → **create** a new Concept.
 
 ## Lazy creation
 
@@ -52,34 +52,24 @@ Create `docs/concepts/` when the first Concept is ready — not before; do nothi
 
 ## Record identity
 
-A record is named `docs/concepts/{{kind}}-{{slug}}.md` and its `id` is that filename stem. `{{kind}}` is the kind of the `/doc-concept` template the body came from — `domain`, `structure`, or `ops` — so the directory listing groups the families; `{{slug}}` is the title in kebab-case. Sharpen the slug when a name is already taken; the identity carries no counter, so nothing has to be renumbered.
+A record is named `docs/concepts/{{kind}}-{{slug}}.md`. `{{kind}}` is the kind of the `/doc-concept` template the body came from — `domain`, `structure`, or `ops` — so the directory listing groups the families; `{{slug}}` is the title in kebab-case. Sharpen the slug when a name is already taken; the identity carries no counter, so nothing has to be renumbered.
 
-## Frontmatter is mandatory
-
-Every Concept opens with the YAML frontmatter block defined in [CONCEPT-FORMAT.md](./CONCEPT-FORMAT.md#frontmatter). It is the machine-readable contract for the record, and the source of truth for its `ARCHITECTURE.md` index row.
-
-1. Author `id`, `title`, `trigger`, `summary`, `applies_to` before writing the body — they force the "does this apply to me?" decision up front.
-2. Derive `trigger` with `/index-docs`' skill **Generate trigger condition**, then write the returned value into frontmatter — not straight into the table.
-3. `related` is bidirectional: adding `related: ["structure-skill-owned-code"]` here means adding this record's id to that record's `related` in the same change. A one-directional link is lost to any reader arriving from the other side.
-4. Superseding or retiring a Concept applies the marker to its index row via `/index-docs`' skill **Sync index row**; the record itself carries no status field.
+A record carries no frontmatter — it opens directly with `# {{conceptTitle}}`.
 
 ## Body
 
-Run `/doc-concept` skill to render or revise the body, or accept a body already rendered by it from `/define-concept`. Preserve its required headings and applicable optional sections. This skill alone combines the body with frontmatter and writes the record.
+Run `/doc-concept` skill to render or revise the body, or accept a body already rendered by it from `/define-concept`. Preserve its required headings and applicable optional sections. This skill writes the body and authors the index row in the same change.
 
-## Keeping the index in sync
+## Authoring the index row
 
-When a Concept is added, superseded, or retired, Run `/index-docs`' skill **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** in the same change — never edit the table in `ARCHITECTURE.md` directly.
+The `ARCHITECTURE.md` row is authored directly by this skill, not projected from the record — the record carries nothing to project.
 
-Pass `{{rowMetadata}}` **from the record's frontmatter**, so the table stays a projection of the files rather than a hand-maintained duplicate:
+1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
+2. Derive the Trigger condition with `/index-docs`' skill **Generate trigger condition**, passing the rendered body as `{{recordContent}}`.
+3. Author `default` yourself — one sentence naming the choice to take when the design doesn't state one.
+4. Run `/index-docs`' skill **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `triggerCondition`, `default` — never edit the table in `ARCHITECTURE.md` directly.
 
-| Column | Frontmatter key |
-|--------|-----------------|
-| `Concept` | `title`, linked to the record path |
-| `Trigger condition` | `trigger` |
-| `Summary` | `summary` |
-
-If a row and its record disagree, the frontmatter wins — resync the row, don't edit the file to match the table.
+Superseding or retiring a Concept applies the marker to its index row via the same **Sync index row** call; the record itself carries no status field.
 
 ## Approval gate
 

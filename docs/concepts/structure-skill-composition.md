@@ -1,34 +1,3 @@
----
-id: structure-skill-composition
-title: Skill Composition
-trigger: >-
-  splitting one skill into two, a procedure needed by more than one skill, an agent body restating a skill's
-  steps, deciding whether a skill is model- or user-invoked, choosing what a new skill is responsible for, one
-  skill reaching another skill's behaviour, a skill accumulating unrelated responsibilities, the same steps
-  appearing in two skills, a family of related agents sharing a workflow, one agent extending or overriding
-  another, an agent file pointing at another agent file
-summary: >-
-  A skill is responsible for one purpose, and behaviour needed by more than one caller is owned by exactly one
-  skill that the others reach by name rather than restate. A family of agents sharing a workflow follows the same
-  rule: the workflow becomes a flow skill each member invokes, and a member carries only what it overrides — an
-  agent file never points at another agent file. Invocation is a design choice, not a formatting one:
-  a skill keeps a description only when an agent or another skill must reach it unprompted, because that
-  description is loaded on every turn whether or not it fires.
-default: >-
-  Give each skill one purpose and invoke a sibling skill's documented action by name instead of restating its
-  steps; give a family of agents one flow skill they each invoke, leaving each member only its overrides; keep a
-  skill model-invoked only when an agent or another skill must reach it unprompted.
-owns:
-  - "division of a capability across skills"
-  - "composition of a family of related agents"
-  - "skill-to-skill and agent-to-skill invocation style"
-  - "model- versus user-invocation choice"
-applies_to:
-  - plugins/**
-  - skills/**
-related: ["structure-resource-access-skill", "structure-agents-style", "structure-skill-owned-code"]
----
-
 # Skill Composition
 
 ## Purpose

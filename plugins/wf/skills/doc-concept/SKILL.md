@@ -5,7 +5,7 @@ description: Document the body of an arc42 Crosscutting Concept using a business
 
 # Document Concept
 
-Render **body only**. `/record-concept` owns frontmatter, record identity, file writes, and index synchronization. Do not edit those surfaces here.
+Render **body only**. `/record-concept` owns record identity, file writes, and index synchronization. Do not edit those surfaces here.
 
 Choose by the shared concern, not the component where it was found; read only the selected template. The chosen row's **kind** is what `/record-concept` prefixes the filename with, so a record sorts next to its siblings.
 
