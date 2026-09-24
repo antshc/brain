@@ -1,3 +1,10 @@
+## Install
+### Meeting management
+```
+gh skill install ericgandrade/claude-superskills audio-transcriber --agent github-copilot --scope user -f 
+```
+
+
 | PM flow                           | Real skill/plugin           | Repository                           | Sources / inputs used                                                                                                          | Output                                                                                                                                                                                           |
 | --------------------------------- | --------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Project initiation**            | `stakeholder-map`           | `phuryn/pm-skills`                   | Project brief, stakeholder names, org/team information, known responsibilities                                                 | Stakeholder map, influence/interest matrix, engagement/communication recommendations                                                                                                             |
