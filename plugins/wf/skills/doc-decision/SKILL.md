@@ -1,30 +1,34 @@
 ---
 name: doc-decision
-description: Render established architectural decisions in full ADR or compact bullet form. Use for decision lists, design appendices, and when draft-decision needs an ADR body. Owns formatting, not ADR placement or indexing.
+description: Render an established architectural decision as a compact bullet. Use for decision lists, design appendices, and `**Decisions**` sections. Owns formatting, not ADR placement or indexing.
 ---
 
 # Document Decision
 
-Render architectural decisions from established context.
+Render one architectural decision from established context as a compact bullet. Use only decision facts established by the caller or grounded in the source material.
 
-## Formats
+## Template
 
-Prefer the **full** format when the ADR is one per single file. When multiple ADRs writes to the file then **compact** format.
+```md
+- **{{decisionTitle}}**: {{context}}. {{decision}} {{rationale}}.
+```
 
-- **Full** — use when the caller requests **full** format, requests a standalone ADR.
-- **Compact** — use when the caller requests **compact** format, a compact decision, a decision list, or an appendix entry.
+- `{{decisionTitle}}`: the architectural decision, not the problem.
+- `{{context}}`: why a decision is required.
+- `{{decision}}`: what is decided, including architecturally significant abstractions, contracts, fields, components, and high-level implementation details.
 
+## Rules
 
+- Keep each decision to one bullet.
+- State the architectural decision in the title, not the problem.
+- Explain why a decision is required in `{{context}}`.
+- State what is chosen and the important implementation boundary in `{{decision}}`.
+- The rationale should explain **why this decision is preferable in this context**, not repeat the decision itself.
+- Include concrete abstraction, interface, class, event, field, claim, service, topic, or component names when they are part of the architectural contract.
+- Include high-level implementation details when they materially define the decision.
+- Include references to external protocol, API, or schema details from the Appendix only when the architecture depends on them.
+- Keep method bodies, local variables, exact algorithms, and details that can change without changing the decision outside the ADR.
+- Prefer application abstractions over vendor-specific terminology when the vendor detail is not essential.
+- Add rationale, alternatives, consequences, or implementation steps only when explicitly requested.
 
-**Done when:** exactly one format is selected.
-
-## 2. Render
-
-Open the selected template before drafting:
-
-- **Full** — [FULL-DECISION-TEMPLATE.md](./FULL-DECISION-TEMPLATE.md)
-- **Compact** — [COMPACT-DECISION-TEMPLATE.md](./COMPACT-DECISION-TEMPLATE.md)
-
-Apply that template and its rules to every decision in scope. Use only decision facts established by the caller or grounded in the source material.
-
-**Done when:** every decision in scope matches the selected template and every rule under that format has been applied.
+**Done when:** the bullet matches the template and every rule above has been applied.

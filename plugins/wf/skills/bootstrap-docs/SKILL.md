@@ -9,9 +9,9 @@ Own the *mechanics* of `ARCHITECTURE.md`/`CONTEXT.md` existence and creation —
 
 ## Mandatory creation
 
-If `ARCHITECTURE.md` and/or `CONTEXT.md` don't exist, create them **immediately** — don't wait for a term, structural rule, ADR, Concept, or service to be ready to capture.
+If `ARCHITECTURE.md` and/or `CONTEXT.md` don't exist, create them **immediately** — don't wait for a term, structural rule, Concept, or service to be ready to capture.
 
 - **`ARCHITECTURE.md`** is the system map and Concept index. Fill in only the required sections (`{{systemName}} Overview`, `Context`) from what's already known about the codebase, using [ARCHITECTURE-FORMAT.md](../index-docs/ARCHITECTURE-FORMAT.md). Leave the optional sections (`Building blocks`, `Deployment View`, `Crosscutting Concepts`) out until there's content for them — `index-docs` adds those via *Ensure section exists*.
 - **`CONTEXT.md`** is the glossary every other document assumes as shared vocabulary. Create it with its `{{contextName}}` heading and an empty `Language` section, using [CONTEXT-FORMAT.md](../record-term/CONTEXT-FORMAT.md) — leave individual terms out until `record-term` captures the first one.
 
-These two are the only non-lazy documents. `docs/concepts/` and `docs/services/` are created lazily by the skill that writes into each; `/draft-decision` creates `docs/adr/` only on an explicit standalone ADR request.
+These two are the only non-lazy documents. `docs/concepts/` and `docs/services/` are created lazily by the skill that writes into each.
