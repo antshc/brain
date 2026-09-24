@@ -5,7 +5,7 @@ description: A relentless interview and domain-modeling probe set that sharpens 
 
 # Grill Design
 
-Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-concept`; codebase lookups → `/explore-codebase`. Call them; never restate their rules.
+Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-concept`; codebase lookups → `/explore-codebase`; Concept evidence packets → `/inspect-concept`. Call them; never restate their rules.
 
 ## Scope
 
@@ -54,8 +54,8 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 | State | Resolved by | Home | Durable write |
 |---|---|---|---|
 | Feature Assumption | model, via the checklist | ledger only | never a *new* Concept — the record whose `default` cleared the checklist already covers it; a gap in that record is closing-sweep work |
-| Assumed record | model, no user answer asked for it, Concept gate passes | ledger + document | same turn it crystallises — write it, no offer, no permission; reported `[assumed]` |
-| Feature Decision | user, feature-scoped (fails the Concept gate, resolves no term) | ledger only | never |
+| Assumed record | model, no user answer asked for it, Concept gate passes on an inspection packet | ledger + document | same turn it crystallises — write it, no offer, no permission; reported `[assumed]` |
+| Feature Decision | user, feature-scoped (fails the Concept gate, resolves no term); or a candidate whose inspection packet found a single occurrence | ledger only | never |
 | Concept decision | user, reusable rule | ledger + Concept | same turn it's approved |
 | Rejected option | user | ledger only | never |
 
@@ -64,6 +64,7 @@ Log every state and every change of state via `/track-ledger`' skill **Log decis
 ## Context economy
 
 - Broad-sweep code and test lookups → Run `/explore-codebase` skill; direct reads only to quote an exact line.
+- Counting a candidate rule's occurrences in the repo → the *Concept inspection* probe's `/inspect-concept` subagent; `/explore-codebase` answers a question, a packet carries the evidence a Concept gate stands on.
 - Re-fetch a durable artifact when you first need it, or when you need it and can't quote it verbatim from context — never on a schedule, never "just in case", never right after your own write.
 - Authority order: `CONTEXT.md`/`ARCHITECTURE.md`/Concept > code > external sources. A conflict against a higher-ranked source is asked, never assumed.
 
@@ -98,9 +99,25 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
-**Record inline** — nothing is ever batched to the end of the session. Resolved term or reusable rule by explicit user answer → Run `/record-term` or `/record-concept` that same turn; the answer is the approval. Keep feature-scoped decisions in the ledger. Resolved by you → it's a Feature Assumption; ledger only when a matched Concept already covers it, otherwise *Record without asking* (see *Decision states*). Every Concept write runs **Extend or create** first — sharpening an existing record beats spawning a near-duplicate.
+**Concept inspection** — fires on its own, before any Concept write, so *crosscutting* and *reusable* are counted against the repo instead of judged from this session's context. Signals, any one of: a rule stated in general form ("always", "every", "we do X for all Y"); *Record without asking* spotting a candidate; *Code cross-reference* finding the same shape in a second place; *Classify conflicts* returning **Supersession**; a gate miss logged with `nearest source: none` over a rule-shaped decision. One candidate, one agent, once a session.
 
-**Record without asking** — you spot a reusable Concept no user answer asked you to record. Run `/record-concept`'s gate; it passes → record it that same turn, before your next interview question. Don't offer it, don't ask permission, don't defer — log it via `/track-ledger`' skill **Log decision** assumed-record form and report it in the closing `[assumed]` list, where `git diff` is the review. Never carry a candidate past the turn it crystallised. A localized trade-off remains a Feature Decision in the ledger.
+Spawn one bounded read-only subagent and instruct it to Run `/inspect-concept` skill, giving it the candidate rule in one sentence, the ledger's `Touched surface` paths as its exact scope, and one question — *how many independent occurrences exist, and what are the counterexamples?* Ask the rest of the round while it runs: *Turn shape* already forbids a turn ending on a write, so the inspection overlaps the user's thinking and a round never waits on a packet.
+
+Read the returned packet top-down; the first matching row wins.
+
+| Packet says | Action |
+|---|---|
+| `Intent vs implementation: drift` | an existing record is wrong, not missing → **Extend or create**'s extend path, plus a `/track-ledger` drift line for the closing sweep; never a new record |
+| the occurrence count rests on an `ASSUMPTION` | downgrade write → offer; a subagent reports evidence, it never launders a guess into evidence |
+| counterexamples present | the rule has exceptions only the user can rule on → offer it in the next question round, with the counterexamples quoted in the question body |
+| ≥2 independent occurrences, no contradicting counterexample | crosscutting and reusable are **evidenced** → write via `/record-concept`, citing the packet's `file:line` in the record |
+| exactly 1 occurrence | not crosscutting → Feature Decision, ledger only, no Concept |
+
+A rule the user explicitly answered is still written — for it, the `ASSUMPTION` and counterexample rows raise a follow-up question alongside the write rather than downgrading it. Log the packet via `/track-ledger`' skill **Log inspection** the turn it returns.
+
+**Record inline** — nothing is ever batched to the end of the session. Resolved term or reusable rule by explicit user answer → Run `/record-term` or `/record-concept` that same turn; the answer is the approval. Keep feature-scoped decisions in the ledger. Resolved by you → it's a Feature Assumption; ledger only when a matched Concept already covers it, otherwise *Record without asking* (see *Decision states*). Every Concept write consumes *Concept inspection*'s packet, then runs **Extend or create** — the packet's actual implementations, not the index table alone, separate *same rule, wider scope* (extend) from *different rule, adjacent area* (create), and sharpening an existing record beats spawning a near-duplicate.
+
+**Record without asking** — you spot a reusable Concept no user answer asked you to record. *Concept inspection* fires first; its packet clears `/record-concept`'s gate → record it that same turn, before your next interview question. Don't offer it, don't ask permission, don't defer — log it via `/track-ledger`' skill **Log decision** assumed-record form and report it in the closing `[assumed]` list, where `git diff` is the review. Never carry a candidate past the turn it crystallised. A localized trade-off remains a Feature Decision in the ledger.
 
 ## Closing sweep
 
