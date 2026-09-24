@@ -16,7 +16,7 @@ Split on **when the rule is needed**:
 | The rule answers | Home | Written by |
 |---|---|---|
 | which building block to reach for, what shape the system takes | Concept, `docs/concepts/` | this skill — continue below |
-| which option was chosen here, and why the others were not | feature design or standalone ADR | session ledger / `/to-zdesign`; `/draft-decision` on explicit ADR request |
+| which option was chosen here, and why the others were not | feature design | session ledger / `/to-zdesign` |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
 | what a contested term means | glossary, `CONTEXT.md` | `/record-term` |
 | which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
@@ -36,7 +36,7 @@ Write one only when all three are true:
 2. **Reusable** — future features of the same kind are expected to follow it every time.
 3. **Backbone-defining** — it is one of the foundational decisions that hold the architecture together and constrain everything built on top of it.
 
-If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above. Do not draft an ADR as a side effect.
+If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above.
 
 ## Extend or create
 

@@ -100,7 +100,7 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **Record inline** — nothing is ever batched to the end of the session. Resolved term or reusable rule by explicit user answer → Run `/record-term` or `/record-concept` that same turn; the answer is the approval. Keep feature-scoped decisions in the ledger. Resolved by you → it's a Feature Assumption; ledger only when a matched Concept already covers it, otherwise *Record without asking* (see *Decision states*). Every Concept write runs **Extend or create** first — sharpening an existing record beats spawning a near-duplicate.
 
-**Record without asking** — you spot a reusable Concept no user answer asked you to record. Run `/record-concept`'s gate; it passes → record it that same turn, before your next interview question. Don't offer it, don't ask permission, don't defer — log it via `/track-ledger`' skill **Log decision** assumed-record form and report it in the closing `[assumed]` list, where `git diff` is the review. Never carry a candidate past the turn it crystallised. A localized trade-off remains a Feature Decision in the ledger; an ADR requires a separate explicit `/draft-decision` request.
+**Record without asking** — you spot a reusable Concept no user answer asked you to record. Run `/record-concept`'s gate; it passes → record it that same turn, before your next interview question. Don't offer it, don't ask permission, don't defer — log it via `/track-ledger`' skill **Log decision** assumed-record form and report it in the closing `[assumed]` list, where `git diff` is the review. Never carry a candidate past the turn it crystallised. A localized trade-off remains a Feature Decision in the ledger.
 
 ## Closing sweep
 
