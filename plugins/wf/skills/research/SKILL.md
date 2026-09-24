@@ -5,8 +5,6 @@ description: Investigate a question against high-trust primary sources and captu
 
 # Research
 
-Every path below delegates the investigation to a subagent via `runSubagent` — omit `agentName` so it inherits full tool access (including web fetch), rather than the codebase-only `Explore` agent, since the question usually reaches outside this repo. This keeps the raw reading out of this session's context; it doesn't run in the background, so the caller waits for its one final report.
-
 ## 1. Dispatch to a specialist
 
 Specialists use two families. Each owns its sources, evidence rules, template, and output path — richer than anything the generic job below produces.
@@ -22,6 +20,11 @@ Discover both families, never hardcode individual skills: scan the available ski
 - **Several cover different parts** → one subagent per specialist, each over the part that specialist owns, each writing its own file.
 - **The best match names a tool or server in `compatibility` that this session lacks** → say which one is missing, then continue below.
 - **None covers it** → continue below.
+
+**Dispatch shape** — set by the family, since the two read different sources:
+
+- `research-*`, and the generic job in 2 — delegate via `runSubagent`, omitting `agentName` so it inherits full tool access (including web fetch) rather than the codebase-only `Explore` agent, since the question reaches outside this repo. This keeps the raw reading out of this session's context; it doesn't run in the background, so the caller waits for its one final report.
+- `inspect-*` — Run `/explore-codebase` skill over the question, instructing its subagent to Run the chosen `inspect-*` skill. The engine owns delegation shape, target resolution, contract material, and tool selection; the specialist still owns its evidence rules, template, and output path, so the read-only contract lifts for the one file that specialist writes.
 
 Pass the user's requested output shape — document count, diagram type, file path, framing — to the subagent **verbatim**, as a constraint the specialist's own defaults do not override. Paraphrasing it is how a shape requirement gets dropped.
 
