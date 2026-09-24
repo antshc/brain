@@ -5,7 +5,7 @@ description: A relentless interview and domain-modeling probe set that sharpens 
 
 # Grill Design
 
-Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-concept`; codebase lookups → `/explore-codebase`; Concept evidence packets → `/inspect-concept`. Call them; never restate their rules.
+Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-concept`; codebase lookups → `/explore-codebase`; Concept evidence packets → `/probe-concept`. Call them; never restate their rules.
 
 ## Scope
 
@@ -64,7 +64,7 @@ Log every state and every change of state via `/track-ledger`' skill **Log decis
 ## Context economy
 
 - Broad-sweep code and test lookups → Run `/explore-codebase` skill; direct reads only to quote an exact line.
-- Counting a candidate rule's occurrences in the repo → the *Concept inspection* probe's `/inspect-concept` subagent; `/explore-codebase` answers a question, a packet carries the evidence a Concept gate stands on.
+- Counting a candidate rule's occurrences in the repo → the *Concept inspection* probe's `/probe-concept` subagent; `/explore-codebase` answers a question, a packet carries the evidence a Concept gate stands on.
 - Re-fetch a durable artifact when you first need it, or when you need it and can't quote it verbatim from context — never on a schedule, never "just in case", never right after your own write.
 - Authority order: `CONTEXT.md`/`ARCHITECTURE.md`/Concept > code > external sources. A conflict against a higher-ranked source is asked, never assumed.
 
@@ -101,7 +101,7 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **Concept inspection** — fires on its own, before any Concept write, so *crosscutting* and *reusable* are counted against the repo instead of judged from this session's context. Signals, any one of: a rule stated in general form ("always", "every", "we do X for all Y"); *Record without asking* spotting a candidate; *Code cross-reference* finding the same shape in a second place; *Classify conflicts* returning **Supersession**; a gate miss logged with `nearest source: none` over a rule-shaped decision. One candidate, one agent, once a session.
 
-Spawn one bounded read-only subagent and instruct it to Run `/inspect-concept` skill, giving it the candidate rule in one sentence, the ledger's `Touched surface` paths as its exact scope, and one question — *how many independent occurrences exist, and what are the counterexamples?* Ask the rest of the round while it runs: *Turn shape* already forbids a turn ending on a write, so the inspection overlaps the user's thinking and a round never waits on a packet.
+Spawn one bounded read-only subagent and instruct it to Run `/probe-concept` skill, giving it the candidate rule in one sentence, the ledger's `Touched surface` paths as its exact scope, and one question — *how many independent occurrences exist, and what are the counterexamples?* Ask the rest of the round while it runs: *Turn shape* already forbids a turn ending on a write, so the inspection overlaps the user's thinking and a round never waits on a packet.
 
 Read the returned packet top-down; the first matching row wins.
 

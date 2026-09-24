@@ -1,5 +1,5 @@
 ---
-name: inspect-concept
+name: probe-concept
 description: Inspect how a shared domain, structural, or operational concept is implemented across a codebase. Use to find representative implementations, variations, tests, and drift with file-and-line evidence before defining or documenting an arc42 Crosscutting Concept; also called by define-concept inspection agents.
 ---
 
