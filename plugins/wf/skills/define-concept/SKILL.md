@@ -5,7 +5,7 @@ description: Define an arc42 Crosscutting Concept through questioning and parall
 
 # Define Concept
 
-Own the concept's scope and decisions. `/questioning` owns the interview; `/inspect-concept` establishes codebase facts; `/doc-concept` renders the body; `/record-concept` owns persistence, frontmatter, and indexing. Do not reimplement their rules.
+Own the concept's scope and decisions. `/questioning` owns the interview; `/inspect-concept` establishes codebase facts; `/doc-concept` renders the body; `/record-concept` owns persistence and indexing. Do not reimplement their rules.
 
 1. Frame one candidate shared concept and the affected system. Read `ARCHITECTURE.md`'s `Crosscutting Concepts` index and matching records; check for an existing owner before expanding a new concept. Map the decision tree for scope, applicable contexts, shared behavior/invariants, exceptions, and verification. A single feature choice is not a crosscutting concept.
 2. Run `/questioning` for unresolved **decisions**. Before each round, identify environmental **facts** needed by that frontier. Spawn bounded read-only subagents for independent codebase areas (for example separate deployables, workflow boundaries, or configuration versus tests). Give each one the concept, exact scope, and a distinct question; instruct it to Run `/inspect-concept` and return its cited evidence packet. For one focused path use one agent; for dependent paths inspect sequentially. Ask independent frontier decisions while inspections run; wait for evidence only where a decision depends on it. Do not launch duplicate fact lookups through `/questioning` for areas already in flight.

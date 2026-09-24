@@ -1,26 +1,3 @@
----
-id: structure-resource-access-skill
-title: Resource Access Skill
-trigger: >-
-  a skill encapsulating access to a ticket tracker, docs backend, or other external infrastructure, vendor
-  commands or IDs appearing in a caller, swapping the backend behind an existing skill, index-table read/write
-  ownership, a new external API reached from more than one place
-summary: >-
-  Access to one category of infrastructure is encapsulated behind a single skill's documented actions, so all
-  vendor-specific knowledge — commands, IDs, formats — lives inside that skill and the backend can be replaced
-  without touching a caller. Examples: `manage-backlog` (GitHub issues, swappable for Jira) and `manage-docs`
-  (local markdown files).
-default: >-
-  Put vendor-specific knowledge for one infrastructure category inside a single skill and let callers reach it
-  through that skill's documented actions.
-owns:
-  - "encapsulation of external infrastructure behind a skill"
-applies_to:
-  - plugins/**
-  - skills/**
-related: ["structure-trigger-indexer", "structure-skill-owned-code", "structure-skill-composition"]
----
-
 # Resource Access Skill
 
 ## Purpose

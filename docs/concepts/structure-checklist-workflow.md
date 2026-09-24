@@ -1,25 +1,3 @@
----
-id: structure-checklist-workflow
-title: Checklist-Driven Workflow
-trigger: >-
-  authoring a skill with a sequential multi-step procedure, a step that can fail and require returning to an
-  earlier step, a task needing resumable progress tracking, progress that must survive a context reset, an agent
-  drifting out of sequence, naming a checklist header
-summary: >-
-  Embeds a literal Markdown checklist in a skill's instructions that the agent copies into its working notes at
-  task start and checks off step by step, so ordered, resumable, multi-step procedures survive context resets
-  and failures without drifting off sequence.
-default: >-
-  Embed a literal, fenced checklist the agent copies into its working notes whenever a procedure has three or
-  more ordered steps, or whenever progress must survive a context reset.
-owns:
-  - "ordered, resumable execution tracking inside a skill"
-applies_to:
-  - plugins/**
-  - skills/**
-related: ["ops-completeness-sweep", "structure-agents-style", "ops-per-repo-config-resolution", "structure-skill-owned-code"]
----
-
 # Checklist-Driven Workflow
 
 ## Purpose
