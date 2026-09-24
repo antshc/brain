@@ -1,5 +1,5 @@
 ---
-id: "0001"
+id: structure-resource-access-skill
 title: Resource Access Skill
 trigger: >-
   a skill encapsulating access to a ticket tracker, docs backend, or other external infrastructure, vendor
@@ -18,7 +18,7 @@ owns:
 applies_to:
   - plugins/**
   - skills/**
-related: ["0003", "0009", "0010"]
+related: ["structure-trigger-indexer", "structure-skill-owned-code", "structure-skill-composition"]
 ---
 
 # Resource Access Skill

@@ -1,5 +1,5 @@
 ---
-id: "0002"
+id: structure-ledger
 title: Ledger
 trigger: >-
   session tracking of opened Concept/service records, grilling or domain-modeling session state, avoiding a
@@ -16,7 +16,7 @@ owns:
   - "session-scoped state persistence for a grilling session"
 applies_to:
   - plugins/wf/**
-related: ["0003", "0004", "0008"]
+related: ["structure-trigger-indexer", "ops-completeness-sweep", "ops-per-repo-config-resolution"]
 ---
 
 # Ledger
@@ -50,4 +50,4 @@ only when a specific detail is needed again.
 
 - A record retired mid-session is only reflected on the *next* index scan — content the caller already opened
   earlier in the same session is not retroactively invalidated by the Ledger; that is a scan/match concern (see
-  [0003](0003-trigger-indexer.md)), not the Ledger's own.
+  [structure-trigger-indexer](structure-trigger-indexer.md)), not the Ledger's own.

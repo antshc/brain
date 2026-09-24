@@ -1,5 +1,5 @@
 ---
-id: "0010"
+id: structure-skill-composition
 title: Skill Composition
 trigger: >-
   splitting one skill into two, a procedure needed by more than one skill, an agent body restating a skill's
@@ -26,7 +26,7 @@ owns:
 applies_to:
   - plugins/**
   - skills/**
-related: ["0001", "0007", "0009"]
+related: ["structure-resource-access-skill", "structure-agents-style", "structure-skill-owned-code"]
 ---
 
 # Skill Composition
@@ -89,8 +89,8 @@ moves into a **flow skill**: each member is then frontmatter, a flow-skill invoc
 overrides — a delta, not a copy. Two families with genuinely different steps get two flow skills, because one
 skill serving both would branch on its caller, which is worse than the duplication it avoids.
 
-Two related records own adjacent areas: [0001](0001-resource-access-skill.md) owns *what* a skill encapsulates
-when its purpose is infrastructure access, and [0009](0009-skill-owned-code.md) owns where a skill's code and
+Two related records own adjacent areas: [structure-resource-access-skill](structure-resource-access-skill.md) owns *what* a skill encapsulates
+when its purpose is infrastructure access, and [structure-skill-owned-code](structure-skill-owned-code.md) owns where a skill's code and
 tests live. This record owns the division and the call style only.
 
 How to word a description, name a skill, or lay out its folders is write-time guidance, not design — see

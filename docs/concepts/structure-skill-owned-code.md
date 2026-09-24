@@ -1,5 +1,5 @@
 ---
-id: "0009"
+id: structure-skill-owned-code
 title: Skill-Owned Code
 trigger: >-
   a skill needing a helper script, deciding where a skill's Python lives, adding a module to
@@ -22,7 +22,7 @@ applies_to:
   - skills/**
   - tools/src/modules/**
   - .githooks/pre-commit
-related: ["0001", "0005", "0010"]
+related: ["structure-resource-access-skill", "structure-checklist-workflow", "structure-skill-composition"]
 ---
 
 # Skill-Owned Code

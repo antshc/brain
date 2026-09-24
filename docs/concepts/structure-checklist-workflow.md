@@ -1,5 +1,5 @@
 ---
-id: "0005"
+id: structure-checklist-workflow
 title: Checklist-Driven Workflow
 trigger: >-
   authoring a skill with a sequential multi-step procedure, a step that can fail and require returning to an
@@ -17,7 +17,7 @@ owns:
 applies_to:
   - plugins/**
   - skills/**
-related: ["0004", "0007", "0008", "0009"]
+related: ["ops-completeness-sweep", "structure-agents-style", "ops-per-repo-config-resolution", "structure-skill-owned-code"]
 ---
 
 # Checklist-Driven Workflow
@@ -74,7 +74,7 @@ Run: `<command>`
 If item <N> fails, return to item <M>.
 ```
 
-Distinct from [0004](0004-completeness-sweep.md): a checklist orders sequential execution *during* the task; a
+Distinct from [ops-completeness-sweep](ops-completeness-sweep.md): a checklist orders sequential execution *during* the task; a
 Completeness Sweep is a closing pass that checks coverage *after* implementation is believed done.
 
 ## Exceptions

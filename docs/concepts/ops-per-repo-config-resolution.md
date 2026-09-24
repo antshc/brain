@@ -1,5 +1,5 @@
 ---
-id: "0008"
+id: ops-per-repo-config-resolution
 title: Per-Repo Config Resolution
 trigger: >-
   a skill or agent reading per-repository configuration, adding a dotfile or convention folder under the Harness
@@ -26,7 +26,7 @@ applies_to:
   - plugins/**
   - .crew/**
   - .atlassian
-related: ["0002", "0005"]
+related: ["structure-ledger", "structure-checklist-workflow"]
 ---
 
 # Per-Repo Config Resolution

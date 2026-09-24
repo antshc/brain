@@ -26,7 +26,7 @@ Use `python3` — `python` is not available in this environment.
 
 ### Skill-owned Python
 
-A skill may own its own Python code and tests inside its own folder — see [Concept 0009](../docs/concepts/0009-skill-owned-code.md).
+A skill may own its own Python code and tests inside its own folder — see [Skill-Owned Code](../docs/concepts/structure-skill-owned-code.md).
 
 - Code with **one** consumer lives in the skill that uses it; no module, no sync mapping.
 - Code shared by several skills in **one** plugin is owned by exactly one of them; siblings invoke that skill rather than importing across skill folders.
