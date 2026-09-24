@@ -1,14 +1,14 @@
 # Concept Record Format
 
-`/record-concept` owns frontmatter, numbering, file writing, and the `ARCHITECTURE.md` index. `/doc-concept` owns all body templates and writing rules.
+`/record-concept` owns frontmatter, record identity, file writing, and the `ARCHITECTURE.md` index. `/doc-concept` owns all body templates and writing rules.
 
-Files live in `docs/concepts/` as `{{nnnn}}-{{slug}}.md`.
+Files live in `docs/concepts/` as `{{kind}}-{{slug}}.md`, where `{{kind}}` is `domain`, `structure`, or `ops` — the kind of the `/doc-concept` template the body was written from, so a listing sorts the records into their families.
 
 ## Frontmatter template
 
 ```md
 ---
-id: "{{nnnn}}"
+id: {{kind}}-{{slug}}
 title: {{conceptTitle}}
 trigger: >-
   {{comma-separated trigger clauses}}
@@ -19,7 +19,7 @@ default: >-
 owns: ["{{decision area}}"]
 applies_to:
   - {{path glob}}
-related: ["{{nnnn}}"]
+related: ["{{kind}}-{{slug}}"]
 ---
 
 # {{conceptTitle}}
@@ -32,7 +32,7 @@ YAML frontmatter is **mandatory** and is the machine-readable contract for the r
 
 | Key | Required | Value |
 |-----|----------|-------|
-| `id` | yes | Quoted four-digit record number, matching the filename prefix. |
+| `id` | yes | The filename stem, `{{kind}}-{{slug}}`, matching the file it opens. |
 | `title` | yes | Same text as the `# ` heading and the index row's record cell. |
 | `trigger` | yes | Comma-separated clauses naming the change types that make this Concept apply. Source of truth for the index's Trigger condition cell. |
 | `summary` | yes | The index row's Summary cell, verbatim. |

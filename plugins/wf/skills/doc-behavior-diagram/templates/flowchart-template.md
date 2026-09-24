@@ -38,11 +38,14 @@ Use short, stable node IDs and descriptive labels. Never use `click` as a node I
 
 ## Relationships
 
-- `-->` — normal directed flow.
+- `-->` — normal directed flow, connecting steps inside one process.
 - `-- text -->` — directed flow with a condition or handoff label.
-- `-.text.->` — deprecated, exceptional, or non-primary path.
+- `-.text.->` — deprecated, exceptional, or non-primary path, and a separately initiated follow-up step; label it with the initiating actor.
+- Keep independently triggered processes joined by a dotted, actor-labelled edge — a solid edge between them claims automatic execution that nothing performs.
+- Show an enabling or blocking state as its own node wherever it gates another process.
 - Relationship direction must match the actual process or data-flow direction.
 - Label decisions and non-obvious handoffs with meaningful text.
+- Define any non-obvious edge notation in one sentence below the diagram.
 - Use `flowchart TD` for top-down flows and `flowchart LR` for wide pipelines when it improves readability.
 
 ## Current-mode styling

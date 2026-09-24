@@ -1,4 +1,4 @@
-# Structural implementation — body template
+# Structure implementation — body template
 
 Retain the existing record's fixed heading set and order. `Design Guidance` must explain the pattern itself, not point to one implementation as its definition.
 

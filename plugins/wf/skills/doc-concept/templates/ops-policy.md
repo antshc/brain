@@ -1,4 +1,4 @@
-# Operational policy — body template
+# Ops policy — body template
 
 ```md
 ## Purpose
