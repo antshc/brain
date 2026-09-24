@@ -4,6 +4,7 @@ One page covers a **process family**: exactly one main process owning the end-to
 
 ```md
 ## Purpose
+<!-- Anchor on the business term it governs (e.g. `failover`, `lease`, `reservation`), never a file name or class name. -->
 <Shared business outcome in one sentence; the role, bounded context, or service accountable end to end.>
 
 ## Definition
@@ -14,6 +15,7 @@ One page covers a **process family**: exactly one main process owning the end-to
 - **Ends:** <Every valid terminal business state, and where operation outcomes are recorded.>
 
 ## Process Matrix
+<!-- Anchor each cell on the business term it governs (e.g. `failover`, `lease`, `reservation`), never a file name or class name. -->
 | Level | Process | Parent | Actor | Trigger | Available when | Main stages | Outcome | Failure behavior |
 |---|---|---|---|---|---|---|---|---|
 | Main process | <Verb-object name, e.g. Commit Failover> | None | <Initiator> | <Event or explicit action> | <Permissions, lifecycle state, required data, concurrency> | <Stage> → <subprocess or stage> → <resulting state> | <Business-visible result> | <Persisted failure evidence, cleanup, retry, partial success, or compensation> |
@@ -34,6 +36,7 @@ One page covers a **process family**: exactly one main process owning the end-to
 - **Evidence:** MUST <state, progress, metadata, result, and recovery context that survives failure or restart>.
 
 ## Relationships
+<!-- Anchor each node/edge label on the business term it governs (e.g. `failover`, `lease`, `reservation`), never a file name or class name. -->
 <Mermaid flowchart.>
 
 <One sentence defining any non-obvious edge notation.>
