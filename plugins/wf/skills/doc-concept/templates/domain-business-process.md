@@ -25,6 +25,7 @@ One page covers a **process family**: exactly one main process owning the end-to
 | <Process> | <Variant> | <Data or state condition> | <Only the stages, rules, outcome details, or failure behavior that differ from the parent.> |
 
 ## Rules
+<!-- Anchor each rule on the business term it governs (e.g. `failover`, `lease`, `reservation`), never a file name or class name. -->
 - **Ownership:** MUST <command intake, orchestration, and execution responsibility>.
 - **State:** MUST <valid transitions across the family, keeping lifecycle state, execution status, and completion status distinct>.
 - **Concurrency:** MUST <mutual exclusion and conflict behavior>.
