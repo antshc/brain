@@ -1,4 +1,4 @@
-# Logic Prototype
+# Logic Experiment
 
 Use for pure business logic, state transitions, state machines, reducers, data shapes, and transformations.
 

@@ -128,7 +128,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
 - [normalize-requirements](plugins/wf/skills/normalize-requirements/SKILL.md): strip implementation artifacts out of requirement or story text.
 - [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): delegate read-only codebase questions to a subagent.
-- [prototype](plugins/wf/skills/prototype/SKILL.md): build a throwaway prototype to answer a design question.
+- [experiment](plugins/wf/skills/experiment/SKILL.md): run a throwaway experiment to answer a design question.
 - [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
 - [inspect-system](plugins/wf/skills/inspect-system/SKILL.md): inspect a system as-built along the capability, deployables, or data axis, cited to `file:line`, with diagrams.
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
