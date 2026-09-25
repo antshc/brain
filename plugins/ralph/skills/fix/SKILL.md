@@ -9,7 +9,7 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
 1. Run `/resolve-harness` skill from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
-   - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Non-zero exit → **exit** and report.
+   - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Empty/unset `CODEBASE_REPO_PATH` → default it to `$HARNESS_REPO_PATH`. Non-zero exit → **exit** and report.
 2. Get PR branch names:
   ```bash
   eval "$(gh pr view <number> --repo <owner>/<repo> --json headRefName,baseRefName \

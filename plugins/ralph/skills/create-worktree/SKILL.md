@@ -14,6 +14,12 @@ The path is supplied by the caller — this skill performs no resolution of its 
 
 ```bash
 CODEBASE_REPO_PATH=<codebase-repo-path>
+git -C "$CODEBASE_REPO_PATH" rev-parse --is-inside-work-tree
+```
+
+If this fails (path missing or not a git repo), **exit** and report `Not a git repository: $CODEBASE_REPO_PATH` before running any other command.
+
+```bash
 cd "$CODEBASE_REPO_PATH"
 ```
 

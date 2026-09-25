@@ -25,7 +25,7 @@ If the pull exits non-zero (conflicts detected), discard local state in favor of
 git -C "$HARNESS_REPO_PATH" reset --hard "@{upstream}"
 ```
 
-`/resolve-harness` unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. `/resolve-harness` exiting non-zero → **exit** and report.
+`/resolve-harness` unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Empty/unset `CODEBASE_REPO_PATH` (e.g. a `.harness.env` written before this key existed) → default it to `$HARNESS_REPO_PATH`. `/resolve-harness` exiting non-zero → **exit** and report.
 
 ## 1. Resolve milestone
 
