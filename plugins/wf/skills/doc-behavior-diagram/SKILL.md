@@ -55,6 +55,8 @@ Use **delta mode** when the user asks for a delta or change-focused diagram, inc
 
 Open [flowchart-template.md](templates/flowchart-template.md).
 
+`orientation := the orientation the caller named — `TD` or `LR`; `TD` when the caller named none`
+
 ### Swimlane Diagram
 
 Open [swimlane-diagram-template.md](templates/swimlane-diagram-template.md).
@@ -69,7 +71,7 @@ A renderer fallback may change syntax, never semantics: a swimlane falls back to
 
 Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
-**Done when:** the type drawn is the one the caller named when there was one; the selected template was opened this run; the selected diagram follows its rules; current mode uses the base palette; delta mode uses the diagram-specific delta rules and minimum context; no unused placeholder or instruction-only comment remains.
+**Done when:** the type drawn is the one the caller named when there was one; the selected template was opened this run; the selected diagram follows its rules; a flowchart opens with the caller's `orientation`, or `TD` when none was named; current mode uses the base palette; delta mode uses the diagram-specific delta rules and minimum context; no unused placeholder or instruction-only comment remains.
 
 ## 3. Assign a diagram id
 
