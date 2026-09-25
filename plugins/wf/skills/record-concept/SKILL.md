@@ -52,7 +52,7 @@ Create `docs/concepts/` when the first Concept is ready — not before; do nothi
 
 ## Record identity
 
-A record is named `docs/concepts/{{kind}}-{{slug}}.md`. `{{kind}}` is the kind of the `/doc-concept` template the body came from — `domain`, `structure`, or `ops` — so the directory listing groups the families; `{{slug}}` is the title in kebab-case. For `domain`, the title is the Business Capability the page covers, so the slug is that capability in kebab-case. Sharpen the slug when a name is already taken; the identity carries no counter, so nothing has to be renumbered.
+A record is named `docs/concepts/{{kind}}-{{slug}}.md`. `{{kind}}` is the kind of the `/doc-concept` template the body came from — `dom`, `str`, or `ops` — so the directory listing groups the families; `{{slug}}` is the title in kebab-case. For `dom`, the title is the Business Capability the page covers, so the slug is that capability in kebab-case. Sharpen the slug when a name is already taken; the identity carries no counter, so nothing has to be renumbered.
 
 A record carries no frontmatter — it opens directly with `# {{conceptTitle}}`.
 
