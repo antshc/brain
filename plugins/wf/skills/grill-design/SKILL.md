@@ -29,19 +29,31 @@ The grill produces exactly two things: **questions** and **records**. Writable s
 
 ## Interview
 
-Interview me relentlessly about every aspect of this until we reach a shared understanding. Map the decisions as a tree and work it in rounds. Before each round, find the **frontier**: every decision whose prerequisites are settled. Apply the fact lookup and evidence rules below before asking; decisions resolved as Feature Assumptions never enter the question frontier. Ask the entire remaining frontier in one round, numbering each question and giving your recommended answer. A question whose answer depends on another unresolved question in the same round belongs to a later round. Wait for the user's answers, reshape the tree, and recompute the frontier.
+Interview me relentlessly about every aspect of this until we reach a shared understanding. Map it as a **design tree**: every decision branches into the decisions that hang off it.
 
-Format every question in the round like so:
+Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Before asking, filter it — a *fact* the environment can supply is looked up, never asked; a *decision* that clears the evidence checklist in *Decision states* becomes a Feature Assumption and leaves the frontier. Ask everything left in one round: number and title each question and give your recommended answer. Then wait for my answers before the next round.
+
+Format a round like so:
 
 ```
-Q1: <question body, might be multiple paragraphs, including multiple choices>
+❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
 
-> <your recommended answer>
+➡️ <your recommended answer>
+
+---
+
+❓ **Q2** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+
+➡️ <your recommended answer>
 ```
+
+Each round I answer reshapes the tree: settled decisions push the frontier outward and unblock the questions that depended on them. Re-run the probes, recompute the frontier, and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
+
+Finding *facts* is your job, never mine. When a frontier question needs a fact from code, tests, or tools, Run `/explore-codebase` skill; don't block on it — an unfinished lookup is an unsettled prerequisite, so only the questions downstream of it wait for its result; ask the rest of the frontier now. The *decisions* are mine: put each one that misses the checklist to me and wait.
+
+An empty frontier means every branch of the tree is visited and nothing is silently assumed — it is still a mid-session state (see *Scope*): end that turn on the explicit ask to close.
 
 **Turn shape** — every turn ends on one of two moves: the next question round, or the explicit ask to close the session. Lookups, ledger lines, and record writes are the middle of a turn; a turn that ends on a write is unfinished, so name the branches it opened or closed and ask the next question round in that same turn.
-
-If a *fact* is discoverable in the environment (filesystem, tools), look it up rather than asking. If a *decision* clears the evidence checklist below, take it as a Feature Assumption rather than asking; if any part fails, put it to me and wait.
 
 Before confirming we've reached a shared understanding, report every Feature Decision and Feature Assumption made this session — one bullet each, 1-3 sentences on what was decided/assumed and why, tagged so the two are never confused: `- [decided] {{item}}: {{explanation}}` / `- [assumed] {{item}}: {{explanation}}`. This is a **report, not a gate**: nothing waits on it, everything recorded is already on disk, and `git diff` is the review surface.
 
