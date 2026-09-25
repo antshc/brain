@@ -25,6 +25,8 @@ Then:
   ```
   Resolve `{{codeRepoName}}`/`{{codeRepoSlug}}` from the nested repo (e.g. `git -C workspace/{{codeRepoName}} remote get-url origin`).
 
+  Run `/init-harness` skill from the reporoot so `.harness.env` records both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` — without it, ralph tooling falls back to treating the harness root as the codebase root.
+
 ## 2. Seed the copilot instructions
 
 Seed content: [copilot-instructions.template.md](./copilot-instructions.template.md) — same section structure as a working harness example (topology, safety/targeting, authoritative sources, code navigation, external repos, build/validation, doc conventions, skills).
@@ -43,6 +45,7 @@ Run `/manage-backlog` skill **Setup labels**.
 ## Done when
 
 - Topology confirmed; `workspace/` split (if any) set up.
+- For a wrapping repo, `.harness.env` exists with both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` set.
 - Copilot instructions seeded in `.github/copilot-instructions.md`, placeholders resolved, no duplicate sections.
 - `ARCHITECTURE.md` and `CONTEXT.md` exist.
 - `/manage-backlog` **Setup labels** ran without error.

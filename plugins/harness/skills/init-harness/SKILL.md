@@ -12,7 +12,7 @@ Run from the intended harness directory. Resolve its physical absolute path:
 harnessRepoPath=$(pwd -P)
 ```
 
-The actual source code may live in a separate repo under `workspace/`. Probe for it (same probe `/create-worktree` runs before any branch or worktree operation):
+The actual source code may live in a separate repo under `workspace/`. Probe for it:
 
 ```bash
 src_git=$(find "$harnessRepoPath/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
