@@ -62,6 +62,12 @@ def render_block(node: dict) -> str:
                 node.get("attrs", {}).get("parameters", {}).get("guestParams", {}).get("diagramName", "")
             )
             return f'<!-- adf:diagram drawio="{diagram_name}" -->'
+        if extension_key == "drawio":
+            diagram_name = (
+                node.get("attrs", {}).get("parameters", {}).get("macroParams", {})
+                .get("diagramName", {}).get("value", "")
+            )
+            return f'<!-- adf:diagram drawio="{diagram_name}" -->'
         raise NotImplementedError(f"unhandled ADF extension '{extension_key}'")
     if node_type in ("mediaSingle", "media"):
         media_node = node if node_type == "media" else next(
@@ -196,7 +202,7 @@ def render_inline_card(node: dict) -> str:
 
 def render_inline_extension(node: dict) -> str:
     extension_key = node.get("attrs", {}).get("extensionKey", "")
-    if extension_key == "create-from-template":
+    if extension_key in ("create-from-template", "anchor"):
         return ""
     else:
         raise NotImplementedError(f"unhandled ADF inline extension '{extension_key}'")

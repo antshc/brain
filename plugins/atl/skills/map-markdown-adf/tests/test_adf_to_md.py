@@ -273,6 +273,27 @@ def test_create_from_template_inline_extension_is_ignored(adf_to_md):
     assert adf_to_md(doc) == ""
 
 
+def test_anchor_inline_extension_is_ignored(adf_to_md):
+    doc = _doc(
+        _p(
+            {
+                "type": "inlineExtension",
+                "attrs": {
+                    "extensionType": "com.atlassian.confluence.macro.core",
+                    "extensionKey": "anchor",
+                    "parameters": {
+                        "macroParams": {
+                            "": {"value": "_Toc67901069"},
+                            "legacyAnchorId": {"value": "Page-_Toc67901069"},
+                        }
+                    },
+                },
+            }
+        )
+    )
+    assert adf_to_md(doc) == ""
+
+
 def test_inline_card_without_url_raises(run_cli):
     doc = _doc(_p({"type": "inlineCard", "attrs": {}}))
     result = run_cli("adf-to-md", json.dumps(doc))
@@ -425,6 +446,23 @@ def test_drawio_extension_renders_diagram_placeholder(adf_to_md):
         }
     )
     assert adf_to_md(doc) == '<!-- adf:diagram drawio="order-flow.drawio" -->'
+
+
+def test_classic_drawio_macro_renders_diagram_placeholder(adf_to_md):
+    doc = _doc(
+        {
+            "type": "extension",
+            "attrs": {
+                "extensionKey": "drawio",
+                "parameters": {
+                    "macroParams": {
+                        "diagramName": {"value": "Untitled Diagram-1749031667953.drawio"},
+                    },
+                },
+            },
+        }
+    )
+    assert adf_to_md(doc) == '<!-- adf:diagram drawio="Untitled Diagram-1749031667953.drawio" -->'
 
 
 def test_media_single_renders_attachment_placeholder(adf_to_md):
