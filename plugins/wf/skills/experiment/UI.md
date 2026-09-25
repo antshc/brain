@@ -5,14 +5,14 @@ Use when the question is what a page, component, flow, or interaction should loo
 ## Build
 
 1. Inspect the existing frontend framework, routing, components, styles, data access, and host page.
-2. Prefer an existing route/page. Create a prototype route only when no natural host exists.
+2. Prefer an existing route/page. Create an experiment route only when no natural host exists.
 3. Reuse the current frontend stack and design system.
-4. Build 3 structurally different variants by default; cap at 5.
+4. Build one minimal variant for behavior validation; build 2-3 materially different variants when comparing design alternatives. Cap at 5.
 5. Keep existing data fetching/auth when safe. Avoid real mutations unless mutation behavior is the question.
-6. Make variants switchable on one route, preferably with a shareable URL parameter such as `?variant=`.
-7. Keep the switcher clearly prototype-only and excluded from production.
+6. When comparing variants, make them switchable on one route, preferably with a shareable URL parameter such as `?variant=`.
+7. Keep any switcher clearly experiment-only and excluded from production.
 8. Surface enough real state/data density to evaluate the variants.
-9. Capture the selected design decision; remove prototype variants/switcher from production code.
+9. Capture observations and, when provided, the user's selected variant. Remove experiment variants/switcher from production code.
 
 ## Constraints
 
