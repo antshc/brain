@@ -57,6 +57,8 @@ A description with no embedded image or file never touches the Jira REST/attachm
 
 ## Gotchas
 
+**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `fetch-work/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
+
 **The Atlassian MCP's `getJiraIssue` tool never returns real ADF for `description`**, even with `responseContentFormat: "adf"` — verified live: it returns an already-flattened Markdown-ish string with each embedded image as `![](blob:https://media.staging.atl-paas.net/?...&id=<media-uuid>&...)`, alt text always empty. That string is not valid JSON, so piping it into `/map-markdown-adf`'s `adf-to-md` raises `JSONDecodeError`. `assemble_work.py` fetches the real ADF separately over REST whenever a token is configured, and only falls back to this lossy string when it isn't.
 
 ## Verification
