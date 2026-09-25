@@ -46,7 +46,7 @@ Use short, stable node IDs and descriptive labels. Never use `click` as a node I
 - Relationship direction must match the actual process or data-flow direction.
 - Label decisions and non-obvious handoffs with meaningful text.
 - Define any non-obvious edge notation in one sentence below the diagram.
-- Use `flowchart TD` for top-down flows and `flowchart LR` for wide pipelines when it improves readability.
+- Open the diagram with `flowchart {{orientation}}` — `TD` unless the caller named `LR`, which suits a wide pipeline.
 
 ## Current-mode styling
 
@@ -81,7 +81,7 @@ Apply only when `SKILL.md` selects **delta mode**.
 
 - A `subgraph` can group existing nodes and can itself be an edge target.
 - Mermaid parsing can report a reserved-ID error on a later edge instead of the offending node declaration; avoid `click` as an ID.
-- Pick `TD` or `LR` based on readability rather than convention.
+- Keep the caller's `{{orientation}}`; pick on readability only when the caller named none.
 - Delete unused placeholders and example nodes from the final diagram.
 
 ## Output template
@@ -91,7 +91,7 @@ Replace all placeholders with real behavior. Add or remove nodes and relationshi
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: {{diagramId}}
-flowchart TD
+flowchart {{orientation}}
     start(["Start"])
     input[/"{{input}}"/]
     process["{{process}}"]
