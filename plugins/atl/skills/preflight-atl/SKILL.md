@@ -27,7 +27,7 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 
 Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected`, `accountId`, `displayName`. Never echo `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN`, or the `email` the identity call returns — not in output, logs, or errors.
 
-**1 — Config-derived facts (offline).** Resolve `$HARNESS_REPO_PATH` first: non-empty → use it as-is. Empty → resolve the repository root instead (e.g. `git rev-parse --show-toplevel`, falling back to cwd only if that fails) — **never** substitute `/` or leave the value blank, which would walk the whole filesystem. `cd` to the directory holding the `preflight-atl/SKILL.md` file you loaded to read this skill — never guess or reconstruct that path from a different skill's location — then run:
+**1 — Config-derived facts (offline).** Resolve `$HARNESS_REPO_PATH` first: non-empty → use it as-is. Empty → resolve the repository root instead (e.g. `git rev-parse --show-toplevel`, falling back to cwd only if that fails) — **never** substitute `/` or leave the value blank, which would walk the whole filesystem. Take the absolute path of `preflight-atl/SKILL.md` you were already given (in the system/tool context that told you this skill exists) and `cd` to its parent directory — never search for it, and never guess or reconstruct that path from a different skill's location — then run:
 
 ```bash
 python scripts/preflight.py --root "<resolved repo root>"
@@ -59,6 +59,8 @@ Apply in every `atl` skill:
 - Never search for `.atlassian` (or anything else) from `/` or any other unbounded root — an empty `$HARNESS_REPO_PATH` is resolved to the repository root first (Step 1), never widened into a filesystem-wide search.
 
 ## Gotchas
+
+**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `preflight-atl/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
 
 **A long absolute path inside `python3 -c "..."` or a heredoc gets corrupted by terminal line-wrapping**, and the command then fails on a path that looks correct in the transcript. `cd` into the directory and use a relative filename; anything longer than one short statement goes into a temp `.py` file that gets run by name.
 

@@ -70,6 +70,10 @@ A page whose raw ADF body has none of the three referenced-attachment shapes nev
 
 A diagram published before the round-trip sidecar existed → its placeholder resolves to a note naming the missing `{name}.source.mmd` attachment instead of a fence; republish the page with `/publish-page` to enable the round-trip, then fetch again.
 
+## Gotchas
+
+**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `fetch-page/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
+
 ## Verification
 
 `python3 -m pytest plugins/atl/skills/fetch-page/tests/` (from the repo root) — title/body extraction, the conversion handoff and its sanitized non-zero-exit failure path, offline attachment-reference detection, single-pass attachment listing/download, atomic cache publication (including preserving a prior complete cache on failure and leaving no partial staging directory), sidecar/image/file resolution (drawio and media-id, all three rendering rules), the no-sidecar and no-attachment notes, the `--md-path`/`--assets-dir`/`--attachments` CLI wiring, all three `--attachments` modes (including that `skip` makes no credential or REST call), TLS/timeout/listing/download/write failure paths and their redacted category-only notes, and a synthetic cross-skill fixture covering TOC, inline cards, lists, tables, and media — all mocked except the fixture, which runs the real CLI end to end. The ADF-to-placeholder seam is covered at its own home, `python3 -m pytest plugins/atl/skills/map-markdown-adf/`.

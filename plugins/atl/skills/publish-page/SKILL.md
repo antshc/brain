@@ -40,10 +40,10 @@ The custom content record must name the page's **space** as well as its containe
 
 ### Installing the Draw.io CLI
 
-Only for `ATLASSIAN_DIAGRAM_RENDERER=drawio`. When `drawio --version` fails, run:
+Only for `ATLASSIAN_DIAGRAM_RENDERER=drawio`. When `drawio --version` fails, `cd` to this skill's own directory (see Gotchas) and run:
 
 ```bash
-python plugins/atl/skills/publish-page/scripts/install_drawio.py
+python scripts/install_drawio.py
 ```
 
 Unpacks the official AppImage into `~/.local/opt/drawio` and puts a wrapper at `~/.local/bin/drawio` — no root, no FUSE, stdlib only. Re-running is safe; it exits early when the version already matches. Pass a version (`install_drawio.py 31.4.5`) to pin one, or `--prefix`/`--bindir` to relocate.
@@ -133,6 +133,10 @@ Report the page URL from the tool result and, when diagrams were rendered, confi
 - Token configured but `mmdc` missing → `run` exits non-zero naming `mmdc`; nothing is published (re-run once `mmdc` is installed).
 - `ATLASSIAN_DIAGRAM_RENDERER=drawio` with `drawio` missing or `ATLASSIAN_DRAWIO_EXTENSION_KEY` unset → `run` exits non-zero naming the missing one; nothing is published.
 - `ATLASSIAN_DIAGRAM_RENDERER` set to `mermaid` → `run` exits non-zero naming the renderer and the capture it still needs; nothing is published. Set the key to `png` or `drawio` to publish now.
+
+## Gotchas
+
+**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `publish-page/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
 
 ## Other subcommands
 

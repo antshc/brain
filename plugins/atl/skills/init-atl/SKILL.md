@@ -75,6 +75,10 @@ Nothing printed → continue. `NOT IGNORED` → append a `.atlassian` line (with
 
 No MCP connection → Steps 1-6 complete in full; Step 8 is skipped, naming "an Atlassian MCP connection" as the missing prerequisite.
 
+## Gotchas
+
+**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `init-atl/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
+
 ## Verification
 
 Config creation and value preservation share the file shape parsed by `/preflight-atl`: `python3 -m pytest plugins/atl/skills/preflight-atl/`. Generated wrapper content and developer prompts are deliberately untested — asserting on generated prose locks in wording; verify manually against a repo with no `.atlassian`, and again against one already carrying values, confirming `plugins/atl/` and `plugins/atl/skills/` are byte-identical before and after and that the shell profile and system environment are unchanged.

@@ -89,6 +89,10 @@ Marks nest and combine onto one text node, innermost first: `` [`Foo.Bar`](href)
 
 Every table's rows must resolve to one consistent column count once `colspan`/`rowspan` are applied. A mismatched table is rejected — non-zero exit, `error:` on stderr naming the table — with no partial output.
 
+## Gotchas
+
+**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `map-markdown-adf/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
+
 ## Verification
 
 `python -m pytest plugins/atl/skills/map-markdown-adf/` (from the repo root). Tests invoke the CLI as a subprocess — the only test seam — and assert only on emitted JSON/Markdown, never on which internal module produced it.

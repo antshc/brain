@@ -79,6 +79,8 @@ No reply from you is visible via the API for these. Comment reactions are invisi
 
 ## Gotchas
 
+**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `brief-daily/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
+
 **The scripts resolve `brief_daily/` relative to the current directory** — run them from anywhere else and the import fails. `cd` to the directory holding this `SKILL.md`, then `cd scripts`, and call them by bare filename.
 
 **Every search and most issue reads spill to a `content.json` path instead of returning inline** — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `/preflight-atl` skill **Standing MCP usage rules**.
