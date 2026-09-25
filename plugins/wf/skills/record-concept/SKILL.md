@@ -66,7 +66,7 @@ The `ARCHITECTURE.md` row is authored directly by this skill, not projected from
 
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
 2. Derive the Trigger condition with `/index-docs`' skill **Generate trigger condition**, passing the rendered body as `{{recordContent}}`.
-3. Author `default` yourself — one sentence naming the choice to take when the design doesn't state one.
+3. Author `default` yourself — one sentence naming the choice to take when the design doesn't state one. A caller-supplied, user-confirmed `default` (from `/define-concept`) is used verbatim.
 4. Run `/index-docs`' skill **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `triggerCondition`, `default` — never edit the table in `ARCHITECTURE.md` directly.
 
 Superseding or retiring a Concept applies the marker to its index row via the same **Sync index row** call; the record itself carries no status field.
