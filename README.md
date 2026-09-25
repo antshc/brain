@@ -131,7 +131,6 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [prototype](plugins/wf/skills/prototype/SKILL.md): build a throwaway prototype to answer a design question.
 - [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
 - [inspect-system](plugins/wf/skills/inspect-system/SKILL.md): inspect a system as-built along the capability, deployables, or data axis, cited to `file:line`, with diagrams.
-- [probe-concept](plugins/wf/skills/probe-concept/SKILL.md): classify a candidate rule by concern, skip it when already recorded, and return cited evidence, variations, and drift.
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): question the shared rule, coordinate concept inspections, and record the resolved result.
 - [doc-concept](plugins/wf/skills/doc-concept/SKILL.md): render domain, structural, or operational concept bodies from three one-page templates.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.

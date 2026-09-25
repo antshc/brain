@@ -43,7 +43,8 @@ flowchart TD
 
 | Group                                     | Purpose                                      | Current skills                                                                            |
 | ----------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **define- / discover-**                     | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `questioning`, `prototype`, `explore-codebase`, `probe-concept` |
+| **define- / discover-**                   | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `questioning`, `prototype`, `explore-codebase` |
+| **probe-**                                | Auto-discover facts in a system and record them | —                                                                                      |
 | **research-**                             | Gather external/domain evidence              | `research`, `define-research`                                                             |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-system`, `inspect-nuget-source`                                                  |
 | **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
