@@ -1,19 +1,21 @@
 ---
 name: grill-design
-description: A relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, reusable Concepts, feature decisions, and assumptions. Use when the user wants to stress-test a plan or design, get grilled, pin down domain terminology, or uses any 'grill design', 'grilling design' trigger phrases.
+description: A relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, feature decisions, and assumptions. Use when the user wants to stress-test a plan or design, get grilled, pin down domain terminology, or uses any 'grill design', 'grilling design' trigger phrases.
 ---
 
 # Grill Design
 
-Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; writes → `/record-term`, `/record-concept`; codebase lookups → `/explore-codebase`; Concept evidence packets → `/probe-concept`. Call them; never restate their rules.
+Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → `/track-ledger`; index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; term writes → `/record-term`; Concept repairs → `/record-concept`; codebase lookups → `/explore-codebase`. Call them; never restate their rules.
 
 ## Scope
 
 The grill produces exactly two things: **questions** and **records**. Writable surface for the whole session — `CONTEXT.md`, `ARCHITECTURE.md`, `docs/concepts/**`, `docs/services/**`, and the ledger. Source code, tests, configuration, and scaffolding are **read-only** for the entire session: reading them is the job (`/explore-codebase`), changing them is a different session.
 
+**Concepts are consumed, not discovered.** The grill matches, opens, and applies recorded Concepts, and repairs the ones this session proves wrong — a wrong `default`, a drifted key, a missing trigger clause. It never counts a rule's occurrences in the repo and never authors a record: a reusable-looking rule no recorded Concept covers stays a ledger line, and writing it up is a different session's job.
+
 **A finished record is not a finished session.** A term, Concept, or service row resolves one branch of the decision tree and nothing more. The turn a write lands, return to the interview — the write is a side effect of the interview, never its exit.
 
-**Only the user ends the grill.** An empty candidate list, a clean closing sweep, and a full doc set are mid-session states, not stop conditions. When you believe the tree is resolved, say so, ask, and wait for the answer.
+**Only the user ends the grill.** An empty question frontier, a clean closing sweep, and a full doc set are mid-session states, not stop conditions. When you believe the tree is resolved, say so, ask, and wait for the answer.
 
 **Implementation is a handoff, not a next step.** The user asks to build it → state that the grill is closing, run the closing sweep, then hand off: `/to-tickets` for backlog items, `/to-zdesign` for a design doc, `/prototype` for a throwaway spike. Inside a grill turn, production code stays untouched — including the one-line change the answer you just got seems to imply.
 
@@ -53,24 +55,21 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 
 | State | Resolved by | Home | Durable write |
 |---|---|---|---|
-| Feature Assumption | model, via the checklist | ledger only | never a *new* Concept — the record whose `default` cleared the checklist already covers it; a gap in that record is closing-sweep work |
-| Assumed record | model, no user answer asked for it, Concept gate passes on an inspection packet | ledger + document | same turn it crystallises — write it, no offer, no permission; reported `[assumed]` |
-| Feature Decision | user, feature-scoped (fails the Concept gate, resolves no term); or a candidate whose inspection packet found a single occurrence | ledger only | never |
-| Concept decision | user, reusable rule | ledger + Concept | same turn it's approved |
+| Feature Assumption | model, via the checklist | ledger only | never — the record whose `default` cleared the checklist already covers it; a gap in that record is closing-sweep work |
+| Feature Decision | user, resolving no term — feature-scoped or reusable alike | ledger only | never |
 | Rejected option | user | ledger only | never |
 
-Log every state and every change of state via `/track-ledger`' skill **Log decision**, the turn it happens. When I correct an assumption you made — at any point in the session — rewrite its ledger line that turn: the correction form when it stood on a Concept's `default` (the closing sweep repairs that key), a deletion otherwise; if it had already reached a Concept, fix that Concept the same turn too. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question in a round MUST get its own gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line: a feature-scoped decision that no Concept row matches is both a Feature Decision and a `gate miss: single-matching-record, nearest source: none`. The sweep resolves that miss as feature-scoped, without creating a Concept. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
+Log every state and every change of state via `/track-ledger`' skill **Log decision**, the turn it happens. When I correct an assumption you made — at any point in the session — rewrite its ledger line that turn: the correction form when it stood on a Concept's `default` (the closing sweep repairs that key), a deletion otherwise. Every question you ask *because a gate missed* is logged the same turn via that skill's gate-miss form — it is the closing sweep's harvest input. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question in a round MUST get its own gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line: a feature-scoped decision that no Concept row matches is both a Feature Decision and a `gate miss: single-matching-record, nearest source: none`. The sweep resolves that miss as feature-scoped, without creating a Concept. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
 
 ## Context economy
 
 - Broad-sweep code and test lookups → Run `/explore-codebase` skill; direct reads only to quote an exact line.
-- Counting a candidate rule's occurrences in the repo → the *Concept inspection* probe, spawned through `/explore-codebase`; `/explore-codebase` alone answers a question, a `/probe-concept` packet carries the evidence a Concept gate stands on.
 - Re-fetch a durable artifact when you first need it, or when you need it and can't quote it verbatim from context — never on a schedule, never "just in case", never right after your own write.
 - Authority order: `CONTEXT.md`/`ARCHITECTURE.md`/Concept > code > external sources. A conflict against a higher-ranked source is asked, never assumed.
 
 ## Probes
 
-Alongside the interview, build and sharpen the project's domain model — challenging terms, inventing edge-case scenarios, and writing the glossary and reusable Concepts down the moment they crystallise. Keep local decisions in the ledger. Merely *reading* `CONTEXT.md`, `ARCHITECTURE.md`, or Concepts for guardrails isn't enough here: this changes the model, not just consumes it.
+Alongside the interview, build and sharpen the project's domain model — challenging terms, inventing edge-case scenarios, and writing the glossary down the moment a term crystallises. Every other decision stays in the ledger. Merely *reading* `CONTEXT.md` for guardrails isn't enough here: the glossary changes as the session goes, even where the Concepts are only read, applied, and repaired.
 
 Every probe stays live for the whole session: re-check its trigger after each user answer, not just once — a later answer can retroactively put an earlier one in conflict.
 
@@ -99,32 +98,11 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
-**Concept inspection** — fires on its own, before any Concept write, so *crosscutting* and *reusable* are counted against the repo instead of judged from this session's context. Signals, any one of: a rule stated in general form ("always", "every", "we do X for all Y"); *Record without asking* spotting a candidate; *Code cross-reference* finding the same shape in a second place; *Classify conflicts* returning **Supersession**; a gate miss logged with `nearest source: none` over a rule-shaped decision.
-
-**Keyed by concern, once a session.** Before spawning, read the ledger's `inspected, concern:` lines. A candidate whose concern already carries one is answered from that line — no second probe for the same concern, whatever new wording surfaced it. A concern with no line earns one agent.
-
-Spawn it through `/explore-codebase`' skill **Run caller-supplied work inside the subagent**, naming `/probe-concept` and passing the candidate rule in one sentence, the ledger's `Touched surface` paths as its exact scope, and one question — *how many independent occurrences exist, and what are the counterexamples?* The probe classifies the concern and checks the recorded concepts itself, so neither costs this session's context. Ask the rest of the round while it runs: *Turn shape* already forbids a turn ending on a write, so the inspection overlaps the user's thinking and a round never waits on a packet.
-
-Read the returned packet top-down; the first matching row wins. Every row writes, asks, or both without stopping for permission — the packet is the approval, `git diff` is the review.
-
-| Packet says | Action |
-|---|---|
-| `Existing record:` names a path | the concern is already documented → **Extend or create**'s extend path when the packet carries a rule that record lacks, nothing at all when it doesn't; never a second record for the same concern |
-| `Intent vs implementation: drift` | an existing record is wrong, not missing → **Extend or create**'s extend path, plus a `/track-ledger` drift line for the closing sweep; never a new record |
-| the occurrence count rests on an `ASSUMPTION` | no record this turn — a subagent reports evidence, it never launders a guess into evidence. Log `, downgraded: assumption` and put the unverified claim into the next question round |
-| counterexamples present | the rule holds with exceptions → write it via `/record-concept` carrying the counterexamples as the record's `Exceptions`, and raise the exception boundary as a question alongside the write, never instead of it |
-| ≥2 independent occurrences, no contradicting counterexample | crosscutting and reusable are **evidenced** → write via `/record-concept`, citing the packet's `file:line` in the record |
-| exactly 1 occurrence | not crosscutting → Feature Decision, ledger only, no Concept |
-
-A rule the user explicitly answered is written even on the `ASSUMPTION` row — the answer already carries it, so the follow-up question runs alongside the write rather than replacing it. Log the packet via `/track-ledger`' skill **Log inspection** the turn it returns, passing the packet's concern and kind, and the path of whatever record you wrote or extended.
-
-**Record inline** — nothing is ever batched to the end of the session. Resolved term or reusable rule by explicit user answer → Run `/record-term` or `/record-concept` that same turn; the answer is the approval. Keep feature-scoped decisions in the ledger. Resolved by you → it's a Feature Assumption; ledger only when a matched Concept already covers it, otherwise *Record without asking* (see *Decision states*). Every Concept write consumes *Concept inspection*'s packet, then runs **Extend or create** — the packet's actual implementations, not the index table alone, separate *same rule, wider scope* (extend) from *different rule, adjacent area* (create), and sharpening an existing record beats spawning a near-duplicate.
-
-**Record without asking** — you spot a reusable Concept no user answer asked you to record. *Concept inspection* fires first; its packet clears `/record-concept`'s gate → record it that same turn, before your next interview question. Don't offer it, don't ask permission, don't defer — log it via `/track-ledger`' skill **Log decision** assumed-record form and report it in the closing `[assumed]` list, where `git diff` is the review. Never carry a candidate past the turn it crystallised. A localized trade-off remains a Feature Decision in the ledger.
+**Record inline** — nothing is ever batched to the end of the session. A term resolved by explicit user answer → Run `/record-term` that same turn; the answer is the approval. Resolved by you → it's a Feature Assumption, ledger only (see *Decision states*). Every other decision stays in the ledger, a reusable-sounding rule included: the only Concept writes this skill makes are the closing sweep's repairs to records that already exist.
 
 ## Closing sweep
 
-Three parts, each with its own trigger. The sweep **repairs** existing records; it never authors a design record — those are written inline the turn they crystallise, and a candidate never written inline is a miss, not sweep work.
+Three parts, each with its own trigger. The sweep **repairs** existing records; it never authors a new one — a term is written inline by `/record-term`, and a rule no recorded Concept covers stays in the ledger.
 
 **1. Per-row disposition.** If the session opened at least one full Concept, emit one verdict per row in the `Crosscutting Concepts` index table — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so no row is silently omitted. Skip for trivial sessions that only touched glossary terms.
 
@@ -133,10 +111,10 @@ Three parts, each with its own trigger. The sweep **repairs** existing records; 
 **Reconciliation first (the anti-skip guard).** Before repairing anything, enumerate *every* user-answered question logged this session and find its gate-miss line. Any question without one is an **unlogged miss** — reconstruct its gate-miss line now, then inspect it like the rest. An empty gap-form list is valid only when no question was asked; reaching "no repairs" without enumerating the questions skips this step.
 
 Then inspect each of the ledger's three gap forms:
-* **Gap miss** (`asked, gate miss:`) — if the answer establishes a reusable rule, add the missing `default` to the nearest Concept's index row. If no Concept can host it, log a next-session Concept candidate; authoring a brand-new record here breaks *Record without asking*'s inline-only rule. If the answer is feature-scoped, keep the Feature Decision in the ledger and mark the gate miss resolved without changing a record.
+* **Gap miss** (`asked, gate miss:`) — if the answer establishes a reusable rule, add the missing `default` to the nearest Concept's index row. If no Concept can host it, leave the decision in the ledger and mark the miss resolved; authoring a brand-new record is never this skill's job. If the answer is feature-scoped, keep the Feature Decision in the ledger and mark the gate miss resolved without changing a record.
 * **Correction** (`corrected, evidence was:`) — a `default` produced an assumption the user corrected mid-session; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
 * **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
 
-Write the Concept fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*. A key change no answer covers is your own call: write it, log it, and report it in the closing `[assumed]` list. Apply each Concept write via `/record-concept`, resync the row via `/index-docs`' skill **Sync index row**, and mark the ledger line resolved.
+Write the Concept fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*'s term writes. A key change no answer covers is your own call: write it, log it, and report it in the closing `[assumed]` list. Apply each Concept fix via `/record-concept`, resync the row via `/index-docs`' skill **Sync index row**, and mark the ledger line resolved.
 
 **3. Trigger-condition refinement.** Runs last, so it also covers any row part 2 just resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, blank cell). If found, refine the clause and apply it via `/index-docs`' skill **Sync index row**.
