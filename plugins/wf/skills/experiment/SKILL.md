@@ -1,11 +1,11 @@
 ---
-name: prototype
-description: Build a minimal throwaway prototype to answer one uncertain technical question by observing actual behavior. Use to validate feasibility, assumptions, or behavior for logic/state, UI/frontend, SDK/API/integration, cloud resources, message brokers, databases, or backend/runtime systems before committing production code.
+name: experiment
+description: Run a minimal throwaway experiment to answer one uncertain technical question by observing actual behavior. Use to validate feasibility, assumptions, or behavior for logic/state, UI/frontend, SDK/API/integration, cloud resources, message brokers, databases, or backend/runtime systems before committing production code.
 ---
 
-# Prototype
+# Experiment
 
-Prototype the uncertainty, not the feature. Use the smallest executable artifact that exercises the uncertain part for real.
+Experiment on the uncertainty, not the feature. Use the smallest executable artifact that exercises the uncertain part for real.
 
 ## Workflow
 
@@ -17,7 +17,7 @@ Prototype the uncertainty, not the feature. Use the smallest executable artifact
    - frontend routing/components/styles
    - scripts, containers, Compose, infrastructure tooling
    - AWS/Azure SDKs, CLI usage, IaC and environment conventions
-3. Reuse the repository's stack, dependencies, clients, test infrastructure, scripts, and conventions unless the prototype evaluates an alternative.
+3. Reuse the repository's stack, dependencies, clients, test infrastructure, scripts, and conventions unless the experiment evaluates an alternative.
 4. Route by uncertainty:
    - pure logic, state, transitions, data shape -> [LOGIC.md](LOGIC.md)
    - visual/interaction design -> [UI.md](UI.md)
@@ -38,7 +38,7 @@ Prototype the uncertainty, not the feature. Use the smallest executable artifact
 
 ## Rules
 
-- One question per prototype.
+- One question per experiment.
 - Prefer existing dependencies; add only what the question requires.
 - No production-grade abstractions, unrelated tests, speculative extensibility, or polish.
 - Use in-memory/local/sandbox state unless persistence is the question.

@@ -1,4 +1,4 @@
-# UI Prototype
+# UI Experiment
 
 Use when the question is what a page, component, flow, or interaction should look or feel like.
 

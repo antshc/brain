@@ -1,4 +1,4 @@
-# Runtime Prototype
+# Runtime Experiment
 
 Use when the uncertainty is in framework, process, backend/frontend runtime, OS, container, serialization, concurrency, lifecycle, or automation behavior rather than an external contract.
 

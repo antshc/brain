@@ -1,4 +1,4 @@
-# Integration Prototype
+# Integration Experiment
 
 Use for real external boundaries: SDKs, REST APIs, cloud APIs/resources, message brokers, databases, and external/internal services.
 

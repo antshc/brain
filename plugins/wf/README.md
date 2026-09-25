@@ -4,7 +4,7 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 ## Skill flow
 
-1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/prototype`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/to-zdesign` directly).
+1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/to-zdesign` directly).
 2. **Spec synthesis** — `/to-spec` synthesizes the spec from the resolved Wayfinder decisions or grill-design conversation, the step right after the discovery loop; a spec can feed `/to-tickets` directly or go on into design synthesis.
 3. **Design synthesis** — `/to-zdesign` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
 4. **Story breakdown** — `/to-stories` accepts requirements, `/to-spec` output, or `/to-zdesign` output and assembles an ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`/draft-story`](skills/draft-story/SKILL.md) once per story for that story's formatted title and body, while `/draft-story` also runs standalone for one User story.
@@ -43,7 +43,7 @@ flowchart TD
 
 | Group                                     | Purpose                                      | Current skills                                                                            |
 | ----------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **define- / discover-**                   | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `questioning`, `prototype`, `explore-codebase` |
+| **define- / discover-**                   | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `questioning`, `experiment`, `explore-codebase` |
 | **probe-**                                | Auto-discover facts in a system and record them | —                                                                                      |
 | **research-**                             | Gather external/domain evidence              | `research`, `define-research`                                                             |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-system`, `inspect-nuget-source`                                                  |
