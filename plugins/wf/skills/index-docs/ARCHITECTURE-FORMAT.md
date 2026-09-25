@@ -74,7 +74,7 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `domain`, `structure`, or `ops`. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{default}}: one sentence naming the choice to take when the design doesn't state one. See the `record-concept` skill. -->
+<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{default}}: one sentence naming the choice to take when the design doesn't state one. See the `record-concept` skill. -->
 
 | Concept | Trigger condition | Default |
 |---------|-------------------|---------|

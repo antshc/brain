@@ -11,8 +11,8 @@ Inspect the **as-built** shared approach, read-only. Do not author a rule, chang
 
 | Concern | Kind |
 |---|---|
-| Business processes — their triggers, stages, outcomes, and failure behavior | `domain` |
-| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `structure` |
+| Business processes — their triggers, stages, outcomes, and failure behavior | `dom` |
+| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `str` |
 | Security, error handling, testing, configuration, migration, installation, logging, disaster recovery, domain safety, runtime safety or batch operations | `ops` |
 
 2. Trace representative execution paths, boundaries, configuration, storage or messages, and tests as applicable. Pick tools by `/explore-codebase`' skill **Select tools by question shape** — you are already the exploration agent, so search and read directly rather than spawning another. Look for independent occurrences, exceptions, legacy variants, and counterexamples. For a domain concept, follow its trigger to observable outcome; for structural, follow the shared implementation pattern; for operational, check configuration, runtime behavior, and verification.
@@ -20,7 +20,7 @@ Inspect the **as-built** shared approach, read-only. Do not author a rule, chang
 4. Return a bounded evidence packet to the caller:
 
 ```md
-**Concept / scope:** <name; `domain`|`structure`|`ops`; repositories and building blocks inspected>
+**Concept / scope:** <name; `dom`|`str`|`ops`; repositories and building blocks inspected>
 **Shared mechanism:** <how it works, or none found>
 **Facts:** <claim → filename-only link with visible line numbers>
 **Variations / counterexamples:** <different behavior and evidence>

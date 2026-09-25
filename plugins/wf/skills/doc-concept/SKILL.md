@@ -11,13 +11,13 @@ Choose by the shared concern, not the component where it was found; read only th
 
 | Concern | Kind | Template |
 |---|---|---|
-| Business capabilities — the processes that deliver them, and the scenarios each process handles | `domain` | [domain-business-process.md](./templates/domain-business-process.md) |
-| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `structure` | [structure-implementation.md](./templates/structure-implementation.md) |
+| Business capabilities — the processes that deliver them, and the scenarios each process handles | `dom` | [domain-business-process.md](./templates/domain-business-process.md) |
+| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `str` | [structure-implementation.md](./templates/structure-implementation.md) |
 | Security, error handling, testing, configuration, migration, installation, logging, disaster recovery, domain safety, runtime safety or batch operations | `ops` | [ops-policy.md](./templates/ops-policy.md) |
 
 Keep one concept per page and aim for one page. Describe a shared approach that governs multiple building blocks; name the affected scope and the conditions under which it applies. If the subject crosses categories, select the template that explains its governing rule best; link related concepts instead of duplicating obligations. Show **how** it works with one representative scenario, code or test anchor where useful. Omit optional sections and inapplicable template prompts.
 
-Each kind fixes its required `##` headings in order — `domain`: `Purpose`, `Definition`, `Business Processes`, `Relationships`; `structure` and `ops`: `Purpose`, `Rules`, `Design Guidance`. `structure` and `ops` then take the same optional tail, in order: `Violation signals`, `Exceptions`, `Examples`, `Consequences`, `Implementation Map`; `domain` takes `Implementation Map` alone, since its scenario rows already carry conditions, outcomes, and failure behavior. Preserve an existing record's headings when extending it; do not bulk-rewrite old records merely to choose another template.
+Each kind fixes its required `##` headings in order — `dom`: `Purpose`, `Definition`, `Business Processes`, `Relationships`; `str` and `ops`: `Purpose`, `Rules`, `Design Guidance`. `str` and `ops` then take the same optional tail, in order: `Violation signals`, `Exceptions`, `Examples`, `Consequences`, `Implementation Map`; `dom` takes `Implementation Map` alone, since its scenario rows already carry conditions, outcomes, and failure behavior. Preserve an existing record's headings when extending it; do not bulk-rewrite old records merely to choose another template.
 
 Write one independently checkable obligation per `Rules` bullet, using MUST, MUST NOT, or SHOULD. Put the reason and application criteria in `Design Guidance`, self-contained without following a link. State a repo path or symbol only when it is itself governed; otherwise use code and tests as corroborating examples. Keep volatile commands and growing inventories in a linked runbook or code, not in the concept.
 
@@ -53,8 +53,8 @@ Include the smallest useful set of concerns and drop the rest. A stable anchor i
 
 ## Quality gate
 
-- Every `structure` or `ops` `Rules` bullet is one checkable obligation, shared across the governed scope.
-- A `domain` page covers one business capability, and every `###` process under it carries the `Actor; Trigger; Action; Outcome` descriptor line.
+- Every `str` or `ops` `Rules` bullet is one checkable obligation, shared across the governed scope.
+- A `dom` page covers one business capability, and every `###` process under it carries the `Actor; Trigger; Action; Outcome` descriptor line.
 - A scenario table appears only where the user asked for one, and every row it carries names a concrete business situation and fills `Input`, `Rule/Condition`, and `Output/Expected`.
 - Every scenario row is anchored on a business term that survives a refactor, not on a class, method, field, table, or endpoint name.
 - A situation with its own actor, trigger, and business outcome is promoted to its own `###` process.
