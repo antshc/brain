@@ -24,7 +24,7 @@ Discover both families, never hardcode individual skills: scan the available ski
 **Dispatch shape** — set by the family, since the two read different sources:
 
 - `research-*`, and the generic job in 2 — delegate via `runSubagent`, omitting `agentName` so it inherits full tool access (including web fetch) rather than the codebase-only `Explore` agent, since the question reaches outside this repo. This keeps the raw reading out of this session's context; it doesn't run in the background, so the caller waits for its one final report.
-- `inspect-*` — Run `/explore-codebase` skill over the question, instructing its subagent to Run the chosen `inspect-*` skill. The engine owns delegation shape, target resolution, contract material, and tool selection; the specialist still owns its evidence rules, template, and output path, so the read-only contract lifts for the one file that specialist writes.
+- `inspect-*` — Run `/explore-codebase` skill over the question, naming the chosen `inspect-*` skill as the one for its subagent to run and that skill's document as the output artifact. The engine owns delegation shape, target resolution, contract material, and tool selection; the specialist still owns its evidence rules, template, and output path.
 
 Pass the user's requested output shape — document count, diagram type, file path, framing — to the subagent **verbatim**, as a constraint the specialist's own defaults do not override. Paraphrasing it is how a shape requirement gets dropped.
 

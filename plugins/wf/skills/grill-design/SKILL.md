@@ -64,7 +64,7 @@ Log every state and every change of state via `/track-ledger`' skill **Log decis
 ## Context economy
 
 - Broad-sweep code and test lookups → Run `/explore-codebase` skill; direct reads only to quote an exact line.
-- Counting a candidate rule's occurrences in the repo → the *Concept inspection* probe's `/probe-concept` subagent; `/explore-codebase` answers a question, a packet carries the evidence a Concept gate stands on.
+- Counting a candidate rule's occurrences in the repo → the *Concept inspection* probe, spawned through `/explore-codebase`; `/explore-codebase` alone answers a question, a `/probe-concept` packet carries the evidence a Concept gate stands on.
 - Re-fetch a durable artifact when you first need it, or when you need it and can't quote it verbatim from context — never on a schedule, never "just in case", never right after your own write.
 - Authority order: `CONTEXT.md`/`ARCHITECTURE.md`/Concept > code > external sources. A conflict against a higher-ranked source is asked, never assumed.
 
@@ -99,21 +99,24 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
-**Concept inspection** — fires on its own, before any Concept write, so *crosscutting* and *reusable* are counted against the repo instead of judged from this session's context. Signals, any one of: a rule stated in general form ("always", "every", "we do X for all Y"); *Record without asking* spotting a candidate; *Code cross-reference* finding the same shape in a second place; *Classify conflicts* returning **Supersession**; a gate miss logged with `nearest source: none` over a rule-shaped decision. One candidate, one agent, once a session.
+**Concept inspection** — fires on its own, before any Concept write, so *crosscutting* and *reusable* are counted against the repo instead of judged from this session's context. Signals, any one of: a rule stated in general form ("always", "every", "we do X for all Y"); *Record without asking* spotting a candidate; *Code cross-reference* finding the same shape in a second place; *Classify conflicts* returning **Supersession**; a gate miss logged with `nearest source: none` over a rule-shaped decision.
 
-Spawn one bounded read-only subagent and instruct it to Run `/probe-concept` skill, giving it the candidate rule in one sentence, the ledger's `Touched surface` paths as its exact scope, and one question — *how many independent occurrences exist, and what are the counterexamples?* Ask the rest of the round while it runs: *Turn shape* already forbids a turn ending on a write, so the inspection overlaps the user's thinking and a round never waits on a packet.
+**Keyed by concern, once a session.** Before spawning, read the ledger's `inspected, concern:` lines. A candidate whose concern already carries one is answered from that line — no second probe for the same concern, whatever new wording surfaced it. A concern with no line earns one agent.
 
-Read the returned packet top-down; the first matching row wins.
+Spawn it through `/explore-codebase`' skill **Run caller-supplied work inside the subagent**, naming `/probe-concept` and passing the candidate rule in one sentence, the ledger's `Touched surface` paths as its exact scope, and one question — *how many independent occurrences exist, and what are the counterexamples?* The probe classifies the concern and checks the recorded concepts itself, so neither costs this session's context. Ask the rest of the round while it runs: *Turn shape* already forbids a turn ending on a write, so the inspection overlaps the user's thinking and a round never waits on a packet.
+
+Read the returned packet top-down; the first matching row wins. Every row writes, asks, or both without stopping for permission — the packet is the approval, `git diff` is the review.
 
 | Packet says | Action |
 |---|---|
+| `Existing record:` names a path | the concern is already documented → **Extend or create**'s extend path when the packet carries a rule that record lacks, nothing at all when it doesn't; never a second record for the same concern |
 | `Intent vs implementation: drift` | an existing record is wrong, not missing → **Extend or create**'s extend path, plus a `/track-ledger` drift line for the closing sweep; never a new record |
-| the occurrence count rests on an `ASSUMPTION` | downgrade write → offer; a subagent reports evidence, it never launders a guess into evidence |
-| counterexamples present | the rule has exceptions only the user can rule on → offer it in the next question round, with the counterexamples quoted in the question body |
+| the occurrence count rests on an `ASSUMPTION` | no record this turn — a subagent reports evidence, it never launders a guess into evidence. Log `, downgraded: assumption` and put the unverified claim into the next question round |
+| counterexamples present | the rule holds with exceptions → write it via `/record-concept` carrying the counterexamples as the record's `Exceptions`, and raise the exception boundary as a question alongside the write, never instead of it |
 | ≥2 independent occurrences, no contradicting counterexample | crosscutting and reusable are **evidenced** → write via `/record-concept`, citing the packet's `file:line` in the record |
 | exactly 1 occurrence | not crosscutting → Feature Decision, ledger only, no Concept |
 
-A rule the user explicitly answered is still written — for it, the `ASSUMPTION` and counterexample rows raise a follow-up question alongside the write rather than downgrading it. Log the packet via `/track-ledger`' skill **Log inspection** the turn it returns.
+A rule the user explicitly answered is written even on the `ASSUMPTION` row — the answer already carries it, so the follow-up question runs alongside the write rather than replacing it. Log the packet via `/track-ledger`' skill **Log inspection** the turn it returns, passing the packet's concern and kind, and the path of whatever record you wrote or extended.
 
 **Record inline** — nothing is ever batched to the end of the session. Resolved term or reusable rule by explicit user answer → Run `/record-term` or `/record-concept` that same turn; the answer is the approval. Keep feature-scoped decisions in the ledger. Resolved by you → it's a Feature Assumption; ledger only when a matched Concept already covers it, otherwise *Record without asking* (see *Decision states*). Every Concept write consumes *Concept inspection*'s packet, then runs **Extend or create** — the packet's actual implementations, not the index table alone, separate *same rule, wider scope* (extend) from *different rule, adjacent area* (create), and sharpening an existing record beats spawning a near-duplicate.
 

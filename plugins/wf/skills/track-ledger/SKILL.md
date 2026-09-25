@@ -56,9 +56,17 @@ Returns the written line, or confirmation of the rewrite/deletion.
 
 Writes into `Decisions / assumptions` — one line per inspected Concept candidate, recording the evidence its gate stands on rather than a decision.
 
-* `{{item}} — inspected, occurrences: {{n}}, counterexamples: {{n|none}}, cite: {{path}}#{{Lstart}}`
+* `{{item}} — inspected, concern: {{concern}}/{{kind}}, occurrences: {{n}}, counterexamples: {{n|none}}, cite: {{path}}#{{Lstart}}`
 
-Append `, downgraded: assumption` when the occurrence count rests on an unverified claim. Located and rewritten by `{{item}}`, same as the decision forms; a candidate inspected again updates its line in place.
+`{{concern}}` is the concern row the probe classified the candidate into and `{{kind}}` its `str`/`ops` kind — together the key that tells a later turn this concern was already probed. An unclassified candidate reads `concern: unclassified`.
+
+Three suffixes qualify the line, in this order when several apply:
+
+* `, existing: {{path}}` — the probe's scan found the concern already recorded; no new record is warranted.
+* `, recorded: {{path}}` — the caller wrote the Concept this inspection earned.
+* `, downgraded: assumption` — the occurrence count rests on an unverified claim.
+
+Located and rewritten by `{{item}}`, same as the decision forms; a candidate inspected again updates its line in place.
 
 Returns the written line.
 

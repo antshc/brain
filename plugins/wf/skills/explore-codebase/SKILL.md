@@ -1,11 +1,11 @@
 ---
 name: explore-codebase
-description: Finds code — where a symbol lives, what calls it, how a flow works, which file holds a literal, config, test, or owner — by delegating read-only lookups to subagents. Use for any "where is", "what calls", "how does this work", or "find the code that..." question about the current repo or a named external codebase, and whenever a task must locate code before it can proceed.
+description: Finds code — where a symbol lives, what calls it, how a flow works, which file holds a literal, config, test, or owner — by delegating read-only lookups to subagents. The engine for any codebase exploration: the caller supplies a question, its own prompt instruction, or a skill to run inside the subagent. Use for any "where is", "what calls", "how does this work", or "find the code that..." question about the current repo or a named external codebase, and whenever a task must locate code before it can proceed.
 ---
 
 # Explore Codebase
 
-Delegate every lookup through `runSubagent`; omit `agentName` so the general-purpose subagent inherits execution, skill, search, LSP, and read tools. The caller supplies the question and `quick | medium | thorough`.
+Delegate every lookup through `runSubagent`; omit `agentName` so the general-purpose subagent inherits execution, skill, search, LSP, and read tools. The caller supplies `quick | medium | thorough` plus the work itself — a question, a prompt instruction of its own, or a skill to run. This skill owns the delegation, the target, and the contract whichever form arrives.
 
 ## Choose delegation shape
 
@@ -14,9 +14,17 @@ Delegate every lookup through `runSubagent`; omit `agentName` so the general-pur
 - Do not split a question when one agent must discover the answer before another can proceed; make that dependency sequential.
 - Consolidate all agent results into one concise verdict, resolve conflicts with targeted evidence, and state any remaining uncertainty.
 
+## Run caller-supplied work inside the subagent
+
+Beyond a plain question, a caller may hand over a prompt instruction to carry out, or name a skill for the subagent to run. Either way the caller owns what the exploration produces — a named skill owns its own procedure, evidence rules, and return shape; a prompt instruction owns its own task and output.
+
+Pass the instruction or skill name through **verbatim**, never paraphrased, and put into the brief the caller-supplied inputs, the read-only contract, the resolved target, and the routing rules below — the subagent reads none of this file on its own. Return the caller's own output shape unaltered rather than folding it into a verdict.
+
 ## Read-only contract
 
 Tell the subagent that exploration is strictly read-only. It must not edit source, documentation, configuration, generated files, or `graphify-out/`.
+
+The one exception is an output artifact the caller names — the subagent writes that file, and nothing else.
 
 ## Resolve the target
 
