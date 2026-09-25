@@ -1,13 +1,13 @@
 ---
 name: define-research
-description: Charts a research prompt or context into a research map of one or many research and hypothesis topics under docs/ongoing/, then resolves them through /research or /prototype until the destination is clear. Use to define, split, or scope research before running it, or to resume an existing research map.
+description: Charts a research prompt or context into a research map of one or many research and hypothesis topics under docs/ongoing/, then resolves them through /research or through experiments run by /prototype until the destination is clear. Use to define, split, or scope research before running it, or to resume an existing research map.
 argument-hint: "{{researchPromptOrContext}} | {{researchMapPath}}"
 disable-model-invocation: true
 ---
 
 # Define Research
 
-A research prompt or context has arrived, and it may hide several questions. This skill charts it as a **research map**: a destination, the topics that must be resolved to reach it, and the fog beyond them. It then works the frontier — `/research` topics in parallel, `/prototype` hypotheses one at a time with the user — until nothing left open can change the destination.
+A research prompt or context has arrived, and it may hide several questions. This skill charts it as a **research map**: a destination, the topics that must be resolved to reach it, and the fog beyond them. It then works the frontier — `/research` topics in parallel, experiments one at a time with the user — until nothing left open can change the destination.
 
 The destination is the decision, explanation, design, or action the findings must support. Naming it is the first act of charting: it fixes the scope and shapes every topic.
 
@@ -42,7 +42,7 @@ The map is one Markdown file at `docs/ongoing/{{destinationSlug}}-research-map.m
 
 <!-- one line per resolved topic -->
 
-- [{{topic title}}]({{findings file or prototype link}}) — {{one-line gist of the finding}}
+- [{{topic title}}]({{findings file or experiment link}}) — {{one-line gist of the finding}}
 
 ## Not yet specified
 
@@ -55,19 +55,21 @@ The map is one Markdown file at `docs/ongoing/{{destinationSlug}}-research-map.m
 
 ## Topics
 
-One topic is one sharp question, sized to one `/research` or `/prototype` run.
+One topic is one sharp question, sized to one `/research` run or one experiment.
 
 ```markdown
 ### {{topic title}}
 
 - **Type:** {{type| research | hypothesis }}
 - **Question:** {{research: the fact to surface}} | **Claim:** {{hypothesis: the falsifiable claim}} — **confirmed when** {{observable condition}}, **refuted when** {{observable condition}}
-- **Resolve via:** {{resolver| /research | /prototype }}
+- **Resolve via:** {{resolver| research | experiment }}
 - **Blocked by:** {{titles of open topics this waits on, or none}}
 ```
 
-- **Research** (AFK) — surfaces a fact the destination waits on from documentation, APIs, specifications, source code, or local knowledge bases. Always resolved via `/research`.
-- **Hypothesis** — a falsifiable claim whose truth changes the destination. Names its resolver: `/prototype` (HITL) when the behavior must be observed for real; `/research` (AFK) when authoritative sources settle it.
+- **Research** (AFK) — surfaces a fact the destination waits on from documentation, APIs, specifications, source code, or local knowledge bases. Always resolved via research.
+- **Hypothesis** — a falsifiable claim whose truth changes the destination. Names its resolver: experiment (HITL) when the behavior must be observed for real; research (AFK) when authoritative sources settle it.
+
+Resolvers map to skills: **research** → `/research`; **experiment** → `/prototype`, which builds the smallest throwaway artifact that exercises the claim and records whether it held. An experiment's result is an observation, so it confirms or refutes the claim; it never ships.
 
 A topic is **unblocked** when every title in its Blocked by has moved to Findings so far. The **frontier** is every open, unblocked topic.
 
@@ -125,8 +127,8 @@ Ask whether to resolve the frontier now. On decline, stop — the map file holds
 
 On acceptance:
 
-- Run `/research` skill in parallel, one subagent per frontier topic resolved via `/research`. Pass the topic's Question or Claim with its confirm/refute conditions, the Destination, and the Notes verbatim.
-- Offer each frontier topic resolved via `/prototype` to the user one at a time; on acceptance, Run `/prototype` skill with the Claim and its confirm/refute conditions as the question and success criteria.
+- Run `/research` skill in parallel, one subagent per frontier topic resolved via research. Pass the topic's Question or Claim with its confirm/refute conditions, the Destination, and the Notes verbatim.
+- Offer each frontier experiment to the user one at a time; on acceptance, Run `/prototype` skill with the Claim as the question, its confirm/refute conditions as the observation criteria, and the Notes verbatim.
 
 **Done when:** every frontier topic has either returned a result or been declined by the user.
 
@@ -134,7 +136,7 @@ On acceptance:
 
 For each result:
 
-- Add a line to Findings so far linking the findings file or prototype result, and remove the topic from Topics.
+- Add a line to Findings so far linking the findings file or experiment result, and remove the topic from Topics.
 - Graduate any fog the result made specifiable into new topics, clearing it from Not yet specified.
 - Move any topic the result shows to sit past the destination into Out of scope.
 - Update or delete topics the result invalidates, and re-rank Topics by risk.
