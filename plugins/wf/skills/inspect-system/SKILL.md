@@ -9,7 +9,7 @@ Source of truth is this repo, not the web. Output: one Markdown file, every clai
 
 Inspection documents **as-built** — current state, never a delta.
 
-Run `/explore-codebase` skill for every lookup — contract material, source, target resolution, the optional codebase index, and tool selection are its job. This skill structures and cites what it returns.
+Lookups belong to the engine running this skill — contract material, source, target resolution, the optional codebase index, and tool selection are its job. This skill structures and cites what that engine returns.
 
 ## Axis-specific routing
 
