@@ -9,9 +9,12 @@ runs with no conventions at all. This Concept fixes how such a file is located a
 ## Rules
 
 - A per-repo config file MUST declare exactly one resolution root, and that root MUST be the Harness Repo Path.
-- A resolution strategy MUST NOT search above its declared root, and MUST NOT reach the filesystem root.
-- A record MUST name exactly one strategy — fixed path or bounded search — and MUST NOT add a second lookup path
-  as a fallback to the first.
+- A per-repo config file MUST be read at one fixed path under that root; a component MUST NOT search for it, and
+  MUST NOT add a second lookup path as a fallback.
+- Per-developer settings MUST live in one gitignored file holding one section per plugin; a section MUST exist only
+  when its plugin owns a key.
+- A credential MUST live in that file's dedicated credentials section, keyed by plugin, and MUST be read only by the
+  script that uses it, on the branch that uses it; a resolver MUST NOT emit the credentials section.
 - A config that exists once per variant MUST encode the variant in the filename, and an unsuffixed name MUST mean
   shared across variants.
 - A missing variant file MUST be treated as absent; reading the unsuffixed name instead is the second lookup path
@@ -25,13 +28,17 @@ runs with no conventions at all. This Concept fixes how such a file is located a
 
 ## Design Guidance
 
-Choose the strategy from where the file comes from, not from convenience:
+Every file sits at a fixed path; the shape of the path follows what the file holds:
 
-| Strategy | Use when | Reference |
+| Shape | Use when | Reference |
 |----------|----------|-----------|
 | Fixed path | a setup skill scaffolds the file, so its location is guaranteed | `$HARNESS_REPO_PATH/.crew/<FILE>` ([0002](../adr/0002-crew-is-agnostic.md)) |
 | Fixed path, variant-suffixed | the same config exists once per variant, and one root still holds them all | `$HARNESS_REPO_PATH/.crew/CODE-<stack>.md` ([0002](../adr/0002-crew-is-agnostic.md)) |
-| Bounded search | the file is user-authored and may sit in a nested workspace folder | `.atlassian`, searched from the Harness Repo Path downward ([0005](../adr/0005-atl-is-mcp-first.md)) |
+| Fixed path, one section per plugin | per-developer settings and credentials for every plugin a harness uses | `$HARNESS_REPO_PATH/.harness.json.user` — top-level `harness`, `atl`, …, plus `credentials.<plugin>` |
+
+A script reads its plugin's section straight from the file with the standard library's parser; a skill with no
+script reads the resolver's output, which carries every section except `credentials`. Each reader has exactly one
+path to a value.
 
 A variant split belongs in the filename rather than a subfolder: the folder encodes the same fact while making
 "shared by every variant" a position in a tree instead of a visible property of the name, and it tempts a reader
@@ -41,16 +48,24 @@ Split by lifecycle, because the two halves have different readers and different 
 
 | Content | Home | In git |
 |---------|------|--------|
-| Credentials, per-developer connection facts | a single dotfile, e.g. `.atlassian` | no |
+| Credentials | the `credentials.<plugin>` section of `.harness.json.user` | no |
+| Per-developer connection facts, working-set repos and pull branches | the `<plugin>` section of `.harness.json.user` | no |
 | Team conventions, field maps, item-type defaults | committed files or generated repo-level skills under `.github/skills/` | yes |
 
 A skill that degrades when its config is absent states per field what it can still do — an unresolved field is
 empty, not fatal — rather than refusing wholesale or inventing a discovery call the config exists to avoid.
 
+## Exceptions
+
+- The harness anchor: `resolve-harness` walks up from cwd to the nearest `.harness.json.user`, and that file's
+  directory is the Harness Repo Path. It is the one search allowed to run above a root, because it is the lookup
+  that defines the root; every other setting is then read at a fixed path under it.
+
 ## Violation signals
 
 - A lookup that tries a second directory after the first misses.
 - A variant file missing, and the unsuffixed file read in its place.
-- A search whose termination condition is the filesystem root rather than a declared root.
+- Any search for a per-repo config file other than the harness anchor walk.
 - An API token and a committed convention table in the same file.
+- A credential value in resolver output, a log, or agent-visible stdout.
 - A component calling a discovery API for a value its config file already carries.

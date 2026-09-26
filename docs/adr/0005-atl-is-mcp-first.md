@@ -29,3 +29,5 @@ Python shapes them, and the API token exists only to reach the one thing the MCP
   `atlassian-python-api>=4.0,<5` — pinned because 5.x removed `Confluence.attach_file()`.
 - With `cloudId` frequently unresolved under soft mode, the standing prohibition on
   `getAccessibleAtlassianResources` becomes a cache rule: it is forbidden only once `cloudId` is known.
+- `.atlassian` is later folded into `.harness.json.user` (`atl` + `credentials.atl`) by the wf-harness-workspaces
+  map ([#133](https://github.com/antshc/brain/issues/133)); its bounded search retires with it.
