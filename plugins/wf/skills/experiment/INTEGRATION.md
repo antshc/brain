@@ -1,6 +1,6 @@
-# Integration Prototype
+# Integration Experiment
 
-Use for real external boundaries: SDKs, REST APIs, cloud APIs/resources, message brokers, databases, and external/internal services.
+Use when the experiment crosses a real external boundary: SDKs, REST APIs, cloud APIs/resources, message brokers, databases, and external/internal services. Apply alongside [RUNTIME.md](RUNTIME.md) when a minimal app, test host, container, or process provides the executable harness.
 
 ## Select the smallest tool
 
@@ -16,11 +16,11 @@ Use for real external boundaries: SDKs, REST APIs, cloud APIs/resources, message
 
 1. Inspect existing AWS/Azure CLI, SDK, IaC, profile/subscription, and environment conventions.
 2. If CLI is available, verify the active identity/account/subscription before resource operations.
-3. Do not install CLIs, log in, create credentials, or reconfigure accounts solely for the prototype.
+3. Do not install CLIs, log in, create credentials, or reconfigure accounts solely for the experiment.
 4. Use CLI for cloud service/API/resource truth.
 5. Use SDK tests for SDK serialization, exceptions, pagination, retries, or client-specific behavior.
 6. Filter CLI output to the fields that answer the question.
-7. Use only local/sandbox/prototype resources for mutations; clean them up when finished.
+7. Use only local/sandbox/experiment resources for mutations; clean them up when finished.
 
 ## SDK / integration test
 
@@ -39,4 +39,4 @@ Use for real external boundaries: SDKs, REST APIs, cloud APIs/resources, message
 
 ## Result
 
-Record the command/run path, observed result, and answered question. Preserve useful assertions/contract knowledge in production code; keep prototype artifacts throwaway.
+Record the command/run path, observed result, and answered question. Preserve useful assertions/contract knowledge in production code; keep experiment artifacts throwaway.
