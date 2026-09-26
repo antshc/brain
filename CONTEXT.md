@@ -71,6 +71,21 @@ The mechanism that owns an index table end to end — abstract over any table wi
 _Avoid_: local RAG, index scanner, retrieval index
 _Plugins_set_: wf
 
+**Workspace layout**:
+The shape of a harness and the repositories it develops: `single-repo`, where the harness is the codebase, or `multi-repo`, where the harness sits alongside one or more separate repositories.
+_Avoid_: simple project, harness-plus-repo, project type
+_Plugins_set_: harness, wf, ralph, crew
+
+**Harness user settings**:
+The per-developer, uncommitted settings for one harness, including credentials, holding one section per plugin that needs configuration; the only harness settings file, and its location marks the Harness Repo Path.
+_Avoid_: harness env, .atlassian, config file
+_Plugins_set_: harness, wf, atl, ralph, crew
+
+**Workspace folder**:
+The one fixed folder under the Harness Repo Path holding every repository checkout and worktree a `multi-repo` workspace develops; it bounds every search into those repositories.
+_Avoid_: workspace root, repos folder, sources
+_Plugins_set_: harness, wf, ralph, crew
+
 ## ralph
 ### Language
 
@@ -138,6 +153,16 @@ Arrows express relationship direction, not cardinality; the definitions below st
 
 **Deployable**:
 An independently runnable or deployed production unit, such as a process, service, container, function, host workload, or scheduled job.
+
+**Building block**:
+One Deployable as documented in the architecture, with its own record indexed from `ARCHITECTURE.md`; when its repository documents it, the index links to that documentation.
+_Avoid_: service, module, component
+_Plugins_set_: wf
+
+**Documentation setup**:
+Where a `multi-repo` workspace keeps its Building block documentation: all in the harness, or in the harness with references to documentation each repository owns.
+_Avoid_: docs placement, docs mode
+_Plugins_set_: wf
 
 **Capability**:
 A stable, coarse-grained system ability. A Capability may be realized by multiple Features, and a Feature may contribute to multiple Capabilities.
