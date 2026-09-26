@@ -86,6 +86,11 @@ The one fixed folder under the Harness Repo Path holding every repository checko
 _Avoid_: workspace root, repos folder, sources
 _Plugins_set_: harness, wf, ralph, crew
 
+**Repository access**:
+Whether agents may change a repository the harness works with, set per repository by each developer: `read` — a reference repository, read and searched but never branched, committed to, or given a worktree, whose local changes are disposable; `write` — a repository under development, whose local changes are protected. Absent means `read`.
+_Avoid_: repo mode, permissions, readonly flag
+_Plugins_set_: harness, ralph, crew, wf
+
 ## ralph
 ### Language
 
