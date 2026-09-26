@@ -61,12 +61,6 @@ copilot plugin install ms@brain
 copilot plugin install aws@brain
 ```
 
-### Solution plugin
-
-```sh
-(copilot plugin uninstall solution@brain >/dev/null 2>&1 || true) && \
-copilot plugin install solution@brain
-```
 
 ### Brain engineering skills
 
