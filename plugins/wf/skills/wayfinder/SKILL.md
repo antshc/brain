@@ -76,7 +76,7 @@ Each ticket is an issue sharing the map's milestone; its issue number is its ide
 <link to the map>
 ```
 
-Each ticket carries a `wayfinder:<type>` label — one of `research`, `prototype`, `questioning`, `task` (see Ticket Types).
+Each ticket carries a `wayfinder:<type>` label — one of `research`, `experiment`, `grilling`, `task` (see Ticket Types).
 
 A session claims a ticket by assigning it to itself, first, before any work, so concurrent sessions skip it. That assignee is the claim: an open, unassigned ticket is unclaimed.
 
@@ -89,8 +89,8 @@ The answer isn't part of the body — it's recorded as a resolution comment on c
 Every ticket is either HITL — human in the loop, worked with a human who speaks for themselves — or AFK, driven by the agent alone. A HITL ticket only resolves through that live exchange; the agent never stands in for the human's side of it.
 
 - **Research** (AFK): Reading documentation, third-party APIs, or local resources like knowledge bases to surface a fact a decision waits on. Resolved by `/research`. Use when knowledge outside the current working directory is required.
-- **Prototype** (HITL): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to via `/experiment`. Links the prototype as an asset. Use when "does this call/logic behave as expected" is the key question.
-- **Questioning** (HITL): Conversation. The default case. Always invoke `/grill-design`. Resolving one may surface decisions narrower than the question itself — child-scoped to it rather than independent frontier items; ticket those as sub-tickets of the questioning ticket (see Tracker operations) via GitHub's native sub-issue relationship, not a fresh body-text field.
+- **Experiment** (HITL): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to via `/experiment`. Links the prototype as an asset. Use when "does this call/logic behave as expected" is the key question.
+- **Grilling** (HITL): Conversation. The default case. Always invoke `/grill-design`. Resolving one may surface decisions narrower than the question itself — child-scoped to it rather than independent frontier items; ticket those as sub-tickets of the grilling ticket (see Tracker operations) via GitHub's native sub-issue relationship, not a fresh body-text field.
 - **Task** (HITL or AFK): Manual work that must happen before a decision can be made — nothing to decide, prototype, or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that does rather than decides — and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
 
 ## Fog of war
@@ -126,7 +126,7 @@ Use these instead of raw `gh` calls; each name below is a `/manage-backlog` acti
 - **Resolve a ticket**: **Comment on ticket** with the answer, then **Close ticket**.
 - **Read the map / a ticket**: **Read ticket**. **Read a ticket's sub-tickets**: **List sub-tickets**.
 
-**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:questioning`, or `wayfinder:task` missing): Run `/manage-backlog` skill **Setup labels**, then retry.
+**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:experiment`, `wayfinder:grilling`, or `wayfinder:task` missing): Run `/manage-backlog` skill **Setup labels**, then retry.
 
 ## Invocation
 
