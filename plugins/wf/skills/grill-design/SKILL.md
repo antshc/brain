@@ -17,7 +17,7 @@ The grill produces exactly two things: **questions** and **records**. Writable s
 
 **Only the user ends the grill.** An empty question frontier, a clean closing sweep, and a full doc set are mid-session states, not stop conditions. When you believe the tree is resolved, say so, ask, and wait for the answer.
 
-**Implementation is a handoff, not a next step.** The user asks to build it → state that the grill is closing, run the closing sweep, then hand off: `/to-tickets` for backlog items, `/to-zdesign` for a design doc, `/prototype` for a throwaway spike. Inside a grill turn, production code stays untouched — including the one-line change the answer you just got seems to imply.
+**Implementation is a handoff, not a next step.** The user asks to build it → state that the grill is closing, run the closing sweep, then hand off: `/to-tickets` for backlog items, `/to-zdesign` for a design doc, `/experiment` for a throwaway spike. Inside a grill turn, production code stays untouched — including the one-line change the answer you just got seems to imply.
 
 ## Session start
 
