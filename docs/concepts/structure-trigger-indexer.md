@@ -31,3 +31,4 @@ with the owning document skill — nor a caller's session state, which is [struc
 ## Exceptions
 
 - `trigger-indexer` writes directly to whichever table the caller supplies, even when its containing file is otherwise owned by another Resource Access Skill (`manage-docs`) — see the `Resource Access Skill` Concept's own Exceptions for the reciprocal note.
+- `ARCHITECTURE.md`'s Shared dependency ownership table is hand-authored: its rows and Trigger condition cells are written by the user, not generated or synced by the indexing skill. Scan and match still applies to it unchanged, and a blank cell still never matches.

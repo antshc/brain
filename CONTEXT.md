@@ -159,6 +159,11 @@ One Deployable as documented in the architecture, with its own record indexed fr
 _Avoid_: service, module, component
 _Plugins_set_: wf
 
+**Shared dependency**:
+A package family, pipeline repository, or infrastructure repository the system relies on but does not deploy — indexed in `ARCHITECTURE.md` alongside the Building blocks, never as one, and without a record of its own.
+_Avoid_: dependency, supporting repo, tooling repo, shared package
+_Plugins_set_: wf
+
 **Documentation setup**:
 Where a `multi-repo` workspace keeps its Building block documentation: all in the harness, or in the harness with references to documentation each repository owns.
 _Avoid_: docs placement, docs mode
