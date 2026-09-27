@@ -1,6 +1,6 @@
 ---
 name: crew-review
-description: Behavior-preserving cleanup review — reviews a commit (when the caller supplies BASELINE_COMMIT) or uncommitted work for refactor candidates, applies only safe fixes, and reports the rest as findings without touching them. Apply during Chorey's REVIEW step.
+description: "Inspect a commit or uncommitted changes for behavior-preserving cleanup, apply safe refactors, and report uncertain candidates as findings. Use during Chorey's REVIEW step; Chorey owns verification."
 ---
 
 # Review
