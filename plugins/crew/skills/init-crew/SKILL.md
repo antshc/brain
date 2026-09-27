@@ -1,6 +1,6 @@
 ---
 name: init-crew
-description: "Manual bootstrap for crew repositories. Use when a user asks to initialize crew conventions: copy selected stack's Copilot instructions, CHORE review template, and shared GOTCHAS file without overwriting existing files."
+description: "Initialize Crew conventions when the user explicitly requests setup in a repository. Copy selected stack Copilot instructions and review templates and create shared gotchas without overwriting existing files."
 disable-model-invocation: true
 ---
 
