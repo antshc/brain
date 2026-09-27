@@ -172,9 +172,6 @@ Run only when Codey's `STATUS` is **complete** and `chorey` is available; otherw
 After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Chorey discovers and reviews the checkpoint's files. Use the following prompt (substitute actual values):
 
 ```
-## HARNESS
-HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
-
 ## BASELINE_COMMIT
 <$checkpoint_sha>
 ```

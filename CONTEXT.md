@@ -117,12 +117,12 @@ _Avoid_: language agent, specialised codey, subclass agent
 Chorey's agent holds its review and revert workflow. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
 _Avoid_: base agent, parent agent, agent template
 
-**Convention folder**:
-The per-repo `.crew/` directory under the `Harness Repo Path` holds shared `GOTCHAS.md` and optional `CHORE-<stack>.md` review rules. Copilot instructions reside in the codebase's `.github/instructions/`; old `CODE*.md` and `VERIFY*.md` are unused.
-_Avoid_: .droid, config folder, settings directory
+**Convention skills**:
+Repository-specific Chore rules and gotchas memory are installed as `.github/skills/chore-<stack>-rules/` and `.github/skills/gotchas-memory/`. Copilot instructions reside in the codebase's `.github/instructions/`; old `.crew/`, `CODE*.md`, and `VERIFY*.md` conventions are unused.
+_Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
-Reusable directives stored with the `crew-gotchas` skill. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
+Reusable directives exposed by the repository's `/gotchas-memory` skill, with shared read/write behavior supplied by `crew-gotchas`. Agents apply them before work and distill reusable session friction into new or extended directives afterward; an unavailable memory skill is a no-op.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
@@ -288,7 +288,7 @@ _Avoid_: rich text, Atlassian JSON, doc format
 _Plugins_set_: atl
 
 **Atlassian config**:
-The gitignored `.atlassian` dotfile holding one developer's Atlassian connection facts — site, email, optional API token, default Jira project keys, default Confluence space IDs — located by a search bounded to the **Harness Repo Path**. Deliberately not a **Convention folder**: it is searched for rather than resolved at a fixed path, and it holds a credential rather than committed team conventions.
+The gitignored `.atlassian` dotfile holding one developer's Atlassian connection facts — site, email, optional API token, default Jira project keys, default Confluence space IDs — located by a search bounded to the **Harness Repo Path**. Deliberately not a **Convention skill**: it is searched for rather than exposed as a skill, and it holds a credential rather than committed team conventions.
 _Avoid_: .atlmcp, .env, credentials file, convention folder
 _Plugins_set_: atl
 
@@ -317,5 +317,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable — handing it `HARNESS_REPO_PATH` through a trusted `## HARNESS` prompt section. `Chorey` follows only on a Codey `STATUS: complete`, and is skipped when unavailable. Each agent treats its invocation directory as its workspace and validates the supplied path rather than discovering it.
-- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance from the `Convention folder` before changing code, then write distilled `Gotchas` back to the reference owned by `crew-gotchas` after feedback loops pass.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable — handing it `HARNESS_REPO_PATH` through a trusted `## HARNESS` prompt section. `Chorey` follows only on a Codey `STATUS: complete`, receives only the checkpoint's trusted `## BASELINE_COMMIT`, and discovers its available rules and gotchas skills directly.
+- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/gotchas-memory` after feedback loops pass.

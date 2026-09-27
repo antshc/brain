@@ -8,12 +8,40 @@ CREW = ROOT / "plugins" / "crew"
 def test_chorey_owns_safe_review_and_revert_contract():
     chorey = (CREW / "agents" / "chorey.agent.md").read_text(encoding="utf-8")
 
-    assert ".github/skills/chore-<stack>-rules/SKILL.md" in chorey
-    assert "Chorey not configured" in chorey
+    assert "HARNESS_REPO_PATH" not in chorey
+    assert "GOTCHAS_PATH" not in chorey
+    assert chorey.index("### 2. Check Chore rules") < chorey.index("### 4. Review and clean up")
+    assert "No confident match or any missing applicable skill makes the review `skipped`" in chorey
+    assert "STATUS: complete | skipped" in chorey
     assert "provably behavior-preserving" in chorey
     assert "exact current content" in chorey
     assert "Restore every file REVIEW touched to its exact pre-review state" in chorey
     assert "/gotchas-memory" in chorey
+    assert "When the skill is unavailable, perform no gotchas work" in chorey
+    for field in ("STATUS:", "SUMMARY:", "FILES:", "GOTCHAS UPDATED:", "NOTES:"):
+        assert field in chorey
+
+
+def test_chorey_callers_do_not_pass_harness_context():
+    standalone = (CREW / "skills" / "to-chorey" / "SKILL.md").read_text(encoding="utf-8")
+    ralph_dev = (ROOT / "plugins" / "ralph" / "skills" / "dev" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    codey_invocation = ralph_dev.split("## 3. Invoke implementation agent", 1)[1].split(
+        "## 4. Distill", 1
+    )[0]
+    chorey_invocation = ralph_dev.split("## 6. Review (Chorey)", 1)[1].split(
+        "## 7. Commit & push Chorey's cleanup", 1
+    )[0]
+
+    assert "resolve-harness" not in standalone
+    assert "## HARNESS" not in standalone
+    assert "HARNESS_REPO_PATH" not in standalone
+    assert "## HARNESS" in codey_invocation
+    assert "HARNESS_REPO_PATH" in codey_invocation
+    assert "## HARNESS" not in chorey_invocation
+    assert "HARNESS_REPO_PATH" not in chorey_invocation
+    assert "## BASELINE_COMMIT" in chorey_invocation
 
 
 def test_initializer_offers_rules_skills_and_preserves_repository_rules_during_merge():
