@@ -5,7 +5,7 @@ description: "Captures Chorey's commit or uncommitted review scope in bin/crew_d
 
 # Chorey Diff
 
-Run every action from the repository cwd. `bin/crew_diff/_manifest.json` is the authoritative initial review-scope ledger; use its repository paths instead of deriving paths from artifact filenames.
+Run every action from the repository cwd. `bin/crew_diff/_manifest.json` is the authoritative initial review-scope ledger; use its repository paths instead of deriving paths from artifact filenames. Its top-level `stacks` array is the sorted aggregate of recognized stacks in the captured current and previous paths.
 
 ## Capture review diff
 
@@ -19,7 +19,7 @@ With `--baseline`, the helper records the commit's per-file changes against its 
 
 Without `--baseline`, Chorey runs `git add -A` immediately before invoking the helper. The helper then records the staged incoming change set, and the Git index becomes its exact defensive revert baseline. The helper can still represent staged, unstaged, and untracked layers independently, but Chorey's pre-capture staging normally leaves only staged patches. Chorey must not stage again during review, so the index remains unchanged while its cleanup stays in the working tree.
 
-The helper recreates `bin/crew_diff/`, writes `_manifest.json` and `diffs/`, then emits one of:
+The helper recreates `bin/crew_diff/`, writes `_manifest.json` and `diffs/`, and records a top-level `stacks` array. It recognizes AI-authoring files, Python files and packaging markers, and C#/.NET files and build markers. Renames and copies contribute both their previous and current paths. Unrecognized paths contribute no stack; therefore an empty array tells `/crew-chore` to load all configured stack files. The helper then emits one of:
 
 - `Reviewing commit <sha>: [files]`
 - `Reviewing uncommitted files: [files]`
@@ -50,5 +50,6 @@ This removes only `bin/crew_diff/` beneath cwd.
 ## Gotchas
 
 - **Read patches through `_manifest.json`.** Numbered artifact names are collision-safe identifiers, not encoded repository paths.
+- **Pass `stacks` through unchanged.** Chorey passes the manifest array to `/crew-chore` as `STACKS`; it does not repeat stack detection.
 - **Keep the bundle through verification.** Its manifest records the selected rollback source and the previous paths needed to reverse captured renames.
 - **Treat deleted paths as reviewable.** Their patch carries the review evidence even though no current file exists.
