@@ -1,6 +1,6 @@
 ---
 name: to-commit
-description: Commit staged/unstaged changes using Codey's status report or the diff itself. Use after a Codey task completes or when the user says "commit".
+description: "Commit current staged or unstaged work after a Codey task completes, or when the user asks to commit it. Derive the message from Codey's report or the diff; require confirmation for partial or blocked work."
 ---
 
 Commit all uncommitted changes using the format below.
