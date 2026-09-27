@@ -1,6 +1,6 @@
 ---
 name: crew-gotchas
-description: Agent gotchas — reads GOTCHAS.md before the agent's work, then distills session friction into new or extended one-line directives and writes them back. Apply during the GOTCHAS step (read) and the UPDATE GOTCHAS step (write). Shared by Codey and Chorey.
+description: "Read and update the shared GOTCHAS.md with reusable directives discovered during implementation or review. Use when Codey or Chorey enters its GOTCHAS or UPDATE GOTCHAS step."
 ---
 
 # Gotchas
