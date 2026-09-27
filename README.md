@@ -142,9 +142,8 @@ Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugin
 
 - [to-codey](plugins/crew/skills/to-codey/SKILL.md) / [to-chorey](plugins/crew/skills/to-chorey/SKILL.md): run the Codey or Chorey subagent for an implementation or review task.
 - [to-commit](plugins/crew/skills/to-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
-- [crew-select](plugins/crew/skills/crew-select/SKILL.md): resolve which Stack(s) apply to a piece of work and name the primary agent.
+- [crew-review](plugins/crew/skills/crew-review/SKILL.md): review cleanup and match changed files to per-stack Chorey rules.
 - [crew-chorey-flow](plugins/crew/skills/crew-chorey-flow/SKILL.md): review workflow (input, gotchas, scoped checks, self-revert, status report); Codey workflows live in their agents.
-- [crew-review](plugins/crew/skills/crew-review/SKILL.md): behavior-preserving cleanup review of a commit or uncommitted work.
 - [crew-gotchas](plugins/crew/skills/crew-gotchas/SKILL.md): read/write per-agent `GOTCHAS.md` friction notes.
 - [init-crew](plugins/crew/skills/init-crew/SKILL.md): copy stack-specific Copilot instructions to the codebase and create per-stack Chorey rules and shared `GOTCHAS.md`.
 

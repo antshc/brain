@@ -23,9 +23,9 @@ Copy this checklist and check off each item as you complete it:
 
 ## 1. Review
 
-`CHORE_PATHS` empty → review every file from Step 0 under the **Default review checklist** below; emit "Review rules: default checklist".
+Run `python3 <skill-directory>/scripts/match_changed_files.py <changed-file> ...` on Step 0's files before applying cleanup. Its JSON maps each Stack to its matching paths; an empty change set returns `{}`. The helper's `review_scopes.json` owns file patterns independently of the agents' task-routing descriptions and validates the installed roster. A helper error stops review before edits and is reported to the caller.
 
-`CHORE_PATHS` non-empty → Run `/crew-select` skill **Resolve From Changed Files** over Step 0's files to learn each file's matched Stack — never re-implement that match. Per file: its matched Stack's `CHORE-<stack>.md` is loaded → follow that file's review rules for it, never another Stack's rules. Its matched Stack has no loaded `CHORE-<stack>.md`, or the file matched no Stack → review it under the **Default review checklist** below instead — never an invented repo-specific rule. Emit "Review rules: [list of CHORE-<stack>.md paths applied] + default checklist for <files, or 'none'>".
+For each file, load the matching Stacks' `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` rules. Several Stacks can match one file: apply each available rule set and report conflicts as findings. Apply the **Default review checklist** for every matched Stack without a review file, or for a file with no matching Stack. Note missing `CHORE-<stack>.md` files for UPDATE GOTCHAS. Emit "Review rules: [list of CHORE-<stack>.md paths applied] + default checklist for <files, or 'none'>".
 
 Read Copilot instructions applicable to every changed file and follow observed neighboring conventions; a cleanup that would violate either is a finding, not an edit. Emit "Style rules: [applicable instruction paths] | observed conventions".
 
@@ -33,7 +33,7 @@ Review every file from Step 0 for behavior-preserving cleanup candidates only �
 
 ### Default review checklist
 
-Used for any file whose matched Stack has no `CHORE-<stack>.md`, or that matched no Stack:
+Used for a file with no matching Stack or for a matching Stack without `CHORE-<stack>.md`:
 
 - **Duplication** → extract function/class
 - **Long methods** → break into private helpers (keep tests on public interface)

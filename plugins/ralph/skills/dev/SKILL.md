@@ -115,16 +115,13 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 
 ## 3. Invoke implementation agent
 
-Run `/crew-select` skill **Resolve From Task Text**, passing the selected task's title + body as `TASK_TEXT`. Retain its `Matched Stacks`/`Primary agent`. **Emit**: "Matched Stacks: [...] or none. Primary agent: <agent>."
+Read the installed `codey-*.agent.md` descriptions in the crew plugin's `agents/` directory. Choose the agent whose description best fits the selected issue's title and body; if several fit, choose the one central to the requested outcome. No matching technology → `general-purpose`. **Emit**: "Primary agent: <agent>."
 
-After changing to `WORKTREE_PATH`, run the `<primary agent from crew-select, or general-purpose when none matched>` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For a general-purpose fallback, instruct it to implement the task, load applicable repository instructions, run focused verification, and return the five-field Codey report (including honest verification results). Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For a general-purpose fallback, instruct it to implement the task, load applicable repository instructions, run focused verification, and return the five-field Codey report (including honest verification results). Use the following prompt (substitute actual values):
 
 ```
 ## HARNESS
 HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
-
-## STACKS
-MATCHED_STACKS=<comma-separated matched Stack ids>
 
 ## TASK
 - Title: <title>
@@ -134,8 +131,6 @@ MATCHED_STACKS=<comma-separated matched Stack ids>
 ## RECENT CHANGES
 <last 5 commits from step 1>
 ```
-
-Omit the `## STACKS` section entirely when no Stack matched.
 
 ## 4. Distill
 
@@ -174,7 +169,7 @@ git push -u origin "$branch"
 
 Run only when Codey's `STATUS` is **complete** and `chorey` is available; otherwise continue to **Handle task result** — reviewing unverified or broken work cannot preserve behavior that was never established.
 
-After changing to `WORKTREE_PATH` (same invocation directory as Codey), collect `git diff-tree --no-commit-id --name-only -r <checkpoint_sha>` and run `/crew-select` **Resolve From Changed Files** on those paths. Run the `chorey` agent via `runSubagent`. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Chorey discovers the checkpoint's files and matches review rules through `/crew-review`. Use the following prompt (substitute actual values):
 
 ```
 ## HARNESS
@@ -182,12 +177,7 @@ HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
 
 ## BASELINE_COMMIT
 <$checkpoint_sha>
-
-## STACKS
-MATCHED_STACKS=<comma-separated matched Stack ids>
 ```
-
-Omit `## STACKS` when no Stack matched.
 
 `$checkpoint_sha` is the commit **Commit & push Codey's checkpoint** just made — Chorey reviews the change it introduced and, if its own edits fail verification, reverts against it. Retain Chorey's report for use in **Commit & push Chorey's cleanup**. Chorey's `STATUS` is informational only — it never changes the `STATUS` recorded in **Handle task result**, which always reflects Codey's report from **Invoke implementation agent**.
 
