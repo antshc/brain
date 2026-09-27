@@ -1,10 +1,8 @@
 ---
 name: codey-ai
-description: Implements and checks AI authoring files. Use for skills, agents, prompts, and instruction files.
+description: "Skills and agent authoring: `SKILL.md`, `*.agent.md`, `*.prompt.md`, `*.instructions.md`, `AGENTS.md`. Implements and checks skills, agents, prompts, and instructions."
 ---
 # Codey — AI Authoring
-
-**Scope**: `SKILL.md`, `*.agent.md`, `*.prompt.md`, `*.instructions.md`, `AGENTS.md`
 
 ## Flow
 

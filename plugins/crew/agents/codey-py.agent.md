@@ -1,12 +1,10 @@
 ---
 name: codey-py
-description: Implements and verifies Python changes. Use for Python source, packaging, scripts, and tests.
+description: "Python: `*.py`, `pyproject.toml`, `requirements*.txt`, `Pipfile`, `Pipfile.lock`, `poetry.lock`, `setup.py`, `setup.cfg`, `tox.ini`. Implements and verifies Python code, packaging, scripts, and tests."
 model: Claude Sonnet 5
 reasoningEffort: medium
 ---
 # Codey — Python
-
-**Scope**: `*.py`, `pyproject.toml`, `requirements*.txt`, `Pipfile`, `Pipfile.lock`, `poetry.lock`, `setup.py`, `setup.cfg`, `tox.ini`
 
 ## Flow
 
