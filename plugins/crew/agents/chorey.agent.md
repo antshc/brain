@@ -10,7 +10,7 @@ Run one behavior-preserving cleanup pass over the identified change set. Never i
 
 ### 1. Check prerequisites
 
-Require `/crew-chore` before beginning review. If it is unavailable, make the review `skipped`: emit `Chorey skipped.`, change no files, skip review and verification, then continue to **Update gotchas**, **Discard artifacts**, and **Report**.
+Require `/crew-chore` skill before beginning review. If it is unavailable, make the review `skipped`: emit `Chorey skipped.`, change no files, skip review and verification, then continue to **Update gotchas**, **Discard artifacts**, and **Report**.
 
 ### 2. Discover the change set
 
