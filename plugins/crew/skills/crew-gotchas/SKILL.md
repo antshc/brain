@@ -1,15 +1,15 @@
 ---
 name: crew-gotchas
-description: "Read and update a repository-local gotchas-memory GOTCHAS.md with reusable directives discovered during implementation or review. Use when Codey or Chorey enters its GOTCHAS or UPDATE GOTCHAS step."
+description: "Apply repository-local gotcha rules and produce reusable rule updates from implementation or review friction. Use through crew-memory when Codey or Chorey enters its GOTCHAS or UPDATE GOTCHAS step."
 ---
 
 # Gotchas
 
-Gotchas live in the `GOTCHAS_PATH` passed by `/gotchas-memory` (auto-created there if missing). Write only that path — never derive or search for another location.
+`/crew-memory` passes the current entries under its `GOTCHAS.md` `## Gotchas` section as `GOTCHAS RULES`. Operate only on those supplied rules. Never locate, read, or write a `GOTCHAS.md` file; `/crew-memory` owns storage.
 
 ## Read Workflow (mandatory before the agent's main work)
 
-Read `GOTCHAS_PATH` in full when provided. Unresolved or empty → "No gotchas recorded yet."
+Read every supplied `GOTCHAS RULES` entry. Missing or empty rules → "No gotchas recorded yet."
 
 Apply every directive found during the agent's work — never contradict one without reporting the conflict.
 
@@ -31,16 +31,16 @@ List the files changed during this invocation. For each file or group, check whe
 
 **Emit**: "Files changed: [list]. Problem candidates: [list or 'none — reason per file']."
 
-### 2. Distill and write each candidate
+### 2. Distill each candidate and return rule updates
 
 Distill each kept candidate into one reusable directive: `- <directive>`, optionally `- <directive> — <what to do instead>.` when the workaround adds concrete guidance. A discovery-gap becomes a note line, e.g. `- [note] chore-py missing — Chorey was not configured.`
 
-Scan the existing lines under `## Gotchas` for one covering the same rule or topic:
+Scan `GOTCHAS RULES` for one covering the same rule or topic:
 
-- **Match** → edit that line in place to extend/refine it. Never duplicate.
-- **No match** → append under `## Gotchas`.
+- **Match** → return an exact replacement that extends/refines that rule. Never duplicate.
+- **No match** → return the new rule to append.
 
-Zero candidates → write nothing.
+Return `RULE UPDATES` to `/crew-memory` as exact `replace <existing rule> with <refined rule>` or `append <new rule>` operations. Zero candidates → return no updates. Do not persist the updates yourself.
 
 **Emit**: "Gotchas updated: [count added/extended]" or "No gotchas to record."
 

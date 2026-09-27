@@ -1,7 +1,7 @@
 # Crew agents own their workflows and use codebase instructions
 <!-- agent instruction: track crew plugin decisions using bullets -->
 
-- **Run location**: Agents execute exploration, implementation, and verification in cwd; callers set the worktree directory before invocation. Codey may receive a trusted `HARNESS_REPO_PATH`. Chorey receives no ambient path and discovers available `chore-<stack>` and `/gotchas-memory` skills directly.
+- **Run location**: Agents execute exploration, implementation, and verification in cwd; callers set the worktree directory before invocation. Codey may receive a trusted `HARNESS_REPO_PATH`. Chorey receives no ambient path and discovers available `chore-<stack>` and `/crew-memory` skills directly.
 - **Roster**: `codey-py`, `codey-ai`, and `codey-dotnet` are independent implementation agents. Callers select from their task descriptions; no match selects `general-purpose`, which receives the same five-field report contract. Chorey semantically selects per-stack review rules from the changed files and available Chore rules skills. The generic `codey` agent is removed.
 - **Ownership**: Each implementation agent owns its input, implementation, verification, and status. Python and AI use compact flows; the .NET agent explicitly traces a functional slice, finds its highest observable test seam, and runs the fewest existing tests that prove the outcome. Chorey's distinct flow retains behavior-preserving review and self-reversion.
 - **Style**: `init-crew` copies stack-specific Copilot instructions into the codebase repo's `.github/instructions/` and never overwrites existing files. Codey and Chorey read applicable instructions and local conventions. `.crew/CODE-<stack>.md` is no longer read.
