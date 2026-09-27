@@ -66,10 +66,67 @@ def test_empty_uncommitted_capture_writes_empty_bundle(tmp_path):
         "schema_version": 1,
         "mode": "uncommitted",
         "baseline_commit": None,
+        "stacks": [],
         "files": [],
     }
     assert (repo / "bin" / "crew_diff" / "diffs").is_dir()
     assert not (repo / "bin" / "crew_diff" / "snapshots").exists()
+
+
+def test_uncommitted_capture_detects_sorted_aggregate_stacks(tmp_path):
+    repo = tmp_path / "repo"
+    initialize(repo)
+    (repo / ".gitignore").write_text("bin/\n", encoding="utf-8")
+    (repo / "AGENTS.md").write_text("initial guidance\n", encoding="utf-8")
+    commit_all(repo)
+
+    (repo / "AGENTS.md").unlink()
+    (repo / "rules").mkdir()
+    (repo / "rules" / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+    (repo / "rules" / "helper.prompt.md").write_text("prompt\n", encoding="utf-8")
+    (repo / "rules" / "review.instructions.md").write_text("instructions\n", encoding="utf-8")
+    (repo / "src").mkdir()
+    (repo / "src" / "app.py").write_text("print('hello')\n", encoding="utf-8")
+    (repo / "src" / "App.cs").write_text("class App {}\n", encoding="utf-8")
+    (repo / "requirements-dev.txt").write_text("pytest\n", encoding="utf-8")
+    (repo / "pyproject.toml").write_text("[project]\nname = 'demo'\n", encoding="utf-8")
+    (repo / "Pipfile").write_text("[packages]\n", encoding="utf-8")
+    (repo / "Directory.Build.props").write_text("<Project />\n", encoding="utf-8")
+    (repo / "Directory.Packages.props").write_text("<Project />\n", encoding="utf-8")
+    (repo / "notes.rst").write_text("unmatched\n", encoding="utf-8")
+
+    invoke(repo, "capture")
+
+    assert load_manifest(repo)["stacks"] == ["ai", "dotnet", "py"]
+
+
+def test_unmatched_changed_paths_produce_empty_stacks(tmp_path):
+    repo = tmp_path / "repo"
+    initialize(repo)
+    (repo / ".gitignore").write_text("bin/\n", encoding="utf-8")
+    (repo / "notes.rst").write_text("initial\n", encoding="utf-8")
+    commit_all(repo)
+    (repo / "notes.rst").write_text("changed\n", encoding="utf-8")
+
+    invoke(repo, "capture")
+
+    assert load_manifest(repo)["stacks"] == []
+
+
+def test_commit_capture_detects_both_sides_of_cross_stack_rename(tmp_path):
+    repo = tmp_path / "repo"
+    initialize(repo)
+    (repo / ".gitignore").write_text("bin/\n", encoding="utf-8")
+    (repo / "legacy.py").write_text("same content\n", encoding="utf-8")
+    commit_all(repo, "base")
+    git(repo, "mv", "legacy.py", "Modern.cs")
+    checkpoint = commit_all(repo, "rename")
+
+    invoke(repo, "capture", "--baseline", checkpoint)
+
+    manifest = load_manifest(repo)
+    assert manifest["stacks"] == ["dotnet", "py"]
+    assert entries_by_path(manifest)["Modern.cs"]["previous_path"] == "legacy.py"
 
 
 def test_uncommitted_capture_keeps_layers_and_restores_staged_versions(tmp_path):

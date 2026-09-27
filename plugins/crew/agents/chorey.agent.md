@@ -24,13 +24,13 @@ Use `bin/crew_diff/_manifest.json` as the initial change-set ledger. An empty ma
 
 ### 3. Load guidance
 
-Follow `/crew-chore`'s stack-selection guidance. It reads the configured per-stack files, applies every matching rule set to a multiply matched file, and retains rule conflicts as findings. Keep every manifest path in review scope; use observed conventions alone for a path without a confidently matching stack file. Emit `Review rules: [stack files]`.
+Parse the top-level `stacks` array from `bin/crew_diff/_manifest.json` and pass it unchanged to `/crew-chore` as `STACKS`. Follow `/crew-chore`'s stack-loading guidance: a nonempty array loads the named stack files, while an empty array loads every configured stack file. Do not independently infer stacks from paths, patches, file contents, or repository markers. Apply each loaded rule only where relevant, retain rule conflicts as findings, and use observed conventions where no loaded rule applies. Report missing named stack files as discovery gaps. Emit `Review rules: [stack files]`.
 
 When `/crew-memory` is available, follow `/crew-memory`' skill **Read Gotchas** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
 
 Read every manifest path's listed diff first, then its complete current file when present and only the neighboring code needed to establish local conventions. Review deleted paths from their diffs. Emit `Observed conventions: [summary]`.
 
-When an applicable `/crew-chore` rule cannot be fulfilled without a minimal companion cleanup in a related path outside the initial manifest, read that path, apply every matching stack rule, and include it in cleanup, verification, restore, and reporting. Do not touch a related path merely to broaden or continue the refactor.
+When an applicable `/crew-chore` rule cannot be fulfilled without a minimal companion cleanup in a related path outside the initial manifest, read that path, apply every relevant loaded stack rule, and include it in cleanup, verification, restore, and reporting. Do not touch a related path merely to broaden or continue the refactor.
 
 ### 4. Review and clean up
 

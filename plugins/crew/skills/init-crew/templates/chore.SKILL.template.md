@@ -5,7 +5,9 @@ description: Repository-specific, stack-aware cleanup rules for Chorey. Used onl
 
 # Crew Chore rules
 
-Read the files in `stacks/` before reviewing. Each file contains the rules for one configured stack. Infer the applicable stacks from the review scope, then load every matching stack file. If no stack file confidently matches, use observed repository conventions alone.
+Accept the manifest's JSON array from Chorey as `STACKS`. Do not infer stacks from the review scope.
+
+When `STACKS` is nonempty, read each existing `stacks/<stack>.md` file named by the array. Report every missing named file as a discovery gap, then continue with the available rules and observed repository conventions. When `STACKS` is empty, enumerate and read every configured `stacks/*.md` file in filename order. Apply each loaded rule only where relevant and retain rule conflicts as findings. If no stack files are available, use observed repository conventions alone.
 
 <!-- stack: ai -->
 ## Hazard rules

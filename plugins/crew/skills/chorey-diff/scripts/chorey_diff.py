@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import os
 import shutil
@@ -17,6 +18,20 @@ from typing import Iterable, Sequence
 
 ARTIFACT_DIR = Path("bin") / "crew_diff"
 MANIFEST_NAME = "_manifest.json"
+
+AI_BASENAMES = {"AGENTS.md", "SKILL.md"}
+AI_SUFFIXES = (".agent.md", ".instructions.md", ".prompt.md")
+DOTNET_BASENAMES = {"Directory.Build.props", "Directory.Packages.props"}
+DOTNET_SUFFIXES = (".cs", ".csproj", ".sln")
+PY_BASENAMES = {
+    "Pipfile",
+    "Pipfile.lock",
+    "poetry.lock",
+    "pyproject.toml",
+    "setup.cfg",
+    "setup.py",
+    "tox.ini",
+}
 
 
 class ChoreyDiffError(RuntimeError):
@@ -146,6 +161,23 @@ def _write_patch(path: Path, sections: Sequence[tuple[str, bytes]]) -> None:
     path.write_bytes(bytes(content))
 
 
+def _detect_stacks(paths: Iterable[str]) -> list[str]:
+    stacks: set[str] = set()
+    for repo_path in paths:
+        name = PurePosixPath(repo_path).name
+        if name in AI_BASENAMES or name.endswith(AI_SUFFIXES):
+            stacks.add("ai")
+        if name in DOTNET_BASENAMES or name.endswith(DOTNET_SUFFIXES):
+            stacks.add("dotnet")
+        if (
+            name in PY_BASENAMES
+            or name.endswith(".py")
+            or fnmatch.fnmatchcase(name, "requirements*.txt")
+        ):
+            stacks.add("py")
+    return sorted(stacks)
+
+
 def _prepare_artifacts(repo: Path) -> tuple[Path, Path]:
     root = _artifact_root(repo)
     _discard(repo)
@@ -203,6 +235,12 @@ def _capture_commit(repo: Path, baseline: str) -> dict[str, object]:
         "mode": "commit",
         "baseline_commit": commit,
         "base_commit": base,
+        "stacks": _detect_stacks(
+            path
+            for change in changes
+            for path in (change.old_path, change.path)
+            if path is not None
+        ),
         "files": files,
     }
     _write_json(artifact_root / MANIFEST_NAME, manifest)
@@ -303,6 +341,11 @@ def _capture_uncommitted(repo: Path) -> dict[str, object]:
         "schema_version": 1,
         "mode": "uncommitted",
         "baseline_commit": None,
+        "stacks": _detect_stacks(
+            path
+            for repo_path, grouped_entry in grouped.items()
+            for path in (*grouped_entry["previous_paths"], repo_path)
+        ),
         "files": files,
     }
     _write_json(artifact_root / MANIFEST_NAME, manifest)
@@ -320,7 +363,12 @@ def _load_manifest(repo: Path) -> dict[str, object]:
         value = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError as error:
         raise ChoreyDiffError(f"missing manifest: {path}") from error
-    if not isinstance(value, dict) or not isinstance(value.get("files"), list):
+    if (
+        not isinstance(value, dict)
+        or not isinstance(value.get("files"), list)
+        or not isinstance(value.get("stacks"), list)
+        or not all(isinstance(stack, str) for stack in value["stacks"])
+    ):
         raise ChoreyDiffError("invalid chorey-diff manifest")
     return value
 
