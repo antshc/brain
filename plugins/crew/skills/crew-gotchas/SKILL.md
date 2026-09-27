@@ -5,7 +5,7 @@ description: "Read and update a repository-local gotchas-memory GOTCHAS.md with 
 
 # Gotchas
 
-Gotchas live in the `GOTCHAS_PATH` resolved by the calling agent through `/gotchas-memory` (auto-created there if missing). Write only that path — never derive or search for another location.
+Gotchas live in the `GOTCHAS_PATH` passed by `/gotchas-memory` (auto-created there if missing). Write only that path — never derive or search for another location.
 
 ## Read Workflow (mandatory before the agent's main work)
 

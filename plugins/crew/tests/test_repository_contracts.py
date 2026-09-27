@@ -22,8 +22,13 @@ def test_chorey_owns_safe_review_and_revert_contract():
         assert field in chorey
 
 
-def test_chorey_callers_do_not_pass_harness_context():
+def test_crew_agents_use_direct_skills_without_manual_path_discovery():
     standalone = (CREW / "skills" / "to-chorey" / "SKILL.md").read_text(encoding="utf-8")
+    to_codey = (CREW / "skills" / "to-codey" / "SKILL.md").read_text(encoding="utf-8")
+    chorey = (CREW / "agents" / "chorey.agent.md").read_text(encoding="utf-8")
+    codey_agents = [
+        path.read_text(encoding="utf-8") for path in (CREW / "agents").glob("codey-*.agent.md")
+    ]
     ralph_dev = (ROOT / "plugins" / "ralph" / "skills" / "dev" / "SKILL.md").read_text(
         encoding="utf-8"
     )
@@ -34,13 +39,14 @@ def test_chorey_callers_do_not_pass_harness_context():
         "## 7. Commit & push Chorey's cleanup", 1
     )[0]
 
+    for text in [standalone, to_codey, codey_invocation, chorey_invocation, chorey, *codey_agents]:
+        assert "## HARNESS" not in text
+        assert "HARNESS_REPO_PATH" not in text
+        assert "GOTCHAS_PATH" not in text
+        assert ".github/instructions" not in text
     assert "resolve-harness" not in standalone
-    assert "## HARNESS" not in standalone
-    assert "HARNESS_REPO_PATH" not in standalone
-    assert "## HARNESS" in codey_invocation
-    assert "HARNESS_REPO_PATH" in codey_invocation
-    assert "## HARNESS" not in chorey_invocation
-    assert "HARNESS_REPO_PATH" not in chorey_invocation
+    assert "resolve-harness" not in to_codey
+    assert all("/gotchas-memory" in agent for agent in codey_agents)
     assert "## BASELINE_COMMIT" in chorey_invocation
 
 
