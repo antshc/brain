@@ -1,6 +1,6 @@
 ---
 name: crew-chorey-flow
-description: Shared workflow for the review-agent family — INPUT, GOTCHAS, REVIEW, VERIFY, Revert, UPDATE GOTCHAS, failure routing, hard rules, and the status-report contract. Invoked by name from the chorey agent; every phase applies unchanged unless that agent declares its own override.
+description: "Run Chorey's maintainability review workflow for a supplied commit or uncommitted change set, including gotchas, behavior-preserving cleanup, verification, rollback, and status reporting. Use only when the Chorey agent invokes its flow."
 ---
 
 # Chorey Flow
