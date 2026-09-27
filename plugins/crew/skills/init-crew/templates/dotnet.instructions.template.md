@@ -1,9 +1,8 @@
 ---
-applyTo: "**/*.cs,**/*.csproj,**/*.sln,**/*.fs,**/*.fsproj,**/*.vb,**/*.vbproj,**/*.props"
+applyTo: "**/*.cs,**/*.csproj,**/*.sln,**/Directory.Build.props,**/Directory.Packages.props"
 ---
 # .NET code conventions
 
 - Follow the repository's existing naming, formatting, project layout, and dependency direction; check neighboring code before editing.
-- Keep changes inside the affected functional slice. A nearest `.csproj` defines the build project; trace its test project through references and existing tests.
-- Dispose acquired `IDisposable` resources on every exit path.
-- Add or update a test at an observable input/output seam for changed behavior; prefer an existing slice test. The `codey-dotnet` agent owns test selection and feedback.
+- Keep changes inside the affected functional slice and follow the repository's project boundaries.
+- Dispose resources whose lifetime the changed code owns, including async resources; leave injected dependencies to their owner.

@@ -2,7 +2,7 @@
 
 Three implementation agents cover Python, AI authoring, and .NET: `codey-py`, `codey-ai`, and `codey-dotnet`. `chorey` reviews behavior-preserving cleanup. There is no base `codey` agent.
 
-- `crew-select` discovers the three agents by their `**Scope**` lines. `to-codey` and `ralph:dev` invoke the primary matched agent or `general-purpose` when none matches.
+- `crew-select` discovers the three agents from their frontmatter descriptions: leading terms route task text, and backtick-quoted file patterns route changed paths. `to-codey` and `ralph:dev` invoke the primary matched agent or `general-purpose` when none matches.
 - Each Codey agent owns input, implementation, focused verification, gotchas, and its five-field status report. The .NET agent traces the functional slice and tests its highest useful observable seam. Python and AI agents use compact flows.
 - `crew-chorey-flow` and `crew-review` own Chorey's review, scoped verification, and self-revert on failed checks. Chorey's report is informational; Codey's `STATUS` gates follow-up handling.
 - `init-crew` copies per-stack `.github/instructions/*.instructions.md` into the codebase repo and creates `.crew/CHORE-<stack>.md` plus `.crew/GOTCHAS.md` in the harness repo. Existing files are preserved. Old `CODE*.md` and `VERIFY*.md` are not read or migrated.
