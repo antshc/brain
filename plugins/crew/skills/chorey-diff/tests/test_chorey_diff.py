@@ -69,16 +69,17 @@ def test_empty_uncommitted_capture_writes_empty_bundle(tmp_path):
         "files": [],
     }
     assert (repo / "bin" / "crew_diff" / "diffs").is_dir()
-    assert (repo / "bin" / "crew_diff" / "snapshots").is_dir()
+    assert not (repo / "bin" / "crew_diff" / "snapshots").exists()
 
 
-def test_uncommitted_capture_keeps_layers_snapshots_and_index(tmp_path):
+def test_uncommitted_capture_keeps_layers_and_restores_staged_versions(tmp_path):
     repo = tmp_path / "repo"
     initialize(repo)
     (repo / ".gitignore").write_text("ignored.txt\nbin/\n", encoding="utf-8")
     (repo / "mixed.txt").write_text("initial\n", encoding="utf-8")
     (repo / "deleted.txt").write_text("delete me\n", encoding="utf-8")
     (repo / "rename-source.txt").write_text("rename me\n", encoding="utf-8")
+    (repo / "unstaged-rename-source.txt").write_text("unstaged rename\n", encoding="utf-8")
     commit_all(repo)
 
     (repo / "mixed.txt").write_text("staged\n", encoding="utf-8")
@@ -92,6 +93,7 @@ def test_uncommitted_capture_keeps_layers_snapshots_and_index(tmp_path):
     (repo / "cancelled.txt").unlink()
     git(repo, "mv", "rename-source.txt", "rename-target.txt")
     (repo / "rename-target.txt").write_text("renamed and edited\n", encoding="utf-8")
+    (repo / "unstaged-rename-source.txt").rename(repo / "unstaged-rename-target.txt")
     index_before = git(repo, "diff", "--cached", "--binary")
     status_before = git(repo, "status", "--porcelain=v1", "-z")
 
@@ -106,6 +108,8 @@ def test_uncommitted_capture_keeps_layers_snapshots_and_index(tmp_path):
         "mixed.txt",
         "rename-target.txt",
         "space name.bin",
+        "unstaged-rename-source.txt",
+        "unstaged-rename-target.txt",
     }
     assert "ignored.txt" not in entries
     mixed_patch = (repo / "bin" / "crew_diff" / entries["mixed.txt"]["diff"]).read_bytes()
@@ -113,10 +117,9 @@ def test_uncommitted_capture_keeps_layers_snapshots_and_index(tmp_path):
     assert b"=== UNSTAGED ===" in mixed_patch
     untracked_patch = (repo / "bin" / "crew_diff" / entries["space name.bin"]["diff"]).read_bytes()
     assert b"=== UNTRACKED ===" in untracked_patch
-    assert entries["cancelled.txt"]["snapshot"] == {"exists": False}
     assert entries["rename-target.txt"]["previous_paths"] == ["rename-source.txt"]
-    assert (repo / "bin" / "crew_diff" / entries["mixed.txt"]["snapshot"]["artifact"]).read_bytes() == b"working\r\n"
-    assert (repo / "bin" / "crew_diff" / entries["space name.bin"]["snapshot"]["artifact"]).read_bytes() == b"\x00\x01new\xff"
+    assert "snapshot" not in entries["space name.bin"]
+    assert "previous_snapshots" not in entries["rename-target.txt"]
     assert git(repo, "diff", "--cached", "--binary") == index_before
     assert git(repo, "status", "--porcelain=v1", "-z") == status_before
 
@@ -137,14 +140,21 @@ def test_uncommitted_capture_keeps_layers_snapshots_and_index(tmp_path):
         "deleted.txt",
         "--path",
         "rename-target.txt",
+        "--path",
+        "unstaged-rename-target.txt",
+        "--path",
+        "unstaged-rename-source.txt",
     )
 
-    assert (repo / "mixed.txt").read_bytes() == b"working\r\n"
-    assert (repo / "space name.bin").read_bytes() == b"\x00\x01new\xff"
-    assert not (repo / "cancelled.txt").exists()
-    assert not (repo / "deleted.txt").exists()
-    assert (repo / "rename-target.txt").read_text(encoding="utf-8") == "renamed and edited\n"
+    assert (repo / "mixed.txt").read_bytes() == b"staged\r\n"
+    assert not (repo / "space name.bin").exists()
+    assert (repo / "cancelled.txt").read_text(encoding="utf-8") == "staged addition\n"
+    assert (repo / "deleted.txt").read_text(encoding="utf-8") == "delete me\n"
+    assert (repo / "rename-target.txt").read_text(encoding="utf-8") == "rename me\n"
+    assert not (repo / "unstaged-rename-target.txt").exists()
+    assert (repo / "unstaged-rename-source.txt").read_text(encoding="utf-8") == "unstaged rename\n"
     assert git(repo, "diff", "--cached", "--binary") == index_before
+    assert git(repo, "diff", "--binary") == b""
 
 
 def test_commit_capture_handles_rename_delete_binary_and_restore(tmp_path):
@@ -167,8 +177,7 @@ def test_commit_capture_handles_rename_delete_binary_and_restore(tmp_path):
     assert manifest["mode"] == "commit"
     assert set(entries) == {"deleted.txt", "renamed.txt", "space name.bin"}
     assert entries["renamed.txt"]["previous_path"] == "old.txt"
-    assert all(entry["snapshot"] is None for entry in entries.values())
-    assert list((repo / "bin" / "crew_diff" / "snapshots").iterdir()) == []
+    assert all("snapshot" not in entry for entry in entries.values())
 
     (repo / "renamed.txt").write_text("review edit", encoding="utf-8")
     (repo / "space name.bin").write_bytes(b"review edit")
@@ -189,6 +198,39 @@ def test_commit_capture_handles_rename_delete_binary_and_restore(tmp_path):
     assert not (repo / "deleted.txt").exists()
 
 
+def test_restore_related_paths_uses_commit_baseline(tmp_path):
+    repo = tmp_path / "repo"
+    initialize(repo)
+    (repo / ".gitignore").write_text("bin/\n", encoding="utf-8")
+    (repo / "changed.txt").write_text("base\n", encoding="utf-8")
+    (repo / "related.txt").write_text("committed\n", encoding="utf-8")
+    commit_all(repo, "base")
+    (repo / "changed.txt").write_text("checkpoint\n", encoding="utf-8")
+    checkpoint = commit_all(repo, "checkpoint")
+    invoke(repo, "capture", "--baseline", checkpoint)
+    assert "related.txt" not in entries_by_path(load_manifest(repo))
+
+    (repo / "related.txt").write_text("review edit\n", encoding="utf-8")
+    (repo / "new-related.txt").write_text("review addition\n", encoding="utf-8")
+    invoke(repo, "restore", "--path", "related.txt", "--path", "new-related.txt")
+
+    assert (repo / "related.txt").read_text(encoding="utf-8") == "committed\n"
+    assert not (repo / "new-related.txt").exists()
+
+
+def test_restore_rejects_artifact_paths(tmp_path):
+    repo = tmp_path / "repo"
+    initialize(repo)
+    (repo / ".gitignore").write_text("bin/\n", encoding="utf-8")
+    commit_all(repo)
+    invoke(repo, "capture")
+
+    result = invoke(repo, "restore", "--path", "bin/crew_diff/escape.txt", check=False)
+
+    assert result.returncode == 1
+    assert b"refusing to restore chorey-diff artifacts" in result.stderr
+
+
 def test_root_commit_uses_empty_tree_and_invalid_commit_leaves_no_bundle(tmp_path):
     repo = tmp_path / "repo"
     initialize(repo)
@@ -207,7 +249,7 @@ def test_root_commit_uses_empty_tree_and_invalid_commit_leaves_no_bundle(tmp_pat
     assert git(repo, "status", "--porcelain") == b""
 
 
-def test_symlink_snapshot_and_restore_when_supported(tmp_path):
+def test_staged_symlink_restores_from_index_when_supported(tmp_path):
     repo = tmp_path / "repo"
     initialize(repo)
     (repo / ".gitignore").write_text("bin/\n", encoding="utf-8")
@@ -217,10 +259,9 @@ def test_symlink_snapshot_and_restore_when_supported(tmp_path):
         os.symlink("target.txt", repo / "link.txt")
     except OSError:
         pytest.skip("symlinks are not available")
+    git(repo, "add", "link.txt")
 
     invoke(repo, "capture")
-    entry = entries_by_path(load_manifest(repo))["link.txt"]
-    assert entry["snapshot"]["kind"] == "symlink"
     (repo / "link.txt").unlink()
     (repo / "link.txt").write_text("review replacement", encoding="utf-8")
 
@@ -230,20 +271,25 @@ def test_symlink_snapshot_and_restore_when_supported(tmp_path):
     assert os.readlink(repo / "link.txt") == "target.txt"
 
 
-def test_restore_rejects_paths_outside_manifest_and_discard_is_scoped(tmp_path):
+def test_restore_related_index_paths_and_discard_is_scoped(tmp_path):
     repo = tmp_path / "repo"
     initialize(repo)
     (repo / ".gitignore").write_text("bin/\n", encoding="utf-8")
     (repo / "tracked.txt").write_text("initial\n", encoding="utf-8")
+    (repo / "related.txt").write_text("baseline\n", encoding="utf-8")
     commit_all(repo)
     (repo / "tracked.txt").write_text("changed\n", encoding="utf-8")
     invoke(repo, "capture")
+    (repo / "related.txt").write_text("review edit\n", encoding="utf-8")
+    (repo / "new-related.txt").write_text("review addition\n", encoding="utf-8")
     sibling = repo / "bin" / "keep.txt"
     sibling.write_text("keep", encoding="utf-8")
 
-    result = invoke(repo, "restore", "--path", "other.txt", check=False)
-    assert result.returncode == 1
+    invoke(repo, "restore", "--path", "related.txt", "--path", "new-related.txt")
+
     assert (repo / "tracked.txt").read_text(encoding="utf-8") == "changed\n"
+    assert (repo / "related.txt").read_text(encoding="utf-8") == "baseline\n"
+    assert not (repo / "new-related.txt").exists()
 
     invoke(repo, "discard")
     assert not (repo / "bin" / "crew_diff").exists()
