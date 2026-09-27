@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[3]
 CREW = ROOT / "plugins" / "crew"
 
 
-def test_chorey_owns_safe_review_and_revert_contract():
+def test_chorey_owns_safe_review_and_delegates_diff_mechanics():
     chorey = (CREW / "agents" / "chorey.agent.md").read_text(encoding="utf-8")
 
     assert "HARNESS_REPO_PATH" not in chorey
@@ -14,8 +14,12 @@ def test_chorey_owns_safe_review_and_revert_contract():
     assert "No confident match or any missing applicable skill makes the review `skipped`" in chorey
     assert "STATUS: complete | skipped" in chorey
     assert "provably behavior-preserving" in chorey
-    assert "exact current content" in chorey
-    assert "Restore every file REVIEW touched to its exact pre-review state" in chorey
+    assert "Follow `/chorey-diff`'s skill **Capture review diff**" in chorey
+    assert "Follow `/chorey-diff`'s skill **Restore pre-review files**" in chorey
+    assert "Follow `/chorey-diff`'s skill **Discard artifacts**" in chorey
+    assert "bin/crew_diff/_manifest.json" in chorey
+    assert "Read every manifest path's listed diff first" in chorey
+    assert "exact current content" not in chorey
     assert "/gotchas-memory" in chorey
     assert "When the skill is unavailable, perform no gotchas work" in chorey
     for field in ("STATUS:", "SUMMARY:", "FILES:", "GOTCHAS UPDATED:", "NOTES:"):
@@ -48,6 +52,18 @@ def test_crew_agents_use_direct_skills_without_manual_path_discovery():
     assert "resolve-harness" not in to_codey
     assert all("/gotchas-memory" in agent for agent in codey_agents)
     assert "## BASELINE_COMMIT" in chorey_invocation
+
+
+def test_chorey_diff_owns_capture_restore_and_artifact_contract():
+    skill = (CREW / "skills" / "chorey-diff" / "SKILL.md").read_text(encoding="utf-8")
+
+    assert "name: chorey-diff" in skill
+    assert "## Capture review diff" in skill
+    assert "## Restore pre-review files" in skill
+    assert "## Discard artifacts" in skill
+    assert "bin/crew_diff/_manifest.json" in skill
+    assert "Reviewing commit <sha>: [files]" in skill
+    assert "Reviewing uncommitted files: [files]" in skill
 
 
 def test_initializer_offers_rules_skills_and_preserves_repository_rules_during_merge():

@@ -4,9 +4,9 @@ Three implementation agents cover Python, AI authoring, and .NET: `codey-py`, `c
 
 - `to-codey` and `ralph:dev` choose an implementation agent from the installed agents' descriptions, or `general-purpose` when none matches. Chorey uses the changed files and installed Chore rules skill descriptions to select applicable per-stack rules.
 - Each Codey agent owns input, implementation, focused verification, gotchas, and its five-field status report. The .NET agent traces the functional slice and tests its highest useful observable seam. Python and AI agents use compact flows.
-- Chorey's agent owns change discovery, rule selection, behavior-preserving review, scoped verification, and self-revert on failed checks. Chorey's report is informational; Codey's `STATUS` gates follow-up handling.
+- `chorey-diff` owns Chorey's commit/uncommitted change capture, manifest, exact standalone snapshots, restoration, and artifact cleanup. Chorey's agent owns rule selection, behavior-preserving review, scoped verification, and the decision to self-revert failed cleanup. Chorey's report is informational; Codey's `STATUS` gates follow-up handling.
 - `init-crew` copies per-stack `.github/instructions/*.instructions.md` into the codebase repo, offers `chore-<stack>` skills, and creates `/gotchas-memory` in the harness repo's `.github/skills/`. Existing repository rules are preserved and merged. Legacy `.crew/` files are ignored.
-- `/gotchas-memory` locates the repository's persistent gotchas file; `crew-gotchas` owns the shared read/write procedure; `to-commit` owns post-task commits.
+- `/gotchas-memory` locates the repository's persistent gotchas file; `crew-gotchas` owns the shared read/write procedure; `chorey-diff` owns the temporary `bin/crew_diff/` review bundle; `to-commit` owns post-task commits.
 
 Codey runs in cwd and uses `/gotchas-memory` directly; callers do not pass its storage location. Chorey receives only an optional trusted `## BASELINE_COMMIT`, runs in cwd, and likewise uses available Chore rules and `/gotchas-memory` skills directly. The gotchas skill encapsulates its storage path; an unavailable skill is a no-op. Applicable Copilot instructions are supplied automatically and need no explicit discovery step.
 
