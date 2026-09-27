@@ -119,6 +119,19 @@ def _safe_workspace_path(repo: Path, repo_path: str) -> Path:
     return repo.joinpath(*path.parts)
 
 
+def _normalize_repo_path(value: str) -> str:
+    normalized = value.replace("\\", "/")
+    path = PurePosixPath(normalized)
+    if path.is_absolute() or ".." in path.parts or not path.parts or normalized in {"", "."}:
+        raise ChoreyDiffError(f"unsafe repository path: {value!r}")
+    repo_path = path.as_posix()
+    if repo_path == ".git" or repo_path.startswith(".git/"):
+        raise ChoreyDiffError(f"refusing to restore Git internals: {value!r}")
+    if repo_path == "bin/crew_diff" or repo_path.startswith("bin/crew_diff/"):
+        raise ChoreyDiffError(f"refusing to restore chorey-diff artifacts: {value!r}")
+    return repo_path
+
+
 def _write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
 
@@ -133,43 +146,12 @@ def _write_patch(path: Path, sections: Sequence[tuple[str, bytes]]) -> None:
     path.write_bytes(bytes(content))
 
 
-def _snapshot(repo: Path, artifact_root: Path, identifier: str, repo_path: str) -> dict[str, object]:
-    workspace_path = _safe_workspace_path(repo, repo_path)
-    try:
-        file_stat = workspace_path.lstat()
-    except FileNotFoundError:
-        return {"exists": False}
-
-    mode = stat.S_IMODE(file_stat.st_mode)
-    snapshot_rel = Path("snapshots") / f"{identifier}.bin"
-    snapshot_path = artifact_root / snapshot_rel
-    if stat.S_ISLNK(file_stat.st_mode):
-        snapshot_path.write_bytes(os.fsencode(os.readlink(workspace_path)))
-        return {
-            "exists": True,
-            "kind": "symlink",
-            "mode": mode,
-            "artifact": snapshot_rel.as_posix(),
-        }
-    if stat.S_ISREG(file_stat.st_mode):
-        snapshot_path.write_bytes(workspace_path.read_bytes())
-        return {
-            "exists": True,
-            "kind": "file",
-            "mode": mode,
-            "artifact": snapshot_rel.as_posix(),
-        }
-    raise ChoreyDiffError(f"unsupported changed path type: {repo_path}")
-
-
-def _prepare_artifacts(repo: Path) -> tuple[Path, Path, Path]:
+def _prepare_artifacts(repo: Path) -> tuple[Path, Path]:
     root = _artifact_root(repo)
     _discard(repo)
     diffs = root / "diffs"
-    snapshots = root / "snapshots"
     diffs.mkdir(parents=True)
-    snapshots.mkdir()
-    return root, diffs, snapshots
+    return root, diffs
 
 
 def _resolve_commit(repo: Path, baseline: str) -> str:
@@ -188,7 +170,7 @@ def _capture_commit(repo: Path, baseline: str) -> dict[str, object]:
     parent_line = _git(repo, "rev-list", "--parents", "-n", "1", commit).decode("ascii").split()
     base = parent_line[1] if len(parent_line) > 1 else _empty_tree(repo)
     changes = _name_status(repo, "diff", base, commit)
-    artifact_root, diffs_dir, _ = _prepare_artifacts(repo)
+    artifact_root, diffs_dir = _prepare_artifacts(repo)
     files: list[dict[str, object]] = []
     for number, change in enumerate(sorted(changes, key=lambda item: item.path), start=1):
         identifier = f"{number:04d}"
@@ -214,7 +196,6 @@ def _capture_commit(repo: Path, baseline: str) -> dict[str, object]:
                 "previous_path": change.old_path,
                 "changes": {"commit": [change.as_dict()]},
                 "diff": diff_rel.as_posix(),
-                "snapshot": None,
             }
         )
     manifest: dict[str, object] = {
@@ -284,7 +265,7 @@ def _capture_uncommitted(repo: Path) -> dict[str, object]:
     unstaged = _name_status(repo, "diff")
     untracked = _untracked_paths(repo)
     grouped = _group_uncommitted(staged, unstaged, untracked)
-    artifact_root, diffs_dir, _ = _prepare_artifacts(repo)
+    artifact_root, diffs_dir = _prepare_artifacts(repo)
     files: list[dict[str, object]] = []
     for number, repo_path in enumerate(sorted(grouped), start=1):
         grouped_entry = grouped[repo_path]
@@ -316,7 +297,6 @@ def _capture_uncommitted(repo: Path) -> dict[str, object]:
                     "untracked": bool(grouped_entry["untracked"]),
                 },
                 "diff": diff_rel.as_posix(),
-                "snapshot": _snapshot(repo, artifact_root, identifier, repo_path),
             }
         )
     manifest: dict[str, object] = {
@@ -372,51 +352,59 @@ def _restore_commit(repo: Path, commit: str, repo_path: str) -> None:
         _remove_workspace_path(workspace_path)
 
 
-def _restore_snapshot(repo: Path, artifact_root: Path, repo_path: str, snapshot: object) -> None:
-    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("exists"), bool):
-        raise ChoreyDiffError(f"invalid snapshot metadata for {repo_path}")
+def _index_contains(repo: Path, repo_path: str) -> bool:
+    output = _git(repo, "ls-files", "--stage", "-z", "--", repo_path)
+    for record in output.split(b"\0"):
+        if not record:
+            continue
+        _, separator, returned_path = record.partition(b"\t")
+        if not separator:
+            raise ChoreyDiffError(f"invalid index entry for {repo_path}")
+        if os.fsdecode(returned_path) == repo_path:
+            return True
+    return False
+
+
+def _restore_index(repo: Path, repo_path: str) -> None:
     workspace_path = _safe_workspace_path(repo, repo_path)
-    if not snapshot["exists"]:
+    if not _index_contains(repo, repo_path):
         _remove_workspace_path(workspace_path)
         return
-    artifact_value = snapshot.get("artifact")
-    kind = snapshot.get("kind")
-    mode = snapshot.get("mode")
-    if not isinstance(artifact_value, str) or not isinstance(kind, str) or not isinstance(mode, int):
-        raise ChoreyDiffError(f"incomplete snapshot metadata for {repo_path}")
-    snapshot_path = artifact_root / Path(artifact_value)
-    content = snapshot_path.read_bytes()
-    workspace_path.parent.mkdir(parents=True, exist_ok=True)
-    _remove_workspace_path(workspace_path)
-    if kind == "file":
-        workspace_path.write_bytes(content)
-        os.chmod(workspace_path, mode)
-    elif kind == "symlink":
-        os.symlink(os.fsdecode(content), workspace_path)
-    else:
-        raise ChoreyDiffError(f"unsupported snapshot kind for {repo_path}: {kind}")
+    _git(repo, "restore", "--worktree", "--", repo_path)
 
 
 def _restore(repo: Path, paths: Sequence[str]) -> None:
     manifest = _load_manifest(repo)
     entries = {entry.get("path"): entry for entry in manifest["files"] if isinstance(entry, dict)}
-    unknown = [path for path in paths if path not in entries]
-    if unknown:
-        raise ChoreyDiffError(f"paths absent from manifest: {json.dumps(unknown, ensure_ascii=True)}")
+    restore_paths: list[str] = []
+    for path in paths:
+        repo_path = _normalize_repo_path(path)
+        if repo_path not in restore_paths:
+            restore_paths.append(repo_path)
+        entry = entries.get(repo_path)
+        if isinstance(entry, dict):
+            previous_paths = entry.get("previous_paths", [])
+            if not isinstance(previous_paths, list) or not all(
+                isinstance(previous_path, str) for previous_path in previous_paths
+            ):
+                raise ChoreyDiffError(f"invalid previous paths for {repo_path}")
+            for previous_path in previous_paths:
+                normalized_previous = _normalize_repo_path(previous_path)
+                if normalized_previous not in restore_paths:
+                    restore_paths.append(normalized_previous)
     mode = manifest.get("mode")
-    artifact_root = _artifact_root(repo)
     if mode == "commit":
         commit = manifest.get("baseline_commit")
         if not isinstance(commit, str):
             raise ChoreyDiffError("commit manifest has no baseline_commit")
-        for repo_path in paths:
+        for repo_path in restore_paths:
             _restore_commit(repo, commit, repo_path)
     elif mode == "uncommitted":
-        for repo_path in paths:
-            _restore_snapshot(repo, artifact_root, repo_path, entries[repo_path].get("snapshot"))
+        for repo_path in restore_paths:
+            _restore_index(repo, repo_path)
     else:
         raise ChoreyDiffError(f"unknown manifest mode: {mode!r}")
-    print(f"Restored pre-review files: {json.dumps(list(paths), ensure_ascii=True)}")
+    print(f"Restored review baseline files: {json.dumps(restore_paths, ensure_ascii=True)}")
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -424,7 +412,7 @@ def _parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
     capture = subparsers.add_parser("capture", help="capture the review scope")
     capture.add_argument("--baseline", help="checkpoint commit to review")
-    restore = subparsers.add_parser("restore", help="restore manifest-listed paths")
+    restore = subparsers.add_parser("restore", help="restore touched paths to the selected baseline")
     restore.add_argument("--path", action="append", required=True, dest="paths")
     subparsers.add_parser("discard", help="remove bin/crew_diff")
     return parser
