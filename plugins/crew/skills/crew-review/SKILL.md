@@ -5,14 +5,6 @@ description: "Inspect a commit or uncommitted changes for behavior-preserving cl
 
 # Review
 
-Copy this checklist and check off each item as you complete it:
-
-```
-- [ ] 0 Identify the change set and establish a revert baseline
-- [ ] 1 Review for behavior-preserving cleanup
-- [ ] 2 Apply safe fixes; record unsafe candidates as findings
-```
-
 ## 0. Identify the change set and establish a revert baseline
 
 **`BASELINE_COMMIT` supplied** → identify the files that commit changed (`git show --stat <BASELINE_COMMIT>`). The commit itself is the pre-review state; **Revert** restores against it directly — no snapshot needed.
