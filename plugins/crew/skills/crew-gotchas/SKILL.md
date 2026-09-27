@@ -24,7 +24,7 @@ List the files changed during this invocation. For each file or group, check whe
 - A conflicting or ambiguous convention
 - A directory/filesystem access issue (permissions, missing paths, wrong cwd)
 - A tool access issue (missing CLI, auth failure, unreachable service) during verification
-- A missing `CHORE_PATHS` entry or applicable Copilot instruction noted during INPUT
+- A missing applicable `CHORE-<stack>.md` review file or Copilot instruction noted during review
 - Any other friction that cost time or blocked progress
 
 **Discard** one-off typos, transient blips resolved on first retry, and routine execution steps. Only friction that would help a future run avoid the same mistake qualifies.
