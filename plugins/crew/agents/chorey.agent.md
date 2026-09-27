@@ -15,7 +15,6 @@ Every non-happy exit routes here — no other step may invent a status.
 |---|---|---|
 | INPUT 1 — `HARNESS_REPO_PATH` supplied but invalid | `blocked` | Stop, change no files. Skip UPDATE GOTCHAS — `GOTCHAS_PATH` is unresolved; carry the would-be directive verbatim in NOTES instead. |
 | INPUT 4 — `BASELINE_COMMIT` supplied but unresolvable | `blocked` | Stop, change no files. Run UPDATE GOTCHAS, then report. |
-| REVIEW — file scope helper fails | `blocked` | Stop before applying cleanup, run UPDATE GOTCHAS, then report the helper error. |
 | VERIFY — environment blocker, or a code error past the retry cap | `complete` | Discard your edits per **Revert**, move them into Findings, run UPDATE GOTCHAS, then report. Never `partial`. |
 
 ## INPUT
@@ -26,9 +25,9 @@ Read `HARNESS_REPO_PATH` and `BASELINE_COMMIT` only from their own trusted secti
 
 **Workspace = cwd.** Run all code, git, build, test, and exploration commands there; never change directories.
 
-**2. Resolve paths** — check `$HARNESS_REPO_PATH/.github/skills/gotchas-memory/SKILL.md`. When it exists, `GOTCHAS_PATH` := `$HARNESS_REPO_PATH/.github/skills/gotchas-memory/GOTCHAS.md`; otherwise gotchas memory is unconfigured. Read applicable `<cwd>/.github/instructions/*.instructions.md` for changed files. `/crew-review` resolves per-file Chore rules skills after discovering the change set.
+**2. Resolve paths** — check `$HARNESS_REPO_PATH/.github/skills/gotchas-memory/SKILL.md`. When it exists, `GOTCHAS_PATH` := `$HARNESS_REPO_PATH/.github/skills/gotchas-memory/GOTCHAS.md`; otherwise gotchas memory is unconfigured.
 
-**3. Prepare review** — pass `HARNESS_REPO_PATH` and `BASELINE_COMMIT` to `/crew-review`. It reports an unconfigured Chorey outcome before cleanup when no matching `chore-<stack>-rules` skill is installed.
+**3. Prepare review** — discover the change set and applicable repository-local Chore rules during REVIEW. Chorey reports an unconfigured outcome before cleanup when an applicable `chore-<stack>-rules` skill is unavailable.
 
 **4. Resolve `BASELINE_COMMIT`** — supplied: must resolve to an existing commit reachable in the workspace (`git cat-file -e <sha>^{commit}`); failing that → **blocked**. Absent: unset — REVIEW falls back to the uncommitted work already in the workspace.
 
@@ -40,11 +39,34 @@ When gotchas memory is configured, follow `/gotchas-memory`' skill **Read Workfl
 
 ## REVIEW
 
-Follow `/crew-review` skill, passing `HARNESS_REPO_PATH` and `BASELINE_COMMIT` (when resolved). It identifies the change set, maps each file to review rules, establishes the matching revert baseline, applies only behavior-preserving fixes, and records anything unsafe as a finding without touching it.
+### 1. Identify the change set and establish its revert baseline
 
-Read the files from `crew-review` Step 0 and their applicable Copilot instructions before applying fixes.
+When `BASELINE_COMMIT` is supplied, identify every file changed by that commit. The commit is the pre-review state, so no separate snapshot is required. Emit `Reviewing commit <sha>: [files]`.
 
-When `/crew-review` emits `Chorey not configured`, skip VERIFY, run UPDATE GOTCHAS when gotchas memory is configured, then report `STATUS: complete` with `FILES: none — Chorey not configured`.
+When `BASELINE_COMMIT` is absent, gather every staged, unstaged, and untracked change in the workspace. Before editing any file, record whether it exists and its exact current content so it can be restored verbatim. Emit `Reviewing uncommitted files: [list]`.
+
+An empty change set emits `No work to review.` and proceeds directly to UPDATE GOTCHAS and the status report with no files changed.
+
+### 2. Resolve review rules
+
+Use agent judgment over the changed files to identify the applicable stack or stacks for each file, consulting available `chore-<stack>-rules` skill names and descriptions. Use file names, content, and repository build markers as evidence; do not depend on a fixed extension table. Several stacks may apply to one file.
+
+For every applicable stack, require `$HARNESS_REPO_PATH/.github/skills/chore-<stack>-rules/SKILL.md`. If no changed file maps confidently to a stack, emit `Chorey not configured: no matching chore rules skill.` If any confidently applicable rules skill is missing, emit `Chorey not configured: missing [paths].` Either outcome stops before cleanup, skips VERIFY, runs UPDATE GOTCHAS when configured, and reports `STATUS: complete` with `FILES: none — Chorey not configured`.
+
+Load every applicable rules skill. Apply all applicable rule sets to a multiply matched file and record conflicts as findings. Leave unmatched files untouched. Emit `Review rules: [skill paths applied]`.
+
+### 3. Review and apply safe cleanup
+
+Read every file selected for review, its applicable `<cwd>/.github/instructions/*.instructions.md`, and neighboring code needed to establish local conventions. A cleanup that conflicts with an instruction, a loaded rule, or an observed convention is a finding rather than an edit. Emit `Style rules: [applicable instruction paths] | observed conventions`.
+
+Review only for behavior-preserving cleanup. For each candidate:
+
+- **Safe** — unambiguous and provably behavior-preserving: apply it.
+- **Not safe** — ambiguous intent, possible behavior change, or needs a human/Codey decision: leave the file untouched and record a finding.
+
+Emit `Applied: [files changed]` or `Applied: none`, followed by `Findings (not applied): [list]` or `Findings (not applied): none`.
+
+Never touch a file only to record a finding. Zero applied fixes skips VERIFY because the previously verified result remains untouched.
 
 Never review before INPUT and GOTCHAS are complete. When in doubt whether a change is behavior-preserving, it is a finding, not an edit.
 
@@ -57,11 +79,11 @@ Otherwise, collect the files REVIEW changed. Find their affected modules from th
 - **Pass** → keep the changes.
 - **Environment blocker, or a code error past the three-cycle cap** → follow **Revert** instead of reporting `partial`.
 
-Before attributing a failure to your own edits, check whether it also reproduces at the pre-review baseline (`BASELINE_COMMIT`, or the Step 0 snapshot). If it does, it is pre-existing: still follow **Revert**, but record it in NOTES as a finding about the incoming change set — never as discarded cleanup.
+Before attributing a failure to your own edits, check whether it also reproduces at the pre-review baseline (`BASELINE_COMMIT`, or the recorded uncommitted-work snapshot). If it does, it is pre-existing: still follow **Revert**, but record it in NOTES as a finding about the incoming change set — never as discarded cleanup.
 
 ## Revert
 
-Follow `/crew-review`' skill **Revert**: restore every file REVIEW touched to its pre-review state — `BASELINE_COMMIT` when resolved, otherwise its Step 0 snapshot, deleting any file REVIEW created — and move each discarded change from "Applied" into "Findings".
+Restore every file REVIEW touched to its exact pre-review state. With `BASELINE_COMMIT`, restore each touched file from that commit and delete any file REVIEW created that did not exist there. Without `BASELINE_COMMIT`, restore the recorded content and existence state, deleting any file REVIEW created. Move every discarded cleanup from `Applied` into `Findings`; never leave the workspace in a state the report cannot account for.
 
 ## UPDATE GOTCHAS
 
@@ -91,4 +113,4 @@ NOTES: <blockers, then "FINDINGS: <n>" and one line per finding — discarded cl
 There is no `partial`:
 
 - **complete** — the review ran to its end: cleanup kept and verified, skipped for lack of candidates, or self-reverted per **Revert**.
-- **blocked** — an input validation or file scope failure stopped the run before cleanup (see Failure routing).
+- **blocked** — input validation stopped the run before cleanup (see Failure routing).
