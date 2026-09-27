@@ -26,7 +26,7 @@ def main() -> None:
 
     stack_scopes = discover_stack_agents(Path(args.agents_dir))
     result = select_stacks(args.changed_files, stack_scopes)
-    result["primaryAgent"] = f"codey-{result['primary']}" if result["primary"] else "codey"
+    result["primaryAgent"] = f"codey-{result['primary']}" if result["primary"] else "general-purpose"
     print(json.dumps(result))
 
 

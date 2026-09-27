@@ -138,17 +138,15 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 
 Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.
 
-Agents: [codey](agents/crew/codey.agent.md), [codey-py](agents/crew/codey-py.agent.md), [codey-dotnet](agents/crew/codey-dotnet.agent.md), [codey-ai](agents/crew/codey-ai.agent.md), [chorey](agents/crew/chorey.agent.md).
+Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [codey-ai](plugins/crew/agents/codey-ai.agent.md), [chorey](plugins/crew/agents/chorey.agent.md).
 
 - [to-codey](plugins/crew/skills/to-codey/SKILL.md) / [to-chorey](plugins/crew/skills/to-chorey/SKILL.md): run the Codey or Chorey subagent for an implementation or review task.
 - [to-commit](plugins/crew/skills/to-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
 - [crew-select](plugins/crew/skills/crew-select/SKILL.md): resolve which Stack(s) apply to a piece of work and name the primary agent.
-- [crew-codey-flow](plugins/crew/skills/crew-codey-flow/SKILL.md) / [crew-chorey-flow](plugins/crew/skills/crew-chorey-flow/SKILL.md): shared implementation/review workflow (input, gotchas, feedback loops, status-report contract).
-- [crew-implement](plugins/crew/skills/crew-implement/SKILL.md): implementation rules — style, layers, design, and tests.
+- [crew-chorey-flow](plugins/crew/skills/crew-chorey-flow/SKILL.md): review workflow (input, gotchas, scoped checks, self-revert, status report); Codey workflows live in their agents.
 - [crew-review](plugins/crew/skills/crew-review/SKILL.md): behavior-preserving cleanup review of a commit or uncommitted work.
-- [crew-feedback](plugins/crew/skills/crew-feedback/SKILL.md): run LSP, build, and test against changed files.
 - [crew-gotchas](plugins/crew/skills/crew-gotchas/SKILL.md): read/write per-agent `GOTCHAS.md` friction notes.
-- [init-crew](plugins/crew/skills/init-crew/SKILL.md): scaffold per-Stack convention files and `GOTCHAS.md`.
+- [init-crew](plugins/crew/skills/init-crew/SKILL.md): copy stack-specific Copilot instructions to the codebase and create per-stack Chorey rules and shared `GOTCHAS.md`.
 
 ### ralph
 

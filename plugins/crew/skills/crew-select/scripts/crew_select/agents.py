@@ -20,8 +20,8 @@ def parse_scope(agent_text: str) -> list[str]:
 def discover_stack_agents(agents_dir: Path) -> dict[str, list[str]]:
     """Map each installed Stack id (`py`, `dotnet`, `ai`, ...) to its declared glob scope.
 
-    Scans `codey-<stack>.agent.md` files in `agents_dir`; the base `codey.agent.md` and
-    `chorey.agent.md` carry no `**Scope**:` line and are never Stacks.
+    Scans `codey-<stack>.agent.md` files in `agents_dir`; `chorey.agent.md`
+    carries no `**Scope**:` line and is not a Stack.
     """
     stacks: dict[str, list[str]] = {}
     for agent_file in sorted(agents_dir.glob("codey-*.agent.md")):

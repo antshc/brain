@@ -11,8 +11,7 @@ def test_parse_scope_returns_empty_when_no_scope_line():
     assert parse_scope(text) == []
 
 
-def test_discover_stack_agents_skips_base_codey_and_chorey(tmp_path):
-    (tmp_path / "codey.agent.md").write_text("# Codey\n\nBody.\n")
+def test_discover_stack_agents_skips_chorey(tmp_path):
     (tmp_path / "chorey.agent.md").write_text("# Chorey\n\nBody.\n")
     (tmp_path / "codey-py.agent.md").write_text("# Codey — Python Stack\n**Scope**: `*.py`\n")
 
@@ -24,7 +23,8 @@ def test_discover_stack_agents_skips_base_codey_and_chorey(tmp_path):
 def test_discover_stack_agents_maps_every_installed_stack(tmp_path):
     (tmp_path / "codey-py.agent.md").write_text("**Scope**: `*.py`\n")
     (tmp_path / "codey-dotnet.agent.md").write_text("**Scope**: `*.cs`, `*.csproj`\n")
+    (tmp_path / "codey-ai.agent.md").write_text("**Scope**: `SKILL.md`, `*.agent.md`\n")
 
     stacks = discover_stack_agents(tmp_path)
 
-    assert stacks == {"py": ["*.py"], "dotnet": ["*.cs", "*.csproj"]}
+    assert stacks == {"py": ["*.py"], "dotnet": ["*.cs", "*.csproj"], "ai": ["SKILL.md", "*.agent.md"]}
