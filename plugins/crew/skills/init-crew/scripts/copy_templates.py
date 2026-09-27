@@ -13,9 +13,9 @@ INSTRUCTIONS = {
     "py": ("python.instructions.template.md", "python.instructions.md"),
 }
 RULE_SKILLS = {
-    "ai": "chore-ai-rules",
-    "dotnet": "chore-dotnet-rules",
-    "py": "chore-py-rules",
+    "ai": "chore-ai",
+    "dotnet": "chore-dotnet",
+    "py": "chore-py",
 }
 
 

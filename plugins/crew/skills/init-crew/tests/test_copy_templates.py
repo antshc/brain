@@ -23,9 +23,9 @@ def test_copy_templates_targets_codebase_and_preserves_existing_files(tmp_path):
     assert existing.read_text() == "custom rules\n"
     assert (codebase / ".github/instructions/dotnet.instructions.md").read_text().startswith("---\napplyTo:")
     assert (codebase / ".github/instructions/ai-authoring.instructions.md").exists()
-    assert (harness / ".github/skills/chore-ai-rules/SKILL.md").exists()
-    assert (harness / ".github/skills/chore-dotnet-rules/SKILL.md").exists()
-    assert (harness / ".github/skills/chore-py-rules/SKILL.md").exists()
+    assert (harness / ".github/skills/chore-ai/SKILL.md").exists()
+    assert (harness / ".github/skills/chore-dotnet/SKILL.md").exists()
+    assert (harness / ".github/skills/chore-py/SKILL.md").exists()
     assert (harness / ".github/skills/gotchas-memory/SKILL.md").exists()
     assert (harness / ".github/skills/gotchas-memory/GOTCHAS.md").exists()
     assert len(first["created"]) == 7
@@ -41,7 +41,7 @@ def test_copy_templates_preserves_existing_repository_skills_and_memory(tmp_path
     codebase = tmp_path / "codebase"
     harness.mkdir()
     codebase.mkdir()
-    rules = harness / ".github/skills/chore-py-rules/SKILL.md"
+    rules = harness / ".github/skills/chore-py/SKILL.md"
     memory_skill = harness / ".github/skills/gotchas-memory/SKILL.md"
     memory = harness / ".github/skills/gotchas-memory/GOTCHAS.md"
     for path, content in (

@@ -118,7 +118,7 @@ Chorey's agent holds its review and revert workflow. Implementation agents carry
 _Avoid_: base agent, parent agent, agent template
 
 **Convention skills**:
-Repository-specific Chore rules and gotchas memory are installed as `.github/skills/chore-<stack>-rules/` and `.github/skills/gotchas-memory/`. Copilot instructions reside in the codebase's `.github/instructions/`; old `.crew/`, `CODE*.md`, and `VERIFY*.md` conventions are unused.
+Repository-specific Chore rules and gotchas memory are installed as `.github/skills/chore-<stack>/` and `.github/skills/gotchas-memory/`. Copilot instructions reside in the codebase's `.github/instructions/`; old `.crew/`, `CODE*.md`, and `VERIFY*.md` conventions are unused.
 _Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:

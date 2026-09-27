@@ -23,13 +23,13 @@ An empty change set emits `No work to review.` and continues directly to **Updat
 
 ### 2. Check Chore rules
 
-Infer every applicable stack from the changed file names and contents, repository build markers, and the names and descriptions of available `chore-<stack>-rules` skills. Use agent judgment rather than a fixed extension table; several stacks may apply to one file.
+Infer every applicable stack from the changed file names and contents, repository build markers, and the names and descriptions of available `chore-<stack>` skills. Use agent judgment rather than a fixed extension table; several stacks may apply to one file.
 
-Require an available `chore-<stack>-rules` skill for every confidently applicable stack. No confident match or any missing applicable skill makes the review `skipped`: emit `Chorey skipped: <no matching Chore rules | missing skills>`, change no files, skip cleanup and verification, then continue to **Update gotchas** and **Report**.
+Require an available `chore-<stack>` skill for every confidently applicable stack. No confident match or any missing applicable skill makes the review `skipped`: emit `Chorey skipped: <no matching Chore rules | missing skills>`, change no files, skip cleanup and verification, then continue to **Update gotchas** and **Report**.
 
 ### 3. Load guidance
 
-Load every applicable `chore-<stack>-rules` skill. Apply all matched rule sets to a multiply matched file and retain rule conflicts as findings. Leave unmatched files untouched. Emit `Review rules: [skills]`.
+Load every applicable `chore-<stack>` skill. Apply all matched rule sets to a multiply matched file and retain rule conflicts as findings. Leave unmatched files untouched. Emit `Review rules: [skills]`.
 
 When `/gotchas-memory` is available, follow `/gotchas-memory`' skill **Read Workflow** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
 
