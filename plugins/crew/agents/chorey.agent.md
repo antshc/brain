@@ -37,23 +37,25 @@ Read `HARNESS_REPO_PATH` and `BASELINE_COMMIT` only from their own trusted secti
 
 **Workspace = cwd.** Run all code, git, build, test, and exploration commands there; never change directories.
 
-**2. Resolve paths** — `GOTCHAS_PATH` := `$HARNESS_REPO_PATH/.crew/GOTCHAS.md` unconditionally. Read applicable `<cwd>/.github/instructions/*.instructions.md` for changed files. `/crew-review` resolves per-file Stack review rules after discovering the change set.
+**2. Resolve paths** — check `$HARNESS_REPO_PATH/.github/skills/gotchas-memory/SKILL.md`. When it exists, `GOTCHAS_PATH` := `$HARNESS_REPO_PATH/.github/skills/gotchas-memory/GOTCHAS.md`; otherwise gotchas memory is unconfigured. Read applicable `<cwd>/.github/instructions/*.instructions.md` for changed files. `/crew-review` resolves per-file Chore rules skills after discovering the change set.
 
-**3. Handle missing files** — `GOTCHAS.md` missing → create it (creating `.crew/` if needed). Pass `HARNESS_REPO_PATH` and `BASELINE_COMMIT` to `/crew-review`; it notes missing review rules for UPDATE GOTCHAS.
+**3. Prepare review** — pass `HARNESS_REPO_PATH` and `BASELINE_COMMIT` to `/crew-review`. It reports an unconfigured Chorey outcome before cleanup when no matching `chore-<stack>-rules` skill is installed.
 
 **4. Resolve `BASELINE_COMMIT`** — supplied: must resolve to an existing commit reachable in the workspace (`git cat-file -e <sha>^{commit}`); failing that → **blocked**. Absent: unset — REVIEW falls back to the uncommitted work already in the workspace.
 
-**Emit**: "HARNESS_REPO_PATH=<path> (supplied | fallback cwd). Workspace=<cwd>. GOTCHAS=<path>. BASELINE_COMMIT=<sha | none>."
+**Emit**: "HARNESS_REPO_PATH=<path> (supplied | fallback cwd). Workspace=<cwd>. GOTCHAS=<path | not configured>. BASELINE_COMMIT=<sha | none>."
 
 ## GOTCHAS
 
-Mandatory before REVIEW. Follow `/crew-gotchas`' skill **Read Workflow**, passing `GOTCHAS_PATH`. Apply every directive during REVIEW; never contradict one without reporting the conflict.
+When gotchas memory is configured, follow `/gotchas-memory`' skill **Read Workflow**. Otherwise emit "Gotchas memory not configured — skipped." Apply every loaded directive during REVIEW; never contradict one without reporting the conflict.
 
 ## REVIEW
 
 Follow `/crew-review` skill, passing `HARNESS_REPO_PATH` and `BASELINE_COMMIT` (when resolved). It identifies the change set, maps each file to review rules, establishes the matching revert baseline, applies only behavior-preserving fixes, and records anything unsafe as a finding without touching it.
 
 Read the files from `crew-review` Step 0 and their applicable Copilot instructions before applying fixes.
+
+When `/crew-review` emits `Chorey not configured`, skip VERIFY, run UPDATE GOTCHAS when gotchas memory is configured, then report `STATUS: complete` with `FILES: none — Chorey not configured`.
 
 Never review before INPUT and GOTCHAS are complete. When in doubt whether a change is behavior-preserving, it is a finding, not an edit.
 
@@ -74,7 +76,7 @@ Follow `/crew-review`' skill **Revert**: restore every file REVIEW touched to it
 
 ## UPDATE GOTCHAS
 
-Mandatory on every exit path where `GOTCHAS_PATH` is resolved — including the skip, Revert, and `blocked` paths. Run it before the status report. Follow `/crew-gotchas`' skill **Write Workflow**, passing `GOTCHAS_PATH`.
+When gotchas memory is configured, run this before the status report on every exit path where `GOTCHAS_PATH` is resolved — including skip, Revert, and `blocked` paths — by following `/gotchas-memory`' skill **Write Workflow**. Otherwise report `GOTCHAS UPDATED: none — gotchas memory not configured`.
 
 ## HARD RULES
 

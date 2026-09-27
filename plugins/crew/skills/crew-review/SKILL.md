@@ -25,22 +25,11 @@ Copy this checklist and check off each item as you complete it:
 
 Run `python3 <skill-directory>/scripts/match_changed_files.py <changed-file> ...` on Step 0's files before applying cleanup. Its JSON maps each Stack to its matching paths; an empty change set returns `{}`. The helper's `review_scopes.json` owns file patterns independently of the agents' task-routing descriptions and validates the installed roster. A helper error stops review before edits and is reported to the caller.
 
-For each file, load the matching Stacks' `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` rules. Several Stacks can match one file: apply each available rule set and report conflicts as findings. Apply the **Default review checklist** for every matched Stack without a review file, or for a file with no matching Stack. Note missing `CHORE-<stack>.md` files for UPDATE GOTCHAS. Emit "Review rules: [list of CHORE-<stack>.md paths applied] + default checklist for <files, or 'none'>".
+If the helper returns no matching Stack, emit "Chorey not configured: no matching chore rules skill." and stop before applying cleanup. For every matching Stack, require `$HARNESS_REPO_PATH/.github/skills/chore-<stack>-rules/SKILL.md`. If any required rules skill is missing, emit "Chorey not configured: missing [paths]." and stop before applying cleanup. Otherwise, load every matching rules skill; several Stacks can match one file, so apply each and report conflicts as findings. Review only files mapped to the configured skills; leave unmatched files untouched. Emit "Review rules: [list of chore-<stack>-rules skill paths applied]."
 
 Read Copilot instructions applicable to every changed file and follow observed neighboring conventions; a cleanup that would violate either is a finding, not an edit. Emit "Style rules: [applicable instruction paths] | observed conventions".
 
 Review every file from Step 0 for behavior-preserving cleanup candidates only — never a behavior change, a new feature, or scope beyond cleanup.
-
-### Default review checklist
-
-Used for a file with no matching Stack or for a matching Stack without `CHORE-<stack>.md`:
-
-- **Duplication** → extract function/class
-- **Long methods** → break into private helpers (keep tests on public interface)
-- **Shallow modules** → combine or deepen
-- **Feature envy** → move logic to where data lives
-- **Primitive obsession** → introduce value objects
-- **Existing code** the new code reveals as problematic
 
 ## 2. Apply safe fixes; record unsafe candidates as findings
 
