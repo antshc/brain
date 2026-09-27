@@ -113,8 +113,8 @@ _Avoid_: language, platform, toolchain, tech
 A self-contained implementation agent for one Stack, with declared scope, implementation flow, focused verification, and a five-field report. Repo-specific style lives in applicable Copilot instructions.
 _Avoid_: language agent, specialised codey, subclass agent
 
-**Flow skill**:
-The `crew-chorey-flow` skill holds Chorey's review and revert workflow. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
+**Agent flow**:
+Chorey's agent holds its review and revert workflow. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
 _Avoid_: base agent, parent agent, agent template
 
 **Convention folder**:
