@@ -1,6 +1,6 @@
 ---
 name: to-chorey
-description: Run the Chorey subagent to review uncommitted work for behavior-preserving cleanup. Use standalone, outside the autonomous loop, when uncommitted changes (from Codey or elsewhere) need a review pass.
+description: "Run a standalone Chorey maintainability review of current uncommitted work for behavior-preserving cleanup. Use when the user asks for a cleanup pass outside Ralph's autonomous loop."
 ---
 
 Run the commands below, substitute their output into the prompt, then pass it to `runSubagent`:`chorey`.
