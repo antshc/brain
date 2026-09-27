@@ -118,11 +118,11 @@ Chorey's agent holds its review, verification, revert decision, and verdict whil
 _Avoid_: base agent, parent agent, agent template
 
 **Convention skills**:
-Repository-specific Chore rules and gotchas memory are installed as `.github/skills/chore-<stack>/` and `.github/skills/gotchas-memory/`. Copilot instructions reside in the codebase's `.github/instructions/`; old `.crew/`, `CODE*.md`, and `VERIFY*.md` conventions are unused.
+Repository-specific Chore rules and Crew memory are installed as `.github/skills/chore-<stack>/` and `.github/skills/crew-memory/`. Copilot instructions reside in the codebase's `.github/instructions/`; old `.crew/`, `CODE*.md`, and `VERIFY*.md` conventions are unused.
 _Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
-Reusable directives exposed by the repository's `/gotchas-memory` skill, with shared read/write behavior supplied by `crew-gotchas`. Agents apply them before work and distill reusable session friction into new or extended directives afterward; an unavailable memory skill is a no-op.
+Reusable directives exposed by the repository's `/crew-memory` skill, which loads and persists `GOTCHAS.md` while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
@@ -317,5 +317,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/gotchas-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, receives only the checkpoint's trusted `## BASELINE_COMMIT`, and discovers its available rules and gotchas skills directly.
-- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/gotchas-memory` after feedback loops pass.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, receives only the checkpoint's trusted `## BASELINE_COMMIT`, and discovers its available rules and memory skills directly.
+- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/crew-memory` after feedback loops pass.

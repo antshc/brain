@@ -20,7 +20,7 @@ def test_chorey_owns_safe_review_and_delegates_diff_mechanics():
     assert "bin/crew_diff/_manifest.json" in chorey
     assert "Read every manifest path's listed diff first" in chorey
     assert "exact current content" not in chorey
-    assert "/gotchas-memory" in chorey
+    assert "/crew-memory" in chorey
     assert "When the skill is unavailable, perform no gotchas work" in chorey
     for field in ("STATUS:", "SUMMARY:", "FILES:", "GOTCHAS UPDATED:", "NOTES:"):
         assert field in chorey
@@ -50,7 +50,7 @@ def test_crew_agents_use_direct_skills_without_manual_path_discovery():
         assert ".github/instructions" not in text
     assert "resolve-harness" not in standalone
     assert "resolve-harness" not in to_codey
-    assert all("/gotchas-memory" in agent for agent in codey_agents)
+    assert all("/crew-memory" in agent for agent in codey_agents)
     assert "## BASELINE_COMMIT" in chorey_invocation
 
 
@@ -72,6 +72,23 @@ def test_initializer_offers_rules_skills_and_preserves_repository_rules_during_m
     assert "Present the available `chore-<stack>` skills" in initializer
     assert "preserve all repository-authored wording and conflicting repository rules" in initializer
     assert "add only non-conflicting shipped rules" in initializer
+
+
+def test_crew_memory_passes_rules_without_exposing_its_storage_path():
+    initializer = (CREW / "skills" / "init-crew" / "SKILL.md").read_text(encoding="utf-8")
+    memory = (
+        CREW / "skills" / "init-crew" / "templates" / "crew-memory.SKILL.template.md"
+    ).read_text(encoding="utf-8")
+    gotchas = (CREW / "skills" / "crew-gotchas" / "SKILL.md").read_text(encoding="utf-8")
+
+    assert ".github/skills/crew-memory/SKILL.md" in initializer
+    assert "name: crew-memory" in memory
+    assert "## Read Gotchas" in memory
+    assert "## Write Gotchas" in memory
+    assert "GOTCHAS RULES" in memory
+    assert "GOTCHAS RULES" in gotchas
+    assert "GOTCHAS_PATH" not in memory
+    assert "GOTCHAS_PATH" not in gotchas
 
 
 def test_ralph_delegates_review_to_chorey_without_naming_its_internals():

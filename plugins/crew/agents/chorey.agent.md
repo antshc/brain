@@ -26,7 +26,7 @@ Require an available `chore-<stack>` skill for every confidently applicable stac
 
 Load every applicable `chore-<stack>` skill. Apply all matched rule sets to a multiply matched file and retain rule conflicts as findings. Keep every manifest path in review scope; use observed conventions alone for a path without stack-specific rules. Emit `Review rules: [skills]`.
 
-When `/gotchas-memory` is available, follow `/gotchas-memory`' skill **Read Workflow** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
+When `/crew-memory` is available, follow `/crew-memory`' skill **Read Gotchas** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
 
 Read every manifest path's listed diff first, then its complete current file when present and only the neighboring code needed to establish local conventions. Review deleted paths from their diffs. Emit `Observed conventions: [summary]`.
 
@@ -55,7 +55,7 @@ Follow `/chorey-diff`'s skill **Restore pre-review files**, passing every manife
 
 ### 7. Update gotchas
 
-When `/gotchas-memory` is available, follow `/gotchas-memory`' skill **Write Workflow** before reporting every outcome, including `skipped` and reverted cleanup. When the skill is unavailable, perform no gotchas work and report `GOTCHAS UPDATED: none`.
+When `/crew-memory` is available, follow `/crew-memory`' skill **Write Gotchas** before reporting every outcome, including `skipped` and reverted cleanup. When the skill is unavailable, perform no gotchas work and report `GOTCHAS UPDATED: none`.
 
 ### 8. Discard artifacts
 
