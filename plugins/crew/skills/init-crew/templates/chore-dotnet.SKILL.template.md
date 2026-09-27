@@ -1,13 +1,13 @@
 ---
-name: chore-py-rules
-description: Repository-specific Python cleanup rules for Chorey. Used only by Chorey during behavior-preserving review.
+name: chore-dotnet
+description: Repository-specific .NET cleanup rules for Chorey. Used only by Chorey during behavior-preserving review.
 ---
 
-# Chore Python rules
+# Chore .NET rules
 
 ## Hazard rules
 
-- Never collapse a narrowed `except SomeError:` back into a broader `except Exception:` while refactoring — the narrowing is often a deliberate prior fix, not incidental style.
+- Never hand-edit a generated file (`*.Designer.cs`, `*.g.cs`, or anything under `obj/`/`bin/`) as part of a cleanup — regenerate it through its source instead.
 
 ## Review rules
 

@@ -53,7 +53,7 @@ def test_crew_agents_use_direct_skills_without_manual_path_discovery():
 def test_initializer_offers_rules_skills_and_preserves_repository_rules_during_merge():
     initializer = (CREW / "skills" / "init-crew" / "SKILL.md").read_text(encoding="utf-8")
 
-    assert "Present the available `chore-<stack>-rules` skills" in initializer
+    assert "Present the available `chore-<stack>` skills" in initializer
     assert "preserve all repository-authored wording and conflicting repository rules" in initializer
     assert "add only non-conflicting shipped rules" in initializer
 

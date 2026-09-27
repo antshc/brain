@@ -1,5 +1,5 @@
 ---
-name: chore-ai-rules
+name: chore-ai
 description: Repository-specific AI authoring cleanup rules for Chorey. Used only by Chorey during behavior-preserving review.
 ---
 
