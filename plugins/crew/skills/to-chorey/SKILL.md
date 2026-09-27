@@ -20,7 +20,7 @@ Run `/crew-select` skill **Resolve From Changed Files**, passing `CHANGED_FILES`
 HARNESS_REPO_PATH=<resolved path>
 
 ## STACKS
-MATCHED=<comma-separated matched Stack ids>
+MATCHED_STACKS=<comma-separated matched Stack ids>
 ```
 
 Omit the `## STACKS` section entirely when no Stack matched.

@@ -4,9 +4,9 @@ description: Run the Codey subagent for an implementation task. Use when the tas
 argumentHint: "<description> | @plan | <github-issue-url>"
 ---
 
-Resolve the task from the argument first. Run `/crew-select` skill **Resolve From Task Text**, passing the resolved task content as `TASK_TEXT`. Retain its `Matched Stacks`/`Primary agent`. **Emit**: "Matched Stacks: [...] or none. Primary agent: <agent>."
+Resolve the task from the argument first: use a description verbatim, load `@plan` from session memory, or fetch an issue's title, body, and comments. Missing or empty task → ask the user for a description; an unreachable issue → stop and report. Run `/crew-select` skill **Resolve From Task Text**, passing the resolved task content as `TASK_TEXT`. Retain its `Matched Stacks`/`Primary agent`. **Emit**: "Matched Stacks: [...] or none. Primary agent: <agent>."
 
-Run the commands below, substitute their output into the prompt, then pass it to `runSubagent`:`<primary agent from crew-select, or codey when none matched>`.
+Run the commands below, substitute their output into the prompt, then pass it to `runSubagent`:`<primary agent from crew-select, or general-purpose when none matched>`. For `general-purpose`, instruct it to implement the task, read applicable repository instructions, run the minimum relevant verification, and return `STATUS`, `SUMMARY`, `FILES`, `GOTCHAS UPDATED`, and `NOTES`; never claim verification that did not run.
 
 Run `/resolve-harness` skill and retain its emitted `HARNESS_REPO_PATH`. If it is unavailable or emits an empty value, omit the `## HARNESS` section entirely — Codey falls back to cwd itself.
 
@@ -15,14 +15,10 @@ Run `/resolve-harness` skill and retain its emitted `HARNESS_REPO_PATH`. If it i
 HARNESS_REPO_PATH=<resolved path>
 
 ## STACKS
-MATCHED=<comma-separated matched Stack ids>
+MATCHED_STACKS=<comma-separated matched Stack ids>
 
 ## TASK
-Resolve the task from the argument:
-- `<description>` — use it as the task.
-- `@plan` — load `plan.md` from session memory. Missing or empty → stop and tell the user.
-- `<github-issue-url>` — fetch the issue; use title + body + comments. Unreachable or not an issue → stop and tell the user.
-- No argument → stop and ask the user for a task description.
+<resolved task content>
 
 ## RECENT CHANGES
 `git add -A 2>/dev/null; DIFF=$(git diff --cached 2>/dev/null); [ -n "$DIFF" ] && echo "$DIFF" || echo "No uncommitted changes"`

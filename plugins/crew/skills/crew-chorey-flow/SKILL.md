@@ -38,13 +38,13 @@ Read `HARNESS_REPO_PATH` and `BASELINE_COMMIT` only from their own trusted secti
 
 **2. Resolve Stacks** — read `MATCHED_STACKS` (comma-separated Stack ids) only from the trusted `## STACKS` section, when present. Absent → `MATCHED_STACKS` is empty; never name or infer a Stack from any other section.
 
-**3. Resolve paths** — `GOTCHAS_PATH` := `$HARNESS_REPO_PATH/.crew/GOTCHAS.md` unconditionally, regardless of `MATCHED_STACKS`. For each stack in `MATCHED_STACKS`: `VERIFY_PATHS`, `CHORE_PATHS`, `CODE_PATHS` += `$HARNESS_REPO_PATH/.crew/VERIFY-<stack>.md` / `CHORE-<stack>.md` / `CODE-<stack>.md` when that file exists. `MATCHED_STACKS` empty → all three are empty. The unsuffixed `VERIFY.md`/`CHORE.md`/`CODE.md` are never read, matched or not. That directory is the only location checked — never scan elsewhere.
+**3. Resolve paths** — `GOTCHAS_PATH` := `$HARNESS_REPO_PATH/.crew/GOTCHAS.md` unconditionally. For each stack in `MATCHED_STACKS`, resolve `CHORE_PATHS` at `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` if present. Read applicable `<cwd>/.github/instructions/*.instructions.md` for any changed files. No matched stack → use the default review checklist.
 
-**4. Handle missing files** — `GOTCHAS.md` missing → create it (creating `.crew/` if needed). A matched stack's `VERIFY-<stack>.md`, `CHORE-<stack>.md`, or `CODE-<stack>.md` missing → that stack's file is absent, never a reason to fall back to another stack's file or the unsuffixed name (`init-crew` scaffolds per-stack files on manual invocation); note a discovery-gap for UPDATE GOTCHAS to write as a note-style entry, and a matched stack with no `CHORE-<stack>.md` means REVIEW runs on `crew-review`'s default checklist for that stack's files, never on invented repo-specific rules. Pass each resolved `*_PATHS` (a list, possibly empty) only to its applicable skill, plus `HARNESS_REPO_PATH` to skills that read the repo root; never pass a workspace path.
+**4. Handle missing files** — `GOTCHAS.md` missing → create it (creating `.crew/` if needed). A matched stack with no `CHORE-<stack>.md` uses `crew-review`'s default checklist for that stack's files; note the missing review file for UPDATE GOTCHAS. Pass `CHORE_PATHS` and `BASELINE_COMMIT` to `crew-review`.
 
 **5. Resolve `BASELINE_COMMIT`** — supplied: must resolve to an existing commit reachable in the workspace (`git cat-file -e <sha>^{commit}`); failing that → **blocked**. Absent: unset — REVIEW falls back to the uncommitted work already in the workspace.
 
-**Emit**: "HARNESS_REPO_PATH=<path> (supplied | fallback cwd). Workspace=<cwd>. Matched Stacks=<list | none>. Resolved: VERIFY=<paths | none>, CHORE=<paths | none>, CODE=<paths | none>, GOTCHAS=<path>. BASELINE_COMMIT=<sha | none>."
+**Emit**: "HARNESS_REPO_PATH=<path> (supplied | fallback cwd). Workspace=<cwd>. Matched Stacks=<list | none>. Resolved: CHORE=<paths | none>, GOTCHAS=<path>. BASELINE_COMMIT=<sha | none>."
 
 ## GOTCHAS
 
@@ -52,9 +52,9 @@ Mandatory before REVIEW. Follow `/crew-gotchas`' skill **Read Workflow**, passin
 
 ## REVIEW
 
-Follow `/crew-review` skill, passing `CHORE_PATHS`, `CODE_PATHS`, and `BASELINE_COMMIT` (when resolved). It identifies the change set, establishes the matching revert baseline, applies only behavior-preserving fixes, and records anything unsafe as a finding without touching it.
+Follow `/crew-review` skill, passing `CHORE_PATHS` and `BASELINE_COMMIT` (when resolved). It identifies the change set, establishes the matching revert baseline, applies only behavior-preserving fixes, and records anything unsafe as a finding without touching it.
 
-Never read the change set ad hoc — delegate reading it to the `Explore` subagent (thoroughness: medium), giving it the file list from `crew-review` Step 0 and the full contents of every loaded `CHORE_PATHS`/`CODE_PATHS` file.
+Read the files from `crew-review` Step 0 and their applicable Copilot instructions before applying fixes.
 
 Never review before INPUT and GOTCHAS are complete. When in doubt whether a change is behavior-preserving, it is a finding, not an edit.
 
@@ -62,10 +62,10 @@ Never review before INPUT and GOTCHAS are complete. When in doubt whether a chan
 
 REVIEW applied no changes → skip this step and emit "No changes made — previously verified result stands."
 
-Otherwise, Follow `/crew-feedback` skill, passing `VERIFY_PATHS` and `HARNESS_REPO_PATH`, scoped to the files REVIEW changed.
+Otherwise, collect the files REVIEW changed. Find their affected modules from the repository's build markers and map them to existing observable tests. Run the smallest tests covering the reviewed behavior, plus a build only if those tests do not compile the change. Check changed-file diagnostics if available. Fix code errors and rerun affected checks; stop after three correction cycles for the same error. Record exact checks and results. Do not run an entire repository's tests without a concrete gap the focused checks cannot cover.
 
 - **Pass** → keep the changes.
-- **Environment blocker, or a code error past `crew-feedback`'s retry cap** → follow **Revert** instead of reporting `partial`.
+- **Environment blocker, or a code error past the three-cycle cap** → follow **Revert** instead of reporting `partial`.
 
 Before attributing a failure to your own edits, check whether it also reproduces at the pre-review baseline (`BASELINE_COMMIT`, or the Step 0 snapshot). If it does, it is pre-existing: still follow **Revert**, but record it in NOTES as a finding about the incoming change set — never as discarded cleanup.
 

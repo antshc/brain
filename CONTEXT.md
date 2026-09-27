@@ -106,19 +106,19 @@ The maintainability-review agent. Reviews the change set for behavior-preserving
 _Avoid_: reviewer, refactorer, cleanup agent
 
 **Stack**:
-A technology family a repo's code belongs to — `py`, `dotnet`, `ai` — named by the `codey-<stack>` agent that ships for it and used as the suffix on the per-repo files it owns (`CODE-<stack>.md`, `VERIFY-<stack>.md`, `CHORE-<stack>.md`). The vocabulary is closed: a stack exists only where an agent ships for it, so a repo never declares one nothing would read. One repo can carry several.
+A technology family a repo's code belongs to — `py`, `dotnet`, `ai` — named by the `codey-<stack>` agent that ships for it and used for `CHORE-<stack>.md` and Copilot instruction templates. The vocabulary is closed: a stack exists only where an agent ships for it. One repo can carry several.
 _Avoid_: language, platform, toolchain, tech
 
 **Stack agent**:
-A delta agent for one Stack — frontmatter, a declared scope, and only the phases it overrides, invoking a Flow skill for everything else. Carries stack-level knowledge that holds in any repo, never one repo's paths, commands, or layout.
+A self-contained implementation agent for one Stack, with declared scope, implementation flow, focused verification, and a five-field report. Repo-specific style lives in applicable Copilot instructions.
 _Avoid_: language agent, specialised codey, subclass agent
 
 **Flow skill**:
-The skill holding a family of agents' shared workflow — `crew-codey-flow` for `codey` and every Stack agent, `crew-chorey-flow` for `chorey`. Reached by name, which is why no agent file ever points at another agent file.
+The `crew-chorey-flow` skill holds Chorey's review and revert workflow. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
 _Avoid_: base agent, parent agent, agent template
 
 **Convention folder**:
-The per-repo `.crew/` directory under the `Harness Repo Path` holding the shared `GOTCHAS.md` plus a `CODE-<stack>.md`, `VERIFY-<stack>.md`, and `CHORE-<stack>.md` per installed Stack — the single location a crew agent resolves them from, never discovered or searched for. An unsuffixed filename means shared across every Stack; a missing suffixed file is absent, never a reason to read the unsuffixed one.
+The per-repo `.crew/` directory under the `Harness Repo Path` holds shared `GOTCHAS.md` and optional `CHORE-<stack>.md` review rules. Copilot instructions reside in the codebase's `.github/instructions/`; old `CODE*.md` and `VERIFY*.md` are unused.
 _Avoid_: .droid, config folder, settings directory
 
 **Gotchas**:
@@ -126,11 +126,11 @@ Reusable directives stored with the `crew-gotchas` skill. Read and applied befor
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
-The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — the walk-up rule is written in the Stack's own `VERIFY-<stack>.md`, in that Stack's vocabulary, never assumed or named by a skill.
+The unit of code plus its build config, identified by walking up from a changed file to the nearest relevant build marker. Its agent uses the repository's actual project and test references to select checks.
 _Avoid_: project, package
 
 **Verification counterpart**:
-The sibling/child unit that verifies a Module (tests, specs, or whatever the repo calls it), mapped by the same `VERIFY-<stack>.md` that defines its Module. Absent a `VERIFY` file, `crew-feedback` discovers the toolchain from the repo's README and runs it unscoped rather than deriving counterparts itself.
+The existing tests that exercise a Module's observable behavior, identified by following its project references, test naming, and affected functional slice.
 _Avoid_: test project, test suite
 
 ## wf

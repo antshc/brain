@@ -19,7 +19,7 @@ The Stack vocabulary is closed to the roster that ships: one Stack per `codey-<s
 
 ## 1. Discover installed Stacks
 
-Read every `codey-<stack>.agent.md` in `<skill-directory>/../../agents` — never the base `codey.agent.md` or `chorey.agent.md`, neither of which carries a `**Scope**:` line. Each Stack agent's first `**Scope**:` line lists its covered areas as backtick-quoted globs, e.g. `` **Scope**: `*.py`, `pyproject.toml` ``. This is the only source of a Stack's covered areas — never hardcode a second copy of the mapping.
+Read every `codey-<stack>.agent.md` in `<skill-directory>/../../agents` — never `chorey.agent.md`. Each Stack agent's first `**Scope**:` line lists its covered areas as backtick-quoted globs, e.g. `` **Scope**: `*.py`, `pyproject.toml` ``. This is the only source of a Stack's covered areas — never hardcode a second copy of the mapping.
 
 ## 2a. Resolve From Task Text (before the work exists)
 
@@ -38,10 +38,10 @@ Run `python3 <skill-directory>/scripts/select.py --agents-dir <skill-directory>/
 ```
 Matched Stacks: [<stack-id>, ...] or none
 Primary: <stack-id> or none
-Primary agent: codey-<stack-id> or codey (no match)
+Primary agent: codey-<stack-id> or general-purpose (no match)
 ```
 
-Several Stacks matching is normal: **every** matched Stack is reported, but exactly one is primary — the one whose agent body the caller launches. No match → the primary agent is the base `codey`, and the caller resolves no per-stack convention files.
+Several Stacks matching is normal: **every** matched Stack is reported, but exactly one is primary — the one whose agent body the caller launches. No match → run `general-purpose` with the same task and report contract; do not invent a Stack.
 
 ## Hard rules
 
