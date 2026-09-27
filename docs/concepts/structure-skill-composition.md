@@ -30,6 +30,11 @@ agent never needs to find. This Concept fixes how a capability is divided and ho
   prompt instruction, or skill name, its inputs verbatim, and any artifact the subagent may write.
 - A skill reached that way MUST NOT invoke the engine that runs it, and MUST state which of its concerns the
   calling engine owns.
+- A skill whose behaviour is extended by specialists MUST discover the current members of its documented
+  `skillname-*` family from the available skill roster, then select a member by its description and declared
+  compatibility rather than by a hardcoded member list.
+- A specialist extension MUST own the subject-specific procedure and contract; the main skill owns family
+  discovery, routing, and the common continuation or verification around the extension.
 
 ## Design Guidance
 
@@ -69,6 +74,13 @@ and the caller holds the pairing. The passenger is the mirror of that: it states
 engine owns and invokes no engine itself, because a skill that calls the engine that calls it has two entry
 paths through one procedure.
 
+The same roster rule makes a main skill extensible without editing it for every specialist. The main skill names
+the extension family once as `skillname-*`, discovers its current members from the available roster, and routes
+by each member's declared scope and compatibility. Each member keeps the domain procedure it owns; the main
+skill keeps the shared routing and completion contract. `/research` applies this with `research-*` and
+`inspect-*`: a new matching specialist changes the available behaviour without becoming a new hardcoded branch
+in `/research`.
+
 Two related records own adjacent areas: [structure-resource-access-skill](structure-resource-access-skill.md) owns *what* a skill encapsulates
 when its purpose is infrastructure access, and [structure-skill-owned-code](structure-skill-owned-code.md) owns where a skill's code and
 tests live. This record owns the division and the call style only.
@@ -84,3 +96,4 @@ How to word a description, name a skill, or lay out its folders is write-time gu
 - A skill whose description needs "and" to state what it does.
 - A model-invoked skill no agent and no other skill ever reaches.
 - A delegating skill listing the skills it can run, or a delegated skill invoking its own delegator.
+- A main skill contains a hardcoded list of specialist skills that belong to an extensible `skillname-*` family.
