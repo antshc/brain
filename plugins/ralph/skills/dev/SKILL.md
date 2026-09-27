@@ -117,12 +117,9 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 
 Read the installed `codey-*.agent.md` descriptions in the crew plugin's `agents/` directory. Choose the agent whose description best fits the selected issue's title and body; if several fit, choose the one central to the requested outcome. No matching technology → `general-purpose`. **Emit**: "Primary agent: <agent>."
 
-After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For a general-purpose fallback, instruct it to implement the task, load applicable repository instructions, run focused verification, and return the five-field Codey report (including honest verification results). Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For a general-purpose fallback, instruct it to implement the task, run focused verification, and return the five-field Codey report (including honest verification results). Use the following prompt (substitute actual values):
 
 ```
-## HARNESS
-HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
-
 ## TASK
 - Title: <title>
 - Body: <body>

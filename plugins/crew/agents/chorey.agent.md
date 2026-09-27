@@ -31,13 +31,13 @@ Require an available `chore-<stack>-rules` skill for every confidently applicabl
 
 Load every applicable `chore-<stack>-rules` skill. Apply all matched rule sets to a multiply matched file and retain rule conflicts as findings. Leave unmatched files untouched. Emit `Review rules: [skills]`.
 
-When `/gotchas-memory` is available, follow its **Read Workflow** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
+When `/gotchas-memory` is available, follow `/gotchas-memory`' skill **Read Workflow** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
 
-Read every selected file, its applicable `<cwd>/.github/instructions/*.instructions.md`, and only the neighboring code needed to establish local conventions. Emit `Style rules: [instruction paths] | observed conventions`.
+Read every selected file and only the neighboring code needed to establish local conventions. Emit `Observed conventions: [summary]`.
 
 ### 4. Review and clean up
 
-Review only for behavior-preserving cleanup. Apply a candidate only when it is unambiguous, provably behavior-preserving, and consistent with loaded rules, instructions, and observed conventions. Leave every ambiguous candidate, possible behavior change, or convention conflict untouched and retain it as a finding.
+Review only for behavior-preserving cleanup. Apply a candidate only when it is unambiguous, provably behavior-preserving, and consistent with loaded rules and observed conventions. Leave every ambiguous candidate, possible behavior change, or convention conflict untouched and retain it as a finding.
 
 Emit `Applied: [files]` or `Applied: none`, followed by `Findings (not applied): [findings]` or `Findings (not applied): none`. Never touch a file only to record a finding.
 
@@ -60,7 +60,7 @@ Restore every file REVIEW touched to its exact pre-review state. With `BASELINE_
 
 ### 7. Update gotchas
 
-When `/gotchas-memory` is available, follow its **Write Workflow** before reporting every outcome, including `skipped` and reverted cleanup. When the skill is unavailable, perform no gotchas work and report `GOTCHAS UPDATED: none`.
+When `/gotchas-memory` is available, follow `/gotchas-memory`' skill **Write Workflow** before reporting every outcome, including `skipped` and reverted cleanup. When the skill is unavailable, perform no gotchas work and report `GOTCHAS UPDATED: none`.
 
 ### 8. Report the outcome
 
