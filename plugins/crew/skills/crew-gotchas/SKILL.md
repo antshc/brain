@@ -1,11 +1,11 @@
 ---
 name: crew-gotchas
-description: "Read and update the shared GOTCHAS.md with reusable directives discovered during implementation or review. Use when Codey or Chorey enters its GOTCHAS or UPDATE GOTCHAS step."
+description: "Read and update a repository-local gotchas-memory GOTCHAS.md with reusable directives discovered during implementation or review. Use when Codey or Chorey enters its GOTCHAS or UPDATE GOTCHAS step."
 ---
 
 # Gotchas
 
-Gotchas live in the `GOTCHAS_PATH` resolved by the calling agent during INPUT (auto-created there if missing). Write only that path — never derive or search for another location.
+Gotchas live in the `GOTCHAS_PATH` resolved by the calling agent through `/gotchas-memory` (auto-created there if missing). Write only that path — never derive or search for another location.
 
 ## Read Workflow (mandatory before the agent's main work)
 
@@ -24,7 +24,7 @@ List the files changed during this invocation. For each file or group, check whe
 - A conflicting or ambiguous convention
 - A directory/filesystem access issue (permissions, missing paths, wrong cwd)
 - A tool access issue (missing CLI, auth failure, unreachable service) during verification
-- A missing applicable `CHORE-<stack>.md` review file or Copilot instruction noted during review
+- A missing applicable `chore-<stack>-rules` skill or Copilot instruction noted during review
 - Any other friction that cost time or blocked progress
 
 **Discard** one-off typos, transient blips resolved on first retry, and routine execution steps. Only friction that would help a future run avoid the same mistake qualifies.
@@ -33,7 +33,7 @@ List the files changed during this invocation. For each file or group, check whe
 
 ### 2. Distill and write each candidate
 
-Distill each kept candidate into one reusable directive: `- <directive>`, optionally `- <directive> — <what to do instead>.` when the workaround adds concrete guidance. A discovery-gap becomes a note line, e.g. `- [note] CHORE-py.md missing — review used default rules.`
+Distill each kept candidate into one reusable directive: `- <directive>`, optionally `- <directive> — <what to do instead>.` when the workaround adds concrete guidance. A discovery-gap becomes a note line, e.g. `- [note] chore-py-rules missing — Chorey was not configured.`
 
 Scan the existing lines under `## Gotchas` for one covering the same rule or topic:
 

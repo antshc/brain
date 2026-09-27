@@ -7,7 +7,7 @@ Pass the prompt below to `runSubagent`:`chorey`.
 
 Run `/resolve-harness` skill and retain its emitted `HARNESS_REPO_PATH`. If it is unavailable or emits an empty value, omit the `## HARNESS` section entirely — Chorey falls back to cwd itself.
 
-Chorey discovers uncommitted files and matches their review rules through `/crew-review`.
+Chorey discovers and reviews the current uncommitted change set.
 
 ```
 ## HARNESS

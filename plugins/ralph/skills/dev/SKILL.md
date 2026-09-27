@@ -169,7 +169,7 @@ git push -u origin "$branch"
 
 Run only when Codey's `STATUS` is **complete** and `chorey` is available; otherwise continue to **Handle task result** — reviewing unverified or broken work cannot preserve behavior that was never established.
 
-After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Chorey discovers the checkpoint's files and matches review rules through `/crew-review`. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Chorey discovers and reviews the checkpoint's files. Use the following prompt (substitute actual values):
 
 ```
 ## HARNESS
