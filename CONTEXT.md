@@ -114,7 +114,7 @@ A self-contained implementation agent for one Stack, with declared scope, implem
 _Avoid_: language agent, specialised codey, subclass agent
 
 **Agent flow**:
-Chorey's agent holds its review and revert workflow. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
+Chorey's agent holds its review, verification, revert decision, and verdict while `chorey-diff` owns change capture and restoration mechanics. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
 _Avoid_: base agent, parent agent, agent template
 
 **Convention skills**:
