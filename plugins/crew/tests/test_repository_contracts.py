@@ -10,8 +10,9 @@ def test_chorey_owns_safe_review_and_delegates_diff_mechanics():
 
     assert "HARNESS_REPO_PATH" not in chorey
     assert "GOTCHAS_PATH" not in chorey
-    assert chorey.index("### 2. Check Chore rules") < chorey.index("### 4. Review and clean up")
-    assert "No confident match or any missing applicable skill makes the review `skipped`" in chorey
+    assert chorey.index("### 1. Check prerequisites") < chorey.index("### 2. Discover the change set")
+    assert "Require `/crew-chore` before beginning review" in chorey
+    assert "Chorey skipped." in chorey
     assert "STATUS: complete | skipped" in chorey
     assert "provably behavior-preserving" in chorey
     assert "Follow `/chorey-diff`'s skill **Capture review diff**" in chorey
@@ -69,7 +70,9 @@ def test_chorey_diff_owns_capture_restore_and_artifact_contract():
 def test_initializer_offers_rules_skills_and_preserves_repository_rules_during_merge():
     initializer = (CREW / "skills" / "init-crew" / "SKILL.md").read_text(encoding="utf-8")
 
-    assert "Present the available `chore-<stack>` skills" in initializer
+    assert "Present the available stack rule files" in initializer
+    assert ".github/skills/crew-chore/SKILL.md" in initializer
+    assert "stacks/<stack>.md" in initializer
     assert "preserve all repository-authored wording and conflicting repository rules" in initializer
     assert "add only non-conflicting shipped rules" in initializer
 

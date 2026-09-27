@@ -24,7 +24,7 @@ List the files changed during this invocation. For each file or group, check whe
 - A conflicting or ambiguous convention
 - A directory/filesystem access issue (permissions, missing paths, wrong cwd)
 - A tool access issue (missing CLI, auth failure, unreachable service) during verification
-- A missing applicable `chore-<stack>` skill or Copilot instruction noted during review
+- A missing `/crew-chore` skill, stack rule file, or Copilot instruction noted during review
 - Any other friction that cost time or blocked progress
 
 **Discard** one-off typos, transient blips resolved on first retry, and routine execution steps. Only friction that would help a future run avoid the same mistake qualifies.
@@ -33,7 +33,7 @@ List the files changed during this invocation. For each file or group, check whe
 
 ### 2. Distill each candidate and return rule updates
 
-Distill each kept candidate into one reusable directive: `- <directive>`, optionally `- <directive> — <what to do instead>.` when the workaround adds concrete guidance. A discovery-gap becomes a note line, e.g. `- [note] chore-py missing — Chorey was not configured.`
+Distill each kept candidate into one reusable directive: `- <directive>`, optionally `- <directive> — <what to do instead>.` when the workaround adds concrete guidance. A discovery-gap becomes a note line, e.g. `- [note] crew-chore missing — Chorey was not configured.`
 
 Scan `GOTCHAS RULES` for one covering the same rule or topic:
 
