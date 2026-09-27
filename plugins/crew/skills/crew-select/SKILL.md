@@ -1,6 +1,6 @@
 ---
 name: crew-select
-description: Resolves which Stack(s) apply to a piece of work — from task text before the work exists, from a changed-file-path list after it does — and names the primary Stack's agent. Invoked by ralph:dev, to-codey, and to-chorey before launching codey/chorey.
+description: Select installed Codey stacks from task text or changed file paths, and identify the primary implementation agent. Use before dispatching Codey or Chorey, or when matching Chorey review rules to changed files.
 ---
 
 # Crew Select
