@@ -122,7 +122,7 @@ Repository-specific Chore rules and Crew memory are installed as `.github/skills
 _Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
-Reusable directives exposed by the repository's `/crew-memory` skill, which loads and persists its own `## Gotchas` section while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
+Reusable directives exposed by the repository's `crew-memory` skill, which loads and persists its own `## Gotchas` section while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
@@ -317,5 +317,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
-- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/crew-memory` after feedback loops pass.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `crew-memory` skill directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
+- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `crew-memory` skill after feedback loops pass.

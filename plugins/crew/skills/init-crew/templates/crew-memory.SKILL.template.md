@@ -1,6 +1,6 @@
 ---
 name: crew-memory
-description: Repository-local persistent memory for Crew agents. Loads and persists rules from its own Gotchas section, with rule handling supplied by crew-gotchas.
+description: Uses with the crew codey and chorey agents. Repository-local persistent memory for Crew agents. Loads and persists rules from its own Gotchas section, with rule handling supplied by crew-gotchas skill.
 ---
 
 # Crew memory
