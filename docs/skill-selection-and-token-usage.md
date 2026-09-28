@@ -58,6 +58,11 @@ Distinguish **YAML delimiters** from characters *inside* the value:
 
 ```yaml
 description: 'Inspect as-built behavior in one deployable.'
+```
+
+Or:
+
+```yaml
 description: "Inspect as-built behavior in one deployable."
 ```
 
