@@ -1,6 +1,6 @@
 ---
 description: How to write a skill, agent, or convention file in this repo — frontmatter, invocation, disclosure, and pruning.
-applyTo: "**/skills/**/*.md,**/agents/*.agent.md,.crew/*.md,.github/copilot-instructions.md"
+applyTo: "**/skills/**/*.md,**/agents/*.agent.md,.github/instructions/*.instructions.md"
 ---
 
 # Writing agent-facing documents
@@ -88,6 +88,11 @@ Bundle resources by how the agent uses them:
 | `templates/` | scaffolds the agent fills in and modifies |
 
 One or two files in a category live directly in the skill folder; more than that earns a subfolder.
+
+**Path resolution:** the agent's working directory is not the skill's folder. Never point at a bundled
+`scripts/`, `references/`, `assets/`, or `templates/` file with a bare relative path (`scripts/run.py`) — resolve
+it from the skill file's own location first (e.g. "resolve relative to this `SKILL.md`'s folder", or have the
+agent locate the folder once and reuse that path for every reference in the step).
 
 Write commands in Python rather than bash- or PowerShell-only syntax, so they run unmodified on every OS
  Use  `python` is not available here.
