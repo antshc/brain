@@ -66,7 +66,7 @@ A few bullets naming what the reader sees when the skill is doing its job. The b
 
 Always present. Situate the skill in the system in a sentence or two:
 
-- **Role.** Name it: a **chain step** (`wayfinder → to-zdesign → to-stories → to-tickets → to-codey → to-chorey`), a **run-once setup** (`manage-backlog`, `init-crew`, `init-harness`), **periodic maintenance** (`domain-modeling`, run as decisions crystallise), or a **reach-for-it-anytime standalone** (`find-root-cause`, `prototype`, `research`). A standalone's map is one honest sentence, which is far better than omitting the section.
+- **Role.** Name it: a **chain step** (`wayfinder → to-zdesign → to-stories → to-tickets → to-crew`), a **run-once setup** (`manage-backlog`, `init-crew`, `init-harness`), **periodic maintenance** (`domain-modeling`, run as decisions crystallise), or a **reach-for-it-anytime standalone** (`find-root-cause`, `prototype`, `research`). A standalone's map is one honest sentence, which is far better than omitting the section.
 - **Neighbours.** The one or two siblings that matter, each with a because-clause, linked absolutely.
 
 

@@ -1,57 +1,33 @@
 ---
 name: init-crew
-description: Manual, user-invoked bootstrap that scaffolds the crew's per-Stack convention files (CODE-<stack>.md, VERIFY-<stack>.md, CHORE-<stack>.md) for a user-chosen subset of the shipped Stack roster, plus a single shared GOTCHAS.md, under the resolved Harness Repo Path. Only creates files that don't already exist; never called by Codey or Chorey themselves.
+description: "Initialize Crew conventions when the user explicitly requests setup in a repository. Copy selected stack Copilot instructions, offer repository-local Chore rules skills, and create shared gotchas memory without overwriting repository conventions."
 disable-model-invocation: true
 ---
 
-# Setup Crew
+# Initialize Crew
 
-Scaffold the convention/state files Codey and Chorey resolve during INPUT: one `CODE-<stack>.md`/`VERIFY-<stack>.md`/`CHORE-<stack>.md` triad per Stack the user chooses, plus a single shared `GOTCHAS.md`. Run only on explicit human invocation — never inside an autonomous `codey` or `chorey` run.
+Run on explicit user invocation. Resolve `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` via `/resolve-harness`; use cwd for `HARNESS_REPO_PATH` when unavailable or empty and use `HARNESS_REPO_PATH` for `CODEBASE_REPO_PATH` when absent. Stop on a resolver error. Validate both as existing directories. Copilot instructions belong to the codebase; Chore rules skills and gotchas memory belong to the harness. Never create or modify `.harness.env`.
 
-## Resolve Harness Repo Path
+## Select stacks
 
-Mirror `codey.agent.md`'s INPUT resolution — never invent a second scheme:
+Read `codey-<stack>.agent.md` in this plugin's `agents/` directory to discover the installed roster. Present the available stack rule files for the stack ids (`ai`, `dotnet`, `py`) and let the user choose one or more. No choice means create nothing. Do not infer or offer stacks outside that roster.
 
-1. `/resolve-harness` available → run it from cwd; retain the emitted `HARNESS_REPO_PATH`.
-2. Unavailable or empty value → `HARNESS_REPO_PATH` := cwd.
-3. Available but exits non-zero → stop as blocked.
+## Copy missing files
 
-## 1. Present the Stack choice
+For every chosen stack, create each missing target below and its parent directories. Never overwrite an existing target; add it to `Skipped` instead. Copy Copilot instruction templates verbatim. Their `applyTo` scope determines when Copilot loads each instruction.
 
-Read every `codey-<stack>.agent.md` in `<skill-directory>/../../agents` (never the base `codey.agent.md`/`chorey.agent.md`) — the same closed roster `/crew-select` discovers (currently `py`, `dotnet`, `ai`). Present the discovered stack ids as a plain menu and ask the user which one or more to set up. Never auto-detect which Stacks the repository contains from its files — the choice is the user's alone, and no other technology name is ever offered. No selection made → stop; create nothing.
-
-## 2. Create missing per-Stack files
-
-For each chosen stack, skip silently any file below that already exists — never overwrite, merge, or prompt. If missing, copy the matching template from `templates/` (this skill's directory) verbatim, renamed to the target filename. Create `.crew/` if needed.
-
-| File | Target path | Template |
+| Stack | Target | Template |
 |---|---|---|
-| `CODE-<stack>.md` | `$HARNESS_REPO_PATH/.crew/CODE-<stack>.md` | `templates/CODE-<stack>.template.md` |
-| `VERIFY-<stack>.md` | `$HARNESS_REPO_PATH/.crew/VERIFY-<stack>.md` | `templates/VERIFY-<stack>.template.md` |
-| `CHORE-<stack>.md` | `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` | `templates/CHORE-<stack>.template.md` |
+| `ai` | `$CODEBASE_REPO_PATH/.github/instructions/ai-authoring.instructions.md` | `templates/ai-authoring.instructions.template.md` |
+| `dotnet` | `$CODEBASE_REPO_PATH/.github/instructions/dotnet.instructions.md` | `templates/dotnet.instructions.template.md` |
+| `py` | `$CODEBASE_REPO_PATH/.github/instructions/python.instructions.md` | `templates/python.instructions.template.md` |
+| all selections | `$HARNESS_REPO_PATH/.github/skills/crew-chore/SKILL.md` | `templates/chore.SKILL.template.md` with stack sections removed |
+| each chosen stack | `$HARNESS_REPO_PATH/.github/skills/crew-chore/stacks/<stack>.md` | generated from that stack's section in `templates/chore.SKILL.template.md` |
 
-A repository already having some of a Stack's files from a prior run is normal: re-running this skill, whether for the same Stack again or an additional one, creates only what's still missing and never touches an existing Stack's files.
+To create `/crew-chore`, read `templates/chore.SKILL.template.md` and write its common content, omitting every stack section and section marker, to its `SKILL.md` target. For each chosen stack, preserve the contents within every matching `<!-- stack: <stack> -->` through `<!-- /stack: <stack> -->` pair, omit all section markers and all other stacks' sections, and write the result to `stacks/<stack>.md`. Each stack file is read by `/crew-chore`.
 
-## 3. Create the shared GOTCHAS.md
+Also create `$HARNESS_REPO_PATH/.github/skills/crew-memory/SKILL.md` from `templates/crew-memory.SKILL.template.md` when missing. Do not read from, migrate, report on, or modify `.crew/`, `.droid/`, `CODE*.md`, or `VERIFY*.md` files.
 
-Regardless of how many Stacks were chosen, create exactly one `$HARNESS_REPO_PATH/.crew/GOTCHAS.md` from `templates/GOTCHAS.template.md` when it doesn't already exist yet — same skip-if-exists rule as Step 2. Never one per Stack.
+For each selected stack file, inspect the target repository's review conventions. For a newly created file, replace its repository-rules placeholder with observed rules while preserving the shipped safety constraints. For an existing file, semantically merge the shipped seed: preserve all repository-authored wording and conflicting repository rules, add only non-conflicting shipped rules, and report every conflict. Never rewrite copied Copilot instructions during init; the user can customize them after scaffolding.
 
-## 4. Extend each newly created file from the repo
-
-Only for files just created in Step 2 (never `GOTCHAS.md`, never a file that already existed), run the `Explore` agent once over `HARNESS_REPO_PATH` and use its findings to extend every section of each new file with this repository's own observed conventions. Ground every line in files `Explore` actually found — never invent a convention or copy one from another repo or Stack. A section with no discoverable convention keeps its placeholder comment.
-
-Each template ships two kinds of content, marked in its own comments:
-
-- **Hazard rules** — Stack-general, safety-relevant defaults (e.g. Python's broad-`except` hazard, .NET's `.csproj` Module boundary). Keep these exactly as shipped, even when `Explore` finds the repository actually does otherwise. Instead, append one line under `## Gotchas` in the shared `GOTCHAS.md` recording the conflict — what the shipped rule says, what the repo actually does — so a future run reads it before touching that Stack's files.
-- **Everything else** (style, layer placement, design principles, tests, verify steps, review rules) — a shipped default here is a suggestion only. When `Explore`'s finding differs from it, the repository's convention wins silently: write what `Explore` found and drop the shipped default, no note required.
-
-## Hard rules
-
-- Manual invocation only — never wire this into either agent's INPUT step.
-- Never offer or scaffold a Stack outside the roster discovered in Step 1 — a technology with no shipped `codey-<stack>.agent.md` gets no file, ever.
-- Never overwrite, merge, or prompt about an existing file.
-- Never read from, copy out of, or delete an existing `.droid/` folder, or an unsuffixed `CODE.md`/`VERIFY.md`/`CHORE.md` left by an older scaffold — migration/renaming is a manual human step outside this skill.
-- Never create or modify `.harness.env` — read Harness Settings only through the resolver.
-- Templates ship Stack-general hazard defaults plus placeholder sections; do not fill either with invented, repo-specific content outside Step 4.
-
-**Emit**: "HARNESS_REPO_PATH=<path> (resolver | fallback cwd). Stacks chosen: [list]. Created: [list]. Skipped (already exist): [list]. Hazard conflicts recorded in GOTCHAS.md: [count or none]. Templates: <plugin-relative dir>."
+**Emit**: `HARNESS_REPO_PATH=<path>. CODEBASE_REPO_PATH=<path>. Rules skills: <list>. Created: <paths>. Merged: <paths or none>. Skipped: <existing paths>. Review conflicts: <count or none>.`
