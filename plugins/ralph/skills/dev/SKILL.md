@@ -115,17 +115,11 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 
 ## 3. Invoke implementation agent
 
-Run `/crew-select` skill **Resolve From Task Text**, passing the selected task's title + body as `TASK_TEXT`. Retain its `Matched Stacks`/`Primary agent`. **Emit**: "Matched Stacks: [...] or none. Primary agent: <agent>."
+Read the installed `codey-*.agent.md` descriptions in the crew plugin's `agents/` directory. Choose the agent whose description best fits the selected issue's title and body; if several fit, choose the one central to the requested outcome. No matching technology → `general-purpose`. **Emit**: "Primary agent: <agent>."
 
-After changing to `WORKTREE_PATH`, run the `<primary agent from crew-select, or codey when none matched>` agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For a general-purpose fallback, instruct it to implement the task, run focused verification, and return the five-field Codey report (including honest verification results). Use the following prompt (substitute actual values):
 
 ```
-## HARNESS
-HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
-
-## STACKS
-MATCHED=<comma-separated matched Stack ids>
-
 ## TASK
 - Title: <title>
 - Body: <body>
@@ -135,68 +129,45 @@ MATCHED=<comma-separated matched Stack ids>
 <last 5 commits from step 1>
 ```
 
-Omit the `## STACKS` section entirely when no Stack matched.
-
 ## 4. Distill
 
-Distill Codey's SUMMARY into Implementation Decisions. Use this in **Commit & push Codey's checkpoint** (commit body) and **Update Spec** (spec update).
+Distill Codey's SUMMARY into Implementation Decisions. Use this in **Commit & push** (commit body) and **Update Spec** (spec update).
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
 - Short, implementation-oriented statements.
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-## 5. Commit & push Codey's checkpoint (source repo)
+## 5. Stage Codey's changes (source repo)
 
-Operate in `WORKTREE_PATH`. This commit is the safe baseline **Review (Chorey)** reviews and reverts against, so it must land before Chorey touches anything. Build it from Codey's report fields and the distilled outputs from **Distill**:
-- **SUBJECT** → Use **ccode:** prefix, than one line commit summary
-- **SUMMARY** → commit body (Implementation Decisions block)
-- **FILES** → list of files changed
-- **NOTES** → blockers or context for the next iteration
-
-Stage and commit:
+Operate in `WORKTREE_PATH`. Stage Codey's changes regardless of `STATUS` (**complete**, **partial**, or **blocked**) so Chorey has a staged diff to review; this only updates the index, no commit yet:
 
 ```bash
 git add -A
-git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
-checkpoint_sha=$(git rev-parse HEAD)
-```
-
-Retain `$checkpoint_sha` for use in **Review (Chorey)**.
-
-Push the feature branch regardless of Codey's `STATUS` (**complete**, **partial**, or **blocked**):
-
-```bash
-git push -u origin "$branch"
 ```
 
 ## 6. Review (Chorey)
 
-Run only when Codey's `STATUS` is **complete** and `chorey` is available; otherwise continue to **Handle task result** — reviewing unverified or broken work cannot preserve behavior that was never established.
+Run only when Codey's `STATUS` is **complete** and `chorey` is available; otherwise continue directly to **Commit & push** — reviewing unverified or broken work cannot preserve behavior that was never established.
 
-After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent`. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent` with no arguments; it reviews the staged diff directly (`git diff --cached`). Retain Chorey's report for use in **Commit & push**. Chorey's `STATUS` is informational only — it never changes the `STATUS` recorded in **Handle task result**, which always reflects Codey's report from **Invoke implementation agent**.
 
-```
-## HARNESS
-HARNESS_REPO_PATH=<$HARNESS_REPO_PATH>
+## 7. Commit & push (source repo)
 
-## BASELINE_COMMIT
-<$checkpoint_sha>
-```
+Operate in `WORKTREE_PATH`. Build a single commit:
 
-`$checkpoint_sha` is the commit **Commit & push Codey's checkpoint** just made — Chorey reviews the change it introduced and, if its own edits fail verification, reverts against it. Retain Chorey's report for use in **Commit & push Chorey's cleanup**. Chorey's `STATUS` is informational only — it never changes the `STATUS` recorded in **Handle task result**, which always reflects Codey's report from **Invoke implementation agent**.
+- When **Review (Chorey)** ran and its `FILES` field is not "none": run `git add -A` again to stage Chorey's cleanup, then build the commit from both reports —
+  - **SUBJECT** → Use **ccode:** prefix, then Codey's one-line commit summary
+  - **SUMMARY** → commit body: Implementation Decisions block, plus Chorey's `SUMMARY` when it changed files
+  - **FILES** → Codey's list of files changed, plus Chorey's
+  - **NOTES** → Codey's `NOTES`, plus Chorey's findings not applied
+- Otherwise (Chorey did not run, or ran and changed nothing): build the commit from Codey's report fields and the distilled outputs from **Distill** alone —
+  - **SUBJECT** → Use **ccode:** prefix, then one line commit summary
+  - **SUMMARY** → commit body (Implementation Decisions block)
+  - **FILES** → list of files changed
+  - **NOTES** → blockers or context for the next iteration
 
-## 7. Commit & push Chorey's cleanup (source repo)
-
-Run only when **Review (Chorey)** ran and its `FILES` field is not "none" — otherwise Codey's checkpoint already stands as the final result.
-
-Operate in `WORKTREE_PATH`. Build a second commit from Chorey's own report fields:
-- **SUBJECT** → Use **ccode: review —** prefix, then one line summary of what Chorey cleaned up
-- **SUMMARY** → commit body (Chorey's SUMMARY)
-- **FILES** → Chorey's list of files changed
-- **NOTES** → Chorey's findings not applied, or blockers
-
-Stage, commit, and push:
+Commit and push regardless of Codey's `STATUS` (**complete**, **partial**, or **blocked**):
 
 ```bash
 git add -A

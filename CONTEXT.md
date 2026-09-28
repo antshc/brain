@@ -102,35 +102,35 @@ The implementation agent. Implements one task in its invocation directory and re
 _Avoid_: droid, implementer, coder
 
 **Chorey**:
-The maintainability-review agent. Reviews the change set for behavior-preserving refactors — Codey's checkpoint commit (named by a trusted `BASELINE_COMMIT`) inside the loop, or uncommitted work standalone — runs only behind a Codey `STATUS: complete` gate, reports informationally, and discards its own refactors (git-native revert against the checkpoint, or a manual snapshot standalone) when its verification cannot pass.
+The maintainability-review agent. Reviews the staged change set in cwd for behavior-preserving refactors — the caller stages it with `git add` before invoking Chorey — runs only behind a Codey `STATUS: complete` gate, reports informationally, and reports `failed` instead of reverting when its own cleanup cannot be verified.
 _Avoid_: reviewer, refactorer, cleanup agent
 
 **Stack**:
-A technology family a repo's code belongs to — `py`, `dotnet`, `ai` — named by the `codey-<stack>` agent that ships for it and used as the suffix on the per-repo files it owns (`CODE-<stack>.md`, `VERIFY-<stack>.md`, `CHORE-<stack>.md`). The vocabulary is closed: a stack exists only where an agent ships for it, so a repo never declares one nothing would read. One repo can carry several.
+A technology family a repo's code belongs to — `py`, `dotnet`, `ai` — named by the `codey-<stack>` agent that ships for it and used for `CHORE-<stack>.md` and Copilot instruction templates. The vocabulary is closed: a stack exists only where an agent ships for it. One repo can carry several.
 _Avoid_: language, platform, toolchain, tech
 
 **Stack agent**:
-A delta agent for one Stack — frontmatter, a declared scope, and only the phases it overrides, invoking a Flow skill for everything else. Carries stack-level knowledge that holds in any repo, never one repo's paths, commands, or layout.
+A self-contained implementation agent for one Stack, with declared scope, implementation flow, focused verification, and a five-field report. Repo-specific style lives in applicable Copilot instructions.
 _Avoid_: language agent, specialised codey, subclass agent
 
-**Flow skill**:
-The skill holding a family of agents' shared workflow — `crew-codey-flow` for `codey` and every Stack agent, `crew-chorey-flow` for `chorey`. Reached by name, which is why no agent file ever points at another agent file.
+**Agent flow**:
+Chorey's agent holds its review, verification, revert decision, and verdict while `chorey-diff` owns change capture and restoration mechanics. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
 _Avoid_: base agent, parent agent, agent template
 
-**Convention folder**:
-The per-repo `.crew/` directory under the `Harness Repo Path` holding the shared `GOTCHAS.md` plus a `CODE-<stack>.md`, `VERIFY-<stack>.md`, and `CHORE-<stack>.md` per installed Stack — the single location a crew agent resolves them from, never discovered or searched for. An unsuffixed filename means shared across every Stack; a missing suffixed file is absent, never a reason to read the unsuffixed one.
-_Avoid_: .droid, config folder, settings directory
+**Convention skills**:
+Repository-specific Chore rules and Crew memory are installed as `.github/skills/chore-<stack>/` and `.github/skills/crew-memory/`. Copilot instructions reside in the codebase's `.github/instructions/`; old `.crew/`, `CODE*.md`, and `VERIFY*.md` conventions are unused.
+_Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
-Reusable directives stored with the `crew-gotchas` skill. Read and applied before implementation; after feedback loops pass, the agent distills session friction (convention conflicts, directory/tool access issues) into new directives or extensions of existing ones and writes them back directly — no human curation step.
+Reusable directives exposed by the repository's `crew-memory` skill, which loads and persists its own `## Gotchas` section while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
-The unit of code plus its build config, identified by walking up from a changed file to the nearest build-config marker — the walk-up rule is written in the Stack's own `VERIFY-<stack>.md`, in that Stack's vocabulary, never assumed or named by a skill.
+The unit of code plus its build config, identified by walking up from a changed file to the nearest relevant build marker. Its agent uses the repository's actual project and test references to select checks.
 _Avoid_: project, package
 
 **Verification counterpart**:
-The sibling/child unit that verifies a Module (tests, specs, or whatever the repo calls it), mapped by the same `VERIFY-<stack>.md` that defines its Module. Absent a `VERIFY` file, `crew-feedback` discovers the toolchain from the repo's README and runs it unscoped rather than deriving counterparts itself.
+The existing tests that exercise a Module's observable behavior, identified by following its project references, test naming, and affected functional slice.
 _Avoid_: test project, test suite
 
 ## wf
@@ -288,7 +288,7 @@ _Avoid_: rich text, Atlassian JSON, doc format
 _Plugins_set_: atl
 
 **Atlassian config**:
-The gitignored `.atlassian` dotfile holding one developer's Atlassian connection facts — site, email, optional API token, default Jira project keys, default Confluence space IDs — located by a search bounded to the **Harness Repo Path**. Deliberately not a **Convention folder**: it is searched for rather than resolved at a fixed path, and it holds a credential rather than committed team conventions.
+The gitignored `.atlassian` dotfile holding one developer's Atlassian connection facts — site, email, optional API token, default Jira project keys, default Confluence space IDs — located by a search bounded to the **Harness Repo Path**. Deliberately not a **Convention skill**: it is searched for rather than exposed as a skill, and it holds a credential rather than committed team conventions.
 _Avoid_: .atlmcp, .env, credentials file, convention folder
 _Plugins_set_: atl
 
@@ -317,5 +317,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable — handing it `HARNESS_REPO_PATH` through a trusted `## HARNESS` prompt section. `Chorey` follows only on a Codey `STATUS: complete`, and is skipped when unavailable. Each agent treats its invocation directory as its workspace and validates the supplied path rather than discovering it.
-- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance from the `Convention folder` before changing code, then write distilled `Gotchas` back to the reference owned by `crew-gotchas` after feedback loops pass.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `crew-memory` skill directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
+- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `crew-memory` skill after feedback loops pass.
