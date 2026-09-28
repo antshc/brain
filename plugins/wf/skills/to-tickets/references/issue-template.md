@@ -5,6 +5,7 @@
 
 ## What to build
 <what-to-build-rule>
+- For a `tests` ticket, describe spec-wide functional verification to execute, not code to build. Carry the spec's automation decision and scenario bullets without skill references, test-file paths, or fixed test-method names.
 - Self-contained: describe enough of the end-to-end behavior that an implementing agent needs no further repo exploration to understand what to build.
 - Describe behavior across all integration layers touched by this slice, not a layer-by-layer breakdown.
 - Avoid specific file paths or code snippets — they go stale fast.
@@ -25,6 +26,8 @@
 - [ ] Acceptance criteria 3
 
 ## Blocked by
+
+<!-- For a functional-testing ticket, list every implementation ticket for this parent spec. Dependencies must be completed before execution. -->
 
 - Blocked by #{{issueNumber}} (if any)
 
@@ -89,7 +92,8 @@ Run `/doc-contracts` skill once per touched contract kind (API, Database, Resour
 ## Verify section
 
 This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes.
-- *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. Include the commands that will be used to run the integration, REST API automation tests for the verification.
+- For a `tests` ticket, replace code-change verification with scenario bullets covering the entire spec and its acceptance criteria. Describe preconditions, action, expected outcome, and requirement references. Resolve methods and commands at execution; publish no skill references, test-file paths, or fixed test-method names. Record every scenario as passed, failed, or unverified, with execution evidence. Failed or incomplete verification keeps the ticket open with `tests` and `hitl` and links a `hitl` investigation ticket; passing verification closes it.
+- *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. For implementation tickets, include the commands that will run the integration or REST API automation tests; functional-testing tickets resolve commands at execution as described above.
 - Only test external behavior, not implementation details.
 - List which modules will be tested and prior art for the tests.
 

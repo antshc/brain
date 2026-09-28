@@ -60,6 +60,12 @@ Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an
 - Identify the seam through which each slice is verified (e.g. an integration test observing the database layer) and prefer the highest seam that still exercises the slice end-to-end
 </vertical-slice-rules>
 
+### 3a. Draft spec-wide functional verification
+
+When the spec approves automated functional verification, append one functional-testing ticket for the entire spec. Preserve declined/deferred decisions; unresolved automation scope remains a question in **Quiz the user**, not implicit approval. Carry the spec's scenario bullets and requirement references into the ticket, covering all functional requirements, business rules, edge cases, and acceptance criteria. Use label `tests` only for functional-test execution; adding or repairing test code remains an implementation slice.
+
+Make the functional-testing ticket depend on every implementation slice for its parent spec, including test additions needed for identified coverage gaps. Describe reuse of existing functional-slice tests and observable seams without test-file paths or fixed method names. Execution maps scenarios to current methods. Missing coverage discovered at execution is unverified and becomes a `hitl` investigation ticket; Testy does not write tests.
+
 ### 4. Quiz the user
 
 Present the proposed breakdown as a numbered list. For each slice, show:
@@ -68,6 +74,7 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Type**: HITL | AFK
 - **Blocked by**: which other slices (if any) must complete first
 - **Functional Requirements covered**: which functional requirements from the spec this addresses
+- **Work**: implementation or spec-wide functional testing; show the latter's complete scenario coverage and dependencies
 
 Ask the user:
 
@@ -83,6 +90,8 @@ Iterate until the user approves the breakdown.
 For each approved slice, create a GitHub issue: via `/manage-backlog` **Create ticket**, passing the milestone `{{milestoneTitle}}` and label `hitl`.
 
 Use `hitl` as the label for all issues `HITL` or `AFK` to indicate that user review is required.
+
+Create the approved functional-testing ticket last, with both `tests` and `hitl`, the same milestone, its exact parent spec, and real implementation issue numbers under **Blocked by**. Approval of the breakdown does not remove `hitl`: removing that label releases execution. Reuse an existing functional-testing ticket for the same spec instead of duplicating it on reruns.
 
 The `{{milestoneTitle}}` from the spec is required for each call, if missing ask user.
 Use the issue body template below.
