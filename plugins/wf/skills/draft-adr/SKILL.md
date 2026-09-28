@@ -1,3 +1,8 @@
+---
+name: draft-adr
+description: Draft a standalone architecture decision record. Use when an ADR or standalone decision file is explicitly requested.
+---
+
 # Draft ADR
 
 Draft one point-in-time, localized architectural decision. Run only on an explicit request for an ADR or a standalone decision file. For a compact decision inside a design or decision list, call `/doc-decision` directly.
