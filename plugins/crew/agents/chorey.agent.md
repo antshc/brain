@@ -24,7 +24,7 @@ Use `bin/crew_diff/_manifest.json` as the initial change-set ledger. An empty ma
 
 ### 3. Load guidance
 
-Parse the top-level `stacks` array from `bin/crew_diff/_manifest.json` and pass it unchanged to `/crew-chore` as `STACKS`. Follow `/crew-chore`'s stack-loading guidance: a nonempty array loads the named stack files, while an empty array loads every configured stack file. Do not independently infer stacks from paths, patches, file contents, or repository markers. Apply each loaded rule only where relevant, retain rule conflicts as findings, and use observed conventions where no loaded rule applies. Report missing named stack files as discovery gaps. Emit `Review rules: [stack files]`.
+Parse the top-level `stacks` array from `bin/crew_diff/_manifest.json` and pass it unchanged to `/crew-chore` as `STACKS`. Use `/crew-chore`'s stack-loading guidance: a nonempty array loads the named stack files, while an empty array loads every configured stack file. Do not independently infer stacks from paths, patches, file contents, or repository markers. Apply each loaded rule only where relevant, retain rule conflicts as findings, and use observed conventions where no loaded rule applies. Report missing named stack files as discovery gaps. Emit `Review rules: [stack files]`.
 
 When `crew-memory` skill is available, follow `crew-memory` skill' skill **Read Gotchas** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
 
