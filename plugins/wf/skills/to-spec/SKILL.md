@@ -17,13 +17,13 @@ If the `/manage-backlog` skill is not available, fall back to saving the spec to
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any Concepts and ADRs in the area you're touching.
 
-2. Sketch out the seams at which you're going to test the Initiative. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+2. Synthesize the agreed functional-testing decision: approved, declined, or deferred, including its scope and rationale. Preserve settled decisions without another interview; an unresolved decision stays explicitly unresolved. Prefer existing functional-slice tests at the highest useful observable seams. Discover applicable `testing-*` skills across repository, user, and installed scopes and follow the applicable `/testing-*` skills internally to establish feasibility and coverage gaps.
 
-Check with the user that these seams match their expectations.
-
-3. Write the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, Run `/doc-contracts` skill once per touched contract kind and inline its output verbatim under **Contracts Delta**. Then Run `/manage-backlog` skill **Publish spec** to publish it to the project ticket tracker. Apply the `spec` triage label - no need for additional triage.
+3. Draft the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, Run `/doc-contracts` skill once per touched contract kind and inline its substantive contract content under **Contracts Delta**, preserving contract facts while removing skill references and authoring directives.
 
 Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
+
+4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Keep testing scenarios independent of test-file paths and fixed method names. Run `/manage-backlog` skill **Publish spec** with the checked body and label `spec` — no additional triage.
 
 <spec-template>
 
@@ -93,15 +93,13 @@ Exception: if a prototype produced a snippet that encodes a decision more precis
 
 <!-- Omit this section entirely if no API, Database, or Resource contract changed. -->
 
-Run `/doc-contracts` skill once per touched contract kind (API, Database, Resource) and inline its output verbatim here, one block per kind.
+The changed API, Database, or Resource contracts, one block per kind. Include only the substantive contract content.
 
 ## Testing Decisions
 
-A list of testing decisions that were made. Include:
+A bullet list of the functional-testing decision (approved, declined, deferred, or unresolved), its scope and rationale, observable seams, reusable coverage described by behavior, and known gaps. Keep repository/accessor/proxy integration verification with implementation work.
 
-- A description of what makes a good test (only test external behavior, not implementation details)
-- Which modules will be tested
-- Prior art for the tests (i.e. similar types of tests in the codebase)
+List functional scenarios as bullets: `Given {{preconditions}}, when {{action}}, then {{observableOutcome}} — covers {{requirementReferences}}`. Cover the spec's functional requirements, business rules, edge cases, and acceptance criteria. Describe external behavior precisely enough to map to current test methods during execution; omit test-file paths, fixed test-method names, and all skill references.
 
 ## Out of Scope
 
