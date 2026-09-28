@@ -1,11 +1,11 @@
 ---
 name: crew-gotchas
-description: "Apply repository-local gotcha rules and produce reusable rule updates from implementation or review friction. Use through crew-memory when Codey or Chorey enters its GOTCHAS or UPDATE GOTCHAS step."
+description: "Uses with the crew codey and chorey agents. Apply repository-local gotcha rules and produce reusable rule updates from implementation or review friction. Use through crew-memory skill."
 ---
 
 # Gotchas
 
-`/crew-memory` passes the current entries under its own `## Gotchas` section as `GOTCHAS RULES`. Operate only on those supplied rules. Never locate, read, or write crew-memory's storage file; `/crew-memory` owns storage.
+`crew-memory` skill passes the current entries under its own `## Gotchas` section as `GOTCHAS RULES`. Operate only on those supplied rules. Never locate, read, or write crew-memory's storage file; `crew-memory` skill owns storage.
 
 ## Read Workflow (mandatory before the agent's main work)
 
@@ -40,7 +40,7 @@ Scan `GOTCHAS RULES` for one covering the same rule or topic:
 - **Match** → return an exact replacement that extends/refines that rule. Never duplicate.
 - **No match** → return the new rule to append.
 
-Return `RULE UPDATES` to `/crew-memory` as exact `replace <existing rule> with <refined rule>` or `append <new rule>` operations. Zero candidates → return no updates. Do not persist the updates yourself.
+Return `RULE UPDATES` to `crew-memory` skill as exact `replace <existing rule> with <refined rule>` or `append <new rule>` operations. Zero candidates → return no updates. Do not persist the updates yourself.
 
 **Emit**: "Gotchas updated: [count added/extended]" or "No gotchas to record."
 
