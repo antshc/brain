@@ -49,6 +49,22 @@ description: "Inspect as-built behavior in one deployable and write a cited repo
 
 Test descriptions against realistic prompts, including negative cases. Do not rely on a long body to repair an incorrect initial match: the body is loaded after selection.
 
+
+### Do quotes or bold markers improve selection?
+
+There is no documented selection boost for wrapping words in `'single quotes'` or `**Markdown bold**`. Copilot uses the parsed description to judge relevance; the Agent Skills specification calls for a clear task and trigger with specific terms. The `description` is a YAML string, not the Markdown body, so `**` has no specified emphasis effect. A model might react differently to any changed text, but punctuation alone is not a reliable routing strategy.
+
+Distinguish **YAML delimiters** from characters *inside* the value:
+
+```yaml
+description: 'Inspect as-built behavior in one deployable.'
+description: "Inspect as-built behavior in one deployable."
+```
+
+These yield the same description text. Choose outer single or double quotes when needed to parse the value safely (for example, when it contains `: `); they do not make selection more likely. Quotes *inside* the value remain text and can clarify a literal command, label, or phrase, but only when that distinction matters. Likewise, `**as-built behavior**` adds literal asterisks to the value and has no guaranteed benefit over `as-built behavior`.
+
+Spend the characters on discriminating task words and boundaries instead. If punctuation appears to help in one run, compare both versions on the same should-trigger and near-miss prompts before retaining it.
+
 ## Keep the loaded body focused
 
 Put common steps, branch selection, and checkable completion criteria in `SKILL.md`. Put material needed only for one branch in a linked file, with a pointer that says exactly when to open it. Keep hard safety and correctness gates on the path that needs them.
@@ -93,6 +109,9 @@ In VS Code, use **Agent Debug Logs** for discovery and token metrics, and **Chat
 ## References
 
 - [VS Code: Agent Skills](https://code.visualstudio.com/docs/agent-customization/agent-skills)
+- [Agent Skills: description specification](https://agentskills.io/specification#description-field)
+- [Agent Skills: optimizing descriptions](https://agentskills.io/skill-creation/optimizing-descriptions)
+- [YAML: scalar styles and values](https://yaml.org/spec/1.2.2/ext/glossary/)
 - [GitHub Copilot CLI: manage skills](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#managing-skills-non-interactively)
 - [VS Code: Debug chat interactions](https://code.visualstudio.com/docs/agents/agent-troubleshooting/chat-debug-view)
 - [GitHub Copilot CLI: Manage context](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/context-management)
