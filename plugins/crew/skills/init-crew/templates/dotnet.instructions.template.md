@@ -1,5 +1,6 @@
 ---
 applyTo: "**/*.cs,**/*.csproj,**/*.sln,**/Directory.Build.props,**/Directory.Packages.props"
+description: "C# coding and test conventions — naming, formatting, CancellationToken propagation, error handling, utils usage, serialization, unit/integration test rules, and fakes/test-data reuse. Loads whenever any *.cs, csharp related file changes."
 ---
 # .NET code conventions
 
