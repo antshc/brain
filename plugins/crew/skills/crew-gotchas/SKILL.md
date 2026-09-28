@@ -1,6 +1,6 @@
 ---
 name: crew-gotchas
-description: Agent gotchas — reads GOTCHAS.md before the agent's work, then distills session friction into new or extended one-line directives and writes them back. Apply during the GOTCHAS step (read) and the UPDATE GOTCHAS step (write). Shared by Codey and Chorey.
+description: "Uses with the crew codey and chorey agents. Apply repository-local gotcha rules and produce reusable rule updates from implementation or review friction. Use through crew-memory skill. Use when Gotchas, **Read Gotchas**, **Write Gotchas** mentioned"
 ---
 
 # Gotchas
