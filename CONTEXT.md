@@ -102,7 +102,7 @@ The implementation agent. Implements one task in its invocation directory and re
 _Avoid_: droid, implementer, coder
 
 **Chorey**:
-The maintainability-review agent. Reviews the change set for behavior-preserving refactors — Codey's checkpoint commit (named by a trusted `BASELINE_COMMIT`) inside the loop, or uncommitted work standalone — runs only behind a Codey `STATUS: complete` gate, reports informationally, and discards its own refactors (git-native revert against the checkpoint, or a manual snapshot standalone) when its verification cannot pass.
+The maintainability-review agent. Reviews the staged change set in cwd for behavior-preserving refactors — the caller stages it with `git add` before invoking Chorey — runs only behind a Codey `STATUS: complete` gate, reports informationally, and reports `failed` instead of reverting when its own cleanup cannot be verified.
 _Avoid_: reviewer, refactorer, cleanup agent
 
 **Stack**:
@@ -317,5 +317,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, receives only the checkpoint's trusted `## BASELINE_COMMIT`, and discovers its available rules and memory skills directly.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
 - **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/crew-memory` after feedback loops pass.

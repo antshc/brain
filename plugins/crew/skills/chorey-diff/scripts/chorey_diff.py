@@ -8,7 +8,6 @@ import fnmatch
 import json
 import os
 import shutil
-import stat
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -127,26 +126,6 @@ def _name_status(repo: Path, *diff_args: str) -> list[Change]:
     return _parse_name_status(_git(repo, *diff_args, "--name-status", "-z", "-M", "-C", "--"))
 
 
-def _safe_workspace_path(repo: Path, repo_path: str) -> Path:
-    path = PurePosixPath(repo_path)
-    if path.is_absolute() or ".." in path.parts or not path.parts:
-        raise ChoreyDiffError(f"unsafe repository path in Git output: {repo_path!r}")
-    return repo.joinpath(*path.parts)
-
-
-def _normalize_repo_path(value: str) -> str:
-    normalized = value.replace("\\", "/")
-    path = PurePosixPath(normalized)
-    if path.is_absolute() or ".." in path.parts or not path.parts or normalized in {"", "."}:
-        raise ChoreyDiffError(f"unsafe repository path: {value!r}")
-    repo_path = path.as_posix()
-    if repo_path == ".git" or repo_path.startswith(".git/"):
-        raise ChoreyDiffError(f"refusing to restore Git internals: {value!r}")
-    if repo_path == "bin/crew_diff" or repo_path.startswith("bin/crew_diff/"):
-        raise ChoreyDiffError(f"refusing to restore chorey-diff artifacts: {value!r}")
-    return repo_path
-
-
 def _write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
 
@@ -184,72 +163,6 @@ def _prepare_artifacts(repo: Path) -> tuple[Path, Path]:
     diffs = root / "diffs"
     diffs.mkdir(parents=True)
     return root, diffs
-
-
-def _resolve_commit(repo: Path, baseline: str) -> str:
-    output = _git(repo, "rev-parse", "--verify", f"{baseline}^{{commit}}")
-    return output.decode("ascii").strip()
-
-
-def _empty_tree(repo: Path) -> str:
-    return _run(("git", "hash-object", "-t", "tree", "--stdin"), cwd=repo, input_bytes=b"").decode(
-        "ascii"
-    ).strip()
-
-
-def _capture_commit(repo: Path, baseline: str) -> dict[str, object]:
-    commit = _resolve_commit(repo, baseline)
-    parent_line = _git(repo, "rev-list", "--parents", "-n", "1", commit).decode("ascii").split()
-    base = parent_line[1] if len(parent_line) > 1 else _empty_tree(repo)
-    changes = _name_status(repo, "diff", base, commit)
-    artifact_root, diffs_dir = _prepare_artifacts(repo)
-    files: list[dict[str, object]] = []
-    for number, change in enumerate(sorted(changes, key=lambda item: item.path), start=1):
-        identifier = f"{number:04d}"
-        pathspecs = [value for value in (change.old_path, change.path) if value]
-        patch = _git(
-            repo,
-            "diff",
-            "--binary",
-            "--full-index",
-            "--find-renames",
-            "--find-copies",
-            base,
-            commit,
-            "--",
-            *pathspecs,
-        )
-        diff_rel = Path("diffs") / f"{identifier}.patch"
-        _write_patch(diffs_dir / f"{identifier}.patch", (("COMMIT", patch),))
-        files.append(
-            {
-                "id": identifier,
-                "path": change.path,
-                "previous_path": change.old_path,
-                "changes": {"commit": [change.as_dict()]},
-                "diff": diff_rel.as_posix(),
-            }
-        )
-    manifest: dict[str, object] = {
-        "schema_version": 1,
-        "mode": "commit",
-        "baseline_commit": commit,
-        "base_commit": base,
-        "stacks": _detect_stacks(
-            path
-            for change in changes
-            for path in (change.old_path, change.path)
-            if path is not None
-        ),
-        "files": files,
-    }
-    _write_json(artifact_root / MANIFEST_NAME, manifest)
-    names = [entry["path"] for entry in files]
-    if names:
-        print(f"Reviewing commit {commit}: {json.dumps(names, ensure_ascii=True)}")
-    else:
-        print("No work to review.")
-    return manifest
 
 
 def _group_uncommitted(
@@ -357,111 +270,10 @@ def _capture_uncommitted(repo: Path) -> dict[str, object]:
     return manifest
 
 
-def _load_manifest(repo: Path) -> dict[str, object]:
-    path = _artifact_root(repo) / MANIFEST_NAME
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError as error:
-        raise ChoreyDiffError(f"missing manifest: {path}") from error
-    if (
-        not isinstance(value, dict)
-        or not isinstance(value.get("files"), list)
-        or not isinstance(value.get("stacks"), list)
-        or not all(isinstance(stack, str) for stack in value["stacks"])
-    ):
-        raise ChoreyDiffError("invalid chorey-diff manifest")
-    return value
-
-
-def _remove_workspace_path(path: Path) -> None:
-    try:
-        file_stat = path.lstat()
-    except FileNotFoundError:
-        return
-    if stat.S_ISDIR(file_stat.st_mode) and not stat.S_ISLNK(file_stat.st_mode):
-        try:
-            path.rmdir()
-        except OSError as error:
-            raise ChoreyDiffError(f"refusing to recursively remove directory: {path}") from error
-    else:
-        path.unlink()
-
-
-def _commit_contains(repo: Path, commit: str, repo_path: str) -> bool:
-    output = _git(repo, "ls-tree", "-z", commit, "--", repo_path)
-    return bool(output)
-
-
-def _restore_commit(repo: Path, commit: str, repo_path: str) -> None:
-    workspace_path = _safe_workspace_path(repo, repo_path)
-    if _commit_contains(repo, commit, repo_path):
-        _git(repo, "restore", f"--source={commit}", "--worktree", "--", repo_path)
-    else:
-        _remove_workspace_path(workspace_path)
-
-
-def _index_contains(repo: Path, repo_path: str) -> bool:
-    output = _git(repo, "ls-files", "--stage", "-z", "--", repo_path)
-    for record in output.split(b"\0"):
-        if not record:
-            continue
-        _, separator, returned_path = record.partition(b"\t")
-        if not separator:
-            raise ChoreyDiffError(f"invalid index entry for {repo_path}")
-        if os.fsdecode(returned_path) == repo_path:
-            return True
-    return False
-
-
-def _restore_index(repo: Path, repo_path: str) -> None:
-    workspace_path = _safe_workspace_path(repo, repo_path)
-    if not _index_contains(repo, repo_path):
-        _remove_workspace_path(workspace_path)
-        return
-    _git(repo, "restore", "--worktree", "--", repo_path)
-
-
-def _restore(repo: Path, paths: Sequence[str]) -> None:
-    manifest = _load_manifest(repo)
-    entries = {entry.get("path"): entry for entry in manifest["files"] if isinstance(entry, dict)}
-    restore_paths: list[str] = []
-    for path in paths:
-        repo_path = _normalize_repo_path(path)
-        if repo_path not in restore_paths:
-            restore_paths.append(repo_path)
-        entry = entries.get(repo_path)
-        if isinstance(entry, dict):
-            previous_paths = entry.get("previous_paths", [])
-            if not isinstance(previous_paths, list) or not all(
-                isinstance(previous_path, str) for previous_path in previous_paths
-            ):
-                raise ChoreyDiffError(f"invalid previous paths for {repo_path}")
-            for previous_path in previous_paths:
-                normalized_previous = _normalize_repo_path(previous_path)
-                if normalized_previous not in restore_paths:
-                    restore_paths.append(normalized_previous)
-    mode = manifest.get("mode")
-    if mode == "commit":
-        commit = manifest.get("baseline_commit")
-        if not isinstance(commit, str):
-            raise ChoreyDiffError("commit manifest has no baseline_commit")
-        for repo_path in restore_paths:
-            _restore_commit(repo, commit, repo_path)
-    elif mode == "uncommitted":
-        for repo_path in restore_paths:
-            _restore_index(repo, repo_path)
-    else:
-        raise ChoreyDiffError(f"unknown manifest mode: {mode!r}")
-    print(f"Restored review baseline files: {json.dumps(restore_paths, ensure_ascii=True)}")
-
-
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    capture = subparsers.add_parser("capture", help="capture the review scope")
-    capture.add_argument("--baseline", help="checkpoint commit to review")
-    restore = subparsers.add_parser("restore", help="restore touched paths to the selected baseline")
-    restore.add_argument("--path", action="append", required=True, dest="paths")
+    subparsers.add_parser("capture", help="capture the review scope")
     subparsers.add_parser("discard", help="remove bin/crew_diff")
     return parser
 
@@ -472,12 +284,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         repo = _repo_root(Path.cwd())
         if args.command == "capture":
             _discard(repo)
-            if args.baseline:
-                _capture_commit(repo, args.baseline)
-            else:
-                _capture_uncommitted(repo)
-        elif args.command == "restore":
-            _restore(repo, args.paths)
+            _capture_uncommitted(repo)
         elif args.command == "discard":
             _discard(repo)
             print("Discarded chorey-diff artifacts.")
