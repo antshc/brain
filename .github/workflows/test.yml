@@ -44,4 +44,4 @@ jobs:
           python -m pip install -e ".[dev]"
 
       - name: Run all Python tests
-        run: python -m pytest --import-mode=importlib .
+        run: python .github/scripts/run-python-tests.py

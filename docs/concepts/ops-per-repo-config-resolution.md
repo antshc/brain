@@ -33,7 +33,7 @@ Every file sits at a fixed path; the shape of the path follows what the file hol
 | Shape | Use when | Reference |
 |----------|----------|-----------|
 | Fixed path | a setup skill scaffolds the file, so its location is guaranteed | `$HARNESS_REPO_PATH/.crew/<FILE>` ([0002](../adr/0002-crew-is-agnostic.md)) |
-| Fixed path, variant-suffixed | the same config exists once per variant, and one root still holds them all | `$HARNESS_REPO_PATH/.crew/CODE-<stack>.md` ([0002](../adr/0002-crew-is-agnostic.md)) |
+| Fixed path, variant-suffixed | the same config exists once per variant, and one root still holds them all | `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` ([0002](../adr/0002-crew-is-agnostic.md)) |
 | Fixed path, one section per plugin | per-developer settings and credentials for every plugin a harness uses | `$HARNESS_REPO_PATH/.harness.json.user` — top-level `harness`, `atl`, …, plus `credentials.<plugin>` |
 
 A script reads its plugin's section straight from the file with the standard library's parser; a skill with no
