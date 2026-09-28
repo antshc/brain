@@ -3,6 +3,7 @@ name: codey-dotnet
 description: "Implements C#/.NET functionality. Implements and verifies affected changes. MUST use the crew-* skills through the established workflows."
 model: MAI-Code-1.1-Flash
 reasoningEffort: high
+include-custom-instructions: true
 ---
 # Codey — .NET
 

@@ -1,6 +1,7 @@
 ---
 name: codey-ai
 description: "Skills and agent authoring: `SKILL.md`, `*.agent.md`, `*.prompt.md`, `*.instructions.md`, `AGENTS.md`. Implements and checks skills, agents, prompts, and instructions."
+include-custom-instructions: true
 ---
 # Codey — AI Authoring
 

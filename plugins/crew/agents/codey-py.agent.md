@@ -3,6 +3,7 @@ name: codey-py
 description: "Python: `*.py`, `pyproject.toml`, `requirements*.txt`, `Pipfile`, `Pipfile.lock`, `poetry.lock`, `setup.py`, `setup.cfg`, `tox.ini`. Implements and verifies Python code, packaging, scripts, and tests. MUST use the crew-* skills through the established workflows."
 model: Claude Sonnet 5
 reasoningEffort: medium
+include-custom-instructions: true
 ---
 # Codey — Python
 

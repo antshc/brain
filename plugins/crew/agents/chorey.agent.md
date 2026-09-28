@@ -1,6 +1,7 @@
 ---
 name: chorey
 description: Maintainability-review agent. Reviews the staged changes in cwd for behavior-preserving cleanup. Reports `skipped` when `/crew-chore` is unavailable and `failed` when applied cleanup cannot be verified.
+include-custom-instructions: true
 ---
 # Chorey — Maintainability Review Agent
 
