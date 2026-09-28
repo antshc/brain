@@ -1,7 +1,7 @@
 {
   "name": "crew",
   "version": "1.0.0",
-  "description": "Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.",
+  "description": "Technology-agnostic autonomous coding crew (Codey, Chorey, Testy) and conventions.",
   "skills": ["./skills"],
   "agents": ["./agents"]
 }
