@@ -140,8 +140,8 @@ Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.
 
 Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [codey-ai](plugins/crew/agents/codey-ai.agent.md), [chorey](plugins/crew/agents/chorey.agent.md).
 
-- [to-codey](plugins/crew/skills/to-codey/SKILL.md) / [to-chorey](plugins/crew/skills/to-chorey/SKILL.md): run the Codey or Chorey subagent for an implementation or review task.
-- [to-commit](plugins/crew/skills/to-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
+- [to-crew](plugins/crew/skills/to-crew/SKILL.md): run the Codey subagent for an implementation task.
+- [crew-commit](plugins/crew/skills/crew-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
 - [chorey-diff](plugins/crew/skills/chorey-diff/SKILL.md) owns Chorey's commit/uncommitted review bundle, aggregate stack detection, and exact restoration mechanics; Chorey passes the manifest stacks to `/crew-chore` and owns behavior-preserving cleanup, scoped checks, the revert decision, and its status report.
 - [crew-gotchas](plugins/crew/skills/crew-gotchas/SKILL.md): shared read/write procedure for repository-local gotchas memory.
 - [init-crew](plugins/crew/skills/init-crew/SKILL.md): copy stack-specific Copilot instructions and install per-stack Chorey rules skills plus shared gotchas memory.
