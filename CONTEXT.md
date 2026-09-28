@@ -122,7 +122,7 @@ Repository-specific Chore rules and Crew memory are installed as `.github/skills
 _Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
-Reusable directives exposed by the repository's `/crew-memory` skill, which loads and persists `GOTCHAS.md` while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
+Reusable directives exposed by the repository's `/crew-memory` skill, which loads and persists its own `## Gotchas` section while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
