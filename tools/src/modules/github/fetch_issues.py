@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Entry point for fetching actionable issues for a repository."""
 
+from __future__ import annotations
+
 import json
 import pathlib
 import re
@@ -9,8 +11,9 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from github.features.fetch_issues.handler import fetch_issues
+from github.domain.services.issue_filter import ISSUE_KINDS
 
-_USAGE = "Usage: fetch_issues.py <owner>/<repo> [--milestone <title>]"
+_USAGE = "Usage: fetch_issues.py <owner>/<repo> [--milestone <title>] [--kind all|implementation|tests]"
 _REPOSITORY_RE = re.compile(r"^[^/]+/[^/]+$")
 
 
@@ -30,16 +33,21 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     owner, repo = repository.split("/", 1)
 
-    milestone_title: str | None = None
-    if len(argv) == 1:
-        pass
-    elif len(argv) == 3 and argv[1] == "--milestone":
-        milestone_title = argv[2]
-    else:
+    options: dict[str, str] = {}
+    if len(argv[1:]) % 2:
+        print(_USAGE, file=sys.stderr)
+        return 1
+    for option, value in zip(argv[1::2], argv[2::2]):
+        if option not in {"--milestone", "--kind"} or option in options:
+            print(_USAGE, file=sys.stderr)
+            return 1
+        options[option] = value
+    kind = options.get("--kind", "all")
+    if kind not in ISSUE_KINDS:
         print(_USAGE, file=sys.stderr)
         return 1
 
-    print(json.dumps(fetch_issues(owner, repo, milestone_title=milestone_title), indent=2))
+    print(json.dumps(fetch_issues(owner, repo, milestone_title=options.get("--milestone"), kind=kind), indent=2))
     return 0
 
 

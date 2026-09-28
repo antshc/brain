@@ -3,6 +3,9 @@
 import logging
 
 from ..domain.comment import Comment
+from ..domain.issue import Issue
+from ..domain.issue_comment import IssueComment
+from ..domain.milestone import Milestone
 from ..domain.pull_request import PullRequest
 from ..domain.review_thread import ReviewThread
 from .gh_cli import GhCli
@@ -21,9 +24,10 @@ class VCSClient:
         """Return open PRs authored by *user* in *repo* as PullRequest domain objects."""
         prs = self._gh.pr_list(user, repo)
         result = []
-        for url in [pr["url"] for pr in prs]:
+        for pr in prs:
+            url = pr["url"]
             owner, repo_name, number = parse_pr_url(url)
-            result.append(PullRequest(owner=owner, repo=repo_name, number=number, url=url))
+            result.append(PullRequest(owner=owner, repo=repo_name, number=number, url=url, title=pr.get("title", "")))
         return result
 
     def checkout_pr(self, pr_url: str) -> None:
@@ -34,6 +38,16 @@ class VCSClient:
         """Fetch review threads for a PR via GraphQL."""
         nodes = self._gh.fetch_threads_raw(owner, repo, number)
         return [self._thread_from_raw(node) for node in nodes]
+
+    def fetch_issues(self, owner: str, repo: str, milestone_title: str | None = None) -> list[Issue]:
+        """Fetch open issues via GraphQL."""
+        nodes = self._gh.fetch_issues_raw(owner, repo, milestone_title)
+        return [self._issue_from_raw(node) for node in nodes]
+
+    def list_milestones(self, owner: str, repo: str) -> list[Milestone]:
+        """Fetch open milestones via GraphQL."""
+        nodes = self._gh.list_milestones_raw(owner, repo)
+        return [self._milestone_from_raw(node) for node in nodes]
 
     def _thread_from_raw(self, raw: dict) -> ReviewThread:
         """Map a raw GitHub API thread dict to a ReviewThread domain entity."""
@@ -46,4 +60,34 @@ class VCSClient:
             lines=f"{start}-{end}",
             is_resolved=raw.get("isResolved", False),
             comments=comments,
+        )
+
+    def _issue_from_raw(self, raw: dict) -> Issue:
+        """Map a raw GitHub API issue dict to an Issue domain entity."""
+        labels = [label["name"] if isinstance(label, dict) else label for label in raw.get("labels", [])]
+        comments = [
+            IssueComment(
+                id=comment["id"],
+                body=comment.get("body", ""),
+                created_at=comment.get("createdAt", comment.get("created_at", "")),
+            )
+            for comment in raw.get("comments", [])
+        ]
+        return Issue(
+            number=raw["number"],
+            title=raw.get("title", ""),
+            body=raw.get("body", ""),
+            url=raw["url"],
+            labels=labels,
+            comments=comments,
+        )
+
+    def _milestone_from_raw(self, raw: dict) -> Milestone:
+        """Map a raw GitHub API milestone dict to a Milestone domain entity."""
+        return Milestone(
+            id=raw["id"],
+            number=raw["number"],
+            title=raw.get("title", ""),
+            description=raw.get("description") or "",
+            url=raw["url"],
         )

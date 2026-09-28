@@ -7,3 +7,4 @@ class PullRequest:
     repo: str
     number: int
     url: str
+    title: str

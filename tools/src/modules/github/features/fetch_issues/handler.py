@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Fetch Issues use case: fetches actionable issues for a repository."""
 
+from __future__ import annotations
+
 from ...domain.issue import Issue
 from ...domain.services.issue_filter import IssueFilter
 from ...infrastructure.vcs_client import VCSClient
@@ -11,6 +13,7 @@ def fetch_issues(
     repo: str,
     *,
     milestone_title: str | None = None,
+    kind: str = "all",
     vcs: VCSClient | None = None,
 ) -> list[dict]:
     """Fetch and return actionable issues for a repository as serialisable dicts."""
@@ -18,7 +21,7 @@ def fetch_issues(
     issue_filter = IssueFilter()
 
     fetched_issues = vcs.fetch_issues(owner, repo, milestone_title)
-    actionable_issues = issue_filter.get_actionable_issues(fetched_issues)
+    actionable_issues = issue_filter.get_actionable_issues(fetched_issues, kind=kind)
 
     return [_issue_to_dict(issue) for issue in actionable_issues]
 

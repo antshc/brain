@@ -6,6 +6,10 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
+from __future__ import annotations
+
+import pytest
+
 from modules.github.domain.issue import Issue
 from modules.github.domain.services.issue_filter import IssueFilter
 
@@ -46,3 +50,25 @@ class TestIssueFilter:
     def test_empty_input_returns_empty_list(self):
         # Scenario: Empty input returns empty list
         assert IssueFilter().get_actionable_issues([]) == []
+
+    def test_kind_filters_preserve_approval_gates(self):
+        # Scenario: Kind filters preserve approval gates
+        issues = [_make_issue(1, []), _make_issue(2, ["Tests"]),
+                  _make_issue(3, ["tests", "HITL"]), _make_issue(4, ["tests", "SPEC"])]
+        selector = IssueFilter()
+        assert [i.number for i in selector.get_actionable_issues(issues)] == [1, 2]
+        assert [i.number for i in selector.get_actionable_issues(issues, kind="all")] == [1, 2]
+        assert [i.number for i in selector.get_actionable_issues(issues, kind="implementation")] == [1]
+        assert [i.number for i in selector.get_actionable_issues(issues, kind="tests")] == [2]
+
+    def test_removing_hitl_releases_functional_testing(self):
+        # Scenario: Removing hitl releases functional testing
+        issue = _make_issue(1, ["tests", "hitl"])
+        assert IssueFilter().get_actionable_issues([issue], kind="tests") == []
+        issue.labels.remove("hitl")
+        assert IssueFilter().get_actionable_issues([issue], kind="tests") == [issue]
+
+    def test_unknown_kind_is_rejected(self):
+        # Scenario: Unknown kind is rejected
+        with pytest.raises(ValueError, match="kind"):
+            IssueFilter().get_actionable_issues([], kind="typo")

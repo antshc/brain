@@ -1,5 +1,7 @@
 """Thin wrapper around the `gh` CLI for subprocess execution."""
 
+from __future__ import annotations
+
 import json
 import subprocess
 
@@ -21,9 +23,10 @@ query($owner: String!, $repo: String!, $number: Int!) {
 }
 """
 _OPEN_ISSUES_QUERY = """
-query($owner: String!, $repo: String!) {{
+query($owner: String!, $repo: String!, $endCursor: String) {{
   repository(owner: $owner, name: $repo) {{
-    issues(first: 100, states: OPEN) {{
+    issues(first: 100, states: OPEN, after: $endCursor) {{
+      pageInfo {{ hasNextPage endCursor }}
       nodes {{
         number title body url
         milestone {{ title }}
@@ -87,14 +90,14 @@ class GhCli:
     def fetch_issues_raw(self, owner: str, repo: str, milestone_title: str | None = None) -> list[dict]:
         """Run `gh api graphql` for open issues and return flattened nodes."""
         cmd = [
-            "gh", "api", "graphql",
+            "gh", "api", "graphql", "--paginate", "--slurp",
             "-f", f"query={_OPEN_ISSUES_QUERY}",
             "-f", f"owner={owner}",
             "-f", f"repo={repo}",
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         data = json.loads(result.stdout)
-        nodes = data["data"]["repository"]["issues"]["nodes"]
+        nodes = [node for page in data for node in page["data"]["repository"]["issues"]["nodes"]]
         for node in nodes:
             node["labels"] = [label["name"] for label in node["labels"]["nodes"]]
             node["comments"] = node["comments"]["nodes"]

@@ -6,6 +6,8 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -172,3 +174,16 @@ class TestDevMilestoneLoop:
         dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=MagicMock(spec=AIAgent))
 
         mock_execution_log_class.assert_called_once_with(_LOG_DIR, _GITHUB_REPO, "dev")
+
+    def test_tests_only_milestone_still_starts_ralph(self):
+        # Scenario: Tests-only milestone still starts Ralph
+        vcs = MagicMock(spec=VCSClient)
+        vcs.list_milestones.return_value = [Milestone(
+            id="M1", number=3, title="Sprint 3", description="", url=_MILESTONE_URL)]
+        vcs.fetch_issues.return_value = [Issue(
+            number=20, title="Functional verification", body="", url="u", labels=["tests"])]
+        agent = MagicMock(spec=AIAgent)
+        exec_log = MagicMock(spec=ExecutionLog)
+        exec_log.get_count.return_value = 0
+        dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
+        agent.run.assert_called_once_with()
