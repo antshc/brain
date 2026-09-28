@@ -7,7 +7,7 @@ Both agents are from the `crew` plugin and are invoked by `/dev` via `runSubagen
 | Agent | Role | Defined in |
 |-------|------|-----------|
 | `codey-py`, `codey-ai`, `codey-dotnet` | Stack-specific implementers selected per task; unmatched work uses `general-purpose` | [crew agents](../../crew/agents) |
-| `chorey` | Maintainability-review agent — reviews Codey's checkpoint commit in step 6, gated on `STATUS: complete`; its own `STATUS` never overrides Codey's recorded outcome | [`plugins/crew/agents/chorey.agent.md`](../../crew/agents/chorey.agent.md) |
+| `chorey` | Maintainability-review agent — reviews Codey's staged changes in step 6, gated on `STATUS: complete`; its own `STATUS` never overrides Codey's recorded outcome | [`plugins/crew/agents/chorey.agent.md`](../../crew/agents/chorey.agent.md) |
 
 **Via `/dev` skill** (fully automated — fetches milestone, picks tasks, loops):
 
