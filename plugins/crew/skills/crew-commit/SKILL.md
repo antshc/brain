@@ -1,5 +1,5 @@
 ---
-name: to-commit
+name: crew-commit
 description: "Commit current staged or unstaged work after a Codey task completes, or when the user asks to commit it. Derive the message from Codey's report or the diff; require confirmation for partial or blocked work."
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: to-codey
+name: to-crew
 description: "Delegate an implementation task to the matching Codey agent from a task description, session plan, or GitHub issue. Use when the user asks Codey to implement a change."
 argumentHint: "<description> | @plan | <github-issue-url>"
 ---
