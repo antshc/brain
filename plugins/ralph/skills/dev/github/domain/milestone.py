@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 
 @dataclass
-class PullRequest:
-    owner: str
-    repo: str
+class Milestone:
+    id: str
     number: int
-    url: str
     title: str
+    description: str
+    url: str

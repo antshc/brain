@@ -6,6 +6,8 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
+from __future__ import annotations
+
 import json
 from unittest.mock import Mock, patch
 
@@ -45,3 +47,24 @@ class TestGhCliMilestoneQueryConstruction:
             text=True,
             check=True,
         )
+
+
+class TestGhCliIssuePagination:
+    """Feature: GhCli Issue Pagination"""
+
+    @patch("modules.github.infrastructure.gh_cli.subprocess.run")
+    def test_all_issue_pages_are_filtered_by_milestone(self, mock_run):
+        # Scenario: All issue pages are filtered by milestone
+        def node(number, milestone):
+            return {"number": number, "milestone": {"title": milestone},
+                    "labels": {"nodes": [{"name": "tests"}]}, "comments": {"nodes": []}}
+        pages = [{"data": {"repository": {"issues": {"nodes": [node(1, "Other")]}}}},
+                 {"data": {"repository": {"issues": {"nodes": [node(2, "Sprint 1")]}}}}]
+        mock_run.return_value = Mock(stdout=json.dumps(pages))
+        result = GhCli().fetch_issues_raw("owner", "repo", "Sprint 1")
+        assert [item["number"] for item in result] == [2]
+        assert result[0]["labels"] == ["tests"]
+        command = mock_run.call_args.args[0]
+        assert "--paginate" in command and "--slurp" in command
+        assert "after: $endCursor" in command[command.index("-f") + 1]
+        assert "hasNextPage endCursor" in command[command.index("-f") + 1]

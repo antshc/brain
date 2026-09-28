@@ -48,8 +48,6 @@ gh api "repos/$repo/milestones?per_page=100&state=all" | jq --arg title "$milest
 
 If no milestone matches, **exit** and report "Milestone not found: `$milestone`".
 
-Retain the matched milestone number as `$milestone_number` for paginated issue reads.
-
 Extract from `milestone.description`:
 - **Feature ID** — value inside backticks after `**Initiative ID:**`, with legacy `**Feature ID:**` as fallback (e.g. `PROJ-1234`)
 - **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`). This branch lives in the **source repository** the worktree is created from (the `workspace/` source repo when present, otherwise the harness repo), not necessarily the harness repo.
@@ -90,15 +88,14 @@ Repeat the following loop until no eligible implementation tasks remain, then co
 
 ## 1. Read state
 
-Resolve `DEV_SKILL_DIR` from this installed `SKILL.md`'s folder. From `WORKTREE_PATH`, read recent commits and fetch every open issue page into a temporary snapshot outside the worktree. Use the resolved milestone number; a failed fetch/filter exits rather than becoming an empty queue.
+Resolve `DEV_SKILL_DIR` from this installed `SKILL.md`'s folder. From `WORKTREE_PATH`, read recent commits and run the hook-synced shared issue fetcher against the harness repository and milestone:
 
 ```bash
 git log -n 5 --format="%H%n%ad%n%B" --date=short
-gh api --method GET "repos/$repo/issues" -f milestone="$milestone_number" -f state=open -f per_page=100 --paginate --slurp > "$ISSUE_SNAPSHOT"
-python3 "$DEV_SKILL_DIR/select_tickets.py" "$ISSUE_SNAPSHOT" --kind implementation
+python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --milestone "$milestone" --kind implementation
 ```
 
-`ISSUE_SNAPSHOT` is an absolute temporary JSON path allocated for this invocation. Run the commands sequentially and check each exit code. Parse the Python output as the task array; review the commits as recent-change context. The filter excludes pull requests and tickets labeled `tests`, `spec`, or `hitl` (case-insensitive). An empty array ends only the implementation loop.
+Run the commands sequentially and check each exit code. Parse the fetcher's JSON output as the task array; review the commits as recent-change context. The shared fetcher owns pagination, milestone filtering, issue/comment serialization, and `IssueFilter` selection. `implementation` excludes `tests`, `spec`, and `hitl` (case-insensitive). A failed fetch exits rather than becoming an empty queue; an empty array ends only the implementation loop. Edit shared code in `tools/src/modules/github/`; `.githooks/pre-commit` generates this skill's `github/` copy.
 
 ## 2. Select next task
 
@@ -110,7 +107,7 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 4. Polish and quick wins
 5. Refactors
 
-**Emit** the selected `#<number> — <title>` before **Invoke implementation agent**. Fetch its current body and comments with `gh issue view <number> --repo "$repo" --json number,title,body,comments,labels,state`; recheck eligibility before dispatch. REST list responses contain comment counts, not comment bodies.
+**Emit** the selected `#<number> — <title>` before **Invoke implementation agent**. Fetch its current body and comments with `gh issue view <number> --repo "$repo" --json number,title,body,comments,labels,state`; recheck eligibility before dispatch. Fetch the selected issue directly to refresh all comments beyond the shared fetcher's bounded comment preview.
 
 ## 3. Invoke implementation agent
 
@@ -222,7 +219,7 @@ Functional Testing Progress:
 
 Ensure all implementation and review changes are committed through **Commit & push**. Skip an empty commit, push `$branch`, and record its HEAD as `testedCommit`; a failed commit/push exits before running tests. This also applies to a resumed invocation with no implementation work. Keep the tested source revision fixed throughout this phase.
 
-Refresh the paginated issue snapshot with **Read state**'s fetch command and check its exit status. Run `python3 "$DEV_SKILL_DIR/select_tickets.py" "$ISSUE_SNAPSHOT" --kind tests`. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **CREATE PULL REQUEST**. Track handled ticket numbers for this invocation so no ticket is processed twice.
+Refresh approved testing tickets with the same shared fetcher: `python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --milestone "$milestone" --kind tests`. Check its exit status before parsing its JSON output. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **CREATE PULL REQUEST**. Track handled ticket numbers for this invocation so no ticket is processed twice.
 
 ## 2. Check readiness
 

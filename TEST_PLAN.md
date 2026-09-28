@@ -320,6 +320,21 @@ Scenario: Issue comment fields are preserved
 > Unit: `IssueFilter.get_actionable_issues()`
 
 ```gherkin
+Scenario: Kind filters preserve approval gates
+  Given mixed implementation and tests tickets including hitl and spec
+  When each kind is selected
+  Then only approved tickets of that kind are returned; all preserves both kinds
+
+Scenario: Removing hitl releases functional testing
+  Given a tests ticket with hitl
+  When hitl is removed
+  Then tests selection includes the ticket
+
+Scenario: Unknown kind is rejected
+  Given an unknown kind
+  When the filter runs
+  Then it raises ValueError
+
 Scenario: Only actionable issues are returned
   Given a list of issues with labels [], ["blocked"], ["prd"], and ["bug", "hitl"]
   When get_actionable_issues() is called
@@ -479,6 +494,11 @@ Scenario: Open milestones query is built and nodes are returned
 > Integration: mocked `GhCli`
 
 ```gherkin
+Scenario: Kind selection flows through shared fetching
+  Given mixed ticket kinds from the VCS adapter
+  When each fetch kind is requested
+  Then the correct approved tickets and comments are returned
+
 Scenario: Handler returns correctly shaped output for actionable issues
   Given the repository "owner/repo"
     And the VCS returns actionable issues 14 and 15 with labels and comments
@@ -513,6 +533,16 @@ Scenario: Milestone title is forwarded to GhCli
 > Unit: `fetch_issues.py`
 
 ```gherkin
+Scenario: CLI passes kind and milestone in either order
+  Given valid kind and milestone arguments
+  When the CLI runs with either option order
+  Then the handler receives both values
+
+Scenario: CLI rejects invalid kind without fetching
+  Given an invalid or missing kind value or unknown option
+  When the CLI runs
+  Then it returns one without fetching
+
 Scenario: CLI prints JSON array for valid repository
   Given fetch_issues() returns one serialisable issue for "owner/repo"
   When main() is called with ["owner/repo"]
@@ -548,6 +578,11 @@ Scenario: CLI passes milestone title when provided
 > Unit: `afk.features.dev.handler.dev()`
 
 ```gherkin
+Scenario: Tests-only milestone still starts Ralph
+  Given a milestone containing only an approved tests ticket
+  When the launcher runs
+  Then Ralph starts for that milestone
+
 Scenario: No open milestones found — early exit
   Given list_milestones() returns no milestones for owner "owner" and repo "repo"
   When dev() is called
@@ -998,6 +1033,18 @@ Scenario: Current repository's architecture index matches its records
   Given this repository's actual ARCHITECTURE.md and docs/adr, docs/concepts records
   When find_architecture_index_violations() is called against the repo root
   Then the result has no violations
+```
+
+**Coverage:** Unit test
+
+
+## Feature: GhCli Issue Pagination
+
+```gherkin
+Scenario: All issue pages are filtered by milestone
+  Given multiple GitHub issue pages with the matching milestone on the later page
+  When fetch_issues_raw is called for that milestone
+  Then all pages are fetched and the matching issue is returned with flattened labels and comments
 ```
 
 **Coverage:** Unit test
