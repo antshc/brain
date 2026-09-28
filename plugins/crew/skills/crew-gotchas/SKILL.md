@@ -5,7 +5,7 @@ description: "Apply repository-local gotcha rules and produce reusable rule upda
 
 # Gotchas
 
-`/crew-memory` passes the current entries under its `GOTCHAS.md` `## Gotchas` section as `GOTCHAS RULES`. Operate only on those supplied rules. Never locate, read, or write a `GOTCHAS.md` file; `/crew-memory` owns storage.
+`/crew-memory` passes the current entries under its own `## Gotchas` section as `GOTCHAS RULES`. Operate only on those supplied rules. Never locate, read, or write crew-memory's storage file; `/crew-memory` owns storage.
 
 ## Read Workflow (mandatory before the agent's main work)
 
