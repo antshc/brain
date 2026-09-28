@@ -13,7 +13,7 @@ Find the heading matching the requested operation and follow its steps exactly â
 
 Create missing GitHub issue labels for AFK/HITL task workflow.
 
-Run `python scripts/create_labels.py` to create any missing labels.
+Resolve `scripts/create_labels.py` relative to this installed `SKILL.md`'s folder and run it with `python3` to create any missing labels, including `tests` and `bug`.
 
 **Returns:** nothing.
 
@@ -79,13 +79,13 @@ Reads `{{milestoneTitle}}` from context. Use this instead of **Publish spec**'s 
 
 ## Create ticket
 
-Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}` from context.
+Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}` from context. `{{label}}` accepts comma-separated labels: `tests,hitl` for functional verification; `bug,hitl` for failed-test investigation.
 
 ```bash
 gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "{{label}}" --title "{{title}}" --body "{{body}}"
 ```
 
-Use a heredoc for a multi-line `{{body}}`.
+Write a multiline `{{body}}` to a temporary UTF-8 file and use `--body-file` instead of `--body`; preserve literal text without shell interpolation.
 
 **Returns:** the new ticket's number.
 
@@ -156,6 +156,8 @@ gh issue edit {{issueNumber}} --repo "$REPO" --add-assignee "@me"
 
 Reads `{{issueNumber}}`, `{{body}}` from context.
 
+For multiline evidence, write `{{body}}` to a temporary UTF-8 file and replace `--body` with `--body-file`; preserve logs literally without shell interpolation.
+
 ```bash
 gh issue comment {{issueNumber}} --repo "$REPO" --body "{{body}}"
 ```
@@ -184,7 +186,7 @@ gh issue close {{issueNumber}} --repo "$REPO" --comment "{{comment}}"
 
 ## Troubleshooting (all actions)
 
-**Label not found** (`hitl` or `spec` label missing when any other action runs): via `/manage-backlog` **Setup labels** first, then retry the other action.
+**Label not found** (a workflow label missing when any other action runs): via `/manage-backlog` **Setup labels** first, then retry the other action.
 
 ---
 
@@ -198,6 +200,8 @@ Tickets and Specs for this repo live as GitHub issues. Use the `gh` CLI for all 
 |---|---:|---|
 | `hitl` | `fbca04` | Requires human implementation |
 | `spec` | `5319e7` | Spec task with implementation context |
+| `tests` | `1d76db` | Spec-wide functional-test execution; combine with `hitl` until approved |
+| `bug` | `d73a4a` | Failure requiring investigation |
 | `wayfinder:map` | `0e8a16` | Marks the map issue itself |
 | `wayfinder:research` | `1d76db` | Research-type decision ticket |
 | `wayfinder:experiment` | `5319e7` | Experiment-type decision ticket |
@@ -217,4 +221,3 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 - **Comment / label / close**: `gh pr comment`, `gh pr edit --add-label`/`--remove-label`, `gh pr close`.
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either â€” resolve with `gh pr view 42` and fall back to `gh issue view 42`.
-

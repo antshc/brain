@@ -1,6 +1,6 @@
 ---
 name: dev
-description: AFK autonomous development loop — picks the next open issue, implements it, and commits the result.
+description: AFK development loop — implements approved milestone tickets, commits and pushes, then runs approved spec-wide functional-testing tickets through Testy.
 argument-hint: '<milestone-title>'
 ---
 
@@ -48,8 +48,10 @@ gh api "repos/$repo/milestones?per_page=100&state=all" | jq --arg title "$milest
 
 If no milestone matches, **exit** and report "Milestone not found: `$milestone`".
 
+Retain the matched milestone number as `$milestone_number` for paginated issue reads.
+
 Extract from `milestone.description`:
-- **Feature ID** — value inside backticks after `**Feature ID:**` (e.g. `PROJ-1234`)
+- **Feature ID** — value inside backticks after `**Initiative ID:**`, with legacy `**Feature ID:**` as fallback (e.g. `PROJ-1234`)
 - **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`). This branch lives in the **source repository** the worktree is created from (the `workspace/` source repo when present, otherwise the harness repo), not necessarily the harness repo.
 
 If either field is missing, **exit** and report "Milestone is missing required metadata."
@@ -84,22 +86,19 @@ A non-pass build → **exit** and report. Never enter the orchestrator loop on a
 
 # ORCHESTRATOR LOOP
 
-Repeat the following loop until no tasks remain.
+Repeat the following loop until no eligible implementation tasks remain, then continue to **FUNCTIONAL TESTING**. Coding agents retain their focused repository/accessor/proxy integration verification before commit; the later phase verifies the whole spec.
 
 ## 1. Read state
 
-Run the following commands from the `WORKTREE_PATH` and print their output so it is available as context.
+Resolve `DEV_SKILL_DIR` from this installed `SKILL.md`'s folder. From `WORKTREE_PATH`, read recent commits and fetch every open issue page into a temporary snapshot outside the worktree. Use the resolved milestone number; a failed fetch/filter exits rather than becoming an empty queue.
 
 ```bash
-echo "=== COMMITS ==="; 
-echo "$(git log -n 5 --format="%H%n%ad%n%B---" --date=short 2>/dev/null || echo "No commits found.")"; 
-echo ""
-echo "=== TASKS ==="; echo "$(gh issue list --repo "$repo" --state open --milestone "$milestone" --json number,labels,title,body,comments 2>/dev/null | jq '[.[] | select(.labels | map(.name) | (contains(["hitl"]) or contains(["spec"])) | not)]' 2>/dev/null || echo "[]")" | jq 'if length == 0 then "No issues found." else . end'
+git log -n 5 --format="%H%n%ad%n%B" --date=short
+gh api --method GET "repos/$repo/issues" -f milestone="$milestone_number" -f state=open -f per_page=100 --paginate --slurp > "$ISSUE_SNAPSHOT"
+python3 "$DEV_SKILL_DIR/select_tickets.py" "$ISSUE_SNAPSHOT" --kind implementation
 ```
 
-Parse the `TASKS` json array. Review `COMMITS` to understand what work has already been done.
-
-> `spec`, `hitl`-labeled issues are intentionally excluded from the task list (see step 1 filter) and must never be selected for implementation.
+`ISSUE_SNAPSHOT` is an absolute temporary JSON path allocated for this invocation. Run the commands sequentially and check each exit code. Parse the Python output as the task array; review the commits as recent-change context. The filter excludes pull requests and tickets labeled `tests`, `spec`, or `hitl` (case-insensitive). An empty array ends only the implementation loop.
 
 ## 2. Select next task
 
@@ -111,7 +110,7 @@ Pick the next task. Prioritize in this order (first match wins); break ties with
 4. Polish and quick wins
 5. Refactors
 
-**Emit** the selected `#<number> — <title>` before **Invoke implementation agent**.
+**Emit** the selected `#<number> — <title>` before **Invoke implementation agent**. Fetch its current body and comments with `gh issue view <number> --repo "$repo" --json number,title,body,comments,labels,state`; recheck eligibility before dispatch. REST list responses contain comment counts, not comment bodies.
 
 ## 3. Invoke implementation agent
 
@@ -167,7 +166,7 @@ Operate in `WORKTREE_PATH`. Build a single commit:
   - **FILES** → list of files changed
   - **NOTES** → blockers or context for the next iteration
 
-Commit and push regardless of Codey's `STATUS` (**complete**, **partial**, or **blocked**):
+Commit and push regardless of Codey's `STATUS` (**complete**, **partial**, or **blocked**). Skip an empty commit when no staged changes exist, but still push. Check each command separately; a failed commit or push exits before functional testing:
 
 ```bash
 git add -A
@@ -206,9 +205,60 @@ Using the Implementation Decisions from **Distill**, update the spec issue.
 
 Return to **Read state**.
 
+# FUNCTIONAL TESTING
+
+Run after the implementation loop and before **CREATE PULL REQUEST**. This phase processes only approved `tests` tickets; its outcomes never enter Codey's partial/blocked retry loop.
+
+Copy this checklist and check off items as you complete them:
+```markdown
+Functional Testing Progress:
+- [ ] 1. Commit/push the source revision and select approved tests tickets.
+- [ ] 2. Resolve each ticket's spec and completed implementation dependencies.
+- [ ] 3. Run Testy and retry transient network failures within budget.
+- [ ] 4. Save evidence and close or escalate each testing ticket.
+```
+
+## 1. Publish revision and select tickets
+
+Ensure all implementation and review changes are committed through **Commit & push**. Skip an empty commit, push `$branch`, and record its HEAD as `testedCommit`; a failed commit/push exits before running tests. This also applies to a resumed invocation with no implementation work. Keep the tested source revision fixed throughout this phase.
+
+Refresh the paginated issue snapshot with **Read state**'s fetch command and check its exit status. Run `python3 "$DEV_SKILL_DIR/select_tickets.py" "$ISSUE_SNAPSHOT" --kind tests`. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **CREATE PULL REQUEST**. Track handled ticket numbers for this invocation so no ticket is processed twice.
+
+## 2. Check readiness
+
+For each selected ticket in issue-number order, read its current body, comments, labels, and state; skip it if approval was withdrawn or it closed. Resolve its exact **Parent Spec**, not the first spec in the milestone, and read that spec. Resolve every **Blocked by** issue and confirm the spec's implementation dependencies are complete: closed as completed, with implementation evidence. An open, inaccessible, missing, or closed-as-not-planned dependency is not completion. Report pending dependencies and continue to other testing tickets without running this one; never treat an empty coding queue as proof of completion.
+
+## 3. Execute and retry
+
+From `WORKTREE_PATH`, run `testy` via `runSubagent` with explicit inputs:
+
+```text
+## TASK
+<testing ticket number, title, body, comments, and full parent spec>
+## REVISION
+<testedCommit, WORKTREE_PATH, HARNESS_REPO_PATH, known target environment>
+```
+
+Testy discovers applicable `testing-*` skills from every available scope; its report owns test selection, execution evidence, and failure classification. Missing Testy, missing guidance, or an interrupted invocation is `unverified`, handled below; do not route it to Codey or stop the phase.
+
+Retry only the reported transient network-failed subset, at most **two retries after the initial attempt (three attempts total)** per testing ticket in this invocation. Retain the counter and all reports across context resets. Pass the subset, evidence, reset procedure, and attempt number under `## RETRY`. Require the safe rerun/reset procedure reported by Testy; if unavailable, report the subset unverified instead of replaying side effects. Do not reset the budget for different commands or add another retry layer. Assertion, authorization, configuration, and unknown failures are not network retries. A mixed report may retry its network subset while preserving assertion failures and passed results. Continue covered independent scenarios when others are unverified.
+
+## 4. Save results and investigate
+
+Aggregate all attempts by scenario, replacing only a retried scenario's prior transport outcome while retaining its attempt history. Every required scenario must have a final outcome. A missing/malformed report, zero intended tests, skipped required scenarios, unknown target revision, or missing coverage is unverified. Preserve available test output, relevant application logs, stack traces, and correlation IDs before worktree cleanup; publish concise redacted excerpts or durable artifact links, not temporary local paths. Unavailable logs do not block reporting.
+
+Use the harness tracker through `/manage-backlog` actions: bind its `REPO` to the resolved harness `$repo`, never the worktree remote, and pass the current milestone and ticket inputs explicitly. Run `/manage-backlog` skill **Comment on ticket** to save the tested commit/environment, requirement-to-scenario-to-test mapping, exact commands, outcomes, attempt counts, gaps, and evidence on the original testing ticket.
+
+- **All scenarios passed:** Run `/manage-backlog` skill **Close ticket** with the execution evidence. Never infer a pass from a successful command alone.
+- **Any failed or unverified scenario:** Keep the original ticket open with `tests`; Run `/manage-backlog` skill **Label ticket** to add `hitl` before creating follow-up work. Run `/manage-backlog` skill **Create ticket** for one investigation containing all outstanding failures and gaps for this testing ticket in the same milestone: `bug,hitl` if any test failed or network retries were exhausted; otherwise `hitl` for missing coverage or prerequisites. Include the parent spec and testing-ticket links, tested commit/environment, failed or uncovered scenarios, expected versus actual results, reproduction commands, retry history, and useful available logs. Reuse and update an already-linked open investigation covering these findings instead of duplicating it. Run `/manage-backlog` skill **Comment on ticket** to link the investigation back to the original ticket.
+
+Report unsuccessful verification and continue with other eligible testing tickets, then **CREATE PULL REQUEST**. Removal of `hitl` is required for a later rerun. Investigation issues remain outside autonomous implementation while labeled `hitl`. A tracker write failure still exits and reports what was not saved; do not claim escalation succeeded.
+
+Before leaving the phase, account for every testing ticket as passed, escalated, awaiting approval, or pending dependencies. Include these outcomes, tested commit, and investigation links in the PR/report; functional failures do not block PR creation and must not be described as passing verification.
+
 # CREATE PULL REQUEST
 
-Once all tasks are complete and the loop exits, check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
+After the functional-testing phase finishes, including deferred or unsuccessful verification, check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
 
 ```bash
 existing_pr=$(gh pr list \
@@ -251,8 +301,8 @@ Run **once**, after **Commit & Push Harness Repo** completes — development on 
 
 # RULES
 
-- ONE TASK AT A TIME. The agent handles one task per invocation.
+- ONE TASK AT A TIME. Each Codey or Testy invocation handles one ticket; Ralph processes tickets sequentially.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
-- IF NO TASKS ARE AVAILABLE, EXIT. IF ALL TASKS ARE COMPLETE, EXIT — the `spec`-labeled issue is owned by the user; do not close it.
-- ITERATION CAP: exit after 2x the initial open-task count if tasks still remain, to guard against a stuck loop.
-- ANY FAILED SKILL INVOCATION, `git push`, OR `gh` CALL: **exit** and report the error.
+- An empty implementation queue proceeds to **FUNCTIONAL TESTING**, then PR/reporting. Report unresolved implementation dependencies and testing outcomes honestly; the `spec`-labeled issue is owned by the user and stays open.
+- IMPLEMENTATION ITERATION CAP: after 2x the initial eligible implementation-task count, stop the implementation loop and continue to **FUNCTIONAL TESTING**; incomplete dependencies remain pending. Functional tickets use their own once-per-Ralph-invocation handling and network retry budget; context resets retain both.
+- Failed functional-test execution or its testing-skill invocation is evidence for **FUNCTIONAL TESTING**, not an orchestrator exit. Other failed skill invocations, commits, `git push`, or `gh` calls still exit with the error; never claim a bug or approval label was saved when its tracker write failed.
