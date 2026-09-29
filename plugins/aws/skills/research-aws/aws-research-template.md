@@ -1,8 +1,29 @@
 # AWS Research: {{topic}}
 
-- Question: {{implementation question}}
-- Scope: {{services, API operations, region, account, architecture}}
+- Mode: question | implementation
+- Question: {{question}}
+- Scope: {{services, API operations, region, account, architecture — only what applies}}
 - Status: investigating | answered
+
+## Answer
+
+{{direct answer, citing the finding IDs and sections it rests on}}
+
+## Findings
+
+<!-- Facts the Answer rests on that no dimension section below holds. -->
+
+| ID | Type | Finding | Evidence |
+|---|---|---|---|
+| F1 | FACT / LIMIT | {{statement; a LIMIT states its impact}} | {{AWS doc URL + section, or CLI/MCP query + field}} |
+
+## Assumptions / Unknowns
+
+| Type | Finding | Verification |
+|---|---|---|
+| ASSUMPTION / UNKNOWN | {{finding}} | {{exact doc lookup or read-only probe that would settle it}} |
+
+<!-- Question mode: keep only the sections below the answer depends on; delete the rest. Implementation mode: fill every section. -->
 
 ## Services
 
@@ -47,9 +68,3 @@
 
 | Failure | Operation / error code | Implementation impact | Evidence |
 |---|---|---|---|
-
-## Assumptions / Unknowns
-
-| Type | Finding | Verification |
-|---|---|---|
-| ASSUMPTION / UNKNOWN | {{finding}} | {{exact doc lookup or read-only probe that would settle it}} |

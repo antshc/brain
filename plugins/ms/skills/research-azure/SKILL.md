@@ -1,6 +1,6 @@
 ---
 name: research-azure
-description: Research Azure implementation constraints — services, REST/ARM operations, SDK behavior, Entra ID authentication, RBAC roles, VNet and private endpoints, subscription quotas, pagination, throttling and retries, and documented failures — and capture them as an evidence-backed research file. Use when an implementation or design decision turns on how an Azure service actually behaves.
+description: Research Azure implementation constraints — services, REST/ARM operations, SDK behavior, Entra ID authentication, RBAC roles, VNet and private endpoints, subscription quotas, pagination, throttling and retries, and documented failures — and capture them as an evidence-backed research file. Use when an implementation or design decision turns on how an Azure service actually behaves, or to answer a standalone question about an Azure service with evidence.
 compatibility: Requires Microsoft Learn MCP Server (https://learn.microsoft.com/api/mcp). Applied-quota and resource-state facts additionally require an authenticated Azure CLI.
 ---
 
@@ -20,13 +20,13 @@ Evidence priority: live subscription result > official REST/SDK reference > offi
 
 ## Workflow
 
-1. **Frame** — state the implementation question and scope: services, operations, region, subscription, resource group, architecture.
-2. **Research only the dimensions the decision turns on** — resources and their SKUs/tiers; REST or ARM operation semantics; SDK client, methods, and version-specific behavior; Entra ID identity (managed identity, service principal, `DefaultAzureCredential` chain); RBAC roles, data actions, and assignment scope; VNet, private endpoints, service endpoints, DNS, and firewall rules; subscription and per-resource quotas plus regional availability; pagination, throttling, retries and backoff; documented errors and failure conditions.
-3. **Verify every request parameter the implementation sends** — required or optional, allowed values, default, API version, response shape, and the errors it can raise.
+1. **Frame** — state the question and scope: services, operations, region, subscription, resource group, architecture. Set the mode: `implementation` when a design or implementation decision depends on the answer, `question` otherwise.
+2. **Research only the dimensions the answer turns on** — resources and their SKUs/tiers; REST or ARM operation semantics; SDK client, methods, and version-specific behavior; Entra ID identity (managed identity, service principal, `DefaultAzureCredential` chain); RBAC roles, data actions, and assignment scope; VNet, private endpoints, service endpoints, DNS, and firewall rules; subscription and per-resource quotas plus regional availability; pagination, throttling, retries and backoff; documented errors and failure conditions.
+3. **Implementation mode: verify every request parameter the implementation sends** — required or optional, allowed values, default, API version, response shape, and the errors it can raise.
 4. **Classify each quota** — hard, adjustable, default, or applied. Query the subscription when the applied value is what the design depends on.
 5. **Probe only when the docs cannot settle a design-relevant fact** — prefer read-only commands and `--what-if` deployments.
-6. **Record every finding as FACT, LIMIT, ASSUMPTION, or UNKNOWN.** Every LIMIT states its implementation impact.
-7. **Fill** [azure-research-template.md](azure-research-template.md).
+6. **Record every finding as FACT, LIMIT, ASSUMPTION, or UNKNOWN.** Every LIMIT states its impact.
+7. **Fill** [azure-research-template.md](azure-research-template.md) — `question` mode keeps the core sections plus only the dimension sections the answer depends on; `implementation` mode fills every section.
 
 ## Citations
 
@@ -49,4 +49,6 @@ Write `docs/ongoing/research-<slug>-azure.md` unless the user names another path
 
 ## Done
 
-Every implementation-relevant operation semantic, SDK behavior, RBAC role, network path, quota, retry rule, and failure condition is covered with evidence, and the remaining UNKNOWNs cannot change the implementation path.
+`question` mode: the Answer rests only on cited findings, and the remaining UNKNOWNs cannot change it.
+
+`implementation` mode: every implementation-relevant operation semantic, SDK behavior, RBAC role, network path, quota, retry rule, and failure condition is covered with evidence, and the remaining UNKNOWNs cannot change the implementation path.

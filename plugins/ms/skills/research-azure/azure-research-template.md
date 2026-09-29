@@ -1,8 +1,29 @@
 # Azure Research: {{topic}}
 
-- Question: {{implementation question}}
-- Scope: {{services, operations, region, subscription, resource group, architecture}}
+- Mode: question | implementation
+- Question: {{question}}
+- Scope: {{services, operations, region, subscription, resource group, architecture — only what applies}}
 - Status: investigating | answered
+
+## Answer
+
+{{direct answer, citing the finding IDs and sections it rests on}}
+
+## Findings
+
+<!-- Facts the Answer rests on that no dimension section below holds. -->
+
+| ID | Type | Finding | Evidence |
+|---|---|---|---|
+| F1 | FACT / LIMIT | {{statement; a LIMIT states its impact}} | {{Learn URL + section, or `az`/MCP query + field}} |
+
+## Assumptions / Unknowns
+
+| Type | Finding | Verification |
+|---|---|---|
+| ASSUMPTION / UNKNOWN | {{finding}} | {{exact doc lookup or read-only probe that would settle it}} |
+
+<!-- Question mode: keep only the sections below the answer depends on; delete the rest. Implementation mode: fill every section. -->
 
 ## Resources
 
@@ -48,9 +69,3 @@
 
 | Failure | Operation / error code | Implementation impact | Evidence |
 |---|---|---|---|
-
-## Assumptions / Unknowns
-
-| Type | Finding | Verification |
-|---|---|---|
-| ASSUMPTION / UNKNOWN | {{finding}} | {{exact doc lookup or read-only probe that would settle it}} |
