@@ -52,9 +52,14 @@ _Avoid_: repo root, home repo, harness root
 _Plugins_set_: ralph, crew, wf
 
 **Codebase Repo Path**:
-The Git repository containing the source code Ralph develops, resolved once alongside the `Harness Repo Path` by the entry-point skill and supplied explicitly to `/create-worktree`. Distinct from the `Harness Repo Path` and `Worktree Path`, though it can also be the Harness Repo Path.
+The checkout of the one repository a ticket or pull request is developed in, derived from that repository's `owner/name` as `<Workspace folder>/<name>`, or the Harness Repo Path when the repository is the harness itself; never configured.
 _Avoid_: codebase, source checkout, source repository
-_Plugins_set_: ralph, wf
+_Plugins_set_: ralph, wf, harness
+
+**Ticket metadata**:
+The machine-readable block closing a ticket's body that names its Initiative ID, Target Branch, and Repository (`owner/name`); the only place Ralph reads them from.
+_Avoid_: frontmatter, milestone metadata, ticket header
+_Plugins_set_: wf, ralph
 
 **Worktree Path**:
 The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches the crew agents from it when applicable; each agent treats its invocation directory as its workspace and does not receive this path.
