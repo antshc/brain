@@ -1,6 +1,7 @@
 ---
 description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow.
 name: diagnosing-bugs
+argument-hint: "{{bugDescription}} [log]"
 ---
 # Diagnosing Bugs
 
@@ -13,6 +14,16 @@ When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear men
 This skill has you show commands, outputs and captured artifacts. **Redact every secret first** — write `<REDACTED>` in its place. Build loops against env vars, so the credential stays in the environment rather than in what you show. Captured artifacts carry auth headers: quote only the lines that carry the signal.
 
 If the redacted output is not enough to diagnose the bug, say so and ask the user.
+
+## Diagnostic log
+
+Run this section only when the arguments include `log`.
+
+1. `logPath := docs/bugs/diagnosis-{{bugSlug}}.md`, unless the user names a location.
+2. Before Phase 1, copy `templates/diagnostic-log-template.md` — resolved relative to this `SKILL.md`'s folder — to `$logPath` and fill the header.
+3. At the end of every phase, update that phase's section and `Status` before starting the next phase, obeying the template's `**Rules**` blocks. A phase is not done until its log section is.
+4. When stopping blocked (e.g. no loop can be built), set `Status: blocked` and record what was tried.
+5. At Phase 6, delete every `**Rules**` block and report `$logPath` to the user.
 
 ## Phase 1 — Build a feedback loop
 
