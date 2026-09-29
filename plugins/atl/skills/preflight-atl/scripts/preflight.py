@@ -4,7 +4,7 @@
 Usage:
     python3 preflight.py --root <Harness Repo Path>
 
-Offline only: bounded config search + parsing + the six-field shape. `mcpConnected` and
+Offline only: fixed-path `.harness.json.user` read + the six-field shape. `mcpConnected` and
 site-less instance-identifier discovery need a live MCP call — see ../SKILL.md.
 
 This file is a thin entrypoint; the implementation lives in ./preflight_atl/, split along

@@ -8,7 +8,7 @@ Every request in every shape goes in one `http` block, **on the wire** — reque
 
 ```http
 GET /api/v2/alerts?top=1000 HTTP/1.1
-Host: zic.example.com
+Host: proj.example.com
 Authorization: Bearer {{token}}
 
 HTTP/1.1 200 OK

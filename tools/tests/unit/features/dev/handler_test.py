@@ -154,6 +154,47 @@ class TestDevMilestoneLoop:
         mock_agent.run.assert_called_once_with()
         exec_log.update.assert_called_once_with(milestone.url, [14], "owner", "repo", "milestone", 3, milestone.title)
 
+    @patch("afk.features.dev.handler.AIAgent")
+    def test_milestone_whose_repository_is_unusable_does_not_stop_iteration(self, mock_agent_class):
+        # Scenario: Continue with the next milestone when the current milestone's repository is unusable
+        first_milestone = Milestone(
+            id="M1",
+            number=3,
+            title="Sprint 3",
+            description="```metadata\nrepository: owner/missing-checkout\n```",
+            url=_MILESTONE_URL,
+        )
+        second_milestone = Milestone(
+            id="M2",
+            number=4,
+            title="Sprint 4",
+            description="```metadata\nrepository: owner/repo\n```",
+            url="https://github.com/owner/repo/milestone/4",
+        )
+        vcs = MagicMock(spec=VCSClient)
+        vcs.list_milestones.return_value = [first_milestone, second_milestone]
+        vcs.fetch_issues.side_effect = [
+            [Issue(number=14, title="Build feature", body="", url="https://github.com/owner/repo/issues/14", labels=["ready"])],
+            [Issue(number=15, title="Build another", body="", url="https://github.com/owner/repo/issues/15", labels=["ready"])],
+        ]
+        exec_log = MagicMock(spec=ExecutionLog)
+        exec_log.get_count.return_value = 0
+        # The agent's underlying process may exit early (e.g. the ralph `dev` skill
+        # stopping before any worktree, per the milestone's derived repository check) —
+        # AIAgent.run() never raises on that, so the handler must still reach the next milestone.
+        mock_agent = MagicMock()
+        mock_agent_class.return_value = mock_agent
+
+        dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, exec_log=exec_log)
+
+        assert mock_agent.run.call_count == 2
+        exec_log.update.assert_any_call(
+            first_milestone.url, [14], "owner", "repo", "milestone", 3, first_milestone.title
+        )
+        exec_log.update.assert_any_call(
+            second_milestone.url, [15], "owner", "repo", "milestone", 4, second_milestone.title
+        )
+
     @patch("afk.features.dev.handler.ExecutionLog")
     def test_default_execution_log_uses_dev_log_name(self, mock_execution_log_class):
         # Scenario: Default ExecutionLog is created with dev log name

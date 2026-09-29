@@ -359,7 +359,7 @@ def test_restore_diagrams_without_credentials_replaces_every_placeholder_with_a_
     )
     result = restore_diagrams_without_credentials(md)
 
-    assert result.count("ATLASSIAN_API_TOKEN") == 2
+    assert result.count("credentials.atl.api_token") == 2
     assert "```mermaid" not in result
 
 

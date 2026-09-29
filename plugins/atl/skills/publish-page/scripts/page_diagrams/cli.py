@@ -35,11 +35,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     render = sub.add_parser(
         "render-attach",
         help="Render each diagram (stdin: {\"diagrams\": [...]} from `extract`) to PNG and upload it as a "
-        "Confluence attachment. Requires `mmdc` on PATH and a configured `.atlassian` token.",
+        "Confluence attachment. Requires `mmdc` on PATH and a configured `.harness.json.user` token.",
     )
     render.add_argument("--assets-dir", required=True, help="Directory to write rendered .mmd/.png files into")
     render.add_argument("--page-id", required=True, help="Confluence pageId to attach the rendered images to")
-    render.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    render.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
     render.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
     render.add_argument(
         "--out",
@@ -71,7 +71,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     publish_adf.add_argument("--page-id", help="Confluence pageId to update (update path)")
     publish_adf.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
     publish_adf.add_argument("--title", help="Page title (create path, or update path when the title changed)")
-    publish_adf.add_argument("--root", help="Harness Repo Path to bound the `.atlassian` search to")
+    publish_adf.add_argument("--root", help="Harness Repo Path holding `.harness.json.user`")
     publish_adf.add_argument(
         "--threshold-bytes",
         type=int,
@@ -92,7 +92,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     target.add_argument("--page-id", help="Confluence pageId to update (update path)")
     target.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
     run.add_argument("--title", help="Page title (default: the Markdown's first '#' heading)")
-    run.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    run.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
     run.add_argument(
         "--assets-dir",
         help="Directory to write rendered .mmd/.png files into (default: <md path>.tmp)",
@@ -157,7 +157,7 @@ def _run_render_attach(args: argparse.Namespace) -> None:
         # This step ends in a mediaIdsByIndex map, which only the png renderer's one-image-per-
         # diagram output fits; the macro renderers need the custom content `run` creates.
         print(
-            f"error: render-attach supports ATLASSIAN_DIAGRAM_RENDERER=png only; {renderer!r} "
+            f"error: render-attach supports atl.diagram_renderer=png only; {renderer!r} "
             "publishes a macro, so use the `run` subcommand instead",
             file=sys.stderr,
         )

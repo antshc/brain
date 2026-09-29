@@ -10,10 +10,10 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-1. Run `/resolve-harness` skill from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use `HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues) and `CODEBASE_REPO_PATH` for codebase/worktree operations.
+1. Run `/resolve-harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Use it as `$HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues).
 
 2. Bring `HARNESS_REPO_PATH` up to date with its remote before any reads or the final push depend on it.
-**GUARD**:  Run only when `/resolve-harness` found `.harness.env` and emitted a non-empty `HARNESS_REPO_PATH`.
+**GUARD**:  Run only when `/resolve-harness` found `.harness.json.user` and emitted a non-empty `harnessRepoPath`.
 ```bash
 git -C "$HARNESS_REPO_PATH" fetch --all --prune
 git -C "$HARNESS_REPO_PATH" pull
@@ -25,7 +25,7 @@ If the pull exits non-zero (conflicts detected), discard local state in favor of
 git -C "$HARNESS_REPO_PATH" reset --hard "@{upstream}"
 ```
 
-`/resolve-harness` unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Empty/unset `CODEBASE_REPO_PATH` (e.g. a `.harness.env` written before this key existed) → default it to `$HARNESS_REPO_PATH`. `/resolve-harness` exiting non-zero → **exit** and report.
+`/resolve-harness` unavailable or empty `harnessRepoPath` → use cwd as `$HARNESS_REPO_PATH`. `/resolve-harness` exiting non-zero → **exit** and report.
 
 ## 1. Resolve milestone
 
@@ -48,18 +48,21 @@ gh api "repos/$repo/milestones?per_page=100&state=all" | jq --arg title "$milest
 
 If no milestone matches, **exit** and report "Milestone not found: `$milestone`".
 
-Extract from `milestone.description`:
-- **Feature ID** — value inside backticks after `**Initiative ID:**`, with legacy `**Feature ID:**` as fallback (e.g. `PROJ-1234`)
-- **Target Branch** — value inside backticks after `**Target Branch:**` (e.g. `release/1.3.10`). This branch lives in the **source repository** the worktree is created from (the `workspace/` source repo when present, otherwise the harness repo), not necessarily the harness repo.
+Parse the fenced ```` ```metadata ```` block from `milestone.description` — the only source read; legacy bold header lines (`**Initiative ID:**`, `**Target Branch:**`, `**Feature ID:**`) are never parsed, even when a `metadata` block is absent:
+- `initiative_id`
+- `repository` — `owner/name`
+- `target_branch` — this branch lives in the **source repository** the worktree is created from, not necessarily the harness repo.
 
-If either field is missing, **exit** and report "Milestone is missing required metadata."
+Any field missing → **exit** before creating any worktree, leave ticket labels unchanged, and report "Milestone is missing required metadata."
+
+Derive the checkout for `repository`: equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `harness.repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/<name>` (`<name>` is `repository`'s part after the slash). Confirm the checkout exists and its own `origin` normalizes to `repository` — missing or a clone of another repository → **exit** before creating any worktree, leave ticket labels unchanged, and report why. Never read `harness.repos` to make this decision.
 
 ## 2. Compute feature branch name
 
-Format: `<version_underscored>_<milestone-title-slug>`
+Format: `<version_underscored>_<milestone-title-slug>` — or just `<milestone-title-slug>` when `target_branch` carries no version.
 
 Rules:
-- Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `1_3_10`
+- Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `1_3_10`. No version segment found (e.g. `main`, `develop`) → the branch name is the slug alone, with no version prefix.
 - Slugify the full milestone title: lowercase, replace spaces and special chars (including `:`) with hyphens, strip consecutive hyphens, max 50 chars
 
 Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1.3.10` → `1_3_10_proj-1234-azure-storage-circuit-breaker`
@@ -202,9 +205,34 @@ Using the Implementation Decisions from **Distill**, update the spec issue.
 
 Return to **Read state**.
 
+# CREATE PULL REQUEST
+
+Run once, after the implementation loop ends (an empty implementation queue, or the iteration cap). Check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
+
+```bash
+existing_pr=$(gh pr list \
+  --head "$branch" \
+  --base "<target-branch>" \
+  --state open \
+  --json url \
+  --jq '.[0].url' 2>/dev/null)
+```
+
+**If `existing_pr` is non-empty**, a PR already exists — print `"PR already exists: $existing_pr"` and skip creation.
+
+**Otherwise**, open a draft PR from inside `WORKTREE_PATH`:
+
+```bash
+gh pr create --draft \
+  --title "[<initiative-id>]: <milestone-title>" \
+  --body "**Initiative ID:** \`<initiative-id>\`" \
+  --base "<target-branch>" \
+  --head "$branch"
+```
+
 # FUNCTIONAL TESTING
 
-Run after the implementation loop and before **CREATE PULL REQUEST**. This phase processes only approved `tests` tickets; its outcomes never enter Codey's partial/blocked retry loop.
+Run after **CREATE PULL REQUEST** and before **COMMIT & PUSH HARNESS REPO**. This phase processes only approved `tests` tickets; its outcomes never enter Codey's partial/blocked retry loop, and never amend the PR created above — a functional-test failure opens a `hitl` investigation issue instead (Step 4), without failing this run or posting anything to the pull request.
 
 Copy this checklist and check off items as you complete them:
 ```markdown
@@ -219,7 +247,7 @@ Functional Testing Progress:
 
 Ensure all implementation and review changes are committed through **Commit & push**. Skip an empty commit, push `$branch`, and record its HEAD as `testedCommit`; a failed commit/push exits before running tests. This also applies to a resumed invocation with no implementation work. Keep the tested source revision fixed throughout this phase.
 
-Refresh approved testing tickets with the same shared fetcher: `python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --milestone "$milestone" --kind tests`. Check its exit status before parsing its JSON output. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **CREATE PULL REQUEST**. Track handled ticket numbers for this invocation so no ticket is processed twice.
+Refresh approved testing tickets with the same shared fetcher: `python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --milestone "$milestone" --kind tests`. Check its exit status before parsing its JSON output. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **COMMIT & PUSH HARNESS REPO**. Track handled ticket numbers for this invocation so no ticket is processed twice.
 
 ## 2. Check readiness
 
@@ -249,38 +277,13 @@ Use the harness tracker through `/manage-backlog` actions: bind its `REPO` to th
 - **All scenarios passed:** Run `/manage-backlog` skill **Close ticket** with the execution evidence. Never infer a pass from a successful command alone.
 - **Any failed or unverified scenario:** Keep the original ticket open with `tests`; Run `/manage-backlog` skill **Label ticket** to add `hitl` before creating follow-up work. Run `/manage-backlog` skill **Create ticket** for one investigation containing all outstanding failures and gaps for this testing ticket in the same milestone: `bug,hitl` if any test failed or network retries were exhausted; otherwise `hitl` for missing coverage or prerequisites. Include the parent spec and testing-ticket links, tested commit/environment, failed or uncovered scenarios, expected versus actual results, reproduction commands, retry history, and useful available logs. Reuse and update an already-linked open investigation covering these findings instead of duplicating it. Run `/manage-backlog` skill **Comment on ticket** to link the investigation back to the original ticket.
 
-Report unsuccessful verification and continue with other eligible testing tickets, then **CREATE PULL REQUEST**. Removal of `hitl` is required for a later rerun. Investigation issues remain outside autonomous implementation while labeled `hitl`. A tracker write failure still exits and reports what was not saved; do not claim escalation succeeded.
+Report unsuccessful verification and continue with other eligible testing tickets, then **COMMIT & PUSH HARNESS REPO**. Removal of `hitl` is required for a later rerun. Investigation issues remain outside autonomous implementation while labeled `hitl`. A tracker write failure still exits and reports what was not saved; do not claim escalation succeeded.
 
-Before leaving the phase, account for every testing ticket as passed, escalated, awaiting approval, or pending dependencies. Include these outcomes, tested commit, and investigation links in the PR/report; functional failures do not block PR creation and must not be described as passing verification.
-
-# CREATE PULL REQUEST
-
-After the functional-testing phase finishes, including deferred or unsuccessful verification, check whether a PR already exists for `$branch` targeting `<target-branch>`. Run from inside `WORKTREE_PATH` so the command targets the source repository's remote:
-
-```bash
-existing_pr=$(gh pr list \
-  --head "$branch" \
-  --base "<target-branch>" \
-  --state open \
-  --json url \
-  --jq '.[0].url' 2>/dev/null)
-```
-
-**If `existing_pr` is non-empty**, a PR already exists — print `"PR already exists: $existing_pr"` and skip creation.
-
-**Otherwise**, open a draft PR from inside `WORKTREE_PATH`:
-
-```bash
-gh pr create --draft \
-  --title "[<feature-id>]: <milestone-title>" \
-  --body "**Feature ID:** \`<feature-id>\`" \
-  --base "<target-branch>" \
-  --head "$branch"
-```
+Before leaving the phase, account for every testing ticket as passed, escalated, awaiting approval, or pending dependencies in this run's own report — never in the pull request created above. Functional failures never fail this run, never reopen or edit the pull request, and are never described as passing verification.
 
 # COMMIT & PUSH HARNESS REPO
 
-Run **once**, after **Create Pull Request** completes. Operate in `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**) — never the worktree.
+Run **once**, after **FUNCTIONAL TESTING** completes, including deferred or unsuccessful verification. Operate in `$HARNESS_REPO_PATH` (resolved in **Resolve harness settings**) — never the worktree.
 
 - Stage **any change** in the harness root (`git add -A`), on top of whatever is already staged.
 - If nothing is staged, skip the commit (no empty commits).
@@ -300,6 +303,6 @@ Run **once**, after **Commit & Push Harness Repo** completes — development on 
 
 - ONE TASK AT A TIME. Each Codey or Testy invocation handles one ticket; Ralph processes tickets sequentially.
 - ALWAYS re-read state before selecting the next task — context changes after each commit.
-- An empty implementation queue proceeds to **FUNCTIONAL TESTING**, then PR/reporting. Report unresolved implementation dependencies and testing outcomes honestly; the `spec`-labeled issue is owned by the user and stays open.
-- IMPLEMENTATION ITERATION CAP: after 2x the initial eligible implementation-task count, stop the implementation loop and continue to **FUNCTIONAL TESTING**; incomplete dependencies remain pending. Functional tickets use their own once-per-Ralph-invocation handling and network retry budget; context resets retain both.
+- An empty implementation queue proceeds to **CREATE PULL REQUEST**, then **FUNCTIONAL TESTING**. Report unresolved implementation dependencies and testing outcomes honestly; the `spec`-labeled issue is owned by the user and stays open.
+- IMPLEMENTATION ITERATION CAP: after 2x the initial eligible implementation-task count, stop the implementation loop and continue to **CREATE PULL REQUEST**; incomplete dependencies remain pending. Functional tickets use their own once-per-Ralph-invocation handling and network retry budget; context resets retain both.
 - Failed functional-test execution or its testing-skill invocation is evidence for **FUNCTIONAL TESTING**, not an orchestrator exit. Other failed skill invocations, commits, `git push`, or `gh` calls still exit with the error; never claim a bug or approval label was saved when its tracker write failed.

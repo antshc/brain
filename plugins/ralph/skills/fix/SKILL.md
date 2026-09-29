@@ -8,21 +8,21 @@ argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.
 
-1. Run `/resolve-harness` skill from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
-   - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Empty/unset `CODEBASE_REPO_PATH` → default it to `$HARNESS_REPO_PATH`. Non-zero exit → **exit** and report.
-2. Get PR branch names:
+1. Run `/resolve-harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Empty → use cwd as `$HARNESS_REPO_PATH`. Non-zero exit → **exit** and report. Otherwise `HARNESS_REPO_PATH := harnessRepoPath`.
+2. Derive the checkout for `<owner>/<repo>`: equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `harness.repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/<repo>`. Confirm the checkout exists and its own `origin` normalizes to `<owner>/<repo>` — missing or a clone of another repository → **stop** before creating any worktree or touching any review thread, post no replies, and report why. Never read `harness.repos` to make this decision.
+3. Get PR branch names:
   ```bash
   eval "$(gh pr view <number> --repo <owner>/<repo> --json headRefName,baseRefName \
     -q '"branch=\(.headRefName)\ntarget_branch=\(.baseRefName)"')"
   ```
-3. Run `/create-worktree` skill:
+4. Run `/create-worktree` skill:
    ```
   /create-worktree $CODEBASE_REPO_PATH $target_branch $branch
    ```
    Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
-4. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`:
+5. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`:
    A non-pass build → **exit** and report. Never fix threads on a broken build.
-5. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
+6. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
 Output is a JSON array of actionable threads. Each thread has this structure:
 

@@ -8,8 +8,8 @@ from .resolve import resolve
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Resolve Atlassian Preflight facts from `.atlassian`.")
-    parser.add_argument("--root", required=True, help="Harness Repo Path to bound the config search to")
+    parser = argparse.ArgumentParser(description="Resolve Atlassian Preflight facts from `.harness.json.user`.")
+    parser.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
     return parser
 
 

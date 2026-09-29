@@ -126,7 +126,7 @@ def main() -> None:
         description="Assemble a fetched Confluence page's title + Markdown body in one pass."
     )
     parser.add_argument("--page-id", required=True, help="Confluence pageId the page was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    parser.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
         "--assets-dir",

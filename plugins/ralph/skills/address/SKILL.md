@@ -32,10 +32,10 @@ Done when `action` is `proceed` and the working set is in hand.
 
 **Load `references/github-api.md` now.** Every `gh` invocation in this run is copied from it, and nothing below restates one.
 
-1. Run `/resolve-harness` skill from cwd; retain the emitted `KEY=value` lines as `HARNESS_SETTINGS`. Use its `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH` values.
-   - Unavailable or empty `HARNESS_REPO_PATH` → use cwd for both `HARNESS_REPO_PATH` and `CODEBASE_REPO_PATH`. Empty/unset `CODEBASE_REPO_PATH` → default it to `$HARNESS_REPO_PATH`. Non-zero exit → **exit** and report.
-2. Run `/create-worktree` skill with `$CODEBASE_REPO_PATH $baseRef $headRef`. Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
-3. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`. A non-pass build → **exit** and report. Never fix threads on a broken build.
+1. Run `/resolve-harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Empty → use cwd as `$HARNESS_REPO_PATH`. Non-zero exit → **exit** and report. Otherwise `HARNESS_REPO_PATH := harnessRepoPath`.
+2. Derive the checkout for `{{owner}}/{{repo}}` (the PR's repository, from §0): equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `harness.repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/{{repo}}`. Confirm the checkout exists and its own `origin` normalizes to `{{owner}}/{{repo}}` — missing or a clone of another repository → **stop** before touching any review thread, post no replies, and report why. Never read `harness.repos` to make this decision.
+3. Run `/create-worktree` skill with `$CODEBASE_REPO_PATH $baseRef $headRef`. Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
+4. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`. A non-pass build → **exit** and report. Never fix threads on a broken build.
 
 Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef` and the build gate has passed.
 

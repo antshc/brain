@@ -84,7 +84,7 @@ Run `/doc-contracts` skill once per touched contract kind (API, Database, Resour
 <affected-layers-rule>
 - State which layers/modules this slice touches and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
 - Source layer headings and Cross-Module Dependency Rules from the Concept or supplied ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
-- If the slice belongs to a specific service, also scan the `Services` bullet list (under `Building blocks` in `ARCHITECTURE.md`) and load the matching service's doc (`docs/services/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
+- If the slice belongs to a specific building block, also scan the `Deployables` table (under `Building blocks` in `ARCHITECTURE.md`) and load the matching block's record (`docs/building-blocks/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
 </affected-layers-rule>
 
 - {{layerOrModuleName}}: {{crossModuleDependencyRule}}

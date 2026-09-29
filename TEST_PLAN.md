@@ -608,6 +608,13 @@ Scenario: Actionable milestone invokes agent and updates execution log
   When dev() is called
   Then AIAgent is invoked with prompt "/ralph:dev #3"
     And the execution log is updated for the milestone URL with no thread ids
+
+Scenario: Continue with the next milestone when the current milestone's repository is unusable
+  Given list_milestones() returns two actionable milestones
+    And the first milestone's Milestone metadata names a repository whose derived checkout is unusable
+  When dev() is called
+  Then the AI agent is invoked once per milestone
+    And the execution log is updated for both milestone URLs
 ```
 
 **Coverage:** Unit test
@@ -690,32 +697,83 @@ Scenario: PR URL with numeric owner/repo
 Scenario: Nearest Harness Configuration File is resolved
   Given nested directories with Harness Configuration Files in two ancestor directories
   When the resolver runs from the nested directory
-  Then it emits settings from the nearest configuration only
+  Then it emits settings from the nearest configuration only, as one JSON object
 
-Scenario: All Harness Settings are emitted verbatim
-  Given a Harness Configuration File with values containing additional equals signs and empty values
+Scenario: All non-credential Harness Settings are emitted verbatim
+  Given a Harness Configuration File with a harness section and an atl section
   When the resolver runs
-  Then it emits every configured KEY=value line unchanged
+  Then it emits every configured section unchanged
 
-Scenario: No Harness Configuration File returns an empty Harness Repo Path
+Scenario: Credentials are never emitted
+  Given a Harness Configuration File with a credentials section
+  When the resolver runs
+  Then the credentials section is absent from the emitted JSON
+
+Scenario: No Harness Configuration File returns empty sections
   Given no ancestor directory has a Harness Configuration File
   When the resolver runs
-  Then it exits successfully with HARNESS_REPO_PATH= on stdout and a current-directory fallback explanation on stderr
+  Then it exits successfully with an empty harnessRepoPath and empty harness/atl sections on stdout and a current-directory fallback explanation on stderr
 
-Scenario: Missing Harness Repo Path fails resolution
-  Given a discovered Harness Configuration File without HARNESS_REPO_PATH
+Scenario: Invalid JSON fails resolution
+  Given a discovered Harness Configuration File that is not valid JSON
   When the resolver runs
   Then it exits with an error
 
-Scenario: Setup creates Harness Configuration File in current directory
+Scenario: Setup ensures the Harness Configuration File exists
   Given the current directory has no Harness Configuration File
   When harness setup runs
-  Then it creates a configuration with the current directory as HARNESS_REPO_PATH and the probed workspace/ repo (or the current directory) as CODEBASE_REPO_PATH
+  Then it creates an empty configuration, confirms it is gitignored, and installs the pull command at the harness root
 
-Scenario: Setup merges managed keys into an existing Harness Configuration File
-  Given the current directory has an existing Harness Configuration File with a legacy HARNESS_ROOT line and a custom key
+Scenario: Setup overwrites a differing pull command and reports it as updated
+  Given the current directory has an existing Harness Configuration File and a pull command that differs from the skill-owned copy
   When harness setup runs
-  Then it sets HARNESS_REPO_PATH and CODEBASE_REPO_PATH, drops the legacy HARNESS_ROOT line, and preserves the custom key unchanged
+  Then it leaves the configuration file untouched and reports the pull command as updated
+```
+
+## Feature: Pull Repos
+
+> Script CLI unit test, using local bare git repositories as `origin`
+
+```gherkin
+Scenario: No repos configured succeeds
+  Given a Harness Configuration File with no harness.repos entries, or none at all
+  When the pull command runs
+  Then it reports "no repos configured" and exits successfully
+
+Scenario: Configuration errors abort before any repository is touched
+  Given a malformed harness.repos entry, a duplicated repository name, an entry equal to the harness's own origin, or an unknown name argument
+  When the pull command runs
+  Then it exits with an error before touching any repository
+
+Scenario: A read repository is force-reset keeping untracked files
+  Given a read repository with dirty tracked files and untracked files, and a newer commit on its remote branch
+  When the pull command runs
+  Then the tracked files match the remote branch and the untracked files are kept
+
+Scenario: A write repository with dirty tracked changes fails naming the files
+  Given a write repository with uncommitted tracked changes
+  When the pull command runs
+  Then that repository fails naming the dirty files and the command exits with an error
+
+Scenario: A write repository fast-forwards when clean
+  Given a clean write repository behind its configured branch
+  When the pull command runs
+  Then it switches to the configured branch and fast-forwards it
+
+Scenario: A write repository that has diverged is skipped
+  Given a write repository with a local commit not on the remote branch, and the remote branch has also moved
+  When the pull command runs
+  Then that repository is skipped naming the divergence and its local commit is kept
+
+Scenario: A branch missing on the remote is skipped
+  Given a repository whose configured branch does not exist on its remote
+  When the pull command runs
+  Then that repository is skipped naming the missing branch
+
+Scenario: A missing checkout with no clone tool available is skipped
+  Given a repository with no local checkout and no clone tool on PATH
+  When the pull command runs
+  Then that repository is skipped naming the missing clone tool
 ```
 
 **Coverage:** Resolver unit test; setup manual test

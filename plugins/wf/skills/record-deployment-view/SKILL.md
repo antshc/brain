@@ -17,7 +17,9 @@ Create `DEPLOYMENT.md` from [DEPLOYMENT-VIEW-FORMAT.md](./DEPLOYMENT-VIEW-FORMAT
 
 ## Reuse the building blocks
 
-Every `Container`/`ContainerDb`/`ContainerQueue` alias in the diagram is an existing `Services` row in `ARCHITECTURE.md` — same `{{mermaidComponentName}}`, so the two diagrams line up. An alias with no row is a gap: Run `/record-service` skill for it first, then place it here.
+Every `Container`/`ContainerDb`/`ContainerQueue` alias in the diagram is an existing `Deployables` row in `ARCHITECTURE.md` — same `{{mermaidComponentName}}`, so the two diagrams line up. An alias with no row is a gap: Run `/record-building-block` skill for it first, then place it here.
+
+Name every external dependency explicitly — a registry, reverse proxy, managed service, or SaaS the deployment relies on — rather than folding it into a generic "external" node; the deployment view is where a reader learns what actually sits between the building blocks and the outside world.
 
 ## Pick the hosting-model block
 

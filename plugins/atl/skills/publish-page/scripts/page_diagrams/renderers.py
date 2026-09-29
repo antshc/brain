@@ -1,4 +1,4 @@
-"""Renderer vocabulary and readiness gate for `ATLASSIAN_DIAGRAM_RENDERER`.
+"""Renderer vocabulary and readiness gate for `atl.diagram_renderer`.
 
 Three modes: `png` rasterises the diagram with mmdc, `drawio` produces an editable Draw.io
 diagram, `mermaid` publishes the source as a live Confluence macro. All three run mmdc — as
@@ -23,7 +23,7 @@ _PENDING_MACRO_CAPTURE = (
     "renderer {name!r} is not usable yet: its Confluence macro ADF shape must first be "
     "captured from a real diagram via body-format=atlas_doc_format (see "
     "docs/ongoing/publish-page-diagram-renderers.md section 7). Set "
-    "ATLASSIAN_DIAGRAM_RENDERER=png to publish now."
+    "atl.diagram_renderer=png to publish now."
 )
 
 
@@ -31,7 +31,7 @@ def validate(name: str) -> str:
     """Return `name` if it is a known renderer; raise `ValueError` naming the alternatives."""
     if name not in NAMES:
         raise ValueError(
-            f"ATLASSIAN_DIAGRAM_RENDERER={name!r} is not supported; expected one of {', '.join(NAMES)}"
+            f"atl.diagram_renderer={name!r} is not supported; expected one of {', '.join(NAMES)}"
         )
     return name
 
