@@ -8,7 +8,7 @@ description: Locate me.txt in the repository containing this installed skill, in
 Run:
 
 ```bash
-bash <skill-directory>/scripts/locate_me.sh
+python3 <skill-directory>/scripts/locate_me.py
 ```
 
 `<skill-directory>` is the directory containing this `SKILL.md`.
