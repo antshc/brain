@@ -52,14 +52,9 @@ _Avoid_: repo root, home repo, harness root
 _Plugins_set_: ralph, crew, wf
 
 **Codebase Repo Path**:
-The checkout of the one repository a ticket or pull request is developed in, derived from that repository's `owner/name` as `<Workspace folder>/<name>`, or the Harness Repo Path when the repository is the harness itself; never configured.
+The Git repository containing the source code Ralph develops, derived from the `Harness Repo Path` and the target repository — the milestone's, or the pull request's — as that repository's checkout in the **Workspace folder**, or the `Harness Repo Path` itself when the target is the harness; never looked up in the developer's working set. Supplied explicitly to `/create-worktree`. Distinct from the `Harness Repo Path` and `Worktree Path`, though it can also be the Harness Repo Path.
 _Avoid_: codebase, source checkout, source repository
-_Plugins_set_: ralph, wf, harness
-
-**Ticket metadata**:
-The machine-readable block closing a ticket's body that names its Initiative ID, Target Branch, and Repository (`owner/name`); the only place Ralph reads them from.
-_Avoid_: frontmatter, milestone metadata, ticket header
-_Plugins_set_: wf, ralph
+_Plugins_set_: ralph, wf
 
 **Worktree Path**:
 The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches the crew agents from it when applicable; each agent treats its invocation directory as its workspace and does not receive this path.
@@ -92,7 +87,7 @@ _Avoid_: workspace root, repos folder, sources
 _Plugins_set_: harness, wf, ralph, crew
 
 **Repository access**:
-Whether agents may change a repository the harness works with, set per repository by each developer: `read` — a reference repository, read and searched but never branched, committed to, or given a worktree, whose local changes are disposable; `write` — a repository under development, whose local changes are protected. Absent means `read`.
+How a pull treats a repository in the developer's working set, set per repository by each developer: `read` — a reference repository kept identical to its remote, whose local changes are disposable; `write` — a repository under development, whose local changes are protected. Absent means `read`. It governs pulling only; it never decides where Ralph develops.
 _Avoid_: repo mode, permissions, readonly flag
 _Plugins_set_: harness, ralph, crew, wf
 
@@ -127,7 +122,7 @@ Repository-specific Chore rules and Crew memory are installed as `.github/skills
 _Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
-Reusable directives exposed by the repository's `crew-memory` skill, which loads and persists its own `## Gotchas` section while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
+Reusable directives exposed by the repository's `/crew-memory` skill, which loads and persists its own `## Gotchas` section while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
@@ -322,5 +317,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` and `Codebase Repo Path` once via `resolve-harness`, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `crew-memory` skill directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
-- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `crew-memory` skill after feedback loops pass.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` once via `resolve-harness`, derives the `Codebase Repo Path` from the target repository, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
+- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/crew-memory` after feedback loops pass.
