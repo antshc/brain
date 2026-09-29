@@ -17,12 +17,33 @@ If the redacted output is not enough to diagnose the bug, say so and ask the use
 
 ## Diagnostic log
 
-Run this section only when the arguments include `log`.
+Run this section only when the arguments include `log`. The log is the **handoff**: a later run with no memory of this one continues from it alone, so it records facts, never intentions.
 
 1. `logPath := docs/bugs/diagnosis-{{bugSlug}}.md`, unless the user names a location.
-2. Before Phase 1, copy `templates/diagnostic-log-template.md` — resolved relative to this `SKILL.md`'s folder — to `$logPath` and fill the header.
-3. At the end of every phase, update that phase's section and `Status` before starting the next phase, obeying the template's `**Rules**` blocks. A phase is not done until its log section is.
-4. When stopping blocked (e.g. no loop can be built), set `Status: blocked` and record what was tried.
+2. If `$logPath` exists, **resume**:
+   1. Read the whole log.
+   2. Re-verify it against the workspace: `Commit` matches `git rev-parse HEAD`, and every `Artifacts` row marked `present` exists at its path. Record any drift as a log event before continuing.
+   3. Run `Setup`, then — once a loop is recorded — re-run it; its verdict must match the last recorded one. On a mismatch, log it and resume from the earliest phase the mismatch invalidates.
+   4. Continue at `Next step`, keeping row numbering (`H`, `P`, loop `#`) consecutive. Each recorded step stays done; redo one only when step 3 invalidates it.
+
+   Otherwise copy `templates/diagnostic-log-template.md` — resolved relative to this `SKILL.md`'s folder — to `$logPath` and fill the header.
+3. Write each **log event** to `$logPath` the moment it happens, before taking the next action, obeying the template's `**Rules**` blocks. Hold nothing in memory to write later — the file is a running journal, so an interrupted session still leaves every step recorded.
+
+   | Log event | Write |
+   |---|---|
+   | A feedback loop is tried | Phase 1 row, with its outcome |
+   | The loop is chosen | Loop command, first-run output, checklist |
+   | A loop run completes in Phase 2 | Runs count, symptom match |
+   | A minimising cut is re-run | Phase 2 cut row |
+   | Hypotheses are ranked, or the user re-ranks | Phase 3 rows, user input |
+   | A probe returns | Phase 4 probe row, then the hypothesis `Status` it decides |
+   | A test fails or passes, a fix is applied | The matching Phase 5 line |
+   | A cleanup item is done | Its Phase 6 checkbox |
+   | A file is created, modified, or removed by the diagnosis | Its `Artifacts` row |
+   | A phase starts | Header `Status` |
+   | Any event above | Header `Next step` |
+
+4. When stopping blocked (e.g. no loop can be built), set `Status: blocked`, record what was tried, and set `Next step` to what unblocks it.
 5. At Phase 6, delete every `**Rules**` block and report `$logPath` to the user.
 
 ## Phase 1 — Build a feedback loop
