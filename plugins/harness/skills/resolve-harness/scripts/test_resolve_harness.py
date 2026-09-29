@@ -5,6 +5,7 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -26,42 +27,69 @@ class TestMainHarness:
 
     def test_nearest_harness_configuration_is_resolved(self, tmp_path: Path):
         # Scenario: Nearest Harness Configuration File is resolved
-        (tmp_path / ".harness.env").write_text('HARNESS_REPO_PATH="/outer"\nOUTER=value\n')
+        (tmp_path / ".harness.json.user").write_text(json.dumps({"harness": {"outer": True}}))
         nested_directory = tmp_path / "project" / "nested"
         nested_directory.mkdir(parents=True)
-        (tmp_path / "project" / ".harness.env").write_text('HARNESS_REPO_PATH="/inner"\nINNER=value\n')
+        inner_config = tmp_path / "project" / ".harness.json.user"
+        inner_config.write_text(json.dumps({"harness": {"inner": True}}))
 
         result = run_script(RESOLVER_SCRIPT, nested_directory)
 
         assert result.returncode == 0
-        assert result.stdout == 'HARNESS_REPO_PATH="/inner"\nINNER=value\n'
+        assert json.loads(result.stdout) == {
+            "harnessRepoPath": str(inner_config.parent),
+            "harness": {"inner": True},
+            "atl": {},
+        }
         assert result.stderr == ""
 
-    def test_all_harness_settings_are_emitted_verbatim(self, tmp_path: Path):
-        # Scenario: All Harness Settings are emitted verbatim
-        config_path = tmp_path / ".harness.env"
-        config_path.write_text('HARNESS_REPO_PATH="/harness"\nVALUE=first=second\nEMPTY=\n')
+    def test_all_non_credential_sections_are_emitted_verbatim(self, tmp_path: Path):
+        # Scenario: All non-credential Harness Settings are emitted verbatim
+        config_path = tmp_path / ".harness.json.user"
+        config_path.write_text(json.dumps({
+            "harness": {"repos": [{"repository": "owner/name", "branch": "main"}]},
+            "atl": {"site": "example.atlassian.net"},
+        }))
 
         result = run_script(RESOLVER_SCRIPT, tmp_path)
 
         assert result.returncode == 0
-        assert result.stdout == 'HARNESS_REPO_PATH="/harness"\nVALUE=first=second\nEMPTY=\n'
+        assert json.loads(result.stdout) == {
+            "harnessRepoPath": str(tmp_path),
+            "harness": {"repos": [{"repository": "owner/name", "branch": "main"}]},
+            "atl": {"site": "example.atlassian.net"},
+        }
         assert result.stderr == ""
 
-    def test_no_harness_configuration_returns_empty_root(self, tmp_path: Path):
-        # Scenario: No Harness Configuration File returns an empty Harness Root
+    def test_credentials_are_never_emitted(self, tmp_path: Path):
+        # Scenario: Credentials are never emitted
+        config_path = tmp_path / ".harness.json.user"
+        config_path.write_text(json.dumps({
+            "atl": {"site": "example.atlassian.net"},
+            "credentials": {"atl": {"api_token": "super-secret", "email": "me@example.com"}},
+        }))
+
         result = run_script(RESOLVER_SCRIPT, tmp_path)
 
         assert result.returncode == 0
-        assert result.stdout == "HARNESS_REPO_PATH=\n"
-        assert result.stderr == "No .harness.env found; fall back to the current directory.\n"
+        output = json.loads(result.stdout)
+        assert "credentials" not in output
+        assert "super-secret" not in result.stdout
 
-    def test_missing_harness_root_fails_resolution(self, tmp_path: Path):
-        # Scenario: Missing Harness Root fails resolution
-        (tmp_path / ".harness.env").write_text("SETTING=value\n")
+    def test_no_harness_configuration_returns_empty_sections(self, tmp_path: Path):
+        # Scenario: No Harness Configuration File returns empty sections
+        result = run_script(RESOLVER_SCRIPT, tmp_path)
+
+        assert result.returncode == 0
+        assert json.loads(result.stdout) == {"harnessRepoPath": "", "harness": {}, "atl": {}}
+        assert result.stderr == "No .harness.json.user found; fall back to the current directory.\n"
+
+    def test_invalid_json_fails_resolution(self, tmp_path: Path):
+        # Scenario: Invalid JSON fails resolution
+        (tmp_path / ".harness.json.user").write_text("{not valid json")
 
         result = run_script(RESOLVER_SCRIPT, tmp_path)
 
         assert result.returncode == 1
         assert result.stdout == ""
-        assert "HARNESS_REPO_PATH is required" in result.stderr
+        assert "Invalid harness configuration" in result.stderr

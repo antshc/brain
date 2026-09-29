@@ -6,29 +6,29 @@ argument-hint: '<md_file_path>, [pageId], [spaceId]'
 
 # Publish Page
 
-Create or update a Confluence **page** from a local Markdown file, via one `run` command that chains extract -> convert -> attach -> substitute -> publish. Text-only publishes go over the MCP when the body is small; a diagram- or local-attachment-bearing publish always forces a REST publish, since attachment upload needs `atlassian-python-api` (an `ATLASSIAN_API_TOKEN`) regardless of body size.
+Create or update a Confluence **page** from a local Markdown file, via one `run` command that chains extract -> convert -> attach -> substitute -> publish. Text-only publishes go over the MCP when the body is small; a diagram- or local-attachment-bearing publish always forces a REST publish, since attachment upload needs `atlassian-python-api` (`credentials.atl.api_token`) regardless of body size.
 
 ## Prerequisites
 
 - `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; it covers every REST-publish path (diagrams or local attachments present, or a large diagram-free body).
-- A diagram- or local-attachment-bearing publish always goes REST, so for that branch `ATLASSIAN_API_TOKEN` (in `.atlassian`) is **mandatory**, not optional; `mmdc` is mandatory too whenever a diagram is present:
+- A diagram- or local-attachment-bearing publish always goes REST, so for that branch `credentials.atl.api_token` (in `.harness.json.user`) is **mandatory**, not optional; `mmdc` is mandatory too whenever a diagram is present:
   - `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli` (npm, not pip); verify `mmdc --version`.
   - `mmdc` renders via headless Chrome (puppeteer), needing these shared libraries on Debian/Ubuntu (names shown for Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.
 - A diagram-free source needs none of this — it publishes over the MCP alone when small, or REST (still no `mmdc`) when large.
 
 ## Diagram renderer
 
-`ATLASSIAN_DIAGRAM_RENDERER` in `.atlassian` selects how a mermaid fence reaches the page. Absent or empty → `png`.
+`diagram_renderer` in `atl` (`.harness.json.user`) selects how a mermaid fence reaches the page. Absent or empty → `png`.
 
 | Value | Page output | Extra prerequisite | Status |
 |---|---|---|---|
 | `png` | Static image attached to the page | none beyond `mmdc` | Usable |
-| `drawio` | Editable Confluence Draw.io diagram | Draw.io app, `drawio` CLI on PATH, `ATLASSIAN_DRAWIO_EXTENSION_KEY` | Usable |
+| `drawio` | Editable Confluence Draw.io diagram | Draw.io app, `drawio` CLI on PATH, `drawio_extension_key` | Usable |
 | `mermaid` | Live Confluence Mermaid macro | Confluence Mermaid app | Refused — macro shape not yet captured |
 
 `mmdc` is required for every value: it renders the image for `png` and validates the source for the other two. An unknown value, or a value whose macro shape is still uncaptured, fails **before** any page is created or updated — nothing is half-published. See `docs/ongoing/publish-page-diagram-renderers.md` for what the pending renderer still needs.
 
-### `ATLASSIAN_DRAWIO_EXTENSION_KEY`
+### `drawio_extension_key`
 
 Required by `drawio` mode, and by nothing else. Format `<appId>/<envId>/static/drawio` — the app id and environment id differ per site and per install, so there is no default. To find yours, read a Confluence page that already carries a Draw.io diagram with `contentFormat: "adf"` and copy the diagram node's `attrs.extensionKey`. A missing or malformed key fails before any page is touched.
 
@@ -40,7 +40,7 @@ The custom content record must name the page's **space** as well as its containe
 
 ### Installing the Draw.io CLI
 
-Only for `ATLASSIAN_DIAGRAM_RENDERER=drawio`. When `drawio --version` fails, `cd` to this skill's own directory (see Gotchas) and run:
+Only for `diagram_renderer=drawio`. When `drawio --version` fails, `cd` to this skill's own directory (see Gotchas) and run:
 
 ```bash
 python scripts/install_drawio.py
@@ -64,7 +64,7 @@ An id is permanent once published: renaming or deleting one leaves its attachmen
 
 ## Confidentiality
 
-Never print, log, quote, or publish `ATLASSIAN_SITE`, `ATLASSIAN_EMAIL`, or `ATLASSIAN_API_TOKEN` — not in page content, tool arguments, or output. `run` reads credentials from `.atlassian` itself; never pass them as CLI arguments.
+Never print, log, quote, or publish `atl.site`, `credentials.atl.email`, or `credentials.atl.api_token` — not in page content, tool arguments, or output. `run` reads credentials from `.harness.json.user` itself; never pass them as CLI arguments.
 
 ## Inputs
 
@@ -95,15 +95,15 @@ One call does the rest: strips `<!-- adf:ignore:start/end -->` spans, extracts `
 
 - Diagrams or local attachments present and a token is configured → forces REST end to end: ensures the page exists (creating a placeholder when none was named), renders each diagram, uploads every diagram and local attachment, substitutes every marker (at any nesting depth) for its media node — a local image becomes a `mediaSingle` node carrying its filename as `alt` (and, when `/fetch-page` recorded Confluence's own reported size, real `width`/`height`), a non-image local file becomes a `mediaGroup` node — and publishes the final body.
 - No diagrams or local attachments, token configured → REST when the ADF body is over `--threshold-bytes` (default 50KB — the practical ceiling is what an agent can safely inline into an MCP tool argument, not Confluence/MCP transport), otherwise MCP handback.
-- No token → substitutes every marker for a note naming `ATLASSIAN_API_TOKEN` as the missing prerequisite when diagrams or local attachments are present, then always hands back to MCP (REST needs the same token, so it can't cover this case either).
+- No token → substitutes every marker for a note naming `credentials.atl.api_token` as the missing prerequisite when diagrams or local attachments are present, then always hands back to MCP (REST needs the same token, so it can't cover this case either).
 
-Failure framing: `mmdc` missing on the REST/diagram path exits non-zero naming `mmdc`, and `drawio` missing in `drawio` mode exits non-zero naming `drawio`; an unsupported or not-yet-usable `ATLASSIAN_DIAGRAM_RENDERER`, or `drawio` mode without `ATLASSIAN_DRAWIO_EXTENSION_KEY`, exits non-zero naming the renderer or the key, before any page is touched; two fences sharing one `%% diagram-id` exit non-zero naming the id, before any page is touched; a leftover marker after substitution exits non-zero naming it — fix and re-run rather than working around it.
+Failure framing: `mmdc` missing on the REST/diagram path exits non-zero naming `mmdc`, and `drawio` missing in `drawio` mode exits non-zero naming `drawio`; an unsupported or not-yet-usable `diagram_renderer`, or `drawio` mode without `drawio_extension_key`, exits non-zero naming the renderer or the key, before any page is touched; two fences sharing one `%% diagram-id` exit non-zero naming the id, before any page is touched; a leftover marker after substitution exits non-zero naming it — fix and re-run rather than working around it.
 
 Rendered `.mmd`/`.png`/`.drawio` files and the final ADF default to `<mdPath>.tmp/` beside the source (suffix included, e.g. `docs/design.md` → `docs/design.md.tmp/`, holding `final-adf.json`). Override with `--assets-dir` and `--out`.
 
 Prints one JSON result to stdout:
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` — already published; nothing left to do but report.
-- `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"ATLASSIAN_API_TOKEN"}` (the `missingPrerequisite` key is present only when diagrams were substituted for notes) — proceed to Step 4.
+- `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"credentials.atl.api_token"}` (the `missingPrerequisite` key is present only when diagrams were substituted for notes) — proceed to Step 4.
 
 **4 — When `run` returns `method: mcp`.** Read the ADF from `adfPath` (always written pretty-printed, `json.dump(..., indent=2)`, for exactly the reason below) and publish it:
 
@@ -131,8 +131,8 @@ Report the page URL from the tool result and, when diagrams were rendered, confi
 - No **Atlassian config** → `cloudId`/`defaultSpaceId` empty; Preflight's Step 2 resolves `cloudId`, Step 2's space-visibility lookup resolves `spaceId` (asking when ambiguous). A diagram-free source publishes identically to full configuration.
 - No **API token** with diagrams present → `run`'s no-token branch runs; text still publishes over MCP and the result names the unrendered diagrams' missing prerequisite.
 - Token configured but `mmdc` missing → `run` exits non-zero naming `mmdc`; nothing is published (re-run once `mmdc` is installed).
-- `ATLASSIAN_DIAGRAM_RENDERER=drawio` with `drawio` missing or `ATLASSIAN_DRAWIO_EXTENSION_KEY` unset → `run` exits non-zero naming the missing one; nothing is published.
-- `ATLASSIAN_DIAGRAM_RENDERER` set to `mermaid` → `run` exits non-zero naming the renderer and the capture it still needs; nothing is published. Set the key to `png` or `drawio` to publish now.
+- `diagram_renderer=drawio` with `drawio` missing or `drawio_extension_key` unset → `run` exits non-zero naming the missing one; nothing is published.
+- `diagram_renderer` set to `mermaid` → `run` exits non-zero naming the renderer and the capture it still needs; nothing is published. Set the key to `png` or `drawio` to publish now.
 
 ## Gotchas
 

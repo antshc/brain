@@ -33,7 +33,7 @@ _ATTACHMENT_PLACEHOLDER_RE = re.compile(
 _BLOB_IMAGE_RE = re.compile(r"!\[\]\(blob:[^)]*\)")
 
 NO_TOKEN_NOTE = (
-    "<!-- adf:attachment source unavailable: set ATLASSIAN_API_TOKEN to resolve embedded images -->"
+    "<!-- adf:attachment source unavailable: set credentials.atl.api_token to resolve embedded images -->"
 )
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
@@ -189,7 +189,7 @@ def main() -> None:
         description="Restore Markdown image/link references from a fetched issue's attachment placeholders."
     )
     parser.add_argument("--issue-key", required=True, help="Jira issue key the Markdown was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    parser.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
     parser.add_argument("--assets-dir", required=True, help="Directory to cache this issue's attachments into")
     args = parser.parse_args()
 

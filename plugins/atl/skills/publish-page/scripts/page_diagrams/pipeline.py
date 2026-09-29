@@ -60,7 +60,7 @@ def convert_markdown_to_adf(processed_md: str) -> dict:
 
 
 def try_load_credentials(root: str) -> dict[str, str] | None:
-    """Non-fatal probe: `None` when `.atlassian` is missing/incomplete, never raises."""
+    """Non-fatal probe: `None` when `.harness.json.user`'s `atl` section is missing/incomplete, never raises."""
     try:
         return load_credentials(root)
     except SystemExit:
@@ -73,7 +73,7 @@ def _diagram_note_node(name: str) -> dict:
         "content": [
             {
                 "type": "text",
-                "text": f"[Diagram '{name}' not rendered: ATLASSIAN_API_TOKEN is not configured]",
+                "text": f"[Diagram '{name}' not rendered: credentials.atl.api_token is not configured]",
             }
         ],
     }
@@ -259,7 +259,7 @@ def _publish_without_credentials(
     }
     if diagrams or local_media:
         final_adf, _ = substitute_diagram_notes(base_adf, diagrams, local_media)
-        result["missingPrerequisite"] = "ATLASSIAN_API_TOKEN"
+        result["missingPrerequisite"] = "credentials.atl.api_token"
     else:
         final_adf = base_adf
     result["sizeBytes"] = adf_body_size(final_adf)
@@ -296,7 +296,7 @@ def publish(
     base_adf = convert_markdown_to_adf(processed)
 
     # A page with only local attachments and no mermaid fence must not be blocked by an
-    # unrelated/unusable ATLASSIAN_DIAGRAM_RENDERER setting.
+    # unrelated/unusable atl.diagram_renderer setting.
     drawio_extension_key = None
     if diagrams:
         unavailable = renderers.unavailable_reason(renderer)

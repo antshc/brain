@@ -263,7 +263,7 @@ def test_restore_attachments_without_credentials_replaces_every_placeholder_with
     )
     result = restore_attachments_without_credentials(md)
 
-    assert result.count("ATLASSIAN_API_TOKEN") == 2
+    assert result.count("credentials.atl.api_token") == 2
     assert NO_TOKEN_NOTE in result
 
 

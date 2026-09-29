@@ -1,7 +1,7 @@
-"""Locate and parse `.atlassian` for the raw `site`/`email`/`token` a Jira REST call needs — the
-one thing `preflight-atl`'s public contract deliberately never exposes (it reports only
-`tokenAvailable`, a boolean, and never echoes the value). Bounded to `root`, mirroring
-`preflight-atl`'s own config search.
+"""Locate and parse `atl` + `credentials.atl` from `.harness.json.user` for the raw `site`/`email`/`token`
+a Jira REST call needs — the one thing `preflight-atl`'s public contract deliberately never
+exposes (it reports only `tokenAvailable`, a boolean, and never echoes the value). Read at the
+fixed path `<root>/.harness.json.user`, mirroring `preflight-atl`'s own resolution.
 
 A Jira-flavored copy of `/fetch-page`'s own `env.py` — never imported across skill folders
 (Concept 0009). A missing credential here is `/fetch-work`'s degraded mode, not a hard failure,
@@ -9,42 +9,32 @@ so `load_credentials` returns `None` instead of raising.
 """
 from __future__ import annotations
 
-import os
+import json
 from pathlib import Path
 
 from atlassian import Jira
 
-CONFIG_FILENAME = ".atlassian"
+CONFIG_FILENAME = ".harness.json.user"
 
 
-def find_config(root: str) -> str | None:
-    root_path = Path(root).resolve()
-    for dirpath, dirnames, filenames in os.walk(root_path):
-        dirnames.sort()
-        if CONFIG_FILENAME in filenames:
-            return str(Path(dirpath) / CONFIG_FILENAME)
-    return None
-
-
-def parse_config(path: str) -> dict[str, str]:
-    values: dict[str, str] = {}
-    with Path(path).open(encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, _, value = line.partition("=")
-            values[key.strip()] = value.strip().strip('"').strip("'")
-    return values
+def load_settings(root: str) -> dict:
+    path = Path(root) / CONFIG_FILENAME
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        return {}
+    atl = data.get("atl") or {}
+    atl_credentials = (data.get("credentials") or {}).get("atl") or {}
+    return {**atl, **atl_credentials}
 
 
 def load_credentials(root: str) -> dict[str, str] | None:
-    """Return `site`/`email`/`token`, or `None` when any is missing or `.atlassian` is absent."""
-    path = find_config(root)
-    config = parse_config(path) if path else {}
-    site = config.get("ATLASSIAN_SITE", "").strip()
-    email = config.get("ATLASSIAN_EMAIL", "").strip()
-    token = config.get("ATLASSIAN_API_TOKEN", "").strip()
+    """Return `site`/`email`/`token`, or `None` when any is missing or the `atl` section is absent."""
+    config = load_settings(root)
+    site = str(config.get("site", "")).strip()
+    email = str(config.get("email", "")).strip()
+    token = str(config.get("api_token", "")).strip()
     if not (site and email and token):
         return None
     return {"site": site, "email": email, "token": token}

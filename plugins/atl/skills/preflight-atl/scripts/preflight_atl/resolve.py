@@ -1,4 +1,4 @@
-"""Resolve the offline Preflight facts from `.atlassian` — never echoes a secret.
+"""Resolve the offline Preflight facts from `.harness.json.user`'s `atl` section — never echoes a secret.
 
 `mcpConnected` and instance-identifier discovery (when no site is configured) require a
 live MCP call, which this module deliberately does not make — see SKILL.md Steps 2-3.
@@ -8,9 +8,9 @@ from __future__ import annotations
 from .config import load_config
 
 
-def _first_entry(csv: str) -> str:
-    for item in csv.split(","):
-        item = item.strip()
+def _first_entry(values: list[str] | None) -> str:
+    for item in values or []:
+        item = str(item).strip()
         if item:
             return item
     return ""
@@ -33,15 +33,15 @@ def resolve(root: str) -> dict:
     a live `atlassianUserInfo` call is the only other way to populate them (see SKILL.md Step 3).
     """
     config = load_config(root)
-    site = config.get("ATLASSIAN_SITE", "").strip()
-    token = config.get("ATLASSIAN_API_TOKEN", "").strip()
+    site = str(config.get("site", "")).strip()
+    token = str(config.get("api_token", "")).strip()
     return {
         "site": site,
         "cloudId": derive_cloud_id(site),
-        "defaultProjectKey": _first_entry(config.get("ATLASSIAN_JIRA_PROJECT_KEYS", "")),
-        "defaultSpaceId": _first_entry(config.get("ATLASSIAN_CONFLUENCE_SPACE_IDS", "")),
+        "defaultProjectKey": _first_entry(config.get("jira_project_keys")),
+        "defaultSpaceId": _first_entry(config.get("confluence_space_ids")),
         "tokenAvailable": bool(token),
         "mcpConnected": False,
-        "accountId": config.get("ATLASSIAN_ACCOUNT_ID", "").strip(),
-        "displayName": config.get("ATLASSIAN_DISPLAY_NAME", "").strip(),
+        "accountId": str(config.get("account_id", "")).strip(),
+        "displayName": str(config.get("display_name", "")).strip(),
     }

@@ -19,31 +19,36 @@ Resolve `scripts/create_labels.py` relative to this installed `SKILL.md`'s folde
 
 ## Publish spec
 
-Reads `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}` from context.
+Reads `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, `{{repository}}` (`owner/name`) from context.
 
-The milestone represents the Initiative identified by `{{initiativeId}}` and may be reused by many Specs. Its title is set only once, on first creation — never renamed by a later Spec.
+The milestone represents one Initiative developed against one repository and is never reused by another Spec — a second Spec for the same Initiative and repository stops instead of publishing.
 
-1. Look up an existing milestone for this capability:
+1. Derive `{{repoName}}` as `{{repository}}`'s part after the slash, and `{{milestoneTitle}}` as `{{initiativeId}}-{{repoName}}: {{specTitle}}`.
+
+2. Look up an existing milestone for this Initiative and repository:
    ```
-   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{initiativeId}}")) | .title' | head -1
+   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{initiativeId}}-{{repoName}}")) | .title' | head -1
    ```
-   Set `{{milestoneTitle}}` to the matched title if found.
+   A match found → **stop** and report: a milestone for this Initiative and repository already exists; publish nothing.
 
-2. If no milestone was found, create one and set `{{milestoneTitle}}` to the title just created:
+3. Create the milestone:
    ```
    gh api repos/$REPO/milestones \
      --method POST \
-   --field title="{{initiativeId}}: {{specTitle}}" \
-   --field description="**Initiative ID:** \`{{initiativeId}}\`\n**Target Branch:** \`{{targetBranch}}\`"
-   ```
-   If a milestone was already found in step 1, skip this step — do not create or rename it, even if `{{specTitle}}` differs.
-
-3. Create the issue:
-   ```
-   gh issue create --label spec --title "{{initiativeId}}: {{specTitle}}"
+   --field title="{{milestoneTitle}}" \
+   --field description="\`\`\`metadata
+   initiative_id: {{initiativeId}}
+   repository: {{repository}}
+   target_branch: {{targetBranch}}
+   \`\`\`"
    ```
 
-4. Assign the issue to the milestone, using the resolved `{{milestoneTitle}}` (not a newly derived title):
+4. Create the issue:
+   ```
+   gh issue create --label spec --title "{{milestoneTitle}}"
+   ```
+
+5. Assign the issue to the milestone, using `{{milestoneTitle}}`:
    ```
    gh issue edit {{issueNumber}} --milestone "{{milestoneTitle}}"
    ```

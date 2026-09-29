@@ -46,10 +46,10 @@ Else → **create**:
 2. `createJiraIssue` with `cloudId`, `projectKey`, `issueTypeName: issueType`, `summary`, `description`, `contentFormat`, `parent` (when named), `additional_fields` (supplied values only).
 3. Report only `issueKey` and `webUrl`.
 
-**6 — Attach files.** Only when `attachments` is supplied. The Atlassian MCP has no Jira attachment-upload tool — fall back to the REST API: `POST /rest/api/3/issue/{issueIdOrKey}/attachments` with header `X-Atlassian-Token: no-check`, multipart file upload, authenticated with `.atlassian`'s `ATLASSIAN_SITE`/`ATLASSIAN_EMAIL`/`ATLASSIAN_API_TOKEN` (same credential trio `publish-page` uses for its own REST fallback).
+**6 — Attach files.** Only when `attachments` is supplied. The Atlassian MCP has no Jira attachment-upload tool — fall back to the REST API: `POST /rest/api/3/issue/{issueIdOrKey}/attachments` with header `X-Atlassian-Token: no-check`, multipart file upload, authenticated with `atl.site`/`credentials.atl.email`/`credentials.atl.api_token` from `.harness.json.user` (same credential trio `publish-page` uses for its own REST fallback).
 
 - Preflight's `tokenAvailable` is `true` → upload each file against the created/updated issue key; report the attached filenames alongside the key and `webUrl`.
-- `tokenAvailable` is `false` → soft-degrade: the issue is still created/updated; report that attachments were not uploaded, naming `ATLASSIAN_API_TOKEN` as the missing prerequisite. Never fail the whole call over a missing token.
+- `tokenAvailable` is `false` → soft-degrade: the issue is still created/updated; report that attachments were not uploaded, naming `credentials.atl.api_token` as the missing prerequisite. Never fail the whole call over a missing token.
 
 **7 — Verify against the live issue.** Only after an `adf` publish. `getJiraIssue` with `cloudId`, `issueIdOrKey`, `fields: ["description"]`, `contentFormat: "adf"`, then confirm in the returned body that every construct Step 3 reported is present as its ADF node (`expand`, `panel`, `status`) and that combined marks arrived merged rather than as literal `` ` `` characters. Something is missing → fix the description and re-publish through Step 5. Verification is read-only: never re-run `editJiraIssue`/`createJiraIssue` with placeholder or probe content to inspect the result, which overwrites the real publish.
 
@@ -79,4 +79,4 @@ One physical line per bullet and paragraph keeps the two paths identical — `ma
 
 No **Atlassian config** → `cloudId`/`defaultProjectKey` empty; Preflight's Step 2 resolves `cloudId`, Step 5's project-visibility lookup resolves `projectKey` (asking when ambiguous). All other steps unchanged.
 
-No `ATLASSIAN_API_TOKEN` → Step 6 is skipped and reported as unresolved; create/update in Step 5 is unaffected either way.
+No `credentials.atl.api_token` → Step 6 is skipped and reported as unresolved; create/update in Step 5 is unaffected either way.

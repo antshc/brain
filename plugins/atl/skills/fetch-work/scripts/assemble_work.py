@@ -88,7 +88,7 @@ def main() -> None:
         description="Assemble a fetched Jira issue's header + Markdown body in one pass."
     )
     parser.add_argument("--issue-key", required=True, help="Jira issue key the issue was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    parser.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
         "--assets-dir",

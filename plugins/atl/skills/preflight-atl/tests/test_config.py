@@ -1,58 +1,46 @@
-from preflight_atl.config import find_config, load_config, parse_config
+import json
 
 import pytest
 
-
-def test_find_config_returns_none_when_absent(tmp_path):
-    assert find_config(str(tmp_path)) is None
+from preflight_atl.config import config_path, load_config
 
 
-def test_find_config_raises_on_empty_root():
+def write_settings(tmp_path, data: dict) -> None:
+    (tmp_path / ".harness.json.user").write_text(json.dumps(data))
+
+
+def test_config_path_raises_on_empty_root():
     with pytest.raises(ValueError):
-        find_config("")
+        config_path("")
 
 
-def test_find_config_raises_on_filesystem_root():
-    with pytest.raises(ValueError):
-        find_config("/")
-
-
-def test_load_config_returns_empty_dict_when_absent(tmp_path):
+def test_load_config_returns_empty_dict_when_file_absent(tmp_path):
     assert load_config(str(tmp_path)) == {}
 
 
-def test_find_config_locates_file_nested_beneath_root(tmp_path):
+def test_load_config_merges_atl_and_credentials_atl(tmp_path):
+    write_settings(tmp_path, {
+        "atl": {"site": "example.atlassian.net", "jira_project_keys": ["PROJ"]},
+        "credentials": {"atl": {"api_token": "secret", "email": "me@example.com"}},
+    })
+
+    config = load_config(str(tmp_path))
+
+    assert config["site"] == "example.atlassian.net"
+    assert config["jira_project_keys"] == ["PROJ"]
+    assert config["api_token"] == "secret"
+    assert config["email"] == "me@example.com"
+
+
+def test_load_config_ignores_other_plugins_sections(tmp_path):
+    write_settings(tmp_path, {"harness": {"repos": []}, "atl": {"site": "x"}})
+
+    assert load_config(str(tmp_path)) == {"site": "x"}
+
+
+def test_load_config_does_not_search_ancestors(tmp_path):
     nested = tmp_path / "a" / "b"
     nested.mkdir(parents=True)
-    config_path = nested / ".atlassian"
-    config_path.write_text("ATLASSIAN_SITE=example.atlassian.net\n")
+    write_settings(tmp_path, {"atl": {"site": "outer"}})
 
-    assert find_config(str(tmp_path)) == str(config_path)
-
-
-def test_find_config_ignores_file_above_root(tmp_path):
-    above = tmp_path / "above"
-    root = tmp_path / "above" / "root"
-    root.mkdir(parents=True)
-    (above / ".atlassian").write_text("ATLASSIAN_SITE=example.atlassian.net\n")
-
-    assert find_config(str(root)) is None
-    assert load_config(str(root)) == {}
-
-
-def test_parse_config_parses_key_value_pairs(tmp_path):
-    path = tmp_path / ".atlassian"
-    path.write_text(
-        '# comment\nATLASSIAN_SITE="example.atlassian.net"\nATLASSIAN_EMAIL=me@example.com\n'
-        "ATLASSIAN_API_TOKEN=secret\n"
-    )
-    values = parse_config(str(path))
-    assert values["ATLASSIAN_SITE"] == "example.atlassian.net"
-    assert values["ATLASSIAN_EMAIL"] == "me@example.com"
-    assert values["ATLASSIAN_API_TOKEN"] == "secret"
-
-
-def test_parse_config_ignores_blank_lines_and_comments(tmp_path):
-    path = tmp_path / ".atlassian"
-    path.write_text("\n# a comment\nATLASSIAN_SITE=site\n\n")
-    assert parse_config(str(path)) == {"ATLASSIAN_SITE": "site"}
+    assert load_config(str(nested)) == {}

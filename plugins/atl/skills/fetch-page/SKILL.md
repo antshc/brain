@@ -1,6 +1,6 @@
 ---
 name: fetch-page
-description: Run when fetch the Confluence page. Fetch a Confluence page as Markdown from its identifier or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page by ID or URL. No Atlassian config required; a page whose attachments are referenced from its body (diagrams, images, or files) caches them to a `.md.assets` folder alongside the Markdown and references them in it when `ATLASSIAN_API_TOKEN` is configured and retrieval succeeds — `--attachments` controls that behavior.
+description: Run when fetch the Confluence page. Fetch a Confluence page as Markdown from its identifier or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page by ID or URL. No Atlassian config required; a page whose attachments are referenced from its body (diagrams, images, or files) caches them to a `.md.assets` folder alongside the Markdown and references them in it when `credentials.atl.api_token` is configured and retrieval succeeds — `--attachments` controls that behavior.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
@@ -11,7 +11,7 @@ Return a Confluence **Page** as Markdown from its identifier or URL. MCP only fo
 ## Prerequisites
 
 - `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; this skill installs nothing of its own.
-- Caching a page's attachments and restoring a diagram's mermaid source both need `ATLASSIAN_API_TOKEN` (in `.atlassian`), the same credential `/publish-page` uses to upload it. Without it, nothing is downloaded and each reference comes back as a placeholder note instead.
+- Caching a page's attachments and restoring a diagram's mermaid source both need `credentials.atl.api_token` (in `.harness.json.user`), the same credential `/publish-page` uses to upload it. Without it, nothing is downloaded and each reference comes back as a placeholder note instead.
 
 ## Workflow
 
@@ -64,7 +64,7 @@ Attachment downloads always go over TLS with certificate verification enabled; t
 
 No **Atlassian config** → `site`/`cloudId` empty; Preflight's Step 2 supplies `cloudId`. All other steps unchanged.
 
-No **API token** with an attachment reference present and `--attachments auto` (the default) → the page's text and structure still return in full, with a `set ATLASSIAN_API_TOKEN to restore it` note in place of each placeholder and no `.md.assets` folder created. This is distinct from a `skip`-mode note (retrieval was never attempted) and from an `auto`-mode retrieval-failure note (credentials existed but TLS, network, API, or disk I/O failed) — each names its own reason instead of always pointing at the token.
+No **API token** with an attachment reference present and `--attachments auto` (the default) → the page's text and structure still return in full, with a `set credentials.atl.api_token to restore it` note in place of each placeholder and no `.md.assets` folder created. This is distinct from a `skip`-mode note (retrieval was never attempted) and from an `auto`-mode retrieval-failure note (credentials existed but TLS, network, API, or disk I/O failed) — each names its own reason instead of always pointing at the token.
 
 A page whose raw ADF body has none of the three referenced-attachment shapes never touches the Confluence REST/attachment path at all, regardless of credentials or `--attachments`.
 

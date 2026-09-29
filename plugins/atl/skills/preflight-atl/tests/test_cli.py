@@ -3,6 +3,13 @@ import json
 from preflight_atl.cli import main
 
 
+def write_settings(tmp_path, atl: dict, credentials: dict | None = None) -> None:
+    data: dict = {"atl": atl}
+    if credentials is not None:
+        data["credentials"] = {"atl": credentials}
+    (tmp_path / ".harness.json.user").write_text(json.dumps(data))
+
+
 def test_main_prints_empty_fields_as_json_when_config_absent(tmp_path, capsys):
     main(["--root", str(tmp_path)])
     facts = json.loads(capsys.readouterr().out)
@@ -19,10 +26,10 @@ def test_main_prints_empty_fields_as_json_when_config_absent(tmp_path, capsys):
 
 
 def test_main_prints_resolved_facts_without_echoing_the_token(tmp_path, capsys):
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\n"
-        "ATLASSIAN_API_TOKEN=super-secret-token\nATLASSIAN_JIRA_PROJECT_KEYS=PROJ\n"
-        "ATLASSIAN_CONFLUENCE_SPACE_IDS=12345\n"
+    write_settings(
+        tmp_path,
+        atl={"site": "example.atlassian.net", "jira_project_keys": ["PROJ"], "confluence_space_ids": ["12345"]},
+        credentials={"email": "me@example.com", "api_token": "super-secret-token"},
     )
     main(["--root", str(tmp_path)])
     raw_out = capsys.readouterr().out

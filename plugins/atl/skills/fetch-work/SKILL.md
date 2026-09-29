@@ -1,6 +1,6 @@
 ---
 name: fetch-work
-description: Fetch a Jira work item as Markdown from its key or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Jira work item/issue by key or URL. No Atlassian config required; a description whose body embeds images or files caches them to a `.tmp` folder alongside the Markdown and references them in it when `ATLASSIAN_API_TOKEN` is configured.
+description: Fetch a Jira work item as Markdown from its key or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Jira work item/issue by key or URL. No Atlassian config required; a description whose body embeds images or files caches them to a `.tmp` folder alongside the Markdown and references them in it when `credentials.atl.api_token` is configured.
 argument-hint: '<work_item_key_or_url> (e.g. "PROJ-123" or "https://<site>.atlassian.net/browse/PROJ-123")'
 ---
 
@@ -11,7 +11,7 @@ Return a Jira **Work item** as Markdown from its key or URL. MCP only for summar
 ## Prerequisites
 
 - `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; this skill installs nothing of its own.
-- Resolving an embedded image or file needs `ATLASSIAN_API_TOKEN` (in `.atlassian`) — the Atlassian MCP's `getJiraIssue` tool never returns real ADF for `description` (see Gotchas), only a lossy Markdown-ish string with every embedded image's `alt` text empty, so restoring the real file needs a direct REST call. Without the token, nothing is downloaded and each embedded image comes back as a placeholder note instead.
+- Resolving an embedded image or file needs `credentials.atl.api_token` (in `.harness.json.user`) — the Atlassian MCP's `getJiraIssue` tool never returns real ADF for `description` (see Gotchas), only a lossy Markdown-ish string with every embedded image's `alt` text empty, so restoring the real file needs a direct REST call. Without the token, nothing is downloaded and each embedded image comes back as a placeholder note instead.
 
 ## Workflow
 
@@ -31,7 +31,7 @@ Return a Jira **Work item** as Markdown from its key or URL. MCP only for summar
 python scripts/assemble_work.py --issue-key <key> --root "$HARNESS_REPO_PATH" --md-path work.md < content.json
 ```
 
-from this skill's directory. Writes `work.md` directly (add `--assets-dir <dir>` to override where attachments are cached; defaults to `work.md.tmp`, next to `work.md`). Internally: no token configured → the MCP result's already Markdown-ish `fields.description` is used as-is, with each embedded `![](blob:...)` image reference swapped for a note naming `ATLASSIAN_API_TOKEN`; token configured → fetches the issue's real ADF description directly over REST, converts it via `/map-markdown-adf` **Action: Convert ADF to Markdown** (a `media`/`mediaSingle`/`mediaGroup` node becomes a placeholder, never a raw error), then, only when a pure offline scan of the raw ADF body finds a node referencing an attached file, downloads every attachment on the issue to the assets dir and resolves each placeholder per the rendering rules below. `work.md` already reads `# <key> — <summary>\n**Status:** ... · **Type:** ... · **Assignee:** ...\n\n<body Markdown>`.
+from this skill's directory. Writes `work.md` directly (add `--assets-dir <dir>` to override where attachments are cached; defaults to `work.md.tmp`, next to `work.md`). Internally: no token configured → the MCP result's already Markdown-ish `fields.description` is used as-is, with each embedded `![](blob:...)` image reference swapped for a note naming `credentials.atl.api_token`; token configured → fetches the issue's real ADF description directly over REST, converts it via `/map-markdown-adf` **Action: Convert ADF to Markdown** (a `media`/`mediaSingle`/`mediaGroup` node becomes a placeholder, never a raw error), then, only when a pure offline scan of the raw ADF body finds a node referencing an attached file, downloads every attachment on the issue to the assets dir and resolves each placeholder per the rendering rules below. `work.md` already reads `# <key> — <summary>\n**Status:** ... · **Type:** ... · **Assignee:** ...\n\n<body Markdown>`.
 
 **6 — Return** the contents of `work.md` unchanged.
 

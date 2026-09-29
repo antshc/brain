@@ -1,46 +1,33 @@
 ---
 name: init-harness
-description: Create or update the Harness Configuration File in the current directory — resolving both the Harness Repo Path and the Codebase Repo Path, merging into an existing file rather than overwriting it.
+description: Create or update the Harness Configuration File in the current directory, and install the harness's pull command.
 disable-model-invocation: true
 ---
 
 # Setup Harness
 
-Run from the intended harness directory. Resolve its physical absolute path:
+Run from the intended harness directory.
+
+## 1. Ensure the settings file exists
+
+If `$PWD/.harness.json.user` does not exist, create it holding `{}`. Never overwrite an existing file — every other plugin's section lives in it, and this skill only ensures it exists.
+
+## 2. Keep it out of version control
 
 ```bash
-harnessRepoPath=$(pwd -P)
+git check-ignore -q .harness.json.user
 ```
 
-The actual source code may live in a separate repo under `workspace/`. Probe for it:
+Non-zero exit → append `*.user` to `.gitignore` (create the file if needed) and report it. Never write `.harness.json.user` itself into `.gitignore` — the existing `*.user` pattern is the intended match.
 
-```bash
-src_git=$(find "$harnessRepoPath/workspace" -maxdepth 2 -name .git -type d 2>/dev/null | head -n1)
-if [ -n "$src_git" ]; then
-  codebaseRepoPath=$(dirname "$src_git")
-else
-  codebaseRepoPath=$harnessRepoPath
-fi
-```
+## 3. Install the pull command
 
-- If a `.git` directory is found under `workspace/` (including one subfolder level), `codebaseRepoPath` is that repo.
-- Otherwise, `codebaseRepoPath` falls back to `harnessRepoPath`.
+Resolve `<skill-directory>` the same way as `/resolve-harness`: strip the trailing `/SKILL.md` from the path you used to read this file. Copy `<skill-directory>/scripts/pull-repos.py` to `$PWD/pull-repos.py`:
 
-## No existing file
+- Destination absent → copy it, report "created".
+- Destination present and byte-identical → leave it, report "unchanged".
+- Destination present and differs → overwrite it, report "updated".
 
-If `$PWD/.harness.env` does not exist, create it:
+`pull-repos.py` is committed at the harness root — it is the only reader of `harness.repos` and reads its sibling `.harness.json.user` directly.
 
-```bash
-printf 'HARNESS_REPO_PATH=%s\nCODEBASE_REPO_PATH=%s\n' "$harnessRepoPath" "$codebaseRepoPath" > .harness.env
-```
-
-## Existing file — merge, never overwrite wholesale
-
-`.harness.env` is gitignored — there is no undo, so never rewrite it wholesale. Merge instead:
-
-1. Set `HARNESS_REPO_PATH` to `$harnessRepoPath` — update the line in place if present, else append it.
-2. Set `CODEBASE_REPO_PATH` to `$codebaseRepoPath` — update the line in place if present, else append it.
-3. Drop any legacy `HARNESS_ROOT=` line entirely — it is superseded by `HARNESS_REPO_PATH`.
-4. Preserve every other line byte-for-byte, in its original order.
-
-Emit the created path, or the merged settings plus a report of which lines were set, added, or dropped.
+Emit the settings-file status (created/already present) and the pull-command status (created/updated/unchanged).

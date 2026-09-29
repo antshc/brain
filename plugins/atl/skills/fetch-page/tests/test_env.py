@@ -1,37 +1,35 @@
+import json
+
 import pytest
 
-from env import find_config, load_credentials, parse_config
+from env import load_credentials, load_settings
 
 
-def test_find_config_returns_none_when_absent(tmp_path):
-    assert find_config(str(tmp_path)) is None
+def write_settings(tmp_path, atl: dict, credentials: dict | None = None) -> None:
+    data: dict = {"atl": atl}
+    if credentials is not None:
+        data["credentials"] = {"atl": credentials}
+    (tmp_path / ".harness.json.user").write_text(json.dumps(data))
 
 
-def test_find_config_locates_file_nested_beneath_root(tmp_path):
-    nested = tmp_path / "a" / "b"
-    nested.mkdir(parents=True)
-    config_path = nested / ".atlassian"
-    config_path.write_text("ATLASSIAN_SITE=example.atlassian.net\n")
-
-    assert find_config(str(tmp_path)) == str(config_path)
+def test_load_settings_returns_empty_dict_when_absent(tmp_path):
+    assert load_settings(str(tmp_path)) == {}
 
 
-def test_parse_config_parses_key_value_pairs(tmp_path):
-    path = tmp_path / ".atlassian"
-    path.write_text(
-        '# comment\nATLASSIAN_SITE="example.atlassian.net"\nATLASSIAN_EMAIL=me@example.com\n'
-        "ATLASSIAN_API_TOKEN=secret\n"
-    )
-    values = parse_config(str(path))
-    assert values["ATLASSIAN_SITE"] == "example.atlassian.net"
-    assert values["ATLASSIAN_EMAIL"] == "me@example.com"
-    assert values["ATLASSIAN_API_TOKEN"] == "secret"
+def test_load_settings_merges_atl_and_credentials_atl(tmp_path):
+    write_settings(tmp_path, atl={"site": "example.atlassian.net"}, credentials={"email": "me@example.com"})
+
+    values = load_settings(str(tmp_path))
+
+    assert values["site"] == "example.atlassian.net"
+    assert values["email"] == "me@example.com"
 
 
 def test_load_credentials_returns_site_email_token(tmp_path):
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\n"
-        "ATLASSIAN_API_TOKEN=super-secret-token\n"
+    write_settings(
+        tmp_path,
+        atl={"site": "example.atlassian.net"},
+        credentials={"email": "me@example.com", "api_token": "super-secret-token"},
     )
     creds = load_credentials(str(tmp_path))
     assert creds == {
@@ -42,13 +40,12 @@ def test_load_credentials_returns_site_email_token(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "content",
+    "atl,credentials",
     [
-        "ATLASSIAN_SITE=example.atlassian.net\n",
-        "",
+        ({"site": "example.atlassian.net"}, None),
+        ({}, None),
     ],
 )
-def test_load_credentials_returns_none_instead_of_raising_when_incomplete(tmp_path, content):
-    if content:
-        (tmp_path / ".atlassian").write_text(content)
+def test_load_credentials_returns_none_instead_of_raising_when_incomplete(tmp_path, atl, credentials):
+    write_settings(tmp_path, atl=atl, credentials=credentials)
     assert load_credentials(str(tmp_path)) is None

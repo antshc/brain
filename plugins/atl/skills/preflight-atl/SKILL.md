@@ -9,39 +9,39 @@ The resolution gate every other `atl` skill runs first. Never fails — an unres
 
 ## Configuration
 
-`.atlassian` — a single gitignored dotfile, found by a search bounded to `$HARNESS_REPO_PATH` (never above it, and never the filesystem root `/`). Plain `KEY=VALUE` lines; blank lines and `#` comments ignored.
+`atl` + `credentials.atl` in `.harness.json.user` at `$HARNESS_REPO_PATH` — resolved by `/resolve-harness`, never searched for independently. Empty `atl` section → every config-derived fact comes back empty and the caller runs against the MCP alone.
 
-| Key | Meaning |
-|---|---|
-| `ATLASSIAN_SITE` | Site host, e.g. `example.atlassian.net` |
-| `ATLASSIAN_EMAIL` | Atlassian account email |
-| `ATLASSIAN_API_TOKEN` | Optional — only for what the MCP can't do (e.g. attachment upload) |
-| `ATLASSIAN_JIRA_PROJECT_KEYS` | Comma-separated Jira project keys, first = default |
-| `ATLASSIAN_CONFLUENCE_SPACE_IDS` | Comma-separated Confluence space ids, first = default |
-| `ATLASSIAN_ACCOUNT_ID` | Cached identity, populated by `/init-atl` from a live `atlassianUserInfo` call — never hand-entered |
-| `ATLASSIAN_DISPLAY_NAME` | Cached identity, same origin as `ATLASSIAN_ACCOUNT_ID` — never hand-entered |
-| `ATLASSIAN_DIAGRAM_RENDERER` | Optional — how `/publish-page` renders mermaid diagrams: `png` (default), `drawio`, or `mermaid` |
-| `ATLASSIAN_DRAWIO_EXTENSION_KEY` | Required only by `ATLASSIAN_DIAGRAM_RENDERER=drawio` — the Draw.io macro's `<appId>/<envId>/static/drawio` key |
+| Key | Section | Meaning |
+|---|---|---|
+| `site` | `atl` | Site host, e.g. `example.atlassian.net` |
+| `email` | `credentials.atl` | Atlassian account email |
+| `api_token` | `credentials.atl` | Optional — only for what the MCP can't do (e.g. attachment upload) |
+| `jira_project_keys` | `atl` | JSON array of Jira project keys, first = default |
+| `confluence_space_ids` | `atl` | JSON array of Confluence space ids, first = default |
+| `account_id` | `atl` | Cached identity, populated by `/init-atl` from a live `atlassianUserInfo` call — never hand-entered |
+| `display_name` | `atl` | Cached identity, same origin as `account_id` — never hand-entered |
+| `diagram_renderer` | `atl` | Optional — how `/publish-page` renders mermaid diagrams: `png` (default), `drawio`, or `mermaid` |
+| `drawio_extension_key` | `atl` | Required only by `diagram_renderer=drawio` — the Draw.io macro's `<appId>/<envId>/static/drawio` key |
 
 ## Action: Resolve
 
-Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected`, `accountId`, `displayName`. Never echo `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN`, or the `email` the identity call returns — not in output, logs, or errors.
+Returns `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected`, `accountId`, `displayName`. Never echo `email`, `api_token`, or the `email` the identity call returns — not in output, logs, or errors.
 
-**1 — Config-derived facts (offline).** Resolve `$HARNESS_REPO_PATH` first: non-empty → use it as-is. Empty → resolve the repository root instead (e.g. `git rev-parse --show-toplevel`, falling back to cwd only if that fails) — **never** substitute `/` or leave the value blank, which would walk the whole filesystem. Take the absolute path of `preflight-atl/SKILL.md` you were already given (in the system/tool context that told you this skill exists) and `cd` to its parent directory — never search for it, and never guess or reconstruct that path from a different skill's location — then run:
+**1 — Config-derived facts (offline).** Run `/resolve-harness` skill; use its `harnessRepoPath` as `$HARNESS_REPO_PATH`. Take the absolute path of `preflight-atl/SKILL.md` you were already given (in the system/tool context that told you this skill exists) and `cd` to its parent directory — never search for it, and never guess or reconstruct that path from a different skill's location — then run:
 
 ```bash
-python scripts/preflight.py --root "<resolved repo root>"
+python scripts/preflight.py --root "$HARNESS_REPO_PATH"
 ```
 
-This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--root`. Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected` (always `false` here — only a live call sets it `true`), and `accountId`/`displayName` (from a prior `/init-atl` cache when present, empty otherwise). An empty or filesystem-root `--root` exits non-zero naming the problem rather than searching — resolve a real root and re-run.
+This is the entire CLI — no subcommand (e.g. no `resolve` argument), just `--root`. Prints JSON with `site`, `cloudId`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `mcpConnected` (always `false` here — only a live call sets it `true`), and `accountId`/`displayName` (from a prior `/init-atl` cache when present, empty otherwise). A blank `$HARNESS_REPO_PATH` reads `.harness.json.user` relative to cwd — `/resolve-harness` already resolves this correctly before this step runs.
 
 **2 — Discover `cloudId` only when the config supplies none.** `cloudId` empty and an operation needs it → call `getAccessibleAtlassianResources` once, then treat it as cached for the session. Exactly one accessible resource → use it; more than one → ask the developer which site. Once `cloudId` is known, never call it again. Step 1's `cloudId` is `https://<site>`, not a UUID — that's expected, not a sign of a missing discovery step: every Atlassian MCP tool's `cloudId` parameter accepts "UUID or site URL", so the site-URL form is valid as-is.
 
 **3 — MCP connection status and identity.** Step 1's `accountId` and `displayName` are both non-empty → skip this step: they're already resolved, and `mcpConnected` comes back `false`/unverified rather than guessed — the caller's own next MCP call surfaces a real connectivity failure directly, so nothing downstream needs it pre-checked. Either is empty → call `atlassianUserInfo` once: `mcpConnected := true` on success, `false` on any failure — never raise; on success `accountId := account_id`, `displayName := name`. A caller that specifically needs a guaranteed-fresh `mcpConnected` (today, only `/init-atl`'s own connectivity gate) always calls `atlassianUserInfo` live regardless of the cache.
 
-This reverses an earlier rule that resolved identity fresh on every single call, from this step and nowhere else. It's now resolved once by `/init-atl` (which writes it back to `.atlassian`) and read from the cache everywhere else — a deliberate trade of per-call freshness for one fewer MCP round trip on every `atl` skill invocation. Stale identity (a developer switching Atlassian accounts) is refreshed the same way as any other static config value: re-run `/init-atl`, or hand-edit `.atlassian`.
+This reverses an earlier rule that resolved identity fresh on every single call, from this step and nowhere else. It's now resolved once by `/init-atl` (which writes it back to `.harness.json.user`) and read from the cache everywhere else — a deliberate trade of per-call freshness for one fewer MCP round trip on every `atl` skill invocation. Stale identity (a developer switching Atlassian accounts) is refreshed the same way as any other static config value: re-run `/init-atl`, or hand-edit `.harness.json.user`.
 
-**4 — Report** the eight fields before the caller's operation runs. Never restate `ATLASSIAN_EMAIL`, the raw token, or the identity response's `email`.
+**4 — Report** the eight fields before the caller's operation runs. Never restate `email`, the raw token, or the identity response's `email`.
 
 ## Standing MCP usage rules
 
@@ -56,7 +56,7 @@ Apply in every `atl` skill:
 
   Swap the key path for the field you want; `print(json.dumps(d, indent=2)[:2000])` when the shape is still unknown.
 - `getAccessibleAtlassianResources` at most once per session, only while `cloudId` is unknown (Step 2).
-- Never search for `.atlassian` (or anything else) from `/` or any other unbounded root — an empty `$HARNESS_REPO_PATH` is resolved to the repository root first (Step 1), never widened into a filesystem-wide search.
+- Never search the filesystem for `.harness.json.user` from any `atl` skill — `/resolve-harness` alone resolves `$HARNESS_REPO_PATH`, and the settings file lives at exactly `$HARNESS_REPO_PATH/.harness.json.user`.
 
 ## Gotchas
 

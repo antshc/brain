@@ -128,7 +128,7 @@ def _run_drawio(args: list[str]) -> None:
         result = subprocess.run(["drawio", *args], capture_output=True, text=True)
     except FileNotFoundError:
         raise RuntimeError(
-            "drawio not found on PATH — ATLASSIAN_DIAGRAM_RENDERER=drawio needs the Draw.io Desktop "
+            "drawio not found on PATH — atl.diagram_renderer=drawio needs the Draw.io Desktop "
             "CLI; install it with `python3 scripts/install_drawio.py`"
         ) from None
     if result.returncode != 0:

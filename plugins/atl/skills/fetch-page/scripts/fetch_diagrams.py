@@ -45,7 +45,7 @@ _ATTACHMENT_PLACEHOLDER_RE = re.compile(
 )
 _ANY_PLACEHOLDER_RE = re.compile(r"<!-- adf:(diagram|attachment) ")
 
-NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set ATLASSIAN_API_TOKEN to restore it -->"
+NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set credentials.atl.api_token to restore it -->"
 SKIPPED_NOTE = "<!-- adf:diagram source unavailable: attachment retrieval skipped (--attachments skip) -->"
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
@@ -268,7 +268,7 @@ def main() -> None:
         description="Restore mermaid fences from a fetched page's diagram placeholders."
     )
     parser.add_argument("--page-id", required=True, help="Confluence pageId the Markdown was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    parser.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
     parser.add_argument("--assets-dir", required=True, help="Directory to cache this page's attachments into")
     args = parser.parse_args()
 

@@ -128,7 +128,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [doc-concept](plugins/wf/skills/doc-concept/SKILL.md): render domain, structural, or operational concept bodies from three one-page templates.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [draft-adr](plugins/wf/skills/draft-adr/SKILL.md) / [doc-decision](plugins/wf/skills/doc-decision/SKILL.md): draft a standalone ADR on request; render compact decisions for designs.
-- [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-service](plugins/wf/skills/record-service/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture Concepts, glossary terms, services, and deployment topology into the docs as they crystallise.
+- [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-building-block](plugins/wf/skills/record-building-block/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture Concepts, glossary terms, building blocks, and deployment topology into the docs as they crystallise.
 - [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
 - [manage-backlog](plugins/wf/skills/manage-backlog/SKILL.md) / [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
 - [track-ledger](plugins/wf/skills/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a questioning session.
@@ -173,8 +173,8 @@ Code and technical solution review skills with modular standards and guidance.
 
 Harness configuration setup and resolution skills.
 
-- [init-harness](plugins/harness/skills/init-harness/SKILL.md): create or update the Harness configuration file, resolving repo paths.
-- [resolve-harness](plugins/harness/skills/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.env` file.
+- [init-harness](plugins/harness/skills/init-harness/SKILL.md): create or update the Harness configuration file, and install the harness's pull command.
+- [resolve-harness](plugins/harness/skills/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.json.user` file.
 
 ### atl
 
