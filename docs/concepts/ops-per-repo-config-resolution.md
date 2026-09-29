@@ -22,6 +22,9 @@ runs with no conventions at all. This Concept fixes how such a file is located a
 - A path supplied by a caller through a trusted channel MUST be used as given; a component MUST NOT re-derive,
   guess, or search for it.
 - A supplied-but-invalid path MUST stop the caller as blocked rather than trigger a search.
+- A repository checkout path MUST be derived from the Harness Repo Path and the repository's name —
+  `workspace/<name>`, or the Harness Repo Path itself when the repository is the harness's `origin`; it MUST NOT
+  be stored in, or looked up from, the per-developer settings.
 - A config file holding a credential MUST be gitignored.
 - A config file holding a credential MUST NOT also hold committed team conventions, and vice versa.
 - A skill reading a credential file MUST NOT print, quote, log, or commit its values.
