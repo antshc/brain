@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
 
-An **Initiative** is a coordinated product change tracked as one planning effort and may encompass multiple Capabilities and Features. A **Requirement set** is one Stakeholder requirement together with its Functional requirements, Business rules, Edge cases, and Acceptance criteria. A **Spec** packages one or more Requirement sets for planning and handoff. These definitions are local because this skill may run without the repository glossary.
+An **Initiative** is a coordinated product change tracked as one planning effort and may encompass multiple Capabilities and Features. A **Requirements** is a set of one Stakeholder requirement together with its Functional requirements, Business rules, Edge cases. A **Spec** packages one or more Requirements sets for planning and handoff.
 
 The ticket tracker and triage label vocabulary should have been provided to you — Run `/manage-backlog` skill **Setup labels** if not. 
 
@@ -42,9 +42,15 @@ The problem that the user is facing, from the user's perspective.
 
 The solution to the problem, from the user's perspective.
 
-## Functional Requirements
+## Requirements
 
 <!-- Writing style: non-technical, solution agnostic -->
+
+One subsection per Requirement set. Each groups a Stakeholder requirement with its own Functional Requirements, Business Rules, and Edge Cases. Repeat the `### {{n}}. {{stakeholderRequirement}}` block for every Requirement set covering the Initiative.
+
+### {{n}}. {{stakeholderRequirement}}
+
+**Functional Requirements**
 
 What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
 
@@ -57,19 +63,19 @@ A LONG, numbered list of functional requirements. Each functional requirement sh
 2. *Allow administrators to restore a deleted file to its original location.*
 </functional-requirement-example>
 
-This list of Functional requirements should cover all relevant behavior in the Initiative.
+This list of Functional requirements should cover all relevant behavior in this Requirement set.
 
-## Business Rules
+**Business Rules**
 
-<!-- Writing style: non-technical, solution agnostic. Omit this section if no business rules exist. -->
+<!-- Omit if no business rules exist for this Requirement set. -->
 
 Invariants that must always hold, independent of any single user action. Each rule should be in the format of:
 
 {{n}}. If {{condition}}, {{invariant}}.
 
-## Edge Cases
+**Edge Cases**
 
-<!-- Writing style: non-technical, solution agnostic. Omit this section if no edge cases exist. -->
+<!-- Omit if no edge cases exist for this Requirement set. -->
 
 Boundary conditions and their expected handling. Each edge case should be in the format of:
 
@@ -99,7 +105,7 @@ The changed API, Database, or Resource contracts, one block per kind. Include on
 
 A bullet list of the functional-testing decision (approved, declined, deferred, or unresolved), its scope and rationale, observable seams, reusable coverage described by behavior, and known gaps. Keep repository/accessor/proxy integration verification with implementation work.
 
-List functional scenarios as bullets: `Given {{preconditions}}, when {{action}}, then {{observableOutcome}} — covers {{requirementReferences}}`. Cover the spec's functional requirements, business rules, edge cases, and acceptance criteria. Describe external behavior precisely enough to map to current test methods during execution; omit test-file paths, fixed test-method names, and all skill references.
+List functional scenarios as bullets: `Given {{preconditions}}, when {{action}}, then {{observableOutcome}} — covers {{requirementSetReferences}}`. Cover every Requirement set's functional requirements, business rules, and edge cases. Describe external behavior precisely enough to map to current test methods during execution; omit test-file paths, fixed test-method names, and all skill references.
 
 ## Out of Scope
 
