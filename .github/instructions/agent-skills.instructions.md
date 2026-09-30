@@ -1,153 +1,98 @@
 ---
-description: How to write a skill, agent, or convention file in this repo — frontmatter, invocation, disclosure, and pruning.
+description: How to write concise agent-facing skills, agents, conventions, and supporting files.
 applyTo: "**/skills/**/*.md,**/agents/*.agent.md,.github/instructions/*.instructions.md"
 ---
 
 # Writing agent-facing documents
 
-Applies to every document whose reader is an agent: a `SKILL.md`, a bundled `references/` or `*-FORMAT.md`
-file, an `*.agent.md`, and the `.crew/` convention files.
-
-This file is **write-time** guidance — how to word the file in front of you. **Design-time** questions (which
-building block to reach for, how skills compose) are answered by the Crosscutting Concepts indexed in
-[ARCHITECTURE.md](../../ARCHITECTURE.md).
+Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, and `.crew/` convention files. Design-time composition guidance lives in [ARCHITECTURE.md](../../ARCHITECTURE.md).
 
 ## Style
 
-**Skill content:** write the actual rule or action first. Be extremely concise, terse, agent-optimized, and use no fillers. Sacrifice grammar for concision. Add the reason only when it changes how the rule should be interpreted or applied. Omit explanation that does not change agent behavior.
+**Skill content:** write the actual rule or action first. Be extremely concise, terse, agent-optimized, and use no fillers. Sacrifice grammar for concision. Add the reason only when it changes interpretation or application. Omit explanation that does not change agent behavior.
 
-**Section references:** name a section by its title only — drop the `#` heading markers. Write `Building blocks`, not `## Building blocks`.
+**Section references:** use section titles without `#` markers.
 
-**Skill invocation:** every step that runs another skill reads ``Run `/{{skillName}}` skill `` or ``Follow `/{{skillName}}` skill `` — backticked, slash-prefixed skill name, verb is *run* or *follow*, never "call" or "invoke". Target a named section as ``Run `/index-docs`' skill **Sync index row** `` or ``Follow `/crew-gotchas`' skill **Read Workflow** ``. Naming a skill as an owner rather than running it takes the plain backticked name.
+**Line wrapping:** one physical line per paragraph, bullet, or table cell.
 
-**Cross-skill invocation:** name the exact child skill (ex: load/follow/run `doc-behavior-diagram` skill) plus 3–6 distinctive keywords from its description — the name identifies the dependency, the keywords say why it applies here — then pass the inputs and constraints the child needs. Never copy the child's full description.
+**Leading words:** prefer compact concepts the model already knows; repeat the token, not the explanation.
 
-**Line wrapping:** one physical line per paragraph/bullet/table cell, however long — no fixed-column hard-wrap, keeps grep and diffs clean. Rejoin any line an editor's auto-rewrap splits.
+**Prompt positive behavior:** state the desired behavior. Use prohibitions only for hard guardrails; pair them with the desired behavior.
 
-**Syntax legend** — use when writing or updating skills, templates, and agent instruction files:
+## Frontmatter and discovery
 
-| Syntax | Meaning | Example |
+| Key | Required | Rule |
 |---|---|---|
-| **bold**|Emphasis in prose, labels, warnings, required rules|**Required:** Run tests before commit.|
-| `camelCase` | Conceptual value resolved and maintained by the agent | Resolve `camelCase` from Git; reference it as `$camelCase`. |
-| `camelCase := instruction` | Runtime assignment evaluated by the agent | `NAME := generate a unique kebab-case name` |
-| `{{camelCase}}` | Placeholder in input, a markdown template, in prose, an inline template, replaced with a resolved runtime value | `{{input}}`, `Your name {{userName}}`, `reports/{{camelCase}}.md` |
-| `{{camelCase\|(hint|inline one-liner instruction applicable to camelCase)}}` | Bracketed placeholder with an inline default/hint, pipe-delimited, when the hint is short | `{{priority\| One of (MVP|Should have) }}`, `summary| one-liner` |
-| `<!-- ... -->` | Hidden template instruction not rendered in Markdown preview | `<!-- Remove this comment after population. -->` |
-| `[optional]` | Optional input or argument | `[target-path]` |
-| `value1 \| value2` | Allowed values | `completed \| failed \| blocked` |
-| `` `literal` `` | Fixed command, path, identifier, or value | Run `dotnet test`. |
-| `$VARIABLE` | Shell environment variable | `cd "$REPOSITORY_ROOT"` |
-| `${VARIABLE}` | Braced shell environment variable | `${REPOSITORY_ROOT}/src` |
+| `name` | yes | Lowercase, hyphenated, matches folder name. |
+| `description` | yes | Third person; target 100–300 chars; state **when → responsibility → result**; include 3–6 distinctive trigger keywords. |
+| `disable-model-invocation` | no | `true` = human-only; omit when model or other skills must discover it. |
 
-## Frontmatter
-
-| Key | Required | Value |
-|-----|----------|-------|
-| `name` | yes | Lowercase, hyphens, matches the folder name. |
-| `description` | yes | Third person. States what it does **and** the triggers for reaching it. Spec allows up to 1024 characters, but every installed skill's `name` + `description` loads on every turn — at this repo's scale (dozens to ~100 skills), target 100–300 characters (roughly 1–2 sentences): enough for when/what/result and the shared keywords, not a full spec budget per skill. |
-| `disable-model-invocation` | no | `true` makes the skill user-invoked. |
-
-Name skills by their **verb-prefix family**, not the gerund form other guides recommend:
-`to-*` (produces an artifact), `record-*` (writes one record), `setup-*` / `init-*` (one-time scaffolding),
-`fetch-*` (reads an external resource), `manage-*` (owns a backend), `crew-*` (shared by the crew agents).
-A new skill joins an existing family unless it genuinely starts one.
+Name skills by existing verb-prefix family. Start a new family only when needed.
 
 Register every new plugin in [marketplace.json](../plugin/marketplace.json) in the same change.
 
-## Invocation
+## Skill invocation
 
-The `description` is the skill's always-loaded pointer: it costs tokens on every turn whether or not it fires.
+Reference the exact plain `skill-name` without a leading `/`. Wording may use run, follow, use, load, or equivalent prose; do not enforce one verb.
 
-- **Model-invoked** (omit `disable-model-invocation`) — the agent can fire it, and other skills can reach it.
-  Choose this only when the agent must reach it on its own, or another skill must.
-- **User-invoked** (`disable-model-invocation: true`) — only a human typing its name reaches it. Costs no
-  context, but you become the index that has to remember it exists.
+For cross-skill selection, include 3–6 distinctive keywords from the child description plus required inputs and constraints. Do not copy the full child description.
 
-Write the description in third person, front-loading the word you actually type when you want the skill. One
-trigger per distinct case; synonyms that rename the same case are one case written twice — collapse them. Cut
-identity the body already carries.
+## Subagents
 
-Compose it in three parts: **when** — the observable request or artifact that fires it; **what** — its single
-responsibility; **result** — the output or decision it produces. Carry the 3–6 distinctive keywords a caller
-would cite under Cross-skill invocation inside the description itself, not only in the body — the same words
-must work for automatic discovery and for a parent skill naming this one.
+Run subagents through prose instructions describing the task, scope, inputs, constraints, and expected output. Do not instruct agents to call `runSubagent` directly.
 
-## What goes in the file
+## Content and resources
 
-A document is **steps** (ordered actions) and **reference** (rules and facts consulted on demand). They mix
-freely — all steps, all reference, or both. Rank each piece by how immediately the agent needs it:
+Order content by need: **steps → inline reference → disclosed reference**. Inline always-needed material; disclose conditional or bulky material.
 
-1. In-file steps — what the agent does, in order.
-2. In-file reference — consulted on demand.
-3. Disclosed reference — a sibling file reached by a pointer, loaded only when the pointer fires.
-
-Keep `SKILL.md` under 500 lines; move material out well before that. Disclose what only some runs need and
-inline what every run needs. When a skill has steps, in-file reference that should be disclosed buries them.
-
-Bundle resources by how the agent uses them:
+Keep `SKILL.md` under 500 lines.
 
 | Folder | Holds |
-|--------|-------|
-| `scripts/` | executable automation the agent runs |
-| `references/` | documentation the agent reads to decide |
-| `assets/` | files used unchanged in the output |
-| `templates/` | scaffolds the agent fills in and modifies |
+|---|---|
+| `scripts/` | executable automation |
+| `references/` | decision/reference material |
+| `assets/` | files used unchanged |
+| `templates/` | scaffolds to fill or modify |
 
-One or two files in a category live directly in the skill folder; more than that earns a subfolder.
+Keep up to two category files at skill root; otherwise use the matching resource folder.
 
-**Path resolution:** the agent's working directory is not the skill's folder. Never point at a bundled
-`scripts/`, `references/`, `assets/`, or `templates/` file with a bare relative path (`scripts/run.py`) — resolve
-it from the skill file's own location first (e.g. "resolve relative to this `SKILL.md`'s folder", or have the
-agent locate the folder once and reuse that path for every reference in the step). 
-Example for scripts: **Run `./scripts/locate_me.py` from this skill's base directory**.
-Example for markdown: **Consult `[config.md](./references/config.md)` from this skill's base directory**.
+**Bundled paths:** resolve `scripts/`, `references/`, `assets/`, and `templates/` from the skill base directory, never the caller CWD. Example: **Run `./scripts/run.py` from this skill's base directory**.
 
-Write commands in Python rather than bash- or PowerShell-only syntax, so they run unmodified on every OS
- Use  `python` is not available here.
+Prefer Python over shell-specific scripts for cross-platform automation. Use the repository-supported Python command.
 
-## Steps and completion criteria
+## Syntax legend
 
-Every step ends on a condition that tells the agent it is done. Make it checkable — can the agent tell done
-from not-done? — and, where it matters, exhaustive: "every modified record accounted for" drives real work
-where "produce a list" does not.
+| Syntax | Meaning | Example |
+|---|---|---|
+| **bold** | Required rule, label, warning | **Required:** Run tests. |
+| `camelCase` | Agent-resolved conceptual value | Resolve `camelCase` from Git. |
+| `camelCase := instruction` | Runtime assignment | `NAME := generate unique kebab-case name` |
+| `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
+| `{{camelCase\\|hint}}` | Placeholder with short hint/default | `{{priority\\|MVP or Should have}}` |
+| `<!-- ... -->` | Hidden template instruction | `<!-- Remove after population. -->` |
+| `[optional]` | Optional input | `[target-path]` |
+| `value1 \\| value2` | Allowed values | `completed \\| failed` |
+| ``literal`` | Fixed command/path/value | `dotnet test` |
+| `$VARIABLE` | Shell variable | `$REPOSITORY_ROOT` |
+| `${VARIABLE}` | Braced shell variable | `${REPOSITORY_ROOT}/src` |
 
-Reserve numbered steps for procedures where the sequence genuinely matters. For open-ended work (debugging,
-review, refactoring) give decision criteria instead, so the agent can adapt.
+## Procedures
 
-## Wording
+Every procedural step needs a checkable completion condition. Use numbered steps only when order matters; otherwise state decision criteria.
 
-Reach for a **leading word** — a compact concept the model already holds (*ledger*, *sweep*, *drift*,
-*tracer bullet*) — and repeat the token, never the sentence. It anchors the same behaviour every time it
-appears and costs one word.
+## Gotchas
 
-**Prompt the positive.** Steering by prohibition drags the banned behaviour into context and makes it more
-available: *don't think of an elephant*. State the target instead — "write one-line comments" rather than
-"never write verbose comments". Keep a prohibition only as a hard guardrail you cannot phrase positively, and
-pair it with the positive target.
-
-Write a `## Gotchas` section whenever the skill touches an external tool, API, or platform quirk. Bold the
-constraint, then say why. Treat it as living: every time the agent gets something wrong, add a line. This is
-distinct from `## Troubleshooting`, which fixes things after they break.
+When a skill depends on an external tool, API, or platform quirk, add `## Gotchas`. State the constraint first; add why only when it changes interpretation or handling.
 
 ## Pruning
 
-- **One meaning, one place.** The same rule in two files costs maintenance, costs tokens, and inflates the
-  rule's apparent rank. Shared procedure belongs to one skill that the others invoke.
-- **The environment is a source of truth too.** A document restating `pyproject.toml`, a folder layout, or
-  `--help` output is a cache of a lookup, and earns its load only when the lookup is expensive. Write down what
-  the agent cannot find by looking: the unwritten convention, the reason behind a choice, the gotcha no config
-  confesses.
-- **Cut no-ops.** A line the model already obeys by default pays load to say nothing. Test each sentence: does
-  it change behaviour versus the default? When one fails, delete the whole sentence rather than trim it. The
-  same test grades a leading word — *be thorough* is a no-op when the agent is already thorough-ish.
-- **Check relevance.** A line goes stale as the behaviour it describes changes. Without a pruning pass, stale
-  layers settle because adding feels safe and removing feels risky.
+- **One meaning, one place.** Invoke shared procedure; do not duplicate it.
+- **Record only non-obvious knowledge.** Prefer source-of-truth files/config over copied facts.
+- **Delete no-ops and stale rules.** Keep only text that changes agent behavior.
 
 ## Before finishing
 
-- Frontmatter has `name` and `description`; the description carries triggers, not just identity.
-- Every line teaches something the agent would otherwise get wrong — nothing restates common knowledge.
-- Body under 500 lines; bulky or occasional material disclosed to `references/`.
-- Shared procedure is invoked, not duplicated.
-- No credentials, tokens, or secrets in any file.
+- Valid frontmatter; trigger-rich description.
+- `SKILL.md` under 500 lines.
+- Shared procedure not duplicated.
+- No credentials, tokens, or secrets.
