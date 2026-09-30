@@ -17,7 +17,7 @@ def test_load_credentials_returns_site_email_token(tmp_path):
     write_config(
         tmp_path,
         {
-            "site": "example.atlassian.net",
+            "cloudId": "example.atlassian.net",
             "email": "me@example.com",
             "apiToken": "super-secret-token",
         },
@@ -33,7 +33,7 @@ def test_load_credentials_returns_site_email_token(tmp_path):
 @pytest.mark.parametrize(
     "data",
     [
-        {"site": "example.atlassian.net"},
+        {"cloudId": "example.atlassian.net"},
         {},
     ],
 )
