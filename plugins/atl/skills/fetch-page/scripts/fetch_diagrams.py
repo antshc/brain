@@ -25,10 +25,8 @@ URL or an auth token; callers degrade to a one-line note instead of failing the 
 """
 from __future__ import annotations
 
-import argparse
 import re
 import shutil
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import quote
@@ -37,15 +35,13 @@ from uuid import uuid4
 from atlassian import Confluence
 from requests.exceptions import RequestException
 
-from env import get_confluence, load_credentials
-
 _DRAWIO_PLACEHOLDER_RE = re.compile(r'<!-- adf:diagram drawio="([^"]*)" -->')
 _ATTACHMENT_PLACEHOLDER_RE = re.compile(
     r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")? -->'
 )
 _ANY_PLACEHOLDER_RE = re.compile(r"<!-- adf:(diagram|attachment) ")
 
-NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set credentials.atl.api_token to restore it -->"
+NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set apiToken in .atlassian.json.user to restore it -->"
 SKIPPED_NOTE = "<!-- adf:diagram source unavailable: attachment retrieval skipped (--attachments skip) -->"
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
@@ -261,36 +257,3 @@ def restore_diagrams_skipped(markdown: str) -> str:
 def restore_diagrams_failed(markdown: str, category: str) -> str:
     """`--attachments auto` after a failed retrieval: every placeholder names the safe category."""
     return _replace_all_placeholders(markdown, _failure_note(category))
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Restore mermaid fences from a fetched page's diagram placeholders."
-    )
-    parser.add_argument("--page-id", required=True, help="Confluence pageId the Markdown was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
-    parser.add_argument("--assets-dir", required=True, help="Directory to cache this page's attachments into")
-    args = parser.parse_args()
-
-    markdown = sys.stdin.read()
-    if not has_diagram_placeholder(markdown):
-        sys.stdout.write(markdown)
-        return
-
-    credentials = load_credentials(args.root)
-    if credentials is None:
-        sys.stdout.write(restore_diagrams_without_credentials(markdown))
-        return
-
-    confluence = get_confluence(credentials)
-    try:
-        snapshot = fetch_attachment_snapshot(confluence, args.page_id)
-        publish_attachment_cache(snapshot, args.assets_dir)
-    except AttachmentRetrievalError as exception:
-        sys.stdout.write(restore_diagrams_failed(markdown, str(exception)))
-        return
-    sys.stdout.write(restore_diagrams(markdown, snapshot, Path(args.assets_dir).name))
-
-
-if __name__ == "__main__":
-    main()

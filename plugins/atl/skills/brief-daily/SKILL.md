@@ -2,6 +2,7 @@
 name: brief-daily
 description: Report the current Jira user's blocked work items and open items where they're @mentioned in a comment, over a period defaulting to the last month. Use when asked for a daily briefing, standup update, or to show blocked or mentioned Jira items. Works against any connected Jira site — no project key or site configuration required.
 argument-hint: '[period] (e.g. "2 weeks", "3 months"; default: 1 month)'
+disable-model-invocation: true
 ---
 
 # Brief Daily
@@ -12,12 +13,13 @@ Budget: **two searches and two script runs**. Query B projects `comment`, so eve
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**. It returns `cloudId`, `accountId` and `displayName` — this skill resolves none of them itself.
+**1 — Preflight.** Run `/preflight-atlassian` skill (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**. It returns `cloudId`, `accountId` and `displayName` — this skill resolves none of them itself.
 
 **2 — Resolve period.** Parse `{{input}}`: empty → default `1 month`. Convert it into a JQL relative-date modifier in **days only** — never the `M` (month) unit (see Gotchas) — using 1 month ≈ 30 days: `1 month` → `-30d`, `"2 weeks"` → `-14d`, `"3 months"` → `-90d`. Keep the day count: it is Step 5's `--cutoff-days`.
 
 **3 — Query A: blocked items assigned to me.** `searchJiraIssuesUsingJql` with `cloudId`, `jql: 'assignee = currentUser() AND (status = "Blocked" OR flagged = Impediment) AND updated >= <cutoffJql> ORDER BY updated DESC'`, `maxResults: 25`. Paginate per Pagination. Renders as section 1 of the output template.
 - **Fallback:** some Jira instances have no `"Blocked"` status literal and the clause errors — retry with `jql: 'flagged = Impediment AND updated >= <cutoffJql> ORDER BY updated DESC'`, record the dropped clause under Excluded, and never fail the whole report over it.
+- No matching MCP tool for `searchJiraIssuesUsingJql` → REST fallback per Preflight (`GET /rest/api/3/search/jql`).
 
 **4 — Query B: mentions.** `searchJiraIssuesUsingJql` with `cloudId`, `fields: ["summary","status","comment"]`, `jql: 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC'`, `maxResults: 25`. Search by Preflight's `accountId`, never display name — a display-name search both false-positives on comments the user authored and misses real `@mentions`. Issue this in the same turn as Step 3.
 
@@ -83,7 +85,7 @@ No reply from you is visible via the API for these. Comment reactions are invisi
 
 **The scripts resolve `brief_daily/` relative to the current directory** — run them from anywhere else and the import fails. `cd` to the directory holding this `SKILL.md`, then `cd scripts`, and call them by bare filename.
 
-**Every search and most issue reads spill to a `content.json` path instead of returning inline** — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `/preflight-atl` skill **Standing MCP usage rules**.
+**Every search and most issue reads spill to a `content.json` path instead of returning inline** — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `/preflight-atlassian` skill **Standing MCP usage rules**.
 
 **`issues` is a flat list, not a nested `nodes` envelope** — verified against this MCP: `d["issues"]` is the issue list directly (`d["issues"][0]["fields"]["comment"]["comments"]` is the comment thread), and `d["isLast"]` — not `d["issues"]["pageInfo"]["hasNextPage"]` — signals whether more pages remain. Treating `issues` as `{"nodes": [...], "pageInfo": {...}}` raises `TypeError: list indices must be integers or slices, not str` on the first row. `payload.py`'s `nodes()`/`truncated()` detect both shapes, so the scripts themselves never need this distinction.
 

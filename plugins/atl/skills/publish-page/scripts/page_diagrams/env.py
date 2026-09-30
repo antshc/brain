@@ -1,9 +1,7 @@
-"""Locate and parse `atl` + `credentials.atl` from `.harness.json.user` for the raw `site`/`email`/`token`
-this skill's attachment upload needs — the one thing `preflight-atl`'s public contract deliberately
-never exposes (it reports only `tokenAvailable`, a boolean, and never echoes the value). Read at
-the fixed path `<root>/.harness.json.user`, mirroring `preflight-atl`'s own resolution — but this
-module is not imported across skill folders; it exists only because the raw secret is out of scope
-for what Preflight may return.
+"""Parse `.atlassian.json.user` for the raw `site`/`email`/`token` this skill's attachment
+upload needs, plus its renderer settings. The config path comes from `/preflight-atlassian`'s
+Locate command (`configPath`) — never rebuilt or searched for here. Not imported across skill
+folders.
 """
 from __future__ import annotations
 
@@ -15,41 +13,36 @@ from atlassian import Confluence
 
 from . import renderers
 
-CONFIG_FILENAME = ".harness.json.user"
-DRAWIO_EXTENSION_KEY = "drawio_extension_key"
+DRAWIO_EXTENSION_KEY = "drawioExtensionKey"
 
 _EXTENSION_KEY_RE = re.compile(r"\A[^/\s]+/[^/\s]+/static/[^/\s]+\Z")
 
 
-def load_settings(root: str) -> dict:
-    path = Path(root) / CONFIG_FILENAME
-    if not path.is_file():
+def load_config(config_path: str) -> dict:
+    path = Path(config_path)
+    if not path.exists():
         return {}
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        return {}
-    atl = data.get("atl") or {}
-    atl_credentials = (data.get("credentials") or {}).get("atl") or {}
-    return {**atl, **atl_credentials}
+    with path.open(encoding="utf-8") as f:
+        return json.load(f)
 
 
-def load_credentials(root: str) -> dict[str, str]:
+def load_credentials(config_path: str) -> dict[str, str]:
     """Return `site`/`email`/`token`; raises `SystemExit` naming the missing key(s)."""
-    config = load_settings(root)
-    site = str(config.get("site", "")).strip()
+    config = load_config(config_path)
+    site = str(config.get("cloudId", "")).strip()  # config key is `cloudId`, not `site`
     email = str(config.get("email", "")).strip()
-    token = str(config.get("api_token", "")).strip()
+    token = str(config.get("apiToken", "")).strip()
     missing = [
         name
         for name, value in (
-            ("atl.site", site),
-            ("credentials.atl.email", email),
-            ("credentials.atl.api_token", token),
+            ("cloudId", site),
+            ("email", email),
+            ("apiToken", token),
         )
         if not value
     ]
     if missing:
-        raise SystemExit(f"error: .harness.json.user missing required key(s): {', '.join(missing)}")
+        raise SystemExit(f"error: .atlassian.json.user missing required key(s): {', '.join(missing)}")
     return {"site": site, "email": email, "token": token}
 
 
@@ -70,39 +63,39 @@ def get_confluence(credentials: dict[str, str]) -> Confluence:
     )
 
 
-def load_renderer(root: str) -> str:
+def load_renderer(config_path: str) -> str:
     """Return the configured diagram renderer, defaulting to `png` when the key is absent.
 
-    Unlike `load_credentials`, a missing `.harness.json.user` is not an error here — the default
-    keeps existing repos publishing exactly as they did before the key existed.
+    Unlike `load_credentials`, a missing config is not an error here — the default keeps
+    existing repos publishing exactly as they did before the key existed.
     """
-    config = load_settings(root)
-    name = str(config.get("diagram_renderer", "")).strip() or renderers.DEFAULT
+    config = load_config(config_path)
+    name = str(config.get("diagramRenderer", "")).strip() or renderers.DEFAULT
     return renderers.validate(name)
 
 
-def load_swimlane_drawio_enabled(root: str) -> bool:
-    """Whether `swimlane_drawio` opts into the native swimlane-beta-to-drawio
-    converter; defaults to `True`, opting out only on an explicit falsy value.
+def load_swimlane_drawio_enabled(config_path: str) -> bool:
+    """Whether `swimlaneDrawio` opts into the native swimlane-beta-to-drawio converter; defaults
+    to `True`, opting out only on an explicit falsy value.
     """
-    config = load_settings(root)
-    value = str(config.get("swimlane_drawio", "")).strip().lower()
+    config = load_config(config_path)
+    value = str(config.get("swimlaneDrawio", "")).strip().lower()
     if not value:
         return True
     return value not in ("0", "false", "no")
 
 
-def load_drawio_extension_key(root: str) -> str:
+def load_drawio_extension_key(config_path: str) -> str:
     """Return the Draw.io Forge extension key; raise `ValueError` when absent or malformed.
 
     The key embeds the app id and the environment id, both of which differ per site and per
     install, so it cannot be hard-coded and has no usable default.
     """
-    config = load_settings(root)
+    config = load_config(config_path)
     key = str(config.get(DRAWIO_EXTENSION_KEY, "")).strip()
     if not key:
         raise ValueError(
-            f"diagram_renderer=drawio needs atl.{DRAWIO_EXTENSION_KEY} in .harness.json.user; it embeds "
+            f"diagramRenderer=drawio needs {DRAWIO_EXTENSION_KEY} in .atlassian.json.user; it embeds "
             "the Draw.io app id and environment id, which differ per site. To find it, read a page "
             "that already carries a Draw.io diagram with contentFormat=adf and copy the diagram "
             "node's attrs.extensionKey."

@@ -1,72 +1,84 @@
 ---
 name: init-atl
-description: 'First-run setup for this repository''s Atlassian configuration (`atl` + `credentials.atl` in `.harness.json.user`), plus optional generation of repository-level Jira wrapper skills named `pub-<issue-type>`. Touches nothing outside the harness — no shell profile, no system environment, no extra binary. Use when the `atl` section is missing or incomplete, or when asked to "setup atl", "init atl", "setup atlassian", or generate a per-repo Jira skill.'
+description: 'First-run setup for this repository''s Atlassian configuration (`.atlassian.json.user`), plus optional generation of repository-level Jira wrapper skills named `pub-<issue-type>`.'
+disable-model-invocation: true
 ---
 
 # Init Atl
 
-Setup skill for the `atl` plugin. Creates or updates the `atl` + `credentials.atl` sections of `.harness.json.user` (per `/preflight-atl`'s Configuration table), then offers repository-level skills pinning this repo's Jira required fields. Never installs a binary, edits a shell profile, or sets a system/user environment variable.
+Sets up `atl` in the current repo (= CWD): copies `preflight-atlassian` from template, creates/updates its config, offers `pub-<issue-type>` Jira wrapper skills. **MUST NOT** install binaries, edit shell profiles, or set system/user env vars; `.atlassian.json.user` is the only config surface.
 
 ## Workflow
 
-**1 — Install Python dependencies.** Run once, from this skill's directory: `pip install -r requirements.txt`. Covers every `atl` skill's Python needs (`atlassian-python-api` for `fetch-page`/`publish-page`, `pytest` for tests across the plugin) — no other `atl` skill installs its own.
+**1 — Install deps.** From this skill's base directory: `pip install -r requirements.txt`. Covers every `atl` skill (`atlassian-python-api`, `pytest`).
 
-**2 — Resolve the settings file.** Run `/resolve-harness` skill; retain its `harnessRepoPath`. Empty → stop and report: run `/init-harness` first, this skill only writes into an existing `.harness.json.user`, never creates the harness. Otherwise `configPath := $harnessRepoPath/.harness.json.user`.
+**2 — Copy preflight template.** `skillDir :=` parent of this `SKILL.md`'s absolute path from context. Copy `<skillDir>/preflight-atlassian.SKILL.template.md` → CWD `.github/skills/preflight-atlassian/SKILL.md`, always overwriting.
 
-**3 — Read existing keys.** Parse `configPath` as JSON. `atl := data.atl` (or `{}`); `credentialsAtl := data.credentials.atl` (or `{}`). `presentKeys := ` every key already set in either section (a key present with an empty string still counts as present — it was already asked once).
+```bash
+python3 -c "
+from pathlib import Path
+import shutil
+dest = Path('.github/skills/preflight-atlassian/SKILL.md')
+dest.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy('<skillDir>/preflight-atlassian.SKILL.template.md', dest)
+"
+```
 
-**4 — Collect values for missing keys only.** For each key below **not** in `presentKeys`, ask for a value; the developer may decline — record the key with an empty value rather than omitting it. A key in `presentKeys` is never re-asked, so edited values survive a second run.
+**3 — Read config.** `configPath := .github/skills/preflight-atlassian/.atlassian.json.user` (CWD). Exists → `presentKeys :=` its top-level keys; else `{}`. From the copied `SKILL.md`'s `| Key | Meaning | API | Default |` Configuration table: `tableKeys :=` Key column in row order; `tableDefault(key) :=` Default cell, empty when `—`. Table is the schema source of truth.
 
-| Key | Section | Prompt |
-|---|---|---|
-| `email` | `credentials.atl` | "Enter your Atlassian account email:" |
-| `site` | `atl` | "Enter your Atlassian site (e.g. `<organization>.atlassian.net`):" |
-| `jira_project_keys` | `atl` | "Enter your Jira project key(s), comma-separated, first = default:" (store as a JSON array) |
-| `confluence_space_ids` | `atl` | "Enter your Confluence space id(s), comma-separated, first = default:" (store as a JSON array) |
-| `api_token` | `credentials.atl` | "Enter an API token (optional — only needed for `/publish-page`'s mermaid-diagram upload), from https://id.atlassian.com/manage-profile/security/api-tokens:" |
-| `diagram_renderer` | `atl` | "How should `/publish-page` render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |
-| `drawio_extension_key` | `atl` | "Only for `drawio` — enter the Draw.io macro's extension key, `<appId>/<envId>/static/drawio`. Find it by reading a page that already holds a Draw.io diagram with `contentFormat: "adf"` and copying the diagram node's `attrs.extensionKey`:" |
+**4 — Ask missing keys only.** Per key below not in `presentKeys`, ask. Declined → write `""` (`[]` for arrays). Never re-ask present keys.
 
-`drawio` and `mermaid` each need their Confluence app installed. `drawio` additionally needs `drawio_extension_key`, since the app and environment ids differ per site. `mermaid` is declared but not yet usable — `/publish-page` refuses it until its macro shape is captured. Leave both keys empty for `png`.
+| Key | Prompt |
+|---|---|
+| `email` | "Enter your Atlassian account email:" |
+| `cloudId` | "Enter your Atlassian site (e.g. `<organization>.atlassian.net`):" |
+| `jiraProjectKeys` | "Enter your Jira project key(s), comma-separated, first = default:" → trimmed JSON array |
+| `confluenceSpaceIds` | "Enter your Confluence space id(s), comma-separated, first = default:" → trimmed JSON array |
+| `apiToken` | "Enter an API token (optional — only needed for `/publish-page`'s mermaid-diagram upload), from https://id.atlassian.com/manage-profile/security/api-tokens:" |
+| `diagramRenderer` | "How should `/publish-page` render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |
+| `drawioExtensionKey` | "Only for `drawio` — enter the Draw.io macro's extension key, `<appId>/<envId>/static/drawio`. Find it by reading a page that already holds a Draw.io diagram with `contentFormat: "adf"` and copying the diagram node's `attrs.extensionKey`:" |
 
-**5 — Write.** Merge only the newly-collected keys into `atl` and `credentials.atl` — every other key in either section, and every other top-level section (`harness`, other plugins' sections), stays byte-for-byte as it was. Never print, log, or echo `api_token`'s value.
+`drawio`/`mermaid` need their Confluence app installed; `drawio` also needs `drawioExtensionKey` (ids differ per site). `mermaid` not yet usable — `publish-page` refuses it. `png` → leave both empty.
 
-`account_id`/`display_name` are never part of this step — they're auto-populated from a live call in Step 6, never asked of the developer here.
+**5 — Write.** Per `tableKeys`: Step 4 value (asked or present) → else `tableDefault` (e.g. `maxResults`/`limit` → `10`, `diagramRenderer` → `png`) → else omit (e.g. `swimlaneDrawio`). New file → create one JSON object; existing → add missing keys only, never change existing values. `accountId`/`displayName` seeded empty, never asked; Step 7 fills them. **MUST NOT** print/log `apiToken`.
 
-**6 — Resolve the MCP connection and cache identity.** Run `/preflight-atl` skill **Action: Resolve**, forcing the live identity/connectivity check — this step is what populates the cache Preflight's Step 3 later reads instead of calling `atlassianUserInfo` again, so its own cache-skip rule does not apply here. `mcpConnected` false → name "an Atlassian MCP connection" as the missing prerequisite, skip Step 7, go to Step 8. `mcpConnected` true and `account_id`/`display_name` missing from `presentKeys` → merge them into `atl` with Preflight's live `accountId`/`displayName`, mirroring Step 5's merge-only-missing-keys behavior.
+**6 — Gitignore config file only.**
+```bash
+git check-ignore -q "$configPath" || echo "NOT IGNORED"
+```
+`NOT IGNORED` → append `.atlassian.json.user` line, commented as holding a credential, to CWD `.gitignore` (create if needed). Never ignore the folder — its `SKILL.md` is checked in.
 
-**7 — Offer a wrapper skill per Jira work item type.**
-1. Resolve `projectKey`: Preflight's `defaultProjectKey` if non-empty. Else `getVisibleJiraProjects` — exactly one → use it; more → ask; zero → name "a visible Jira project" as the missing prerequisite, skip to Step 8.
-2. Call `getJiraProjectIssueTypesMetadata` with `projectIdOrKey: <projectKey>` — this repo's work item types.
-3. Per type, ask: "Generate a repository-level skill for creating a `<issueType.name>` in `<projectKey>`? (yes/no)".
+**7 — Resolve MCP, cache identity.** Run `preflight-atlassian` **Action: Resolve**, forcing the live identity check (ignore its cache-skip rule; this populates the cache). `mcpConnected` false → report missing "an Atlassian MCP connection", skip to Step 9. True and `accountId`/`displayName` not in `presentKeys` → merge live values, missing keys only.
+
+**8 — Offer `pub-<issue-type>` wrappers.**
+1. `projectKey :=` Preflight `defaultProjectKey`; empty → `getVisibleJiraProjects`: one → use; many → ask; zero → report missing "a visible Jira project", skip to Step 9.
+2. `getJiraProjectIssueTypesMetadata(projectIdOrKey: projectKey)`.
+3. Per type ask: "Generate a repository-level skill for creating a `<issueType.name>` in `<projectKey>`? (yes/no)".
 4. Per accepted type:
-   - `getJiraIssueTypeMetaWithFields` with `projectIdOrKey`, `issueTypeId`, `requiredFieldsOnly: true`.
-   - `skillName := pub-<issueType.name, lowercased, spaces → hyphens>` (e.g. `Bug` → `pub-bug`, `Story` → `pub-story`).
-   - `$harnessRepoPath/.github/skills/<skillName>/` exists → ask before overwriting; never overwrite silently.
-   - Create `$harnessRepoPath/.github/skills/<skillName>/SKILL.md` — never under `plugins/atl/`, `plugins/atl/skills/`, or any other plugin folder — with:
+   - `getJiraIssueTypeMetaWithFields(projectIdOrKey, issueTypeId, requiredFieldsOnly: true)`.
+   - `skillName := pub-<issueType.name lowercased, spaces → hyphens>` (`Bug` → `pub-bug`).
+   - Folder exists → ask before overwriting.
+   - Write CWD `.github/skills/<skillName>/SKILL.md` containing:
      - Frontmatter `name: <skillName>`, `description: Create a <issueType.name> in <projectKey> with this repository's required fields pre-filled. Use when asked to create/open/file a <issueType.name>.`
-     - A table of the discovered required fields: field key, field name.
-     - A workflow step gathering a value per required field (from the developer, or by mirroring an existing issue), then running `/publish-work` with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additional_fields`. The generated skill never calls `createJiraIssue` itself.
-     - A description-fidelity step, because the wrapper is what drafts the description: run `/map-markdown-adf` skill **Action: Detect ADF-only constructs** over the source **before** drafting; mirror the source's headings verbatim, adding no wrapper heading of its own and flattening no `<details>` block; and after an ADF publish, confirm the result by fetching the issue back with `getJiraIssue` rather than trusting the publish response.
+     - Required-fields table: field key, field name.
+     - Step: gather each required field (developer or mirrored issue), then run `publish-work` with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additional_fields`; never call `createJiraIssue` directly.
+     - Description-fidelity step: before drafting, run `map-markdown-adf` **Action: Detect ADF-only constructs** on the source; mirror source headings verbatim, add no heading, keep `<details>` blocks; after ADF publish, verify via `getJiraIssue`, not the publish response.
 
-**8 — Report.** Whether `atl`/`credentials.atl` were created or updated and which keys were added (never a value — only whether a token was supplied); which wrapper skills were generated and their `.github/skills/` paths; which capabilities were skipped and the missing prerequisite for each; and that `plugins/atl/` and `plugins/atl/skills/` were not touched.
+**9 — Report.** Preflight copied; config created/updated + keys added (no values; only whether token supplied); generated wrapper paths; skipped capabilities + missing prerequisite each; `plugins/atl/` untouched.
 
 ## Rules
 
-- Generated skills always land under `$harnessRepoPath/.github/skills/`, never under any plugin folder — one team's required fields never reach another repository.
-- A missing prerequisite (no MCP connection, no visible project) is named explicitly — never a silent skip that looks like success.
-- Never offer or generate a Confluence-page-defaults wrapper skill — Confluence publishing goes through `/publish-page` directly.
-- Required fields are always discovered live via `getJiraIssueTypeMetaWithFields`, never hardcoded.
-- No binary installed, no shell profile or system/user environment variable touched — `atl` + `credentials.atl` in `.harness.json.user` is the only configuration surface, and `/init-harness` owns its gitignore status.
-
-## Degraded mode
-
-No MCP connection → Steps 1-5 complete in full; Step 7 is skipped, naming "an Atlassian MCP connection" as the missing prerequisite.
+- Generated skills only under CWD `.github/skills/`, never a plugin folder — required fields are per-repo.
+- Preflight `SKILL.md` always overwritten; `pub-*` never overwritten without asking.
+- Name every missing prerequisite; never skip silently.
+- No Confluence wrapper skill — use `publish-page` directly.
+- Discover required fields live; never hardcode.
 
 ## Gotchas
 
-**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `init-atl/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
+- **MUST NOT** `find`/`grep`/`ls -R` for this skill's directory or template; derive from this `SKILL.md`'s absolute path in context.
+- Resolve `.github/` from CWD, never an env var (`$HARNESS_REPO_PATH` removed); run from repo root.
 
 ## Verification
 
-Config merging and value preservation share the file shape parsed by `/preflight-atl`: `python3 -m pytest plugins/atl/skills/preflight-atl/`. Generated wrapper content and developer prompts are deliberately untested — asserting on generated prose locks in wording; verify manually against a harness whose `.harness.json.user` carries no `atl` section, and again against one already carrying `atl` values, confirming `plugins/atl/` and `plugins/atl/skills/` are byte-identical before and after and that the shell profile and system environment are unchanged.
+No test suite. Verify manually on a repo with no config and one with values: preflight `SKILL.md` byte-identical to template; config has every table key with correct asked/default value (`maxResults`/`limit`/`diagramRenderer` defaults, no `swimlaneDrawio`); `plugins/atl/` unchanged; shell profile and env unchanged.

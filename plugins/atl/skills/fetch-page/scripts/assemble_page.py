@@ -82,7 +82,7 @@ def default_assets_dir(md_path: Path) -> Path:
     return md_path.with_name(f"{md_path.name}.assets")
 
 
-def assemble(raw: dict, page_id: str, root: str, assets_dir: str, attachments: str = "auto") -> str:
+def assemble(raw: dict, page_id: str, config_path: str, assets_dir: str, attachments: str = "auto") -> str:
     title, body = extract_title_and_body(raw)
     markdown = convert_adf_to_markdown(body)
 
@@ -94,7 +94,7 @@ def assemble(raw: dict, page_id: str, root: str, assets_dir: str, attachments: s
             markdown = restore_diagrams_skipped(markdown)
         return _with_title(markdown, title)
 
-    credentials = load_credentials(root)
+    credentials = load_credentials(config_path)
     if credentials is None:
         if attachments == "required":
             raise AttachmentRetrievalError("missing credentials")
@@ -126,7 +126,7 @@ def main() -> None:
         description="Assemble a fetched Confluence page's title + Markdown body in one pass."
     )
     parser.add_argument("--page-id", required=True, help="Confluence pageId the page was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path holding `.harness.json.user`")
+    parser.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
         "--assets-dir",
@@ -149,7 +149,7 @@ def main() -> None:
 
     raw = json.loads(sys.stdin.read())
     try:
-        markdown = assemble(raw, args.page_id, args.root, assets_dir, args.attachments)
+        markdown = assemble(raw, args.page_id, args.config, assets_dir, args.attachments)
     except ConversionError as exception:
         print(f"ADF conversion failed: {exception}", file=sys.stderr)
         raise SystemExit(1)

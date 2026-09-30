@@ -1,7 +1,6 @@
-"""Locate and parse `atl` + `credentials.atl` from `.harness.json.user` for the raw `site`/`email`/`token`
-a Jira REST call needs — the one thing `preflight-atl`'s public contract deliberately never
-exposes (it reports only `tokenAvailable`, a boolean, and never echoes the value). Read at the
-fixed path `<root>/.harness.json.user`, mirroring `preflight-atl`'s own resolution.
+"""Parse `.atlassian.json.user` for the raw `site`/`email`/`token` a Jira REST call needs.
+The config path comes from `/preflight-atlassian`'s Locate command (`configPath`) — never
+rebuilt or searched for here.
 
 A Jira-flavored copy of `/fetch-page`'s own `env.py` — never imported across skill folders
 (Concept 0009). A missing credential here is `/fetch-work`'s degraded mode, not a hard failure,
@@ -14,27 +13,20 @@ from pathlib import Path
 
 from atlassian import Jira
 
-CONFIG_FILENAME = ".harness.json.user"
-
-
-def load_settings(root: str) -> dict:
-    path = Path(root) / CONFIG_FILENAME
-    if not path.is_file():
+def load_config(config_path: str) -> dict:
+    path = Path(config_path)
+    if not path.exists():
         return {}
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        return {}
-    atl = data.get("atl") or {}
-    atl_credentials = (data.get("credentials") or {}).get("atl") or {}
-    return {**atl, **atl_credentials}
+    with path.open(encoding="utf-8") as f:
+        return json.load(f)
 
 
-def load_credentials(root: str) -> dict[str, str] | None:
-    """Return `site`/`email`/`token`, or `None` when any is missing or the `atl` section is absent."""
-    config = load_settings(root)
-    site = str(config.get("site", "")).strip()
+def load_credentials(config_path: str) -> dict[str, str] | None:
+    """Return `site`/`email`/`token`, or `None` when any is missing or the config is absent."""
+    config = load_config(config_path)
+    site = str(config.get("cloudId", "")).strip()  # config key is `cloudId`, not `site`
     email = str(config.get("email", "")).strip()
-    token = str(config.get("api_token", "")).strip()
+    token = str(config.get("apiToken", "")).strip()
     if not (site and email and token):
         return None
     return {"site": site, "email": email, "token": token}
