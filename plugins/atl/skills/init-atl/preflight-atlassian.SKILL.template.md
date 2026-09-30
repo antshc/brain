@@ -50,7 +50,3 @@ Apply in every `atl` skill:
 
 - **MUST NOT search the filesystem** (`find`/`grep`/`ls -R`/`os.walk`) for this skill's directory or `.atlassian.json.user`. Base dir = parent of the `SKILL.md` path given in context; config is its sibling.
 - **Long absolute paths in `python3 -c` or heredocs get corrupted by terminal line-wrapping.** `cd` to the directory and use relative filenames; multi-statement code → temp `.py` file run by name.
-
-## Ambiguity
-
-Multiple candidate project keys, space ids, or sites → ask developer; never choose silently.
