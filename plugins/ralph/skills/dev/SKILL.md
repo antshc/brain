@@ -10,10 +10,10 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-1. Run `/resolve-harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Use it as `$HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues).
+1. Run `/harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Use it as `$HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues).
 
 2. Bring `HARNESS_REPO_PATH` up to date with its remote before any reads or the final push depend on it.
-**GUARD**:  Run only when `/resolve-harness` found `.harness.json.user` and emitted a non-empty `harnessRepoPath`.
+**GUARD**:  Run only when `/harness` found its settings file and emitted a non-empty `harnessRepoPath`.
 ```bash
 git -C "$HARNESS_REPO_PATH" fetch --all --prune
 git -C "$HARNESS_REPO_PATH" pull
@@ -25,7 +25,7 @@ If the pull exits non-zero (conflicts detected), discard local state in favor of
 git -C "$HARNESS_REPO_PATH" reset --hard "@{upstream}"
 ```
 
-`/resolve-harness` unavailable or empty `harnessRepoPath` → use cwd as `$HARNESS_REPO_PATH`. `/resolve-harness` exiting non-zero → **exit** and report.
+`/harness` unavailable, or exits reporting `missing` → use cwd as `$HARNESS_REPO_PATH`. `/harness` exits reporting `invalid` → **exit** and report.
 
 ## 1. Resolve milestone
 
@@ -55,7 +55,7 @@ Parse the fenced ```` ```metadata ```` block from `milestone.description` — th
 
 Any field missing → **exit** before creating any worktree, leave ticket labels unchanged, and report "Milestone is missing required metadata."
 
-Derive the checkout for `repository`: equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `harness.repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/<name>` (`<name>` is `repository`'s part after the slash). Confirm the checkout exists and its own `origin` normalizes to `repository` — missing or a clone of another repository → **exit** before creating any worktree, leave ticket labels unchanged, and report why. Never read `harness.repos` to make this decision.
+Derive the checkout for `repository`: equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/<name>` (`<name>` is `repository`'s part after the slash). Confirm the checkout exists and its own `origin` normalizes to `repository` — missing or a clone of another repository → **exit** before creating any worktree, leave ticket labels unchanged, and report why. Never read `repos` to make this decision.
 
 ## 2. Compute feature branch name
 
