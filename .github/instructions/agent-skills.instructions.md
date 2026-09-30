@@ -19,6 +19,8 @@ Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, 
 
 **Prompt positive behavior:** state the desired behavior. Use prohibitions only for hard guardrails; pair them with the desired behavior.
 
+**Normative wording:** use **MUST** / **MUST NOT** for mandatory rules only. Use plain imperative wording for guidance or preference.
+
 ## Frontmatter and discovery
 
 | Key | Required | Rule |
