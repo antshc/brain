@@ -62,6 +62,14 @@ Keep up to two category files at skill root; otherwise use the matching resource
 
 Prefer Python over shell-specific scripts for cross-platform automation. Use the repository-supported Python command.
 
+## Template ownership
+
+- **Template owns rendering; skill owns orchestration.** Template: structure, format, conditions, rendering, local constraints. `SKILL.md`: selection, workflow, inputs/outputs, shared rules.
+- `{{value|hint}}` — preferred field-local guidance.
+- `<!-- @: instruction -->` — hidden structural/rendering directive; **MUST** be one terse line.
+- Templates MAY define local **Rules** and **Gotchas**.
+- Keep template-specific guidance in the template; move only shared/cross-template guidance to `SKILL.md` or `references/`.
+
 ## Syntax legend
 
 | Syntax | Meaning | Example |
@@ -70,8 +78,8 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 | `camelCase` | Agent-resolved conceptual value | Resolve `camelCase` from Git. |
 | `camelCase := instruction` | Runtime assignment | `NAME := generate unique kebab-case name` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
-| `{{camelCase\\|hint}}` | Placeholder with short hint/default | `{{priority\\|MVP or Should have}}` |
-| `<!-- ... -->` | Hidden template instruction | `<!-- Remove after population. -->` |
+| `{{camelCase\\|hint}}` | Preferred field-local guidance | `{{priority\\|MVP or Should have}}` |
+| `<!-- @: instruction -->` | Hidden structural/rendering directive; **MUST** be one terse line | `<!-- @: repeat per component -->` |
 | `[optional]` | Optional input | `[target-path]` |
 | `value1 \\| value2` | Allowed values | `completed \\| failed` |
 | ``literal`` | Fixed command/path/value | `dotnet test` |
