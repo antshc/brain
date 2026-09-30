@@ -18,9 +18,7 @@ building block to reach for, how skills compose) are answered by the Crosscuttin
 
 **Section references:** name a section by its title only — drop the `#` heading markers. Write `Building blocks`, not `## Building blocks`.
 
-**Skill invocation:** every step that runs another skill reads ``Run `/{{skillName}}` skill `` or ``Follow `/{{skillName}}` skill `` — backticked, slash-prefixed skill name, verb is *run* or *follow*, never "call" or "invoke". Target a named section as ``Run `/index-docs`' skill **Sync index row** `` or ``Follow `/crew-gotchas`' skill **Read Workflow** ``. Naming a skill as an owner rather than running it takes the plain backticked name.
-
-**Cross-skill invocation:** name the exact child skill (ex: load/follow/run `doc-behavior-diagram` skill) plus 3–6 distinctive keywords from its description — the name identifies the dependency, the keywords say why it applies here — then pass the inputs and constraints the child needs. Never copy the child's full description.
+**Skill invocation:** name the exact child skill (ex: load/follow/run `doc-behavior-diagram` skill) with 3–6 distinctive keywords from its description — the name identifies the dependency, the keywords say why it applies here — then pass the inputs and constraints the child needs. Never copy the child's full description.
 
 **Line wrapping:** one physical line per paragraph/bullet/table cell, however long — no fixed-column hard-wrap, keeps grep and diffs clean. Rejoin any line an editor's auto-rewrap splits.
 
@@ -103,8 +101,8 @@ agent locate the folder once and reuse that path for every reference in the step
 Example for scripts: **Run `./scripts/locate_me.py` from this skill's base directory**.
 Example for markdown: **Consult `[config.md](./references/config.md)` from this skill's base directory**.
 
-Write commands in Python rather than bash- or PowerShell-only syntax, so they run unmodified on every OS
- Use  `python` is not available here.
+Write commands in Python rather than bash- or PowerShell-only syntax, so they run unmodified on every OS.
+Invoke it as `python`, not `python3` — skills run on environments where the `python` is preferable.
 
 ## Steps and completion criteria
 
