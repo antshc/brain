@@ -14,7 +14,7 @@ building block to reach for, how skills compose) are answered by the Crosscuttin
 
 ## Style
 
-**Writing style:** be terse, concise, no fillers.
+**Skill content:** write the actual rule or action first. Keep it terse, concise, and agent-optimized. Add the reason only when it changes how the rule should be interpreted or applied. Omit explanation that does not change agent behavior.
 
 **Section references:** name a section by its title only — drop the `#` heading markers. Write `Building blocks`, not `## Building blocks`.
 
