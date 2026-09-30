@@ -1,79 +1,63 @@
 ---
 name: fetch-page
-description: Run when fetch the Confluence page. Fetch a Confluence page as Markdown from its identifier or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page by ID or URL. No Atlassian config required; a page whose attachments are referenced from its body (diagrams, images, or files) caches them to a `.md.assets` folder alongside the Markdown and references them in it when `ATLASSIAN_API_TOKEN` is configured and retrieval succeeds — `--attachments` controls that behavior.
+description: Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. No Atlassian config required; body-referenced attachments (diagrams, images, files) cache to `.md.assets` when `apiToken` is configured — `--attachments` controls it.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
 # Fetch Page
 
-Return a Confluence **Page** as Markdown from its identifier or URL. MCP only for the page body itself — no API token required unless the page carries a `/publish-page`-rendered diagram, in which case restoring its mermaid source needs one.
+Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token required) only for body-referenced attachments.
 
 ## Prerequisites
 
-- `atlassian-python-api` is installed once by `/init-atl` for the whole `atl` plugin — run that first if you haven't; this skill installs nothing of its own.
-- Caching a page's attachments and restoring a diagram's mermaid source both need `ATLASSIAN_API_TOKEN` (in `.atlassian`), the same credential `/publish-page` uses to upload it. Without it, nothing is downloaded and each reference comes back as a placeholder note instead.
+- `atlassian-python-api` installed by `init-atl`; run it first if missing. This skill installs nothing.
+- Attachment caching and mermaid restore need `apiToken` in `.atlassian.json.user` (see `preflight-atlassian`). Without it: no downloads; placeholders become notes.
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**.
+1. **Preflight.** Run `preflight-atlassian` (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**; keep `configPath`.
+2. **Parse `{{input}}`.** URL `<site>` wins as `cloudId`; else Preflight's.
+   - `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<site>`, `<page_id>`.
+   - `https://<site>/wiki/x/<tiny_id>` → `<site>`, `<page_id> := <tiny_id>`.
+   - Bare numeric or tiny ID → `<page_id>` as-is.
+3. **Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`. Guard truncation per Preflight; no matching MCP tool → REST fallback per Preflight. Result lands at `content.json` (title/body at `content.nodes[0].title` / `.body`; don't explore).
+4. **Assemble** from this skill's base directory:
+   ```bash
+   python3 scripts/assemble_page.py --page-id <page_id> --config "<configPath>" --md-path page.md < content.json
+   ```
+   Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`. Converts via `map-markdown-adf` **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
+5. **Return** `page.md` unchanged.
 
-**2 — Parse `{{input}}`.**
-- `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<site>`, `<page_id>`.
-- `https://<site>/wiki/x/<tiny_id>` → `<site>`, `<page_id> := <tiny_id>`.
-- Bare `<page_id>` (numeric or tiny token) → no `<site>`; pass through as-is, `getConfluencePage` accepts either form.
+## Attachments
 
-A `<site>` from the URL wins as `cloudId`; otherwise use Preflight's.
+**Detection:** offline recursive scan of raw ADF; no match → no REST call regardless of token or mode. Matches:
+- `media` with `attrs.type == "file"`;
+- `media` with `attrs.alt` ending `.png|.jpg|.jpeg|.gif|.svg|.webp|.bmp`;
+- `extension` with `attrs.extensionKey` containing `drawio`.
 
-**3 — Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`. Guard truncation per Preflight's standing rule — the tool result (or your own save of it) lands at `content.json`; its title and ADF body live at `content.nodes[0].title` / `content.nodes[0].body`, a stable shape you never need to explore by hand.
+**Caching:** on match, list and download all page attachments once; stage in sibling dir, then atomically replace assets dir — failure never leaves a partial cache or damages a prior one. TLS verification always on.
 
-**4 — Assemble.** One call does conversion, attachment caching, and placeholder resolution together:
+**Placeholder resolution:**
+1. `{stem}.source.mmd` sidecar attached → verbatim ```mermaid fence only, no image (`publish-page` re-renders).
+2. Image, no sidecar → `![<alt or filename>](page.md.assets/<file>)`; if placeholder has `width`/`height`, add `<!-- media-size: width=<w> height=<h> -->` on the next line.
+3. Other file → `[<filename>](page.md.assets/<file>)`.
 
-```bash
-python3 scripts/assemble_page.py --page-id <page_id> --root "$HARNESS_REPO_PATH" --md-path page.md < content.json
-```
+Links percent-encoded, relative to `page.md`'s dir. `publish-page` re-uploads rule 2/3 references on republish.
 
-from this skill's directory. Writes `page.md` directly (add `--assets-dir <dir>` to override where attachments are cached, default `page.md.assets`; add `--attachments auto|skip|required` to override the default retrieval policy — see below). Internally: converts the ADF body via `/map-markdown-adf` **Action: Convert ADF to Markdown** (a Draw.io macro, Confluence TOC macro, smart link, or `media`/`mediaSingle`/`mediaGroup` node becomes a placeholder or a normal link, never a raw error). A rejected conversion (a genuinely unsupported ADF construct) exits non-zero with `ADF conversion failed: <reason>` on stderr and never writes `--md-path` — no Python traceback, since the reason is already `/map-markdown-adf`'s own sanitized diagnostic. Only when a pure offline scan of the raw ADF body finds a node referencing an attached file does this step touch the Confluence REST/attachment path at all, and only per the `--attachments` policy below. `page.md` already reads `# <title>\n\n<body Markdown>`.
+## `--attachments` modes
 
-**5 — Return** the contents of `page.md` unchanged.
-
-## Attachment cache and rendering rules
-
-Detection is a pure, offline, recursive scan of the raw ADF body — no REST call at all when it finds nothing, regardless of whether a token is configured — for any node shaped like:
-- `type: "media"` with `attrs.type == "file"` (a generic attached file),
-- `type: "media"` whose `attrs.alt` ends in an image extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`),
-- `type: "extension"` whose `attrs.extensionKey` contains `"drawio"` (a Draw.io macro).
-
-Only when the scan matches does every attachment on the page get listed and downloaded, once (metadata and bytes are fetched a single time and reused for both caching and placeholder resolution), then published atomically to the assets dir (`page.md.assets/` by default): every download is staged in a sibling directory first, and only a fully-written staging directory ever replaces the live cache, so a failed refresh never leaves a partial cache and never damages a prior complete one. Each placeholder then resolves by rule:
-1. A `{stem}.source.mmd` sidecar is also attached (a `/publish-page`-rendered diagram) → the verbatim ```mermaid fence.
-2. No sidecar, the file is an image → `![<alt or filename>](page.md.assets/<file>)`. When the placeholder also carries Confluence's own reported `width`/`height` (see `/map-markdown-adf`'s mapping table — only ever present for an image, never a generic file), a `<!-- media-size: width=<w> height=<h> -->` comment follows on its own line right after, so a later `/publish-page` republish can carry the real size through instead of falling back to a fixed placeholder width.
-3. No sidecar, not an image → a plain link `[<filename>](page.md.assets/<file>)`.
-
-The relative link is percent-encoded (spaces etc.) and always relative to `page.md`'s own directory. Rule 1 never adds a separate image reference alongside the fence — the mermaid source is the sole publishable artifact for a diagram; republishing via `/publish-page` regenerates its rendered image fresh. Rules 2/3's standalone reference lines are also what `/publish-page` re-uploads as a real attachment on republish — see its own SKILL.md.
-
-Attachment downloads always go over TLS with certificate verification enabled; this skill never disables it and never will, regardless of `--attachments` mode.
-
-## Attachment retrieval policy (`--attachments`)
-
-`assemble_page.py --attachments auto|skip|required` (default `auto`) controls what happens once the offline scan finds a reference:
-
-- **`auto`** (default) — attempt retrieval when credentials exist; on any listing, download, or cache-publish failure (TLS, timeout, HTTP, or disk I/O), keep the page's title and converted body and replace each placeholder with a note naming only a safe failure category (e.g. `attachment retrieval failed (SSLError)`) — never the original exception text, which can carry a signed media URL or token.
-- **`skip`** — make no credential lookup and no Confluence REST call at all; every placeholder becomes an `attachment retrieval skipped (--attachments skip)` note. Use this for a fast, fully offline fetch.
-- **`required`** — treat missing credentials, retrieval/publish failure, or an attachment placeholder that cannot be resolved from the fetched metadata as fatal: `assemble_page.py` exits non-zero with `Attachment retrieval failed: <reason>` on stderr and never writes `--md-path`, so a caller never gets a silently incomplete page.
+- **`auto`** (default) — retrieve when credentials exist. No token → `set apiToken in .atlassian.json.user to restore it` note per placeholder, no assets dir. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` — **MUST NOT** include exception text (may hold signed URL/token).
+- **`skip`** — no credential lookup, no REST; note `attachment retrieval skipped (--attachments skip)`.
+- **`required`** — missing credentials, failure, or unresolvable placeholder → non-zero exit, `Attachment retrieval failed: <reason>` on stderr, no `page.md`.
 
 ## Degraded mode
 
-No **Atlassian config** → `site`/`cloudId` empty; Preflight's Step 2 supplies `cloudId`. All other steps unchanged.
-
-No **API token** with an attachment reference present and `--attachments auto` (the default) → the page's text and structure still return in full, with a `set ATLASSIAN_API_TOKEN to restore it` note in place of each placeholder and no `.md.assets` folder created. This is distinct from a `skip`-mode note (retrieval was never attempted) and from an `auto`-mode retrieval-failure note (credentials existed but TLS, network, API, or disk I/O failed) — each names its own reason instead of always pointing at the token.
-
-A page whose raw ADF body has none of the three referenced-attachment shapes never touches the Confluence REST/attachment path at all, regardless of credentials or `--attachments`.
-
-A diagram published before the round-trip sidecar existed → its placeholder resolves to a note naming the missing `{name}.source.mmd` attachment instead of a fence; republish the page with `/publish-page` to enable the round-trip, then fetch again.
+- Diagram published before sidecars existed → note naming missing `{name}.source.mmd`; republish via `publish-page`, then refetch.
 
 ## Gotchas
 
-**Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `fetch-page/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
+- **MUST NOT** `find`/`grep`/`ls -R` to locate this skill's directory. Use the parent of this `SKILL.md`'s absolute path, already given in context.
 
 ## Verification
 
-`python3 -m pytest plugins/atl/skills/fetch-page/tests/` (from the repo root) — title/body extraction, the conversion handoff and its sanitized non-zero-exit failure path, offline attachment-reference detection, single-pass attachment listing/download, atomic cache publication (including preserving a prior complete cache on failure and leaving no partial staging directory), sidecar/image/file resolution (drawio and media-id, all three rendering rules), the no-sidecar and no-attachment notes, the `--md-path`/`--assets-dir`/`--attachments` CLI wiring, all three `--attachments` modes (including that `skip` makes no credential or REST call), TLS/timeout/listing/download/write failure paths and their redacted category-only notes, and a synthetic cross-skill fixture covering TOC, inline cards, lists, tables, and media — all mocked except the fixture, which runs the real CLI end to end. The ADF-to-placeholder seam is covered at its own home, `python3 -m pytest plugins/atl/skills/map-markdown-adf/`.
+From repo root: `python3 -m pytest plugins/atl/skills/fetch-page/tests/`; ADF-to-placeholder seam: `python3 -m pytest plugins/atl/skills/map-markdown-adf/`.

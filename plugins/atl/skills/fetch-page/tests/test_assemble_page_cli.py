@@ -21,11 +21,15 @@ def _raw(title: str, body: dict) -> str:
     return json.dumps({"content": {"nodes": [{"title": title, "body": body}]}})
 
 
+def _config(tmp_path) -> str:
+    return str(tmp_path / ".atlassian.json.user")
+
+
 def test_main_writes_markdown_to_md_path_with_default_assets_dir(tmp_path):
     md_path = tmp_path / "page.md"
     raw = _raw("Simple Page", {"type": "doc", "version": 1, "content": []})
 
-    result = _run(["--page-id", "123", "--root", str(tmp_path), "--md-path", str(md_path)], raw)
+    result = _run(["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path)], raw)
 
     assert result.returncode == 0, result.stderr
     assert md_path.read_text() == "# Simple Page\n\n\n"
@@ -42,8 +46,8 @@ def test_main_accepts_an_explicit_assets_dir_override(tmp_path):
         [
             "--page-id",
             "123",
-            "--root",
-            str(tmp_path),
+            "--config",
+            _config(tmp_path),
             "--md-path",
             str(md_path),
             "--assets-dir",
@@ -62,7 +66,7 @@ def test_main_reports_a_sanitized_conversion_failure_without_a_traceback_and_wri
     body = {"type": "doc", "version": 1, "content": [{"type": "totallyUnknownNode"}]}
     raw = _raw("Broken Page", body)
 
-    result = _run(["--page-id", "123", "--root", str(tmp_path), "--md-path", str(md_path)], raw)
+    result = _run(["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path)], raw)
 
     assert result.returncode != 0
     assert "ADF conversion failed:" in result.stderr
@@ -84,7 +88,7 @@ def test_main_attachments_skip_makes_no_credential_or_rest_calls(tmp_path):
     raw = _raw("Diagram Page", _attachment_reference_body())
 
     result = _run(
-        ["--page-id", "123", "--root", str(tmp_path), "--md-path", str(md_path), "--attachments", "skip"],
+        ["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path), "--attachments", "skip"],
         raw,
     )
 
@@ -101,8 +105,8 @@ def test_main_attachments_required_fails_without_writing_when_credentials_are_mi
         [
             "--page-id",
             "123",
-            "--root",
-            str(tmp_path),
+            "--config",
+            _config(tmp_path),
             "--md-path",
             str(md_path),
             "--attachments",
@@ -122,10 +126,10 @@ def test_main_attachments_auto_default_degrades_with_a_missing_credential_note(t
     md_path = tmp_path / "page.md"
     raw = _raw("Diagram Page", _attachment_reference_body())
 
-    result = _run(["--page-id", "123", "--root", str(tmp_path), "--md-path", str(md_path)], raw)
+    result = _run(["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path)], raw)
 
     assert result.returncode == 0, result.stderr
-    assert "ATLASSIAN_API_TOKEN" in md_path.read_text()
+    assert "apiToken" in md_path.read_text()
     assert not (tmp_path / "page.md.assets").exists()
 
 
@@ -205,7 +209,7 @@ def test_main_converts_the_synthetic_cross_skill_fixture_with_no_preprocessing(t
     raw = _raw("ZIC Monitoring GUI Alerts + Tasks", _synthetic_fixture_body())
 
     result = _run(
-        ["--page-id", "123", "--root", str(tmp_path), "--md-path", str(md_path), "--attachments", "skip"],
+        ["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path), "--attachments", "skip"],
         raw,
     )
 

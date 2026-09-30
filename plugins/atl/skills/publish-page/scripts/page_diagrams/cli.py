@@ -35,11 +35,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     render = sub.add_parser(
         "render-attach",
         help="Render each diagram (stdin: {\"diagrams\": [...]} from `extract`) to PNG and upload it as a "
-        "Confluence attachment. Requires `mmdc` on PATH and a configured `.atlassian` token.",
+        "Confluence attachment. Requires `mmdc` on PATH and a configured Atlassian API token "
+        "(see `/preflight-atlassian` skill).",
     )
     render.add_argument("--assets-dir", required=True, help="Directory to write rendered .mmd/.png files into")
     render.add_argument("--page-id", required=True, help="Confluence pageId to attach the rendered images to")
-    render.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    render.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     render.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
     render.add_argument(
         "--out",
@@ -71,7 +72,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     publish_adf.add_argument("--page-id", help="Confluence pageId to update (update path)")
     publish_adf.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
     publish_adf.add_argument("--title", help="Page title (create path, or update path when the title changed)")
-    publish_adf.add_argument("--root", help="Harness Repo Path to bound the `.atlassian` search to")
+    publish_adf.add_argument("--config", help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     publish_adf.add_argument(
         "--threshold-bytes",
         type=int,
@@ -92,7 +93,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     target.add_argument("--page-id", help="Confluence pageId to update (update path)")
     target.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
     run.add_argument("--title", help="Page title (default: the Markdown's first '#' heading)")
-    run.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    run.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     run.add_argument(
         "--assets-dir",
         help="Directory to write rendered .mmd/.png files into (default: <md path>.tmp)",
@@ -152,12 +153,12 @@ def _run_render_attach(args: argparse.Namespace) -> None:
         _write_media_ids_by_index({"mediaIdsByIndex": {}}, args.out)
         return
 
-    renderer = load_renderer(args.root)
+    renderer = load_renderer(args.config)
     if renderer != renderers.PNG:
         # This step ends in a mediaIdsByIndex map, which only the png renderer's one-image-per-
         # diagram output fits; the macro renderers need the custom content `run` creates.
         print(
-            f"error: render-attach supports ATLASSIAN_DIAGRAM_RENDERER=png only; {renderer!r} "
+            f"error: render-attach supports diagramRenderer=png only; {renderer!r} "
             "publishes a macro, so use the `run` subcommand instead",
             file=sys.stderr,
         )
@@ -173,7 +174,7 @@ def _run_render_attach(args: argparse.Namespace) -> None:
         )
         raise SystemExit(1)
 
-    credentials = load_credentials(args.root)
+    credentials = load_credentials(args.config)
     confluence = get_confluence(credentials)
     filename_to_file_id = upload_diagrams(confluence, args.page_id, diagrams)
 
@@ -209,7 +210,7 @@ def _run_publish_adf(args: argparse.Namespace) -> None:
         sys.stdout.write("\n")
         return
 
-    credentials = load_credentials(args.root)
+    credentials = load_credentials(args.config)
     confluence = get_confluence(credentials)
 
     if args.page_id:
@@ -238,7 +239,7 @@ def _run_run(args: argparse.Namespace) -> None:
     try:
         result = publish(
             md_path=str(md_path),
-            root=args.root,
+            config_path=args.config,
             page_id=args.page_id,
             space_id=args.space_id,
             title=args.title,
