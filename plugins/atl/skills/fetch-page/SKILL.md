@@ -1,6 +1,6 @@
 ---
 name: fetch-page
-description: Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. No Atlassian config required; body-referenced attachments (diagrams, images, files) cache to `.md.assets` when `ATLASSIAN_API_TOKEN` is set — `--attachments` controls it.
+description: Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. No Atlassian config required; body-referenced attachments (diagrams, images, files) cache to `.md.assets` when `apiToken` is configured — `--attachments` controls it.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
@@ -11,7 +11,7 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
 ## Prerequisites
 
 - `atlassian-python-api` installed by `init-atl`; run it first if missing. This skill installs nothing.
-- Attachment caching and mermaid restore need `ATLASSIAN_API_TOKEN` (`apiToken` in `.atlassian.json.user`, see `preflight-atlassian`). Without it: no downloads; placeholders become notes.
+- Attachment caching and mermaid restore need `apiToken` in `.atlassian.json.user` (see `preflight-atlassian`). Without it: no downloads; placeholders become notes.
 
 ## Workflow
 
@@ -46,7 +46,7 @@ Links percent-encoded, relative to `page.md`'s dir. `publish-page` re-uploads ru
 
 ## `--attachments` modes
 
-- **`auto`** (default) — retrieve when credentials exist. No token → `set ATLASSIAN_API_TOKEN to restore it` note per placeholder, no assets dir. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` — **MUST NOT** include exception text (may hold signed URL/token).
+- **`auto`** (default) — retrieve when credentials exist. No token → `set apiToken in .atlassian.json.user to restore it` note per placeholder, no assets dir. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` — **MUST NOT** include exception text (may hold signed URL/token).
 - **`skip`** — no credential lookup, no REST; note `attachment retrieval skipped (--attachments skip)`.
 - **`required`** — missing credentials, failure, or unresolvable placeholder → non-zero exit, `Attachment retrieval failed: <reason>` on stderr, no `page.md`.
 

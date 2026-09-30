@@ -129,7 +129,7 @@ def test_main_attachments_auto_default_degrades_with_a_missing_credential_note(t
     result = _run(["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path)], raw)
 
     assert result.returncode == 0, result.stderr
-    assert "ATLASSIAN_API_TOKEN" in md_path.read_text()
+    assert "apiToken" in md_path.read_text()
     assert not (tmp_path / "page.md.assets").exists()
 
 

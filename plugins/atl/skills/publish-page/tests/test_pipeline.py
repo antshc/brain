@@ -62,7 +62,7 @@ def test_substitute_diagram_notes_replaces_top_level_marker():
     result, replaced = substitute_diagram_notes(adf, diagrams)
     assert replaced == 1
     text = result["content"][0]["content"][0]["text"]
-    assert "ATLASSIAN_API_TOKEN" in text
+    assert "apiToken" in text
     assert "00-title" in text
 
 
@@ -81,7 +81,7 @@ def test_substitute_diagram_notes_replaces_marker_nested_inside_expand():
     assert replaced == 1
     nested = result["content"][0]["content"][0]
     assert nested["type"] == "paragraph"
-    assert "ATLASSIAN_API_TOKEN" in nested["content"][0]["text"]
+    assert "apiToken" in nested["content"][0]["text"]
 
 
 def _write_page(tmp_path, renderer=None, extension_key=None):
@@ -332,7 +332,7 @@ def test_publish_without_credentials_notes_local_media_when_no_diagrams_present(
         )
 
     assert result["method"] == "mcp"
-    assert result["missingPrerequisite"] == "ATLASSIAN_API_TOKEN"
+    assert result["missingPrerequisite"] == "apiToken"
     note_texts = [n["content"][0]["text"] for n in base_adf["content"]]
     assert any("screenshot.png" in t for t in note_texts)
     assert any("notes.pdf" in t for t in note_texts)

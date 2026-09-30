@@ -29,7 +29,7 @@ _ATTACHMENT_PLACEHOLDER_RE = re.compile(
 _BLOB_IMAGE_RE = re.compile(r"!\[\]\(blob:[^)]*\)")
 
 NO_TOKEN_NOTE = (
-    "<!-- adf:attachment source unavailable: set ATLASSIAN_API_TOKEN to resolve embedded images -->"
+    "<!-- adf:attachment source unavailable: set apiToken in .atlassian.json.user to resolve embedded images -->"
 )
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")

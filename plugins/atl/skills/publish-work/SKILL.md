@@ -48,10 +48,10 @@ Else → **create**:
 
 No matching MCP tool for `editJiraIssue`/`createJiraIssue`/`getVisibleJiraProjects` → REST fallback per Preflight (`PUT`/`POST /rest/api/3/issue`, `GET /rest/api/3/project/search`).
 
-**6 — Attach files.** Only when `attachments` supplied. MCP has no Jira upload tool → REST: `POST /rest/api/3/issue/{issueIdOrKey}/attachments`, header `X-Atlassian-Token: no-check`, multipart, auth `.atlassian.json.user` `site`/`email`/`apiToken` (`ATLASSIAN_SITE`/`ATLASSIAN_EMAIL`/`ATLASSIAN_API_TOKEN`; see `preflight-atlassian`).
+**6 — Attach files.** Only when `attachments` supplied. MCP has no Jira upload tool → REST: `POST /rest/api/3/issue/{issueIdOrKey}/attachments`, header `X-Atlassian-Token: no-check`, multipart, auth `.atlassian.json.user` `site`/`email`/`apiToken` (see `preflight-atlassian`).
 
 - `tokenAvailable: true` → upload each file to the issue key; report attached filenames with key and `webUrl`.
-- `tokenAvailable: false` → keep create/update; report attachments not uploaded, `ATLASSIAN_API_TOKEN` missing. Never fail the call.
+- `tokenAvailable: false` → keep create/update; report attachments not uploaded, `apiToken` missing. Never fail the call.
 
 **7 — Verify live issue.** Only after `adf` publish. `getJiraIssue` with `cloudId`, `issueIdOrKey`, `fields: ["description"]`, `contentFormat: "adf"`; confirm each Step 3 construct is its ADF node (`expand`, `panel`, `status`) and combined marks merged, not literal `` ` ``. Missing → fix description, re-publish via Step 5. Read-only: **MUST NOT** re-run `editJiraIssue`/`createJiraIssue` with probe/placeholder content — overwrites the real publish.
 
