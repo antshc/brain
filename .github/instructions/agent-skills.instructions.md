@@ -92,7 +92,9 @@ One or two files in a category live directly in the skill folder; more than that
 **Path resolution:** the agent's working directory is not the skill's folder. Never point at a bundled
 `scripts/`, `references/`, `assets/`, or `templates/` file with a bare relative path (`scripts/run.py`) — resolve
 it from the skill file's own location first (e.g. "resolve relative to this `SKILL.md`'s folder", or have the
-agent locate the folder once and reuse that path for every reference in the step).
+agent locate the folder once and reuse that path for every reference in the step). 
+Example for scripts: **Run `./scripts/locate_me.py` from this skill's base directory**.
+Example for markdown: **Consult `[config.md](./references/config.md)` from this skill's base directory**.
 
 Write commands in Python rather than bash- or PowerShell-only syntax, so they run unmodified on every OS
  Use  `python` is not available here.
