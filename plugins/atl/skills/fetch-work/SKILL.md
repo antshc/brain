@@ -15,7 +15,7 @@ Return a Jira **Work item** as Markdown from key or URL. MCP only; API token nee
 
 ## Workflow
 
-**1 — Preflight.** Run `preflight-atlassian` **Action: Resolve**; keep `configPath`.
+**1 — Preflight.** Run `preflight-atlassian` (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**; keep `configPath`.
 
 **2 — Parse `{{input}}`.**
 - `https://<site>/browse/<key>` → `<site>`, `<key>`; `<site>` overrides Preflight's `cloudId`.

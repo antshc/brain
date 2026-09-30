@@ -15,7 +15,7 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
 
 ## Workflow
 
-1. **Preflight.** Run `preflight-atlassian` **Action: Resolve**; keep `configPath`.
+1. **Preflight.** Run `preflight-atlassian` (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**; keep `configPath`.
 2. **Parse `{{input}}`.** URL `<site>` wins as `cloudId`; else Preflight's.
    - `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<site>`, `<page_id>`.
    - `https://<site>/wiki/x/<tiny_id>` → `<site>`, `<page_id> := <tiny_id>`.
