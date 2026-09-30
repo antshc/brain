@@ -32,8 +32,8 @@ Done when `action` is `proceed` and the working set is in hand.
 
 **Load `references/github-api.md` now.** Every `gh` invocation in this run is copied from it, and nothing below restates one.
 
-1. Run `/resolve-harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Empty → use cwd as `$HARNESS_REPO_PATH`. Non-zero exit → **exit** and report. Otherwise `HARNESS_REPO_PATH := harnessRepoPath`.
-2. Derive the checkout for `{{owner}}/{{repo}}` (the PR's repository, from §0): equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `harness.repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/{{repo}}`. Confirm the checkout exists and its own `origin` normalizes to `{{owner}}/{{repo}}` — missing or a clone of another repository → **stop** before touching any review thread, post no replies, and report why. Never read `harness.repos` to make this decision.
+1. Run `/harness` skill from cwd. Unavailable, or exits reporting `missing` — use cwd as `$HARNESS_REPO_PATH`. Exits reporting `invalid` — **exit** and report. Otherwise `HARNESS_REPO_PATH := harnessRepoPath` from its emitted JSON.
+2. Derive the checkout for `{{owner}}/{{repo}}` (the PR's repository, from §0): equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/{{repo}}`. Confirm the checkout exists and its own `origin` normalizes to `{{owner}}/{{repo}}` — missing or a clone of another repository → **stop** before touching any review thread, post no replies, and report why. Never read `repos` to make this decision.
 3. Run `/create-worktree` skill with `$CODEBASE_REPO_PATH $baseRef $headRef`. Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
 4. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`. A non-pass build → **exit** and report. Never fix threads on a broken build.
 

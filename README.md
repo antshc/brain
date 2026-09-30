@@ -10,7 +10,7 @@ copilot plugin marketplace add antshc/brain
 
 Pick the plugin bundles you need. Each block uninstalls any stale version first, then installs the current one.
 
-### Workflow plugins (wf, crew, ralph, review, harness)
+### Workflow plugins (wf, crew, ralph, review)
 
 ```sh
 (copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) && \
@@ -21,9 +21,6 @@ copilot plugin install crew@brain && \
 copilot plugin install ralph@brain && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true) && \
 copilot plugin install review@brain
-
-(copilot plugin uninstall harness@brain >/dev/null 2>&1 || true) && \
-copilot plugin install harness@brain
 ```
 
 <details>
@@ -154,6 +151,7 @@ AFK PR review and autonomous development loop.
 - [fix](plugins/ralph/skills/fix/SKILL.md): apply suggested changes from review comments.
 - [create-worktree](plugins/ralph/skills/create-worktree/SKILL.md) / [delete-worktree](plugins/ralph/skills/delete-worktree/SKILL.md): create/reuse or remove an isolated git worktree per feature branch.
 - [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
+- [init-harness](plugins/ralph/skills/init-harness/SKILL.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
 
 ### review
 
@@ -168,13 +166,6 @@ Code and technical solution review skills with modular standards and guidance.
 - [posting](plugins/review/skills/posting/SKILL.md): post a review comment as an inline PR comment via the `gh` API.
 - [to-review-comment](plugins/review/skills/to-review-comment/SKILL.md): format a raw review comment into the review tone of voice.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
-
-### harness
-
-Harness configuration setup and resolution skills.
-
-- [init-harness](plugins/harness/skills/init-harness/SKILL.md): create or update the Harness configuration file, and install the harness's pull command.
-- [resolve-harness](plugins/harness/skills/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.json.user` file.
 
 ### atl
 

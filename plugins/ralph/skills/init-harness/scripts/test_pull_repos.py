@@ -31,13 +31,15 @@ pull_repos = _load_module()
 
 def run_script(harness_root: Path, *names: str) -> subprocess.CompletedProcess[str]:
     # The script reads its sibling .harness.json.user via __file__, mirroring how
-    # /init-harness copies it to the harness root — so run a copy placed there.
-    installed_script = harness_root / "pull-repos.py"
+    # /init-harness copies it to .github/skills/harness/ — so run a copy placed there.
+    install_dir = harness_root / ".github" / "skills" / "harness"
+    installed_script = install_dir / "pull-repos.py"
     if not installed_script.exists():
+        install_dir.mkdir(parents=True, exist_ok=True)
         installed_script.write_bytes(SCRIPT_PATH.read_bytes())
     return subprocess.run(
         [sys.executable, str(installed_script), *names],
-        cwd=harness_root,
+        cwd=install_dir,
         capture_output=True,
         text=True,
         check=False,
@@ -45,7 +47,9 @@ def run_script(harness_root: Path, *names: str) -> subprocess.CompletedProcess[s
 
 
 def write_settings(harness_root: Path, repos: list[dict]) -> None:
-    (harness_root / ".harness.json.user").write_text(json.dumps({"harness": {"repos": repos}}))
+    install_dir = harness_root / ".github" / "skills" / "harness"
+    install_dir.mkdir(parents=True, exist_ok=True)
+    (install_dir / ".harness.json.user").write_text(json.dumps({"repos": repos}))
 
 
 def git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -104,7 +108,7 @@ class TestPullCommand:
         assert "no repos configured" in result.stdout
 
     def test_invalid_repository_field_is_a_config_error(self, tmp_path: Path):
-        # Scenario: Malformed harness.repos entry is a configuration error before any repository is touched
+        # Scenario: Malformed repos entry is a configuration error before any repository is touched
         write_settings(tmp_path, [{"repository": "not-owner-slash-name", "branch": "main"}])
 
         result = run_script(tmp_path)
@@ -125,7 +129,7 @@ class TestPullCommand:
         assert not (tmp_path / "workspace").exists()
 
     def test_harness_origin_entry_is_a_config_error(self, tmp_path: Path):
-        # Scenario: harness.repos entry equal to the harness's own origin is a configuration error
+        # Scenario: repos entry equal to the harness's own origin is a configuration error
         origin = make_origin_with_commit(tmp_path, "harness")
         git("init", cwd=tmp_path)
         git("remote", "add", "origin", str(origin), cwd=tmp_path)

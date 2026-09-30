@@ -691,43 +691,38 @@ Scenario: PR URL with numeric owner/repo
 
 ## Feature: Main Harness
 
-> Resolver unit test; setup manual test
+> Manual test — no resolver script; the `harness` skill runs inline Python copied from a template
 
 ```gherkin
-Scenario: Nearest Harness Configuration File is resolved
-  Given nested directories with Harness Configuration Files in two ancestor directories
-  When the resolver runs from the nested directory
-  Then it emits settings from the nearest configuration only, as one JSON object
+Scenario: The harness skill derives its own repo path
+  Given the generated `harness` skill installed at `<H>/.github/skills/harness/SKILL.md`
+  When the skill runs
+  Then it reports `harnessRepoPath` as `<H>`, derived from its own folder's location, with no filesystem search
 
-Scenario: All non-credential Harness Settings are emitted verbatim
-  Given a Harness Configuration File with a harness section and an atl section
-  When the resolver runs
-  Then it emits every configured section unchanged
+Scenario: Settings are emitted verbatim
+  Given a sibling `.harness.json.user` holding a `repos` key
+  When the skill runs
+  Then it reports every top-level key from that file unchanged, alongside `harnessRepoPath`
 
-Scenario: Credentials are never emitted
-  Given a Harness Configuration File with a credentials section
-  When the resolver runs
-  Then the credentials section is absent from the emitted JSON
+Scenario: A missing settings file is reported as missing
+  Given no sibling `.harness.json.user`
+  When the skill runs
+  Then it exits with an error reporting `missing`, and the caller falls back to cwd as the Harness Repo Path
 
-Scenario: No Harness Configuration File returns empty sections
-  Given no ancestor directory has a Harness Configuration File
-  When the resolver runs
-  Then it exits successfully with an empty harnessRepoPath and empty harness/atl sections on stdout and a current-directory fallback explanation on stderr
+Scenario: An unparseable settings file is reported as invalid
+  Given a sibling `.harness.json.user` that is not valid JSON, or not a JSON object
+  When the skill runs
+  Then it exits with an error reporting `invalid` and the parse detail, and the caller stops rather than falling back
 
-Scenario: Invalid JSON fails resolution
-  Given a discovered Harness Configuration File that is not valid JSON
-  When the resolver runs
-  Then it exits with an error
+Scenario: Setup copies the skill and the pull command, creating settings only when missing
+  Given a harness root with no `.github/skills/harness/`
+  When `/init-harness` runs
+  Then `SKILL.md` and `pull-repos.py` are copied byte-identical to their sources, `.harness.json.user` is created holding `{}`, and the file (not the folder) is confirmed gitignored
 
-Scenario: Setup ensures the Harness Configuration File exists
-  Given the current directory has no Harness Configuration File
-  When harness setup runs
-  Then it creates an empty configuration, confirms it is gitignored, and installs the pull command at the harness root
-
-Scenario: Setup overwrites a differing pull command and reports it as updated
-  Given the current directory has an existing Harness Configuration File and a pull command that differs from the skill-owned copy
-  When harness setup runs
-  Then it leaves the configuration file untouched and reports the pull command as updated
+Scenario: Rerunning setup refreshes the skill and script but never the settings
+  Given an existing `.github/skills/harness/` with a `.harness.json.user` already holding values
+  When `/init-harness` runs again
+  Then `SKILL.md` and `pull-repos.py` are overwritten and the settings file is left untouched
 ```
 
 ## Feature: Pull Repos
@@ -736,12 +731,12 @@ Scenario: Setup overwrites a differing pull command and reports it as updated
 
 ```gherkin
 Scenario: No repos configured succeeds
-  Given a Harness Configuration File with no harness.repos entries, or none at all
+  Given a Harness user settings file with no `repos` entries, or none at all
   When the pull command runs
   Then it reports "no repos configured" and exits successfully
 
 Scenario: Configuration errors abort before any repository is touched
-  Given a malformed harness.repos entry, a duplicated repository name, an entry equal to the harness's own origin, or an unknown name argument
+  Given a malformed `repos` entry, a duplicated repository name, an entry equal to the harness's own origin, or an unknown name argument
   When the pull command runs
   Then it exits with an error before touching any repository
 
@@ -776,7 +771,7 @@ Scenario: A missing checkout with no clone tool available is skipped
   Then that repository is skipped naming the missing clone tool
 ```
 
-**Coverage:** Resolver unit test; setup manual test
+**Coverage:** Script CLI unit test
 
 ---
 

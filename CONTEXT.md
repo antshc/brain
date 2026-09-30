@@ -74,27 +74,27 @@ _Plugins_set_: wf
 **Workspace layout**:
 The shape of a harness and the repositories it develops: `single-repo`, where the harness is the codebase, or `multi-repo`, where the harness sits alongside one or more separate repositories.
 _Avoid_: simple project, harness-plus-repo, project type
-_Plugins_set_: harness, wf, ralph, crew
+_Plugins_set_: wf, ralph, crew
 
 **Harness skill**:
 The repository-level skill generated into a `multi-repo` harness whose own location marks the **Harness Repo Path** and whose folder holds the **Harness user settings**. When it is absent — a `single-repo` workspace — or its Harness user settings are missing, the current directory stands in for the Harness Repo Path.
 _Avoid_: resolve-harness, harness anchor
-_Plugins_set_: harness, wf, ralph, crew
+_Plugins_set_: wf, ralph, crew
 
 **Harness user settings**:
 The per-developer, uncommitted harness settings kept beside the **Harness skill**. Holds only the harness's own settings; every other plugin keeps its per-developer settings beside its own repository-level skill.
 _Avoid_: harness env, .atlassian, config file
-_Plugins_set_: harness, wf, ralph, crew
+_Plugins_set_: wf, ralph, crew
 
 **Workspace folder**:
 The one fixed folder under the Harness Repo Path holding every repository checkout and worktree a `multi-repo` workspace develops; it bounds every search into those repositories.
 _Avoid_: workspace root, repos folder, sources
-_Plugins_set_: harness, wf, ralph, crew
+_Plugins_set_: wf, ralph, crew
 
 **Repository access**:
 How a pull treats a repository in the developer's working set, set per repository by each developer: `read` — a reference repository kept identical to its remote, whose local changes are disposable; `write` — a repository under development, whose local changes are protected. Absent means `read`. It governs pulling only; it never decides where Ralph develops.
 _Avoid_: repo mode, permissions, readonly flag
-_Plugins_set_: harness, ralph, crew, wf
+_Plugins_set_: ralph, crew, wf
 
 ## ralph
 ### Language
@@ -322,5 +322,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` once via `resolve-harness`, derives the `Codebase Repo Path` from the target repository, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` once via the `harness` skill, derives the `Codebase Repo Path` from the target repository, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
 - **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/crew-memory` after feedback loops pass.

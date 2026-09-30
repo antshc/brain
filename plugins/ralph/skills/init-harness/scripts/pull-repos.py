@@ -37,7 +37,7 @@ def load_settings(settings_path: Path) -> dict:
 
 
 def parse_repos(data: dict) -> list[RepoEntry]:
-    raw_repos = data.get("harness", {}).get("repos", [])
+    raw_repos = data.get("repos", [])
     entries: list[RepoEntry] = []
     seen_names: set[str] = set()
     for index, raw in enumerate(raw_repos):
@@ -45,14 +45,14 @@ def parse_repos(data: dict) -> list[RepoEntry]:
         branch = raw.get("branch")
         access = raw.get("access", "read")
         if not repository or "/" not in repository:
-            raise ConfigError(f"harness.repos[{index}] is missing a valid 'repository' (owner/name)")
+            raise ConfigError(f"repos[{index}] is missing a valid 'repository' (owner/name)")
         if not branch:
-            raise ConfigError(f"harness.repos[{index}] ({repository}) is missing a required 'branch'")
+            raise ConfigError(f"repos[{index}] ({repository}) is missing a required 'branch'")
         if access not in ("read", "write"):
-            raise ConfigError(f"harness.repos[{index}] ({repository}) has invalid access '{access}' (must be read|write)")
+            raise ConfigError(f"repos[{index}] ({repository}) has invalid access '{access}' (must be read|write)")
         entry = RepoEntry(repository=repository, branch=branch, access=access)
         if entry.name in seen_names:
-            raise ConfigError(f"Duplicate repository name in harness.repos: {entry.name}")
+            raise ConfigError(f"Duplicate repository name in repos: {entry.name}")
         seen_names.add(entry.name)
         entries.append(entry)
     return entries
@@ -197,12 +197,13 @@ def pull_repo(entry: RepoEntry, harness_root: Path) -> tuple[str, str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Bring harness.repos checkouts up to date.")
+    parser = argparse.ArgumentParser(description="Bring the configured repos checkouts up to date.")
     parser.add_argument("names", nargs="*", help="Optional '<name>[:<branch>]' selection; default is every configured repository.")
     args = parser.parse_args(argv)
 
-    harness_root = Path(__file__).resolve().parent
-    settings_path = harness_root / SETTINGS_FILE_NAME
+    script_dir = Path(__file__).resolve().parent
+    harness_root = script_dir.parents[2]
+    settings_path = script_dir / SETTINGS_FILE_NAME
 
     try:
         data = load_settings(settings_path)
@@ -224,7 +225,7 @@ def main(argv: list[str] | None = None) -> int:
     if origin is not None:
         for entry in entries:
             if entry.repository == origin:
-                print(f"error: harness.repos entry '{entry.repository}' is the harness's own origin", file=sys.stderr)
+                print(f"error: repos entry '{entry.repository}' is the harness's own origin", file=sys.stderr)
                 return 1
 
     try:
