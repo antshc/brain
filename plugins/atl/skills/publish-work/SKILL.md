@@ -6,77 +6,74 @@ argument-hint: '<summary>, <issueType>, <description-markdown>, [workItemKey], [
 
 # Publish Work
 
-Create or update a Jira **Work item** from a summary and a Markdown description. MCP only for create/update — no API token needed unless attachments are requested.
+Create/update a Jira **Work item** over MCP. API token needed only for attachments.
 
 ## Inputs
 
-Infer from context; ask only when required information is missing.
+Infer from context; ask only when required input missing.
 
-- **summary** — required, terse one-line title.
-- **issueType** — required, e.g. `Story`, `Task`, `Bug`, `Epic`.
-- **description** — required, Markdown; preserved verbatim.
-- **workItemKey** — optional; when named, update that item instead of creating one.
-- **projectKey** — optional; resolved per Step 5 when omitted.
+- **summary** — required; terse one-line title.
+- **issueType** — required; e.g. `Story`, `Task`, `Bug`, `Epic`.
+- **description** — required; Markdown, verbatim.
+- **workItemKey** — optional; named → update, not create.
+- **projectKey** — optional; resolved in Step 5.
 - **parent** — optional parent/epic key.
-- **additional fields** — only labels, priority, components, or custom fields explicitly supplied.
-- **attachments** — optional, local file paths to attach to the work item.
+- **additional fields** — only explicitly supplied labels, priority, components, custom fields.
+- **attachments** — optional local file paths.
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**, and use the `cloudId` it returns.
+**1 — Preflight.** Run `preflight-atlassian` (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**; use returned `cloudId`.
 
-**2 — Re-read the source.** `description` read from a file → `read_file` that file again now, immediately before extracting the content, even when this session already read it. An edit landing between the two reads is invisible otherwise, and the stale copy is what gets published.
+**2 — Re-read source.** Description from file → `read_file` it again now, even if already read this session; else a mid-session edit is missed and stale content published.
 
-**3 — Detect ADF-only constructs, before drafting.** Run `/map-markdown-adf` skill **Action: Detect ADF-only constructs** over the re-read source exactly as it stands — before composing, trimming, or re-levelling a single line. Detection run over a description you already assembled reports what survived your editing, not what the source holds: a `<details>` block flattened into a heading while drafting detects as plain Markdown and publishes as plain Markdown.
+**3 — Detect ADF-only constructs.** Run `map-markdown-adf` **Action: Detect ADF-only constructs** on the re-read source as-is, before composing, trimming, or re-levelling anything. Detecting on drafted text misses constructs lost while drafting.
 
-**4 — Assemble the description and choose the content format.** The description mirrors the source — its headings verbatim, its ADF-only constructs intact (see Rules).
+**4 — Assemble description; choose format.** Mirror source (see Rules).
 
-- `adfOnly: false` → `contentFormat := "markdown"`, and `description` goes out verbatim, unconverted.
-- `adfOnly: true` → run `/map-markdown-adf` skill **Action: Convert Markdown to ADF**, `contentFormat := "adf"`, and `description := ` the resulting ADF. Name the reported construct kinds when confirming completion, so the extra conversion is visible.
-- **Guard, always:** re-run **Action: Detect ADF-only constructs** over the final description exactly as it will be sent. Anything reported while `contentFormat` is `markdown` → convert it and publish as `adf` instead, reporting the construct kinds and lines that forced the switch. Jira accepts the markdown form silently (see Gotchas), so this guard is the only signal.
+- `adfOnly: false` → `contentFormat := "markdown"`; send `description` verbatim.
+- `adfOnly: true` → run `map-markdown-adf` **Action: Convert Markdown to ADF**; `contentFormat := "adf"`; `description :=` result. Name reported construct kinds at completion.
+- **Guard, always:** re-run Detect on final description as sent. Anything reported under `markdown` → convert, publish as `adf`, report construct kinds and lines that forced it. Only signal — Jira accepts it silently (see Gotchas).
 
 **5 — Update or create.**
 
-`workItemKey` named → **update**, never create a second item:
+`workItemKey` named → **update**; never create a second item:
 - `editJiraIssue` with `cloudId`, `issueIdOrKey: workItemKey`, `contentFormat`, `fields: {summary (if changed), description}`.
-- Report the key and `webUrl`; proceed to Step 6 when `attachments` is supplied, otherwise go to Step 7.
+- Report key and `webUrl`; `attachments` → Step 6, else Step 7.
 
 Else → **create**:
-1. Resolve `projectKey`: supplied → use it. Else Preflight's `defaultProjectKey` if non-empty. Else `getVisibleJiraProjects` — exactly one → use it and report it as resolved; more than one → ask, never choose silently (Preflight's Ambiguity rule).
-2. `createJiraIssue` with `cloudId`, `projectKey`, `issueTypeName: issueType`, `summary`, `description`, `contentFormat`, `parent` (when named), `additional_fields` (supplied values only).
+1. `projectKey`: supplied → use. Else Preflight `defaultProjectKey` if non-empty. Else `getVisibleJiraProjects`: one → use, report as resolved; several → ask, never choose silently.
+2. `createJiraIssue` with `cloudId`, `projectKey`, `issueTypeName: issueType`, `summary`, `description`, `contentFormat`, `parent` (if named), `additional_fields` (supplied only).
 3. Report only `issueKey` and `webUrl`.
 
-**6 — Attach files.** Only when `attachments` is supplied. The Atlassian MCP has no Jira attachment-upload tool — fall back to the REST API: `POST /rest/api/3/issue/{issueIdOrKey}/attachments` with header `X-Atlassian-Token: no-check`, multipart file upload, authenticated with `atl.site`/`credentials.atl.email`/`credentials.atl.api_token` from `.harness.json.user` (same credential trio `publish-page` uses for its own REST fallback).
+No matching MCP tool for `editJiraIssue`/`createJiraIssue`/`getVisibleJiraProjects` → REST fallback per Preflight (`PUT`/`POST /rest/api/3/issue`, `GET /rest/api/3/project/search`).
 
-- Preflight's `tokenAvailable` is `true` → upload each file against the created/updated issue key; report the attached filenames alongside the key and `webUrl`.
-- `tokenAvailable` is `false` → soft-degrade: the issue is still created/updated; report that attachments were not uploaded, naming `credentials.atl.api_token` as the missing prerequisite. Never fail the whole call over a missing token.
+**6 — Attach files.** Only when `attachments` supplied. MCP has no Jira upload tool → REST: `POST /rest/api/3/issue/{issueIdOrKey}/attachments`, header `X-Atlassian-Token: no-check`, multipart, auth `.atlassian.json.user` `site`/`email`/`apiToken` (see `preflight-atlassian`).
 
-**7 — Verify against the live issue.** Only after an `adf` publish. `getJiraIssue` with `cloudId`, `issueIdOrKey`, `fields: ["description"]`, `contentFormat: "adf"`, then confirm in the returned body that every construct Step 3 reported is present as its ADF node (`expand`, `panel`, `status`) and that combined marks arrived merged rather than as literal `` ` `` characters. Something is missing → fix the description and re-publish through Step 5. Verification is read-only: never re-run `editJiraIssue`/`createJiraIssue` with placeholder or probe content to inspect the result, which overwrites the real publish.
+- `tokenAvailable: true` → upload each file to the issue key; report attached filenames with key and `webUrl`.
+- `tokenAvailable: false` → keep create/update; report attachments not uploaded, `apiToken` missing. Never fail the call.
+
+**7 — Verify live issue.** Only after `adf` publish. `getJiraIssue` with `cloudId`, `issueIdOrKey`, `fields: ["description"]`, `contentFormat: "adf"`; confirm each Step 3 construct is its ADF node (`expand`, `panel`, `status`) and combined marks merged, not literal `` ` ``. Missing → fix description, re-publish via Step 5. Read-only: **MUST NOT** re-run `editJiraIssue`/`createJiraIssue` with probe/placeholder content — overwrites the real publish.
 
 ## Gotchas
 
-- **`createJiraIssue`/`editJiraIssue` accept `<details>` under `contentFormat: "markdown"` with no error or warning** — Jira stores it and renders it as literal text, so a silently broken publish looks like a successful one. Step 4's guard is what catches it.
-- **The JSON echoed back by `editJiraIssue`/`createJiraIssue` proves acceptance, not rendering** — an `expand` block or a merged `code`+`link` mark can be accepted and still come back wrong. Step 7 reads the live issue instead of trusting the echo.
+- `createJiraIssue`/`editJiraIssue` accept `<details>` under `markdown` silently; Jira renders it as literal text. Step 4 guard catches it.
+- Echoed JSON proves acceptance, not rendering; `expand` or merged `code`+`link` marks can come back wrong. Step 7 reads the live issue.
 
-## Markdown conversion rules
+## Markdown conversion
 
-Jira renders plain CommonMark natively under `contentFormat: "markdown"` — headings, bullet and ordered lists, tables, fenced code, blockquotes, links, `**strong**`, `*em*`, `` `code` ``, `~~strike~~`, and `---` all survive without a conversion step.
-
-The rows `map-markdown-adf` marks **ADF-only** in its Supported structure table — `<details>` expands, `> [!INFO]` panels, `[STATUS:text|color]` lozenges, `<!-- adf:toc -->`, `<!-- adf:wide-table -->` — have no Markdown equivalent and arrive as literal text. Steps 3 and 4's detection gates exist to catch exactly those; that table is the single source of truth for the list, so read it there rather than re-deriving it here.
-
-One physical line per bullet and paragraph keeps the two paths identical — `map-markdown-adf` folds soft-wrapped continuations, and Jira's own Markdown parser folds them too, but an unwrapped source removes the question.
+- Jira renders plain CommonMark natively under `markdown`: headings, lists, tables, fenced code, blockquotes, links, `**strong**`, `*em*`, `` `code` ``, `~~strike~~`, `---`.
+- ADF-only constructs (e.g. `<details>`, `> [!INFO]`, `[STATUS:text|color]`) arrive as literal text under `markdown`. Source of truth: rows marked **ADF-only** in `map-markdown-adf`'s Supported structure table; don't re-derive.
+- One physical line per bullet/paragraph.
 
 ## Rules
 
-- **Do not rephrase.** Preserve the description's wording, structure, tables, code, and quotes verbatim; only the encoding changes between the two paths, never the content.
-- **Mirror the source's headings.** Reproduce each heading exactly as written, at its own level and in its own order. A heading the source does not carry — a `### Story` wrapper added for "organization", a `<summary>` promoted into a heading — is invented content, even when the prose under it is untouched.
-- **Keep ADF-only constructs whole.** A `<details>` block, a panel, or a status lozenge travels to Step 4 exactly as the source wrote it; flattening one into a heading or a plain paragraph drops behaviour the reader was meant to get.
-- Never invent fields, assignees, priorities, labels, components, or custom-field values.
-- Set `additional_fields` and `parent` only from explicitly supplied values.
-- Confirm completion with the key and `webUrl`; do not repeat the description.
+- **Do not rephrase.** Preserve wording, structure, tables, code, quotes verbatim; only encoding changes.
+- **Mirror source headings** — exact text, level, order. Add none (e.g. `### Story` wrapper, `<summary>` promoted to heading).
+- **Keep ADF-only constructs whole** — never flatten `<details>`, panels, lozenges into headings or paragraphs.
+- Never invent fields, assignees, priorities, labels, components, custom-field values; set `additional_fields`/`parent` only from supplied values.
+- Confirm with key and `webUrl`; don't repeat description.
 
 ## Degraded mode
 
-No **Atlassian config** → `cloudId`/`defaultProjectKey` empty; Preflight's Step 2 resolves `cloudId`, Step 5's project-visibility lookup resolves `projectKey` (asking when ambiguous). All other steps unchanged.
-
-No `credentials.atl.api_token` → Step 6 is skipped and reported as unresolved; create/update in Step 5 is unaffected either way.
+No **Atlassian config** → `cloudId`/`defaultProjectKey` empty; Preflight Step 2 resolves `cloudId`, Step 5 project lookup resolves `projectKey` (ask when ambiguous). No token → see Step 6.

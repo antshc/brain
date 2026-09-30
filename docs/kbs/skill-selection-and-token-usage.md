@@ -70,6 +70,26 @@ These yield the same description text. Choose outer single or double quotes when
 
 Spend the characters on discriminating task words and boundaries instead. If punctuation appears to help in one run, compare both versions on the same should-trigger and near-miss prompts before retaining it.
 
+## Cross-skill invocation
+
+Use the exact child skill name with a few distinctive keywords from its description. The name identifies the dependency; the keywords state why the child applies.
+
+### Reusable template
+
+> When <trigger keywords from child description> applies, load and follow <exact-skill-name> skill. Use it for <child responsibility and output keywords>. Pass <required inputs and parent constraints>. Confirm it was loaded before continuing.
+
+### Example
+
+> When documenting software behavior—interactions, decisions, or responsibility handoffs—load and follow `doc-behavior-diagram` skill. Use it to create sequence, flowchart, or swimlane diagrams. Pass the required diagram type, scope, participants, evidence, and requested output location. Confirm it was loaded before drafting.
+
+### Terse examples
+
+> For behavior interactions, decisions, or handoffs, load `doc-behavior-diagram` skill. Create the requested sequence, flowchart, or swimlane diagram from the supplied scope and evidence.
+
+> For an unresolved SDK, API, cloud, database, or broker assumption, load `experiment` skill. Run the smallest real probe, reuse existing integration tests when available, and report the observed result.
+
+Use 3–6 distinctive keywords from the child description. Do not copy the complete description or add unrelated terms. A child skill's description supports independent discovery; the parent instruction defines the required dependency.
+
 ## Keep the loaded body focused
 
 Put common steps, branch selection, and checkable completion criteria in `SKILL.md`. Put material needed only for one branch in a linked file, with a pointer that says exactly when to open it. Keep hard safety and correctness gates on the path that needs them.

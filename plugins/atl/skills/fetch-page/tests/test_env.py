@@ -2,36 +2,27 @@ import json
 
 import pytest
 
-from env import load_credentials, load_settings
+from env import load_credentials
 
 
-def write_settings(tmp_path, atl: dict, credentials: dict | None = None) -> None:
-    data: dict = {"atl": atl}
-    if credentials is not None:
-        data["credentials"] = {"atl": credentials}
-    (tmp_path / ".harness.json.user").write_text(json.dumps(data))
+def config_path(tmp_path) -> str:
+    return str(tmp_path / ".atlassian.json.user")
 
 
-def test_load_settings_returns_empty_dict_when_absent(tmp_path):
-    assert load_settings(str(tmp_path)) == {}
-
-
-def test_load_settings_merges_atl_and_credentials_atl(tmp_path):
-    write_settings(tmp_path, atl={"site": "example.atlassian.net"}, credentials={"email": "me@example.com"})
-
-    values = load_settings(str(tmp_path))
-
-    assert values["site"] == "example.atlassian.net"
-    assert values["email"] == "me@example.com"
+def write_config(tmp_path, data: dict):
+    (tmp_path / ".atlassian.json.user").write_text(json.dumps(data))
 
 
 def test_load_credentials_returns_site_email_token(tmp_path):
-    write_settings(
+    write_config(
         tmp_path,
-        atl={"site": "example.atlassian.net"},
-        credentials={"email": "me@example.com", "api_token": "super-secret-token"},
+        {
+            "cloudId": "example.atlassian.net",
+            "email": "me@example.com",
+            "apiToken": "super-secret-token",
+        },
     )
-    creds = load_credentials(str(tmp_path))
+    creds = load_credentials(config_path(tmp_path))
     assert creds == {
         "site": "example.atlassian.net",
         "email": "me@example.com",
@@ -40,12 +31,17 @@ def test_load_credentials_returns_site_email_token(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "atl,credentials",
+    "data",
     [
-        ({"site": "example.atlassian.net"}, None),
-        ({}, None),
+        {"cloudId": "example.atlassian.net"},
+        {},
     ],
 )
-def test_load_credentials_returns_none_instead_of_raising_when_incomplete(tmp_path, atl, credentials):
-    write_settings(tmp_path, atl=atl, credentials=credentials)
-    assert load_credentials(str(tmp_path)) is None
+def test_load_credentials_returns_none_instead_of_raising_when_incomplete(tmp_path, data):
+    if data:
+        write_config(tmp_path, data)
+    assert load_credentials(config_path(tmp_path)) is None
+
+
+def test_load_credentials_returns_none_when_config_absent(tmp_path):
+    assert load_credentials(config_path(tmp_path)) is None

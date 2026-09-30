@@ -7,8 +7,8 @@ import pytest
 from page_diagrams.pipeline import convert_markdown_to_adf, publish, resolve_title, substitute_diagram_notes
 
 
-def write_settings(tmp_path, atl: dict) -> None:
-    (tmp_path / ".harness.json.user").write_text(json.dumps({"atl": atl}))
+def write_config(tmp_path, data: dict):
+    (tmp_path / ".atlassian.json.user").write_text(json.dumps(data))
 
 
 def test_resolve_title_from_first_heading():
@@ -62,7 +62,7 @@ def test_substitute_diagram_notes_replaces_top_level_marker():
     result, replaced = substitute_diagram_notes(adf, diagrams)
     assert replaced == 1
     text = result["content"][0]["content"][0]["text"]
-    assert "credentials.atl.api_token" in text
+    assert "apiToken" in text
     assert "00-title" in text
 
 
@@ -81,25 +81,25 @@ def test_substitute_diagram_notes_replaces_marker_nested_inside_expand():
     assert replaced == 1
     nested = result["content"][0]["content"][0]
     assert nested["type"] == "paragraph"
-    assert "credentials.atl.api_token" in nested["content"][0]["text"]
+    assert "apiToken" in nested["content"][0]["text"]
 
 
 def _write_page(tmp_path, renderer=None, extension_key=None):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n")
-    atl = {"site": "example.atlassian.net", "email": "me@example.com", "api_token": "secret"}
+    config = {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"}
     if renderer:
-        atl["diagram_renderer"] = renderer
+        config["diagramRenderer"] = renderer
     if extension_key:
-        atl["drawio_extension_key"] = extension_key
-    write_settings(tmp_path, atl)
+        config["drawioExtensionKey"] = extension_key
+    write_config(tmp_path, config)
     return md_path
 
 
 def _publish(md_path, tmp_path):
     return publish(
         md_path=str(md_path),
-        root=str(tmp_path),
+        config_path=str(tmp_path / ".atlassian.json.user"),
         page_id="123",
         space_id=None,
         title=None,
@@ -254,7 +254,7 @@ def test_publish_drawio_without_the_extension_key_fails_before_touching_a_page(t
     with patch("page_diagrams.pipeline.get_confluence") as mock_confluence, patch(
         "page_diagrams.pipeline.render_diagrams"
     ) as mock_render:
-        with pytest.raises(ValueError, match="drawio_extension_key"):
+        with pytest.raises(ValueError, match="drawioExtensionKey"):
             _publish(md_path, tmp_path)
 
     mock_confluence.assert_not_called()
@@ -276,7 +276,10 @@ def _write_local_media_page(tmp_path):
 
 def test_publish_uploads_local_attachments_with_no_diagrams_present(tmp_path):
     md_path = _write_local_media_page(tmp_path)
-    write_settings(tmp_path, {"site": "example.atlassian.net", "email": "me@example.com", "api_token": "secret"})
+    write_config(
+        tmp_path,
+        {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"},
+    )
     base_adf = {"content": [_marker_paragraph(0), _marker_paragraph(1)]}
     file_ids = {"screenshot.png": "file-1", "notes.pdf": "file-2"}
 
@@ -319,7 +322,7 @@ def test_publish_without_credentials_notes_local_media_when_no_diagrams_present(
     with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
         result = publish(
             md_path=str(md_path),
-            root=str(tmp_path),
+            config_path=str(tmp_path / ".atlassian.json.user"),
             page_id="123",
             space_id=None,
             title=None,
@@ -329,7 +332,7 @@ def test_publish_without_credentials_notes_local_media_when_no_diagrams_present(
         )
 
     assert result["method"] == "mcp"
-    assert result["missingPrerequisite"] == "credentials.atl.api_token"
+    assert result["missingPrerequisite"] == "apiToken"
     note_texts = [n["content"][0]["text"] for n in base_adf["content"]]
     assert any("screenshot.png" in t for t in note_texts)
     assert any("notes.pdf" in t for t in note_texts)
