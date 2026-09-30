@@ -76,17 +76,17 @@ Use the exact child skill name with a few distinctive keywords from its descript
 
 ### Reusable template
 
-> When <trigger keywords from child description> applies, load and follow <exact-skill-name> from <plugin>. Use it for <child responsibility and output keywords>. Pass <required inputs and parent constraints>. Confirm it was loaded before continuing.
+> When <trigger keywords from child description> applies, load and follow <exact-skill-name> skill. Use it for <child responsibility and output keywords>. Pass <required inputs and parent constraints>. Confirm it was loaded before continuing.
 
 ### Example
 
-> When documenting software behavior—interactions, decisions, or responsibility handoffs—load and follow `doc-behavior-diagram` from the `wf` plugin. Use it to create sequence, flowchart, or swimlane diagrams. Pass the required diagram type, scope, participants, evidence, and requested output location. Confirm it was loaded before drafting.
+> When documenting software behavior—interactions, decisions, or responsibility handoffs—load and follow `doc-behavior-diagram` skill. Use it to create sequence, flowchart, or swimlane diagrams. Pass the required diagram type, scope, participants, evidence, and requested output location. Confirm it was loaded before drafting.
 
 ### Terse examples
 
-> For behavior interactions, decisions, or handoffs, load `doc-behavior-diagram` from `wf`. Create the requested sequence, flowchart, or swimlane diagram from the supplied scope and evidence.
+> For behavior interactions, decisions, or handoffs, load `doc-behavior-diagram` skill. Create the requested sequence, flowchart, or swimlane diagram from the supplied scope and evidence.
 
-> For an unresolved SDK, API, cloud, database, or broker assumption, load `experiment` from `wf`. Run the smallest real probe, reuse existing integration tests when available, and report the observed result.
+> For an unresolved SDK, API, cloud, database, or broker assumption, load `experiment` skill. Run the smallest real probe, reuse existing integration tests when available, and report the observed result.
 
 Use 3–6 distinctive keywords from the child description. Do not copy the complete description or add unrelated terms. A child skill's description supports independent discovery; the parent instruction defines the required dependency.
 

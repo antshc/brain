@@ -20,6 +20,8 @@ building block to reach for, how skills compose) are answered by the Crosscuttin
 
 **Skill invocation:** every step that runs another skill reads ``Run `/{{skillName}}` skill `` or ``Follow `/{{skillName}}` skill `` — backticked, slash-prefixed skill name, verb is *run* or *follow*, never "call" or "invoke". Target a named section as ``Run `/index-docs`' skill **Sync index row** `` or ``Follow `/crew-gotchas`' skill **Read Workflow** ``. Naming a skill as an owner rather than running it takes the plain backticked name.
 
+**Cross-skill invocation:** name the exact child skill (ex: load/follow/run `doc-behavior-diagram` skill) plus 3–6 distinctive keywords from its description — the name identifies the dependency, the keywords say why it applies here — then pass the inputs and constraints the child needs. Never copy the child's full description.
+
 **Line wrapping:** one physical line per paragraph/bullet/table cell, however long — no fixed-column hard-wrap, keeps grep and diffs clean. Rejoin any line an editor's auto-rewrap splits.
 
 **Syntax legend** — use when writing or updating skills, templates, and agent instruction files:
@@ -43,7 +45,7 @@ building block to reach for, how skills compose) are answered by the Crosscuttin
 | Key | Required | Value |
 |-----|----------|-------|
 | `name` | yes | Lowercase, hyphens, matches the folder name. |
-| `description` | yes | Third person. States what it does **and** the triggers for reaching it. |
+| `description` | yes | Third person. States what it does **and** the triggers for reaching it. Spec allows up to 1024 characters, but every installed skill's `name` + `description` loads on every turn — at this repo's scale (dozens to ~100 skills), target 100–300 characters (roughly 1–2 sentences): enough for when/what/result and the shared keywords, not a full spec budget per skill. |
 | `disable-model-invocation` | no | `true` makes the skill user-invoked. |
 
 Name skills by their **verb-prefix family**, not the gerund form other guides recommend:
@@ -65,6 +67,11 @@ The `description` is the skill's always-loaded pointer: it costs tokens on every
 Write the description in third person, front-loading the word you actually type when you want the skill. One
 trigger per distinct case; synonyms that rename the same case are one case written twice — collapse them. Cut
 identity the body already carries.
+
+Compose it in three parts: **when** — the observable request or artifact that fires it; **what** — its single
+responsibility; **result** — the output or decision it produces. Carry the 3–6 distinctive keywords a caller
+would cite under Cross-skill invocation inside the description itself, not only in the body — the same words
+must work for automatic discovery and for a parent skill naming this one.
 
 ## What goes in the file
 
