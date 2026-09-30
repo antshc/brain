@@ -45,7 +45,7 @@ Run subagents through prose instructions describing the task, scope, inputs, con
 
 Order content by need: **steps → inline reference → disclosed reference**. Inline always-needed material; disclose conditional or bulky material.
 
-Keep `SKILL.md` under 500 lines.
+Keep `SKILL.md` body under 300 lines.
 
 | Folder | Holds |
 |---|---|
@@ -93,6 +93,6 @@ When a skill depends on an external tool, API, or platform quirk, add `## Gotcha
 ## Before finishing
 
 - Valid frontmatter; trigger-rich description.
-- `SKILL.md` under 500 lines.
+- `SKILL.md` body under 300 lines.
 - Shared procedure not duplicated.
 - No credentials, tokens, or secrets.
