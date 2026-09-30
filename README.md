@@ -181,7 +181,7 @@ Harness configuration setup and resolution skills.
 Atlassian workflow skills.
 
 - [init-atl](plugins/atl/skills/init-atl/SKILL.md): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
-- [preflight-atlassian](plugins/atl/skills/preflight-atlassian/SKILL.md): resolve Atlassian connection facts before any Jira/Confluence operation, and own locating/parsing the repo's Atlassian config file.
+- [preflight-atlassian](plugins/atl/skills/init-atl/preflight-atlassian.SKILL.template.md): `init-atl` template generated per-repo into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
 - [fetch-work](plugins/atl/skills/fetch-work/SKILL.md) / [publish-work](plugins/atl/skills/publish-work/SKILL.md): fetch or create/update a Jira work item.
 - [fetch-page](plugins/atl/skills/fetch-page/SKILL.md) / [publish-page](plugins/atl/skills/publish-page/SKILL.md): fetch or create/update a Confluence page.
 - [map-markdown-adf](plugins/atl/skills/map-markdown-adf/SKILL.md): convert Markdown to/from Atlassian Document Format, and detect the constructs only ADF can express.
