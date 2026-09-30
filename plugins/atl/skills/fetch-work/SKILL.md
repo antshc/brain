@@ -21,7 +21,7 @@ Return a Jira **Work item** as Markdown from key or URL. MCP only; API token nee
 - `https://<site>/browse/<key>` → `<site>`, `<key>`; `<site>` overrides Preflight's `cloudId`.
 - Bare `<key>` → Preflight's `cloudId`.
 
-**3 — Fetch.** `getJiraIssue` with `cloudId`, `issueIdOrKey: <key>`. Omit `fields`; defaults suffice.
+**3 — Fetch.** `getJiraIssue` with `cloudId`, `issueIdOrKey: <key>`. Omit `fields`; defaults suffice. No matching MCP tool → REST fallback per Preflight.
 
 **4 — Guard truncation.** Save result to `content.json`; read with Python (Preflight rule).
 

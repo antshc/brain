@@ -44,7 +44,6 @@ Apply in every `atl` skill:
 - JQL/CQL searches use resolved `maxResults`/`limit`, unless the caller bundles its own extraction script and declares a higher cap.
 - Large tool result → save to `content.json`, `cd` there, extract with Python (`read_file` silently truncates lines at ~2000 chars): `python3 -c "import json;d=json.load(open('content.json'));print(d['fields']['description'])"`. Unknown shape → `print(json.dumps(d, indent=2)[:2000])`.
 - `getAccessibleAtlassianResources` at most once per session, only while `cloudId` unknown.
-- No MCP tool found for the needed call (e.g. subagent session lacks the MCP connection) + `tokenAvailable` → REST fallback via `atlassian-python-api`, using `site` (from `cloudId`), `email`, `apiToken`; report `mcp` vs `rest` per call. Neither MCP nor token → surface the missing-MCP error, name the tool.
 
 ## Gotchas
 
