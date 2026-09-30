@@ -23,7 +23,7 @@ Infer from context; ask only when required input missing.
 
 ## Workflow
 
-**1 — Preflight.** Run `preflight-atlassian` **Action: Resolve**; use returned `cloudId`.
+**1 — Preflight.** Run `preflight-atlassian` (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**; use returned `cloudId`.
 
 **2 — Re-read source.** Description from file → `read_file` it again now, even if already read this session; else a mid-session edit is missed and stale content published.
 
