@@ -87,7 +87,7 @@ def test_substitute_diagram_notes_replaces_marker_nested_inside_expand():
 def _write_page(tmp_path, renderer=None, extension_key=None):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n")
-    config = {"site": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"}
+    config = {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"}
     if renderer:
         config["diagramRenderer"] = renderer
     if extension_key:
@@ -278,7 +278,7 @@ def test_publish_uploads_local_attachments_with_no_diagrams_present(tmp_path):
     md_path = _write_local_media_page(tmp_path)
     write_config(
         tmp_path,
-        {"site": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"},
+        {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"},
     )
     base_adf = {"content": [_marker_paragraph(0), _marker_paragraph(1)]}
     file_ids = {"screenshot.png": "file-1", "notes.pdf": "file-2"}

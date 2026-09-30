@@ -29,13 +29,13 @@ def load_config(config_path: str) -> dict:
 def load_credentials(config_path: str) -> dict[str, str]:
     """Return `site`/`email`/`token`; raises `SystemExit` naming the missing key(s)."""
     config = load_config(config_path)
-    site = str(config.get("site", "")).strip()
+    site = str(config.get("cloudId", "")).strip()  # config key is `cloudId`, not `site`
     email = str(config.get("email", "")).strip()
     token = str(config.get("apiToken", "")).strip()
     missing = [
         name
         for name, value in (
-            ("site", site),
+            ("cloudId", site),
             ("email", email),
             ("apiToken", token),
         )

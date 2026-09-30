@@ -22,7 +22,7 @@ def test_load_credentials_returns_site_email_token(tmp_path):
     write_config(
         tmp_path,
         {
-            "site": "example.atlassian.net",
+            "cloudId": "example.atlassian.net",
             "email": "me@example.com",
             "apiToken": "super-secret-token",
         },
@@ -36,13 +36,13 @@ def test_load_credentials_returns_site_email_token(tmp_path):
 
 
 def test_load_credentials_raises_naming_every_missing_key(tmp_path):
-    write_config(tmp_path, {"site": "example.atlassian.net"})
+    write_config(tmp_path, {"cloudId": "example.atlassian.net"})
     try:
         load_credentials(config_path(tmp_path))
     except SystemExit as exc:
         assert "email" in str(exc)
         assert "apiToken" in str(exc)
-        assert "site" not in str(exc)
+        assert "cloudId" not in str(exc)
     else:
         raise AssertionError("expected SystemExit")
 
@@ -51,7 +51,7 @@ def test_load_credentials_raises_when_config_absent(tmp_path):
     try:
         load_credentials(config_path(tmp_path))
     except SystemExit as exc:
-        assert "site" in str(exc)
+        assert "cloudId" in str(exc)
     else:
         raise AssertionError("expected SystemExit")
 

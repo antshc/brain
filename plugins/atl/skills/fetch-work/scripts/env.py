@@ -24,7 +24,7 @@ def load_config(config_path: str) -> dict:
 def load_credentials(config_path: str) -> dict[str, str] | None:
     """Return `site`/`email`/`token`, or `None` when any is missing or the config is absent."""
     config = load_config(config_path)
-    site = str(config.get("site", "")).strip()
+    site = str(config.get("cloudId", "")).strip()  # config key is `cloudId`, not `site`
     email = str(config.get("email", "")).strip()
     token = str(config.get("apiToken", "")).strip()
     if not (site and email and token):
