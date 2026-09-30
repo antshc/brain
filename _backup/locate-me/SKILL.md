@@ -5,6 +5,6 @@ description: Locate me.txt in the repository containing this installed skill, in
 
 # Locate Me
 
-Run `./scripts/locate_me.py` from this skill's base directory.
+Run `./locate_me.py` from this skill's base directory.
 
 Return the printed absolute path. Report a non-zero exit.
