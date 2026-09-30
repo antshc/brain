@@ -46,6 +46,8 @@ Else → **create**:
 2. `createJiraIssue` with `cloudId`, `projectKey`, `issueTypeName: issueType`, `summary`, `description`, `contentFormat`, `parent` (if named), `additional_fields` (supplied only).
 3. Report only `issueKey` and `webUrl`.
 
+No matching MCP tool for `editJiraIssue`/`createJiraIssue`/`getVisibleJiraProjects` → REST fallback per Preflight (`PUT`/`POST /rest/api/3/issue`, `GET /rest/api/3/project/search`).
+
 **6 — Attach files.** Only when `attachments` supplied. MCP has no Jira upload tool → REST: `POST /rest/api/3/issue/{issueIdOrKey}/attachments`, header `X-Atlassian-Token: no-check`, multipart, auth `.atlassian.json.user` `site`/`email`/`apiToken` (`ATLASSIAN_SITE`/`ATLASSIAN_EMAIL`/`ATLASSIAN_API_TOKEN`; see `preflight-atlassian`).
 
 - `tokenAvailable: true` → upload each file to the issue key; report attached filenames with key and `webUrl`.

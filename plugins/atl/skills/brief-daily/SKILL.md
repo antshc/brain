@@ -18,6 +18,7 @@ Budget: **two searches and two script runs**. Query B projects `comment`, so eve
 
 **3 — Query A: blocked items assigned to me.** `searchJiraIssuesUsingJql` with `cloudId`, `jql: 'assignee = currentUser() AND (status = "Blocked" OR flagged = Impediment) AND updated >= <cutoffJql> ORDER BY updated DESC'`, `maxResults: 25`. Paginate per Pagination. Renders as section 1 of the output template.
 - **Fallback:** some Jira instances have no `"Blocked"` status literal and the clause errors — retry with `jql: 'flagged = Impediment AND updated >= <cutoffJql> ORDER BY updated DESC'`, record the dropped clause under Excluded, and never fail the whole report over it.
+- No matching MCP tool for `searchJiraIssuesUsingJql` → REST fallback per Preflight (`GET /rest/api/3/search/jql`).
 
 **4 — Query B: mentions.** `searchJiraIssuesUsingJql` with `cloudId`, `fields: ["summary","status","comment"]`, `jql: 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC'`, `maxResults: 25`. Search by Preflight's `accountId`, never display name — a display-name search both false-positives on comments the user authored and misses real `@mentions`. Issue this in the same turn as Step 3.
 

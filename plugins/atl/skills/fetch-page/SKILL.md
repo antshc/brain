@@ -20,7 +20,7 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
    - `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<site>`, `<page_id>`.
    - `https://<site>/wiki/x/<tiny_id>` → `<site>`, `<page_id> := <tiny_id>`.
    - Bare numeric or tiny ID → `<page_id>` as-is.
-3. **Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`. Guard truncation per Preflight. Result lands at `content.json` (title/body at `content.nodes[0].title` / `.body`; don't explore).
+3. **Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`. Guard truncation per Preflight; no matching MCP tool → REST fallback per Preflight. Result lands at `content.json` (title/body at `content.nodes[0].title` / `.body`; don't explore).
 4. **Assemble** from this skill's base directory:
    ```bash
    python3 scripts/assemble_page.py --page-id <page_id> --config "<configPath>" --md-path page.md < content.json

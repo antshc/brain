@@ -17,7 +17,7 @@ Publish local Markdown to a Confluence page via one `run` command: extract → c
 
 ## Diagram renderer
 
-`diagramRenderer` in `.atlassian.json.user` (see `preflight-atl`). Absent/empty → `png`.
+`diagramRenderer` in `.atlassian.json.user` (see `preflight-atlassian`). Absent/empty → `png`.
 
 | Value | Page output | Extra prerequisite | Status |
 |---|---|---|---|
@@ -72,7 +72,7 @@ Ids are permanent: rename/delete orphans the attachment and record (`run` never 
 
 ## Workflow
 
-**1 — Preflight.** Run `preflight-atl` **Action: Resolve**; keep `cloudId`, `configPath`.
+**1 — Preflight.** Run `preflight-atlassian` **Action: Resolve**; keep `cloudId`, `configPath`.
 
 **2 — Resolve target.** `pageId` → update, `--page-id`. Else create, `--space-id` from first hit: supplied `spaceId` → Preflight `defaultSpaceId` (report) → `getConfluenceSpaces` `limit: 10`: one → use, report; several → ask (Preflight Ambiguity rule).
 
@@ -107,7 +107,7 @@ Stdout JSON:
 
 **`body` MUST be the literal stringified ADF JSON**, never a file reference (`{"adf_file": ...}` → opaque 400).
 
-Body too large to inline → re-run with `--threshold-bytes 0` (forces REST).
+Body too large to inline, or no matching MCP tool found for Step 4 → re-run with `--threshold-bytes 0` (forces REST for the whole publish, skipping Step 4).
 
 Report page URL; with diagrams, confirm page and attachment list show every image.
 
