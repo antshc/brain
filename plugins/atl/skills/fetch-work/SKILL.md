@@ -1,6 +1,6 @@
 ---
 name: fetch-work
-description: Fetch a Jira work item as Markdown from its key or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Jira work item/issue by key or URL. No Atlassian config required; with `ATLASSIAN_API_TOKEN`, embedded images/files are cached to a `.tmp` folder beside the Markdown and linked.
+description: Fetch a Jira work item as Markdown from its key or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Jira work item/issue by key or URL. No Atlassian config required; with `apiToken` configured, embedded images/files are cached to a `.tmp` folder beside the Markdown and linked.
 argument-hint: '<work_item_key_or_url> (e.g. "PROJ-123" or "https://<site>.atlassian.net/browse/PROJ-123")'
 ---
 
@@ -11,7 +11,7 @@ Return a Jira **Work item** as Markdown from key or URL. MCP only; API token nee
 ## Prerequisites
 
 - `atlassian-python-api` installed by `init-atl` (plugin-wide); run it first if missing. This skill installs nothing.
-- Embedded image/file resolution needs `ATLASSIAN_API_TOKEN` (`apiToken` in `.atlassian.json.user`; see `preflight-atlassian` skill) — MCP returns no real ADF (see Gotchas). No token → no download; each embedded image becomes a placeholder note.
+- Embedded image/file resolution needs `apiToken` in `.atlassian.json.user` (see `preflight-atlassian` skill) — MCP returns no real ADF (see Gotchas). No token → no download; each embedded image becomes a placeholder note.
 
 ## Workflow
 
@@ -32,7 +32,7 @@ python3 scripts/assemble_work.py --issue-key <key> --config "<configPath>" --md-
 ```
 
 Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body. `--assets-dir <dir>` overrides cache dir (default `work.md.tmp`, beside `work.md`).
-- No token → uses MCP `fields.description` as-is; each `![](blob:...)` → note naming `ATLASSIAN_API_TOKEN`.
+- No token → uses MCP `fields.description` as-is; each `![](blob:...)` → note naming `apiToken`.
 - Token → fetches real ADF over REST, converts via `map-markdown-adf` **Action: Convert ADF to Markdown** (media nodes → placeholders), then applies Attachment rules.
 
 **6 — Return** `work.md` contents unchanged.

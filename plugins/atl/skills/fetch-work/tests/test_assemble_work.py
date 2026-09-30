@@ -80,7 +80,7 @@ def test_assemble_uses_the_mcp_description_directly_and_notes_blob_images_withou
     result = assemble(_raw("ZIC-5881", fields), "ZIC-5881", "/repo", "/repo/work.md.tmp")
 
     assert result.startswith("# ZIC-5881 — ")
-    assert "ATLASSIAN_API_TOKEN" in result
+    assert "apiToken" in result
     assert "blob:" not in result
 
 

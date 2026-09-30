@@ -11,7 +11,7 @@ Publish local Markdown to a Confluence page via one `run` command: extract → c
 ## Prerequisites
 
 - `atlassian-python-api` — installed by `init-atl`; run it first. Needed by every REST path.
-- Diagrams or local attachments → **MUST** have `ATLASSIAN_API_TOKEN` (`apiToken` in `.atlassian.json.user`).
+- Diagrams or local attachments → **MUST** have `apiToken` configured in `.atlassian.json.user`.
 - Diagram present → **MUST** have `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli`; verify `mmdc --version`. Headless Chrome libs (Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.
 - Diagram-free source: small → MCP only; large → REST, no `mmdc`.
 
@@ -61,7 +61,7 @@ Ids are permanent: rename/delete orphans the attachment and record (`run` never 
 
 ## Confidentiality
 
-**MUST NOT** print, log, quote, or publish `site`, `email`, `apiToken` (`ATLASSIAN_SITE`/`ATLASSIAN_EMAIL`/`ATLASSIAN_API_TOKEN`) in page content, tool args, or output. `run` reads `.atlassian.json.user` itself; never pass credentials as CLI args.
+**MUST NOT** print, log, quote, or publish `site`, `email`, `apiToken` (the `.atlassian.json.user` credential fields) in page content, tool args, or output. `run` reads `.atlassian.json.user` itself; never pass credentials as CLI args.
 
 ## Inputs
 
@@ -90,7 +90,7 @@ Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```mermaid fences
 
 - Diagrams/local attachments + token → REST: ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `fetch-page`-recorded `width`/`height` when present; other file → `mediaGroup`), publish.
 - Neither + token → REST if ADF > `--threshold-bytes` (default 50KB = safe MCP-inline size), else MCP handback.
-- No token → markers become notes naming `ATLASSIAN_API_TOKEN`; always MCP handback.
+- No token → markers become notes naming `apiToken`; always MCP handback.
 
 Exits non-zero naming the cause on: missing `mmdc` (diagram path) or `drawio` (`drawio` mode); unsupported/unusable `diagramRenderer`; missing `drawioExtensionKey`; duplicate `%% diagram-id`; leftover marker after substitution. All but the last fail before any page is touched. Fix and re-run; don't work around.
 
@@ -98,7 +98,7 @@ Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); o
 
 Stdout JSON:
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published; report.
-- `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"ATLASSIAN_API_TOKEN"}` → Step 4. `missingPrerequisite` only when diagrams became notes.
+- `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"apiToken"}` → Step 4. `missingPrerequisite` only when diagrams became notes.
 
 **4 — MCP handback.** Read the whole `adfPath` file (pretty-printed so line-truncating reads lose nothing), then:
 

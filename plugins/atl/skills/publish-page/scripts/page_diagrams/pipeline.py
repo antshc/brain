@@ -73,7 +73,7 @@ def _diagram_note_node(name: str) -> dict:
         "content": [
             {
                 "type": "text",
-                "text": f"[Diagram '{name}' not rendered: ATLASSIAN_API_TOKEN is not configured]",
+                "text": f"[Diagram '{name}' not rendered: apiToken is not configured in .atlassian.json.user]",
             }
         ],
     }
@@ -259,7 +259,7 @@ def _publish_without_credentials(
     }
     if diagrams or local_media:
         final_adf, _ = substitute_diagram_notes(base_adf, diagrams, local_media)
-        result["missingPrerequisite"] = "ATLASSIAN_API_TOKEN"
+        result["missingPrerequisite"] = "apiToken"
     else:
         final_adf = base_adf
     result["sizeBytes"] = adf_body_size(final_adf)

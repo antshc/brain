@@ -142,7 +142,7 @@ def test_assemble_degrades_when_reference_present_and_no_token(monkeypatch, tmp_
     assets_dir = tmp_path / "page.md.tmp"
     result = assemble(raw, "123", "/repo", str(assets_dir))
 
-    assert "ATLASSIAN_API_TOKEN" in result
+    assert "apiToken" in result
     assert "```mermaid" not in result
     assert not assets_dir.exists()
 

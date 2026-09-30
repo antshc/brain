@@ -41,7 +41,7 @@ _ATTACHMENT_PLACEHOLDER_RE = re.compile(
 )
 _ANY_PLACEHOLDER_RE = re.compile(r"<!-- adf:(diagram|attachment) ")
 
-NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set ATLASSIAN_API_TOKEN to restore it -->"
+NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set apiToken in .atlassian.json.user to restore it -->"
 SKIPPED_NOTE = "<!-- adf:diagram source unavailable: attachment retrieval skipped (--attachments skip) -->"
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")

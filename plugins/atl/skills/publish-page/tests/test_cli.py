@@ -447,11 +447,11 @@ def test_run_with_no_creds_substitutes_notes_and_writes_pretty_printed_adf(tmp_p
 
     out = json.loads(capsys.readouterr().out)
     assert out["method"] == "mcp"
-    assert out["missingPrerequisite"] == "ATLASSIAN_API_TOKEN"
+    assert out["missingPrerequisite"] == "apiToken"
     assert out["diagramsRendered"] == 0
 
     written_text = out_path.read_text()
-    assert "ATLASSIAN_API_TOKEN" in written_text
+    assert "apiToken" in written_text
     assert len(written_text.splitlines()) > 1
 
 
