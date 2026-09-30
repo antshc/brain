@@ -26,9 +26,9 @@ Tell the subagent that exploration is strictly read-only. It must not edit sourc
 
 The one exception is an output artifact the caller names — the subagent writes that file, and nothing else.
 
-## Resolve the harness
+## Resolve the repository root
 
-Run `/resolve-harness` skill to get `HARNESS_REPO_PATH` (cwd fallback when the skill is unavailable or the value is empty). Resolve it once and put the absolute path in every subagent brief — the subagent never re-resolves it.
+Resolve `HARNESS_REPO_PATH` once from the repository where the skill was invoked with `git rev-parse --show-toplevel`; stop if cwd is not inside a Git repository. Put the absolute path in every subagent brief — the subagent never re-resolves it.
 
 Every harness-side search is bounded to `$HARNESS_REPO_PATH`, never above it. A supporting repository the index names is searched inside its own path, however far outside the harness that sits — never by widening the harness search.
 
