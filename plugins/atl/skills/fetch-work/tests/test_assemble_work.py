@@ -72,7 +72,7 @@ def test_convert_adf_to_markdown_shells_out_to_map_markdown_adf(monkeypatch):
 def test_assemble_uses_the_mcp_description_directly_and_notes_blob_images_without_credentials(
     monkeypatch,
 ):
-    monkeypatch.setattr("assemble_work.load_credentials", lambda root: None)
+    monkeypatch.setattr("assemble_work.load_credentials", lambda config_path: None)
 
     fields = _fields(
         description="text\n\n![](blob:https://media.staging.atl-paas.net/?type=file&id=abc)"
@@ -86,7 +86,7 @@ def test_assemble_uses_the_mcp_description_directly_and_notes_blob_images_withou
 
 def test_assemble_fetches_real_adf_and_resolves_attachments_when_token_available(monkeypatch, tmp_path):
     jira = MagicMock()
-    monkeypatch.setattr("assemble_work.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"})
+    monkeypatch.setattr("assemble_work.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"})
     monkeypatch.setattr("assemble_work.get_jira", lambda credentials: jira)
     monkeypatch.setattr("assemble_work.fetch_description_adf", lambda jira_, key: _image_body())
     monkeypatch.setattr(
@@ -115,7 +115,7 @@ def test_assemble_fetches_real_adf_and_resolves_attachments_when_token_available
 def test_assemble_skips_attachment_handling_when_token_available_but_no_reference_present(
     monkeypatch, tmp_path
 ):
-    monkeypatch.setattr("assemble_work.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"})
+    monkeypatch.setattr("assemble_work.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"})
     monkeypatch.setattr("assemble_work.get_jira", lambda credentials: MagicMock())
     monkeypatch.setattr(
         "assemble_work.fetch_description_adf",

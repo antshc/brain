@@ -17,15 +17,11 @@ fetch.
 """
 from __future__ import annotations
 
-import argparse
 import re
-import sys
 from pathlib import Path
 from urllib.parse import quote
 
 from atlassian import Jira
-
-from env import get_jira, load_credentials
 
 _ATTACHMENT_PLACEHOLDER_RE = re.compile(
     r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")? -->'
@@ -182,33 +178,3 @@ def replace_blob_image_refs_without_credentials(markdown: str) -> str:
     an `/map-markdown-adf` placeholder — swap that pattern directly for the same note instead.
     """
     return _BLOB_IMAGE_RE.sub(NO_TOKEN_NOTE, markdown)
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Restore Markdown image/link references from a fetched issue's attachment placeholders."
-    )
-    parser.add_argument("--issue-key", required=True, help="Jira issue key the Markdown was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
-    parser.add_argument("--assets-dir", required=True, help="Directory to cache this issue's attachments into")
-    args = parser.parse_args()
-
-    markdown = sys.stdin.read()
-    if not has_attachment_placeholder(markdown):
-        sys.stdout.write(markdown)
-        return
-
-    credentials = load_credentials(args.root)
-    if credentials is None:
-        sys.stdout.write(restore_attachments_without_credentials(markdown))
-        return
-
-    jira = get_jira(credentials)
-    downloaded = save_attachments(jira, args.issue_key, args.assets_dir)
-    sys.stdout.write(
-        restore_attachments(jira, args.issue_key, markdown, downloaded, Path(args.assets_dir).name)
-    )
-
-
-if __name__ == "__main__":
-    main()
