@@ -61,11 +61,11 @@ def format_header(issue_key: str, fields: dict) -> str:
     )
 
 
-def assemble(raw: dict, issue_key: str, root: str, assets_dir: str) -> str:
+def assemble(raw: dict, issue_key: str, config_path: str, assets_dir: str) -> str:
     fields = extract_fields(raw)
     header = format_header(issue_key, fields)
 
-    credentials = load_credentials(root)
+    credentials = load_credentials(config_path)
     if credentials is None:
         body = replace_blob_image_refs_without_credentials(fields.get("description") or "")
         return header + body
@@ -88,7 +88,7 @@ def main() -> None:
         description="Assemble a fetched Jira issue's header + Markdown body in one pass."
     )
     parser.add_argument("--issue-key", required=True, help="Jira issue key the issue was fetched from")
-    parser.add_argument("--root", required=True, help="Harness Repo Path to bound the `.atlassian` search to")
+    parser.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
         "--assets-dir",
@@ -100,7 +100,7 @@ def main() -> None:
     assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.name}.tmp")
 
     raw = json.loads(sys.stdin.read())
-    markdown = assemble(raw, args.issue_key, args.root, assets_dir)
+    markdown = assemble(raw, args.issue_key, args.config, assets_dir)
     md_path.write_text(markdown)
 
 

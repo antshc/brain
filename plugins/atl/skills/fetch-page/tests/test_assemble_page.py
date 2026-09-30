@@ -96,7 +96,7 @@ def test_assemble_saves_attachments_and_restores_diagrams_when_reference_present
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
     monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"}
+        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
     )
     confluence = MagicMock()
     monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: confluence)
@@ -136,7 +136,7 @@ def test_assemble_degrades_when_reference_present_and_no_token(monkeypatch, tmp_
         "assemble_page.convert_adf_to_markdown",
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
-    monkeypatch.setattr("assemble_page.load_credentials", lambda root: None)
+    monkeypatch.setattr("assemble_page.load_credentials", lambda config_path: None)
 
     raw = _raw("Complex Page", _drawio_body())
     assets_dir = tmp_path / "page.md.tmp"
@@ -183,7 +183,7 @@ def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_p
         ),
     )
     monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"}
+        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
     )
     monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: confluence)
 
@@ -226,7 +226,7 @@ def test_assemble_required_mode_raises_and_writes_nothing_when_credentials_are_m
         "assemble_page.convert_adf_to_markdown",
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
-    monkeypatch.setattr("assemble_page.load_credentials", lambda root: None)
+    monkeypatch.setattr("assemble_page.load_credentials", lambda config_path: None)
 
     raw = _raw("Complex Page", _drawio_body())
     assets_dir = tmp_path / "page.md.tmp"
@@ -242,7 +242,7 @@ def test_assemble_auto_mode_degrades_safely_on_attachment_retrieval_failure(monk
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
     monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"}
+        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
     )
     monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: MagicMock())
 
@@ -270,7 +270,7 @@ def test_assemble_required_mode_propagates_attachment_retrieval_failure_and_writ
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
     monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"}
+        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
     )
     monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: MagicMock())
 
@@ -296,7 +296,7 @@ def test_assemble_required_mode_raises_when_attachment_placeholder_cannot_be_res
         lambda body: '<!-- adf:attachment media-id="missing" alt="missing.png" -->',
     )
     monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda root: {"site": "x", "email": "e", "token": "t"}
+        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
     )
     monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: MagicMock())
     monkeypatch.setattr("assemble_page.fetch_attachment_snapshot", lambda confluence, page_id: MagicMock())

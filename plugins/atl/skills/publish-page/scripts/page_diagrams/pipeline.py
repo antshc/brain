@@ -59,10 +59,10 @@ def convert_markdown_to_adf(processed_md: str) -> dict:
     return json.loads(result.stdout)
 
 
-def try_load_credentials(root: str) -> dict[str, str] | None:
-    """Non-fatal probe: `None` when `.atlassian` is missing/incomplete, never raises."""
+def try_load_credentials(config_path: str) -> dict[str, str] | None:
+    """Non-fatal probe: `None` when the Atlassian config is missing/incomplete, never raises."""
     try:
-        return load_credentials(root)
+        return load_credentials(config_path)
     except SystemExit:
         return None
 
@@ -268,7 +268,7 @@ def _publish_without_credentials(
 
 def publish(
     md_path: str,
-    root: str,
+    config_path: str,
     page_id: str | None,
     space_id: str | None,
     title: str | None,
@@ -285,8 +285,8 @@ def publish(
     pretty-printed (`json.dump(..., indent=2)`) so it stays readable through
     line-truncating file readers.
     """
-    renderer = load_renderer(root)
-    swimlane_drawio_enabled = load_swimlane_drawio_enabled(root)
+    renderer = load_renderer(config_path)
+    swimlane_drawio_enabled = load_swimlane_drawio_enabled(config_path)
 
     md_text = Path(md_path).read_text(encoding="utf-8")
     resolved_title = resolve_title(md_text, title)
@@ -296,16 +296,16 @@ def publish(
     base_adf = convert_markdown_to_adf(processed)
 
     # A page with only local attachments and no mermaid fence must not be blocked by an
-    # unrelated/unusable ATLASSIAN_DIAGRAM_RENDERER setting.
+    # unrelated/unusable diagramRenderer setting.
     drawio_extension_key = None
     if diagrams:
         unavailable = renderers.unavailable_reason(renderer)
         if unavailable:
             raise RuntimeError(unavailable)
         # Resolved up front so a missing key fails before any page is created or updated.
-        drawio_extension_key = load_drawio_extension_key(root) if renderer == renderers.DRAWIO else None
+        drawio_extension_key = load_drawio_extension_key(config_path) if renderer == renderers.DRAWIO else None
 
-    credentials = try_load_credentials(root)
+    credentials = try_load_credentials(config_path)
 
     if credentials and (diagrams or local_media):
         result, final_adf = _publish_with_diagrams(

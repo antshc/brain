@@ -12,7 +12,7 @@ Budget: **two searches and two script runs**. Query B projects `comment`, so eve
 
 ## Workflow
 
-**1 — Preflight.** Run `/preflight-atl` skill **Action: Resolve**. It returns `cloudId`, `accountId` and `displayName` — this skill resolves none of them itself.
+**1 — Preflight.** Run `/preflight-atlassian` skill **Action: Resolve**. It returns `cloudId`, `accountId` and `displayName` — this skill resolves none of them itself.
 
 **2 — Resolve period.** Parse `{{input}}`: empty → default `1 month`. Convert it into a JQL relative-date modifier in **days only** — never the `M` (month) unit (see Gotchas) — using 1 month ≈ 30 days: `1 month` → `-30d`, `"2 weeks"` → `-14d`, `"3 months"` → `-90d`. Keep the day count: it is Step 5's `--cutoff-days`.
 
@@ -83,7 +83,7 @@ No reply from you is visible via the API for these. Comment reactions are invisi
 
 **The scripts resolve `brief_daily/` relative to the current directory** — run them from anywhere else and the import fails. `cd` to the directory holding this `SKILL.md`, then `cd scripts`, and call them by bare filename.
 
-**Every search and most issue reads spill to a `content.json` path instead of returning inline** — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `/preflight-atl` skill **Standing MCP usage rules**.
+**Every search and most issue reads spill to a `content.json` path instead of returning inline** — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `/preflight-atlassian` skill **Standing MCP usage rules**.
 
 **`issues` is a flat list, not a nested `nodes` envelope** — verified against this MCP: `d["issues"]` is the issue list directly (`d["issues"][0]["fields"]["comment"]["comments"]` is the comment thread), and `d["isLast"]` — not `d["issues"]["pageInfo"]["hasNextPage"]` — signals whether more pages remain. Treating `issues` as `{"nodes": [...], "pageInfo": {...}}` raises `TypeError: list indices must be integers or slices, not str` on the first row. `payload.py`'s `nodes()`/`truncated()` detect both shapes, so the scripts themselves never need this distinction.
 

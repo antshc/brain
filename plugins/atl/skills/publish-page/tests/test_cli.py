@@ -6,6 +6,14 @@ import pytest
 from page_diagrams.cli import DEFAULT_THRESHOLD_BYTES, main
 
 
+def config_path(tmp_path) -> str:
+    return str(tmp_path / ".atlassian.json.user")
+
+
+def write_config(tmp_path, data: dict):
+    (tmp_path / ".atlassian.json.user").write_text(json.dumps(data))
+
+
 def test_extract_prints_processed_markdown_and_diagrams(capsys):
     md = "# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n"
     with patch("sys.stdin.read", return_value=md):
@@ -55,20 +63,20 @@ def test_render_attach_reports_mmdc_missing(tmp_path, capsys):
         "page_diagrams.cli.render_diagrams", side_effect=FileNotFoundError
     ):
         with pytest.raises(SystemExit):
-            main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--root", str(tmp_path)])
+            main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--config", config_path(tmp_path)])
     err = capsys.readouterr().err
     assert "mmdc" in err
 
 
 def test_render_attach_refuses_a_macro_renderer_and_points_at_run(tmp_path, capsys):
-    (tmp_path / ".atlassian").write_text("ATLASSIAN_DIAGRAM_RENDERER=drawio\n")
+    write_config(tmp_path, {'diagramRenderer': 'drawio'})
     payload = json.dumps({"diagrams": [{"index": 0, "code": "graph TD; A-->B;", "name": "00-title"}]})
 
     with patch("sys.stdin.read", return_value=payload), patch(
         "page_diagrams.cli.render_diagrams"
     ) as mock_render:
         with pytest.raises(SystemExit):
-            main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--root", str(tmp_path)])
+            main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
     mock_render.assert_not_called()
     err = capsys.readouterr().err
@@ -77,9 +85,7 @@ def test_render_attach_refuses_a_macro_renderer_and_points_at_run(tmp_path, caps
 
 
 def test_render_attach_uploads_and_prints_media_ids(tmp_path, capsys):
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     diagrams = [
         {
             "index": 0,
@@ -99,7 +105,7 @@ def test_render_attach_uploads_and_prints_media_ids(tmp_path, capsys):
     ) as mock_get_confluence, patch(
         "page_diagrams.cli.upload_diagrams", return_value={"00-title.png": "file-1"}
     ) as mock_upload:
-        main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--root", str(tmp_path)])
+        main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
     mock_render.assert_called_once()
     mock_get_confluence.assert_called_once()
@@ -114,8 +120,8 @@ def test_render_attach_requires_credentials(tmp_path):
         {"diagrams": [{"index": 0, "code": "x", "name": "00-x", "filename": "00-x.png", "png_path": "/tmp/00-x.png"}]}
     )
     with patch("sys.stdin.read", return_value=payload), patch("page_diagrams.cli.render_diagrams"):
-        with pytest.raises(SystemExit, match="ATLASSIAN"):
-            main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--root", str(tmp_path)])
+        with pytest.raises(SystemExit, match="atlassian.json.user"):
+            main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
 
 def test_render_attach_with_no_diagrams_skips_render_and_upload(tmp_path, capsys):
@@ -123,7 +129,7 @@ def test_render_attach_with_no_diagrams_skips_render_and_upload(tmp_path, capsys
     with patch("sys.stdin.read", return_value=payload), patch(
         "page_diagrams.cli.render_diagrams"
     ) as mock_render, patch("page_diagrams.cli.upload_diagrams") as mock_upload:
-        main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--root", str(tmp_path)])
+        main(["render-attach", "--assets-dir", str(tmp_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
     mock_render.assert_not_called()
     mock_upload.assert_not_called()
@@ -132,9 +138,7 @@ def test_render_attach_with_no_diagrams_skips_render_and_upload(tmp_path, capsys
 
 
 def test_render_attach_with_out_writes_file_and_leaves_stdout_clean(tmp_path, capsys):
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     diagrams = [
         {
             "index": 0,
@@ -155,7 +159,7 @@ def test_render_attach_with_out_writes_file_and_leaves_stdout_clean(tmp_path, ca
                 "render-attach",
                 "--assets-dir", str(tmp_path),
                 "--page-id", "123",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--out", str(out_path),
             ]
         )
@@ -222,9 +226,7 @@ def test_publish_adf_small_body_signals_mcp(capsys):
 
 
 def test_publish_adf_large_body_updates_existing_page(tmp_path, capsys):
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     adf = {"type": "doc", "content": []}
     payload = json.dumps({"adf": adf})
 
@@ -239,7 +241,7 @@ def test_publish_adf_large_body_updates_existing_page(tmp_path, capsys):
                 "publish-adf",
                 "--page-id", "123",
                 "--title", "Title",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--threshold-bytes", "1",
             ]
         )
@@ -251,9 +253,7 @@ def test_publish_adf_large_body_updates_existing_page(tmp_path, capsys):
 
 
 def test_publish_adf_large_body_creates_new_page(tmp_path, capsys):
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     adf = {"type": "doc", "content": []}
     payload = json.dumps({"adf": adf})
 
@@ -266,7 +266,7 @@ def test_publish_adf_large_body_creates_new_page(tmp_path, capsys):
                 "publish-adf",
                 "--space-id", "space-1",
                 "--title", "Title",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--threshold-bytes", "1",
             ]
         )
@@ -288,9 +288,7 @@ def test_publish_adf_default_threshold_is_50000(capsys):
 
 
 def test_publish_adf_threshold_zero_forces_rest_regardless_of_size(tmp_path, capsys):
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     adf = {"type": "doc", "content": []}
     payload = json.dumps({"adf": adf})
 
@@ -305,7 +303,7 @@ def test_publish_adf_threshold_zero_forces_rest_regardless_of_size(tmp_path, cap
                 "publish-adf",
                 "--page-id", "123",
                 "--title", "Title",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--threshold-bytes", "0",
             ]
         )
@@ -367,7 +365,7 @@ def test_run_with_diagrams_and_creds_creates_placeholder_then_publishes(tmp_path
                 "run",
                 "--md-path", str(md_path),
                 "--space-id", "space-1",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--assets-dir", str(tmp_path / "assets"),
                 "--out", str(out_path),
                 "--threshold-bytes", "999999999",
@@ -417,7 +415,7 @@ def test_run_with_diagrams_and_page_id_updates_in_place_no_placeholder(tmp_path,
                 "run",
                 "--md-path", str(md_path),
                 "--page-id", "123",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--assets-dir", str(tmp_path / "assets"),
                 "--out", str(out_path),
             ]
@@ -442,7 +440,7 @@ def test_run_with_no_creds_substitutes_notes_and_writes_pretty_printed_adf(tmp_p
                 "run",
                 "--md-path", str(md_path),
                 "--page-id", "123",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--out", str(out_path),
             ]
         )
@@ -460,9 +458,7 @@ def test_run_with_no_creds_substitutes_notes_and_writes_pretty_printed_adf(tmp_p
 def test_run_no_diagrams_under_threshold_returns_mcp(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\nSome text\n")
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
     out_path = tmp_path / "final.json"
 
@@ -472,7 +468,7 @@ def test_run_no_diagrams_under_threshold_returns_mcp(tmp_path, capsys):
                 "run",
                 "--md-path", str(md_path),
                 "--page-id", "123",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--out", str(out_path),
                 "--threshold-bytes", "999999",
             ]
@@ -487,9 +483,7 @@ def test_run_no_diagrams_under_threshold_returns_mcp(tmp_path, capsys):
 def test_run_no_diagrams_over_threshold_returns_rest(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\nSome text\n")
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
     out_path = tmp_path / "final.json"
 
@@ -503,7 +497,7 @@ def test_run_no_diagrams_over_threshold_returns_rest(tmp_path, capsys):
                 "run",
                 "--md-path", str(md_path),
                 "--page-id", "123",
-                "--root", str(tmp_path),
+                "--config", config_path(tmp_path),
                 "--out", str(out_path),
                 "--threshold-bytes", "1",
             ]
@@ -519,9 +513,7 @@ def test_run_no_diagrams_over_threshold_returns_rest(tmp_path, capsys):
 def test_run_reports_mmdc_missing(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n")
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\nATLASSIAN_API_TOKEN=secret\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
 
     with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
@@ -533,7 +525,7 @@ def test_run_reports_mmdc_missing(tmp_path, capsys):
                     "run",
                     "--md-path", str(md_path),
                     "--page-id", "123",
-                    "--root", str(tmp_path),
+                    "--config", config_path(tmp_path),
                     "--out", str(tmp_path / "final.json"),
                 ]
             )
@@ -547,7 +539,7 @@ def test_run_defaults_artifacts_to_md_filename_tmp_beside_the_source(tmp_path, c
     base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
 
     with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
-        main(["run", "--md-path", str(md_path), "--page-id", "123", "--root", str(tmp_path)])
+        main(["run", "--md-path", str(md_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
     tmp_dir = tmp_path / "design.md.tmp"
     assert tmp_dir.is_dir()
@@ -558,14 +550,11 @@ def test_run_defaults_artifacts_to_md_filename_tmp_beside_the_source(tmp_path, c
 def test_run_refuses_a_renderer_whose_macro_shape_is_not_captured(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n")
-    (tmp_path / ".atlassian").write_text(
-        "ATLASSIAN_SITE=example.atlassian.net\nATLASSIAN_EMAIL=me@example.com\n"
-        "ATLASSIAN_API_TOKEN=secret\nATLASSIAN_DIAGRAM_RENDERER=mermaid\n"
-    )
+    write_config(tmp_path, {'site': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret', 'diagramRenderer': 'mermaid'})
 
     with patch("page_diagrams.pipeline.get_confluence") as mock_confluence:
         with pytest.raises(SystemExit):
-            main(["run", "--md-path", str(md_path), "--page-id", "123", "--root", str(tmp_path)])
+            main(["run", "--md-path", str(md_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
     mock_confluence.assert_not_called()
     assert "section 7" in capsys.readouterr().err
