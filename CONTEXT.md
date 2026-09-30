@@ -47,7 +47,7 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 **Harness environment**:
 The repository that owns the milestone/issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
 **Harness Repo Path**:
-The repository that owns the milestone/issues and hosts the repo-local development workflow, resolved once by the entry-point skill (`resolve-harness`/`init-harness`) and passed explicitly downstream rather than re-derived by each component. Distinct from the `Codebase Repo Path` and `Worktree Path`, though one repository can serve all three roles.
+The repository that owns the milestone/issues and hosts the repo-local development workflow, resolved once from the location of its **Harness skill** and passed explicitly downstream rather than re-derived by each component. Distinct from the `Codebase Repo Path` and `Worktree Path`, though one repository can serve all three roles.
 _Avoid_: repo root, home repo, harness root
 _Plugins_set_: ralph, crew, wf
 
@@ -76,10 +76,15 @@ The shape of a harness and the repositories it develops: `single-repo`, where th
 _Avoid_: simple project, harness-plus-repo, project type
 _Plugins_set_: harness, wf, ralph, crew
 
+**Harness skill**:
+The repository-level skill generated into a `multi-repo` harness whose own location marks the **Harness Repo Path** and whose folder holds the **Harness user settings**. When it is absent — a `single-repo` workspace — or its Harness user settings are missing, the current directory stands in for the Harness Repo Path.
+_Avoid_: resolve-harness, harness anchor
+_Plugins_set_: harness, wf, ralph, crew
+
 **Harness user settings**:
-The per-developer, uncommitted settings for one harness, including credentials, holding one section per plugin that needs configuration; the only harness settings file, and its location marks the Harness Repo Path.
+The per-developer, uncommitted harness settings kept beside the **Harness skill**. Holds only the harness's own settings; every other plugin keeps its per-developer settings beside its own repository-level skill.
 _Avoid_: harness env, .atlassian, config file
-_Plugins_set_: harness, wf, atl, ralph, crew
+_Plugins_set_: harness, wf, ralph, crew
 
 **Workspace folder**:
 The one fixed folder under the Harness Repo Path holding every repository checkout and worktree a `multi-repo` workspace develops; it bounds every search into those repositories.
@@ -288,7 +293,7 @@ _Avoid_: rich text, Atlassian JSON, doc format
 _Plugins_set_: atl
 
 **Atlassian config**:
-The gitignored `.atlassian` dotfile holding one developer's Atlassian connection facts — site, email, optional API token, default Jira project keys, default Confluence space IDs — located by a search bounded to the **Harness Repo Path**. Deliberately not a **Convention skill**: it is searched for rather than exposed as a skill, and it holds a credential rather than committed team conventions.
+The gitignored settings file holding one developer's Atlassian connection facts — site, email, optional API token, default Jira project keys, default Confluence space IDs — kept beside the repository-level `preflight-atlassian` skill, never searched for and never part of the **Harness user settings**. Deliberately not a **Convention skill**: it holds a credential rather than committed team conventions.
 _Avoid_: .atlmcp, .env, credentials file, convention folder
 _Plugins_set_: atl
 
