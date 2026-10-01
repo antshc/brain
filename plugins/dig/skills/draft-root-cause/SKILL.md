@@ -1,25 +1,49 @@
 ---
 name: draft-root-cause
-description: Draft one cited root-cause summary from a confirmed diagnosis — symptom, mechanism chain, evidence table, ruled-out hypotheses. Use when asked to write up or report a root cause, or when another skill confirms one or needs its summary.
+description: Render one cited root-cause summary from a confirmed diagnosis using the shared hypothesis log and current run evidence. Print it; do not save it.
 argument-hint: "[bugSlug]"
 ---
-
 # Draft Root Cause
 
-Render and print one root-cause summary. Drafting is **transcription**: every claim traces to the investigation log; it adds no facts and runs no probes.
+Render and print one root-cause summary. Drafting is transcription: add no new facts and run no probes.
 
-**Input:** `logPath := /memories/session/diagnosis-{{bugSlug}}.md`, the `diagnosing-root-cause` investigation log. No log → the confirmed diagnosis stated in the conversation.
+## Input
 
-## Workflow
+Default hypothesis log:
+`repository root/docs/tmp/{{bugSlug}}/diagnosis.md`.
 
-1. **Gate** → read the log; `Status` **MUST** be `root-cause-found` or `done` with `Correct hypothesis` set. Otherwise stop and report `Status` and `Next step`. *Done when* one confirmed hypothesis is named.
-2. **Map** → fill each template section from the log:
-   - Title, Summary of issue ← `Summary` → `Symptom` and captured signal.
-   - Root cause & mechanism ← the confirmed `H` bullet and its mechanism chain; one numbered link per step, cause first, each citing `path:line` or a `P` bullet.
-   - Evidence ← one row per `P` bullet that decided an `H` status.
-   - Ruled out ← one line per falsified `H`, citing the `P` that killed it.
-   - Known gap / tracking ← ticket, `// TODO`, or upstream issue found in the log; else omit.
+A caller may provide another log path.
 
-   *Done when* every chain link cites, and every falsified `H` appears under Ruled out. A claim with no log citation is dropped or marked `Unknown`.
-3. **Redact** → replace every secret with `<REDACTED>`; quote only signal lines. *Done when* no credential, token, or secret value remains.
-4. **Render** → fill `templates/root-cause-summary.template.md` (from this skill's base directory) and print it without wrapper prose. *Done when* no placeholder remains.
+Use:
+- checked hypotheses from the log;
+- current-run evidence for mechanism-chain facts not represented as hypotheses.
+
+## Gate
+
+At least one hypothesis MUST be `confirmed`.
+
+If none is confirmed, stop and report that the root cause is not established.
+
+## Map
+
+Fill `templates/root-cause-summary.template.md`:
+
+- **Summary of issue** — reported symptom and observed impact.
+- **Root cause & mechanism** — confirmed hypothesis plus ordered mechanism chain.
+- **Evidence** — deciding facts and their evidence.
+- **Ruled out** — falsified hypotheses and their deciding evidence.
+- **Known gap / tracking** — only when supported by current evidence.
+
+Every mechanism claim MUST cite re-checkable evidence. Unsupported claims are omitted or marked `Unknown`.
+
+If an authoritative source was used, preserve its canonical URL.
+
+## Redact
+
+Replace secrets with `<REDACTED>`. Quote only signal lines.
+
+## Output
+
+Print the rendered summary without wrapper prose.
+
+MUST NOT save the rendered summary to a file.
