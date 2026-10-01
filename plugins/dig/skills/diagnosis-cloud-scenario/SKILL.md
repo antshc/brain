@@ -55,9 +55,11 @@ Climb only when lower rung drops/changes a load-bearing setting, operation type,
 
 ## Scenario log
 
-*Run `diagnosis-session-log` skill to open or resume the diagnosis log, write shared log events, and mark it blocked, passing `logDir :=` the scenario file's folder.* Log lives beside the scenario file, never in session memory. Write each event the moment it occurs, before the next step or command.
+Use a scenario-run log owned by this skill; do **not** use `diagnosis-session-log`, which is reserved for checked root-cause hypotheses.
 
-**One log per run.** `runNumber :=` last Run history run + 1 (first → `1`). Open log with `bugSlug := {{bugSlug}}-run{{runNumber}}`. Draft + first Run share one log; each Run of an existing scenario file opens a **new** log, never resumes an old one. Read earlier runs from Run history, not logs.
+The scenario log lives beside the scenario file. Write each event the moment it occurs, before the next step or command.
+
+**One log per run.** `runNumber :=` last Run history run + 1 (first → `1`). Log path: `diagnosis-{{bugSlug}}-run{{runNumber}}.md`. Draft + first Run share one log; each Run of an existing scenario file opens a **new** log, never resumes an old one. Read earlier runs from Run history, not logs.
 
 Extra events:
 

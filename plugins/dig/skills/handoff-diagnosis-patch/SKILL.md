@@ -1,75 +1,57 @@
 ---
 name: handoff-diagnosis-patch
-description: Persist a finished diagnosis from session memory into the repo as a replayable bundle — repro patch, investigation log, root-cause summary, and a README with matching signals — under patches/<slug>/, so future root-cause runs find and reuse it. Use when asked to hand off, package, or save a diagnosis, repro, or experiment.
+description: Persist a finished diagnosis as a replayable repo bundle — repro patch, hypothesis log, rendered root-cause summary, and matching signals — under patches/<slug>/.
 disable-model-invocation: true
 argument-hint: "[bugSlug]"
 ---
-
 # Hand off a diagnosis
 
-Turns a diagnosis in session memory — the `diagnosing-root-cause` investigation log plus its repro patch — into one **bundle** in the repo. A memory-less agent can **replay** it (apply, set up, run the loop, see the same result), and later `diagnosing-root-cause` runs match it through its `## Matching signals` section.
+This is an explicit persistence workflow. Normal diagnosis does not save its rendered root-cause summary.
 
-## 1. Confirm there is a diagnosis to hand off
+## 1. Resolve diagnosis
 
-1. List `/memories/session/diagnosis-*.md`. Pick the one matching `[bugSlug]`; several and no argument → ask the user which.
-2. Its `Status` **MUST** be `root-cause-found` or `done`. Otherwise stop and report its `Status` and `Next step`.
-3. `patchSource :=` diff of the log's `Artifacts` bullets marked `present` — tracked: `git diff HEAD -- <paths>`; untracked: `git diff --no-index /dev/null <path>` per file. None present but `git status --porcelain` non-empty → ask whether the working-tree diff is the repro; else no patch.
-4. `summary :=` the root-cause summary printed in this conversation; missing → *run `draft-root-cause` skill to draft the cited root-cause summary from the confirmed diagnosis log*.
+`slug :=` supplied bug slug, or infer the single matching diagnosis folder.
 
-Done when the log is chosen and `patchSource` (diff or none) and `summary` are resolved.
+Default hypothesis log:
+`repository root/docs/tmp/{{slug}}/diagnosis.md`.
 
-## 2. Create the bundle folder
+Require at least one `confirmed` hypothesis.
 
-`slug :=` the log's `bugSlug` (kebab-case naming the behavior — prefix a ticket id when one exists); `bundleDir := $(git rev-parse --show-toplevel)/patches/{{slug}}`.
+Resolve:
+- `patchSource :=` diff of present repro/instrumentation changes when applicable;
+- `summary :=` root-cause summary already produced in the conversation, otherwise run `draft-root-cause`.
 
-`$bundleDir` already exists → ask: overwrite, or suffix the slug.
+## 2. Create bundle
 
-Done when `$bundleDir` exists and is empty.
+`bundleDir := repository root/patches/{{slug}}`.
 
-## 3. Write and validate the patch
+If it already exists, ask whether to overwrite or suffix the slug.
 
-Skip when `patchSource` is none.
+## 3. Persist
 
-Write `patchSource` to `$bundleDir/{{slug}}.patch`, then validate against the current tree:
+Write:
+- `$bundleDir/diagnosis-log.md` := shared hypothesis log;
+- `$bundleDir/root-cause.md` := rendered summary;
+- optional `$bundleDir/{{slug}}.patch` := repro/instrumentation patch.
 
-| Tree state | Check |
-|---|---|
-| Repro changes still applied | `git apply --check --reverse "$bundleDir/{{slug}}.patch"` |
-| Repro changes already cleaned up | `git apply --check "$bundleDir/{{slug}}.patch"` |
+Validate an included patch with `git apply --check` or `git apply --check --reverse`, matching the current tree state.
 
-Done when the check exits 0. A failing patch **MUST NOT** be handed off — regenerate it or drop it and say so in the README.
+## 4. README
 
-## 4. Persist the log and summary
+Copy `DIAGNOSIS-FORMAT.md` from this skill's base directory to `$bundleDir/DIAGNOSIS-{{slug}}.md`.
 
-- `$bundleDir/diagnosis-log.md` := the session log.
-- `$bundleDir/root-cause.md` := `summary`.
+Fill it from the diagnosis and observed replay evidence:
+- matching symptom/error/component/path/environment signals;
+- changed files;
+- real-interface scenario;
+- commands that were actually run;
+- actual observed outputs;
+- instructions to produce a new summary.
 
-Re-check both for secrets; replace any with `<REDACTED>`.
+MUST NOT claim an unobserved replay result.
 
-Done when both files exist and contain no secret.
+## 5. Redact and report
 
-## 5. Write the README
+Replace secrets with `<REDACTED>` in every persisted file.
 
-Copy `DIAGNOSIS-FORMAT.md` (from this skill's base directory) to `$bundleDir/DIAGNOSIS-{{slug}}.md` and fill every placeholder from the log:
-
-- **Matching signals** — verbatim error strings, symptom words, components, `path`s, environment; what a future run would grep for.
-- **Files changed** — one row per file in the patch.
-- **Scenario** — one Gherkin `Scenario` per behavior the patch proves, against the real interface (route, CLI, test name). Built but unexercised → titled "not yet exercised".
-- **Replay steps** — the log's `Setup` and loop commands in the order run, with the real output observed.
-- **Produce a new summary** — what the next session reports back.
-
-Done when no placeholder remains.
-
-## 6. Final check
-
-Reread every replay step. **MUST NOT** keep a step whose output you or the log did not observe — mark it "untested" or drop it.
-
-Report `$bundleDir` to the user. Leave committing to them.
-
-Done when no step claims an unobserved outcome.
-
-## Gotchas
-
-- Optional/manual asides silently go unverified — run them or delete them; a reasoned step reads identically to an executed one.
-- `git apply --check --reverse` proves only that the patch matches the current tree, not that it forward-applies on another checkout — record the base commit so a mismatch is diagnosable.
-- Session memory is cleared when the conversation ends — hand off before it does.
+Report `$bundleDir`. Leave committing to the caller.

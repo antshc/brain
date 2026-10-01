@@ -1,47 +1,68 @@
 ---
 name: diagnosis-session-log
-description: Own the diagnosis log (default /memories/session/diagnosis-{{bugSlug}}.md, or a caller-supplied folder) — its location, template, resume check, shared log events, entry rules, and blocked state. Use when another skill needs to open, resume, write, or block the diagnosis log; the caller adds its own events.
+description: Own the shared hypothesis log for diagnosis runs — defaulting to repository root/docs/tmp/{{bugSlug}}/diagnosis.md — and record only checked hypotheses with their verification, observed fact, evidence, and result.
 ---
-# Track Session Log
+# Track Diagnosis Hypotheses
 
-The log is the run's whole memory: a later run with no memory of this one continues from it alone. It records facts, never intentions.
-
-Every skill working the same bug writes to the same log. The caller supplies its own event table; this skill owns everything else.
+The log is a compact evidence record shared by `diagnosing-root-cause` and `diagnosing-bugs`. It records **only checked hypotheses**. Do not use it as a phase journal, command transcript, artifact list, test log, or fix log.
 
 ## Location
 
-`bugSlug :=` short kebab-case name of the symptom; `logDir :=` caller-supplied folder, else `/memories/session` (session memory); `logPath := {{logDir}}/diagnosis-{{bugSlug}}.md`.
+`bugSlug :=` short kebab-case name of the symptom.
+
+Default:
+`logPath := repository root/docs/tmp/{{bugSlug}}/diagnosis.md`.
+
+A caller may supply another `logPath` when it owns a specialized workflow.
+
+Runs for the same bug slug MUST reuse the same log. Independent bugs use independent slug folders.
 
 ## Open
 
-If `$logPath` exists and this conversation did not write it, **resume**:
+If `$logPath` exists, read it before testing new hypotheses and continue numbering after the last `H` entry.
 
-1. Read the whole log.
-2. Re-verify against the workspace: `Commit` matches `git rev-parse HEAD`; every `Artifacts` bullet marked `present` exists. Log any drift as an event.
-3. Run `Setup`, then re-run the recorded loop; its verdict must match the last recorded one. On mismatch, log it and resume from the earliest phase it invalidates.
-4. Continue at `Next step`, keeping bullet IDs consecutive.
-
-No `$logPath` → create it from `session-log.template.md` (resolved from this skill's base directory) and fill its `Summary`.
-
-Done when `$logPath` exists and, on resume, the drift and loop verdict are logged.
+If it does not exist, create its parent folder and initialize it from `Session log template`.
 
 ## Write
 
-Write each **log event** the moment it happens, before the next action. The caller's event table extends these:
+Append an entry **only after a hypothesis was actually checked**, including a check that ended blocked.
 
-| Log event | Write |
-|---|---|
-| A phase starts | `### {{phase name}}` under `Investigation`; `Summary` → `Status` |
-| A file is created, modified, or removed | Its `Artifacts` bullet |
-| Any event | `Summary` → `Next step` |
+Every entry MUST contain:
 
-Every entry:
+- **Hypothesis** — the falsifiable cause being checked.
+- **Prediction** — what should be observed if it is true.
+- **Verification** — exactly how it was checked.
+- **Fact** — the actual observed fact, not an inference or intended result.
+- **Evidence** — re-checkable evidence supporting the fact.
+- **Result** — `confirmed`, `falsified`, or `blocked`.
 
-- One bullet per event; unreached sections keep placeholders.
-- Re-checkable evidence: copy-pasteable command, redacted signal lines only, `path:line` for code claims. A conclusion names the bullet ID that proves it.
-- Secrets by env var name (`$API_TOKEN`); outputs redacted (`<REDACTED>`).
-- Dead ends too — rejected loops, falsified hypotheses, empty probes.
+Evidence MUST be one or more of:
 
-## Blocked
+- code evidence: `path:line`;
+- probe evidence: command/request plus the actual redacted signal output;
+- authoritative-source evidence: the checked statement plus its canonical URL.
 
-Set `Status: blocked`, record what was tried, set `Next step` to what unblocks it, and stop.
+When an authoritative source is used to verify the hypothesis, the URL MUST be present in the same hypothesis entry.
+
+Do not write an `open` hypothesis. Do not write phase starts, loop attempts, setup, cleanup, fixes, tests, artifacts, plans, or next steps.
+
+## Redact
+
+Secrets MUST be represented by environment-variable names or `<REDACTED>`. Keep only output lines carrying the verification signal.
+
+## Session log template
+
+```markdown
+# Diagnosis Hypotheses
+
+<!-- @: checked hypotheses only; append after verification, never before -->
+
+## H{{n}} — {{short hypothesis}}
+
+- Hypothesis: {{falsifiable cause}}
+- Prediction: {{observable result if true}}
+- Verification: {{how it was checked}}
+- Fact: {{actual observed fact}}
+- Evidence: {{path:line | command/request → redacted signal | authoritative statement + canonical URL}}
+- Result: {{confirmed | falsified | blocked}}
+```
