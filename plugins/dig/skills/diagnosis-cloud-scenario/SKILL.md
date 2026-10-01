@@ -1,6 +1,6 @@
 ---
 name: diagnosis-cloud-scenario
-description: Draft and run a working cloud scenario that simulates a bug on real AWS or Azure resources — map code to its infrastructure, pick the cheapest faithful fidelity, reproduce the symptom, validate a fix. Use to simulate, reproduce in the cloud, or write a test scenario for an escalation.
+description: Draft a cloud scenario simulating a bug on real AWS or Azure resources with the user from codebase and provider docs, then run and self-correct it until the symptom reproduces and a fix validates. Use to simulate, reproduce in the cloud, or write a test scenario for an escalation.
 disable-model-invocation: true
 ---
 
@@ -8,18 +8,22 @@ disable-model-invocation: true
 
 Goal: one **working** scenario file — every phase run on real resources, every **Expected:** met. Simulate the cheapest behavior that still exercises the bug's mechanism, not the full flow.
 
-**Write-through:** scenario file and log are saved to disk as each step, phase, or correction happens — before the next action, never batched to the end. Never invent a resource name, flag, setting, or expected result not traceable to user input, ticket/summary doc, or real source/IaC.
+Two phases: **Draft** — agent drafts the runnable scenario from codebase + official provider docs, user reviews open choices (HITL), agent re-explores after each answer; **Run** — execute phases, auto-correct the scenario on failure, re-run until working.
 
-**Codebase is read-only:** **MUST NOT** edit source/IaC or fix the bug in code — only the scenario file and log are written. Explore code/IaC only through the `Explore` subagent (read-only lookups: symbol, caller, IaC definition, `path:line`). Apply fix acts on cloud resources only; a needed code fix → Open item.
+**Write-through:** scenario file and log are saved to disk as each section, phase, or correction happens — before the next action, never batched to the end. Never invent a resource name, flag, setting, or expected result not traceable to user input, ticket/summary doc, real source/IaC, or official provider docs.
 
-## Start gate
+**Codebase is read-only:** **MUST NOT** edit source/IaC or fix the bug in code — only the scenario file and log are written. Apply fix acts on cloud resources only; a needed code fix → Open item.
 
-**MUST** run first on every invocation, before any read, search, `Explore` call, or terminal/CLI command — even when the request looks like a narrow factual lookup (e.g. one IAM/RBAC policy question):
+## Location
 
-1. Resolve scenario folder (Draft); create `{{bugSlug}}-scenario.md` with Status `Draft` + Output skeleton headings; existing scenario file → reuse it.
-2. Open the log beside it (Scenario log).
+`scenarioSlug :=` short kebab-case name of the simulated scenario; prefix ticket id when one exists.
 
-No request is too small to skip this — a narrow answer is a Draft/Run step; record it in the scenario file + log. Gate skipped → stop, run it now, log `L` naming what ran before it.
+| File | Path | Template |
+|---|---|---|
+| Scenario | `repository root/docs/tmp/{{scenarioSlug}}/{{scenarioSlug}}-scenario.md` | `templates/scenario.template.md` |
+| Log | `repository root/docs/tmp/{{scenarioSlug}}/{{scenarioSlug}}-log.md` | `templates/scenario-log.template.md` |
+
+Resolve `templates/` from this skill's base directory.
 
 ## Inputs
 
@@ -29,17 +33,19 @@ No request is too small to skip this — a narrow answer is a Draft/Run step; re
 | Root cause / mechanism | no | Narrows Resource map |
 | Workaround / fix option | no | Present → add Apply fix + Verify; absent → reproduce-only |
 | Ticket / summary doc | no | Real resource names, evidence, fix-option caveats |
-| Existing scenario file | no | Present → skip Draft; Run with new log |
+| Existing scenario file | no | Present → skip Draft; Run as next run |
 
 Accept any mix of free text/docs. Ask only when symptom missing; existing scenario file supplies it.
 
-## Redact
+## Sources
 
-Commands, outputs, scenario file, log **MUST** show secrets and tenant identifiers as `<REDACTED>`: keys, tokens, connection strings, signed URLs, account/subscription/tenant IDs, IDs inside ARNs/resource IDs. Credentials stay in CLI profile/env vars, referenced by name. Quote only signal lines.
+- **Codebase:** only through the `Explore` subagent — read-only lookups returning `path:line`; semantic/symbol search, not text search alone. Discover the scenario under diagnosis itself from code: entry point (API handler, job, event consumer, workflow, script) and the ordered steps and SDK calls that lead to the symptom. Resources and their settings may come from IaC (Terraform, CloudFormation, CDK, SAM, Bicep/ARM, serverless config) **or** from application code calling cloud SDKs at runtime (create/update/attach/delete calls, request parameters, config/env-driven values, scripts, workflows); trace both. Code missing → ask path.
+- **Cloud provider:** verify every operation's semantics, CLI subcommand/flag, default, limit, and consistency behavior against official provider documentation — AWS Documentation (AWS Documentation MCP) for AWS, Microsoft Learn (Microsoft Learn MCP) for Azure; cite the canonical URL in the scenario file. CLI `--help` confirms flag syntax only.
+- **User:** decisions only; never ask for a fact the codebase or provider docs supply.
 
 ## Cloud CLI
 
-Use target cloud's own CLI: `az` (Azure), `aws` (AWS). Load existing aws/azure cloud skills for environment info. Per phase, find exact subcommand/flags via CLI help/docs (create from image vs. raw/imported source, attach/detach volume, swap boot volume, stop/start, console/boot output, teardown, …); check against the real code path from Ground mechanism. Command names differ per cloud — never copy across.
+Use target cloud's own CLI: `az` (Azure), `aws` (AWS). Load existing aws/azure cloud skills for environment info. Per phase, find exact subcommand/flags per Sources (create from image vs. raw/imported source, attach/detach volume, swap boot volume, stop/start, console/boot output, teardown, …); check against the real code path from the mechanism. Command names differ per cloud — never copy across.
 
 ## Fidelity ladder
 
@@ -55,69 +61,60 @@ Climb only when lower rung drops/changes a load-bearing setting, operation type,
 
 ## Scenario log
 
-Use a scenario-run log owned by this skill; do **not** use `diagnosis-session-log`, which is reserved for checked root-cause hypotheses.
+Problem log rendered from `templates/scenario-log.template.md`.
 
-The scenario log lives beside the scenario file. Write each event the moment it occurs, before the next step or command.
-
-**One log per run.** `runNumber :=` last Run history run + 1 (first → `1`). Log path: `diagnosis-{{bugSlug}}-run{{runNumber}}.md`. Draft + first Run share one log; each Run of an existing scenario file opens a **new** log, never resumes an old one. Read earlier runs from Run history, not logs.
-
-Extra events:
-
-| Log event | Write |
-|---|---|
-| Resource map row / mechanism grounded | `L`: resource, IaC `path:line`, caller `path:line`, load-bearing settings |
-| Fidelity rung chosen | `L`: rung, rejected lower rung + setting it breaks |
-| Phase runs | `P`: phase, command, redacted signal line, pass/fail vs **Expected:** |
-| Fix applied | `F`: change, command |
-| Scenario corrected (failure or user request) | `L`: what changed, why, phases re-run |
-| Cleanup / leftover check runs | `K`: command, remaining resources |
-
-Status: drafting → `building-loop`; Reproduce → `reproducing`; Verify → `confirming`; working → `done`.
+- One log per scenario: `## Draft`, then one `## Run {{runNumber}} — {{date}}` section per run, appended. `runNumber :=` last Run history run + 1 (first → `1`).
+- Content: only problems faced and their solutions, as `**Problem:** … → **Solution:** …` bullets; blocked → `**Unblocker:**` instead of Solution.
+- Group bullets under `### Phase N — <name>` when the problem belongs to a phase; omit phases without problems.
+- Write each bullet once the problem is solved or blocked, before the next action. Phase verdicts go to Run history, not the log.
 
 ## Draft
 
-Write whole scenario to **one file** `{{bugSlug}}-scenario.md` beside ticket/summary doc (none → ask folder), per Output skeleton. File exists from Start gate; save each section as its step completes. **MUST** save the full draft (step 12 passed) before any cloud CLI call, Preflight included.
+Goal: a runnable scenario — every phase with exact commands and **Expected:** — drafted by the agent, confirmed by the user. **MUST** finish Draft (step 5 passed) before any cloud CLI call, Preflight included.
 
-1. **Target cloud** from input site/platform info. *Done when* one cloud named; ambiguous → ask; never mix clouds.
-2. **Map resources**: symptom → code path → cloud SDK call (service + operation) → IaC definition (Terraform, CloudFormation, CDK, SAM, Bicep/ARM, serverless config) → applied settings, via `Explore` subagent (semantic/symbol search, not text search alone). IaC/code missing → ask path. *Done when* Resource map has resource, IaC `path:line`, caller `path:line`, SDK op, CLI op, load-bearing settings.
-3. **Ground mechanism**: exact creation semantics of operation under test — operation type (e.g. import-from-source vs. create-from-image), which branch sets which properties. *Done when* "must match the real code path" section cites file + line range and why a naive alternative command diverges.
-4. **Fidelity**: apply Fidelity ladder. *Done when* Fidelity choice names rung + load-bearing setting the rung below breaks.
-5. **Scope**: symptom reproduced; exclude unfixed root cause, naming its tracking ticket. *Done when* reader can tell which rung builds the broken state.
-6. **Target environment**: variable block — account/subscription, resource group/equivalent, region, image, size, `scenarioTag` (e.g. `dig-scenario={{bugSlug}}`); non-load-bearing values minimal. *Done when* phases use variables, not literals.
-7. **Naming convention**: table test resource → ticket analog → role; names mirror real ones so phases read like the incident. *Done when* every later-named resource appears here first; every create applies `scenarioTag` (prerequisites: `prereqTag`).
-8. **Prerequisites**: reusable resources needed but not exercised, created once, reused across runs (e.g. bucket/container phases write blobs to; network, base image, key pair). Qualifies only if no setting is load-bearing and no phase mutates its settings; else per-run phase resource. Each: idempotent ensure command (exists check → create if missing), tagged `prereqTag` (e.g. `dig-scenario-prereq={{bugSlug}}`), settings check vs. Target environment. *Done when* each is in Naming convention and ensure is re-run safe.
-9. **Phases**: one **symptom check** command asserting the user's exact symptom, reused across phases. Each `## Phase N — <name>` has exact commands, verification, **Expected:** pass criterion:
-   - **Preflight** — print active identity, account/subscription, region (`aws sts get-caller-identity`, `az account show`); stop unless intended non-production target.
-   - **Prerequisites** — run ensures; reuse existing; verify settings.
-   - **Baseline** — symptom check green on healthy state; skip only when Verify exists.
-   - **Reproduce** — build broken state at chosen rung; symptom check red with exact symptom.
-   - **Apply fix** + **Verify** — only with fix option; same symptom check green.
-   - **Cleanup** — step 10.
-
-   Use CLI dry-run/what-if before first-time creates where available. *Done when* every **Expected:** checkable from command output alone.
-10. **Cleanup**: delete every per-run resource in target cloud's real dependency order (e.g. detach NICs before deleting the SG/NSG they reference), incl. data phases left in prerequisites (e.g. test blobs); then list leftovers carrying `scenarioTag` via tag/label query. Prerequisites stay; separate **Prerequisite teardown** block runs only on user request. Mark both **destructive — requires explicit confirmation before running**. *Done when* each per-run resource has a delete, leftover query present, each prerequisite has teardown, account/resource group untouched unless input asks.
-11. **Caveats + Open items**: fix option's documented limitations → Caveats; unconfirmed naming/region/size/fidelity choices → Open items. *Done when* no overlap and no caveat resolvable now.
-12. **Check** draft against Quality Check.
+1. **Gather facts** per Sources; ask nothing yet:
+   - **Target cloud** from input site/platform info; ambiguous → ask before drafting; never mix clouds.
+   - **Scenario flow**: symptom → entry point → ordered steps and SDK calls in the product that produce it, incl. branches/conditions taken. *Done when* each step cites `path:line` and the step where the symptom appears is marked.
+   - **Resource map**: per Scenario flow SDK call (service + operation + request parameters) → where the resource and its settings are defined (IaC, or the SDK call itself when code creates/mutates it) → applied settings. *Done when* each row has resource, definition `path:line` (IaC or SDK call), caller `path:line`, SDK op, CLI op, load-bearing settings.
+   - **Mechanism**: exact creation semantics of the operation under test — operation type (e.g. import-from-source vs. create-from-image), which branch sets which properties. *Done when* "must match the real code path" section cites file + line range, provider doc URL, and why a naive alternative command diverges.
+2. **Draft the scenario**: write every section below into the scenario file, choosing each value yourself from facts; cite `path:line` or provider doc URL per choice. A choice facts cannot settle → pick the safest/cheapest default and mark it `❓` inline. *Done when* every section is filled and every unconfirmed choice carries `❓`.
+   1. **Scope** — symptom reproduced; unfixed root cause excluded, naming its tracking ticket; fix option under test or reproduce-only.
+   2. **Fidelity** — apply Fidelity ladder; name rung + load-bearing setting the rung below breaks.
+   3. **Phase list** — Preflight, Prerequisites, Baseline (skip only when Verify exists), Reproduce (Scenario flow steps kept at chosen rung), Apply fix + Verify (only with fix option), Cleanup.
+   4. **Target environment** — variable block: account/subscription, resource group/equivalent, region, image, size, `scenarioTag` (`dig-scenario={{scenarioSlug}}`), `prereqTag` (`dig-scenario-prereq={{scenarioSlug}}`); non-load-bearing values minimal; phases use variables, not literals.
+   5. **Naming convention** — test resource → ticket analog → role; names mirror real ones so phases read like the incident; every later-named resource appears here first.
+   6. **Prerequisites** — reusable resources needed but not exercised, created once, reused across runs (e.g. bucket/container phases write blobs to; network, base image, key pair). Qualifies only if no setting is load-bearing and no phase mutates its settings; else per-run phase resource. Each: idempotent ensure (exists check → create if missing), tagged `prereqTag`, settings check vs. Target environment.
+   7. **Symptom check** — one command asserting the user's exact symptom, reused by Baseline, Reproduce, Verify.
+   8. **Phase commands + Expected:** — each `## Phase N — <name>` has exact commands, verification, **Expected:** checkable from command output alone. Preflight prints active identity, account/subscription, region (`aws sts get-caller-identity`, `az account show`) and stops unless intended non-production target; Reproduce builds broken state at chosen rung → symptom check red; Verify → same check green. Use CLI dry-run/what-if before first-time creates where available.
+   9. **Cleanup** — delete every per-run resource in target cloud's real dependency order (e.g. detach NICs before deleting the SG/NSG they reference), incl. data phases left in prerequisites (e.g. test blobs); then leftover query on `scenarioTag`. Prerequisites stay; separate **Prerequisite teardown** runs only on user request. Mark both **destructive — requires explicit confirmation before running**. Account/resource group untouched unless input asks.
+3. **Review with the user**, in rounds:
+   - Show the draft path and a short summary: scope, fidelity rung, phase list, resources to be created.
+   - Ask every `❓` choice as a numbered question with options, your recommended answer, and its citation. Ask a choice that depends on another open one in a later round.
+   - Ask only decisions; never ask a fact Sources can supply.
+   - After each answer round, **re-explore before editing**: run Gather facts again for whatever the answers touch (new resource, branch, operation, region, setting) and verify affected commands per Sources; then update affected sections, remove resolved `❓`, and log a Draft problem bullet when an answer invalidated a drafted choice.
+   - *Done when* no `❓` remains and the user confirms the draft.
+4. **Caveats + Open items**: fix option's documented limitations → Caveats; choices the user deferred, needed code fix → Open items. *Done when* no overlap and no caveat resolvable now.
+5. **Check** draft against Quality Check.
 
 ## Run
 
-Loop run → improve → re-run until working.
+Loop run → auto-correct → re-run until working.
 
-1. No saved draft → stop, finish Draft first. Existing scenario file → read whole, open new log, re-check Quality Check.
+1. Draft not finished → stop, finish Draft first. Existing scenario file → read whole, append `## Run {{runNumber}} — {{date}}` to log, re-check Quality Check.
 2. Show Preflight output + resources Prerequisites/Reproduce will create (existing prerequisites reused, not listed); get **explicit confirmation before first create**.
-3. Run phases in order; after each, before the next phase, save Run history row tagged `runNumber` + log `P`.
-4. On failure: save fix to scenario file in place + log `L` **before** re-running; re-run from earliest invalidated phase:
-   - Command error (wrong flag, missing dependency, async unfinished) → fix command.
+3. Run phases in order; after each, before the next phase, save Run history row tagged `runNumber`.
+4. On failure, auto-correct: save fix to scenario file in place + log problem/solution bullet under current run/phase **before** re-running; re-run from earliest invalidated phase:
+   - Command error (wrong flag, missing dependency, async unfinished) → fix command, verified per Sources.
    - Reproduce stays green / shows different symptom → re-check Resource map, then climb one rung.
    - **MUST NOT** rewrite **Expected:** or symptom check to match observed output without user agreement.
 5. Repeat 3–4 until Done.
-6. Get explicit confirmation, run Cleanup, log leftover query result.
+6. Get explicit confirmation, run Cleanup, save leftover query result to Run history; leftovers → log problem bullet.
 
-*Done when* Reproduce red with user's exact symptom, Verify (if present) green, Cleanup leaves no `scenarioTag` resources, Status `Working — verified {{date}}`. Unresolvable → log `blocked` with unblocker, Status `Blocked — {{reason}}`, stop.
+*Done when* Reproduce red with user's exact symptom, Verify (if present) green, Cleanup leaves no `scenarioTag` resources, Status `Working — verified {{date}}`. Unresolvable → log `**Unblocker:**` bullet, Status `Blocked — {{reason}}`, stop.
 
 ## Revise
 
-User correction → save edit to same file in place + log `L` before any cloud call, then re-run from earliest invalidated phase (with create/cleanup confirmations), update Run history. *Done when* Run Done holds again.
+User correction → save edit to scenario file in place + log problem/solution bullet (current run/phase, or Draft) before any cloud call, then re-run from earliest invalidated phase (with create/cleanup confirmations), update Run history. *Done when* Run Done holds again.
 
 ## Gotchas
 
@@ -130,104 +127,14 @@ User correction → save edit to same file in place + log `L` before any cloud c
 
 - Commands name only Naming convention resources; per-run creates apply `scenarioTag`, prerequisites `prereqTag`.
 - No prerequisite load-bearing or mutated by a phase.
-- Resource map + mechanism cite real source/IaC, not input prose alone.
+- Resource map + mechanism cite real source/IaC, not input prose alone; provider-behavior claims cite canonical doc URL.
+- No `❓` left; every agent-chosen value confirmed by the user in Review.
 - Fidelity choice justifies rejecting lower rung.
 - Reproduce + Verify share symptom check; every **Expected:** checkable from output.
 - Cleanup follows target cloud's real delete-dependency order.
 - Every create/delete behind its confirmation gate.
-- File and log match what was actually run — no command executed that isn't saved in the file first.
-- Start gate ran before any investigation; scenario file and its log `diagnosis-{{bugSlug}}-run{{runNumber}}.md` exist side by side from the first action.
+- File matches what was actually run — no command executed that isn't saved in the file first.
+- Log holds only problem → solution bullets, grouped by run and phase.
+- Start gate ran before any investigation; `{{scenarioSlug}}-scenario.md` and `{{scenarioSlug}}-log.md` exist in `docs/tmp/{{scenarioSlug}}/` from the first action.
 - No source/IaC file changed; code exploration went through `Explore` subagent.
 - No unredacted secret or tenant identifier.
-
-## Output skeleton
-
-````markdown
-# <bugSlug> — <one-line title>: cloud scenario (<option under test | reproduce-only>)
-
-**Status:** Draft | Working — verified <date> | Blocked — <reason>
-**Purpose:** Reproduce <symptom> from [<bugSlug>.md](<bugSlug>.md) on real <cloud> resources<, and validate <option> from [<bugSlug>-summary.md](<bugSlug>-summary.md)>.
-
-## Scope
-
-<symptom reproduced; root cause excluded and its tracking ticket>
-
-## Resource map
-
-| Resource | IaC | Caller | SDK operation | CLI operation | Load-bearing settings |
-| --- | --- | --- | --- | --- | --- |
-
-## <Mechanism section title> (must match the real code path)
-
-<file+line citation, exact API/CLI operation type, why a naive alternative would diverge>
-
-## Fidelity choice
-
-<rung N; what rung N-1 would break>
-
-## Target environment
-
-| Item | Value |
-| --- | --- |
-
-## Naming convention
-
-| Test resource | Ticket analog | Role |
-| --- | --- | --- |
-
-## Prerequisites (reusable)
-
-| Resource | Why not load-bearing | Ensure command | Settings check |
-| --- | --- | --- | --- |
-
-## Symptom check
-
-```bash
-...
-```
-
-## Phase 0 — Preflight
-
-## Phase 1 — Prerequisites
-
-## Phase 2 — Baseline
-
-## Phase 3 — Reproduce
-
-1. ...
-
-**Expected:** ...
-
-## Phase 4 — Apply fix
-
-## Phase 5 — Verify
-
-## Phase N — Cleanup
-
-**Requires explicit confirmation before running** (destructive):
-
-```bash
-...
-```
-
-### Prerequisite teardown
-
-**Run only on user request; requires explicit confirmation** (destructive):
-
-```bash
-...
-```
-
-## Caveats carried over from <option>
-
-- ...
-
-## Open items for review
-
-- ...
-
-## Run history
-
-| Run | Date | Phase | Verdict | Signal line |
-| --- | --- | --- | --- | --- |
-````
