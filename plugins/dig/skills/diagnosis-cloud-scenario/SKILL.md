@@ -6,7 +6,9 @@ disable-model-invocation: true
 
 # Diagnosis Cloud Scenario
 
-Goal: one **working** scenario file — every phase run on real resources, every **Expected:** met. Simulate the cheapest behavior that still exercises the bug's mechanism, not the full flow. Never invent a resource name, flag, setting, or expected result not traceable to user input, ticket/summary doc, or real source/IaC.
+Goal: one **working** scenario file — every phase run on real resources, every **Expected:** met. Simulate the cheapest behavior that still exercises the bug's mechanism, not the full flow.
+
+**Write-through:** scenario file and log are saved to disk as each step, phase, or correction happens — before the next action, never batched to the end. Never invent a resource name, flag, setting, or expected result not traceable to user input, ticket/summary doc, or real source/IaC.
 
 ## Inputs
 
@@ -42,7 +44,7 @@ Climb only when lower rung drops/changes a load-bearing setting, operation type,
 
 ## Scenario log
 
-*Run `diagnosis-session-log` skill to open or resume the diagnosis log, write shared log events, and mark it blocked.* Write each event immediately — never batch.
+*Run `diagnosis-session-log` skill to open or resume the diagnosis log, write shared log events, and mark it blocked.* Write each event the moment it occurs, before the next step or command.
 
 **One log per run.** `runNumber :=` last Run history run + 1 (first → `1`). Open log with `bugSlug := {{bugSlug}}-run{{runNumber}}`. Draft + first Run share one log; each Run of an existing scenario file opens a **new** log, never resumes an old one. Read earlier runs from Run history, not logs.
 
@@ -61,7 +63,7 @@ Status: drafting → `building-loop`; Reproduce → `reproducing`; Verify → `c
 
 ## Draft
 
-Write whole scenario to **one file** `{{bugSlug}}-scenario.md` beside ticket/summary doc (none → ask folder), per Output skeleton.
+Write whole scenario to **one file** `{{bugSlug}}-scenario.md` beside ticket/summary doc (none → ask folder), per Output skeleton. Create file at step 1 with Status `Draft`; save each section as its step completes. **MUST** save the full draft (step 12 passed) before any cloud CLI call, Preflight included.
 
 1. **Target cloud** from input site/platform info. *Done when* one cloud named; ambiguous → ask; never mix clouds.
 2. **Map resources**: symptom → code path → cloud SDK call (service + operation) → IaC definition (Terraform, CloudFormation, CDK, SAM, Bicep/ARM, serverless config) → applied settings, via semantic/symbol search, not text search alone. IaC/code missing → ask path. *Done when* Resource map has resource, IaC `path:line`, caller `path:line`, SDK op, CLI op, load-bearing settings.
@@ -88,10 +90,10 @@ Write whole scenario to **one file** `{{bugSlug}}-scenario.md` beside ticket/sum
 
 Loop run → improve → re-run until working.
 
-1. Existing scenario file → read whole, open new log, re-check Quality Check.
+1. No saved draft → stop, finish Draft first. Existing scenario file → read whole, open new log, re-check Quality Check.
 2. Show Preflight output + resources Prerequisites/Reproduce will create (existing prerequisites reused, not listed); get **explicit confirmation before first create**.
-3. Run phases in order; after each, append Run history row tagged `runNumber` + log `P`.
-4. On failure: fix scenario file in place, log `L`, re-run from earliest invalidated phase:
+3. Run phases in order; after each, before the next phase, save Run history row tagged `runNumber` + log `P`.
+4. On failure: save fix to scenario file in place + log `L` **before** re-running; re-run from earliest invalidated phase:
    - Command error (wrong flag, missing dependency, async unfinished) → fix command.
    - Reproduce stays green / shows different symptom → re-check Resource map, then climb one rung.
    - **MUST NOT** rewrite **Expected:** or symptom check to match observed output without user agreement.
@@ -102,7 +104,7 @@ Loop run → improve → re-run until working.
 
 ## Revise
 
-User correction → edit same file in place, log `L`, re-run from earliest invalidated phase (with create/cleanup confirmations), update Run history. *Done when* Run Done holds again.
+User correction → save edit to same file in place + log `L` before any cloud call, then re-run from earliest invalidated phase (with create/cleanup confirmations), update Run history. *Done when* Run Done holds again.
 
 ## Gotchas
 
@@ -120,6 +122,7 @@ User correction → edit same file in place, log `L`, re-run from earliest inval
 - Reproduce + Verify share symptom check; every **Expected:** checkable from output.
 - Cleanup follows target cloud's real delete-dependency order.
 - Every create/delete behind its confirmation gate.
+- File and log match what was actually run — no command executed that isn't saved in the file first.
 - No unredacted secret or tenant identifier.
 
 ## Output skeleton
