@@ -12,10 +12,7 @@ When exploring the codebase, read `CONTEXT`, `ARCHITECTURE` docs (if they exist)
 
 ## Shared hypothesis log
 
-*Use `diagnosis-session-log` skill to open the shared hypothesis log and append checked hypotheses with verification, evidence, and result.*
-
-Default log:
-`repository root/docs/tmp/{{bugSlug}}/diagnosis.md`.
+*Use `diagnosis-session-log` skill to reuse the same shared hypothesis log (`logPath`) of checked hypotheses, verification, and evidence.*
 
 ## Redact
 
