@@ -44,7 +44,10 @@
 
 ## Prototype
 
-<!-- @: omit when no phase runs a Python script -->
+<!-- @: omit when CLI alone simulates the behavior (rung 1–2); proposed in Draft with ❓ until user approves; scripts written in Run only -->
+
+**Why CLI alone falls short:** {{cliGap|ordering, loops/polling, timing/concurrency, intermediate state, or SDK-only parameter}}
+**Closest CLI-only alternative:** {{cliAlternative}}
 
 | Script | Simulates | Mirrors code |
 | --- | --- | --- |

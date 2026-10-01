@@ -61,7 +61,7 @@ Pick **lowest** rung preserving every load-bearing setting in Resource map; ever
 
 Climb only when lower rung drops/changes a load-bearing setting, operation type, or ordering/timing the bug needs. Load-bearing settings = production exactly; rest = smallest/cheapest (size, count, storage, region unless region matters).
 
-**Prototype rules:** `python3`; one script per role (e.g. `simulate_app.py`, `symptom_check.py`); read every value from Target environment variables, never literals; tag every create with `scenarioTag`; each SDK call cites the mirrored code as a `# path:line` comment; no import from the application codebase.
+**Prototype rules:** propose only when CLI commands alone cannot faithfully simulate the behavior — e.g. multi-step ordering, loops/polling, timing or concurrency, reacting to intermediate state, SDK-only parameters with no CLI equivalent; name which one in the proposal. Proposed in Draft as a `❓` question, never written in Draft; scripts written in Run only after the user approved the prototype. `python3`; one script per role (e.g. `simulate_app.py`, `symptom_check.py`); read every value from Target environment variables, never literals; tag every create with `scenarioTag`; each SDK call cites the mirrored code as a `# path:line` comment; no import from the application codebase.
 
 ## Scenario log
 
@@ -83,7 +83,7 @@ Goal: a runnable scenario — every phase with exact commands and **Expected:** 
    - **Mechanism**: exact creation semantics of the operation under test — operation type (e.g. import-from-source vs. create-from-image), which branch sets which properties. *Done when* "must match the real code path" section cites file + line range, provider doc URL, and why a naive alternative command diverges.
 2. **Draft the scenario**: write every section below into the scenario file, choosing each value yourself from facts; cite `path:line` or provider doc URL per choice. A choice facts cannot settle → pick the safest/cheapest default and mark it `❓` inline. *Done when* every section is filled and every unconfirmed choice carries `❓`.
    1. **Scope** — symptom reproduced; real application excluded; unfixed root cause excluded, naming its tracking ticket; fix option under test or reproduce-only.
-   2. **Fidelity** — apply Fidelity ladder; name rung + load-bearing setting the rung below breaks.
+   2. **Fidelity** — apply Fidelity ladder; name rung + load-bearing setting the rung below breaks. Rung 3–4 (CLI alone cannot simulate it, per Prototype rules) → always `❓`: add a Prototype section listing each proposed script (what it simulates, mirrored code), why CLI alone falls short, and the closest CLI-only alternative; **MUST NOT** write any `.py` file in Draft.
    3. **Phase list** — Preflight, Prerequisites, Baseline (skip only when Verify exists), Reproduce (Scenario flow steps, when present, kept at chosen rung), Apply fix + Verify (only with fix option), Cleanup.
    4. **Target environment** — variable block: account/subscription, resource group/equivalent, region, image, size, `scenarioTag` (`dig-scenario={{scenarioSlug}}`), `prereqTag` (`dig-scenario-prereq={{scenarioSlug}}`); non-load-bearing values minimal; phases use variables, not literals.
    5. **Naming convention** — test resource → ticket analog → role; names mirror real ones so phases read like the incident; every later-named resource appears here first.
@@ -105,14 +105,15 @@ Goal: a runnable scenario — every phase with exact commands and **Expected:** 
 Loop run → auto-correct → re-run until working.
 
 1. Draft not finished → stop, finish Draft first. Existing scenario file → read whole, append `## Run {{runNumber}} — {{date}}` to log, re-check Quality Check.
-2. Show Preflight output + resources Prerequisites/Reproduce will create (existing prerequisites reused, not listed); get **explicit confirmation before first create**.
-3. Run phases in order; after each, before the next phase, save Run history row tagged `runNumber`.
-4. On failure, auto-correct: save fix to scenario file in place + log problem/solution bullet under current run/phase **before** re-running; re-run from earliest invalidated phase:
+2. Approved prototype in the scenario file → write its scripts per Prototype rules, matching the Prototype section; log a problem bullet if a script must diverge from it.
+3. Show Preflight output + resources Prerequisites/Reproduce will create (existing prerequisites reused, not listed); get **explicit confirmation before first create**.
+4. Run phases in order; after each, before the next phase, save Run history row tagged `runNumber`.
+5. On failure, auto-correct: save fix to scenario file in place + log problem/solution bullet under current run/phase **before** re-running; re-run from earliest invalidated phase:
    - Command error (wrong flag, missing dependency, async unfinished) → fix command, verified per Sources.
-   - Reproduce stays green / shows different symptom → re-check Resource map, then climb one rung.
+   - Reproduce stays green / shows different symptom → re-check Resource map, then climb one rung; climbing to rung 3–4 without an approved prototype → ask the user first.
    - **MUST NOT** rewrite **Expected:** or symptom check to match observed output without user agreement.
-5. Repeat 3–4 until Done.
-6. Get explicit confirmation, run Cleanup, save leftover query result to Run history; leftovers → log problem bullet.
+6. Repeat 4–5 until Done.
+7. Get explicit confirmation, run Cleanup, save leftover query result to Run history; leftovers → log problem bullet.
 
 *Done when* Reproduce red with user's exact symptom, Verify (if present) green, Cleanup leaves no `scenarioTag` resources, Status `Working — verified {{date}}`. Unresolvable → log `**Unblocker:**` bullet, Status `Blocked — {{reason}}`, stop.
 
@@ -141,5 +142,6 @@ User correction → save edit to scenario file in place + log problem/solution b
 - File matches what was actually run — no command executed that isn't saved in the file first.
 - Log holds only problem → solution bullets, grouped by run and phase.
 - No command or prototype call targets the real application or its resources; every target is a Naming convention test resource.
+- No prototype script written before the user approved it in Review.
 - No source/IaC file changed; code exploration went through `Explore` subagent.
 - No unredacted secret or tenant identifier.
