@@ -10,6 +10,8 @@ Goal: one **working** scenario file — every phase run on real resources, every
 
 **Write-through:** scenario file and log are saved to disk as each step, phase, or correction happens — before the next action, never batched to the end. Never invent a resource name, flag, setting, or expected result not traceable to user input, ticket/summary doc, or real source/IaC.
 
+**Codebase is read-only:** **MUST NOT** edit source/IaC or fix the bug in code — only the scenario file and log are written. Explore code/IaC only through the `Explore` subagent (read-only lookups: symbol, caller, IaC definition, `path:line`). Apply fix acts on cloud resources only; a needed code fix → Open item.
+
 ## Inputs
 
 | Input | Required | Effect |
@@ -66,7 +68,7 @@ Status: drafting → `building-loop`; Reproduce → `reproducing`; Verify → `c
 Write whole scenario to **one file** `{{bugSlug}}-scenario.md` beside ticket/summary doc (none → ask folder), per Output skeleton. Create file at step 1 with Status `Draft`; save each section as its step completes. **MUST** save the full draft (step 12 passed) before any cloud CLI call, Preflight included.
 
 1. **Target cloud** from input site/platform info. *Done when* one cloud named; ambiguous → ask; never mix clouds.
-2. **Map resources**: symptom → code path → cloud SDK call (service + operation) → IaC definition (Terraform, CloudFormation, CDK, SAM, Bicep/ARM, serverless config) → applied settings, via semantic/symbol search, not text search alone. IaC/code missing → ask path. *Done when* Resource map has resource, IaC `path:line`, caller `path:line`, SDK op, CLI op, load-bearing settings.
+2. **Map resources**: symptom → code path → cloud SDK call (service + operation) → IaC definition (Terraform, CloudFormation, CDK, SAM, Bicep/ARM, serverless config) → applied settings, via `Explore` subagent (semantic/symbol search, not text search alone). IaC/code missing → ask path. *Done when* Resource map has resource, IaC `path:line`, caller `path:line`, SDK op, CLI op, load-bearing settings.
 3. **Ground mechanism**: exact creation semantics of operation under test — operation type (e.g. import-from-source vs. create-from-image), which branch sets which properties. *Done when* "must match the real code path" section cites file + line range and why a naive alternative command diverges.
 4. **Fidelity**: apply Fidelity ladder. *Done when* Fidelity choice names rung + load-bearing setting the rung below breaks.
 5. **Scope**: symptom reproduced; exclude unfixed root cause, naming its tracking ticket. *Done when* reader can tell which rung builds the broken state.
@@ -123,6 +125,7 @@ User correction → save edit to same file in place + log `L` before any cloud c
 - Cleanup follows target cloud's real delete-dependency order.
 - Every create/delete behind its confirmation gate.
 - File and log match what was actually run — no command executed that isn't saved in the file first.
+- No source/IaC file changed; code exploration went through `Explore` subagent.
 - No unredacted secret or tenant identifier.
 
 ## Output skeleton
