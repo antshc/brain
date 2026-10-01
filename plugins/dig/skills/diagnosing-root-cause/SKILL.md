@@ -34,9 +34,9 @@ Write the diagnosis log with the `diagnosis-session-log` skill. Events beyond it
 
 ## Reuse prior diagnoses
 
-Prior handoffs live at `patches/*/README.md` under the repo root (`git rev-parse --show-toplevel`). Search their `## Matching signals` sections for this bug's error text, symptom words, components, and paths.
+Prior handoffs live at `patches` under the repo root. Search their `## Matching signals` sections for this bug's error text, symptom words, components, and paths.
 
-For each plausible match, read its README and `root-cause.md`, and record a Phase 0 `C` bullet. Reuse what fits:
+For each plausible match, read its markdown (`DIAGNOSIS-*.md`) and `root-cause.md`, and record a Phase 0 `C` bullet. Reuse what fits:
 
 - its loop or replay steps as the first Phase 1 candidate;
 - its patch (`git apply --check` first) as a ready-made harness;
