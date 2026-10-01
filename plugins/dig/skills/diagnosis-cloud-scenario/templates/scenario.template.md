@@ -1,17 +1,20 @@
 # {{scenarioSlug}} — {{title|one-line scenario title}}: cloud scenario ({{optionUnderTest|fix option under test, or reproduce-only}})
 
 **Status:** {{status|Draft | Working — verified <date> | Blocked — <reason>}}
-**Purpose:** Reproduce {{symptom}} from [{{ticketDocName}}]({{ticketDocPath|relative path to input ticket/summary doc}}) on real {{cloud|AWS or Azure}} resources<!-- @: append ", and validate <option> from [<doc>](<path>)" only when a fix option exists -->.
+**Purpose:** Reproduce {{symptom}} from [{{ticketDocName}}]({{ticketDocPath|relative path to input ticket/summary doc}}) on isolated {{cloud|AWS or Azure}} test resources<!-- @: append ", and validate <option> from [<doc>](<path>)" only when a fix option exists -->.
 
 ## Scope
 
-{{scope|symptom reproduced; root cause excluded and its tracking ticket}}
+{{scope|symptom reproduced; real application excluded; root cause excluded and its tracking ticket}}
 
 ## Scenario flow
 
-<!-- @: product flow under diagnosis as found in code; mark the step where the symptom appears -->
+<!-- @: optional; omit when no product flow is found in code or the flow is one SDK call already in Resource map -->
+<!-- @: Given–When–Then one-liners in flow order; extend with And; link each code keyword as [`keyword`](path#Lline); suffix the symptom line with **(symptom)** -->
 
-1. {{step|entry point or step, SDK call if any — path:line}}
+- **Given** {{precondition|state/config, e.g. [`AutoAttach`](path#Lline) is true}}
+- **When** {{action|entry point or SDK call, e.g. [`CreateVolumeAsync`](path#Lline) runs with [`SnapshotId`](path#Lline)}}
+- **Then** {{outcome|resulting state, e.g. volume lacks [`Encrypted`](path#Lline)}} **(symptom)**
 
 ## Resource map
 
@@ -37,7 +40,15 @@
 
 | Test resource | Ticket analog | Role |
 | --- | --- | --- |
-| {{testResource}} | {{ticketAnalog}} | {{role}} |
+| {{testResource|scenarioTag'd test resource; never a real app resource}} | {{ticketAnalog|real resource/ID it stands in for; never a command target}} | {{role}} |
+
+## Prototype
+
+<!-- @: omit when no phase runs a Python script -->
+
+| Script | Simulates | Mirrors code |
+| --- | --- | --- |
+| `prototype/{{script}}.py` | {{simulates|application step or symptom check}} | {{mirrors|[`keyword`](path#Lline)}} |
 
 ## Prerequisites (reusable)
 
