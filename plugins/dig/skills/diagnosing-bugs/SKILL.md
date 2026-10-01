@@ -1,5 +1,5 @@
 ---
-description: Diagnose and fix hard bugs and performance regressions — establish the root cause, lock it with a regression test, apply the fix, verify, and clean up.
+description: Use when asked to fix, repair, or debug-and-fix a hard bug — confirms the root cause, writes a regression test at the correct seam, applies the fix, verifies, and cleans up.
 name: diagnosing-bugs
 argument-hint: "{{bugDescription}}"
 ---
@@ -9,51 +9,50 @@ Root cause first, fix second.
 
 ## Root cause
 
-Run `diagnosing-root-cause` for `{{bugDescription}}`.
+*Run `diagnosing-root-cause` skill to run the diagnosis loop on `{{bugDescription}}` — hard bug: broken, throwing, or failing.*
 
-Use the same shared hypothesis log:
-`repository root/docs/tmp/{{bugSlug}}/diagnosis.md`.
+*Use `diagnosis-session-log` skill to reuse the same shared hypothesis log (`logPath`) of checked hypotheses, verification, and evidence.*
 
-Do not duplicate root-cause investigation logic in this skill. Continue only after a confirmed root cause is returned.
+Require from root cause: `loopCmd :=` red-capable command from Phase 1; `minRepro :=` minimised scenario from Phase 2.
 
-## Fix + regression test
+Do not duplicate root-cause investigation logic in this skill.
 
-Write the regression test before the fix when a correct test seam exists.
+**Gate:** no `confirmed` hypothesis in `logPath` → stop; return the blocker and what was tried. Apply no fix.
 
-A correct seam MUST exercise the real bug pattern as it occurs at the relevant boundary/call path.
+## Phase 6: Fix + regression test
 
-1. Turn the minimal repro into a failing regression test.
-2. Observe the failure.
+Fix the confirmed mechanism, not the symptom; minimal diff.
+
+Write the regression test **before the fix**, but only if there is a **correct seam** for it.
+
+A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
+
+**If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Report it in Output as the missing-seam finding; apply the fix without a test and verify via `loopCmd`.
+
+If a correct seam exists:
+
+1. Turn `minRepro` into a failing test at that seam.
+2. Watch it fail.
 3. Apply the fix.
-4. Observe the test pass.
-5. Re-run the original un-minimised repro.
+4. Watch it pass.
+5. Re-run `loopCmd` against the original (un-minimised) scenario.
 
-If no correct seam exists, record that as a finding in the user-facing result; do not create a misleading shallow test.
+## Phase 7: Cleanup
 
-## Shared log
+Required before declaring done:
 
-The shared diagnosis log remains hypothesis-only.
-
-MUST NOT write tests, fixes, cleanup, phase state, artifacts, or commands to it.
-
-If fixing reveals a new causal hypothesis that must be checked, verify it and append it using `diagnosis-session-log`. Otherwise leave the log unchanged.
-
-## Cleanup
-
-Before declaring done:
-- original repro no longer reproduces;
-- regression test passes, or missing seam is explicitly stated;
-- temporary debug instrumentation removed;
-- throwaway prototypes removed or clearly isolated;
-- relevant focused tests pass.
+- [ ] Original (un-minimised) repro no longer reproduces (re-run `loopCmd`)
+- [ ] Regression test passes (or absence of seam is documented)
+- [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
+- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
+- [ ] The hypothesis that turned out correct is stated in the commit / PR message, so the next debugger learns
 
 ## Output
 
 Return:
 - confirmed root cause;
+- The hypothesis that turned out correct is stated for the commit / PR message, so the next debugger learns
 - fix summary;
 - regression-test result or missing-seam finding;
 - verification of the original scenario;
-- shared hypothesis log path.
-
-Do not persist a root-cause summary unless an explicit handoff/persistence workflow is invoked.
+- `logPath` shared hypothesis log path.

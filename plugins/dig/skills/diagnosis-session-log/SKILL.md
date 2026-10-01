@@ -21,7 +21,7 @@ Runs for the same bug slug MUST reuse the same log. Independent bugs use indepen
 
 If `$logPath` exists, read it before testing new hypotheses and continue numbering after the last `H` entry.
 
-If it does not exist, create its parent folder and initialize it from `session-log.template.md` resolved from this skill's base directory.
+If it does not exist, create its parent folder and initialize it from `Session log template`.
 
 ## Write
 
@@ -49,3 +49,20 @@ Do not write an `open` hypothesis. Do not write phase starts, loop attempts, set
 ## Redact
 
 Secrets MUST be represented by environment-variable names or `<REDACTED>`. Keep only output lines carrying the verification signal.
+
+## Session log template
+
+```markdown
+# Diagnosis Hypotheses
+
+<!-- @: checked hypotheses only; append after verification, never before -->
+
+## H{{n}} — {{short hypothesis}}
+
+- Hypothesis: {{falsifiable cause}}
+- Prediction: {{observable result if true}}
+- Verification: {{how it was checked}}
+- Fact: {{actual observed fact}}
+- Evidence: {{path:line | command/request → redacted signal | authoritative statement + canonical URL}}
+- Result: {{confirmed | falsified | blocked}}
+```
