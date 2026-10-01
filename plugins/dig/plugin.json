@@ -1,0 +1,6 @@
+{
+  "name": "dig",
+  "version": "1.0.0",
+  "description": "Bug diagnosis skills: root-cause investigation, fix with regression test, and diagnosis handoff.",
+  "skills": ["./skills"]
+}
