@@ -1,18 +1,20 @@
 ---
 name: diagnosis-cloud-scenario
-description: Draft a cloud scenario simulating a bug on real AWS or Azure resources with the user from codebase and provider docs, then run and self-correct it until the symptom reproduces and a fix validates. Use to simulate, reproduce in the cloud, or write a test scenario for an escalation.
+description: Draft a cloud scenario simulating a bug on isolated AWS or Azure test resources, never the real application, from codebase and provider docs, then run and self-correct it until the symptom reproduces and a fix validates. Use to simulate, reproduce in the cloud, or write a test scenario for an escalation.
 disable-model-invocation: true
 ---
 
 # Diagnosis Cloud Scenario
 
-Goal: one **working** scenario file — every phase run on real resources, every **Expected:** met. Simulate the cheapest behavior that still exercises the bug's mechanism, not the full flow.
+Goal: one **working** scenario file — every phase run on isolated cloud test resources, every **Expected:** met. Simulate the cheapest behavior that still exercises the bug's mechanism, not the full flow.
 
 Two phases: **Draft** — agent drafts the runnable scenario from codebase + official provider docs, user reviews open choices (HITL), agent re-explores after each answer; **Run** — execute phases, auto-correct the scenario on failure, re-run until working.
 
 **Write-through:** scenario file and log are saved to disk as each section, phase, or correction happens — before the next action, never batched to the end. Never invent a resource name, flag, setting, or expected result not traceable to user input, ticket/summary doc, real source/IaC, or official provider docs.
 
-**Codebase is read-only:** **MUST NOT** edit source/IaC or fix the bug in code — only the scenario file and log are written. Apply fix acts on cloud resources only; a needed code fix → Open item.
+**Codebase is read-only:** **MUST NOT** edit source/IaC or fix the bug in code — only the scenario file, log, and prototype scripts are written. Apply fix acts on scenario test resources only; a needed code fix → Open item.
+
+**Isolated from the real application:** **MUST NOT** run, invoke, deploy, or modify the real application instance or any of its resources (roles/policies, VMs, volumes, queues, functions, app-level IDs) — even when the request describes the real flow or names real IDs. Treat that description as the behavior to simulate: every target is a `scenarioTag`/`prereqTag` test resource, and the application's actions are reproduced by the CLI or a throwaway Python prototype using the cloud SDK (`boto3`, Azure SDK for Python) that mirrors the code's exact operations, parameters, and ordering.
 
 ## Location
 
@@ -22,6 +24,7 @@ Two phases: **Draft** — agent drafts the runnable scenario from codebase + off
 |---|---|---|
 | Scenario | `repository root/docs/tmp/{{scenarioSlug}}/{{scenarioSlug}}-scenario.md` | `templates/scenario.template.md` |
 | Log | `repository root/docs/tmp/{{scenarioSlug}}/{{scenarioSlug}}-log.md` | `templates/scenario-log.template.md` |
+| Prototype | `repository root/docs/tmp/{{scenarioSlug}}/prototype/*.py` | — |
 
 Resolve `templates/` from this skill's base directory.
 
@@ -32,7 +35,7 @@ Resolve `templates/` from this skill's base directory.
 | Symptom | yes | Red signal the symptom check asserts |
 | Root cause / mechanism | no | Narrows Resource map |
 | Workaround / fix option | no | Present → add Apply fix + Verify; absent → reproduce-only |
-| Ticket / summary doc | no | Real resource names, evidence, fix-option caveats |
+| Ticket / summary doc | no | Real resource names → Ticket analog only, evidence, fix-option caveats |
 | Existing scenario file | no | Present → skip Draft; Run as next run |
 
 Accept any mix of free text/docs. Ask only when symptom missing; existing scenario file supplies it.
@@ -49,15 +52,16 @@ Use target cloud's own CLI: `az` (Azure), `aws` (AWS). Load existing aws/azure c
 
 ## Fidelity ladder
 
-Pick **lowest** rung preserving every load-bearing setting in Resource map:
+Pick **lowest** rung preserving every load-bearing setting in Resource map; every rung runs against test resources only:
 
 1. Single CLI/API call with code's exact operation + parameters.
 2. Broken end-state built directly via CLI.
-3. Replay of code's exact SDK operation from throwaway script.
-4. Only affected component deployed from real IaC into isolated stack/resource group.
-5. Real product flow end to end.
+3. Throwaway Python SDK script replaying code's exact operation(s).
+4. Throwaway Python prototype simulating the Scenario flow — the application's steps, ordering, loops, timing — via the SDK.
 
 Climb only when lower rung drops/changes a load-bearing setting, operation type, or ordering/timing the bug needs. Load-bearing settings = production exactly; rest = smallest/cheapest (size, count, storage, region unless region matters).
+
+**Prototype rules:** `python3`; one script per role (e.g. `simulate_app.py`, `symptom_check.py`); read every value from Target environment variables, never literals; tag every create with `scenarioTag`; each SDK call cites the mirrored code as a `# path:line` comment; no import from the application codebase.
 
 ## Scenario log
 
@@ -74,13 +78,13 @@ Goal: a runnable scenario — every phase with exact commands and **Expected:** 
 
 1. **Gather facts** per Sources; ask nothing yet:
    - **Target cloud** from input site/platform info; ambiguous → ask before drafting; never mix clouds.
-   - **Scenario flow**: symptom → entry point → ordered steps and SDK calls in the product that produce it, incl. branches/conditions taken. *Done when* each step cites `path:line` and the step where the symptom appears is marked.
-   - **Resource map**: per Scenario flow SDK call (service + operation + request parameters) → where the resource and its settings are defined (IaC, or the SDK call itself when code creates/mutates it) → applied settings. *Done when* each row has resource, definition `path:line` (IaC or SDK call), caller `path:line`, SDK op, CLI op, load-bearing settings.
+   - **Scenario flow** (optional; skip when no product flow is found in code or it is one SDK call): symptom → entry point → ordered steps and SDK calls in the product that produce it, incl. branches/conditions taken; written as Given–When–Then one-liners. *Done when* every code keyword links to its source as [`keyword`](path#Lline) and the symptom line is marked.
+   - **Resource map**: per SDK call on the symptom's code path (from Scenario flow when present) (service + operation + request parameters) → where the resource and its settings are defined (IaC, or the SDK call itself when code creates/mutates it) → applied settings. *Done when* each row has resource, definition `path:line` (IaC or SDK call), caller `path:line`, SDK op, CLI op, load-bearing settings.
    - **Mechanism**: exact creation semantics of the operation under test — operation type (e.g. import-from-source vs. create-from-image), which branch sets which properties. *Done when* "must match the real code path" section cites file + line range, provider doc URL, and why a naive alternative command diverges.
 2. **Draft the scenario**: write every section below into the scenario file, choosing each value yourself from facts; cite `path:line` or provider doc URL per choice. A choice facts cannot settle → pick the safest/cheapest default and mark it `❓` inline. *Done when* every section is filled and every unconfirmed choice carries `❓`.
-   1. **Scope** — symptom reproduced; unfixed root cause excluded, naming its tracking ticket; fix option under test or reproduce-only.
+   1. **Scope** — symptom reproduced; real application excluded; unfixed root cause excluded, naming its tracking ticket; fix option under test or reproduce-only.
    2. **Fidelity** — apply Fidelity ladder; name rung + load-bearing setting the rung below breaks.
-   3. **Phase list** — Preflight, Prerequisites, Baseline (skip only when Verify exists), Reproduce (Scenario flow steps kept at chosen rung), Apply fix + Verify (only with fix option), Cleanup.
+   3. **Phase list** — Preflight, Prerequisites, Baseline (skip only when Verify exists), Reproduce (Scenario flow steps, when present, kept at chosen rung), Apply fix + Verify (only with fix option), Cleanup.
    4. **Target environment** — variable block: account/subscription, resource group/equivalent, region, image, size, `scenarioTag` (`dig-scenario={{scenarioSlug}}`), `prereqTag` (`dig-scenario-prereq={{scenarioSlug}}`); non-load-bearing values minimal; phases use variables, not literals.
    5. **Naming convention** — test resource → ticket analog → role; names mirror real ones so phases read like the incident; every later-named resource appears here first.
    6. **Prerequisites** — reusable resources needed but not exercised, created once, reused across runs (e.g. bucket/container phases write blobs to; network, base image, key pair). Qualifies only if no setting is load-bearing and no phase mutates its settings; else per-run phase resource. Each: idempotent ensure (exists check → create if missing), tagged `prereqTag`, settings check vs. Target environment.
@@ -122,6 +126,7 @@ User correction → save edit to scenario file in place + log problem/solution b
 - IAM/RBAC assignments and tags eventually consistent → retry before concluding red/green.
 - CLI region/account/subscription default from active profile → pass explicitly from variable block on every command.
 - Tag/label indexes lag deletes → re-query before declaring leftovers.
+- Request names a real app action or ID → simulate, never apply: build test analogs (role, resource, tag/ID), apply the action to them, reproduce the app's calls with the prototype, assert the symptom on test resources only.
 
 ## Quality Check
 
@@ -135,6 +140,6 @@ User correction → save edit to scenario file in place + log problem/solution b
 - Every create/delete behind its confirmation gate.
 - File matches what was actually run — no command executed that isn't saved in the file first.
 - Log holds only problem → solution bullets, grouped by run and phase.
-- Start gate ran before any investigation; `{{scenarioSlug}}-scenario.md` and `{{scenarioSlug}}-log.md` exist in `docs/tmp/{{scenarioSlug}}/` from the first action.
+- No command or prototype call targets the real application or its resources; every target is a Naming convention test resource.
 - No source/IaC file changed; code exploration went through `Explore` subagent.
 - No unredacted secret or tenant identifier.
