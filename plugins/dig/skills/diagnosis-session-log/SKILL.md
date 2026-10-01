@@ -1,6 +1,6 @@
 ---
 name: diagnosis-session-log
-description: Own the diagnosis log at /memories/session/diagnosis-{{bugSlug}}.md — its location, template, resume check, shared log events, entry rules, and blocked state. Use when another skill needs to open, resume, write, or block the diagnosis log; the caller adds its own events.
+description: Own the diagnosis log (default /memories/session/diagnosis-{{bugSlug}}.md, or a caller-supplied folder) — its location, template, resume check, shared log events, entry rules, and blocked state. Use when another skill needs to open, resume, write, or block the diagnosis log; the caller adds its own events.
 ---
 # Track Session Log
 
@@ -10,7 +10,7 @@ Every skill working the same bug writes to the same log. The caller supplies its
 
 ## Location
 
-`bugSlug :=` short kebab-case name of the symptom; `logPath := /memories/session/diagnosis-{{bugSlug}}.md` (session memory).
+`bugSlug :=` short kebab-case name of the symptom; `logDir :=` caller-supplied folder, else `/memories/session` (session memory); `logPath := {{logDir}}/diagnosis-{{bugSlug}}.md`.
 
 ## Open
 

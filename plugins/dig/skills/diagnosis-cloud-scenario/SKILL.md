@@ -16,8 +16,8 @@ Goal: one **working** scenario file — every phase run on real resources, every
 
 **MUST** run first on every invocation, before any read, search, `Explore` call, or terminal/CLI command — even when the request looks like a narrow factual lookup (e.g. one IAM/RBAC policy question):
 
-1. Open the log (Scenario log).
-2. Create `{{bugSlug}}-scenario.md` (Draft) with Status `Draft` + Output skeleton headings; existing scenario file → reuse it.
+1. Resolve scenario folder (Draft); create `{{bugSlug}}-scenario.md` with Status `Draft` + Output skeleton headings; existing scenario file → reuse it.
+2. Open the log beside it (Scenario log).
 
 No request is too small to skip this — a narrow answer is a Draft/Run step; record it in the scenario file + log. Gate skipped → stop, run it now, log `L` naming what ran before it.
 
@@ -55,7 +55,7 @@ Climb only when lower rung drops/changes a load-bearing setting, operation type,
 
 ## Scenario log
 
-*Run `diagnosis-session-log` skill to open or resume the diagnosis log, write shared log events, and mark it blocked.* Write each event the moment it occurs, before the next step or command.
+*Run `diagnosis-session-log` skill to open or resume the diagnosis log, write shared log events, and mark it blocked, passing `logDir :=` the scenario file's folder.* Log lives beside the scenario file, never in session memory. Write each event the moment it occurs, before the next step or command.
 
 **One log per run.** `runNumber :=` last Run history run + 1 (first → `1`). Open log with `bugSlug := {{bugSlug}}-run{{runNumber}}`. Draft + first Run share one log; each Run of an existing scenario file opens a **new** log, never resumes an old one. Read earlier runs from Run history, not logs.
 
@@ -134,7 +134,7 @@ User correction → save edit to same file in place + log `L` before any cloud c
 - Cleanup follows target cloud's real delete-dependency order.
 - Every create/delete behind its confirmation gate.
 - File and log match what was actually run — no command executed that isn't saved in the file first.
-- Start gate ran before any investigation; log and scenario file exist from the first action.
+- Start gate ran before any investigation; scenario file and its log `diagnosis-{{bugSlug}}-run{{runNumber}}.md` exist side by side from the first action.
 - No source/IaC file changed; code exploration went through `Explore` subagent.
 - No unredacted secret or tenant identifier.
 
