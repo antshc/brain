@@ -1,139 +1,110 @@
 ---
 name: diagnosing-root-cause
-description: Find a bug's real root cause from evidence — reuse prior diagnosis handoffs, build a red-capable feedback loop, reproduce, minimise, rank falsifiable hypotheses, instrument, and report a cited root-cause summary. Use when asked to find the root cause, debug, or investigate why something is broken, throwing, failing, or slow, without fixing it.
+description: Find a bug's real root cause from evidence — build a red-capable feedback loop, reproduce, minimise, falsify hypotheses, and return a cited root-cause summary without fixing or saving the summary to a file.
 argument-hint: "{{bugDescription}}"
 ---
 # Diagnosing Root Cause
 
-Discipline for hard bugs. Ends at a confirmed, cited root cause; never applies the fix. Skip phases only when explicitly justified.
+Find and return the confirmed root cause. Never apply the fix.
 
-When exploring the codebase, read `CONTEXT.md` (if it exists) for a mental model of the relevant modules, and check ADRs in the area you're touching.
+When exploring the codebase, read `CONTEXT.md` when present and relevant ADRs.
 
-**Evidence** — a cited fact: `path:line`, a quoted line of primary documentation with its URL, or a probe with its actual output (command, request/response, log line with host and timestamp). Everything else — blog, forum, design doc, search hit, recollection, a prior handoff — is a **lead**: it may point at evidence, never stand in for it.
+**Evidence** is a re-checkable fact: `path:line`, actual probe output, or an authoritative source with canonical URL. Everything else is a lead.
 
-**Code changes allowed:** harnesses, fixtures, captured traces, `[DEBUG-…]` instrumentation. The fix belongs to the caller.
+## Shared hypothesis log
+
+Use `diagnosis-session-log`.
+
+Default log:
+`repository root/docs/tmp/{{bugSlug}}/diagnosis.md`.
+
+The log records **only checked hypotheses**. Do not write phases, setup, loop attempts, fixes, tests, artifacts, plans, or next steps to it.
+
+Each checked hypothesis MUST record:
+- hypothesis;
+- prediction;
+- verification method;
+- actual observed fact;
+- evidence;
+- result: `confirmed | falsified | blocked`.
+
+If verification relies on an authoritative source, include its canonical URL in that hypothesis entry.
 
 ## Redact
 
-Shown commands, outputs and captured artifacts **MUST** have every secret replaced by `<REDACTED>`. Build loops against env vars so the credential stays in the environment. Quote only the lines that carry the signal.
+Commands, outputs, and captured evidence MUST replace secrets with `<REDACTED>`. Credentials stay in environment variables. Quote only signal lines.
 
-If the redacted output is not enough to diagnose the bug, say so and ask the user.
+## Phase 1 — Build a red-capable feedback loop
 
-## Investigation log
+Create one command/check that exercises the reported bug and can become green after a fix.
 
-Write the diagnosis log with the `diagnosis-session-log` skill. Events beyond its shared ones:
+Prefer, in order:
+1. existing failing test;
+2. HTTP/CLI invocation;
+3. captured trace replay;
+4. throwaway harness;
+5. browser automation;
+6. fuzz/property loop;
+7. bisect/differential loop;
+8. HITL script from `scripts/hitl-loop.template.sh`.
 
-| Log event | Write |
-|---|---|
-| A prior handoff is read | `C` bullet |
-| A feedback loop is tried | `L` bullet, with outcome |
-| The loop is chosen | Bullet: loop command, first-run signal line, red-capable/deterministic/fast/agent-runnable |
-| A Phase 2 loop run or minimising cut completes | Bullet: runs count and symptom match, or cut and verdict |
-| Hypotheses ranked, or user re-ranks | `H` bullets with predictions, user input |
-| A probe returns | `P` bullet, then the `H` status it decides |
+The loop MUST be:
+- red-capable for the user's exact symptom;
+- deterministic or high-reproduction for flaky bugs;
+- fast enough for repeated checks;
+- agent-runnable.
 
-## Reuse prior diagnoses
+If no valid loop can be built, stop and report what evidence or access is missing. MUST NOT invent a root cause from code reading alone.
 
-Prior handoffs live at `patches` under the repo root. Search their `## Matching signals` sections for this bug's error text, symptom words, components, and paths.
+## Phase 2 — Reproduce and minimise
 
-For each plausible match, read its markdown (`DIAGNOSIS-*.md`) and `root-cause.md`, and record a Phase 0 `C` bullet. Reuse what fits:
+Run the loop and verify it reproduces the exact symptom.
 
-- its loop or replay steps as the first Phase 1 candidate;
-- its patch (`git apply --check` first) as a ready-made harness;
-- its confirmed root cause as a Phase 3 hypothesis.
+Shrink inputs, callers, configuration, data, and steps one at a time. Re-run after each cut.
 
-A match is a **lead** — re-verify it in this run before relying on it.
-
-Done when every match is recorded, or the log states none were found.
-
-## Phase 1 — Build a feedback loop
-
-**This is the skill.** With a **tight** pass/fail signal that goes red on _this_ bug, you will find the cause; bisection, hypotheses, and instrumentation just consume it. Without one, no amount of staring at code helps. Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give up.**
-
-### Ways to construct one — roughly in this order
-
-1. **Failing test** at whatever seam reaches the bug — unit, integration, e2e.
-2. **Curl / HTTP script** against a running dev server.
-3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
-4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM/console/network.
-5. **Replay a captured trace** — save a real request / payload / event log to disk; replay it through the code path in isolation.
-6. **Throwaway harness** — minimal subset of the system (one service, mocked deps) exercising the bug path with one call.
-7. **Property / fuzz loop** — for "sometimes wrong output", run 1000 random inputs and look for the failure mode.
-8. **Bisection harness** — bug appeared between two known states (commit, dataset, version): automate "boot at X, check" and `git bisect run` it.
-9. **Differential loop** — same input through old vs new version (or two configs); diff outputs.
-10. **HITL bash script** — last resort. Drive the human with `scripts/hitl-loop.template.sh` (from this skill's base directory) so the loop stays structured.
-
-### Tighten the loop
-
-Once you have _a_ loop, make it faster (cache setup, skip unrelated init, narrow scope), sharper (assert the specific symptom, not "didn't crash"), and more deterministic (pin time, seed RNG, isolate filesystem, freeze network). A 30-second flaky loop is barely better than none.
-
-### Non-deterministic bugs
-
-Goal is a **higher reproduction rate**, not a clean repro. Loop the trigger 100×, parallelise, add stress, narrow timing windows, inject sleeps. 50% is debuggable; 1% is not — keep raising it.
-
-### When you genuinely cannot build a loop
-
-Stop and say so. List what you tried. Ask the user for: (a) access to an environment that reproduces it, (b) a redacted captured artifact (HAR, log dump, core dump, timestamped recording), or (c) permission for temporary production instrumentation. **MUST NOT** hypothesise without a loop.
-
-### Completion — a tight loop that goes red
-
-Done when you can name **one command** you have **already run** (invocation and redacted output shown) that is:
-
-- [ ] **Red-capable** — drives the actual bug path and asserts the **user's exact symptom**; goes green once fixed.
-- [ ] **Deterministic** — same verdict every run (flaky bugs: pinned, high reproduction rate).
-- [ ] **Fast** — seconds, not minutes.
-- [ ] **Agent-runnable** — unattended; a human only via `scripts/hitl-loop.template.sh`.
-
-Reading code to build a theory before this command exists is the exact failure this skill prevents — stop and return to the loop.
-
-## Phase 2 — Reproduce + minimise
-
-Run the loop; watch it go red. Confirm:
-
-- [ ] It produces the failure the **user** described — not a nearby one. Wrong bug = wrong fix.
-- [ ] Reproducible across runs (or at a debuggable rate).
-- [ ] Exact symptom captured (error message, wrong output, timing).
-
-Then shrink to the **smallest scenario that still goes red**: cut inputs, callers, config, data, and steps **one at a time**, re-running after each cut. A minimal repro shrinks the hypothesis space and becomes the caller's regression test.
-
-Done when reproduced **and** every remaining element is load-bearing — removing any one turns the loop green.
+Done when the smallest practical scenario still reproduces the same symptom.
 
 ## Phase 3 — Hypothesise
 
-Generate **3–5 ranked hypotheses** before testing any — including boring ones (config, permissions, version skew, caching, clock, retries, ordering, resource exhaustion) and "the expectation is wrong". Each **MUST** be falsifiable:
+Generate 3–5 ranked falsifiable hypotheses before testing them.
 
-> If <X> is the cause, then <changing Y> will make the bug disappear / <changing Z> will make it worse.
+Each MUST include a prediction:
+> If X is the cause, then checking/changing Y will produce Z.
 
-No statable prediction → sharpen or discard. Rank by cost of falsification, then by how many facts each explains.
+Show the hypotheses to the user, then proceed unless they re-rank or reject one.
 
-**Show the ranked list to the user before testing**; they may re-rank or rule some out. Don't block — proceed with your ranking if the user is AFK.
+Do **not** write open hypotheses to the shared log.
 
-Done when Phase 3 lists every hypothesis with its prediction, all `open`.
+## Phase 4 — Verify
 
-## Phase 4 — Instrument
+Test one hypothesis at a time. Change one variable at a time.
 
-Each probe maps to one Phase 3 prediction. **Change one variable at a time.**
+Preferred verification:
+1. debugger/REPL;
+2. focused probe or targeted log;
+3. authoritative source when behavior depends on an external API/platform contract.
 
-1. **Debugger / REPL** if the env supports it — one breakpoint beats ten logs.
-2. **Targeted logs** at boundaries that distinguish hypotheses.
-3. Never "log everything and grep".
+After each check, write exactly one hypothesis entry to the shared log using `diagnosis-session-log`.
 
-**Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`, so cleanup is a single grep.
+A hypothesis is:
+- `confirmed` only when evidence supports its prediction;
+- `falsified` when evidence contradicts it;
+- `blocked` when the check cannot be completed.
 
-**Perf branch:** for performance regressions, establish a baseline measurement (timing harness, profiler, query plan), then bisect. Measure first.
-
-Record each outcome before the next probe. All hypotheses falsified → the fact set is incomplete; gather a new class of fact (wider log window, another layer, deployed config vs source default) and return to Phase 3 — never re-test a falsified hypothesis.
-
-Done when one hypothesis is `confirmed`, or all are falsified/blocked and `Next step` names the next probe.
+All hypotheses falsified → gather a new class of facts and create a new ranked set. Do not recycle falsified hypotheses without new evidence.
 
 ## Phase 5 — Confirm root cause
 
-A confirmed hypothesis becomes the root cause only once it passes all three:
+A confirmed hypothesis is the root cause only when:
 
-1. **Mechanism chain** — cause to symptom in ordered steps, each cited `path:line` or `P` bullet; no "and then somehow".
-2. **Fits every fact** — explains the delta, intermittency, working cases, and every logged fact; a contradiction sends it back to Phase 4.
-3. **Nothing else fits** — every rival is falsified with evidence.
+1. **Mechanism chain** — cause to symptom in ordered steps, each backed by evidence.
+2. **Fits all facts** — no known observation contradicts it.
+3. **Rivals eliminated** — competing hypotheses were falsified with evidence.
 
-Then set `Status: root-cause-found` and `Correct hypothesis` in the log. *Run `draft-root-cause` skill to draft the cited root-cause summary — mechanism chain, evidence table, ruled-out hypotheses — from the log.*
+Then run `draft-root-cause` to render the final cited root-cause summary from the shared hypothesis log plus the current run evidence.
 
-Done when the summary is printed and the log reads `Status: root-cause-found`.
+## Output
+
+Return the rendered root-cause summary directly to the user.
+
+MUST NOT save the rendered root-cause summary to a file. Persistence belongs only to an explicitly invoked handoff/persistence workflow.
