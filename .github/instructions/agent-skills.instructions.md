@@ -37,7 +37,9 @@ Register every new plugin in [marketplace.json](../plugin/marketplace.json) in t
 
 Reference the exact plain `skill-name` without a leading `/` following the skill word. Wording may use run, follow, use, load, or equivalent prose; do not enforce one verb.
 
-For cross-skill selection, include 3–6 distinctive keywords from the child description plus required inputs and constraints. Do not copy the full child description.
+Every skill invocation **MUST** include 3–6 distinctive keywords from the invoked skill's description to strengthen triggering. Do not copy the full description.
+
+Wrap the whole invocation phrase in *italics* to mark it visibly. Example: *Run `fetch-page` to fetch the Confluence page as Markdown.*
 
 ## Subagents
 
@@ -75,6 +77,7 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 | Syntax | Meaning | Example |
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
+| *italic* | Skill invocation phrase | *Run `fetch-page` to fetch the Confluence page as Markdown.* |
 | `camelCase` | Agent-resolved conceptual value | Resolve `camelCase` from Git. |
 | `camelCase := instruction` | Runtime assignment | `NAME := generate unique kebab-case name` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
