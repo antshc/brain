@@ -39,6 +39,13 @@ copilot plugin install harness@brain
 
 </details>
 
+### Diagnosis plugin (dig)
+
+```sh
+(copilot plugin uninstall dig@brain >/dev/null 2>&1 || true) && \
+copilot plugin install dig@brain
+```
+
 ### Atlassian plugin (atl)
 
 ```sh
@@ -176,6 +183,16 @@ Harness configuration setup and resolution skills.
 - [init-harness](plugins/harness/skills/init-harness/SKILL.md): create or update the Harness configuration file, resolving repo paths.
 - [resolve-harness](plugins/harness/skills/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.env` file.
 
+### dig
+
+Bug diagnosis skills: root-cause investigation, fix with regression test, and diagnosis handoff.
+
+- [diagnosing-bugs](plugins/dig/skills/diagnosing-bugs/SKILL.md): find the root cause, then fix it behind a regression test and clean up.
+- [diagnosing-root-cause](plugins/dig/skills/diagnosing-root-cause/SKILL.md): reuse prior handoffs, build a red-capable loop, falsify hypotheses, and report a cited root-cause summary; logs to session memory.
+- [draft-root-cause](plugins/dig/skills/draft-root-cause/SKILL.md): render a confirmed diagnosis log as a cited root-cause summary — mechanism chain, evidence, ruled-out hypotheses.
+- [handoff-diagnosis-patch](plugins/dig/skills/handoff-diagnosis-patch/SKILL.md): manual-only; persist a diagnosis as a replayable `patches/<slug>/` bundle that later root-cause runs match.
+- [diagnosis-session-log](plugins/dig/skills/diagnosis-session-log/SKILL.md): own the session log — location, resume check, shared events, entry rules, blocked state.
+
 ### atl
 
 Atlassian workflow skills.
@@ -212,6 +229,5 @@ General-purpose skills not tied to a specific platform.
 - [suggest](skills/engineering/suggest/SKILL.md): analyze provided information and propose improvements with reasoning.
 - [render-mermaid-png](skills/engineering/render-mermaid-png/SKILL.md): render Mermaid diagrams as high-resolution PNGs.
 - [suggest-graphify-improvements](skills/engineering/suggest-graphify-improvements/SKILL.md): audit a Graphify knowledge graph and suggest evidence-backed improvements.
-- [find-root-cause](skills/engineering/find-root-cause/SKILL.md): drive a bug or regression down to its root cause on cited evidence alone.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
