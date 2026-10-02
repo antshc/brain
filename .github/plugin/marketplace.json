@@ -20,11 +20,6 @@
             "description": "ralph AFK PR review automation skills."
         },
         {
-            "name": "harness",
-            "source": "./plugins/harness",
-            "description": "Harness configuration setup and resolution skills."
-        },
-        {
             "name": "dig",
             "source": "./plugins/dig",
             "description": "Bug diagnosis skills: root-cause investigation, fix with regression test, and diagnosis handoff."
@@ -48,11 +43,6 @@
             "name": "aws",
             "source": "./plugins/aws",
             "description": "AWS documentation, SDK reference, and implementation-constraint research skills."
-        },
-        {
-            "name": "solution",
-            "source": "./plugins/solution",
-            "description": "Software solution research skill covering the capability, cross-deployable flow, and data-model axes."
         }
     ]
 }

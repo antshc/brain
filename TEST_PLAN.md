@@ -452,37 +452,36 @@ Scenario: Missing issue labels and comments map to empty lists
 
 ---
 
-## Feature: VCS Client Milestone Mapping
+## Feature: VCS Client Spec Mapping
 
-> Unit: `VCSClient.list_milestones()`
+> Unit: `VCSClient.list_specs()`
 
 ```gherkin
-Scenario: Raw milestone nodes are mapped to Milestone domain entities
-  Given GhCli returns one raw milestone dict with id "M1", number 1, title "Sprint 1", and description "First delivery slice"
-    And url "https://github.com/owner/repo/milestone/1"
-  When list_milestones() is called
-  Then the result contains one Milestone with the same id, number, title, description, and url
+Scenario: Raw spec nodes are mapped to Issue domain entities
+  Given GhCli returns one raw spec dict with number 1, a title, a metadata-block body, and labels "spec" and "repo:owner/repo"
+  When list_specs() is called
+  Then the result contains one Issue with the same number, title, body, and labels
 
-Scenario: Missing milestone description maps to empty string
-  Given GhCli returns one raw milestone dict with id "M2", number 2, title "Backlog", and description null
-  When list_milestones() is called
-  Then the result Milestone description is ""
+Scenario: No spec nodes map to an empty list
+  Given GhCli returns no raw spec dicts
+  When list_specs() is called
+  Then the result is []
 ```
 
 **Coverage:** Unit test
 
 ---
 
-## Feature: GhCli Milestone Query Construction
+## Feature: GhCli Spec Query Construction
 
-> Unit: `GhCli.list_milestones_raw()`
+> Unit: `GhCli.list_specs_raw()`
 
 ```gherkin
-Scenario: Open milestones query is built and nodes are returned
-  Given gh api graphql returns one milestone node for owner "owner" and repo "repo"
-  When list_milestones_raw() is called
-  Then subprocess.run() is invoked with the open milestones GraphQL query and repository variables
-  And the returned nodes are passed through unchanged
+Scenario: Open spec issues query is built and nodes are returned
+  Given gh api graphql returns one open issue node labelled "spec" for owner "owner" and repo "repo"
+  When list_specs_raw() is called
+  Then subprocess.run() is invoked with the paginated spec GraphQL query and repository variables
+  And the returned nodes have flattened labels and comments
 ```
 
 **Coverage:** Unit test
@@ -517,11 +516,11 @@ Scenario: Handler includes blocked issues and excludes prd and hitl issues
   When fetch_issues() is called
   Then only the blocked and unlabeled issues are returned
 
-Scenario: Milestone title is forwarded to GhCli
+Scenario: Spec number is forwarded to GhCli
   Given the repository "owner/repo"
     And the VCS is backed by a mocked GhCli
-  When fetch_issues() is called with milestone_title "Sprint 1"
-  Then GhCli.fetch_issues_raw() is called with owner "owner", repo "repo", and milestone title "Sprint 1"
+  When fetch_issues() is called with spec_number 7
+  Then GhCli.fetch_issues_raw() is called with owner "owner", repo "repo", and spec number 7
 ```
 
 **Coverage:** Integration test
@@ -533,13 +532,13 @@ Scenario: Milestone title is forwarded to GhCli
 > Unit: `fetch_issues.py`
 
 ```gherkin
-Scenario: CLI passes kind and milestone in either order
-  Given valid kind and milestone arguments
+Scenario: CLI passes kind and spec in either order
+  Given valid kind and spec arguments
   When the CLI runs with either option order
   Then the handler receives both values
 
 Scenario: CLI rejects invalid kind without fetching
-  Given an invalid or missing kind value or unknown option
+  Given an invalid or missing kind value, a non-numeric spec, or an unknown option
   When the CLI runs
   Then it returns one without fetching
 
@@ -563,51 +562,71 @@ Scenario: No actionable issues prints empty JSON array
   When main() is called with ["owner/repo"]
   Then exit code is 0 and stdout is []
 
-Scenario: CLI passes milestone title when provided
+Scenario: CLI passes spec number when provided
   Given fetch_issues() is stubbed to capture its inputs
-  When main() is called with ["owner/repo", "--milestone", "Sprint 1"]
-  Then fetch_issues() receives repository "owner/repo" and milestone title "Sprint 1"
+  When main() is called with ["owner/repo", "--spec", "14"]
+  Then fetch_issues() receives repository "owner/repo" and spec number 14
 ```
 
 **Coverage:** Unit test
 
 ---
 
-## Feature: Dev Milestone Loop
+## Feature: Dev Spec Loop
 
 > Unit: `afk.features.dev.handler.dev()`
 
 ```gherkin
-Scenario: Tests-only milestone still starts Ralph
-  Given a milestone containing only an approved tests ticket
+Scenario: Tests-only spec still starts Ralph
+  Given a spec whose sub-issues contain only an approved tests ticket
   When the launcher runs
-  Then Ralph starts for that milestone
+  Then Ralph starts for that spec
 
-Scenario: No open milestones found — early exit
-  Given list_milestones() returns no milestones for owner "owner" and repo "repo"
+Scenario: No open specs found — early exit
+  Given list_specs() returns no specs for owner "owner" and repo "repo"
   When dev() is called
   Then no issues are fetched and the AI agent is not invoked
 
-Scenario: Milestone with no actionable issues is skipped
-  Given list_milestones() returns milestone "Sprint 3"
-    And fetch_issues() returns only non-actionable issues for that milestone
+Scenario: Spec with no actionable issues and prior count resets execution log
+  Given list_specs() returns spec 3
+    And fetch_issues() returns only non-actionable issues for that spec
+    And the execution log count for the spec URL is greater than 0
   When dev() is called
-  Then the milestone is skipped without updating the execution log
+  Then the execution count is reset and the AI agent is not invoked
 
-Scenario: Milestone at max executions is skipped
-  Given list_milestones() returns milestone "Sprint 3"
-    And fetch_issues() returns actionable issues for that milestone
-    And the execution log count for the milestone URL equals the max executions limit
+Scenario: Spec with no actionable issues and zero count does not reset execution log
+  Given list_specs() returns spec 3
+    And fetch_issues() returns only non-actionable issues for that spec
+    And the execution log count for the spec URL is 0
   When dev() is called
-  Then the AI agent is not invoked and the milestone is skipped
+  Then the spec is skipped without updating or resetting the execution log
 
-Scenario: Actionable milestone invokes agent and updates execution log
-  Given list_milestones() returns milestone number 3 titled "Sprint 3"
-    And fetch_issues() returns at least one actionable issue for that milestone
-    And the execution log count for the milestone URL is 0
+Scenario: Spec at max executions is skipped
+  Given list_specs() returns spec 3
+    And fetch_issues() returns actionable issues for that spec
+    And the execution log count for the spec URL equals the max executions limit
   When dev() is called
-  Then AIAgent is invoked with prompt "/ralph:dev #3"
-    And the execution log is updated for the milestone URL with no thread ids
+  Then the AI agent is not invoked and the spec is skipped
+
+Scenario: Actionable spec invokes agent and updates execution log
+  Given list_specs() returns spec number 3
+    And fetch_issues() returns at least one actionable issue for that spec
+    And the execution log count for the spec URL is 0
+  When dev() is called
+  Then AIAgent is invoked with prompt "/ralph:dev 3"
+    And the execution log is updated for the spec URL with type "spec"
+
+Scenario: Continue with the next spec when the current spec's run ends early
+  Given list_specs() returns two actionable specs
+    And the AI agent returns without error for the first spec
+  When dev() is called
+  Then the AI agent is invoked once per spec
+    And the execution log is updated for both spec URLs
+
+Scenario: Default ExecutionLog is created with dev log name
+  Given no execution log is supplied
+  When dev() is called
+  Then ExecutionLog is created with the log directory, repository, and name "dev"
 ```
 
 **Coverage:** Unit test
@@ -684,41 +703,87 @@ Scenario: PR URL with numeric owner/repo
 
 ## Feature: Main Harness
 
-> Resolver unit test; setup manual test
+> Manual test — no resolver script; the `harness` skill runs inline Python copied from a template
 
 ```gherkin
-Scenario: Nearest Harness Configuration File is resolved
-  Given nested directories with Harness Configuration Files in two ancestor directories
-  When the resolver runs from the nested directory
-  Then it emits settings from the nearest configuration only
+Scenario: The harness skill derives its own repo path
+  Given the generated `harness` skill installed at `<H>/.github/skills/harness/SKILL.md`
+  When the skill runs
+  Then it reports `harnessRepoPath` as `<H>`, derived from its own folder's location, with no filesystem search
 
-Scenario: All Harness Settings are emitted verbatim
-  Given a Harness Configuration File with values containing additional equals signs and empty values
-  When the resolver runs
-  Then it emits every configured KEY=value line unchanged
+Scenario: Settings are emitted verbatim
+  Given a sibling `.harness.json.user` holding a `repos` key
+  When the skill runs
+  Then it reports every top-level key from that file unchanged, alongside `harnessRepoPath`
 
-Scenario: No Harness Configuration File returns an empty Harness Repo Path
-  Given no ancestor directory has a Harness Configuration File
-  When the resolver runs
-  Then it exits successfully with HARNESS_REPO_PATH= on stdout and a current-directory fallback explanation on stderr
+Scenario: A missing settings file is reported as missing
+  Given no sibling `.harness.json.user`
+  When the skill runs
+  Then it exits with an error reporting `missing`, and the caller falls back to cwd as the Harness Repo Path
 
-Scenario: Missing Harness Repo Path fails resolution
-  Given a discovered Harness Configuration File without HARNESS_REPO_PATH
-  When the resolver runs
-  Then it exits with an error
+Scenario: An unparseable settings file is reported as invalid
+  Given a sibling `.harness.json.user` that is not valid JSON, or not a JSON object
+  When the skill runs
+  Then it exits with an error reporting `invalid` and the parse detail, and the caller stops rather than falling back
 
-Scenario: Setup creates Harness Configuration File in current directory
-  Given the current directory has no Harness Configuration File
-  When harness setup runs
-  Then it creates a configuration with the current directory as HARNESS_REPO_PATH and the probed workspace/ repo (or the current directory) as CODEBASE_REPO_PATH
+Scenario: Setup copies the skill and the pull command, creating settings only when missing
+  Given a harness root with no `.github/skills/harness/`
+  When `/init-harness` runs
+  Then `SKILL.md` and `pull-repos.py` are copied byte-identical to their sources, `.harness.json.user` is created holding `{}`, and the file (not the folder) is confirmed gitignored
 
-Scenario: Setup merges managed keys into an existing Harness Configuration File
-  Given the current directory has an existing Harness Configuration File with a legacy HARNESS_ROOT line and a custom key
-  When harness setup runs
-  Then it sets HARNESS_REPO_PATH and CODEBASE_REPO_PATH, drops the legacy HARNESS_ROOT line, and preserves the custom key unchanged
+Scenario: Rerunning setup refreshes the skill and script but never the settings
+  Given an existing `.github/skills/harness/` with a `.harness.json.user` already holding values
+  When `/init-harness` runs again
+  Then `SKILL.md` and `pull-repos.py` are overwritten and the settings file is left untouched
 ```
 
-**Coverage:** Resolver unit test; setup manual test
+## Feature: Pull Repos
+
+> Script CLI unit test, using local bare git repositories as `origin`
+
+```gherkin
+Scenario: No repos configured succeeds
+  Given a Harness user settings file with no `repos` entries, or none at all
+  When the pull command runs
+  Then it reports "no repos configured" and exits successfully
+
+Scenario: Configuration errors abort before any repository is touched
+  Given a malformed `repos` entry, a duplicated repository name, an entry equal to the harness's own origin, or an unknown name argument
+  When the pull command runs
+  Then it exits with an error before touching any repository
+
+Scenario: A read repository is force-reset keeping untracked files
+  Given a read repository with dirty tracked files and untracked files, and a newer commit on its remote branch
+  When the pull command runs
+  Then the tracked files match the remote branch and the untracked files are kept
+
+Scenario: A write repository with dirty tracked changes fails naming the files
+  Given a write repository with uncommitted tracked changes
+  When the pull command runs
+  Then that repository fails naming the dirty files and the command exits with an error
+
+Scenario: A write repository fast-forwards when clean
+  Given a clean write repository behind its configured branch
+  When the pull command runs
+  Then it switches to the configured branch and fast-forwards it
+
+Scenario: A write repository that has diverged is skipped
+  Given a write repository with a local commit not on the remote branch, and the remote branch has also moved
+  When the pull command runs
+  Then that repository is skipped naming the divergence and its local commit is kept
+
+Scenario: A branch missing on the remote is skipped
+  Given a repository whose configured branch does not exist on its remote
+  When the pull command runs
+  Then that repository is skipped naming the missing branch
+
+Scenario: A missing checkout with no clone tool available is skipped
+  Given a repository with no local checkout and no clone tool on PATH
+  When the pull command runs
+  Then that repository is skipped naming the missing clone tool
+```
+
+**Coverage:** Script CLI unit test
 
 ---
 
@@ -1041,10 +1106,15 @@ Scenario: Current repository's architecture index matches its records
 ## Feature: GhCli Issue Pagination
 
 ```gherkin
-Scenario: All issue pages are filtered by milestone
-  Given multiple GitHub issue pages with the matching milestone on the later page
-  When fetch_issues_raw is called for that milestone
-  Then all pages are fetched and the matching issue is returned with flattened labels and comments
+Scenario: All sub-issue pages are collected and closed ones dropped
+  Given multiple GitHub sub-issue pages of a spec, the first containing only a closed issue
+  When fetch_issues_raw is called for that spec
+  Then all pages are fetched and only open sub-issues are returned with flattened labels and comments
+
+Scenario: All open issue pages are returned without a spec number
+  Given multiple GitHub open issue pages
+  When fetch_issues_raw is called without a spec number
+  Then all pages are fetched and every issue is returned
 ```
 
 **Coverage:** Unit test

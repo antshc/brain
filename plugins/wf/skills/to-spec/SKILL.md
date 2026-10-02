@@ -23,12 +23,11 @@ If the `/manage-backlog` skill is not available, fall back to saving the spec to
 
 Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
-4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Keep testing scenarios independent of test-file paths and fixed method names. Run `/manage-backlog` skill **Publish spec** with the checked body and label `spec` — no additional triage.
+Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
+
+4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Keep testing scenarios independent of test-file paths and fixed method names. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Run `/manage-backlog` skill **Publish spec** with the checked body (without a metadata block — it adds one), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
 
 <spec-template>
-
-**Target Branch:** `{{targetBranch}}`
-**Initiative ID:** `{{initiativeId}}`
 
 ## Problem Statement
 

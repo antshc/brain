@@ -5,7 +5,6 @@ import logging
 from ..domain.comment import Comment
 from ..domain.issue import Issue
 from ..domain.issue_comment import IssueComment
-from ..domain.milestone import Milestone
 from ..domain.pull_request import PullRequest
 from ..domain.review_thread import ReviewThread
 from .gh_cli import GhCli
@@ -39,15 +38,15 @@ class VCSClient:
         nodes = self._gh.fetch_threads_raw(owner, repo, number)
         return [self._thread_from_raw(node) for node in nodes]
 
-    def fetch_issues(self, owner: str, repo: str, milestone_title: str | None = None) -> list[Issue]:
-        """Fetch open issues via GraphQL."""
-        nodes = self._gh.fetch_issues_raw(owner, repo, milestone_title)
+    def fetch_issues(self, owner: str, repo: str, spec_number: int | None = None) -> list[Issue]:
+        """Fetch open issues via GraphQL — the open sub-issues of *spec_number* when given."""
+        nodes = self._gh.fetch_issues_raw(owner, repo, spec_number)
         return [self._issue_from_raw(node) for node in nodes]
 
-    def list_milestones(self, owner: str, repo: str) -> list[Milestone]:
-        """Fetch open milestones via GraphQL."""
-        nodes = self._gh.list_milestones_raw(owner, repo)
-        return [self._milestone_from_raw(node) for node in nodes]
+    def list_specs(self, owner: str, repo: str) -> list[Issue]:
+        """Fetch open issues labelled `spec` via GraphQL."""
+        nodes = self._gh.list_specs_raw(owner, repo)
+        return [self._issue_from_raw(node) for node in nodes]
 
     def _thread_from_raw(self, raw: dict) -> ReviewThread:
         """Map a raw GitHub API thread dict to a ReviewThread domain entity."""
@@ -80,14 +79,4 @@ class VCSClient:
             url=raw["url"],
             labels=labels,
             comments=comments,
-        )
-
-    def _milestone_from_raw(self, raw: dict) -> Milestone:
-        """Map a raw GitHub API milestone dict to a Milestone domain entity."""
-        return Milestone(
-            id=raw["id"],
-            number=raw["number"],
-            title=raw.get("title", ""),
-            description=raw.get("description") or "",
-            url=raw["url"],
         )

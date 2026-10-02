@@ -10,7 +10,7 @@ Every requirement is **solution-agnostic**: it names a **behavior and entity** �
 
 The **capability title** names the behavior and entity, never the surface or placement that delivers it. Titles must not reference a page, screen, header, panel, tab, dropdown, grid, badge, endpoint, or route. Raise any such term to the behavior it enables — the same swap test applies: if renaming the screen or moving the control would force a retitle, the title is over-specified.
 - Reject: *Surface active alerts in the page header* · *Manage tasks on the Monitoring page* · *View aggregated health on the Dashboard*.
-- Prefer: *Surface the count of active alerts* · *Manage tasks* · *View aggregated ZIC health*.
+- Prefer: *Surface the count of active alerts* · *Manage tasks* · *View aggregated health*.
 
 ## Domain vocabulary
 Name entities and behaviors in the project's approved language. `CONTEXT.md` is the domain glossary — the source of allowed terms. When it exists in the repo, prefer its exact terms over synonyms so requirements match the shared language; when it is absent, fall back to the plainest business language for the domain.

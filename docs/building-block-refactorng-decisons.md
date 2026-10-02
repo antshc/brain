@@ -8,4 +8,4 @@
 - Extend deployment documentation with external dependencies covering managed services, registries, SaaS endpoints, reverse proxies, and runtime platforms.
 - Rename `record-service` to `record-building-block`, update all callers and references, and provide no compatibility alias.
 - Update the reusable `index-docs`, `record-building-block`, `record-deployment-view`, and `research-system` contracts and their owned templates. Also update reusable callers and public reference documentation that name the old skill or schema.
-- Keep root project architecture documents and the ZIC research example unchanged; they are examples and migration targets for a separate project repository.
+- Keep root project architecture documents and the research example unchanged; they are examples and migration targets for a separate project repository.
