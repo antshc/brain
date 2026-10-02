@@ -452,37 +452,36 @@ Scenario: Missing issue labels and comments map to empty lists
 
 ---
 
-## Feature: VCS Client Milestone Mapping
+## Feature: VCS Client Spec Mapping
 
-> Unit: `VCSClient.list_milestones()`
+> Unit: `VCSClient.list_specs()`
 
 ```gherkin
-Scenario: Raw milestone nodes are mapped to Milestone domain entities
-  Given GhCli returns one raw milestone dict with id "M1", number 1, title "Sprint 1", and description "First delivery slice"
-    And url "https://github.com/owner/repo/milestone/1"
-  When list_milestones() is called
-  Then the result contains one Milestone with the same id, number, title, description, and url
+Scenario: Raw spec nodes are mapped to Issue domain entities
+  Given GhCli returns one raw spec dict with number 1, a title, a metadata-block body, and labels "spec" and "repo:owner/repo"
+  When list_specs() is called
+  Then the result contains one Issue with the same number, title, body, and labels
 
-Scenario: Missing milestone description maps to empty string
-  Given GhCli returns one raw milestone dict with id "M2", number 2, title "Backlog", and description null
-  When list_milestones() is called
-  Then the result Milestone description is ""
+Scenario: No spec nodes map to an empty list
+  Given GhCli returns no raw spec dicts
+  When list_specs() is called
+  Then the result is []
 ```
 
 **Coverage:** Unit test
 
 ---
 
-## Feature: GhCli Milestone Query Construction
+## Feature: GhCli Spec Query Construction
 
-> Unit: `GhCli.list_milestones_raw()`
+> Unit: `GhCli.list_specs_raw()`
 
 ```gherkin
-Scenario: Open milestones query is built and nodes are returned
-  Given gh api graphql returns one milestone node for owner "owner" and repo "repo"
-  When list_milestones_raw() is called
-  Then subprocess.run() is invoked with the open milestones GraphQL query and repository variables
-  And the returned nodes are passed through unchanged
+Scenario: Open spec issues query is built and nodes are returned
+  Given gh api graphql returns one open issue node labelled "spec" for owner "owner" and repo "repo"
+  When list_specs_raw() is called
+  Then subprocess.run() is invoked with the paginated spec GraphQL query and repository variables
+  And the returned nodes have flattened labels and comments
 ```
 
 **Coverage:** Unit test
@@ -517,11 +516,11 @@ Scenario: Handler includes blocked issues and excludes prd and hitl issues
   When fetch_issues() is called
   Then only the blocked and unlabeled issues are returned
 
-Scenario: Milestone title is forwarded to GhCli
+Scenario: Spec number is forwarded to GhCli
   Given the repository "owner/repo"
     And the VCS is backed by a mocked GhCli
-  When fetch_issues() is called with milestone_title "Sprint 1"
-  Then GhCli.fetch_issues_raw() is called with owner "owner", repo "repo", and milestone title "Sprint 1"
+  When fetch_issues() is called with spec_number 7
+  Then GhCli.fetch_issues_raw() is called with owner "owner", repo "repo", and spec number 7
 ```
 
 **Coverage:** Integration test
@@ -533,13 +532,13 @@ Scenario: Milestone title is forwarded to GhCli
 > Unit: `fetch_issues.py`
 
 ```gherkin
-Scenario: CLI passes kind and milestone in either order
-  Given valid kind and milestone arguments
+Scenario: CLI passes kind and spec in either order
+  Given valid kind and spec arguments
   When the CLI runs with either option order
   Then the handler receives both values
 
 Scenario: CLI rejects invalid kind without fetching
-  Given an invalid or missing kind value or unknown option
+  Given an invalid or missing kind value, a non-numeric spec, or an unknown option
   When the CLI runs
   Then it returns one without fetching
 
@@ -563,58 +562,71 @@ Scenario: No actionable issues prints empty JSON array
   When main() is called with ["owner/repo"]
   Then exit code is 0 and stdout is []
 
-Scenario: CLI passes milestone title when provided
+Scenario: CLI passes spec number when provided
   Given fetch_issues() is stubbed to capture its inputs
-  When main() is called with ["owner/repo", "--milestone", "Sprint 1"]
-  Then fetch_issues() receives repository "owner/repo" and milestone title "Sprint 1"
+  When main() is called with ["owner/repo", "--spec", "14"]
+  Then fetch_issues() receives repository "owner/repo" and spec number 14
 ```
 
 **Coverage:** Unit test
 
 ---
 
-## Feature: Dev Milestone Loop
+## Feature: Dev Spec Loop
 
 > Unit: `afk.features.dev.handler.dev()`
 
 ```gherkin
-Scenario: Tests-only milestone still starts Ralph
-  Given a milestone containing only an approved tests ticket
+Scenario: Tests-only spec still starts Ralph
+  Given a spec whose sub-issues contain only an approved tests ticket
   When the launcher runs
-  Then Ralph starts for that milestone
+  Then Ralph starts for that spec
 
-Scenario: No open milestones found — early exit
-  Given list_milestones() returns no milestones for owner "owner" and repo "repo"
+Scenario: No open specs found — early exit
+  Given list_specs() returns no specs for owner "owner" and repo "repo"
   When dev() is called
   Then no issues are fetched and the AI agent is not invoked
 
-Scenario: Milestone with no actionable issues is skipped
-  Given list_milestones() returns milestone "Sprint 3"
-    And fetch_issues() returns only non-actionable issues for that milestone
+Scenario: Spec with no actionable issues and prior count resets execution log
+  Given list_specs() returns spec 3
+    And fetch_issues() returns only non-actionable issues for that spec
+    And the execution log count for the spec URL is greater than 0
   When dev() is called
-  Then the milestone is skipped without updating the execution log
+  Then the execution count is reset and the AI agent is not invoked
 
-Scenario: Milestone at max executions is skipped
-  Given list_milestones() returns milestone "Sprint 3"
-    And fetch_issues() returns actionable issues for that milestone
-    And the execution log count for the milestone URL equals the max executions limit
+Scenario: Spec with no actionable issues and zero count does not reset execution log
+  Given list_specs() returns spec 3
+    And fetch_issues() returns only non-actionable issues for that spec
+    And the execution log count for the spec URL is 0
   When dev() is called
-  Then the AI agent is not invoked and the milestone is skipped
+  Then the spec is skipped without updating or resetting the execution log
 
-Scenario: Actionable milestone invokes agent and updates execution log
-  Given list_milestones() returns milestone number 3 titled "Sprint 3"
-    And fetch_issues() returns at least one actionable issue for that milestone
-    And the execution log count for the milestone URL is 0
+Scenario: Spec at max executions is skipped
+  Given list_specs() returns spec 3
+    And fetch_issues() returns actionable issues for that spec
+    And the execution log count for the spec URL equals the max executions limit
   When dev() is called
-  Then AIAgent is invoked with prompt "/ralph:dev #3"
-    And the execution log is updated for the milestone URL with no thread ids
+  Then the AI agent is not invoked and the spec is skipped
 
-Scenario: Continue with the next milestone when the current milestone's repository is unusable
-  Given list_milestones() returns two actionable milestones
-    And the first milestone's Milestone metadata names a repository whose derived checkout is unusable
+Scenario: Actionable spec invokes agent and updates execution log
+  Given list_specs() returns spec number 3
+    And fetch_issues() returns at least one actionable issue for that spec
+    And the execution log count for the spec URL is 0
   When dev() is called
-  Then the AI agent is invoked once per milestone
-    And the execution log is updated for both milestone URLs
+  Then AIAgent is invoked with prompt "/ralph:dev 3"
+    And the execution log is updated for the spec URL with type "spec"
+
+Scenario: Continue with the next spec when the current spec's run ends early
+  Given list_specs() returns two actionable specs
+    And the AI agent returns without error for the first spec
+  When dev() is called
+  Then the AI agent is invoked once per spec
+    And the execution log is updated for both spec URLs
+
+Scenario: Default ExecutionLog is created with dev log name
+  Given no execution log is supplied
+  When dev() is called
+  Then ExecutionLog is created with the log directory, repository, and name "dev"
 ```
 
 **Coverage:** Unit test
@@ -1094,10 +1106,15 @@ Scenario: Current repository's architecture index matches its records
 ## Feature: GhCli Issue Pagination
 
 ```gherkin
-Scenario: All issue pages are filtered by milestone
-  Given multiple GitHub issue pages with the matching milestone on the later page
-  When fetch_issues_raw is called for that milestone
-  Then all pages are fetched and the matching issue is returned with flattened labels and comments
+Scenario: All sub-issue pages are collected and closed ones dropped
+  Given multiple GitHub sub-issue pages of a spec, the first containing only a closed issue
+  When fetch_issues_raw is called for that spec
+  Then all pages are fetched and only open sub-issues are returned with flattened labels and comments
+
+Scenario: All open issue pages are returned without a spec number
+  Given multiple GitHub open issue pages
+  When fetch_issues_raw is called without a spec number
+  Then all pages are fetched and every issue is returned
 ```
 
 **Coverage:** Unit test

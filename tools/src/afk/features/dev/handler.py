@@ -1,4 +1,4 @@
-"""Dev use case: processes actionable milestones and drives the Copilot agent."""
+"""Dev use case: processes actionable specs and drives the Copilot agent."""
 
 from pathlib import Path
 
@@ -23,12 +23,12 @@ def dev(
     agent: AIAgent | None = None,
     exec_log: ExecutionLog | None = None,
 ) -> None:
-    """List open milestones for *github_repo* and run the Copilot agent on actionable work.
+    """List open spec issues for *github_repo* and run the Copilot agent on actionable work.
 
     Args:
         github_repo:    Repository in owner/repo format.
         log_dir:        Directory where execution logs are written.
-        max_executions: Maximum processing attempts per milestone before skipping.
+        max_executions: Maximum processing attempts per spec before skipping.
         prompt:         Prompt text passed to the AI agent (default: "/ralph:dev").
         vcs:            VCSClient instance (defaults to VCSClient()).
         agent:          AIAgent instance (defaults to AIAgent()).
@@ -41,44 +41,44 @@ def dev(
 
     _log.info("Service run started", extra={"owner": owner, "repo": repo})
 
-    milestones = vcs.list_milestones(owner, repo)
-    if not milestones:
-        _log.info("No open milestones found", extra={"owner": owner, "repo": repo})
+    specs = vcs.list_specs(owner, repo)
+    if not specs:
+        _log.info("No open specs found", extra={"owner": owner, "repo": repo})
         return
 
-    _log.info("Found open milestones", extra={"count": len(milestones), "owner": owner, "repo": repo})
+    _log.info("Found open specs", extra={"count": len(specs), "owner": owner, "repo": repo})
 
-    for milestone in milestones:
-        _log.info("Processing milestone", extra={"milestone_url": milestone.url, "title": milestone.title})
+    for spec in specs:
+        _log.info("Processing spec", extra={"spec_url": spec.url, "title": spec.title})
 
-        fetched_issues = vcs.fetch_issues(owner, repo, milestone.title)
+        fetched_issues = vcs.fetch_issues(owner, repo, spec.number)
         actionable_issues = issue_filter.get_actionable_issues(fetched_issues)
         issue_ids = [issue.number for issue in actionable_issues]
 
         if len(actionable_issues) == 0:
-            _log.info("No actionable issues, skipping", extra={"milestone_url": milestone.url})
-            exec_count = exec_log.get_count(milestone.url)
+            _log.info("No actionable issues, skipping", extra={"spec_url": spec.url})
+            exec_count = exec_log.get_count(spec.url)
             if exec_count > 0:
-                exec_log.reset(milestone.url)
-                _log.info("Reset execution count (all issues resolved)", extra={"milestone_url": milestone.url})
+                exec_log.reset(spec.url)
+                _log.info("Reset execution count (all issues resolved)", extra={"spec_url": spec.url})
             continue
 
-        exec_count = exec_log.get_count(milestone.url)
+        exec_count = exec_log.get_count(spec.url)
         if exec_count >= max_executions:
             _log.warning(
-                "Milestone exceeded max executions, skipping",
-                extra={"milestone_url": milestone.url, "count": exec_count, "max": max_executions, "actionable_issues": len(actionable_issues)},
+                "Spec exceeded max executions, skipping",
+                extra={"spec_url": spec.url, "count": exec_count, "max": max_executions, "actionable_issues": len(actionable_issues)},
             )
             continue
 
         _log.info(
             "Running copilot agent",
-            extra={"milestone_url": milestone.url, "issues": len(actionable_issues), "attempt": exec_count + 1},
+            extra={"spec_url": spec.url, "issues": len(actionable_issues), "attempt": exec_count + 1},
         )
 
-        (agent or AIAgent(alias=agent_name, prompt=f"{prompt} {milestone.title}")).run()
+        (agent or AIAgent(alias=agent_name, prompt=f"{prompt} {spec.number}")).run()
 
-        exec_log.update(milestone.url, issue_ids, owner, repo, "milestone", milestone.number, milestone.title)
-        _log.info("Completed milestone processing", extra={"milestone_url": milestone.url, "attempt": exec_count + 1})
+        exec_log.update(spec.url, issue_ids, owner, repo, "spec", spec.number, spec.title)
+        _log.info("Completed spec processing", extra={"spec_url": spec.url, "attempt": exec_count + 1})
 
     _log.info("Service run completed")

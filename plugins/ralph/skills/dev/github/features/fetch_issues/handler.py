@@ -12,7 +12,7 @@ def fetch_issues(
     owner: str,
     repo: str,
     *,
-    milestone_title: str | None = None,
+    spec_number: int | None = None,
     kind: str = "all",
     vcs: VCSClient | None = None,
 ) -> list[dict]:
@@ -20,7 +20,7 @@ def fetch_issues(
     vcs = vcs or VCSClient()
     issue_filter = IssueFilter()
 
-    fetched_issues = vcs.fetch_issues(owner, repo, milestone_title)
+    fetched_issues = vcs.fetch_issues(owner, repo, spec_number)
     actionable_issues = issue_filter.get_actionable_issues(fetched_issues, kind=kind)
 
     return [_issue_to_dict(issue) for issue in actionable_issues]

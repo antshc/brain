@@ -19,75 +19,48 @@ Resolve `scripts/create_labels.py` relative to this installed `SKILL.md`'s folde
 
 ## Publish spec
 
-Reads `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, `{{repository}}` (`owner/name`) from context.
+Reads `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, `{{repository}}` (`owner/name`), `{{body}}` from context.
 
-The milestone represents one Initiative developed against one repository and is never reused by another Spec — a second Spec for the same Initiative and repository stops instead of publishing.
+The spec is one Initiative developed against one repository. Its tickets are sub-issues of the spec issue, and `repo:{{repository}}` marks the repository. A second Spec for the same Initiative and repository stops instead of publishing.
 
-1. Derive `{{repoName}}` as `{{repository}}`'s part after the slash, and `{{milestoneTitle}}` as `{{initiativeId}}-{{repoName}}: {{specTitle}}`.
-
-2. Look up an existing milestone for this Initiative and repository:
+1. Look up an existing spec for this Initiative and repository:
    ```
-   gh api repos/$REPO/milestones --jq '.[] | select(.title | startswith("{{initiativeId}}-{{repoName}}")) | .title' | head -1
+   gh issue list --repo "$REPO" --state all --label spec --label "repo:{{repository}}" --search '"initiative_id: {{initiativeId}}" in:body' --json number --jq '.[0].number'
    ```
-   A match found → **stop** and report: a milestone for this Initiative and repository already exists; publish nothing.
+   A number returned → **stop** and report: a spec for this Initiative and repository already exists; publish nothing.
 
-3. Create the milestone:
+2. Ensure the repository label exists:
    ```
-   gh api repos/$REPO/milestones \
-     --method POST \
-   --field title="{{milestoneTitle}}" \
-   --field description="\`\`\`metadata
+   gh label create "repo:{{repository}}" --repo "$REPO" --color 0e8a16 --description "Source repository for this spec's tickets" --force
+   ```
+
+3. Write the issue body to a temporary UTF-8 file: the metadata block first, a blank line, then `{{body}}` verbatim.
+   ````
+   ```metadata
    initiative_id: {{initiativeId}}
-   repository: {{repository}}
    target_branch: {{targetBranch}}
-   \`\`\`"
    ```
+   ````
 
 4. Create the issue:
    ```
-   gh issue create --label spec --title "{{milestoneTitle}}"
-   ```
-
-5. Assign the issue to the milestone, using `{{milestoneTitle}}`:
-   ```
-   gh issue edit {{issueNumber}} --milestone "{{milestoneTitle}}"
+   gh issue create --repo "$REPO" --label "spec,repo:{{repository}}" --title "{{initiativeId}}: {{specTitle}}" --body-file <file>
    ```
 
 **Returns:** the spec ticket's number.
 
 ## Find spec ticket
 
-Reads `{{milestoneTitle}}` from context.
+Reads `{{issueNumber}}` from context. Use **Read ticket**; if no number is given, ask the user for it.
 
-```bash
-gh issue list --repo "$REPO" --milestone "{{milestoneTitle}}" --label "spec" --json number,title,body,comments --limit 1
-```
-
-If no issue is found, ask the user for the GitHub issue number and fetch it with **Read ticket**.
-
-**Returns:** the spec ticket's number, title, body, and comments.
-
-## Find or create milestone
-
-Reads `{{milestoneTitle}}` from context. Use this instead of **Publish spec**'s inline steps when the caller isn't a Spec (e.g. a `/wayfinder` map) — the title is taken verbatim, with no Initiative-ID formatting.
-
-1. Look for an existing milestone with this exact title:
-   ```bash
-   gh api repos/$REPO/milestones --jq '.[] | select(.title == "{{milestoneTitle}}") | .number' | head -1
-   ```
-2. If none found, create it:
-   ```bash
-   gh api repos/$REPO/milestones --method POST --field title="{{milestoneTitle}}"
-   ```
-
-**Returns:** the milestone's number and title.
+**Returns:** the spec ticket's number, title, body, labels, and comments.
 
 ## Create ticket
 
-Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}` from context. `{{label}}` accepts comma-separated labels: `tests,hitl` for functional verification; `bug,hitl` for failed-test investigation.
+Reads `{{title}}`, `{{body}}`, `{{label}}` from context. `{{label}}` accepts comma-separated labels: `tests,hitl` for functional verification; `bug,hitl` for failed-test investigation; add `repo:{{repository}}` to tickets of a spec.
 
 ```bash
-gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "{{label}}" --title "{{title}}" --body "{{body}}"
+gh issue create --repo "$REPO" --label "{{label}}" --title "{{title}}" --body "{{body}}"
 ```
 
 Write a multiline `{{body}}` to a temporary UTF-8 file and use `--body-file` instead of `--body`; preserve literal text without shell interpolation.
@@ -96,11 +69,11 @@ Write a multiline `{{body}}` to a temporary UTF-8 file and use `--body-file` ins
 
 ## Create sub-ticket
 
-Reads `{{title}}`, `{{body}}`, `{{milestoneTitle}}`, `{{label}}`, `{{parentIssueNumber}}` from context. Creates a ticket and links it to `{{parentIssueNumber}}` via GitHub's native sub-issue relationship, so it shows as a child on the parent issue — use this instead of **Create ticket** whenever the new ticket belongs under another ticket rather than standing alone on the milestone.
+Reads `{{title}}`, `{{body}}`, `{{label}}`, `{{parentIssueNumber}}` from context. Creates a ticket and links it to `{{parentIssueNumber}}` via GitHub's native sub-issue relationship, so it shows as a child on the parent issue — use this instead of **Create ticket** whenever the new ticket belongs under another ticket, such as a spec's tickets.
 
 1. Create the ticket, same as **Create ticket**:
    ```bash
-   gh issue create --repo "$REPO" --milestone "{{milestoneTitle}}" --label "{{label}}" --title "{{title}}" --body "{{body}}"
+   gh issue create --repo "$REPO" --label "{{label}}" --title "{{title}}" --body "{{body}}"
    ```
    Set `{{childIssueNumber}}` to the number in the returned URL.
 
@@ -129,7 +102,7 @@ gh issue view {{issueNumber}} --repo "$REPO" --json number,title,body,labels,com
 
 ## List tickets
 
-Reads `{{state}}`, `{{label}}` from context. Add `--milestone "{{milestoneTitle}}"` too when scoping to one milestone (e.g. one `/wayfinder` map).
+Reads `{{state}}`, `{{label}}` from context. To list a parent's children, use **List sub-tickets**.
 
 ```bash
 gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number,title,body,labels,comments,assignees --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body], assignees: [.assignees[].login]}]'
@@ -142,10 +115,10 @@ gh issue list --repo "$REPO" --state {{state}} --label "{{label}}" --json number
 Reads `{{issueNumber}}` from context.
 
 ```bash
-gh api repos/$REPO/issues/{{issueNumber}}/sub_issues --jq '[.[] | {number, title, state, labels: [.labels[].name]}]'
+gh api --paginate "repos/$REPO/issues/{{issueNumber}}/sub_issues?per_page=100" --jq '.[] | {number, title, body, state, labels: [.labels[].name], assignees: [.assignees[].login]}'
 ```
 
-**Returns:** an array of sub-tickets, each with number, title, state, and labels.
+**Returns:** one object per sub-ticket, each with number, title, body, state, labels, and assignees.
 
 ## Assign ticket
 

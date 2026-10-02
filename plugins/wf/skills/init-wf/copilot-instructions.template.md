@@ -42,7 +42,7 @@ You MUST actually execute the check command above — not merely reference or re
 | **Code** `git worktree add`, `git commit`, `git push`, code `gh pr create` | workspace (`{{project}}`) | `cd workspace/{{project}}` first |
 | Code-modifying, build, test, package, and source-repository Git commands | workspace (`{{project}}`) | run from inside `workspace/{{project}}` |
 | **Docs** `git commit`, `git push`, `gh pr create` (for `CONTEXT.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, reporoot docs) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
-| `gh issue`, `gh api` (milestones, PRD/SPECS/ISSUE updates) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
+| `gh issue`, `gh api` (spec/ticket updates) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
 | `gh pr` (view, create, review, merge) for **code** | workspace (`{{project}}`) | `--repo {{repository}}/{{project}}` or run from inside `workspace/{{project}}` |
 
 ## 3. Authoritative sources

@@ -21,7 +21,7 @@ Every map and ticket is an issue, so it has a name — its title. In everything 
 
 ## The Map
 
-The map is a single issue on this repo's GitHub tracker, labelled `wayfinder:map`. Its tickets are separate issues sharing the map's milestone — see **Tracker operations** below for how the map, its children, blocking, and the frontier are actually expressed through `/manage-backlog`.
+The map is a single issue on this repo's GitHub tracker, labelled `wayfinder:map`. Its tickets are sub-issues of the map — see **Tracker operations** below for how the map, its children, blocking, and the frontier are actually expressed through `/manage-backlog`.
 
 The map is an index, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
 
@@ -60,7 +60,7 @@ advances -->
 
 ### Tickets
 
-Each ticket is an issue sharing the map's milestone; its issue number is its identity. Its body is the question, sized to one 100K token agent session:
+Each ticket is a sub-issue of the map (or of the ticket it's narrower than); its issue number is its identity. Its body is the question, sized to one 100K token agent session:
 
 ```markdown
 ## Question
@@ -118,11 +118,11 @@ Ruling something out of scope is a scoping act, not a step on the route. When a 
 
 Use these instead of raw `gh` calls; each name below is a `/manage-backlog` action.
 
-- **Create the map**: **Find or create milestone** with `{{milestoneTitle}}` = the destination's short name, then **Create ticket** with that milestone, label `wayfinder:map`, and the map body template above.
-- **Create a ticket**: **Create ticket** with the map's milestone, label `wayfinder:<type>`, body = Question + Blocked by + Part of.
-- **Create a sub-ticket**: **Create sub-ticket** with `parentIssueNumber` = the ticket it's narrower than, same milestone as the map, label `wayfinder:<type>`, body = Question + Blocked by + Part of. Use when a resolution surfaces a decision that's child-scoped to the ticket just worked, not a fresh frontier item.
+- **Create the map**: **Create ticket** with label `wayfinder:map` and the map body template above.
+- **Create a ticket**: **Create sub-ticket** with `parentIssueNumber` = the map, label `wayfinder:<type>`, body = Question + Blocked by + Part of.
+- **Create a sub-ticket**: **Create sub-ticket** with `parentIssueNumber` = the ticket it's narrower than, label `wayfinder:<type>`, body = Question + Blocked by + Part of. Use when a resolution surfaces a decision that's child-scoped to the ticket just worked, not a fresh frontier item.
 - **Claim a ticket**: **Assign ticket**.
-- **Find the frontier**: **List tickets** with `{{state}}=open` scoped to the map's milestone, once per `wayfinder:<type>` label; drop any ticket that's assigned, or whose `Blocked by` section names a still-open ticket. Sub-tickets share the milestone, so this already surfaces them — no separate query needed.
+- **Find the frontier**: **List sub-tickets** of the map, then of every open child recursively; keep open tickets with a `wayfinder:<type>` label, and drop any that's assigned, or whose `Blocked by` section names a still-open ticket.
 - **Resolve a ticket**: **Comment on ticket** with the answer, then **Close ticket**.
 - **Read the map / a ticket**: **Read ticket**. **Read a ticket's sub-tickets**: **List sub-tickets**.
 

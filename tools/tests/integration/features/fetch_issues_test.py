@@ -117,14 +117,14 @@ class TestFetchIssues:
 
         assert [issue["number"] for issue in result] == [30, 33]
 
-    def test_milestone_title_is_forwarded_to_gh_cli(self):
-        # Scenario: Milestone title is forwarded to GhCli
+    def test_spec_number_is_forwarded_to_gh_cli(self):
+        # Scenario: Spec number is forwarded to GhCli
         issues_raw = [make_raw_issue(40, ["bug"])]
         owner, repo, vcs, gh = setup_handler(issues_raw)
 
-        result = fetch_issues(owner, repo, milestone_title="Sprint 1", vcs=vcs)
+        result = fetch_issues(owner, repo, spec_number=7, vcs=vcs)
 
-        gh.fetch_issues_raw.assert_called_once_with("owner", "repo", "Sprint 1")
+        gh.fetch_issues_raw.assert_called_once_with("owner", "repo", 7)
         assert result == [
             {
                 "number": 40,
@@ -150,8 +150,8 @@ class TestFetchIssues:
         ])
         assert [i["number"] for i in fetch_issues(owner, repo, vcs=vcs)] == [1, 2]
         implementation = fetch_issues(owner, repo, kind="implementation", vcs=vcs)
-        tests = fetch_issues(owner, repo, kind="tests", milestone_title="Sprint 1", vcs=vcs)
+        tests = fetch_issues(owner, repo, kind="tests", spec_number=7, vcs=vcs)
         assert [i["number"] for i in implementation] == [1]
         assert [i["number"] for i in tests] == [2]
         assert tests[0]["comments"][0]["body"] == "Comment for issue 2"
-        gh.fetch_issues_raw.assert_called_with(owner, repo, "Sprint 1")
+        gh.fetch_issues_raw.assert_called_with(owner, repo, 7)

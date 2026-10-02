@@ -1,7 +1,7 @@
 ---
 name: to-tickets
 description: Break a Spec into agent-executable Tracer-bullet functional slices. Accepts optional implementation details or `plan.md` to guide the breakdown.
-argument-hint: "{{milestoneTitle}} [{{implementationDetails}}, `plan.md`]"
+argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`]"
 disable-model-invocation: true
 ---
 
@@ -11,9 +11,9 @@ disable-model-invocation: true
 
 ### 1. Gather inputs
 
-`{{milestoneTitle}}` is **required**. If not provided as argument, ask the user.
+`{{specIssueNumber}}` is **required**. If not provided as argument, ask the user.
 
-**If only `{{milestoneTitle}}` is provided:**
+**If only `{{specIssueNumber}}` is provided:**
 
 Resolve the target repo once (runs unmodified on Linux, macOS, and Windows — no bash- or PowerShell-only syntax):
 
@@ -23,16 +23,15 @@ python -c 'import re,subprocess; url=subprocess.run(["git","remote","get-url","o
 
 Set `$REPO` to the printed value for use in later steps (e.g. `/manage-backlog` actions that read `$REPO`).
 
-Find the spec issue by milestone: via `/manage-backlog` **Find spec ticket**.
+Find the spec issue: via `/manage-backlog` **Find spec ticket** with `{{specIssueNumber}}`.
 
-If no issue is found, ask the user for the GitHub issue number and fetch it:
-via `/manage-backlog` **Read ticket**.
+Set `{{repoLabel}}` to the spec's single `repo:<owner>/<name>` label. None or several → ask the user.
 
 Use the issue title, body, and comments as the spec content.
 
-**If `{{milestoneTitle}}` and (`{{implementationDetails}}` or `plan.md`) is provided:**
+**If `{{specIssueNumber}}` and (`{{implementationDetails}}` or `plan.md`) is provided:**
 
-Use the implementation details as the spec content instead of a GitHub issue:
+Resolve `$REPO` and `{{repoLabel}}` as above. Use the implementation details as the spec content instead of the issue body:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
 - **Inline text** — use directly.
 
@@ -87,13 +86,13 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue: via `/manage-backlog` **Create ticket**, passing the milestone `{{milestoneTitle}}` and label `hitl`.
+For each approved slice, create a GitHub issue: via `/manage-backlog` **Create sub-ticket**, with `parentIssueNumber` = `{{specIssueNumber}}` and label `hitl,{{repoLabel}}`.
 
 Use `hitl` as the label for all issues `HITL` or `AFK` to indicate that user review is required.
 
-Create the approved functional-testing ticket last, with both `tests` and `hitl`, the same milestone, its exact parent spec, and real implementation issue numbers under **Blocked by**. Approval of the breakdown does not remove `hitl`: removing that label releases execution. Reuse an existing functional-testing ticket for the same spec instead of duplicating it on reruns.
+Create the approved functional-testing ticket last, with `tests`, `hitl`, and `{{repoLabel}}`, as a sub-ticket of the same spec, and real implementation issue numbers under **Blocked by**. Approval of the breakdown does not remove `hitl`: removing that label releases execution. Reuse an existing functional-testing ticket for the same spec instead of duplicating it on reruns.
 
-The `{{milestoneTitle}}` from the spec is required for each call, if missing ask user.
+`{{specIssueNumber}}` is required for each call, if missing ask user.
 Use the issue body template below.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.

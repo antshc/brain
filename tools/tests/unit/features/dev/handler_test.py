@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit tests for the dev milestone handler.
+"""Unit tests for the dev spec handler.
 
 Mapped to TEST_PLAN.md — every class docstring names the Feature,
 every method name is the Scenario in snake_case.
@@ -16,46 +16,50 @@ from afk.features.dev.handler import dev
 from afk.infrastructure.ai_agent import AIAgent
 from afk.shared.execution_log import ExecutionLog
 from modules.github.domain.issue import Issue
-from modules.github.domain.milestone import Milestone
 from modules.github.infrastructure.vcs_client import VCSClient
 
 _LOG_DIR = Path("logs")
 _GITHUB_REPO = "owner/repo"
-_MILESTONE_URL = "https://github.com/owner/repo/milestone/3"
 
 
-class TestDevMilestoneLoop:
-    """Feature: Dev Milestone Loop"""
+def _spec(number: int = 3, title: str = "PROJ-3: Delivery slice") -> Issue:
+    return Issue(
+        number=number,
+        title=title,
+        body="```metadata\ninitiative_id: PROJ-3\ntarget_branch: main\n```",
+        url=f"https://github.com/owner/repo/issues/{number}",
+        labels=["spec", "repo:owner/repo"],
+    )
 
-    def test_no_open_milestones_early_exit(self, caplog):
-        # Scenario: No open milestones found — early exit
+
+def _ticket(number: int, labels: list[str]) -> Issue:
+    return Issue(number=number, title="Ticket", body="", url=f"https://github.com/owner/repo/issues/{number}", labels=labels)
+
+
+class TestDevSpecLoop:
+    """Feature: Dev Spec Loop"""
+
+    def test_no_open_specs_early_exit(self, caplog):
+        # Scenario: No open specs found — early exit
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = []
+        vcs.list_specs.return_value = []
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)
 
         with caplog.at_level(logging.INFO):
             dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
-        vcs.list_milestones.assert_called_once_with("owner", "repo")
+        vcs.list_specs.assert_called_once_with("owner", "repo")
         vcs.fetch_issues.assert_not_called()
         agent.run.assert_not_called()
-        assert "No open milestones found" in caplog.text
+        assert "No open specs found" in caplog.text
 
-    def test_milestone_with_no_actionable_issues_and_prior_count_resets_log(self, caplog):
-        # Scenario: Milestone with no actionable issues and prior count resets execution log
-        milestone = Milestone(
-            id="M1",
-            number=3,
-            title="Sprint 3",
-            description="",
-            url=_MILESTONE_URL,
-        )
+    def test_spec_with_no_actionable_issues_and_prior_count_resets_log(self, caplog):
+        # Scenario: Spec with no actionable issues and prior count resets execution log
+        spec = _spec()
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = [milestone]
-        vcs.fetch_issues.return_value = [
-            Issue(number=14, title="Refactor", body="", url="https://github.com/owner/repo/issues/14", labels=["spec"])
-        ]
+        vcs.list_specs.return_value = [spec]
+        vcs.fetch_issues.return_value = [_ticket(14, ["hitl"])]
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)
         exec_log.get_count.return_value = 3
@@ -63,28 +67,20 @@ class TestDevMilestoneLoop:
         with caplog.at_level(logging.INFO):
             dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
-        vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
-        exec_log.get_count.assert_called_once_with(milestone.url)
-        exec_log.reset.assert_called_once_with(milestone.url)
+        vcs.fetch_issues.assert_called_once_with("owner", "repo", spec.number)
+        exec_log.get_count.assert_called_once_with(spec.url)
+        exec_log.reset.assert_called_once_with(spec.url)
         exec_log.update.assert_not_called()
         agent.run.assert_not_called()
         assert "No actionable issues, skipping" in caplog.text
         assert "Reset execution count (all issues resolved)" in caplog.text
 
-    def test_milestone_with_no_actionable_issues_and_zero_count_does_not_reset_log(self, caplog):
-        # Scenario: Milestone with no actionable issues and zero count does not reset execution log
-        milestone = Milestone(
-            id="M1",
-            number=3,
-            title="Sprint 3",
-            description="",
-            url=_MILESTONE_URL,
-        )
+    def test_spec_with_no_actionable_issues_and_zero_count_does_not_reset_log(self, caplog):
+        # Scenario: Spec with no actionable issues and zero count does not reset execution log
+        spec = _spec()
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = [milestone]
-        vcs.fetch_issues.return_value = [
-            Issue(number=14, title="Refactor", body="", url="https://github.com/owner/repo/issues/14", labels=["spec"])
-        ]
+        vcs.list_specs.return_value = [spec]
+        vcs.fetch_issues.return_value = [_ticket(14, ["hitl"])]
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)
         exec_log.get_count.return_value = 0
@@ -92,27 +88,19 @@ class TestDevMilestoneLoop:
         with caplog.at_level(logging.INFO):
             dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
-        vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
-        exec_log.get_count.assert_called_once_with(milestone.url)
+        vcs.fetch_issues.assert_called_once_with("owner", "repo", spec.number)
+        exec_log.get_count.assert_called_once_with(spec.url)
         exec_log.reset.assert_not_called()
         exec_log.update.assert_not_called()
         agent.run.assert_not_called()
         assert "No actionable issues, skipping" in caplog.text
 
-    def test_milestone_at_max_executions_is_skipped(self, caplog):
-        # Scenario: Milestone at max executions is skipped
-        milestone = Milestone(
-            id="M1",
-            number=3,
-            title="Sprint 3",
-            description="",
-            url=_MILESTONE_URL,
-        )
+    def test_spec_at_max_executions_is_skipped(self, caplog):
+        # Scenario: Spec at max executions is skipped
+        spec = _spec()
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = [milestone]
-        vcs.fetch_issues.return_value = [
-            Issue(number=14, title="Build feature", body="", url="https://github.com/owner/repo/issues/14", labels=["ready"])
-        ]
+        vcs.list_specs.return_value = [spec]
+        vcs.fetch_issues.return_value = [_ticket(14, ["ready"])]
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)
         exec_log.get_count.return_value = 5
@@ -120,26 +108,18 @@ class TestDevMilestoneLoop:
         with caplog.at_level(logging.WARNING):
             dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
 
-        exec_log.get_count.assert_called_once_with(milestone.url)
+        exec_log.get_count.assert_called_once_with(spec.url)
         exec_log.update.assert_not_called()
         agent.run.assert_not_called()
-        assert "Milestone exceeded max executions, skipping" in caplog.text
+        assert "Spec exceeded max executions, skipping" in caplog.text
 
     @patch("afk.features.dev.handler.AIAgent")
-    def test_actionable_milestone_invokes_agent_and_updates_execution_log(self, mock_agent_class):
-        # Scenario: Actionable milestone invokes agent and updates execution log
-        milestone = Milestone(
-            id="M1",
-            number=3,
-            title="Sprint 3",
-            description="",
-            url=_MILESTONE_URL,
-        )
+    def test_actionable_spec_invokes_agent_and_updates_execution_log(self, mock_agent_class):
+        # Scenario: Actionable spec invokes agent and updates execution log
+        spec = _spec()
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = [milestone]
-        vcs.fetch_issues.return_value = [
-            Issue(number=14, title="Build feature", body="", url="https://github.com/owner/repo/issues/14", labels=["ready"])
-        ]
+        vcs.list_specs.return_value = [spec]
+        vcs.fetch_issues.return_value = [_ticket(14, ["ready"])]
         exec_log = MagicMock(spec=ExecutionLog)
         exec_log.get_count.return_value = 0
         mock_agent = MagicMock()
@@ -147,66 +127,39 @@ class TestDevMilestoneLoop:
 
         dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, exec_log=exec_log)
 
-        vcs.list_milestones.assert_called_once_with("owner", "repo")
-        vcs.fetch_issues.assert_called_once_with("owner", "repo", milestone.title)
-        exec_log.get_count.assert_called_once_with(milestone.url)
-        mock_agent_class.assert_called_once_with(alias="yolo", prompt="/ralph:dev Sprint 3")
+        vcs.list_specs.assert_called_once_with("owner", "repo")
+        vcs.fetch_issues.assert_called_once_with("owner", "repo", spec.number)
+        exec_log.get_count.assert_called_once_with(spec.url)
+        mock_agent_class.assert_called_once_with(alias="yolo", prompt="/ralph:dev 3")
         mock_agent.run.assert_called_once_with()
-        exec_log.update.assert_called_once_with(milestone.url, [14], "owner", "repo", "milestone", 3, milestone.title)
+        exec_log.update.assert_called_once_with(spec.url, [14], "owner", "repo", "spec", 3, spec.title)
 
     @patch("afk.features.dev.handler.AIAgent")
-    def test_milestone_whose_repository_is_unusable_does_not_stop_iteration(self, mock_agent_class):
-        # Scenario: Continue with the next milestone when the current milestone's repository is unusable
-        first_milestone = Milestone(
-            id="M1",
-            number=3,
-            title="Sprint 3",
-            description="```metadata\nrepository: owner/missing-checkout\n```",
-            url=_MILESTONE_URL,
-        )
-        second_milestone = Milestone(
-            id="M2",
-            number=4,
-            title="Sprint 4",
-            description="```metadata\nrepository: owner/repo\n```",
-            url="https://github.com/owner/repo/milestone/4",
-        )
+    def test_spec_whose_run_ends_early_does_not_stop_iteration(self, mock_agent_class):
+        # Scenario: Continue with the next spec when the current spec's run ends early
+        first_spec = _spec(3, "PROJ-3: First")
+        second_spec = _spec(4, "PROJ-4: Second")
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = [first_milestone, second_milestone]
-        vcs.fetch_issues.side_effect = [
-            [Issue(number=14, title="Build feature", body="", url="https://github.com/owner/repo/issues/14", labels=["ready"])],
-            [Issue(number=15, title="Build another", body="", url="https://github.com/owner/repo/issues/15", labels=["ready"])],
-        ]
+        vcs.list_specs.return_value = [first_spec, second_spec]
+        vcs.fetch_issues.side_effect = [[_ticket(14, ["ready"])], [_ticket(15, ["ready"])]]
         exec_log = MagicMock(spec=ExecutionLog)
         exec_log.get_count.return_value = 0
-        # The agent's underlying process may exit early (e.g. the ralph `dev` skill
-        # stopping before any worktree, per the milestone's derived repository check) —
-        # AIAgent.run() never raises on that, so the handler must still reach the next milestone.
+        # AIAgent.run() never raises when the ralph `dev` skill stops early (e.g. before any
+        # worktree), so the handler must still reach the next spec.
         mock_agent = MagicMock()
         mock_agent_class.return_value = mock_agent
 
         dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, exec_log=exec_log)
 
         assert mock_agent.run.call_count == 2
-        exec_log.update.assert_any_call(
-            first_milestone.url, [14], "owner", "repo", "milestone", 3, first_milestone.title
-        )
-        exec_log.update.assert_any_call(
-            second_milestone.url, [15], "owner", "repo", "milestone", 4, second_milestone.title
-        )
+        exec_log.update.assert_any_call(first_spec.url, [14], "owner", "repo", "spec", 3, first_spec.title)
+        exec_log.update.assert_any_call(second_spec.url, [15], "owner", "repo", "spec", 4, second_spec.title)
 
     @patch("afk.features.dev.handler.ExecutionLog")
     def test_default_execution_log_uses_dev_log_name(self, mock_execution_log_class):
         # Scenario: Default ExecutionLog is created with dev log name
-        milestone = Milestone(
-            id="M1",
-            number=3,
-            title="Sprint 3",
-            description="",
-            url=_MILESTONE_URL,
-        )
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = [milestone]
+        vcs.list_specs.return_value = [_spec()]
         vcs.fetch_issues.return_value = []
         exec_log = MagicMock(spec=ExecutionLog)
         exec_log.get_count.return_value = 0
@@ -216,15 +169,15 @@ class TestDevMilestoneLoop:
 
         mock_execution_log_class.assert_called_once_with(_LOG_DIR, _GITHUB_REPO, "dev")
 
-    def test_tests_only_milestone_still_starts_ralph(self):
-        # Scenario: Tests-only milestone still starts Ralph
+    def test_tests_only_spec_still_starts_ralph(self):
+        # Scenario: Tests-only spec still starts Ralph
         vcs = MagicMock(spec=VCSClient)
-        vcs.list_milestones.return_value = [Milestone(
-            id="M1", number=3, title="Sprint 3", description="", url=_MILESTONE_URL)]
-        vcs.fetch_issues.return_value = [Issue(
-            number=20, title="Functional verification", body="", url="u", labels=["tests"])]
+        vcs.list_specs.return_value = [_spec()]
+        vcs.fetch_issues.return_value = [_ticket(20, ["tests"])]
         agent = MagicMock(spec=AIAgent)
         exec_log = MagicMock(spec=ExecutionLog)
         exec_log.get_count.return_value = 0
+
         dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
+
         agent.run.assert_called_once_with()
