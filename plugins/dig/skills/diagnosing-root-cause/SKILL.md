@@ -24,13 +24,23 @@ If the redacted output is not enough to diagnose the bug, say so and ask the use
 
 Exploration means any information gathering: code, tests, logs, tickets (Jira, GitHub), wiki/knowledge pages, external docs. Fetching a ticket or page counts.
 
-Semantic-search repo docs (glossary, architecture, concept/process docs, ADRs) for the business process and domain model involved. Use hits to build a mental model and adopt the domain language for navigation, analysis, and the root-cause wording. Doc hits are leads; confirm in code before relying on them.
+Search the repo's **domain docs only**, not code:
+
+1. Locate them by listing the repo's Markdown docs (`**/*.md`) and keeping the ones that describe the domain: glossary, architecture, concepts, services, ADRs. Record the paths found.
+2. Search inside those paths for the business process and domain terms involved (from the request, ticket title, error text) and read the matching sections.
+
+A workspace-wide semantic search does **not** satisfy this step, because it returns code. Hits that aren't doc files don't count.
+
+Use the doc hits to build a mental model and adopt the domain language for navigation, analysis, and the root-cause wording. Doc hits are leads; confirm in code before relying on them.
 
 Repeat whenever exploration enters a new business process or domain area, in any phase.
 
 Run independent questions or topics as parallel read-only exploration subagents.
 
-**Done when** found domain terms/concepts are named in your reply, or `none found` is stated, before the first exploration call.
+**Done when**, before the first exploration call, your reply lists:
+
+- **Docs searched:** the doc paths checked, or `no domain docs in repo`.
+- **Domain terms:** the terms/concepts found, each with its doc path, or `none found`.
 
 ## Phase 1: Build a feedback loop
 
