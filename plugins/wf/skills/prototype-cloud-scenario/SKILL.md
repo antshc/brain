@@ -1,5 +1,5 @@
 ---
-name: diagnosis-cloud-scenario
+name: prototype-cloud-scenario
 description: Draft a cloud scenario simulating a bug on isolated AWS or Azure test resources, never the real application, from codebase and provider docs, then run and self-correct it until the symptom reproduces and a fix validates. Use to simulate, reproduce in the cloud, or write a test scenario for an escalation.
 disable-model-invocation: true
 ---
