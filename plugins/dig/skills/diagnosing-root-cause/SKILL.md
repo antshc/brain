@@ -8,6 +8,8 @@ A discipline for hard bugs. Skip phases only when explicitly justified. Find and
 
 When exploring the codebase, read `CONTEXT`, `ARCHITECTURE` docs (if they exist) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
+**Before exploring, semantically search repo docs** for the business process / domain model involved. Use the hits only to build a mental model and pick up the documented business process and domain language to guide navigation and analysis. Phrase the root cause in that domain language. Found docs are leads, not evidence: confirm against actual code before treating any doc claim as fact.
+
 **Evidence** is a re-checkable fact: `path:line`, actual probe output, or an authoritative source with canonical URL. Everything else is a lead.
 
 ## Shared hypothesis log
