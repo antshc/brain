@@ -24,7 +24,7 @@ Draft and print one standalone bug report that defines the affected behavior, re
 - User Actions are ordered, reproducible actions and contain no expected outcomes.
 - Actual Results report observations, including exact error text or identifiers when available.
 - Expected Results define one externally verifiable outcome.
-- Technical notes contain only useful known evidence, references, environment details, or explicit unknowns; they do not speculate about root cause.
+- Technical notes contain only useful known evidence, references, environment details, explicit unknowns, or a root cause; they do not speculate about an unverified root cause.
 - Unknown required details are marked `Unknown` rather than invented.
 
 ## Output Format
@@ -54,5 +54,8 @@ Use this exact structure without wrapper prose:
 
 **Technical notes**
 {{Any useful technical context}}
+
+**Root cause (if known):**
+{{Verified root cause, or omit}}
 <details>
 ```
