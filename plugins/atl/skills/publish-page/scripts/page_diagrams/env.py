@@ -102,6 +102,6 @@ def load_drawio_extension_key(config_path: str) -> str:
         )
     if not _EXTENSION_KEY_RE.match(key):
         raise ValueError(
-            f"{DRAWIO_EXTENSION_KEY}={key!r} is malformed; expected <appId>/<envId>/static/drawio"
+            f"atl.{DRAWIO_EXTENSION_KEY}={key!r} is malformed; expected <appId>/<envId>/static/drawio"
         )
     return key

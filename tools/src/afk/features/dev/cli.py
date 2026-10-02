@@ -42,7 +42,7 @@ def _build_parser() -> argparse.ArgumentParser:
                         help="GitHub repository in owner/repo format.")
     parser.add_argument("--max_executions", nargs="?", type=int, default=DEFAULT_MAX_EXECUTIONS,
                         metavar="max-executions",
-                        help=f"Max processing attempts per milestone before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
+                        help=f"Max processing attempts per spec before skipping (default: {DEFAULT_MAX_EXECUTIONS}).")
     parser.add_argument("--agent", default="yolo",
                         help="Agent CLI alias to invoke (default: yolo).")
     parser.add_argument("--prompt", default="/ralph:dev",

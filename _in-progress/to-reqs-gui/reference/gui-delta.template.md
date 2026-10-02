@@ -4,7 +4,7 @@ Fill this template to document the GUI **delta** a feature introduces. Copy only
 
 - The section is organised by **surface** — either a **page** (its entry documents changes to the GUI components on that page) or a **GUI component** itself (a utility component, or a Layout component used across pages such as, header, menu, or badge). Add one `<details>` entry per surface the feature adds or changes.
 - Every surface, sub-component (toolbar, panel, modal, grid), and grid records its changes as **Behaviour changes** bullets, each starting with an **Added**, **Modified**, or **Removed** marker (use **Obsolete** for a field the backend still returns but the GUI must stop using).
-- Fold data loading into a Behaviour-changes bullet: name the exact API call the surface fires (`GET /api/v2/…`) and the polling cadence when it polls, so the GUI ties back to the ZIC API section.
+- Fold data loading into a Behaviour-changes bullet: name the exact API call the surface fires (`GET /api/v2/…`) and the polling cadence when it polls, so the GUI ties back to the API section.
 - Grid columns list **only changed** columns, each with a `Change` column; field-rendering rules shared across a grid's columns live in that grid's inline **Grid column formatting** block.
 - Cross-cutting GUI rules live under `## Conventions`.
 

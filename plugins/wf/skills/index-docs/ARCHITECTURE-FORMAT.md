@@ -17,46 +17,35 @@ A 1-3 sentence summary of what the system is, its architectural style (e.g. modu
 
 ## Context
 
-References the `CONTEXT.md` file that defines the shared language (terms and domain concepts) used throughout this document.
+References the `CONTEXT.md` file that defines the shared language (terms and domain concepts) used throughout this document, and the `docs/building-blocks/system-context.md` file that holds the system context and solution container diagrams.
 
 ## Building blocks
 
-Documents the system's components/services and their responsibilities, how they interact, and the top-level codebase layout.
+Documents the system's Deployables and their responsibilities, how they interact, and where each lives.
 
 [Building blocks](https://docs.arc42.org/section-5/)
 
-### High-Level Architecture Overview
+#### Deployables
 
-High-level overview of the system's architecture: main components, their interactions, and overall structure, illustrated with a diagram.
+Table of the system's Deployables, each with a short description of its purpose, where it lives, and a reference to its own record. The Trigger condition is a concise, comma-separated set of domain phrases matched semantically against the caller's touched surface. The link is a full harness record under `docs/building-blocks/`, or the repository's own documentation when that repository documents itself — `record-building-block` owns which.
 
-\```mermaid
-graph TD
-    {{buildingBlock1}} --> {{buildingBlock2}}
-    {{buildingBlock2}} --> {{buildingBlock3}}
-\```
-#### Services
+| Building block | Trigger condition | Summary | Location |
+|---|---|---|---|
+| **[{{buildingBlockName}}](docs/building-blocks/{{slug}}.md)** ({{mermaidComponentName}}) | {{triggerCondition}} | {{shortDescription}} <!-- terse, concise, optimized for agent navigation --> | `{{location}}` (e.g. `workspace/{{repo}}[/subpath]` or an absolute path) — `{{originUrl}}` |
 
-Table of the system's services/building blocks, each with a short description of its purpose and a reference to its API/config docs. The Trigger condition is a concise, comma-separated set of domain phrases matched semantically against the caller's touched surface. The link to a full doc is optional — `record-service` owns when one is written.
+#### Shared dependency ownership *(optional, hand-authored)*
 
-| Service | Trigger condition | Summary |
-|---------|-------------------|---------|
-| **[{{buildingBlockName}}](docs/services/{{buildingBlockName}}-service.md)** ({{mermaidComponentName}}) | {{triggerCondition}} | {{shortDescription}} <!-- terse, concise, optimized for agent navigation -->. Appendixes: [{{buildingBlockName}} API Contracts](docs/services/{{buildingBlockName}}-service.swagger.json) |
+A dependency more than one Deployable uses (a shared database, queue, cache, or package) and who owns it. Scanned and matched the same as any Trigger condition table; a blank cell never matches.
 
-#### Interactions *(optional)*
+| Shared dependency | Trigger condition | Summary | Location |
+|---|---|---|---|
 
-One-directional, surface communication between the building blocks — one line per dependency arrow, mapped to building blocks.
+#### Terminal infrastructure boundaries *(optional, hand-authored)*
 
-\```mermaid
-{{buildingBlock1}} --> {{buildingBlock2}}   ← {{whatMapsOntoIt}}
-\```
+Where codebase exploration stops — a managed service, a third-party SaaS, a registry, or a reverse proxy with no further source to read.
 
-### Codebase Structure
-
-The top-level folders and what each contains, one line per folder, with nested modules grouped under their parent.
-
-- `{{folder}}/` — {{whatLivesHere}}
-- `{{folder}}/` — {{whatLivesHere}}
-  - `{{folder}}/{{module}}/` — {{whatThisModuleIsResponsibleFor}}
+| Boundary | Responsibility | Navigation anchor |
+|---|---|---|
 
 ## Deployment View *(optional)*
 

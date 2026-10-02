@@ -6,7 +6,6 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
-from modules.github.domain.milestone import Milestone
 from modules.github.infrastructure.tests.fake_gh_cli import FakeGhCli
 from modules.github.infrastructure.vcs_client import VCSClient
 
@@ -149,53 +148,35 @@ class TestVCSClientIssueMapping:
         assert result[0].comments == []
 
 
-class TestVCSClientMilestoneMapping:
-    """Feature: VCS Client Milestone Mapping"""
+class TestVCSClientSpecMapping:
+    """Feature: VCS Client Spec Mapping"""
 
-    def test_raw_milestone_nodes_are_mapped_to_milestone_domain_entities(self):
-        # Scenario: Raw milestone nodes are mapped to Milestone domain entities
+    def test_raw_spec_nodes_are_mapped_to_issue_domain_entities(self):
+        # Scenario: Raw spec nodes are mapped to Issue domain entities
         client = VCSClient(
             gh=FakeGhCli(
-                milestones_raw=[
+                specs_raw=[
                     {
-                        "id": "M1",
                         "number": 1,
-                        "title": "Sprint 1",
-                        "description": "First delivery slice",
-                        "url": "https://github.com/owner/repo/milestone/1",
+                        "title": "PROJ-1: First delivery slice",
+                        "body": "```metadata\ninitiative_id: PROJ-1\ntarget_branch: main\n```",
+                        "url": "https://github.com/owner/repo/issues/1",
+                        "labels": ["spec", "repo:owner/repo"],
                     }
                 ]
             )
         )
 
-        result = client.list_milestones("owner", "repo")
+        result = client.list_specs("owner", "repo")
 
-        assert result == [
-            Milestone(
-                id="M1",
-                number=1,
-                title="Sprint 1",
-                description="First delivery slice",
-                url="https://github.com/owner/repo/milestone/1",
-            )
-        ]
+        assert len(result) == 1
+        assert result[0].number == 1
+        assert result[0].title == "PROJ-1: First delivery slice"
+        assert result[0].body.startswith("```metadata")
+        assert result[0].labels == ["spec", "repo:owner/repo"]
 
-    def test_missing_milestone_description_maps_to_empty_string(self):
-        # Scenario: Missing milestone description maps to empty string
-        client = VCSClient(
-            gh=FakeGhCli(
-                milestones_raw=[
-                    {
-                        "id": "M2",
-                        "number": 2,
-                        "title": "Backlog",
-                        "description": None,
-                        "url": "https://github.com/owner/repo/milestone/2",
-                    }
-                ]
-            )
-        )
+    def test_no_spec_nodes_map_to_empty_list(self):
+        # Scenario: No spec nodes map to an empty list
+        client = VCSClient(gh=FakeGhCli())
 
-        result = client.list_milestones("owner", "repo")
-
-        assert result[0].description == ""
+        assert client.list_specs("owner", "repo") == []

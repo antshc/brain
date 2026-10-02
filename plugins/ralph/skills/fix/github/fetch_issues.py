@@ -13,7 +13,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 from github.features.fetch_issues.handler import fetch_issues
 from github.domain.services.issue_filter import ISSUE_KINDS
 
-_USAGE = "Usage: fetch_issues.py <owner>/<repo> [--milestone <title>] [--kind all|implementation|tests]"
+_USAGE = "Usage: fetch_issues.py <owner>/<repo> [--spec <number>] [--kind all|implementation|tests]"
 _REPOSITORY_RE = re.compile(r"^[^/]+/[^/]+$")
 
 
@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
         print(_USAGE, file=sys.stderr)
         return 1
     for option, value in zip(argv[1::2], argv[2::2]):
-        if option not in {"--milestone", "--kind"} or option in options:
+        if option not in {"--spec", "--kind"} or option in options:
             print(_USAGE, file=sys.stderr)
             return 1
         options[option] = value
@@ -46,8 +46,12 @@ def main(argv: list[str] | None = None) -> int:
     if kind not in ISSUE_KINDS:
         print(_USAGE, file=sys.stderr)
         return 1
+    spec = options.get("--spec")
+    if spec is not None and not spec.isdecimal():
+        print(_USAGE, file=sys.stderr)
+        return 1
 
-    print(json.dumps(fetch_issues(owner, repo, milestone_title=options.get("--milestone"), kind=kind), indent=2))
+    print(json.dumps(fetch_issues(owner, repo, spec_number=int(spec) if spec else None, kind=kind), indent=2))
     return 0
 
 

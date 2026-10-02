@@ -1,6 +1,6 @@
 ---
 argument-hint: Which feature design document, and which GUI surface(s) changed?
-description: Add or update a ZIC GUI section in a feature design document, documenting only the delta each page or GUI component introduces.
+description: Add or update a GUI section in a feature design document, documenting only the delta each page or GUI component introduces.
 disable-model-invocation: true
 name: to-reqs-gui
 ---

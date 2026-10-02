@@ -10,7 +10,7 @@ copilot plugin marketplace add antshc/brain
 
 Pick the plugin bundles you need. Each block uninstalls any stale version first, then installs the current one.
 
-### Workflow plugins (wf, crew, ralph, review, harness)
+### Workflow plugins (wf, crew, ralph, review)
 
 ```sh
 (copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) && \
@@ -21,9 +21,6 @@ copilot plugin install crew@brain && \
 copilot plugin install ralph@brain && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true) && \
 copilot plugin install review@brain
-
-(copilot plugin uninstall harness@brain >/dev/null 2>&1 || true) && \
-copilot plugin install harness@brain
 ```
 
 <details>
@@ -135,7 +132,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [doc-concept](plugins/wf/skills/doc-concept/SKILL.md): render domain, structural, or operational concept bodies from three one-page templates.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [draft-adr](plugins/wf/skills/draft-adr/SKILL.md) / [doc-decision](plugins/wf/skills/doc-decision/SKILL.md): draft a standalone ADR on request; render compact decisions for designs.
-- [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-service](plugins/wf/skills/record-service/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture Concepts, glossary terms, services, and deployment topology into the docs as they crystallise.
+- [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-building-block](plugins/wf/skills/record-building-block/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture Concepts, glossary terms, building blocks, and deployment topology into the docs as they crystallise.
 - [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
 - [manage-backlog](plugins/wf/skills/manage-backlog/SKILL.md) / [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
 - [track-ledger](plugins/wf/skills/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a questioning session.
@@ -161,6 +158,7 @@ AFK PR review and autonomous development loop.
 - [fix](plugins/ralph/skills/fix/SKILL.md): apply suggested changes from review comments.
 - [create-worktree](plugins/ralph/skills/create-worktree/SKILL.md) / [delete-worktree](plugins/ralph/skills/delete-worktree/SKILL.md): create/reuse or remove an isolated git worktree per feature branch.
 - [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
+- [init-harness](plugins/ralph/skills/init-harness/SKILL.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
 
 ### review
 
@@ -175,13 +173,6 @@ Code and technical solution review skills with modular standards and guidance.
 - [posting](plugins/review/skills/posting/SKILL.md): post a review comment as an inline PR comment via the `gh` API.
 - [to-review-comment](plugins/review/skills/to-review-comment/SKILL.md): format a raw review comment into the review tone of voice.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
-
-### harness
-
-Harness configuration setup and resolution skills.
-
-- [init-harness](plugins/harness/skills/init-harness/SKILL.md): create or update the Harness configuration file, resolving repo paths.
-- [resolve-harness](plugins/harness/skills/resolve-harness/SKILL.md): resolve Harness settings from the nearest ancestor `.harness.env` file.
 
 ### dig
 

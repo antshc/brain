@@ -62,7 +62,9 @@ Run `/doc-concept` skill to render or revise the body, or accept a body already 
 
 ## Authoring the index row
 
-The `ARCHITECTURE.md` row is authored directly by this skill, not projected from the record — the record carries nothing to project.
+A Concept governing multiple building blocks is indexed in `ARCHITECTURE.md`'s `Crosscutting Concepts` table — the row below. A Concept that applies to exactly one Building block is indexed in that block's own `Concepts` table inside its `docs/building-blocks/{{slug}}.md` record instead (or its repository's own Crosscutting Concepts when that repository documents itself) — same authoring rules, different table; never both.
+
+The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skill, not projected from the record — the record carries nothing to project.
 
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
 2. Derive the Trigger condition with `/index-docs`' skill **Generate trigger condition**, passing the rendered body as `{{recordContent}}`.

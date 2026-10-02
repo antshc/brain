@@ -9,7 +9,7 @@ Own the interview and the session's design state — *when* to look up, log, ask
 
 ## Scope
 
-The grill produces exactly two things: **questions** and **records**. Writable surface for the whole session — `CONTEXT.md`, `ARCHITECTURE.md`, `docs/concepts/**`, `docs/services/**`, and the ledger. Source code, tests, configuration, and scaffolding are **read-only** for the entire session: reading them is the job (`/explore-codebase`), changing them is a different session.
+The grill produces exactly two things: **questions** and **records**. Writable surface for the whole session — `CONTEXT.md`, `ARCHITECTURE.md`, `docs/concepts/**`, `docs/building-blocks/**`, and the ledger. Source code, tests, configuration, and scaffolding are **read-only** for the entire session: reading them is the job (`/explore-codebase`), changing them is a different session.
 
 **Concepts are consumed, not discovered.** The grill matches, opens, and applies recorded Concepts, and repairs the ones this session proves wrong — a wrong `default`, a drifted key, a missing trigger clause. It never counts a rule's occurrences in the repo and never authors a record: a reusable-looking rule no recorded Concept covers stays a ledger line, and writing it up is a different session's job.
 
@@ -22,7 +22,7 @@ The grill produces exactly two things: **questions** and **records**. Writable s
 ## Session start
 
 1. **Docs exist** — existence check only on `ARCHITECTURE.md` and `CONTEXT.md`; either missing → Run `/bootstrap-docs`' skill **Mandatory creation**.
-2. **Load the index** — read `ARCHITECTURE.md` in full: `Building blocks` services and every row of the `Crosscutting Concepts` table. Both sections are optional — absent is not a gap. Multi-part sections need multiple ranged reads; never stop at a partial read.
+2. **Load the index** — read `ARCHITECTURE.md` in full: `Building blocks`' `Deployables` table and every row of the `Crosscutting Concepts` table. Both sections are optional — absent is not a gap. Multi-part sections need multiple ranged reads; never stop at a partial read.
 3. **Claim the ledger** — read `/track-ledger`'s ledger if it exists and confirm it belongs to this session; otherwise start fresh. An inherited `opened` line suppresses a guardrail re-scan for the rest of the session.
 4. **Seed the surface** — extract the touched surface from the initial request — terms **and** any concrete file/folder paths it names — and run *Scan and match* once; its normal trigger — a user answer — doesn't exist yet.
 5. **Interview.**
@@ -97,11 +97,12 @@ Every probe stays live for the whole session: re-check its trigger after each us
 
 **Scan and match** — on each triggering turn (user answer / new fact), Run `/track-ledger`' skill **Append surface term** with any new surface terms **and any concrete file/folder paths** newly surfaced — by the user, by *Code cross-reference*, or by an `/explore-codebase` result. Paths go in verbatim and repo-relative.
 * **Nothing new** — reason over the in-context index copy; no scan, no write.
-* **New term(s) or path(s)** — Run `/index-docs`' skill **Scan and match** passing only those, against the not-yet-`opened` rows only.
+* **New term(s) or path(s)** — Run `/index-docs`' skill **Scan and match** passing only those, against the not-yet-`opened` rows of both the global `Crosscutting Concepts` table and the `Deployables` table.
+* **A matched Deployable row** — open its record (this session's harness record under `docs/building-blocks/`, or the repository's own documentation when that repository documents itself — either way, read-only) and run **Scan and match** again against its own Concepts table: a harness-owned block's `Concepts` table, or a repo-owned block's own Crosscutting Concepts standing in for it. A Concept listed in both the global table and a block's table is opened once per session — check the ledger before re-opening it.
 
 This verdict is **monotonic** — once a row matches it stays matched as the surface only grows; never re-check an already-`opened` row here.
 
-**Open and extract** — open a linked Concept's **body** only on a matching verdict; indexing alone never implies relevance. Log every Concept you open or skip via `/track-ledger`' skill **Log opened record**, and check the ledger before discussing any module, boundary, or service — listed means its full record is already loaded, don't re-open or re-scan for it. A section absent from an opened record means "not documented", never "not applicable". Extract **mandates** (required concepts, patterns, boundaries), **prohibitions** (explicitly rejected approaches and considered options), **open space** (unconstrained choices), **defaults** (the matched row's Default cell — the choice to take when the design doesn't state one) — and frame every question, scenario, and alternative against them.
+**Open and extract** — open a linked Concept's or Deployable's **body** only on a matching verdict; indexing alone never implies relevance. Log every record you open or skip via `/track-ledger`' skill **Log opened record**, and check the ledger before discussing any module, boundary, or service — listed means its full record is already loaded, don't re-open or re-scan for it. A section absent from an opened record means "not documented", never "not applicable". Extract **mandates** (required concepts, patterns, boundaries), **prohibitions** (explicitly rejected approaches and considered options), **open space** (unconstrained choices), **defaults** (the matched row's Default cell — the choice to take when the design doesn't state one) — and frame every question, scenario, and alternative against them.
 
 **Classify conflicts** — over the full text of already-`opened` Concepts in context; no tool call; re-runs every triggering turn because it is **non-monotonic**: a later answer can retroactively put an earlier design in conflict with a Concept that matched turns ago.
 * **Violation** — breaks a Concept. Never present as equally valid — cite the Concept number, surface the conflict.

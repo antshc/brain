@@ -2,7 +2,7 @@
 
 ## 1. Scope and repository topology
 
-The reporoot itself plays the role of the **harness** for coding agents: context (`CONTEXT.md`, `ARCHITECTURE.md`), architectural Concepts (`docs/concepts/`), agent conventions (`.crew/`, `.harness.env`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
+The reporoot itself plays the role of the **harness** for coding agents: context (`CONTEXT.md`, `ARCHITECTURE.md`), architectural Concepts (`docs/concepts/`), agent conventions (`.crew/`, `.harness.json.user`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
 
 This repo (the **reporoot**) is the **documentation/context repo**, not the codebase.
 
@@ -42,7 +42,7 @@ You MUST actually execute the check command above — not merely reference or re
 | **Code** `git worktree add`, `git commit`, `git push`, code `gh pr create` | workspace (`{{project}}`) | `cd workspace/{{project}}` first |
 | Code-modifying, build, test, package, and source-repository Git commands | workspace (`{{project}}`) | run from inside `workspace/{{project}}` |
 | **Docs** `git commit`, `git push`, `gh pr create` (for `CONTEXT.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, reporoot docs) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
-| `gh issue`, `gh api` (milestones, PRD/SPECS/ISSUE updates) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
+| `gh issue`, `gh api` (spec/ticket updates) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
 | `gh pr` (view, create, review, merge) for **code** | workspace (`{{project}}`) | `--repo {{repository}}/{{project}}` or run from inside `workspace/{{project}}` |
 
 ## 3. Authoritative sources
@@ -51,10 +51,10 @@ Consult these before searching the code:
 
 - **Domain glossary:** [`CONTEXT.md`](../CONTEXT.md) — domain terminology and concepts.
 - **Architecture:** [`ARCHITECTURE.md`](../ARCHITECTURE.md) — Concept index, high-level source structure, and Codebase Structure.
-- **{{proejctName}} service overview:** [`{{proejctName}}-service.md`](../docs/services/{{proejctName}}-service.md) — {{proejctName}} service description and `main/src/` application-layer module map.
-- **REST API/contracts:** [`{{proejctName}}-service.swagger.json`](../docs/services/{{proejctName}}-service.swagger.json) — request/response shapes, endpoint paths, status codes, schema definitions.
-- **Support REST API/contracts:** [`support-service.swagger.json`](../docs/services/support-service.swagger.json) — request/response shapes, endpoint paths, status codes, schema definitions for the Support Service.
-- **Configurations/tweaks:** [`{{proejctName}}-service.configuration-tweaks.md`](../docs/services/{{proejctName}}-service.configuration-tweaks.md) — available configurations/tweaks.
+- **{{proejctName}} building-block overview:** [`{{proejctName}}.md`](../docs/building-blocks/{{proejctName}}.md) — {{proejctName}} building-block description and `main/src/` application-layer module map.
+- **REST API/contracts:** [`{{proejctName}}-service.swagger.json`](../docs/building-blocks/{{proejctName}}-service.swagger.json) — request/response shapes, endpoint paths, status codes, schema definitions.
+- **Support REST API/contracts:** [`support-service.swagger.json`](../docs/building-blocks/support-service.swagger.json) — request/response shapes, endpoint paths, status codes, schema definitions for the Support Service.
+- **Configurations/tweaks:** [`{{proejctName}}-service.configuration-tweaks.md`](../docs/building-blocks/{{proejctName}}-service.configuration-tweaks.md) — available configurations/tweaks.
 - **Code and Tests Conventions:** follow [CODE.md](../.crew/CODE.md) when writing or reviewing code or tests.
 
 ## 4. Navigation policy
