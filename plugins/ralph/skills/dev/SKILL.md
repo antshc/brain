@@ -1,7 +1,7 @@
 ---
 name: dev
-description: AFK development loop — implements approved milestone tickets, commits and pushes, then runs approved spec-wide functional-testing tickets through Testy.
-argument-hint: '<milestone-title>'
+description: AFK development loop — implements approved sub-tickets of a spec issue, commits and pushes, then runs approved spec-wide functional-testing tickets through Testy.
+argument-hint: '<spec-issue-number-or-url>'
 ---
 
 # WORKTREE SETUP
@@ -10,7 +10,7 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 ## 0. Resolve harness settings
 
-1. Run `/harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Use it as `$HARNESS_REPO_PATH` for all harness-repo operations (milestones, issues).
+1. Run `/harness` skill from cwd; retain its `harnessRepoPath` from the emitted JSON. Use it as `$HARNESS_REPO_PATH` for all harness-repo operations (specs, issues).
 
 2. Bring `HARNESS_REPO_PATH` up to date with its remote before any reads or the final push depend on it.
 **GUARD**:  Run only when `/harness` found its settings file and emitted a non-empty `harnessRepoPath`.
@@ -27,45 +27,46 @@ git -C "$HARNESS_REPO_PATH" reset --hard "@{upstream}"
 
 `/harness` unavailable, or exits reporting `missing` → use cwd as `$HARNESS_REPO_PATH`. `/harness` exits reporting `invalid` → **exit** and report.
 
-## 1. Resolve milestone
+## 1. Resolve spec
 
-A `<milestone-title>` argument is **required**. If not provided, **exit** and report `Usage: /dev <milestone-title>`.
+A `<spec-issue-number-or-url>` argument is **required**. If not provided, **exit** and report `Usage: /dev <spec-issue-number-or-url>`.
 
-Assign it once and reuse everywhere as `$milestone`:
+Assign its issue number once and reuse everywhere as `$spec`:
 
 ```bash
-milestone="<milestone-title>"
+spec="<spec-issue-number>"
 ```
 
-Fetch the milestone by title:
+Fetch the spec issue:
 
 ```bash
 repo=$(git -C "$HARNESS_REPO_PATH" remote get-url origin | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##')
-gh api "repos/$repo/milestones?per_page=100&state=all" | jq --arg title "$milestone" '.[] | select(.title == $title)'
+gh issue view "$spec" --repo "$repo" --json number,title,body,labels,state
 ```
 
 `repo` resolves the harness remote (tasks live there) and is reused for all harness-repo commands below. Run this before the worktree is created.
 
-If no milestone matches, **exit** and report "Milestone not found: `$milestone`".
+If the issue is missing or lacks the `spec` label, **exit** and report "Spec not found: `$spec`".
 
-Parse the fenced ```` ```metadata ```` block from `milestone.description` — the only source read; legacy bold header lines (`**Initiative ID:**`, `**Target Branch:**`, `**Feature ID:**`) are never parsed, even when a `metadata` block is absent:
+Parse the fenced ```` ```metadata ```` block from `spec.body` — the only source read; legacy bold header lines (`**Initiative ID:**`, `**Target Branch:**`, `**Feature ID:**`) are never parsed, even when a `metadata` block is absent:
 - `initiative_id`
-- `repository` — `owner/name`
 - `target_branch` — this branch lives in the **source repository** the worktree is created from, not necessarily the harness repo.
 
-Any field missing → **exit** before creating any worktree, leave ticket labels unchanged, and report "Milestone is missing required metadata."
+Read `repository` (`owner/name`) from the spec's single `repo:<owner>/<name>` label.
+
+Any field missing, or no/several `repo:` labels → **exit** before creating any worktree, leave ticket labels unchanged, and report "Spec is missing required metadata."
 
 Derive the checkout for `repository`: equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/<name>` (`<name>` is `repository`'s part after the slash). Confirm the checkout exists and its own `origin` normalizes to `repository` — missing or a clone of another repository → **exit** before creating any worktree, leave ticket labels unchanged, and report why. Never read `repos` to make this decision.
 
 ## 2. Compute feature branch name
 
-Format: `<version_underscored>_<milestone-title-slug>` — or just `<milestone-title-slug>` when `target_branch` carries no version.
+Format: `<version_underscored>_<spec-title-slug>` — or just `<spec-title-slug>` when `target_branch` carries no version.
 
 Rules:
 - Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `1_3_10`. No version segment found (e.g. `main`, `develop`) → the branch name is the slug alone, with no version prefix.
-- Slugify the full milestone title: lowercase, replace spaces and special chars (including `:`) with hyphens, strip consecutive hyphens, max 50 chars
+- Slugify the full spec title: lowercase, replace spaces and special chars (including `:`) with hyphens, strip consecutive hyphens, max 50 chars
 
-Example: milestone `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1.3.10` → `1_3_10_proj-1234-azure-storage-circuit-breaker`
+Example: spec `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1.3.10` → `1_3_10_proj-1234-azure-storage-circuit-breaker`
 
 ## 3. Create worktree
 
@@ -75,7 +76,7 @@ Run `/create-worktree` skill:
 /create-worktree $CODEBASE_REPO_PATH <target-branch> <feature-branch>
 ```
 
-Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the milestone/issue commands target the harness `repo`.
+Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `branch` and reuse it as `$branch` for the rest of this skill. All subsequent code, git, and PR commands run inside `WORKTREE_PATH`; only the spec/issue commands target the harness `repo`.
 
 ## 4. Build
 
@@ -91,14 +92,14 @@ Repeat the following loop until no eligible implementation tasks remain, then co
 
 ## 1. Read state
 
-Resolve `DEV_SKILL_DIR` from this installed `SKILL.md`'s folder. From `WORKTREE_PATH`, read recent commits and run the hook-synced shared issue fetcher against the harness repository and milestone:
+Resolve `DEV_SKILL_DIR` from this installed `SKILL.md`'s folder. From `WORKTREE_PATH`, read recent commits and run the hook-synced shared issue fetcher against the harness repository and spec:
 
 ```bash
 git log -n 5 --format="%H%n%ad%n%B" --date=short
-python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --milestone "$milestone" --kind implementation
+python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --spec "$spec" --kind implementation
 ```
 
-Run the commands sequentially and check each exit code. Parse the fetcher's JSON output as the task array; review the commits as recent-change context. The shared fetcher owns pagination, milestone filtering, issue/comment serialization, and `IssueFilter` selection. `implementation` excludes `tests`, `spec`, and `hitl` (case-insensitive). A failed fetch exits rather than becoming an empty queue; an empty array ends only the implementation loop. Edit shared code in `tools/src/modules/github/`; `.githooks/pre-commit` generates this skill's `github/` copy.
+Run the commands sequentially and check each exit code. Parse the fetcher's JSON output as the task array; review the commits as recent-change context. The shared fetcher owns pagination, spec sub-issue selection, issue/comment serialization, and `IssueFilter` selection. `implementation` excludes `tests`, `spec`, and `hitl` (case-insensitive). A failed fetch exits rather than becoming an empty queue; an empty array ends only the implementation loop. Edit shared code in `tools/src/modules/github/`; `.githooks/pre-commit` generates this skill's `github/` copy.
 
 ## 2. Select next task
 
@@ -191,16 +192,16 @@ Using the Implementation Decisions from **Distill**, update the spec issue.
 
 1. Fetch the open spec issue:
    ```bash
-   gh issue list --repo "$repo" --milestone "$milestone" --label "spec" --state open --json number,body --jq '.[0]'
+   gh issue view "$spec" --repo "$repo" --json number,body
    ```
-2. If no spec issue is found, skip steps 3-4 below.
-3. For the `Implementation Decisions` section, apply the merge logic:
+2. If the spec is closed or unreadable, skip steps 3-4 below.
+3. For the `Implementation Decisions` section, apply the merge logic, keeping the leading `metadata` block untouched:
    - If the section is absent from the spec body, append it.
    - Replace any entry that conflicts with or is superseded by a new decision.
    - Append decisions that are additive.
 4. Write the updated body back:
    ```bash
-   gh issue edit <spec-number> --repo "$repo" --body "<updated-body>"
+   gh issue edit "$spec" --repo "$repo" --body "<updated-body>"
    ```
 
 Return to **Read state**.
@@ -224,7 +225,7 @@ existing_pr=$(gh pr list \
 
 ```bash
 gh pr create --draft \
-  --title "[<initiative-id>]: <milestone-title>" \
+  --title "[<initiative-id>]: <spec-title>" \
   --body "**Initiative ID:** \`<initiative-id>\`" \
   --base "<target-branch>" \
   --head "$branch"
@@ -247,11 +248,11 @@ Functional Testing Progress:
 
 Ensure all implementation and review changes are committed through **Commit & push**. Skip an empty commit, push `$branch`, and record its HEAD as `testedCommit`; a failed commit/push exits before running tests. This also applies to a resumed invocation with no implementation work. Keep the tested source revision fixed throughout this phase.
 
-Refresh approved testing tickets with the same shared fetcher: `python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --milestone "$milestone" --kind tests`. Check its exit status before parsing its JSON output. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **COMMIT & PUSH HARNESS REPO**. Track handled ticket numbers for this invocation so no ticket is processed twice.
+Refresh approved testing tickets with the same shared fetcher: `python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --spec "$spec" --kind tests`. Check its exit status before parsing its JSON output. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **COMMIT & PUSH HARNESS REPO**. Track handled ticket numbers for this invocation so no ticket is processed twice.
 
 ## 2. Check readiness
 
-For each selected ticket in issue-number order, read its current body, comments, labels, and state; skip it if approval was withdrawn or it closed. Resolve its exact **Parent Spec**, not the first spec in the milestone, and read that spec. Resolve every **Blocked by** issue and confirm the spec's implementation dependencies are complete: closed as completed, with implementation evidence. An open, inaccessible, missing, or closed-as-not-planned dependency is not completion. Report pending dependencies and continue to other testing tickets without running this one; never treat an empty coding queue as proof of completion.
+For each selected ticket in issue-number order, read its current body, comments, labels, and state; skip it if approval was withdrawn or it closed. Resolve its **Parent Spec** (it must be `$spec`) and read that spec. Resolve every **Blocked by** issue and confirm the spec's implementation dependencies are complete: closed as completed, with implementation evidence. An open, inaccessible, missing, or closed-as-not-planned dependency is not completion. Report pending dependencies and continue to other testing tickets without running this one; never treat an empty coding queue as proof of completion.
 
 ## 3. Execute and retry
 
@@ -272,10 +273,10 @@ Retry only the reported transient network-failed subset, at most **two retries a
 
 Aggregate all attempts by scenario, replacing only a retried scenario's prior transport outcome while retaining its attempt history. Every required scenario must have a final outcome. A missing/malformed report, zero intended tests, skipped required scenarios, unknown target revision, or missing coverage is unverified. Preserve available test output, relevant application logs, stack traces, and correlation IDs before worktree cleanup; publish concise redacted excerpts or durable artifact links, not temporary local paths. Unavailable logs do not block reporting.
 
-Use the harness tracker through `/manage-backlog` actions: bind its `REPO` to the resolved harness `$repo`, never the worktree remote, and pass the current milestone and ticket inputs explicitly. Run `/manage-backlog` skill **Comment on ticket** to save the tested commit/environment, requirement-to-scenario-to-test mapping, exact commands, outcomes, attempt counts, gaps, and evidence on the original testing ticket.
+Use the harness tracker through `/manage-backlog` actions: bind its `REPO` to the resolved harness `$repo`, never the worktree remote, and pass the current spec and ticket inputs explicitly. Run `/manage-backlog` skill **Comment on ticket** to save the tested commit/environment, requirement-to-scenario-to-test mapping, exact commands, outcomes, attempt counts, gaps, and evidence on the original testing ticket.
 
 - **All scenarios passed:** Run `/manage-backlog` skill **Close ticket** with the execution evidence. Never infer a pass from a successful command alone.
-- **Any failed or unverified scenario:** Keep the original ticket open with `tests`; Run `/manage-backlog` skill **Label ticket** to add `hitl` before creating follow-up work. Run `/manage-backlog` skill **Create ticket** for one investigation containing all outstanding failures and gaps for this testing ticket in the same milestone: `bug,hitl` if any test failed or network retries were exhausted; otherwise `hitl` for missing coverage or prerequisites. Include the parent spec and testing-ticket links, tested commit/environment, failed or uncovered scenarios, expected versus actual results, reproduction commands, retry history, and useful available logs. Reuse and update an already-linked open investigation covering these findings instead of duplicating it. Run `/manage-backlog` skill **Comment on ticket** to link the investigation back to the original ticket.
+- **Any failed or unverified scenario:** Keep the original ticket open with `tests`; Run `/manage-backlog` skill **Label ticket** to add `hitl` before creating follow-up work. Run `/manage-backlog` skill **Create sub-ticket** under `$spec` for one investigation containing all outstanding failures and gaps for this testing ticket: label `bug,hitl,repo:<repository>` if any test failed or network retries were exhausted; otherwise `hitl,repo:<repository>` for missing coverage or prerequisites. Include the parent spec and testing-ticket links, tested commit/environment, failed or uncovered scenarios, expected versus actual results, reproduction commands, retry history, and useful available logs. Reuse and update an already-linked open investigation covering these findings instead of duplicating it. Run `/manage-backlog` skill **Comment on ticket** to link the investigation back to the original ticket.
 
 Report unsuccessful verification and continue with other eligible testing tickets, then **COMMIT & PUSH HARNESS REPO**. Removal of `hitl` is required for a later rerun. Investigation issues remain outside autonomous implementation while labeled `hitl`. A tracker write failure still exits and reports what was not saved; do not claim escalation succeeded.
 

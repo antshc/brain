@@ -47,14 +47,14 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 
 ### Language
 **Harness environment**:
-The repository that owns the milestone/issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
+The repository that owns the specs and issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
 **Harness Repo Path**:
-The repository that owns the milestone/issues and hosts the repo-local development workflow, resolved once from the location of its **Harness skill** and passed explicitly downstream rather than re-derived by each component. Distinct from the `Codebase Repo Path` and `Worktree Path`, though one repository can serve all three roles.
+The repository that owns the specs and issues and hosts the repo-local development workflow, resolved once from the location of its **Harness skill** and passed explicitly downstream rather than re-derived by each component. Distinct from the `Codebase Repo Path` and `Worktree Path`, though one repository can serve all three roles.
 _Avoid_: repo root, home repo, harness root
 _Plugins_set_: ralph, crew, wf
 
 **Codebase Repo Path**:
-The Git repository containing the source code Ralph develops, derived from the `Harness Repo Path` and the target repository — the milestone's, or the pull request's — as that repository's checkout in the **Workspace folder**, or the `Harness Repo Path` itself when the target is the harness; never looked up in the developer's working set. Supplied explicitly to `/create-worktree`. Distinct from the `Harness Repo Path` and `Worktree Path`, though it can also be the Harness Repo Path.
+The Git repository containing the source code Ralph develops, derived from the `Harness Repo Path` and the target repository — the spec's `repo:` label, or the pull request's — as that repository's checkout in the **Workspace folder**, or the `Harness Repo Path` itself when the target is the harness; never looked up in the developer's working set. Supplied explicitly to `/create-worktree`. Distinct from the `Harness Repo Path` and `Worktree Path`, though it can also be the Harness Repo Path.
 _Avoid_: codebase, source checkout, source repository
 _Plugins_set_: ralph, wf
 
