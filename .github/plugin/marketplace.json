@@ -43,11 +43,6 @@
             "name": "aws",
             "source": "./plugins/aws",
             "description": "AWS documentation, SDK reference, and implementation-constraint research skills."
-        },
-        {
-            "name": "solution",
-            "source": "./plugins/solution",
-            "description": "Software solution research skill covering the capability, cross-deployable flow, and data-model axes."
         }
     ]
 }
