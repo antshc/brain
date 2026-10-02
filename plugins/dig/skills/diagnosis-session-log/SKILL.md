@@ -1,6 +1,6 @@
 ---
 name: diagnosis-session-log
-description: Own the shared hypothesis log for diagnosis runs — defaulting to repository root/docs/tmp/{{bugSlug}}/diagnosis.md — and record only checked hypotheses with their verification, observed fact, evidence, and result.
+description: Own the shared hypothesis log for diagnosis runs — defaulting to repository root/tmp/{{bugSlug}}-diagnosis.md — and record only checked hypotheses with their verification, observed fact, evidence, and result.
 ---
 # Track Diagnosis Hypotheses
 
@@ -11,11 +11,11 @@ The log is a compact evidence record shared by `diagnosing-root-cause` and `diag
 `bugSlug :=` short kebab-case name of the symptom.
 
 Default:
-`logPath := repository root/docs/tmp/{{bugSlug}}/diagnosis.md`.
+`logPath := repository root/tmp/{{bugSlug}}-diagnosis.md`.
 
 A caller may supply another `logPath` when it owns a specialized workflow.
 
-Runs for the same bug slug MUST reuse the same log. Independent bugs use independent slug folders.
+Runs for the same bug slug MUST reuse the same log. Independent bugs use independent log files.
 
 ## Open
 
