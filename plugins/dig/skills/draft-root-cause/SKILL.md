@@ -9,10 +9,7 @@ Render and print one root-cause summary. Drafting is transcription: add no new f
 
 ## Input
 
-Default hypothesis log:
-`repository root/docs/tmp/{{bugSlug}}/diagnosis.md`.
-
-A caller may provide another log path.
+Resolve `logPath` per `diagnosis-session-log`'s Location section, or use the log path a caller provides.
 
 Use:
 - checked hypotheses from the log;
