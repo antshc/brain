@@ -42,17 +42,6 @@
 | --- | --- | --- |
 | {{testResource|scenarioTag'd test resource; never a real app resource}} | {{ticketAnalog|real resource/ID it stands in for; never a command target}} | {{role}} |
 
-## Prototype
-
-<!-- @: omit when CLI alone simulates the behavior (rung 1–2); proposed in Draft with ❓ until user approves; scripts written in Run only -->
-
-**Why CLI alone falls short:** {{cliGap|ordering, loops/polling, timing/concurrency, intermediate state, or SDK-only parameter}}
-**Closest CLI-only alternative:** {{cliAlternative}}
-
-| Script | Simulates | Mirrors code |
-| --- | --- | --- |
-| `prototype/{{script}}.py` | {{simulates|application step or symptom check}} | {{mirrors|[`keyword`](path#Lline)}} |
-
 ## Prerequisites (reusable)
 
 <!-- @: omit section when the scenario needs no reusable resource -->
@@ -61,15 +50,17 @@
 | --- | --- | --- | --- |
 | {{prerequisite}} | {{whyNotLoadBearing}} | {{ensureCommand|idempotent exists-check → create, tagged prereqTag}} | {{settingsCheck}} |
 
-## Symptom check
+## Packages
 
-```bash
-{{symptomCheck|one command asserting the user's exact symptom; reused by Baseline, Reproduce, Verify}}
-```
+| Package | Version | Source |
+| --- | --- | --- |
+| {{package}} | {{version}} | {{source|path:line in csproj/Directory.Packages.props, or nuget.org for LightBDD.XUnit3/xunit.v3}} |
 
-<!-- @: repeat per phase; each phase has numbered commands, verification, and one **Expected:** checkable from output alone -->
+<!-- @: repeat per stage; each stage has exact commands or a scenario-code link, verification, and one **Expected:** checkable from output alone -->
 
 ## Phase 0 — Preflight
+
+**Mode:** {{mode|in code (link method) or manual CLI}}
 
 1. {{command|print active identity, account/subscription, region}}
 
@@ -77,25 +68,24 @@
 
 ## Phase 1 — Prerequisites
 
-## Phase 2 — Baseline
+**Mode:** {{mode|in code (link method) or manual CLI}}
 
-<!-- @: omit only when Verify exists -->
+## Scenario
 
-## Phase 3 — Reproduce
+**Code:** [`{{scenarioSlug}}.cs`]({{scenarioSlug}}.cs)
+**Run:** `dotnet run {{scenarioSlug}}.cs` (env vars per Target environment)
 
-1. {{command}}
-
-**Expected:** {{expected|symptom check red with the user's exact symptom}}
-
-## Phase 4 — Apply fix
-
-<!-- @: omit Apply fix and Verify when reproduce-only -->
-
-## Phase 5 — Verify
-
-**Expected:** {{expected|same symptom check green}}
+| Stage | Step method | Mirrors code | Expected |
+| --- | --- | --- | --- |
+| Build broken state | `Given_{{step}}` | [`keyword`](path#Lline) | {{expected|resource reaches the broken end-state}} |
+| Reproduce | `Then_{{step}}` | [`keyword`](path#Lline) | {{expected|symptom check red with the user's exact symptom}} |
+| Apply remediation | `When_{{step}}` | [`keyword`](path#Lline) | {{expected}} |
+<!-- @: omit Apply remediation and Validation rows when reproduce-only -->
+| Validation | `Then_{{step}}` | [`keyword`](path#Lline) | {{expected|same symptom check green}} |
 
 ## Phase {{n}} — Cleanup
+
+**Mode:** {{mode|manual CLI or link to a separate code path, never the `[Scenario]`}}
 
 **Requires explicit confirmation before running** (destructive):
 
@@ -123,5 +113,5 @@
 
 ## Run history
 
-| Run | Date | Phase | Verdict | Signal line |
+| Run | Date | Stage | Verdict | Signal line |
 | --- | --- | --- | --- | --- |
