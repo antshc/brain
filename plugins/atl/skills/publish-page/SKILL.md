@@ -72,7 +72,7 @@ Ids are permanent: rename/delete orphans the attachment and record (`run` never 
 
 ## Workflow
 
-**1 — Preflight.** Run `preflight-atlassian` (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**; keep `cloudId`, `configPath`.
+**1 — Preflight.** *Run `preflight-atlassian` skill to resolve cloudId, default project key, default space id, and token availability from `.atlassian.json.user` config* **Action: Resolve**; keep `cloudId`, `configPath`.
 
 **2 — Resolve target.** `pageId` → update, `--page-id`. Else create, `--space-id` from first hit: supplied `spaceId` → Preflight `defaultSpaceId` (report) → `getConfluenceSpaces` `limit: 10`: one → use, report; several → ask (Preflight Ambiguity rule).
 
