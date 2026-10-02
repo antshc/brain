@@ -12,9 +12,9 @@
 
 <!-- @: one section per run, appended; keep earlier runs unchanged -->
 
-### Phase {{n}} — {{phaseName}}
+### {{stageName|Preflight, Prerequisites, Build broken state, Reproduce, Apply remediation, Validation, Cleanup}}
 
-<!-- @: one subsection per phase that hit a problem; omit phases without problems -->
+<!-- @: one subsection per stage that hit a problem; omit stages without problems -->
 
-- **Problem:** {{problem|failing command or signal line, redacted}} → **Solution:** {{solution|scenario change made; phases re-run}}
+- **Problem:** {{problem|failing command, compile error, or signal line, redacted}} → **Solution:** {{solution|scenario/code change made; stages re-run}}
 - **Problem:** {{problem}} → **Unblocker:** {{unblocker|what is needed to continue}}
