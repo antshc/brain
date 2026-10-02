@@ -6,10 +6,6 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 A discipline for hard bugs. Skip phases only when explicitly justified. Find and return the confirmed root cause. Never apply the fix, if not asked to do that in further phases.
 
-When exploring the codebase, read `CONTEXT`, `ARCHITECTURE` docs (if they exist) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
-
-**Before exploring, semantically search repo docs** for the business process / domain model involved. Use the hits only to build a mental model and pick up the documented business process and domain language to guide navigation and analysis. Phrase the root cause in that domain language. Found docs are leads, not evidence: confirm against actual code before treating any doc claim as fact.
-
 **Evidence** is a re-checkable fact: `path:line`, actual probe output, or an authoritative source with canonical URL. Everything else is a lead.
 
 ## Shared hypothesis log
@@ -21,6 +17,20 @@ When exploring the codebase, read `CONTEXT`, `ARCHITECTURE` docs (if they exist)
 This skill has you show commands, outputs and captured artifacts. **Redact every secret first**: write `<REDACTED>` in its place. Build loops against env vars, so the credential stays in the environment rather than in what you show. Captured artifacts carry auth headers: quote only the lines that carry the signal.
 
 If the redacted output is not enough to diagnose the bug, say so and ask the user.
+
+## Domain grounding (first step)
+
+**Run first, before planning or any other tool call — even when the user's request lists concrete steps.** User-listed steps are inputs to plan with after this step, not a replacement for it.
+
+Exploration means any information gathering: code, tests, logs, tickets (Jira, GitHub), wiki/knowledge pages, external docs. Fetching a ticket or page counts.
+
+Semantic-search repo docs (glossary, architecture, concept/process docs, ADRs) for the business process and domain model involved. Use hits to build a mental model and adopt the domain language for navigation, analysis, and the root-cause wording. Doc hits are leads; confirm in code before relying on them.
+
+Repeat whenever exploration enters a new business process or domain area, in any phase.
+
+Run independent questions or topics as parallel read-only exploration subagents.
+
+**Done when** found domain terms/concepts are named in your reply, or `none found` is stated, before the first exploration call.
 
 ## Phase 1: Build a feedback loop
 
