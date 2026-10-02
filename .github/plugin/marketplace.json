@@ -20,6 +20,11 @@
             "description": "ralph AFK PR review automation skills."
         },
         {
+            "name": "dig",
+            "source": "./plugins/dig",
+            "description": "Bug diagnosis skills: root-cause investigation, fix with regression test, and diagnosis handoff."
+        },
+        {
             "name": "atl",
             "source": "./plugins/atl",
             "description": "Atlassian workflow skills."

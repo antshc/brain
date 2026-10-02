@@ -23,16 +23,16 @@ Infer from context; ask only when required input missing.
 
 ## Workflow
 
-**1 — Preflight.** Run `preflight-atlassian` (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**; use returned `cloudId`.
+**1 — Preflight.** *Run `preflight-atlassian` skill to resolve cloudId, default project key, default space id, and token availability from `.atlassian.json.user` config* **Action: Resolve**; use returned `cloudId`.
 
 **2 — Re-read source.** Description from file → `read_file` it again now, even if already read this session; else a mid-session edit is missed and stale content published.
 
-**3 — Detect ADF-only constructs.** Run `map-markdown-adf` **Action: Detect ADF-only constructs** on the re-read source as-is, before composing, trimming, or re-levelling anything. Detecting on drafted text misses constructs lost while drafting.
+**3 — Detect ADF-only constructs.** *Run `map-markdown-adf` skill to detect the constructs only ADF can express, preserving source wording verbatim* **Action: Detect ADF-only constructs** on the re-read source as-is, before composing, trimming, or re-levelling anything. Detecting on drafted text misses constructs lost while drafting.
 
 **4 — Assemble description; choose format.** Mirror source (see Rules).
 
 - `adfOnly: false` → `contentFormat := "markdown"`; send `description` verbatim.
-- `adfOnly: true` → run `map-markdown-adf` **Action: Convert Markdown to ADF**; `contentFormat := "adf"`; `description :=` result. Name reported construct kinds at completion.
+- `adfOnly: true` → *run `map-markdown-adf` skill to convert Markdown to Atlassian Document Format, preserving source wording verbatim* **Action: Convert Markdown to ADF**; `contentFormat := "adf"`; `description :=` result. Name reported construct kinds at completion.
 - **Guard, always:** re-run Detect on final description as sent. Anything reported under `markdown` → convert, publish as `adf`, report construct kinds and lines that forced it. Only signal — Jira accepts it silently (see Gotchas).
 
 **5 — Update or create.**
