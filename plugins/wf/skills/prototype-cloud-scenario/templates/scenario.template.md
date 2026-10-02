@@ -10,17 +10,15 @@
 ## Scenario flow
 
 <!-- @: optional; omit when no product flow is found in code or the flow is one SDK call already in Resource map -->
-<!-- @: Given–When–Then one-liners in flow order; extend with And; link each code keyword as [`keyword`](path#Lline); suffix the symptom line with **(symptom)** -->
+<!-- @: single scenario — one sentence, no bullet; multiple scenarios — one bulleted line each, flow order; link each code keyword as [`keyword`](path#Lline); suffix with **(symptom)** when the outcome is the symptom -->
 
-- **Given** {{precondition|state/config, e.g. [`AutoAttach`](path#Lline) is true}}
-- **When** {{action|entry point or SDK call, e.g. [`CreateVolumeAsync`](path#Lline) runs with [`SnapshotId`](path#Lline)}}
-- **Then** {{outcome|resulting state, e.g. volume lacks [`Encrypted`](path#Lline)}} **(symptom)**
+**Given** {{precondition|state/config, e.g. [`AutoAttach`](path#Lline) is true}}, **when** {{action|entry point or SDK call, e.g. [`CreateVolumeAsync`](path#Lline) runs with [`SnapshotId`](path#Lline)}}, **then** {{outcome|resulting state, e.g. volume lacks [`Encrypted`](path#Lline)}} **(symptom)**.
 
 ## Resource map
 
-| Resource | Definition | Caller | SDK operation | CLI operation | Load-bearing settings |
-| --- | --- | --- | --- | --- | --- |
-| {{resource}} | {{definitionRef|IaC or SDK-call path:line}} | {{callerRef|path:line}} | {{sdkOperation}} | {{cliOperation}} | {{loadBearingSettings}} |
+| Resource | SDK operation | CLI operation | Load-bearing settings |
+| --- | --- | --- | --- |
+| {{resource}} | {{sdkOperation}} | {{cliOperation}} | {{loadBearingSettings}} |
 
 ## {{mechanismTitle|operation under test}} (must match the real code path)
 
