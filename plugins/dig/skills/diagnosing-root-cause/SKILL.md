@@ -150,10 +150,14 @@ A confirmed hypothesis is the root cause only when:
 2. **Fits all facts** — no known observation contradicts it.
 3. **Rivals eliminated** — every ranked `H` from Phase 3 has a log entry; all but the root cause are `falsified` with evidence.
 
-Then *run `draft-root-cause` skill to render the final cited root-cause summary* from the shared hypothesis log plus the current run evidence.
+Then **MUST** *run `draft-root-cause` skill to render the final cited root-cause summary* from the shared hypothesis log plus the current run evidence: load that skill's file and follow its Gate and template.
+
+**MUST NOT write the summary yourself**, even when the full evidence chain is already in the session. `draft-root-cause` owns the summary format; a self-written summary that "meets the same requirements" still fails this step.
+
+**Done when** `draft-root-cause` was loaded this run and the summary follows its template.
 
 ## Output
 
-Return the rendered root-cause summary directly to the user.
+Return the summary rendered by `draft-root-cause`, unchanged, directly to the user.
 
 MUST NOT save the rendered root-cause summary to a file. Persistence belongs only to an explicitly invoked handoff/persistence workflow.
