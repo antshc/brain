@@ -21,30 +21,25 @@ Resolve `scripts/create_labels.py` relative to this installed `SKILL.md`'s folde
 
 Reads `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, `{{repository}}` (`owner/name`), `{{body}}` from context.
 
-The spec is one Initiative developed against one repository. Its tickets are sub-issues of the spec issue, and `repo:{{repository}}` marks the repository. A second Spec for the same Initiative and repository stops instead of publishing.
+The spec is one Initiative developed against one repository. Its tickets are sub-issues of the spec issue. `repo:target:{{repository}}` marks the repository, `repo:base:{{targetBranch}}` the base branch; `{{initiativeId}}` lives only in the title prefix. A second Spec for the same Initiative and repository stops instead of publishing.
 
 1. Look up an existing spec for this Initiative and repository:
    ```
-   gh issue list --repo "$REPO" --state all --label spec --label "repo:{{repository}}" --search '"initiative_id: {{initiativeId}}" in:body' --json number --jq '.[0].number'
+   gh issue list --repo "$REPO" --state all --label spec --label "repo:target:{{repository}}" --search '"{{initiativeId}}:" in:title' --json number --jq '.[0].number'
    ```
    A number returned → **stop** and report: a spec for this Initiative and repository already exists; publish nothing.
 
-2. Ensure the repository label exists:
+2. Ensure the repository and base-branch labels exist:
    ```
-   gh label create "repo:{{repository}}" --repo "$REPO" --color 0e8a16 --description "Source repository for this spec's tickets" --force
+   gh label create "repo:target:{{repository}}" --repo "$REPO" --color 0e8a16 --description "Source repository for this spec's tickets" --force
+   gh label create "repo:base:{{targetBranch}}" --repo "$REPO" --color c5def5 --description "Base branch for this spec's feature branch" --force
    ```
 
-3. Write the issue body to a temporary UTF-8 file: the metadata block first, a blank line, then `{{body}}` verbatim.
-   ````
-   ```metadata
-   initiative_id: {{initiativeId}}
-   target_branch: {{targetBranch}}
-   ```
-   ````
+3. Write `{{body}}` verbatim to a temporary UTF-8 file.
 
 4. Create the issue:
    ```
-   gh issue create --repo "$REPO" --label "spec,repo:{{repository}}" --title "{{initiativeId}}: {{specTitle}}" --body-file <file>
+   gh issue create --repo "$REPO" --label "spec,repo:target:{{repository}},repo:base:{{targetBranch}}" --title "{{initiativeId}}: {{specTitle}}" --body-file <file>
    ```
 
 **Returns:** the spec ticket's number.
@@ -57,7 +52,7 @@ Reads `{{issueNumber}}` from context. Use **Read ticket**; if no number is given
 
 ## Create ticket
 
-Reads `{{title}}`, `{{body}}`, `{{label}}` from context. `{{label}}` accepts comma-separated labels: `tests,hitl` for functional verification; `bug,hitl` for failed-test investigation; add `repo:{{repository}}` to tickets of a spec.
+Reads `{{title}}`, `{{body}}`, `{{label}}` from context. `{{label}}` accepts comma-separated labels: `tests,hitl` for functional verification; `bug,hitl` for failed-test investigation; add `repo:target:{{repository}}` to tickets of a spec.
 
 ```bash
 gh issue create --repo "$REPO" --label "{{label}}" --title "{{title}}" --body "{{body}}"

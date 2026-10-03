@@ -25,7 +25,7 @@ Set `$REPO` to the printed value for use in later steps (e.g. `/manage-backlog` 
 
 Find the spec issue: via `/manage-backlog` **Find spec ticket** with `{{specIssueNumber}}`.
 
-Set `{{repoLabel}}` to the spec's single `repo:<owner>/<name>` label. None or several → ask the user.
+Set `{{repoLabel}}` to the spec's single `repo:target:<owner>/<name>` label. None or several → ask the user.
 
 Use the issue title, body, and comments as the spec content.
 
