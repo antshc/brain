@@ -64,7 +64,7 @@ _Avoid_: working directory, checkout
 _Plugins_set_: ralph, crew, wf
 
 **Ledger**:
-A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/service doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
+A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/building-block doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
 _Avoid_: log, history
 _Plugins_set_: wf
 
@@ -256,7 +256,7 @@ _Typical question_: “What do we need to know about X?”
 _Typical output_: Consolidated knowledge, options, constraints, citations.
 
 **Completeness sweep**:
-A closing check, run before concluding a session that opened at least one full Concept, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Crosscutting Concepts index table.
+A closing check, run before concluding a session that opened at least one full Concept or ADR, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Architecture Decision Records and Crosscutting Concepts index tables.
 _Avoid_: final review, wrap-up
 _Plugins_set_: wf
 

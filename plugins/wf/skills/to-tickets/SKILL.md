@@ -39,9 +39,9 @@ Resolve `$REPO` and `{{repoLabel}}` as above. Use the implementation details as 
 
 If you have not already explored the codebase, do so to understand the current state of the code. 
 Issue titles and descriptions should use the project's domain glossary vocabulary `CONTEXT.md`.
-If `ARCHITECTURE.md` has a `Crosscutting Concepts` index, read it and open any Concept relevant to the area you're changing. Read a legacy ADR only when the input or an applicable document explicitly links it.
+If `ARCHITECTURE.md` has an `Architecture Decision Records` or `Crosscutting Concepts` index, read it and open any record relevant to the area you're changing.
 - **Concepts** capture shared domain behavior, implementation patterns, and operational policies (such as layering, validation, persistence, testing) — slices and their acceptance/testing decisions MUST conform to matched records. See the `record-concept` skill.
-- **ADRs** capture localized decisions — respect and reference any explicitly supplied relevant record in the issue body.
+- **ADRs** capture localized decisions — respect and reference matched records in the issue body.
 
 Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 

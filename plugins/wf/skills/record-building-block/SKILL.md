@@ -5,7 +5,7 @@ description: Document one Deployable in ARCHITECTURE.md's Deployables table, plu
 
 # Record Building Block
 
-Record **one building block** — its responsibility, dependencies, interfaces, source layout, and Concepts.
+Record **one building block** — its responsibility, dependencies, interfaces, source layout, Concepts, and ADRs.
 
 Inputs: `{{buildingBlockName}}`, `{{mermaidComponentName}}`, `{{shortDescription}}`, `{{location}}` (`workspace/<repo>[/subpath]` or an absolute path, plus its `origin` URL), `{{grillingContext}}`, `{{domainGlossary}}`.
 

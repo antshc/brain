@@ -1,6 +1,6 @@
 ---
 name: track-ledger
-description: Own the session ledger at /memories/session/domain-model-ledger.md — its location, section names, line grammar, and compression rule. Records which Concept/service records were opened or skipped, the surface terms touched so far, and every decision or assumption staged this session. Called by grill-design; owns the grammar only, never when to log or whether an item is recorded.
+description: Own the session ledger at /memories/session/domain-model-ledger.md — its location, section names, line grammar, and compression rule. Records which Concept/ADR/building-block records were opened or skipped, the surface terms touched so far, and every decision or assumption staged this session. Called by grill-design; owns the grammar only, never when to log or whether an item is recorded.
 ---
 
 # Track Ledger
@@ -47,6 +47,7 @@ Three further forms record a **missing source, correction, or drift** rather tha
 
 Append `, repaired: {{path}}#{{key}}` to a gap line once its fix is written; a repaired line is not reproduced under compression.
 For a gate miss that resolves to a feature-scoped decision rather than a reusable rule, append `, resolved: feature decision`; do not invent a record to repair.
+For a gate miss whose answer was recorded as an ADR, append `, resolved: recorded {{path}}`.
 
 Also rewrites or deletes an existing line, located by `{{item}}` — used when the user corrects a staged item.
 

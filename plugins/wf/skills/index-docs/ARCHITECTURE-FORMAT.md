@@ -1,8 +1,11 @@
 # ARCHITECTURE.md Format
-<!-- `ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it follows, and the index of Crosscutting Concepts. It is the structural counterpart to `CONTEXT.md` (which is the glossary). Keep it about *shape and rules*, not implementation detail — the detail lives in the code and in the Crosscutting Concepts it links to. -->
+<!-- `ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it follows, and the indexes of Architecture Decision Records and Crosscutting Concepts. It is the structural counterpart to `CONTEXT.md` (which is the glossary). Keep it about *shape and rules*, not implementation detail — the detail lives in the code and in the Crosscutting Concepts it links to. -->
 
 ## Structure
 <!--
+ADR
+“Why did we choose this approach?”
+        ↓
 Crosscutting Concept
 “How must this approach be applied consistently?”
         ↓
@@ -55,6 +58,16 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 [Deployment view](https://docs.arc42.org/section-7/)
 
+## Architecture Decision Records *(optional)*
+
+An ADR records a point-in-time, localized decision — hard to reverse, surprising without context, and the result of a real trade-off. ADRs applying to exactly one Deployable are indexed in that block's record instead. See the `record-adr` skill.
+
+<!-- One row per ADR. {{nnnn}}/{{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: 1-2 agent-optimized sentences stating the decision. -->
+
+| # | Decision | Trigger condition | Summary |
+|---|----------|-------------------|---------|
+| [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) | {{decisionTitle}} | {{triggerCondition}} | {{summary}} |
+
 ## Crosscutting Concepts *(optional)*
 
 This section describes crosscutting concepts (practices, patterns, regulations, recurring approaches). They preserve architectural consistency.
@@ -74,5 +87,5 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 
 - **Shape, not steps.** Describe how the system is decomposed and the rules that hold it together. Step-by-step "how to build X" guidance belongs in a Concept (`docs/concepts/`) or the code, not here.
 - **One directional layering.** State the dependency direction explicitly and the prohibited references. The arrows are the contract.
-- **Index Concepts.** Every record in `docs/concepts/` appears in its table with a matching Trigger condition and summary. The table is the entry point an agent scans before designing; nothing is added or retired without updating it.
-- **Link, don't inline.** Full Concept content stays in `docs/concepts/` and is *linked* from the index, so the map stays scannable.
+- **Index ADRs and Concepts.** Every record in `docs/adr/` and `docs/concepts/` appears in exactly one table — here or in its single building block's record — with a matching Trigger condition. The tables are the entry point an agent scans before designing; nothing is added or retired without updating them.
+- **Link, don't inline.** Full ADR and Concept content stays in `docs/adr/` and `docs/concepts/` and is *linked* from the index, so the map stays scannable.

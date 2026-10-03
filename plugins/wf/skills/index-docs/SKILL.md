@@ -1,21 +1,21 @@
 ---
 name: index-docs
-description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, and the Deployment View reference stub whose content comes from record-deployment-view), host ARCHITECTURE-FORMAT.md, and insert its missing section skeletons. Owns the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Deployables, Concepts, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
+description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, and the Deployment View reference stub whose content comes from record-deployment-view), host ARCHITECTURE-FORMAT.md, and insert its missing section skeletons. Owns the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Deployables, ADRs, Concepts, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
 ---
 
 # Index Docs
 
-Own `ARCHITECTURE.md`'s structural prose and its two indexes (`Deployables`, `Crosscutting Concepts`) — the file itself is created by `bootstrap-docs`. Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+Own `ARCHITECTURE.md`'s structural prose and its three indexes (`Deployables`, `Architecture Decision Records`, `Crosscutting Concepts`) — the file itself is created by `bootstrap-docs`. Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
 
 ## Rules
 
 - **Shape, not steps.** `ARCHITECTURE.md` describes decomposition and the rules holding it together — not a spec, not a scratch pad, not a home for inlined backbone decisions. Step-by-step detail lives in code and linked Concepts.
 - **Never batch.** Update `ARCHITECTURE.md` in the same change as the structure/layering shift it reflects. A stale architecture map is worse than none.
-- **The owning skill authors its row.** A table row is authored directly by the skill that owns that record kind (`record-concept`, `record-building-block`) via **Sync index row** — never derived from the record file itself, and never hand-edited independently of it.
+- **The owning skill authors its row.** A table row is authored directly by the skill that owns that record kind (`record-adr`, `record-concept`, `record-building-block`) via **Sync index row** — never derived from the record file itself, and never hand-edited independently of it.
 
 ## Ensure section exists
 
-Inputs: `{{sectionAnchor}}` (e.g. `Crosscutting Concepts`, the `Deployables` table under `Building blocks`); optionally `{{skeletonContent}}`.
+Inputs: `{{sectionAnchor}}` (e.g. `Architecture Decision Records`, `Crosscutting Concepts`, the `Deployables` table under `Building blocks`); optionally `{{skeletonContent}}`.
 
 1. If `{{sectionAnchor}}` already exists in `ARCHITECTURE.md`, do nothing.
 2. Otherwise insert its skeleton — `{{skeletonContent}}` when the caller supplies one (custom tables), else the skeleton for that section from [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md) — at the position the template gives it.
@@ -33,7 +33,7 @@ Return one Trigger condition value. The caller writes it into the row via **Sync
 
 ## Scan and match
 
-Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{questioningContext}}`, `{{domainGlossary}}`. `{{tableMetadata}}` is the file/section boundary, headers, Trigger condition column, and row locator rules; for this file's own two tables it is implied — the caller passes only the table name (`Deployables`, `Crosscutting Concepts`). Callers supply the touched surface, questioning context, and glossary — never the table shape. `{{touchedSurface}}` may carry domain terms, file paths, or both; a caller that knows which files a change touches passes them, and one that only has terms passes terms.
+Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{questioningContext}}`, `{{domainGlossary}}`. `{{tableMetadata}}` is the file/section boundary, headers, Trigger condition column, and row locator rules; for this file's own three tables it is implied — the caller passes only the table name (`Deployables`, `Architecture Decision Records`, `Crosscutting Concepts`). Callers supply the touched surface, questioning context, and glossary — never the table shape. `{{touchedSurface}}` may carry domain terms, file paths, or both; a caller that knows which files a change touches passes them, and one that only has terms passes terms.
 
 1. Absent or empty table: no matches.
 2. Absent Trigger condition column: table-contract error.
