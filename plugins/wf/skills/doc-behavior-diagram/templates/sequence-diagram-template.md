@@ -9,7 +9,15 @@ Official Mermaid sequence diagram syntax: https://mermaid.ai/open-source/syntax/
 - Ground current-state participants and interactions in repository/code evidence. Do not invent calls.
 - Use `actor` for a human/external initiator and `participant` for a system component.
 - Use `participant X as ClassName` when a short lifeline ID improves readability.
-- Keep `autonumber` as the first line under `sequenceDiagram` so review comments can reference steps by number.
+- Never use `autonumber`; it is flat and cannot number branches.
+
+## Step numbering
+
+Apply `SKILL.md` Step numbering by prefixing message text: `A->>B: 3a.1 - reject(order)`.
+
+- Every message, including returns, is a step.
+- An `alt`/`opt`/`par`/`critical`/`break` block branches from the last step before it, `n`: first arm `na.*`, `else`/`and`/`option` arms `nb.*`, `nc.*`. The step after `end` is `n+1`.
+- `loop` bodies continue main numbering; they are not branches.
 - Prefer readable scenarios over exhaustive traces.
 
 ## Calls, returns, and control flow
@@ -65,30 +73,28 @@ Replace all placeholders with real participants and interactions. Add or remove 
     'labelBoxBkgColor': '#2a2a2a', 'labelBoxBorderColor': '#8b949e', 'labelTextColor': '#c9d1d9',
     'loopTextColor': '#c9d1d9',
     'noteBkgColor': '#2a2a2a', 'noteBorderColor': '#8b949e', 'noteTextColor': '#c9d1d9',
-    'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a',
-    'sequenceNumberColor': '#c9d1d9'
+    'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a'
 }}}%%
 %% diagram-id: {{diagramId}}
 sequenceDiagram
-    autonumber
     actor {{actorAlias}}
     participant {{boundaryAlias}} as {{boundaryClass}}
     participant {{ownerAlias}} as {{behaviorOwnerClass}}
     participant {{dependencyAlias}} as {{dependencyClass}}
 
-    {{actorAlias}}->>{{boundaryAlias}}: {{method}}({{args}})
+    {{actorAlias}}->>{{boundaryAlias}}: 1 - {{method}}({{args}})
     activate {{boundaryAlias}}
-    {{boundaryAlias}}->>{{ownerAlias}}: {{method}}({{args}})
+    {{boundaryAlias}}->>{{ownerAlias}}: 2 - {{method}}({{args}})
     activate {{ownerAlias}}
-    {{ownerAlias}}->>{{dependencyAlias}}: {{method}}({{args}})
-    {{dependencyAlias}}-->>{{ownerAlias}}: {{returnType}}
+    {{ownerAlias}}->>{{dependencyAlias}}: 3 - {{method}}({{args}})
+    {{dependencyAlias}}-->>{{ownerAlias}}: 4 - {{returnType}}
     alt {{successCondition}}
-        {{ownerAlias}}-->>{{boundaryAlias}}: {{returnType}}
+        {{ownerAlias}}-->>{{boundaryAlias}}: 4a.1 - {{returnType}}
     else {{failureCondition}}
-        {{ownerAlias}}-->>{{boundaryAlias}}: throws {{ExceptionType}}
+        {{ownerAlias}}-->>{{boundaryAlias}}: 4b.1 - throws {{ExceptionType}}
     end
     deactivate {{ownerAlias}}
-    {{boundaryAlias}}-->>{{actorAlias}}: {{response}}
+    {{boundaryAlias}}-->>{{actorAlias}}: 5 - {{response}}
     deactivate {{boundaryAlias}}
 
     note over {{ownerAlias}},{{dependencyAlias}}: {{oneLineCrossCuttingNote}}
