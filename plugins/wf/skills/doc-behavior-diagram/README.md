@@ -2,6 +2,8 @@
 
 Presentation examples for the `doc-behavior-diagram` skill.
 
+Every step carries a hierarchical number in its label — main path `1 - …`, `2 - …`; a branch off step 3 `3a.1 - …`, `3b.1 - …`. Flowchart and swimlane diagrams stay acyclic and are rendered and checked for element order with `scripts/check_layout.py`.
+
 ## Flowchart Example
 
 **Prompt**
@@ -16,13 +18,13 @@ Presentation examples for the `doc-behavior-diagram` skill.
 %% diagram-id: order-processing-flowchart
 flowchart TD
     start(["Start"])
-    request[/"Order request"/]
-    validate["Validate order"]
-    valid{"Order valid?"}
-    payment[["Process payment"]]
-    orders[("Order database")]
-    confirmation[/"Order confirmation"/]
-    rejected[/"Validation error"/]
+    request[/"1 - Order request"/]
+    validate["2 - Validate order"]
+    valid{"3 - Order valid?"}
+    payment[["4 - Process payment"]]
+    orders[("5 - Order database")]
+    confirmation[/"6 - Order confirmation"/]
+    rejected[/"3a.1 - Validation error"/]
     endNode(["End"])
 
     start --> request --> validate --> valid
@@ -44,14 +46,15 @@ flowchart TD
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: process-payment-subprocess
 flowchart TD
     start(["Start"])
-    payment[/"Payment details"/]
-    authorize["Authorize payment"]
-    approved{"Approved?"}
-    transaction[("Payment transaction store")]
-    success[/"Payment approved"/]
-    failure[/"Payment declined"/]
+    payment[/"1 - Payment details"/]
+    authorize["2 - Authorize payment"]
+    approved{"3 - Approved?"}
+    transaction[("4 - Payment transaction store")]
+    success[/"5 - Payment approved"/]
+    failure[/"3a.1 - Payment declined"/]
     endNode(["End"])
 
     start --> payment --> authorize --> approved
@@ -75,10 +78,10 @@ flowchart TD
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: order-processing-flowchart-delta
 flowchart TD
-    validate["Validate order"]
-    fraud["Check fraud risk"]:::added
-    payment[["Process payment"]]
-    legacy["Notify legacy queue"]:::removed
+    validate["1 - Validate order"]
+    fraud["2 - Check fraud risk"]:::added
+    payment[["3 - Process payment"]]
+    legacy["1a.1 - Notify legacy queue"]:::removed
 
     validate --> fraud --> payment
     validate -. deprecated .-> legacy
@@ -107,19 +110,19 @@ swimlane-beta TB
 
   subgraph customer [Customer]
     start([Start])
-    submit[/Place order/]
-    result[/Confirmation or error/]
+    submit[/1 - Place order/]
+    result[/6 - Confirmation or error/]
     endNode([End])
   end
 
   subgraph restApi [Order Service - REST API]
-    validate[Validate order]
-    valid{Order valid and in stock?}
-    payment[[Process payment]]
+    validate[2 - Validate order]
+    valid{3 - Order valid and in stock?}
+    payment[[4 - Process payment]]
   end
 
   subgraph database [Order Database - Database]
-    persistOrder[(Order database)]
+    persistOrder[(5 - Order database)]
   end
 
   start --> submit -->|order request| validate --> valid
@@ -148,19 +151,19 @@ swimlane-beta TB
 
   subgraph controller [OrderController - Controller]
     start([Start])
-    receive[/Order request/]
-    returnResult[/Order result/]
+    receive[/1 - Order request/]
+    returnResult[/6 - Order result/]
     endNode([End])
   end
 
   subgraph service [OrderService - Service]
-    validate[Validate order]
-    valid{Order valid?}
-    createOrder[Create order]
+    validate[2 - Validate order]
+    valid{3 - Order valid?}
+    createOrder[4 - Create order]
   end
 
   subgraph repository [OrderRepository - Repository]
-    saveOrder[(Order store)]
+    saveOrder[(5 - Order store)]
   end
 
   start --> receive --> validate --> valid
@@ -188,16 +191,16 @@ swimlane-beta TB
   accDescr: Adds fraud validation before persistence and removes the legacy queue handoff.
 
   subgraph restApi [Order Service - REST API]
-    createOrder[Create order]
-    fraudCheck[Check fraud risk]
+    createOrder[1 - Create order]
+    fraudCheck[2 - Check fraud risk]
   end
 
   subgraph database [Order Database - Database]
-    persistOrder[(Order database)]
+    persistOrder[(3 - Order database)]
   end
 
   subgraph legacyQueue [Legacy Order Queue - Queue]
-    notifyLegacy[Notify legacy queue]
+    notifyLegacy[1a.1 - Notify legacy queue]
   end
 
   createOrder -->|order| fraudCheck
@@ -233,35 +236,33 @@ swimlane-beta TB
     'labelBoxBkgColor': '#2a2a2a', 'labelBoxBorderColor': '#8b949e', 'labelTextColor': '#c9d1d9',
     'loopTextColor': '#c9d1d9',
     'noteBkgColor': '#2a2a2a', 'noteBorderColor': '#8b949e', 'noteTextColor': '#c9d1d9',
-    'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a',
-    'sequenceNumberColor': '#c9d1d9'
+    'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a'
 }}}%%
 %% diagram-id: order-submission-sequence
 sequenceDiagram
-    autonumber
     actor User
     participant Api as OrderController
     participant Svc as OrderService
     participant Repo as IOrderRepository
     participant Queue as OrderExportJob
 
-    User->>Api: submit(order)
+    User->>Api: 1 - submit(order)
     activate Api
-    Api->>Svc: placeOrder(order)
+    Api->>Svc: 2 - placeOrder(order)
     activate Svc
-    Svc->>Repo: save(order)
+    Svc->>Repo: 3 - save(order)
     activate Repo
-    Repo-->>Svc: bool
+    Repo-->>Svc: 4 - bool
     deactivate Repo
     alt order valid
-        Svc->>Queue: run()
-        Queue-->>Svc: ack
+        Svc->>Queue: 4a.1 - run()
+        Queue-->>Svc: 4a.2 - ack
     else order invalid
-        Svc-->>Api: throws ValidationError
+        Svc-->>Api: 4b.1 - throws ValidationError
     end
-    Svc-->>Api: bool
+    Svc-->>Api: 5 - bool
     deactivate Svc
-    Api-->>User: 200 OK
+    Api-->>User: 6 - 200 OK
     deactivate Api
 
     note over Svc,Repo: persistence is transactional
@@ -285,28 +286,26 @@ sequenceDiagram
     'labelBoxBkgColor': '#2a2a2a', 'labelBoxBorderColor': '#8b949e', 'labelTextColor': '#c9d1d9',
     'loopTextColor': '#c9d1d9',
     'noteBkgColor': '#2a2a2a', 'noteBorderColor': '#8b949e', 'noteTextColor': '#c9d1d9',
-    'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a',
-    'sequenceNumberColor': '#c9d1d9'
+    'activationBorderColor': '#8b949e', 'activationBkgColor': '#2a2a2a'
 }}}%%
 %% diagram-id: order-submission-sequence-delta
 sequenceDiagram
-    autonumber
     actor User
     participant Api as OrderController
     participant Svc as OrderService
     participant Fraud as FraudCheckService
     participant Legacy as LegacyOrderQueue
 
-    User->>Api: submit(order)
+    User->>Api: 1 - submit(order)
     activate Api
-    Api->>Svc: placeOrder(order)
+    Api->>Svc: 2 - placeOrder(order)
     activate Svc
     note over Svc,Fraud: NEW: fraud check runs before persistence
-    Svc->>Fraud: check(order)
-    Fraud-->>Svc: riskScore
-    Svc-->>Api: bool
+    Svc->>Fraud: 3 - check(order)
+    Fraud-->>Svc: 4 - riskScore
+    Svc-->>Api: 5 - bool
     deactivate Svc
-    Api-->>User: 200 OK
+    Api-->>User: 6 - 200 OK
     deactivate Api
 
     note over Svc,Legacy: REMOVED: OrderService no longer notifies LegacyOrderQueue
