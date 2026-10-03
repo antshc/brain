@@ -17,7 +17,7 @@ Split on **when the rule is needed**:
 |---|---|---|
 | how a shared business process, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
 | which approach was chosen and its structural decisions | Concept, `docs/concepts/` | this skill — continue below |
-| why it was chosen, and the rejected alternatives | feature design or standalone ADR, linking to the Concept | session ledger / `/to-zdesign`; |
+| why it was chosen, and the rejected alternatives | standalone ADR linking to the Concept, or feature design when it fails the ADR gate | `/record-adr`; otherwise session ledger / `/to-zdesign` |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
 | what a contested term means | glossary, `CONTEXT.md` | `/record-term` |
 | which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
