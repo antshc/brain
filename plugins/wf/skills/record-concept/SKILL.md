@@ -16,14 +16,15 @@ Split on **when the rule is needed**:
 | The rule answers | Home | Written by |
 |---|---|---|
 | how a shared business process, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
-| which option was chosen here, and why the others were not | feature design or standalone ADR | session ledger / `/to-zdesign`; |
+| which approach was chosen and its structural decisions | Concept, `docs/concepts/` | this skill — continue below |
+| why it was chosen, and the rejected alternatives | feature design or standalone ADR, linking to the Concept | session ledger / `/to-zdesign`; |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
 | what a contested term means | glossary, `CONTEXT.md` | `/record-term` |
 | which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
 
 Two tests settle most cases:
 
-- **Does it state a transferable approach?** A shared rule may cite this repo's implementation as evidence, but must explain the approach without that example. A command, path, or setting alone → a convention file.
+- **Is it reusable inside this system?** Reusable means the next implementer in this system's scope follows the same decided approach. It does not mean the text is portable to other systems — keep what makes it specific. A command, path, or setting alone → a convention file.
 - **Is it needed while deciding, or while typing?** Deciding → a record. Typing → write-time guidance, which loads automatically through `applyTo` at the moment it applies.
 
 A rule can be shared across the system *and* have a write-time counterpart. Record the rule once as a Concept, and let the instructions file carry only the wording, naming, or layout that follows from it.
@@ -33,7 +34,7 @@ A rule can be shared across the system *and* have a write-time counterpart. Reco
 Write one only when all three are true:
 
 1. **Crosscutting** — a business process, structural pattern, or operational policy applies to multiple building blocks or workflows, not just one feature.
-2. **Reusable** — other implementations in its scope should follow the same approach.
+2. **Reusable** — the next implementer in this system's scope follows the same decided approach.
 3. **Consequential** — it guides a meaningful design or operational choice and can be checked against behavior, code, tests, or configuration.
 
 If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above.
@@ -55,6 +56,24 @@ Create `docs/concepts/` when the first Concept is ready — not before; do nothi
 A record is named `docs/concepts/{{kind}}-{{slug}}.md`. `{{kind}}` is the kind of the `/doc-concept` template the body came from — `dom`, `str`, or `ops` — so the directory listing groups the families; `{{slug}}` is the title in kebab-case. For `dom`, the title is the Business Capability the page covers, so the slug is that capability in kebab-case. Sharpen the slug when a name is already taken; the identity carries no counter, so nothing has to be renumbered.
 
 A record carries no frontmatter — it opens directly with `# {{conceptTitle}}`.
+
+## Grounding
+
+Runs before Body. Give every rule a source and check it by that source:
+
+| Rule source | Check | Record shows it as |
+|---|---|---|
+| **Implemented** — target code exists | *Run `explore-codebase` skill to find where the rule is implemented — locate symbol, callers, flow.* Code contradicts the rule → stop; ask the user which wins. | `Implementation Map` row |
+| **Decided** — target code does not exist yet | Decision comes from the user, the caller, or an ADR. Do not search for an implementation; do not mark it `not verified`. | Rule only, no map row; add the row once code exists |
+| **Ported** — rule comes from another project | Restate it in the target's stack and conventions; it then counts as Implemented or Decided. | Per the resulting source |
+
+For ported content:
+
+- Remove every source-stack detail (e.g. `npm run typecheck`, a JS-specific path, a tool the target does not use). Replace it with the target's equivalent, or lift it to the decision: "MUST run the project's configured verification commands before commit from the code not the prompt text."
+- Rewrite source-project examples to match how the target implements the concept — its language, structure, and rules — not a syntax translation.
+- Keep a source-project parameter (marker, prefix, signal, name) only when the target's code uses it or the user confirms the target chose it; otherwise use the target's own equivalent or drop it.
+
+**Gate:** every rule has code or a decision behind it; no ported record keeps a source-stack detail.
 
 ## Body
 

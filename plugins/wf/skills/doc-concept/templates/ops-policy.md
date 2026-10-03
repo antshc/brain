@@ -5,7 +5,7 @@
 <!-- Examples: Security, Error Handling, Testing, Configuration, Migration, Installation, Logging, Disaster Recovery, Domain Safety, Runtime Safety, Batch Operations -->
 
 ## Purpose
-<What operational concern does this concept address, and what are the main objectives?>
+<The operational concern this concept addresses in this system, and its main objectives.>
 
 ## Approach
 <Describe the overall operational and technical approach — main mechanisms, responsibilities, technologies, runtime behavior, operational process.>

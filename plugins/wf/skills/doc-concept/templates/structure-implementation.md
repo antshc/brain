@@ -5,10 +5,10 @@
 **Type:** Architecture Pattern | Technical Approach | Code Pattern
 
 ## Purpose
-<What problem does this concept solve, and why do we use it?>
+<The problem this concept solves in this system, and why we use it.>
 
 ## Concept
-<Describe the core idea and how it works.>
+<One sentence naming the general pattern (≤1 external link); then this system's structural decisions — bound, trigger, state store, signal, naming scheme, owner.>
 
 ## Rules
 
@@ -16,10 +16,16 @@
 - SHOULD <recommended rule>
 - MUST NOT <forbidden practice>
 
+<!-- @: repeat per variant in use; omit when only one approach -->
+### Variant: <name>
+**Selected when:** <condition>
+
+- MUST <variant rule>
+
 ---
 
 ## Optional: Example
-<Diagram, code example, flow, configuration, or package structure.>
+<Diagram (*run `doc-code-diagram` skill for class responsibilities, interfaces, dependencies*), flow (*run `doc-behavior-diagram` skill, preferring a **Sequence Diagram**, for call-chain order, cross-boundary calls, decision paths*), code example (real implementation trimmed to rule-relevant lines; an invented one is labelled `Sketch — not the implementation`; MAY pair with the sequence diagram, showing the code behind its key steps), configuration, or package structure.>
 
 ## Optional: Benefits and Trade-offs
 **Benefits**
@@ -28,9 +34,6 @@
 **Trade-offs**
 
 - 
-
-## Optional: Alternatives
-<Relevant alternatives and why they were not chosen.>
 
 ## Optional: Validation
 <How compliance is checked, e.g. tests, code review, linting, architecture rules.>
