@@ -66,7 +66,9 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 
 ### Rules
 
-- **Considered Options is mandatory** — at least one genuine rejected alternative with its reason, from evidence. None can be stated → the trade-off criterion fails; write nothing. Never invent an option.
+- **Considered Options is mandatory** — at least one genuine rejected alternative with its reason. None can be stated → the trade-off criterion fails; write nothing. Never invent an option or a reason.
+- **Harvest options automatically** — collect every rejected alternative and its rejection reason from context without asking: the conversation, grill-design answers, the session ledger, linked docs, and the code. Record each as `**{{rejectedOption}}** — rejected: {{reason}}`.
+- **User-supplied options** — when the user stated options or rejections, use all of them; rephrase each into the bullet form, terse and decision-focused, preserving its meaning. Never drop or weaken one.
 - **Consequences** — only for non-obvious downstream effects; omit the heading otherwise.
 - **Link line** — only when a Concept or document holds how the decision is applied; omit otherwise.
 - State the architectural decision in the title, not the problem.
