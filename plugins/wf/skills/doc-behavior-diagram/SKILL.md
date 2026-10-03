@@ -71,7 +71,30 @@ A renderer fallback may change syntax, never semantics: a swimlane falls back to
 
 Ground current-state elements in the actual codebase or repository evidence. Do not guess. Show only elements relevant to what is being documented.
 
-**Done when:** the type drawn is the one the caller named when there was one; the selected template was opened this run; the selected diagram follows its rules; a flowchart opens with the caller's `orientation`, or `TD` when none was named; current mode uses the base palette; delta mode uses the diagram-specific delta rules and minimum context; no unused placeholder or instruction-only comment remains.
+**Done when:** the type drawn is the one the caller named when there was one; the selected template was opened this run; the selected diagram follows its rules; a flowchart opens with the caller's `orientation`, or `TD` when none was named; current mode uses the base palette; delta mode uses the diagram-specific delta rules and minimum context; every step is numbered per Step numbering; no unused placeholder or instruction-only comment remains.
+
+### Step numbering
+
+Every step **MUST** carry a hierarchical number written into its label text as `{{stepNo}} - {{label}}`, e.g. `3a.1 - Reject order`. Never `3. Label` — Mermaid parses `N.` as a Markdown list and fails. Mermaid built-ins are not used: `autonumber` is flat, flowchart and swimlane have none.
+
+- Main path — the primary/success path — numbers `1`, `2`, `3` in execution order.
+- A decision or branching block is a step; its branches number from it: first branch `3a.1`, `3a.2`; second `3b.1`. Letters follow declaration order.
+- Nested branch appends again: `3a.2b.1`.
+- A branch rejoining the main path continues main numbering.
+- Parallel arms branch the same way as exclusive ones.
+- Start/End terminals, lanes, participants, notes, and edge/condition labels stay unnumbered.
+- Number the diagram as drawn; in delta mode a removed step keeps its own number in sequence.
+- Template-specific placement is in each template's Step numbering rules.
+
+### Layout order (flowchart, swimlane)
+
+The layout engine ranks nodes by edges, not declaration order; a cycle makes it reverse an edge, pushing the start mid-diagram and later steps to the top. Reordering nodes or edges never fixes placement — fix the graph shape.
+
+- Graph **MUST** be acyclic. Draw a repeat/retry as a terminal connector node in the owning lane, `loopBack([Next iteration - back to step N])`, never an edge back to an earlier node.
+- One node per use of an external system or data store, id marked by use (`issuesRead`, `issuesWrite`); a shared store node used early and late closes a cycle.
+- Exactly one start node, no incoming edge, declared first.
+- End/exit nodes have no outgoing edge. Failure branches may share one `exit` node, never a node that feeds a later step.
+- Declare nodes in flow order per lane; list edges main path first, branches after — for review, not placement.
 
 ## 3. Assign a diagram id
 
@@ -82,3 +105,11 @@ Write it as `%% diagram-id: {{diagramId}}` on its own line — after the `%%{ini
 The id is the diagram's published identity: `/publish-page` names its Confluence attachment and Draw.io record after it, so a republish replaces that diagram in place. Redrawing a diagram that already carries an id keeps that id; a fresh id publishes a second copy beside the old one.
 
 **Done when:** the diagram carries exactly one `%% diagram-id` line, reused from the diagram it redraws when there is one, and unique among the ids already in the target file.
+
+## 4. Render and check order
+
+**Run `python3 ./scripts/check_layout.py <file>` from this skill's base directory**, where `<file>` is the `.md` holding the diagram or a `.mmd`. It renders every Mermaid block with `npx -y @mermaid-js/mermaid-cli` and, for flowchart and swimlane, checks the rendered SVG: no cycle, one start node first in flow direction, no edge running against flow (`TD`/`TB` down, `LR` right), each step at or after its predecessor (`3` after `2`, `2a.1` after `2`, `2a.2` after `2a.1`). Sequence diagrams are render-checked only.
+
+On `FAIL`, fix the reported cause per Layout order — back-edge or shared store node — and rerun. Never drop the diagram or a step to make it pass.
+
+**Done when:** the script prints `OK` for every diagram written this run and exits 0.

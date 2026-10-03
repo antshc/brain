@@ -24,6 +24,10 @@ Official Mermaid flowchart syntax: https://mermaid.ai/open-source/syntax/flowcha
 
 Use short, stable node IDs and descriptive labels. Never use `click` as a node ID; it is a reserved Mermaid interaction keyword.
 
+## Step numbering
+
+Apply `SKILL.md` Step numbering and Layout order. Prefix every process, decision, subprocess, data store, and I/O node label: `id["3a.1 - Reject order"]`, `id{"3 - Valid?"}`. Start/End and loop-back connector nodes stay unnumbered.
+
 ## Subprocess rules
 
 - Use a **Process** when the step is fully represented in the current diagram.
@@ -93,17 +97,18 @@ Replace all placeholders with real behavior. Add or remove nodes and relationshi
 %% diagram-id: {{diagramId}}
 flowchart {{orientation}}
     start(["Start"])
-    input[/"{{input}}"/]
-    process["{{process}}"]
-    decision{"{{decision}}?"}
-    subprocess[["{{subprocess}}"]]
-    store[("{{dataStore}}")]
-    output[/"{{output}}"/]
+    input[/"1 - {{input}}"/]
+    process["2 - {{process}}"]
+    decision{"3 - {{decision}}?"}
+    subprocess[["4 - {{subprocess}}"]]
+    store[("5 - {{dataStore}}")]
+    output[/"6 - {{output}}"/]
+    branchStep["3a.1 - {{branchStep}}"]
     endNode(["End"])
 
     start --> input --> process --> decision
     decision -- {{yesOutcome}} --> subprocess --> store --> output --> endNode
-    decision -- {{noOutcome}} --> endNode
+    decision -- {{noOutcome}} --> branchStep --> endNode
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```

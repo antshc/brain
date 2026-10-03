@@ -31,7 +31,7 @@ Before output, confirm:
 - Every owner the caller named has exactly one lane, and no lane is an artifact its owner executes.
 - Every handoff between owners is a visible cross-lane edge.
 - Terminal owners — those the flow ends at — sit at the edge of the diagram.
-- The Mermaid block renders.
+- `SKILL.md` Render and check order passes.
 
 ## Responsibility views
 
@@ -71,7 +71,7 @@ Use a **Process** when the step is fully represented in the current diagram. Use
 - Avoid method-level labels such as `OrderService.placeOrder()` unless implementation detail is explicitly requested.
 - A cross-lane edge represents a responsibility handoff.
 - Label a cross-lane edge when the handoff payload, event, condition, or outcome adds useful meaning; do not label mechanically.
-- Number edges only when execution order would otherwise be ambiguous. If strict temporal ordering is the main concern, use a sequence diagram.
+- Apply `SKILL.md` Step numbering and Layout order: prefix every non-terminal node label, e.g. `reject[3a.1 - Reject order]`. Edges stay unnumbered. If strict temporal ordering is the main concern, use a sequence diagram.
 - For mutually exclusive branches, label evidenced outcomes clearly.
 - Use short, stable node IDs and descriptive labels.
 
@@ -151,21 +151,22 @@ swimlane-beta TB
 
   subgraph ownerA [Owner A]
     start([Start])
-    input[/Input/]
-    stepA[Process]
+    input[/1 - Input/]
+    stepA[2 - Process]
   end
 
   subgraph ownerB [Owner B]
-    decision{Decision?}
-    child[[Subprocess]]
-    store[(Data store)]
-    output[/Output/]
+    decision{3 - Decision?}
+    child[[4 - Subprocess]]
+    store[(5 - Data store)]
+    output[/6 - Output/]
+    branchStep[3a.1 - Branch step]
     endNode([End])
   end
 
   start --> input --> stepA -->|handoff| decision
   decision -->|yes| child --> store --> output --> endNode
-  decision -->|no| endNode
+  decision -->|no| branchStep --> endNode
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
