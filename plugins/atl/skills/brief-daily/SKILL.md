@@ -2,7 +2,6 @@
 name: brief-daily
 description: Report the current Jira user's blocked work items and open items where they're @mentioned in a comment, over a period defaulting to the last month. Use when asked for a daily briefing, standup update, or to show blocked or mentioned Jira items. Works against any connected Jira site — no project key or site configuration required.
 argument-hint: '[period] (e.g. "2 weeks", "3 months"; default: 1 month)'
-disable-model-invocation: true
 ---
 
 # Brief Daily
