@@ -89,11 +89,14 @@ Reads `{{title}}`, `{{body}}`, `{{label}}`, `{{parentIssueNumber}}` from context
 
 Reads `{{issueNumber}}`, `{{blockedBy}}` from context. `{{blockedBy}}`: comma-separated numbers of tickets that must finish before `{{issueNumber}}`. Records native GitHub dependency links — the source of truth for which tickets can run in parallel.
 
+For each number `{{blockerNumber}}` in `{{blockedBy}}`, resolve the blocker's internal `id` (distinct from its issue `number`) and link it via the REST dependencies API, using `-F` (typed) so `issue_id` is sent as a number:
+
 ```bash
-gh issue edit {{issueNumber}} --repo "$REPO" --add-blocked-by "{{blockedBy}}"
+gh api repos/$REPO/issues/{{blockerNumber}} --jq .id
+gh api repos/$REPO/issues/{{issueNumber}}/dependencies/blocked_by --method POST -F issue_id={{blockerId}}
 ```
 
-Adding an existing link is a no-op, so reruns are safe.
+A failure on an already-linked blocker is safe to ignore on rerun.
 
 **Returns:** nothing.
 
@@ -197,7 +200,7 @@ Infer the repo (`$REPO`) from `git remote -v` — `gh` does this automatically w
 
 ## Gotchas
 
-`--add-blocked-by` needs a recent `gh`; if `gh issue edit --help` lacks it, upgrade `gh`.
+Installed `gh` lacks `issue edit --add-blocked-by`; **Link blocking** uses the REST dependencies API instead.
 
 ## Pull requests as a triage surface
 
