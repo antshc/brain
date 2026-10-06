@@ -85,6 +85,18 @@ Reads `{{title}}`, `{{body}}`, `{{label}}`, `{{parentIssueNumber}}` from context
 
 **Returns:** the new ticket's number.
 
+## Link blocking
+
+Reads `{{issueNumber}}`, `{{blockedBy}}` from context. `{{blockedBy}}`: comma-separated numbers of tickets that must finish before `{{issueNumber}}`. Records native GitHub dependency links — the source of truth for which tickets can run in parallel.
+
+```bash
+gh issue edit {{issueNumber}} --repo "$REPO" --add-blocked-by "{{blockedBy}}"
+```
+
+Adding an existing link is a no-op, so reruns are safe.
+
+**Returns:** nothing.
+
 ## Read ticket
 
 Reads `{{issueNumber}}` from context.
@@ -182,6 +194,10 @@ Tickets and Specs for this repo live as GitHub issues. Use the `gh` CLI for all 
 | `wayfinder:task` | `d93f0b` | Manual-work decision ticket |
 
 Infer the repo (`$REPO`) from `git remote -v` — `gh` does this automatically when run inside a clone.
+
+## Gotchas
+
+`--add-blocked-by` needs a recent `gh`; if `gh issue edit --help` lacks it, upgrade `gh`.
 
 ## Pull requests as a triage surface
 
