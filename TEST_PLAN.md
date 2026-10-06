@@ -1084,8 +1084,8 @@ Scenario: Current repository's agents and skills carry required frontmatter
 > Unit: `modules.repo_consistency.architecture_index.find_architecture_index_violations()`
 
 ```gherkin
-Scenario: Index row matching its record's filename and heading is not reported
-  Given an ARCHITECTURE.md ADR row whose id and title match its linked record file
+Scenario: Index row matching its record's heading is not reported
+  Given an ARCHITECTURE.md ADR row whose title matches its linked record's heading
   When find_architecture_index_violations() is called
   Then the result has no violations
 

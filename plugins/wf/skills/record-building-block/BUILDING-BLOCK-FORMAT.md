@@ -43,10 +43,10 @@
 
 ## Architecture Decision Records
 
-<!-- `# | Decision | Trigger condition | Summary` table, rows recorded via /record-adr into docs/adr/ — ADRs applying to this block only. -->
+<!-- `Decision | Trigger condition | Summary` table, rows recorded via /record-adr into docs/adr/ — ADRs applying to this block only. -->
 
-| # | Decision | Trigger condition | Summary |
-|---|----------|-------------------|---------|
+| Decision | Trigger condition | Summary |
+|----------|-------------------|---------|
 
 ## Key features
 

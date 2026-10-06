@@ -6,7 +6,7 @@ from pathlib import Path
 from modules.repo_consistency.frontmatter import find_first_heading, parse_frontmatter
 from modules.repo_consistency.violation import Violation
 
-_ROW = re.compile(r"^\|\s*\[(\d{4})\]\(([^)]+)\)\s*\|\s*([^|]+?)\s*\|")
+_ROW = re.compile(r"^\|\s*\*{0,2}\[([^\]]+)\]\(([^)]+)\)\*{0,2}\s*\|")
 _INDEX_SECTIONS = ("Architecture Decision Records", "Crosscutting Concepts")
 
 
@@ -27,7 +27,7 @@ def _section_lines(lines: list[str], heading: str) -> list[str]:
 
 
 def find_architecture_index_violations(repo_root: Path) -> list[Violation]:
-    """Every ADR/Concept index row whose id or title doesn't match the record it links to."""
+    """Every ADR/Concept index row whose title doesn't match the record it links to."""
     architecture_md = repo_root / "ARCHITECTURE.md"
     rel = "ARCHITECTURE.md"
     violations: list[Violation] = []
@@ -39,17 +39,11 @@ def find_architecture_index_violations(repo_root: Path) -> list[Violation]:
             match = _ROW.match(line)
             if not match:
                 continue
-            row_id, link, row_title = match.group(1), match.group(2), match.group(3).strip()
+            row_title, link = match.group(1).strip(), match.group(2)
             record_path = (repo_root / link).resolve()
             if not record_path.is_file():
-                violations.append(Violation(rel, f"index row [{row_id}] links to missing file {link}"))
+                violations.append(Violation(rel, f"index row '{row_title}' links to missing file {link}"))
                 continue
-
-            filename_id = record_path.stem.split("-", 1)[0]
-            if filename_id != row_id:
-                violations.append(
-                    Violation(rel, f"index row id [{row_id}] doesn't match filename id [{filename_id}] in {link}")
-                )
 
             record_text = record_path.read_text(encoding="utf-8")
             heading_title = find_first_heading(record_text)
@@ -60,11 +54,6 @@ def find_architecture_index_violations(repo_root: Path) -> list[Violation]:
 
             frontmatter = parse_frontmatter(record_text)
             if frontmatter:
-                fm_id = frontmatter.get("id")
-                if fm_id and fm_id != row_id:
-                    violations.append(
-                        Violation(rel, f"index row id [{row_id}] doesn't match {link}'s frontmatter id \"{fm_id}\"")
-                    )
                 fm_title = frontmatter.get("title")
                 if fm_title and fm_title != row_title:
                     violations.append(

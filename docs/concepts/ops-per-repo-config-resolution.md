@@ -38,8 +38,8 @@ Every file sits at a fixed path; the shape of the path follows what the file hol
 
 | Shape | Use when | Reference |
 |----------|----------|-----------|
-| Fixed path | a setup skill scaffolds the file, so its location is guaranteed | `$HARNESS_REPO_PATH/.crew/<FILE>` ([0002](../adr/0002-crew-is-agnostic.md)) |
-| Fixed path, variant-suffixed | the same config exists once per variant, and one root still holds them all | `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` ([0002](../adr/0002-crew-is-agnostic.md)) |
+| Fixed path | a setup skill scaffolds the file, so its location is guaranteed | `$HARNESS_REPO_PATH/.crew/<FILE>` ([Crew agents own their workflows and use codebase instructions](../adr/crew-is-agnostic.md)) |
+| Fixed path, variant-suffixed | the same config exists once per variant, and one root still holds them all | `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` ([Crew agents own their workflows and use codebase instructions](../adr/crew-is-agnostic.md)) |
 | Fixed path, beside the owning skill | per-developer settings and credentials for one plugin | `.github/skills/harness/.harness.json.user`, `.github/skills/preflight-atlassian/.atlassian.json.user` |
 
 A script reads its plugin's file straight from disk with the standard library's parser, and sits beside that file

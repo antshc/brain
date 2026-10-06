@@ -1,6 +1,6 @@
 ---
 name: record-adr
-description: Record one hard-to-reverse architectural decision as an ADR in docs/adr/ the moment it is decided, and index it. Owns the ADR gate, extend-or-create, numbering, body with mandatory Considered Options, and index row. Called directly, or by grill-design automatically without approval.
+description: Record one hard-to-reverse architectural decision as an ADR in docs/adr/ the moment it is decided, and index it. Owns the ADR gate, extend-or-create, naming, body with mandatory Considered Options, and index row. Called directly, or by grill-design automatically without approval.
 ---
 
 # Record ADR
@@ -30,7 +30,7 @@ Runs before any write. A near-duplicate ADR splits authority over one decision a
 1. Run `/index-docs`' skill **Scan and match** over the `Architecture Decision Records` table in `ARCHITECTURE.md` and every matched building block's `Architecture Decision Records` table with this decision's surface — its terms and the paths it governs.
 2. A matched ADR already owns this decision area and the decision still stands → **extend it**: amend the body and resync its row via **Sync index row**. Stop here.
 3. A matched ADR owns the area but this decision reverses it → **rewrite it in place**; never create a second ADR:
-   - Keep its `{{nnnn}}`; rename the file to `docs/adr/{{nnnn}}-{{newSlug}}.md` and update every inbound link to the old path.
+   - Rename the file to `docs/adr/{{newSlug}}.md` and update every inbound link to the old path.
    - Rewrite the heading and body to state the new decision.
    - Add the previous decision to `## Considered Options` as `**{{previousDecision}}** — rejected: {{reasonItWasReversed}}`, keeping the options already listed.
    - **Sync index row** `supersede` on its row with the new path, title, Trigger condition, and Summary.
@@ -40,9 +40,9 @@ Runs before any write. A near-duplicate ADR splits authority over one decision a
 
 Create `docs/adr/` when the first ADR is ready — not before; do nothing if it exists.
 
-## Next record number
+## Record name
 
-Highest four-digit `NNNN` filename prefix in `docs/adr/`, plus 1, zero-padded to four digits. Empty or absent directory → `0001`. Name the file `docs/adr/{{nnnn}}-{{slug}}.md`, `{{slug}}` the title in kebab-case.
+Name the file `docs/adr/{{slug}}.md`, `{{slug}}` the title in kebab-case. The name carries no counter; sharpen the slug when it is already taken by an unrelated ADR.
 
 ## Body
 
@@ -82,10 +82,10 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 
 An ADR that applies to exactly one building block is indexed in that block's `Architecture Decision Records` table inside `docs/building-blocks/{{slug}}.md` (or its repository's own ADR index when that repository documents itself). Every other ADR is indexed in `ARCHITECTURE.md`'s `Architecture Decision Records` table. Never both.
 
-1. Row shape: `| [{{nnnn}}]({{pathToAdr}}) | {{decisionTitle}} | {{triggerCondition}} | {{summary}} |` — `{{decisionTitle}}` identical to the ADR heading; `{{pathToAdr}}` relative to the indexing file.
+1. Row shape: `| [{{decisionTitle}}]({{pathToAdr}}) | {{triggerCondition}} | {{summary}} |` — `{{decisionTitle}}` identical to the ADR heading; `{{pathToAdr}}` relative to the indexing file.
 2. Derive the Trigger condition with `/index-docs`' skill **Generate trigger condition**, passing the written ADR as `{{recordContent}}`.
 3. Author the Summary yourself — 1-2 agent-optimized sentences stating the decision.
-4. Run `/index-docs`' skill **Ensure section exists** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = id, `decisionTitle`, `triggerCondition`, `summary` — never edit the table directly.
+4. Run `/index-docs`' skill **Ensure section exists** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = `pathToAdr` (the previous path when renamed), `decisionTitle`, `triggerCondition`, `summary` — never edit the table directly.
 
 ## Approval gate
 
