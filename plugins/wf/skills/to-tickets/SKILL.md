@@ -72,13 +72,16 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Title**: short descriptive name
 - **Type**: HITL | AFK
 - **Blocked by**: which other slices (if any) must complete first
+- **Wave**: parallel execution wave
 - **Functional Requirements covered**: which functional requirements from the spec this addresses
 - **Work**: implementation or spec-wide functional testing; show the latter's complete scenario coverage and dependencies
+
+Derive the **parallel map** from Blocked by: wave 1 = slices with no blockers; wave n = slices whose blockers all sit in earlier waves. Slices in one wave run in parallel; the functional-testing ticket takes the last wave. Present it as `Wave n: {{slices}}`.
 
 Ask the user:
 
 - Does the granularity feel right? (too coarse / too fine)
-- Are the dependency relationships correct?
+- Are the dependency relationships and waves correct? Would any wave have two slices editing the same code (merge them or add a blocker)?
 - Should any slices be merged or split further?
 - Are the correct slices marked as HITL and AFK?
 
@@ -90,14 +93,18 @@ For each approved slice, create a GitHub issue: via `/manage-backlog` **Create s
 
 Use `hitl` as the label for all issues `HITL` or `AFK` to indicate that user review is required.
 
-Create the approved functional-testing ticket last, with `tests`, `hitl`, and `{{repoLabel}}`, as a sub-ticket of the same spec, and real implementation issue numbers under **Blocked by**. Approval of the breakdown does not remove `hitl`: removing that label releases execution. Reuse an existing functional-testing ticket for the same spec instead of duplicating it on reruns.
+Create the approved functional-testing ticket last, with `tests`, `hitl`, and `{{repoLabel}}`, as a sub-ticket of the same spec. Approval of the breakdown does not remove `hitl`: removing that label releases execution. Reuse an existing functional-testing ticket for the same spec instead of duplicating it on reruns.
 
 `{{specIssueNumber}}` is required for each call, if missing ask user.
 Use the issue body template below.
 
-Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
-
 Load `references/issue-template.md` and use it verbatim as the issue body structure — include every section, following each section's `<...-rule>` instructions to draft its content. If a slice touches an API, Database, or Resource contract, Run `/doc-contracts` skill once per touched contract kind and inline its output verbatim under the issue body's **Contracts Delta** section before creating the issue.
+
+### 5a. Link blocking
+
+After every issue exists (including the functional-testing ticket), build the parallel map with native links: for each approved slice with blockers, via `/manage-backlog` **Link blocking** with `issueNumber` = the slice, `blockedBy` = its blockers' issue numbers. The functional-testing ticket's `blockedBy` = every implementation ticket of the spec. On reruns, link only edges not already present.
+
+*Done when* every approved **Blocked by** edge has a native link. Report the final map as `Wave n: #{{issue}}, …` with issue numbers.
 
 Do NOT close or modify the parent issue.
 

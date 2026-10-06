@@ -25,14 +25,6 @@
 - [ ] Acceptance criteria 2
 - [ ] Acceptance criteria 3
 
-## Blocked by
-
-<!-- For a functional-testing ticket, list every implementation ticket for this parent spec. Dependencies must be completed before execution. -->
-
-- Blocked by #{{issueNumber}} (if any)
-
-Or "None - can start immediately" if no blockers.
-
 ## Requirements addressed
 
 Reference by number from the parent spec. Omit a subsection if the spec has none of that kind, or none apply to this slice.
