@@ -62,11 +62,11 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 An ADR records a point-in-time, localized decision — hard to reverse, surprising without context, and the result of a real trade-off. ADRs applying to exactly one Deployable are indexed in that block's record instead. See the `record-adr` skill.
 
-<!-- One row per ADR. {{nnnn}}/{{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: 1-2 agent-optimized sentences stating the decision. -->
+<!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: 1-2 agent-optimized sentences stating the decision. -->
 
-| # | Decision | Trigger condition | Summary |
-|---|----------|-------------------|---------|
-| [{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md) | {{decisionTitle}} | {{triggerCondition}} | {{summary}} |
+| Decision | Trigger condition | Summary |
+|----------|-------------------|---------|
+| [{{decisionTitle}}](docs/adr/{{slug}}.md) | {{triggerCondition}} | {{summary}} |
 
 ## Crosscutting Concepts *(optional)*
 

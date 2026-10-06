@@ -70,8 +70,8 @@ Reference by number from the parent spec. Omit a subsection if the spec has none
 - No specific file paths or code snippets (they become outdated quickly).
 </relevant-concepts-rule>
 
-- {{ruleSummaryAsItAppliesToThisSlice}} ([{{nnnn}}](docs/concepts/{{nnnn}}-{{slug}}.md))
-- {{ruleSummaryAsItAppliesToThisSlice}} ([{{nnnn}}](docs/adr/{{nnnn}}-{{slug}}.md))
+- {{ruleSummaryAsItAppliesToThisSlice}} ([{{conceptTitle}}](docs/concepts/{{kind}}-{{slug}}.md))
+- {{ruleSummaryAsItAppliesToThisSlice}} ([{{decisionTitle}}](docs/adr/{{slug}}.md))
 
 If a summary above isn't enough to implement its rule, open the linked record for full detail before implementing.
 
