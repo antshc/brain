@@ -102,7 +102,15 @@ Run the commands sequentially and check each exit code. Parse the fetcher's JSON
 
 ## 2. Select next task
 
-Pick the next task. Prioritize in this order (first match wins); break ties within a tier by lowest issue number:
+First drop every task with an unfinished blocker. For each task, list its blockers via the REST dependencies API; any output means it is blocked:
+
+```bash
+gh api "repos/$repo/issues/<number>/dependencies/blocked_by?per_page=100" --jq '.[] | select(.state == "open" or .state_reason == "not_planned") | .number'
+```
+
+A check failure exits. No unblocked task remains → end the implementation loop and report the blocked tasks as pending dependencies.
+
+Pick the next task from the unblocked ones. Prioritize in this order (first match wins); break ties within a tier by lowest issue number:
 
 1. Critical bugfixes
 2. Development infrastructure — tests, types, dev scripts are precursors to features
