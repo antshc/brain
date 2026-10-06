@@ -139,32 +139,20 @@ Distill Codey's SUMMARY into Implementation Decisions. Use this in **Commit & pu
 
 ## 5. Stage Codey's changes (source repo)
 
-Operate in `WORKTREE_PATH`. Stage Codey's changes regardless of `STATUS` (**complete**, **partial**, or **blocked**) so Chorey has a staged diff to review; this only updates the index, no commit yet:
+Operate in `WORKTREE_PATH`. Stage Codey's changes regardless of `STATUS` (**complete**, **partial**, or **blocked**); this only updates the index, no commit yet:
 
 ```bash
 git add -A
 ```
 
-## 6. Review (Chorey)
+## 6. Commit & push (source repo)
 
-Run only when Codey's `STATUS` is **complete** and `chorey` is available; otherwise continue directly to **Commit & push** — reviewing unverified or broken work cannot preserve behavior that was never established.
+Operate in `WORKTREE_PATH`. Build a single commit from Codey's report fields and the distilled outputs from **Distill**:
 
-After changing to `WORKTREE_PATH` (same invocation directory as Codey), run the `chorey` agent via `runSubagent` with no arguments; it reviews the staged diff directly (`git diff --cached`). Retain Chorey's report for use in **Commit & push**. Chorey's `STATUS` is informational only — it never changes the `STATUS` recorded in **Handle task result**, which always reflects Codey's report from **Invoke implementation agent**.
-
-## 7. Commit & push (source repo)
-
-Operate in `WORKTREE_PATH`. Build a single commit:
-
-- When **Review (Chorey)** ran and its `FILES` field is not "none": run `git add -A` again to stage Chorey's cleanup, then build the commit from both reports —
-  - **SUBJECT** → Use **ccode:** prefix, then Codey's one-line commit summary
-  - **SUMMARY** → commit body: Implementation Decisions block, plus Chorey's `SUMMARY` when it changed files
-  - **FILES** → Codey's list of files changed, plus Chorey's
-  - **NOTES** → Codey's `NOTES`, plus Chorey's findings not applied
-- Otherwise (Chorey did not run, or ran and changed nothing): build the commit from Codey's report fields and the distilled outputs from **Distill** alone —
-  - **SUBJECT** → Use **ccode:** prefix, then one line commit summary
-  - **SUMMARY** → commit body (Implementation Decisions block)
-  - **FILES** → list of files changed
-  - **NOTES** → blockers or context for the next iteration
+- **SUBJECT** → Use **ccode:** prefix, then one line commit summary
+- **SUMMARY** → commit body (Implementation Decisions block)
+- **FILES** → list of files changed
+- **NOTES** → blockers or context for the next iteration
 
 Commit and push regardless of Codey's `STATUS` (**complete**, **partial**, or **blocked**). Skip an empty commit when no staged changes exist, but still push. Check each command separately; a failed commit or push exits before functional testing:
 
@@ -174,18 +162,18 @@ git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
 git push -u origin "$branch"
 ```
 
-## 8. Handle task result
+## 7. Handle task result
 
 Maintain a per-issue attempt counter for this session, keyed by issue number.
 
-Read Codey's `STATUS` field from **Invoke implementation agent** — never Chorey's:
+Read Codey's `STATUS` field from **Invoke implementation agent**:
 
 - **complete**: Close the issue with `gh issue close <number> --repo "$repo"`.
 - **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
 - **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
 
 
-## 9. Update Spec
+## 8. Update Spec
 
 Using the Implementation Decisions from **Distill**, update the spec issue.
 
@@ -245,7 +233,7 @@ Functional Testing Progress:
 
 ## 1. Publish revision and select tickets
 
-Ensure all implementation and review changes are committed through **Commit & push**. Skip an empty commit, push `$branch`, and record its HEAD as `testedCommit`; a failed commit/push exits before running tests. This also applies to a resumed invocation with no implementation work. Keep the tested source revision fixed throughout this phase.
+Ensure all implementation changes are committed through **Commit & push**. Skip an empty commit, push `$branch`, and record its HEAD as `testedCommit`; a failed commit/push exits before running tests. This also applies to a resumed invocation with no implementation work. Keep the tested source revision fixed throughout this phase.
 
 Refresh approved testing tickets with the same shared fetcher: `python3 "$DEV_SKILL_DIR/github/fetch_issues.py" "$repo" --spec "$spec" --kind tests`. Check its exit status before parsing its JSON output. This selects only open `tests` tickets without `spec` or `hitl`; implementation tickets never enter this phase. No eligible tickets → continue to **COMMIT & PUSH HARNESS REPO**. Track handled ticket numbers for this invocation so no ticket is processed twice.
 
