@@ -137,15 +137,7 @@ Distill Codey's SUMMARY into Implementation Decisions. Use this in **Commit & pu
 - No file paths or code snippets.
 - No filler — every word carries information.
 
-## 5. Stage Codey's changes (source repo)
-
-Operate in `WORKTREE_PATH`. Stage Codey's changes regardless of `STATUS` (**complete**, **partial**, or **blocked**); this only updates the index, no commit yet:
-
-```bash
-git add -A
-```
-
-## 6. Commit & push (source repo)
+## 5. Commit & push (source repo)
 
 Operate in `WORKTREE_PATH`. Build a single commit from Codey's report fields and the distilled outputs from **Distill**:
 
@@ -162,7 +154,7 @@ git commit -m "<SUBJECT>" -m "<SUMMARY>" -m "<FILES>" -m "<NOTES>"
 git push -u origin "$branch"
 ```
 
-## 7. Handle task result
+## 6. Handle task result
 
 Maintain a per-issue attempt counter for this session, keyed by issue number.
 
@@ -173,7 +165,7 @@ Read Codey's `STATUS` field from **Invoke implementation agent**:
 - **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
 
 
-## 8. Update Spec
+## 7. Update Spec
 
 Using the Implementation Decisions from **Distill**, update the spec issue.
 
