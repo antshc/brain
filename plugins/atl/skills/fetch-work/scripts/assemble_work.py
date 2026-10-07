@@ -4,7 +4,7 @@ module for attachment caching and placeholder resolution) — replaces the old f
 turn chain with a single call.
 
 Reads the raw `getJiraIssue` tool result from stdin; the issue's fields live at
-`issues.nodes[0].fields` (a stable shape confirmed live against ZIC-5881). That MCP result never
+`issues.nodes[0].fields` (a stable shape confirmed live against PROJ-5881). That MCP result never
 carries real ADF for `description` (verified live — see `fetch_attachments.fetch_description_adf`'s
 docstring), only an already-flattened Markdown-ish string with empty `alt` text on every embedded
 image, so it is used as-is only in the no-token branch; the token branch instead fetches the real

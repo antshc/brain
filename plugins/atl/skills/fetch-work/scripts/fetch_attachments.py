@@ -4,7 +4,7 @@ either real ADF descriptions or attachment content).
 
 `/map-markdown-adf`'s `adf-to-md` turns every `media`/`mediaSingle`/`mediaGroup` node into a
 neutral `<!-- adf:attachment media-id="<id>" alt="<alt>" -->` placeholder (see its SKILL.md's
-mapping table). Verified live against ZIC-5881: a Jira `media` node's `attrs.alt` always holds
+mapping table). Verified live against PROJ-5881: a Jira `media` node's `attrs.alt` always holds
 the attachment's exact original filename — unlike Confluence, there is no media-id<->attachment-
 id mapping to make, so every placeholder here resolves by matching its `alt` against
 `fields.attachment[].filename` directly. Jira issues never carry a Draw.io macro or a
@@ -69,7 +69,7 @@ def has_attachment_reference(body: dict) -> bool:
 
 def fetch_description_adf(jira: Jira, issue_key: str) -> dict:
     """Direct REST v3 call for the issue's real ADF description — the Atlassian MCP's
-    `getJiraIssue` never returns real ADF (verified live against ZIC-5881), only an already-
+    `getJiraIssue` never returns real ADF (verified live against PROJ-5881), only an already-
     flattened Markdown-ish string with empty `alt` text on every embedded image.
     """
     resp = jira.get(f"rest/api/3/issue/{issue_key}", params={"fields": "description"})
