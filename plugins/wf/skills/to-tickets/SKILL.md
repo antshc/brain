@@ -61,7 +61,7 @@ Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an
 
 ### 3a. Draft spec-wide functional verification
 
-When the spec approves automated functional verification, append one functional-testing ticket for the entire spec. Preserve declined/deferred decisions; unresolved automation scope remains a question in **Quiz the user**, not implicit approval. Carry the spec's scenario bullets and requirement references into the ticket, covering all functional requirements, business rules, edge cases, and acceptance criteria. Use label `tests` only for functional-test execution; adding or repairing test code remains an implementation slice.
+**Ask the user** whether to add a spec-wide functional-testing ticket; **MUST NOT** add it automatically, even when the spec mentions functional verification. Skip the question when the spec already records a declined/deferred decision; preserve it. Add the question to **Quiz the user**. Only on explicit approval, append one functional-testing ticket for the entire spec. Carry the spec's scenario bullets and requirement references into the ticket, covering all functional requirements, business rules, edge cases, and acceptance criteria. Use label `tests` only for functional-test execution; adding or repairing test code remains an implementation slice.
 
 Make the functional-testing ticket depend on every implementation slice for its parent spec, including test additions needed for identified coverage gaps. Describe reuse of existing functional-slice tests and observable seams without test-file paths or fixed method names. Execution maps scenarios to current methods. Missing coverage discovered at execution is unverified and becomes a `hitl` investigation ticket; Testy does not write tests.
 
@@ -84,6 +84,7 @@ Ask the user:
 - Are the dependency relationships and waves correct? Would any wave have two slices editing the same code (merge them or add a blocker)?
 - Should any slices be merged or split further?
 - Are the correct slices marked as HITL and AFK?
+- Add a spec-wide functional-testing ticket? (omit it unless the user says yes)
 
 Iterate until the user approves the breakdown.
 
