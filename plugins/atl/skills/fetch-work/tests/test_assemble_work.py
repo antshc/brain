@@ -35,19 +35,19 @@ def _image_body() -> dict:
 
 def test_extract_fields_reads_the_documented_json_path():
     fields = _fields()
-    assert extract_fields(_raw("ZIC-5881", fields)) == fields
+    assert extract_fields(_raw("PROJ-5881", fields)) == fields
 
 
 def test_format_header_matches_the_documented_output_shape():
-    header = format_header("ZIC-5881", _fields())
+    header = format_header("PROJ-5881", _fields())
     assert header == (
-        "# ZIC-5881 — Case Number Input Mask - Swagger and GUI are not Aligned\n"
+        "# PROJ-5881 — Case Number Input Mask - Swagger and GUI are not Aligned\n"
         "**Status:** New · **Type:** Bug · **Assignee:** Anton Shcherbyna\n\n"
     )
 
 
 def test_format_header_defaults_a_null_assignee_to_unassigned():
-    header = format_header("ZIC-5881", _fields(assignee=None))
+    header = format_header("PROJ-5881", _fields(assignee=None))
     assert "**Assignee:** Unassigned" in header
 
 
@@ -77,9 +77,9 @@ def test_assemble_uses_the_mcp_description_directly_and_notes_blob_images_withou
     fields = _fields(
         description="text\n\n![](blob:https://media.staging.atl-paas.net/?type=file&id=abc)"
     )
-    result = assemble(_raw("ZIC-5881", fields), "ZIC-5881", "/repo", "/repo/work.md.tmp")
+    result = assemble(_raw("PROJ-5881", fields), "PROJ-5881", "/repo", "/repo/work.md.tmp")
 
-    assert result.startswith("# ZIC-5881 — ")
+    assert result.startswith("# PROJ-5881 — ")
     assert "apiToken" in result
     assert "blob:" not in result
 
@@ -102,14 +102,14 @@ def test_assemble_fetches_real_adf_and_resolves_attachments_when_token_available
 
     fields = _fields()
     assets_dir = tmp_path / "work.md.tmp"
-    result = assemble(_raw("ZIC-5881", fields), "ZIC-5881", "/repo", str(assets_dir))
+    result = assemble(_raw("PROJ-5881", fields), "PROJ-5881", "/repo", str(assets_dir))
 
     assert result == (
-        "# ZIC-5881 — Case Number Input Mask - Swagger and GUI are not Aligned\n"
+        "# PROJ-5881 — Case Number Input Mask - Swagger and GUI are not Aligned\n"
         "**Status:** New · **Type:** Bug · **Assignee:** Anton Shcherbyna\n\n"
         "![shot.png](work.md.tmp/shot.png)"
     )
-    save_attachments.assert_called_once_with(jira, "ZIC-5881", str(assets_dir))
+    save_attachments.assert_called_once_with(jira, "PROJ-5881", str(assets_dir))
 
 
 def test_assemble_skips_attachment_handling_when_token_available_but_no_reference_present(
@@ -126,7 +126,7 @@ def test_assemble_skips_attachment_handling_when_token_available_but_no_referenc
     monkeypatch.setattr("assemble_work.save_attachments", save_attachments)
 
     assets_dir = tmp_path / "work.md.tmp"
-    result = assemble(_raw("ZIC-5881", _fields()), "ZIC-5881", "/repo", str(assets_dir))
+    result = assemble(_raw("PROJ-5881", _fields()), "PROJ-5881", "/repo", str(assets_dir))
 
     assert result.endswith("Plain text body.\n")
     save_attachments.assert_not_called()

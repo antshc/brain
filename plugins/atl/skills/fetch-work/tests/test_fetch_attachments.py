@@ -93,20 +93,20 @@ def test_fetch_description_adf_calls_rest_v3_with_description_field():
     adf = {"type": "doc", "version": 1, "content": []}
     jira = _jira(description=adf)
 
-    result = fetch_description_adf(jira, "ZIC-5881")
+    result = fetch_description_adf(jira, "PROJ-5881")
 
     assert result == adf
-    jira.get.assert_called_once_with("rest/api/3/issue/ZIC-5881", params={"fields": "description"})
+    jira.get.assert_called_once_with("rest/api/3/issue/PROJ-5881", params={"fields": "description"})
 
 
 def test_list_attachments_calls_rest_v3_with_attachment_field():
     attachments = [{"filename": "a.png"}]
     jira = _jira(attachments=attachments)
 
-    result = list_attachments(jira, "ZIC-5881")
+    result = list_attachments(jira, "PROJ-5881")
 
     assert result == attachments
-    jira.get.assert_called_once_with("rest/api/3/issue/ZIC-5881", params={"fields": "attachment"})
+    jira.get.assert_called_once_with("rest/api/3/issue/PROJ-5881", params={"fields": "attachment"})
 
 
 def test_download_attachment_bytes_encodes_str_responses():
@@ -129,7 +129,7 @@ def test_download_attachment_bytes_uses_a_relative_path_built_from_the_attachmen
     """
     jira = MagicMock()
     jira.get.return_value = b"png-bytes"
-    attachment = {"id": "148451", "content": "https://zerto.atlassian.net/rest/api/3/attachment/content/148451"}
+    attachment = {"id": "148451", "content": "https://example.atlassian.net/rest/api/3/attachment/content/148451"}
 
     download_attachment_bytes(jira, attachment)
 
@@ -148,7 +148,7 @@ def test_save_attachments_writes_every_attachment_and_returns_bytes_map(tmp_path
     jira = _jira(attachments=attachments, downloads=downloads)
     assets_dir = tmp_path / "work.md.tmp"
 
-    result = save_attachments(jira, "ZIC-5881", str(assets_dir))
+    result = save_attachments(jira, "PROJ-5881", str(assets_dir))
 
     assert result == {"a.png": b"png-bytes", "b.txt": b"text"}
     assert (assets_dir / "a.png").read_bytes() == b"png-bytes"
@@ -159,7 +159,7 @@ def test_save_attachments_skips_mkdir_when_attachment_list_is_empty(tmp_path):
     jira = _jira(attachments=[])
     assets_dir = tmp_path / "work.md.tmp"
 
-    result = save_attachments(jira, "ZIC-5881", str(assets_dir))
+    result = save_attachments(jira, "PROJ-5881", str(assets_dir))
 
     assert result == {}
     assert not assets_dir.exists()
@@ -172,7 +172,7 @@ def test_relative_link_percent_encodes_spaces():
 def test_restore_attachments_returns_markdown_unchanged_when_no_placeholder():
     jira = MagicMock()
     md = "# Title\n\nNo attachments here.\n"
-    assert restore_attachments(jira, "ZIC-5881", md, {}, "work.md.tmp") == md
+    assert restore_attachments(jira, "PROJ-5881", md, {}, "work.md.tmp") == md
     jira.get.assert_not_called()
 
 
@@ -181,7 +181,7 @@ def test_restore_attachments_resolves_image_attachment_from_downloaded_map_witho
     downloaded = {"image-20260827-132403.png": b"png-bytes"}
 
     md = '<!-- adf:attachment media-id="a21ae9fb-..." alt="image-20260827-132403.png" -->'
-    result = restore_attachments(jira, "ZIC-5881", md, downloaded, "work.md.tmp")
+    result = restore_attachments(jira, "PROJ-5881", md, downloaded, "work.md.tmp")
 
     assert result == "![image-20260827-132403.png](work.md.tmp/image-20260827-132403.png)"
     jira.get.assert_not_called()
@@ -192,7 +192,7 @@ def test_restore_attachments_resolves_generic_file_attachment_to_plain_link():
     downloaded = {"notes.pdf": b"pdf-bytes"}
 
     md = '<!-- adf:attachment media-id="file-1" alt="notes.pdf" -->'
-    result = restore_attachments(jira, "ZIC-5881", md, downloaded, "work.md.tmp")
+    result = restore_attachments(jira, "PROJ-5881", md, downloaded, "work.md.tmp")
 
     assert result == "[notes.pdf](work.md.tmp/notes.pdf)"
 
@@ -203,7 +203,7 @@ def test_restore_attachments_falls_back_to_rest_lookup_when_filename_not_in_down
     jira = _jira(attachments=attachments, downloads=downloads)
 
     md = '<!-- adf:attachment media-id="a21ae9fb-..." alt="image-20260827-132403.png" -->'
-    result = restore_attachments(jira, "ZIC-5881", md, {}, "work.md.tmp")
+    result = restore_attachments(jira, "PROJ-5881", md, {}, "work.md.tmp")
 
     assert result == "![image-20260827-132403.png](work.md.tmp/image-20260827-132403.png)"
 
@@ -212,7 +212,7 @@ def test_restore_attachments_notes_when_filename_has_no_matching_attachment():
     jira = _jira(attachments=[])
 
     md = '<!-- adf:attachment media-id="unknown" alt="missing.png" -->'
-    result = restore_attachments(jira, "ZIC-5881", md, {}, "work.md.tmp")
+    result = restore_attachments(jira, "PROJ-5881", md, {}, "work.md.tmp")
 
     assert "missing.png" in result
     assert "adf:attachment source unavailable" in result
@@ -222,7 +222,7 @@ def test_restore_attachments_notes_when_placeholder_alt_is_empty():
     jira = MagicMock()
 
     md = '<!-- adf:attachment media-id="unknown" alt="" -->'
-    result = restore_attachments(jira, "ZIC-5881", md, {}, "work.md.tmp")
+    result = restore_attachments(jira, "PROJ-5881", md, {}, "work.md.tmp")
 
     assert "no filename" in result
     jira.get.assert_not_called()
@@ -233,7 +233,7 @@ def test_restore_attachments_percent_encodes_spaces_in_the_relative_link():
     downloaded = {"Screenshot 2026-02-10 113535.png": b"png-bytes"}
 
     md = '<!-- adf:attachment media-id="image-1" alt="Screenshot 2026-02-10 113535.png" -->'
-    result = restore_attachments(jira, "ZIC-5881", md, downloaded, "work.md.tmp")
+    result = restore_attachments(jira, "PROJ-5881", md, downloaded, "work.md.tmp")
 
     assert result == (
         "![Screenshot 2026-02-10 113535.png](work.md.tmp/Screenshot%202026-02-10%20113535.png)"
@@ -248,7 +248,7 @@ def test_restore_attachments_resolves_image_attachment_with_size_to_an_image_plu
         '<!-- adf:attachment media-id="image-1" alt="image-20260827-132403.png" '
         'width="628" height="256" -->'
     )
-    result = restore_attachments(jira, "ZIC-5881", md, downloaded, "work.md.tmp")
+    result = restore_attachments(jira, "PROJ-5881", md, downloaded, "work.md.tmp")
 
     assert result == (
         "![image-20260827-132403.png](work.md.tmp/image-20260827-132403.png)\n"

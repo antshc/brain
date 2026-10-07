@@ -9,7 +9,7 @@ tools (Network tab, any request to a `*.atlassian.net` page) and pass it via
 re-capture it when calls start returning 401.
 
 Usage:
-    python3 check_reactions.py --site zerto.atlassian.net --cloud-id 4b23b31c-89fc-47d9-a2e5-3018d6a55a66 \\
+    python3 check_reactions.py --site site.atlassian.net --cloud-id 4b23b31c-89fc-47d9-a2e5-3018d6a55a66 \\
         --issue-id 693693 --comment-ids 2595640,2583602 --cookie-file /tmp/cookie.txt
 """
 
@@ -83,7 +83,7 @@ def summarize(raw: dict) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--site", required=True, help="Jira site host, e.g. zerto.atlassian.net")
+    parser.add_argument("--site", required=True, help="Jira site host, e.g. site.atlassian.net")
     parser.add_argument("--cloud-id", required=True, help="Site cloudId UUID (not the ATLASSIAN_SITE host form)")
     parser.add_argument("--issue-id", required=True, help="Numeric issue id (not the issue key)")
     parser.add_argument("--comment-ids", required=True, help="Comma-separated numeric comment ids")

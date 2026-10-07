@@ -250,7 +250,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 | **Item** | **Applicable** | **Details** |
 | --- | --- | --- |
-| Was new container added? [New Container Checklist](https://zerto.atlassian.net/wiki/spaces/ZA/pages/2241921025) | {{applicable / not applicable}} |  |
+| Was new container added? [New Container Checklist](https://site.atlassian.net/wiki/spaces/ZA/pages/2241921025) | {{applicable / not applicable}} |  |
 | New container expected resources (storage, CPU, Memory) | {{applicable / not applicable}} |  |
 | Any other appliance related changes | {{applicable / not applicable}} |  |
 
