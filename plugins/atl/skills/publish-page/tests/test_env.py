@@ -6,7 +6,6 @@ from page_diagrams.env import (
     load_credentials,
     load_drawio_extension_key,
     load_renderer,
-    load_settings,
     load_swimlane_drawio_enabled,
 )
 
