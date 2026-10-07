@@ -22,7 +22,7 @@ Gotchas on unanswered `@mentions`).
 ## Usage (when a fresh cookie is available)
 
 ```bash
-python3 check_reactions.py --site zerto.atlassian.net \
+python3 check_reactions.py --site site.atlassian.net \
   --cloud-id 4b23b31c-89fc-47d9-a2e5-3018d6a55a66 \
   --issue-id 693693 --comment-ids 2595640,2583602 \
   --cookie-file /tmp/cookie.txt

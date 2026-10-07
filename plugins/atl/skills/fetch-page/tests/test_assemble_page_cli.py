@@ -206,7 +206,7 @@ def test_main_converts_the_synthetic_cross_skill_fixture_with_no_preprocessing(t
     no `jq` or other ADF preprocessing needed.
     """
     md_path = tmp_path / "page.md"
-    raw = _raw("ZIC Monitoring GUI Alerts + Tasks", _synthetic_fixture_body())
+    raw = _raw("PROJ Monitoring GUI Alerts + Tasks", _synthetic_fixture_body())
 
     result = _run(
         ["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path), "--attachments", "skip"],

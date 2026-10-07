@@ -31,30 +31,30 @@ def test_cutoff_counts_back_from_the_injected_now():
 
 
 def test_reads_the_flat_issues_list_the_live_mcp_returns():
-    flat_page = {"issues": [issue("ZIC-1", comments=[])], "isLast": True}
-    assert [node["key"] for node in nodes([flat_page], cloud_id=CLOUD_ID)] == ["ZIC-1"]
+    flat_page = {"issues": [issue("PROJ-1", comments=[])], "isLast": True}
+    assert [node["key"] for node in nodes([flat_page], cloud_id=CLOUD_ID)] == ["PROJ-1"]
 
 
 def test_reads_a_legacy_nested_nodes_envelope():
-    nested_page = {"issues": {"nodes": [issue("ZIC-1", comments=[])]}}
-    assert [node["key"] for node in nodes([nested_page], cloud_id=CLOUD_ID)] == ["ZIC-1"]
+    nested_page = {"issues": {"nodes": [issue("PROJ-1", comments=[])]}}
+    assert [node["key"] for node in nodes([nested_page], cloud_id=CLOUD_ID)] == ["PROJ-1"]
 
 
 def test_synthesizes_web_url_from_cloud_id_and_key():
-    flat_page = {"issues": [issue("ZIC-1", comments=[])], "isLast": True}
-    assert nodes([flat_page], cloud_id=CLOUD_ID)[0]["webUrl"] == f"{CLOUD_ID}/browse/ZIC-1"
+    flat_page = {"issues": [issue("PROJ-1", comments=[])], "isLast": True}
+    assert nodes([flat_page], cloud_id=CLOUD_ID)[0]["webUrl"] == f"{CLOUD_ID}/browse/PROJ-1"
 
 
 def test_keeps_an_existing_web_url_instead_of_overwriting_it():
-    with_url = issue("ZIC-1", comments=[])
-    with_url["webUrl"] = "https://other.atlassian.net/browse/ZIC-1"
+    with_url = issue("PROJ-1", comments=[])
+    with_url["webUrl"] = "https://other.atlassian.net/browse/PROJ-1"
     flat_page = {"issues": [with_url], "isLast": True}
-    assert nodes([flat_page], cloud_id=CLOUD_ID)[0]["webUrl"] == "https://other.atlassian.net/browse/ZIC-1"
+    assert nodes([flat_page], cloud_id=CLOUD_ID)[0]["webUrl"] == "https://other.atlassian.net/browse/PROJ-1"
 
 
 def test_truncated_reads_isLast_on_the_flat_shape():
-    assert truncated([page([issue("ZIC-1", comments=[])], has_next=True)]) is True
-    assert truncated([page([issue("ZIC-1", comments=[])], has_next=False)]) is False
+    assert truncated([page([issue("PROJ-1", comments=[])], has_next=True)]) is True
+    assert truncated([page([issue("PROJ-1", comments=[])], has_next=False)]) is False
 
 
 def test_truncated_reads_pageInfo_on_the_legacy_nested_shape():

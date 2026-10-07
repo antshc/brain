@@ -30,25 +30,25 @@ def run(capsys, *paths, cutoff_days=3650):
 
 
 def test_matches_a_mention_by_display_name(spill, capsys):
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=mention(MY_NAME))])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body=mention(MY_NAME))])]))
     report = run(capsys, path)
-    assert [row["key"] for row in report["unanswered"]] == ["ZIC-1"]
+    assert [row["key"] for row in report["unanswered"]] == ["PROJ-1"]
     assert report["unanswered"][0]["mentionedBy"] == THEIR_NAME
 
 
 def test_ignores_a_mention_of_somebody_else(spill, capsys):
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=mention(THEIR_NAME))])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body=mention(THEIR_NAME))])]))
     assert run(capsys, path)["unanswered"] == []
 
 
 def test_does_not_treat_the_data_id_placeholder_as_an_account_id(spill, capsys):
     body = f'<custom data-type="mention" data-id="{ME}">@{THEIR_NAME}</custom>'
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=body)])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body=body)])]))
     assert run(capsys, path)["unanswered"] == []
 
 
 def test_ignores_a_bare_account_id_in_a_comment_body(spill, capsys):
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=f"cc {ME}")])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body=f"cc {ME}")])]))
     assert run(capsys, path)["unanswered"] == []
 
 
@@ -57,7 +57,7 @@ def test_buckets_a_reply_from_you_as_answered_by_you(spill, capsys):
         page(
             [
                 issue(
-                    "ZIC-1",
+                    "PROJ-1",
                     comments=[
                         comment(RECENT, body=mention(MY_NAME)),
                         comment(LATER, author=ME, name=MY_NAME),
@@ -77,7 +77,7 @@ def test_buckets_a_third_party_reply_separately(spill, capsys):
         page(
             [
                 issue(
-                    "ZIC-1",
+                    "PROJ-1",
                     comments=[
                         comment(RECENT, body=mention(MY_NAME)),
                         comment(LATER, author="third", name="Alan Turing"),
@@ -96,7 +96,7 @@ def test_prefers_your_own_reply_over_a_third_party_one(spill, capsys):
         page(
             [
                 issue(
-                    "ZIC-1",
+                    "PROJ-1",
                     comments=[
                         comment(RECENT, body=mention(MY_NAME)),
                         comment(LATER, author="third", name="Alan Turing"),
@@ -116,7 +116,7 @@ def test_a_reply_before_the_mention_does_not_answer_it(spill, capsys):
         page(
             [
                 issue(
-                    "ZIC-1",
+                    "PROJ-1",
                     comments=[
                         comment(RECENT, author=ME, name=MY_NAME),
                         comment(LATER, body=mention(MY_NAME)),
@@ -125,13 +125,13 @@ def test_a_reply_before_the_mention_does_not_answer_it(spill, capsys):
             ]
         )
     )
-    assert [row["key"] for row in run(capsys, path)["unanswered"]] == ["ZIC-1"]
+    assert [row["key"] for row in run(capsys, path)["unanswered"]] == ["PROJ-1"]
 
 
 def test_excludes_an_issue_whose_every_mention_predates_the_cutoff(spill, capsys):
-    path = spill(page([issue("ZIC-1", comments=[comment(STALE, body=mention(MY_NAME))])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(STALE, body=mention(MY_NAME))])]))
     report = run(capsys, path, cutoff_days=30)
-    assert report["cutoffExcluded"] == ["ZIC-1"]
+    assert report["cutoffExcluded"] == ["PROJ-1"]
     assert report["unanswered"] == []
 
 
@@ -140,7 +140,7 @@ def test_keeps_an_issue_with_one_mention_inside_the_window(spill, capsys):
         page(
             [
                 issue(
-                    "ZIC-1",
+                    "PROJ-1",
                     comments=[
                         comment(STALE, body=mention(MY_NAME)),
                         comment(RECENT, body=mention(MY_NAME)),
@@ -158,48 +158,48 @@ def test_sorts_newest_mention_first(spill, capsys):
     path = spill(
         page(
             [
-                issue("ZIC-OLD", comments=[comment(RECENT, body=mention(MY_NAME))]),
-                issue("ZIC-NEW", comments=[comment(LATER, body=mention(MY_NAME))]),
+                issue("PROJ-OLD", comments=[comment(RECENT, body=mention(MY_NAME))]),
+                issue("PROJ-NEW", comments=[comment(LATER, body=mention(MY_NAME))]),
             ]
         )
     )
-    assert [row["key"] for row in run(capsys, path)["unanswered"]] == ["ZIC-NEW", "ZIC-OLD"]
+    assert [row["key"] for row in run(capsys, path)["unanswered"]] == ["PROJ-NEW", "PROJ-OLD"]
 
 
 def test_merges_every_page_and_reports_truncation(spill, capsys):
     first = spill(
-        page([issue("ZIC-1", comments=[comment(RECENT, body=mention(MY_NAME))])], has_next=True)
+        page([issue("PROJ-1", comments=[comment(RECENT, body=mention(MY_NAME))])], has_next=True)
     )
     second = spill(
-        page([issue("ZIC-2", comments=[comment(LATER, body=mention(MY_NAME))])], has_next=True)
+        page([issue("PROJ-2", comments=[comment(LATER, body=mention(MY_NAME))])], has_next=True)
     )
     report = run(capsys, first, second)
-    assert {row["key"] for row in report["unanswered"]} == {"ZIC-1", "ZIC-2"}
+    assert {row["key"] for row in report["unanswered"]} == {"PROJ-1", "PROJ-2"}
     assert report["truncated"] is True
 
 
 def test_flags_an_issue_whose_comment_thread_came_back_partial(spill, capsys):
     path = spill(
-        page([issue("ZIC-1", comments=[comment(RECENT, body=mention(MY_NAME))], total=40)])
+        page([issue("PROJ-1", comments=[comment(RECENT, body=mention(MY_NAME))], total=40)])
     )
-    assert run(capsys, path)["partialComments"] == ["ZIC-1"]
+    assert run(capsys, path)["partialComments"] == ["PROJ-1"]
 
 
 def test_ignores_a_comment_whose_body_is_not_a_string(spill, capsys):
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body={"type": "doc"})])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body={"type": "doc"})])]))
     assert run(capsys, path)["unanswered"] == []
 
 
 def test_reports_the_browse_url_from_the_payload(spill, capsys):
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=mention(MY_NAME))])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body=mention(MY_NAME))])]))
     row = run(capsys, path)["unanswered"][0]
-    assert row["url"] == "https://example.atlassian.net/browse/ZIC-1"
+    assert row["url"] == "https://example.atlassian.net/browse/PROJ-1"
     assert row["status"] == "New"
 
 
 def test_a_display_name_with_regex_characters_is_matched_literally(spill, capsys):
     tricky = "A. Lovelace (Dr.)"
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=mention(tricky))])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body=mention(tricky))])]))
     main_mentions(
         [
             "--content",
@@ -218,7 +218,7 @@ def test_a_display_name_with_regex_characters_is_matched_literally(spill, capsys
 
 
 def test_a_mention_of_a_name_that_merely_starts_with_yours_is_ignored(spill, capsys):
-    path = spill(page([issue("ZIC-1", comments=[comment(RECENT, body=mention(MY_NAME + " Jr"))])]))
+    path = spill(page([issue("PROJ-1", comments=[comment(RECENT, body=mention(MY_NAME + " Jr"))])]))
     assert run(capsys, path)["unanswered"] == []
 
 
@@ -227,7 +227,7 @@ def test_ignores_an_unrelated_author_accountid_collision(spill, capsys):
         page(
             [
                 issue(
-                    "ZIC-1",
+                    "PROJ-1",
                     comments=[
                         comment(RECENT, body=mention(MY_NAME)),
                         comment(LATER, author=THEM, name=MY_NAME),
