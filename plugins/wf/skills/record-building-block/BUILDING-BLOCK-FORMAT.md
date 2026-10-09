@@ -34,6 +34,10 @@
 
 *(optional)* <!-- C4Component diagram, only when a Container view isn't enough to navigate the block. -->
 
+## Flow view
+
+*(optional)* <!-- Include only when the block's essential behavior is a lifecycle or process (transient resource, job, multi-step handoff) that a Container or Component view cannot show. Draw with `/doc-behavior-diagram` (flowchart; orientation `LR`), in the Container view's component names, current mode, one diagram per block. Omit for long-running services whose structure the Container view already explains. -->
+
 ## Concepts
 
 <!-- `Concept | Trigger condition | Default` table, rows recorded via /record-concept into docs/concepts/ — this block's own Crosscutting Concepts. -->
