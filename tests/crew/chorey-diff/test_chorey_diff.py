@@ -4,7 +4,9 @@ import sys
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "chorey_diff.py"
+SCRIPT = (
+    Path(__file__).resolve().parents[3] / "plugins" / "crew" / "skills" / "chorey-diff" / "scripts" / "chorey_diff.py"
+)
 
 
 def run(command, cwd, *, check=True):

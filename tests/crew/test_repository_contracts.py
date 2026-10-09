@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-CREW_ROOT = Path(__file__).resolve().parents[1]
+CREW_ROOT = Path(__file__).resolve().parents[2] / "plugins" / "crew"
 
 
 def test_chorey_passes_manifest_stacks_without_reinferring_them():

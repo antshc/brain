@@ -9,7 +9,7 @@ centralisation adds a sync mapping for code only one plugin will ever run.
 ## Rules
 
 - A skill MAY own Python code inside its own folder.
-- A skill that owns code MUST place that code's tests alongside it, inside the same skill folder.
+- A skill that owns code MUST place that code's tests under `tests/<plugin>/<skill>/` at the repo root, not inside the skill folder.
 - `tools/src/modules/<module>/` MUST be used only for code consumed by more than one plugin.
 - A module under `tools/src/modules/` MUST have a mapping in `.githooks/pre-commit` for each destination that
   consumes it.
@@ -25,7 +25,7 @@ Placement follows the number of consumers, not the size of the code:
 
 | Consumers | Home | Sync |
 |-----------|------|------|
-| one skill | that skill's folder, tests beside it | none |
+| one skill | that skill's folder; tests under `tests/<plugin>/<skill>/` | none |
 | several skills, one plugin | the one skill that owns the capability; siblings invoke it | none |
 | more than one plugin | `tools/src/modules/<module>/`, tests under `tools/tests/` | pre-commit mapping per destination |
 

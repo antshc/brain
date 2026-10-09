@@ -16,7 +16,7 @@ once by ../../init-atl/requirements.txt via /init-atl) whenever a REST publish i
 
 This file is a thin entrypoint; the pipeline lives in ./page_diagrams/, split along its seams
 (patterns, theme, mermaid, attachments, env, adf, rest_publish, pipeline, cli) so each is
-unit-testable -- see ../tests/.
+unit-testable -- see tests/atl/publish-page/ at the repo root.
 """
 from __future__ import annotations
 

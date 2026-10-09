@@ -47,6 +47,8 @@ git check-ignore -q "$settingsPath" || echo "NOT IGNORED"
 - **MUST NOT** `find`/`grep`/`ls -R` for this skill's directory or template; derive from this `SKILL.md`'s absolute path in context.
 - Resolve paths from CWD, never an env var; run from the harness root.
 
-## Verification
+## Completion criteria
 
-No test suite for the setup steps (unit tests cover `pull-repos.py` directly). Verify manually on a repo with no `.github/skills/harness/`: the copied `SKILL.md` is byte-identical to the template; `pull-repos.py` is byte-identical to its source; `.harness.json.user` is `{}` and gitignored; rerunning leaves the settings file untouched but refreshes `SKILL.md`/`pull-repos.py`.
+- Copied `SKILL.md` byte-identical to the template; `pull-repos.py` byte-identical to its source.
+- `.harness.json.user` exists (`{}` when new) and is gitignored.
+- On rerun the settings file is untouched; `SKILL.md` and `pull-repos.py` are refreshed.

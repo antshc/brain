@@ -8,7 +8,10 @@ from pathlib import Path
 
 import pytest
 
-_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "map_markdown_adf.py"
+_SCRIPT = (
+    Path(__file__).resolve().parents[3]
+    / "plugins" / "atl" / "skills" / "map-markdown-adf" / "scripts" / "map_markdown_adf.py"
+)
 
 
 def _run(direction: str, input_text: str) -> subprocess.CompletedProcess:

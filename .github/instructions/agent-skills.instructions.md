@@ -97,6 +97,16 @@ Every procedural step needs a checkable completion condition. Use numbered steps
 
 When a skill depends on an external tool, API, or platform quirk, add `## Gotchas`. State the constraint first; add why only when it changes interpretation or handling.
 
+## Completion criteria
+
+Add `## Completion criteria` when a skill's result is not self-evident. List observable, checkable conditions on the produced result (files, output, state) the agent confirms before reporting done.
+
+**Why:** without them the agent stops at "steps ran" and claims success on a wrong or empty result. They define done by outcome, not by effort.
+
+- Name the section **Completion criteria** (the condition that tells the agent the work is done). Do not use `Verification`, `Validation`, `Testing`, or `Acceptance criteria` (reserved for stories).
+- State the result to observe, not how to run tests. A skill's own test suite is repository tooling: **MUST NOT** appear in a skill — no test commands, test paths, or test-only dependencies.
+- Omit the section when the steps' completion conditions already prove the result.
+
 ## Pruning
 
 - **One meaning, one place.** Invoke shared procedure; do not duplicate it.
@@ -108,4 +118,5 @@ When a skill depends on an external tool, API, or platform quirk, add `## Gotcha
 - Valid frontmatter; trigger-rich description.
 - `SKILL.md` body under 300 lines.
 - Shared procedure not duplicated.
+- No test commands or test-only dependencies; result checks live under `## Completion criteria`.
 - No credentials, tokens, or secrets.

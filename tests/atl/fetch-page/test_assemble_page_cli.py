@@ -5,7 +5,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "assemble_page.py"
+_SCRIPT = (
+    Path(__file__).resolve().parents[3] / "plugins" / "atl" / "skills" / "fetch-page" / "scripts" / "assemble_page.py"
+)
 
 
 def _run(args: list[str], stdin_text: str) -> subprocess.CompletedProcess:
