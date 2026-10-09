@@ -48,7 +48,7 @@ Else → **create**:
 
 No matching MCP tool for `editJiraIssue`/`createJiraIssue`/`getVisibleJiraProjects` → REST fallback per Preflight (`PUT`/`POST /rest/api/3/issue`, `GET /rest/api/3/project/search`).
 
-**6 — Attach files.** Only when `attachments` supplied. MCP has no Jira upload tool → REST: `POST /rest/api/3/issue/{issueIdOrKey}/attachments`, header `X-Atlassian-Token: no-check`, multipart, auth `.atlassian.json.user` `site`/`email`/`apiToken` (see `preflight-atlassian`).
+**6 — Attach files.** Only when `attachments` supplied. MCP has no Jira upload tool → REST: `POST /rest/api/3/issue/{issueIdOrKey}/attachments`, header `X-Atlassian-Token: no-check`, multipart, auth `.atlassian.json.user` `site`/`email`/`apiToken` (see `preflight-atlassian` skill).
 
 - `tokenAvailable: true` → upload each file to the issue key; report attached filenames with key and `webUrl`.
 - `tokenAvailable: false` → keep create/update; report attachments not uploaded, `apiToken` missing. Never fail the call.
@@ -63,7 +63,7 @@ No matching MCP tool for `editJiraIssue`/`createJiraIssue`/`getVisibleJiraProjec
 ## Markdown conversion
 
 - Jira renders plain CommonMark natively under `markdown`: headings, lists, tables, fenced code, blockquotes, links, `**strong**`, `*em*`, `` `code` ``, `~~strike~~`, `---`.
-- ADF-only constructs (e.g. `<details>`, `> [!INFO]`, `[STATUS:text|color]`) arrive as literal text under `markdown`. Source of truth: rows marked **ADF-only** in `map-markdown-adf`'s Supported structure table; don't re-derive.
+- ADF-only constructs (e.g. `<details>`, `> [!INFO]`, `[STATUS:text|color]`) arrive as literal text under `markdown`. Source of truth: rows marked **ADF-only** in `map-markdown-adf` skill's Supported structure table; don't re-derive.
 - One physical line per bullet/paragraph.
 
 ## Rules
