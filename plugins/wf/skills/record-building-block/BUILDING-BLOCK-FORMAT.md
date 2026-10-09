@@ -40,17 +40,17 @@
 
 ## Concepts
 
-<!-- `Concept | Trigger condition | Default` table, rows recorded via /record-concept into docs/concepts/ — this block's own Crosscutting Concepts. -->
+<!-- `Concept | Summary | Trigger condition & Default` table, rows recorded via /record-concept into docs/concepts/ — this block's own Crosscutting Concepts. -->
 
-| Concept | Trigger condition | Default |
-|---------|-------------------|---------|
+| Concept | Summary | Trigger condition & Default |
+|---------|---------|-----------------------------|
 
 ## Architecture Decision Records
 
-<!-- `Decision | Trigger condition | Summary` table, rows recorded via /record-adr into docs/adr/ — ADRs applying to this block only. -->
+<!-- `Decision | Summary | Trigger condition` table, rows recorded via /record-adr into docs/adr/ — ADRs applying to this block only. A row may be unlinked (plain Decision title, no record) when its Summary carries the whole decision. -->
 
-| Decision | Trigger condition | Summary |
-|----------|-------------------|---------|
+| Decision | Summary | Trigger condition |
+|----------|---------|-------------------|
 
 ## Key features
 

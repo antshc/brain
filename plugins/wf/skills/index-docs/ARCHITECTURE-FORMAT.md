@@ -62,11 +62,12 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 An ADR records a point-in-time, localized decision — hard to reverse, surprising without context, and the result of a real trade-off. ADRs applying to exactly one Deployable are indexed in that block's record instead. See the `record-adr` skill.
 
-<!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: 1-2 agent-optimized sentences stating the decision. -->
+<!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading; plain, unlinked text when the decision has no `docs/adr/` record. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: 1-2 agent-optimized sentences stating the decision; for an unlinked row it is the whole decision. -->
 
-| Decision | Trigger condition | Summary |
-|----------|-------------------|---------|
-| [{{decisionTitle}}](docs/adr/{{slug}}.md) | {{triggerCondition}} | {{summary}} |
+| Decision | Summary | Trigger condition |
+|----------|---------|-------------------|
+| [{{decisionTitle}}](docs/adr/{{slug}}.md) | {{summary}} | {{triggerCondition}} |
+| {{decisionTitle}} | {{summary}} | {{triggerCondition}} |
 
 ## Crosscutting Concepts *(optional)*
 
@@ -76,16 +77,16 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{default}}: one sentence naming the choice to take when the design doesn't state one. See the `record-concept` skill. -->
+<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{summary}}: 1-2 plain-text sentences describing what the Concept covers; no link. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: one sentence naming the choice to take when the design doesn't state one. See the `record-concept` skill. -->
 
-| Concept | Trigger condition | Default |
-|---------|-------------------|---------|
-| **[{{conceptTitle}}](docs/concepts/{{kind}}-{{slug}}.md)** | {{triggerCondition}} | {{default}} |
+| Concept | Summary | Trigger condition & Default |
+|---------|---------|-----------------------------|
+| **[{{conceptTitle}}](docs/concepts/{{kind}}-{{slug}}.md)** | {{summary}} | **Trigger:** {{triggerCondition}}. **Default:** {{default}} |
 ```
 
 ## Rules
 
 - **Shape, not steps.** Describe how the system is decomposed and the rules that hold it together. Step-by-step "how to build X" guidance belongs in a Concept (`docs/concepts/`) or the code, not here.
 - **One directional layering.** State the dependency direction explicitly and the prohibited references. The arrows are the contract.
-- **Index ADRs and Concepts.** Every record in `docs/adr/` and `docs/concepts/` appears in exactly one table — here or in its single building block's record — with a matching Trigger condition. The tables are the entry point an agent scans before designing; nothing is added or retired without updating them.
+- **Index ADRs and Concepts.** Every record in `docs/adr/` and `docs/concepts/` appears in exactly one table — here or in its single building block's record — with a matching Trigger condition. An ADR row may stand alone, unlinked, when its Summary carries the whole decision. The tables are the entry point an agent scans before designing; nothing is added or retired without updating them.
 - **Link, don't inline.** Full ADR and Concept content stays in `docs/adr/` and `docs/concepts/` and is *linked* from the index, so the map stays scannable.
