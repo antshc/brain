@@ -107,6 +107,17 @@ Add `## Completion criteria` when a skill's result is not self-evident. List obs
 - State the result to observe, not how to run tests. A skill's own test suite is repository tooling: **MUST NOT** appear in a skill — no test commands, test paths, or test-only dependencies.
 - Omit the section when the steps' completion conditions already prove the result.
 
+## Completeness sweep
+
+Completion criteria check whether the defined result meets its contract; a completeness sweep checks whether any required scope was omitted.
+
+- Add a **closing completeness sweep** for multi-part work with independently missable obligations: features, cross-file refactors, migrations, or broad research.
+- When used, the sweep **MUST** run last, after other checks. Re-read the request, reconstruct explicit and implied obligations, and map each to evidence across affected code, tests, docs, configuration, and relevant failure/compatibility paths.
+- Resolve uncovered obligations by implementing them, asking for clarification, or reporting explicit deferral. **MUST NOT** declare completion with an unaccounted obligation.
+- Omit the sweep for small, bounded work when procedural checks or completion criteria already prove full coverage (e.g. a method rename or single defined diagram). **MUST NOT** duplicate the same checks under both sections.
+
+See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the closing procedure and [comparison research](../../docs/research/skill-result-check-section-naming.md) for selection examples.
+
 ## Pruning
 
 - **One meaning, one place.** Invoke shared procedure; do not duplicate it.
