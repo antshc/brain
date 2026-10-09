@@ -10,14 +10,14 @@ Publish local Markdown to a Confluence page via one `run` command: extract → c
 
 ## Prerequisites
 
-- `atlassian-python-api` — installed by `init-atl`; run it first. Needed by every REST path.
+- `atlassian-python-api` — installed by `init-atl` skill; if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. Needed by every REST path.
 - Diagrams or local attachments → **MUST** have `apiToken` configured in `.atlassian.json.user`.
 - Diagram present → **MUST** have `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli`; verify `mmdc --version`. Headless Chrome libs (Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.
 - Diagram-free source: small → MCP only; large → REST, no `mmdc`.
 
 ## Diagram renderer
 
-`diagramRenderer` in `.atlassian.json.user` (see `preflight-atlassian`). Absent/empty → `png`.
+`diagramRenderer` in `.atlassian.json.user` (see `preflight-atlassian` skill). Absent/empty → `png`.
 
 | Value | Page output | Extra prerequisite | Status |
 |---|---|---|---|
@@ -49,7 +49,7 @@ Installs to `~/.local/opt/drawio` + wrapper `~/.local/bin/drawio`; no root/FUSE.
 
 ## Diagram ids
 
-`%% diagram-id: <id>` gives a mermaid fence stable identity: `[a-z0-9-]`, unique per file, after any `---` frontmatter or `%%{init: …}%%`, directly above the diagram-type line. Id = attachment filename + Draw.io record title → republish replaces in place despite reorders or heading edits. `run` strips the line before rendering. Emitted by `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`.
+`%% diagram-id: <id>` gives a mermaid fence stable identity: `[a-z0-9-]`, unique per file, after any `---` frontmatter or `%%{init: …}%%`, directly above the diagram-type line. Id = attachment filename + Draw.io record title → republish replaces in place despite reorders or heading edits. `run` strips the line before rendering. Emitted by `doc-architecture-diagram` skill, `doc-behavior-diagram` skill, `doc-code-diagram` skill.
 
 No id → `{index}-{nearest-heading-slug}` naming; reorder or heading rewording → next publish adds a duplicate.
 
@@ -57,7 +57,7 @@ Ids are permanent: rename/delete orphans the attachment and record (`run` never 
 
 ### Round-trip sidecar
 
-`png`/`drawio` also attach `{name}.source.mmd` (fence verbatim, id line included); `fetch-page` uses it to restore the ```` ```mermaid ```` block. `mermaid` mode skips it. Never read on publish; mirrors last `run`, not Confluence-side edits.
+`png`/`drawio` also attach `{name}.source.mmd` (fence verbatim, id line included); `fetch-page` skill uses it to restore the ```` ```mermaid ```` block. `mermaid` mode skips it. Never read on publish; mirrors last `run`, not Confluence-side edits.
 
 ## Confidentiality
 
@@ -86,9 +86,9 @@ python scripts/publish_page_diagrams.py run \
   --config "<configPath>"
 ```
 
-Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```mermaid fences and standalone local image/file refs (as `fetch-page` writes) with markers; convert via `map-markdown-adf` CLI (never import its code); then:
+Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```mermaid fences and standalone local image/file refs (as `fetch-page` skill writes) with markers; convert via *`map-markdown-adf` skill to convert Markdown to Atlassian Document Format (ADF) for Confluence, preserving source wording verbatim* **Action: Convert Markdown to ADF** (CLI only; never import its code); then:
 
-- Diagrams/local attachments + token → REST: ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `fetch-page`-recorded `width`/`height` when present; other file → `mediaGroup`), publish.
+- Diagrams/local attachments + token → REST: ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `fetch-page` skill-recorded `width`/`height` when present; other file → `mediaGroup`), publish.
 - Neither + token → REST if ADF > `--threshold-bytes` (default 50KB = safe MCP-inline size), else MCP handback.
 - No token → markers become notes naming `apiToken`; always MCP handback.
 
@@ -113,7 +113,7 @@ Report page URL; with diagrams, confirm page and attachment list show every imag
 
 ## Rules
 
-- Never rephrase Markdown; `map-markdown-adf` handles structure.
+- Never rephrase Markdown; `map-markdown-adf` skill owns Markdown → ADF structure and preserves source wording verbatim.
 - Named `pageId` → update in place; create only when none named.
 - Never choose a space silently.
 - Out of scope: non-mermaid diagram formats, bulk publishing.

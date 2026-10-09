@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Init Atl
 
-Sets up `atl` in the current repo (= CWD): copies `preflight-atlassian` from template, creates/updates its config, offers `pub-<issue-type>` Jira wrapper skills. **MUST NOT** install binaries, edit shell profiles, or set system/user env vars; `.atlassian.json.user` is the only config surface.
+Sets up `atl` in the current repo (= CWD): copies `preflight-atlassian` skill from template, creates/updates its config, offers `pub-<issue-type>` Jira wrapper skills. **MUST NOT** install binaries, edit shell profiles, or set system/user env vars; `.atlassian.json.user` is the only config surface.
 
 ## Workflow
 
@@ -38,7 +38,7 @@ shutil.copy('<skillDir>/preflight-atlassian.SKILL.template.md', dest)
 | `diagramRenderer` | "How should `/publish-page` render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |
 | `drawioExtensionKey` | "Only for `drawio` — enter the Draw.io macro's extension key, `<appId>/<envId>/static/drawio`. Find it by reading a page that already holds a Draw.io diagram with `contentFormat: "adf"` and copying the diagram node's `attrs.extensionKey`:" |
 
-`drawio`/`mermaid` need their Confluence app installed; `drawio` also needs `drawioExtensionKey` (ids differ per site). `mermaid` not yet usable — `publish-page` refuses it. `png` → leave both empty.
+`drawio`/`mermaid` need their Confluence app installed; `drawio` also needs `drawioExtensionKey` (ids differ per site). `mermaid` not yet usable — `publish-page` skill refuses it. `png` → leave both empty.
 
 **5 — Write.** Per `tableKeys`: Step 4 value (asked or present) → else `tableDefault` (e.g. `maxResults`/`limit` → `10`, `diagramRenderer` → `png`) → else omit (e.g. `swimlaneDrawio`). New file → create one JSON object; existing → add missing keys only, never change existing values. `accountId`/`displayName` seeded empty, never asked; Step 7 fills them. **MUST NOT** print/log `apiToken`.
 
@@ -48,7 +48,7 @@ git check-ignore -q "$configPath" || echo "NOT IGNORED"
 ```
 `NOT IGNORED` → append `.atlassian.json.user` line, commented as holding a credential, to CWD `.gitignore` (create if needed). Never ignore the folder — its `SKILL.md` is checked in.
 
-**7 — Resolve MCP, cache identity.** Run `preflight-atlassian` **Action: Resolve**, forcing the live identity check (ignore its cache-skip rule; this populates the cache). `mcpConnected` false → report missing "an Atlassian MCP connection", skip to Step 9. True and `accountId`/`displayName` not in `presentKeys` → merge live values, missing keys only.
+**7 — Resolve MCP, cache identity.** *Run `preflight-atlassian` skill to resolve cloudId and token availability from `.atlassian.json.user` config* **Action: Resolve**, forcing the live identity check (ignore its cache-skip rule; this populates the cache). `mcpConnected` false → report missing "an Atlassian MCP connection", skip to Step 9. True and `accountId`/`displayName` not in `presentKeys` → merge live values, missing keys only.
 
 **8 — Offer `pub-<issue-type>` wrappers.**
 1. `projectKey :=` Preflight `defaultProjectKey`; empty → `getVisibleJiraProjects`: one → use; many → ask; zero → report missing "a visible Jira project", skip to Step 9.
@@ -61,8 +61,8 @@ git check-ignore -q "$configPath" || echo "NOT IGNORED"
    - Write CWD `.github/skills/<skillName>/SKILL.md` containing:
      - Frontmatter `name: <skillName>`, `description: Create a <issueType.name> in <projectKey> with this repository's required fields pre-filled. Use when asked to create/open/file a <issueType.name>.`
      - Required-fields table: field key, field name.
-     - Step: gather each required field (developer or mirrored issue), then run `publish-work` with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additional_fields`; never call `createJiraIssue` directly.
-     - Description-fidelity step: before drafting, run `map-markdown-adf` **Action: Detect ADF-only constructs** on the source; mirror source headings verbatim, add no heading, keep `<details>` blocks; after ADF publish, verify via `getJiraIssue`, not the publish response.
+     - Step: gather each required field (developer or mirrored issue), then *run `publish-work` skill to create the Jira work item from a summary and Markdown description* with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additional_fields`; never call `createJiraIssue` directly.
+     - Description-fidelity step: before drafting, *run `map-markdown-adf` skill to detect constructs only Atlassian Document Format (ADF) can express, preserving source wording verbatim* **Action: Detect ADF-only constructs** on the source; mirror source headings verbatim, add no heading, keep `<details>` blocks; after ADF publish, verify via `getJiraIssue`, not the publish response.
 
 **9 — Report.** Preflight copied; config created/updated + keys added (no values; only whether token supplied); generated wrapper paths; skipped capabilities + missing prerequisite each; `plugins/atl/` untouched.
 
@@ -71,7 +71,7 @@ git check-ignore -q "$configPath" || echo "NOT IGNORED"
 - Generated skills only under CWD `.github/skills/`, never a plugin folder — required fields are per-repo.
 - Preflight `SKILL.md` always overwritten; `pub-*` never overwritten without asking.
 - Name every missing prerequisite; never skip silently.
-- No Confluence wrapper skill — use `publish-page` directly.
+- No Confluence wrapper skill — *use `publish-page` skill directly to create or update a Confluence page from a local Markdown file*.
 - Discover required fields live; never hardcode.
 
 ## Gotchas

@@ -10,8 +10,8 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
 
 ## Prerequisites
 
-- `atlassian-python-api` installed by `init-atl`; run it first if missing. This skill installs nothing.
-- Attachment caching and mermaid restore need `apiToken` in `.atlassian.json.user` (see `preflight-atlassian`). Without it: no downloads; placeholders become notes.
+- `atlassian-python-api` installed by `init-atl` skill; if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. This skill installs nothing.
+- Attachment caching and mermaid restore need `apiToken` in `.atlassian.json.user` (see `preflight-atlassian` skill). Without it: no downloads; placeholders become notes.
 
 ## Workflow
 
@@ -25,7 +25,7 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
    ```bash
    python3 scripts/assemble_page.py --page-id <page_id> --config "<configPath>" --md-path page.md < content.json
    ```
-   Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`. Converts via `map-markdown-adf` **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
+   Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
 5. **Return** `page.md` unchanged.
 
 ## Attachments
@@ -38,11 +38,11 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
 **Caching:** on match, list and download all page attachments once; stage in sibling dir, then atomically replace assets dir — failure never leaves a partial cache or damages a prior one. TLS verification always on.
 
 **Placeholder resolution:**
-1. `{stem}.source.mmd` sidecar attached → verbatim ```mermaid fence only, no image (`publish-page` re-renders).
+1. `{stem}.source.mmd` sidecar attached → verbatim ```mermaid fence only, no image (`publish-page` skill re-renders).
 2. Image, no sidecar → `![<alt or filename>](page.md.assets/<file>)`; if placeholder has `width`/`height`, add `<!-- media-size: width=<w> height=<h> -->` on the next line.
 3. Other file → `[<filename>](page.md.assets/<file>)`.
 
-Links percent-encoded, relative to `page.md`'s dir. `publish-page` re-uploads rule 2/3 references on republish.
+Links percent-encoded, relative to `page.md`'s dir. `publish-page` skill re-uploads rule 2/3 references on republish.
 
 ## `--attachments` modes
 
@@ -52,7 +52,7 @@ Links percent-encoded, relative to `page.md`'s dir. `publish-page` re-uploads ru
 
 ## Degraded mode
 
-- Diagram published before sidecars existed → note naming missing `{name}.source.mmd`; republish via `publish-page`, then refetch.
+- Diagram published before sidecars existed → note naming missing `{name}.source.mmd`; *republish via `publish-page` skill to update the Confluence page from Markdown*, then refetch.
 
 ## Gotchas
 

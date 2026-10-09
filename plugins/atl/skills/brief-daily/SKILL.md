@@ -12,7 +12,7 @@ Budget: **two searches and two script runs**. Query B projects `comment`, so eve
 
 ## Workflow
 
-**1 — Preflight.** Run `preflight-atlassian` skill (resolves cloudId, default project key, default space id, token availability, `.atlassian.json.user` config) **Action: Resolve**. It returns `cloudId`, `accountId` and `displayName` — this skill resolves none of them itself.
+**1 — Preflight.** *Run `preflight-atlassian` skill to resolve cloudId, default project key, default space id, and token availability from `.atlassian.json.user` config* **Action: Resolve**. It returns `cloudId`, `accountId` and `displayName` — this skill resolves none of them itself.
 
 **2 — Resolve period.** Parse `{{input}}`: empty → default `1 month`. Convert it into a JQL relative-date modifier in **days only** — never the `M` (month) unit (see Gotchas) — using 1 month ≈ 30 days: `1 month` → `-30d`, `"2 weeks"` → `-14d`, `"3 months"` → `-90d`. Keep the day count: it is Step 5's `--cutoff-days`.
 

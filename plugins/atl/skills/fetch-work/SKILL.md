@@ -10,7 +10,7 @@ Return a Jira **Work item** as Markdown from key or URL. MCP only; API token nee
 
 ## Prerequisites
 
-- `atlassian-python-api` installed by `init-atl` (plugin-wide); run it first if missing. This skill installs nothing.
+- `atlassian-python-api` installed by `init-atl` skill (plugin-wide); if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. This skill installs nothing.
 - Embedded image/file resolution needs `apiToken` in `.atlassian.json.user` (see `preflight-atlassian` skill) — MCP returns no real ADF (see Gotchas). No token → no download; each embedded image becomes a placeholder note.
 
 ## Workflow
@@ -33,7 +33,7 @@ python3 scripts/assemble_work.py --issue-key <key> --config "<configPath>" --md-
 
 Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body. `--assets-dir <dir>` overrides cache dir (default `work.md.tmp`, beside `work.md`).
 - No token → uses MCP `fields.description` as-is; each `![](blob:...)` → note naming `apiToken`.
-- Token → fetches real ADF over REST, converts via `map-markdown-adf` **Action: Convert ADF to Markdown** (media nodes → placeholders), then applies Attachment rules.
+- Token → fetches real ADF over REST, converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (media nodes → placeholders), then applies Attachment rules.
 
 **6 — Return** `work.md` contents unchanged.
 
@@ -44,7 +44,7 @@ Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **A
 - Resolve each placeholder by `alt` (original filename) against `fields.attachment[].filename`, never `media-id` (REST doesn't expose it).
   - Image → `![<filename>](work.md.tmp/<file>)`; if `width`/`height` known, next line `<!-- media-size: width=<w> height=<h> -->`.
   - Other → `[<filename>](work.md.tmp/<file>)`.
-- Links percent-encoded, relative to `work.md`'s directory. No Draw.io/mermaid-sidecar rule (unlike `fetch-page`).
+- Links percent-encoded, relative to `work.md`'s directory. No Draw.io/mermaid-sidecar rule (unlike `fetch-page` skill).
 
 ## Degraded mode
 
@@ -54,7 +54,7 @@ Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **A
 ## Gotchas
 
 - **MUST NOT `find`/`grep`/`ls -R` to locate this skill's directory.** Use the parent of the `SKILL.md` path you were given.
-- **MCP `getJiraIssue` never returns real ADF for `description`**, even with `responseContentFormat: "adf"` — returns flattened Markdown with empty-alt `![](blob:...&id=<media-uuid>...)` images. Not JSON; `map-markdown-adf` `adf-to-md` raises `JSONDecodeError` on it. Hence REST fetch when token present.
+- **MCP `getJiraIssue` never returns real ADF for `description`**, even with `responseContentFormat: "adf"` — returns flattened Markdown with empty-alt `![](blob:...&id=<media-uuid>...)` images. Not JSON; `map-markdown-adf` skill's `adf-to-md` raises `JSONDecodeError` on it. Hence REST fetch when token present.
 
 ## Verification
 
