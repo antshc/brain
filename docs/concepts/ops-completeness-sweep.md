@@ -9,7 +9,8 @@ reconstructing the full obligation list and checking each obligation for evidenc
 
 ## Rules
 
-- A Completeness Sweep MUST run last, after implementation and after every other pass.
+- Use a Completeness Sweep for multi-part work where requirements can be silently omitted and step checks or completion criteria cannot prove full coverage. Small, bounded deliverables may omit it when existing checks cover the entire scope.
+- When used, a Completeness Sweep MUST run last, after implementation and after every other pass.
 - The obligation list MUST be reconstructed from the request and acceptance criteria, existing
   architecture/conventions, affected code paths, tests, documentation, configuration/migrations, and
   error/security/observability/compatibility concerns.
@@ -47,4 +48,4 @@ checks coverage *after* the work is believed done.
 
 ## Exceptions
 
-- None recorded yet.
+- Bounded outputs such as a method rename or a diagram with fully enumerated inputs need no separate sweep when step checks or completion criteria already prove full coverage. Do not duplicate the same checks.
