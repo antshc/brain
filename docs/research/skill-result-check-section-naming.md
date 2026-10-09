@@ -54,6 +54,27 @@ Other sections worth noting: Rationalizations (excuses with rebuttals), Red Flag
 | Acceptance criteria | Agile user stories | Already used for stories here (`draft-story`, `to-story`). |
 | Postconditions | Design by contract, UML | Precise but code-contract flavored. |
 
+## Completion criteria versus completeness sweep
+
+[Completion criteria](../../.github/instructions/agent-skills.instructions.md) define checkable conditions on the *expected result*. A [Completeness Sweep](../concepts/ops-completeness-sweep.md) is a *last coverage pass* that reconstructs all obligations and checks whether anything was omitted. Criteria answer "does the result meet its contract?"; the sweep answers "did we cover the whole requested scope?". Neither substitutes for correctness review or testing.
+
+| Situation | Completion criteria | Completeness sweep | Rationale |
+| --- | --- | --- | --- |
+| Rename a method with one known caller | Only if step checks do not already prove the result | No | Small, bounded and directly observable. |
+| Generate a diagram from a defined set of components | Yes, if coverage/relationships are not self-evident | No, if criteria enumerate the full input scope | Finite deliverable; avoid redundant checks. |
+| Add a service with several operations | Yes | When callers, branches or error paths can be missed | Multiple independent obligations. |
+| Refactor a component or implement a feature | Yes | Yes | Changes span contracts, callers, tests and behavior. |
+| Implement RBAC across API, GUI and upgrades | Yes | Yes | A passing new-installation flow can hide a missing upgrade migration. |
+| Research architecture across several systems | Yes, if a deliverable is specified | Yes, when source/concern coverage is not bounded | Conclusions can omit a system or constraint. |
+
+### Example: implement RBAC
+
+Completion criteria (specified in the skill): the API enforces roles; the GUI hides disallowed actions; unauthorized calls return 403; required test evidence exists.
+
+Completeness sweep (performed last): re-read the request; reconstruct obligations for new and upgraded installations, role assignments, API and GUI paths, tests, documentation, configuration and error handling; map each to evidence; implement uncovered work, ask, or explicitly defer it. A missing Keycloak upgrade migration fails the sweep even if the tested new-installation behavior meets its criteria.
+
+**Selection rule:** add `## Completion criteria` only when the result is not already proved by procedural checks. Add a closing completeness sweep when the scope contains independent obligations that can be silently omitted. Omit the sweep for small, bounded outputs if the step checks or completion criteria demonstrably cover every obligation. If used, the sweep runs after all other passes.
+
 ## Outcome
 
 Use **Completion criteria**. Open options not yet adopted: a graded outcome (`verified | partial | failed`) inside the section, Rationalizations and Red Flags tables for the `ralph` skills, a Troubleshooting section, and When to Escalate.
