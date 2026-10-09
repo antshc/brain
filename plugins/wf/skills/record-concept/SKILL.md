@@ -86,9 +86,10 @@ A Concept governing multiple building blocks is indexed in `ARCHITECTURE.md`'s `
 The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skill, not projected from the record — the record carries nothing to project.
 
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
-2. Derive the Trigger condition with `/index-docs`' skill **Generate trigger condition**, passing the rendered body as `{{recordContent}}`.
-3. Author `default` yourself — one sentence naming the choice to take when the design doesn't state one. A caller-supplied, user-confirmed `default` (from `/define-concept`) is used verbatim.
-4. Run `/index-docs`' skill **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `triggerCondition`, `default` — never edit the table in `ARCHITECTURE.md` directly.
+2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
+3. Derive the Trigger condition with `/index-docs`' skill **Generate trigger condition**, passing the rendered body as `{{recordContent}}`.
+4. Author `default` yourself — one sentence naming the choice to take when the design doesn't state one. A caller-supplied, user-confirmed `default` (from `/define-concept`) is used verbatim.
+5. Run `/index-docs`' skill **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
 
 Superseding or retiring a Concept applies the marker to its index row via the same **Sync index row** call; the record itself carries no status field.
 

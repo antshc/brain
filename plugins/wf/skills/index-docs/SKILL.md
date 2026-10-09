@@ -36,8 +36,8 @@ Return one Trigger condition value. The caller writes it into the row via **Sync
 Inputs: `{{tableMetadata}}`, `{{touchedSurface}}`, `{{questioningContext}}`, `{{domainGlossary}}`. `{{tableMetadata}}` is the file/section boundary, headers, Trigger condition column, and row locator rules; for this file's own three tables it is implied — the caller passes only the table name (`Deployables`, `Architecture Decision Records`, `Crosscutting Concepts`). Callers supply the touched surface, questioning context, and glossary — never the table shape. `{{touchedSurface}}` may carry domain terms, file paths, or both; a caller that knows which files a change touches passes them, and one that only has terms passes terms.
 
 1. Absent or empty table: no matches.
-2. Absent Trigger condition column: table-contract error.
-3. Read each row's Trigger condition cell; a blank cell never matches.
+2. Absent Trigger condition column (any header containing `Trigger condition`): table-contract error.
+3. Read each row's Trigger condition cell; a blank cell never matches. A cell split into `**Trigger:** … **Default:** …` matches on its Trigger part only; the Default part is never matched.
 4. Split non-blank cells on commas; match each clause semantically against the touched surface and questioning context, using the glossary for domain terms and paraphrases.
 5. Open the linked record's body only when its locator is supplied and resolvable. Having opened one, treat its cross-references (where the body names another record) as candidates and scan their rows too.
 6. Report matched clauses and rationale for matches; checked clauses and rationale for non-matches.
