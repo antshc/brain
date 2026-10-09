@@ -16,7 +16,13 @@ def test_roots(repo: Path) -> list[Path]:
             continue
         if path.suffix != ".py" or not (path.name.startswith("test_") or path.name.endswith("_test.py")):
             continue
-        roots.add(Path("tools/tests") if path.parts[:2] == ("tools", "tests") else path.parent)
+        if path.parts[:2] == ("tools", "tests"):
+            roots.add(Path("tools/tests"))
+        elif path.parts[0] == "tests":
+            # Per-skill folders run isolated; a file directly under tests/<plugin>/ runs alone.
+            roots.add(Path(*path.parts[:3]))
+        else:
+            roots.add(path.parent)
     return sorted(roots)
 
 

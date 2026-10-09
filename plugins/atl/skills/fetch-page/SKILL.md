@@ -57,7 +57,3 @@ Links percent-encoded, relative to `page.md`'s dir. `publish-page` skill re-uplo
 ## Gotchas
 
 - **MUST NOT** `find`/`grep`/`ls -R` to locate this skill's directory. Use the parent of this `SKILL.md`'s absolute path, already given in context.
-
-## Verification
-
-From repo root: `python3 -m pytest plugins/atl/skills/fetch-page/tests/`; ADF-to-placeholder seam: `python3 -m pytest plugins/atl/skills/map-markdown-adf/`.

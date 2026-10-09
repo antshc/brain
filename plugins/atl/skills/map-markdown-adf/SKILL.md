@@ -7,10 +7,6 @@ description: Convert Markdown to Atlassian Document Format (ADF) and back, and d
 
 The conversion capability shared by every `atl` skill that reads or publishes content. One CLI, both directions plus a detection gate, pure and offline — no filesystem, no config, no network.
 
-## Setup
-
-`pytest` (dev-only, for tests) is installed once by `init-atl` skill for the whole `atl` plugin. The CLI itself has no third-party runtime dependencies.
-
 ## Action: Convert Markdown to ADF
 
 From the directory holding this `SKILL.md`:
@@ -92,7 +88,3 @@ Every table's rows must resolve to one consistent column count once `colspan`/`r
 ## Gotchas
 
 **Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `map-markdown-adf/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.
-
-## Verification
-
-`python -m pytest plugins/atl/skills/map-markdown-adf/` (from the repo root). Tests invoke the CLI as a subprocess — the only test seam — and assert only on emitted JSON/Markdown, never on which internal module produced it.

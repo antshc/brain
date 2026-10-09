@@ -10,7 +10,7 @@ Sets up `atl` in the current repo (= CWD): copies `preflight-atlassian` skill fr
 
 ## Workflow
 
-**1 — Install deps.** From this skill's base directory: `pip install -r requirements.txt`. Covers every `atl` skill (`atlassian-python-api`, `pytest`).
+**1 — Install deps.** From this skill's base directory: `pip install -r requirements.txt`. Covers every `atl` skill (`atlassian-python-api`).
 
 **2 — Copy preflight template.** `skillDir :=` parent of this `SKILL.md`'s absolute path from context. Copy `<skillDir>/preflight-atlassian.SKILL.template.md` → CWD `.github/skills/preflight-atlassian/SKILL.md`, always overwriting.
 
@@ -79,6 +79,8 @@ git check-ignore -q "$configPath" || echo "NOT IGNORED"
 - **MUST NOT** `find`/`grep`/`ls -R` for this skill's directory or template; derive from this `SKILL.md`'s absolute path in context.
 - Resolve `.github/` from CWD, never an env var (`$HARNESS_REPO_PATH` removed); run from repo root.
 
-## Verification
+## Completion criteria
 
-No test suite. Verify manually on a repo with no config and one with values: preflight `SKILL.md` byte-identical to template; config has every table key with correct asked/default value (`maxResults`/`limit`/`diagramRenderer` defaults, no `swimlaneDrawio`); `plugins/atl/` unchanged; shell profile and env unchanged.
+- CWD `.github/skills/preflight-atlassian/SKILL.md` byte-identical to the template.
+- Config has every table key; each value is the asked value, else the table default (`maxResults`/`limit` → `10`, `diagramRenderer` → `png`), else omitted (`swimlaneDrawio`); existing values unchanged.
+- `plugins/atl/` unchanged; shell profile and env unchanged.

@@ -133,9 +133,8 @@ Report page URL; with diagrams, confirm page and attachment list show every imag
 
 `extract`, `render-attach`, `substitute-media`, `publish-adf`, `combine` = steps `run` chains; each invokable alone for fallback or ad-hoc use (`--help`). `replace-markers` = legacy top-level-only alias for `substitute-media`. `render-attach` supports `png` only; refuses macro renderers, points at `run`.
 
-## Verification
+## Completion criteria
 
-- Unit: `python -m pytest plugins/atl/skills/publish-page/` from repo root (pipeline, mocked); conversion: `python -m pytest plugins/atl/skills/map-markdown-adf/`.
 - Live: `getConfluencePage` with `body-format: atlas_doc_format`. `png` → `"type": "media"` count = diagram count; 2 attachments per diagram (`.png`, `.source.mmd`). `drawio` → count `"type": "extension"` with `static/drawio`; 3 attachments per diagram (`.drawio`, `.drawio.png`, `.source.mmd`).
 - Confirm MCP response shape empirically before asserting top-level keys (e.g. `title`/`version`).
 - Raw REST probes MUST use `<site>/wiki/...`; `site_url()` returns bare site, only `atlassian-python-api` adds `/wiki` (else 404 `No endpoint POST /rest/api/content`).

@@ -26,7 +26,7 @@ Use `python3` — `python` is not available in this environment.
 
 ### Skill-owned Python
 
-A skill may own its own Python code and tests inside its own folder — see [Skill-Owned Code](../docs/concepts/structure-skill-owned-code.md).
+A skill may own its own Python code inside its own folder; its tests live under `tests/<plugin>/<skill>/` — see [Skill-Owned Code](../docs/concepts/structure-skill-owned-code.md).
 
 - Code with **one** consumer lives in the skill that uses it; no module, no sync mapping.
 - Code shared by several skills in **one** plugin is owned by exactly one of them; siblings invoke that skill rather than importing across skill folders.
@@ -43,7 +43,7 @@ A skill may own its own Python code and tests inside its own folder — see [Ski
 ### Tests
 
 - Tests for `tools/src/` live in `tools/tests/unit/` and `tools/tests/integration/`, mirroring `tools/src/`.
-- Tests for skill-owned Python live beside that code, inside the skill folder.
+- Tests for skill-owned Python live in `tests/<plugin>/<skill>/` (no `skills/` segment). Run each folder separately — skills share module and test basenames: `python3 -m pytest tests/atl/fetch-page`, or all via `python3 .github/scripts/run-python-tests.py`.
 - Every test under `tools/tests/` is traceable to a scenario in `TEST_PLAN.md`:
   - Test class docstring → Feature name (e.g., `"Feature: Comment Label Detection"`).
   - Test method name → Scenario name in snake_case; add `# Scenario: ...` comment below the def.

@@ -55,7 +55,3 @@ Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **A
 
 - **MUST NOT `find`/`grep`/`ls -R` to locate this skill's directory.** Use the parent of the `SKILL.md` path you were given.
 - **MCP `getJiraIssue` never returns real ADF for `description`**, even with `responseContentFormat: "adf"` — returns flattened Markdown with empty-alt `![](blob:...&id=<media-uuid>...)` images. Not JSON; `map-markdown-adf` skill's `adf-to-md` raises `JSONDecodeError` on it. Hence REST fetch when token present.
-
-## Verification
-
-`python3 -m pytest plugins/atl/skills/fetch-work/tests/` from repo root (all mocked). ADF→placeholder seam: `python3 -m pytest plugins/atl/skills/map-markdown-adf/`.
