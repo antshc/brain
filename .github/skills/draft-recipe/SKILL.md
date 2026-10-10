@@ -11,7 +11,7 @@ Write one standalone recipe about a reusable **AI agent practice**, not about ho
 
 1. Identify the observed AI agent problem and the repeatable instruction that prevents it. For repository-based requests, inspect current evidence; ignore `_backup/` and `_in-progress/`. *Done when* the problem and prevention are specific.
 2. State the Solution in **one or two sentences**. Describe **what to instruct the AI agent to do** and **when**. Do not assign the procedure to the human reader. *Done when* both the instruction and its trigger are clear.
-3. Select **one** practical task. Write directly reusable **AI Instructions** for that task as imperative commands to the agent. *Done when* the reader can copy the instructions into an agent prompt without modification.
+3. Select **one** practical task. Write terse, concise **AI Instructions** as direct imperative commands for that task. Use specific actions, not generic placeholders. Remove explanations and filler. *Done when* the reader can copy the instructions into an agent prompt without modification.
 4. Render the recipe with [templates/recipe.md](templates/recipe.md). Populate all sections; write **exactly three** Best Practices bullets and only **one** Example. Link only confirmed related recipes; if none exist, write `None yet.` *Done when* the rendered recipe matches the template with no empty placeholders.
 
 ## Writing rules
