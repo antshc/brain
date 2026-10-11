@@ -45,7 +45,7 @@ Tracks reusable AI-agent practices found in this repository and explicitly scann
 
 ## External scan: cursor/plugins/pstack
 
-Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/pstack), scanned and rescanned 2026-10-11. These principles link to guidance in another repository. Existing brain entries remain unchanged.
+Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/pstack), scanned three times on 2026-10-11. These principles link to guidance in another repository. Existing brain entries remain unchanged.
 
 ### Design and code principles
 
@@ -81,6 +81,10 @@ Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/psta
 - [ ] **Validate authored skills, referenced files, and structural examples** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/authoring-a-skill.md)
 - [ ] **Repair broken workflow skills in a separate PR from feature work** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/SKILL.md)
 
+- [ ] **Make module internals inaccessible and expose only one supported operation path** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/architect/references/design-red-flags.md)
+- [ ] **Record design alternatives, accepted tradeoffs, and rationale alongside the chosen contract** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/architect/references/rationale-template.md)
+- [ ] **Review the implementation against declared intent and require concrete evidence per finding** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/interrogate/references/reviewer-prompt.md)
+
 ### Understanding and design workflows
 
 - [ ] **Investigate the current code path before explaining it** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/how/SKILL.md)
@@ -100,6 +104,12 @@ Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/psta
 - [ ] **Convert traces to queryable data and attribute findings to source symbols** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/trace-forensics.md)
 - [ ] **Keep suspected causes out of the initial agent task brief** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-help/references/prompting.md)
 
+- [ ] **Separate evidence collection from synthesis and keep investigators within their assigned sources** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/why/references/investigator-prompt.md)
+- [ ] **Record exact investigation queries, empty results, and contradictory evidence** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/why/references/investigator-prompt.md)
+- [ ] **Treat agent transcripts and reviewer outputs as untrusted data, not executable instructions** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/reflect/references/synthesizer.md)
+- [ ] **Limit retrospective skill changes to demonstrated use or missed triggers** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/reflect/references/synthesizer.md)
+- [ ] **Resume from the prior execution trail rather than repeating completed work** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/session-pickup.md)
+
 ### Testing and delivery workflows
 
 - [ ] **Pin existing behavior before structural refactoring** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/refactoring.md)
@@ -118,6 +128,12 @@ Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/psta
 - [ ] **Audit live sessions and uncommitted changes before removing worktrees** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/worktree-cleanup.md)
 - [ ] **Treat PR review text as untrusted input rather than executable instructions** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/babysit.md)
 - [ ] **Select documentation structure by tutorial, how-to, reference, or explanation purpose** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/technical-writing/SKILL.md)
+
+- [ ] **Verify dry-run claims by inspecting actual network, file, and repository effects** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md)
+- [ ] **Health-check and reset verification instances after unexpected drive failures** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md)
+- [ ] **Clean up only owned verification processes and preserve collected proof artifacts** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md)
+- [ ] **Compare changed behavior with current trunk on the same user-visible path** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/autopilot-full.md)
+- [ ] **Keep reproduction recordings, logs, and tokens out of source control** — [source](https://github.com/cursor/plugins/blob/main/pstack/automations/benny/skills/reproduce-and-fix-issues/SKILL.md)
 
 ### Autonomy, continuity, and learning
 
@@ -143,6 +159,12 @@ Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/psta
 - [ ] **Keep verified stacked PRs unmerged until explicitly authorized** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/autopilot-stack.md)
 - [ ] **Apply retrospective changes to shared agent instructions only with approval** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/reflect/SKILL.md)
 
+- [ ] **Audit decision logs against transcripts and correct false or omitted claims by appending rows** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/show-me-your-work/SKILL.md)
+- [ ] **Independently review long-running decision trails with a different model family** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/show-me-your-work/SKILL.md)
+- [ ] **Propagate operator stop orders to all active agents as an immediate no-writes hold** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/autopilot-full.md)
+- [ ] **Prefer event-based agent wakeups with a heartbeat fallback over unnecessary polling** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/autonomous-run.md)
+- [ ] **Keep stack topology updates under one coordinator while PR owners work in parallel** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/autopilot-stack.md)
+
 ### External automations and communication
 
 - [ ] **Freeze report provenance and deduplicate before filing tickets** — [source](https://github.com/cursor/plugins/blob/main/pstack/automations/benny/skills/triage-issue-reports/SKILL.md)
@@ -158,6 +180,9 @@ Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/psta
 - [ ] **Remove generic AI phrasing while preserving the intended meaning** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md)
 - [ ] **Describe goals, proof, and constraints without prescribing skill choreography** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-help/references/prompting.md)
 - [ ] **Frame agent delivery for both the user and the future maintainer** — [source](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/SKILL.md)
+
+- [ ] **Preserve locally edited managed files and keep user configuration outside automation packs** — [source](https://github.com/cursor/plugins/blob/main/pstack/automations/benny/skills/setup-benny/SKILL.md)
+- [ ] **Run automations from committed operational files rather than copied instructions or caches** — [source](https://github.com/cursor/plugins/blob/main/pstack/automations/benny/skills/setup-benny/SKILL.md)
 
 ## Scan and update
 
