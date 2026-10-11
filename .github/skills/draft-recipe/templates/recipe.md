@@ -1,17 +1,14 @@
 # Recipe: {{name|AI agent practice}}
 
 ## Problem
-{{problem|Describe the problem an AI agent can cause.}}
-
-## Solution
-{{solution|In 1–2 sentences, explain what to instruct the AI agent to do and when.}}
+{{problem|Describe the AI agent problem and the context in which it occurs.}}
 
 ## Example
 
-**Task:** {{task|Describe one practical use case.}}
+**Task:** {{task|Describe one practical use case in 1–3 sentences.}}
 
 **AI Instructions:**
-> {{instructions|Write direct commands that can be copied into an AI agent prompt.}}
+> {{instructions|Write terse, concise, task-specific commands ready to copy into an AI agent prompt.}}
 
 ## Best Practices
 - {{recommendedApproach|Recommended approach.}}
