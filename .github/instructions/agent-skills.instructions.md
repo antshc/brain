@@ -78,16 +78,17 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
 | *italic* | Skill invocation phrase | *Run `fetch-page` skill to fetch the Confluence page as Markdown.* |
-| `camelCase` | Agent-resolved conceptual value | Resolve `camelCase` from Git. |
-| `camelCase := instruction` | Runtime assignment | `NAME := generate unique kebab-case name` |
+| `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
+| `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
 | `{{camelCase\\|hint}}` | Preferred field-local guidance | `{{priority\\|MVP or Should have}}` |
 | `<!-- @: instruction -->` | Hidden structural/rendering directive; **MUST** be one terse line | `<!-- @: repeat per component -->` |
 | `[optional]` | Optional input | `[target-path]` |
 | `value1 \\| value2` | Allowed values | `completed \\| failed` |
 | ``literal`` | Fixed command/path/value | `dotnet test` |
-| `$VARIABLE` | Shell variable | `$REPOSITORY_ROOT` |
-| `${VARIABLE}` | Braced shell variable | `${REPOSITORY_ROOT}/src` |
+| `$snake_case` | Local Bash variable (shell only) | `$repo_root` |
+| `$UPPER_SNAKE_CASE` | Bash environment variable (shell only) | `$REPOSITORY_ROOT` |
+| `${UPPER_SNAKE_CASE}` | Braced Bash variable expansion (shell only) | `${REPOSITORY_ROOT}/src` |
 
 ## Procedures
 
