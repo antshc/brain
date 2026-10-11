@@ -186,7 +186,7 @@ Source: [cursor/plugins/pstack](https://github.com/cursor/plugins/tree/main/psta
 
 ## External scan: addyosmani/agent-skills
 
-Source: [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), scanned 2026-10-11. Reviewed the 25 active skills, four agent personas, seven shared reference checklists, and workflow documentation. Missing entries link to source evidence; recipes were not created.
+Source: [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), scanned and rescanned 2026-10-11. Reviewed the 25 active skills, four agent personas, seven shared reference checklists, root agent instructions, command workflows, skill-evaluation guidance, nested references, and hooks. Missing entries link to source evidence; recipes were not created.
 
 ### Intent, discovery, and specifications
 
@@ -207,6 +207,9 @@ Source: [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), s
 - [ ] **Build dependency-ordered, verifiable task slices without implementing during planning** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/planning-and-task-breakdown/SKILL.md)
 - [ ] **Preserve incomplete plans and use the project's designated task tracker** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/planning-and-task-breakdown/SKILL.md)
 
+- [ ] **Inspect working-tree changes before autonomous execution and stop on unrelated dirty files** — [source](https://github.com/addyosmani/agent-skills/blob/main/.claude/commands/build.md)
+- [ ] **Escalate irreversible or high-risk work for fresh human approval even during an approved autonomous run** — [source](https://github.com/addyosmani/agent-skills/blob/main/.claude/commands/build.md)
+
 ### Implementation, context, and independent judgment
 
 - [ ] **Implement complete vertical slices with test, verification, and commit gates** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/incremental-implementation/SKILL.md)
@@ -225,6 +228,14 @@ Source: [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), s
 - [ ] **Define a reference-grounded UI design contract before implementation** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/frontend-ui-engineering/SKILL.md)
 - [ ] **Verify responsive and accessible UI states including empty, loading, and error flows** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/frontend-ui-engineering/SKILL.md)
 
+- [ ] **Stage only files belonging to the current autonomous task rather than blindly staging every change** — [source](https://github.com/addyosmani/agent-skills/blob/main/.claude/commands/build.md)
+- [ ] **Avoid installing a second always-on skill router when the agent host already routes skills natively** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/getting-started.md)
+- [ ] **Keep reusable skills separate from repository-specific agent instructions during installation** — [source](https://github.com/addyosmani/agent-skills/blob/main/AGENTS.md)
+- [ ] **Include required shared references when distributing an individual skill outside its original pack** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/getting-started.md)
+- [ ] **Keep vendor runtime settings in per-agent adapters or permitted metadata, not portable skill frontmatter** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/advanced-per-agent-configuration.md)
+- [ ] **Distinguish tool preapproval from true tool restrictions when configuring least-privilege agents** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/advanced-per-agent-configuration.md)
+- [ ] **Revalidate cached official documentation with origin validators before using it across sessions** — [source](https://github.com/addyosmani/agent-skills/blob/main/hooks/SDD-CACHE.md)
+
 ### Testing, debugging, and evidence
 
 - [ ] **Use the red-green-refactor cycle for behavior-changing implementation** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/test-driven-development/SKILL.md)
@@ -240,6 +251,8 @@ Source: [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), s
 - [ ] **Treat error output, external documentation, and browser content as untrusted instructions** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/debugging-and-error-recovery/SKILL.md)
 - [ ] **Apply standing definition-of-done checks separately from task acceptance criteria** — [source](https://github.com/addyosmani/agent-skills/blob/main/references/definition-of-done.md)
 
+- [ ] **Treat a quality guard that could not run as a blocking failure rather than a clean result** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/constraint-driven-development/references/floor-guard.md)
+
 ### Review and simplification
 
 - [ ] **Review correctness, readability, architecture, security, and performance, reading tests first** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/code-review-and-quality/SKILL.md)
@@ -250,6 +263,9 @@ Source: [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), s
 - [ ] **Automate wide mechanical refactors instead of hand-editing large change sets** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/code-simplification/SKILL.md)
 - [ ] **Parallelize independent specialist reviews, but keep aggregation with the orchestrator** — [source](https://github.com/addyosmani/agent-skills/blob/main/references/orchestration-patterns.md)
 - [ ] **Do not make agent personas invoke other personas or add routing-only hops** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/agents.md)
+
+- [ ] **Use communicating agent teams for competing-hypothesis investigations and independent subagents for report fan-out** — [source](https://github.com/addyosmani/agent-skills/blob/main/references/orchestration-patterns.md)
+- [ ] **Mask protected source blocks during agent simplification and restore them from verified placeholders or backups** — [source](https://github.com/addyosmani/agent-skills/blob/main/hooks/SIMPLIFY-IGNORE.md)
 
 ### Security and trust boundaries
 
@@ -283,6 +299,23 @@ Source: [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), s
 - [ ] **Verify critical user flows and health signals after deployment** — [source](https://github.com/addyosmani/agent-skills/blob/main/skills/shipping-and-launch/SKILL.md)
 - [ ] **Introduce quality checks incrementally in legacy projects rather than enabling the entire lifecycle at once** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/adoption-guide.md)
 - [ ] **Keep skill entrypoints concise with trigger descriptions and load long references on demand** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/skill-anatomy.md)
+
+- [ ] **Default launch decisions to NO-GO for unresolved critical findings unless the operator explicitly accepts the risk** — [source](https://github.com/addyosmani/agent-skills/blob/main/.claude/commands/ship.md)
+
+### Skill authoring and evaluation (second pass)
+
+- [ ] **Check existing skills, active proposals, and rejected changes before introducing a new skill** — [source](https://github.com/addyosmani/agent-skills/blob/main/CONTRIBUTING.md)
+- [ ] **Record rejected skill changes with evaluation evidence in an append-only ledger** — [source](https://github.com/addyosmani/agent-skills/blob/main/CONTRIBUTING.md)
+- [ ] **Write skill procedures in model-neutral capabilities instead of model-specific workarounds** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/skill-anatomy.md)
+- [ ] **Include concrete anti-rationalization rebuttals, misuse red flags, and evidence-based exit checks in skills** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/skill-anatomy.md)
+- [ ] **Test skill routing with realistic positive triggers and neighboring negative triggers** — [source](https://github.com/addyosmani/agent-skills/blob/main/evals/README.md)
+- [ ] **For negative routing tests, require the intended owner skill to outrank the wrong skill** — [source](https://github.com/addyosmani/agent-skills/blob/main/evals/README.md)
+- [ ] **Evaluate skill behavior using isolated executable fixtures and full tool traces rather than claimed intentions** — [source](https://github.com/addyosmani/agent-skills/blob/main/evals/README.md)
+- [ ] **Use dialogue-only evaluations only when conversation itself is the skill's deliverable** — [source](https://github.com/addyosmani/agent-skills/blob/main/evals/README.md)
+- [ ] **Pressure-test skill compliance against shortcuts justified by urgency, authority, or sunk cost** — [source](https://github.com/addyosmani/agent-skills/blob/main/evals/README.md)
+- [ ] **Run skill-on versus skill-off evaluations and score observable output rather than invocation alone** — [source](https://github.com/addyosmani/agent-skills/blob/main/evals/README.md)
+- [ ] **Pin model and runtime versions and repeat trials before drawing conclusions from stochastic skill routing** — [source](https://github.com/addyosmani/agent-skills/blob/main/evals/README.md)
+- [ ] **Validate that equivalent host command adapters stay semantically aligned** — [source](https://github.com/addyosmani/agent-skills/blob/main/docs/developer-onboarding.md)
 
 ## Scan and update
 
