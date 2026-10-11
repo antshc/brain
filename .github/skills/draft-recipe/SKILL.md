@@ -1,6 +1,6 @@
 ---
 name: draft-recipe
-description: Draft a cookbook recipe for an AI agent practice. Use when documenting agent reliability, prompt instructions, repeatable AI workflows, or lessons learned as one concise Problem, Solution, Example, Best Practices, and Related Recipes entry.
+description: Draft a cookbook recipe for an AI agent practice. Use when documenting agent reliability, prompt instructions, repeatable AI workflows, or lessons learned as one concise Problem with context, Examples, Best Practices, and Related Recipes entry.
 ---
 
 # Draft AI Practice Recipe
@@ -9,15 +9,14 @@ Write one standalone recipe about a reusable **AI agent practice**, not about ho
 
 ## Workflow
 
-1. Identify the observed AI agent problem and the repeatable instruction that prevents it. For repository-based requests, inspect current evidence; ignore `_backup/` and `_in-progress/`. *Done when* the problem and prevention are specific.
-2. State the Solution in **one or two sentences**. Describe **what to instruct the AI agent to do** and **when**. Do not assign the procedure to the human reader. *Done when* both the instruction and its trigger are clear.
-3. Select **one** practical task. Write terse, concise **AI Instructions** as direct imperative commands for that task. Use specific actions, not generic placeholders. Remove explanations and filler. *Done when* the reader can copy the instructions into an agent prompt without modification.
-4. Render the recipe with [templates/recipe.md](templates/recipe.md). Populate all sections; write **exactly three** Best Practices bullets and only **one** Example. Link only confirmed related recipes; if none exist, write `None yet.` *Done when* the rendered recipe matches the template with no empty placeholders.
+1. Identify the observed AI agent problem and its context: when it occurs and what makes it relevant. For repository-based requests, inspect current evidence; ignore `_backup/` and `_in-progress/`. *Done when* the Problem describes both the failure and its context.
+2. Select **one or two** practical tasks. Describe each **Task** in **1–3 sentences**. Write terse, concise **AI Instructions** as direct imperative commands for each task. Use specific actions, not generic placeholders. Remove explanations and filler. *Done when* each example is ready to copy into an agent prompt.
+3. Render the recipe with [templates/recipe.md](templates/recipe.md). Populate all sections; write **exactly three** Best Practices bullets and **one or two** Examples. Repeat the Example section for a second task; number the Example headings when there are two. Link only confirmed related recipes; if none exist, write `None yet.` *Done when* the rendered recipe matches the template with no empty placeholders.
 
 ## Writing rules
 
 - Apply ASD-STE100 principles: short sentences, common words, active voice, and one command per instruction.
 - Focus on AI agent behavior and reusable instructions. Do not describe skill invocation.
-- Make the Example operational: include both **Task** and ready-to-copy **AI Instructions**.
-- Keep the Solution brief. Put detailed commands in **AI Instructions**, not in the Solution.
+- Make each Example operational: include a **Task** of 1–3 sentences and ready-to-copy **AI Instructions**.
+- Put detailed commands only in **AI Instructions**. Do not add a Solution section.
 - Do not add a Verification section.
