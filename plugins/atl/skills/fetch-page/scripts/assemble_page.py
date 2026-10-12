@@ -55,7 +55,10 @@ class ConversionError(Exception):
 
 def extract_title_and_body(raw: dict) -> tuple[str, dict]:
     node = raw["content"]["nodes"][0]
-    return node["title"], node["body"]
+    body = node["body"]
+    if not isinstance(body, dict):
+        raise ConversionError(f"ADF body must be a parsed JSON object, got {type(body).__name__}")
+    return node["title"], body
 
 
 def convert_adf_to_markdown(body: dict) -> str:

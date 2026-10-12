@@ -9,6 +9,8 @@ _MARK_ORDER = ("code", "strike", "em", "strong", "link")
 
 
 def adf_to_markdown(doc: dict) -> str:
+    if not isinstance(doc, dict):
+        raise ValueError(f"ADF body must be a parsed JSON object, got {type(doc).__name__}")
     return render_blocks(doc.get("content", []))
 
 

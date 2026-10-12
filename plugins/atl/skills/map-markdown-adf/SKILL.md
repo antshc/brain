@@ -87,4 +87,6 @@ Every table's rows must resolve to one consistent column count once `colspan`/`r
 
 ## Gotchas
 
+- `adf-to-md` stdin **MUST** be one JSON object (`{"type":"doc",...}`), not a JSON-encoded string. Parse REST `atlas_doc_format.value` / `body` strings with `json.loads` before conversion; non-object input → `error: ADF body must be a parsed JSON object`, exit 1.
+
 **Never `find`/`grep`/`ls -R` the filesystem to locate this skill's own directory.** The tool/system context that told you this skill exists already gave you `map-markdown-adf/SKILL.md`'s absolute path verbatim (it's how you're reading this). Take that literal path's parent directory directly (e.g. strip the trailing `/SKILL.md` yourself) — never rediscover it with a search rooted at `/`, `$HOME`, or any other unbounded root, even bounded by `-maxdepth`.

@@ -28,6 +28,12 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
    Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
 5. **Return** `page.md` unchanged.
 
+## Input shape
+
+- Feed `assemble_page.py` the saved `getConfluencePage` result as-is; never hand-build `content.json`.
+- REST fallback (`atlas_doc_format.value` is a JSON string): `json.loads` it first, then write `{"content":{"nodes":[{"title":<title>,"body":<parsed object>}]}}`. A string `body` → `ADF body must be a parsed JSON object` error, no `page.md`.
+- Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `page.md` or retry with edited ADF.
+
 ## Attachments
 
 **Detection:** offline recursive scan of raw ADF; no match → no REST call regardless of token or mode. Matches:
