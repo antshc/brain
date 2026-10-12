@@ -78,16 +78,17 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
 | *italic* | Skill invocation phrase | *Run `fetch-page` skill to fetch the Confluence page as Markdown.* |
-| `camelCase` | Agent-resolved conceptual value | Resolve `camelCase` from Git. |
-| `camelCase := instruction` | Runtime assignment | `NAME := generate unique kebab-case name` |
+| `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
+| `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
 | `{{camelCase\\|hint}}` | Preferred field-local guidance | `{{priority\\|MVP or Should have}}` |
 | `<!-- @: instruction -->` | Hidden structural/rendering directive; **MUST** be one terse line | `<!-- @: repeat per component -->` |
 | `[optional]` | Optional input | `[target-path]` |
 | `value1 \\| value2` | Allowed values | `completed \\| failed` |
 | ``literal`` | Fixed command/path/value | `dotnet test` |
-| `$VARIABLE` | Shell variable | `$REPOSITORY_ROOT` |
-| `${VARIABLE}` | Braced shell variable | `${REPOSITORY_ROOT}/src` |
+| `$snake_case` | Local Bash variable (shell only) | `$repo_root` |
+| `$UPPER_SNAKE_CASE` | Bash environment variable (shell only) | `$REPOSITORY_ROOT` |
+| `${UPPER_SNAKE_CASE}` | Braced Bash variable expansion (shell only) | `${REPOSITORY_ROOT}/src` |
 
 ## Procedures
 
@@ -106,6 +107,17 @@ Add `## Completion criteria` when a skill's result is not self-evident. List obs
 - Name the section **Completion criteria** (the condition that tells the agent the work is done). Do not use `Verification`, `Validation`, `Testing`, or `Acceptance criteria` (reserved for stories).
 - State the result to observe, not how to run tests. A skill's own test suite is repository tooling: **MUST NOT** appear in a skill — no test commands, test paths, or test-only dependencies.
 - Omit the section when the steps' completion conditions already prove the result.
+
+## Completeness sweep
+
+Completion criteria check whether the defined result meets its contract; a completeness sweep checks whether any required scope was omitted.
+
+- Add a **closing completeness sweep** for multi-part work with independently missable obligations: features, cross-file refactors, migrations, or broad research.
+- When used, the sweep **MUST** run last, after other checks. Re-read the request, reconstruct explicit and implied obligations, and map each to evidence across affected code, tests, docs, configuration, and relevant failure/compatibility paths.
+- Resolve uncovered obligations by implementing them, asking for clarification, or reporting explicit deferral. **MUST NOT** declare completion with an unaccounted obligation.
+- Omit the sweep for small, bounded work when procedural checks or completion criteria already prove full coverage (e.g. a method rename or single defined diagram). **MUST NOT** duplicate the same checks under both sections.
+
+See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the closing procedure and [comparison research](../../docs/research/skill-result-check-section-naming.md) for selection examples.
 
 ## Pruning
 
