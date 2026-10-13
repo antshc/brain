@@ -5,7 +5,7 @@ applyTo: "**/skills/**/*.md,**/agents/*.agent.md,.github/instructions/*.instruct
 
 # Writing agent-facing documents
 
-Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, and `.crew/` convention files. Design-time composition guidance lives in [ARCHITECTURE.md](../../ARCHITECTURE.md).
+Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`. Design-time composition guidance lives in [ARCHITECTURE.md](../../ARCHITECTURE.md).
 
 ## Style
 

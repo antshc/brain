@@ -13,26 +13,26 @@ Follow the parent's shared review contract. Review the complete change for this 
 - **Error handling**: exceptions, fallbacks, retries, cancellation, propagation; no silent failures.
 - **Async correctness**: task handling, cancellation propagation, synchronization.
 - **Concurrency safety**: shared mutable state, thread safety, races.
+- **Resource and operation lifecycle**: ownership, cleanup on success, failure, and cancellation; transaction boundaries; retry idempotency; timeouts and bounded work.
 
 ### Compatibility
 - **Backward compatibility**: serialized shapes and public contracts for existing consumers.
+- **Boundary compatibility**: external consumers, persisted formats, defaults, migrations, and mixed-version behavior where relevant. Inspect schemas, configuration, and contract tests beyond LSP references.
 - **Runtime wiring**: DI/config activation only where runtime behavior may break.
 
 ### Performance
 - **Material impact**: hot paths, I/O patterns, allocations, query shape, work amplification.
 
 ### Testability
-- **Coverage**: changed behavior and uncovered high-risk correctness or compatibility scenarios.
+- **Coverage**: report gaps only for specific changed, high-risk behavior with a stated expected result. Include tests for an already reported defect in that finding's fix, not as a separate issue.
 
 For each area, conclude internally: confirmed issue, evidence-backed plausible risk, or no issue found. Emit only actionable findings under the shared contract.
 
-## LSP workflow
+For each finding, connect changed behavior to a supported triggering condition and observable impact. Check relevant guards and handling before reporting; exclude unrelated pre-existing issues.
 
-1. Enumerate changed symbols: types, methods, properties, fields, interfaces, records, constructors. Keep the baseline shallow.
-2. Deepen on changed contracts: find references and read 3-5 representative high-risk callers; resolve implementations/overrides for changed interfaces or abstracts; confirm callers' assumptions and substitutability.
-3. Trace incoming/outgoing calls for changed thrown/returned/error paths, state transitions, and shared-mutable or async state into consumers. Stop once contract impact is clear.
+## Investigation guidance
 
-Perform caller and implementation checks for every changed contract. Deepen call-path tracing only for newly introduced nullability, changed thrown/returned/error behavior, or shared-mutable/async state. Stay at the contract snapshot for body-only changes without those risks; do not expand the full call graph or read every reference.
+Assess changed contracts and behavior, including body-only changes with downstream effects. Inspect relevant callers, implementations, and runtime boundaries to establish triggering conditions and impact. Sample representative paths; expand where assumptions or failure modes differ.
 
 ## Comment format
 

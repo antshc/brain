@@ -10,12 +10,9 @@ Follow the parent's shared review contract. Review the complete change against t
 
 Ground each finding in the ticket description and specific code evidence. Consider the whole change, cross-symbol behavior, and design intent.
 
-## LSP workflow
+## Investigation guidance
 
-1. Enumerate changed symbols: types, methods, properties, fields, interfaces, records, constructors. Keep this shallow; use the map for reachability checks.
-2. Trace each requirement to definitions and references: confirm required behavior exists, is reachable, and is wired rather than dead code.
-3. Invert the map: inspect changed symbols without a requirement mapping as scope-creep candidates, then check their supporting role and stated scope before reporting.
-4. For requirements spanning symbols, trace incoming/outgoing calls from entry point to effect. Stop when implementation, reachability, and wiring are established; prefer representative paths over exhaustive call graphs.
+Account for every supplied requirement using implementation and wiring evidence. Check changed behavior against ticket requirements and stated PR scope; supporting code need not map directly to a requirement. Trace relevant entry points to effects where needed to establish reachability and behavior.
 
 Conclude internally for each candidate: confirmed issue, evidence-backed plausible risk, or no issue found. Emit only actionable findings under the shared contract; anchor comments on changed right-side lines, not on ticket text or off-diff evidence.
 

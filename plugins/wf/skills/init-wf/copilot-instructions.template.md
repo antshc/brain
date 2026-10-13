@@ -2,7 +2,7 @@
 
 ## 1. Scope and repository topology
 
-The reporoot itself plays the role of the **harness** for coding agents: context (`CONTEXT.md`, `ARCHITECTURE.md`), architectural Concepts (`docs/concepts/`), agent conventions (`.crew/`, `.harness.json.user`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
+The reporoot itself plays the role of the **harness** for coding agents: context (`CONTEXT.md`, `ARCHITECTURE.md`), architectural Concepts (`docs/concepts/`), agent conventions (`.harness.json.user`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
 
 This repo (the **reporoot**) is the **documentation/context repo**, not the codebase.
 

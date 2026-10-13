@@ -2,11 +2,7 @@
 
 **Never scan, read, or edit `_backup/`, `docs/kbs`, `_in-progress/`.** Treat them as out of scope for all tasks.
 
-# Writing or updating the skill, templates, agents standards
-
-See [CODE.md](../.crew/CODE.md) for writing style and syntax conventions.
-
-### Plugin Marketplace
+## Plugin Marketplace
 
 All plugins are registered in `.github/plugin/marketplace.json`. **When adding, renaming, or deleting a plugin under `plugins/`, always update `marketplace.json` to match.**
 
@@ -59,7 +55,6 @@ Single repo — docs and codebase live together, no `workspace/` split.
 
 - **Domain glossary:** `CONTEXT.md` — domain terminology and concepts.
 - **Architecture:** `ARCHITECTURE.md` — ADR/Concept indexes, high-level source structure.
-- **Skills best practices** fetch `https://agentskills.io/skill-creation/best-practices` for How to write skills that are well-scoped and calibrated to the task.
 
 ### Ticket tracker
 
