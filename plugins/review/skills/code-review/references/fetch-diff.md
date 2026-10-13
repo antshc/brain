@@ -1,8 +1,3 @@
----
-name: 'fetch-diff'
-description: 'Checks out a PR branch and fetches its diff per file into bin/review_diff/ with a path manifest; invoked by PR-review skills.'
----
-
 # Fetch PR Diff
 
 **MUST** run before analyzing a PR. Substitute `<OWNER>`, `<REPO>`, `<PR_NUMBER>`, `<PR_URL>` for the pull request being reviewed.

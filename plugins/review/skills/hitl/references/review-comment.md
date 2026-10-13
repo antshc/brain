@@ -1,9 +1,3 @@
----
-name: 'to-review-comment'
-description: 'Format a raw code-review comment body into the review tone of voice.'
-argument-hint: '<raw comment body>'
----
-
 Format the raw comment as terse, actionable, specific, and calibrated.
 
 **Structure:** `issue → impact → fix`
