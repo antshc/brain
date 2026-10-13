@@ -30,10 +30,10 @@ disable-model-invocation: true
 
 ## Shared review contract
 
-- Ground findings in specific code evidence and LSP analysis, not the patch alone; consider cross-symbol behavior and design intent. If LSP is unavailable, report the limitation to the parent; do not claim an evidence-grounded review completed.
+- Ground findings in relevant implementation and usage evidence, not the patch alone; consider cross-symbol behavior and design intent. Prefer LSP for symbol relationships; choose source inspection, search, tests, schemas, or configuration where they better establish behavior. Investigate changed behavior and contracts in proportion to risk; expand when evidence reveals materially different paths. Stop when the concern is supported or ruled out.
 - Treat existing comments as already reviewed. Do not revalidate, repeat, restate, or re-report them; use them only to understand covered areas and avoid duplicates. Report only fresh, actionable issues, never unsupported speculation.
 - On success, return JSON only: an array of at most five objects per axis, or `[]` when no net-new actionable issue exists. Each object represents one issue and contains only `AXIS`, `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT`.
-- On unavailable LSP, missing required input, or another review blocker, return `{"AXIS":"<assigned axis>","STATUS":"failed","REASON":"<specific blocker>"}` instead of an array. The parent records the failure; it must not interpret it as no issues found.
+- On missing required input, unresolved evidence gaps, or another review blocker, return `{"AXIS":"<assigned axis>","STATUS":"failed","REASON":"<specific blocker>"}` instead of an array. Tool unavailability alone is not a blocker when other sources establish the required evidence; otherwise identify the tool limitation and missing evidence in `REASON`. The parent records the failure; it must not interpret it as no issues found.
 - `FILE_PATH` must exactly match the manifest. `LINE_NUMBER` is an integer identifying a commentable new-file line on the diff's right side, the last line for a multi-line range. Evidence elsewhere grounds the conclusion, never substitutes for the diff anchor.
 - `REVIEW_COMMENT` is the complete, self-contained posting body, formatted by the subagent using its axis reference. Start with the issue itself. Order findings by impact, highest first, then by file and line.
 
