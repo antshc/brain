@@ -166,12 +166,7 @@ Code and technical solution review skills with modular standards and guidance.
 
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
-- [quality](plugins/review/skills/quality/SKILL.md): PR review for correctness, reliability, compatibility, performance, testability.
-- [smells](plugins/review/skills/smells/SKILL.md): PR review against a fixed set of Fowler design smells.
-- [reqs](plugins/review/skills/reqs/SKILL.md): PR requirements-coverage review.
-- [fetch-diff](plugins/review/skills/fetch-diff/SKILL.md): check out a PR branch and fetch its diff per file for review skills.
-- [posting](plugins/review/skills/posting/SKILL.md): post a review comment as an inline PR comment via the `gh` API.
-- [to-review-comment](plugins/review/skills/to-review-comment/SKILL.md): format a raw review comment into the review tone of voice.
+- [code-review](plugins/review/skills/code-review/SKILL.md): PR quality, Fowler code-smells, and requirements review in separate subagents, each returning axis-formatted, label-free comments for shared inline posting. Requirements run only for a ticket cited in the PR description with a nonempty description.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
 
 ### dig

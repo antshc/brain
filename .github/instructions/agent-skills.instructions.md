@@ -62,6 +62,8 @@ Keep up to two category files at skill root; otherwise use the matching resource
 
 **Bundled paths:** resolve `scripts/`, `references/`, `assets/`, and `templates/` from the skill base directory, never the caller CWD. Example: **Run `./scripts/run.py` from this skill's base directory**.
 
+**Skill-local resources:** each skill **MUST** bundle required resource files inside its own folder; **MUST NOT** read, link, or execute resource files from another skill's folder. Copy required resources into the consuming skill and update its paths. Invoking another skill remains allowed; accessing its internal files does not.
+
 Prefer Python over shell-specific scripts for cross-platform automation. Use the repository-supported Python command.
 
 ## Template ownership
@@ -121,7 +123,7 @@ See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the 
 
 ## Pruning
 
-- **One meaning, one place.** Invoke shared procedure; do not duplicate it.
+- **One meaning, one place within a skill.** Invoke shared procedure; duplicate resources across skills only to preserve skill-local ownership.
 - **Record only non-obvious knowledge.** Prefer source-of-truth files/config over copied facts.
 - **Delete no-ops and stale rules.** Keep only text that changes agent behavior.
 
@@ -129,6 +131,6 @@ See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the 
 
 - Valid frontmatter; trigger-rich description.
 - `SKILL.md` body under 300 lines.
-- Shared procedure not duplicated.
+- No duplicate procedures within a skill; bundled resource paths stay inside that skill's folder.
 - No test commands or test-only dependencies; result checks live under `## Completion criteria`.
 - No credentials, tokens, or secrets.

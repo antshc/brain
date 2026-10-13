@@ -22,7 +22,7 @@ Run once per session, before Review loop.
 
 If `git status --porcelain` is non-empty, stop and ask the user before checkout.
 
-*Run `fetch-diff` skill with `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL` to check out the PR branch and fetch its diff per file into `bin/review_diff/` with a path manifest.* Done when `bin/review_diff/_manifest.tsv` exists.
+Follow [Fetch PR diff](references/fetch-diff.md), resolved from this skill's base directory, with `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL` to check out the PR branch and fetch its diff per file into `bin/review_diff/` with a path manifest. Capture the checked-out commit as `COMMIT_ID` with `git rev-parse HEAD`. Done when the manifest exists and the reviewed commit is recorded.
 
 **2. Load existing review comments**
 
@@ -75,11 +75,9 @@ Drafts, approves, and posts one review comment.
 
 2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability, etc.).
 
-2.2 `IMPROVEMENT` — concrete fix or direction. *Run `to-review-comment` to format the raw code-review comment body into the review tone of voice.*
+2.2 `IMPROVEMENT` — concrete fix or direction. Follow [Comment format](references/review-comment.md), resolved from this skill's base directory.
 
-2.3 `LABEL` — confirmed issue or likely risk worth fixing → `suggest`; minor note or polish → `nit`.
-
-2.4 `REVIEW_COMMENT` — posting body: `<LABEL>: <IMPROVEMENT>`.
+2.3 `REVIEW_COMMENT` — complete formatted posting body from `IMPROVEMENT`, without classification labels or prefixes.
 
 **3. Human approval**
 
@@ -89,7 +87,7 @@ Show the comment and menu in this format; wait for the user's selection:
 <EXPLANATION>
 
 **Review comment:**
-<LABEL>: <IMPROVEMENT>
+<REVIEW_COMMENT>
 
 > Please review the comment above. What would you like to do?
 > 1. Approve & review another code change
@@ -101,7 +99,7 @@ Show the comment and menu in this format; wait for the user's selection:
 
 **4. Handle the reply**
 
-On approval (1 or 2): *run `posting` with `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT` to post the review comment as an inline pull-request review comment via the gh API.* Capture the returned `COMMENT_ID`; add `{FILE_PATH, LINE_NUMBER, REVIEW_COMMENT, COMMENT_ID}` to the **posted queue**. Then, by reply:
+On approval (1 or 2): follow [Posting](references/posting.md), resolved from this skill's base directory, with `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT`, and the reviewed `COMMIT_ID` to post the inline PR comment. Capture the returned `COMMENT_ID`; add `{FILE_PATH, LINE_NUMBER, REVIEW_COMMENT, COMMENT_ID}` to the **posted queue**. Then, by reply:
 - **1:** display the posted queue as a numbered list (`FILE_PATH:LINE_NUMBER — REVIEW_COMMENT (COMMENT_ID)` per item), then return to Get the input.
 - **2:** clear the posted queue and end the session.
 - **3:** drop the draft without posting; return to Get the input.
