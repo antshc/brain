@@ -10,6 +10,8 @@ Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet ver
 
 **MUST** load the bundled [GitHub reference](./github.md) before any GitHub action, including reads. Execute GitHub actions through `gh` according to its prerequisites, procedures, and failure handling. If the reference cannot be loaded, stop and report the blocker. No setup-generated tracker configuration is required.
 
+**Required input:** The user **MUST** supply the GitHub repository for publishing tickets as `OWNER/REPO`. If absent or malformed, ask for it and wait; never infer it from the checkout, remotes, or the parent spec's URL. Record it as `TRACKER_REPOSITORY`, separate from the development/PR repository and any parent issue's repository.
+
 ## Process
 
 ### 1. Gather context
@@ -90,7 +92,7 @@ Avoid specific file paths or code snippets: they go stale fast. Exception: if a 
 
 ## Completion criteria
 
-- Every approved slice exists as one GitHub issue with acceptance criteria and the requested label.
+- Every approved slice exists as one GitHub issue in the user-supplied `TRACKER_REPOSITORY` with acceptance criteria and the requested label.
 - Read-back confirms each parent link and blocking edge, natively or through an explicitly reported fallback; the graph has no cycles.
 - Report ticket URLs, dependencies, and the ready frontier. Leave parent content and status unchanged.
 - Finally compare the published graph against the approved breakdown and source spec; resolve or explicitly report any omitted scope.

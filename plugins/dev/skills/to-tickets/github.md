@@ -4,8 +4,8 @@ Use `gh` for GitHub I/O; ticket storage is GitHub Issues.
 
 ## Prerequisites
 
-- Confirm `gh --version`, `gh auth status`, and the target with `gh repo view --json nameWithOwner,defaultBranchRef`. Resolve ambiguous remotes before writing.
-- Replace `OWNER/REPO`, `NUMBER`, `PARENT`, `CHILD`, and database-ID placeholders with resolved values. Pass `--repo OWNER/REPO` on issue and label commands.
+- Confirm `gh --version` and `gh auth status`. Require the user-supplied `TRACKER_REPOSITORY` in `OWNER/REPO` format: exactly two nonempty GitHub owner/repository names separated by one slash, not a URL or issue reference. Ask and wait when absent or malformed; no inferred default. Verify access with `gh repo view TRACKER_REPOSITORY --json nameWithOwner`.
+- Replace `OWNER/REPO`, `NUMBER`, `PARENT`, `CHILD`, and database-ID placeholders with resolved values. For ticket creation and labels, `OWNER/REPO` is `TRACKER_REPOSITORY`; for issue reads/comments and database-ID lookup, use that issue's owning repository. Resolve a parent from its URL or explicit qualifier; a bare issue number uses `TRACKER_REPOSITORY`. Pass `--repo OWNER/REPO` explicitly; never use the checkout as an implicit destination.
 - Report authentication, permission, network, and validation failures explicitly. Stop dependent writes on failure; retain created URLs to resume without duplicates.
 
 ## Issues and labels
@@ -32,6 +32,8 @@ Create the label only when absent; preserve existing metadata. Use one temporary
 | List blockers | `gh api --paginate repos/OWNER/REPO/issues/CHILD/dependencies/blocked_by` |
 
 Native relationship writes require numeric **database IDs**, not issue numbers or `node_id`. Create blockers before dependants, attach child issues without editing parent content, and read relationships back after writing.
+
+For sub-issue endpoints, `OWNER/REPO` is the parent's repository; for dependency endpoints, it is the blocked child's repository. Resolve each referenced issue's database ID in its own repository, even when parent and tickets differ. Preserve fully qualified identities in body references and read-back.
 
 If native relationships are confirmed unavailable on this host/repository, explain the limitation and retain `Part of OWNER/REPO#PARENT` and `Blocked by: OWNER/REPO#NUMBER` references in each affected child body. A 404 alone does not prove unsupported capability: check repository/issue access and endpoint availability first. Never hide authentication, permission, or malformed-request failures behind a text fallback.
 

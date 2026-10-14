@@ -4,9 +4,15 @@ description: "Synthesises the current conversation into a feature spec with user
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user about requirements; synthesize what you already know. Confirm testing seams and ask only for unresolved publication routing.
+This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user about requirements; synthesize what you already know. Confirm testing seams and explicitly collect all three publication-routing inputs below.
 
 **MUST** load the bundled [GitHub reference](./github.md) before any GitHub action, including reads. Execute GitHub actions through `gh` according to its prerequisites, procedures, and failure handling. If the reference cannot be loaded, stop and report the blocker. No setup-generated tracker configuration is required.
+
+**Required inputs:** Ask the user for each value, one question at a time; confirm any already supplied value. Wait for valid explicit answers before GitHub actions; never infer or default routing from the checkout, remotes, issue URLs, or default branch.
+
+- `TRACKER_REPOSITORY`: GitHub repository for the spec and tickets, in `OWNER/REPO` format.
+- `repo:target`: development/PR repository, in `OWNER/REPO` format; record as `SOURCE_REPOSITORY`.
+- `repo:base`: target base branch in that source repository; record as `BASE_BRANCH`.
 
 ## Process
 
@@ -16,7 +22,7 @@ This skill takes the current conversation context and codebase understanding and
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below. Resolve the tracker repository, source repository, and target base branch using the GitHub reference; ask only when unresolved. Publish it as a GitHub issue with `repo:target:<owner/repo>` and `repo:base:<branch>`, creating missing labels first. Read the published issue back to confirm the full body and both labels, then report its URL.
+3. Write the spec using the template below. Validate the three user-confirmed routing inputs using the GitHub reference. Publish it as a GitHub issue with `repo:target:<owner/repo>` and `repo:base:<branch>`, creating missing labels first. Read the published issue back to confirm the full body and both labels, then report its URL.
 
 <spec-template>
 
@@ -77,4 +83,4 @@ Any further notes about the feature.
 ## Completion criteria
 
 - The spec reflects the conversation and codebase, with testing seams confirmed by the user.
-- A GitHub issue contains the complete spec and the confirmed `repo:target:<owner/repo>` and `repo:base:<branch>` labels; its URL is reported.
+- A GitHub issue in the user-supplied `TRACKER_REPOSITORY` contains the complete spec and the confirmed `repo:target:<owner/repo>` and `repo:base:<branch>` labels; its URL is reported.

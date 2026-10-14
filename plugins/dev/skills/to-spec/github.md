@@ -4,9 +4,9 @@ Use `gh` for GitHub I/O. Resolve paths to body files from the caller's working d
 
 ## Prerequisites
 
-- Confirm `gh --version` and `gh auth status`. Resolve `TRACKER_REPOSITORY` from the supplied issue destination or `gh repo view --json nameWithOwner --jq .nameWithOwner` at the caller's repository root.
-- Resolve `SOURCE_REPOSITORY` (`owner/repo`) from agreed context or the source checkout's `origin`. A `workspace/` folder with exactly one checkout selects that checkout; multiple candidates or ambiguous remotes require clarification. Without a separate source checkout, use the caller's repository. Confirm its identity with `gh repo view SOURCE_REPOSITORY --json nameWithOwner,defaultBranchRef`.
-- Resolve `BASE_BRANCH` from agreed context; otherwise confirm the source repository's default branch as the intended base. Verify the branch exists in the source repository before publication. Ask only for unresolved routing; keep tracker and source distinct even when they are the same repository.
+- Collect explicit user confirmation of `TRACKER_REPOSITORY`, `repo:target` (`SOURCE_REPOSITORY`), and `repo:base` (`BASE_BRANCH`) before GitHub actions. Ask one question at a time, including confirmation of already supplied values; wait for all three valid answers. Never infer or default any value.
+- Confirm `gh --version` and `gh auth status`. Both repositories require `OWNER/REPO` format: exactly two nonempty GitHub owner/repository names separated by one slash, not a URL or issue reference. Verify tracker access with `gh repo view TRACKER_REPOSITORY --json nameWithOwner` and source identity with `gh repo view SOURCE_REPOSITORY --json nameWithOwner,defaultBranchRef`.
+- Verify the user-confirmed `BASE_BRANCH` exists in `SOURCE_REPOSITORY` before publication; its default branch is not a substitute. Ask for corrections on invalid or inaccessible routing; keep tracker and source distinct even when they are the same repository.
 - Commands below use resolved placeholders. Pass `--repo TRACKER_REPOSITORY` explicitly on issue and label commands.
 - Report authentication, permission, network, and validation failures with the failed operation. Do not substitute local output for successful publication or retry creation blindly after ambiguous results.
 
