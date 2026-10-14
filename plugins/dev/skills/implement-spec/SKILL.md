@@ -16,7 +16,9 @@ The tickets form a **task graph** with blocking relationships. Select one ticket
 
 Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: to the spec, tickets, research notes, and previous commits. Don't duplicate information already available via pointers.
 
-Use the same integration branch and worktree for all tickets and review fixes. Implement directly or delegate one ticket at a time; wait for its result before proceeding. Do not create per-ticket branches/worktrees or use merger subagents.
+**One sub-issue = one subagent.** **MUST** launch a fresh implementer subagent for every ticket (sub-issue), exactly one ticket per subagent. **MUST NOT** implement tickets in the orchestrator context, batch several tickets into one subagent, or reuse/resume a previous ticket's subagent for the next ticket. The orchestrator only selects, delegates, verifies, and records. Run one ticket subagent at a time; wait for its result before launching the next.
+
+Use the same integration branch and worktree for all tickets and review fixes. Do not create per-ticket branches/worktrees or use merger subagents.
 
 ## Steps
 
@@ -26,14 +28,15 @@ Use the same integration branch and worktree for all tickets and review fixes. I
 
 3. Record the source repository and target base branch. Follow the GitHub reference to create one integration branch and one worktree at `<source-repo-root>/.fake/worktrees/<spec-id>` without overwriting existing work. Confirm the new worktree is clean and on that branch; perform all implementation and checks there.
 
-4. Select one ready ticket and implement it directly on the shared integration branch in that worktree:
+4. Select one ready ticket and launch a new dedicated subagent for that ticket only. Pass context pointers: the ticket's `OWNER/REPO#NUMBER`, the spec, the worktree path, the integration branch, and prior relevant commits/notes. The subagent implements on the shared integration branch in that worktree:
    - start from the clean, validated integration tip; never reset or discard existing work;
    - Use test-driven development, red-green-refactor, and behavior tests to build the ticket;
-   - run relevant checks against the cumulative result, commit the ticket, and record its commit and validation evidence. Failed checks or incomplete work block advancement.
+   - run relevant checks against the cumulative result, commit the ticket, and return its commit and validation evidence. Failed checks or incomplete work block advancement.
+   - The orchestrator verifies the returned commit and evidence itself; if rework is needed, send it to the same ticket's subagent, never to another ticket's subagent.
 
 5. Mark the ticket **integrated** only when its committed implementation is verified on the integration branch. After the first such commit, push and open a draft GitHub PR against the recorded source base. Add closing references for the spec and implemented tickets, extending coverage as tickets complete; comment on each implemented issue with the PR pointer and evidence. A branch with no commits ahead of its base cannot open a PR.
 
-6. Recompute the **frontier** after each verified ticket commit, then repeat steps 4-5 for one next ready ticket. A blocker is satisfied for this run when its implementation is verified on the integration branch, even while its issue remains open pending PR merge. External blockers still require verified resolution. If unfinished tickets remain but none are ready, report the blockers and preserve the work; do not bypass dependencies or start tickets concurrently.
+6. Recompute the **frontier** after each verified ticket commit, then repeat steps 4-5 for one next ready ticket with a new subagent. A blocker is satisfied for this run when its implementation is verified on the integration branch, even while its issue remains open pending PR merge. External blockers still require verified resolution. If unfinished tickets remain but none are ready, report the blockers and preserve the work; do not bypass dependencies or start tickets concurrently.
 
 7. Once all tickets are integrated, review the integration branch for bugs and logic errors. Fix all reported issues sequentially in the same worktree, commit fixes, and rerun affected checks. If a required skill is unavailable, report the blocker and obtain agreement on an alternative; never silently skip development or review.
 
@@ -43,7 +46,7 @@ Use the same integration branch and worktree for all tickets and review fixes. I
 
 ## Completion criteria
 
-- Every in-scope ticket has verified implementation and test evidence on the integration branch, developed sequentially in the same run-owned worktree.
+- Every in-scope ticket has verified implementation and test evidence on the integration branch, developed sequentially in the same run-owned worktree, each by its own dedicated subagent.
 - The source repository and PR base match the spec's routing labels or an explicitly agreed resolution for missing/conflicting routing; issue operations and PR closing references retain each issue's owning repository.
 - The reviewed PR is ready, links the spec and tickets, and reports any pending checks or closure steps accurately; open issues are not misreported as closed.
 - The run-owned worktree under the source repository's `.fake/worktrees/` is cleaned up or explicitly accounted for, with no user work discarded.
