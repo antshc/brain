@@ -1,6 +1,6 @@
 ---
 name: grill-design
-description: Stress-tests a plan or design through a relentless interview, surfacing domain terminology, feature decisions, assumptions, and ADRs. Use for grill design, grilling design, or domain-modeling probes. Not for implementation; closes with a design or backlog handoff.
+description: Stress-tests a plan or design through a relentless interview, surfacing domain terminology, feature decisions, assumptions, and ADRs. Use for grill design, grilling design, or domain-modeling probes. Not for implementation; closes with a spec or design handoff.
 ---
 
 # Grill Design
@@ -17,7 +17,7 @@ Produce **questions** and **records**. Writable surface: `CONTEXT.md`, `ARCHITEC
 
 **Only the user ends the grill.** The grill MUST end only on a user request or confirmation, not a finished record, empty frontier, or clean sweep. When the tree appears resolved, report it, ask to close, and wait.
 
-**Implementation is a handoff.** When the user asks to build, including a one-line fix, announce closing and run the closing sweep. Then route the saved context to the requested output: *Run `to-tickets` skill for agent-executable Tracer-bullet functional slices*; *Run `to-zdesign` skill to capture a completed design conversation as an authoritative feature design*; or *Run `experiment` skill for a minimal throwaway experiment answering an uncertain technical question*. Execution belongs to the handoff, outside the grill.
+**Implementation is a handoff.** When the user asks to build, including a one-line fix, announce closing and run the closing sweep. Then route the saved context to the requested output: *Run `to-spec` skill to synthesize the conversation into a spec published as a GitHub issue or offline Markdown*; or *Run `to-zdesign` skill to capture a completed design conversation as an authoritative feature design*. Execution belongs to the handoff, outside the grill.
 
 ## Session start
 
