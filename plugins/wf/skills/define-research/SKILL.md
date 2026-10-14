@@ -95,7 +95,7 @@ The destination fixes the scope; work beyond it goes to Out of scope, one line e
 
 ### 1. Name the destination
 
-Run `/questioning` skill over the prompt, the conversation, and the available context to settle the subject and the destination.
+Follow [questioning.md](questioning.md) over the prompt, the conversation, and the available context to settle the subject and the destination.
 
 For third-party API or SDK research, inspect manifests, lockfiles, imports, and configuration to resolve the exact version in use; ask the user only when the codebase does not establish it. Record the version in Notes.
 
@@ -103,7 +103,7 @@ For third-party API or SDK research, inspect manifests, lockfiles, imports, and 
 
 ### 2. Map the frontier
 
-Run `/questioning` skill again, breadth-first: fan out across approaches, alternatives, constraints, and unknowns rather than deep on one thread. Ask only questions that can change the set of topics; look up facts rather than asking for them, and keep unresolved factual claims as topics. Turn claims whose truth changes the destination into hypothesis topics.
+Follow [questioning.md](questioning.md) again, breadth-first: fan out across approaches, alternatives, constraints, and unknowns rather than deep on one thread. Ask only questions that can change the set of topics; look up facts rather than asking for them, and keep unresolved factual claims as topics. Turn claims whose truth changes the destination into hypothesis topics.
 
 **Done when:** every sharp question is a topic with type, resolver, and Blocked by filled in; everything else sits in Not yet specified or Out of scope.
 
@@ -117,7 +117,7 @@ Print to the user:
 |---|---|---|---|
 | {{topic title}} | {{type}} | {{resolver}} | {{blocking titles or none}} |
 
-followed by the Not yet specified and Out of scope lists. Ask the user to confirm or correct the map; return to `/questioning` when a correction exposes an unresolved branch.
+followed by the Not yet specified and Out of scope lists. Ask the user to confirm or correct the map; return to [questioning.md](questioning.md) when a correction exposes an unresolved branch.
 
 **Done when:** the user confirms and the file matches what was printed.
 

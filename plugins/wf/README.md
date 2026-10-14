@@ -43,7 +43,7 @@ flowchart TD
 
 | Group                                     | Purpose                                      | Current skills                                                                            |
 | ----------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **define- / discover-**                   | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `questioning`, `experiment`, `explore-codebase` |
+| **define- / discover-**                   | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `experiment`, `explore-codebase` |
 | **probe-**                                | Auto-discover facts in a system and record them | —                                                                                      |
 | **research-**                             | Gather external/domain evidence              | `research`, `define-research`                                                             |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-system`, `inspect-nuget-source`                                                  |
@@ -53,4 +53,3 @@ flowchart TD
 | **doc-**                                  | Render existing knowledge                    | `doc-concept`, `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`, `doc-decision` |
 | **docs- / setup-** , **manage- / track-** | Workflow plugin documentation infrastructure | `bootstrap-docs`, `index-docs`, `init-wf`, `manage-backlog`, `track-ledger`               |
 | **normalize-**                            | Rewrite/reshape content                      | `normalize-requirements`                                                                  |
-
