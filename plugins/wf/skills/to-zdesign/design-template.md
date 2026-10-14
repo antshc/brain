@@ -105,7 +105,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 **Decisions**
 
-{{compactDecisions| one or more bullets rendered by /doc-decision with **compact** format }}
+{{compactDecisions| one or more compact bullets rendered from this skill's decision-bullet.md reference }}
 
 # Testing Guidelines
 
@@ -285,4 +285,3 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 | --- | --- | --- |
 | {{canonicalSource}} | {{sourceKind|Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
 <!-- adf:ignore:end -->
-
