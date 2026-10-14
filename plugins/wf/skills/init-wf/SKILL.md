@@ -1,12 +1,14 @@
 ---
 name: init-wf
-description: One-time wf-plugin setup — confirms single-repo vs. wrapping/harness-repo topology, seeds `.github/copilot-instructions.md` accordingly, bootstraps ARCHITECTURE.md/CONTEXT.md, and creates the ticket-tracker labels. Run once before first use of the other wf skills.
+description: One-time wf setup — confirms repository topology, seeds Copilot instructions, bootstraps ARCHITECTURE.md/CONTEXT.md, and creates GitHub issue labels. Use before the workflow or in labels-only mode to repair missing labels.
 disable-model-invocation: true
 ---
 
 # Setup WF
 
 Sets up the environment for wf's domain-modeling skills: **single repo** (docs + codebase together) or **wrapping/harness repo** (multi-root workspace; reporoot tracks docs/decisions, codebase in a separate git-ignored `workspace/` repo).
+
+**Labels-only mode:** follow **4. Set up GitHub labels** in the tracker repository; skip topology, instructions, and docs setup.
 
 ## 1. Confirm topology
 
@@ -36,16 +38,16 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 3. Bootstrap the docs
 
-Run `/bootstrap-docs`' skill **Mandatory creation** at the docs root (reporoot for a wrapping repo) — the once-per-repo firing of that guarantee.
+*Run `bootstrap-docs` skill for ARCHITECTURE.md and CONTEXT.md existence-and-creation mechanics* at the docs root (reporoot for a wrapping repo).
 
-## 4. Set up the ticket tracker
+## 4. Set up GitHub labels
 
-Run `/manage-backlog` skill **Setup labels**.
+Follow [github.md](./github.md) **Setup labels**. Done when all nine baseline labels exist in the tracker repository.
 
-## Done when
+## Completion criteria
 
 - Topology confirmed; `workspace/` split (if any) set up.
 - For a wrapping repo, `.github/skills/harness/` exists (the `harness` skill, its settings file, and its pull command) at the harness root.
 - Copilot instructions seeded in `.github/copilot-instructions.md`, placeholders resolved, no duplicate sections.
 - `ARCHITECTURE.md` and `CONTEXT.md` exist.
-- `/manage-backlog` **Setup labels** ran without error.
+- All nine GitHub baseline labels exist; labels-only mode requires only this condition.

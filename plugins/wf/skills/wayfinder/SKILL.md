@@ -1,6 +1,6 @@
 ---
 name: wayfinder
-description: Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision tickets on the issue tracker, and resolve them one at a time until the way to the destination is clear.
+description: Plan work larger than one agent session as a shared GitHub map of decision tickets, and resolve them one at a time until the way to the destination is clear.
 argument-hint: "{{looseIdea}} | {{mapIssueNumberOrUrl}} [{{ticketNumber}}]"
 disable-model-invocation: true
 ---
@@ -21,7 +21,7 @@ Every map and ticket is an issue, so it has a name — its title. In everything 
 
 ## The Map
 
-The map is a single issue on this repo's GitHub tracker, labelled `wayfinder:map`. Its tickets are sub-issues of the map — see **Tracker operations** below for how the map, its children, blocking, and the frontier are actually expressed through `/manage-backlog`.
+The map is a single issue on this repo's GitHub tracker, labelled `wayfinder:map`. Its tickets are native sub-issues of the map — see **Tracker operations** and [github.md](./github.md) for map, child, blocking, and frontier operations.
 
 The map is an index, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
 
@@ -80,7 +80,7 @@ Each ticket carries a `wayfinder:<type>` label — one of `research`, `experimen
 
 A session claims a ticket by assigning it to itself, first, before any work, so concurrent sessions skip it. That assignee is the claim: an open, unassigned ticket is unclaimed.
 
-Blocking is expressed as the `## Blocked by` body convention above, since GitHub's native issue-dependency links aren't wired through `/manage-backlog`. A ticket is unblocked when every ticket named in its `Blocked by` section is closed; the frontier is the open, unblocked, unclaimed children — the edge of the known.
+Blocking keeps the `## Blocked by` body convention above as its source of truth; unlike implementation tickets, Wayfinder decisions do not require native dependency links. A ticket is unblocked when every ticket named in its `Blocked by` section is closed; the frontier is the open, unblocked, unclaimed children — the edge of the known. An unreadable blocker is not confirmed closed.
 
 The answer isn't part of the body — it's recorded as a resolution comment on close (see Work through the map). Assets created while resolving a ticket are linked from the issue, not pasted in.
 
@@ -114,9 +114,9 @@ Out-of-scope work never graduates — the frontier stops at the destination — 
 
 Ruling something out of scope is a scoping act, not a step on the route. When a ticket that already exists turns out to sit past the destination — mis-scoped in while charting, or exposed by a resolution — close it (a closed ticket is unambiguously off the frontier) and leave one line in the Out of scope section: the gist plus why it's out of scope, linking the closed ticket. It stays out of Decisions so far, which records the route actually walked — a scope boundary isn't a step on it.
 
-## Tracker operations (GitHub, via /manage-backlog)
+## Tracker operations
 
-Use these instead of raw `gh` calls; each name below is a `/manage-backlog` action.
+Load [github.md](./github.md) and follow its GitHub operations for this tracker repository. Keep GitHub-specific commands in this skill's reference; do not configure another backlog backend.
 
 - **Create the map**: **Create ticket** with label `wayfinder:map` and the map body template above.
 - **Create a ticket**: **Create sub-ticket** with `parentIssueNumber` = the map, label `wayfinder:<type>`, body = Question + Blocked by + Part of.
@@ -126,7 +126,7 @@ Use these instead of raw `gh` calls; each name below is a `/manage-backlog` acti
 - **Resolve a ticket**: **Comment on ticket** with the answer, then **Close ticket**.
 - **Read the map / a ticket**: **Read ticket**. **Read a ticket's sub-tickets**: **List sub-tickets**.
 
-**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:experiment`, `wayfinder:grilling`, or `wayfinder:task` missing): Run `/manage-backlog` skill **Setup labels**, then retry.
+**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:experiment`, `wayfinder:grilling`, or `wayfinder:task` missing): *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode*, then retry.
 
 ## Invocation
 

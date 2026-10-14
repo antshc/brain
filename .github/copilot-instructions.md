@@ -58,4 +58,4 @@ Single repo — docs and codebase live together, no `workspace/` split.
 
 ### Ticket tracker
 
-Tickets live as GitHub issues in this repo (`gh issue` commands). Labels `hitl` and `spec` are set up per `/manage-backlog`.
+Tickets live as GitHub issues in this repo (`gh issue` commands). *Run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode* to create missing labels. Each backlog skill bundles its own GitHub reference.

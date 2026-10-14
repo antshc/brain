@@ -1,6 +1,6 @@
 ---
 name: to-spec
-description: Turn the current conversation into a spec and publish it to the project ticket tracker — no interview, just synthesis of what you've already discussed.
+description: Turn the current conversation into a spec and publish it as a GitHub issue or explicit offline Markdown — no interview, just synthesis of what you've already discussed.
 argument-hint: "What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"
 disable-model-invocation: true
 ---
@@ -9,9 +9,9 @@ This skill takes the current conversation context and codebase understanding and
 
 An **Initiative** is a coordinated product change tracked as one planning effort and may encompass multiple Capabilities and Features. A **Requirements** is a set of one Stakeholder requirement together with its Functional requirements, Business rules, Edge cases. A **Spec** packages one or more Requirements sets for planning and handoff.
 
-The ticket tracker and triage label vocabulary should have been provided to you — Run `/manage-backlog` skill **Setup labels** if not. 
+Load [github.md](./github.md) for GitHub repository resolution, labels, duplicate prevention, and publication.
 
-If the `/manage-backlog` skill is not available, fall back to saving the spec to `docs/specs/{{initiativeIdSlug}}.md` as markdown.
+Explicit offline publishing or a reported GitHub/tool/authentication failure → save the spec to `docs/specs/{{initiativeIdSlug}}.md` as Markdown, following **Offline publishing** in the reference. Local output is not a published GitHub issue.
 
 ## Process
 
@@ -25,7 +25,7 @@ Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.
 
 Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
-4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Keep testing scenarios independent of test-file paths and fixed method names. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Run `/manage-backlog` skill **Publish spec** with the checked body (no Initiative, branch, or repository metadata — it adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Keep testing scenarios independent of test-file paths and fixed method names. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow **Publish spec** in [github.md](./github.md) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
 
 <spec-template>
 

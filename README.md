@@ -116,7 +116,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 
 - [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
 - [wayfinder](plugins/wf/skills/wayfinder/SKILL.md): plan work larger than one session as a shared map of decision tickets, resolved one at a time.
-- [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a spec and publish it to the ticket tracker.
+- [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a GitHub spec issue, with explicit offline Markdown publishing when needed.
 - [to-stories](plugins/wf/skills/to-stories/SKILL.md): turn requirements, `/to-spec` output, or `/to-zdesign` output into an ordered story list, owning numbered headings, dependencies, Jira metadata, and one `/draft-story` run per story.
 - [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one standalone story body with its formatted title, requirements, acceptance criteria, and optional technical notes.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
@@ -134,7 +134,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [doc-decision](plugins/wf/skills/doc-decision/SKILL.md): render compact decisions for designs.
 - [record-adr](plugins/wf/skills/record-adr/SKILL.md), [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-building-block](plugins/wf/skills/record-building-block/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture ADRs, Concepts, glossary terms, building blocks, and deployment topology into the docs as they crystallise.
 - [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
-- [manage-backlog](plugins/wf/skills/manage-backlog/SKILL.md) / [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for ticket tracker, labels, and doc layout.
+- [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for GitHub issue labels and doc layout; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research/bootstrap-docs remain local, and other skills retain their Jira workflows.
 - [track-ledger](plugins/wf/skills/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a questioning session.
 
 ### crew
