@@ -1,0 +1,6 @@
+{
+  "name": "dev",
+  "version": "1.0.0",
+  "description": "Plan grilling, domain glossary capture, GitHub specifications, ticket graphs, and integrated implementation.",
+  "skills": ["./skills"]
+}
