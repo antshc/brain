@@ -79,7 +79,7 @@ Before confirming shared understanding, report every Feature Decision, ADR decis
 All three checks pass → Feature Assumption; any miss → ask.
 
 * **Single matching record** — exactly one matched Concept or ADR covers the decision area; zero or multiple owners fail.
-* **Direct answer (no analogy)** — the matched Concept's default or normative Rules line, or ADR decision, answers directly. A reference or "follow its shape" pointer fails.
+* **Direct answer (no analogy)** — the matched Concept's default or normative Rules line, or the ADR's default or decision, answers directly. A reference or "follow its shape" pointer fails.
 * **No genuine alternative** — a Concept default selects the choice when unspecified, or the ADR's Considered Options already rejected the alternatives. Alternatives without a default fail.
 
 | State | Resolved by | Home and write timing |
