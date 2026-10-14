@@ -48,7 +48,7 @@ Beneath the representation, describe every shown building block's responsibility
 
 Include the optional bold `Cross Deployable Flow` section only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram**, one lane per deployable, 1-5 major steps per lane.
 
-A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**`. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for the slice's flow visualization. For every architectural decision owned by the slice, Run `/doc-decision` skill with **compact** format and append its output under `**Decisions**`. Keep method-level behavior in `Detailed Design`.
+A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**`. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for the slice's flow visualization. MUST load [decision-bullet.md](./decision-bullet.md) with the file-reading tool before rendering the slice's architectural decisions; append one compact bullet per decision under `**Decisions**`. Keep method-level behavior in `Detailed Design`.
 
 When merging into an existing design, preserve every architecture or functional-slice diagram unless the user confirms its modification, regeneration, or removal.
 
@@ -106,7 +106,7 @@ Maintain `Source Material`:
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or appendix.
 3. Populate every core section, in the template's section order, or mark it not applicable. `Current State` is removed entirely, never marked not applicable, unless the user asked for it. `Use cases` has one bold-titled bullet per actor goal within a Feature.
 4. Include the arc42 Building Block View — a Container Diagram embedded inline within `Solution Overview` — when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Preserve every existing architecture diagram unless the user confirmed a change.
-5. Give every functional slice exactly one current-mode sequence diagram, followed by `**Decisions**` and one or more decision bullets rendered by `/doc-decision` with **compact** format. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
+5. Give every functional slice exactly one current-mode sequence diagram, followed by `**Decisions**` and one or more compact decision bullets rendered from the loaded [decision-bullet.md](./decision-bullet.md). Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
 6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
 7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
 8. Put every unresolved conflict in `Open Questions`.
