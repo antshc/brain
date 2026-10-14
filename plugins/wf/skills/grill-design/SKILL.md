@@ -76,30 +76,33 @@ Before confirming shared understanding, report every Feature Decision, ADR decis
 
 ## Decision states
 
-All three checks pass → Feature Assumption; any miss → ask.
+Evaluate each independently answerable **decision key**; use the record's key when supplied, otherwise name the choice being settled. All four checks pass → Feature Assumption; any miss → keep only that key unresolved.
 
-* **Single matching record** — exactly one matched Concept or ADR covers the decision area; zero or multiple owners fail.
-* **Direct answer (no analogy)** — the matched Concept's default or normative Rules line, or the ADR's default or decision, answers directly. A reference or "follow its shape" pointer fails.
-* **No genuine alternative** — a Concept default selects the choice when unspecified, or the ADR's Considered Options already rejected the alternatives. Alternatives without a default fail.
+* **Direct policy** (`direct-policy`) — at least one opened Concept or ADR directly settles the key through its default, normative rule, or decision. A reference, analogy, recommendation, or code observation alone fails.
+* **Established applicability** (`applicability`) — evidence establishes the governing scope and branch conditions. Apply a settled exception when its condition holds; unknown conditions require fact lookup, then a fact-gap question if unresolved. MUST NOT widen scope from similarity or treat an unknown exception as absent.
+* **Unambiguous answer** (`agreement`) — applicable clauses agree, govern different keys, or have an explicit recorded override. Multiple records and documented alternatives do not fail by themselves; unresolved competing answers do. MUST NOT invent precedence from specificity, record type, or recency. A default may select among genuine alternatives; an open menu without a selection rule fails.
+* **No explicit contradiction** (`contradiction`) — the current user choice and available evidence do not contradict the applicable policy. Surface a user-policy conflict for explicit resolution; MUST NOT replace an explicit answer with a default or use a default to bypass known drift.
+
+Rationale: reuse settled policy per choice; overlapping records need not mean ambiguity. Keep covered keys assumed while uncovered keys remain in the frontier. Existing single-sentence defaults remain usable under these checks. A default applies only when the design is silent on that key.
 
 | State | Resolved by | Home and write timing |
 |---|---|---|
-| Feature Assumption | model, checklist passed | Ledger only; the matching record already covers it. |
+| Feature Assumption | model, checklist passed | Ledger only; applicable records already cover the key. |
 | ADR decision | user, ADR gate passed | Ledger + ADR, same turn; the answer authorizes the write. |
 | Feature Decision | user, ADR gate failed, not a term | Ledger only, whether feature-scoped or reusable. |
 | Rejected option | user | Ledger only. |
 
-Every decision question **MUST** get its own gate-miss line that turn, identifying the failed gate and nearest source; preserve it alongside the resulting state:
+Every decision question **MUST** get a gate-miss line per unresolved key that turn, identifying the failed gate(s) and relevant source anchors; preserve it alongside the resulting state:
 
 | Outcome | Ledger entries |
 |---|---|
-| Feature Decision | Gate miss + decided by user; no owner uses `single-matching-record`, source `none`. |
+| Feature Decision | Gate miss + decided by user; no policy uses `direct-policy`, source `none`. |
 | ADR decision | Gate miss + recorded path, or pending write until persistence succeeds. |
-| Feature Assumption | Assumed with evidence; no gate miss. |
+| Feature Assumption | Assumed with key, applied condition, and governing source anchors; no gate miss. |
 
 Log state changes that turn. When the user corrects an assumption, replace it with a correction line if based on a Concept default; otherwise remove the stale assumption, retaining the correction and new answer in the frontier history. Surface ADR corrections for explicit user resolution through `adr` mode.
 
-Fact-gap questions, term clarifications, and close/authorization requests are not failed decision-checklist gates; record their kind and answer in the frontier instead. Documentation wording, synonyms, and section placement are authoring choices, not decisions.
+Unknown applicability alone creates a fact-gap prerequisite, not a policy decision or gate-miss line; re-evaluate its decision key after the fact is established. Fact-gap questions, term clarifications, and close/authorization requests are not failed decision-checklist gates; record their kind and answer in the frontier instead. Documentation wording, synonyms, and section placement are authoring choices, not decisions.
 
 ## Context economy
 
@@ -107,7 +110,7 @@ Fact-gap questions, term clarifications, and close/authorization requests are no
 - Do not duplicate information already available through those pointers. In questions, reports, lookup briefs, and handoffs, link the source and state only the new question, decision, change, or uncertainty; keep required recommendations and decision summaries concise.
 - Prefer the code-lookup contract for broad code/test searches; use direct reads for a known evidence location.
 - Re-fetch an artifact when first needed or when its required evidence is no longer available in context. Prefer reuse after a confirmed write; re-read when verification or a detected change requires it, not on a schedule.
-- Authority: `CONTEXT.md` / `ARCHITECTURE.md` / ADR / Concept > code > external sources. Surface conflicts, including conflicts within the same rank; ask rather than silently choosing an authority.
+- Authority: `CONTEXT.md` / `ARCHITECTURE.md` / ADR / Concept > code > external sources. Surface unresolved conflicts, including conflicts within the same rank; apply only explicit recorded overrides, otherwise ask rather than silently choosing an authority.
 
 ## Probes
 
@@ -132,7 +135,7 @@ Matches are monotonic as surface grows: an opened record needs no matching re-sc
 
 **Open and extract** — open linked bodies on a match; indexing alone does not imply relevance. Log opened and skipped verdicts. Before discussing a module, boundary, or service, check its ledger status: only `opened` confirms a previous body read; `skipped` does not. Reload previously opened evidence if needed after context loss, without repeating the matching scan. Missing sections mean "not documented", not "not applicable".
 
-Extract mandates, prohibitions, open choices, and defaults from the record and the matched row's `**Default:**` cell. Frame questions and alternatives against them.
+Extract mandates, prohibitions, open choices, and default clauses from the body and the matched row's `**Default:**` cell. Group by decision key; retain scope, selection conditions, exceptions, and body anchors. A trigger match opens a candidate, not every default's applicability. Frame questions and alternatives against them.
 
 **Classify conflicts** — re-evaluate already-opened records after every answer/new fact; use in-context evidence, reloading only missing details.
 * Violation → cite the rule or ADR rejected option; present the conflict, not an equally valid alternative.

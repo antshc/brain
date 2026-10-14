@@ -88,9 +88,9 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 An ADR that applies to exactly one building block is indexed in that block's `Architecture Decision Records` table inside `docs/building-blocks/{{slug}}.md` (or its repository's own ADR index when that repository documents itself). Every other ADR is indexed in `ARCHITECTURE.md`'s `Architecture Decision Records` table. Never both.
 
 1. Row shape: `| [{{decisionTitle}}]({{pathToAdr}}) | {{summary}} | **Trigger:** {{triggerCondition}}. **Default:** {{default}} |` — `{{decisionTitle}}` identical to the ADR heading; `{{pathToAdr}}` relative to the indexing file.
-2. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the written ADR as `{{recordContent}}`. `narrow` → trigger phrases name the entity; `wide` → name the class property and its domain synonyms, never one member alone.
-3. Author the Summary yourself — 1-2 agent-optimized sentences stating the decision.
-4. Author `default` yourself — one imperative sentence naming the choice to take when the design doesn't state one, bounded by `@decisionScope` (`narrow` names the entity). Never restate a rejected option as the default.
+2. Load [defaults.md](./defaults.md) and author `default` under its contract, bounded by `@decisionScope` (`narrow` names the entity). Never restate a rejected option as the default. Several clauses cover only this ADR's localized decision, not unrelated choices.
+3. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the written ADR as `{{recordContent}}` and the authored default as `{{rowValues}}`. `narrow` → trigger phrases name the entity; `wide` → name the class property and its domain synonyms, never one member alone. Confirm every clause's applicability is discoverable.
+4. Author the Summary yourself — 1-2 agent-optimized sentences stating the decision.
 5. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = `pathToAdr` (the previous path when renamed), `decisionTitle`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table directly.
 
 ## Approval gate
