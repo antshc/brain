@@ -1,143 +1,162 @@
 ---
 name: grill-design
-description: A relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, feature decisions, and assumptions, and records hard-to-reverse architectural decisions as ADRs. Use when the user wants to stress-test a plan or design, get grilled, pin down domain terminology, or uses any 'grill design', 'grilling design' trigger phrases.
+description: Stress-tests a plan or design through a relentless interview, surfacing domain terminology, feature decisions, assumptions, and ADRs. Use for grill design, grilling design, or domain-modeling probes. Not for implementation; closes with a design or backlog handoff.
 ---
 
 # Grill Design
 
-Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → [track-ledger.md](./track-ledger.md); index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; codebase lookups → `/explore-codebase`. *Use `record-architecture` skill for settled architecture, ADRs, Concepts, and glossary terms: `term` mode for term writes, `adr` mode for ADR writes, `concept-record` mode for Concept repairs.* Load the ledger reference before accessing the ledger; invoke the other skills as needed. Never restate their rules.
+Own the interview and session design state: when to look up, log, ask, or write. Delegate mechanics through the skill contracts below; apply their procedures without restating them.
 
 ## Scope
 
-The grill produces exactly two things: **questions** and **records**. Writable surface for the whole session — `CONTEXT.md`, `ARCHITECTURE.md`, `docs/adr/**`, `docs/concepts/**`, `docs/building-blocks/**`, and the ledger. Source code, tests, configuration, and scaffolding are **read-only** for the entire session: reading them is the job (`/explore-codebase`), changing them is a different session.
+Produce **questions** and **records**. Writable surface: `CONTEXT.md`, `ARCHITECTURE.md`, `docs/adr/**`, `docs/concepts/**`, `docs/building-blocks/**`, and the session ledger. Source code, tests, configuration, and scaffolding **MUST remain read-only** throughout the grill.
 
-**Concepts are consumed, not discovered.** The grill matches, opens, and applies recorded Concepts, and repairs the ones this session proves wrong — a wrong `default`, a drifted key, a missing trigger clause. It never counts a rule's occurrences in the repo and never authors or offers a Concept: a reusable-looking rule no recorded Concept covers stays a ledger line, and writing it up is a different session's job.
+**Concepts are consumed, not discovered.** Match, open, and apply existing Concepts; repair wrong defaults, drifted keys, and missing trigger clauses during closing. MUST NOT author or offer new Concepts, or count rule occurrences to discover them. Rules with no existing owner stay in the ledger.
 
-**ADRs are recorded, not offered.** A decision I answer that passes the loaded `adr` mode's gate is written as an ADR that same turn — no offer, no approval. Recorded ADRs are matched, opened, and applied like Concepts; an ADR I reverse is rewritten in place by that mode, its previous decision kept as a rejected option.
+**ADRs are recorded, not offered.** An explicit user answer passing the loaded `adr` mode's gate authorizes its same-turn write. A user reversal rewrites that ADR in place through the same mode, preserving the previous decision as a rejected option.
 
-**A finished record is not a finished session.** A term, ADR, Concept, or building-block row resolves one branch of the decision tree and nothing more. The turn a write lands, return to the interview — the write is a side effect of the interview, never its exit.
+**Only the user ends the grill.** The grill MUST end only on a user request or confirmation, not a finished record, empty frontier, or clean sweep. When the tree appears resolved, report it, ask to close, and wait.
 
-**Only the user ends the grill.** An empty question frontier, a clean closing sweep, and a full doc set are mid-session states, not stop conditions. When you believe the tree is resolved, say so, ask, and wait for the answer.
-
-**Implementation is a handoff, not a next step.** The user asks to build it → state that the grill is closing, run the closing sweep, then hand off: `/to-tickets` for backlog items, `/to-zdesign` for a design doc, `/experiment` for a throwaway spike. Inside a grill turn, production code stays untouched — including the one-line change the answer you just got seems to imply.
+**Implementation is a handoff.** When the user asks to build, including a one-line fix, announce closing and run the closing sweep. Then route the saved context to the requested output: *Run `to-tickets` skill for agent-executable Tracer-bullet functional slices*; *Run `to-zdesign` skill to capture a completed design conversation as an authoritative feature design*; or *Run `experiment` skill for a minimal throwaway experiment answering an uncertain technical question*. Execution belongs to the handoff, outside the grill.
 
 ## Session start
 
-1. **Docs exist** — existence check only on `ARCHITECTURE.md` and `CONTEXT.md`; either missing → Run `/bootstrap-docs`' skill **Mandatory creation**.
-2. **Load the index** — read `ARCHITECTURE.md` in full: `Building blocks`' `Deployables` table and every row of the `Architecture Decision Records` and `Crosscutting Concepts` tables. All three sections are optional — absent is not a gap. Multi-part sections need multiple ranged reads; never stop at a partial read.
-3. **Claim the ledger** — load [track-ledger.md](./track-ledger.md); read the session ledger if it exists and confirm it belongs to this session; otherwise start fresh. An inherited `opened` line suppresses a guardrail re-scan for the rest of the session.
-4. **Seed the surface** — extract the touched surface from the initial request — terms **and** any concrete file/folder paths it names — and run *Scan and match* once; its normal trigger — a user answer — doesn't exist yet.
-5. **Interview.**
+1. **Claim state** — load [track-ledger.md](./references/track-ledger.md) before ledger access. Resolve session storage and ownership using its protocol; restore the frontier, answers, pending writes, and blockers. An unknown owner starts fresh without overwriting the old ledger.
+2. **Check docs** — existence-check `ARCHITECTURE.md` and `CONTEXT.md`. If either is missing, *Run `bootstrap-docs` skill to create missing ARCHITECTURE.md and CONTEXT.md from bundled formats*, using **Mandatory creation**. Proceed only when both exist; otherwise apply *Gotchas*.
+3. **Load the index** — read all of `ARCHITECTURE.md`, including every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. Use ranged reads until complete. Missing sections are optional, not gaps.
+4. **Seed the surface** — extract terms and concrete file/folder paths from the initial request; run *Scan and match*. On resume, apply only newly surfaced inputs; retain same-session match history, reloading needed evidence absent from context.
+5. **Interview** — restore or construct the dependency tree and its ready questions.
+
+## Skill contracts
+
+| Operation | Invocation and inputs | Required result |
+|---|---|---|
+| Code/test lookup | *Run `explore-codebase` skill for read-only lookups locating symbols, tests, or how a flow works.* Supply the bounded question, target, depth, and read-only constraint. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
+| Index scan/sync | *Run `index-docs` skill for scan/match and row-sync of Markdown Trigger condition tables.* Supply the operation and its required metadata. | Matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
+| Record | *Run `record-architecture` skill for settled architecture ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, or an explicit blocker. |
+
+Integrate lookup evidence into the frontier and touched surface; integrate record/index results into the ledger. Mark a record written only after the returned result confirms its persistence and required sync.
 
 ## Interview
 
-Interview me relentlessly about every aspect of this until we reach a shared understanding. Map it as a **design tree**: every decision branches into the decisions that hang off it.
+Probe the design until the user confirms shared understanding. Map its dependencies as a **decision tree**. At each **round**, the **frontier** contains every unresolved decision whose prerequisites are settled; exclude questions that require an answer still pending in that round.
 
-Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Before asking, filter it — a *fact* the environment can supply is looked up, never asked; a *decision* that clears the evidence checklist in *Decision states* becomes a Feature Assumption and leaves the frontier. Ask everything left in one round: number and title each question and give your recommended answer. Then wait for my answers before the next round.
+Before presenting the round, look up facts available from the environment and apply *Decision states*: a checklist-backed Feature Assumption leaves the frontier. Present every remaining ready decision, numbered with its stable ID, a descriptive title, and a recommended answer with reasoning. Phrase each question so **"yes" accepts its recommendation**; allow disagreement or another choice without treating silence as approval.
 
-Format a round like so:
+MUST present the whole ready frontier together as one numbered batch per round:
 
-```
-❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+```markdown
+❓ **Q1** - **<title>**: <question phrased so yes accepts the recommendation>
 
-➡️ <your recommended answer>
+➡️ <recommended answer and reason>
 
 ---
 
-❓ **Q2** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+❓ **Q2** - **<title>**: <independent question>
 
-➡️ <your recommended answer>
+➡️ <recommended answer and reason>
 ```
 
-Each round I answer reshapes the tree: settled decisions push the frontier outward and unblock the questions that depended on them. Re-run the probes, recompute the frontier, and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
+Record each answer inline and re-run triggered probes; withdraw or defer any remaining question invalidated by new evidence. Partial answers leave the unanswered questions pending, not implicitly accepted; present the remaining ready questions together, retaining IDs and recommendations.
 
-Finding *facts* is your job, never mine. When a frontier question needs a fact from code, tests, or tools, Run `/explore-codebase` skill; don't block on it — an unfinished lookup is an unsettled prerequisite, so only the questions downstream of it wait for its result; ask the rest of the frontier now. The *decisions* are mine: put each one that misses the checklist to me and wait.
+After the round's outstanding questions are answered or explicitly deferred, rebuild the frontier from the changed tree. Newly unblocked dependents belong to the next round, not the round containing their prerequisites.
 
-An empty frontier means every branch of the tree is visited and nothing is silently assumed — it is still a mid-session state (see *Scope*): end that turn on the explicit ask to close.
+Use the code-lookup contract to obtain environmental facts rather than asking the user to research them. Running lookups are unsettled prerequisites: hold their dependent questions and present the rest of the ready frontier without waiting. If a lookup fails or stays inconclusive, follow *Gotchas* rather than inventing a fact.
 
-**Turn shape** — every turn ends on one of two moves: the next question round, or the explicit ask to close the session. Lookups, ledger lines, and record writes are the middle of a turn; a turn that ends on a write is unfinished, so name the branches it opened or closed and ask the next question round in that same turn.
+Before ending each turn, persist frontier changes, answers, evidence, blockers, and next action. During an active interview, end on the next question or explicit request to close; after a write, name the affected branches and return to questioning. If only running prerequisites remain, persist and report the wait without claiming the tree is resolved. An empty frontier is resolved only when no blocked prerequisites or unanswered questions remain.
 
-Before confirming we've reached a shared understanding, report every Feature Decision, ADR decision, and Feature Assumption made this session — one bullet each, 1-3 sentences on what was decided/assumed and why, tagged so the two are never confused: `- [decided] {{item}}: {{explanation}}` / `- [assumed] {{item}}: {{explanation}}`. This is a **report, not a gate**: nothing waits on it, everything recorded is already on disk, and `git diff` is the review surface.
+Before confirming shared understanding, report every Feature Decision, ADR decision, and Feature Assumption: one bullet each, 1–3 sentences explaining what and why, tagged `[decided]` or `[assumed]`. Include model-authored Concept repairs as assumptions. This report adds no approval gate; identify pending writes explicitly instead of implying everything is on disk. `git diff` is the record review surface.
 
 ## Decision states
 
-Evidence checklist — all three → Feature Assumption; any miss → ask.
+All three checks pass → Feature Assumption; any miss → ask.
 
-* **Single matching record** — exactly one Concept or ADR row matched by *Scan and match* covers the decision area. Zero matches, or two or more, → ask.
-* **Direct answer (no analogy)** — a matched Concept carries a `default` for this decision or a `Rules` line that answers it normatively, or a matched ADR's decision answers it. A `Reference:` / "follow its shape" pointer never clears this gate.
-* **No genuine alternative** — the Concept's `default` names the choice to take when the design doesn't state one, or the ADR's Considered Options already rejected the alternatives. Alternatives listed without a default don't clear it.
+* **Single matching record** — exactly one matched Concept or ADR covers the decision area; zero or multiple owners fail.
+* **Direct answer (no analogy)** — the matched Concept's default or normative Rules line, or ADR decision, answers directly. A reference or "follow its shape" pointer fails.
+* **No genuine alternative** — a Concept default selects the choice when unspecified, or the ADR's Considered Options already rejected the alternatives. Alternatives without a default fail.
 
-| State | Resolved by | Home | Durable write |
-|---|---|---|---|
-| Feature Assumption | model, via the checklist | ledger only | never — the record that cleared the checklist already covers it; a gap in that record is closing-sweep work |
-| ADR decision | user, passes the loaded `adr` mode's gate | ledger + ADR | same turn it's answered — no offer, no approval |
-| Feature Decision | user, fails the ADR gate, resolving no term — feature-scoped or reusable alike | ledger only | never |
-| Rejected option | user | ledger only | never |
+| State | Resolved by | Home and write timing |
+|---|---|---|
+| Feature Assumption | model, checklist passed | Ledger only; the matching record already covers it. |
+| ADR decision | user, ADR gate passed | Ledger + ADR, same turn; the answer authorizes the write. |
+| Feature Decision | user, ADR gate failed, not a term | Ledger only, whether feature-scoped or reusable. |
+| Rejected option | user | Ledger only. |
 
-Log every state and every change of state using **Log decision** in [track-ledger.md](./track-ledger.md), the turn it happens. When I correct an assumption you made — at any point in the session — rewrite its ledger line that turn: the correction form when it stood on a Concept's `default` (the closing sweep repairs that key), a deletion otherwise. Every question you ask *because a gate missed* is logged the same turn via that reference's gate-miss form — it is the closing sweep's harvest input. **Every question you ask is by definition a gate miss** (a cleared checklist never asks), so every question in a round MUST get its own gate-miss line naming which gate failed and the nearest source — even when it also produces a Feature Decision. A `decided by user, feature decision` line is **not** a substitute for the gate-miss line: a feature-scoped decision that no Concept row matches is both a Feature Decision and a `gate miss: single-matching-record, nearest source: none`. The sweep resolves that miss as feature-scoped, without creating a Concept. An ADR decision is both its gate-miss line and a `decided by user, recorded: {{path}}` line. Only decisions you never had to ask (checklist cleared → Feature Assumption) carry no gate-miss line. Authoring choices made while writing docs (synonym lists, term placement, section names, prose wording) are none of these — don't log or list them.
+Every decision question **MUST** get its own gate-miss line that turn, identifying the failed gate and nearest source; preserve it alongside the resulting state:
+
+| Outcome | Ledger entries |
+|---|---|
+| Feature Decision | Gate miss + decided by user; no owner uses `single-matching-record`, source `none`. |
+| ADR decision | Gate miss + recorded path, or pending write until persistence succeeds. |
+| Feature Assumption | Assumed with evidence; no gate miss. |
+
+Log state changes that turn. When the user corrects an assumption, replace it with a correction line if based on a Concept default; otherwise remove the stale assumption, retaining the correction and new answer in the frontier history. Surface ADR corrections for explicit user resolution through `adr` mode.
+
+Fact-gap questions, term clarifications, and close/authorization requests are not failed decision-checklist gates; record their kind and answer in the frontier instead. Documentation wording, synonyms, and section placement are authoring choices, not decisions.
 
 ## Context economy
 
-- Broad-sweep code and test lookups → Run `/explore-codebase` skill; direct reads only to quote an exact line.
-- Re-fetch a durable artifact when you first need it, or when you need it and can't quote it verbatim from context — never on a schedule, never "just in case", never right after your own write.
-- Authority order: `CONTEXT.md`/`ARCHITECTURE.md`/ADR/Concept > code > external sources. A conflict against a higher-ranked source is asked, never assumed.
+- Communicate primarily through **context pointers**: linked record paths/anchors, code locations, source URLs, and ledger question/decision IDs.
+- Do not duplicate information already available through those pointers. In questions, reports, lookup briefs, and handoffs, link the source and state only the new question, decision, change, or uncertainty; keep required recommendations and decision summaries concise.
+- Prefer the code-lookup contract for broad code/test searches; use direct reads for a known evidence location.
+- Re-fetch an artifact when first needed or when its required evidence is no longer available in context. Prefer reuse after a confirmed write; re-read when verification or a detected change requires it, not on a schedule.
+- Authority: `CONTEXT.md` / `ARCHITECTURE.md` / ADR / Concept > code > external sources. Surface conflicts, including conflicts within the same rank; ask rather than silently choosing an authority.
 
 ## Probes
 
-Alongside the interview, build and sharpen the project's domain model — challenging terms, inventing edge-case scenarios, writing the glossary down the moment a term crystallises, and recording each ADR-worthy decision the moment I make it. Every other decision stays in the ledger. Merely *reading* `CONTEXT.md` for guardrails isn't enough here: the glossary changes as the session goes, even where the Concepts are only read, applied, and repaired.
+Re-check each probe's trigger after every user answer or new fact. A later answer can invalidate an earlier interpretation.
 
-Every probe stays live for the whole session: re-check its trigger after each user answer, not just once — a later answer can retroactively put an earlier one in conflict.
+**Glossary conflict** — when the user's term clashes with `CONTEXT.md`, cite the definition and ask which meaning applies.
 
-**Glossary conflict** — the user's term clashes with the existing language in `CONTEXT.md`: call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+**Fuzzy language** — when a term is vague or overloaded, propose a precise canonical term and resolve it with the user.
 
-**Fuzzy language** — vague or overloaded term: propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
+**Concrete scenarios** — when a domain relationship, boundary, or invariant is asserted as fact, invent edge cases that expose its limits.
 
-**Concrete scenarios** — when a domain relationship, boundary, or invariant is stated as fact — not just discussed in the abstract — invent edge-case scenarios that force precision about the boundaries between concepts.
+**Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [probes-verification.md](./references/probes-verification.md) and apply the triggered coverage/functional-slice checks.
 
-**Test coverage** — runs on every change. Check the `Crosscutting Concepts` index for a testing/verification Concept. Match → Run `/explore-codebase` skill to cross-reference it against existing tests and test conventions, then propose add/update/delete. No match → use the code alone. "This adds a repository against the database — your testing Concept mandates an integration-test category. Which category covers persistence round-trips and queries?"
+**External source** — when seeded from an explicit external link or reference, load [probes-external-source.md](./references/probes-external-source.md); track and reconcile it throughout the session.
 
-**Automated functional verification** — when the design establishes or changes observable behavior, inspect existing functional-slice tests and discover applicable `testing-*` skills across repository, user, and installed scopes. Follow applicable `/testing-*` skills for test kinds, setup, commands, and seams; keep code and tests read-only. Offer spec-wide automated functional verification through the highest existing useful seams: propose scenario bullets, identify reusable coverage and gaps, and ask for the automation decision when unresolved. Log approved, declined, or deferred scope through the existing decision flow; revisit only when new behavior changes that scope. Repository/accessor/proxy integration verification remains part of the coding agents' work. Carry the decision and observable scenarios into the spec handoff, without test-file paths or fixed test-method names.
+**Scan and match** — append newly surfaced terms and repo-relative verbatim file/folder paths to the ledger, including lookup results.
+* Nothing new → reason over the current index; no scan or surface write.
+* New terms/paths → use the index contract's **Scan and match** on not-yet-opened global ADR, Concept, and Deployable rows, passing only the new surface plus the required questioning context and glossary.
+* Matched Deployable → open its record read-only, whether harness-owned under `docs/building-blocks/` or repo-owned documentation. Scan its Concepts and ADR tables; for repo-owned blocks, use their own architecture indexes. Deduplicate records across global and block tables by path.
 
-**Scan and match** — on each triggering turn (user answer / new fact), follow **Append surface term** in [track-ledger.md](./track-ledger.md) with any new surface terms **and any concrete file/folder paths** newly surfaced — by the user, by *Code cross-reference*, or by an `/explore-codebase` result. Paths go in verbatim and repo-relative.
-* **Nothing new** — reason over the in-context index copy; no scan, no write.
-* **New term(s) or path(s)** — Run `/index-docs`' skill **Scan and match** passing only those, against the not-yet-`opened` rows of the global `Architecture Decision Records`, `Crosscutting Concepts`, and `Deployables` tables.
-* **A matched Deployable row** — open its record (this session's harness record under `docs/building-blocks/`, or the repository's own documentation when that repository documents itself — either way, read-only) and run **Scan and match** again against its own Concepts and ADR tables: a harness-owned block's `Concepts` and `Architecture Decision Records` tables, or a repo-owned block's own Crosscutting Concepts and ADR index standing in for them. A record listed in both a global table and a block's table is opened once per session — check the ledger before re-opening it.
+Matches are monotonic as surface grows: an opened record needs no matching re-scan. Skipped rows remain candidates when new surface arrives.
 
-This verdict is **monotonic** — once a row matches it stays matched as the surface only grows; never re-check an already-`opened` row here.
+**Open and extract** — open linked bodies on a match; indexing alone does not imply relevance. Log opened and skipped verdicts. Before discussing a module, boundary, or service, check its ledger status: only `opened` confirms a previous body read; `skipped` does not. Reload previously opened evidence if needed after context loss, without repeating the matching scan. Missing sections mean "not documented", not "not applicable".
 
-**Open and extract** — open a linked Concept's, ADR's, or Deployable's **body** only on a matching verdict; indexing alone never implies relevance. Log every record you open or skip using **Log opened record** in [track-ledger.md](./track-ledger.md), and check the ledger before discussing any module, boundary, or service — listed means its full record is already loaded, don't re-open or re-scan for it. A section absent from an opened record means "not documented", never "not applicable". Extract **mandates** (required concepts, patterns, boundaries; an ADR's decision), **prohibitions** (explicitly rejected approaches; an ADR's Considered Options), **open space** (unconstrained choices), **defaults** (the `**Default:**` part of the matched row's Trigger condition & Default cell — the choice to take when the design doesn't state one) — and frame every question, scenario, and alternative against them.
+Extract mandates, prohibitions, open choices, and defaults from the record and the matched row's `**Default:**` cell. Frame questions and alternatives against them.
 
-**Classify conflicts** — over the full text of already-`opened` Concepts and ADRs in context; no tool call; re-runs every triggering turn because it is **non-monotonic**: a later answer can retroactively put an earlier design in conflict with a record that matched turns ago.
-* **Violation** — breaks a Concept or repeats an ADR's rejected option. Never present as equally valid — cite the Concept or ADR, surface the conflict.
-* **Supersession** — the Concept or ADR is outdated. A Concept needs revision; an ADR I reverse is rewritten in place via `adr` mode.
-* **Out of scope** — the record doesn't apply.
+**Classify conflicts** — re-evaluate already-opened records after every answer/new fact; use in-context evidence, reloading only missing details.
+* Violation → cite the rule or ADR rejected option; present the conflict, not an equally valid alternative.
+* Supersession → identify the outdated rule; repair a Concept during closing, or rewrite a user-reversed ADR inline.
+* Out of scope → explain why the record does not apply.
 
-**Code cross-reference** — when the user states how something works, check whether the code agrees, across user-facing, application, integration, and persistence boundaries: validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic. Contradicts the user → surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?" Contradicts a loaded Concept or ADR — its rules, its decision, or its `**Default:**` → classify it as **Drift**, log it using the drift form in [track-ledger.md](./track-ledger.md), and surface the gap.
+**Code cross-reference** — when the user states how something works, use the lookup contract to check user-facing, application, integration, and persistence boundaries: validation, constraints, models, schemas, contracts, relationships, and logic. Surface contradictions with both the claim/record anchor and code `path:line` or symbol evidence. A contradiction against a Concept/ADR is Drift; log both sources. Missing proof → label `unverified`, retain the fact gap, and avoid presenting it as an established contradiction.
 
-**External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
+**Record inline** — resolve terms and architectural decisions in the turn answered, before the next round:
+* Explicitly resolved term → use the record contract's `term` mode.
+* Explicitly resolved decision → load `adr` mode and check its gate; pass → write; miss → Feature Decision in the ledger.
+* Model resolution → Feature Assumption in the ledger, not an ADR.
 
-**Record inline** — nothing is ever batched to the end of the session; the answer is the approval.
-* A term resolved by explicit user answer → *Run `record-architecture` skill in `term` mode to record settled architecture glossary terms* that same turn.
-* A decision resolved by explicit user answer → *Load `record-architecture` skill in `adr` mode for settled architecture ADRs* and check its **ADR gate**. Passes → record that same turn, before the next question round; never offer it, never ask permission. Any miss → Feature Decision, ledger only.
-* Resolved by you → Feature Assumption, ledger only (see *Decision states*); never an ADR.
+Existing Concept repairs belong to closing; other reusable rules remain ledger-only. Apply *Gotchas* when a write is blocked. Round boundaries do not delay authorized inline writes.
 
-Every other decision stays in the ledger, a reusable-sounding rule included: the only Concept writes this skill makes are the closing sweep's repairs to records that already exist.
+## Gotchas
+
+- Required skill/tool unavailable or operation failed → report the operation, target, and error; block only dependent work. Retry a classified transient error at most twice. Missing skills, invalid inputs, and inconclusive evidence require resolution, not repeated identical calls.
+- Bootstrap failure → keep existing files, report partial creation, and block index-dependent assumptions and record writes until both docs exist. Continue only independent questioning.
+- Lookup failure/inconclusive result → ask for the missing fact, labelled **fact gap**. Record user-supplied evidence as such; conflicting or unverified facts remain blocked. An unknown fact is not a design decision.
+- Index failure → treat matching/sync as incomplete, not "no matches". Block affected assumptions; preserve partial writes as pending sync.
+- Record failure/unavailable → persist the answer, intended mode/target, and blocker as `pending write`. If the ADR gate was unavailable, mark classification pending rather than assuming a Feature Decision. Resume the owning procedure after recovery; check existing state first to avoid duplicate records.
+- Missing session storage → apply the ledger's storage failure protocol; do not substitute an arbitrary repository file.
 
 ## Closing sweep
 
-Three parts, each with its own trigger. The sweep **repairs** existing records; it never authors a new one — a term is written inline in `term` mode, an ADR inline in `adr` mode, and a rule no recorded Concept covers stays in the ledger.
+When the user asks to close, confirms closure, or requests implementation, load [closing-sweep.md](./references/closing-sweep.md). Complete its reconciliation, repairs, and trigger refinement before handoff. If the user resumes questioning, persist outstanding work and return to the interview.
 
-**1. Per-row disposition.** If the session opened at least one full Concept or ADR, emit one verdict per row in the `Architecture Decision Records` and `Crosscutting Concepts` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so no row is silently omitted. Skip for trivial sessions that only touched glossary terms.
+## Completion criteria
 
-**2. Assumption-gap harvest.** Never skipped, and never reported "no gaps" without the reconciliation below. A wrong default or drifted key marks a gap in the Concept behind it. A question with no matched owner may be a feature-scoped decision; keep it in the ledger without manufacturing a Concept. Never rewrite an ADR's decision on your own here — a correction or drift against an ADR is surfaced, and once I decide, rewritten inline in `adr` mode.
-
-**Reconciliation first (the anti-skip guard).** Before repairing anything, enumerate *every* user-answered question logged this session and find its gate-miss line. Any question without one is an **unlogged miss** — reconstruct its gate-miss line now, then inspect it like the rest. An empty gap-form list is valid only when no question was asked; reaching "no repairs" without enumerating the questions skips this step.
-
-Then inspect each of the ledger's three gap forms:
-* **Gap miss** (`asked, gate miss:`) — if the answer was recorded as an ADR, mark the miss resolved with that path. Otherwise, if the answer establishes a reusable rule, add the missing `default` to the nearest Concept's index row. If no Concept can host it, leave the decision in the ledger and mark the miss resolved; authoring a brand-new record is never this skill's job. If the answer is feature-scoped, keep the Feature Decision in the ledger and mark the gate miss resolved without changing a record.
-* **Correction** (`corrected, evidence was:`) — a `default` produced an assumption the user corrected mid-session; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
-* **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
-
-Write the Concept fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*'s term writes. A key change no answer covers is your own call: write it, log it, and report it in the closing `[assumed]` list. *Run `record-architecture` skill in `concept-record` mode to repair settled architecture Concepts*, letting that mode resync the row through `index-docs`, then mark the ledger line resolved.
-
-**3. Trigger-condition refinement.** Runs last, so it also covers any row part 2 just resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, blank cell). If found, refine the clause and apply it via `/index-docs`' skill **Sync index row**.
+- The user ended the grill; the sweep accounts for every question, decision, gap, and triggered probe.
+- Each `asked`, `corrected`, or `drift` line is repaired/resolved with evidence, or explicitly reported open with a blocker and next action.
+- Required records and indexes are confirmed written, or individually reported pending; source code, tests, configuration, and scaffolding remain unchanged.
+- The persisted ledger and handoff identify decisions, assumptions, evidence, unanswered questions, verification scope, blockers, and next action. Report closure as incomplete when storage, writes, or checks remain blocked.
