@@ -33,15 +33,17 @@ Append only new terms/paths; return which were new. A skipped verdict is valid o
 
 Use stable item/question IDs. A decision and its gate miss are separate entries sharing an ID; update by ID **and entry kind**, not item text alone.
 
-* `{{id}} {{item}} — assumed, evidence: "{{source}}"`
+* `{{id}} {{item}} — assumed, key: {{decisionKey}}, condition: "{{establishedCondition}}", evidence: "{{governingSourceAnchors}}"`
 * `{{id}} {{item}} — assumed, recorded: {{path}}#{{key}}, evidence: "{{source}}"`
 * `{{id}} {{item}} — decided by user, feature decision, grounded: "{{source}}"`
 * `{{id}} {{item}} — decided by user, recorded: {{path}}`
 * `{{id}} {{item}} — rejected, reason: "{{source}}"`
 
+Keep legacy entries readable; add key/condition/anchors when next evaluated. Conflicting clauses retain all source anchors; unknown applicability links to its fact-gap prerequisite. Multiple keys under one question share the question ID but use distinct decision keys; update by ID, entry kind, and key when present.
+
 Gap forms:
 
-* `{{id}} {{item}} — asked, gate miss: {{gate}}, nearest source: {{path|none}}`
+* `{{id}} {{item}} — asked, key: {{decisionKey}}, gate miss: {{gates}}, nearest source: {{sourceAnchors|none}}`
 * `{{id}} {{item}} — corrected, evidence was: {{path}}#{{key}}, answer: "{{userCorrection}}"`
 * `{{id}} {{item}} — drift, code contradicts: {{path}}#{{key}}, code evidence: {{codePath:line|symbol}}, finding: "{{contradiction}}"`
 

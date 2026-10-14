@@ -37,6 +37,7 @@ Load a format only when its selected procedure needs it:
 - [BUILDING-BLOCK-FORMAT.md](./templates/BUILDING-BLOCK-FORMAT.md)
 - [DEPLOYMENT-VIEW-FORMAT.md](./templates/DEPLOYMENT-VIEW-FORMAT.md)
 - [CONTEXT-FORMAT.md](./templates/CONTEXT-FORMAT.md)
+- Index defaults for `adr` and `concept-record`: [defaults.md](./references/defaults.md).
 - Concept templates: [domain](./templates/domain-business-process.md), [structure](./templates/structure-implementation.md), [operations](./templates/ops-policy.md).
 
 ## Completion criteria

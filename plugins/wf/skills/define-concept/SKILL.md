@@ -15,7 +15,7 @@ Every fact in a suggestion, a question, or the recorded Concept is either a cite
 
 A Concept pays off in `/grill-design` when its index row's `default` lets a decision clear that skill's **Decision states** evidence checklist, turning a question into a Feature Assumption. Rank candidates by, in order:
 
-1. **Default-ability** — inspection shows one consistent choice across the scope, so a one-sentence `default` answers the decision directly with no genuine alternative.
+1. **Default-ability** — rank by independently reusable decision keys with direct choices and checkable selection conditions across the scope. Several settled variants can qualify; unknown conditions or conflicting choices remain blurry. Inspection supports a proposal, not policy; defaults require user confirmation.
 2. **Recurrence** — the number of building blocks where the concept's decision recurs.
 3. **Drift** — for an extend candidate, how far the code has moved from the recorded rules or `default`.
 
@@ -63,7 +63,7 @@ Map the chosen candidate's decisions: scope, applicable contexts, shared behavio
 
 **5. Resolve through questioning and inspection**
 
-Follow [questioning.md](questioning.md) over the tree. Ask every blurry branch as a question carrying its cited evidence; the `default` is always a user-confirmed decision. Before each round, identify the facts its frontier needs and inspect independent areas (separate deployables, workflow boundaries, configuration versus tests) through `/explore-codebase`' skill **Run caller-supplied work inside the subagent**, giving each agent the concept, exact scope, and a distinct question. One focused path → one agent; dependent paths → sequential. Do not launch duplicate fact lookups during questioning for areas already in flight. Done when the user confirms shared understanding, as the questioning reference requires.
+Follow [questioning.md](questioning.md) over the tree. Ask every blurry branch as a question carrying its cited evidence; each default clause, its selection conditions, and exceptions are always user-confirmed decisions. Before each round, identify the facts its frontier needs and inspect independent areas (separate deployables, workflow boundaries, configuration versus tests) through `/explore-codebase`' skill **Run caller-supplied work inside the subagent**, giving each agent the concept, exact scope, and a distinct question. One focused path → one agent; dependent paths → sequential. Do not launch duplicate fact lookups during questioning for areas already in flight. Done when the user confirms shared understanding, as the questioning reference requires.
 
 **6. Consolidate findings**
 
@@ -71,7 +71,7 @@ Resolve conflicting reports with targeted reads. Separate documented intent, obs
 
 **7. Evidence sweep**
 
-List every planned `Rules` bullet, scenario, and `Implementation Map` row, plus the `default`. Map each to a citation or a user answer. Resolve each unmapped item to exactly one of: ask the user (return to item 5), drop it, or mark it `not verified`. Done when no item is unmapped.
+List every planned `Rules` bullet, scenario, and `Implementation Map` row, plus each default clause, condition, and exception. Map each to a citation or a user answer. Resolve each unmapped item to exactly one of: ask the user (return to item 5), drop it, or mark it `not verified`. Default clauses, conditions, and exceptions MUST be user-confirmed; `not verified` cannot substitute for settling them. Done when no item is unmapped.
 
 **8. Document and record**
 
