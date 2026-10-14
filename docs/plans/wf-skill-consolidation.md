@@ -1,6 +1,6 @@
 # WF skill consolidation
 
-Status: proposed; skill changes not implemented.
+Status: partially implemented. `track-ledger` is absorbed into `grill-design` as a root-level `track-ledger.md` reference; its standalone skill is removed. Questioning remains unchanged; other consolidation and archive moves remain proposed.
 
 Backlog entry superseded: `manage-backlog` was removed in favor of GitHub references bundled with each consuming skill and label setup owned by `init-wf`. The historical roster/count below describes the original consolidation proposal, not the current plugin.
 
@@ -46,7 +46,7 @@ Reduce 36 active skills to 27. Use progressive disclosure for grouped procedures
 
 ## Triggering and usage
 
-- `grill-design` covers interviews, questioning, and decision forks; load questioning and ledger procedures as needed.
+- `grill-design` covers interviews, questioning, and decision forks. Its ledger procedure is now a root-level reference, loaded before ledger access; questioning remains unchanged.
 - `record-architecture` covers documenting or recording ADRs, concepts, deployables, deployment topology, glossary terms, and decision bullets. Select the requested record type and load only its procedure and required helpers.
 - `define-concept` discovers, scopes, and resolves concepts; use `record-architecture` to document and persist settled knowledge. Recording a settled concept must not force another interview.
 - Keep `bootstrap-docs` and `index-docs` independently reusable by setup, recording, and inspection workflows.
@@ -57,4 +57,4 @@ Reduce 36 active skills to 27. Use progressive disclosure for grouped procedures
 - Absorbed procedures lose independent skill triggers and commands; references are not standalone skills.
 - Verify representative prompts before implementation is considered complete, especially the broad `record-architecture` entry point.
 
-Only this plan is authorized for saving; no skill consolidation or archive move has been applied.
+The `track-ledger` merge was authorized and applied separately. Other consolidation and archive moves have not been applied.

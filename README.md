@@ -135,7 +135,6 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [record-adr](plugins/wf/skills/record-adr/SKILL.md), [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-building-block](plugins/wf/skills/record-building-block/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture ADRs, Concepts, glossary terms, building blocks, and deployment topology into the docs as they crystallise.
 - [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
 - [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for GitHub issue labels and doc layout; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research/bootstrap-docs remain local, and other skills retain their Jira workflows.
-- [track-ledger](plugins/wf/skills/track-ledger/SKILL.md): session ledger for decisions and assumptions staged during a questioning session.
 
 ### crew
 
