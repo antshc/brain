@@ -4,9 +4,9 @@ description: "Synthesises the current conversation into a feature spec with user
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
+This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user about requirements; synthesize what you already know. Confirm testing seams and ask only for unresolved publication routing.
 
-Use GitHub Issues through `gh`; follow the bundled [GitHub reference](./github.md). No setup-generated tracker configuration is required.
+**MUST** load the bundled [GitHub reference](./github.md) before any GitHub action, including reads. Execute GitHub actions through `gh` according to its prerequisites, procedures, and failure handling. If the reference cannot be loaded, stop and report the blocker. No setup-generated tracker configuration is required.
 
 ## Process
 
@@ -16,7 +16,7 @@ Use GitHub Issues through `gh`; follow the bundled [GitHub reference](./github.m
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it as a GitHub issue. Ensure `ready-for-agent` exists before applying it. Read the published issue back to confirm the full body and label, then report its URL.
+3. Write the spec using the template below. Resolve the tracker repository, source repository, and target base branch using the GitHub reference; ask only when unresolved. Publish it as a GitHub issue with `repo:target:<owner/repo>` and `repo:base:<branch>`, creating missing labels first. Read the published issue back to confirm the full body and both labels, then report its URL.
 
 <spec-template>
 
@@ -77,4 +77,4 @@ Any further notes about the feature.
 ## Completion criteria
 
 - The spec reflects the conversation and codebase, with testing seams confirmed by the user.
-- A GitHub issue contains the complete spec and `ready-for-agent` label; its URL is reported.
+- A GitHub issue contains the complete spec and the confirmed `repo:target:<owner/repo>` and `repo:base:<branch>` labels; its URL is reported.
