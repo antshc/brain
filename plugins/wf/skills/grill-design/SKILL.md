@@ -48,11 +48,18 @@ MUST present the whole ready frontier together as one numbered batch per round:
 ```markdown
 ❓ **Q1** - **<title>**: <question phrased so yes accepts the recommendation>
 
+- **A** (Recommended) <option>
+- **B** <option>
+- **C** <option>
+
 ➡️ <recommended answer and reason>
 
 ---
 
 ❓ **Q2** - **<title>**: <independent question>
+
+- **A** (Recommended) <option>
+- **B** <option>
 
 ➡️ <recommended answer and reason>
 ```
