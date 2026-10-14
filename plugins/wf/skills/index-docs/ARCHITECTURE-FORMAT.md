@@ -62,12 +62,12 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 An ADR records a point-in-time, localized decision — hard to reverse, surprising without context, and the result of a real trade-off. ADRs applying to exactly one Deployable are indexed in that block's record instead. Recording uses `record-architecture`'s `adr` mode.
 
-<!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading; plain, unlinked text when the decision has no `docs/adr/` record. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: 1-2 agent-optimized sentences stating the decision; for an unlinked row it is the whole decision. -->
+<!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading; plain, unlinked text when the decision has no `docs/adr/` record. {{summary}}: 1-2 agent-optimized sentences stating the decision; for an unlinked row it is the whole decision. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: one sentence naming the choice to take within the ADR's scope when the design doesn't state one. -->
 
-| Decision | Summary | Trigger condition |
-|----------|---------|-------------------|
-| [{{decisionTitle}}](docs/adr/{{slug}}.md) | {{summary}} | {{triggerCondition}} |
-| {{decisionTitle}} | {{summary}} | {{triggerCondition}} |
+| Decision | Summary | Trigger condition & Default |
+|----------|---------|-----------------------------|
+| [{{decisionTitle}}](docs/adr/{{slug}}.md) | {{summary}} | **Trigger:** {{triggerCondition}}. **Default:** {{default}} |
+| {{decisionTitle}} | {{summary}} | **Trigger:** {{triggerCondition}}. **Default:** {{default}} |
 
 ## Crosscutting Concepts *(optional)*
 

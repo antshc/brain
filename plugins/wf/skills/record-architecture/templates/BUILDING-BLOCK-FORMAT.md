@@ -47,10 +47,10 @@
 
 ## Architecture Decision Records
 
-<!-- `Decision | Summary | Trigger condition` table, rows recorded through this skill's adr procedure into docs/adr/ — ADRs applying to this block only. A row may be unlinked (plain Decision title, no record) when its Summary carries the whole decision. -->
+<!-- `Decision | Summary | Trigger condition & Default` table, rows recorded through this skill's adr procedure into docs/adr/ — ADRs applying to this block only. A row may be unlinked (plain Decision title, no record) when its Summary carries the whole decision. -->
 
-| Decision | Summary | Trigger condition |
-|----------|---------|-------------------|
+| Decision | Summary | Trigger condition & Default |
+|----------|---------|-----------------------------|
 
 ## Key features
 
