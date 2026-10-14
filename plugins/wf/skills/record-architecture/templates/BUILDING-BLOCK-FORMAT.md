@@ -36,18 +36,18 @@
 
 ## Flow view
 
-*(optional)* <!-- Include only when the block's essential behavior is a lifecycle or process (transient resource, job, multi-step handoff) that a Container or Component view cannot show. Draw with `/doc-behavior-diagram` (flowchart; orientation `LR`), in the Container view's component names, current mode, one diagram per block. Omit for long-running services whose structure the Container view already explains. -->
+*(optional)* <!-- Include only when the block's essential behavior is a lifecycle or process (transient resource, job, multi-step handoff) that a Container or Component view cannot show. *Run `doc-behavior-diagram` skill for Mermaid flowchart, swimlane, or sequence behavior*, using Flowchart, orientation `LR`, the Container view's component names, current mode, one diagram per block. Omit for long-running services whose structure the Container view already explains. -->
 
 ## Concepts
 
-<!-- `Concept | Summary | Trigger condition & Default` table, rows recorded via /record-concept into docs/concepts/ — this block's own Crosscutting Concepts. -->
+<!-- `Concept | Summary | Trigger condition & Default` table, rows recorded through this skill's concept-record procedure into docs/concepts/ — this block's own Crosscutting Concepts. -->
 
 | Concept | Summary | Trigger condition & Default |
 |---------|---------|-----------------------------|
 
 ## Architecture Decision Records
 
-<!-- `Decision | Summary | Trigger condition` table, rows recorded via /record-adr into docs/adr/ — ADRs applying to this block only. A row may be unlinked (plain Decision title, no record) when its Summary carries the whole decision. -->
+<!-- `Decision | Summary | Trigger condition` table, rows recorded through this skill's adr procedure into docs/adr/ — ADRs applying to this block only. A row may be unlinked (plain Decision title, no record) when its Summary carries the whole decision. -->
 
 | Decision | Summary | Trigger condition |
 |----------|---------|-------------------|

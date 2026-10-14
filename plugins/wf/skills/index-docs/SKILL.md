@@ -1,6 +1,6 @@
 ---
 name: index-docs
-description: Own ARCHITECTURE.md's structural prose (Overview, Building blocks, and the Deployment View reference stub whose content comes from record-deployment-view), host ARCHITECTURE-FORMAT.md, and insert its missing section skeletons. Owns the generic trigger-generation, scan/match, and row-sync mechanic for any markdown table with a Trigger condition column (Deployables, ADRs, Concepts, or custom), driven by caller-supplied table/row metadata rather than a fixed schema. Called by grill-design and the record-* skills. Does not create ARCHITECTURE.md and does not author its index rows' content.
+description: Maintains ARCHITECTURE.md structural prose and section skeletons; owns trigger-generation, scan/match, and row-sync for Markdown Trigger condition tables. Uses caller-supplied metadata for Deployables, ADRs, Concepts, or custom indexes; never creates the file or authors row content.
 ---
 
 # Index Docs
@@ -11,7 +11,7 @@ Own `ARCHITECTURE.md`'s structural prose and its three indexes (`Deployables`, `
 
 - **Shape, not steps.** `ARCHITECTURE.md` describes decomposition and the rules holding it together — not a spec, not a scratch pad, not a home for inlined backbone decisions. Step-by-step detail lives in code and linked Concepts.
 - **Never batch.** Update `ARCHITECTURE.md` in the same change as the structure/layering shift it reflects. A stale architecture map is worse than none.
-- **The owning skill authors its row.** A table row is authored directly by the skill that owns that record kind (`record-adr`, `record-concept`, `record-building-block`) via **Sync index row** — never derived from the record file itself, and never hand-edited independently of it.
+- **The owning procedure authors its row.** A table row is authored directly by the owning `record-architecture` mode (`adr`, `concept-record`, `building-block`) via **Sync index row** — never derived from the record file itself, and never hand-edited independently of it.
 
 ## Ensure section exists
 
@@ -19,6 +19,12 @@ Inputs: `{{sectionAnchor}}` (e.g. `Architecture Decision Records`, `Crosscutting
 
 1. If `{{sectionAnchor}}` already exists in `ARCHITECTURE.md`, do nothing.
 2. Otherwise insert its skeleton — `{{skeletonContent}}` when the caller supplies one (custom tables), else the skeleton for that section from [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md) — at the position the template gives it.
+
+## Sync Deployment View reference
+
+Input: `{{skeletonContent}}` — the `DEPLOYMENT.md` link and established topology summary supplied by `record-architecture`'s `deployment-view` mode.
+
+Use **Ensure section exists** for `Deployment View` with this content when absent. When present, update only its deployment link and topology summary; preserve unrelated content. Done when the pointer and summary reflect the recorded topology. **Ensure section exists** alone never refreshes an existing section.
 
 ## Generate trigger condition
 

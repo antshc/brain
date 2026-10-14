@@ -5,7 +5,7 @@ description: A relentless interview and domain-modeling probe set that sharpens 
 
 # Grill Design
 
-Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → [track-ledger.md](./track-ledger.md); index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; term writes → `/record-term`; ADR writes → `/record-adr`; Concept repairs → `/record-concept`; codebase lookups → `/explore-codebase`. Load the ledger reference before accessing the ledger; invoke the other skills as needed. Never restate their rules.
+Own the interview and the session's design state — *when* to look up, log, ask, or write. Every *how* is delegated: ledger grammar → [track-ledger.md](./track-ledger.md); index scan/sync → `/index-docs`; doc creation → `/bootstrap-docs`; codebase lookups → `/explore-codebase`. *Use `record-architecture` skill for settled architecture, ADRs, Concepts, and glossary terms: `term` mode for term writes, `adr` mode for ADR writes, `concept-record` mode for Concept repairs.* Load the ledger reference before accessing the ledger; invoke the other skills as needed. Never restate their rules.
 
 ## Scope
 
@@ -13,7 +13,7 @@ The grill produces exactly two things: **questions** and **records**. Writable s
 
 **Concepts are consumed, not discovered.** The grill matches, opens, and applies recorded Concepts, and repairs the ones this session proves wrong — a wrong `default`, a drifted key, a missing trigger clause. It never counts a rule's occurrences in the repo and never authors or offers a Concept: a reusable-looking rule no recorded Concept covers stays a ledger line, and writing it up is a different session's job.
 
-**ADRs are recorded, not offered.** A decision I answer that passes `/record-adr`'s gate is written as an ADR that same turn — no offer, no approval. Recorded ADRs are matched, opened, and applied like Concepts; an ADR I reverse is rewritten in place by `/record-adr`, its previous decision kept as a rejected option.
+**ADRs are recorded, not offered.** A decision I answer that passes the loaded `adr` mode's gate is written as an ADR that same turn — no offer, no approval. Recorded ADRs are matched, opened, and applied like Concepts; an ADR I reverse is rewritten in place by that mode, its previous decision kept as a rejected option.
 
 **A finished record is not a finished session.** A term, ADR, Concept, or building-block row resolves one branch of the decision tree and nothing more. The turn a write lands, return to the interview — the write is a side effect of the interview, never its exit.
 
@@ -70,7 +70,7 @@ Evidence checklist — all three → Feature Assumption; any miss → ask.
 | State | Resolved by | Home | Durable write |
 |---|---|---|---|
 | Feature Assumption | model, via the checklist | ledger only | never — the record that cleared the checklist already covers it; a gap in that record is closing-sweep work |
-| ADR decision | user, passes `/record-adr`'s gate | ledger + ADR | same turn it's answered — no offer, no approval |
+| ADR decision | user, passes the loaded `adr` mode's gate | ledger + ADR | same turn it's answered — no offer, no approval |
 | Feature Decision | user, fails the ADR gate, resolving no term — feature-scoped or reusable alike | ledger only | never |
 | Rejected option | user | ledger only | never |
 
@@ -109,7 +109,7 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 
 **Classify conflicts** — over the full text of already-`opened` Concepts and ADRs in context; no tool call; re-runs every triggering turn because it is **non-monotonic**: a later answer can retroactively put an earlier design in conflict with a record that matched turns ago.
 * **Violation** — breaks a Concept or repeats an ADR's rejected option. Never present as equally valid — cite the Concept or ADR, surface the conflict.
-* **Supersession** — the Concept or ADR is outdated. A Concept needs revision; an ADR I reverse is rewritten in place via `/record-adr`.
+* **Supersession** — the Concept or ADR is outdated. A Concept needs revision; an ADR I reverse is rewritten in place via `adr` mode.
 * **Out of scope** — the record doesn't apply.
 
 **Code cross-reference** — when the user states how something works, check whether the code agrees, across user-facing, application, integration, and persistence boundaries: validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic. Contradicts the user → surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?" Contradicts a loaded Concept or ADR — its rules, its decision, or its `**Default:**` → classify it as **Drift**, log it using the drift form in [track-ledger.md](./track-ledger.md), and surface the gap.
@@ -117,19 +117,19 @@ This verdict is **monotonic** — once a row matches it stays matched as the sur
 **External-source cross-reference** — if the session was seeded from a link or explicit reference to an external source (Jira work item, Confluence page, GitHub issue), track it for the rest of the session. When a statement, decision, or resolved term contradicts it, surface it immediately: "The Jira ticket says X, but you just said Y — which is right?" Once resolved, offer to fix the source at once — never batch: write-capable tool available → apply the fix after the user confirms wording; otherwise tell the user the source is now stale.
 
 **Record inline** — nothing is ever batched to the end of the session; the answer is the approval.
-* A term resolved by explicit user answer → Run `/record-term` that same turn.
-* A decision resolved by explicit user answer → check it against `/record-adr`'s **ADR gate**. Passes → Run `/record-adr` skill that same turn, before the next question round; never offer it, never ask permission. Any miss → Feature Decision, ledger only.
+* A term resolved by explicit user answer → *Run `record-architecture` skill in `term` mode to record settled architecture glossary terms* that same turn.
+* A decision resolved by explicit user answer → *Load `record-architecture` skill in `adr` mode for settled architecture ADRs* and check its **ADR gate**. Passes → record that same turn, before the next question round; never offer it, never ask permission. Any miss → Feature Decision, ledger only.
 * Resolved by you → Feature Assumption, ledger only (see *Decision states*); never an ADR.
 
 Every other decision stays in the ledger, a reusable-sounding rule included: the only Concept writes this skill makes are the closing sweep's repairs to records that already exist.
 
 ## Closing sweep
 
-Three parts, each with its own trigger. The sweep **repairs** existing records; it never authors a new one — a term is written inline by `/record-term`, an ADR inline by `/record-adr`, and a rule no recorded Concept covers stays in the ledger.
+Three parts, each with its own trigger. The sweep **repairs** existing records; it never authors a new one — a term is written inline in `term` mode, an ADR inline in `adr` mode, and a rule no recorded Concept covers stays in the ledger.
 
 **1. Per-row disposition.** If the session opened at least one full Concept or ADR, emit one verdict per row in the `Architecture Decision Records` and `Crosscutting Concepts` index tables — `Applied`, `Not applicable`, `Violated`, or `Superseded` — so no row is silently omitted. Skip for trivial sessions that only touched glossary terms.
 
-**2. Assumption-gap harvest.** Never skipped, and never reported "no gaps" without the reconciliation below. A wrong default or drifted key marks a gap in the Concept behind it. A question with no matched owner may be a feature-scoped decision; keep it in the ledger without manufacturing a Concept. Never rewrite an ADR's decision on your own here — a correction or drift against an ADR is surfaced, and once I decide, rewritten inline via `/record-adr`.
+**2. Assumption-gap harvest.** Never skipped, and never reported "no gaps" without the reconciliation below. A wrong default or drifted key marks a gap in the Concept behind it. A question with no matched owner may be a feature-scoped decision; keep it in the ledger without manufacturing a Concept. Never rewrite an ADR's decision on your own here — a correction or drift against an ADR is surfaced, and once I decide, rewritten inline in `adr` mode.
 
 **Reconciliation first (the anti-skip guard).** Before repairing anything, enumerate *every* user-answered question logged this session and find its gate-miss line. Any question without one is an **unlogged miss** — reconstruct its gate-miss line now, then inspect it like the rest. An empty gap-form list is valid only when no question was asked; reaching "no repairs" without enumerating the questions skips this step.
 
@@ -138,6 +138,6 @@ Then inspect each of the ledger's three gap forms:
 * **Correction** (`corrected, evidence was:`) — a `default` produced an assumption the user corrected mid-session; the key is wrong or too broad. Fix: correct that key. This is the only signal a *wrong* default ever produces — it yields a confident assumption, never a question.
 * **Drift** (`drift, code contradicts:`) — a key the code contradicts. Fix: correct it, or mark the anchor "verify — may drift".
 
-Write the Concept fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*'s term writes. A key change no answer covers is your own call: write it, log it, and report it in the closing `[assumed]` list. Apply each Concept fix via `/record-concept`, resync the row via `/index-docs`' skill **Sync index row**, and mark the ledger line resolved.
+Write the Concept fix without a second approval when its content is an answer the user already gave this session — the answer was the approval, same as *Record inline*'s term writes. A key change no answer covers is your own call: write it, log it, and report it in the closing `[assumed]` list. *Run `record-architecture` skill in `concept-record` mode to repair settled architecture Concepts*, letting that mode resync the row through `index-docs`, then mark the ledger line resolved.
 
 **3. Trigger-condition refinement.** Runs last, so it also covers any row part 2 just resynced. Per row, check the **Trigger condition** cell for a gap this session exposed (missed clause, blank cell). If found, refine the clause and apply it via `/index-docs`' skill **Sync index row**.

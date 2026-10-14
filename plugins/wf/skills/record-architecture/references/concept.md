@@ -1,19 +1,89 @@
----
-name: doc-concept
-description: Document the body of an arc42 Crosscutting Concept using a business-process, structural implementation, or operational policy one-page template. Use to write or revise shared business process families, architecture or design patterns, or operational conventions; called by record-concept and define-concept.
----
+# Concept
 
-# Document Concept
+Render or record **one shared approach** governing multiple building blocks. Use the selected mode:
 
-Render **body only** and return it with its kind to the caller. MUST NOT write files, name records, sync indexes, or invoke a recording skill.
+- `concept-body`: follow **Body** through **Quality gate**, then return the body and kind. MUST NOT write files, name records, sync indexes, invoke a recording skill, or switch modes.
+- `concept-record`: follow the recording sections below; apply **Body** through **Quality gate** when rendering or revising. Reuse a compliant body supplied by the caller without rendering or interviewing again. Write the record and its index row in the same change.
+
+All sections outside **Body** through **Quality gate** apply only to `concept-record`.
+
+## Where the rule belongs
+
+Runs first, before the Concept gate. Most rules that reach this skill belong somewhere else, and a rule filed in the wrong home is read at the wrong moment — a wording rule buried in a Concept fires during design and stays silent while the file is being written.
+
+Split on **when the rule is needed**:
+
+| The rule answers | Home | Written by |
+|---|---|---|
+| how a shared business process, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
+| which approach was chosen and its structural decisions | Concept, `docs/concepts/` | this skill — continue below |
+| why it was chosen, and the rejected alternatives | standalone ADR linking to the Concept, or feature design when it fails the ADR gate | load [adr.md](./adr.md); otherwise session ledger / feature design |
+| how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
+| what a contested term means | glossary, `CONTEXT.md` | load [term.md](./term.md) |
+| which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
+
+Two tests settle most cases:
+
+- **Is it reusable inside this system?** Reusable means the next implementer in this system's scope follows the same decided approach. It does not mean the text is portable to other systems — keep what makes it specific. A command, path, or setting alone → a convention file.
+- **Is it needed while deciding, or while typing?** Deciding → a record. Typing → write-time guidance, which loads automatically through `applyTo` at the moment it applies.
+
+A rule can be shared across the system *and* have a write-time counterpart. Record the rule once as a Concept, and let the instructions file carry only the wording, naming, or layout that follows from it.
+
+## When to write a Concept
+
+Write one only when all three are true:
+
+1. **Crosscutting** — a business process, structural pattern, or operational policy applies to multiple building blocks or workflows, not just one feature.
+2. **Reusable** — the next implementer in this system's scope follows the same decided approach.
+3. **Consequential** — it guides a meaningful design or operational choice and can be checked against behavior, code, tests, or configuration.
+
+If any of the three is missing, skip the Concept — route it by *Where the rule belongs* above.
+
+## Extend or create
+
+Runs before any write. A near-duplicate record is worse than a longer one: it splits a decision area across two files instead of sharpening one.
+
+1. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Scan and match*** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
+2. A matched record's scope already covers this decision area → **extend it**: apply **Grounding** and **Body** through **Quality gate** for a body change and sharpen its `default` or `trigger` when needed. Resync its row via **Sync index row**. Stop here.
+3. No match covers the area → **create** a new Concept.
+
+## Lazy creation
+
+Create `docs/concepts/` when the first Concept is ready — not before; do nothing if it exists.
+
+## Record identity
+
+A record is named `docs/concepts/{{kind}}-{{slug}}.md`. `{{kind}}` is the selected body template's kind — `dom`, `str`, or `ops` — so the directory listing groups the families; `{{slug}}` is the title in kebab-case. For `dom`, the title is the Business Capability the page covers, so the slug is that capability in kebab-case. Sharpen the slug when a name is already taken; the identity carries no counter, so nothing has to be renumbered.
+
+A record carries no frontmatter — it opens directly with `# {{conceptTitle}}`.
+
+## Grounding
+
+Runs before Body. Give every rule a source and check it by that source:
+
+| Rule source | Check | Record shows it as |
+|---|---|---|
+| **Implemented** — target code exists | *Run `explore-codebase` skill to find where the rule is implemented — locate symbol, callers, flow.* Code contradicts the rule → stop; ask the user which wins. | `Implementation Map` row |
+| **Decided** — target code does not exist yet | Decision comes from the user, the caller, or an ADR. Do not search for an implementation; do not mark it `not verified`. | Rule only, no map row; add the row once code exists |
+| **Ported** — rule comes from another project | Restate it in the target's stack and conventions; it then counts as Implemented or Decided. | Per the resulting source |
+
+For ported content:
+
+- Remove every source-stack detail (e.g. `npm run typecheck`, a JS-specific path, a tool the target does not use). Replace it with the target's equivalent, or lift it to the decision: "MUST run the project's configured verification commands before commit from the code not the prompt text."
+- Rewrite source-project examples to match how the target implements the concept — its language, structure, and rules — not a syntax translation.
+- Keep a source-project parameter (marker, prefix, signal, name) only when the target's code uses it or the user confirms the target chose it; otherwise use the target's own equivalent or drop it.
+
+**Gate:** every rule has code or a decision behind it; no ported record keeps a source-stack detail.
+
+## Body
 
 Choose by the shared concern, not the component where it was found; read only the selected template. Return the chosen row's **kind** with the body.
 
 | Concern | Kind | Template |
 |---|---|---|
-| Business capabilities — the processes that deliver them, and the scenarios each process handles | `dom` | [domain-business-process.md](./templates/domain-business-process.md) |
-| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `str` | [structure-implementation.md](./templates/structure-implementation.md) |
-| Security, error handling, testing, configuration, migration, installation, logging, disaster recovery, domain safety, runtime safety or batch operations | `ops` | [ops-policy.md](./templates/ops-policy.md) |
+| Business capabilities — the processes that deliver them, and the scenarios each process handles | `dom` | [domain-business-process.md](../templates/domain-business-process.md) |
+| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `str` | [structure-implementation.md](../templates/structure-implementation.md) |
+| Security, error handling, testing, configuration, migration, installation, logging, disaster recovery, domain safety, runtime safety or batch operations | `ops` | [ops-policy.md](../templates/ops-policy.md) |
 
 Keep one concept per page and aim for one page. Describe a shared approach that governs multiple building blocks; name the affected scope and the conditions under which it applies. If the subject crosses categories, select the template that explains its governing rule best; link related concepts instead of duplicating obligations. Show **how** it works with one representative scenario, code or test anchor where useful. Omit optional sections and inapplicable template prompts.
 
@@ -98,3 +168,23 @@ Include the smallest useful set of concerns and drop the rest. A stable anchor i
 - Every `Implementation Map` row survives deleting its `Semantic locator` cell, and every locator is greppable and unambiguous inside the named repository.
 - Unverified coverage reads `not verified`; nothing claims an absence the search did not establish.
 - No placeholder, open question, contradictory transition, or speculative claim remains.
+
+## Authoring the index row
+
+A Concept governing multiple building blocks is indexed in `ARCHITECTURE.md`'s `Crosscutting Concepts` table — the row below. A Concept that applies to exactly one Building block is indexed in that block's own `Concepts` table inside its `docs/building-blocks/{{slug}}.md` record instead (or its repository's own Crosscutting Concepts when that repository documents itself) — same authoring rules, different table; never both.
+
+The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skill, not projected from the record — the record carries nothing to project.
+
+1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
+2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
+3. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the rendered body as `{{recordContent}}`.
+4. Author `default` yourself — one sentence naming the choice to take when the design doesn't state one. A caller-supplied, user-confirmed `default` (from `define-concept`) is used verbatim.
+5. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
+
+Superseding or retiring a Concept applies the marker to its index row via the same **Sync index row** call; the record itself carries no status field.
+
+## Approval gate
+
+- **Explicit direct request** ("record a Concept for X") — approval is already given; draft and write immediately.
+- **Invoked by `define-concept`** — its questioning confirmation settled the concept. Write immediately without a second prompt.
+- **Invoked by `grill-design`** — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.

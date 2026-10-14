@@ -5,11 +5,11 @@ description: Define an arc42 Crosscutting Concept — suggest which Concept to a
 
 # Define Concept
 
-Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; `/explore-codebase` owns inspection; `/index-docs` owns scan and match; `/doc-concept` renders the body; `/record-concept` owns persistence and indexing. Do not reimplement their rules.
+Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; `/explore-codebase` owns inspection; `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
 
 ## Evidence
 
-Every fact in a suggestion, a question, or the recorded Concept is either a cited inspection result or a user answer from this session. A fact inspection cannot settle becomes a question to the user, carrying the evidence that left it open. A recommended answer cites its evidence or is labelled `proposal`. Follow `/doc-concept`' skill **Evidence** and **Terminology** for what the body may claim.
+Every fact in a suggestion, a question, or the recorded Concept is either a cited inspection result or a user answer from this session. A fact inspection cannot settle becomes a question to the user, carrying the evidence that left it open. A recommended answer cites its evidence or is labelled `proposal`. *Load `record-architecture` skill in `concept-body` mode for settled architecture concept bodies* and follow the selected procedure's **Evidence** and **Terminology** for what the body may claim.
 
 ## Grill-design value
 
@@ -43,7 +43,7 @@ Read `ARCHITECTURE.md`'s `Crosscutting Concepts` table in full; an absent file o
 
 **2. Match the described candidate, or sweep for candidates**
 
-- **Described** — the user described the concept to add. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run `/explore-codebase` skill to inspect the described concern and each matched record for drift. A rule that is not crosscutting routes per `/record-concept`' skill **Where the rule belongs**; report its home and stop.
+- **Described** — the user described the concept to add. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run `/explore-codebase` skill to inspect the described concern and each matched record for drift. A rule that is not crosscutting → *load `record-architecture` skill in `concept-record` mode for settled architecture Concepts* and route per the selected procedure's **Where the rule belongs**; report its home and stop.
 - **Not described** — sweep. Run `/explore-codebase`' skill **Run caller-supplied work inside the subagent** at `thorough`, with one parallel subagent per category group of the arc42 list plus one drift track over the recorded Concepts. Give each subagent its group's categories, the item 1 mapping, and this instruction verbatim:
 
   > For each category, report: present in the codebase, with file-and-line citations, or `no evidence found in inspected scope`; the building blocks where its decision recurs; whether the code makes one consistent choice (quote it) or several (list each with citations); the recorded Concept covering it, if any. For the drift track, report per recorded Concept every rule or `default` the code contradicts, with citations. Report only what you cite.
@@ -75,7 +75,7 @@ List every planned `Rules` bullet, scenario, and `Implementation Map` row, plus 
 
 **8. Document and record**
 
-Select the `dom`, `str`, or `ops` kind and Run `/doc-concept` skill on the resolved concept and cited evidence. Run `/record-concept` skill with the body and the user-confirmed `default` to apply its gate and extend or create the record. An explicit request to define the concept authorizes this write after the questioning confirmation; no second permission prompt. If the gate fails, report the appropriate home and do not create a Concept.
+Select the `dom`, `str`, or `ops` kind and *run `record-architecture` skill in `concept-body` mode to render settled architecture concept bodies* from the resolved concept and cited evidence. Then *run `record-architecture` skill in `concept-record` mode to record settled architecture Concepts*, passing the body and the user-confirmed `default` to apply its gate and extend or create the record. An explicit request to define the concept authorizes this write after the questioning confirmation; no second permission prompt. If the gate fails, report the appropriate home and do not create a Concept.
 
 **9. Report**
 
