@@ -1,7 +1,7 @@
 ---
 name: to-tickets
 description: Break a Spec into agent-executable Tracer-bullet functional slices. Accepts optional implementation details or `plan.md` to guide the breakdown.
-argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`]"
+argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`] | offline {{localSpecPath}}"
 disable-model-invocation: true
 ---
 
@@ -9,21 +9,23 @@ disable-model-invocation: true
 
 ## Process
 
+Load [github.md](./references/github.md) for GitHub issue reads, native sub-issues, blockers, reruns, and explicit offline publishing.
+
 ### 1. Gather inputs
 
-`{{specIssueNumber}}` is **required**. If not provided as argument, ask the user.
+Online publishing requires `{{specIssueNumber}}`; ask if missing. Explicit offline mode instead requires supplied spec content and Initiative/source-repository metadata. Follow **Offline publishing** in [github.md](./references/github.md) for input resolution; skip online repository/spec lookups below.
 
 **If only `{{specIssueNumber}}` is provided:**
 
-Resolve the target repo once (runs unmodified on Linux, macOS, and Windows — no bash- or PowerShell-only syntax):
+Resolve the tracker repository once from the docs/harness root (current repository for single-repo work):
 
 ```
-python -c 'import re,subprocess; url=subprocess.run(["git","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); print(re.sub(r"\.git$","",re.sub(r"^(git@[^:]+:|https?://[^/]+/)","",url)))'
+gh repo view --json nameWithOwner --jq .nameWithOwner
 ```
 
-Set `$REPO` to the printed value for use in later steps (e.g. `/manage-backlog` actions that read `$REPO`).
+Set `{{trackerRepository}}` to the printed value for later GitHub operations; it is not the source repository encoded by `{{repoLabel}}`.
 
-Find the spec issue: via `/manage-backlog` **Find spec ticket** with `{{specIssueNumber}}`.
+Find the spec issue using **Read spec** in [github.md](./references/github.md) with `{{specIssueNumber}}`. In explicit offline mode, use the supplied local spec; missing content or routing metadata requires user input before drafting.
 
 Set `{{repoLabel}}` to the spec's single `repo:target:<owner>/<name>` label. None or several → ask the user.
 
@@ -31,7 +33,7 @@ Use the issue title, body, and comments as the spec content.
 
 **If `{{specIssueNumber}}` and (`{{implementationDetails}}` or `plan.md`) is provided:**
 
-Resolve `$REPO` and `{{repoLabel}}` as above. Use the implementation details as the spec content instead of the issue body:
+Resolve `{{trackerRepository}}` and `{{repoLabel}}` as above. Use the implementation details as the spec content instead of the issue body:
 - **File path** (e.g. `./plans/feature.md`, `/memories/session/plan.md`) — read the file.
 - **Inline text** — use directly.
 
@@ -90,7 +92,9 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the GitHub issues
 
-For each approved slice, create a GitHub issue: via `/manage-backlog` **Create sub-ticket**, with `parentIssueNumber` = `{{specIssueNumber}}` and label `hitl,{{repoLabel}}`.
+Explicit offline mode → save the approved ticket bodies and symbolic dependency map through **Offline publishing** in [github.md](./references/github.md); skip GitHub creation/linking below. On a GitHub failure, use that procedure to preserve known remote state and remaining local drafts.
+
+For each approved slice, follow **Create sub-ticket** in [github.md](./references/github.md), with `parentIssueNumber` = `{{specIssueNumber}}` and label `hitl,{{repoLabel}}`. Reconcile existing children before creating issues on reruns.
 
 Use `hitl` as the label for all issues `HITL` or `AFK` to indicate that user review is required.
 
@@ -103,7 +107,7 @@ Load `references/issue-template.md` and use it verbatim as the issue body struct
 
 ### 5a. Link blocking
 
-After every issue exists (including the functional-testing ticket), build the parallel map with native links: for each approved slice with blockers, via `/manage-backlog` **Link blocking** with `issueNumber` = the slice, `blockedBy` = its blockers' issue numbers. The functional-testing ticket's `blockedBy` = every implementation ticket of the spec. On reruns, link only edges not already present.
+After every issue exists (including the functional-testing ticket), build the parallel map with native links: for each approved slice with blockers, follow **Link blocking** in [github.md](./references/github.md) with `issueNumber` = the slice, `blockedBy` = its blockers' issue numbers. The functional-testing ticket's `blockedBy` = every implementation ticket of the spec. On reruns, link only edges not already present.
 
 *Done when* every approved **Blocked by** edge has a native link. Report the final map as `Wave n: #{{issue}}, …` with issue numbers.
 
@@ -113,4 +117,4 @@ Do NOT close or modify the parent issue.
 
 ## Troubleshooting
 
-**Label not found** (`hitl` or `spec` label missing): Run `/manage-backlog` skill **Setup labels** to create the required labels, then retry. If the `/manage-backlog` skill is not available, fall back to saving the tickets to `docs/tickets/` as markdown.
+**Label not found:** follow **Labels** in [github.md](./references/github.md), then retry. Explicit offline publishing or a reported GitHub/tool/authentication failure → follow **Offline publishing** there; save approved tickets to `docs/tickets/` as Markdown, not as a local tracker.

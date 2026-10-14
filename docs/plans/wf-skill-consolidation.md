@@ -2,6 +2,8 @@
 
 Status: proposed; skill changes not implemented.
 
+Backlog entry superseded: `manage-backlog` was removed in favor of GitHub references bundled with each consuming skill and label setup owned by `init-wf`. The historical roster/count below describes the original consolidation proposal, not the current plugin.
+
 Reduce 36 active skills to 27. Use progressive disclosure for grouped procedures; archive `to-use-cases`.
 
 ## Proposed skill list
@@ -34,7 +36,7 @@ Reduce 36 active skills to 27. Use progressive disclosure for grouped procedures
 | `to-spec` | `to-spec` |
 | `to-zdesign` | `to-zdesign` |
 | `to-tickets` | `to-tickets` |
-| `manage-backlog` | `manage-backlog` |
+| `manage-backlog` (superseded; removed) | Historical backlog abstraction; now skill-local GitHub references and `init-wf` label setup |
 
 ## Proposed archive
 

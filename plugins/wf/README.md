@@ -2,6 +2,8 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
+The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-spec/SKILL.md), [to-tickets](skills/to-tickets/SKILL.md)) supports GitHub only. Each skill bundles its own GitHub reference; [init-wf](skills/init-wf/SKILL.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [bootstrap-docs](skills/bootstrap-docs/SKILL.md) remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+
 ## Skill flow
 
 1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/to-zdesign` directly).
@@ -51,5 +53,5 @@ flowchart TD
 | **draft-**                                | Author standalone working artifacts          | `draft-bug`, `draft-story`                                                                |
 | **record-**                               | Persist established knowledge                | `record-adr`, `record-concept`, `record-building-block`, `record-term`, `record-deployment-view` |
 | **doc-**                                  | Render existing knowledge                    | `doc-concept`, `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`, `doc-decision` |
-| **docs- / setup-** , **manage- / track-** | Workflow plugin documentation infrastructure | `bootstrap-docs`, `index-docs`, `init-wf`, `manage-backlog`, `track-ledger`               |
+| **docs- / setup- / track-** | Workflow plugin documentation infrastructure | `bootstrap-docs`, `index-docs`, `init-wf`, `track-ledger`               |
 | **normalize-**                            | Rewrite/reshape content                      | `normalize-requirements`                                                                  |
