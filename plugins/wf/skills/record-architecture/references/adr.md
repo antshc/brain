@@ -1,15 +1,10 @@
----
-name: record-adr
-description: Record one hard-to-reverse architectural decision as an ADR in docs/adr/ the moment it is decided, and index it. Owns the ADR gate, extend-or-create, naming, body with mandatory Considered Options, and index row. Called directly, or by grill-design automatically without approval.
----
-
 # Record ADR
 
-Record **one point-in-time, localized architectural decision** into `docs/adr/` — what was decided, why, and which options were rejected. For a compact decision inside a design or decision list, run `/doc-decision` skill instead.
+Record **one point-in-time, localized architectural decision** into `docs/adr/` — what was decided, why, and which options were rejected. For a compact decision inside a design or decision list, load [decision-bullet.md](./decision-bullet.md) instead.
 
 ## Where it belongs
 
-An ADR answers **which option was chosen and why the others were not**. How the decision is applied or implemented belongs elsewhere — a Concept (`/record-concept`), a design doc, or the code — and the ADR links to it rather than restating it. Contested terminology → `/record-term`.
+An ADR answers **which option was chosen and why the others were not**. How the decision is applied or implemented belongs elsewhere — a [Concept](./concept.md), a design doc, or the code — and the ADR links to it rather than restating it. Contested terminology → load [term.md](./term.md).
 
 ## ADR gate
 
@@ -21,13 +16,13 @@ Record only when all three are true:
 
 Qualifies: architectural shape; integration patterns between contexts; technology choices carrying lock-in (not every library); boundary and ownership decisions, where the explicit no-s matter as much as the yes-s; deliberate deviations from the obvious path; constraints invisible in the code (compliance, latency contracts); rejected alternatives whose rejection is non-obvious.
 
-Any miss → write nothing, including on an explicit request. Return the miss and the narrower home: feature decision in the session ledger, a design doc (`/to-zdesign`), `/record-concept`, or `/record-term`.
+Any miss → write nothing, including on an explicit request. Return the miss and the narrower home: feature decision in the session ledger, a design doc, [Concept](./concept.md), or [term](./term.md).
 
 ## Extend or create
 
 Runs before any write. A near-duplicate ADR splits authority over one decision area.
 
-1. Run `/index-docs`' skill **Scan and match** over the `Architecture Decision Records` table in `ARCHITECTURE.md` and every matched building block's `Architecture Decision Records` table with this decision's surface — its terms and the paths it governs.
+1. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Scan and match*** over the `Architecture Decision Records` table in `ARCHITECTURE.md` and every matched building block's `Architecture Decision Records` table with this decision's surface — its terms and the paths it governs.
 2. A matched ADR already owns this decision area and the decision still stands → **extend it**: amend the body and resync its row via **Sync index row**. Stop here.
 3. A matched ADR owns the area but this decision reverses it → **rewrite it in place**; never create a second ADR:
    - Rename the file to `docs/adr/{{newSlug}}.md` and update every inbound link to the old path.
@@ -83,9 +78,9 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 An ADR that applies to exactly one building block is indexed in that block's `Architecture Decision Records` table inside `docs/building-blocks/{{slug}}.md` (or its repository's own ADR index when that repository documents itself). Every other ADR is indexed in `ARCHITECTURE.md`'s `Architecture Decision Records` table. Never both.
 
 1. Row shape: `| [{{decisionTitle}}]({{pathToAdr}}) | {{triggerCondition}} | {{summary}} |` — `{{decisionTitle}}` identical to the ADR heading; `{{pathToAdr}}` relative to the indexing file.
-2. Derive the Trigger condition with `/index-docs`' skill **Generate trigger condition**, passing the written ADR as `{{recordContent}}`.
+2. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the written ADR as `{{recordContent}}`.
 3. Author the Summary yourself — 1-2 agent-optimized sentences stating the decision.
-4. Run `/index-docs`' skill **Ensure section exists** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = `pathToAdr` (the previous path when renamed), `decisionTitle`, `triggerCondition`, `summary` — never edit the table directly.
+4. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = `pathToAdr` (the previous path when renamed), `decisionTitle`, `triggerCondition`, `summary` — never edit the table directly.
 
 ## Approval gate
 

@@ -33,7 +33,7 @@ Actor: <who>; Trigger: <what starts it>; Action: <major business flow>; Outcome:
 | <Scenario> | <Input> | <Condition> | <Expected business result> | <One clause, or empty> |
 
 ## Relationships
-<!-- Anchor each node/edge label on the business term it governs (e.g. `failover`, `lease`, `reservation`), never a file name or class name.  Draw `Relationships` by running `/doc-behavior-diagram` skill **Flowchart** with `orientation` = `LR`-->
+<!-- Anchor each node/edge label on the business term it governs (e.g. `failover`, `lease`, `reservation`), never a file name or class name. *Run `doc-behavior-diagram` skill for Mermaid flowchart, swimlane, or sequence behavior*, using Flowchart with orientation `LR`. -->
 <Mermaid `flowchart LR`. >
 
 <One sentence defining any non-obvious edge notation.>
@@ -59,4 +59,4 @@ Applies once the user has asked for scenarios. Keep every cell to a phrase. `Inp
 
 Pitch each row at the detail level that **survives multiple iterations of the code**. Anchor on the business term the code implements — the state, threshold, or outcome a stakeholder would still recognise after a refactor — rather than on the class, method, field, table, or endpoint expressing it today. A row that goes stale when the implementation is renamed or restructured is pitched too low; raise it to the behavior the change preserved.
 
-Draw `Relationships` by running `/doc-behavior-diagram` skill **Flowchart** with `orientation` = `LR`, showing a domain state as a node wherever it enables or prevents another process.
+*Run `doc-behavior-diagram` skill for Mermaid flowchart, swimlane, or sequence behavior*, using Flowchart with orientation `LR` for `Relationships`, showing a domain state as a node wherever it enables or prevents another process.

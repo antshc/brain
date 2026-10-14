@@ -129,10 +129,8 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
 - [inspect-system](plugins/wf/skills/inspect-system/SKILL.md): inspect a system as-built along the capability, deployables, or data axis, cited to `file:line`, with diagrams.
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
-- [doc-concept](plugins/wf/skills/doc-concept/SKILL.md): render domain, structural, or operational concept bodies from three one-page templates.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
-- [doc-decision](plugins/wf/skills/doc-decision/SKILL.md): render compact decisions for designs.
-- [record-adr](plugins/wf/skills/record-adr/SKILL.md), [record-concept](plugins/wf/skills/record-concept/SKILL.md), [record-term](plugins/wf/skills/record-term/SKILL.md), [record-building-block](plugins/wf/skills/record-building-block/SKILL.md), [record-deployment-view](plugins/wf/skills/record-deployment-view/SKILL.md): capture ADRs, Concepts, glossary terms, building blocks, and deployment topology into the docs as they crystallise.
+- [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
 - [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
 - [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for GitHub issue labels and doc layout; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research/bootstrap-docs remain local, and other skills retain their Jira workflows.
 

@@ -6,6 +6,10 @@ The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-sp
 
 [grill-design](skills/grill-design/SKILL.md) owns session-ledger operations through its root-level [track-ledger reference](skills/grill-design/track-ledger.md); `track-ledger` is no longer a standalone skill or command.
 
+[record-architecture](skills/record-architecture/SKILL.md) replaces the seven standalone architecture record/render commands. Its modes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, and `decision-bullet`; the two render-only modes never save files or update indexes. Explicit modes take precedence, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [define-concept](skills/define-concept/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview.
+
+[to-zdesign](skills/to-zdesign/SKILL.md) renders slice decision bullets from its own local [decision reference](skills/to-zdesign/decision-bullet.md), without invoking the recording skill.
+
 ## Skill flow
 
 1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/to-zdesign` directly).
@@ -53,7 +57,7 @@ flowchart TD
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-system`, `inspect-nuget-source`                                                  |
 | **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
 | **draft-**                                | Author standalone working artifacts          | `draft-bug`, `draft-story`                                                                |
-| **record-**                               | Persist established knowledge                | `record-adr`, `record-concept`, `record-building-block`, `record-term`, `record-deployment-view` |
-| **doc-**                                  | Render existing knowledge                    | `doc-concept`, `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`, `doc-decision` |
+| **record-**                               | Record settled architecture or render bodies | `record-architecture`                                                                     |
+| **doc-**                                  | Render existing knowledge                    | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`        |
 | **docs- / setup-** | Workflow plugin documentation infrastructure | `bootstrap-docs`, `index-docs`, `init-wf`               |
 | **normalize-**                            | Rewrite/reshape content                      | `normalize-requirements`                                                                  |

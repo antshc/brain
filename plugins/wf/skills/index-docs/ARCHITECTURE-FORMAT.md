@@ -30,7 +30,7 @@ Documents the system's Deployables and their responsibilities, how they interact
 
 #### Deployables
 
-Table of the system's Deployables, each with a short description of its purpose, where it lives, and a reference to its own record. The Trigger condition is a concise, comma-separated set of domain phrases matched semantically against the caller's touched surface. The link is a full harness record under `docs/building-blocks/`, or the repository's own documentation when that repository documents itself — `record-building-block` owns which.
+Table of the system's Deployables, each with a short description of its purpose, where it lives, and a reference to its own record. The Trigger condition is a concise, comma-separated set of domain phrases matched semantically against the caller's touched surface. The link is a full harness record under `docs/building-blocks/`, or the repository's own documentation when that repository documents itself — `record-architecture`'s `building-block` mode owns which.
 
 | Building block | Trigger condition | Summary | Location |
 |---|---|---|---|
@@ -52,7 +52,7 @@ Where codebase exploration stops — a managed service, a third-party SaaS, a re
 
 ## Deployment View *(optional)*
 
-References the `DEPLOYMENT.md` file that documents where the building blocks run — nodes, containers, host paths, and the connections between them. `{{deploymentTriggerSummary}}` is 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies, so an agent can decide whether to load the full document. `record-deployment-view` owns the content; this section is only the pointer.
+References the `DEPLOYMENT.md` file that documents where the building blocks run — nodes, containers, host paths, and the connections between them. `{{deploymentTriggerSummary}}` is 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies, so an agent can decide whether to load the full document. `record-architecture`'s `deployment-view` mode owns the content; this section is only the pointer.
 
 [Deployment View](DEPLOYMENT.md) — {{deploymentTriggerSummary}}
 
@@ -60,7 +60,7 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 ## Architecture Decision Records *(optional)*
 
-An ADR records a point-in-time, localized decision — hard to reverse, surprising without context, and the result of a real trade-off. ADRs applying to exactly one Deployable are indexed in that block's record instead. See the `record-adr` skill.
+An ADR records a point-in-time, localized decision — hard to reverse, surprising without context, and the result of a real trade-off. ADRs applying to exactly one Deployable are indexed in that block's record instead. Recording uses `record-architecture`'s `adr` mode.
 
 <!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading; plain, unlinked text when the decision has no `docs/adr/` record. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank cell never matches. {{summary}}: 1-2 agent-optimized sentences stating the decision; for an unlinked row it is the whole decision. -->
 
@@ -77,7 +77,7 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{summary}}: 1-2 plain-text sentences describing what the Concept covers; no link. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: one sentence naming the choice to take when the design doesn't state one. See the `record-concept` skill. -->
+<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{summary}}: 1-2 plain-text sentences describing what the Concept covers; no link. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: one sentence naming the choice to take when the design doesn't state one. Recording uses `record-architecture`'s `concept-record` mode. -->
 
 | Concept | Summary | Trigger condition & Default |
 |---------|---------|-----------------------------|
