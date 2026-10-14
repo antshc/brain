@@ -26,14 +26,14 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 4. Use **implementer subagents** to implement each ticket, each in its own worktree on its own branch. Each implementer subagent:
    - starts in a clean, dedicated worktree based on the current integration tip; never resets or discards existing user work;
-   - *Uses `tdd` skill for test-driven development, red-green-refactor, and behavior tests to build the ticket*;
+   - *Use test-driven development, red-green-refactor, and behavior tests to build the ticket*;
    - merges the integration branch tip into its own branch before reporting done
 
 5. Once an **implementer subagent** completes, merge its work to the integration branch with a **merger subagent**. Serialize integration merges, resolve conflicts, and run relevant checks against the merged result. Only then record the ticket as **integrated**, with its commit and validation evidence; comment on its issue with a PR pointer.
 
 6. Recompute the **frontier** after each verified integration. A blocker is satisfied for this run when its implementation is verified in the integration branch, even while its issue remains open pending PR merge. External blockers still require verified resolution. Start independent ready tickets concurrently; do not schedule a ticket already running.
 
-7. Once all tickets are integrated, *use `code-review` skill for code review, bugs, and logic errors on the integration branch*. Fix all reported issues in a single **implementer subagent**, integrate the fixes, and rerun affected checks. If a required skill is unavailable, report the blocker and obtain agreement on an alternative; never silently skip development or review.
+7. Once all tickets are integrated, *Review code for bugs, and logic errors on the integration branch*. Fix all reported issues in a single **implementer subagent**, integrate the fixes, and rerun affected checks. If a required skill is unavailable, report the blocker and obtain agreement on an alternative; never silently skip development or review.
 
 8. Confirm the final branch passes required checks and the PR covers the spec and every implemented ticket; push remaining commits and mark the draft PR ready. Do not merge the PR or close issues early. Closing keywords take effect only when merged into the repository's default branch; for another target, report the remaining closure step explicitly.
 
