@@ -5,7 +5,7 @@ description: Define an arc42 Crosscutting Concept — suggest which Concept to a
 
 # Define Concept
 
-Own candidate selection, the concept's scope, and its decisions. `/questioning` owns the interview; `/explore-codebase` owns inspection; `/index-docs` owns scan and match; `/doc-concept` renders the body; `/record-concept` owns persistence and indexing. Do not reimplement their rules.
+Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; `/explore-codebase` owns inspection; `/index-docs` owns scan and match; `/doc-concept` renders the body; `/record-concept` owns persistence and indexing. Do not reimplement their rules.
 
 ## Evidence
 
@@ -63,7 +63,7 @@ Map the chosen candidate's decisions: scope, applicable contexts, shared behavio
 
 **5. Resolve through questioning and inspection**
 
-Run `/questioning` skill over the tree. Ask every blurry branch as a question carrying its cited evidence; the `default` is always a user-confirmed decision. Before each round, identify the facts its frontier needs and inspect independent areas (separate deployables, workflow boundaries, configuration versus tests) through `/explore-codebase`' skill **Run caller-supplied work inside the subagent**, giving each agent the concept, exact scope, and a distinct question. One focused path → one agent; dependent paths → sequential. Do not launch duplicate fact lookups through `/questioning` for areas already in flight. Done when the user confirms shared understanding, as `/questioning` requires.
+Follow [questioning.md](questioning.md) over the tree. Ask every blurry branch as a question carrying its cited evidence; the `default` is always a user-confirmed decision. Before each round, identify the facts its frontier needs and inspect independent areas (separate deployables, workflow boundaries, configuration versus tests) through `/explore-codebase`' skill **Run caller-supplied work inside the subagent**, giving each agent the concept, exact scope, and a distinct question. One focused path → one agent; dependent paths → sequential. Do not launch duplicate fact lookups during questioning for areas already in flight. Done when the user confirms shared understanding, as the questioning reference requires.
 
 **6. Consolidate findings**
 
