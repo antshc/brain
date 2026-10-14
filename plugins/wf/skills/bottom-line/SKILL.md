@@ -4,18 +4,18 @@ name: bottom-line
 ---
 # Bottom line
 
-A bottom line answers, per investigated subject, in exactly three sentences — one sentence per answer:
+A bottom line answers three questions per investigated subject, in one bullet. Use one or more concise sentences per answer as needed:
 
-1. **What did we find?** — the finding, one sentence.
-2. **So what?** — why it matters, one sentence.
-3. **Now what?** — the recommended action, or the confirmed/unconfirmed status, one sentence.
+1. **What did we find?** — the finding.
+2. **So what?** — why it matters.
+3. **Now what?** — the recommended action, or the confirmed/unconfirmed status.
 
 ## Write it
 
 1. List the investigated subjects (services, components, options). Done when every subject in the research scope has one bullet.
-2. Open each bullet with the finding in **bold**, one sentence, as the answer itself, not the path to it. Done when a reader who reads only the bold text knows every conclusion.
-3. Follow with so what — one sentence with the deciding fact or consequence (cost, risk, capability unlocked). Done when each finding is tied to a fact or outcome.
-4. End with now what — one sentence with the recommended action. Done when each bullet has an action or status.
+2. Open each bullet with the finding in **bold**, as the answer itself, not the path to it. Done when a reader who reads only the bold text knows every conclusion.
+3. Follow with so what — the deciding fact or consequence (cost, risk, capability unlocked). Done when each finding is tied to a fact or outcome.
+4. End with now what — the recommended action. Done when each bullet has an action or status.
 5. Mark gaps explicitly: bold the risk or partial result as the finding; end any claim the evidence does not prove with bold **Not confirmed**, the same tag as What we did. Done when no bullet implies more certainty than the evidence gives.
 6. Cut everything else — method, evidence detail, open questions, work items — into the sections below. Done when the bottom line alone still reads as complete.
 
@@ -31,7 +31,7 @@ A bottom line answers, per investigated subject, in exactly three sentences — 
 - Lead with the conclusion; never with the setup or method.
 - Negative results count: state "does not need X" as its own bullet with the one-line reason.
 - No hedging ("it depends", "could potentially") unless the recommendation is genuinely conditional — then state the condition as part of the action.
-- Not an **executive summary**: a summary spans paragraphs and covers findings, evidence, and conclusions; a bottom line is one decision per subject, stated once, in three sentences.
+- Not an **executive summary**: a summary spans paragraphs and covers findings, evidence, and conclusions; a bottom line is one decision per subject, stated once. Add sentences only to clarify the finding, consequence, or action.
 
 ## In a full research document
 
@@ -42,7 +42,7 @@ Place the bottom line first, before any method or evidence. Fill this structure;
 
 ## Bottom line
 
-- **{{finding|what did we find; exactly one sentence, plain language}}** {{soWhat|why it matters; exactly one sentence}} {{nowWhat|recommended action, or status ending in bold **Not confirmed**; exactly one sentence}}
+- **{{finding|what did we find; plain language}}** {{soWhat|why it matters}} {{nowWhat|recommended action, or status ending in bold **Not confirmed**}}
 
 ## What we did
 
@@ -77,7 +77,7 @@ Place the bottom line first, before any method or evidence. Fill this structure;
 
 ## Bottom line
 
-- **Only the Checkout service needs the Node.js 22 upgrade.** It runs on Node.js 18, which reaches end of life. Change the runtime setting; no code change is needed.
+- **Only the Checkout service needs the Node.js 22 upgrade.** It runs on Node.js 18, which reaches end of life. Change the runtime setting. No code change is needed.
 - **The Product catalog does not run Node.js** (.NET 8). It has no Node.js end-of-life risk. Do not upgrade it.
 - **The Order email worker already runs Node.js 22.** It has no end-of-life risk. Do not upgrade it.
 - **The payment provider supports only up to Node.js 20.** Checkout may break on Node.js 22. Test the provider SDK on Node.js 22 before release. **Not confirmed**
