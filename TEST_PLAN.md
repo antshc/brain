@@ -1014,6 +1014,16 @@ Scenario: Skill invocation naming a nonexistent skill is reported
   When find_dangling_skill_invocations() is called
   Then the result names the offending file and the unresolved skill name
 
+Scenario: Skill invocation naming a generated skill template is not reported
+  Given a skill invoking `/generated`, and a bundled `*.SKILL.template.md` declaring `name: generated`
+  When find_dangling_skill_invocations() is called
+  Then the result has no violations
+
+Scenario: Template body text does not declare a generated skill
+  Given a skill invoking `/ghost`, and a template containing `name: ghost` only outside frontmatter
+  When find_dangling_skill_invocations() is called
+  Then the result reports the unresolved skill name
+
 Scenario: Current repository has no dangling skill invocations
   Given this repository's actual `plugins/`/`skills/` trees
   When find_dangling_skill_invocations() is called against the repo root
