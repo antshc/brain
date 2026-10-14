@@ -1,13 +1,8 @@
----
-name: track-ledger
-description: Own the session ledger at /memories/session/domain-model-ledger.md — its location, section names, line grammar, and compression rule. Records which Concept/ADR/building-block records were opened or skipped, the surface terms touched so far, and every decision or assumption staged this session. Called by grill-design; owns the grammar only, never when to log or whether an item is recorded.
----
-
 # Track Ledger
 
 Own the session ledger at `domain-model-ledger.md` — use the memory session folder, never a shell/filesystem path. Create it **lazily**, on the first write of any kind — never up front.
 
-Three sections, each with its own line grammar. Callers decide *when* to write; this skill decides *how* the line reads.
+Three sections, each with its own line grammar. The parent skill decides *when* to write; this reference decides *how* the line reads.
 
 ## Log opened record
 
