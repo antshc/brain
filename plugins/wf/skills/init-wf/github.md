@@ -12,7 +12,6 @@ Run from the tracker repository: the current repository for a single repo, the d
 |---|---|---|
 | `hitl` | `fbca04` | Requires human implementation/review |
 | `spec` | `5319e7` | Spec with implementation context |
-| `tests` | `1d76db` | Spec-wide functional-test execution |
 | `bug` | `d73a4a` | Failure requiring investigation |
 | `wayfinder:map` | `0e8a16` | Map issue |
 | `wayfinder:research` | `1d76db` | Research decision |

@@ -112,7 +112,7 @@ Re-check each probe's trigger after every user answer or new fact. A later answe
 
 **Concrete scenarios** — when a domain relationship, boundary, or invariant is asserted as fact, invent edge cases that expose its limits.
 
-**Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [probes-verification.md](./references/probes-verification.md) and apply the triggered coverage/functional-slice checks.
+**Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [probes-verification.md](./references/probes-verification.md) and apply the coverage-category check.
 
 **External source** — when seeded from an explicit external link or reference, load [probes-external-source.md](./references/probes-external-source.md); track and reconcile it throughout the session.
 

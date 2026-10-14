@@ -9,7 +9,6 @@ import sys
 LABELS: list[tuple[str, str, str]] = [
     ("hitl", "fbca04", "Requires human implementation"),
     ("spec", "5319e7", "Spec task with implementation context"),
-    ("tests", "1d76db", "Spec-wide functional-test execution"),
     ("bug", "d73a4a", "Failure requiring investigation"),
     ("wayfinder:map", "0e8a16", "Marks the map issue itself"),
     ("wayfinder:research", "1d76db", "Research-type decision ticket"),

@@ -141,17 +141,3 @@ class TestFetchIssues:
                 ],
             }
         ]
-
-    def test_kind_selection_flows_through_shared_fetching(self):
-        # Scenario: Kind selection flows through shared fetching
-        owner, repo, vcs, gh = setup_handler([
-            make_raw_issue(1, []), make_raw_issue(2, ["tests"]),
-            make_raw_issue(3, ["tests", "hitl"]), make_raw_issue(4, ["spec"]),
-        ])
-        assert [i["number"] for i in fetch_issues(owner, repo, vcs=vcs)] == [1, 2]
-        implementation = fetch_issues(owner, repo, kind="implementation", vcs=vcs)
-        tests = fetch_issues(owner, repo, kind="tests", spec_number=7, vcs=vcs)
-        assert [i["number"] for i in implementation] == [1]
-        assert [i["number"] for i in tests] == [2]
-        assert tests[0]["comments"][0]["body"] == "Comment for issue 2"
-        gh.fetch_issues_raw.assert_called_with(owner, repo, 7)

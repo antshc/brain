@@ -168,16 +168,3 @@ class TestDevSpecLoop:
         dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=MagicMock(spec=AIAgent))
 
         mock_execution_log_class.assert_called_once_with(_LOG_DIR, _GITHUB_REPO, "dev")
-
-    def test_tests_only_spec_still_starts_ralph(self):
-        # Scenario: Tests-only spec still starts Ralph
-        vcs = MagicMock(spec=VCSClient)
-        vcs.list_specs.return_value = [_spec()]
-        vcs.fetch_issues.return_value = [_ticket(20, ["tests"])]
-        agent = MagicMock(spec=AIAgent)
-        exec_log = MagicMock(spec=ExecutionLog)
-        exec_log.get_count.return_value = 0
-
-        dev(_GITHUB_REPO, _LOG_DIR, max_executions=5, vcs=vcs, agent=agent, exec_log=exec_log)
-
-        agent.run.assert_called_once_with()

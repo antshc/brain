@@ -40,11 +40,11 @@ class CreateLabelsTest(unittest.TestCase):
             if call.args[0][:3] == ["gh", "label", "create"]
         ]
 
-    def test_creates_all_nine_baseline_labels(self) -> None:
+    def test_creates_all_eight_baseline_labels(self) -> None:
         self.assertEqual(
             [name for name, _, _ in self.labels],
             [
-                "hitl", "spec", "tests", "bug", "wayfinder:map",
+                "hitl", "spec", "bug", "wayfinder:map",
                 "wayfinder:research", "wayfinder:experiment",
                 "wayfinder:grilling", "wayfinder:task",
             ],
@@ -67,10 +67,10 @@ class CreateLabelsTest(unittest.TestCase):
 
     def test_only_missing_label_is_created(self) -> None:
         created = self.check_setup(
-            [name for name, _, _ in self.labels if name != "tests"]
+            [name for name, _, _ in self.labels if name != "bug"]
         )
         self.assertEqual(len(created), 1)
-        self.assertEqual(created[0][3], "tests")
+        self.assertEqual(created[0][3], "bug")
 
     def test_repository_resolution_failure_stops_setup(self) -> None:
         failure = subprocess.CalledProcessError(1, ["gh", "repo", "view"])

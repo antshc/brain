@@ -42,7 +42,7 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 4. Set up GitHub labels
 
-Follow [github.md](./github.md) **Setup labels**. Done when all nine baseline labels exist in the tracker repository.
+Follow [github.md](./github.md) **Setup labels**. Done when all eight baseline labels exist in the tracker repository.
 
 ## Completion criteria
 
@@ -50,4 +50,4 @@ Follow [github.md](./github.md) **Setup labels**. Done when all nine baseline la
 - For a wrapping repo, `.github/skills/harness/` exists (the `harness` skill, its settings file, and its pull command) at the harness root.
 - Copilot instructions seeded in `.github/copilot-instructions.md`, placeholders resolved, no duplicate sections.
 - `ARCHITECTURE.md` and `CONTEXT.md` exist.
-- All nine GitHub baseline labels exist; labels-only mode requires only this condition.
+- All eight GitHub baseline labels exist; labels-only mode requires only this condition.
