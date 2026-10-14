@@ -13,7 +13,6 @@ def fetch_issues(
     repo: str,
     *,
     spec_number: int | None = None,
-    kind: str = "all",
     vcs: VCSClient | None = None,
 ) -> list[dict]:
     """Fetch and return actionable issues for a repository as serialisable dicts."""
@@ -21,7 +20,7 @@ def fetch_issues(
     issue_filter = IssueFilter()
 
     fetched_issues = vcs.fetch_issues(owner, repo, spec_number)
-    actionable_issues = issue_filter.get_actionable_issues(fetched_issues, kind=kind)
+    actionable_issues = issue_filter.get_actionable_issues(fetched_issues)
 
     return [_issue_to_dict(issue) for issue in actionable_issues]
 

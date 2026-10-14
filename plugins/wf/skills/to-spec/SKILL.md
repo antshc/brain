@@ -17,15 +17,13 @@ Explicit offline publishing or a reported GitHub/tool/authentication failure →
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any Concepts and ADRs in the area you're touching.
 
-2. Synthesize the agreed functional-testing decision: approved, declined, or deferred, including its scope and rationale. Preserve settled decisions without another interview; an unresolved decision stays explicitly unresolved. Prefer existing functional-slice tests at the highest useful observable seams. Discover applicable `testing-*` skills across repository, user, and installed scopes and follow the applicable `/testing-*` skills internally to establish feasibility and coverage gaps.
-
-3. Draft the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, Run `/doc-contracts` skill once per touched contract kind and inline its substantive contract content under **Contracts Delta**, preserving contract facts while removing skill references and authoring directives.
+2. Draft the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, Run `/doc-contracts` skill once per touched contract kind and inline its substantive contract content under **Contracts Delta**, preserving contract facts while removing skill references and authoring directives.
 
 Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
 Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
-4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Keep testing scenarios independent of test-file paths and fixed method names. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow **Publish spec** in [github.md](./github.md) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+3. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow **Publish spec** in [github.md](./github.md) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
 
 <spec-template>
 
@@ -102,9 +100,7 @@ The changed API, Database, or Resource contracts, one block per kind. Include on
 
 ## Testing Decisions
 
-A bullet list of the functional-testing decision (approved, declined, deferred, or unresolved), its scope and rationale, observable seams, reusable coverage described by behavior, and known gaps. Keep repository/accessor/proxy integration verification with implementation work.
-
-List functional scenarios as bullets: `Given {{preconditions}}, when {{action}}, then {{observableOutcome}} — covers {{requirementSetReferences}}`. Cover every Requirement set's functional requirements, business rules, and edge cases. Describe external behavior precisely enough to map to current test methods during execution; omit test-file paths, fixed test-method names, and all skill references.
+A bullet list of agreed testing decisions: relevant test categories, observable seams, reusable coverage described by behavior, and known gaps. Omit test-file paths, fixed test-method names, and all skill references.
 
 ## Out of Scope
 

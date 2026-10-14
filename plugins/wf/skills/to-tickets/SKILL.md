@@ -61,12 +61,6 @@ Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an
 - Identify the seam through which each slice is verified (e.g. an integration test observing the database layer) and prefer the highest seam that still exercises the slice end-to-end
 </vertical-slice-rules>
 
-### 3a. Draft spec-wide functional verification
-
-**Ask the user** whether to add a spec-wide functional-testing ticket; **MUST NOT** add it automatically, even when the spec mentions functional verification. Skip the question when the spec already records a declined/deferred decision; preserve it. Add the question to **Quiz the user**. Only on explicit approval, append one functional-testing ticket for the entire spec. Carry the spec's scenario bullets and requirement references into the ticket, covering all functional requirements, business rules, edge cases, and acceptance criteria. Use label `tests` only for functional-test execution; adding or repairing test code remains an implementation slice.
-
-Make the functional-testing ticket depend on every implementation slice for its parent spec, including test additions needed for identified coverage gaps. Describe reuse of existing functional-slice tests and observable seams without test-file paths or fixed method names. Execution maps scenarios to current methods. Missing coverage discovered at execution is unverified and becomes a `hitl` investigation ticket; Testy does not write tests.
-
 ### 4. Quiz the user
 
 Present the proposed breakdown as a numbered list. For each slice, show:
@@ -76,9 +70,8 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Blocked by**: which other slices (if any) must complete first
 - **Wave**: parallel execution wave
 - **Functional Requirements covered**: which functional requirements from the spec this addresses
-- **Work**: implementation or spec-wide functional testing; show the latter's complete scenario coverage and dependencies
 
-Derive the **parallel map** from Blocked by: wave 1 = slices with no blockers; wave n = slices whose blockers all sit in earlier waves. Slices in one wave run in parallel; the functional-testing ticket takes the last wave. Present it as `Wave n: {{slices}}`.
+Derive the **parallel map** from Blocked by: wave 1 = slices with no blockers; wave n = slices whose blockers all sit in earlier waves. Slices in one wave run in parallel. Present it as `Wave n: {{slices}}`.
 
 Ask the user:
 
@@ -86,7 +79,6 @@ Ask the user:
 - Are the dependency relationships and waves correct? Would any wave have two slices editing the same code (merge them or add a blocker)?
 - Should any slices be merged or split further?
 - Are the correct slices marked as HITL and AFK?
-- Add a spec-wide functional-testing ticket? (omit it unless the user says yes)
 
 Iterate until the user approves the breakdown.
 
@@ -98,8 +90,6 @@ For each approved slice, follow **Create sub-ticket** in [github.md](./reference
 
 Use `hitl` as the label for all issues `HITL` or `AFK` to indicate that user review is required.
 
-Create the approved functional-testing ticket last, with `tests`, `hitl`, and `{{repoLabel}}`, as a sub-ticket of the same spec. Approval of the breakdown does not remove `hitl`: removing that label releases execution. Reuse an existing functional-testing ticket for the same spec instead of duplicating it on reruns.
-
 `{{specIssueNumber}}` is required for each call, if missing ask user.
 Use the issue body template below.
 
@@ -107,7 +97,7 @@ Load `references/issue-template.md` and use it verbatim as the issue body struct
 
 ### 5a. Link blocking
 
-After every issue exists (including the functional-testing ticket), build the parallel map with native links: for each approved slice with blockers, follow **Link blocking** in [github.md](./references/github.md) with `issueNumber` = the slice, `blockedBy` = its blockers' issue numbers. The functional-testing ticket's `blockedBy` = every implementation ticket of the spec. On reruns, link only edges not already present.
+After every issue exists, build the parallel map with native links: for each approved slice with blockers, follow **Link blocking** in [github.md](./references/github.md) with `issueNumber` = the slice, `blockedBy` = its blockers' issue numbers. On reruns, link only edges not already present.
 
 *Done when* every approved **Blocked by** edge has a native link. Report the final map as `Wave n: #{{issue}}, …` with issue numbers.
 

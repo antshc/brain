@@ -14,7 +14,7 @@ gh issue view {{specIssueNumber}} --repo {{trackerRepository}} --json number,tit
 
 ## Labels
 
-Missing baseline `hitl`, `spec`, `tests`, or `bug` → *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode* in the tracker repository. Ensure the spec's routing label also exists:
+Missing baseline `hitl`, `spec`, or `bug` → *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode* in the tracker repository. Ensure the spec's routing label also exists:
 
 ```
 gh label create {{repoLabel}} --repo {{trackerRepository}} --color 0e8a16 --description "Source repository for this spec's tickets" --force
@@ -28,7 +28,7 @@ List all children, including closed ones:
 gh api --paginate repos/{{trackerRepository}}/issues/{{specIssueNumber}}/sub_issues?per_page=100
 ```
 
-Map approved slices to existing child titles, bodies, and type labels. Reuse an unambiguous matching ticket, including the spec-wide `tests` ticket; conflicting matches require user resolution. After interrupted creation, also inspect unlinked issues with the routing label and matching title/parent-spec content before creating replacements. A created issue remains recorded even if its parent-link request failed.
+Map approved slices to existing child titles, bodies, and type labels. Reuse an unambiguous matching ticket; conflicting matches require user resolution. After interrupted creation, also inspect unlinked issues with the routing label and matching title/parent-spec content before creating replacements. A created issue remains recorded even if its parent-link request failed.
 
 ## Create sub-ticket
 
@@ -67,7 +67,7 @@ gh api repos/{{trackerRepository}}/issues/{{blockerNumber}} --jq .id
 gh api repos/{{trackerRepository}}/issues/{{issueNumber}}/dependencies/blocked_by --method POST -F issue_id={{blockerId}}
 ```
 
-**Returns:** confirmed blocker edges after rereading the dependency list. Ignore an already-linked response only after confirming that exact edge exists; surface other failures. The functional-testing ticket depends on every implementation ticket. Do not close or rewrite the parent spec.
+**Returns:** confirmed blocker edges after rereading the dependency list. Ignore an already-linked response only after confirming that exact edge exists; surface other failures. Do not close or rewrite the parent spec.
 
 ## Offline publishing
 

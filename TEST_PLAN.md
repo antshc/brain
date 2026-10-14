@@ -320,21 +320,6 @@ Scenario: Issue comment fields are preserved
 > Unit: `IssueFilter.get_actionable_issues()`
 
 ```gherkin
-Scenario: Kind filters preserve approval gates
-  Given mixed implementation and tests tickets including hitl and spec
-  When each kind is selected
-  Then only approved tickets of that kind are returned; all preserves both kinds
-
-Scenario: Removing hitl releases functional testing
-  Given a tests ticket with hitl
-  When hitl is removed
-  Then tests selection includes the ticket
-
-Scenario: Unknown kind is rejected
-  Given an unknown kind
-  When the filter runs
-  Then it raises ValueError
-
 Scenario: Only actionable issues are returned
   Given a list of issues with labels [], ["blocked"], ["prd"], and ["bug", "hitl"]
   When get_actionable_issues() is called
@@ -493,11 +478,6 @@ Scenario: Open spec issues query is built and nodes are returned
 > Integration: mocked `GhCli`
 
 ```gherkin
-Scenario: Kind selection flows through shared fetching
-  Given mixed ticket kinds from the VCS adapter
-  When each fetch kind is requested
-  Then the correct approved tickets and comments are returned
-
 Scenario: Handler returns correctly shaped output for actionable issues
   Given the repository "owner/repo"
     And the VCS returns actionable issues 14 and 15 with labels and comments
@@ -532,13 +512,8 @@ Scenario: Spec number is forwarded to GhCli
 > Unit: `fetch_issues.py`
 
 ```gherkin
-Scenario: CLI passes kind and spec in either order
-  Given valid kind and spec arguments
-  When the CLI runs with either option order
-  Then the handler receives both values
-
-Scenario: CLI rejects invalid kind without fetching
-  Given an invalid or missing kind value, a non-numeric spec, or an unknown option
+Scenario: CLI rejects invalid options without fetching
+  Given a missing or non-numeric spec value, a duplicate spec, or an unknown option
   When the CLI runs
   Then it returns one without fetching
 
@@ -577,11 +552,6 @@ Scenario: CLI passes spec number when provided
 > Unit: `afk.features.dev.handler.dev()`
 
 ```gherkin
-Scenario: Tests-only spec still starts Ralph
-  Given a spec whose sub-issues contain only an approved tests ticket
-  When the launcher runs
-  Then Ralph starts for that spec
-
 Scenario: No open specs found — early exit
   Given list_specs() returns no specs for owner "owner" and repo "repo"
   When dev() is called
