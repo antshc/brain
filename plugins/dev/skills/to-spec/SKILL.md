@@ -22,7 +22,7 @@ This skill takes the current conversation context and codebase understanding and
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below. Validate the three user-confirmed routing inputs using the GitHub reference. Publish it as a GitHub issue with `repo:target:<owner/repo>` and `repo:base:<branch>`, creating missing labels first. Read the published issue back to confirm the full body and both labels, then report its URL.
+3. Write the spec using the template below. Validate the three user-confirmed routing inputs using the GitHub reference. Publish it as a GitHub issue with the `spec`, `repo:target:<owner/repo>`, and `repo:base:<branch>` labels, creating missing labels first. Read the published issue back to confirm the full body and all three labels, then report its URL.
 
 <spec-template>
 
@@ -83,4 +83,4 @@ Any further notes about the feature.
 ## Completion criteria
 
 - The spec reflects the conversation and codebase, with testing seams confirmed by the user.
-- A GitHub issue in the user-supplied `TRACKER_REPOSITORY` contains the complete spec and the confirmed `repo:target:<owner/repo>` and `repo:base:<branch>` labels; its URL is reported.
+- A GitHub issue in the user-supplied `TRACKER_REPOSITORY` contains the complete spec and the `spec` label plus the confirmed `repo:target:<owner/repo>` and `repo:base:<branch>` labels; its URL is reported.

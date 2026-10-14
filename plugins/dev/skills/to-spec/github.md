@@ -19,11 +19,12 @@ Use `gh` for GitHub I/O. Resolve paths to body files from the caller's working d
 | List all labels | `gh api --paginate repos/TRACKER_REPOSITORY/labels --jq '.[].name'` |
 | Create missing source label | `gh label create "repo:target:SOURCE_REPOSITORY" --repo TRACKER_REPOSITORY --color 0e8a16 --description "Source repository for this spec's tickets"` |
 | Create missing base label | `gh label create "repo:base:BASE_BRANCH" --repo TRACKER_REPOSITORY --color c5def5 --description "Base branch for this spec's feature branch"` |
-| Publish spec | `gh issue create --repo TRACKER_REPOSITORY --title "TITLE" --body-file SPEC_FILE --label "repo:target:SOURCE_REPOSITORY,repo:base:BASE_BRANCH"` |
+| Create missing spec label | `gh label create "spec" --repo TRACKER_REPOSITORY --color 5319e7 --description "Spec task with implementation context"` |
+| Publish spec | `gh issue create --repo TRACKER_REPOSITORY --title "TITLE" --body-file SPEC_FILE --label "spec,repo:target:SOURCE_REPOSITORY,repo:base:BASE_BRANCH"` |
 
-Check the complete label list first; create only missing labels, preserving existing label metadata. The required labels are `repo:target:<owner/repo>` and `repo:base:<branch>`; no `spec` label is required. Write the full spec to a temporary Markdown body file outside the repository, pass it with `--body-file`, and remove only that temporary file after publication/read-back.
+Check the complete label list first; create only missing labels, preserving existing label metadata. The required labels are `spec`, `repo:target:<owner/repo>`, and `repo:base:<branch>`. Write the full spec to a temporary Markdown body file outside the repository, pass it with `--body-file`, and remove only that temporary file after publication/read-back.
 
-Record the returned URL immediately. Read the issue back and confirm its complete body and both exact routing-label values before reporting success. If creation returned an ambiguous error, inspect recent issues for the intended spec before attempting another create; a failed lookup is not proof of absence.
+Record the returned URL immediately. Read the issue back and confirm its complete body, the `spec` label, and both exact routing-label values before reporting success. If creation returned an ambiguous error, inspect recent issues for the intended spec before attempting another create; a failed lookup is not proof of absence.
 
 ## Gotchas
 
