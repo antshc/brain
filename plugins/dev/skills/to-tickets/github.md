@@ -15,12 +15,11 @@ Use `gh` for GitHub I/O; ticket storage is GitHub Issues.
 | Read issue | `gh issue view NUMBER --repo OWNER/REPO --json number,title,body,labels,state,url` |
 | Read all comments | `gh api --paginate repos/OWNER/REPO/issues/NUMBER/comments` |
 | List labels | `gh api --paginate repos/OWNER/REPO/labels --jq '.[].name'` |
-| Create missing label | `gh label create ready-for-agent --repo OWNER/REPO --color 0E8A16 --description "Fully specified and ready for agent implementation"` |
-| Create ticket | `gh issue create --repo OWNER/REPO --title "TITLE" --body-file TICKET_FILE --label ready-for-agent` |
+| Create ticket | `gh issue create --repo OWNER/REPO --title "TITLE" --body-file TICKET_FILE` |
 | Update ticket body | `gh issue edit CHILD --repo OWNER/REPO --body-file TICKET_FILE` |
 | Resolve database ID | `gh api repos/OWNER/REPO/issues/NUMBER --jq .id` |
 
-Create the label only when absent; preserve existing metadata. Use one temporary Markdown body file per ticket outside the repository; remove run-owned files after publication/read-back. Record each returned URL before the next write. On ambiguous creation failure, inspect recent issues before retrying.
+Use one temporary Markdown body file per ticket outside the repository; remove run-owned files after publication/read-back. Record each returned URL before the next write. On ambiguous creation failure, inspect recent issues before retrying.
 
 ## Parent and blocking edges
 

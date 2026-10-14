@@ -59,7 +59,7 @@ Iterate until the user approves the breakdown.
 
 ### 5. Publish the tickets to GitHub
 
-Publish one GitHub issue per approved ticket in dependency order, blockers first, using the issue template below. Ensure `ready-for-agent` exists before applying it unless instructed otherwise. Record created issue URLs immediately; on partial failure report what exists and resume from it rather than duplicating tickets.
+Publish one GitHub issue per approved ticket in dependency order, blockers first, using the issue template below. Record created issue URLs immediately; on partial failure report what exists and resume from it rather than duplicating tickets.
 
 Set native blocking dependencies using database IDs, not issue numbers. If the source was an existing issue, attach each ticket as its sub-issue. Use the reference's explicit text fallback only when the capability is confirmed unavailable.
 
@@ -92,7 +92,7 @@ Avoid specific file paths or code snippets: they go stale fast. Exception: if a 
 
 ## Completion criteria
 
-- Every approved slice exists as one GitHub issue in the user-supplied `TRACKER_REPOSITORY` with acceptance criteria and the requested label.
+- Every approved slice exists as one GitHub issue in the user-supplied `TRACKER_REPOSITORY` with acceptance criteria.
 - Read-back confirms each parent link and blocking edge, natively or through an explicitly reported fallback; the graph has no cycles.
 - Report ticket URLs, dependencies, and the ready frontier. Leave parent content and status unchanged.
 - Finally compare the published graph against the approved breakdown and source spec; resolve or explicitly report any omitted scope.
