@@ -18,12 +18,21 @@ Qualifies: architectural shape; integration patterns between contexts; technolog
 
 Any miss → write nothing, including on an explicit request. Return the miss and the narrower home: feature decision in the session ledger, a design doc, [Concept](./concept.md), or [term](./term.md).
 
+## Scope
+
+Set `@decisionScope` before **Extend or create**: the entity the decision was made for (`narrow`, e.g. tasks) or every member of a named class (`wide`, e.g. every append-only history store).
+
+- Context states the scope explicitly → use it.
+- Unstated → ask one question phrased so yes accepts the recommendation: "Does this apply only to `{{entity}}`, or to every `{{class}}`?" Recommend `narrow` unless context names a second member of the class. Invoked by `grill-design` → return the question to the caller as a pending write; write after the answer.
+- Never widen from analogy, naming similarity, or a single case. A temporary mitigation or stopgap stays `narrow`.
+- `wide` MUST name the class by a property a future reader can check (e.g. "append-only, never deleted"), not by listing entities.
+
 ## Extend or create
 
 Runs before any write. A near-duplicate ADR splits authority over one decision area.
 
-1. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Scan and match*** over the `Architecture Decision Records` table in `ARCHITECTURE.md` and every matched building block's `Architecture Decision Records` table with this decision's surface — its terms and the paths it governs.
-2. A matched ADR already owns this decision area and the decision still stands → **extend it**: amend the body and resync its row via **Sync index row**. Stop here.
+1. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Scan and match*** over the `Architecture Decision Records` table in `ARCHITECTURE.md` and every matched building block's `Architecture Decision Records` table with this decision's surface — its terms and the paths it governs; for `wide`, also the class terms.
+2. A matched ADR already owns this decision area and the decision still stands → **extend it**: amend the body and resync its row via **Sync index row**. Scope changed (e.g. `narrow` → `wide`) → rewrite the scope sentence and regenerate the Trigger condition. Stop here.
 3. A matched ADR owns the area but this decision reverses it → **rewrite it in place**; never create a second ADR:
    - Rename the file to `docs/adr/{{newSlug}}.md` and update every inbound link to the old path.
    - Rewrite the heading and body to state the new decision.
@@ -46,7 +55,7 @@ No frontmatter — the record opens directly with its heading.
 ```md
 # {{decisionTitle}}
 
-{{1-3 sentences: what context required a decision, what was decided, and why.}}
+{{1-3 sentences: what context required a decision, what was decided, and why.}} {{scopeSentence|Applies only to <entity>. — or — Applies to every <class>: <checkable property>.}}
 
 ## Considered Options
 
@@ -66,6 +75,7 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 - **User-supplied options** — when the user stated options or rejections, use all of them; rephrase each into the bullet form, terse and decision-focused, preserving its meaning. Never drop or weaken one.
 - **Consequences** — only for non-obvious downstream effects; omit the heading otherwise.
 - **Link line** — only when a Concept or document holds how the decision is applied; omit otherwise.
+- **Scope sentence is mandatory** — states `@decisionScope` verbatim; entity-specific bounds (limits, windows, names) stay attributed to their entity even in a `wide` ADR.
 - State the architectural decision in the title, not the problem.
 - Explain why a decision is required in the body context.
 - Include concrete abstraction, interface, event, field, service, topic, or component names only when they are part of the architectural contract.
@@ -78,13 +88,13 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 An ADR that applies to exactly one building block is indexed in that block's `Architecture Decision Records` table inside `docs/building-blocks/{{slug}}.md` (or its repository's own ADR index when that repository documents itself). Every other ADR is indexed in `ARCHITECTURE.md`'s `Architecture Decision Records` table. Never both.
 
 1. Row shape: `| [{{decisionTitle}}]({{pathToAdr}}) | {{triggerCondition}} | {{summary}} |` — `{{decisionTitle}}` identical to the ADR heading; `{{pathToAdr}}` relative to the indexing file.
-2. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the written ADR as `{{recordContent}}`.
+2. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the written ADR as `{{recordContent}}`. `narrow` → trigger phrases name the entity; `wide` → name the class property and its domain synonyms, never one member alone.
 3. Author the Summary yourself — 1-2 agent-optimized sentences stating the decision.
 4. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = `pathToAdr` (the previous path when renamed), `decisionTitle`, `triggerCondition`, `summary` — never edit the table directly.
 
 ## Approval gate
 
 - **Explicit direct request** that passes the gate — approval is given; write immediately.
-- **Invoked by `grill-design`** — the user's answer is the approval. Write immediately; never offer, confirm, or defer. The user reviews the result in `git diff`.
+- **Invoked by `grill-design`** — the user's answer is the approval. Write immediately; never offer, confirm, or defer, except an unsettled **Scope** question, returned to the caller. The user reviews the result in `git diff`.
 
 Return the ADR path and the index row written.

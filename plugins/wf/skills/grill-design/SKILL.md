@@ -33,7 +33,7 @@ Produce **questions** and **records**. Writable surface: `CONTEXT.md`, `ARCHITEC
 |---|---|---|
 | Code/test lookup | *Run `explore-codebase` skill for read-only lookups locating symbols, tests, or how a flow works.* Supply the bounded question, target, depth, and read-only constraint. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
 | Index scan/sync | *Run `index-docs` skill for scan/match and row-sync of Markdown Trigger condition tables.* Supply the operation and its required metadata. | Matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
-| Record | *Run `record-architecture` skill for settled architecture ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, or an explicit blocker. |
+| Record | *Run `record-architecture` skill for settled architecture ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
 
 Integrate lookup evidence into the frontier and touched surface; integrate record/index results into the ledger. Mark a record written only after the returned result confirms its persistence and required sync.
 
