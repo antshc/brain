@@ -16,4 +16,4 @@ Highest matching floor wins. Large mechanical changes retain their size floor; r
 
 Resolve tier → concrete model ID from explicit caller/runtime configuration and the runtime's supported-model catalog. If no mapping exists, select supported models using advertised coding/reasoning capabilities; record the chosen mapping. Do not hard-code or invent IDs. When a tier is unavailable, prefer an available stronger tier; otherwise inherit the current model and disclose the limitation. If model selection is unsupported, inherit and record `model selection unsupported`.
 
-Before delegation, record: reviewed SHA, counted lines/files, exclusions, complexity triggers, tier, agent, requested model, and selection rationale/fallback. Record actual model when exposed; never claim an unobservable selection took effect.
+Before delegation, record: reviewed SHA, counted lines/files, exclusions, complexity triggers, tier, requested model, and model selection rationale/fallback. Record actual model when exposed; never claim an unobservable selection took effect.
