@@ -1,34 +1,36 @@
 ---
 name: explore-codebase
-description: Finds code — where a symbol lives, what calls it, how a flow works, which file holds a literal, config, test, or owner — by delegating read-only lookups to subagents. The engine for any codebase exploration: the caller supplies a question, its own prompt instruction, or a skill to run inside the subagent. Use for any "where is", "what calls", "how does this work", or "find the code that..." question about the current repo or a named external codebase, and whenever a task must locate code before it can proceed.
+description: Finds code — where a symbol lives, what calls it, how a flow works, which file holds a literal, config, test, or owner — as a read-only lookup run inside a caller-spawned subagent. The engine for any codebase exploration: the caller reads its Request, forms a question, prompt instruction, or skill to run plus output shape, and spawns the subagent. Use for any "where is", "what calls", "how does this work", or "find the code that..." question about the current repo or a named external codebase, and whenever a task must locate code before it can proceed.
 ---
 
 # Explore Codebase
 
-Delegate every lookup through `runSubagent`; omit `agentName` so the general-purpose subagent inherits execution, skill, search, LSP, and read tools. The caller supplies `quick | medium | thorough` plus the work itself — a question, a prompt instruction of its own, or a skill to run. This skill owns the delegation, the target, and the contract whichever form arrives.
+Runs inside a caller-spawned subagent; never spawns subagents. Owns target resolution, contract material, tool selection, and the read-only contract. The caller owns delegation: it reads Request, forms the request, decides one or parallel subagents, and spawns them. Skill unavailable → caller spawns the explore agent with the same request plus the read-only contract.
 
-## Choose delegation shape
+## Request
 
-- Use one subagent for a focused question with one likely evidence path.
-- Spawn multiple independent subagents in parallel when the question has distinct, non-overlapping exploration tracks, such as separate services, symbol and configuration evidence, or architecture and test coverage. Give each agent a bounded subquestion and the same read-only contract.
-- Do not split a question when one agent must discover the answer before another can proceed; make that dependency sequential.
-- Consolidate all agent results into one concise verdict, resolve conflicts with targeted evidence, and state any remaining uncertainty.
+Caller forms before spawning; the subagent receives it verbatim:
 
-## Run caller-supplied work inside the subagent
+- `@work` — one of: question | prompt instruction | skill name to run. Instruction and skill name pass **verbatim**, never paraphrased.
+- `@depth` — `quick | medium | thorough`.
+- `[@target]` — repository or service names as stated; omitted → current repository.
+- `@outputShape` — caller's return shape; omitted → Return the verdict.
+- `[@outputArtifact]` — the one file the run may write.
+- `[@inputs]` — caller-supplied inputs `@work` needs.
 
-Beyond a plain question, a caller may hand over a prompt instruction to carry out, or name a skill for the subagent to run. Either way the caller owns what the exploration produces — a named skill owns its own procedure, evidence rules, and return shape; a prompt instruction owns its own task and output.
+## Run caller-supplied work
 
-Pass the instruction or skill name through **verbatim**, never paraphrased, and put into the brief the caller-supplied inputs, the read-only contract, the resolved target, and the routing rules below — the subagent reads none of this file on its own. Return the caller's own output shape unaltered rather than folding it into a verdict.
+The caller owns what the exploration produces — a named skill owns its own procedure, evidence rules, and return shape; a prompt instruction owns its own task and output. Run it under the read-only contract, resolved target, and routing rules below. Return `@outputShape` unaltered rather than folding it into a verdict.
 
 ## Read-only contract
 
-Tell the subagent that exploration is strictly read-only. It must not edit source, documentation, configuration, generated files, `$HARNESS_REPO_PATH/graphify-out/`, or any target-repo `graphify-out/`.
+Exploration is strictly read-only. Do not edit source, documentation, configuration, generated files, `$HARNESS_REPO_PATH/graphify-out/`, or any target-repo `graphify-out/`.
 
-The one exception is an output artifact the caller names — the subagent writes that file, and nothing else.
+The one exception is `@outputArtifact` — write that file, and nothing else.
 
 ## Resolve the repository root
 
-Resolve `HARNESS_REPO_PATH` once from the repository where the skill was invoked with `git rev-parse --show-toplevel`; stop if cwd is not inside a Git repository. Put the absolute path in every subagent brief — the subagent never re-resolves it.
+Resolve `HARNESS_REPO_PATH` once with `git rev-parse --show-toplevel`; stop if cwd is not inside a Git repository.
 
 Every harness-side search is bounded to `$HARNESS_REPO_PATH`, never above it. A supporting repository the index names is searched inside its own path, however far outside the harness that sits — never by widening the harness search.
 
@@ -38,9 +40,9 @@ Preserve every repository or service name in the question.
 
 **Building-block index** — MUST use for the navigation, and the only map of the supporting repositories: they sit outside the harness, at paths nothing on disk advertises. Read `$HARNESS_REPO_PATH/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved; a matching row's `Location` cell maps a Deployable name — or its Trigger condition — to a local path (`workspace/<repo>[/subpath]` or absolute) and an `origin` URL. Consult the `Shared dependency ownership` table the same way for a dependency more than one Deployable uses, and the `Terminal infrastructure boundaries` table for where tracing stops. This is the only reader of those tables — never search the filesystem for a fallback index file. A path a row names but the disk lacks is unresolved, not a licence to guess a neighbouring one.
 
-**Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `$HARNESS_REPO_PATH` itself for documentation, the main codebase repository under `$HARNESS_REPO_PATH/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk and put it in every subagent brief — the subagent never re-enumerates. A name the list has no path for routes to the GitHub tools.
+**Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `$HARNESS_REPO_PATH` itself for documentation, the main codebase repository under `$HARNESS_REPO_PATH/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk. A name the list has no path for routes to the GitHub tools.
 
-**Graph coverage** — read `graphify-out/manifest.json` under each enumerated checkout, where present. These are graphs over one multi-repo codebase, not a preference order: pick the graph whose manifest names the resolved target; several naming it are one codebase seen from different cuts — take the widest. Emit exactly one value into every brief, `GRAPH_PATH=<absolute path>` or `GRAPH=none`, so parallel subagents query the same graph.
+**Graph coverage** — read `graphify-out/manifest.json` under each enumerated checkout, where present. These are graphs over one multi-repo codebase, not a preference order: pick the graph whose manifest names the resolved target; several naming it are one codebase seen from different cuts — take the widest. Settle exactly one value, `GRAPH_PATH=<absolute path>` or `GRAPH=none`.
 
 Report a name that resolves to neither a local checkout nor a GitHub repository as unresolved.
 
@@ -75,11 +77,11 @@ Each level supersedes the one below it for claims about that target. A question 
 
 **Graphify** — local checkouts only: the target checkout itself, plus any other deployable or supporting repository that is checked out locally. A target with no local checkout stays on the GitHub tools.
 
-- MUST use when the brief carries a `GRAPH_PATH` **and** the question is one a graph answers — architecture, relationships, an A-to-B connection or flow. A symbol, literal, config, or test lookup goes straight to LSP and grep.
+- MUST use when resolution settled a `GRAPH_PATH` **and** the question is one a graph answers — architecture, relationships, an A-to-B connection or flow. A symbol, literal, config, or test lookup goes straight to LSP and grep.
 - `GRAPH=none` means no graph covers the target — continue with normal exploration; never re-scan for a manifest the resolution step already ruled out.
 - On a `GRAPH_PATH` and a matching question, query that graph before LSP, grep, or semantic search: `graphify query` for broad architecture or relationship questions, `graphify path` for an A-to-B connection or flow, and `graphify explain` for one graph concept. A missing Graphify node is never evidence of absence — settle decisive behavior and absence claims in source.
 - Graphify stays read-only. Never build or update a missing graph, install Graphify, or run reflection, vocabulary-sidecar, `save-result`, add, watch, export, feedback, or any other write-producing operation. If the graph, command, or answer is unavailable or unhelpful, continue with normal exploration.
 
 ## Return the verdict
 
-Return one concise verdict with target-relative files, relevant symbols, evidence, and unresolved uncertainty. The caller retrieves exact quotations, signatures, and assertions directly; never re-read evidence already reported by the subagent.
+Default `@outputShape`: one concise verdict with target-relative files, relevant symbols, evidence, and unresolved uncertainty.

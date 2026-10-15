@@ -5,11 +5,20 @@ description: Define an arc42 Crosscutting Concept — suggest which Concept to a
 
 # Define Concept
 
-Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; `/explore-codebase` owns inspection; `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
+Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `explore-codebase` skill owns in-subagent lookup (unavailable → explore agent); `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
 
 ## Evidence
 
 Every fact in a suggestion, a question, or the recorded Concept is either a cited inspection result or a user answer from this session. A fact inspection cannot settle becomes a question to the user, carrying the evidence that left it open. A recommended answer cites its evidence or is labelled `proposal`. *Load `record-architecture` skill in `concept-body` mode for settled architecture concept bodies* and follow the selected procedure's **Evidence** and **Terminology** for what the body may claim.
+
+## Inspection
+
+1. Read `explore-codebase` skill's **Request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
+2. Pick shape: one focused path → one subagent; distinct non-overlapping tracks (separate deployables, workflow boundaries, configuration versus tests, categories) → parallel subagents, each a bounded subquestion; a track needing another's answer → sequential. No duplicate lookups for areas already in flight.
+3. Spawn each read-only subagent with its request verbatim, instructing it to *run `explore-codebase` skill for the read-only lookup — symbol, callers, flow, config evidence*. Skill unavailable → spawn the explore agent with the same request plus the read-only contract.
+4. Consolidate results: resolve conflicts with targeted evidence; state remaining uncertainty.
+
+Done when every track returned its `@outputShape` or an explicit blocker.
 
 ## Grill-design value
 
@@ -43,8 +52,8 @@ Read `ARCHITECTURE.md`'s `Crosscutting Concepts` table in full; an absent file o
 
 **2. Match the described candidate, or sweep for candidates**
 
-- **Described** — the user described the concept to add. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run `/explore-codebase` skill to inspect the described concern and each matched record for drift. A rule that is not crosscutting → *load `record-architecture` skill in `concept-record` mode for settled architecture Concepts* and route per the selected procedure's **Where the rule belongs**; report its home and stop.
-- **Not described** — sweep. Run `/explore-codebase`' skill **Run caller-supplied work inside the subagent** at `thorough`, with one parallel subagent per category group of the arc42 list plus one drift track over the recorded Concepts. Give each subagent its group's categories, the item 1 mapping, and this instruction verbatim:
+- **Described** — the user described the concept to add. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run Inspection over the described concern and each matched record for drift. A rule that is not crosscutting → *load `record-architecture` skill in `concept-record` mode for settled architecture Concepts* and route per the selected procedure's **Where the rule belongs**; report its home and stop.
+- **Not described** — sweep. Run Inspection at `thorough`, with one parallel track per category group of the arc42 list plus one drift track over the recorded Concepts. Give each track its group's categories and the item 1 mapping as `@inputs`, and this `@work` instruction verbatim:
 
   > For each category, report: present in the codebase, with file-and-line citations, or `no evidence found in inspected scope`; the building blocks where its decision recurs; whether the code makes one consistent choice (quote it) or several (list each with citations); the recorded Concept covering it, if any. For the drift track, report per recorded Concept every rule or `default` the code contradicts, with citations. Report only what you cite.
 
@@ -63,7 +72,7 @@ Map the chosen candidate's decisions: scope, applicable contexts, shared behavio
 
 **5. Resolve through questioning and inspection**
 
-Follow [questioning.md](questioning.md) over the tree. Ask every blurry branch as a question carrying its cited evidence; each default clause, its selection conditions, and exceptions are always user-confirmed decisions. Before each round, identify the facts its frontier needs and inspect independent areas (separate deployables, workflow boundaries, configuration versus tests) through `/explore-codebase`' skill **Run caller-supplied work inside the subagent**, giving each agent the concept, exact scope, and a distinct question. One focused path → one agent; dependent paths → sequential. Do not launch duplicate fact lookups during questioning for areas already in flight. Done when the user confirms shared understanding, as the questioning reference requires.
+Follow [questioning.md](questioning.md) over the tree. Ask every blurry branch as a question carrying its cited evidence; each default clause, its selection conditions, and exceptions are always user-confirmed decisions. Before each round, identify the facts its frontier needs and run Inspection, giving each track the concept, exact scope, and a distinct question. Done when the user confirms shared understanding, as the questioning reference requires.
 
 **6. Consolidate findings**
 
