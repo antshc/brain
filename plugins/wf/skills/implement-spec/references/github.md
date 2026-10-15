@@ -33,8 +33,8 @@ Maintain a run-local mapping of ticket, blockers, status, integrated commit, and
 2. Inspect `git worktree list --porcelain`, branch refs, and the destination. Create only the missing parent directories. If the path or proposed integration branch exists, stop for explicit resume or selection of a unique run suffix; never overwrite, reset, or reuse unrelated work.
 3. Verify `workspace/` is ignored by the harness repository with `git -C HARNESS_ROOT check-ignore -q workspace/`; when not ignored, stop and report rather than editing harness ignore files.
 4. Fetch the confirmed source remote/base and record its resolved commit as `BASE_COMMIT`; report fetch failures rather than using a stale base. Run `git -C SOURCE_ROOT worktree add -b INTEGRATION_BRANCH WORKTREE_PATH BASE_COMMIT`. Verify the worktree is clean and `HEAD` is on the new integration branch at that commit.
-5. Run all ticket implementation, commits, checks, the chore pass, and review fixes in `WORKTREE_PATH`. A delegated implementer receives that exact path/branch and one ticket; wait for completion and verify its result before another writer starts. Commit each verified ticket directly on the integration branch; no ticket-branch merge is needed. Preserve failed/incomplete changes and stop advancement.
-6. After final validation and a successful push, confirm the worktree is clean, the run is complete, and all local commits are present on the remote PR branch. Remove only that run-owned worktree with `git -C SOURCE_ROOT worktree remove WORKTREE_PATH`, without force. Preserve dirty, unpushed, or incomplete work and report its exact path/branch. Keep the integration branch; do not delete `WORKTREES_ROOT`.
+5. Run all ticket implementation, commits, checks, and the chore pass in `WORKTREE_PATH`. A delegated implementer receives that exact path/branch and one ticket; wait for completion and verify its result before another writer starts. Commit each verified ticket directly on the integration branch; no ticket-branch merge is needed. Preserve failed/incomplete changes and stop advancement.
+6. After final validation and a successful push, confirm the worktree is clean, implementation/chore work is complete, and all local commits are present on the remote PR branch. Remove only that run-owned worktree with `git -C SOURCE_ROOT worktree remove WORKTREE_PATH`, without force. Preserve dirty, unpushed, or incomplete work and report its exact path/branch. Keep the integration branch; do not delete `WORKTREES_ROOT`.
 
 ## Pull request lifecycle
 
@@ -45,17 +45,21 @@ Push to the confirmed Git remote with `git push --set-upstream REMOTE INTEGRATIO
 | Find existing PR | `gh pr list --repo SOURCE_REPOSITORY --head INTEGRATION_BRANCH --state open --json number,url,isDraft,baseRefName,headRefName` |
 | Open draft | `gh pr create --repo SOURCE_REPOSITORY --base BASE_BRANCH --head INTEGRATION_BRANCH --draft --title "TITLE" --body-file PR_FILE` |
 | Update coverage | `gh pr edit PR_NUMBER --repo SOURCE_REPOSITORY --body-file PR_FILE` |
-| Read PR | `gh pr view PR_NUMBER --repo SOURCE_REPOSITORY --json url,body,isDraft,baseRefName,headRefName,state` |
+| Read PR | `gh pr view PR_NUMBER --repo SOURCE_REPOSITORY --json url,title,body,headRefOid,isDraft,baseRefName,headRefName,state` |
 | Inspect checks | `gh pr checks PR_NUMBER --repo SOURCE_REPOSITORY` |
 | Mark ready | `gh pr ready PR_NUMBER --repo SOURCE_REPOSITORY` |
 
-Create the draft only after a verified ticket commit exists ahead of the base. Reuse a matching PR rather than duplicating it; preserve user-authored PR content when updating coverage. Use separate `Closes OWNER/REPO#NUMBER` lines with each issue's owning repository for the spec and each implemented ticket, including when tracker and source differ.
+Create the draft only after a verified ticket commit exists ahead of the base. Reuse a matching PR rather than duplicating it; preserve user-authored PR content when updating coverage. Use separate `Closes OWNER/REPO#NUMBER` lines for implemented tickets with their owning repositories. Reference the spec without a closing keyword until finalization gates pass; then add its closing reference. Never add closing references for skipped tickets.
+
+Use title `INITIATIVE_ID: <summary>`. Body must retain exactly one `Initiative: INITIATIVE_ID` and `Initiative source: <authoritative issue URL>`. Default source is the input GitHub spec URL; use an explicitly designated Jira source when supplied, verifying its key matches INITIATIVE_ID. Do not guess Jira from the ID shape. Preserve user text and these fields on every update; read title/body back and verify identity/source before cleanup.
+
+After confirmed worktree removal, invoke code review from SOURCE_ROOT. Review uses a temporary clone, not the removed worktree. Keep draft/spec open for review failure, unavailable initiative verification, posting failure, stale head or unresolved bug/initiative findings. Do not auto-fix during review.
 
 Read the final body, target/head branches, draft state, and check results back. Distinguish pending, failed, absent, and passed checks; required pending/failed checks block readiness. Do not claim a nonexistent check passed.
 
 ## Closure and cleanup
 
-Close each ticket with `gh issue close --reason completed` right after its commit and validation evidence are verified on the integration branch and the evidence comment is posted. Close the spec issue the same way only after all in-scope tickets are integrated and closed and the chore and review fixes are committed. Verify each closure with `gh issue view NUMBER --repo ISSUE_REPOSITORY --json state,stateReason`; if closing fails, report it and never claim closure. Never close an issue whose commit or validation is missing, or that was skipped, cancelled, or deferred. Closing keywords in the PR stay as a merge-time backstop. Do not merge the PR without separate user authorization.
+Close each ticket with `gh issue close --reason completed` right after its commit and validation evidence are verified on the integration branch and the evidence comment is posted. Close the spec issue the same way only after all in-scope tickets are integrated and closed and the chore result is verified/pushed and post-cleanup code review completed at the current head without unresolved bug/initiative findings or review blockers. Verify each closure with `gh issue view NUMBER --repo ISSUE_REPOSITORY --json state,stateReason`; if closing fails, report it and never claim closure. Never close an issue whose commit or validation is missing, or that was skipped, cancelled, or deferred. Closing keywords in the PR stay as a merge-time backstop. Do not merge the PR without separate user authorization.
 
 Use temporary Markdown body files outside the repository and remove only those created by this run. Follow **Single worktree lifecycle** for cleanup; retain dirty, unpushed, or incomplete work with an explicit report.
 

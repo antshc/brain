@@ -1,6 +1,6 @@
 # Posting inline comments
 
-For each finding, post `REVIEW_COMMENT` as an inline pull-request comment. Resolve `OWNER`, `REPO`, `PR_NUMBER`, exact manifest `FILE_PATH`, right-side `LINE_NUMBER`, and the reviewed `COMMIT_ID` before posting. Confirm the current PR head still equals that commit; stop on a mismatch.
+For each finding, post `REVIEW_COMMENT` as an inline pull-request comment. Resolve `OWNER`, `REPO`, `PR_NUMBER`, exact manifest `FILE_PATH`, right-side `LINE_NUMBER`, and the reviewed `COMMIT_ID` before posting. Confirm the current PR head still equals that commit and base still equals REVIEW_BASE; stop on a mismatch. Do not post findings with a null/non-commentable line; retain them as unposted with reason.
 
 Write the body verbatim to a unique temporary file. Build JSON with `jq --rawfile` and send it through `gh api --input -`, substituting the resolved values and body file path:
 
