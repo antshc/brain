@@ -77,7 +77,7 @@ Present a numbered list; per slice show:
 - **Type**: HITL | AFK
 - **Blocked by**: slices that must complete first
 - **Wave**: parallel execution wave
-- **Functional Requirements covered**: spec requirements addressed
+- **Functional Requirements covered**: spec requirement numbers addressed (full verbatim text is copied into each ticket in step 5)
 
 Then print the parallel map as `Wave n: {{slices}}`, uncovered requirements, and source conflicts.
 
@@ -96,7 +96,7 @@ Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 Before any write, confirm the approval guard holds for the current breakdown; otherwise return to step 4.
 
-Render each ticket body from [issue-template.md](./references/issue-template.md) verbatim — every section, each drafted per its `<...-rule>`.
+Render each ticket body from [issue-template.md](./references/issue-template.md) verbatim — every section, each drafted per its `<...-rule>`. Copy each addressed requirement's spec text verbatim into **Requirements addressed**; numbers alone are insufficient.
 
 Branch on mode:
 
