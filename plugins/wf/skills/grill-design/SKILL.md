@@ -23,9 +23,9 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 1. **Claim state** — load [track-ledger.md](./references/track-ledger.md) before ledger access. Resolve session storage and ownership using its protocol; restore the frontier, answers, pending writes, and blockers. An unknown owner starts fresh without overwriting the old ledger.
 2. **Check docs** — existence-check `ARCHITECTURE.md` and `GLOSSARY.md`. If either is missing, *Run `bootstrap-docs` skill to create missing ARCHITECTURE.md and GLOSSARY.md from bundled formats*, using **Mandatory creation**. Proceed only when both exist; otherwise apply *Gotchas*.
-3. **Load the index** — *Run `index-docs` skill to load the full ARCHITECTURE.md index of Trigger condition tables*, using **Load index** on `ARCHITECTURE.md` with `Summary` omitted; this covers every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. Log its `counts` as the ledger's `Index loaded` header. Script unavailable → read `ARCHITECTURE.md` with sequential file-view line ranges until EOF and count rows per table yourself; grep/search output, summaries, and truncated or elided output are not a read. MUST NOT scan/match until every row is loaded. Missing sections are optional, not gaps.
+3. **Load the index** — *Run `index-docs` skill to load the full ARCHITECTURE.md index of Trigger condition tables*, using **Load index** on `ARCHITECTURE.md` with `Summary` omitted; this covers every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. MUST use that operation's Python loader and consume every returned row; MUST NOT substitute manual reads, search, or counts-only output, even if simpler. Rationale: script counts and validation make completeness observable. Log per-table total/loaded counts and source in the ledger's `Index loaded` header. MUST NOT scan/match until every row is loaded; script unavailable or incomplete output → Index failure. Missing sections are optional, not gaps.
 4. **Seed the surface** — extract terms and concrete file/folder paths from the initial request; run *Scan and match*. On resume, apply only newly surfaced inputs; retain same-session match history, reloading needed evidence absent from context.
-5. **Interview** — restore or construct the dependency tree and its ready questions.
+5. **Interview** — restore or construct the dependency tree and its ready questions; apply *Decision states*, persist the ledger, and use the pre-question status below.
 
 ## Skill contracts
 
@@ -39,11 +39,13 @@ Integrate lookup evidence into the frontier and touched surface; integrate recor
 
 ## Interview
 
-Probe the design until the user confirms shared understanding. Map its dependencies as a **decision tree**. At each **round**, the **frontier** contains every unresolved decision whose prerequisites are settled; exclude questions that require an answer still pending in that round.
+Probe the design until the user confirms shared understanding. Maintain the full **decision tree** and **frontier** internally: every unresolved question whose prerequisites are settled. Hold questions with pending prerequisites.
 
-Before presenting the round, look up facts available from the environment and apply *Decision states*: a checklist-backed Feature Assumption leaves the frontier. Present every remaining ready decision, numbered with its stable ID, a descriptive title, and a recommended answer with reasoning. Phrase each question so **"yes" accepts its recommendation**; allow disagreement or another choice without treating silence as approval.
+Before selecting the next question, look up facts available from the environment and apply *Decision states*: a checklist-backed Feature Assumption leaves the frontier. Select one ready question with its stable ID, descriptive title, and recommended answer with reasoning. Phrase it so **"yes" accepts its recommendation**; allow disagreement or another choice without treating silence as approval.
 
-MUST present the whole ready frontier together as one numbered batch per round:
+Before **every question**, including fact-gap, term, ADR-scope, and close questions, persist updated state and print Concept/ADR index coverage (loaded/total rows), opened Concept/ADR record counts, and a clickable ledger link. Example: `Index: Concepts 42/42, ADRs 18/18 rows loaded. Opened records: Concepts 7, ADRs 3. [Assumptions and feature decisions](<ledger-location>)`. Index coverage is per source when block indexes are loaded; opened counts follow the ledger's deduplicated body-read history. Print known partial counts as incomplete on failure; never claim full coverage. Reuse confirmed counts/history without reloading unchanged indexes or bodies merely to print status. Use the host-supported clickable link for the actual persisted ledger; missing storage follows its failure protocol. MUST NOT reproduce assumptions or feature decisions before questions; the ledger is their review surface.
+
+**MUST ask one question at a time in ordinary conversation; MUST NOT use question/input tools.** Keep the current format:
 
 ```markdown
 ❓ **Q1** - **<title>**: <question phrased so yes accepts the recommendation>
@@ -53,26 +55,15 @@ MUST present the whole ready frontier together as one numbered batch per round:
 - **C** <option>
 
 ➡️ <recommended answer and reason>
-
----
-
-❓ **Q2** - **<title>**: <independent question>
-
-- **A** (Recommended) <option>
-- **B** <option>
-
-➡️ <recommended answer and reason>
 ```
 
-Record each answer inline and re-run triggered probes; withdraw or defer any remaining question invalidated by new evidence. Partial answers leave the unanswered questions pending, not implicitly accepted; present the remaining ready questions together, retaining IDs and recommendations.
+After every answer, record it and perform required inline writes; re-check triggered probes and affected decision keys. When the answer changes evidence or dependencies, rebuild assumptions and the frontier before selecting the next question. Withdraw obsolete questions, defer blocked ones, and preserve stable IDs. Unanswered questions remain pending, never implicitly accepted. Newly unblocked dependents become eligible immediately; do not wait for other frontier questions to be answered.
 
-After the round's outstanding questions are answered or explicitly deferred, rebuild the frontier from the changed tree. Newly unblocked dependents belong to the next round, not the round containing their prerequisites.
-
-Use the code-lookup contract to obtain environmental facts rather than asking the user to research them. Running lookups are unsettled prerequisites: hold their dependent questions and present the rest of the ready frontier without waiting. If a lookup fails or stays inconclusive, follow *Gotchas* rather than inventing a fact.
+Use the code-lookup contract to obtain environmental facts rather than asking the user to research them. Running lookups are unsettled prerequisites: hold their dependent questions and select one other ready question without waiting. If a lookup fails or stays inconclusive, follow *Gotchas* rather than inventing a fact. Index loading, lookups, and ledger/record writes still use their required tools.
 
 Before ending each turn, persist frontier changes, answers, evidence, blockers, and next action. During an active interview, end on the next question or explicit request to close; after a write, name the affected branches and return to questioning. If only running prerequisites remain, persist and report the wait without claiming the tree is resolved. An empty frontier is resolved only when no blocked prerequisites or unanswered questions remain.
 
-Before confirming shared understanding, report every Feature Decision, ADR decision, and Feature Assumption: one bullet each, 1–3 sentences explaining what and why, tagged `[decided]` or `[assumed]`. Include model-authored Concept repairs as assumptions. This report adds no approval gate; identify pending writes explicitly instead of implying everything is on disk. `git diff` is the record review surface.
+At closure, report every Feature Decision, ADR decision, and Feature Assumption: one bullet each, 1–3 sentences explaining what and why, tagged `[decided]` or `[assumed]`. Include model-authored Concept repairs as assumptions. This report adds no approval gate; identify pending writes explicitly instead of implying everything is on disk. `git diff` is the record review surface.
 
 ## Decision states
 
@@ -144,19 +135,19 @@ Extract mandates, prohibitions, open choices, and default clauses from the body 
 
 **Code cross-reference** — when the user states how something works, use the lookup contract to check user-facing, application, integration, and persistence boundaries: validation, constraints, models, schemas, contracts, relationships, and logic. Surface contradictions with both the claim/record anchor and code `path:line` or symbol evidence. A contradiction against a Concept/ADR is Drift; log both sources. Missing proof → label `unverified`, retain the fact gap, and avoid presenting it as an established contradiction.
 
-**Record inline** — resolve terms and architectural decisions in the turn answered, before the next round:
+**Record inline** — resolve terms and architectural decisions in the turn answered, before the next question:
 * Explicitly resolved term → use the record contract's `term` mode.
 * Explicitly resolved decision → load `adr` mode and check its gate; pass → write; miss → Feature Decision in the ledger.
 * Model resolution → Feature Assumption in the ledger, not an ADR.
 
-Existing Concept repairs belong to closing; other reusable rules remain ledger-only. Apply *Gotchas* when a write is blocked. Round boundaries do not delay authorized inline writes.
+Existing Concept repairs belong to closing; other reusable rules remain ledger-only. Apply *Gotchas* when a write is blocked. Question sequencing does not delay authorized inline writes.
 
 ## Gotchas
 
 - Required skill/tool unavailable or operation failed → report the operation, target, and error; block only dependent work. Retry a classified transient error at most twice. Missing skills, invalid inputs, and inconclusive evidence require resolution, not repeated identical calls.
 - Bootstrap failure → keep existing files, report partial creation, and block index-dependent assumptions and record writes until both docs exist. Continue only independent questioning.
 - Lookup failure/inconclusive result → ask for the missing fact, labelled **fact gap**. Record user-supplied evidence as such; conflicting or unverified facts remain blocked. An unknown fact is not a design decision.
-- Incomplete index load (**Load index** errors, truncated read, unread range, or missing `Index loaded` counts) → Index failure; re-load before matching.
+- Incomplete index load (Python loader unavailable/not run, **Load index** errors, truncated output, unread rows, or missing total/loaded counts) → Index failure; recover through **Load index** before matching. Manual reads and counts-only output cannot clear the blocker.
 - Index failure → treat matching/sync as incomplete, not "no matches". Block affected assumptions; preserve partial writes as pending sync.
 - Record failure/unavailable → persist the answer, intended mode/target, and blocker as `pending write`. If the ADR gate was unavailable, mark classification pending rather than assuming a Feature Decision. Resume the owning procedure after recovery; check existing state first to avoid duplicate records.
 - Missing session storage → apply the ledger's storage failure protocol; do not substitute an arbitrary repository file.
