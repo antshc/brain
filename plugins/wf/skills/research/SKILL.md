@@ -1,50 +1,66 @@
 ---
 name: research
-description: Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo, dispatching to a specialist research or inspection skill when one covers the subject. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a subagent.
+description: Investigates a question against primary sources — codebase, NuGet packages, cloud docs and CLIs, or the web — via discovered research-* specialists or subagents, saving cited findings as Markdown. Use to research a topic, gather docs or API facts, or delegate reading legwork.
 ---
 
 # Research
 
-## 1. Dispatch to a specialist
+## Inputs
 
-Specialists use two families. Each owns its sources, evidence rules, template, and output path — richer than anything the generic job below produces.
+- `@question` — what to research.
+- `@outputShape` [optional] — user-requested document count, diagram type, file path, framing.
 
-- `research-*` — research an external/domain subject against authoritative sources.
-- `inspect-*` — inspect a concrete as-built implementation or shipped artifact/dependency.
+## Constraints
 
-**Rule:** use `inspect-*` when the question is about what existing code, configuration, or a dependency actually does; use `research-*` when the answer comes from provider, platform, API, SDK, specification, or other authoritative external sources.
+- **MUST** delegate all reading to a subagent; this session only routes, briefs, and verifies. Rationale: keeps raw reading out of parent context. If delegation is unavailable, report the blocker; **MUST NOT** research directly.
+- **MUST** pass `@outputShape` to every subagent **verbatim**, as a constraint the specialist's defaults do not override. Paraphrase drops shape requirements.
+- Discover specialists from the roster, never hardcode them: scan available skills across every scope for names matching `research-*`, then judge each by its `description` and `compatibility` line.
 
-Discover both families, never hardcode individual skills: scan the available skills roster for every name matching `research-*` or `inspect-*`, then judge the question against each one's `description`, and against its `compatibility` line where it carries one.
+## Workflow
 
-- **One covers the question** → its job is to Run that skill over the question; stop here once the subagent reports back and its output passes Verify the delegated output.
-- **Several cover different parts** → one subagent per specialist, each over the part that specialist owns, each writing its own file.
-- **The best match names a tool or server in `compatibility` that this session lacks** → say which one is missing, then continue below.
-- **None covers it** → continue below.
+### 1. Classify sources
 
-**Dispatch shape** — set by the family, since the two read different sources:
+Split `@question` by the source that owns each part's answer:
 
-- `research-*`, and the generic job in 2 — delegate via `runSubagent`, omitting `agentName` so it inherits full tool access (including web fetch) rather than the codebase-only `Explore` agent, since the question reaches outside this repo. This keeps the raw reading out of this session's context; it doesn't run in the background, so the caller waits for its one final report.
-- `inspect-*` — Run `/explore-codebase` skill over the question, naming the chosen `inspect-*` skill as the one for its subagent to run and that skill's document as the output artifact. The engine owns delegation shape, target resolution, contract material, and tool selection; the specialist still owns its evidence rules, template, and output path.
+| Source | Covers |
+|---|---|
+| **codebase** | this repo, any deployable or supporting repo, installed NuGet packages — what existing code, config, or a dependency actually does |
+| **cloud** | provider service behavior, APIs, SDKs, IAM/RBAC, quotas, resource state — AWS, Azure, etc. |
+| **web** | other external docs, specs, standards, libraries |
 
-Pass the user's requested output shape — document count, diagram type, file path, framing — to the subagent **verbatim**, as a constraint the specialist's own defaults do not override. Paraphrasing it is how a shape requirement gets dropped.
+Done when every part of `@question` maps to one source.
 
-A specialist is only what the roster lists — a domain with no entry there is handled by the generic job.
+### 2. Match specialists
 
-## Verify the delegated output
+For each part, pick the `research-*` specialist whose description covers it. A specialist owns its sources, evidence rules, template, and output path. No match → that part uses the Generic brief.
 
-A subagent's summary is a claim about its output, not the output. Open the primary artifact it wrote and check it yourself before reporting completion:
+Best match lists a tool or server in `compatibility` the session lacks → state which is missing, then continue that part with the Generic brief.
 
-- **Path and count** — the file sits where the chosen skill's contract puts it, and the run wrote no extra files the contract did not ask for.
-- **Diagram type** — every diagram is the type the user or the skill's contract named, not whatever the subagent preferred.
-- **Placeholders** — no `{{…}}` token, `**Rules**` block, or unfilled template section survives in the result.
-- **Requested shape** — the verbatim constraints passed in are satisfied.
+### 3. Dispatch by source
 
-A failing check is a defect: repair it directly when the fix is mechanical, and re-dispatch with the violated constraint stated first when it needs the research redone. Report completion only once every check passes.
+One subagent per part; parts with no dependency run in parallel, each writing its own file.
 
-## 2. Generic job
+- **codebase** → **MUST** *run `explore-codebase` skill to delegate the read-only codebase lookup — multi-repo targets, installed NuGet packages, symbol, flow, and config evidence* — naming the matched specialist (e.g. `research-system`) as the skill for its subagent to run and that skill's document as the output artifact; with no specialist, pass the Generic brief as the instruction and its file as the output artifact. **MUST NOT** substitute a plain subagent or direct search. Rationale: the engine owns target resolution, the deployables index, graph coverage, and NuGet routing. If the skill is unavailable, report the blocker for that part.
+- **cloud** → delegate to a general-purpose subagent with full tool access (CLI, MCP docs servers, web fetch) that runs the matched specialist (e.g. `research-aws`, `research-azure`); the specialist owns CLI discovery and docs-MCP search.
+- **web** → delegate the Generic brief directly to a general-purpose subagent with full tool access, including web fetch — not a codebase-only explore agent.
 
-Its job:
+Every subagent returns one final report: output path, cited findings summary, unknowns.
 
-1. Investigate the question against primary sources — official docs, source code, specs, first-party APIs — not a secondary write-up of them. Follow every claim back to the source that owns it.
-2. Write the findings to a single Markdown file, citing each claim's source.
-3. Save it where the repo already keeps such notes (e.g. `docs/researches/`); match the existing convention, and if there is none, put it somewhere sensible and say where.
+### 4. Verify delegated output
+
+A subagent's summary is a claim, not the output. Open each artifact and check it against Completion criteria. Mechanical defect → repair directly. Needs research redone → re-dispatch with the violated constraint stated first.
+
+## Generic brief
+
+1. Investigate against primary sources — official docs, source code, specs, first-party APIs — never a secondary write-up. Trace every claim to the source that owns it.
+2. Cite each claim's source; mark unverified statements as assumptions or unknowns.
+3. Write one Markdown file where the repo keeps such notes (e.g. `docs/research/`); match the existing convention, otherwise pick a sensible path and report it.
+
+## Completion criteria
+
+- **Path and count** — each file sits where the chosen skill's contract (or the Generic brief) puts it; no extra files.
+- **Diagram type** — every diagram is the type the user or the skill's contract named.
+- **Placeholders** — no `{{…}}` token, `**Rules**` block, or unfilled template section remains.
+- **Evidence** — every claim cites its source or is marked as an assumption/unknown.
+- **Requested shape** — `@outputShape` constraints are satisfied.
+- **Coverage** — every part from Classify sources has an artifact or a reported blocker.

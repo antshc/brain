@@ -48,7 +48,7 @@ owns where a family's members are allowed to live and how discovery reaches acro
 
 ## Examples
 
-- `/research`'s discovery of `research-*` and `inspect-*` specialists from the roster, regardless of which plugin
+- `/research`'s discovery of `research-*` specialists from the roster, regardless of which plugin
   or repository defines them.
 
 ## Consequences
