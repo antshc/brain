@@ -53,8 +53,6 @@ Label nodes with the role or step plus one greppable trace keyword — a route p
 
 Default to one: triggers enter as parallel participants meeting at the convergence point, observable outcomes leave from it. Diagram selector and fallback edges, not the winning path alone. Split only when triggers diverge, selection needs a flowchart, outcomes fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
 
-Render the Mermaid block before declaring the inspection complete. Run `/render-mermaid-png` skill only when the user wants an exported image.
-
 ### Flow — cross-deployable slice chain
 
 Inspect how related functional slices connect across runtime or deployment boundaries. Name the capability and feature they realize. Each functional slice belongs to one **deployable** — something independently runnable or deployed in production: a process, service, container, function, host workload, or scheduled job — and each crossing identifies its contract. Trace breadth first across every outcome-relevant deployable whose executing source you can open, and end each branch at a system whose source you cannot or whose behavior is outside the framed outcome. Pick it when a flow crosses a process boundary, or when asked what handles a message next, where it ends, or what contract crosses the wire.
