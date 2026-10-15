@@ -32,6 +32,8 @@ Documents the system's Deployables and their responsibilities, how they interact
 
 Table of the system's Deployables, each with a short description of its purpose, where it lives, and a reference to its own record. The Trigger condition is a concise, comma-separated set of domain phrases matched semantically against the caller's touched surface. The link is a full harness record under `docs/building-blocks/`, or the repository's own documentation when that repository documents itself — `record-architecture`'s `building-block` mode owns which.
 
+<!-- rows: {{rowCount}} -->
+
 | Building block | Trigger condition | Summary | Location |
 |---|---|---|---|
 | **[{{buildingBlockName}}](docs/building-blocks/{{slug}}.md)** ({{mermaidComponentName}}) | {{triggerCondition}} | {{shortDescription}} <!-- terse, concise, optimized for agent navigation --> | `{{location}}` (e.g. `workspace/{{repo}}[/subpath]` or an absolute path) — `{{originUrl}}` |
@@ -64,6 +66,8 @@ An ADR records a point-in-time, localized decision — hard to reverse, surprisi
 
 <!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading; plain, unlinked text when the decision has no `docs/adr/` record. {{summary}}: 1-2 agent-optimized sentences stating the decision; for an unlinked row it is the whole decision. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: scoped choice or keyed conditional clauses for independently settled choices; preserve conditions, exceptions, and body anchors. -->
 
+<!-- rows: {{rowCount}} -->
+
 | Decision | Summary | Trigger condition & Default |
 |----------|---------|-----------------------------|
 | [{{decisionTitle}}](docs/adr/{{slug}}.md) | {{summary}} | **Trigger:** {{triggerCondition}}. **Default:** {{default}} |
@@ -79,6 +83,8 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 
 <!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{summary}}: 1-2 plain-text sentences describing what the Concept covers; no link. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: choice or keyed conditional clauses for independently settled choices; preserve scope, conditions, exceptions, and body anchors. Recording uses `record-architecture`'s `concept-record` mode. -->
 
+<!-- rows: {{rowCount}} -->
+
 | Concept | Summary | Trigger condition & Default |
 |---------|---------|-----------------------------|
 | **[{{conceptTitle}}](docs/concepts/{{kind}}-{{slug}}.md)** | {{summary}} | **Trigger:** {{triggerCondition}}. **Default:** {{default}} |
@@ -90,3 +96,4 @@ Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Auth
 - **One directional layering.** State the dependency direction explicitly and the prohibited references. The arrows are the contract.
 - **Index ADRs and Concepts.** Every record in `docs/adr/` and `docs/concepts/` appears in exactly one table — here or in its single building block's record — with a matching Trigger condition. An ADR row may stand alone, unlinked, when its Summary carries the whole decision. The tables are the entry point an agent scans before designing; nothing is added or retired without updating them.
 - **Link, don't inline.** Full ADR and Concept content stays in `docs/adr/` and `docs/concepts/` and is *linked* from the index, so the map stays scannable.
+- **Row-count marker.** Every table synced by **Sync index row** is preceded by `<!-- rows: N -->`, N = its data-row count; the sync keeps it current. Hand-authored tables carry none.

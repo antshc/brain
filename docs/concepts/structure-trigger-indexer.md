@@ -4,7 +4,7 @@
 
 Any markdown table with a Trigger condition column risks two failure modes if every caller re-implements its own
 logic: inconsistent scan/match behavior between callers, and rows drifting out of sync with the records they
-list. Centralizing trigger generation, semantic scan/match, and row synchronization behind one skill gives every
+list. Centralizing full index load, trigger generation, semantic scan/match, and row synchronization behind one skill gives every
 caller the same table contract and updates a row in the same change that changes its record.
 
 ## Rules
@@ -18,6 +18,8 @@ caller the same table contract and updates a row in the same change that changes
 - A row title or summary MUST NOT substitute for a missing trigger clause.
 - A row MUST be added, superseded, or retired in the same change as its underlying record.
 - Columns and cells the caller did not name MUST be preserved.
+- A full index load MUST return every row with per-table counts; a partial or truncated load MUST NOT be reported as complete.
+- A synced table MUST carry a `<!-- rows: N -->` marker kept equal to its row count; a load that finds a mismatch MUST fail.
 
 ## Design Guidance
 

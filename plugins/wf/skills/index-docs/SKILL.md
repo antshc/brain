@@ -1,6 +1,6 @@
 ---
 name: index-docs
-description: Maintains ARCHITECTURE.md structural prose and section skeletons; owns trigger-generation, scan/match, and row-sync for Markdown Trigger condition tables. Uses caller-supplied metadata for Deployables, ADRs, Concepts, or custom indexes; never creates the file or authors row content.
+description: Maintains ARCHITECTURE.md structural prose and section skeletons; owns full index load, trigger-generation, scan/match, and row-sync for Markdown Trigger condition tables. Uses caller-supplied metadata for Deployables, ADRs, Concepts, or custom indexes; never creates the file or authors row content.
 ---
 
 # Index Docs
@@ -18,7 +18,7 @@ Own `ARCHITECTURE.md`'s structural prose and its three indexes (`Deployables`, `
 Inputs: `{{sectionAnchor}}` (e.g. `Architecture Decision Records`, `Crosscutting Concepts`, the `Deployables` table under `Building blocks`); optionally `{{skeletonContent}}`.
 
 1. If `{{sectionAnchor}}` already exists in `ARCHITECTURE.md`, do nothing.
-2. Otherwise insert its skeleton — `{{skeletonContent}}` when the caller supplies one (custom tables), else the skeleton for that section from [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md) — at the position the template gives it.
+2. Otherwise insert its skeleton — `{{skeletonContent}}` when the caller supplies one (custom tables), else the skeleton for that section from [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md) — at the position the template gives it. A new synced table starts with `<!-- rows: 0 -->`.
 
 ## Sync Deployment View reference
 
@@ -36,6 +36,16 @@ Inputs: `{{recordContent}}`, `{{rowValues}}`, `{{domainGlossary}}`, `{{grillingC
 4. Prefer high-signal phrases and real domain synonyms. Cover each default's applicability without widening its policy scope; exceptions remain discoverable candidates too. Exclude generic phrases, title-only phrases, and the generation requirement itself.
 
 Return one Trigger condition value and report any default condition missing from an authoritative unchanged trigger; refinement needs the caller's explicit request. The caller writes it into the row via **Sync index row**.
+
+## Load index
+
+Input: `{{path}}` — the caller-supplied Markdown index (`ARCHITECTURE.md` or a building-block record); optionally `{{omitColumns}}`, `{{tableNames}}`.
+
+1. **Run `./scripts/load_index.py {{path}} [--omit-column "{{column}}"]... [--table "{{tableName}}"]... [--counts-only]` from this skill's base directory**, with the caller's repo root as CWD. Stdout is one JSON payload: `counts` per table, `totalRows`, `errors`, and `tables[].rows[]` with `title`, `link`, `trigger`, `default`, and remaining `cells`. Every table whose header contains `Trigger condition` is loaded; fenced examples are skipped.
+2. Output truncated or too large to read whole → re-run per table with `--table`; each table's rows MUST be read in full.
+3. Non-empty `errors` (exit 1: rows marker mismatch, malformed row, unknown table) or exit 2 (unreadable file) → index load failed; report the errors, never partial rows as complete.
+
+Return `counts` and the rows, or the errors.
 
 ## Scan and match
 
@@ -56,6 +66,7 @@ Inputs: `{{tableMetadata}}`, `{{rowMetadata}}`, `{{action}}` (`add`, `supersede`
 2. `supersede`: update only the named cells in the located row.
 3. `retire`: apply the caller's retirement marker to the located row.
 4. Preserve unspecified cells, unknown columns, existing rows.
-5. Apply the row change with the underlying record change. If metadata is missing or ambiguous, report it — do not guess.
+5. Set the `<!-- rows: N -->` marker above the table to its data-row count; add it if absent. Skip hand-authored tables.
+6. Apply the row change with the underlying record change. If metadata is missing or ambiguous, report it — do not guess.
 
 Return the updated row or a concise synchronization report.
