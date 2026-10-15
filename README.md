@@ -176,7 +176,7 @@ Code and technical solution review skills with modular standards and guidance.
 
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
-- [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; prefers Rubber Duck, routes models by PR size/risk, and posts evidence-backed findings. Initiative identity/source comes from PR metadata; review uses an isolated pinned clone.
+- [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; prefers Rubber Duck, routes models by PR size/risk, and posts evidence-backed findings. Initiative identity/source comes from PR metadata; accepts a user PR URL or an implement-spec call and fetches the diff into a fresh detached review worktree without cloning.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
 
 ### dig

@@ -53,7 +53,7 @@ Create the draft only after a verified ticket commit exists ahead of the base. R
 
 Use title `INITIATIVE_ID: <summary>`. Body must retain exactly one `Initiative: INITIATIVE_ID` and `Initiative source: <authoritative issue URL>`. Default source is the input GitHub spec URL; use an explicitly designated Jira source when supplied, verifying its key matches INITIATIVE_ID. Do not guess Jira from the ID shape. Preserve user text and these fields on every update; read title/body back and verify identity/source before cleanup.
 
-After confirmed worktree removal, invoke code review from SOURCE_ROOT. Review uses a temporary clone, not the removed worktree. Keep draft/spec open for review failure, unavailable initiative verification, posting failure, stale head or unresolved bug/initiative findings. Do not auto-fix during review.
+After confirmed worktree removal, invoke code review from SOURCE_ROOT. Pass the PR URL and SOURCE_ROOT. Review fetches the diff and creates a separate fresh detached worktree from that existing repository; it must not clone or reuse the removed implementation worktree. Keep draft/spec open for review failure, unavailable initiative verification, posting failure, stale head or unresolved bug/initiative findings. Do not auto-fix during review.
 
 Read the final body, target/head branches, draft state, and check results back. Distinguish pending, failed, absent, and passed checks; required pending/failed checks block readiness. Do not claim a nonexistent check passed.
 

@@ -6,9 +6,15 @@ argument-hint: '<PR_URL>'
 
 # Code review
 
+## Inputs
+
+- User invocation: PR URL, with an existing local checkout of the PR repository available.
+- Workflow invocation: `implement-spec` passes the PR URL and `SOURCE_ROOT` after removing its implementation worktree. The review skill creates a separate fresh review worktree.
+- Both entry points use the same acquisition, review, posting and cleanup workflow. Resolve a matching existing repository from explicit `SOURCE_ROOT`, caller checkout, or the harness workspace; ask for its path if absent/ambiguous. **MUST NOT** clone as a fallback.
+
 ## Workflow
 
-1. Parse `<PR_URL>` into `OWNER`, `REPO`, `PR_NUMBER`. Follow [Fetch PR diff](references/fetch-diff.md) from this skill's base directory. Continue only with a pinned `REVIEW_HEAD`, `REVIEW_BASE`, isolated `REVIEW_REPO`, `DIFF_DIR`, and complete path manifest.
+1. Parse `<PR_URL>` into `OWNER`, `REPO`, `PR_NUMBER`. Follow [Fetch PR diff](references/fetch-diff.md) from this skill's base directory. Continue only with a pinned `REVIEW_HEAD`, `REVIEW_BASE`, fresh detached `REVIEW_REPO` worktree, `DIFF_DIR`, and complete path manifest.
 2. Retain the fetched PR title/body as scope context. Fetch all inline comments with `gh api --paginate repos/OWNER/REPO/pulls/PR_NUMBER/comments`; retain paths, current/original lines, bodies, and IDs. Confirm the current head/base still match the snapshot; otherwise restart acquisition before delegation.
 3. Resolve the initiative gate in the parent using **only the PR body**:
    - Read one nonempty `Initiative: <id>` and optional `Initiative source: <issue URL or qualified reference>`. Conflicting/duplicate identities are ambiguous. Source identifies the authoritative description; an opaque ID requires a source. Without source, accept a qualified GitHub issue reference/URL or Jira key/URL as the ID. Never infer from title, branch, closing references, or unrelated tickets.
@@ -26,7 +32,7 @@ argument-hint: '<PR_URL>'
 
 5. Collect each result; record failure objects separately from successful findings arrays. Validate the output contract, axis-specific comment format, and diff anchors; return malformed findings to their reviewer for correction before posting. Deduplicate against existing comments and across axes by issue/root cause; use `FILE_PATH` + `LINE_NUMBER` to locate candidate duplicates, not to merge unrelated issues sharing a line. Keep only net-new, actionable findings.
 6. In the parent, post each retained `REVIEW_COMMENT` verbatim using [Posting](references/posting.md), resolved from this skill's base directory; do not reformat or add labels. Use the reviewed head commit and exact manifest path. If the PR head or base has changed, stop posting and report the stale review; do not attach old findings to a new commit. Record each returned comment ID. Do not submit a review.
-7. Report each axis as completed, skipped (reason), or failed; report posted comment IDs and any unposted findings or posting failures. Include retained findings and known existing bug/initiative concerns in the handoff; absence of net-new findings does not prove earlier comments resolved. A failed reviewer or post is not a clean review. Remove only the run-owned temporary clone/diff after results are retained; report cleanup failures.
+7. Report each axis as completed, skipped (reason), or failed; report posted comment IDs and any unposted findings or posting failures. Include retained findings and known existing bug/initiative concerns in the handoff; absence of net-new findings does not prove earlier comments resolved. A failed reviewer or post is not a clean review. After retaining results, follow the fetch reference’s Cleanup procedure to remove only the run-owned review worktree, diff and temporary refs; report preserved paths or cleanup failures.
 
 ## Shared review contract
 
