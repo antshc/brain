@@ -23,7 +23,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 1. **Claim state** — load [track-ledger.md](./references/track-ledger.md) before ledger access. Resolve session storage and ownership using its protocol; restore the frontier, answers, pending writes, and blockers. An unknown owner starts fresh without overwriting the old ledger.
 2. **Check docs** — existence-check `ARCHITECTURE.md` and `GLOSSARY.md`. If either is missing, *Run `bootstrap-docs` skill to create missing ARCHITECTURE.md and GLOSSARY.md from bundled formats*, using **Mandatory creation**. Proceed only when both exist; otherwise apply *Gotchas*.
-3. **Load the index** — read all of `ARCHITECTURE.md`, including every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. Use ranged reads until complete. Missing sections are optional, not gaps.
+3. **Load the index** — *Run `index-docs` skill to load the full ARCHITECTURE.md index of Trigger condition tables*, using **Load index** on `ARCHITECTURE.md` with `Summary` omitted; this covers every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. Log its `counts` as the ledger's `Index loaded` header. Script unavailable → read `ARCHITECTURE.md` with sequential file-view line ranges until EOF and count rows per table yourself; grep/search output, summaries, and truncated or elided output are not a read. MUST NOT scan/match until every row is loaded. Missing sections are optional, not gaps.
 4. **Seed the surface** — extract terms and concrete file/folder paths from the initial request; run *Scan and match*. On resume, apply only newly surfaced inputs; retain same-session match history, reloading needed evidence absent from context.
 5. **Interview** — restore or construct the dependency tree and its ready questions.
 
@@ -32,7 +32,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 | Operation | Invocation and inputs | Required result |
 |---|---|---|
 | Code/test lookup | *Run `explore-codebase` skill for read-only lookups locating symbols, tests, or how a flow works.* Supply the bounded question, target, depth, and read-only constraint. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
-| Index scan/sync | *Run `index-docs` skill for scan/match and row-sync of Markdown Trigger condition tables.* Supply the operation and its required metadata. | Matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
+| Index load/scan/sync | *Run `index-docs` skill for full index load, scan/match, and row-sync of Markdown Trigger condition tables.* Supply the operation and its required metadata. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
 | Record | *Run `record-architecture` skill for settled architecture ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
 
 Integrate lookup evidence into the frontier and touched surface; integrate record/index results into the ledger. Mark a record written only after the returned result confirms its persistence and required sync.
@@ -129,7 +129,7 @@ Re-check each probe's trigger after every user answer or new fact. A later answe
 **Scan and match** — append newly surfaced terms and repo-relative verbatim file/folder paths to the ledger, including lookup results.
 * Nothing new → reason over the current index; no scan or surface write.
 * New terms/paths → use the index contract's **Scan and match** on not-yet-opened global ADR, Concept, and Deployable rows, passing only the new surface plus the required questioning context and glossary.
-* Matched Deployable → open its record read-only, whether harness-owned under `docs/building-blocks/` or repo-owned documentation. Scan its Concepts and ADR tables; for repo-owned blocks, use their own architecture indexes. Deduplicate records across global and block tables by path.
+* Matched Deployable → open its record read-only, whether harness-owned under `docs/building-blocks/` or repo-owned documentation. Load its Concepts and ADR tables via **Load index** with the record path, then scan them; for repo-owned blocks, use their own architecture indexes. Deduplicate records across global and block tables by path.
 
 Matches are monotonic as surface grows: an opened record needs no matching re-scan. Skipped rows remain candidates when new surface arrives.
 
@@ -156,6 +156,7 @@ Existing Concept repairs belong to closing; other reusable rules remain ledger-o
 - Required skill/tool unavailable or operation failed → report the operation, target, and error; block only dependent work. Retry a classified transient error at most twice. Missing skills, invalid inputs, and inconclusive evidence require resolution, not repeated identical calls.
 - Bootstrap failure → keep existing files, report partial creation, and block index-dependent assumptions and record writes until both docs exist. Continue only independent questioning.
 - Lookup failure/inconclusive result → ask for the missing fact, labelled **fact gap**. Record user-supplied evidence as such; conflicting or unverified facts remain blocked. An unknown fact is not a design decision.
+- Incomplete index load (**Load index** errors, truncated read, unread range, or missing `Index loaded` counts) → Index failure; re-load before matching.
 - Index failure → treat matching/sync as incomplete, not "no matches". Block affected assumptions; preserve partial writes as pending sync.
 - Record failure/unavailable → persist the answer, intended mode/target, and blocker as `pending write`. If the ADR gate was unavailable, mark classification pending rather than assuming a Feature Decision. Resume the owning procedure after recovery; check existing state first to avoid duplicate records.
 - Missing session storage → apply the ledger's storage failure protocol; do not substitute an arbitrary repository file.

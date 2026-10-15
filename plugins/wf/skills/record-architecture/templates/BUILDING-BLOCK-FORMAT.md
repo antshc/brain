@@ -42,12 +42,16 @@
 
 <!-- `Concept | Summary | Trigger condition & Default` table, rows recorded through this skill's concept-record procedure into docs/concepts/ — this block's own Crosscutting Concepts. -->
 
+<!-- rows: 0 -->
+
 | Concept | Summary | Trigger condition & Default |
 |---------|---------|-----------------------------|
 
 ## Architecture Decision Records
 
 <!-- `Decision | Summary | Trigger condition & Default` table, rows recorded through this skill's adr procedure into docs/adr/ — ADRs applying to this block only. A row may be unlinked (plain Decision title, no record) when its Summary carries the whole decision. -->
+
+<!-- rows: 0 -->
 
 | Decision | Summary | Trigger condition & Default |
 |----------|---------|-----------------------------|

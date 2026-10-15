@@ -26,6 +26,8 @@ See [GLOSSARY.md](GLOSSARY.md) for the shared language.
 
 ## Architecture Decision Records
 
+<!-- rows: 7 -->
+
 | Decision | Summary | Trigger condition |
 |----------|---------|-------------------|
 | [Ralph is agent-agnostic](docs/adr/ralph-is-agent-agnostic.md) | Ralph depends only on an agent's exposed contract — invocation-directory workspace and five-field report — resolves ambient location once at the entry point, and synthesizes the report when an agent is substituted or skipped. | Ralph agent-handoff logic, a new Ralph-to-agent launch path, selecting an agent from task context, Ralph depending on an agent's internals, agent-unavailable substitution or skip, `HARNESS_REPO_PATH`/`CODEBASE_REPO_PATH` resolution, resolving ambient location more than once, OS-specific shell syntax in a `ralph` skill |
@@ -37,6 +39,8 @@ See [GLOSSARY.md](GLOSSARY.md) for the shared language.
 | [Crew agents use `include-custom-instructions: true` to load repository instructions](docs/adr/crew-agents-uses-instructions.md) | Crew agents set `include-custom-instructions: true` so subagents load the repository's unconditional and `applyTo`-scoped instruction files without an agent-authored gate. | subagents missing repository instructions, `include-custom-instructions` frontmatter, crew agents loading `.instructions.md` files, a per-agent coding-convention gate, restating conventions in a subagent prompt |
 
 ## Crosscutting Concepts
+
+<!-- rows: 16 -->
 
 | Concept | Summary | Trigger condition & Default |
 |---------|---------|-----------------------------|
