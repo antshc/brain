@@ -5,6 +5,8 @@ every method name is the Scenario in snake_case.
 When a test or scenario changes, update both sides to stay in sync.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from modules.repo_consistency.skill_invocations import find_dangling_skill_invocations
@@ -39,6 +41,25 @@ class TestSkillInvocationResolution:
         assert len(violations) == 1
         assert violations[0].file.endswith("caller/SKILL.md")
         assert "ghost-skill" in violations[0].message
+
+    def test_skill_invocation_naming_a_generated_skill_template_is_not_reported(self, tmp_path):
+        # Scenario: Skill invocation naming a generated skill template is not reported
+        _write_skill(tmp_path, "demo", "caller", "Run `/generated` skill.")
+        template = tmp_path / "plugins/demo/skills/caller/adapter.SKILL.template.md"
+        template.write_text("---\nname: generated\ndescription: generated skill.\n---\n", encoding="utf-8")
+
+        assert find_dangling_skill_invocations(tmp_path) == []
+
+    def test_template_body_text_does_not_declare_a_generated_skill(self, tmp_path):
+        # Scenario: Template body text does not declare a generated skill
+        _write_skill(tmp_path, "demo", "caller", "Run `/ghost` skill.")
+        template = tmp_path / "plugins/demo/skills/caller/ghost.SKILL.template.md"
+        template.write_text("# Sketch\nname: ghost\n", encoding="utf-8")
+
+        violations = find_dangling_skill_invocations(tmp_path)
+
+        assert len(violations) == 1
+        assert "ghost" in violations[0].message
 
     def test_backticked_filesystem_paths_are_not_skill_invocations(self, tmp_path):
         # Scenario: Backticked filesystem paths are not skill invocations

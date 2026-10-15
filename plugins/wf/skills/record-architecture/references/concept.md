@@ -177,8 +177,8 @@ The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skil
 
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
 2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
-3. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the rendered body as `{{recordContent}}`.
-4. Author `default` yourself — one sentence naming the choice to take when the design doesn't state one. A caller-supplied, user-confirmed `default` (from `define-concept`) is used verbatim.
+3. Load [defaults.md](./defaults.md) and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `define-concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
+4. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.
 5. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
 
 Superseding or retiring a Concept applies the marker to its index row via the same **Sync index row** call; the record itself carries no status field.
