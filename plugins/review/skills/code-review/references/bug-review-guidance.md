@@ -18,11 +18,6 @@ Exclude speculation, unrelated pre-existing bugs, intentional changes without de
 
 ## Comment format
 
-`[P0–P3] Imperative title` followed by one concise paragraph: trigger → incorrect behavior → impact → smallest correction. Cite exact symbols/code evidence; anchor the smallest relevant changed right-side line. One actionable defect per comment.
+Start with a concise imperative title, followed by one paragraph: trigger → incorrect behavior → impact → smallest correction. **MUST NOT** add severity/priority markers (such as `[P0]`, `[P1]`, `[P2]`, `[P3]`) or any classification prefix to the title or body. Cite exact symbols/code evidence; anchor the smallest relevant changed right-side line. One actionable defect per comment.
 
-- P0: universal critical failure/release blocker, independent of special inputs.
-- P1: urgent material defect.
-- P2: ordinary actionable defect.
-- P3: lower-impact defect worth fixing.
-
-Return every qualifying net-new defect, highest priority first; no five-finding limit. Return `[]` only after complete review with no qualifying net-new findings. Quality/design suggestions belong to other axes.
+Return every qualifying net-new defect, ordered by impact; no five-finding limit. Return `[]` only after complete review with no qualifying net-new findings. Quality/design suggestions belong to other axes.
