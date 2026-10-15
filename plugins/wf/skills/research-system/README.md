@@ -1,6 +1,6 @@
-# Inspect System
+# Research System
 
-Prompt examples and recommendations for getting precise, evidence-backed results from the `inspect-system` skill.
+Prompt examples and recommendations for getting precise, evidence-backed results from the `research-system` skill.
 
 ## Write a strong instruction
 
