@@ -21,7 +21,7 @@ One entry per repo-relative record path; update in place. Paths, not row numbers
 * `{{path}} — opened, direct: {{topic}}`
 * `{{path}} — skipped, checked "{{clause1}}", "{{clause2}}": no match`
 
-Return the written line. `opened` preserves match history, not a guarantee that the body remains in context. Derive separate opened Concept and ADR counts from unique record paths with a confirmed successful body read in this session, including restored same-session history. Deduplicate global/block references and repeat reads; exclude index-only, skipped, failed, and unread records. Counts are cumulative body-read history, not records currently in context or records authored without a body read; do not reopen files just to count them.
+Return the written line. `opened` preserves match history, not a guarantee that the body remains in context. Derive separate opened Deployable, Concept, and ADR counts from unique record paths with a confirmed successful body read in this session, including restored same-session history. Deduplicate global/block references and repeat reads; exclude index-only, skipped, failed, and unread records. Counts are cumulative body-read history, not records currently in context or records authored without a body read; do not reopen files just to count them.
 
 ## Append surface term
 
