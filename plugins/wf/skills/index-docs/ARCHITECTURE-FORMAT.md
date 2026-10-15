@@ -62,7 +62,7 @@ References the `DEPLOYMENT.md` file that documents where the building blocks run
 
 An ADR records a point-in-time, localized decision — hard to reverse, surprising without context, and the result of a real trade-off. ADRs applying to exactly one Deployable are indexed in that block's record instead. Recording uses `record-architecture`'s `adr` mode.
 
-<!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading; plain, unlinked text when the decision has no `docs/adr/` record. {{summary}}: 1-2 agent-optimized sentences stating the decision; for an unlinked row it is the whole decision. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: one sentence naming the choice to take within the ADR's scope when the design doesn't state one. -->
+<!-- One row per ADR. {{slug}}: file identity. {{decisionTitle}}: identical to the ADR heading; plain, unlinked text when the decision has no `docs/adr/` record. {{summary}}: 1-2 agent-optimized sentences stating the decision; for an unlinked row it is the whole decision. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: scoped choice or keyed conditional clauses for independently settled choices; preserve conditions, exceptions, and body anchors. -->
 
 | Decision | Summary | Trigger condition & Default |
 |----------|---------|-----------------------------|
@@ -77,7 +77,7 @@ This section describes crosscutting concepts (practices, patterns, regulations, 
 Topics: Architecture Patterns, Design & Coding Patterns, Logging & Tracing, Authorization & Authentication, Configuration, Integration & Communication, Exception & Error Handling, Parallel/Batch Processing
 -->
 
-<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{summary}}: 1-2 plain-text sentences describing what the Concept covers; no link. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: one sentence naming the choice to take when the design doesn't state one. Recording uses `record-architecture`'s `concept-record` mode. -->
+<!-- One row per crosscutting Concept — shared business-process, structural, or operational rules. {{kind}}-{{slug}}: file identity, `{{kind}}` being `dom`, `str`, or `ops`. {{conceptTitle}}: title. {{summary}}: 1-2 plain-text sentences describing what the Concept covers; no link. {{triggerCondition}}: concise, comma-separated domain phrases that would naturally arise while questioning the change; a blank one never matches. {{default}}: choice or keyed conditional clauses for independently settled choices; preserve scope, conditions, exceptions, and body anchors. Recording uses `record-architecture`'s `concept-record` mode. -->
 
 | Concept | Summary | Trigger condition & Default |
 |---------|---------|-----------------------------|
