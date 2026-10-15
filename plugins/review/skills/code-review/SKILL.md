@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: 'Reviews GitHub pull requests for bugs, quality attributes, code smells, and initiative coverage using independent reviewers. Selects agents/models by PR risk and posts evidence-backed inline comments.'
+description: 'Reviews GitHub pull requests for bugs, quality attributes, code smells, and initiative coverage using independent reviewers. Selects models by PR risk and posts evidence-backed inline comments.'
 argument-hint: '<PR_URL>'
 ---
 
@@ -22,7 +22,7 @@ argument-hint: '<PR_URL>'
    - Fetch GitHub `title,body` with explicit repository or Jira's full description in the parent. Pass resolved identity and description to the reviewer; retain the resolved source internally without adding it to the PR description.
    - Require a successfully fetched, non-whitespace description; ADF requires nonempty text content, not just a document wrapper. Pass resolved identity, source, and full description to the initiative reviewer. Titles, comments, metadata, and local spec files do not substitute.
    - Spawn `initiative` only when this gate passes. Otherwise record `skipped` with missing, ambiguous, empty, or inaccessible input and continue independent axes; this is unavailable initiative verification, not a pass.
-4. Follow [Reviewer selection](references/reviewer-selection.md) before delegation. Record PR size, complexity triggers, selected agent/model, and fallbacks. Spawn one fresh read-only subagent per eligible axis, in parallel. Give each `REVIEW_REPO`, `REVIEW_HEAD`, `REVIEW_BASE`, `DIFF_DIR` and manifest, PR context, existing comments, shared contract, and absolute axis-reference path. Each reviews the complete change for its axis and returns posting-ready JSON. **MUST NOT** reuse implementer/chore contexts or substitute parent review when delegation is unavailable; report the blocker. Rationale: independent review context limits implementation bias. Subagents must not refetch/check out the diff, edit source, commit, push, or post.
+4. Follow [Reviewer selection](references/reviewer-selection.md) before delegation. Record PR size, complexity triggers, selected model, and fallbacks. Spawn one fresh read-only subagent per eligible axis, in parallel. Give each `REVIEW_REPO`, `REVIEW_HEAD`, `REVIEW_BASE`, `DIFF_DIR` and manifest, PR context, existing comments, shared contract, and absolute axis-reference path. Each reviews the complete change for its axis and returns posting-ready JSON. **MUST NOT** reuse implementer/chore contexts or substitute parent review when delegation is unavailable; report the blocker. Rationale: independent review context limits implementation bias. Subagents must not refetch/check out the diff, edit source, commit, push, or post.
 
    | Axis | Spawn condition | Reference and extra input |
    |---|---|---|
@@ -52,6 +52,6 @@ argument-hint: '<PR_URL>'
 
 ## Completion criteria
 
-- Bugs, quality, and code smells each ran in a fresh subagent with recorded agent/model selection and outcomes; initiative ran only when the PR-body initiative-description gate passed, otherwise its skip reason is explicit.
+- Bugs, quality, and code smells each ran in a fresh subagent with recorded model selection and outcomes; initiative ran only when the PR-body initiative-description gate passed, otherwise its skip reason is explicit.
 - Every posted finding has a validated manifest path, right-side diff line, reviewed commit, and returned comment ID; duplicates are excluded and no review was submitted.
 - Run a closing completeness sweep across eligible axes, initiative requirements, and retained findings. Account for every skipped, failed, or unposted item before reporting completion.
