@@ -1,6 +1,6 @@
 # Reviewer selection
 
-Resolve before spawning. Prefer the runtime's available Rubber Duck agent for each axis; otherwise use a general read-only reviewer and record the fallback. Do not install or invent an agent. Fresh context per axis; the axis contract remains authoritative.
+Resolve before spawning. Use a fresh, general-purpose read-only review subagent for each eligible axis. Do not install or invent an agent. Fresh context per axis; the axis contract remains authoritative.
 
 ## Model routing
 
