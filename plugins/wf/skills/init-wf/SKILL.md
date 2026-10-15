@@ -1,6 +1,6 @@
 ---
 name: init-wf
-description: One-time wf setup — confirms repository topology, seeds Copilot instructions, bootstraps ARCHITECTURE.md/CONTEXT.md, and creates GitHub issue labels. Use before the workflow or in labels-only mode to repair missing labels.
+description: One-time wf setup — confirms repository topology, seeds Copilot instructions, bootstraps ARCHITECTURE.md/GLOSSARY.md, and creates GitHub issue labels. Use before the workflow or in labels-only mode to repair missing labels.
 disable-model-invocation: true
 ---
 
@@ -38,7 +38,7 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 3. Bootstrap the docs
 
-*Run `bootstrap-docs` skill for ARCHITECTURE.md and CONTEXT.md existence-and-creation mechanics* at the docs root (reporoot for a wrapping repo).
+*Run `bootstrap-docs` skill for ARCHITECTURE.md and GLOSSARY.md existence-and-creation mechanics* at the docs root (reporoot for a wrapping repo).
 
 ## 4. Set up GitHub labels
 
@@ -49,5 +49,5 @@ Follow [github.md](./github.md) **Setup labels**. Done when all eight baseline l
 - Topology confirmed; `workspace/` split (if any) set up.
 - For a wrapping repo, `.github/skills/harness/` exists (the `harness` skill, its settings file, and its pull command) at the harness root.
 - Copilot instructions seeded in `.github/copilot-instructions.md`, placeholders resolved, no duplicate sections.
-- `ARCHITECTURE.md` and `CONTEXT.md` exist.
+- `ARCHITECTURE.md` and `GLOSSARY.md` exist.
 - All eight GitHub baseline labels exist; labels-only mode requires only this condition.

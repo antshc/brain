@@ -1,11 +1,11 @@
-# CONTEXT.md Format
+# GLOSSARY.md Format
 
 ## Structure
 
 ```md
 # {{contextName}}
 
-<!-- Location: optional, only if multiple contexts in the CONTEXT.md file. Path to the module directory covered by the context, relative to the repo root. -->
+<!-- Location: optional, only if multiple contexts in the GLOSSARY.md file. Path to the module directory covered by the context, relative to the repo root. -->
 Location: {{modulePath}}
 
 {{contextDescription}} <!-- one or two sentence description of what this context is and why it exists -->
@@ -25,7 +25,7 @@ A person or organization that places orders.
 _Avoid_: Client, buyer, account
 
 # Relationships
-<!-- exists only if multiple contexts in the CONTEXT.md -->
+<!-- exists only if multiple contexts in the GLOSSARY.md -->
 - **{{producerContext}} → {{consumerContext}}**: {{producerContext}} emits `{{eventName}}` events; {{consumerContext}} consumes them to start picking/processing/etc.
 - **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
 - **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices

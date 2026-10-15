@@ -9,7 +9,7 @@ Own the interview and session design state: when to look up, log, ask, or write.
 
 ## Scope
 
-Produce **questions** and **records**. Writable surface: `CONTEXT.md`, `ARCHITECTURE.md`, `docs/adr/**`, `docs/concepts/**`, `docs/building-blocks/**`, and the session ledger. Source code, tests, configuration, and scaffolding **MUST remain read-only** throughout the grill.
+Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITECTURE.md`, `docs/adr/**`, `docs/concepts/**`, `docs/building-blocks/**`, and the session ledger. Source code, tests, configuration, and scaffolding **MUST remain read-only** throughout the grill.
 
 **Concepts are consumed, not discovered.** Match, open, and apply existing Concepts; repair wrong defaults, drifted keys, and missing trigger clauses during closing. MUST NOT author or offer new Concepts, or count rule occurrences to discover them. Rules with no existing owner stay in the ledger.
 
@@ -22,7 +22,7 @@ Produce **questions** and **records**. Writable surface: `CONTEXT.md`, `ARCHITEC
 ## Session start
 
 1. **Claim state** — load [track-ledger.md](./references/track-ledger.md) before ledger access. Resolve session storage and ownership using its protocol; restore the frontier, answers, pending writes, and blockers. An unknown owner starts fresh without overwriting the old ledger.
-2. **Check docs** — existence-check `ARCHITECTURE.md` and `CONTEXT.md`. If either is missing, *Run `bootstrap-docs` skill to create missing ARCHITECTURE.md and CONTEXT.md from bundled formats*, using **Mandatory creation**. Proceed only when both exist; otherwise apply *Gotchas*.
+2. **Check docs** — existence-check `ARCHITECTURE.md` and `GLOSSARY.md`. If either is missing, *Run `bootstrap-docs` skill to create missing ARCHITECTURE.md and GLOSSARY.md from bundled formats*, using **Mandatory creation**. Proceed only when both exist; otherwise apply *Gotchas*.
 3. **Load the index** — read all of `ARCHITECTURE.md`, including every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. Use ranged reads until complete. Missing sections are optional, not gaps.
 4. **Seed the surface** — extract terms and concrete file/folder paths from the initial request; run *Scan and match*. On resume, apply only newly surfaced inputs; retain same-session match history, reloading needed evidence absent from context.
 5. **Interview** — restore or construct the dependency tree and its ready questions.
@@ -110,13 +110,13 @@ Unknown applicability alone creates a fact-gap prerequisite, not a policy decisi
 - Do not duplicate information already available through those pointers. In questions, reports, lookup briefs, and handoffs, link the source and state only the new question, decision, change, or uncertainty; keep required recommendations and decision summaries concise.
 - Prefer the code-lookup contract for broad code/test searches; use direct reads for a known evidence location.
 - Re-fetch an artifact when first needed or when its required evidence is no longer available in context. Prefer reuse after a confirmed write; re-read when verification or a detected change requires it, not on a schedule.
-- Authority: `CONTEXT.md` / `ARCHITECTURE.md` / ADR / Concept > code > external sources. Surface unresolved conflicts, including conflicts within the same rank; apply only explicit recorded overrides, otherwise ask rather than silently choosing an authority.
+- Authority: `GLOSSARY.md` / `ARCHITECTURE.md` / ADR / Concept > code > external sources. Surface unresolved conflicts, including conflicts within the same rank; apply only explicit recorded overrides, otherwise ask rather than silently choosing an authority.
 
 ## Probes
 
 Re-check each probe's trigger after every user answer or new fact. A later answer can invalidate an earlier interpretation.
 
-**Glossary conflict** — when the user's term clashes with `CONTEXT.md`, cite the definition and ask which meaning applies.
+**Glossary conflict** — when the user's term clashes with `GLOSSARY.md`, cite the definition and ask which meaning applies.
 
 **Fuzzy language** — when a term is vague or overloaded, propose a precise canonical term and resolve it with the user.
 

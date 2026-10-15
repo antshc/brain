@@ -15,7 +15,7 @@
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code or the spec.
 - Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions.
-- Use the domain language of the spec or `CONTEXT.md`; apply the solution-agnostic rule — no file paths, class/variable names, or other implementation details.
+- Use the domain language of the spec or `GLOSSARY.md`; apply the solution-agnostic rule — no file paths, class/variable names, or other implementation details.
 - State the exact expected outcome — never vague words like "works", "correctly", "properly", "as expected".
 - Fold every applicable Business Rule (`If {{condition}}, {{invariant}}`), Edge Case (`{{boundaryCondition}} → {{expectedHandling}}`), and relevant error condition into its own criterion here, rephrased per the format above — do not create separate sections for them.
 </acceptance-criteria-rule>
