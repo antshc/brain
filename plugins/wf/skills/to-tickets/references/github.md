@@ -28,7 +28,7 @@ List all children, including closed ones:
 gh api --paginate repos/{{trackerRepository}}/issues/{{specIssueNumber}}/sub_issues?per_page=100
 ```
 
-Map approved slices to existing child titles, bodies, and type labels. Reuse an unambiguous matching ticket; conflicting matches require user resolution. After interrupted creation, also inspect unlinked issues with the routing label and matching title/parent-spec content before creating replacements. A created issue remains recorded even if its parent-link request failed.
+Map approved slices to existing child titles and bodies; labels do not encode HITL/AFK type. Reuse an unambiguous matching ticket; conflicting matches require user resolution. After interrupted creation, also inspect unlinked issues with the routing label and matching title/parent-spec content before creating replacements. A created issue remains recorded even if its parent-link request failed.
 
 ## Create sub-ticket
 

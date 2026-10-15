@@ -69,7 +69,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 ## Contracts Delta
 <!-- Omit this section entirely if this slice touches no API, Database, or Resource contract. -->
 
-Run `/doc-contracts` skill once per touched contract kind (API, Database, Resource) and inline its output verbatim here, one block per kind.
+*Run `doc-contracts` skill once per touched contract kind (API, Database, Resource) to write the REST endpoint, table schema, or resource contract delta as a terse diff;* inline its output verbatim here, one block per kind.
 
 ## Affected layers & modules
 <affected-layers-rule>
