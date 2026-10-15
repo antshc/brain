@@ -20,10 +20,11 @@ Use `gh` for GitHub I/O and Git for branches/worktrees.
 | List child tickets | `gh api --paginate repos/ISSUE_REPOSITORY/issues/PARENT/sub_issues` |
 | List blockers | `gh api --paginate repos/ISSUE_REPOSITORY/issues/NUMBER/dependencies/blocked_by` |
 | Record integrated evidence | `gh issue comment NUMBER --repo ISSUE_REPOSITORY --body-file EVIDENCE_FILE` |
+| Close implemented issue | `gh issue close NUMBER --repo ISSUE_REPOSITORY --reason completed --comment "Implemented in COMMIT_SHA on INTEGRATION_BRANCH (PR_URL)."` |
 
 Read every page. Resolve explicit parent/blocker references in issue bodies too; honor explicit repository qualifiers for external issues. Tickets inherit the spec's source/base; conflicting ticket routing requires resolution. Use text relationships only when native capabilities are confirmed unavailable, and report that mode. A 404 alone can mean an inaccessible or incorrect resource; do not silently interpret it as an empty graph.
 
-Maintain a run-local mapping of ticket, blockers, status, integrated commit, and validation evidence, with the single shared worktree/branch recorded once. GitHub issues can stay open while their implementation is integrated. Schedule one ticket at a time; dependants require committed, validated blocker implementations on the integration branch. Do not use open-issue counts alone as the frontier.
+Maintain a run-local mapping of ticket, blockers, status, integrated commit, and validation evidence, with the single shared worktree/branch recorded once. Tickets are closed as completed once their implementation is integrated (see **Closure and cleanup**); a ticket closed by this run counts as satisfied. Schedule one ticket at a time; dependants require committed, validated blocker implementations on the integration branch. Do not use open-issue counts alone as the frontier.
 
 ## Single worktree lifecycle
 
@@ -53,12 +54,12 @@ Read the final body, target/head branches, draft state, and check results back. 
 
 ## Closure and cleanup
 
-Closing keywords close issues only after merge into the default branch, not when the PR is created or marked ready. For other targets, explain the outstanding closure step. Do not merge or close issues without separate user authorization.
+Close each ticket with `gh issue close --reason completed` right after its commit and validation evidence are verified on the integration branch and the evidence comment is posted. Close the spec issue the same way only after all in-scope tickets are integrated and closed and the review fixes are committed. Verify each closure with `gh issue view NUMBER --repo ISSUE_REPOSITORY --json state,stateReason`; if closing fails, report it and never claim closure. Never close an issue whose commit or validation is missing, or that was skipped, cancelled, or deferred. Closing keywords in the PR stay as a merge-time backstop. Do not merge the PR without separate user authorization.
 
 Use temporary Markdown body files outside the repository and remove only those created by this run. Follow **Single worktree lifecycle** for cleanup; retain dirty, unpushed, or incomplete work with an explicit report.
 
 ## Gotchas
 
-- A closed issue may be cancelled or duplicate rather than implemented; verify the result exists in the integration base.
+- A closed issue may be cancelled or duplicate rather than implemented; verify the result exists in the integration base or integration branch. On resume, a ticket closed by an earlier run is satisfied only if its commit is on the integration branch.
 - A ticket commit is not complete until the cumulative integration result passes relevant checks.
 - Treat external blockers separately from run-local integrated work; never bypass unresolved external dependencies.
