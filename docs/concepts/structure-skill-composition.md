@@ -44,7 +44,7 @@ agent never needs to find. This Concept fixes how a capability is divided and ho
   compatibility rather than a hardcoded list.
 - **Split extension responsibilities** - A specialist owns its subject-specific procedure and contract; the main
   skill owns family discovery, routing, and the shared continuation or verification. `/research` applies this
-  with `research-*` and `inspect-*` so a new matching specialist changes available behaviour without adding a
+  with `research-*` so a new matching specialist changes available behaviour without adding a
   hardcoded branch to `/research`.
 - **Keep adjacent concerns separate** - This record owns division and call style. The
   [resource-access concept](structure-resource-access-skill.md) owns what an infrastructure-access skill
