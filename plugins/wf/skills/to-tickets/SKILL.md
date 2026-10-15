@@ -73,7 +73,7 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 
 Derive the **parallel map** from Blocked by: wave 1 = slices with no blockers; wave n = slices whose blockers all sit in earlier waves. Slices in one wave run in parallel. Present it as `Wave n: {{slices}}`.
 
-Ask the user:
+Ask the user in ordinary conversation; MUST NOT use question/input tools:
 
 - Does the granularity feel right? (too coarse / too fine)
 - Are the dependency relationships and waves correct? Would any wave have two slices editing the same code (merge them or add a blocker)?
