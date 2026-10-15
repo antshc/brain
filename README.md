@@ -144,7 +144,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
-- [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`CONTEXT.md` and their indexes in sync.
+- [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`GLOSSARY.md` and their indexes in sync.
 - [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for GitHub issue labels and doc layout; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research/bootstrap-docs remain local, and other skills retain their Jira workflows.
 
 ### crew

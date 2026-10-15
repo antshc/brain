@@ -9,7 +9,7 @@ Create only the required sections below. Omit optional Building blocks, Deployme
 
 ## Context
 
-See [CONTEXT.md](CONTEXT.md) for the shared language.
+See [GLOSSARY.md](GLOSSARY.md) for the shared language.
 ```
 
 - `{{systemSummary}}`: 1-3 sentences on the system, architectural style, and core technology stack, using only known facts.

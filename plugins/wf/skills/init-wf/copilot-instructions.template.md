@@ -2,11 +2,11 @@
 
 ## 1. Scope and repository topology
 
-The reporoot itself plays the role of the **harness** for coding agents: context (`CONTEXT.md`, `ARCHITECTURE.md`), architectural Concepts (`docs/concepts/`), agent conventions (`.harness.json.user`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
+The reporoot itself plays the role of the **harness** for coding agents: context (`GLOSSARY.md`, `ARCHITECTURE.md`), architectural Concepts (`docs/concepts/`), agent conventions (`.harness.json.user`), and the tool/action layer (`.github/skills/`, `.github/prompts/`, and the MCP servers/CLIs in [Tools](#8-tools)) all live here, while `workspace/` holds the subject the harness operates on.
 
 This repo (the **reporoot**) is the **documentation/context repo**, not the codebase.
 
-- **Docs & decisions live at the reporoot:** `CONTEXT.md` (domain glossary) and `ARCHITECTURE.md` (ADR/Concept indexes and high-level source structure), with ADRs under `docs/adr/` (localized decisions) and Crosscutting Concepts under `docs/concepts/` (shared domain, structural, and operational approaches).
+- **Docs & decisions live at the reporoot:** `GLOSSARY.md` (domain glossary) and `ARCHITECTURE.md` (ADR/Concept indexes and high-level source structure), with ADRs under `docs/adr/` (localized decisions) and Crosscutting Concepts under `docs/concepts/` (shared domain, structural, and operational approaches).
 - **Source code ({{project}}) & git worktrees live in `workspace/`** (git-ignored by the reporoot). The source hierarchy is documented under **Codebase Structure** in `ARCHITECTURE.md`.
 
 Within this file, resolve conflicts in this order: **safety and repository targeting → authoritative sources → navigation → build and validation → documentation conventions.** This ordering scopes only the rules in this file; it does not override `AGENTS.md`, path-scoped instructions, or user instructions. Avoid authoring rules that conflict across instruction files.
@@ -15,7 +15,7 @@ Within this file, resolve conflicts in this order: **safety and repository targe
 
 You MUST NOT introduce **code changes, build artifacts, or code PRs** into the `{{project-board}}` reporoot; all *code* work happens inside `workspace/{{project}}`, and you MUST NOT make code changes, run builds, or create worktrees anywhere else.
 
-Authoring, committing, and opening PRs for docs (`CONTEXT.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, and other reporoot docs) is allowed in `{{project-board}}`. You MUST NOT commit code or build output there.
+Authoring, committing, and opening PRs for docs (`GLOSSARY.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, and other reporoot docs) is allowed in `{{project-board}}`. You MUST NOT commit code or build output there.
 
 Verify the target repo before any **code/build** `git`/`gh pr` command by checking `origin` exactly. Workspace code repo's `origin`: `{{codeRepoSlug}}`. Reporoot's `origin`: `{{boardRepoSlug}}`.
 
@@ -41,7 +41,7 @@ You MUST actually execute the check command above — not merely reference or re
 | --- | --- | --- |
 | **Code** `git worktree add`, `git commit`, `git push`, code `gh pr create` | workspace (`{{project}}`) | `cd workspace/{{project}}` first |
 | Code-modifying, build, test, package, and source-repository Git commands | workspace (`{{project}}`) | run from inside `workspace/{{project}}` |
-| **Docs** `git commit`, `git push`, `gh pr create` (for `CONTEXT.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, reporoot docs) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
+| **Docs** `git commit`, `git push`, `gh pr create` (for `GLOSSARY.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, reporoot docs) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
 | `gh issue`, `gh api` (spec/ticket updates) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
 | `gh pr` (view, create, review, merge) for **code** | workspace (`{{project}}`) | `--repo {{repository}}/{{project}}` or run from inside `workspace/{{project}}` |
 
@@ -49,7 +49,7 @@ You MUST actually execute the check command above — not merely reference or re
 
 Consult these before searching the code:
 
-- **Domain glossary:** [`CONTEXT.md`](../CONTEXT.md) — domain terminology and concepts.
+- **Domain glossary:** [`GLOSSARY.md`](../GLOSSARY.md) — domain terminology and concepts.
 - **Architecture:** [`ARCHITECTURE.md`](../ARCHITECTURE.md) — Concept index, high-level source structure, and Codebase Structure.
 - **{{proejctName}} building-block overview:** [`{{proejctName}}.md`](../docs/building-blocks/{{proejctName}}.md) — {{proejctName}} building-block description and `main/src/` application-layer module map.
 - **REST API/contracts:** [`{{proejctName}}-service.swagger.json`](../docs/building-blocks/{{proejctName}}-service.swagger.json) — request/response shapes, endpoint paths, status codes, schema definitions.
@@ -84,7 +84,7 @@ Consult the relevant [authoritative source](#3-authoritative-sources) first, and
 | You know | Use | If it fails |
 | --- | --- | --- |
 | The exact symbol, and need definition, references, rename, hover, implementations, or call hierarchy | **LSP** — semantic search cannot perform these | `lsp-recover` skill, then text search |
-| The concept or behavior but not the symbol (e.g. "where is failover progress tracked?") | **Semantic search**, which is served by the Graphify graph — see the gate below | text search on domain terms from `CONTEXT.md` |
+| The concept or behavior but not the symbol (e.g. "where is failover progress tracked?") | **Semantic search**, which is served by the Graphify graph — see the gate below | text search on domain terms from `GLOSSARY.md` |
 | A literal, configuration value, or generated file | **Text search** with `includePattern: workspace/{{project}}/**` | manual directory browsing under `workspace/{{project}}` |
 
 Semantic results span both workspace roots: discard reporoot hits when the question is about code, and code hits when the question is about board documentation. Exclude `.artifacts/`, `**/bin/`, `**/obj/`, `TestResults/`, `graphify-out/`, and `bin/review_diff/` from text search.
@@ -102,8 +102,8 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 
 ## 6. Documentation conventions
 
-- You MUST author all docs (`CONTEXT.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts) at the reporoot, and MUST NOT author docs inside `workspace/`.
-- You MUST keep `CONTEXT.md` and `ARCHITECTURE.md` high-level — no implementation details, specs, or scratch notes.
+- You MUST author all docs (`GLOSSARY.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts) at the reporoot, and MUST NOT author docs inside `workspace/`.
+- You MUST keep `GLOSSARY.md` and `ARCHITECTURE.md` high-level — no implementation details, specs, or scratch notes.
 - You SHOULD cross-reference plans against code under `workspace/{{project}}`.
 
 ## 7. Skills

@@ -53,7 +53,7 @@ Single repo — docs and codebase live together, no `workspace/` split.
 
 ### Authoritative sources
 
-- **Domain glossary:** `CONTEXT.md` — domain terminology and concepts.
+- **Domain glossary:** `GLOSSARY.md` — domain terminology and concepts.
 - **Architecture:** `ARCHITECTURE.md` — ADR/Concept indexes, high-level source structure.
 
 ### Ticket tracker

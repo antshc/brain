@@ -19,7 +19,7 @@ Split on **when the rule is needed**:
 | which approach was chosen and its structural decisions | Concept, `docs/concepts/` | this skill — continue below |
 | why it was chosen, and the rejected alternatives | standalone ADR linking to the Concept, or feature design when it fails the ADR gate | load [adr.md](./adr.md); otherwise session ledger / feature design |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
-| what a contested term means | glossary, `CONTEXT.md` | load [term.md](./term.md) |
+| what a contested term means | glossary, `GLOSSARY.md` | load [term.md](./term.md) |
 | which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
 
 Two tests settle most cases:

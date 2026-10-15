@@ -9,7 +9,7 @@ Draft and print one standalone **User story** body that advances one **Functiona
 
 **Verbatim rule:** when a prior source artifact supplies a Feature, Functional slice, Stakeholder requirement, or Functional requirement, copy it **verbatim**. Derive only fields the source omits.
 
-When available, use `CONTEXT.md` for project-specific domain language and `ARCHITECTURE.md` for module placement. The definitions below make this skill independently runnable.
+When available, use `GLOSSARY.md` for project-specific domain language and `ARCHITECTURE.md` for module placement. The definitions below make this skill independently runnable.
 
 ## Vocabulary
 
@@ -23,7 +23,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 ## Workflow
 1. **Assemble the body** → write the exact Title line, then list the verbatim Functional requirements addressed. *Done when* the User story is one Functional slice owned by the named Deployable kind and contains no unrelated behavior.
 2. **Derive Acceptance Criteria** → apply Acceptance Criteria below. *Done when* every applicable Business rule, Edge case, and error condition in the source lands in its own criterion, and input, processing, integration, state, and failure are covered.
-3. **Verify** → Run `/normalize-requirements` skill over the Title, Requirements, and Acceptance Criteria, passing `CONTEXT.md` as the domain glossary when it exists, then confirm each criterion implies concrete code changes and maps to the Functional slice's responsibility. *Done when* Quality Check passes line by line.
+3. **Verify** → Run `/normalize-requirements` skill over the Title, Requirements, and Acceptance Criteria, passing `GLOSSARY.md` as the domain glossary when it exists, then confirm each criterion implies concrete code changes and maps to the Functional slice's responsibility. *Done when* Quality Check passes line by line.
 4. **Contracts Delta (optional)** → if the User story changes an API, GUI, Database, Resource, or other contract, Run `/doc-contracts` skill for each touched contract kind and append its output to the optional Contracts Delta appendix. *Done when* every changed contract kind passes `/doc-contracts`' skill own done conditions.
 
 ## Acceptance Criteria
@@ -31,7 +31,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code.
 - Phrase as: `{{outcome}} when {{condition}}` for behaviors; `If {{condition}}, {{actor}} must {{outcome}}` for invariants/edge cases. Vary the subject (entity, actor, outcome) — don't force "The system" every time.
 - Cover: input, processing, integration, state, failure — one criterion each, not a labeled section.
-- Use domain language (`CONTEXT.md`); state behavior, not implementation — no file paths, class/variable names, widget/screen, or other implementation details. Run `/normalize-requirements` skill to raise any leaked artifact to the behavior and entity it enables.
+- Use domain language (`GLOSSARY.md`); state behavior, not implementation — no file paths, class/variable names, widget/screen, or other implementation details. Run `/normalize-requirements` skill to raise any leaked artifact to the behavior and entity it enables.
 - State the exact outcome — never "works", "correctly", "properly", "as expected".
 - Fold every applicable Business Rule, Edge Case, and relevant error condition from the source requirement into its own criterion here — do not create separate sections for them.
 </acceptance-criteria-rule>

@@ -1,5 +1,5 @@
 # ARCHITECTURE.md Format
-<!-- `ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it follows, and the indexes of Architecture Decision Records and Crosscutting Concepts. It is the structural counterpart to `CONTEXT.md` (which is the glossary). Keep it about *shape and rules*, not implementation detail — the detail lives in the code and in the Crosscutting Concepts it links to. -->
+<!-- `ARCHITECTURE.md` is the map of the system: how the codebase is organized, the layering it follows, and the indexes of Architecture Decision Records and Crosscutting Concepts. It is the structural counterpart to `GLOSSARY.md` (which is the glossary). Keep it about *shape and rules*, not implementation detail — the detail lives in the code and in the Crosscutting Concepts it links to. -->
 
 ## Structure
 <!--
@@ -20,7 +20,7 @@ A 1-3 sentence summary of what the system is, its architectural style (e.g. modu
 
 ## Context
 
-References the `CONTEXT.md` file that defines the shared language (terms and domain concepts) used throughout this document, and the `docs/building-blocks/system-context.md` file that holds the system context and solution container diagrams.
+References the `GLOSSARY.md` file that defines the shared language (terms and domain concepts) used throughout this document, and the `docs/building-blocks/system-context.md` file that holds the system context and solution container diagrams.
 
 ## Building blocks
 

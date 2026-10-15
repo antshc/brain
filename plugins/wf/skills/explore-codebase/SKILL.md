@@ -48,7 +48,7 @@ Report a name that resolves to neither a local checkout nor a GitHub repository 
 
 ### Contracts first
 
-Before source, read the contract material for the resolved target, nearest owner first. `CONTEXT.md` carries terminology; `ARCHITECTURE.md`, `DEPLOYMENT.md`, and `README.md` carry ownership and runtime boundaries; `*.swagger.json` carries REST contracts; `*.configuration-tweaks.md` carries configuration surfaces.
+Before source, read the contract material for the resolved target, nearest owner first. `GLOSSARY.md` carries terminology; `ARCHITECTURE.md`, `DEPLOYMENT.md`, and `README.md` carry ownership and runtime boundaries; `*.swagger.json` carries REST contracts; `*.configuration-tweaks.md` carries configuration surfaces.
 
 1. The target checkout's own copies of those files.
 2. The `$HARNESS_REPO_PATH` document whose folder or filename names that target — a `$HARNESS_REPO_PATH/**/` glob returns one set per documented service, so match on the name rather than reading them all.
