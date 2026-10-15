@@ -25,22 +25,24 @@
 - [ ] Acceptance criteria 3
 
 ## Requirements addressed
-
-Reference by number from the parent spec. Omit a subsection if the spec has none of that kind, or none apply to this slice.
+<requirements-addressed-rule>
+- One bullet per addressed spec item: its number, then the spec's text copied verbatim — never numbers alone, never paraphrased, merged, or shortened.
+- Omit a subsection if the spec has none of that kind, or none apply to this slice.
+</requirements-addressed-rule>
 
 **Functional Requirements:**
 
-{{functionalRequirementName}}
+- {{number}}. {{verbatimSpecText}}
 ...
 
 **Business Rule:**
 
-{{businessRuleName}}
+- {{number}}. {{verbatimSpecText}}
 ...
 
 **Edge cases:**
 
-{{edgeCaseName}}
+- {{number}}. {{verbatimSpecText}}
 ...
 
 ## Implementation Decisions
