@@ -41,11 +41,11 @@ Return one Trigger condition value and report any default condition missing from
 
 Input: `{{path}}` — the caller-supplied Markdown index (`ARCHITECTURE.md` or a building-block record); optionally `{{omitColumns}}`, `{{tableNames}}`.
 
-1. **Run `./scripts/load_index.py {{path}} [--omit-column "{{column}}"]... [--table "{{tableName}}"]... [--counts-only]` from this skill's base directory**, with the caller's repo root as CWD. Stdout is one JSON payload: `counts` per table, `totalRows`, `errors`, and `tables[].rows[]` with `title`, `link`, `trigger`, `default`, and remaining `cells`. Every table whose header contains `Trigger condition` is loaded; fenced examples are skipped.
-2. Output truncated or too large to read whole → re-run per table with `--table`; each table's rows MUST be read in full.
-3. Non-empty `errors` (exit 1: rows marker mismatch, malformed row, unknown table) or exit 2 (unreadable file) → index load failed; report the errors, never partial rows as complete.
+1. **MUST run `python3 <resolved-skill-base>/scripts/load_index.py {{path}} [--omit-column "{{column}}"]... [--table "{{tableName}}"]...`**, resolving the script from this skill's base directory and keeping the caller's repo root as CWD. Stdout is one JSON payload: `counts` per table, `totalRows`, `errors`, and `tables[].rows[]` with `title`, `link`, `trigger`, `default`, and remaining `cells`. Every table whose header contains `Trigger condition` is parsed; fenced examples are skipped. MUST NOT replace execution with manual reads or search, even if simpler; script validation establishes index completeness.
+2. Consume every requested table's rows in full. Output truncated or too large → re-run per table with `--table`; if one table still exceeds the output limit, save the script JSON and read it in bounded ranges until every row is consumed. Track consumed rows separately from script-reported totals; `--table` leaves `counts` covering all tables, not just emitted rows. `--counts-only` may inspect totals but never satisfies **Load index**.
+3. Non-empty `errors` (exit 1: rows marker mismatch, malformed row, unknown table), exit 2 (unreadable file), or unavailable Python/script → index load failed; report the errors, never partial rows as complete. Unread/truncated rows remain incomplete; no manual fallback.
 
-Return `counts` and the rows, or the errors.
+Return source, per-table total/loaded counts, and every requested row, or explicit errors/incomplete coverage. Mark complete only when consumed row counts equal totals for every requested table; omitted `tableNames` requires all tables.
 
 ## Scan and match
 
