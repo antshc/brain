@@ -31,7 +31,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 | Operation | Invocation and inputs | Required result |
 |---|---|---|
-| Code/test lookup | *Run `explore-codebase` skill for read-only lookups locating symbols, tests, or how a flow works.* Supply the bounded question, target, depth, and read-only constraint. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
+| Code/test lookup | Read `explore-codebase` skill's **Request**; form the bounded question, target, depth, and output shape. Spawn one read-only subagent per independent track (dependent tracks sequential) with that request verbatim, instructing it to *run `explore-codebase` skill for read-only lookups locating symbols, tests, or how a flow works*. Skill unavailable → explore agent with the same request. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
 | Index load/scan/sync | *Run `index-docs` skill for full index load, scan/match, and row-sync of Markdown Trigger condition tables.* Supply the operation and its required metadata. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
 | Record | *Run `record-architecture` skill for settled architecture ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
 

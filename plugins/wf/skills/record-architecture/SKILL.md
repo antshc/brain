@@ -28,7 +28,7 @@ Record settled knowledge or render an established body. Discovery and interviews
 - Both concept modes use the same procedure; `concept-record` accepts a body already rendered under its shared body rules without rendering or interviewing again.
 - A Deployable describes what a building block is; deployment topology describes where it runs. Load both procedures only when both artifacts are requested or a deployment prerequisite requires a missing Deployable.
 - Persist one record at a time, when settled. Grouping adds no approval, publication, execution, or discovery steps.
-- Keep index mechanics with `index-docs`, diagram production with the diagram skills, and code inspection with `explore-codebase`. Invoke helpers; never access another skill's private resources.
+- Keep index mechanics with `index-docs`, diagram production with the diagram skills, and code inspection with `explore-codebase` run inside a subagent this skill spawns (skill unavailable → explore agent with the same request). Invoke helpers; never access another skill's private resources.
 
 ## Resource map
 

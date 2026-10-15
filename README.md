@@ -137,7 +137,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [doc-architecture-diagram](plugins/wf/skills/doc-architecture-diagram/SKILL.md), [doc-behavior-diagram](plugins/wf/skills/doc-behavior-diagram/SKILL.md), [doc-code-diagram](plugins/wf/skills/doc-code-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
 - [normalize-requirements](plugins/wf/skills/normalize-requirements/SKILL.md): strip implementation artifacts out of requirement or story text.
-- [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): delegate read-only codebase questions to a subagent.
+- [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): read-only codebase lookup run inside a caller-spawned subagent; callers fall back to the explore agent when the skill is unavailable.
 - [experiment](plugins/wf/skills/experiment/SKILL.md): run a throwaway experiment to answer a design question.
 - [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
 - [research-system](plugins/wf/skills/research-system/SKILL.md): inspect a system as-built along the capability, deployables, or data axis, cited to `file:line`, with diagrams.
