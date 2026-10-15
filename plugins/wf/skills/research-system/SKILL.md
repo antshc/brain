@@ -1,5 +1,5 @@
 ---
-name: inspect-system
+name: research-system
 description: "Inspect a software system as-built and write a Markdown inspection document citing every claim with filename-only file references and visible line numbers. Use when asked how behavior is implemented inside one deployable, to trace a flow across deployables and document its integration contracts, or to settle a question turning on data — keys, ownership, consistency, migration, concurrency, retention."
 ---
 
@@ -25,7 +25,7 @@ Lookups belong to the engine running this skill — contract material, source, t
 
 Three axes, one per unit of inspection. A capability is the stable product ability in context; its features and functional slices realize it. One functional slice belongs to one deployable: use Behavior to inspect that slice and Flow to trace the contracts connecting related slices across deployables. Pick by the unit the question is about, load only that axis's references and template, and leave the other two unread.
 
-Write to the axis's output path unless the user names a location. Every path is flat — one file directly in `docs/ongoing/`, no subfolder. Fill its template, obeying the `**Rules**` blocks and deleting every one of them from the result.
+Write to the axis's output path unless the user names a location. Every path is flat — one file directly in `docs/researches/<slug>`, no subfolder. Fill its template, obeying the `**Rules**` blocks and deleting every one of them from the result.
 
 ### Behavior — one deployable's contribution
 
@@ -33,7 +33,7 @@ Inspect how one deployable fulfills its responsibility in a functional slice. Na
 
 - References: [behavior-inspection.md](references/behavior-inspection.md)
 - Template: [behavior-inspection-template.md](templates/behavior-inspection-template.md)
-- Output: `docs/ongoing/research-{{slug}}.md`, or `docs/researches/{{chainSlug}}-{{n}}-{{deployable}}.md` when the user asks for a lane of an existing chain
+- Output: `docs/researches/<slug>/{{slug}}.md`, or `docs/researches/<slug>/{{chainSlug}}-{{n}}-{{deployable}}.md` when the user asks for a lane of an existing chain
 
 **Diagram:** Pick the diagram from what the question asks, then Run its owning skill for syntax and styling — never compose Mermaid from memory.
 
@@ -59,7 +59,7 @@ Inspect how related functional slices connect across runtime or deployment bound
 
 - References: [flow-inspection.md](references/flow-inspection.md)
 - Template: [flow-inspection-template.md](templates/flow-inspection-template.md)
-- Output: exactly one file, `docs/researches/{{slug}}-chain.md`. A chain run writes no other document.
+- Output: exactly one file, `docs/researches/<slug>/{{slug}}-chain.md`. A chain run writes no other document.
 
 **Diagram:** Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. Follow `/doc-behavior-diagram` skill's **Swimlane Diagram** and open its swimlane template before drafting.
 
@@ -75,14 +75,14 @@ Inspect persistence semantics around one data boundary: the governed item type, 
 
 - References: [data-inspection.md](references/data-inspection.md)
 - Template: [data-inspection-template.md](templates/data-inspection-template.md)
-- Output: `docs/researches/{{slug}}-data.md`
+- Output: `docs/researches/<slug>/{{slug}}-data.md`
 
 **Diagram:** None by default — the store, key, and shape tables carry the answer. When the user asks for one, pick the diagram from the question and Run its owning skill: `/doc-behavior-diagram` for access order or branching, `/doc-architecture-diagram` for ownership or deployment boundaries, and `/doc-code-diagram` for item types and their relationships. Keep evidence in the tables and render the Mermaid block before declaring the inspection complete.
 
 ### Crossing axes
 
 - A Flow run ends at the chain document. Add a Behavior follow-up only when the framed outcome depends on a lane's internal decision and its boundary contracts do not explain it. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
-- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/researches/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the follow-up question verbatim, use its inbound contract as the entry point, use its expected outbound contracts to bound observable outcomes, and link the result from that follow-up row.
+- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/researches/<slug>/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the follow-up question verbatim, use its inbound contract as the entry point, use its expected outbound contracts to bound observable outcomes, and link the result from that follow-up row.
 - Run the Data axis when either Flow or Behavior inspection reaches a persistence question whose correctness depends on ownership, keys, consistency, migration, concurrency, retention, or deletion.
 - Provider semantics, quotas, and API parameters behind a managed service belong to the provider, not this repo: Run `/research-aws` skill or `/research-azure` skill.
 
