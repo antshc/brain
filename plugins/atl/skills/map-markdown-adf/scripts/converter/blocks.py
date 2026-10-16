@@ -39,9 +39,11 @@ CODE_LANG_ALLOWLIST = {
 
 _BULLET_RE = re.compile(r"^(\s*)[-*+]\s+(.*)")
 _ORDERED_RE = re.compile(r"^(\s*)\d+\.\s+(.*)")
+_ORDERED_NUMBER_RE = re.compile(r"^\s*(\d+)\.")
 _RULE_RE = re.compile(r"^(-{3,}|\*{3,}|_{3,})\s*$")
-_TABLE_ROW_RE = re.compile(r"^\|(.*)\|\s*$")
-_TABLE_SEP_RE = re.compile(r"^\|[\s:|-]+\|\s*$")
+# Leading whitespace is allowed so a table indented under a list item is still a table.
+_TABLE_ROW_RE = re.compile(r"^(\s*)\|(.*)\|\s*$")
+_TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 _FENCE_OPEN_RE = re.compile(r"^```(\w*)\s*$")
 
 # Column widths (px) for headers this skill recognizes by name, stripped of markdown marks
@@ -185,20 +187,23 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             blocks.append({"type": "expand", "attrs": {"title": title}, "content": content})
             continue
 
-        if _TABLE_ROW_RE.match(line) and i + 1 < n and _TABLE_SEP_RE.match(lines[i + 1]):
-            header_cells = split_table_row(line)
-            i += 2
-            rows = []
-            while i < n and _TABLE_ROW_RE.match(lines[i]):
-                rows.append(split_table_row(lines[i]))
-                i += 1
+        if _table_start(lines, i) is not None:
             layout = "wide" if apply_wide_table else "default"
-            blocks.append(build_table(header_cells, rows, layout=layout))
+            table, i = _parse_table(lines, i, layout)
+            blocks.append(table)
             continue
 
         if _BULLET_RE.match(line) or _ORDERED_RE.match(line):
-            list_block, i = parse_list(lines, i)
+            # ADF forbids a table inside a listItem: tables nested anywhere in the list are
+            # collected and emitted as siblings right after the whole list.
+            deferred_tables: list[dict] = []
+            list_block, i = parse_list(lines, i, deferred_tables)
+            if list_block["type"] == "orderedList":
+                start = int(_ORDERED_NUMBER_RE.match(line).group(1))
+                if start != 1:
+                    list_block["attrs"] = {"order": start}
             blocks.append(list_block)
+            blocks.extend(deferred_tables)
             continue
 
         # Paragraph: consume consecutive plain lines until a blank line or block start.
@@ -229,11 +234,34 @@ def _is_block_start(line: str, lines: list[str], i: int) -> bool:
         return True
     if TOC_COMMENT_RE.match(line) or WIDE_TABLE_MARKER_RE.match(line):
         return True
-    if _TABLE_ROW_RE.match(line) and i + 1 < len(lines) and _TABLE_SEP_RE.match(lines[i + 1]):
+    if _table_start(lines, i) is not None:
         return True
     if _BULLET_RE.match(line) or _ORDERED_RE.match(line):
         return True
     return False
+
+
+def _table_start(lines: list[str], i: int) -> int | None:
+    """Indent of a table starting at `lines[i]` (header row + separator), optionally preceded by
+    a `<!-- adf:wide-table -->` marker line; None when no table starts there."""
+    if WIDE_TABLE_MARKER_RE.match(lines[i]):
+        i += 1
+    if i + 1 >= len(lines):
+        return None
+    row_m = _TABLE_ROW_RE.match(lines[i])
+    if not row_m or not _TABLE_SEP_RE.match(lines[i + 1]):
+        return None
+    return len(row_m.group(1))
+
+
+def _parse_table(lines: list[str], i: int, layout: str) -> tuple[dict, int]:
+    header_cells = split_table_row(lines[i])
+    i += 2
+    rows = []
+    while i < len(lines) and _TABLE_ROW_RE.match(lines[i]):
+        rows.append(split_table_row(lines[i]))
+        i += 1
+    return build_table(header_cells, rows, layout=layout), i
 
 
 def paragraphs_from_lines(lines: list[str]) -> list[dict]:
@@ -267,12 +295,18 @@ def _match_list_marker(line: str):
     return None, None
 
 
-def parse_list(lines: list[str], i: int) -> tuple[dict, int]:
+def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[dict, int]:
+    """Parse a list at `lines[i]`. Tables indented under its items are appended to
+    `deferred_tables` (ADF has no table-in-listItem) instead of ending the list."""
     n = len(lines)
     is_ordered, first_m = _match_list_marker(lines[i])
     base_indent = len(first_m.group(1))
     list_type = "orderedList" if is_ordered else "bulletList"
     items: list[dict] = []
+
+    def nested_table_indent(j: int) -> int | None:
+        indent = _table_start(lines, j)
+        return indent if indent is not None and indent > base_indent else None
 
     while i < n:
         line = lines[i]
@@ -280,12 +314,21 @@ def parse_list(lines: list[str], i: int) -> tuple[dict, int]:
             # A single blank line inside a tight list doesn't necessarily end it;
             # stop when the following line isn't this same list (different marker
             # type at the same level ends it, so a new list can start after it).
+            if i + 1 < n and nested_table_indent(i + 1) is not None:
+                i += 1
+                continue
             nxt_ordered, nxt_m = _match_list_marker(lines[i + 1]) if i + 1 < n else (None, None)
             if nxt_m is None:
                 break
             if len(nxt_m.group(1)) <= base_indent and nxt_ordered != is_ordered:
                 break
             i += 1
+            continue
+
+        if nested_table_indent(i) is not None:
+            wide = bool(WIDE_TABLE_MARKER_RE.match(line))
+            table, i = _parse_table(lines, i + 1 if wide else i, "wide" if wide else "default")
+            deferred_tables.append(table)
             continue
 
         line_ordered, m = _match_list_marker(line)
@@ -297,7 +340,7 @@ def parse_list(lines: list[str], i: int) -> tuple[dict, int]:
             break
         if indent > base_indent:
             # Nested list belongs to the previous item.
-            nested_block, i = parse_list(lines, i)
+            nested_block, i = parse_list(lines, i, deferred_tables)
             if items:
                 items[-1]["content"].append(nested_block)
             continue
@@ -313,7 +356,7 @@ def parse_list(lines: list[str], i: int) -> tuple[dict, int]:
             if sub_m and len(sub_m.group(1)) > indent:
                 if not item_content:
                     item_content.append({"type": "paragraph", "content": parse_inline(item_text)})
-                nested_block, i = parse_list(lines, i)
+                nested_block, i = parse_list(lines, i, deferred_tables)
                 item_content.append(nested_block)
                 continue
             if sub_m or item_content or _is_block_start(lines[i], lines, i):

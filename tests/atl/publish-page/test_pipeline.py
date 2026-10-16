@@ -4,11 +4,61 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from page_diagrams.pipeline import convert_markdown_to_adf, publish, resolve_title, substitute_diagram_notes
+from page_diagrams.pipeline import (
+    convert_markdown_to_adf,
+    publish,
+    resolve_title,
+    strip_title_heading,
+    substitute_diagram_notes,
+)
 
 
 def write_config(tmp_path, data: dict):
     (tmp_path / ".atlassian.json.user").write_text(json.dumps(data))
+
+
+def _heading(level: int, text: str) -> dict:
+    return {"type": "heading", "attrs": {"level": level}, "content": [{"type": "text", "text": text}]}
+
+
+def _para(text: str) -> dict:
+    return {"type": "paragraph", "content": [{"type": "text", "text": text}]}
+
+
+def test_strip_title_heading_drops_leading_h1():
+    adf = {"version": 1, "type": "doc", "content": [_heading(1, "Title"), _para("body")]}
+    assert strip_title_heading(adf)["content"] == [_para("body")]
+
+
+def test_strip_title_heading_keeps_non_leading_or_lower_headings():
+    later_h1 = {"type": "doc", "content": [_para("intro"), _heading(1, "Section")]}
+    leading_h2 = {"type": "doc", "content": [_heading(2, "Section"), _para("body")]}
+    assert strip_title_heading(later_h1) == later_h1
+    assert strip_title_heading(leading_h2) == leading_h2
+
+
+def test_strip_title_heading_leaves_a_valid_body_when_only_the_title_remains():
+    adf = {"type": "doc", "content": [_heading(1, "Title")]}
+    assert strip_title_heading(adf)["content"] == [{"type": "paragraph", "content": []}]
+
+
+def test_publish_does_not_include_the_title_heading_in_the_body(tmp_path):
+    md_path = tmp_path / "doc.md"
+    md_path.write_text("# My Page\n\nBody text.\n")
+    out_path = tmp_path / "final.json"
+    result = publish(
+        md_path=str(md_path),
+        config_path=str(tmp_path / ".atlassian.json.user"),
+        page_id=None,
+        space_id="SPACE",
+        title=None,
+        assets_dir=str(tmp_path / "assets"),
+        out_path=str(out_path),
+        threshold_bytes=50_000,
+    )
+    assert result["title"] == "My Page"
+    body = json.loads(out_path.read_text())["content"]
+    assert [n["type"] for n in body] == ["paragraph"]
 
 
 def test_resolve_title_from_first_heading():

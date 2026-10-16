@@ -68,7 +68,7 @@ Ids are permanent: rename/delete orphans the attachment and record (`run` never 
 - **mdPath** — required; local Markdown path.
 - **pageId** — optional; update that page instead of creating.
 - **spaceId** — optional; resolved in Step 2.
-- **title** — optional; defaults to first `#` heading. Update writes title too → differing heading **renames** page; pass existing title to keep it.
+- **title** — optional; defaults to first `#` heading. Update writes title too → differing heading **renames** page; pass existing title to keep it. A leading level-1 heading is never published in the body — Confluence shows the title itself (`fetch-page` re-adds `# <title>` on fetch).
 
 ## Workflow
 

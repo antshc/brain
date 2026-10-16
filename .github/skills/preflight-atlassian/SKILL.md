@@ -1,6 +1,6 @@
 ---
 name: preflight-atlassian
-description: Resolve Atlassian connection facts (cloudId, default project key, default space id, token availability) and parse this repo's `.atlassian.json.user` config. Run first from every `atl` skill before creating, searching, reading, or updating a Jira issue or Confluence page.
+description: Resolve Atlassian connection facts (cloudId, default project key, default space id, token availability) from this repo's `.atlassian.json.user` config. Internal gate invoked by other `atl` skills, not a user entry point. Publish a Confluence page via `publish-page`; create or update a Jira work item via `publish-work`.
 compatibility: Requires the Atlassian Rovo MCP server (`atlassianUserInfo`, `getAccessibleAtlassianResources`, plus each caller's Jira/Confluence search or content tools) for live identity and cloudId discovery; degrades to config-only facts without one.
 ---
 
@@ -9,6 +9,13 @@ compatibility: Requires the Atlassian Rovo MCP server (`atlassianUserInfo`, `get
 Resolution gate every `atl` skill runs first. Never fails — unresolved facts return empty; caller degrades to MCP-only. Sole owner of locating and parsing `.atlassian.json.user` (gitignored, sibling of this `SKILL.md`); other skills MUST NOT re-implement it.
 
 **MUST NOT echo** config `email`/`apiToken` or identity-response `email` — not in output, logs, or errors.
+
+## Routing
+
+Preflight resolves facts only; never creates/updates content. Request is the operation itself → hand off to the owning skill, which runs Preflight as its Step 1:
+
+- Publish/create/update a Confluence page from a Markdown file → *run `publish-page` skill to create or update a Confluence page from a local Markdown file, converting to ADF and uploading mermaid diagrams*.
+- Create/update a Jira work item/issue/story/task/bug/epic → *run `publish-work` skill to create or update a Jira work item from a summary and Markdown description*.
 
 ## Resolve
 
@@ -44,6 +51,7 @@ Apply in every `atl` skill:
 - JQL/CQL searches use resolved `maxResults`/`limit`, unless the caller bundles its own extraction script and declares a higher cap.
 - Large tool result → save to `content.json`, `cd` there, extract with Python (`read_file` silently truncates lines at ~2000 chars): `python3 -c "import json;d=json.load(open('content.json'));print(d['fields']['description'])"`. Unknown shape → `print(json.dumps(d, indent=2)[:2000])`.
 - `getAccessibleAtlassianResources` at most once per session, only while `cloudId` unknown.
+- No MCP tool found for the needed call (e.g. subagent session lacks the MCP connection) + `tokenAvailable` → REST fallback via `atlassian-python-api`, using `site` (from `cloudId`), `email`, `apiToken`; report `mcp` vs `rest` per call. Neither MCP nor token → surface the missing-MCP error, name the tool.
 
 ## Gotchas
 
