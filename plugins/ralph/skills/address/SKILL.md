@@ -18,7 +18,7 @@ The first action of the run, before any checkout and before reading a single com
 python3 {{skillDir}}/scripts/pr_discussion_state.py "{{input}}" --pretty
 ```
 
-The script resolves `$actingLogin`, fetches every review thread, discards the resolved ones and any comment still attached to an unsubmitted (`PENDING`) review, and reports each survivor as `answered` (its last comment is `$actingLogin`'s) or `pending`. A `fix!:` in that last comment of `$actingLogin`'s own keeps the thread `pending` — a self-note that still needs work, not an answer. Its JSON is the only source of the discussion this run; `pr` gives `{{owner}}`, `{{repo}}`, `{{number}}`, and `headRef`/`baseRef` give `$headRef`/`$baseRef`.
+The script resolves `$actingLogin`, fetches every review thread, discards the resolved ones and any comment still attached to an unsubmitted (`PENDING`) review, and reports each survivor as `answered` (its last comment is `$actingLogin`'s) or `pending`. A `fix!:` in that last comment of `$actingLogin`'s own keeps the thread `pending` — a self-note that still needs work, not an answer. A thread opened by `$actingLogin` (`origin: self`) is likewise a self-note: its opening comment is the task, not an answer, and the thread stays `pending` until a later comment answers it. Its JSON is the only source of the discussion this run; `pr` gives `{{owner}}`, `{{repo}}`, `{{number}}`, and `headRef`/`baseRef` give `$headRef`/`$baseRef`.
 
 | `action` | Do |
 |---|---|
@@ -47,7 +47,9 @@ Done when each holds a real command or is recorded as absent. Absent → say so 
 
 ## 3. Read the working set
 
-Each entry in `threads[]` carries `id`, `anchor` (`path`, `line`, `startLine`, and `basis` — `original` means the thread outdated and the position is the one it was written against, with `diffHunk` holding the surrounding source), `mode`, and every comment in order.
+Each entry in `threads[]` carries `id`, `origin` (`reviewer`, or `self` when `$actingLogin` opened the thread), `anchor` (`path`, `line`, `startLine`, and `basis` — `original` means the thread outdated and the position is the one it was written against, with `diffHunk` holding the surrounding source), `mode`, and every comment in order.
+
+`origin: self` — the opening comment is the instruction; run the regular flow (steps 4–8) unchanged, replying per step 8 so the next gate returns `skip`.
 
 | `mode` | Means | Read |
 |---|---|---|

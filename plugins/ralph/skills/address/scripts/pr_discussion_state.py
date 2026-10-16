@@ -9,8 +9,9 @@ question per remaining thread: is its *last* comment authored by the acting user
              `first-pass`  - the acting user has never commented in the thread.
              `follow-up`   - the acting user replied and someone commented after that.
 
-An acting user's own last comment containing `fix!:` bypasses the `answered` state — it's
-treated as a self-note that still needs work, not as an answer already given.
+A thread opened by the acting user is a self-note: its opening comment is a task, never an
+answer, so a thread holding only that comment stays `pending` (`origin: "self"`). An acting
+user's own last comment containing `fix!:` likewise bypasses the `answered` state.
 
 The whole discussion coming back `answered` is what makes the calling skill rerunnable:
 the run stops at the gate without reading a single comment body.
@@ -184,20 +185,31 @@ def classify(thread: dict[str, Any], login: str) -> dict[str, Any] | None:
     }
 
     last_index = len(comments) - 1
+    self_opened = comments[0]["author"] == login
     self_fix_bypass = comments[-1]["author"] == login and bool(FIX_KEYWORD_RE.search(comments[-1]["body"]))
+    # The opening comment of a self-opened thread is a task, not an answer.
+    only_self_note = self_opened and last_index == 0
 
     # A truncated thread cannot prove its last comment is ours, so treat it as unanswered.
-    if comments and comments[-1]["author"] == login and not truncated and not self_fix_bypass:
+    if (
+        comments[-1]["author"] == login
+        and not truncated
+        and not self_fix_bypass
+        and not only_self_note
+    ):
         record["state"] = "answered"
         return record
 
-    # The fix!: note itself doesn't count as "my answer already given" — it's new work to surface.
+    # Self-notes (opening comment, fix!: comment) are new work to surface, not "my answer already given".
     mine = [
         index
         for index, comment in enumerate(comments)
-        if comment["author"] == login and not (self_fix_bypass and index == last_index)
+        if comment["author"] == login
+        and not (self_fix_bypass and index == last_index)
+        and not (self_opened and index == 0)
     ]
     record["state"] = "pending"
+    record["origin"] = "self" if self_opened else "reviewer"
     record["mode"] = "follow-up" if mine else "first-pass"
     record["diffHunk"] = first_hunk
     record["comments"] = comments
