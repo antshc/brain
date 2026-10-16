@@ -29,6 +29,19 @@ Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, 
 | `description` | yes | Third person; target 100–300 chars; state **when → responsibility → result**; include 3–6 distinctive trigger keywords. |
 | `disable-model-invocation` | no | `true` = human-only; omit when model or other skills must discover it. |
 
+**Description characters:** plain text, single line, max 1024 chars. Separate clauses with `.`, `;`, or `,`. **MUST NOT** use:
+
+| Character | Why |
+|---|---|
+| `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`publish-page`) allowed |
+| `<` `>` | Rejected by skill validators (XML/HTML injection guard) |
+| `: ` (colon + space) | YAML reads it as a nested mapping key |
+| ` #` (space + hash) | YAML starts a comment; rest of description dropped |
+| Leading `-` `?` `:` `[` `]` `{` `}` `,` `&` `*` `!` `\|` `>` `'` `"` `%` `@` `` ` `` | YAML indicator; plain scalar cannot start with it |
+| Tabs, line breaks, leading/trailing whitespace | Multiline/indent parse errors |
+
+Unavoidable YAML-special character → wrap whole value in single quotes, doubling inner `'` (`'repo''s'`).
+
 Name skills by existing verb-prefix family. Start a new family only when needed.
 
 Register every new plugin in [marketplace.json](../plugin/marketplace.json) in the same change.
@@ -129,7 +142,7 @@ See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the 
 
 ## Before finishing
 
-- Valid frontmatter; trigger-rich description.
+- Valid frontmatter; trigger-rich description free of forbidden description characters.
 - `SKILL.md` body under 300 lines.
 - No duplicate procedures within a skill; bundled resource paths stay inside that skill's folder.
 - No test commands or test-only dependencies; result checks live under `## Completion criteria`.

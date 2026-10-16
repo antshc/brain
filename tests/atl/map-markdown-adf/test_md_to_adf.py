@@ -139,6 +139,48 @@ def test_bullet_list(md_to_adf):
 def test_ordered_list(md_to_adf):
     doc = md_to_adf("1. one\n2. two")
     assert doc["content"][0]["type"] == "orderedList"
+    assert "attrs" not in doc["content"][0]
+
+
+def test_ordered_list_keeps_start_number(md_to_adf):
+    doc = md_to_adf("3. three\n4. four")
+    assert doc["content"][0]["attrs"] == {"order": 3}
+
+
+def test_table_nested_in_list_item_moves_after_whole_list(md_to_adf):
+    doc = md_to_adf(
+        "1. one\n2. two\n3. see below\n\n   | a | b |\n   | --- | --- |\n   | 1 | 2 |\n\n4. four\n\n## Next"
+    )
+    assert [b["type"] for b in doc["content"]] == ["orderedList", "table", "heading"]
+    assert len(doc["content"][0]["content"]) == 4
+    assert "attrs" not in doc["content"][0]
+    assert doc["content"][1]["content"][1]["content"][0]["content"][0]["content"][0]["text"] == "1"
+
+
+def test_table_directly_under_list_item_does_not_fold_into_paragraph(md_to_adf):
+    doc = md_to_adf("- item\n  | a |\n  | --- |\n  | 1 |\n- next")
+    assert [b["type"] for b in doc["content"]] == ["bulletList", "table"]
+    items = doc["content"][0]["content"]
+    assert [it["content"][0]["content"][0]["text"] for it in items] == ["item", "next"]
+
+
+def test_table_under_nested_item_moves_after_outermost_list(md_to_adf):
+    doc = md_to_adf("1. one\n   - sub\n\n     | a |\n     | --- |\n     | 1 |\n   - sub two\n2. two")
+    assert [b["type"] for b in doc["content"]] == ["orderedList", "table"]
+    outer = doc["content"][0]["content"]
+    assert len(outer) == 2
+    assert len(outer[0]["content"][1]["content"]) == 2
+
+
+def test_unindented_table_after_list_ends_it(md_to_adf):
+    doc = md_to_adf("1. one\n\n| a |\n| --- |\n| 1 |\n\n1. again")
+    assert [b["type"] for b in doc["content"]] == ["orderedList", "table", "orderedList"]
+
+
+def test_wide_table_marker_applies_to_nested_table(md_to_adf):
+    doc = md_to_adf("1. one\n\n   <!-- adf:wide-table -->\n   | a |\n   | --- |\n   | 1 |\n\n2. two")
+    assert [b["type"] for b in doc["content"]] == ["orderedList", "table"]
+    assert doc["content"][1]["attrs"]["layout"] == "wide"
 
 
 def test_nested_bullet_list(md_to_adf):

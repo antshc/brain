@@ -42,6 +42,16 @@ def resolve_title(md_text: str, explicit: str | None) -> str:
     raise ValueError("no title resolved: pass --title or add a '#' heading to the Markdown")
 
 
+def strip_title_heading(adf: dict) -> dict:
+    """Drop a leading level-1 heading: Confluence renders the page title itself, so keeping
+    it would show the title twice. `fetch-page` re-adds it as `# <title>` on the way back."""
+    content = adf.get("content", [])
+    if content and content[0].get("type") == "heading" and content[0].get("attrs", {}).get("level") == 1:
+        content = content[1:] or [{"type": "paragraph", "content": []}]
+        return {**adf, "content": content}
+    return adf
+
+
 def convert_markdown_to_adf(processed_md: str) -> dict:
     """Convert Markdown to ADF via the sibling `map-markdown-adf` skill's CLI, as a
     subprocess — Concept 0009 forbids importing its `converter.*` code directly.
@@ -293,7 +303,7 @@ def publish(
     processed = strip_ignored_sections(md_text)
     processed, diagrams = extract_mermaid(processed)
     processed, local_media = extract_local_media(processed, Path(md_path).parent, start_index=len(diagrams))
-    base_adf = convert_markdown_to_adf(processed)
+    base_adf = strip_title_heading(convert_markdown_to_adf(processed))
 
     # A page with only local attachments and no mermaid fence must not be blocked by an
     # unrelated/unusable diagramRenderer setting.
