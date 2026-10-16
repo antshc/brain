@@ -20,7 +20,7 @@ Conclude internally for each candidate: confirmed gap or no issue found. Emit on
 
 Return each `REVIEW_COMMENT` as a posting-ready body: `requirement gap → impact → fix`.
 
-- One gap; name the exact symbol or code path, identify the initiative, and quote the relevant description text.
-- Contrast required and implemented behavior. For scope creep, tie the extra behavior to the quoted scope rather than treating an unmapped symbol as proof.
+- One gap; name the exact symbol or code path and state the required behavior: quote the supplied issue/ticket description text verbatim when available, otherwise restate it. Never add the initiative ID, link, or URL.
+- Contrast required and implemented behavior. For scope creep, state the intended scope explicitly rather than treating an unmapped symbol as proof.
 - Explain the unmet behavior or out-of-scope effect in one sentence; suggest the smallest change that meets the requirement or removes the extra behavior.
-- Start with the gap, without classification labels or prefixes (`suggest`, `suggestion`, `nit`, `bug`). Keep only essential context; remove praise, repetition, hedging, and background.
+- Start with the gap. No classification labels (`Suggestion:`, `Nit:`, `Bug:`) anywhere in the comment. Keep only essential context; remove praise, repetition, hedging, and background.

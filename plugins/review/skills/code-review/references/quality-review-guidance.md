@@ -12,4 +12,4 @@ Inspect implementation, usage, configuration and relevant tests. Report only int
 
 ## Comment format
 
-Return `REVIEW_COMMENT`: concrete concern → evidenced quality impact → smallest improvement. One issue; identify symbols/path and applicable conditions. Frame as a suggestion, not a proven bug. No classification prefix, praise or background. Use shared JSON, five-finding limit and explicit failure result.
+Return `REVIEW_COMMENT`: concrete concern → evidenced quality impact → smallest improvement. One issue; identify symbols/path and applicable conditions. Frame as a suggestion, not a proven bug. No classification labels (`Suggestion:`, `Nit:`, `Bug:`) anywhere in the comment; no praise or background. Use shared JSON, five-finding limit and explicit failure result.

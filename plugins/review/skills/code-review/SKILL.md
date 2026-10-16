@@ -44,6 +44,8 @@ argument-hint: '<PR_URL>'
 - On missing required input, unresolved evidence gaps, or another review blocker, return `{"AXIS":"<assigned axis>","STATUS":"failed","REASON":"<specific blocker>"}` instead of an array. Tool unavailability alone is not a blocker when other sources establish the required evidence; otherwise identify the tool limitation and missing evidence in `REASON`. The parent records the failure; it must not interpret it as no issues found.
 - `FILE_PATH` must exactly match the manifest. For a finding with no commentable right-side anchor, use `LINE_NUMBER: null`; the parent retains it as unposted with reason and never calls the posting API for it. Otherwise `LINE_NUMBER` is an integer identifying a commentable new-file line on the diff's right side, the last line for a multi-line range. Evidence elsewhere grounds the conclusion, never substitutes for the diff anchor.
 - `REVIEW_COMMENT` is the complete, self-contained posting body, formatted by the subagent using its axis reference. Start with the issue itself. Order findings by impact, highest first, then by file and line.
+- Each `REVIEW_COMMENT` must be understandable on its own. **MUST NOT** cite or link repository markdown files (docs, instructions, ADRs, specs) or GitHub issues/Jira tickets (IDs, URLs, "see issue/ticket"); state the relevant rule or requirement directly in the comment. Issue/ticket description text may be quoted verbatim without attribution. Code symbols and paths remain allowed.
+- **MUST NOT** use classification labels such as `Bug:`, `Suggestion:`, `Nit:`, `Issue:`, `Note:`, or severity markers anywhere in the comment — not as a prefix, heading, bold lead-in, or mid-body label.
 
 ## Gotchas
 
