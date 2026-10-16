@@ -45,4 +45,4 @@ Return each `REVIEW_COMMENT` as a posting-ready body: `concrete design issue →
 - One issue; name the exact symbols or code paths that demonstrate the pattern. Keep smell names and heuristic classifications internal.
 - Explain the concrete cost to change, understand, or use the code in one sentence; frame the refactor as a suggestion, not a proven defect.
 - Suggest the smallest refactor that reduces that cost while preserving behavior; avoid speculative abstractions.
-- Start with the issue, without classification labels or prefixes (`suggest`, `suggestion`, `nit`, `bug`). Keep only essential context; remove praise, repetition, hedging, and background.
+- Start with the issue. No classification labels (`Suggestion:`, `Nit:`, `Bug:`) anywhere in the comment. Keep only essential context; remove praise, repetition, hedging, and background.
