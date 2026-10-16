@@ -1,34 +1,22 @@
-# Fetch PR Diff
+# Fetch PR diff
 
-**MUST** run before analyzing a PR. Substitute `<OWNER>`, `<REPO>`, `<PR_NUMBER>`, `<PR_URL>` for the pull request being reviewed.
+Both direct PR-URL requests and `implement-spec` calls follow this procedure. **MUST** use an existing repository and a fresh detached review worktree. **MUST NOT** clone, copy the repository, reuse the implementation worktree, or switch/reset the caller checkout. Rationale: share the existing object database for large repositories while isolating review files.
 
-## 1. Check out the PR branch
+## Acquisition
 
-```bash
-gh pr checkout <PR_NUMBER> --repo <OWNER>/<REPO>
-```
+1. Resolve `SOURCE_ROOT` from the explicit caller input, current checkout, or harness workspace. Verify it is an existing Git repository and select `REMOTE` whose URL identifies the PR's `OWNER/REPO` (base repository, including for fork PRs). If no unique matching checkout/remote exists, ask for the path/remote; stop acquisition rather than cloning. Record existing worktrees and caller HEAD/status. Done when source identity and remote are verified.
+2. Read PR metadata with `gh pr view PR_NUMBER --repo OWNER/REPO --json url,title,body,headRefOid,baseRefOid`. Retain `REVIEW_HEAD`, `REVIEW_BASE`, title/body. Create a unique run-owned directory outside existing worktrees, with absent `REVIEW_REPO` child and separate `DIFF_DIR` child. Choose unused temporary refs under `refs/review/RUN_ID/`; never overwrite existing refs or paths. Done when identities, paths and ownership are recorded.
+3. Fetch the PR head through the verified base-repository remote with `git -C SOURCE_ROOT fetch --no-tags REMOTE refs/pull/PR_NUMBER/head:refs/review/RUN_ID/head`; fetch the exact `REVIEW_BASE` SHA into `refs/review/RUN_ID/base`. Verify both refs equal the captured SHAs. On unavailable objects or mismatch, report incomplete acquisition or clean up and reacquire; never substitute stale refs. Resolve `REVIEW_MERGE_BASE` with `git -C SOURCE_ROOT merge-base REVIEW_BASE REVIEW_HEAD`; if shallow history prevents resolution, fetch the required ancestry explicitly or report the blocker. Done when both commits and merge-base are available locally.
+4. Create `git -C SOURCE_ROOT worktree add --detach REVIEW_REPO REVIEW_HEAD`. Verify registration in `git worktree list --porcelain`, detached HEAD equals `REVIEW_HEAD`, and clean status. Use this new worktree for source inspection; no implementation branch checkout, clone or new branch. Done when the fresh review worktree is verified.
+5. Generate the full fetched PR change from the pinned commits using `git -C REVIEW_REPO diff --no-ext-diff --no-textconv --find-renames REVIEW_MERGE_BASE REVIEW_HEAD`. Inventory files with `--name-status -z` and additions/deletions with `--numstat -z` over the same range/options. Inspect binary, deleted and renamed files explicitly; inaccessible content is uncovered scope, not an empty diff. Split per-file patches into unique numbered files in `DIFF_DIR`; write `_manifest.tsv` as `REAL_PATH<TAB>DIFF_FILENAME`, using exact Git destination paths (old paths for deletions). Decode Git-quoted names, use literal pathspecs, preserve rename metadata, and verify every inventory entry appears once. Unsupported tab/newline paths block manifest creation; never flatten paths into colliding filenames. Done when inventory, manifest and patches cover the same pinned range.
+6. Re-read PR head/base. On change, follow Cleanup, then reacquire; after two changed-snapshot retries, report stale review. Return `SOURCE_ROOT`, `REVIEW_REPO`, `DIFF_DIR`, manifest, head/base/merge-base, metadata and cleanup ownership. Done when snapshot identity is confirmed.
 
-## 2. Fetch the diff per file
+Only the parent fetches and creates the worktree. Reviewers use the supplied paths without refetching or creating worktrees. Acquisition failures also follow Cleanup for resources already created.
 
-```bash
-rm -rf bin/review_diff && mkdir -p bin/review_diff &&
-gh pr diff "<PR_URL>" | awk -v outdir="bin/review_diff/" '
-/^diff --git / {
-  if (outfile) close(outfile)
-  match($0, /b\/(.+)$/, arr)
-  filepath = arr[1]
-  sanitized = filepath
-  gsub("/", "_", sanitized)
-  outfile = outdir "/" sanitized
-  print filepath "\t" sanitized >> (outdir "/_manifest.tsv")
-}
-outfile { print > outfile }
-'
-```
+## Cleanup
 
-This writes per-file diffs into `bin/review_diff/` and `bin/review_diff/_manifest.tsv` (`REAL_PATH<TAB>SANITIZED_FILENAME`), preserving the exact repo-relative path (as GitHub expects for `FILE_PATH`) before it gets flattened for the local filename. Never reconstruct or guess this path later (e.g. via search) — always read it from the manifest.
+After retaining findings and evidence, leave `REVIEW_REPO` and remove only the recorded run-owned worktree with `git -C SOURCE_ROOT worktree remove REVIEW_REPO`, without force. Verify it is absent from disk and Git's worktree list. Preserve/report dirty worktrees or failed removal; never recursively delete a registered worktree. After successful removal (or if creation never occurred), delete only this run's temporary refs using `git update-ref -d REF EXPECTED_SHA`, then remove its diff/temp directory. Preserve caller worktrees, branch refs, HEAD and files; report any unexpected change. Keep fetched Git objects in the shared database; no pruning/GC.
 
-## Return to caller
+## Anchors
 
-- `bin/review_diff/` — per-file diffs.
-- `bin/review_diff/_manifest.tsv` — maps each diff filename back to its real repo-relative path. Callers MUST report `FILE_PATH` from this manifest, never from a guessed or locally-resolved path.
+Use exact manifest paths. Only commentable right-side changed lines qualify for inline posting; never invent anchors for deleted/binary files. Retain findings without valid anchors as unposted with reason. Check current PR head/base again before posting.
