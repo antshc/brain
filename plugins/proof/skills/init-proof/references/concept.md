@@ -2,11 +2,13 @@
 
 Read this once before generating features. The kit exists so an agent can prove a change with evidence instead of saying "it should work".
 
+The kit ships in two languages with one behavior, one receipt shape and one set of feature maps. Names below are TypeScript; Python equivalents: `app.py`, `features/__init__.py`, `snake_case` (`APP.source_paths`, `kit.api_url`, `StartConfig.timeout_s`), sync Playwright, `python3 -m proof.engine.mole` for `pnpm mole`.
+
 ## Terms
 
 - **Feature**: a behavior contract in the user's words ("a page lists up to N items, pages count from 1"). It is proved on one or more surfaces.
-- **Surface**: how a feature reaches a user. `web` is the app in a real Chrome over CDP; `api` is HTTP. A repo supports the surfaces in `APP.surfaces` (`proof/app.ts`).
-- **Surface adapter**: one per surface (`proof/features/surfaces/web.ts`, `api.ts`). It turns one feature call (`items.list({ page: 2 })`) into that surface's wire details (selectors and URLs on web; routes, versioning, 0-based paging, ids on api) and returns the same shape. A rule is written once in the feature and checked on every surface. All selectors, routes and wire details live in adapters, never in a feature or a map.
+- **Surface**: how a feature reaches a user. `web` is the app in a real Chrome over CDP; `api` is HTTP. A repo supports the surfaces in `APP.surfaces` (`proof/app.ts` or `proof/app.py`).
+- **Surface adapter**: one per surface (`proof/features/surfaces/web.ts`/`web.py`, `api.ts`/`api.py`). It turns one feature call (`items.list({ page: 2 })`) into that surface's wire details (selectors and URLs on web; routes, versioning, 0-based paging, ids on api) and returns the same shape. A rule is written once in the feature and checked on every surface. All selectors, routes and wire details live in adapters, never in a feature or a map.
 - **Check**: one recorded fact, `kit.check(name, actual, expected, hint)`. It never throws: a failed check is evidence. Name it `feature/surface: rule`. The hint says what to fix, because the receipt's `next` repeats it.
 - **observe(kit, label, step)**: runs an adapter call and turns a thrown `SurfaceError` into a failed `<label>: observed` check, so an unreachable surface is a finding, not a crash (a crash is exit 2, "can't tell").
 - **Receipt**: `PASS`/`FAIL`/`ERROR` (exit 0/1/2) with `revision`, `features`, `surfaces`, `checks`, `pageErrors`, `screenshot` (web), `next`. Exit 2 means missing evidence, never "probably fine".
