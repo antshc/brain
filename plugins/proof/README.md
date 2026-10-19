@@ -257,6 +257,71 @@ This illustrates a possible receipt format, not a mandated industry schema.
 
 A receipt establishes the outcome only for the recorded scope, environment, inputs, and revision.
 
+### How receipts relate to existing REST API E2E tests
+
+**A receipt is not another test and does not execute assertions.** E2E tests check whether the running application behaves as expected. A receipt identifies **which tests ran, for which task and revision, what happened, and where the test evidence can be found**.
+
+| Item | Responsibility |
+|---|---|
+| E2E test | Executes real application behavior and evaluates assertions |
+| Evidence | Test results, HTTP traces, database checks, logs, or screenshots |
+| Receipt | Compact record of the task, revision, environment, verdict, and evidence references |
+| Proof workflow | Selects relevant verifiers, executes them, collects results, and returns an actionable completion verdict |
+
+For example, an agent fixes issue **#123 — Order creation does not persist to PostgreSQL** and runs the existing suite:
+
+~~~bash
+dotnet test --filter "Category=Orders" \
+  --logger "trx;LogFileName=results.trx"
+~~~
+
+The tests report **12 passed, 0 failed**. A minimal receipt could be a few lines of Markdown instead of a custom JSON schema:
+
+~~~markdown
+## Verification — Issue #123
+
+Status: PASS (executed checks)
+Commit: a7b93cf
+Environment: Local ASP.NET Core API + PostgreSQL test container
+Command: dotnet test --filter "Category=Orders"
+Tests: 12 passed, 0 failed
+Evidence: results.trx, application.log
+~~~
+
+The receipt does **not** mean that every requirement is satisfied merely because 12 tests passed. The agent or verifier must also establish that those tests cover the issue's acceptance criteria.
+
+### What do you do with a receipt?
+
+- **Pull request:** Link the receipt or CI run so reviewers can see exactly what was verified without trusting the agent's "done" message.
+- **Agent implementation loop:** Read the PASS/FAIL/INCONCLUSIVE verdict. Use failure details to fix and rerun the relevant checks. PASS is meaningful only if required behavior is covered.
+- **Later debugging:** Trace a historical result to a commit, environment, test selection, and available logs.
+- **Continuous improvement:** Aggregate recurring failure categories or missing checks to improve tests, instructions, and tooling.
+
+### When an existing CI run is already the receipt
+
+If CI retains a **commit-linked test run, its logs, execution environment, and test artifacts**, it already provides most of the receipt's value.
+
+For example, the agent's final verification summary can simply be:
+
+~~~text
+Issue: #123
+Commit: a7b93cf
+Verification: Orders E2E — 12 passed
+Evidence: GitHub Actions run #456 (test results and logs)
+~~~
+
+Use an actual run URL in practice; the numbers above are illustrative. Do not duplicate TRX reports, screenshots, or logs merely to create a second set of files.
+
+**Recommended minimal implementation for a Proof plugin:**
+
+1. Select existing E2E/integration tests that cover the task's acceptance criteria.
+2. Execute those tests using the existing runner or CI system.
+3. Collect the verdict, commit SHA, environment, and references to retained artifacts.
+4. Return a terse verification summary to the agent and optionally attach it to the PR.
+5. Introduce a separate machine-readable receipt file **only if** cross-tool aggregation, historical comparison, or automated analysis needs one.
+
+**A CI run can function as a receipt; a dedicated receipt schema is optional.** Preserve evidence where the testing infrastructure already stores it.
+
 ## 6. The WorkOS Example: A Feature That Looks Correct but Is Broken
 
 The [Beyond Done workshop](https://github.com/workos/beyond-done) demonstrates verification using a fictional waitlist application called Midnight Snack Lab.
