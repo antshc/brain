@@ -1,6 +1,6 @@
 ---
 feature: example
-prove: pnpm mole prove --feature example
+prove: {{MOLE}} prove --feature example
 touches:
   - src/
 surfaces:
@@ -17,9 +17,9 @@ A smoke check that the app answers on each surface. Replace it with real feature
 
 ## Driving it
 
-- Prove it: `pnpm mole prove --feature example`.
-- Look at it: `pnpm mole snapshot`<!-- surface: api -->, `pnpm mole api get /`<!-- /surface: api -->.
+- Prove it: `{{MOLE}} prove --feature example`.
+- Look at it: `{{MOLE}} snapshot`<!-- surface: api -->, `{{MOLE}} api get /`<!-- /surface: api -->.
 
 ## What usually lies
 
-- A stale build: `pnpm mole doctor` says STALE when the source moved past the running app.
+- A stale build: `{{MOLE}} doctor` says STALE when the source moved past the running app.

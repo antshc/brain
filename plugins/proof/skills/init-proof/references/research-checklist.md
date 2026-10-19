@@ -2,6 +2,8 @@
 
 Answer each item from the repository itself: read manifests, configs, docs, routes, tests, CI. Never guess a port, selector or route. Where the repo does not say, record "unknown" and ask the user (one `ask_user` form for all unknowns), or pick the safest default and say so in the report.
 
+Field names are TypeScript (`proof/app.ts`). Python kit (`proof/app.py`): `APP.source_paths`, `StartConfig(command, args, env, cwd, prerequisites, ready, timeout_s)`, `ApiConfig(discover, probe)`, `WebConfig(settle, snapshot)`; hooks are synchronous callables. Start scripts also come from `pyproject.toml` scripts, `Makefile`, `manage.py`, `uvicorn`/`flask` entry points.
+
 ## 1. Start and stop (fills `APP.url`, `APP.start`)
 
 - [ ] The dev or start script: `package.json` scripts (`dev`, `start`, `serve`), `Procfile`, `docker-compose.yml`, `README`/`CONTRIBUTING`. Pick the command a developer runs locally, not a production build.

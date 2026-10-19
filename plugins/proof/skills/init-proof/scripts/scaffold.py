@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Scaffold the proof kit (mole engine, app seams, verify-mole skill) into a pnpm repository.
+"""Scaffold the proof kit (mole engine, app seams, verify-mole skill) into a repository, in TypeScript or Python.
 
 Deterministic copy and render. Never overwrites an existing file: it is reported as skipped.
+TypeScript needs a pnpm repository; Python works in any repository.
 
 Surface markers in templates keep a section only when its expression holds for the chosen surfaces:
   TypeScript  // <surface: api>  ...  // </surface: api>      (own lines)
+  Python      # <surface: api>  ...  # </surface: api>        (own lines)
   Markdown    <!-- surface: web+api -->  ...  <!-- /surface: web+api -->   (own lines or inline)
 Expressions: web, api, web+api (all listed chosen), web-only, api-only (exactly that surface).
 Markers do not nest.
@@ -24,24 +26,54 @@ SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES = SKILL_DIR / "templates"
 
 KNOWN_SURFACES = ("web", "api")
+LANGUAGES = ("typescript", "python")
+MIN_PYTHON = (3, 10)
 
-# Template folder -> target folder inside the repository.
+# (template folder under templates/, target folder inside the repository, copied byte for byte?)
 TREES = {
-    "engine": "proof/engine",
-    "app": "proof",
-    "verify-mole": ".github/skills/verify-mole",
+    "typescript": [
+        ("typescript/engine", "proof/engine", True),
+        ("typescript/app", "proof", False),
+        ("verify-mole", ".github/skills/verify-mole", False),
+    ],
+    "python": [
+        ("python/engine", "proof/engine", True),
+        ("python/app", "proof", False),
+        ("verify-mole", ".github/skills/verify-mole", False),
+    ],
 }
 # Files that exist only when their surface is chosen.
 SURFACE_FILES = {
-    "proof/features/surfaces/web.ts": "web",
-    "proof/features/surfaces/api.ts": "api",
+    "typescript": {
+        "proof/features/surfaces/web.ts": "web",
+        "proof/features/surfaces/api.ts": "api",
+    },
+    "python": {
+        "proof/features/surfaces/web.py": "web",
+        "proof/features/surfaces/api.py": "api",
+    },
 }
 # Template names that differ from their target, so no nested SKILL.md inside this plugin is mistaken for a skill.
 RENAMES = {
     ".github/skills/verify-mole/verify-mole.SKILL.template.md": ".github/skills/verify-mole/SKILL.md",
 }
-# Engine files are copied byte for byte; everything else is rendered.
-VERBATIM_TREES = {"engine"}
+# Per-language text that the shared templates (the verify-mole skill and maps) refer to.
+COMMAND_PLACEHOLDERS = {
+    "typescript": {
+        "{{MOLE}}": "pnpm mole",
+        "{{PROVE}}": "pnpm prove",
+        "{{TEST_PROOF}}": "pnpm test:proof",
+        "{{TYPECHECK_PROOF}}": "pnpm typecheck:proof",
+        "{{APP_FILE}}": "proof/app.ts",
+    },
+    "python": {
+        "{{MOLE}}": "python3 -m proof.engine.mole",
+        "{{PROVE}}": "python3 -m proof.engine.prove_cli",
+        "{{TEST_PROOF}}": "python3 -m pytest proof/test_features.py",
+        "{{TYPECHECK_PROOF}}": "python3 -m mypy --strict proof",
+        "{{APP_FILE}}": "proof/app.py",
+    },
+}
 
 SCRIPTS = {
     "mole": "tsx proof/engine/mole.ts",
@@ -50,10 +82,17 @@ SCRIPTS = {
     "typecheck:proof": "tsc -p proof/tsconfig.json",
 }
 DEV_DEPENDENCIES = ("tsx", "@playwright/test", "@types/node", "typescript")
-GITIGNORE_LINE = "/proof/.runs/"
+REQUIREMENTS = "proof/requirements.txt"
+GITIGNORE_LINES = {
+    "typescript": [("/proof/.runs/", {"/proof/.runs/", "proof/.runs/", "/proof/.runs", "proof/.runs", "/proof/", "proof/"})],
+    "python": [
+        ("/proof/.runs/", {"/proof/.runs/", "proof/.runs/", "/proof/.runs", "proof/.runs", "/proof/", "proof/"}),
+        ("__pycache__/", {"__pycache__/", "__pycache__", "**/__pycache__/", "**/__pycache__"}),
+    ],
+}
 
 _EXPR = r"([a-z]+(?:\+[a-z]+)*(?:-only)?)"
-_TS_BLOCK = re.compile(rf"^[ \t]*// <surface: {_EXPR}>[ \t]*\n(.*?)^[ \t]*// </surface: \1>[ \t]*\n", re.S | re.M)
+_CODE_BLOCK = re.compile(rf"^[ \t]*(?://|\#) <surface: {_EXPR}>[ \t]*\n(.*?)^[ \t]*(?://|\#) </surface: \1>[ \t]*\n", re.S | re.M)
 _MD_BLOCK = re.compile(rf"^[ \t]*<!-- surface: {_EXPR} -->[ \t]*\n(.*?)^[ \t]*<!-- /surface: \1 -->[ \t]*\n", re.S | re.M)
 _MD_INLINE = re.compile(rf"<!-- surface: {_EXPR} -->(.*?)<!-- /surface: \1 -->", re.S)
 _LEFTOVER = re.compile(r"<surface:|</surface:|<!-- /?surface:|\{\{[A-Z_]+\}\}")
@@ -76,6 +115,14 @@ def parse_surfaces(value: str) -> list[str]:
     if not names:
         raise ScaffoldError("Choose at least one surface: web, api or both.")
     return [name for name in KNOWN_SURFACES if name in names]
+
+
+def parse_language(value: str) -> str:
+    """`typescript` / `ts` / `python` / `py` -> canonical name."""
+    language = {"ts": "typescript", "py": "python"}.get(value.strip().lower(), value.strip().lower())
+    if language not in LANGUAGES:
+        raise ScaffoldError(f"Unknown language '{value}'. Use typescript or python.")
+    return language
 
 
 def is_pnpm_repo(repo: Path) -> bool:
@@ -105,7 +152,7 @@ def _active(expression: str, surfaces: list[str]) -> bool:
     return all(part in chosen for part in parts)
 
 
-def render(text: str, surfaces: list[str], app_name: str) -> str:
+def render(text: str, surfaces: list[str], app_name: str, language: str = "typescript") -> str:
     """Drop sections whose surface is not chosen, strip the markers, fill the placeholders."""
 
     def block(match: re.Match[str]) -> str:
@@ -114,7 +161,7 @@ def render(text: str, surfaces: list[str], app_name: str) -> str:
     def inline(match: re.Match[str]) -> str:
         return match.group(2) if _active(match.group(1), surfaces) else ""
 
-    text = _TS_BLOCK.sub(block, text)
+    text = _CODE_BLOCK.sub(block, text)
     text = _MD_BLOCK.sub(block, text)
     text = _MD_INLINE.sub(inline, text)
     values = {
@@ -123,6 +170,7 @@ def render(text: str, surfaces: list[str], app_name: str) -> str:
         "{{SURFACES_LIST}}": ", ".join(json.dumps(name) for name in surfaces),
         "{{SURFACES_TEXT}}": ", ".join(surfaces),
         "{{SURFACES_YAML}}": "\n".join(f"  - {name}" for name in surfaces),
+        **COMMAND_PLACEHOLDERS[language],
     }
     for key, value in values.items():
         text = text.replace(key, value)
@@ -132,13 +180,13 @@ def render(text: str, surfaces: list[str], app_name: str) -> str:
     return text
 
 
-def _copy_tree(repo: Path, surfaces: list[str], app_name: str, created: list[str], skipped: list[str]) -> None:
-    for tree, target_root in TREES.items():
+def _copy_tree(repo: Path, surfaces: list[str], app_name: str, language: str, created: list[str], skipped: list[str]) -> None:
+    for tree, target_root, verbatim in TREES[language]:
         source_root = TEMPLATES / tree
-        for source in sorted(p for p in source_root.rglob("*") if p.is_file()):
+        for source in sorted(p for p in source_root.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
             relative = f"{target_root}/{source.relative_to(source_root).as_posix()}"
             relative = RENAMES.get(relative, relative)
-            gate = SURFACE_FILES.get(relative)
+            gate = SURFACE_FILES[language].get(relative)
             if gate and gate not in surfaces:
                 continue
             target = repo / relative
@@ -146,10 +194,10 @@ def _copy_tree(repo: Path, surfaces: list[str], app_name: str, created: list[str
                 skipped.append(relative)
                 continue
             target.parent.mkdir(parents=True, exist_ok=True)
-            if tree in VERBATIM_TREES:
+            if verbatim:
                 shutil.copyfile(source, target)
             else:
-                target.write_text(render(source.read_text(), surfaces, app_name))
+                target.write_text(render(source.read_text(), surfaces, app_name, language))
             created.append(relative)
 
 
@@ -211,35 +259,53 @@ def _install(repo: Path, packages: list[str]) -> str:
     return "installed"
 
 
-def _ensure_gitignore(repo: Path) -> str:
+def _pip_install(repo: Path) -> str:
+    command = [sys.executable, "-m", "pip", "install", "-r", REQUIREMENTS]
+    result = subprocess.run(command, cwd=repo, capture_output=True, text=True)
+    if result.returncode != 0:
+        return f"`python3 -m pip install -r {REQUIREMENTS}` failed: {_last_line(result)}"
+    return "installed"
+
+
+def _ensure_gitignore(repo: Path, language: str = "typescript") -> str:
+    """Returns the state of the `/proof/.runs/` line: present, added or created."""
     path = repo / ".gitignore"
-    accepted = {GITIGNORE_LINE, "proof/.runs/", "/proof/.runs", "proof/.runs", "/proof/", "proof/"}
-    if path.is_file():
-        text = path.read_text()
-        if any(line.strip() in accepted for line in text.splitlines()):
-            return "present"
-        path.write_text(text + ("" if text.endswith("\n") or not text else "\n") + GITIGNORE_LINE + "\n")
-        return "added"
-    path.write_text(GITIGNORE_LINE + "\n")
-    return "created"
+    existed = path.is_file()
+    text = path.read_text() if existed else ""
+    present = {line.strip() for line in text.splitlines()}
+    missing = [line for line, accepted in GITIGNORE_LINES[language] if not present & accepted]
+    if missing:
+        path.write_text(text + ("" if text.endswith("\n") or not text else "\n") + "\n".join(missing) + "\n")
+    if GITIGNORE_LINES[language][0][0] not in missing:
+        return "present"
+    return "added" if existed else "created"
 
 
-def scaffold(repo: Path, surfaces: list[str], app_name: str, install: bool = True) -> dict:
+def scaffold(repo: Path, surfaces: list[str], app_name: str, install: bool = True, language: str = "typescript") -> dict:
     repo = repo.resolve()
-    if not is_pnpm_repo(repo):
+    if language == "typescript" and not is_pnpm_repo(repo):
         raise ScaffoldError(
             f"{repo} is not a pnpm repository (needs package.json and pnpm-lock.yaml, pnpm-workspace.yaml or packageManager: pnpm@...)."
-            " Use the create-verification-skill skill for other stacks."
+            " Choose python for other stacks."
         )
+    if language == "python" and sys.version_info < MIN_PYTHON:
+        raise ScaffoldError(f"The Python kit needs Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or newer; this is {sys.version.split()[0]}.")
     if not app_name.strip():
         raise ScaffoldError("The app name is empty.")
     created: list[str] = []
     skipped: list[str] = []
-    _copy_tree(repo, surfaces, app_name.strip(), created, skipped)
-    scripts_added, script_conflicts, missing = _update_package(repo)
-    install_status = _install(repo, missing) if install else ("skipped" if missing else "nothing to install")
+    _copy_tree(repo, surfaces, app_name.strip(), language, created, skipped)
+    scripts_added: list[str] = []
+    script_conflicts: list[str] = []
+    missing: list[str] = []
+    if language == "typescript":
+        scripts_added, script_conflicts, missing = _update_package(repo)
+        install_status = _install(repo, missing) if install else ("skipped" if missing else "nothing to install")
+    else:
+        install_status = _pip_install(repo) if install else "skipped"
     return {
         "repo": str(repo),
+        "language": language,
         "surfaces": surfaces,
         "app_name": app_name.strip(),
         "created": created,
@@ -248,19 +314,20 @@ def scaffold(repo: Path, surfaces: list[str], app_name: str, install: bool = Tru
         "scripts_conflicting": script_conflicts,
         "dev_dependencies_missing": missing,
         "install": install_status,
-        "gitignore": _ensure_gitignore(repo),
+        "gitignore": _ensure_gitignore(repo, language),
     }
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--repo", required=True, type=Path, help="Repository root (the pnpm package that gets proof/).")
+    parser.add_argument("--repo", required=True, type=Path, help="Repository root (gets proof/).")
+    parser.add_argument("--language", default="typescript", help="typescript (pnpm repos only) or python (any repo).")
     parser.add_argument("--surfaces", required=True, help="web, api, both, or a comma list.")
     parser.add_argument("--app-name", required=True, help="Name shown in receipts and the verify-mole skill.")
-    parser.add_argument("--no-install", action="store_true", help="Do not run `pnpm add -D`; report the missing packages.")
+    parser.add_argument("--no-install", action="store_true", help="Do not install dependencies (`pnpm add -D` or `pip install -r`).")
     args = parser.parse_args(argv)
     try:
-        result = scaffold(args.repo, parse_surfaces(args.surfaces), args.app_name, install=not args.no_install)
+        result = scaffold(args.repo, parse_surfaces(args.surfaces), args.app_name, install=not args.no_install, language=parse_language(args.language))
     except ScaffoldError as error:
         print(json.dumps({"ok": False, "error": str(error)}, indent=2), file=sys.stderr)
         return 2

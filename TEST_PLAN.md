@@ -1130,7 +1130,7 @@ Scenario: Repo without package json is refused
 Scenario: Npm repo is refused and untouched
   Given a repository with package-lock.json only
   When scaffold runs
-  Then it is refused pointing at create-verification-skill and no proof folder exists
+  Then it is refused pointing at the python language and no proof folder exists
 
 Scenario: Package manager field marks a pnpm repo
   Given a package.json with packageManager pnpm
@@ -1326,3 +1326,232 @@ Scenario: Every skill has name and description frontmatter
 ```
 
 **Coverage:** Unit test
+
+
+## Feature: Proof Language Selection
+
+> Script unit test (`init-proof` `scaffold.py`, `--language`)
+
+```gherkin
+Scenario: Language choice is normalised
+  Given a language of typescript, ts, python or py in any case with spaces
+  When the choice is parsed
+  Then typescript or python is returned
+
+Scenario: Unknown language is refused
+  Given an empty language or one that is neither typescript nor python
+  When the choice is parsed
+  Then scaffolding is refused saying to use typescript or python
+
+Scenario: Language defaults to typescript on the command line
+  Given the scaffold command without --language in a non-pnpm folder
+  When it runs
+  Then it exits 2 with the pnpm repository error
+
+Scenario: Python language is accepted on the command line
+  Given the scaffold command with --language python
+  When it runs
+  Then it exits 0 and reports the language python
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Python Kit Gate
+
+```gherkin
+Scenario: Any folder without package json is accepted
+  Given a folder with no package.json
+  When scaffold runs for python
+  Then the kit is created and no package.json exists
+
+Scenario: Old python is refused and untouched
+  Given Python older than 3.10
+  When scaffold runs for python
+  Then it is refused naming Python 3.10 and no proof folder exists
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Python Kit Scaffold Output
+
+```gherkin
+Scenario: Both surfaces create the engine adapters and skill
+  Given a repository and surfaces web and api
+  When scaffold runs for python
+  Then the python engine, app config, both adapters, requirements, tests and the verify-mole skill are created and no TypeScript file is
+
+Scenario: Web only has no api adapter or api config
+  Given surfaces web only
+  When scaffold runs for python
+  Then there is no api adapter, no ApiConfig in app.py and no api_surface in the adapter index
+
+Scenario: Api only has no web adapter or web config
+  Given surfaces api only
+  When scaffold runs for python
+  Then there is no web adapter, no WebConfig in app.py and the skill speaks of HTTP without screenshots
+
+Scenario: No marker or placeholder is left in any file
+  Given each surface choice
+  When scaffold runs for python
+  Then no surface marker or {{PLACEHOLDER}} remains in any file
+
+Scenario: Every scaffolded python file is valid python
+  Given each surface choice
+  When scaffold runs for python
+  Then every scaffolded .py file parses
+
+Scenario: Verify mole skill and maps use the python commands
+  Given a python scaffold
+  When the verify-mole files are read
+  Then they name python3 -m proof.engine.mole and proof/app.py and never pnpm
+
+Scenario: Engine is copied byte for byte
+  Given a python scaffold
+  When the engine files are compared with the templates
+  Then they are identical
+
+Scenario: App name is json escaped in app py and plain in the skill
+  Given an app name with quotes
+  When scaffold runs for python
+  Then app.py holds it as a valid string literal and the skill holds it plain
+
+Scenario: Example map lists exactly the chosen surfaces
+  Given surfaces api only
+  When scaffold runs for python
+  Then the example map frontmatter lists api and not web
+
+Scenario: Unresolved todo markers remain for the research step
+  Given a python scaffold
+  When app.py is read
+  Then it still holds TODO(proof) markers
+
+Scenario: Typescript scaffold is unchanged by the python templates
+  Given a pnpm repository
+  When scaffold runs for typescript
+  Then no python file is created and the skill uses pnpm mole
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Python Kit No Overwrite
+
+```gherkin
+Scenario: Existing files are kept and reported as skipped
+  Given a repository that already has proof/app.py
+  When scaffold runs for python
+  Then app.py is untouched and reported as skipped
+
+Scenario: Second run creates nothing
+  Given a repository scaffolded for python
+  When scaffold runs again
+  Then nothing is created
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Python Kit Install
+
+```gherkin
+Scenario: Requirements list the kit dependencies
+  Given a python scaffold
+  When proof/requirements.txt is read
+  Then it lists playwright, pytest and mypy
+
+Scenario: Install is skipped on request and never touches package json
+  Given scaffold runs for python with install off
+  When the result is read
+  Then install is skipped, no scripts were added and no package.json exists
+
+Scenario: Install runs pip with the requirements file
+  Given scaffold runs for python with install on
+  When it installs
+  Then it runs python -m pip install -r proof/requirements.txt and reports installed
+
+Scenario: Failed install is reported not raised
+  Given pip fails
+  When scaffold runs for python
+  Then the result says the install failed with the last output line and the files are still created
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Python Kit Gitignore
+
+```gherkin
+Scenario: Runs folder and bytecode are ignored
+  Given a repository without .gitignore
+  When scaffold runs for python
+  Then .gitignore holds /proof/.runs/ and __pycache__/
+
+Scenario: Existing entries are respected and missing ones appended
+  Given a .gitignore with an equivalent __pycache__ entry
+  When scaffold runs for python
+  Then only /proof/.runs/ is appended
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Python Kit Engine
+
+> Runs the scaffolded kit; needs playwright installed
+
+```gherkin
+Scenario: Scaffolded selftest passes
+  Given a python scaffold for web, api or both
+  When proof/test_features.py runs
+  Then it passes
+
+Scenario: Selftest catches a map that drifted from the registry
+  Given a map with no feature
+  When proof/test_features.py runs
+  Then it fails on the map and feature pairing
+
+Scenario: Deep equality does not treat true as one
+  Given the engine's equality helper
+  When it compares True with 1, lists of different length and different keys
+  Then only equal values match
+
+Scenario: Help lists commands with the python invocation
+  Given a python scaffold
+  When mole help runs
+  Then it prints usage with python3 -m proof.engine.mole
+
+Scenario: Unknown command exits 2 with a next step
+  Given a python scaffold
+  When mole runs an unknown command
+  Then it exits 2 and the JSON error names the help command
+
+Scenario: Commands that need a session say nothing is running
+  Given no mole session
+  When mole snapshot runs
+  Then it exits 2 with "Nothing is running."
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Python Kit End To End
+
+> Needs playwright and its Chromium
+
+```gherkin
+Scenario: Up start doctor prove stale and down
+  Given a python scaffold in a git repo with a small HTTP app
+  When mole up --start runs, then doctor, prove, prove --surface api, snapshot and api get
+  Then doctor is ok, the proof is PASS with a screenshot and no page errors, the api-only run says web did not run, and snapshot and api get show the app
+  And after the source changes, prove refuses and doctor reports STALE
+  And down stops mole and removes the session
+
+Scenario: A failing check is a fail receipt with its hint
+  Given a feature whose check expects the wrong value
+  When mole prove runs
+  Then it exits 1 with verdict FAIL and the check's hint as the first next step
+```
+
+**Coverage:** Integration test

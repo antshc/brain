@@ -68,7 +68,7 @@ class TestRepositoryGate:
     def test_npm_repo_is_refused_and_untouched(self, tmp_path: Path) -> None:
         (tmp_path / "package.json").write_text("{}")
         (tmp_path / "package-lock.json").write_text("{}")
-        with pytest.raises(scaffold_module.ScaffoldError, match="create-verification-skill"):
+        with pytest.raises(scaffold_module.ScaffoldError, match="Choose python"):
             run(tmp_path)
         assert not (tmp_path / "proof").exists()
 
@@ -137,7 +137,7 @@ class TestScaffoldedFiles:
 
     def test_engine_is_copied_byte_for_byte(self, repo: Path) -> None:
         run(repo, "both")
-        for source in (SKILL_DIR / "templates" / "engine").iterdir():
+        for source in (SKILL_DIR / "templates" / "typescript" / "engine").iterdir():
             assert (repo / "proof/engine" / source.name).read_bytes() == source.read_bytes()
 
     def test_unresolved_todo_markers_remain_for_the_research_step(self, repo: Path) -> None:
