@@ -1098,3 +1098,231 @@ Scenario: All open issue pages are returned without a spec number
 ```
 
 **Coverage:** Unit test
+
+
+## Feature: Proof Surface Selection
+
+> Script unit test (`init-proof` `scaffold.py`)
+
+```gherkin
+Scenario: Surface choice is normalised to canonical order
+  Given a surface choice of web, api, both, a comma list, or mixed case with spaces
+  When the choice is parsed
+  Then the surfaces are returned as web then api without duplicates
+
+Scenario: Unknown or empty surface choice is refused
+  Given an empty choice or a surface that is neither web nor api
+  When the choice is parsed
+  Then scaffolding is refused with an error
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Repository Gate
+
+```gherkin
+Scenario: Repo without package json is refused
+  Given a folder with no package.json
+  When scaffold runs
+  Then it is refused as not a pnpm repository
+
+Scenario: Npm repo is refused and untouched
+  Given a repository with package-lock.json only
+  When scaffold runs
+  Then it is refused pointing at create-verification-skill and no proof folder exists
+
+Scenario: Package manager field marks a pnpm repo
+  Given a package.json with packageManager pnpm
+  When the repository is checked
+  Then it is a pnpm repository
+
+Scenario: Cli exits 2 with error for non pnpm repo
+  Given a non-pnpm repository
+  When the scaffold command runs
+  Then it exits 2 and prints a JSON error
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Scaffold Output
+
+```gherkin
+Scenario: Both surfaces create both adapters
+  Given a pnpm repository and surfaces web and api
+  When scaffold runs
+  Then both adapters, the engine and the verify-mole skill are created
+
+Scenario: Web only has no api adapter or api config
+  Given surfaces web only
+  When scaffold runs
+  Then there is no api adapter, no api config in app.ts and no apiSurface in the adapter index
+
+Scenario: Api only has no web adapter or web config
+  Given surfaces api only
+  When scaffold runs
+  Then there is no web adapter, no web config, and the skill mentions HTTP and no screenshot
+
+Scenario: No marker or placeholder is left in any file
+  Given any surface choice
+  When scaffold runs
+  Then no surface marker or placeholder remains in a created file
+
+Scenario: Both surfaces skill explains cross surface driving
+  Given surfaces web and api
+  When scaffold runs
+  Then the verify-mole skill explains --surface web|api and screenshots
+
+Scenario: App name is json escaped in app ts and plain in the skill
+  Given an app name containing quotes
+  When scaffold runs
+  Then app.ts holds it as a JSON string and the skill heading holds it as text
+
+Scenario: Example map lists exactly the chosen surfaces
+  Given surfaces api only
+  When scaffold runs
+  Then the example map's frontmatter lists api and its driving section mentions the api command
+
+Scenario: Engine is copied byte for byte
+  Given any surface choice
+  When scaffold runs
+  Then every engine file equals its template
+
+Scenario: Unresolved todo markers remain for the research step
+  Given any surface choice
+  When scaffold runs
+  Then app.ts keeps TODO(proof) markers for the researcher
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Scaffold No Overwrite
+
+```gherkin
+Scenario: Existing files are kept and reported as skipped
+  Given a repository that already has proof/app.ts
+  When scaffold runs
+  Then the file is unchanged and reported as skipped, not created
+
+Scenario: Second run creates nothing
+  Given a repository scaffolded once
+  When scaffold runs again
+  Then nothing is created and everything from the first run is skipped
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Package Setup
+
+```gherkin
+Scenario: Scripts are added and indent is preserved
+  Given a package.json with its own scripts
+  When scaffold runs
+  Then mole, prove, test:proof and typecheck:proof are added and the file's indent and scripts are preserved
+
+Scenario: Conflicting script is kept and reported
+  Given a package.json whose mole script differs
+  When scaffold runs
+  Then the script is kept and reported as conflicting
+
+Scenario: Declared dev dependencies are not reinstalled
+  Given some required devDependencies already declared
+  When scaffold runs without installing
+  Then only the missing ones are reported and install is skipped
+
+Scenario: Workspace root installs with dash w
+  Given a pnpm-workspace.yaml at the repository root
+  When the missing packages are installed
+  Then pnpm add -D -w is used
+
+Scenario: Ignored build scripts are approved
+  Given pnpm refusing an install with ignored build scripts
+  When the packages are installed
+  Then the blocked packages are approved and the install is reported as installed
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Gitignore
+
+```gherkin
+Scenario: Missing gitignore is created
+  Given a repository without .gitignore
+  When scaffold runs
+  Then .gitignore holds /proof/.runs/
+
+Scenario: Line is appended once to an existing file
+  Given an existing .gitignore without the entry
+  When scaffold runs twice
+  Then the entry is appended once, and the second run finds it present
+
+Scenario: Equivalent existing entry is respected
+  Given a .gitignore with proof/.runs/
+  When scaffold runs
+  Then it is reported present and not changed
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Surface Markers
+
+```gherkin
+Scenario: Ts block markers
+  Given a TypeScript block guarded by an api marker
+  When it is rendered for web only and for api
+  Then the block is dropped or kept without markers
+
+Scenario: Markdown inline and block markers
+  Given Markdown guarded inline by web+api and as a block by web-only
+  When it is rendered for both surfaces and for web
+  Then only the sections whose expression holds remain
+
+Scenario: Unknown marker expression is an error
+  Given a marker naming an unknown surface
+  When it is rendered
+  Then rendering fails
+
+Scenario: Unresolved placeholder is an error
+  Given a template with an unknown placeholder
+  When it is rendered
+  Then rendering fails
+```
+
+**Coverage:** Unit test
+
+
+## Feature: Proof Plugin Layout
+
+```gherkin
+Scenario: Only the four skills carry a skill md
+  Given the proof plugin folder
+  When SKILL.md files are listed
+  Then only init-proof, maintain-proof, create-verification-skill and playwright-cli have one
+
+Scenario: Plugin manifest points at the skills folder
+  Given the proof plugin manifest
+  When it is read
+  Then it names proof and ./skills
+
+Scenario: Marketplace lists the plugin
+  Given the marketplace file
+  When the proof entry is read
+  Then it points at ./plugins/proof
+
+Scenario: Template skill is renamed on scaffold
+  Given a scaffolded repository
+  When the verify-mole folder is listed
+  Then it holds SKILL.md and no template-named file
+
+Scenario: Every skill has name and description frontmatter
+  Given each proof skill
+  When its frontmatter is read
+  Then it has the skill's name and a description
+```
+
+**Coverage:** Unit test

@@ -78,6 +78,13 @@ copilot plugin install ms@brain
 copilot plugin install aws@brain
 ```
 
+### Proof plugin (proof)
+
+```sh
+(copilot plugin uninstall proof@brain >/dev/null 2>&1 || true) && \
+copilot plugin install proof@brain
+```
+
 
 ### Brain engineering skills
 
@@ -216,6 +223,15 @@ AWS documentation, SDK reference, and implementation-constraint research skills.
 - [search-aws-docs](plugins/aws/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
 - [search-aws-sdk-nuget](plugins/aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
 - [research-aws](plugins/aws/skills/research-aws/SKILL.md): research AWS implementation constraints — APIs, SDK, IAM, networking, quotas, retries, failures — with provider evidence.
+
+### proof
+
+Agent-driven proof of app behavior for pnpm repos: a `mole` CLI that drives the app in a real Chrome, receipts with a revision-bound verdict, web and API surface adapters, and feature maps.
+
+- [init-proof](plugins/proof/skills/init-proof/SKILL.md): install the kit into a pnpm repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus a repository-local `verify-mole` skill.
+- [maintain-proof](plugins/proof/skills/maintain-proof/SKILL.md): keep maps, adapters and proofs honest as the app changes, and re-prove on a fresh build.
+- [create-verification-skill](plugins/proof/skills/create-verification-skill/SKILL.md): generic fallback that generates a verification skill for any stack (CLI, desktop, other surfaces).
+- [playwright-cli](plugins/proof/skills/playwright-cli/SKILL.md): browser driving helper for ad-hoc exploration and Playwright tests.
 
 ### engineering
 
