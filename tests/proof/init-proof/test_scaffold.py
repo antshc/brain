@@ -90,7 +90,9 @@ class TestScaffoldedFiles:
         assert "proof/features/surfaces/web.ts" in result["created"]
         assert "proof/features/surfaces/api.ts" in result["created"]
         assert (repo / ".github/skills/verify-mole/SKILL.md").is_file()
-        assert (repo / "proof/engine/mole.ts").is_file()
+        assert (repo / "mole/mole.ts").is_file()
+        assert (repo / "proof/kit/run.ts").is_file()
+        assert not (repo / "proof/engine").exists()
 
     def test_web_only_has_no_api_adapter_or_api_config(self, repo: Path) -> None:
         run(repo, "web")
@@ -135,10 +137,11 @@ class TestScaffoldedFiles:
         assert "surfaces:\n  - api\n---" in map_text
         assert "api get /" in map_text
 
-    def test_engine_is_copied_byte_for_byte(self, repo: Path) -> None:
+    def test_kit_and_mole_are_copied_byte_for_byte(self, repo: Path) -> None:
         run(repo, "both")
-        for source in (SKILL_DIR / "templates" / "typescript" / "engine").iterdir():
-            assert (repo / "proof/engine" / source.name).read_bytes() == source.read_bytes()
+        for folder, target in (("kit", "proof/kit"), ("mole", "mole")):
+            for source in (SKILL_DIR / "templates" / "typescript" / folder).iterdir():
+                assert (repo / target / source.name).read_bytes() == source.read_bytes()
 
     def test_unresolved_todo_markers_remain_for_the_research_step(self, repo: Path) -> None:
         run(repo, "both")
@@ -169,7 +172,7 @@ class TestPackageJson:
     def test_scripts_are_added_and_indent_is_preserved(self, repo: Path) -> None:
         result = run(repo)
         data = json.loads((repo / "package.json").read_text())
-        assert data["scripts"]["mole"] == "tsx proof/engine/mole.ts"
+        assert data["scripts"]["mole"] == "tsx mole/mole.ts"
         assert data["scripts"]["dev"] == "node server.js"
         assert set(result["scripts_added"]) == {"mole", "prove", "test:proof", "typecheck:proof"}
         assert (repo / "package.json").read_text().startswith('{\n  "name"')

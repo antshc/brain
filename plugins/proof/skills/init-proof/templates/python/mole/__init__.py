@@ -22,4 +22,4 @@ def _load_env(path: Path) -> None:
         os.environ.setdefault(key.strip().removeprefix("export ").strip(), value)
 
 
-_load_env(Path(__file__).resolve().parents[2] / ".env")
+_load_env(Path(__file__).resolve().parents[1] / ".env")

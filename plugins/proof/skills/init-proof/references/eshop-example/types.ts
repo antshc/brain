@@ -1,10 +1,10 @@
 // Reference only (eShop, a .NET Blazor storefront plus catalog API): a worked example of a feature's adapter shapes,
-// written against the kit's engine. Not compiled or copied by init-proof.
+// written against the proof kit. Not compiled or copied by init-proof.
 // What a feature does, said once. Each surface (web, api) turns the same call into its own way of driving the app
 // and returns the same shape, so a contract rule is written once and checked on every surface.
-import type { Surface } from "../../engine/surfaces";
+import type { Surface } from "../../kit";
 
-export { SurfaceError, type Surface } from "../../engine/surfaces";
+export { SurfaceError, type Surface } from "../../kit";
 
 // Both surfaces list this many products per page, and pages count from 1.
 export const PAGE_SIZE = 9;

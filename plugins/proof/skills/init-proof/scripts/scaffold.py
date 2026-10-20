@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffold the proof kit (mole engine, app seams, verify-mole skill) into a repository, in TypeScript or Python.
+"""Scaffold the proof kit (proof kit, mole runner, app seams, verify-mole skill) into a repository, in TypeScript or Python.
 
 Deterministic copy and render. Never overwrites an existing file: it is reported as skipped.
 TypeScript needs a pnpm repository; Python works in any repository.
@@ -32,12 +32,14 @@ MIN_PYTHON = (3, 10)
 # (template folder under templates/, target folder inside the repository, copied byte for byte?)
 TREES = {
     "typescript": [
-        ("typescript/engine", "proof/engine", True),
+        ("typescript/kit", "proof/kit", True),
+        ("typescript/mole", "mole", True),
         ("typescript/app", "proof", False),
         ("verify-mole", ".github/skills/verify-mole", False),
     ],
     "python": [
-        ("python/engine", "proof/engine", True),
+        ("python/kit", "proof/kit", True),
+        ("python/mole", "mole", True),
         ("python/app", "proof", False),
         ("verify-mole", ".github/skills/verify-mole", False),
     ],
@@ -67,17 +69,17 @@ COMMAND_PLACEHOLDERS = {
         "{{APP_FILE}}": "proof/app.ts",
     },
     "python": {
-        "{{MOLE}}": "python3 -m proof.engine.mole",
-        "{{PROVE}}": "python3 -m proof.engine.prove_cli",
+        "{{MOLE}}": "python3 -m mole",
+        "{{PROVE}}": "python3 -m mole.prove_cli",
         "{{TEST_PROOF}}": "python3 -m pytest proof/test_features.py",
-        "{{TYPECHECK_PROOF}}": "python3 -m mypy --strict proof",
+        "{{TYPECHECK_PROOF}}": "python3 -m mypy --strict proof mole",
         "{{APP_FILE}}": "proof/app.py",
     },
 }
 
 SCRIPTS = {
-    "mole": "tsx proof/engine/mole.ts",
-    "prove": "tsx proof/engine/prove-cli.ts",
+    "mole": "tsx mole/mole.ts",
+    "prove": "tsx mole/prove-cli.ts",
     "test:proof": "tsx --test proof/features.test.ts",
     "typecheck:proof": "tsc -p proof/tsconfig.json",
 }

@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import os
 
-from .engine.model import AppConfig, StartConfig
+from mole.config import AppConfig, StartConfig
 # <surface: api>
-from .engine.model import ApiConfig
+from mole.config import ApiConfig
 # </surface: api>
 # <surface: web>
-from .engine.model import WebConfig
+from mole.config import WebConfig
 # </surface: web>
 
-# The one file that says what this app is. The engine reads it; every value comes from the codebase, not a guess.
+# The one file that says what this app is. The mole reads it; every value comes from the codebase, not a guess.
 # Resolve each TODO(proof) from the repo (see the init-proof research checklist), then delete the marker.
 APP = AppConfig(
     name={{APP_NAME_JSON}},
@@ -19,12 +19,12 @@ APP = AppConfig(
     surfaces=[{{SURFACES_LIST}}],
     # TODO(proof): repo-relative folders whose changes alter the running build. The revision is derived from them.
     source_paths=["src"],
-    # TODO(proof): how `python3 -m proof.engine.mole up --start` runs the app, and how it knows the app is ready (seeded, first render done).
+    # TODO(proof): how `{{MOLE}} up --start` runs the app, and how it knows the app is ready (seeded, first render done).
     start=StartConfig(
         command="python3",
         args=["-m", "your_app"],
         # prerequisites=check_tools,  # a function that raises RuntimeError("What is missing and how to install it")
-        # ready=lambda url: fetch(url).status == 200,  # fetch is in proof.engine.runtime
+        # ready=lambda url: fetch(url).status == 200,  # fetch is in mole.runtime
         timeout_s=120,
     ),
     # <surface: api>

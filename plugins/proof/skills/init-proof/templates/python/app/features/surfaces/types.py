@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from ...engine.model import Surface, SurfaceError
+from proof.kit import Surface, SurfaceError
 
 __all__ = ["AppApi", "AppStatus", "Surface", "SurfaceAdapter", "SurfaceError"]
 

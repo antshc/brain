@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
-MOLE = "python3 -m proof.engine.mole"
-PROVE_CLI = "python3 -m proof.engine.prove_cli"
+MOLE = "python3 -m mole"
+PROVE_CLI = "python3 -m mole.prove_cli"
+# Handed to the proof kit, which quotes them in receipts.
+RERUN = f"{MOLE} prove (or {PROVE_CLI})"
+DIAGNOSE = f"Run {MOLE} doctor (or check the app is running at --url)"
 
 COMMANDS: dict[str, tuple[str, str, str]] = {
     "up": ("Health", "up [--url URL] [--start] [--headless]", "Open a Chrome you can drive on the app and find the API. --start also runs the app (APP.start). Leave it running in its own terminal."),

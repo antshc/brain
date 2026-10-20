@@ -1,4 +1,4 @@
-"""Usage: python3 -m proof.engine.prove_cli [--url URL] [--feature NAME] [--surface web|api]
+"""Usage: python3 -m mole.prove_cli [--url URL] [--feature NAME] [--surface web|api]
 
 Exit 0 PASS, 1 FAIL, 2 can't tell. Receipts and screenshots go to proof/.runs/.
 Runs against an app you already started, in its own throwaway browser. `mole prove` does the same in mole's browser.
@@ -7,17 +7,19 @@ Runs against an app you already started, in its own throwaway browser. `mole pro
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 import time
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright
 
-from ..app import APP
-from .proof import run_proof
-from .registry import prove_features, select_features, surfaces_for
-from .runtime import DEFAULT_URL, ROOT, discover_api, source_revision
+from proof.app import APP
+from proof.features import FEATURES
+from proof.kit import exit_code, prove_features, run_proof, select_features, surfaces_for
+
+from .commands import DIAGNOSE, RERUN
+from .receipts import write_receipt
+from .runtime import DEFAULT_URL, ROOT, SURFACES, discover_api, source_revision
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -27,8 +29,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--surface", action="append", default=[])
     args = parser.parse_args(argv)
     try:
-        selected = select_features(args.feature)
-        surfaces = surfaces_for(selected, args.surface)
+        selected = select_features(FEATURES, args.feature)
+        surfaces = surfaces_for(FEATURES, selected, SURFACES, args.surface)
         api_url = discover_api() if "api" in surfaces else None
         if "api" in surfaces and not api_url:
             web_hint = ", or prove the web surface only: --surface web" if "web" in APP.surfaces else ""
@@ -39,18 +41,17 @@ def main(argv: list[str] | None = None) -> int:
             browser = playwright.chromium.launch()
             try:
                 shot = directory / f"proof-{int(time.time() * 1000)}.png"
-                receipt = run_proof(browser, args.url, prove_features(selected), shot, source_revision, surfaces=surfaces, api_url=api_url)
+                receipt = run_proof(
+                    browser, args.url, prove_features(FEATURES, selected), screenshot=shot, revision=source_revision,
+                    surfaces=surfaces, api_url=api_url, features=selected, rerun=RERUN, diagnose=DIAGNOSE,
+                )
             finally:
                 browser.close()
     except (RuntimeError, ValueError, OSError, PlaywrightError) as exception:
         print(exception, file=sys.stderr)
         return 2
-    receipt.features = selected
-    receipt.surfaces = surfaces
-    data = json.dumps(receipt.to_json(), indent=2, default=str)
-    (directory / "last-receipt.json").write_text(data)
-    print(data)
-    return {"PASS": 0, "FAIL": 1}.get(receipt.verdict, 2)
+    print(write_receipt(directory / "last-receipt.json", receipt))
+    return exit_code(receipt)
 
 
 if __name__ == "__main__":

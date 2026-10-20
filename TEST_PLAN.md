@@ -1146,13 +1146,35 @@ Scenario: Cli exits 2 with error for non pnpm repo
 **Coverage:** Unit test
 
 
+## Feature: Proof Kit Independence
+
+```gherkin
+Scenario: Kit imports only its own files
+  Given the kit templates of a language
+  When their imports are read
+  Then none reaches the app, the mole, the commands or the runtime
+
+Scenario: Kit names no runner command
+  Given the kit templates of a language
+  When their text is read
+  Then no pnpm mole, python3 -m mole or other runner command appears
+
+Scenario: Mole uses the kit
+  Given the mole templates of a language
+  When their imports are read
+  Then they import the kit
+```
+
+**Coverage:** Unit test
+
+
 ## Feature: Proof Scaffold Output
 
 ```gherkin
 Scenario: Both surfaces create both adapters
   Given a pnpm repository and surfaces web and api
   When scaffold runs
-  Then both adapters, the engine and the verify-mole skill are created
+  Then both adapters, the proof kit, the mole and the verify-mole skill are created and there is no proof/engine
 
 Scenario: Web only has no api adapter or api config
   Given surfaces web only
@@ -1184,10 +1206,10 @@ Scenario: Example map lists exactly the chosen surfaces
   When scaffold runs
   Then the example map's frontmatter lists api and its driving section mentions the api command
 
-Scenario: Engine is copied byte for byte
+Scenario: Kit and mole are copied byte for byte
   Given any surface choice
   When scaffold runs
-  Then every engine file equals its template
+  Then every proof/kit file and every mole file equals its template
 
 Scenario: Unresolved todo markers remain for the research step
   Given any surface choice
@@ -1377,10 +1399,10 @@ Scenario: Old python is refused and untouched
 ## Feature: Proof Python Kit Scaffold Output
 
 ```gherkin
-Scenario: Both surfaces create the engine adapters and skill
+Scenario: Both surfaces create the kit, mole, adapters and skill
   Given a repository and surfaces web and api
   When scaffold runs for python
-  Then the python engine, app config, both adapters, requirements, tests and the verify-mole skill are created and no TypeScript file is
+  Then the python kit, mole, app config, both adapters, requirements, tests and the verify-mole skill are created and no TypeScript file is
 
 Scenario: Web only has no api adapter or api config
   Given surfaces web only
@@ -1405,12 +1427,12 @@ Scenario: Every scaffolded python file is valid python
 Scenario: Verify mole skill and maps use the python commands
   Given a python scaffold
   When the verify-mole files are read
-  Then they name python3 -m proof.engine.mole and proof/app.py and never pnpm
+  Then they name python3 -m mole and proof/app.py and never pnpm
 
-Scenario: Engine is copied byte for byte
+Scenario: Kit and mole are copied byte for byte
   Given a python scaffold
-  When the engine files are compared with the templates
-  Then they are identical
+  When the files in proof/kit and mole are compared with the templates
+  Then they are identical and there is no proof/engine
 
 Scenario: App name is json escaped in app py and plain in the skill
   Given an app name with quotes
@@ -1513,14 +1535,14 @@ Scenario: Selftest catches a map that drifted from the registry
   Then it fails on the map and feature pairing
 
 Scenario: Deep equality does not treat true as one
-  Given the engine's equality helper
+  Given the kit's equality helper
   When it compares True with 1, lists of different length and different keys
   Then only equal values match
 
 Scenario: Help lists commands with the python invocation
   Given a python scaffold
   When mole help runs
-  Then it prints usage with python3 -m proof.engine.mole
+  Then it prints usage with python3 -m mole
 
 Scenario: Unknown command exits 2 with a next step
   Given a python scaffold

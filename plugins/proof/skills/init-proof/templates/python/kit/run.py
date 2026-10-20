@@ -10,12 +10,9 @@ from urllib.parse import urlsplit
 from playwright.sync_api import Browser, Page
 from playwright.sync_api import Error as PlaywrightError
 
-from .commands import MOLE
-from .model import Check, Prove, ProofKit, Receipt, Surface
+from .types import Check, ProofKit, Prove, Receipt, Surface
 
-__all__ = ["Check", "ProofKit", "Prove", "Receipt", "Revision", "read_storage", "run_proof", "same"]
-
-# The caller supplies a revision (see source_revision() in runtime.py), or it stays None.
+# The caller supplies a revision of the code under proof, or it stays None.
 Revision = Callable[[], "str | None"]
 
 
@@ -69,16 +66,27 @@ def run_proof(
     browser: Browser,
     app: str,
     prove: Prove,
+    *,
+    # Where to save a full-page screenshot (web surface only).
     screenshot: Path | None = None,
     revision: Revision = lambda: None,
-    *,
+    # The surfaces this run proves.
     surfaces: Sequence[Surface] = ("web",),
     api_url: str | None = None,
+    # The feature names this run proves, recorded on the receipt.
+    features: Sequence[str] | None = None,
+    # How to run the proof again, quoted in a FAIL receipt.
+    rerun: str = "Run the proof again",
+    # What to do when the verdict is "can't tell" or a surface cannot be observed.
+    diagnose: str = "Check that the app is running and the build is fresh",
 ) -> Receipt:
     checks: list[Check] = []
     page_errors: dict[str, None] = {}
     run_surfaces = list(surfaces)
-    receipt = Receipt(verdict="ERROR", revision=None, app=app, at=_now(), checks=checks)
+    receipt = Receipt(
+        verdict="ERROR", revision=None, app=app, at=_now(), checks=checks,
+        features=None if features is None else list(features), surfaces=run_surfaces,
+    )
 
     def check(name: str, actual: Any, expected: Any, hint: str | None = None) -> None:
         checks.append(Check(name, same(actual, expected), expected, actual, hint))
@@ -93,8 +101,8 @@ def run_proof(
         if "web" in run_surfaces:
             page.goto(app, wait_until="load", timeout=5000)
         try:
-            prove(ProofKit(page=page, surfaces=run_surfaces, api_url=api_url, check=check, storage=lambda: read_storage(page)))
-        except Exception as exception:  # A feature may raise anything; that is a finding, not a crash of the engine.
+            prove(ProofKit(page=page, surfaces=run_surfaces, api_url=api_url, diagnose=diagnose, check=check, storage=lambda: read_storage(page)))
+        except Exception as exception:  # A feature may raise anything; that is a finding, not a crash of the kit.
             receipt.error = (
                 f"prove() raised: {type(exception).__name__}: {_first_line(exception)}"
                 ". If something is missing, that is a finding: record it with check() instead of raising."
@@ -130,11 +138,11 @@ def run_proof(
     elif receipt.verdict == "FAIL":
         receipt.next_steps = [
             *(item.hint or f'Fix "{item.name}": expected {_show(item.expected)}, got {_show(item.actual)}.' for item in checks if not item.passed),
-            f"Then re-run: {MOLE} prove",
+            f"Then re-run: {rerun}",
         ]
     else:
         receipt.next_steps = [
             receipt.error or "Unknown error.",
-            f"Can't tell is not the same as broken. Run {MOLE} doctor (or check the app is running at --url), then prove again.",
+            f"Can't tell is not the same as broken. {diagnose}, then prove again.",
         ]
     return receipt

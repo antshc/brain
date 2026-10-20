@@ -21,7 +21,7 @@ description: Drive and prove {{APP_NAME}} with the mole CLI. Use to reproduce a 
 
 - <!-- surface: web -->Exercise the user path in the browser. Use `eval` only to read state after the path ran.<!-- /surface: web --><!-- surface: api-only -->Exercise the real HTTP contract through the surface adapter, never by calling app internals.<!-- /surface: api-only -->
 - The revision is `git HEAD` plus a hash of uncommitted changes under `APP.sourcePaths` in `{{APP_FILE}}`. Evidence belongs to one revision; after any edit the old receipt proves nothing, and `doctor` reports it as STALE.
-- `proof/features/` (one proof per feature), `proof/engine/` and the feature maps define done. If one looks wrong, report it and stop.
+- `proof/features/` (one proof per feature), `proof/kit/`, `mole/` and the feature maps define done. If one looks wrong, report it and stop.
 - TODO(proof): what is out of scope for this proof (auth, other services, data the app needs).
 
 ## When to stop

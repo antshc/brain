@@ -12,11 +12,14 @@ from http.client import HTTPException
 from pathlib import Path
 from typing import IO, Any
 
-from ..app import APP
+from proof.app import APP
+from proof.kit import Surface
 
-# proof/engine/runtime.py -> the repository root, wherever mole is started from.
-ROOT = Path(__file__).resolve().parents[2]
+# mole/runtime.py -> the repository root, wherever mole is started from.
+ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_URL = APP.url
+# The surfaces this repo supports. proof/app.py says which.
+SURFACES: tuple[Surface, ...] = tuple(APP.surfaces)
 
 
 def git(*args: str) -> str:
@@ -24,12 +27,13 @@ def git(*args: str) -> str:
     return result.stdout
 
 
-# Proof files are not part of the build, so editing them must not stale the running app. Bytecode is never source.
+# Proof and mole files are not part of the build, so editing them must not stale the running app. Bytecode is never source.
 def _pathspec() -> list[str]:
     return [
         "--",
         *(APP.source_paths or ["."]),
         ":(exclude)proof",
+        ":(exclude)mole",
         ":(exclude).github",
         ":(exclude,glob)**/__pycache__/**",
         ":(exclude,glob)**/*.pyc",

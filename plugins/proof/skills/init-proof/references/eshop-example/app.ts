@@ -1,10 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { AppConfig } from "./engine/runtime";
+import type { AppConfig } from "../mole/config";
 
 // Reference only: the proof/app.ts that eShop (a .NET Aspire AppHost, a Blazor storefront on :5045 and a catalog API
-// behind a mobile-bff proxy) would use with this kit. Everything eShop-specific lives here, none of it in the engine.
+// behind a mobile-bff proxy) would use with this kit. Everything eShop-specific lives here, none of it in the kit or the mole.
 
 // An SDK that satisfies global.json may exist without being on PATH (a user-level install in ~/.dotnet is common).
 // Returns the extra environment to run dotnet with, or throws when no SDK matches.

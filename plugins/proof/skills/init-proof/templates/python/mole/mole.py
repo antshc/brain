@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import shutil
 import signal
 import socket
@@ -25,13 +24,14 @@ from urllib.parse import urljoin, urlsplit
 from playwright.sync_api import Browser, Page, Request, Response, sync_playwright
 from playwright.sync_api import Error as PlaywrightError
 
-from ..app import APP
-from .commands import COMMANDS, MOLE
-from .model import DriveCall, Receipt, SurfaceError, is_surface
-from .proof import read_storage, run_proof
-from .registry import FEATURES, feature_names, prove_features, select_features, surfaces_for
-from .runtime import DEFAULT_URL, ROOT, StartedApp, api_answers, changed_files, discover_api, fetch, reachable, source_revision, start_app
-from .surfaces import SURFACES
+from proof.app import APP
+from proof.features import FEATURES
+from proof.kit import Receipt, SurfaceError, exit_code, feature_names, features_for, is_surface, prove_features, read_storage, run_proof, select_features, surfaces_for
+
+from .commands import COMMANDS, DIAGNOSE, MOLE, RERUN
+from .feature import DriveCall
+from .receipts import coverage_notes, proof_status, save_receipt
+from .runtime import DEFAULT_URL, ROOT, SURFACES, StartedApp, api_answers, changed_files, discover_api, fetch, reachable, source_revision, start_app
 
 T = TypeVar("T")
 
@@ -370,35 +370,16 @@ def doctor() -> int:
             "detail": f"the running build matches the source ({source})" if fresh else f"STALE: the app was started on {session['builtRevision']}, the source is now {source}",
             **({} if fresh else {"next": f"{MOLE} down; {MOLE} up --start" if session["startedApp"] else f"Restart the app, then: {MOLE} down; {MOLE} up"}),
         })
-        proof = _proof_status(source)
+        proof = proof_status(RECEIPT, source)
     ok = all(check["ok"] for check in checks)
     out({"ok": ok, "checks": checks, "proof": proof})
     return 0 if ok else 1
 
 
-def _proof_status(source: str | None) -> dict[str, Any]:
-    if not RECEIPT.exists():
-        return {"status": "none yet", "next": f"{MOLE} prove"}
-    receipt = json.loads(RECEIPT.read_text())
-    if receipt["revision"] != source:
-        return {
-            "status": f"STALE: the last receipt says {receipt['verdict']} for {receipt['revision']}, but the source is now {source}. That proof is for code that no longer exists.",
-            "next": f"{MOLE} prove",
-        }
-    status = f"{receipt['verdict']} for the current source ({source}) at {receipt['at']}"
-    proved = receipt.get("features")
-    if proved and len(proved) < len(feature_names()):
-        status += f", only {', '.join(proved)}: run {MOLE} prove for all"
-    surfaces = receipt.get("surfaces")
-    if surfaces and len(surfaces) < len(SURFACES):
-        status += f", only the {', '.join(surfaces)} surface: run {MOLE} prove with no --surface"
-    return {"status": status, **({} if receipt["verdict"] == "PASS" else {"next": receipt["next"][0]})}
-
-
 def prove(features: list[str], surface_names: list[str]) -> int:
     try:
-        selected = select_features(features)
-        surfaces = surfaces_for(selected, surface_names)
+        selected = select_features(FEATURES, features)
+        surfaces = surfaces_for(FEATURES, selected, SURFACES, surface_names)
     except ValueError as exception:
         raise MoleError(str(exception), f"See the features: {MOLE} features. The surfaces are: {', '.join(SURFACES)}") from exception
 
@@ -412,29 +393,21 @@ def prove(features: list[str], surface_names: list[str]) -> int:
             )
         # One screenshot per run, so each saved receipt keeps the image it was proved with.
         shot = DIR / f"proof-{source}-{int(time.time() * 1000)}.png"
-        return run_proof(browser, session["appUrl"], prove_features(selected), shot, source_revision, surfaces=surfaces, api_url=api_url)
+        return run_proof(
+            browser, session["appUrl"], prove_features(FEATURES, selected), screenshot=shot, revision=source_revision,
+            surfaces=surfaces, api_url=api_url, features=selected, rerun=RERUN, diagnose=DIAGNOSE,
+        )
 
     receipt = with_page(run)
-    receipt.features = selected
-    receipt.surfaces = surfaces
-    if len(selected) < len(feature_names()):
-        receipt.next_steps.append(f"Only {', '.join(selected)} was proved. Run {MOLE} prove with no --feature before you report.")
-    skipped = [surface for surface in SURFACES if surface not in surfaces and any(surface in FEATURES[name].surfaces for name in selected)]
-    if skipped:
-        receipt.next_steps.append(f"The {', '.join(skipped)} surface did not run, so it is not proved. Run {MOLE} prove with no --surface before you report.")
-    data = json.dumps(receipt.to_json(), indent=2, default=str)
-    (DIR / "receipts").mkdir(parents=True, exist_ok=True)
-    RECEIPT.write_text(data)  # latest, for doctor
-    # Append, never overwrite: failures stay in the history next to the final green.
-    (DIR / "receipts" / f"{re.sub(r'[:.]', '-', receipt.at)}-{receipt.revision or 'unknown'}.json").write_text(data)
-    print(data, flush=True)
-    return {"PASS": 0, "FAIL": 1}.get(receipt.verdict, 2)
+    receipt.next_steps.extend(coverage_notes(selected, surfaces))
+    print(save_receipt(DIR, RECEIPT, receipt), flush=True)
+    return exit_code(receipt)
 
 
 # Which features need proving: all of them, or those whose files your uncommitted changes touch.
 def list_features(changed: bool) -> int:
     files = changed_files() if changed else []
-    names = [name for name in feature_names() if any(file.startswith(prefix) for prefix in FEATURES[name].touches for file in files)] if changed else feature_names()
+    names = features_for(FEATURES, files) if changed else feature_names(FEATURES)
     listing = []
     for name in names:
         feature = FEATURES[name]

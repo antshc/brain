@@ -7,7 +7,7 @@ description: Keep a repository's proof kit honest as the app changes — update 
 
 Applies to a repo scaffolded by `init-proof` (it has `proof/app.ts` or `proof/app.py`, `proof/features/` and `.github/skills/verify-mole/`). Concepts: `init-proof/references/concept.md` in this plugin. Run from the repo root.
 
-Commands below use the TypeScript form. Python kit (`proof/app.py`): `pnpm mole` = `python3 -m proof.engine.mole`; `pnpm prove` = `python3 -m proof.engine.prove_cli`; `pnpm test:proof` = `python3 -m pytest proof/test_features.py`; `pnpm typecheck:proof` = `python3 -m mypy --strict proof`; `features/index.ts` = `features/__init__.py`; `APP.sourcePaths` = `APP.source_paths`.
+Commands below use the TypeScript form. Python kit (`proof/app.py`): `pnpm mole` = `python3 -m mole`; `pnpm prove` = `python3 -m mole.prove_cli`; `pnpm test:proof` = `python3 -m pytest proof/test_features.py`; `pnpm typecheck:proof` = `python3 -m mypy --strict proof mole`; `features/index.ts` = `features/__init__.py`; `APP.sourcePaths` = `APP.source_paths`.
 
 ## Loop
 
@@ -31,6 +31,6 @@ Commands below use the TypeScript form. Python kit (`proof/app.py`): `pnpm mole`
 
 ## Rules
 
-- Never edit `proof/engine/`. To change engine behavior, change the `proof/app.ts` (or `proof/app.py`) hooks or report the gap.
+- Never edit `proof/kit/` or `mole/`. To change their behavior, change the `proof/app.ts` (or `proof/app.py`) hooks or report the gap.
 - Never fix a failing proof by loosening it. Report what the check observed.
 - Report: the receipt verdict, revision, features and surfaces proved, and any map or constant you changed and why.
