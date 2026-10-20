@@ -93,6 +93,7 @@ gh skill install antshc/brain engineering/be-terse --agent github-copilot --scop
 gh skill install antshc/brain engineering/suggest --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/render-mermaid-png --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/suggest-graphify-improvements --agent github-copilot --scope user -f
+gh skill install antshc/brain engineering/remove-zone-identifiers --agent github-copilot --scope user -f
 ```
 
 ### dotnet skill (external)
@@ -243,3 +244,4 @@ General-purpose skills not tied to a specific platform.
 - [suggest-graphify-improvements](skills/engineering/suggest-graphify-improvements/SKILL.md): audit a Graphify knowledge graph and suggest evidence-backed improvements.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
+- [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
