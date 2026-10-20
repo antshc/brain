@@ -1,14 +1,16 @@
 // Keeps the registry, the feature maps and the app config in step. Run with: pnpm test:proof
-// Add your own adapter tests to proof/features.test.ts; this file is the engine's and is replaced on upgrade.
+// Add your own adapter tests to proof/features.test.ts; this file belongs to the mole and is replaced on upgrade.
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { APP } from "../app";
+import { APP } from "../proof/app";
+import { FEATURES } from "../proof/features";
+import { ALL_SURFACES, featureNames, featuresFor, selectFeatures, selectSurfaces, surfacesFor } from "../proof/kit";
 import { COMMANDS } from "./commands";
-import { FEATURES, featureNames, featuresFor, selectFeatures, surfacesFor } from "./registry";
 import { ROOT } from "./runtime";
-import { ALL_SURFACES, SURFACES, selectSurfaces } from "./surfaces";
+
+const SURFACES = APP.surfaces;
 
 const MAPS = join(ROOT, APP.featureMaps ?? ".github/skills/verify-mole/features");
 
@@ -43,7 +45,7 @@ test("every feature has a map, and every map has a feature", () => {
 });
 
 test("a feature name is a plain word that no built-in command already uses", () => {
-  for (const name of featureNames()) {
+  for (const name of featureNames(FEATURES)) {
     assert.match(name, /^[a-z][a-z0-9-]*$/, `"${name}" must be lowercase words joined by hyphens`);
     assert.ok(!(name in COMMANDS), `"${name}" is a built-in mole command`);
   }
@@ -75,17 +77,17 @@ for (const [name, feature] of Object.entries(FEATURES)) {
 }
 
 test("changed files select the features they touch", () => {
-  for (const [name, feature] of Object.entries(FEATURES)) assert.ok(featuresFor([`${feature.touches[0]}x.file`]).includes(name));
-  assert.deepEqual(featuresFor(["no/such/place.txt"]), []);
+  for (const [name, feature] of Object.entries(FEATURES)) assert.ok(featuresFor(FEATURES, [`${feature.touches[0]}x.file`]).includes(name));
+  assert.deepEqual(featuresFor(FEATURES, ["no/such/place.txt"]), []);
 });
 
 test("an unknown feature is refused and no names means all", () => {
-  assert.throws(() => selectFeatures(["no-such-feature"]), /Unknown feature "no-such-feature"/);
-  assert.deepEqual(selectFeatures(), featureNames());
+  assert.throws(() => selectFeatures(FEATURES, ["no-such-feature"]), /Unknown feature "no-such-feature"/);
+  assert.deepEqual(selectFeatures(FEATURES), featureNames(FEATURES));
 });
 
 test("--surface is validated against the surfaces a feature has", () => {
-  assert.throws(() => surfacesFor(featureNames(), ["ftp"]), /Unknown surface "ftp"/);
+  assert.throws(() => surfacesFor(FEATURES, featureNames(FEATURES), SURFACES, ["ftp"]), /Unknown surface "ftp"/);
   assert.deepEqual(selectSurfaces([], ["web"]), ["web"]);
   assert.throws(() => selectSurfaces(["api"], ["web"]), /no "api" surface/);
 });

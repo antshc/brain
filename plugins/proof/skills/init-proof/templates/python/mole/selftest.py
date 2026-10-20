@@ -1,6 +1,6 @@
 """Keeps the registry, the feature maps and the app config in step. Run with: python3 -m pytest proof/test_features.py
 
-Add your own adapter tests to proof/test_features.py; this file is the engine's and is replaced on upgrade.
+Add your own adapter tests to proof/test_features.py; this file belongs to the mole and is replaced on upgrade.
 """
 
 from __future__ import annotations
@@ -10,13 +10,14 @@ from pathlib import Path
 
 import pytest
 
-from ..app import APP
-from .commands import COMMANDS, MOLE
-from .model import ALL_SURFACES
-from .registry import FEATURES, feature_names, features_for, select_features, surfaces_for
-from .runtime import ROOT
-from .surfaces import SURFACES, select_surfaces
+from proof.app import APP
+from proof.features import FEATURES
+from proof.kit import ALL_SURFACES, feature_names, features_for, select_features, select_surfaces, surfaces_for
 
+from .commands import COMMANDS, MOLE
+from .runtime import ROOT, SURFACES
+
+NAMES = feature_names(FEATURES)
 MAPS = ROOT / APP.feature_maps
 BANNED = [re.compile(pattern) for pattern in (r"localStorage", r"querySelector", r"page\.locator", r"getByRole", r"get_by_role")] + list(APP.map_banned)
 
@@ -59,12 +60,12 @@ def test_every_feature_has_a_map_and_every_map_has_a_feature() -> None:
 
 
 def test_a_feature_name_is_a_plain_word_that_no_built_in_command_already_uses() -> None:
-    for name in feature_names():
+    for name in NAMES:
         assert re.fullmatch(r"[a-z][a-z0-9-]*", name), f'"{name}" must be lowercase words joined by hyphens'
         assert name not in COMMANDS, f'"{name}" is a built-in mole command'
 
 
-@pytest.mark.parametrize("name", feature_names())
+@pytest.mark.parametrize("name", NAMES)
 def test_the_map_names_its_feature_files_surfaces_and_proof_command(name: str) -> None:
     data = frontmatter(f"{name}.md")
     assert data["feature"] == name
@@ -73,7 +74,7 @@ def test_the_map_names_its_feature_files_surfaces_and_proof_command(name: str) -
     assert data["surfaces"] == FEATURES[name].surfaces
 
 
-@pytest.mark.parametrize("name", feature_names())
+@pytest.mark.parametrize("name", NAMES)
 def test_the_feature_only_uses_surfaces_this_repo_supports(name: str) -> None:
     feature = FEATURES[name]
     assert feature.surfaces, f"{name} has no surfaces"
@@ -82,7 +83,7 @@ def test_the_feature_only_uses_surfaces_this_repo_supports(name: str) -> None:
     assert feature.touches, f"{name} touches nothing, so `features --changed` can never select it"
 
 
-@pytest.mark.parametrize("name", feature_names())
+@pytest.mark.parametrize("name", NAMES)
 def test_the_map_states_a_contract_not_selectors_routes_or_wire_details(name: str) -> None:
     text = (MAPS / f"{name}.md").read_text()
     for banned in BANNED:
@@ -91,7 +92,7 @@ def test_the_map_states_a_contract_not_selectors_routes_or_wire_details(name: st
     assert len(re.findall(r"^## Driving it$", text, re.M)) == 1, f'{name}.md needs exactly one "Driving it" block'
 
 
-@pytest.mark.parametrize("name", feature_names())
+@pytest.mark.parametrize("name", NAMES)
 def test_the_feature_map_index_links_its_map_and_its_proof_command(name: str) -> None:
     assert f"({name}.md)" in INDEX, f"features/README.md does not link {name}.md"
     assert f"{MOLE} prove --feature {name}" in INDEX, f"features/README.md does not show the proof command for {name}"
@@ -99,19 +100,19 @@ def test_the_feature_map_index_links_its_map_and_its_proof_command(name: str) ->
 
 def test_changed_files_select_the_features_they_touch() -> None:
     for name, feature in FEATURES.items():
-        assert name in features_for([f"{feature.touches[0]}x.file"])
-    assert features_for(["no/such/place.txt"]) == []
+        assert name in features_for(FEATURES, [f"{feature.touches[0]}x.file"])
+    assert features_for(FEATURES, ["no/such/place.txt"]) == []
 
 
 def test_an_unknown_feature_is_refused_and_no_names_means_all() -> None:
     with pytest.raises(ValueError, match='Unknown feature "no-such-feature"'):
-        select_features(["no-such-feature"])
-    assert select_features() == feature_names()
+        select_features(FEATURES, ["no-such-feature"])
+    assert select_features(FEATURES) == NAMES
 
 
 def test_surface_is_validated_against_the_surfaces_a_feature_has() -> None:
     with pytest.raises(ValueError, match='Unknown surface "ftp"'):
-        surfaces_for(feature_names(), ["ftp"])
+        surfaces_for(FEATURES, NAMES, SURFACES, ["ftp"])
     assert select_surfaces([], ["web"]) == ["web"]
     with pytest.raises(ValueError, match='no "api" surface'):
         select_surfaces(["api"], ["web"])

@@ -4,7 +4,7 @@ from typing import Protocol
 
 from playwright.sync_api import Page
 
-from ...engine.model import Surface
+from proof.kit import Surface
 from .types import AppApi, AppStatus, SurfaceAdapter, SurfaceError
 # <surface: api>
 from .api import ApiSurface, api_surface

@@ -1,7 +1,6 @@
-// Reference only (eShop catalog feature): a worked example of one feature proof, written against the kit's engine.
+// Reference only (eShop catalog feature): a worked example of one feature proof, written against the proof kit.
 // Not compiled or copied by init-proof. Its adapters are web.ts and api.ts next to this file.
-import type { ProofKit } from "../../engine/proof";
-import { observe } from "../../engine/surfaces";
+import { observe, type ProofKit } from "../../kit";
 import { PAGE_SIZE, adapterFor, type CatalogList, type Surface } from "./surfaces";
 
 const SEED = 101;

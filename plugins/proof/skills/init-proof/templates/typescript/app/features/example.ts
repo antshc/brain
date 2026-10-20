@@ -1,5 +1,4 @@
-import type { ProofKit } from "../engine/proof";
-import { observe } from "../engine/surfaces";
+import { observe, type ProofKit } from "../kit";
 import { adapterFor } from "./surfaces";
 
 // Map: .github/skills/verify-mole/features/example.md

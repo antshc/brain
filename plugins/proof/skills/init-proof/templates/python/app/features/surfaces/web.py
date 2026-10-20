@@ -5,8 +5,9 @@ from urllib.parse import urljoin
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, Response
 
+from mole.commands import MOLE
+
 from ...app import APP
-from ...engine.commands import MOLE
 from .types import AppStatus, Surface, SurfaceError
 
 # A freshly started app renders its first pages slowly; waits for first renders use this (milliseconds).

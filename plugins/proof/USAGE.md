@@ -1,6 +1,6 @@
 # Proof kit and the mole
 
-The **proof kit** is the evidence library. It defines what a proof is and records its evidence. The **mole** is the CLI agents use to run the app. It drives the app, inspects it and runs the proofs. The kit sits in `proof/engine/` (`proof.ts` or `proof.py`) and the mole in `proof/engine/mole.ts` (or `python3 -m proof.engine.mole`).
+The **proof kit** is the evidence library. It defines what a proof is and records its evidence. The **mole** is the CLI agents use to run the app. It drives the app, inspects it and runs the proofs. The kit is `proof/kit/` and knows nothing of the app or the mole. The mole is `mole/` at the repo root (`mole/mole.ts`, or `python3 -m mole`) and uses the kit: dependencies run mole → kit, never back. Whatever the kit needs (revision, surfaces, API URL, the features, the commands to suggest) the mole passes in.
 
 ## Proof kit
 

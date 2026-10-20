@@ -1,36 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 import type { Browser, Page } from "@playwright/test";
-import type { Surface } from "./surfaces";
-
-export type Check = { name: string; pass: boolean; expected: unknown; actual: unknown; hint?: string };
-export type ProofKit = {
-  /** A fresh visitor (no storage) with the app already loaded. Blank when the run has no web surface. */
-  page: Page;
-  /** The surfaces this run proves. A feature checks its contract on each. */
-  surfaces: Surface[];
-  /** Where the API answers, or null when the run has no API. */
-  apiUrl: string | null;
-  /** Record one fact. Never throws: a failed check is evidence, not a crash. */
-  check(name: string, actual: unknown, expected: unknown, hint?: string): void;
-  /** localStorage for the app's origin, read through the DevTools protocol. */
-  storage(): Promise<Record<string, unknown>>;
-};
-export type Prove = (kit: ProofKit) => Promise<void>;
-export type Receipt = {
-  verdict: "PASS" | "FAIL" | "ERROR";
-  revision: string | null;
-  app: string;
-  at: string;
-  checks: Check[];
-  /** The features this run proved. A subset is not a full proof. */
-  features?: string[];
-  /** The surfaces this run proved. A surface that did not run is not proved. */
-  surfaces?: Surface[];
-  pageErrors: string[];
-  screenshot?: string;
-  error?: string;
-  next: string[];
-};
+import type { Check, Prove, Receipt, Surface } from "./types";
 
 const parse = (value: string) => { try { return JSON.parse(value); } catch { return value; } };
 
@@ -45,21 +15,36 @@ export async function readStorage(page: Page): Promise<Record<string, unknown>> 
   } finally { await cdp.detach(); }
 }
 
-// The caller supplies a revision (see sourceRevision() in runtime.ts), or it stays null.
+/** The caller supplies a revision of the code under proof, or it stays null. */
 export type Revision = () => Promise<string | null>;
+
+export type RunOptions = {
+  /** Where to save a full-page screenshot (web surface only). */
+  screenshot?: string;
+  revision?: Revision;
+  /** The surfaces this run proves. Default: web. */
+  surfaces?: Surface[];
+  apiUrl?: string | null;
+  /** The feature names this run proves, recorded on the receipt. */
+  features?: string[];
+  /** How to run the proof again, quoted in a FAIL receipt. */
+  rerun?: string;
+  /** What to do when the verdict is "can't tell" or a surface cannot be observed. */
+  diagnose?: string;
+};
 
 const show = (value: unknown) => JSON.stringify(value);
 
 // Runs a `prove()` against a running app and returns a receipt. If the revision changes while
 // proving, the evidence belongs to two builds and the verdict is "can't tell".
-export async function runProof(
-  browser: Browser, app: string, prove: Prove, screenshot?: string, revision: Revision = async () => null,
-  run: { surfaces?: Surface[]; apiUrl?: string | null } = {},
-): Promise<Receipt> {
+export async function runProof(browser: Browser, app: string, prove: Prove, options: RunOptions = {}): Promise<Receipt> {
+  const { screenshot, revision = async () => null, apiUrl = null, features } = options;
+  const surfaces = options.surfaces ?? ["web"];
+  const rerun = options.rerun ?? "Run the proof again";
+  const diagnose = options.diagnose ?? "Check that the app is running and the build is fresh";
   const checks: Check[] = [];
   const pageErrors = new Set<string>();
-  const surfaces = run.surfaces ?? ["web"];
-  const receipt: Receipt = { verdict: "ERROR", revision: null, app, at: new Date().toISOString(), checks, pageErrors: [], next: [] };
+  const receipt: Receipt = { verdict: "ERROR", revision: null, app, at: new Date().toISOString(), checks, pageErrors: [], next: [], ...(features ? { features } : {}), surfaces };
   const context = await browser.newContext({ ignoreHTTPSErrors: true }); // fresh visitor: no storage, no cookies
   try {
     const page = await context.newPage();
@@ -69,7 +54,7 @@ export async function runProof(
     receipt.revision = await revision();
     if (surfaces.includes("web")) await page.goto(app, { waitUntil: "load", timeout: 5000 });
     await prove({
-      page, surfaces, apiUrl: run.apiUrl ?? null, storage: () => readStorage(page),
+      page, surfaces, apiUrl, diagnose, storage: () => readStorage(page),
       check: (name, actual, expected, hint) =>
         checks.push({ name, pass: isDeepStrictEqual(actual, expected), expected, actual, ...(hint ? { hint } : {}) }),
     });
@@ -106,9 +91,9 @@ export async function runProof(
   } else if (receipt.verdict === "FAIL") {
     receipt.next = [...checks.filter(check => !check.pass).map(check =>
       check.hint ?? `Fix "${check.name}": expected ${show(check.expected)}, got ${show(check.actual)}.`),
-      "Then re-run: pnpm mole prove (or pnpm prove)"];
+      `Then re-run: ${rerun}`];
   } else {
-    receipt.next = [receipt.error ?? "Unknown error.", "Can't tell is not the same as broken. Run pnpm mole doctor (or check the app is running at --url), then prove again."];
+    receipt.next = [receipt.error ?? "Unknown error.", `Can't tell is not the same as broken. ${diagnose}, then prove again.`];
   }
   return receipt;
 }

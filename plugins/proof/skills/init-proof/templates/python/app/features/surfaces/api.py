@@ -5,8 +5,8 @@ from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlencode, urljoin, urlsplit
 
-from ...engine.commands import MOLE
-from ...engine.runtime import HttpResponse, fetch
+from mole.commands import MOLE
+from mole.runtime import HttpResponse, fetch
 from .types import AppStatus, Surface, SurfaceError
 
 

@@ -1,6 +1,6 @@
-import type { Surface } from "../../engine/surfaces";
+import type { Surface } from "../../kit";
 
-export { SurfaceError, type Surface } from "../../engine/surfaces";
+export { SurfaceError, type Surface } from "../../kit";
 
 // What a feature does, said once. Each surface turns the same call into its own way of driving the app
 // and returns the same shape, so a contract rule is written once and checked on every surface.

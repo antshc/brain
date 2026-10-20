@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import type { Surface } from "../../engine/surfaces";
+import type { Surface } from "../../kit";
 import type { SurfaceAdapter } from "./types";
 // <surface: api>
 import { apiSurface } from "./api";

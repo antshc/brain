@@ -6,8 +6,9 @@ Drives {{APP_NAME}} like a user, records facts, and writes a receipt with a verd
 
 | Path | Owner | What it is |
 |---|---|---|
-| `engine/` | the kit | The generic engine: `mole.py` (CLI), `proof.py` (receipts), `registry.py`, `runtime.py`, `surfaces.py`, `model.py`, `selftest.py`. Do not edit; an upgrade replaces this folder. |
-| `app.py` | you | `APP`: the URL, start command, source paths, API discovery and page hooks. The only place the engine learns about this app. |
+| `kit/` | the kit | The independent proof lib: `types.py`, `surfaces.py`, `features.py`, `receipt.py`, `run.py`. It imports nothing from the app or the mole. Do not edit; an upgrade replaces this folder. |
+| `../mole/` | the kit | The runner at the repository root: `mole.py` (CLI), `prove_cli.py`, `runtime.py`, `receipts.py`, `config.py`, `feature.py`, `selftest.py`. It uses the kit, never the reverse. Do not edit; an upgrade replaces this folder. |
+| `app.py` | you | `APP`: the URL, start command, source paths, API discovery and page hooks. The only place the mole learns about this app. |
 | `features/` | you | One proof per feature, registered in `features/__init__.py`. |
 | `features/surfaces/` | you | One adapter per surface. Turns a feature call into that surface's wire details and returns one shape. |
 | `.github/skills/verify-mole/` | you | The agent skill and one map per feature. |
@@ -15,6 +16,7 @@ Drives {{APP_NAME}} like a user, records facts, and writes a receipt with a verd
 ## Concepts
 
 - A **feature** is a behavior contract, proved on one or more **surfaces**: `web` (the app in a real Chrome over CDP) and `api` (HTTP). Supported here: {{SURFACES_TEXT}}.
+- The **kit** (`proof/kit/`) is a lib: it knows what a proof and a receipt are, and gets the features, surfaces, revision and commands to suggest passed in. The **mole** (`mole/`) is the runner: it starts and drives the app, supplies those, and saves the receipts.
 - A **surface adapter** returns the same shape on every surface, so a rule is written once and checked everywhere. `check()` never raises; a check is named `feature/surface: rule`.
 - A **receipt** is PASS, FAIL or ERROR (exit 0, 1, 2) with the revision, features, surfaces, checks with hints, `pageErrors` and a screenshot.
 - The **revision** is `git HEAD` plus a hash of uncommitted changes under `APP.source_paths`. A stale build makes `prove` refuse.
@@ -43,7 +45,7 @@ python3 -m playwright install chromium   # once
 1. Write the contract in `.github/skills/verify-mole/features/<name>.md` (frontmatter: `feature`, `prove`, `touches`, `surfaces`; sections `## Contract` and `## Driving it`; update `features/README.md`).
 2. Extend the adapters in `features/surfaces/` with the calls the contract needs, returning one shape per surface.
 3. Write `features/<name>.py`: loop over `kit.surfaces`, call the adapter through `observe()`, and `kit.check(name, actual, expected, hint)`.
-4. Register it in `features/__init__.py` with its `surfaces` and `touches`.
+4. Register it in `features/__init__.py` as a `MoleFeature` with its `surfaces` and `touches`.
 5. Run `{{TEST_PROOF}}`, then `{{MOLE}} prove --feature <name>`.
 
 Environment: `PROOF_URL` (app URL), `PROOF_API_URL` (API base URL), `MOLE_DIR` (isolates a second mole instance); a `.env` at the repository root is read too. Receipts and screenshots go to `proof/.runs/` (gitignored). Needs Python 3.10 or newer and Linux or macOS.

@@ -2,7 +2,9 @@
 
 Read this once before generating features. The kit exists so an agent can prove a change with evidence instead of saying "it should work".
 
-The kit ships in two languages with one behavior, one receipt shape and one set of feature maps. Names below are TypeScript; Python equivalents: `app.py`, `features/__init__.py`, `snake_case` (`APP.source_paths`, `kit.api_url`, `StartConfig.timeout_s`), sync Playwright, `python3 -m proof.engine.mole` for `pnpm mole`.
+The kit ships in two languages with one behavior, one receipt shape and one set of feature maps. Names below are TypeScript; Python equivalents: `app.py`, `features/__init__.py`, `snake_case` (`APP.source_paths`, `kit.api_url`, `StartConfig.timeout_s`), sync Playwright, `python3 -m mole` for `pnpm mole`.
+
+Two parts, one direction: `proof/kit/` is the independent proof lib (types, `runProof`, receipt, feature selection; no app, no CLI); `mole/` is the runner at the repo root that starts, drives and inspects the app and calls the kit to prove. The kit never imports the mole or `proof/app`; the mole hands it everything.
 
 ## Terms
 
@@ -27,4 +29,4 @@ The kit ships in two languages with one behavior, one receipt shape and one set 
 
 ## Worked example
 
-`references/eshop-example/` is a real feature set from eShop (a .NET Aspire AppHost with a Blazor storefront and a catalog API): `app.ts` (everything eShop-specific: the AppHost start command, the .NET SDK prerequisite, `aspire describe` API discovery, Blazor streaming settle), `catalog.ts` (the feature), `web.ts`/`api.ts`/`types.ts` (adapters and shapes), `catalog.md` (the map). They are reference only and import from the engine paths the kit uses.
+`references/eshop-example/` is a real feature set from eShop (a .NET Aspire AppHost with a Blazor storefront and a catalog API): `app.ts` (everything eShop-specific: the AppHost start command, the .NET SDK prerequisite, `aspire describe` API discovery, Blazor streaming settle), `catalog.ts` (the feature), `web.ts`/`api.ts`/`types.ts` (adapters and shapes), `catalog.md` (the map). They are reference only and import from the kit and mole paths the scaffold uses.

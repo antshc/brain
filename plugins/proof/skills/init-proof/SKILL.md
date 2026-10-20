@@ -8,16 +8,16 @@ disable-model-invocation: true
 
 Run on explicit user invocation. `skillDir :=` the parent of this `SKILL.md`'s absolute path. Read [references/concept.md](references/concept.md) first: it defines features, surfaces, adapters, receipts and revisions, and the rules for good checks.
 
-Outcome: `proof/` (engine, app seams, features), the `verify-mole` skill with feature maps in `.github/skills/verify-mole/`, the language's commands (below), and `proof/.runs/` gitignored, with the chosen starter cases passing against the repo's running app.
+Outcome: `proof/kit/` (the proof lib), `mole/` (the runner), `proof/` (app seams, features), the `verify-mole` skill with feature maps in `.github/skills/verify-mole/`, the language's commands (below), and `proof/.runs/` gitignored, with the chosen starter cases passing against the repo's running app.
 
 Commands by language (`<mole>`, `<prove>`, `<test>`, `<typecheck>` below):
 
 | | typescript | python |
 |---|---|---|
-| mole | `pnpm mole` | `python3 -m proof.engine.mole` |
-| prove | `pnpm prove` | `python3 -m proof.engine.prove_cli` |
+| mole | `pnpm mole` | `python3 -m mole` |
+| prove | `pnpm prove` | `python3 -m mole.prove_cli` |
 | test | `pnpm test:proof` | `python3 -m pytest proof/test_features.py` |
-| typecheck | `pnpm typecheck:proof` | `python3 -m mypy --strict proof` |
+| typecheck | `pnpm typecheck:proof` | `python3 -m mypy --strict proof mole` |
 | app config | `proof/app.ts` | `proof/app.py` |
 | registry | `proof/features/index.ts` | `proof/features/__init__.py` |
 | feature file, adapters | `.ts` | `.py` |
@@ -41,7 +41,7 @@ Use `ask_user` (never ask in plain text), one form:
 python3 "<skillDir>/scripts/scaffold.py" --repo "$REPO_PATH" --language "<typescript|python>" --surfaces "<web|api|both>" --app-name "<name>"
 ```
 
-It copies the engine to `proof/engine/`, renders the app seams (`proof/` app config, `proof/features/`, adapters only for chosen surfaces, `proof/README.md`) and the verify-mole skill, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
+It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, adapters only for chosen surfaces, `proof/README.md`) and the verify-mole skill, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
 
 - typescript: adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript` (approving esbuild's build script).
 - python: writes `proof/requirements.txt` (`playwright`, `pytest`, `mypy`) and runs `python3 -m pip install -r proof/requirements.txt` into the active environment; also gitignores `__pycache__/`. A repo that manages dependencies elsewhere (venv, uv, poetry) activates that environment first.
@@ -90,7 +90,7 @@ If `up --start` cannot start the app (missing database, container runtime, crede
 
 ## Rules
 
-- Never overwrite repository files; scaffold reports `skipped`. Never edit `proof/engine/` (an upgrade replaces it).
+- Never overwrite repository files; scaffold reports `skipped`. Never edit `proof/kit/` or `mole/` (an upgrade replaces them; delete a leftover `proof/engine/` from an older scaffold).
 - No real feature is wired by scaffold; every real case comes from step 6.
 - The eShop files in `references/eshop-example/` are TypeScript examples, never copied verbatim into a repo; Python features follow the same shape.
 

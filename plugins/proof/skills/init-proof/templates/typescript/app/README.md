@@ -6,8 +6,9 @@ Drives {{APP_NAME}} like a user, records facts, and writes a receipt with a verd
 
 | Path | Owner | What it is |
 |---|---|---|
-| `engine/` | the kit | The generic engine: `mole.ts` (CLI), `proof.ts` (receipts), `registry.ts`, `runtime.ts`, `surfaces.ts`, `selftest.ts`. Do not edit; an upgrade replaces this folder. |
-| `app.ts` | you | `APP`: the URL, start command, source paths, API discovery and page hooks. The only place the engine learns about this app. |
+| `kit/` | the kit | The independent proof lib: `types.ts`, `surfaces.ts`, `features.ts`, `receipt.ts`, `run.ts` (`runProof`). Knows nothing of the app or the mole. Do not edit; an upgrade replaces this folder. |
+| `../mole/` | the mole | The runner at the repo root: `mole.ts` (CLI), `prove-cli.ts`, `runtime.ts`, `config.ts`, `feature.ts`, `receipts.ts`, `selftest.ts`. It uses the kit. Do not edit; an upgrade replaces this folder. |
+| `app.ts` | you | `APP`: the URL, start command, source paths, API discovery and page hooks. The only place the mole learns about this app. |
 | `features/` | you | One proof per feature, registered in `features/index.ts`. |
 | `features/surfaces/` | you | One adapter per surface. Turns a feature call into that surface's wire details and returns one shape. |
 | `.github/skills/verify-mole/` | you | The agent skill and one map per feature. |

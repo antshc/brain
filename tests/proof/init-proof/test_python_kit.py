@@ -23,7 +23,7 @@ import pytest
 
 SKILL_DIR = Path(__file__).resolve().parents[3] / "plugins" / "proof" / "skills" / "init-proof"
 SCRIPT_PATH = SKILL_DIR / "scripts" / "scaffold.py"
-PY_ENGINE = SKILL_DIR / "templates" / "python" / "engine"
+PY_TEMPLATES = SKILL_DIR / "templates" / "python"
 
 spec = importlib.util.spec_from_file_location("proof_scaffold_python", SCRIPT_PATH)
 assert spec and spec.loader
@@ -31,7 +31,7 @@ scaffold_module = importlib.util.module_from_spec(spec)
 sys.modules["proof_scaffold_python"] = scaffold_module
 spec.loader.exec_module(scaffold_module)
 
-MOLE = "python3 -m proof.engine.mole"
+MOLE = "python3 -m mole"
 HAS_PLAYWRIGHT = importlib.util.find_spec("playwright") is not None
 
 
@@ -45,7 +45,7 @@ def run(repo: Path, surfaces: str = "both", name: str = "Demo shop") -> dict:
 
 
 def text_files(repo: Path) -> list[Path]:
-    return [p for root in (repo / "proof", repo / ".github") for p in root.rglob("*") if p.is_file()]
+    return [p for root in (repo / "proof", repo / "mole", repo / ".github") for p in root.rglob("*") if p.is_file()]
 
 
 class TestLanguageSelection:
@@ -91,10 +91,10 @@ class TestPythonKitGate:
 class TestPythonKitScaffoldOutput:
     """Feature: Proof Python Kit Scaffold Output"""
 
-    def test_both_surfaces_create_the_engine_adapters_and_skill(self, repo: Path) -> None:
+    def test_both_surfaces_create_the_kit_mole_adapters_and_skill(self, repo: Path) -> None:
         result = run(repo, "both")
         for path in (
-            "proof/engine/mole.py", "proof/engine/proof.py", "proof/app.py", "proof/requirements.txt", "proof/test_features.py",
+            "mole/mole.py", "mole/__main__.py", "proof/kit/run.py", "proof/app.py", "proof/requirements.txt", "proof/test_features.py",
             "proof/features/__init__.py", "proof/features/surfaces/web.py", "proof/features/surfaces/api.py",
             ".github/skills/verify-mole/SKILL.md",
         ):
@@ -129,7 +129,7 @@ class TestPythonKitScaffoldOutput:
     @pytest.mark.parametrize("surfaces", ["web", "api", "both"])
     def test_every_scaffolded_python_file_is_valid_python(self, repo: Path, surfaces: str) -> None:
         run(repo, surfaces)
-        for path in (repo / "proof").rglob("*.py"):
+        for path in [*(repo / "proof").rglob("*.py"), *(repo / "mole").rglob("*.py")]:
             ast.parse(path.read_text(), filename=str(path))
 
     def test_verify_mole_skill_and_maps_use_the_python_commands(self, repo: Path) -> None:
@@ -140,12 +140,14 @@ class TestPythonKitScaffoldOutput:
         assert f"`{MOLE} doctor`" in skill and "`proof/app.py`" in skill
         assert f"prove: {MOLE} prove --feature example" in (repo / ".github/skills/verify-mole/features/example.md").read_text()
 
-    def test_engine_is_copied_byte_for_byte(self, repo: Path) -> None:
+    def test_kit_and_mole_are_copied_byte_for_byte(self, repo: Path) -> None:
         run(repo, "both")
-        sources = [p for p in PY_ENGINE.iterdir() if p.is_file()]
-        assert sources
-        for source in sources:
-            assert (repo / "proof/engine" / source.name).read_bytes() == source.read_bytes()
+        assert not (repo / "proof/engine").exists()
+        for template, target in (("kit", "proof/kit"), ("mole", "mole")):
+            sources = [p for p in (PY_TEMPLATES / template).iterdir() if p.is_file()]
+            assert sources
+            for source in sources:
+                assert (repo / target / source.name).read_bytes() == source.read_bytes()
 
     def test_app_name_is_json_escaped_in_app_py_and_plain_in_the_skill(self, repo: Path) -> None:
         run(repo, "both", name='My "shop"')
@@ -262,7 +264,7 @@ class TestPythonKitEngine:
     def test_deep_equality_does_not_treat_true_as_one(self, repo: Path) -> None:
         self._scaffold(repo)
         code = (
-            "from proof.engine.proof import same;"
+            "from proof.kit import same;"
             "assert same({'a': [1, 2]}, {'a': [1, 2]}); assert same(1, 1.0);"
             "assert not same(True, 1); assert not same([1], [1, 2]); assert not same({'a': 1}, {'b': 1})"
         )
@@ -270,18 +272,18 @@ class TestPythonKitEngine:
 
     def test_help_lists_commands_with_the_python_invocation(self, repo: Path) -> None:
         self._scaffold(repo)
-        out = self._python(repo, "-m", "proof.engine.mole", "help").stdout
+        out = self._python(repo, "-m", "mole", "help").stdout
         assert f"Usage: {MOLE} <command>" in out and "prove [--feature NAME]" in out
 
     def test_unknown_command_exits_2_with_a_next_step(self, repo: Path) -> None:
         self._scaffold(repo)
-        result = self._python(repo, "-m", "proof.engine.mole", "bogus", check=False)
+        result = self._python(repo, "-m", "mole", "bogus", check=False)
         assert result.returncode == 2
         assert json.loads(result.stderr)["next"] == f"See the commands: {MOLE} help"
 
     def test_commands_that_need_a_session_say_nothing_is_running(self, repo: Path) -> None:
         self._scaffold(repo)
-        result = self._python(repo, "-m", "proof.engine.mole", "snapshot", check=False)
+        result = self._python(repo, "-m", "mole", "snapshot", check=False)
         assert result.returncode == 2
         assert json.loads(result.stderr)["error"] == "Nothing is running."
 
@@ -340,11 +342,11 @@ class TestPythonKitEndToEnd:
         return repo
 
     def _mole(self, repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-        return subprocess.run([sys.executable, "-m", "proof.engine.mole", *args], cwd=repo, capture_output=True, text=True, timeout=120)
+        return subprocess.run([sys.executable, "-m", "mole", *args], cwd=repo, capture_output=True, text=True, timeout=120)
 
     def test_up_start_doctor_prove_stale_and_down(self, app_repo: Path) -> None:
         up = subprocess.Popen(
-            [sys.executable, "-m", "proof.engine.mole", "up", "--start", "--headless"],
+            [sys.executable, "-m", "mole", "up", "--start", "--headless"],
             cwd=app_repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
         session = app_repo / "proof/.runs/mole/session.json"
@@ -390,7 +392,7 @@ class TestPythonKitEndToEnd:
         feature = app_repo / "proof/features/example.py"
         feature.write_text(feature.read_text().replace("status.ok, True,", "status.ok, False,"))
         up = subprocess.Popen(
-            [sys.executable, "-m", "proof.engine.mole", "up", "--start", "--headless"],
+            [sys.executable, "-m", "mole", "up", "--start", "--headless"],
             cwd=app_repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
         session = app_repo / "proof/.runs/mole/session.json"

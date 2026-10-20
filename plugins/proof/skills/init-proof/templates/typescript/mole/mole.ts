@@ -7,12 +7,12 @@ import { createServer } from "node:net";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { chromium, type Browser, type Page } from "@playwright/test";
-import { APP } from "../app";
+import { APP } from "../proof/app";
+import { FEATURES } from "../proof/features";
+import { SurfaceError, exitCode, featureNames, featuresFor, isSurface, proveFeatures, readStorage, runProof, selectFeatures, surfacesFor, type Surface } from "../proof/kit";
 import { COMMANDS, type Command } from "./commands";
-import { readStorage, runProof, type Receipt } from "./proof";
-import { FEATURES, featureNames, proveFeatures, selectFeatures, surfacesFor } from "./registry";
+import { coverageNotes, proofStatus, saveReceipt } from "./receipts";
 import { DEFAULT_URL, ROOT, apiAnswers, changedFiles, discoverApi, reachable, sourceRevision, startApp, type StartedApp } from "./runtime";
-import { SURFACES, SurfaceError, isSurface, type Surface } from "./surfaces";
 
 // MOLE_DIR isolates a second instance (tests, a parallel checkout) from the default one.
 const DIR = process.env.MOLE_DIR ?? join(ROOT, "proof", ".runs", "mole");
@@ -23,6 +23,7 @@ const PROFILE = join(DIR, "profile");
 const LOCK = join(DIR, "up.lock");
 const APP_LOG = join(DIR, "app.log");
 const MAPS = APP.featureMaps ?? ".github/skills/verify-mole/features";
+const SURFACES = APP.surfaces;
 const hasWeb = APP.surfaces.includes("web");
 const hasApi = APP.surfaces.includes("api");
 
@@ -249,10 +250,7 @@ async function doctor() {
     checks.push({ name: "build", ok: fresh,
       detail: fresh ? `the running build matches the source (${source})` : `STALE: the app was started on ${session.builtRevision}, the source is now ${source}`,
       ...(!fresh ? { next: session.startedApp ? "pnpm mole down; pnpm mole up --start" : "Restart the app, then: pnpm mole down; pnpm mole up" } : {}) });
-    const receipt: Receipt | null = existsSync(RECEIPT) ? JSON.parse(await readFile(RECEIPT, "utf8")) : null;
-    proof = !receipt ? { status: "none yet", next: "pnpm mole prove" }
-      : receipt.revision !== source ? { status: `STALE: the last receipt says ${receipt.verdict} for ${receipt.revision}, but the source is now ${source}. That proof is for code that no longer exists.`, next: "pnpm mole prove" }
-      : { status: `${receipt.verdict} for the current source (${source}) at ${receipt.at}${receipt.features && receipt.features.length < featureNames().length ? `, only ${receipt.features.join(", ")}: run pnpm mole prove for all` : ""}${receipt.surfaces && receipt.surfaces.length < SURFACES.length ? `, only the ${receipt.surfaces.join(", ")} surface: run pnpm mole prove with no --surface` : ""}`, ...(receipt.verdict !== "PASS" ? { next: receipt.next[0] } : {}) };
+    proof = await proofStatus(RECEIPT, source);
   }
   const ok = checks.every(check => check.ok);
   out({ ok, checks, proof });
@@ -263,8 +261,8 @@ async function prove(features: string[], surfaceNames: string[]) {
   let selected: string[];
   let surfaces: Surface[];
   try {
-    selected = selectFeatures(features);
-    surfaces = surfacesFor(selected, surfaceNames);
+    selected = selectFeatures(FEATURES, features);
+    surfaces = surfacesFor(FEATURES, selected, SURFACES, surfaceNames);
   } catch (error) {
     throw new MoleError((error as Error).message, "See the features: pnpm mole features. The surfaces are: " + SURFACES.join(", "));
   }
@@ -275,26 +273,21 @@ async function prove(features: string[], surfaceNames: string[]) {
       `The running build was started on ${session.builtRevision} but the source is now ${source}. A proof would describe code that is not running.`,
       session.startedApp ? "Restart it: pnpm mole down; pnpm mole up --start" : "Restart the app, then: pnpm mole down; pnpm mole up");
     // One screenshot per run, so each saved receipt keeps the image it was proved with.
-    return runProof(browser, session.appUrl, proveFeatures(selected), join(DIR, `proof-${source}-${Date.now()}.png`), sourceRevision, { surfaces, apiUrl });
+    return runProof(browser, session.appUrl, proveFeatures(FEATURES, selected), {
+      screenshot: join(DIR, `proof-${source}-${Date.now()}.png`), revision: sourceRevision, surfaces, apiUrl, features: selected,
+      rerun: "pnpm mole prove (or pnpm prove)", diagnose: "Run pnpm mole doctor (or check the app is running at --url)",
+    });
   });
-  receipt.features = selected;
-  receipt.surfaces = surfaces;
-  if (selected.length < featureNames().length) receipt.next.push(`Only ${selected.join(", ")} was proved. Run pnpm mole prove with no --feature before you report.`);
-  const skipped = SURFACES.filter(surface => !surfaces.includes(surface) && selected.some(name => FEATURES[name].surfaces.includes(surface)));
-  if (skipped.length) receipt.next.push(`The ${skipped.join(", ")} surface did not run, so it is not proved. Run pnpm mole prove with no --surface before you report.`);
-  const json = JSON.stringify(receipt, null, 2);
-  await mkdir(join(DIR, "receipts"), { recursive: true });
-  await writeFile(RECEIPT, json); // latest, for doctor
-  // Append, never overwrite: failures stay in the history next to the final green.
-  await writeFile(join(DIR, "receipts", `${receipt.at.replace(/[:.]/g, "-")}-${receipt.revision ?? "unknown"}.json`), json);
+  receipt.next.push(...coverageNotes({ features: selected, surfaces }));
+  await saveReceipt(DIR, RECEIPT, receipt);
   out(receipt);
-  process.exitCode = receipt.verdict === "PASS" ? 0 : receipt.verdict === "FAIL" ? 1 : 2;
+  process.exitCode = exitCode(receipt);
 }
 
 // Which features need proving: all of them, or those whose files your uncommitted changes touch.
 function listFeatures(changed: boolean) {
   const files = changed ? changedFiles() : [];
-  const names = changed ? featuresChanged(files) : featureNames();
+  const names = changed ? featuresFor(FEATURES, files) : featureNames(FEATURES);
   out({
     ...(changed ? { changedFiles: files.length } : {}),
     features: names.map(name => ({
@@ -305,8 +298,6 @@ function listFeatures(changed: boolean) {
       : names.length ? "Prove each, then run pnpm mole prove with no --feature once before you report." : "No feature's files changed. Run pnpm mole prove if you still need proof.",
   });
 }
-const featuresChanged = (files: string[]) =>
-  featureNames().filter(name => FEATURES[name].touches.some(prefix => files.some(file => file.startsWith(prefix))));
 
 // `mole <feature> <verb> ...`: the feature's own drive hook, on one surface. The answer says which.
 async function driveFeature(name: string, argv: string[]) {

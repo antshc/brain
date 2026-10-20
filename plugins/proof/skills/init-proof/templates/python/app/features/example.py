@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from ..engine.commands import MOLE
-from ..engine.model import ProofKit
-from ..engine.surfaces import observe
+from mole.commands import MOLE
+from proof.kit import ProofKit, observe
+
 from .surfaces import adapter_for
 
 

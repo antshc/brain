@@ -3,57 +3,16 @@ import { createHash } from "node:crypto";
 import { createWriteStream } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Page } from "@playwright/test";
-import { APP } from "../app";
-import type { Surface } from "./surfaces";
+import { APP } from "../proof/app";
 
-/** Everything the engine needs to know about this repo's app. proof/app.ts fills it in. */
-export type AppConfig = {
-  name: string;
-  /** Where the app answers by default. `--url` overrides it. */
-  url: string;
-  /** The surfaces this repo supports. Features may only use these. */
-  surfaces: Surface[];
-  /** Repo-relative paths whose changes alter the running build. The revision is derived from them. */
-  sourcePaths: string[];
-  /** Where the feature maps live. Default: .github/skills/verify-mole/features */
-  featureMaps?: string;
-  /** Extra patterns a feature map must not contain (selectors, routes, wire details). */
-  mapBanned?: RegExp[];
-  /** How `mole up --start` runs the app. Omit when the app is always started by hand. */
-  start?: {
-    command: string;
-    args: string[];
-    env?: Record<string, string>;
-    cwd?: string;
-    /** Throws with an actionable message when a tool is missing. May return extra environment for the command. */
-    prerequisites?: () => NodeJS.ProcessEnv | void;
-    /** The app has answered `url`; return true once it is really ready (seed loaded, first render done). */
-    ready?: (url: string) => Promise<boolean>;
-    timeoutMs?: number;
-  };
-  api?: {
-    /** The API base URL, when it is not the app URL or PROOF_API_URL. */
-    discover?: () => string | null | Promise<string | null>;
-    /** Whether the API really answers at this base URL. Default: any answer below 500. */
-    probe?: (baseUrl: string) => boolean | Promise<boolean>;
-  };
-  web?: {
-    /** Wait until a page has finished rendering. Default: the load event. */
-    settle?: (page: Page) => Promise<void>;
-    /** What a user sees, merged into `mole snapshot`. Default: url, title, h1, aria. */
-    snapshot?: (page: Page) => Promise<Record<string, unknown>>;
-  };
-};
-
-// pnpm runs scripts from the package root, which is where proof/ lives.
+// pnpm runs scripts from the package root, which is where proof/ and mole/ live.
 export const ROOT = process.cwd();
 export const DEFAULT_URL = APP.url;
 
 const git = (...args: string[]) => execFileSync("git", args, { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
 
-// Proof files are not part of the build, so editing them must not stale the running app.
-const pathspec = () => ["--", ...(APP.sourcePaths.length ? APP.sourcePaths : ["."]), ":(exclude)proof", ":(exclude).github"];
+// Proof and mole files are not part of the build, so editing them must not stale the running app.
+const pathspec = () => ["--", ...(APP.sourcePaths.length ? APP.sourcePaths : ["."]), ":(exclude)proof", ":(exclude)mole", ":(exclude).github"];
 
 // An app rarely serves its revision, so derive one from the source: HEAD plus a hash of uncommitted changes under APP.sourcePaths.
 export async function sourceRevision(): Promise<string | null> {
