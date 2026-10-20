@@ -10,6 +10,8 @@ Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet ver
 
 **MUST** load the bundled [GitHub reference](./github.md) before any GitHub action, including reads. Execute GitHub actions through `gh` according to its prerequisites, procedures, and failure handling. If the reference cannot be loaded, stop and report the blocker. No setup-generated tracker configuration is required.
 
+**MUST ask questions in ordinary conversation; MUST NOT use question/input tools.**
+
 **Required input:** The user **MUST** supply the GitHub repository for publishing tickets as `OWNER/REPO`. If absent or malformed, ask for it and wait; never infer it from the checkout, remotes, or the parent spec's URL. Record it as `TRACKER_REPOSITORY`, separate from the development/PR repository and any parent issue's repository.
 
 ## Process
