@@ -5,6 +5,11 @@
     },
     "plugins": [
         {
+            "name": "af",
+            "source": "./plugins/af",
+            "description": "Planning and delivery skills: grill a design, write a GitHub spec, break it into tickets, and implement the ticket graph into a reviewed PR."
+        },
+        {
             "name": "review",
             "source": "./plugins/review",
             "description": "Code and technical solution review skills with modular standards and guidance."

@@ -36,16 +36,16 @@ copilot plugin install review@brain
 
 </details>
 
-### Planning and delivery plugin (dev)
+### Planning and delivery plugin (af)
 
 ```sh
-copilot plugin install dev@brain
+copilot plugin install af@brain
 ```
 
-- [grill-with-docs](plugins/dev/skills/grill-with-docs/SKILL.md): stress-test a design and capture resolved terms in one root `GLOSSARY.md`.
-- [to-spec](plugins/dev/skills/to-spec/SKILL.md): synthesise the conversation into a GitHub specification issue.
-- [to-tickets](plugins/dev/skills/to-tickets/SKILL.md): publish approved vertical slices with parent links and blocking dependencies.
-- [implement-spec](plugins/dev/skills/implement-spec/SKILL.md): integrate the ticket graph through parallel worktrees and prepare a reviewed PR; requires the external `tdd` and `code-review` skills.
+- [grill-with-docs](plugins/af/skills/grill-with-docs/SKILL.md): stress-test a design and capture resolved terms in one root `GLOSSARY.md`.
+- [to-spec](plugins/af/skills/to-spec/SKILL.md): synthesise the conversation into a GitHub specification issue.
+- [to-tickets](plugins/af/skills/to-tickets/SKILL.md): publish approved vertical slices with parent links and blocking dependencies.
+- [implement-spec](plugins/af/skills/implement-spec/SKILL.md): integrate the ticket graph through parallel worktrees and prepare a reviewed PR; requires the external `tdd` and `code-review` skills.
 
 Delivery skills use `gh` with their own bundled GitHub references; no tracker setup skill is required.
 
