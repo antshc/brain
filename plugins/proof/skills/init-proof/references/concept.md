@@ -30,23 +30,3 @@ Two parts, one direction: `proof/kit/` is the independent proof lib (types, `run
 ## Worked example
 
 `references/eshop-example/` is a real feature set from eShop (a .NET Aspire AppHost with a Blazor storefront and a catalog API): `app.ts` (everything eShop-specific: the AppHost start command, the .NET SDK prerequisite, `aspire describe` API discovery, Blazor streaming settle), `catalog.ts` (the feature), `web.ts`/`api.ts`/`types.ts` (adapters and shapes), `catalog.md` (the map). They are reference only and import from the kit and mole paths the scaffold uses.
-
-## TypeScript durable evidence
-
-Live checks remain unchanged. An independent `EvidenceContract` uses an
-`EvidenceKit` without a browser Page. Approve its required names, stable partial
-matchers, source selection and test policy before coding. Project `proof/tools/`
-collects application and existing-test artifacts; read-only `evaluateEvidence()`
-validates a separate immutable JSON manifest and emits the original receipt.
-
-Prefer recorded persisted GET; use DB only with an approved no-read-API reason.
-Refreshed UI/screenshot, successful task, correlated logs, submitted request and
-complete console capture support that result. Existing test results on the final
-clean revision remain mandatory separately. Missing/stale/untrusted/incomplete
-required evidence means ERROR; conclusive mismatch means FAIL. All required names
-execute exactly once. Hashes detect alteration; the protected project policy
-must independently authorize collection and execution provenance. Contracts,
-adapters and imports are reviewed trusted read-only code, not a runtime sandbox.
-
-See [the e-commerce order example](ecommerce-evidence-example/README.md) and the installed
-`proof/tools/README.md` for schemas, approval pins and extension points.
