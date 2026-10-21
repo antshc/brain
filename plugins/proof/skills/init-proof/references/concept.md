@@ -48,5 +48,5 @@ execute exactly once. Hashes detect alteration; the protected project policy
 must independently authorize collection and execution provenance. Contracts,
 adapters and imports are reviewed trusted read-only code, not a runtime sandbox.
 
-See [the VPG example](vpg-evidence-example/README.md) and the installed
+See [the e-commerce order example](ecommerce-evidence-example/README.md) and the installed
 `proof/tools/README.md` for schemas, approval pins and extension points.

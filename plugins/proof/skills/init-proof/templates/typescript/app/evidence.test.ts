@@ -44,13 +44,13 @@ async function fixture() {
     await writeFile(join(runDir, path), value);
     manifest.artifacts[path] = { runId, revision, build, capturedAt: endedAt, complete: true, kind, sha256: sha256(value) };
   };
-  await save("resource.json", JSON.stringify({ name: "TestVpg", extra: 1 }), "api");
+  await save("resource.json", JSON.stringify({ status: "Confirmed", items: [{ sku: "SKU-COFFEE", quantity: 2 }], extra: 1 }), "api");
   await save("report.xml", report, "tests"); await save("test-run.json", JSON.stringify(metadata), "metadata");
   const policy: EvidencePolicy = { revision, build, modules, contractDigest: digest, approvedAt: "2024-12-31T00:00:00Z",
     tests: { report: "report.xml", metadata: "test-run.json", format: "junit", requiredIds: ["suite::C::persists"], requiredSuites: ["suite"], allowedSkips: [] },
     async authorize(m) { return m.provenance === "external attestation"; } };
-  const contract: EvidenceContract = { feature: "vpg", required: ["vpg/name"], surfaces: ["api"], resource: { path: "resource.json", kind: "api" },
-    async verify(k) { const value = await k.evidence.json("resource.json"); k.check("vpg/name", matchesFields(value, { name: "TestVpg" }), true); } };
+  const contract: EvidenceContract = { feature: "order", required: ["order/status"], surfaces: ["api"], resource: { path: "resource.json", kind: "api" },
+    async verify(k) { const value = await k.evidence.json("resource.json"); k.check("order/status", matchesFields(value, { status: "Confirmed" }), true); } };
   const evaluate = async () => {
     await writeFile(join(runDir, "evidence.json"), JSON.stringify(manifest));
     return evaluateEvidence({ root, runDir, app: "test", policy, contracts: [contract] });
@@ -64,12 +64,12 @@ test("Read-only evaluation produces unchanged PASS receipt without network/brows
   try {
     const receipt = await f.evaluate(); assert.equal(receipt.verdict, "PASS"); assert.equal(exitCode(receipt), 0);
     assert.deepEqual(Object.keys(receipt).sort(), ["verdict", "revision", "app", "at", "checks", "pageErrors", "next", "features", "surfaces"].sort());
-    assert.deepEqual(receipt.features, ["vpg"]); assert.deepEqual(receipt.surfaces, ["api"]);
+    assert.deepEqual(receipt.features, ["order"]); assert.deepEqual(receipt.surfaces, ["api"]);
   } finally { globalThis.fetch = fetch; await f.cleanup(); }
 });
 
 for (const [name, mutate] of Object.entries<(f: Awaited<ReturnType<typeof fixture>>) => Promise<void> | void>({
-  "business mismatch": f => f.save("resource.json", '{"name":"wrong"}', "api"),
+  "business mismatch": f => f.save("resource.json", '{"status":"Cancelled"}', "api"),
   "failed executed tests": f => f.save("report.xml", '<testsuite name="suite" tests="1" failures="1"><testcase classname="C" name="persists"><failure>bug</failure></testcase></testsuite>', "tests"),
 })) test(`${name} is FAIL`, async () => {
   const f = await fixture(); try {
@@ -93,10 +93,10 @@ const errors: Record<string, (f: Awaited<ReturnType<typeof fixture>>) => Promise
   "tampered resource": f => writeFile(join(f.runDir, "resource.json"), "{}"),
   "incomplete capture": f => { f.manifest.artifacts["resource.json"].complete = false; },
   "stale capture": f => { f.manifest.artifacts["resource.json"].capturedAt = "2024-01-01T00:00:00Z"; },
-  "missing required check": f => { f.contract.required = ["vpg/name", "missing"]; },
-  "unknown check caught by contract": f => { f.contract.verify = async k => { await k.evidence.json("resource.json"); try { k.check("unknown", true, true); } catch {} k.check("vpg/name", true, true); }; },
-  "duplicate check": f => { f.contract.verify = async k => { await k.evidence.json("resource.json"); k.check("vpg/name", true, true); k.check("vpg/name", true, true); }; },
-  "unread persisted resource": f => { f.contract.verify = async k => k.check("vpg/name", true, true); },
+  "missing required check": f => { f.contract.required = ["order/status", "missing"]; },
+  "unknown check caught by contract": f => { f.contract.verify = async k => { await k.evidence.json("resource.json"); try { k.check("unknown", true, true); } catch {} k.check("order/status", true, true); }; },
+  "duplicate check": f => { f.contract.verify = async k => { await k.evidence.json("resource.json"); k.check("order/status", true, true); k.check("order/status", true, true); }; },
+  "unread persisted resource": f => { f.contract.verify = async k => k.check("order/status", true, true); },
   "DB fallback without approval": f => { f.contract.resource.kind = "db"; },
   "missing required test": f => { f.policy.tests.requiredIds = ["missing"]; },
   "missing required suite": f => { f.policy.tests.requiredSuites = ["missing"]; },
@@ -131,11 +131,11 @@ test("JSON reports require explicit schema and consistent totals", () => {
 });
 test("Logs require complete scope and match stable correlated fields", () => {
   const adapter = new JsonlLogAdapter();
-  const records = adapter.parse(JSON.stringify({ timestamp: "2025-01-01T00:00:00Z", level: "INFO", event: "Created", correlationId: "run", fields: { name: "vpg", extra: 1 } }), "logs");
+  const records = adapter.parse(JSON.stringify({ timestamp: "2025-01-01T00:00:00Z", level: "INFO", event: "OrderCreated", correlationId: "run", fields: { orderId: "ORDER-1001", extra: 1 } }), "logs");
   const scoped = scopedLogs(records, { complete: true, correlationId: "run" });
-  assert.ok(logs.eventExists(scoped, "Created", { name: "vpg" })); assert.ok(logs.noErrors(scoped));
-  assert.ok(!logs.eventExists(scopedLogs(records, { complete: true, correlationId: "other" }), "Created"));
-  assert.ok(logs.count(scoped, "Created", { equals: 1 }));
+  assert.ok(logs.eventExists(scoped, "OrderCreated", { orderId: "ORDER-1001" })); assert.ok(logs.noErrors(scoped));
+  assert.ok(!logs.eventExists(scopedLogs(records, { complete: true, correlationId: "other" }), "OrderCreated"));
+  assert.ok(logs.count(scoped, "OrderCreated", { equals: 1 }));
   assert.throws(() => scopedLogs(records, { complete: false, correlationId: "run" }));
   assert.throws(() => scopedLogs(records, { complete: true }));
   assert.throws(() => adapter.parse('{broken', "logs"));
@@ -178,7 +178,7 @@ test("Evidence CLI passes without importing live app, features, runtime or brows
     for (const file of ["proof/app.ts", "proof/features.ts", "mole/runtime.ts", "mole/prove-live.ts"]) await writeFile(join(f.root, file), 'throw new Error("FORBIDDEN live import");');
     await symlink(join(process.cwd(), "node_modules"), join(f.root, "node_modules"));
     await writeFile(join(f.root, "package.json"), '{"type":"module"}');
-    const module = `export const CONTRACTS = [{ feature: "vpg", surfaces: ["api"], required: ["vpg/name"], resource: {path:"resource.json", kind:"api"}, async verify(k) { const r = await k.evidence.json("resource.json"); k.check("vpg/name", r.name, "TestVpg"); } }];`;
+    const module = `export const CONTRACTS = [{ feature: "order", surfaces: ["api"], required: ["order/status"], resource: {path:"resource.json", kind:"api"}, async verify(k) { const r = await k.evidence.json("resource.json"); k.check("order/status", r.status, "Confirmed"); } }];`;
     await writeFile(join(f.root, "proof/contracts/index.ts"), module);
     f.policy.modules = [{ path: "proof/contracts/index.ts", sha256: sha256(module) }];
     f.policy.contractDigest = await contractDigest(f.root, f.policy.modules);
@@ -214,7 +214,7 @@ test("Contract changes during evaluation cannot pass", async () => {
 test("Optional observations cannot mask a failed required check", async () => {
   const f = await fixture(); try {
     f.contract.optional = ["extra"];
-    f.contract.verify = async k => { await k.evidence.json("resource.json"); k.check("vpg/name", false, true); k.check("extra", true, true); };
+    f.contract.verify = async k => { await k.evidence.json("resource.json"); k.check("order/status", false, true); k.check("extra", true, true); };
     assert.equal((await f.evaluate()).verdict, "FAIL");
   } finally { await f.cleanup(); }
 });
