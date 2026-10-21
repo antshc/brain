@@ -30,11 +30,3 @@ Two parts, one direction: `proof/kit/` is the independent proof lib (types, `run
 ## Worked example
 
 `references/eshop-example/` is a real feature set from eShop (a .NET Aspire AppHost with a Blazor storefront and a catalog API): `app.ts` (everything eShop-specific: the AppHost start command, the .NET SDK prerequisite, `aspire describe` API discovery, Blazor streaming settle), `catalog.ts` (the feature), `web.ts`/`api.ts`/`types.ts` (adapters and shapes), `catalog.md` (the map). They are reference only and import from the kit and mole paths the scaffold uses.
-
-## Durable evidence contracts (Python)
-
-Python adds code-first contracts and read-only saved-evidence evaluation alongside live proof. Review and pin contract code before implementation. The coding agent runs tests and authorized collectors drive the final deployed revision; the Prover evaluates saved bytes only. Required check names/artifacts are declared in `Contract`; `EvaluationKit.check()` records ordinary checks. Database/log/test adapters are evidence sources, not new surfaces.
-
-Evidence strength: persisted GET API; normalized DB snapshot only when no suitable API exists; refreshed UI observation plus screenshot; associated completed task; correlated application event; browser request; complete clean console capture. Final-revision test reports are required separately. Never downgrade a failing API result to a passing DB result.
-
-Use subset fields, unordered membership, explicit counts and deterministic predicates. Completeness/provenance gaps mean ERROR; complete observations contradicting a rule mean FAIL. Hashes need an external trusted manifest digest and approved contract digest; self-authored claims are insufficient. The evaluator is not a Python sandbox: reviewed project contracts must remain pure, and the workflow enforces isolation for untrusted code. Original Receipt/Check schemas and live proof behavior stay intact. See Python `proof/tools/README.md` for adapter/parser schemas, immutable capture folders and retention.

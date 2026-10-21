@@ -4,13 +4,12 @@ import json
 from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from urllib.parse import urlsplit
 
-if TYPE_CHECKING:
-    from playwright.sync_api import Browser, Page
+from playwright.sync_api import Browser, Page
+from playwright.sync_api import Error as PlaywrightError
 
-from .matchers import same
 from .types import Check, ProofKit, Prove, Receipt, Surface
 
 # The caller supplies a revision of the code under proof, or it stays None.
@@ -36,6 +35,17 @@ def read_storage(page: Page) -> dict[str, Any]:
         return {key: _parse(value) for key, value in result["entries"]}
     finally:
         cdp.detach()
+
+
+def same(actual: Any, expected: Any) -> bool:
+    """Deep equality that, unlike ==, does not treat True as 1."""
+    if isinstance(actual, bool) or isinstance(expected, bool):
+        return isinstance(actual, bool) and isinstance(expected, bool) and actual == expected
+    if isinstance(actual, dict) and isinstance(expected, dict):
+        return actual.keys() == expected.keys() and all(same(actual[key], expected[key]) for key in actual)
+    if isinstance(actual, (list, tuple)) and isinstance(expected, (list, tuple)):
+        return len(actual) == len(expected) and all(same(left, right) for left, right in zip(actual, expected))
+    return bool(actual == expected)
 
 
 def _show(value: Any) -> str:
@@ -70,8 +80,6 @@ def run_proof(
     # What to do when the verdict is "can't tell" or a surface cannot be observed.
     diagnose: str = "Check that the app is running and the build is fresh",
 ) -> Receipt:
-    from playwright.sync_api import Error as PlaywrightError
-
     checks: list[Check] = []
     page_errors: dict[str, None] = {}
     run_surfaces = list(surfaces)
