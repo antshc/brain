@@ -42,10 +42,10 @@ Spawn two fresh subagents in parallel, each with its own absolute instruction-re
 
 | Subagent | Instruction reference | Output in `SESSION_DIR` |
 |---|---|---|
-| Blast radius + unslop | [Blast-radius preparation](references/pre-review-blast-radius.md) | `blast-radius.md` |
+| Blast radius | [Blast-radius preparation](references/pre-review-blast-radius.md) | `blast-radius.md` |
 | PR summary | [PR preparation](references/pre-review-pr.md) | `pr-summary.md` |
 
-Both **MUST** start before waiting for either. Each reads its own reference and writes only its assigned report and temporary proof files; source edits, checkout changes, commits, pushes, PR edits, and comment posting are forbidden. Keep proof files in a task-specific temporary directory. Run only non-destructive local checks; report unavailable or unsafe execution as unproven. Subagents review the same recorded commit independently; neither consumes the other's output. If delegation is unavailable, report the blocker and stop preparation rather than substitute parent analysis.
+Both **MUST** start before waiting for either. Each reads its own reference, applies [Unslop](references/unslop.md) to its report, and writes only its assigned report and temporary proof files; source edits, checkout changes, commits, pushes, PR edits, and comment posting are forbidden. Keep proof files in a task-specific temporary directory. Run only non-destructive local checks; report unavailable or unsafe execution as unproven. Subagents review the same recorded commit independently; neither consumes the other's output. If delegation is unavailable, report the blocker and stop preparation rather than substitute parent analysis.
 
 Wait for both; verify each report exists, is nonempty, and identifies the PR and `COMMIT_ID`. On failure, save a failure report at that agent's output path with the blocker and label it failed, never clean. Reuse reports only for the same PR and commit. Recheck `git rev-parse HEAD` and `gh pr view <PR_URL> --json headRefOid`; if either differs from `COMMIT_ID`, refresh context and rerun both before review.
 
