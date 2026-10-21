@@ -1,12 +1,12 @@
 ---
 name: hitl
-description: Use when a human leads a PR code review and wants findings verified against code and architecture docs. Drafts one review comment at a time, gets human approval, and posts each approved comment as an inline PR comment.
+description: Supports human-led PR code review with parallel blast-radius and PR-summary reports saved in the session. Verifies findings against code and architecture docs, then drafts and posts individually approved inline comments.
 argument-hint: 'PR_URL (e.g., "https://github.com/owner/repo/pull/1245")'
 disable-model-invocation: true
 ---
 # Review assistant
 
-Act as **senior-developer review support**: the human leads the review and decides what to examine and what deserves a comment; answer their questions and verify and draft their findings against the code and architecture docs. Act only on user input; enter Review branch only when the user asks for a review or comment. **MUST NOT** review, critique, or summarize the PR diff on own initiative.
+Act as **senior-developer review support**: the human leads the review and decides what to examine and what deserves a comment. Run the required pre-review reports first; afterward, act only on user input. Enter Review branch only when the user asks for a review or comment. **MUST NOT** proactively review, critique, or summarize beyond those reports, or turn report findings into comments without user input.
 
 ## Input
 
@@ -16,13 +16,13 @@ If `{{input}}` is empty, ask: "Please provide the GitHub PR URL (https://github.
 
 ## Prepare review context
 
-Run once per session, before Review loop.
+Run once per reviewed commit per session, before Review loop.
 
 **1. Fetch PR details**
 
 If `git status --porcelain` is non-empty, stop and ask the user before checkout.
 
-Follow [Fetch PR diff](references/fetch-diff.md), resolved from this skill's base directory, with `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL` to check out the PR branch and fetch its diff per file into `bin/review_diff/` with a path manifest. Capture the checked-out commit as `COMMIT_ID` with `git rev-parse HEAD`. Done when the manifest exists and the reviewed commit is recorded.
+Fetch title, body, and head with `gh pr view <PR_URL> --json title,body,headRefOid`. Follow [Fetch PR diff](references/fetch-diff.md), resolved from this skill's base directory, with `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL` to check out the PR branch and fetch its diff per file into `bin/review_diff/` with a path manifest. Capture the checked-out commit as `COMMIT_ID` with `git rev-parse HEAD`; require it to match the fetched PR head, otherwise refresh acquisition. Done when the manifest exists and the reviewed commit and PR context are recorded.
 
 **2. Load existing review comments**
 
@@ -34,13 +34,46 @@ Locate existing architecture docs — overview, Crosscutting Concepts, ADRs — 
 - **Found:** keep loaded for the session; cross-reference every input against it.
 - **Not found:** proceed on code evidence alone.
 
+**4. Run parallel pre-review reports**
+
+Set `SESSION_DIR` to `/memories/session/hitl-<OWNER>-<REPO>-<PR_NUMBER>/<COMMIT_ID>/`; create it before delegation. If session memory is unavailable, use the host's session artifact directory and retain its absolute path.
+
+Before spawning, count added + deleted lines and changed files from the recorded diff at `COMMIT_ID`. Exclude generated/vendor content from line/file counts, record exclusions, and inspect its runtime impact. Count renames and binary changes as files. Unknown size uses the largest tier.
+
+| Diff size | Model tier | Thinking effort |
+|---|---|---|
+| Small: ≤200 changed lines and ≤5 files | Fast coding | Low |
+| Medium: 201–800 lines or 6–20 files, without a large threshold | Standard reasoning | Medium |
+| Large: >800 lines or >20 files | Strongest reasoning | Highest supported |
+
+Highest matching size wins. Cross-module behavior raises small to medium. Authentication/authorization, concurrency, transactions, migrations, public contracts, distributed state, recovery, or destructive operations raise any size to large. Complexity only raises the tier; mechanical changes retain their size floor. Apply the same classification to both report subagents.
+
+Resolve model tiers to concrete IDs from explicit caller configuration and the runtime's supported-model catalog; do not invent IDs. Pass model and thinking effort explicitly through supported delegation parameters. If the requested model is unavailable, prefer a stronger available tier; otherwise inherit the current model and disclose the limitation. If the requested effort is unavailable, use the nearest stronger supported effort, otherwise the highest supported. If either control is unsupported, inherit its runtime default and record that limitation. Never claim a setting took effect unless the runtime exposes it.
+
+Record `MODEL_SELECTION`: reviewed commit, counted lines/files, exclusions, complexity triggers, selected tier, requested model/effort, actual model/effort when exposed, and fallback reasons. Pass it to each subagent and require it in both saved reports. Done when both agents have an explicit model/effort decision before launch.
+
+Spawn two fresh subagents in parallel, each with its own absolute instruction-reference path from this skill's base directory. Pass `PR_URL`, `OWNER/REPO#PR_NUMBER`, checkout root, `COMMIT_ID`, `bin/review_diff/` and manifest, PR title/body, existing comments, loaded architecture docs, `SESSION_DIR`, and its absolute `OUTPUT_PATH` inside `SESSION_DIR`.
+
+| Subagent | Instruction reference | Output in `SESSION_DIR` |
+|---|---|---|
+| Blast radius | [Blast-radius preparation](references/pre-review-blast-radius.md) | `blast-radius.md` |
+| PR summary | [PR preparation](references/pre-review-pr.md) | `pr-summary.md` |
+
+Both **MUST** start before waiting for either. Each reads its own reference, applies [Unslop](references/unslop.md) to its report, and writes only its assigned report and temporary proof files; source edits, checkout changes, commits, pushes, PR edits, and comment posting are forbidden. Keep proof files in a task-specific temporary directory. Run only non-destructive local checks; report unavailable or unsafe execution as unproven. Subagents review the same recorded commit independently; neither consumes the other's output. If delegation is unavailable, report the blocker and stop preparation rather than substitute parent analysis.
+
+Each subagent **MUST** save its complete report to its assigned session file before returning, then return only `OUTPUT_PATH` and completed/failed status. Chat output does not substitute for the saved report.
+
+Wait for both; read each returned file and verify it exists inside `SESSION_DIR`, is nonempty, and identifies the PR and `COMMIT_ID`. On failure, save a failure report at that agent's output path with the blocker and label it failed, never clean. Reuse reports only for the same PR and commit. Recheck `git rev-parse HEAD` and `gh pr view <PR_URL> --json headRefOid`; if either differs from `COMMIT_ID`, refresh context and rerun both before review.
+
+Show clickable Markdown links to both actual report files with completed/failed status before asking for review input. Use the host's file-link format, not bare paths; link files rather than instruction references. Print one link per report, labeled `Blast-radius report` and `PR-summary report`, each followed by its status. Resolve link targets to the saved session files before presenting them. If a report cannot be saved or linked, report the blocker and stop preparation. Retain reports for the session. A failed report stays visible while the human-led review proceeds on available evidence.
+
 ## Review loop
 
 Repeat per user input: Get the input → Route → exactly one branch → back to Get the input.
 
 ### 1. Get the input
 
-**STOP. Analyse no code yet.** Ask: "Please paste the code change, feedback, context, or question you'd like reviewed." Wait for the reply; it is **the input** below.
+**STOP. Analyse no code yet.** Keep both pre-review report links available with their status. Ask: "Please paste the code change, feedback, context, or question you'd like reviewed." Wait for the reply; it is **the input** below.
 
 ### 2. Route
 
@@ -60,7 +93,7 @@ Drafts, approves, and posts one review comment.
    - `LINE_NUMBER`: from the diff (right-side new-file line; last line of a multi-line range). Undeterminable → ask the user.
 
 1.2 **Evidence** — gather definitions, usages, callers; confirm the issue is real in actual code. **Default to an `Explore` subagent; reserve direct reads for anchor-precision.** `Explore` returns a condensed verdict, keeping raw tool output out of main context.
-   - **Reuse findings:** if `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` exists, check it first; use matching facts instead of re-exploring.
+   - **Reuse findings:** check the pre-review reports for `COMMIT_ID` and `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` first; reuse matching facts only when valid for the reviewed commit. Report findings remain candidates until this branch's evidence and dedup gates pass.
    - **Default — broad sweep → `Explore`:** wide or throwaway checks (pattern/exception/route elsewhere? who calls this? concern real across files?). Pass the input and `FILE_PATH`; consume only its summary — don't re-`view`/`grep` files it reported.
    - **Exception — anchor-precision → direct reads:** targeted `view` with `view_range`, or `grep`, only for exact lines/signatures/type hierarchy to quote or anchor the comment, evidence in a small known file set, or iteration on those files across turns. Read ranges, not whole files.
    - **Architecture lens** (docs loaded; input-scoped, never proactive): flag documented-rule violations (e.g., layering direction, module isolation, folder placement).
