@@ -33,7 +33,7 @@ formats (including Playwright JSON) and must resolve retries explicitly.
 Export `EVIDENCE_JSON_ADAPTER` from `proof/evidence-config.ts` for CLI evaluation
 of an approved custom JSON schema; include its module in the approval pins.
 
-Copy the VPG example from the init-proof reference, adapt real domain fields,
+Copy the e-commerce order example from the init-proof reference, adapt real domain fields,
 and register it in `proof/contracts/index.ts`. Approve IDs, expected values,
 required test suites/IDs, and source selection before coding. Include the registry,
 contracts, tools used by contracts, and test/trust policy dependencies in

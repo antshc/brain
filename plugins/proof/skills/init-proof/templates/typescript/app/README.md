@@ -74,5 +74,5 @@ run tests or collectors; contracts and adapters are trusted read-only project co
 Live `pnpm prove` and all `pnpm mole` commands retain their current behavior.
 A feature subset remains partial coverage in the original receipt fields.
 Run evidence mode for every approved feature before reporting completion.
-The init-proof reference `references/vpg-evidence-example/` shows a persisted
-VPG plus UI/task/request/console/log checks, backed separately by required tests.
+The init-proof reference `references/ecommerce-evidence-example/` shows a persisted
+order plus UI/task/request/console/log checks, backed separately by required tests.

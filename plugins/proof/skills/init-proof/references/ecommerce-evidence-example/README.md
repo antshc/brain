@@ -1,8 +1,10 @@
-# VPG contract-first example
+# E-commerce order contract-first example
 
-Copy `vpg-create.ts` to `proof/contracts/`, register the contract, and associate
-`vpg-create` with the existing FEATURES identity/map. Adapt stable values and
-correlation scope before review. For API-only projects omit UI/browser checks
+Copy `order-create.ts` to `proof/contracts/`, register the contract, and associate
+`order-create` with the existing FEATURES identity/map. Adapt stable values and
+correlation scope before review. The example proves a confirmed order containing
+two units of `SKU-COFFEE`, its completed processing task, refreshed order list,
+order submission request, clean console and correlated `OrderCreated` event. For API-only projects omit UI/browser checks
 before approval; keep persisted GET and tests mandatory. If no read API exists,
 review a DB source with `resource.kind: "db"`, a normalized snapshot path and
 `noReadApiReason`; never select DB because a GET check failed.
@@ -14,8 +16,8 @@ review a DB source with `resource.kind: "db"`, a normalized snapshot path and
    capture and test execution provenance. Pin final revision/build outside the run.
 5. Run `pnpm prove --evidence proof/.runs/<run-id>`. Retain every failed attempt.
 
-Required artifacts: `api/get-vpg.json`, `tasks/create-vpg.json`,
-`browser/vpg-list.json`, `browser/vpg-list.png`, `browser/network.json`,
+Required artifacts: `api/get-order.json`, `tasks/create-order.json`,
+`browser/order-list.json`, `browser/order-list.png`, `browser/network.json`,
 `browser/console.json`, `logs/scope.json`, `logs/application.jsonl`,
 `tests/results.xml`, `tests/run.json`, `evidence.json`. Each is allowlisted,
 hashed, revision/build/run-bound, timestamped and marked complete in the manifest.

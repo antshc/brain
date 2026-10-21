@@ -93,21 +93,23 @@ export interface EvidenceReader {
 
 Project-owned contracts can live in `proof/contracts/<feature>.ts`, associated with existing `FEATURES` names and feature maps. All required check names MUST be unique, declared before coding, and executed exactly once. Unknown/duplicate/missing required checks prevent PASS. A contract file/digest MUST NOT be changed during a run.
 
-Example VPG checks:
+Example e-commerce order checks:
 
 ```ts
 import { matchesFields, containsItem } from "../kit";
 import type { EvidenceContract } from "../kit";
 
-export const vpgCreate: EvidenceContract = {
-  feature: "vpg-create",
-  required: ["vpg/api: name", "vpg/api: VM present", "vpg/task: succeeded"],
+export const orderCreate: EvidenceContract = {
+  feature: "order-create",
+  surfaces: ["web", "api"],
+  resource: { path: "api/get-order.json", kind: "api" },
+  required: ["order/api: status", "order/api: item present", "order/task: succeeded"],
   async verify(kit) {
-    const vpg = await kit.evidence.json<{ name: string; vms: { name: string }[] }>("api/get-vpg.json");
-    const task = await kit.evidence.json("tasks/create-vpg.json");
-    kit.check("vpg/api: name", matchesFields(vpg, { name: "TestVpg" }), true, "See api/get-vpg.json");
-    kit.check("vpg/api: VM present", containsItem(vpg.vms, { name: "TestVm" }), true, "See api/get-vpg.json");
-    kit.check("vpg/task: succeeded", matchesFields(task, { state: "Succeeded" }), true, "See tasks/create-vpg.json");
+    const order = await kit.evidence.json<{ status: string; items: { sku: string; quantity: number }[] }>("api/get-order.json");
+    const task = await kit.evidence.json("tasks/create-order.json");
+    kit.check("order/api: status", matchesFields(order, { status: "Confirmed" }), true, "See api/get-order.json");
+    kit.check("order/api: item present", containsItem(order.items, { sku: "SKU-COFFEE", quantity: 2 }), true, "See api/get-order.json");
+    kit.check("order/task: succeeded", matchesFields(task, { state: "Succeeded" }), true, "See tasks/create-order.json");
   },
 };
 ```
@@ -133,10 +135,10 @@ The list ranks **directness of proving durable business behavior**, not file ret
 
 | Priority | Evidence | Check |
 |---|---|---|
-| 1 | Recorded GET resource response | Persisted VPG exists with stable fields and VM membership |
+| 1 | Recorded GET resource response | Persisted order exists with stable fields and line-item membership |
 | 2 | Read-only normalized DB snapshot | Use only when suitable GET API is unavailable by contract |
-| 3 | Refreshed UI list observation + screenshot | VPG appears after reload; screenshot supports review |
-| 4 | Completed task record | Correct VPG-associated task has succeeded |
+| 3 | Refreshed UI list observation + screenshot | order appears after reload; screenshot supports review |
+| 4 | Completed task record | Correct order-associated task has succeeded |
 | 5 | Correlated application logs (when applicable) | Expected event/fields appeared during the run |
 | 6 | Captured browser network request | Browser submitted method/path and selected payload fields |
 | 7 | Complete browser console capture | No unexpected runtime errors for the flow |
@@ -205,13 +207,13 @@ Use JSON as an **external manifest**, not YAML and not a new receipt format:
 ```text
 proof/.runs/<run-id>/
   evidence.json           # contract digest, Git SHA, app build, sources, hashes, completeness
-  api/get-vpg.json
-  tasks/create-vpg.json
-  browser/vpg-list.json
-  browser/vpg-list.png
+  api/get-order.json
+  tasks/create-order.json
+  browser/order-list.json
+  browser/order-list.png
   browser/network.json
   browser/console.json
-  db/vpg.json              # only if API not suitable by contract
+  db/order.json              # only if API not suitable by contract
   logs/application.jsonl
   tests/results.xml
   tests/run.json
@@ -256,10 +258,10 @@ The manifest MUST bind evidence to a trusted authorized run, exact tested/deploy
 11. Validate expected test suites/cases, counts, skips, failures, report hash, final Git SHA and capture provenance.
 12. Map conclusive failures to `FAIL`, missing/invalid/stale reports to `ERROR`; prove no test command can execute in read-only mode.
 
-### Phase 5 — Scaffold, docs and VPG example
+### Phase 5 — Scaffold, docs and e-commerce example
 
 13. Update TypeScript `app/README.md`, `init-proof/SKILL.md`, `references/concept.md`, verify-mole guidance and scaffold/self-tests.
-14. Provide VPG-create contract-first example: recorded GET (or contract-approved DB), refreshed UI + screenshot, task success, browser request, clean scoped console, applicable log event, and test report.
+14. Provide an e-commerce order-create contract-first example: recorded GET (or contract-approved DB), refreshed UI + screenshot, task success, browser request, clean scoped console, applicable log event, and test report.
 15. Run `pnpm typecheck:proof`, `pnpm test:proof`, scaffold smoke tests (`web`, `api`, `both`), live Mole regression tests, and read-only evaluation integration tests.
 
 ## Acceptance criteria
@@ -274,7 +276,7 @@ The manifest MUST bind evidence to a trusted authorized run, exact tested/deploy
 - [ ] Original receipt fields, `PASS / FAIL / ERROR`, exit codes `0 / 1 / 2`, coverage and history remain unchanged.
 - [ ] Every required check is executed exactly once; missing evidence, changed contract or mismatched final revision prevent PASS.
 - [ ] `proof/tools/` extensions survive scaffold/kit upgrades; API-only, web-only and both-surface scaffolds work.
-- [ ] VPG example proves the persisted business result plus supporting UI/task/request/console/log/test observations.
+- [ ] order example proves the persisted business result plus supporting UI/task/request/console/log/test observations.
 
 ## References
 
@@ -297,4 +299,4 @@ The manifest MUST bind evidence to a trusted authorized run, exact tested/deploy
 - JSON reports use an explicit normalized schema; custom `TestResultAdapter`
   implementations handle Playwright JSON and project-specific retry policies.
 - JUnit/TRX XML parsing uses `fast-xml-parser` with validation and no DTD/entities.
-- Project extension guidance and a VPG contract live in the scaffold and references.
+- Project extension guidance and an e-commerce order contract live in the scaffold and references.

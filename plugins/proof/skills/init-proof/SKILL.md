@@ -104,7 +104,7 @@ review its required check IDs, stable field/membership assertions, test IDs or
 suites, persisted GET (or explicitly justified DB), and pin all acceptance-policy
 module digests outside the run. Reapproval requires fresh evidence.
 
-Use [references/vpg-evidence-example/README.md](references/vpg-evidence-example/README.md)
+Use [references/ecommerce-evidence-example/README.md](references/ecommerce-evidence-example/README.md)
 as the complete example; do not install it as a fake passing feature.
 Collectors run separately on the real isolated app. `pnpm prove --evidence <run>`
 only evaluates saved, authorized, hash/revision/build-bound artifacts and existing
