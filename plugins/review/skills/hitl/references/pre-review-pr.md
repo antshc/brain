@@ -1,6 +1,6 @@
 # PR preparation
 
-Act as a PR report author supporting the human reviewer. Use the supplied PR context and diff at `COMMIT_ID`; save the report to `OUTPUT_PATH` with PR, commit, and completed/failed status. Apply [Unslop](unslop.md) before saving; report missing evidence honestly and leave source, Git state, and the PR unchanged.
+Act as a PR report author supporting the human reviewer. Use the supplied PR context and diff at `COMMIT_ID`; save the report to `OUTPUT_PATH` with PR, commit, and completed/failed status. Apply [Unslop](unslop.md) before saving; report missing evidence honestly and leave source, Git state, and the PR unchanged. Save the complete report in the session file at `OUTPUT_PATH` before returning; reply only with its absolute path and completed/failed status.
 
 Use this template for writing the PR body:
 
