@@ -1577,20 +1577,3 @@ Scenario: A failing check is a fail receipt with its hint
 ```
 
 **Coverage:** Integration test
-
-## Feature: Durable Evidence Evaluation
-
-**Coverage:** `tests/proof/init-proof/test_evidence.py` — offline unit/integration tests.
-
-- Subset matching is typed and order independent: extra fields/reordering survive; missing/null and boolean/numeric distinctions remain strict.
-- Saved evidence passes with original receipt: no receipt schema additions or browser runtime imports.
-- Gaps error and observed mismatch fails: tampering, missing/duplicate checks, manifest mismatch and traversal never pass.
-- Required logs are scoped and complete: historical events do not satisfy the current run; malformed logs error.
-- Test reports normalize failures skips and namespaces: TRX/JUnit identities and counters remain consistent.
-- Provenance gaps never pass: wrong build/revision/contract, dirty state and missing run/environment are ERROR.
-- Invalid capture never passes: incomplete, stale, wrong-scope or corrupt artifacts are ERROR.
-- Test report gates: failed/unexpected skipped tests FAIL; zero discovery, missing IDs, malformed/stale/untrusted reports ERROR.
-- CLI Order example is offline and preserves history: API/task/reloaded UI/request/console/log/test evidence passes with live I/O blocked, each evaluation persists, changed contract refuses before import.
-- Log adapters and matchers: JSONL/Serilog, OTLP typed attributes, text scopes, event fields/counts and reviewed regex.
-- Duplicate retries and invalid XML are rejected: ambiguous IDs, reruns, DTD, runner failures and invalid JSON outcomes cannot pass.
-- Capture is immutable and project tools survive scaffold: no overwrites after capture/finalization or scaffold reruns.

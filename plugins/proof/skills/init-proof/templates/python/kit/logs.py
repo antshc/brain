@@ -86,7 +86,7 @@ class OtelAdapter:
 
 
 class LogView:
-    """Use only with a complete capture validated through Evidence.text()."""
+    """Use only with a complete log capture."""
 
     def __init__(self, records: list[LogRecord], *, correlation_id: str) -> None:
         if not correlation_id:
