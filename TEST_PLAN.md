@@ -1590,7 +1590,7 @@ Scenario: A failing check is a fail receipt with its hint
 - Provenance gaps never pass: wrong build/revision/contract, dirty state and missing run/environment are ERROR.
 - Invalid capture never passes: incomplete, stale, wrong-scope or corrupt artifacts are ERROR.
 - Test report gates: failed/unexpected skipped tests FAIL; zero discovery, missing IDs, malformed/stale/untrusted reports ERROR.
-- CLI VPG example is offline and preserves history: API/task/reloaded UI/request/console/log/test evidence passes with live I/O blocked, each evaluation persists, changed contract refuses before import.
+- CLI Order example is offline and preserves history: API/task/reloaded UI/request/console/log/test evidence passes with live I/O blocked, each evaluation persists, changed contract refuses before import.
 - Log adapters and matchers: JSONL/Serilog, OTLP typed attributes, text scopes, event fields/counts and reviewed regex.
 - Duplicate retries and invalid XML are rejected: ambiguous IDs, reruns, DTD, runner failures and invalid JSON outcomes cannot pass.
 - Capture is immutable and project tools survive scaffold: no overwrites after capture/finalization or scaffold reruns.

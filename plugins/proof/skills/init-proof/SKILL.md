@@ -80,7 +80,7 @@ For new feature implementation, define and review `proof/tools/contracts.py` con
 
 The coding agent runs existing tests on the clean final commit. Authorized project collectors save API/UI/task/browser/DB/log/test captures with `Capture`; the workflow verifies deployed/build SHA and retains the finalized manifest digest outside the artifact folder. Use API reads first; DB only if no suitable API exists by contract. Keep adapters in project-owned `proof/tools/`, never overwrite them.
 
-Run `python3 -m mole evaluate --app <name> --run <folder> --revision <full-sha> --contract-sha256 <reviewed-digest> --manifest-sha256 <trusted-digest>`. This separate mode only evaluates saved evidence; it MUST NOT launch browsers/apps, issue HTTP/SQL or execute tests. Keep reviewed contract imports pure. Missing/incomplete/stale captures are ERROR; conclusive mismatches are FAIL. Preserve original receipt JSON/exit codes. Read `proof/tools/README.md` for schemas, trust requirements, retention and the opt-in VPG example. TypeScript/live commands retain their existing behavior.
+Run `python3 -m mole evaluate --app <name> --run <folder> --revision <full-sha> --contract-sha256 <reviewed-digest> --manifest-sha256 <trusted-digest>`. This separate mode only evaluates saved evidence; it MUST NOT launch browsers/apps, issue HTTP/SQL or execute tests. Keep reviewed contract imports pure. Missing/incomplete/stale captures are ERROR; conclusive mismatches are FAIL. Preserve original receipt JSON/exit codes. Read `proof/tools/README.md` for schemas, trust requirements, retention and the opt-in Order example. TypeScript/live commands retain their existing behavior.
 
 ## 7. Verify
 

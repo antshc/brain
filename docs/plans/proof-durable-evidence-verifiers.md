@@ -78,12 +78,12 @@ Rank by how directly the evidence demonstrates the desired durable outcome (not 
 
 | Priority | Evidence | Expected verifier behavior |
 |---|---|---|
-| 1 | GET resource API returns expected VPG | Partial JSON/business invariant matching against **recorded** response |
-| 2 | Database record for the VPG | Normalized, read-only snapshot when **no suitable read API** exists |
-| 3 | Refreshed VPG list with resource visible | Machine-readable UI observation + supporting screenshot after reload |
-| 4 | VPG task completed successfully | Task status, correlation/resource association |
+| 1 | GET resource API returns expected order | Partial JSON/business invariant matching against **recorded** response |
+| 2 | Database record for the order | Normalized, read-only snapshot when **no suitable read API** exists |
+| 3 | Refreshed order list with resource visible | Machine-readable UI observation + supporting screenshot after reload |
+| 4 | order task completed successfully | Task status, correlation/resource association |
 | 5 | Expected application log event (if applicable) | Structured event/fields with run-scoped correlation |
-| 6 | Browser sent expected VPG request | Captured network request method/path and selected payload fields |
+| 6 | Browser sent expected order request | Captured network request method/path and selected payload fields |
 | 7 | No unexpected browser console errors | Complete console capture scoped to feature execution |
 
 Also require **tests for the final commit**, separately from the strength ranking. A task success, HTTP 2xx, a screenshot alone, or the absence of console errors cannot prove persistence.
@@ -97,28 +97,28 @@ Use the existing feature registry, Python feature functions and `kit.check(name,
 ```python
 from proof.kit import matches_fields, contains_item
 
-def prove_vpg_create(kit):
+def prove_order_create(kit):
     # Read stored artifacts; do not send HTTP or query the DB here.
-    vpg = kit.evidence.json("api/get-vpg.json")
-    task = kit.evidence.json("tasks/create-vpg.json")
+    order = kit.evidence.json("api/get-order.json")
+    task = kit.evidence.json("tasks/create-order.json")
 
     kit.check(
-        "vpg/api: stable fields",
-        matches_fields(vpg, {"name": "TestVpg"}),
+        "order/api: stable fields",
+        matches_fields(order, {"orderNumber": "ORD-1001"}),
         True,
-        "Check api/get-vpg.json",
+        "Check api/get-order.json",
     )
     kit.check(
-        "vpg/api: VM is present",
-        contains_item(vpg["vms"], {"name": "TestVm"}),
+        "order/api: line item is present",
+        contains_item(order["items"], {"sku": "SKU-COFFEE", "quantity": 2}),
         True,
-        "Check api/get-vpg.json",
+        "Check api/get-order.json",
     )
     kit.check(
-        "vpg/task: succeeded",
+        "order/task: succeeded",
         matches_fields(task, {"state": "Succeeded"}),
         True,
-        "Check tasks/create-vpg.json",
+        "Check tasks/create-order.json",
     )
 ```
 
@@ -135,7 +135,7 @@ Add `kit/matchers.py` and export its functions via `kit/__init__.py`:
 
 Keep `same()` as the existing strict matcher for callers that explicitly need it. Make predicate behavior deterministic and testable. Distinguish false from numeric zero; type-check numeric bounds; do not quietly cast string numbers. Paths MUST be safe lookups, not arbitrary expressions. Avoid fuzzy semantic/LLM judgments as acceptance criteria.
 
-**Durability is purposeful, not permissive.** A VPG name/VM membership may be stable across implementation iterations; if a status is transient or eventually consistent, explicitly define when it can be checked and use a captured settled observation. Do not weaken actual business requirements to avoid flaky checks.
+**Durability is purposeful, not permissive.** An order number/line-item membership may be stable across implementation iterations; if a status is transient or eventually consistent, explicitly define when it can be checked and use a captured settled observation. Do not weaken actual business requirements to avoid flaky checks.
 
 ## Project-owned evidence adapters
 
@@ -150,7 +150,7 @@ class DatabaseAdapter(Protocol):
         ...
 ```
 
-The project implements `SqlServerVpgAdapter`, `PostgresVpgAdapter`, or domain-specific adapters. Queries MUST be read-only, parameterized, scoped to an isolated approved environment, and use least-privilege credentials. Collection stores a stable snapshot such as `{"name":"TestVpg","vmNames":["TestVm"]}`; verification reads that snapshot and uses generic partial/invariant matchers. Never expose connection strings or sensitive rows in artifacts. Add a capture-time/environment/correlation record so an unrelated old DB row cannot prove a new run.
+The project implements `SqlServerOrderAdapter`, `PostgresOrderAdapter`, or domain-specific adapters. Queries MUST be read-only, parameterized, scoped to an isolated approved environment, and use least-privilege credentials. Collection stores a stable snapshot such as `{"orderNumber":"ORD-1001","items":[{"sku":"SKU-COFFEE","quantity":2}]}`; verification reads that snapshot and uses generic partial/invariant matchers. Never expose connection strings or sensitive rows in artifacts. Add a capture-time/environment/correlation record so an unrelated old DB row cannot prove a new run.
 
 For UI, collect a normalized list-row observation and screenshot *after reload*; the image supports human review but a screenshot file's existence alone never passes an assertion. For task and browser network, save structured status/request records with correlation IDs and timestamps.
 
@@ -182,8 +182,8 @@ For example:
 ```python
 logs.event_exists(
     "logs/application.jsonl",
-    event="VpgCreated",
-    fields={"vpgName": "TestVpg"},
+    event="OrderCreated",
+    fields={"orderNumber": "ORD-1001"},
     correlation_id=run_id,
 )
 ```
@@ -233,13 +233,13 @@ Suggested **companion files**, not changes to receipt JSON:
 ```text
 proof/.runs/<run-id>/
   evidence.json            # run ID, full Git SHA, contract SHA, captures, hashes
-  api/get-vpg.json
-  tasks/create-vpg.json
-  browser/vpg-list.json
-  browser/vpg-list.png
+  api/get-order.json
+  tasks/create-order.json
+  browser/order-list.json
+  browser/order-list.png
   browser/network.har
   browser/console.json
-  db/vpg.json               # if API unavailable by contract
+  db/order.json               # if API unavailable by contract
   logs/application.jsonl
   tests/results.trx
   tests/run.json
@@ -254,15 +254,15 @@ The run manifest identifies the approved contract digest, evidence provenance, c
 {
   "verdict": "PASS",
   "revision": "abc123",
-  "app": "zic",
+  "app": "shop",
   "at": "2026-10-21T12:00:00Z",
   "checks": [
     {
-      "name": "vpg/api: name",
+      "name": "order/api: order number",
       "pass": true,
-      "expected": "TestVpg",
-      "actual": "TestVpg",
-      "hint": "See api/get-vpg.json"
+      "expected": "ORD-1001",
+      "actual": "ORD-1001",
+      "hint": "See api/get-order.json"
     },
     {
       "name": "tests: results match commit",
@@ -272,10 +272,10 @@ The run manifest identifies the approved contract digest, evidence provenance, c
       "hint": "See tests/results.trx and tests/run.json"
     }
   ],
-  "features": ["vpg-create"],
+  "features": ["order-create"],
   "surfaces": ["web", "api"],
   "pageErrors": [],
-  "screenshot": "browser/vpg-list.png",
+  "screenshot": "browser/order-list.png",
   "next": ["These checks passed on this revision."]
 }
 ```
@@ -316,7 +316,7 @@ For missing **required** artifacts or failed provenance validation, set `receipt
 ### Phase 5 — Skill/template updates and end-to-end example
 
 16. Update `init-proof/SKILL.md`, `references/concept.md`, Python template READMEs, `verify-mole` skill scaffolding and scaffold/self-tests.
-17. Add a VPG-create example with predeclared invariant checks: persisted API (or approved DB alternative), refreshed-list screenshot, successful task, browser request, clean console, applicable correlated log, and test report.
+17. Add an order-create example with predeclared invariant checks: persisted API (or approved DB alternative), refreshed-list screenshot, successful task, browser request, clean console, applicable correlated log, and test report.
 18. Run template tests, Python type checks, scaffold smoke tests, old Mole command regression tests, and new read-only evaluation integration tests.
 19. Document what is reviewed before coding, collection command responsibilities, evidence retention, and how to extend per-project adapters without changing `kit/`.
 
@@ -333,7 +333,7 @@ For missing **required** artifacts or failed provenance validation, set `receipt
 - [ ] Failed required tests produce FAIL; missing/invalid/stale reports produce ERROR.
 - [ ] Original `Receipt` and `Check` JSON schemas, exit codes, and append-only receipt history remain unchanged.
 - [ ] Evidence cannot be falsely accepted from a different build/run; mandatory evidence gaps prevent PASS.
-- [ ] VPG example exercises the API-preferred/DB-only-if-unavailable rule, refreshed UI evidence, task, browser, console, logs, and test outcomes.
+- [ ] Order example exercises the API-preferred/DB-only-if-unavailable rule, refreshed UI evidence, task, browser, console, logs, and test outcomes.
 - [ ] Consumer-specific extensions remain outside upgrade-replaced `proof/kit/` and `mole/` folders.
 
 ## References
