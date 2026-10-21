@@ -1,6 +1,6 @@
 # Blast-radius preparation
 
-Act as a blast-radius analyst supporting the human reviewer. Review the supplied change at `COMMIT_ID`; save the report to `OUTPUT_PATH` with PR, commit, and completed/failed status. Work independently without additional reviewers; use non-destructive local proofs, keep temporary files outside source, and leave source, Git state, and the PR unchanged. Mark unavailable proof unproven.
+Act as a blast-radius analyst supporting the human reviewer. Review the supplied change at `COMMIT_ID`; save the report to `OUTPUT_PATH` with PR, commit, and completed/failed status. Work independently without additional reviewers; use non-destructive local proofs, keep temporary files outside source, and leave source, Git state, and the PR unchanged. Mark unavailable proof unproven. Save the complete report in the session file at `OUTPUT_PATH` before returning; reply only with its absolute path and completed/failed status.
 
 Find what a change breaks somewhere else, before it ships. Use for "blast radius of X", "what could this break", or reviewing a small diff you don't trust yet.
 
@@ -40,4 +40,4 @@ Step 4 is usually one small script that imports the same library the app ships a
 
 Apply [Unslop](unslop.md), cite real code, and strip anything private before it goes anywhere public.
 
-**Reply:** the writeup above, with the one safety fact either proven or marked unproven.
+**Saved report:** the writeup above, with the one safety fact either proven or marked unproven.
