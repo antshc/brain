@@ -1577,3 +1577,15 @@ Scenario: A failing check is a fail receipt with its hint
 ```
 
 **Coverage:** Integration test
+
+
+### TypeScript Durable Evidence Verification
+
+Node/tsx scenarios in the installed `proof/evidence.test.ts` (included by
+`proof/features.test.ts`): stable partial matching and unsafe paths; original
+receipt PASS/FAIL/ERROR; required/unknown/duplicate checks; approval, contract,
+revision/build, integrity, completeness and symlink boundaries; persisted resource
+consumption; mandatory final-revision test metadata; JUnit/TRX/JSON parsing;
+complete scoped JSONL/OpenTelemetry logs. Evidence CLI integration must bypass
+live app imports, discovery, Chromium and test execution. Scaffold web/api/both,
+no-overwrite, strict typecheck and existing Mole selftests remain regression gates.

@@ -31,3 +31,15 @@ description: Drive and prove {{APP_NAME}} with the mole CLI. Use to reproduce a 
 - `doctor` red or `prove` exit 2: fix the environment or ask. Missing evidence is "can't tell", never "probably fine".
 
 Stop only what you started: `{{MOLE}} down` (it also stops an app that `--start` ran). Receipts<!-- surface: web --> and screenshots<!-- /surface: web --> stay in `proof/.runs/mole/`.
+
+## Saved evidence
+
+When the repository has TypeScript `proof/contracts/` and `proof/evidence-config.ts`,
+use `{{PROVE}} --evidence proof/.runs/<run-id>` for read-only evaluation. Approve
+required contract checks and test IDs/suites before implementation. Run existing
+tests and project collectors separately on the clean final revision. Require a
+persisted GET or explicitly approved DB snapshot plus complete trusted evidence;
+never replace a failing API assertion with DB evidence. Read `proof/tools/README.md`
+for approval pins and project adapters. The evaluator does not drive the app,
+launch a browser, query DB/HTTP or execute tests. Original receipts and exit codes
+apply; retain failed runs and report partial feature/surface coverage.

@@ -41,7 +41,7 @@ class TestProofKitIndependence:
         for path in files:
             if language == "typescript":
                 imports = [line for line in path.read_text().splitlines() if re.match(r"\s*(import|export)\b.*\bfrom\b", line)]
-                outside = [line for line in imports if LEAVES_THE_KIT[language].search(line) and "@playwright/test" not in line and "node:" not in line]
+                outside = [line for line in imports if LEAVES_THE_KIT[language].search(line) and "@playwright/test" not in line and "node:" not in line and "fast-xml-parser" not in line]
                 assert not outside, f"{path.name} imports outside the kit: {outside}"
             else:
                 assert not LEAVES_THE_KIT[language].search(path.read_text()), f"{path.name} imports outside the kit"
