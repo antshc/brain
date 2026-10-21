@@ -1,6 +1,6 @@
 # Plan: Durable Evidence Verifiers for Proof (TypeScript)
 
-**Status:** Proposed; not implemented  
+**Status:** Implemented on feature branch; pending review
 **Repository:** `antshc/brain`  
 **Target:** `plugins/proof/skills/init-proof/templates/typescript/`  
 **Reference:** [Python durable-evidence plan](proof-durable-evidence-verifiers.md)  
@@ -285,3 +285,16 @@ The manifest MUST bind evidence to a trusted authorized run, exact tested/deploy
 - [Proof concept](../../plugins/proof/skills/init-proof/references/concept.md)
 
 **Implementation boundary:** This document is a plan only. No TypeScript template code is changed by publishing it.
+
+
+## Implementation notes
+
+- `pnpm prove --evidence <run>` selects the saved-artifact evaluator before live imports.
+  `pnpm mole prove` remains the live command; the optional Mole evidence alias was omitted.
+- Protected project policy supplies approved digest/time, final full SHA/build and
+  attestation validation. The scaffold defaults to denial. Callbacks/imports are
+  trusted read-only project code; this is capability separation, not a JS sandbox.
+- JSON reports use an explicit normalized schema; custom `TestResultAdapter`
+  implementations handle Playwright JSON and project-specific retry policies.
+- JUnit/TRX XML parsing uses `fast-xml-parser` with validation and no DTD/entities.
+- Project extension guidance and a VPG contract live in the scaffold and references.

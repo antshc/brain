@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { APP } from "../proof/app";
 import { FEATURES } from "../proof/features";
+import { CONTRACTS } from "../proof/contracts";
 import { ALL_SURFACES, featureNames, featuresFor, selectFeatures, selectSurfaces, surfacesFor } from "../proof/kit";
 import { COMMANDS } from "./commands";
 import { ROOT } from "./runtime";
@@ -90,4 +91,13 @@ test("--surface is validated against the surfaces a feature has", () => {
   assert.throws(() => surfacesFor(FEATURES, featureNames(FEATURES), SURFACES, ["ftp"]), /Unknown surface "ftp"/);
   assert.deepEqual(selectSurfaces([], ["web"]), ["web"]);
   assert.throws(() => selectSurfaces(["api"], ["web"]), /no "api" surface/);
+});
+
+
+test("evidence contracts name existing features and supported surfaces", () => {
+  assert.equal(new Set(CONTRACTS.map(c => c.feature)).size, CONTRACTS.length);
+  for (const contract of CONTRACTS) {
+    assert.ok(Object.hasOwn(FEATURES, contract.feature), `Unknown evidence feature: ${contract.feature}`);
+    for (const surface of contract.surfaces) assert.ok(FEATURES[contract.feature].surfaces.includes(surface));
+  }
 });

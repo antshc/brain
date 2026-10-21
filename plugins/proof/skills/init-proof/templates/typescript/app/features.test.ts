@@ -3,3 +3,5 @@ import "../mole/selftest";
 
 // Add unit tests for your surface adapters below, with a fake `fetch` for the API adapter, for example:
 //   import { apiSurface } from "./features/surfaces";
+
+import "./evidence.test";

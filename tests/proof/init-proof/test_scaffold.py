@@ -93,6 +93,9 @@ class TestScaffoldedFiles:
         assert (repo / "mole/mole.ts").is_file()
         assert (repo / "proof/kit/run.ts").is_file()
         assert not (repo / "proof/engine").exists()
+        for name in ("kit/evaluate.ts", "kit/evidence.ts", "contracts/index.ts", "tools/README.md", "evidence-config.ts", "evidence.test.ts"):
+            assert (repo / "proof" / name).is_file()
+        assert 'return false' in (repo / "proof/evidence-config.ts").read_text()
 
     def test_web_only_has_no_api_adapter_or_api_config(self, repo: Path) -> None:
         run(repo, "web")
@@ -154,10 +157,15 @@ class TestNoOverwrite:
     def test_existing_files_are_kept_and_reported_as_skipped(self, repo: Path) -> None:
         (repo / "proof").mkdir()
         (repo / "proof/app.ts").write_text("// mine\n")
+        (repo / "proof/tools").mkdir()
+        (repo / "proof/tools/custom.ts").write_text("// project-owned\n")
+        (repo / "proof/evidence-config.ts").write_text("// approved policy\n")
         result = run(repo, "both")
         assert (repo / "proof/app.ts").read_text() == "// mine\n"
         assert "proof/app.ts" in result["skipped"]
         assert "proof/app.ts" not in result["created"]
+        assert (repo / "proof/tools/custom.ts").read_text() == "// project-owned\n"
+        assert (repo / "proof/evidence-config.ts").read_text() == "// approved policy\n"
 
     def test_second_run_creates_nothing(self, repo: Path) -> None:
         first = run(repo, "both")
@@ -188,7 +196,7 @@ class TestPackageJson:
         package = dict(PACKAGE, devDependencies={"tsx": "^4", "typescript": "^5"})
         (repo / "package.json").write_text(json.dumps(package))
         result = run(repo)
-        assert result["dev_dependencies_missing"] == ["@playwright/test", "@types/node"]
+        assert result["dev_dependencies_missing"] == ["@playwright/test", "@types/node", "fast-xml-parser"]
         assert result["install"] == "skipped"
 
     def test_workspace_root_installs_with_dash_w(self, repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
