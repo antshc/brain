@@ -43,7 +43,7 @@ python3 "<skillDir>/scripts/scaffold.py" --repo "$REPO_PATH" --language "<typesc
 
 It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, adapters only for chosen surfaces, `proof/README.md`) and the verify-mole skill, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
 
-- typescript: adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript fast-xml-parser` (approving esbuild's build script).
+- typescript: adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript` (approving esbuild's build script).
 - python: writes `proof/requirements.txt` (`playwright`, `pytest`, `mypy`) and runs `python3 -m pip install -r proof/requirements.txt` into the active environment; also gitignores `__pycache__/`. A repo that manages dependencies elsewhere (venv, uv, poetry) activates that environment first.
 
 A non-zero exit means the repo was refused; relay `error`. If `install` is not `installed`/`nothing to install`, fix it before step 7. Keep the JSON: it feeds the final report.
@@ -95,18 +95,3 @@ If `up --start` cannot start the app (missing database, container runtime, crede
 - The eShop files in `references/eshop-example/` are TypeScript examples, never copied verbatim into a repo; Python features follow the same shape.
 
 **Emit**: `REPO_PATH=<path>. Language: <typescript|python>. Surfaces: <list>. Created: <paths>. Skipped: <existing paths or none>. Features: <names>. Receipt: <PASS|FAIL|ERROR|not run> (<revision>). Open items: <TODOs, unknowns, failures or none>.`
-
-## TypeScript saved-evidence extension
-
-The TypeScript scaffold also installs project-owned `proof/contracts/`,
-`proof/tools/` and `proof/evidence-config.ts`. Before implementing a feature,
-review its required check IDs, stable field/membership assertions, test IDs or
-suites, persisted GET (or explicitly justified DB), and pin all acceptance-policy
-module digests outside the run. Reapproval requires fresh evidence.
-
-Use [references/ecommerce-evidence-example/README.md](references/ecommerce-evidence-example/README.md)
-as the complete example; do not install it as a fake passing feature.
-Collectors run separately on the real isolated app. `pnpm prove --evidence <run>`
-only evaluates saved, authorized, hash/revision/build-bound artifacts and existing
-test reports. Configure external attestation verification; default policy refuses
-all runs. Never broaden surfaces beyond web/api or alter the receipt schema.

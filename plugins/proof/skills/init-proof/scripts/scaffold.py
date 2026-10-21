@@ -83,7 +83,7 @@ SCRIPTS = {
     "test:proof": "tsx --test proof/features.test.ts",
     "typecheck:proof": "tsc -p proof/tsconfig.json",
 }
-DEV_DEPENDENCIES = ("tsx", "@playwright/test", "@types/node", "typescript", "fast-xml-parser")
+DEV_DEPENDENCIES = ("tsx", "@playwright/test", "@types/node", "typescript")
 REQUIREMENTS = "proof/requirements.txt"
 GITIGNORE_LINES = {
     "typescript": [("/proof/.runs/", {"/proof/.runs/", "proof/.runs/", "/proof/.runs", "proof/.runs", "/proof/", "proof/"})],

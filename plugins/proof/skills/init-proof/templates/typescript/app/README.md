@@ -46,33 +46,3 @@ pnpm typecheck:proof
 5. Run `pnpm test:proof`, then `pnpm mole prove --feature <name>`.
 
 Environment: `PROOF_URL` (app URL), `PROOF_API_URL` (API base URL), `MOLE_DIR` (isolates a second mole instance). Receipts and screenshots go to `proof/.runs/` (gitignored). Needs Node 20.12 or newer.
-
-## Durable evidence (TypeScript)
-
-Define project contracts in `proof/contracts/` **before implementation**. Review
-required check IDs, stable business invariants and mandatory test IDs/suites,
-then pin the contract/dependency digest outside the run. Use `matchesFields`,
-`containsItem`, `countMatches` and `fieldSatisfies`; live `check()` stays strict.
-
-Keep collectors, DB/log/report adapters in project-owned `proof/tools/`; see its
-README for the manifest and test metadata schemas. Prefer persisted GET over DB.
-Do not fall back to DB after a failing API check. Collect real application and
-existing-test evidence separately on the clean final commit.
-
-Configure the protected approval/attestation policy in `proof/evidence-config.ts`.
-Its default denies all evidence. The evaluator reads allowlisted hashed files,
-requires approved check execution exactly once, validates revision/build/provenance
-and tests, and emits the unchanged receipt (0 PASS, 1 FAIL, 2 ERROR).
-
-```bash
-pnpm prove --evidence proof/.runs/<run-id>
-pnpm prove --evidence proof/.runs/<run-id> --feature <name>
-```
-
-This branch runs before live app configuration/discovery/Chromium. It does not
-run tests or collectors; contracts and adapters are trusted read-only project code.
-Live `pnpm prove` and all `pnpm mole` commands retain their current behavior.
-A feature subset remains partial coverage in the original receipt fields.
-Run evidence mode for every approved feature before reporting completion.
-The init-proof reference `references/ecommerce-evidence-example/` shows a persisted
-order plus UI/task/request/console/log checks, backed separately by required tests.

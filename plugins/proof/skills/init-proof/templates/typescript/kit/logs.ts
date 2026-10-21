@@ -1,5 +1,9 @@
 import { matchesFields, countMatches, type CountBounds } from "./matchers";
-import { time } from "./evidence";
+const time = (value: string) => {
+  const n = Date.parse(value);
+  if (!Number.isFinite(n)) throw new Error("Invalid log timestamp");
+  return n;
+};
 export type LogRecord = { timestamp: string; level: string; event?: string; template?: string; message?: string; traceId?: string; correlationId?: string; fields: Record<string, unknown>; source: string; offset: number };
 export interface LogAdapter { parse(input: string, source: string): LogRecord[] }
 export type LogScope = { complete: boolean; correlationId?: string; traceId?: string; start?: string; end?: string };
@@ -47,7 +51,7 @@ export class OtelLogAdapter implements LogAdapter {
     });
   }
 }
-/** The regex is project-reviewed policy, never taken from evidence. Bound input before matching. */
+/** The regex is project-reviewed policy, never taken from captured logs. Bound input before matching. */
 export class TextLogAdapter implements LogAdapter {
   constructor(private readonly parseLine: (line: string) => Omit<LogRecord, "source" | "offset">) {}
   parse(input: string, source: string): LogRecord[] {
