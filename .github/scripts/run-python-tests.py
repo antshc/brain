@@ -14,6 +14,9 @@ def test_roots(repo: Path) -> list[Path]:
         path = Path(name)
         if any(part in {"_backup", "_in-progress"} for part in path.parts):
             continue
+        # Unrendered scaffold tests run only after generation in tests/proof/init-proof.
+        if "templates" in path.parts and path.parts[0] == "plugins":
+            continue
         if path.suffix != ".py" or not (path.name.startswith("test_") or path.name.endswith("_test.py")):
             continue
         if path.parts[:2] == ("tools", "tests"):

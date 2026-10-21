@@ -74,6 +74,14 @@ For each chosen case, in this order, following the "Add a feature" steps in `pro
 
 Use only routes, selectors, ids and counts you read from the repo, and read-only requests. Remove the `example` feature (code, map, README row, registry entry) once a real feature covers the same surfaces; keep it when the user chose none. Then fill the `TODO(proof)` markers in `.github/skills/verify-mole/SKILL.md` (trigger words, scope exclusions). Confirm no placeholders are left: `grep -rn "TODO(proof)" proof .github/skills/verify-mole` returns nothing.
 
+## Python durable evidence contracts
+
+For new feature implementation, define and review `proof/tools/contracts.py` contracts **before coding**. Pin `contract_digest(Path("proof"))` through the trusted workflow. Reuse live feature names; keep mandatory check/artifact names explicit. Prefer partial business invariants over full response snapshots.
+
+The coding agent runs existing tests on the clean final commit. Authorized project collectors save API/UI/task/browser/DB/log/test captures with `Capture`; the workflow verifies deployed/build SHA and retains the finalized manifest digest outside the artifact folder. Use API reads first; DB only if no suitable API exists by contract. Keep adapters in project-owned `proof/tools/`, never overwrite them.
+
+Run `python3 -m mole evaluate --app <name> --run <folder> --revision <full-sha> --contract-sha256 <reviewed-digest> --manifest-sha256 <trusted-digest>`. This separate mode only evaluates saved evidence; it MUST NOT launch browsers/apps, issue HTTP/SQL or execute tests. Keep reviewed contract imports pure. Missing/incomplete/stale captures are ERROR; conclusive mismatches are FAIL. Preserve original receipt JSON/exit codes. Read `proof/tools/README.md` for schemas, trust requirements, retention and the opt-in VPG example. TypeScript/live commands retain their existing behavior.
+
 ## 7. Verify
 
 Run from `REPO_PATH`; fix what fails or report it precisely (command, output, cause):

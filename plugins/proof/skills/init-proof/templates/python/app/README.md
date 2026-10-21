@@ -49,3 +49,15 @@ python3 -m playwright install chromium   # once
 5. Run `{{TEST_PROOF}}`, then `{{MOLE}} prove --feature <name>`.
 
 Environment: `PROOF_URL` (app URL), `PROOF_API_URL` (API base URL), `MOLE_DIR` (isolates a second mole instance); a `.env` at the repository root is read too. Receipts and screenshots go to `proof/.runs/` (gitignored). Needs Python 3.10 or newer and Linux or macOS.
+
+## Saved evidence evaluation
+
+Python also supports a separate offline mode. Live `run_proof()`, `mole prove` and `prove_cli` keep their behavior. The offline evaluator accepts reviewed contracts from `proof/tools/contracts.py`; it does not execute the live feature functions or start the app/browser/tests. Define/check contracts before implementing the feature, then collect final-revision observations. See [tools/README.md](tools/README.md) for manifests, trust, adapters and the VPG example.
+
+```bash
+python3 -m mole evaluate --app app-name --run proof/.runs/run-id \
+  --revision FULL_FINAL_GIT_SHA --contract-sha256 REVIEWED_CODE_TREE_DIGEST \
+  --manifest-sha256 TRUSTED_COLLECTOR_DIGEST
+```
+
+Select contracts with repeated `--feature NAME`. To try the adapted VPG example use `--contract-module proof.tools.vpg_example`. Keep registry keys aligned with live feature names; surfaces stay `web`/`api`, while DB/logs/tasks/tests are evidence sources. Every declared check must be recorded once. Missing/stale/invalid required evidence yields ERROR (2); observed mismatch yields FAIL (1); complete matching evidence yields PASS (0). Receipt/Check JSON stays unchanged; manifest/report details remain companion files. `receipt.json` is latest, `receipts/` retains every evaluation.

@@ -4,12 +4,16 @@ from __future__ import annotations
 
 from .features import Features, feature_names, features_for, prove_features, select_features, surfaces_for
 from .receipt import Coverage, coverage, exit_code, is_stale
-from .run import Revision, read_storage, run_proof, same
+from .run import Revision, read_storage, run_proof
+from .matchers import same, matches_fields, contains_item, count_matches, field_satisfies
+from .evidence import Evidence, EvidenceError
+from .evaluate import Contract, EvaluationKit, evaluate
 from .surfaces import ALL_SURFACES, SurfaceError, is_surface, observe, select_surfaces
 from .types import Check, CheckFn, Feature, ProofKit, Prove, Receipt, Surface
 
 __all__ = [
     "ALL_SURFACES", "Check", "CheckFn", "Coverage", "Feature", "Features", "ProofKit", "Prove", "Receipt", "Revision", "Surface", "SurfaceError",
     "coverage", "exit_code", "feature_names", "features_for", "is_stale", "is_surface", "observe", "prove_features", "read_storage", "run_proof",
-    "same", "select_features", "select_surfaces", "surfaces_for",
+    "Contract", "EvaluationKit", "evaluate", "Evidence", "EvidenceError",
+    "matches_fields", "contains_item", "count_matches", "field_satisfies", "same", "select_features", "select_surfaces", "surfaces_for",
 ]

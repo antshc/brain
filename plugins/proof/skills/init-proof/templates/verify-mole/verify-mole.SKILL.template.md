@@ -31,3 +31,9 @@ description: Drive and prove {{APP_NAME}} with the mole CLI. Use to reproduce a 
 - `doctor` red or `prove` exit 2: fix the environment or ask. Missing evidence is "can't tell", never "probably fine".
 
 Stop only what you started: `{{MOLE}} down` (it also stops an app that `--start` ran). Receipts<!-- surface: web --> and screenshots<!-- /surface: web --> stay in `proof/.runs/mole/`.
+
+## Saved evidence mode (Python only)
+
+When the project uses durable contracts, read `proof/tools/README.md` and `proof/tools/contracts.py` before implementation. Review/pin required checks first; do not weaken them to pass. The coding agent runs existing tests on the final clean commit and authorized collectors drive the isolated app. The workflow authenticates contract/build/run identity and supplies digests from outside the artifact folder.
+
+Use `python3 -m mole evaluate --app <name> --run <folder> --revision <full-sha> --contract-sha256 <reviewed-digest> --manifest-sha256 <trusted-digest>` to evaluate saved evidence. The Prover MUST NOT start apps/browsers, query HTTP/SQL or execute tests. Keep project contract imports pure. Prefer persisted API evidence; DB only when preapproved because no suitable API exists. Missing/stale/incomplete evidence is ERROR, observed mismatch is FAIL. Report the unchanged receipt and retain companion artifacts. Live commands above remain available.

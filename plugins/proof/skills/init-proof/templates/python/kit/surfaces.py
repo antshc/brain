@@ -3,8 +3,6 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from typing import TypeGuard, TypeVar
 
-from playwright.sync_api import Error as PlaywrightError
-
 from .types import ProofKit, Surface
 
 T = TypeVar("T")
@@ -37,6 +35,8 @@ def select_surfaces(names: Sequence[str], available: Sequence[Surface]) -> list[
 
 # A surface that cannot be observed is a finding, not a crash: a raise would turn the whole run into "can't tell".
 def observe(kit: ProofKit, label: str, step: Callable[[], T]) -> T | None:
+    from playwright.sync_api import Error as PlaywrightError
+
     try:
         return step()
     except (SurfaceError, PlaywrightError, OSError) as exception:
