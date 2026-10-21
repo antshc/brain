@@ -52,7 +52,7 @@ Environment: `PROOF_URL` (app URL), `PROOF_API_URL` (API base URL), `MOLE_DIR` (
 
 ## Saved evidence evaluation
 
-Python also supports a separate offline mode. Live `run_proof()`, `mole prove` and `prove_cli` keep their behavior. The offline evaluator accepts reviewed contracts from `proof/tools/contracts.py`; it does not execute the live feature functions or start the app/browser/tests. Define/check contracts before implementing the feature, then collect final-revision observations. See [tools/README.md](tools/README.md) for manifests, trust, adapters and the VPG example.
+Python also supports a separate offline mode. Live `run_proof()`, `mole prove` and `prove_cli` keep their behavior. The offline evaluator accepts reviewed contracts from `proof/tools/contracts.py`; it does not execute the live feature functions or start the app/browser/tests. Define/check contracts before implementing the feature, then collect final-revision observations. See [tools/README.md](tools/README.md) for manifests, trust, adapters and the Order example.
 
 ```bash
 python3 -m mole evaluate --app app-name --run proof/.runs/run-id \
@@ -60,4 +60,4 @@ python3 -m mole evaluate --app app-name --run proof/.runs/run-id \
   --manifest-sha256 TRUSTED_COLLECTOR_DIGEST
 ```
 
-Select contracts with repeated `--feature NAME`. To try the adapted VPG example use `--contract-module proof.tools.vpg_example`. Keep registry keys aligned with live feature names; surfaces stay `web`/`api`, while DB/logs/tasks/tests are evidence sources. Every declared check must be recorded once. Missing/stale/invalid required evidence yields ERROR (2); observed mismatch yields FAIL (1); complete matching evidence yields PASS (0). Receipt/Check JSON stays unchanged; manifest/report details remain companion files. `receipt.json` is latest, `receipts/` retains every evaluation.
+Select contracts with repeated `--feature NAME`. To try the adapted Order example use `--contract-module proof.tools.order_example`. Keep registry keys aligned with live feature names; surfaces stay `web`/`api`, while DB/logs/tasks/tests are evidence sources. Every declared check must be recorded once. Missing/stale/invalid required evidence yields ERROR (2); observed mismatch yields FAIL (1); complete matching evidence yields PASS (0). Receipt/Check JSON stays unchanged; manifest/report details remain companion files. `receipt.json` is latest, `receipts/` retains every evaluation.

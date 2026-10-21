@@ -18,7 +18,7 @@ spec.loader.exec_module(kit)
 
 
 def saved(tmp_path, *, content=None):
-    body = json.dumps(content if content is not None else {'name': 'VPG', 'extra': 1}).encode()
+    body = json.dumps(content if content is not None else {'orderNumber': 'ORD-1001', 'extra': 1}).encode()
     (tmp_path / 'resource.json').write_bytes(body)
     manifest = {'runId': 'run-1', 'revision': 'a' * 40, 'buildRevision': 'a' * 40,
                 'contractSha256': 'b' * 64, 'environment': 'isolated', 'dirty': False,
@@ -51,7 +51,7 @@ class TestDurableEvidence:
 
     def test_saved_evidence_passes_with_original_receipt(self, tmp_path):
         digest = saved(tmp_path)
-        receipt = evaluate(tmp_path, digest, lambda k: k.check('name', k.evidence.json('resource.json')['name'], 'VPG'))
+        receipt = evaluate(tmp_path, digest, lambda k: k.check('name', k.evidence.json('resource.json')['orderNumber'], 'ORD-1001'))
         assert receipt.verdict == 'PASS'
         assert set(receipt.to_json()) == {'verdict', 'revision', 'app', 'at', 'checks', 'features', 'surfaces', 'pageErrors', 'next'}
         subprocess.run([sys.executable, '-c',
@@ -63,7 +63,7 @@ class TestDurableEvidence:
         def prove(k):
             if mode == 'missing':
                 return
-            k.check('name', k.evidence.json('resource.json')['name'], 'wrong' if mode == 'mismatch' else 'VPG')
+            k.check('name', k.evidence.json('resource.json')['orderNumber'], 'wrong' if mode == 'mismatch' else 'ORD-1001')
             if mode == 'duplicate':
                 k.check('name', True, True)
             if mode == 'traversal':
@@ -144,7 +144,7 @@ class TestDurableEvidence:
             contracts={'test': kit.Contract(prove, ('tests: no failures', 'tests: expected skips'), ('tests.xml', 'run.json'))})
         assert receipt.verdict == ('PASS' if mode == 'pass' else 'FAIL' if mode in ('failure', 'skip') else 'ERROR')
 
-    def test_cli_vpg_example_is_offline_and_preserves_history(self, tmp_path):
+    def test_cli_order_example_is_offline_and_preserves_history(self, tmp_path):
         import shutil
         from durable_kit.capture import Capture, contract_digest
         from datetime import datetime, timezone
@@ -158,17 +158,17 @@ class TestDurableEvidence:
         digest = contract_digest(proof)
         capture = Capture(tmp_path / 'run', run_id='one', revision='a' * 40, build_revision='a' * 40,
                           contract_sha256=digest, environment='isolated')
-        observations = {'api/get-vpg.json': {'id': 'id1', 'name': 'TestVpg', 'vms': [{'name': 'TestVm', 'extra': True}]},
-            'tasks/create-vpg.json': {'state': 'Succeeded', 'resourceId': 'id1'},
-            'browser/vpg-list.json': {'reloaded': True, 'rows': [{'id': 'id1', 'name': 'TestVpg'}]},
-            'browser/request.json': {'method': 'POST', 'path': '/vpgs', 'body': {'name': 'TestVpg'}},
+        observations = {'api/get-order.json': {'id': 'id1', 'orderNumber': 'ORD-1001', 'items': [{'sku': 'SKU-COFFEE', 'quantity': 2, 'extra': True}]},
+            'tasks/create-order.json': {'state': 'Succeeded', 'resourceId': 'id1'},
+            'browser/order-list.json': {'reloaded': True, 'rows': [{'id': 'id1', 'orderNumber': 'ORD-1001'}]},
+            'browser/request.json': {'method': 'POST', 'path': '/orders', 'body': {'items': [{'sku': 'SKU-COFFEE', 'quantity': 2}]}},
             'browser/console.json': {'errors': []}}
         for name, value in observations.items():
             capture.add(name, json.dumps(value).encode())
-        capture.add('browser/vpg-list.png', b'fixture-image-is-supplementary')
-        capture.add('logs/application.jsonl', b'{"event":"VpgCreated","severity":"Information","correlationId":"one","properties":{"vpgName":"TestVpg"}}\n')
+        capture.add('browser/order-list.png', b'fixture-image-is-supplementary')
+        capture.add('logs/application.jsonl', b'{"event":"OrderCreated","severity":"Information","correlationId":"one","properties":{"orderNumber":"ORD-1001"}}\n')
         start = datetime.now(timezone.utc).isoformat()
-        xml = b'<testsuite tests="1"><testcase classname="vpg" name="create"/></testsuite>'
+        xml = b'<testsuite tests="1"><testcase classname="order" name="create"/></testsuite>'
         capture.add('tests/results.xml', xml)
         capture.add('tests/run.json', json.dumps({'runId': 'one', 'revision': 'a' * 40, 'dirty': False,
             'startedAt': start, 'finishedAt': datetime.now(timezone.utc).isoformat(), 'command': 'existing-tests',
@@ -184,14 +184,14 @@ def audit(event, args):
 sys.addaudithook(audit)
 runpy.run_module('mole', run_name='__main__')
 '''
-        command = [sys.executable, '-c', runner, 'evaluate', '--app', 'vpg', '--run', str(tmp_path / 'run'),
+        command = [sys.executable, '-c', runner, 'evaluate', '--app', 'order', '--run', str(tmp_path / 'run'),
             '--revision', 'a' * 40, '--contract-sha256', digest, '--manifest-sha256', manifest_digest,
-            '--contract-module', 'proof.tools.vpg_example']
+            '--contract-module', 'proof.tools.order_example']
         for _ in range(2):
             result = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True, check=True)
             assert json.loads(result.stdout)['verdict'] == 'PASS'
         assert len(list((tmp_path / 'run/receipts').glob('*.json'))) == 2
-        (proof / 'tools/vpg_example.py').write_text('raise AssertionError("unapproved contract executed")')
+        (proof / 'tools/order_example.py').write_text('raise AssertionError("unapproved contract executed")')
         result = subprocess.run(command, cwd=tmp_path, capture_output=True, text=True)
         assert result.returncode == 2
         assert 'Local contract code differs' in json.loads(result.stdout)['error']

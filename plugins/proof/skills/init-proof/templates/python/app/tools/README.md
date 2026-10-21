@@ -2,7 +2,7 @@
 
 This folder belongs to the project. Scaffold reruns skip existing files; keep custom adapters here, outside upgrade-replaced `proof/kit/` and `mole/`.
 
-1. Before implementing a feature, review its `Contract`: named mandatory checks, artifacts, test IDs, business constants, surface names and evidence sources. Use the same feature names as the live registry. Register in `contracts.py`. `vpg_example.py` is an opt-in example; adapt routes and schema before use.
+1. Before implementing a feature, review its `Contract`: named mandatory checks, artifacts, test IDs, business constants, surface names and evidence sources. Use the same feature names as the live registry. Register in `contracts.py`. `order_example.py` is an opt-in example; adapt routes and schema before use.
 2. Commit the approved contract. Record `contract_digest(Path('proof'))` through a trusted workflow. It hashes relative paths and contents of all Python files under `proof/`; include imports outside that tree in the project's review/pinning policy. Do not weaken checks during implementation. A contract change requires review and a new digest.
 3. Implement and commit the feature. The coding agent/workflow runs existing tests on the clean final commit, records the full Git SHA, command, start/end times, dirty state and report hash in `tests/run.json`. Rebuild/deploy that revision; do not infer the deployed revision merely from the current source checkout.
 4. An authorized collector drives the isolated app and saves observations with `Capture`. It verifies the clean checkout and build identities, strips secrets and writes complete run-scoped captures. Use fresh immutable run directories; never reuse old resource snapshots. Required screenshots accompany structured post-reload UI observations. A screenshot alone cannot prove persistence.
@@ -18,7 +18,7 @@ capture = Capture(Path('proof/.runs/unique-id'), run_id='unique-id',
     revision=final_sha, build_revision=deployed_sha,
     contract_sha256=approved_digest, environment='isolated-ci')
 # Project collectors perform actual API/UI/DB/log collection here.
-capture.add('api/get-vpg.json', normalized_response_bytes)
+capture.add('api/get-order.json', normalized_response_bytes)
 # Add every required artifact, then hand the digest to the workflow securely.
 manifest_digest = capture.finish()
 ```
