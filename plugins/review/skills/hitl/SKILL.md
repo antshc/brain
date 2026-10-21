@@ -38,7 +38,7 @@ Locate existing architecture docs — overview, Crosscutting Concepts, ADRs — 
 
 Set `SESSION_DIR` to `/memories/session/hitl-<OWNER>-<REPO>-<PR_NUMBER>/<COMMIT_ID>/`; create it before delegation. If session memory is unavailable, use the host's session artifact directory and retain its absolute path.
 
-Spawn two fresh subagents in parallel, each with its own absolute instruction-reference path from this skill's base directory. Pass `PR_URL`, `OWNER/REPO#PR_NUMBER`, checkout root, `COMMIT_ID`, `bin/review_diff/` and manifest, PR title/body, existing comments, loaded architecture docs, and its absolute `OUTPUT_PATH`.
+Spawn two fresh subagents in parallel, each with its own absolute instruction-reference path from this skill's base directory. Pass `PR_URL`, `OWNER/REPO#PR_NUMBER`, checkout root, `COMMIT_ID`, `bin/review_diff/` and manifest, PR title/body, existing comments, loaded architecture docs, `SESSION_DIR`, and its absolute `OUTPUT_PATH` inside `SESSION_DIR`.
 
 | Subagent | Instruction reference | Output in `SESSION_DIR` |
 |---|---|---|
@@ -47,9 +47,11 @@ Spawn two fresh subagents in parallel, each with its own absolute instruction-re
 
 Both **MUST** start before waiting for either. Each reads its own reference, applies [Unslop](references/unslop.md) to its report, and writes only its assigned report and temporary proof files; source edits, checkout changes, commits, pushes, PR edits, and comment posting are forbidden. Keep proof files in a task-specific temporary directory. Run only non-destructive local checks; report unavailable or unsafe execution as unproven. Subagents review the same recorded commit independently; neither consumes the other's output. If delegation is unavailable, report the blocker and stop preparation rather than substitute parent analysis.
 
-Wait for both; verify each report exists, is nonempty, and identifies the PR and `COMMIT_ID`. On failure, save a failure report at that agent's output path with the blocker and label it failed, never clean. Reuse reports only for the same PR and commit. Recheck `git rev-parse HEAD` and `gh pr view <PR_URL> --json headRefOid`; if either differs from `COMMIT_ID`, refresh context and rerun both before review.
+Each subagent **MUST** save its complete report to its assigned session file before returning, then return only `OUTPUT_PATH` and completed/failed status. Chat output does not substitute for the saved report.
 
-Show clickable Markdown links to both actual report files with completed/failed status before asking for review input. Use the host's file-link format, not bare paths; link files rather than instruction references. Retain reports for the session. A failed report stays visible while the human-led review proceeds on available evidence.
+Wait for both; read each returned file and verify it exists inside `SESSION_DIR`, is nonempty, and identifies the PR and `COMMIT_ID`. On failure, save a failure report at that agent's output path with the blocker and label it failed, never clean. Reuse reports only for the same PR and commit. Recheck `git rev-parse HEAD` and `gh pr view <PR_URL> --json headRefOid`; if either differs from `COMMIT_ID`, refresh context and rerun both before review.
+
+Show clickable Markdown links to both actual report files with completed/failed status before asking for review input. Use the host's file-link format, not bare paths; link files rather than instruction references. Print one link per report, labeled `Blast-radius report` and `PR-summary report`, each followed by its status. Resolve link targets to the saved session files before presenting them. If a report cannot be saved or linked, report the blocker and stop preparation. Retain reports for the session. A failed report stays visible while the human-led review proceeds on available evidence.
 
 ## Review loop
 
