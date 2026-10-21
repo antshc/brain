@@ -38,6 +38,20 @@ Locate existing architecture docs — overview, Crosscutting Concepts, ADRs — 
 
 Set `SESSION_DIR` to `/memories/session/hitl-<OWNER>-<REPO>-<PR_NUMBER>/<COMMIT_ID>/`; create it before delegation. If session memory is unavailable, use the host's session artifact directory and retain its absolute path.
 
+Before spawning, count added + deleted lines and changed files from the recorded diff at `COMMIT_ID`. Exclude generated/vendor content from line/file counts, record exclusions, and inspect its runtime impact. Count renames and binary changes as files. Unknown size uses the largest tier.
+
+| Diff size | Model tier | Thinking effort |
+|---|---|---|
+| Small: ≤200 changed lines and ≤5 files | Fast coding | Low |
+| Medium: 201–800 lines or 6–20 files, without a large threshold | Standard reasoning | Medium |
+| Large: >800 lines or >20 files | Strongest reasoning | Highest supported |
+
+Highest matching size wins. Cross-module behavior raises small to medium. Authentication/authorization, concurrency, transactions, migrations, public contracts, distributed state, recovery, or destructive operations raise any size to large. Complexity only raises the tier; mechanical changes retain their size floor. Apply the same classification to both report subagents.
+
+Resolve model tiers to concrete IDs from explicit caller configuration and the runtime's supported-model catalog; do not invent IDs. Pass model and thinking effort explicitly through supported delegation parameters. If the requested model is unavailable, prefer a stronger available tier; otherwise inherit the current model and disclose the limitation. If the requested effort is unavailable, use the nearest stronger supported effort, otherwise the highest supported. If either control is unsupported, inherit its runtime default and record that limitation. Never claim a setting took effect unless the runtime exposes it.
+
+Record `MODEL_SELECTION`: reviewed commit, counted lines/files, exclusions, complexity triggers, selected tier, requested model/effort, actual model/effort when exposed, and fallback reasons. Pass it to each subagent and require it in both saved reports. Done when both agents have an explicit model/effort decision before launch.
+
 Spawn two fresh subagents in parallel, each with its own absolute instruction-reference path from this skill's base directory. Pass `PR_URL`, `OWNER/REPO#PR_NUMBER`, checkout root, `COMMIT_ID`, `bin/review_diff/` and manifest, PR title/body, existing comments, loaded architecture docs, `SESSION_DIR`, and its absolute `OUTPUT_PATH` inside `SESSION_DIR`.
 
 | Subagent | Instruction reference | Output in `SESSION_DIR` |
