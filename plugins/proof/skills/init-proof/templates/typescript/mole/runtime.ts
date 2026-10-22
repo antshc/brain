@@ -89,3 +89,8 @@ export async function startApp(options: { url?: string; log: string; timeoutMs?:
   await close();
   throw new Error(`${APP.name} did not answer at ${url} in time. See ${options.log}`);
 }
+
+/** An error with the next thing to do. The CLIs print both as JSON. */
+export class MoleError extends Error {
+  constructor(message: string, readonly next: string, readonly code = 2) { super(message); }
+}

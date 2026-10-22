@@ -25,7 +25,7 @@ __all__ = [
 
 
 class Target(Protocol):
-    """A ProofKit or a DriveCall: whatever carries the page and the API URL of this run."""
+    """A FlowContext (or the page and API URL of any other run) for the adapters below."""
 
     @property
     def page(self) -> Page | None: ...

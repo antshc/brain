@@ -1171,40 +1171,45 @@ Scenario: Mole uses the kit
 ## Feature: Proof Scaffold Output
 
 ```gherkin
-Scenario: Both surfaces create both adapters
+Scenario: Both surfaces create the api adapter and the web page object
   Given a pnpm repository and surfaces web and api
   When scaffold runs
-  Then both adapters, the proof kit, the mole and the verify-mole skill are created and there is no proof/engine
+  Then the api adapter, the web page object, flow and example checks, the proof kit, the mole and the verify-mole skill are created and there is no proof/engine or proof/features/surfaces
+
+Scenario: Scaffold creates the scenario model layout
+  Given a pnpm repository and surfaces web and api
+  When scaffold runs
+  Then features, adapters, components, the self-test file and the skill's feature README, example map, agent.md and component-extractor.md exist
 
 Scenario: Web only has no api adapter or api config
   Given surfaces web only
   When scaffold runs
-  Then there is no api adapter, no api config in app.ts and no apiSurface in the adapter index
+  Then there is no api adapter or api example check, no api config in app.ts, and the example feature names no api scenario
 
 Scenario: Api only has no web adapter or web config
   Given surfaces api only
   When scaffold runs
-  Then there is no web adapter, no web config, and the skill mentions HTTP and no screenshot
+  Then there is no web page object, flow or example check, no web config, and the skill mentions HTTP and no screenshot
 
 Scenario: No marker or placeholder is left in any file
   Given any surface choice
   When scaffold runs
   Then no surface marker or placeholder remains in a created file
 
-Scenario: Both surfaces skill explains cross surface driving
+Scenario: Skill drives the scenario loop with run flow and receipts
   Given surfaces web and api
   When scaffold runs
-  Then the verify-mole skill explains --surface web|api and screenshots
+  Then the verify-mole skill names mole run, flow, receipts and scripts/agent.md, and no longer names prove --feature or --surface
 
 Scenario: App name is json escaped in app ts and plain in the skill
   Given an app name containing quotes
   When scaffold runs
   Then app.ts holds it as a JSON string and the skill heading holds it as text
 
-Scenario: Example map lists exactly the chosen surfaces
+Scenario: Example map has one scenario paragraph per chosen surface
   Given surfaces api only
   When scaffold runs
-  Then the example map's frontmatter lists api and its driving section mentions the api command
+  Then the example map has the four sections and an api scenario paragraph naming its evidence, and no web scenario paragraph
 
 Scenario: Kit and mole are copied byte for byte
   Given any surface choice
@@ -1402,7 +1407,7 @@ Scenario: Old python is refused and untouched
 Scenario: Both surfaces create the kit, mole, adapters and skill
   Given a repository and surfaces web and api
   When scaffold runs for python
-  Then the python kit, mole, app config, both adapters, requirements, tests and the verify-mole skill are created and no TypeScript file is
+  Then the python kit, mole, app config, both adapters, requirements, tests, flows, pages, checks, components, evidence adapters, the verify-mole skill with its scenario-authoring rules and the component-extractor agent are created and no TypeScript file is
 
 Scenario: Web only has no api adapter or api config
   Given surfaces web only
@@ -1427,7 +1432,12 @@ Scenario: Every scaffolded python file is valid python
 Scenario: Verify mole skill and maps use the python commands
   Given a python scaffold
   When the verify-mole files are read
-  Then they name python3 -m mole and proof/app.py and never pnpm
+  Then they name python3 -m mole run, proof/app.py and the scenario-authoring rules, and never pnpm or prove --feature
+
+Scenario: The agent template names the component extractor and its rules
+  Given a python scaffold
+  When the component-extractor agent is read
+  Then it has the name component-extractor, writes to proof/components/ and explores with Playwright CLI
 
 Scenario: Kit and mole are copied byte for byte
   Given a python scaffold
@@ -1442,7 +1452,7 @@ Scenario: App name is json escaped in app py and plain in the skill
 Scenario: Example map lists exactly the chosen surfaces
   Given surfaces api only
   When scaffold runs for python
-  Then the example map frontmatter lists api and not web
+  Then the example map names only the API response as evidence, the example feature lists api and the check does not use the network log
 
 Scenario: Unresolved todo markers remain for the research step
   Given a python scaffold
@@ -1542,7 +1552,7 @@ Scenario: Deep equality does not treat true as one
 Scenario: Help lists commands with the python invocation
   Given a python scaffold
   When mole help runs
-  Then it prints usage with python3 -m mole
+  Then it prints usage with python3 -m mole, the run and flow commands and no prove --feature
 
 Scenario: Unknown command exits 2 with a next step
   Given a python scaffold
@@ -1563,17 +1573,31 @@ Scenario: Commands that need a session say nothing is running
 > Needs playwright and its Chromium
 
 ```gherkin
-Scenario: Up start doctor prove stale and down
+Scenario: Up start doctor run receipts stale and down
   Given a python scaffold in a git repo with a small HTTP app
-  When mole up --start runs, then doctor, prove, prove --surface api, snapshot and api get
-  Then doctor is ok, the proof is PASS with a screenshot and no page errors, the api-only run says web did not run, and snapshot and api get show the app
-  And after the source changes, prove refuses and doctor reports STALE
+  When mole up --start runs, then doctor, run, run by sub-feature, run with an unknown id, prove, flow, api get, receipts and features
+  Then doctor is ok and the run is PASS with a screenshot, no page errors and every check's evidence on disk
+  And an unknown id is refused with the valid ids and prove points to run
+  And flow shows the page and receipts and features list the scenario
+  And after the source changes, run refuses, doctor and receipts report STALE
   And down stops mole and removes the session
 
-Scenario: A failing check is a fail receipt with its hint
+Scenario: A failing check is a fail receipt with its hint and kept evidence
   Given a feature whose check expects the wrong value
-  When mole prove runs
-  Then it exits 1 with verdict FAIL and the check's hint as the first next step
+  When mole run runs
+  Then it exits 1 with verdict FAIL, the check's hint as the first next step and the failing check's evidence on disk
+
+Scenario: A check that declares no evidence cannot pass
+  Given a check built with no evidence
+  When the registry is loaded
+  Then it is refused naming the check as declaring no evidence
+
+Scenario: A scenario fails before the fix passes after it and goes stale on the next edit
+  Given a demo shop whose sort by price is wrong and scenarios built from the dropdown, table and modal components
+  When mole run shop runs before the fix, after the fix and after a further edit
+  Then the sorting scenario is FAIL with the actual prices and the details scenario is PASS
+  And after the fix on a fresh build both are PASS and the trace shows the flows in order
+  And after a further edit run refuses because the build is stale
 ```
 
 **Coverage:** Integration test

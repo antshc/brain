@@ -85,30 +85,41 @@ class TestRepositoryGate:
 class TestScaffoldedFiles:
     """Feature: Proof Scaffold Output"""
 
-    def test_both_surfaces_create_both_adapters(self, repo: Path) -> None:
+    def test_both_surfaces_create_the_api_adapter_and_the_web_page_object(self, repo: Path) -> None:
         result = run(repo, "both")
-        assert "proof/features/surfaces/web.ts" in result["created"]
-        assert "proof/features/surfaces/api.ts" in result["created"]
+        for created in ("proof/adapters/api.ts", "proof/pages/app-page.ts", "proof/flows/open-app.ts", "proof/checks/example-web.ts", "proof/checks/example-api.ts"):
+            assert created in result["created"]
         assert (repo / ".github/skills/verify-mole/SKILL.md").is_file()
         assert (repo / "mole/mole.ts").is_file()
         assert (repo / "proof/kit/run.ts").is_file()
         assert not (repo / "proof/engine").exists()
+        assert not (repo / "proof/features/surfaces").exists()
+
+    def test_scaffold_creates_the_scenario_model_layout(self, repo: Path) -> None:
+        run(repo, "both")
+        for path in ("proof/features/index.ts", "proof/features/example.ts", "proof/adapters/index.ts", "proof/components/README.md", "proof/features.test.ts"):
+            assert (repo / path).is_file(), path
+        for path in ("features/README.md", "features/example.md", "scripts/agent.md", "scripts/component-extractor.md"):
+            assert (repo / ".github/skills/verify-mole" / path).is_file(), path
 
     def test_web_only_has_no_api_adapter_or_api_config(self, repo: Path) -> None:
         run(repo, "web")
-        assert not (repo / "proof/features/surfaces/api.ts").exists()
+        assert not (repo / "proof/adapters/api.ts").exists()
+        assert not (repo / "proof/checks/example-api.ts").exists()
         app = (repo / "proof/app.ts").read_text()
         assert 'surfaces: ["web"]' in app
         assert "api: {" not in app and "web: {" in app
-        index = (repo / "proof/features/surfaces/index.ts").read_text()
-        assert "apiSurface" not in index and "webSurface" in index
+        assert "apiResponse" not in (repo / "proof/adapters/index.ts").read_text()
+        assert "apiAnswers" not in (repo / "proof/features/example.ts").read_text()
 
     def test_api_only_has_no_web_adapter_or_web_config(self, repo: Path) -> None:
         run(repo, "api")
-        assert not (repo / "proof/features/surfaces/web.ts").exists()
+        for absent in ("proof/pages/app-page.ts", "proof/flows/open-app.ts", "proof/checks/example-web.ts"):
+            assert not (repo / absent).exists(), absent
         app = (repo / "proof/app.ts").read_text()
         assert 'surfaces: ["api"]' in app
         assert "web: {" not in app and "api: {" in app
+        assert "openApp" not in (repo / "proof/features/example.ts").read_text()
         skill = (repo / ".github/skills/verify-mole/SKILL.md").read_text()
         assert "screenshot" not in skill and "over HTTP" in skill
 
@@ -120,10 +131,12 @@ class TestScaffoldedFiles:
             for leftover in ("<surface:", "</surface:", "<!-- surface", "<!-- /surface", "{{", "}}"):
                 assert leftover not in body, f"{leftover!r} left in {path.relative_to(repo)}"
 
-    def test_both_surfaces_skill_explains_cross_surface_driving(self, repo: Path) -> None:
+    def test_skill_drives_the_scenario_loop_with_run_flow_and_receipts(self, repo: Path) -> None:
         run(repo, "both")
         skill = (repo / ".github/skills/verify-mole/SKILL.md").read_text()
-        assert "--surface web|api" in skill and "screenshot" in skill
+        for command in ("pnpm mole run", "pnpm mole flow", "pnpm mole receipts", "scripts/agent.md"):
+            assert command in skill
+        assert "prove --feature" not in skill and "--surface" not in skill
 
     def test_app_name_is_json_escaped_in_app_ts_and_plain_in_the_skill(self, repo: Path) -> None:
         run(repo, "web", name='Shop "Pro"')
@@ -131,11 +144,13 @@ class TestScaffoldedFiles:
         assert "name: verify-mole" in (repo / ".github/skills/verify-mole/SKILL.md").read_text()
         assert 'Verify Shop "Pro"' in (repo / ".github/skills/verify-mole/SKILL.md").read_text()
 
-    def test_example_map_lists_exactly_the_chosen_surfaces(self, repo: Path) -> None:
+    def test_example_map_has_one_scenario_paragraph_per_chosen_surface(self, repo: Path) -> None:
         run(repo, "api")
         map_text = (repo / ".github/skills/verify-mole/features/example.md").read_text()
-        assert "surfaces:\n  - api\n---" in map_text
-        assert "api get /" in map_text
+        for section in ("## Sub-features", "## How to get to it (user POV)", "## Driving it with Mole", "## Gotchas"):
+            assert section in map_text
+        assert "**(app-answers | api):**" in map_text and "(API response)" in map_text
+        assert "(app-answers | web)" not in map_text and "(DOM assertion)" not in map_text
 
     def test_kit_and_mole_are_copied_byte_for_byte(self, repo: Path) -> None:
         run(repo, "both")

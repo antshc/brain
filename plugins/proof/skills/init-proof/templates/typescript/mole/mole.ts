@@ -8,11 +8,12 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { chromium, type Browser, type Page } from "@playwright/test";
 import { APP } from "../proof/app";
-import { FEATURES } from "../proof/features";
-import { SurfaceError, exitCode, featureNames, featuresFor, isSurface, proveFeatures, readStorage, runProof, selectFeatures, surfacesFor, type Surface } from "../proof/kit";
+import { exitCode, featuresFor, readStorage, scenarioId, type RunEnv } from "../proof/kit";
 import { COMMANDS, type Command } from "./commands";
-import { coverageNotes, proofStatus, saveReceipt } from "./receipts";
-import { DEFAULT_URL, ROOT, apiAnswers, changedFiles, discoverApi, reachable, sourceRevision, startApp, type StartedApp } from "./runtime";
+import { MAPS } from "./maps";
+import { proveScenarios } from "./prove";
+import { adapters, proofStatus, readReceipts, registry } from "./receipts";
+import { DEFAULT_URL, MoleError, ROOT, apiAnswers, changedFiles, discoverApi, reachable, sourceRevision, startApp, type StartedApp } from "./runtime";
 
 // MOLE_DIR isolates a second instance (tests, a parallel checkout) from the default one.
 const DIR = process.env.MOLE_DIR ?? join(ROOT, "proof", ".runs", "mole");
@@ -22,14 +23,9 @@ const RECEIPT = join(DIR, "receipt.json");
 const PROFILE = join(DIR, "profile");
 const LOCK = join(DIR, "up.lock");
 const APP_LOG = join(DIR, "app.log");
-const MAPS = APP.featureMaps ?? ".github/skills/verify-mole/features";
-const SURFACES = APP.surfaces;
 const hasWeb = APP.surfaces.includes("web");
 const hasApi = APP.surfaces.includes("api");
 
-class MoleError extends Error {
-  constructor(message: string, readonly next: string, readonly code = 2) { super(message); }
-}
 const out = (value: unknown) => console.log(JSON.stringify(value, null, 2));
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -109,7 +105,7 @@ async function claimUp() {
   throw new MoleError("Another up is already starting or running here.", "Use it, or stop it first: pnpm mole down");
 }
 
-// The API may come up after the app, so when mole started the app give it a minute. Not finding it is not fatal for the web surface.
+// The API may come up after the app, so when mole started the app give it a minute. Not finding it is fatal only for scenarios that need it.
 async function findApi(patient: boolean): Promise<string | null> {
   if (!hasApi) return null;
   const deadline = Date.now() + (patient ? 60_000 : 0);
@@ -190,7 +186,7 @@ async function up(options: { url: string; start: boolean; headless: boolean }) {
     const session: Session = { pid: process.pid, appUrl: options.url, apiUrl, cdpUrl: `http://127.0.0.1:${port}`, startedApp: Boolean(app), builtRevision, headless, startedAt: new Date().toISOString() };
     await writeFile(SESSION, JSON.stringify(session, null, 2));
     out({ ok: true, ...session, ...(app ? { appLog: APP_LOG } : {}),
-      next: hasApi && !apiUrl ? "Leave this running. The API was not found, so only the web surface works: see pnpm mole doctor"
+      next: hasApi && !apiUrl ? "Leave this running. The API was not found, so scenarios that need it cannot run: see pnpm mole doctor"
         : "Leave this running. In another terminal: pnpm mole doctor" });
 
     let stopping = false;
@@ -243,7 +239,7 @@ async function doctor() {
       const apiUrl = session.apiUrl ?? await findApi(false);
       const apiOk = apiUrl ? await apiAnswers(apiUrl) : false;
       checks.push({ name: "api", ok: apiOk, detail: apiOk ? `the API answers at ${apiUrl}` : apiUrl ? `no answer from ${apiUrl}` : "the API base URL was not found",
-        ...(!apiOk ? { next: `Start the app, then: pnpm mole down; pnpm mole up. Or set PROOF_API_URL.${hasWeb ? " Without it only --surface web can be proved." : ""}` } : {}) });
+        ...(!apiOk ? { next: `Start the app, then: pnpm mole down; pnpm mole up. Or set PROOF_API_URL.${hasWeb ? " Without it, scenarios that need the API cannot run." : ""}` } : {}) });
     }
     const source = await sourceRevision();
     const fresh = source !== null && source === session.builtRevision;
@@ -253,78 +249,68 @@ async function doctor() {
     proof = await proofStatus(RECEIPT, source);
   }
   const ok = checks.every(check => check.ok);
-  out({ ok, checks, proof });
+  const evidence = adapters().map(adapter => ({ source: adapter.source, assertive: adapter.assertive }));
+  out({ ok, checks, evidence, proof });
   if (!ok) process.exitCode = 1;
 }
 
-async function prove(features: string[], surfaceNames: string[]) {
-  let selected: string[];
-  let surfaces: Surface[];
-  try {
-    selected = selectFeatures(FEATURES, features);
-    surfaces = surfacesFor(FEATURES, selected, SURFACES, surfaceNames);
-  } catch (error) {
-    throw new MoleError((error as Error).message, "See the features: pnpm mole features. The surfaces are: " + SURFACES.join(", "));
-  }
+async function run(targets: string[]) {
   const receipt = await withPage(async (_page, browser, session) => {
-    const apiUrl = surfaces.includes("api") ? await apiUrlOf(session) : null;
+    const apiUrl = await apiUrlOf(session).catch(() => null);
     const source = await sourceRevision();
     if (source !== session.builtRevision) throw new MoleError(
       `The running build was started on ${session.builtRevision} but the source is now ${source}. A proof would describe code that is not running.`,
       session.startedApp ? "Restart it: pnpm mole down; pnpm mole up --start" : "Restart the app, then: pnpm mole down; pnpm mole up");
-    // One screenshot per run, so each saved receipt keeps the image it was proved with.
-    return runProof(browser, session.appUrl, proveFeatures(FEATURES, selected), {
-      screenshot: join(DIR, `proof-${source}-${Date.now()}.png`), revision: sourceRevision, surfaces, apiUrl, features: selected,
-      rerun: "pnpm mole prove (or pnpm prove)", diagnose: "Run pnpm mole doctor (or check the app is running at --url)",
+    return proveScenarios({
+      browser, appUrl: session.appUrl, apiUrl, dir: DIR, targets,
+      rerun: "pnpm mole run (or pnpm prove)", diagnose: "Run pnpm mole doctor (or check the app is running at --url)",
     });
   });
-  receipt.next.push(...coverageNotes({ features: selected, surfaces }));
-  await saveReceipt(DIR, RECEIPT, receipt);
   out(receipt);
   process.exitCode = exitCode(receipt);
 }
 
-// Which features need proving: all of them, or those whose files your uncommitted changes touch.
+// Which scenarios need proving: all of them, or those of the features your uncommitted changes touch.
 function listFeatures(changed: boolean) {
+  const reg = registry();
   const files = changed ? changedFiles() : [];
-  const names = changed ? featuresFor(FEATURES, files) : featureNames(FEATURES);
+  const names = changed ? featuresFor(reg, files) : reg.features.map(feature => feature.name);
   out({
     ...(changed ? { changedFiles: files.length } : {}),
-    features: names.map(name => ({
-      name, surfaces: FEATURES[name].surfaces, map: `${MAPS}/${name}.md`, prove: `pnpm mole prove --feature ${name}`,
-      ...(FEATURES[name].drive ? { drive: `pnpm mole ${name} ${FEATURES[name].drive!.usage}` } : {}),
+    features: reg.features.filter(feature => names.includes(feature.name)).map(feature => ({
+      name: feature.name, surfaces: feature.surfaces ?? APP.surfaces, map: `${MAPS}/${feature.name}.md`,
+      subFeatures: feature.subFeatures.map(sub => ({ id: sub.id, scenarios: sub.scenarios.map(scenario => scenarioId(feature.name, sub.id, scenario.id)) })),
+      run: `pnpm mole run ${feature.name}`,
     })),
-    next: !changed ? "Open the map of the feature you are touching, then: pnpm mole prove --feature <name>"
-      : names.length ? "Prove each, then run pnpm mole prove with no --feature once before you report." : "No feature's files changed. Run pnpm mole prove if you still need proof.",
+    flows: [...reg.flows.keys()],
+    next: !changed ? "Open the map of the feature you are touching, then: pnpm mole run <feature|feature.sub-feature|feature.sub-feature.scenario>"
+      : names.length ? "Run each, then pnpm mole run with no target once before you report." : "No feature's files changed. Run pnpm mole run if you still need proof.",
   });
 }
 
-// `mole <feature> <verb> ...`: the feature's own drive hook, on one surface. The answer says which.
-async function driveFeature(name: string, argv: string[]) {
-  const feature = FEATURES[name];
-  if (!feature.drive) throw new MoleError(`The feature "${name}" has no drive hook, so it cannot be driven by hand.`,
-    `Prove it instead: pnpm mole prove --feature ${name}. Or add a \`drive\` to it in proof/features/index.ts.`);
-  const requested: string[] = [];
-  const rest: string[] = [];
-  for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === "--surface") requested.push(argv[++i] ?? "");
-    else if (argv[i].startsWith("--surface=")) requested.push(argv[i].slice("--surface=".length));
-    else rest.push(argv[i]);
-  }
-  if (requested.length > 1) throw new MoleError("Give one --surface.", `One of: ${feature.surfaces.join(", ")}. To run all of them: pnpm mole prove`);
-  const surface = requested[0] ?? (feature.surfaces.includes("web") ? "web" : feature.surfaces[0]);
-  if (!isSurface(surface)) throw new MoleError(`Unknown surface "${surface}".`, `Use one of: ${feature.surfaces.join(", ")}`);
-  if (!feature.surfaces.includes(surface)) throw new MoleError(`${name} has no ${surface} surface.`, `It has: ${feature.surfaces.join(", ")}`);
-  try {
-    const result = surface === "api"
-      ? await feature.drive.run({ argv: rest, surface, page: null, apiUrl: await apiUrlOf(await readSession()) })
-      : await withPage((page, _browser, session) => feature.drive!.run({ argv: rest, surface, page, apiUrl: session.apiUrl }));
-    const other = feature.surfaces.find(candidate => candidate !== surface);
-    return out({ ...result, ...(other ? { next: `The same call on the ${other} surface: add --surface ${other}` } : {}) });
-  } catch (error) {
-    if (error instanceof SurfaceError) throw new MoleError(error.message, error.next);
-    throw error;
-  }
+// `mole flow <id>`: a registered flow, on the page `up` opened, the way a scenario would run it. It does not prove anything.
+async function runFlow(id: string | undefined, vars: string[]) {
+  const reg = registry();
+  const flow = id ? reg.flows.get(id) : undefined;
+  if (!flow) throw new MoleError(id ? `No flow "${id}".` : "flow needs an id.", `The flows: ${[...reg.flows.keys()].join(", ") || "none yet"}. See: pnpm mole features`);
+  const given = Object.fromEntries(vars.map(pair => [pair.slice(0, pair.indexOf("=")), pair.slice(pair.indexOf("=") + 1)]));
+  out(await withPage(async (page, _browser, session) => {
+    const env: RunEnv = { page, appUrl: session.appUrl, apiUrl: session.apiUrl, surfaces: APP.surfaces, events: { step: 0, entries: [] }, vars: given };
+    const made = await flow.run(env);
+    return { flow: id, vars: { ...given, ...(made ?? {}) }, ...await snapshot(page), note: "A flow only drives. Run pnpm mole run for a verdict." };
+  }));
+}
+
+async function listReceipts(target?: string) {
+  const receipts = await readReceipts(DIR, target);
+  out({
+    receipts: receipts.slice(-10).map(receipt => ({
+      at: receipt.at, verdict: receipt.verdict, revision: receipt.revision,
+      scenarios: receipt.scenarios.map(scenario => ({ id: scenario.id, verdict: scenario.verdict, checks: scenario.checks.map(check => ({ id: check.id, verdict: check.verdict, evidence: check.evidence.map(ref => ref.artifact) })) })),
+    })),
+    artifacts: join(DIR),
+    next: receipts.length ? "Open the artifact paths (relative to the artifacts directory) to read the evidence." : "No receipts yet: pnpm mole run",
+  });
 }
 
 function help(command?: string) {
@@ -332,14 +318,9 @@ function help(command?: string) {
     const [group, usage, summary] = COMMANDS[command as Command];
     return out({ command, group, usage: `pnpm mole ${usage}`, summary });
   }
-  if (command && FEATURES[command]?.drive) {
-    const { usage, summary } = FEATURES[command].drive!;
-    return out({ command, group: "Drive", usage: `pnpm mole ${command} ${usage}`, summary, surfaces: FEATURES[command].surfaces });
-  }
   const groups: Record<string, string[]> = {};
   const add = (group: string, usage: string, summary: string) => (groups[group] ??= []).push(`${usage.padEnd(52)} ${summary}`);
   for (const [, [group, usage, summary]] of Object.entries(COMMANDS)) add(group, usage, summary);
-  for (const [name, feature] of Object.entries(FEATURES)) if (feature.drive) add("Drive", `${name} ${feature.drive.usage}`, feature.drive.summary);
   console.log(`mole: drive and prove ${APP.name}.\n\nUsage: pnpm mole <command>\n`);
   for (const [group, lines] of Object.entries(groups)) console.log(`${group}\n${lines.map(line => "  " + line).join("\n")}\n`);
   console.log("Start with: pnpm mole up --start   (own terminal)   then: pnpm mole doctor\nGuide for agents: .github/skills/verify-mole/SKILL.md");
@@ -350,18 +331,11 @@ async function main() {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
   const argv = process.argv.slice(2);
-  const firstAt = argv.findIndex(token => !token.startsWith("-"));
-  const first = firstAt < 0 ? undefined : argv[firstAt];
-  // A feature name is a command of its own; its flags belong to its drive hook, so they are not parsed here.
-  if (first && !(first in COMMANDS) && first in FEATURES) {
-    if (argv.slice(firstAt + 1).some(token => token === "-h" || token === "--help")) return help(first);
-    return driveFeature(first, argv.slice(firstAt + 1));
-  }
   let parsed;
   try {
     parsed = parseArgs({ args: argv, allowPositionals: true, options: {
       url: { type: "string", default: DEFAULT_URL }, start: { type: "boolean", default: false }, headless: { type: "boolean", default: false },
-      feature: { type: "string", multiple: true }, surface: { type: "string", multiple: true }, changed: { type: "boolean", default: false },
+      var: { type: "string", multiple: true }, changed: { type: "boolean", default: false },
       "dry-run": { type: "boolean", default: false }, errors: { type: "boolean", default: false }, help: { type: "boolean", short: "h", default: false },
     } });
   } catch (error) {
@@ -431,7 +405,9 @@ async function main() {
         note: "For looking around. A proof goes through a surface adapter, not through this." });
     }
     case "features": return listFeatures(values.changed);
-    case "prove": return prove(values.feature ?? [], values.surface ?? []);
+    case "flow": return runFlow(args[0], values.var ?? []);
+    case "run": return run(args);
+    case "receipts": return listReceipts(args[0]);
   }
 }
 

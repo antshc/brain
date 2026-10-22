@@ -1,45 +1,39 @@
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from dataclasses import replace
+from collections.abc import Sequence
 
-from .surfaces import select_surfaces
-from .types import Feature, ProofKit, Prove, Surface
-
-# Features by name. The caller owns the map; the kit only reads it.
-Features = Mapping[str, Feature]
+from .builder import Registry
+from .types import Scenario
 
 
-def feature_names(features: Features) -> list[str]:
-    return list(features)
+def feature_names(registry: Registry) -> list[str]:
+    return list(registry.features)
 
 
-# No names means every feature. An unknown name is the caller's mistake, so say what exists.
-def select_features(features: Features, names: Sequence[str] = ()) -> list[str]:
-    unknown = [name for name in names if name not in features]
+# Every id a caller may select: feature, feature.sub-feature, feature.sub-feature.scenario.
+def selectable_ids(registry: Registry) -> list[str]:
+    ids: list[str] = []
+    for feature in registry.features.values():
+        ids.append(feature.id)
+        for sub in feature.sub_features:
+            ids.append(sub.id)
+            ids.extend(scenario.id for scenario in sub.scenarios)
+    return ids
+
+
+# No ids means every scenario. An unknown id is the caller's mistake, so say what exists.
+def select_scenarios(registry: Registry, ids: Sequence[str] = ()) -> list[Scenario]:
+    scenarios = list(registry.scenarios.values())
+    if not ids:
+        return scenarios
+    known = selectable_ids(registry)
+    unknown = [item for item in ids if item not in known]
     if unknown:
-        raise ValueError(f'Unknown feature "{", ".join(unknown)}". Features: {", ".join(features)}')
-    return list(dict.fromkeys(names)) or feature_names(features)
-
-
-# The surfaces to run for these features. No names means every supported surface all of them share; a name a feature lacks is refused.
-def surfaces_for(features: Features, selected: Sequence[str], supported: Sequence[Surface], names: Sequence[str] = ()) -> list[Surface]:
-    shared = [surface for surface in supported if all(surface in features[name].surfaces for name in selected)]
-    return select_surfaces(names, shared)
-
-
-# Each feature runs on the surfaces the run asked for that it has.
-def prove_features(features: Features, names: Sequence[str] = ()) -> Prove:
-    selected = select_features(features, names)
-
-    def prove(kit: ProofKit) -> None:
-        for name in selected:
-            surfaces = [surface for surface in kit.surfaces if surface in features[name].surfaces]
-            features[name].prove(replace(kit, surfaces=surfaces))
-
-    return prove
+        raise ValueError(f'Unknown id "{", ".join(unknown)}". Ids: {", ".join(known)}')
+    wanted = set(ids)
+    return [scenario for scenario in scenarios if wanted & {scenario.feature, scenario.sub_feature, scenario.id}]
 
 
 # The features a set of changed files belongs to.
-def features_for(features: Features, files: Sequence[str]) -> list[str]:
-    return [name for name in features if any(file.startswith(prefix) for prefix in features[name].touches for file in files)]
+def features_for(registry: Registry, files: Sequence[str]) -> list[str]:
+    return [name for name, feature in registry.features.items() if any(file.startswith(prefix) for prefix in feature.touches for file in files)]

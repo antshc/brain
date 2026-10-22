@@ -1,26 +1,27 @@
 ---
 name: init-proof
-description: "Install the proof kit (mole CLI, receipts, surface adapters, feature maps, verify-mole skill) into a repository in TypeScript (pnpm) or Python, research the codebase, ask the language and which surfaces to prove (web, api, both), and generate starter proof cases. Use when the user explicitly asks to set up proof, mole, or agent verification in a repo."
+description: "Install the proof kit (mole CLI, receipts, evidence adapters, scenario builders, feature maps, verify-mole skill) into a repository in TypeScript (pnpm) or Python, research the codebase, ask the language and which surfaces to prove (web, api, both), and generate starter proof cases. Use when the user explicitly asks to set up proof, mole, or agent verification in a repo."
 disable-model-invocation: true
 ---
 
 # Initialize proof
 
-Run on explicit user invocation. `skillDir :=` the parent of this `SKILL.md`'s absolute path. Read [references/concept.md](references/concept.md) first: it defines features, surfaces, adapters, receipts and revisions, and the rules for good checks.
+Run on explicit user invocation. `skillDir :=` the parent of this `SKILL.md`'s absolute path. Read [references/concept.md](references/concept.md) first: it defines features, scenarios, evidence, receipts and revisions, and the rules for good checks.
 
 Outcome: `proof/kit/` (the proof lib), `mole/` (the runner), `proof/` (app seams, features), the `verify-mole` skill with feature maps in `.github/skills/verify-mole/`, the language's commands (below), and `proof/.runs/` gitignored, with the chosen starter cases passing against the repo's running app.
 
-Commands by language (`<mole>`, `<prove>`, `<test>`, `<typecheck>` below):
+Commands by language (`<mole>`, `<run>`, `<prove>`, `<test>`, `<typecheck>` below):
 
 | | typescript | python |
 |---|---|---|
 | mole | `pnpm mole` | `python3 -m mole` |
-| prove | `pnpm prove` | `python3 -m mole.prove_cli` |
+| run (a `<mole>` verb) | `run` | `run` |
+| prove (throwaway browser) | `pnpm prove` | `python3 -m mole.prove_cli` |
 | test | `pnpm test:proof` | `python3 -m pytest proof/test_features.py` |
 | typecheck | `pnpm typecheck:proof` | `python3 -m mypy --strict proof mole` |
 | app config | `proof/app.ts` | `proof/app.py` |
 | registry | `proof/features/index.ts` | `proof/features/__init__.py` |
-| feature file, adapters | `.ts` | `.py` |
+| feature files | `.ts` | `.py` |
 | install Chromium | `pnpm exec playwright install chromium` | `python3 -m playwright install chromium` |
 
 ## 1. Resolve the repository
@@ -41,10 +42,10 @@ Use `ask_user` (never ask in plain text), one form:
 python3 "<skillDir>/scripts/scaffold.py" --repo "$REPO_PATH" --language "<typescript|python>" --surfaces "<web|api|both>" --app-name "<name>"
 ```
 
-It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, adapters only for chosen surfaces, `proof/README.md`) and the verify-mole skill, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
+It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, and for the chosen surfaces `proof/adapters/`, `pages/`, `flows/`, `checks/`, `proof/README.md`) and the verify-mole skill, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
 
-- typescript: adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript` (approving esbuild's build script).
-- python: writes `proof/requirements.txt` (`playwright`, `pytest`, `mypy`) and runs `python3 -m pip install -r proof/requirements.txt` into the active environment; also gitignores `__pycache__/`. A repo that manages dependencies elsewhere (venv, uv, poetry) activates that environment first.
+- typescript: also seeds `proof/components/` and ships `scripts/agent.md` and `scripts/component-extractor.md` in the verify-mole skill; adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript` (approving esbuild's build script).
+- python: also seeds `proof/components/`, ships `scripts/agent.md` in the verify-mole skill and the `component-extractor` agent in `.github/agents/`; writes `proof/requirements.txt` (`playwright`, `pytest`, `mypy`) and runs `python3 -m pip install -r proof/requirements.txt` into the active environment; also gitignores `__pycache__/`. A repo that manages dependencies elsewhere (venv, uv, poetry) activates that environment first.
 
 A non-zero exit means the repo was refused; relay `error`. If `install` is not `installed`/`nothing to install`, fix it before step 7. Keep the JSON: it feeds the final report.
 
@@ -65,14 +66,27 @@ Offer a multi-select of starter cases via `ask_user`: pre-fill candidates the re
 
 ## 6. Generate the cases
 
-For each chosen case, in this order, following the "Add a feature" steps in `proof/README.md`:
-
-1. Write the map `.github/skills/verify-mole/features/<feature>.md` (frontmatter `feature`, `prove`, `touches`, `surfaces`; `## Contract`, `## Driving it`, then web-only and Gotchas sections as needed) and add its row to `features/README.md`. Contracts in user words; no selectors, routes or wire details.
-2. Extend the adapters in `proof/features/surfaces/` (`types` shapes, then `web` and/or `api`) so one call returns one shape on each surface.
-3. Write `proof/features/<feature>` (`.ts` or `.py`): loop `kit.surfaces`, call adapters through `observe()`, record `kit.check(name, actual, expected, hint)`; surface-only behavior in guarded blocks. Add a `drive` hook when a by-hand call helps.
-4. Register in the registry (`proof/features/index.ts` or `__init__.py`) with `surfaces` and `touches`.
-
 Use only routes, selectors, ids and counts you read from the repo, and read-only requests. Remove the `example` feature (code, map, README row, registry entry) once a real feature covers the same surfaces; keep it when the user chose none. Then fill the `TODO(proof)` markers in `.github/skills/verify-mole/SKILL.md` (trigger words, scope exclusions). Confirm no placeholders are left: `grep -rn "TODO(proof)" proof .github/skills/verify-mole` returns nothing.
+
+### typescript
+
+For each chosen case, following the "Add a feature" steps in `proof/README.md`:
+
+1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read [scripts/agent.md](../../../.github/skills/verify-mole/scripts/agent.md) in the generated skill and follow it.
+2. Missing reusable UI parts (dropdown, modal, table, form): run a subagent with the prompt in `.github/skills/verify-mole/scripts/component-extractor.md`; pass the capability needed and the inventory in `proof/components/README.md`. Review the files it returns.
+3. Write the map `.github/skills/verify-mole/features/<feature>.md` in the four-section format of `features/README.md`: sub-features, how a user gets there, one unbulleted `**(sub | scenario):**` paragraph per scenario with `**Proof:** check (evidence)`, gotchas. Add its row to `features/README.md`. User words only; no selectors, routes or wire details.
+4. Write page objects, flows and checks in `proof/pages/`, `flows/`, `checks/`; evidence adapters in `proof/adapters/` only when the kit's sources (DOM assertion, API response, network, console, storage, screenshot) do not reach the result.
+5. Write `proof/features/<feature>.ts` with `defineFeature`: `touches`, `surfaces`, sub-features, scenarios composing `.flow()` and `.proof()` in the map's order. Register it in `proof/features/index.ts`.
+
+### python
+
+For each chosen case, following the "Add a scenario" steps in `proof/README.md`:
+
+1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read [scripts/agent.md](../../../.github/skills/verify-mole/scripts/agent.md) in the generated skill and follow it.
+2. Missing reusable UI parts (dropdown, modal, table, form): run the `component-extractor` agent (`.github/agents/component-extractor.agent.md`); pass the capability needed and the inventory in `proof/components/README.md`. Review the files it returns.
+3. Write the map `.github/skills/verify-mole/features/<feature>.md` in the four-section format of `features/README.md`: sub-features, how a user gets there, one unbulleted `**(sub | scenario):**` paragraph per scenario with `**Proof** check (Evidence labels)`, gotchas. Add its row to `features/README.md`. User words only; no selectors, routes or wire details.
+4. Write page objects, flows and checks in `proof/pages/`, `flows/`, `checks/`; evidence adapters in `proof/adapters/` only when the kit's sources (screenshot, network log, API response) do not reach the result.
+5. Write `proof/features/<feature>.py` with the builder: `touches`, `surfaces`, sub-features, scenarios composing flows and checks in the map's order. Register it in `proof/features/__init__.py`.
 
 ## 7. Verify
 
@@ -82,16 +96,17 @@ Run from `REPO_PATH`; fix what fails or report it precisely (command, output, ca
 <typecheck> && <test>
 <mole> up --start --headless      # own background process; wait for "ok": true
 <mole> doctor                     # ok must be true
-<mole> prove                      # exit 0 (PASS)
+<mole> <run>                      # exit 0 (PASS)
 <mole> down
 ```
 
-If `up --start` cannot start the app (missing database, container runtime, credentials), do not invent a workaround: report it and run what can run (`<typecheck>`, `<test>`). A FAIL on a freshly generated case is a bug in the case until the app is shown wrong: read the check's `hint`, `expected` and `actual`, fix the adapter or the constant, and re-run. Stop only what you started.
+If `up --start` cannot start the app (missing database, container runtime, credentials), do not invent a workaround: report it and run what can run (`<typecheck>`, `<test>`). A FAIL on a freshly generated case is a bug in the case until the app is shown wrong: read the check's `hint`, `expected` and `actual`, fix the adapter, page object or constant, and re-run. Stop only what you started.
 
 ## Rules
 
 - Never overwrite repository files; scaffold reports `skipped`. Never edit `proof/kit/` or `mole/` (an upgrade replaces them; delete a leftover `proof/engine/` from an older scaffold).
+- A v1 scaffold (typescript `FEATURES` record or python `prove(kit)`, `drive` hooks, `Contract`/`Driving it` maps) is not upgraded in place: scaffold never overwrites, so move its features aside, delete `proof/kit/`, `mole/` and `proof/features/`, re-scaffold, then rewrite each feature as scenarios (steps 5 and 6).
 - No real feature is wired by scaffold; every real case comes from step 6.
-- The eShop files in `references/eshop-example/` are TypeScript examples, never copied verbatim into a repo; Python features follow the same shape.
+- The eShop files in `references/eshop-example/` are TypeScript examples, never copied verbatim into a repo; Python scenarios follow the same shape with the builder.
 
 **Emit**: `REPO_PATH=<path>. Language: <typescript|python>. Surfaces: <list>. Created: <paths>. Skipped: <existing paths or none>. Features: <names>. Receipt: <PASS|FAIL|ERROR|not run> (<revision>). Open items: <TODOs, unknowns, failures or none>.`

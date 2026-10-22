@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from mole.feature import MoleFeature
+from proof.kit import Registry, registry
 
-from .example import prove_example
+from .example import example
 
-# Each key has a map at .github/skills/verify-mole/features/<key>.md. `{{TEST_PROOF}}` keeps the two in step.
-# A feature may add `drive=DriveHook(usage, summary, run)` (from mole.feature) so `{{MOLE}} <key> <verb>` can drive it by hand.
-FEATURES: dict[str, MoleFeature] = {
+# Each feature has a map at .github/skills/verify-mole/features/<feature>.md. `{{TEST_PROOF}}` keeps the two in step.
+# Add a feature by writing proof/features/<feature>.py with the builder, then listing it here.
+REGISTRY: Registry = registry(
     # Placeholder: replace it with real features, or keep it as a smoke check.
-    "example": MoleFeature(
-        prove=prove_example,
-        surfaces=[{{SURFACES_LIST}}],
-        touches=["src/"],  # TODO(proof): the path prefixes of this feature's files
-    ),
-}
+    example(),
+)

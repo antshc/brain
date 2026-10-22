@@ -25,13 +25,13 @@ from playwright.sync_api import Browser, Page, Request, Response, sync_playwrigh
 from playwright.sync_api import Error as PlaywrightError
 
 from proof.app import APP
-from proof.features import FEATURES
-from proof.kit import Receipt, SurfaceError, exit_code, feature_names, features_for, is_surface, prove_features, read_storage, run_proof, select_features, surfaces_for
+from proof.features import REGISTRY
+from proof.kit import FlowContext, Receipt, Scenario, SurfaceError, aggregate, exit_code, features_for, read_storage, select_scenarios
 
-from .commands import COMMANDS, DIAGNOSE, MOLE, RERUN
-from .feature import DriveCall
-from .receipts import coverage_notes, proof_status, save_receipt
-from .runtime import DEFAULT_URL, ROOT, SURFACES, StartedApp, api_answers, changed_files, discover_api, fetch, reachable, source_revision, start_app
+from .commands import COMMANDS, MOLE
+from .receipts import coverage_notes, proof_status, receipt_states, save_receipt, summarize
+from .runner import run_scenarios, settle
+from .runtime import DEFAULT_URL, ROOT, StartedApp, api_answers, changed_files, discover_api, fetch, reachable, source_revision, start_app
 
 T = TypeVar("T")
 
@@ -39,7 +39,6 @@ T = TypeVar("T")
 DIR = Path(os.environ.get("MOLE_DIR") or ROOT / "proof" / ".runs" / "mole")
 SESSION = DIR / "session.json"
 EVENTS = DIR / "events.jsonl"
-RECEIPT = DIR / "receipt.json"
 PROFILE = DIR / "profile"
 LOCK = DIR / "up.lock"
 APP_LOG = DIR / "app.log"
@@ -130,13 +129,6 @@ def with_page(fn: Callable[[Page, Browser, Session], T]) -> T:
 def text_of(page: Page, role_level: int) -> str | None:
     locator = page.get_by_role("heading", level=role_level)
     return locator.first.inner_text().strip() if locator.count() else None
-
-
-def settle(page: Page) -> None:
-    if APP.web and APP.web.settle:
-        APP.web.settle(page)
-    else:
-        page.wait_for_load_state("load")
 
 
 def snapshot(page: Page) -> dict[str, Any]:
@@ -361,7 +353,7 @@ def doctor() -> int:
             checks.append({
                 "name": "api", "ok": api_ok,
                 "detail": f"the API answers at {api_url}" if api_ok else f"no answer from {api_url}" if api_url else "the API base URL was not found",
-                **({} if api_ok else {"next": f"Start the app, then: {MOLE} down; {MOLE} up. Or set PROOF_API_URL.{' Without it only --surface web can be proved.' if HAS_WEB else ''}"}),
+                **({} if api_ok else {"next": f"Start the app, then: {MOLE} down; {MOLE} up. Or set PROOF_API_URL.{' Without it the scenarios that use the api surface cannot run.' if HAS_WEB else ''}"}),
             })
         source = source_revision()
         fresh = source is not None and source == session["builtRevision"]
@@ -370,96 +362,92 @@ def doctor() -> int:
             "detail": f"the running build matches the source ({source})" if fresh else f"STALE: the app was started on {session['builtRevision']}, the source is now {source}",
             **({} if fresh else {"next": f"{MOLE} down; {MOLE} up --start" if session["startedApp"] else f"Restart the app, then: {MOLE} down; {MOLE} up"}),
         })
-        proof = proof_status(RECEIPT, source)
+        proof = proof_status(DIR, source)
     ok = all(check["ok"] for check in checks)
     out({"ok": ok, "checks": checks, "proof": proof})
     return 0 if ok else 1
 
 
-def prove(features: list[str], surface_names: list[str]) -> int:
+def _stale_build(session: Session) -> MoleError | None:
+    source = source_revision()
+    if source == session["builtRevision"]:
+        return None
+    return MoleError(
+        f"The running build was started on {session['builtRevision']} but the source is now {source}. A proof would describe code that is not running.",
+        f"Restart it: {MOLE} down; {MOLE} up --start" if session["startedApp"] else f"Restart the app, then: {MOLE} down; {MOLE} up",
+    )
+
+
+def _select(ids: list[str]) -> list[Scenario]:
     try:
-        selected = select_features(FEATURES, features)
-        surfaces = surfaces_for(FEATURES, selected, SURFACES, surface_names)
+        return select_scenarios(REGISTRY, ids)
     except ValueError as exception:
-        raise MoleError(str(exception), f"See the features: {MOLE} features. The surfaces are: {', '.join(SURFACES)}") from exception
+        raise MoleError(str(exception), f"See the scenarios: {MOLE} features") from exception
 
-    def run(_page: Page, browser: Browser, session: Session) -> Receipt:
-        api_url = api_url_of(session) if "api" in surfaces else None
-        source = source_revision()
-        if source != session["builtRevision"]:
-            raise MoleError(
-                f"The running build was started on {session['builtRevision']} but the source is now {source}. A proof would describe code that is not running.",
-                f"Restart it: {MOLE} down; {MOLE} up --start" if session["startedApp"] else f"Restart the app, then: {MOLE} down; {MOLE} up",
-            )
-        # One screenshot per run, so each saved receipt keeps the image it was proved with.
-        shot = DIR / f"proof-{source}-{int(time.time() * 1000)}.png"
-        return run_proof(
-            browser, session["appUrl"], prove_features(FEATURES, selected), screenshot=shot, revision=source_revision,
-            surfaces=surfaces, api_url=api_url, features=selected, rerun=RERUN, diagnose=DIAGNOSE,
-        )
 
-    receipt = with_page(run)
-    receipt.next_steps.extend(coverage_notes(selected, surfaces))
-    print(save_receipt(DIR, RECEIPT, receipt), flush=True)
-    return exit_code(receipt)
+def run(ids: list[str]) -> int:
+    selected = _select(ids)
+
+    def prove(_page: Page, browser: Browser, session: Session) -> list[Receipt]:
+        api_url = api_url_of(session) if any("api" in scenario.surfaces for scenario in selected) else None
+        stale = _stale_build(session)
+        if stale:
+            raise stale
+        return run_scenarios(browser, session["appUrl"], api_url, selected, DIR)
+
+    receipts = with_page(prove)
+    for receipt in receipts:
+        save_receipt(DIR, receipt)
+    out(summarize(receipts, coverage_notes(selected)))
+    return exit_code(aggregate(receipts))
+
+
+def receipts_command(ids: list[str]) -> int:
+    selected = _select(ids)
+    states = receipt_states(DIR, selected, source_revision())
+    out({"receipts": states, "next": f"Run what is not proved: {MOLE} run <id>"})
+    return 0
+
+
+# Runs one named flow on the attached page: the same function `run` calls, so what you see is what the proof does.
+def run_flow(flow_id: str) -> int:
+    flow = REGISTRY.flows.get(flow_id)
+    if flow is None:
+        raise MoleError(f'Unknown flow "{flow_id}".', f"Flows: {', '.join(REGISTRY.flows) or 'none'}")
+
+    def act(page: Page, _browser: Browser, session: Session) -> dict[str, Any]:
+        context = FlowContext(page=page, app_url=session["appUrl"], api_url=session["apiUrl"], fetch=fetch, settle=settle)
+        flow.run(context)
+        return {"flow": flow_id, "ok": True, **snapshot(page), "next": f"Look at what it did: {MOLE} snapshot. Prove it: {MOLE} run <scenario>"}
+
+    try:
+        out(with_page(act))
+    except SurfaceError as exception:
+        raise MoleError(str(exception), exception.next_step) from exception
+    return 0
 
 
 # Which features need proving: all of them, or those whose files your uncommitted changes touch.
 def list_features(changed: bool) -> int:
     files = changed_files() if changed else []
-    names = features_for(FEATURES, files) if changed else feature_names(FEATURES)
+    names = features_for(REGISTRY, files) if changed else list(REGISTRY.features)
     listing = []
     for name in names:
-        feature = FEATURES[name]
-        entry: dict[str, Any] = {"name": name, "surfaces": feature.surfaces, "map": f"{MAPS}/{name}.md", "prove": f"{MOLE} prove --feature {name}"}
-        if feature.drive:
-            entry["drive"] = f"{MOLE} {name} {feature.drive.usage}"
-        listing.append(entry)
+        feature = REGISTRY.features[name]
+        listing.append({
+            "name": name, "surfaces": feature.surfaces, "map": f"{MAPS}/{name}.md", "run": f"{MOLE} run {name}",
+            "subFeatures": [
+                {"id": sub.id, "scenarios": [{"id": scenario.id, "surfaces": scenario.surfaces, "flows": [step.id for step in scenario.flows]} for scenario in sub.scenarios]}
+                for sub in feature.sub_features
+            ],
+        })
     if not changed:
-        next_step = "Open the map of the feature you are touching, then: " + f"{MOLE} prove --feature <name>"
+        next_step = f"Open the map of the feature you are touching, then: {MOLE} run <feature | sub-feature | scenario>"
     elif names:
-        next_step = f"Prove each, then run {MOLE} prove with no --feature once before you report."
+        next_step = f"Run each, then {MOLE} run with no id once before you report."
     else:
-        next_step = f"No feature's files changed. Run {MOLE} prove if you still need proof."
+        next_step = f"No feature's files changed. Run {MOLE} run if you still need proof."
     out({**({"changedFiles": len(files)} if changed else {}), "features": listing, "next": next_step})
-    return 0
-
-
-# `mole <feature> <verb> ...`: the feature's own drive hook, on one surface. The answer says which.
-def drive_feature(name: str, argv: list[str]) -> int:
-    feature = FEATURES[name]
-    drive = feature.drive
-    if drive is None:
-        raise MoleError(
-            f'The feature "{name}" has no drive hook, so it cannot be driven by hand.',
-            f"Prove it instead: {MOLE} prove --feature {name}. Or add a `drive` to it in proof/features/__init__.py.",
-        )
-    requested: list[str] = []
-    rest: list[str] = []
-    tokens = iter(argv)
-    for token in tokens:
-        if token == "--surface":
-            requested.append(next(tokens, ""))
-        elif token.startswith("--surface="):
-            requested.append(token[len("--surface="):])
-        else:
-            rest.append(token)
-    if len(requested) > 1:
-        raise MoleError("Give one --surface.", f"One of: {', '.join(feature.surfaces)}. To run all of them: {MOLE} prove")
-    surface = requested[0] if requested else ("web" if "web" in feature.surfaces else feature.surfaces[0])
-    if not is_surface(surface):
-        raise MoleError(f'Unknown surface "{surface}".', f"Use one of: {', '.join(feature.surfaces)}")
-    if surface not in feature.surfaces:
-        raise MoleError(f"{name} has no {surface} surface.", f"It has: {', '.join(feature.surfaces)}")
-    try:
-        if surface == "api":
-            result = drive.run(DriveCall(argv=rest, surface=surface, page=None, api_url=api_url_of(read_session())))
-        else:
-            result = with_page(lambda page, _browser, session: drive.run(DriveCall(argv=rest, surface=surface, page=page, api_url=session["apiUrl"])))
-    except SurfaceError as exception:
-        raise MoleError(str(exception), exception.next_step) from exception
-    other = next((candidate for candidate in feature.surfaces if candidate != surface), None)
-    out({**result, **({"next": f"The same call on the {other} surface: add --surface {other}"} if other else {})})
     return 0
 
 
@@ -468,17 +456,9 @@ def show_help(command: str | None = None) -> int:
         group, usage, summary = COMMANDS[command]
         out({"command": command, "group": group, "usage": f"{MOLE} {usage}", "summary": summary})
         return 0
-    if command and command in FEATURES and FEATURES[command].drive:
-        hook = FEATURES[command].drive
-        assert hook is not None
-        out({"command": command, "group": "Drive", "usage": f"{MOLE} {command} {hook.usage}", "summary": hook.summary, "surfaces": FEATURES[command].surfaces})
-        return 0
     groups: dict[str, list[str]] = {}
     for _, (group, usage, summary) in COMMANDS.items():
         groups.setdefault(group, []).append(f"{usage:<52} {summary}")
-    for name, feature in FEATURES.items():
-        if feature.drive:
-            groups.setdefault("Drive", []).append(f"{name + ' ' + feature.drive.usage:<52} {feature.drive.summary}")
     print(f"mole: drive and prove {APP.name}.\n\nUsage: {MOLE} <command>\n")
     for group, lines in groups.items():
         print(group)
@@ -497,8 +477,6 @@ def _parser() -> _Parser:
     parser.add_argument("--url", default=DEFAULT_URL)
     parser.add_argument("--start", action="store_true")
     parser.add_argument("--headless", action="store_true")
-    parser.add_argument("--feature", action="append", default=[])
-    parser.add_argument("--surface", action="append", default=[])
     parser.add_argument("--changed", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--errors", action="store_true")
@@ -509,18 +487,13 @@ def _parser() -> _Parser:
 
 
 def _run(argv: list[str]) -> int:
-    first = next((token for token in argv if not token.startswith("-")), None)
-    # A feature name is a command of its own; its flags belong to its drive hook, so they are not parsed here.
-    if first and first not in COMMANDS and first in FEATURES:
-        rest = argv[argv.index(first) + 1:]
-        if any(token in ("-h", "--help") for token in rest):
-            return show_help(first)
-        return drive_feature(first, rest)
     parsed = _parser().parse_intermixed_args(argv)
     command: str | None = parsed.command
     args: list[str] = parsed.args
     if not command or command == "help":
         return show_help(args[0] if args else None)
+    if command == "prove":
+        raise MoleError("`prove` is now `run`.", f"{MOLE} run [feature | sub-feature | scenario]. See {MOLE} features")
     if command not in COMMANDS:
         raise MoleError(f'Unknown command "{command}".', f"See the commands: {MOLE} help")
     if parsed.help:
@@ -563,7 +536,13 @@ def _run(argv: list[str]) -> int:
         return _api_get(args)
     if command == "features":
         return list_features(parsed.changed)
-    return prove(parsed.feature, parsed.surface)
+    if command == "flow":
+        if not args:
+            raise MoleError("flow needs an id.", f"{MOLE} flow <id>. See {MOLE} features")
+        return run_flow(args[0])
+    if command == "receipts":
+        return receipts_command(args)
+    return run(args)
 
 
 def _origin(url: str) -> str:
