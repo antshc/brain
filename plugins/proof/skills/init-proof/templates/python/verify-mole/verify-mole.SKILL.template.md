@@ -1,5 +1,5 @@
 ---
-name: verify-mole
+name: {{SKILL_NAME}}
 description: Drive and prove {{APP_NAME}} with the mole CLI. Use to reproduce a bug, verify a change, or show proof that it works. TODO(proof): name the app's folders here so the skill triggers on them.
 ---
 
@@ -9,11 +9,22 @@ description: Drive and prove {{APP_NAME}} with the mole CLI. Use to reproduce a 
 
 A feature has sub-features; a sub-feature has scenarios. A scenario is flows (what a user does) and checks (what must be true), and every check names the evidence that proves it. Ids: `feature`, `feature.sub-feature`, `feature.sub-feature.scenario`.
 
+## This app
+
+Facts a cold agent needs; each is read from the repo, never guessed. TODO(proof): fill from the repo, then delete the marker.
+
+- **Launch:** the command `{{MOLE}} up --start` runs ({{APP_FILE}} `start`), the ready signal, and what a usable state means (migrations and seed data done). Teardown is `{{MOLE}} down`.
+- **Doctor:** what `{{MOLE}} doctor` must show for this app (URL, build revision, port owned by this run, auth valid).
+- **Drive:** the stable handles users reach this app by: ARIA roles and names, routes, endpoints. Pages and components hold the selectors; name only the entry points here.
+- **Evidence:** what each surface captures and where it lands (`proof/.runs/mole/`), plus the side effects worth checking beside what is visible.
+- **Cleanup:** what to stop or reset after a run. Stop only what you started. Never remove evidence.
+- **Isolation:** whether two instances can run side by side (ports, data dirs). If not, never drive an instance this run did not start.
+
 ## The loop
 
 1. **Doctor.** Run `{{MOLE}} doctor`. Done when `ok` is true. Nothing running: start it and leave it running with `{{MOLE}} up --start` (in the background if no human is watching). If the app already runs, attach with `{{MOLE}} up`. Build STALE: the source moved past the running build, so `{{MOLE}} down` and `up` again.
 2. **Read the map.** Run `{{MOLE}} features --changed` to see which features your files touch, or start from the [feature map](features/README.md). Open only those maps.
-3. **Author or change scenarios.** Read [scripts/agent.md](scripts/agent.md) first, then write the Python in `proof/`.
+3. **Author or change scenarios.** Read [scripts/agent.md](scripts/agent.md) first, then write the Python in `proof/`. A scenario needs a control that `proof/components/` lacks: run the component extractor subagent it points to.
 4. **Reproduce.** Run a flow with `{{MOLE}} flow <id>` and look (`snapshot`, `console`, `network`<!-- surface: api -->, `api get`<!-- /surface: api -->). Done when you can name the observation that is wrong.
 5. **Fix** the source, then restart the app so the build is fresh.
 6. **Prove.** Run `{{MOLE}} run <id>` for each scenario you touched, then `{{MOLE}} run` with no id before you report: a fix in one feature can break another. Done when every receipt is PASS for the current revision. FAIL lists what to fix. Exit 2 means the evidence is missing, so fix the environment, not the app.

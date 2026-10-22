@@ -14,7 +14,7 @@ Verifies {{APP_NAME}} like a user, scenario by scenario, and writes a receipt wi
 | `checks/` | you | Named checks. Each declares the evidence it needs. |
 | `adapters/` | you | Evidence sources beyond the browser: database and logs. |
 | `features/surfaces/` | you | One adapter per surface. Turns a call into that surface's wire details and returns one shape. |
-| `.github/skills/verify-mole/` | you | The agent skill and one map per feature. |
+| `{{SKILL_DIR}}/` | you | The agent skill and one map per feature. |
 
 ## Concepts
 
@@ -44,11 +44,11 @@ python3 -m playwright install chromium   # once
 {{TYPECHECK_PROOF}}
 ```
 
-`{{MOLE}} help` lists every command. The agent loop is in [.github/skills/verify-mole/SKILL.md](../.github/skills/verify-mole/SKILL.md).
+`{{MOLE}} help` lists every command. The agent loop is in [{{SKILL_DIR}}/SKILL.md](../{{SKILL_DIR}}/SKILL.md).
 
 ## Add a scenario
 
-1. Write the map in `.github/skills/verify-mole/features/<feature>.md` (four sections; one `(sub | scenario): **Given** … **When** … **Then** … **Proof** check (Evidence labels)` line per scenario; update `features/README.md`).
+1. Write the map in `{{SKILL_DIR}}/features/<feature>.md` (four sections; one `(sub | scenario): **Given** … **When** … **Then** … **Proof** check (Evidence labels)` line per scenario; update `features/README.md`).
 2. Add the flows, page and component calls it needs under `flows/`, `pages/`, `components/`; add checks under `checks/` with their evidence.
 3. Write `features/<feature>.py` with the builder and register it in `features/__init__.py`.
 4. Run `{{TEST_PROOF}}`, then `{{MOLE}} run <feature>.<sub-feature>.<scenario>`.

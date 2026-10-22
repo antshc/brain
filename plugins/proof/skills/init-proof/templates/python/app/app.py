@@ -19,6 +19,7 @@ APP = AppConfig(
     surfaces=[{{SURFACES_LIST}}],
     # TODO(proof): repo-relative folders whose changes alter the running build. The revision is derived from them.
     source_paths=["src"],
+    feature_maps="{{SKILL_DIR}}/features",
     # TODO(proof): how `{{MOLE}} up --start` runs the app, and how it knows the app is ready (seeded, first render done).
     start=StartConfig(
         command="python3",

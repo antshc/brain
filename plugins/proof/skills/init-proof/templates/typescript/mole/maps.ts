@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { APP } from "../proof/app";
 import { ROOT } from "./runtime";
 
-export const MAPS = APP.featureMaps ?? ".github/skills/verify-mole/features";
+export const MAPS = APP.featureMaps;
 
 /** The feature maps by feature name (their file name without .md). README.md describes the format and is not a map. */
 export async function loadMaps(): Promise<Record<string, string>> {

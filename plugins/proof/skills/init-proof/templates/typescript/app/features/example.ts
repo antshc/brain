@@ -7,7 +7,7 @@ import { pageShowsHeading } from "../checks/example-web";
 import { apiAnswers } from "../checks/example-api";
 // </surface: api>
 
-// Map: .github/skills/verify-mole/features/example.md. Sub-features own scenarios; a scenario composes flows (user actions)
+// Map: {{SKILL_DIR}}/features/example.md. Sub-features own scenarios; a scenario composes flows (user actions)
 // and attaches proof checks in the order the map lists them. Replace this placeholder, or keep it as a smoke check.
 export const example = defineFeature("example", feature => {
   feature.touches("src/"); // TODO(proof): the path prefixes of this feature's files

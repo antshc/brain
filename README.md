@@ -237,9 +237,8 @@ AWS documentation, SDK reference, and implementation-constraint research skills.
 
 Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: a `mole` CLI that drives the app in a real Chrome, receipts with a revision-bound verdict, web and API surface adapters, and feature maps.
 
-- [init-proof](plugins/proof/skills/init-proof/SKILL.md): install the TypeScript or Python kit into a repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus a repository-local `verify-mole` skill.
+- [init-proof](plugins/proof/skills/init-proof/SKILL.md): install the TypeScript or Python kit into a repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus a repository-local `verify-<app>` skill.
 - [maintain-proof](plugins/proof/skills/maintain-proof/SKILL.md): keep maps, adapters and proofs honest as the app changes, and re-prove on a fresh build.
-- [create-verification-skill](plugins/proof/skills/create-verification-skill/SKILL.md): generic fallback that generates a verification skill for any stack (CLI, desktop, other surfaces).
 - [playwright-cli](plugins/proof/skills/playwright-cli/SKILL.md): browser driving helper for ad-hoc exploration and Playwright tests.
 
 ### skill

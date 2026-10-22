@@ -98,9 +98,10 @@ class TestPythonKitScaffoldOutput:
             "proof/features/__init__.py", "proof/features/example.py", "proof/features/surfaces/web.py", "proof/features/surfaces/api.py",
             "proof/flows/app.py", "proof/pages/home.py", "proof/checks/app.py", "proof/components/dropdown.py", "proof/components/modal.py",
             "proof/components/table.py", "proof/adapters/database.py", "proof/adapters/logs.py",
-            ".github/skills/verify-mole/SKILL.md", ".github/skills/verify-mole/scripts/agent.md", ".github/agents/component-extractor.agent.md",
+            ".github/skills/verify-demo-shop/SKILL.md", ".github/skills/verify-demo-shop/scripts/agent.md", ".github/skills/verify-demo-shop/scripts/component-extractor.md",
         ):
             assert path in result["created"]
+        assert not (repo / ".github/agents").exists()
         assert not list((repo / "proof").rglob("*.ts"))
 
     def test_web_only_has_no_api_adapter_or_api_config(self, repo: Path) -> None:
@@ -118,7 +119,7 @@ class TestPythonKitScaffoldOutput:
         app = (repo / "proof/app.py").read_text()
         assert 'surfaces=["api"]' in app
         assert "WebConfig" not in app and "ApiConfig(" in app
-        skill = (repo / ".github/skills/verify-mole/SKILL.md").read_text()
+        skill = (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text()
         assert "screenshot" not in skill and "over HTTP" in skill
 
     @pytest.mark.parametrize("surfaces", ["web", "api", "both"])
@@ -136,18 +137,20 @@ class TestPythonKitScaffoldOutput:
 
     def test_verify_mole_skill_and_maps_use_the_python_commands(self, repo: Path) -> None:
         run(repo, "both")
-        for path in (repo / ".github/skills/verify-mole").rglob("*.md"):
+        for path in (repo / ".github/skills/verify-demo-shop").rglob("*.md"):
             assert "pnpm" not in path.read_text(), f"pnpm left in {path.relative_to(repo)}"
-        skill = (repo / ".github/skills/verify-mole/SKILL.md").read_text()
+        skill = (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text()
         assert f"`{MOLE} doctor`" in skill and "`proof/app.py`" in skill
-        example = (repo / ".github/skills/verify-mole/features/example.md").read_text()
+        example = (repo / ".github/skills/verify-demo-shop/features/example.md").read_text()
         assert f"`{MOLE} run example`" in example and "prove --feature" not in skill + example
-        assert "scripts/agent.md" in skill and "Playwright CLI" in (repo / ".github/skills/verify-mole/scripts/agent.md").read_text()
+        assert "scripts/agent.md" in skill and "Playwright CLI" in (repo / ".github/skills/verify-demo-shop/scripts/agent.md").read_text()
 
-    def test_the_agent_template_names_the_component_extractor_and_its_rules(self, repo: Path) -> None:
+    def test_the_component_extractor_prompt_is_embedded_in_the_skill(self, repo: Path) -> None:
         run(repo, "both")
-        agent = (repo / ".github/agents/component-extractor.agent.md").read_text()
-        assert agent.startswith("---\nname: component-extractor\n") and "proof/components/" in agent and "Playwright CLI" in agent
+        prompt = (repo / ".github/skills/verify-demo-shop/scripts/component-extractor.md").read_text()
+        assert "proof/components/" in prompt and "Playwright CLI" in prompt and f"`{MOLE} run <id>`" in prompt and "{{" not in prompt
+        agent_doc = (repo / ".github/skills/verify-demo-shop/scripts/agent.md").read_text()
+        assert "component-extractor.md" in agent_doc
 
     def test_kit_and_mole_are_copied_byte_for_byte(self, repo: Path) -> None:
         run(repo, "both")
@@ -161,11 +164,19 @@ class TestPythonKitScaffoldOutput:
     def test_app_name_is_json_escaped_in_app_py_and_plain_in_the_skill(self, repo: Path) -> None:
         run(repo, "both", name='My "shop"')
         assert 'name="My \\"shop\\""' in (repo / "proof/app.py").read_text()
-        assert "# Verify My \"shop\"" in (repo / ".github/skills/verify-mole/SKILL.md").read_text()
+        assert "# Verify My \"shop\"" in (repo / ".github/skills/verify-my-shop/SKILL.md").read_text()
+
+    def test_the_only_skill_is_named_after_the_app_and_the_app_config_points_at_its_maps(self, repo: Path) -> None:
+        result = run(repo, "both", name="Demo Shop!")
+        assert result["skill"] == "verify-demo-shop"
+        assert sorted(p.name for p in (repo / ".github/skills").iterdir()) == ["verify-demo-shop"]
+        assert (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text().startswith("---\nname: verify-demo-shop\n")
+        assert 'feature_maps=".github/skills/verify-demo-shop/features"' in (repo / "proof/app.py").read_text()
+        assert not list(repo.rglob("verify-mole"))
 
     def test_example_map_lists_exactly_the_chosen_surfaces(self, repo: Path) -> None:
         run(repo, "api")
-        example = (repo / ".github/skills/verify-mole/features/example.md").read_text()
+        example = (repo / ".github/skills/verify-demo-shop/features/example.md").read_text()
         assert "(API response)" in example and "network log" not in example
         assert 'surfaces=["api"]' in (repo / "proof/features/example.py").read_text()
         assert "NetworkLog" not in (repo / "proof/checks/app.py").read_text()
@@ -180,7 +191,7 @@ class TestPythonKitScaffoldOutput:
         result = scaffold_module.scaffold(tmp_path, ["web"], "x", install=False)
         assert result["language"] == "typescript"
         assert not list((tmp_path / "proof").rglob("*.py"))
-        assert "pnpm mole doctor" in (tmp_path / ".github/skills/verify-mole/SKILL.md").read_text()
+        assert "pnpm mole doctor" in (tmp_path / ".github/skills/verify-x/SKILL.md").read_text()
 
 
 class TestPythonKitNoOverwrite:
@@ -268,7 +279,7 @@ class TestPythonKitEngine:
 
     def test_selftest_catches_a_map_that_drifted_from_the_registry(self, repo: Path) -> None:
         self._scaffold(repo)
-        (repo / ".github/skills/verify-mole/features/orphan.md").write_text("# orphan\n")
+        (repo / ".github/skills/verify-demo-shop/features/orphan.md").write_text("# orphan\n")
         result = self._python(repo, "-m", "pytest", "proof/test_features.py", "-q", "-p", "no:cacheprovider", check=False)
         assert result.returncode != 0 and "every_feature_has_a_map" in result.stdout
 
@@ -494,7 +505,7 @@ def shop() -> Feature:
         .build()
     )
 ''',
-    ".github/skills/verify-mole/features/shop.md": """\
+    ".github/skills/verify-demo/features/shop.md": """\
 # shop
 
 The product catalog.
@@ -642,7 +653,7 @@ class TestPythonKitEndToEnd:
             target.write_text(body)
         index = repo / "proof/features/__init__.py"
         index.write_text(index.read_text().replace("from .example import example", "from .example import example\nfrom .shop import shop").replace("example(),", "example(), shop(),"))
-        readme = repo / ".github/skills/verify-mole/features/README.md"
+        readme = repo / ".github/skills/verify-demo/features/README.md"
         row = f"`{MOLE} run example` |\n"
         readme.write_text(readme.read_text().replace(row, f"{row}| shop | web | [shop.md](shop.md) | `{MOLE} run shop` |\n", 1))
         for command in (["add", "-A"], ["commit", "-qm", "shop"]):

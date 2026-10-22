@@ -9,6 +9,7 @@ export const APP: AppConfig = {
   surfaces: [{{SURFACES_LIST}}],
   // TODO(proof): repo-relative folders whose changes alter the running build. The revision is derived from them.
   sourcePaths: ["src"],
+  featureMaps: "{{SKILL_DIR}}/features",
   // TODO(proof): how `pnpm mole up --start` runs the app, and how it knows the app is ready (seeded, first render done).
   start: {
     command: "pnpm",

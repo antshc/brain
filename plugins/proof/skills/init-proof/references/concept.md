@@ -16,7 +16,7 @@ Two parts, one direction: `proof/kit/` is the independent proof lib (types, feat
 - **Receipt**: per scenario `PASS`/`FAIL`/`ERROR`/`STALE` (exit 0/1/2/2) with `revision`, the checks with their evidence artifacts, per-step results, coverage and `next`. After the first step that does not pass, the rest are NOT_REACHED. Exit 2 means missing evidence or a changed revision, never "probably fine".
 - **Revision**: `git HEAD` plus a hash of uncommitted changes under `APP.sourcePaths`. If it changes while a scenario runs, that scenario is STALE. If it differs from what the running app was started on, `run` refuses and `doctor` says STALE.
 - **mole**: a long-lived Chrome session (`up`/`down`/`doctor`) plus drive and look commands (`open`, `snapshot`, `console`, `network`, `eval`, `api get`), `flow <id>`, `features --changed`, `run [target...]` and `receipts`.
-- **Feature map**: `.github/skills/verify-mole/features/<feature>.md`, four sections: Sub-features, How to get to it (user POV), Driving it with Mole (one paragraph per scenario ending in its proofs and their evidence), Gotchas. Never selectors or routes. `pnpm test:proof` keeps maps and registry in step.
+- **Feature map**: `.github/skills/verify-<app>/features/<feature>.md`, four sections: Sub-features, How to get to it (user POV), Driving it with Mole (one paragraph per scenario ending in its proofs and their evidence), Gotchas. Never selectors or routes. `pnpm test:proof` keeps maps and registry in step.
 
 ## Rules for good features
 

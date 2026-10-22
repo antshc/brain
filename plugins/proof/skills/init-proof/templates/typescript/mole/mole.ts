@@ -323,7 +323,7 @@ function help(command?: string) {
   for (const [, [group, usage, summary]] of Object.entries(COMMANDS)) add(group, usage, summary);
   console.log(`mole: drive and prove ${APP.name}.\n\nUsage: pnpm mole <command>\n`);
   for (const [group, lines] of Object.entries(groups)) console.log(`${group}\n${lines.map(line => "  " + line).join("\n")}\n`);
-  console.log("Start with: pnpm mole up --start   (own terminal)   then: pnpm mole doctor\nGuide for agents: .github/skills/verify-mole/SKILL.md");
+  console.log(`Start with: pnpm mole up --start   (own terminal)   then: pnpm mole doctor\nGuide for agents: ${MAPS.replace(/\/features$/, "")}/SKILL.md`);
 }
 
 async function main() {

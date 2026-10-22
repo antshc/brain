@@ -10,8 +10,8 @@ export type AppConfig = {
   surfaces: Surface[];
   /** Repo-relative paths whose changes alter the running build. The revision is derived from them. */
   sourcePaths: string[];
-  /** Where the feature maps live. Default: .github/skills/verify-mole/features */
-  featureMaps?: string;
+  /** Where the feature maps live: <the verify-<app> skill folder>/features. */
+  featureMaps: string;
   /** Extra patterns a feature map must not contain (selectors, routes, wire details). */
   mapBanned?: RegExp[];
   /** How `mole up --start` runs the app. Omit when the app is always started by hand. */

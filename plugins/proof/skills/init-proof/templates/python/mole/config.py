@@ -55,8 +55,8 @@ class AppConfig:
     surfaces: list[Surface]
     # Repo-relative paths whose changes alter the running build. The revision is derived from them.
     source_paths: list[str]
-    # Where the feature maps live.
-    feature_maps: str = ".github/skills/verify-mole/features"
+    # Where the feature maps live: <the verify-<app> skill folder>/features.
+    feature_maps: str
     # Extra patterns a feature map must not contain (selectors, routes, wire details).
     map_banned: list[re.Pattern[str]] = field(default_factory=list)
     start: StartConfig | None = None
