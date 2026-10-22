@@ -137,7 +137,7 @@ It never silently fixes product code or weakens a journey to make it pass.
 
 ## Comparison with this repository's Proof kit
 
-The local Proof design already includes `init-proof`, `verify-mole`, a feature map, explicit executable feature checks, surface adapters, and durable receipts. The systems are complementary.
+The local Proof design already includes `init-verify`, `verify-mole`, a feature map, explicit executable feature checks, surface adapters, and durable receipts. The systems are complementary.
 
 | Aspect | pstack | Proof kit |
 |---|---|---|

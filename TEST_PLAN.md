@@ -1102,7 +1102,7 @@ Scenario: All open issue pages are returned without a spec number
 
 ## Feature: Proof Surface Selection
 
-> Script unit test (`init-proof` `scaffold.py`)
+> Script unit test (`init-verify` `scaffold.py`)
 
 ```gherkin
 Scenario: Surface choice is normalised to canonical order
@@ -1336,28 +1336,28 @@ Scenario: Unresolved placeholder is an error
 ## Feature: Proof Plugin Layout
 
 ```gherkin
-Scenario: Only the three skills carry a skill md
-  Given the proof plugin folder
+Scenario: Only the two skills carry a skill md
+  Given the verify plugin folder
   When SKILL.md files are listed
-  Then only init-proof, maintain-proof and playwright-cli have one
+  Then only init-verify and playwright-cli have one
 
 Scenario: Plugin manifest points at the skills folder
-  Given the proof plugin manifest
+  Given the verify plugin manifest
   When it is read
-  Then it names proof and ./skills
+  Then it names verify and ./skills
 
 Scenario: Marketplace lists the plugin
   Given the marketplace file
-  When the proof entry is read
-  Then it points at ./plugins/proof
+  When the verify entry is read
+  Then it points at ./plugins/verify
 
 Scenario: Template skill is renamed on scaffold
   Given a scaffolded repository
-  When the verify-mole folder is listed
-  Then it holds SKILL.md and no template-named file
+  When the verify-<app> and maintain-verify-<app> folders are listed
+  Then each holds SKILL.md and no template-named file
 
 Scenario: One shared verify-mole template serves both languages
-  Given the init-proof templates and a typescript scaffold
+  Given the init-verify templates and a typescript scaffold
   When the templates and the scaffolded files are listed
   Then verify-mole exists once with AGENT.md and references/component-extractor.md, no per-language verify-mole folder exists, and the typescript wording lands in proof/AGENT.md and the extractor
 
@@ -1372,7 +1372,7 @@ Scenario: Every skill has name and description frontmatter
 
 ## Feature: Proof Language Selection
 
-> Script unit test (`init-proof` `scaffold.py`, `--language`)
+> Script unit test (`init-verify` `scaffold.py`, `--language`)
 
 ```gherkin
 Scenario: Language choice is normalised
@@ -1448,6 +1448,11 @@ Scenario: Verify mole skill and maps use the python commands
   Given a python scaffold
   When the verify-mole files are read
   Then they name python3 -m mole run, proof/app.py and the scenario-authoring rules, and never pnpm or prove --feature
+
+Scenario: Maintain skill uses the python commands
+  Given a python scaffold for both surfaces
+  When .github/skills/maintain-verify-<app>/SKILL.md is read
+  Then it names python3 -m mole, APP.source_paths and proof/features/__init__.py, points at the verify-<app> skill and its maps, and names no pnpm or TypeScript
 
 Scenario: The component extractor prompt is embedded in the skill
   Given a python scaffold

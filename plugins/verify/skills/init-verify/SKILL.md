@@ -1,14 +1,14 @@
 ---
-name: init-proof
-description: "Install the proof kit (mole CLI, receipts, evidence adapters, scenario builders, feature maps, verify-<app> skill) into a repository in TypeScript (pnpm) or Python, research the codebase, ask the language and which surfaces to prove (web, api, both), and generate starter proof cases. Use when the user explicitly asks to set up proof, mole, or agent verification in a repo."
+name: init-verify
+description: "Install the proof kit (mole CLI, receipts, evidence adapters, scenario builders, feature maps, verify-<app> and maintain-verify-<app> skills) into a repository in TypeScript (pnpm) or Python, research the codebase, ask the language and which surfaces to prove (web, api, both), and generate starter proof cases. Use when the user explicitly asks to set up proof, mole, or agent verification in a repo."
 disable-model-invocation: true
 ---
 
-# Initialize proof
+# Initialize verify
 
 Run on explicit user invocation. `skillDir :=` the parent of this `SKILL.md`'s absolute path. Read [references/concept.md](references/concept.md) first: it defines features, scenarios, evidence, receipts and revisions, and the rules for good checks.
 
-Outcome: `proof/kit/` (the proof lib), `mole/` (the runner), `proof/` (app seams, features), the single agent skill `verify-<app>` (`<app>` is the app name lowercased, non-alphanumerics to `-`; the JSON `skill` field) with its feature maps in `.github/skills/verify-<app>/`, the language's commands (below), and `proof/.runs/` gitignored, with the chosen starter cases passing against the repo's running app.
+Outcome: `proof/kit/` (the proof lib), `mole/` (the runner), `proof/` (app seams, features), the agent skill `verify-<app>` (`<app>` is the app name lowercased, non-alphanumerics to `-`; the JSON `skill` field) with its feature maps in `.github/skills/verify-<app>/`, its upkeep skill `.github/skills/maintain-verify-<app>/` (the JSON `maintain_skill` field), the language's commands (below), and `proof/.runs/` gitignored, with the chosen starter cases passing against the repo's running app.
 
 Commands by language (`<mole>`, `<run>`, `<prove>`, `<test>`, `<typecheck>` below):
 
@@ -42,7 +42,7 @@ Use `ask_user` (never ask in plain text), one form:
 python3 "<skillDir>/scripts/scaffold.py" --repo "$REPO_PATH" --language "<typescript|python>" --surfaces "<web|api|both>" --app-name "<name>"
 ```
 
-It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, `proof/AGENT.md`, and for the chosen surfaces `proof/adapters/`, `pages/`, `flows/`, `checks/`, `proof/README.md`) and the verify-<app> skill from the one shared `templates/verify-mole/` (the only skill it creates; never a `verify-mole` one). `proof/AGENT.md` holds the scenario-authoring rules; the skill's `references/component-extractor.md` is the subagent prompt for missing UI controls, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
+It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, `proof/AGENT.md`, and for the chosen surfaces `proof/adapters/`, `pages/`, `flows/`, `checks/`, `proof/README.md`) the verify-<app> skill from the one shared `templates/verify-mole/` and the maintain-verify-<app> skill from `templates/maintain-verify/` (the only skills it creates; never a `verify-mole` or `maintain-verify` one). `proof/AGENT.md` holds the scenario-authoring rules; the skill's `references/component-extractor.md` is the subagent prompt for missing UI controls, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
 
 - typescript: also seeds `proof/components/`; adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript` (approving esbuild's build script).
 - python: also seeds `proof/components/`; writes `proof/requirements.txt` (`playwright`, `pytest`, `mypy`) and runs `python3 -m pip install -r proof/requirements.txt` into the active environment; also gitignores `__pycache__/`. A repo that manages dependencies elsewhere (venv, uv, poetry) activates that environment first.
@@ -70,7 +70,7 @@ Use only routes, selectors, ids and counts you read from the repo, and read-only
 
 ### The verify-<app> skill and map index
 
-Write the one project-local skill, aimed at a cold agent that has never seen the app, with the mole as the harness. It lives in the scaffolded `.github/skills/verify-<app>/` (never a second skill).
+Write the one project-local skill, aimed at a cold agent that has never seen the app, with the mole as the harness. It lives in the scaffolded `.github/skills/verify-<app>/` (never a second verify skill). The scaffolded `maintain-verify-<app>/` needs no filling.
 
 1. Interview the repo, ask the user only what you cannot observe: surface (web UI, API, both), run (the repo's own dev command, ports, env vars, seed data, auth), drive (existing Playwright or API tests first), observe (screenshots, response bodies, logs, DB state), isolate (can two instances run side by side?). The step 4 research answers most of it. A checkout that does not build or start is fixed or reported first, never documented around.
 2. Fill the `## This app` section of `SKILL.md`, each item grounded in the repo with no placeholder left:

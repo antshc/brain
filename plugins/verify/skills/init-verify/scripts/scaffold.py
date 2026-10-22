@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffold the proof kit (proof kit, mole runner, app seams, verify-<app> skill) into a repository, in TypeScript or Python.
+"""Scaffold the proof kit (proof kit, mole runner, app seams, verify-<app> and maintain-verify-<app> skills) into a repository, in TypeScript or Python.
 
 Deterministic copy and render. Never overwrites an existing file: it is reported as skipped.
 TypeScript needs a pnpm repository; Python works in any repository.
@@ -32,23 +32,28 @@ KNOWN_SURFACES = ("web", "api")
 LANGUAGES = ("typescript", "python")
 MIN_PYTHON = (3, 10)
 
-# The one agent skill per repository is named verify-<app>; its folder is filled in per app.
+# The agent skills per repository are named verify-<app> and maintain-verify-<app>; their folders are filled in per app.
 SKILL_DIR = ".github/skills/{skill}"
+MAINTAIN_SKILL_DIR = ".github/skills/maintain-{skill}"
 SKILL_TEMPLATE = "verify-mole.SKILL.template.md"
+MAINTAIN_SKILL_TEMPLATE = "maintain-verify.SKILL.template.md"
 
-# (template folder under templates/, target folder inside the repository, copied byte for byte?); verify-mole is shared by both languages
+# (template folder under templates/, target folder inside the repository, copied byte for byte?);
+# verify-mole and maintain-verify are shared by both languages
 TREES = {
     "typescript": [
         ("typescript/kit", "proof/kit", True),
         ("typescript/mole", "mole", True),
         ("typescript/app", "proof", False),
         ("verify-mole", SKILL_DIR, False),
+        ("maintain-verify", MAINTAIN_SKILL_DIR, False),
     ],
     "python": [
         ("python/kit", "proof/kit", True),
         ("python/mole", "mole", True),
         ("python/app", "proof", False),
         ("verify-mole", SKILL_DIR, False),
+        ("maintain-verify", MAINTAIN_SKILL_DIR, False),
     ],
 }
 # Files that exist only when their surface is chosen.
@@ -69,9 +74,10 @@ SURFACE_FILES = {
 # the scenario-authoring rules live in proof/ beside the code they govern.
 RENAMES = {
     f"{SKILL_DIR}/{SKILL_TEMPLATE}": f"{SKILL_DIR}/SKILL.md",
+    f"{MAINTAIN_SKILL_DIR}/{MAINTAIN_SKILL_TEMPLATE}": f"{MAINTAIN_SKILL_DIR}/SKILL.md",
     f"{SKILL_DIR}/AGENT.md": "proof/AGENT.md",
 }
-# Per-language text that the shared templates (the verify-<app> skill and maps) refer to.
+# Per-language text that the shared templates (the verify-<app> and maintain-verify-<app> skills and maps) refer to.
 COMMAND_PLACEHOLDERS = {
     "typescript": {
         "{{MOLE}}": "pnpm mole",
@@ -79,6 +85,9 @@ COMMAND_PLACEHOLDERS = {
         "{{TEST_PROOF}}": "pnpm test:proof",
         "{{TYPECHECK_PROOF}}": "pnpm typecheck:proof",
         "{{APP_FILE}}": "proof/app.ts",
+        "{{REGISTRY_FILE}}": "proof/features/index.ts",
+        "{{SOURCE_PATHS}}": "APP.sourcePaths",
+        "{{TOUCHES}}": "feature.touches(...)",
     },
     "python": {
         "{{MOLE}}": "python3 -m mole",
@@ -86,6 +95,9 @@ COMMAND_PLACEHOLDERS = {
         "{{TEST_PROOF}}": "python3 -m pytest proof/test_features.py",
         "{{TYPECHECK_PROOF}}": "python3 -m mypy --strict proof mole",
         "{{APP_FILE}}": "proof/app.py",
+        "{{REGISTRY_FILE}}": "proof/features/__init__.py",
+        "{{SOURCE_PATHS}}": "APP.source_paths",
+        "{{TOUCHES}}": "feature(..., touches=[...])",
     },
 }
 
@@ -197,6 +209,7 @@ def render(text: str, surfaces: list[str], app_name: str, language: str = "types
     values = {
         "{{SKILL_NAME}}": skill,
         "{{SKILL_DIR}}": SKILL_DIR.format(skill=skill),
+        "{{MAINTAIN_SKILL_NAME}}": f"maintain-{skill}",
         "{{APP_NAME_JSON}}": json.dumps(app_name),
         "{{APP_NAME}}": app_name,
         "{{SURFACES_LIST}}": ", ".join(json.dumps(name) for name in surfaces),
@@ -342,6 +355,7 @@ def scaffold(repo: Path, surfaces: list[str], app_name: str, install: bool = Tru
         "surfaces": surfaces,
         "app_name": app_name.strip(),
         "skill": skill_name(app_name.strip()),
+        "maintain_skill": f"maintain-{skill_name(app_name.strip())}",
         "created": created,
         "skipped": skipped,
         "scripts_added": scripts_added,
@@ -357,7 +371,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repo", required=True, type=Path, help="Repository root (gets proof/).")
     parser.add_argument("--language", default="typescript", help="typescript (pnpm repos only) or python (any repo).")
     parser.add_argument("--surfaces", required=True, help="web, api, both, or a comma list.")
-    parser.add_argument("--app-name", required=True, help="Name shown in receipts; the agent skill is named verify-<app-name slug>.")
+    parser.add_argument("--app-name", required=True, help="Name shown in receipts; the agent skills are named verify-<slug> and maintain-verify-<slug>.")
     parser.add_argument("--no-install", action="store_true", help="Do not install dependencies (`pnpm add -D` or `pip install -r`).")
     args = parser.parse_args(argv)
     try:

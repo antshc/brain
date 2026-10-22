@@ -1,4 +1,4 @@
-"""Proof kit independence tests (init-proof templates, both languages).
+"""Proof kit independence tests (init-verify templates, both languages).
 
 Mapped to TEST_PLAN.md — every class docstring names the Feature,
 every method name is the Scenario in snake_case.
@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-TEMPLATES = Path(__file__).resolve().parents[3] / "plugins" / "proof" / "skills" / "init-proof" / "templates"
+TEMPLATES = Path(__file__).resolve().parents[3] / "plugins" / "verify" / "skills" / "init-verify" / "templates"
 KITS = {"typescript": ("kit", "*.ts"), "python": ("kit", "*.py")}
 LEAVES_THE_KIT = {
     "typescript": re.compile(r"""from\s+["'](?!\./)"""),

@@ -233,13 +233,12 @@ AWS documentation, SDK reference, and implementation-constraint research skills.
 - [search-aws-sdk-nuget](plugins/aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
 - [research-aws](plugins/aws/skills/research-aws/SKILL.md): research AWS implementation constraints — APIs, SDK, IAM, networking, quotas, retries, failures — with provider evidence.
 
-### proof
+### verify
 
 Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: a `mole` CLI that drives the app in a real Chrome, receipts with a revision-bound verdict, web and API surface adapters, and feature maps.
 
-- [init-proof](plugins/proof/skills/init-proof/SKILL.md): install the TypeScript or Python kit into a repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus a repository-local `verify-<app>` skill.
-- [maintain-proof](plugins/proof/skills/maintain-proof/SKILL.md): keep maps, adapters and proofs honest as the app changes, and re-prove on a fresh build.
-- [playwright-cli](plugins/proof/skills/playwright-cli/SKILL.md): browser driving helper for ad-hoc exploration and Playwright tests.
+- [init-verify](plugins/verify/skills/init-verify/SKILL.md): install the TypeScript or Python kit into a repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus repository-local `verify-<app>` and `maintain-verify-<app>` skills (the latter keeps maps, adapters and proofs honest as the app changes and re-proves on a fresh build).
+- [playwright-cli](plugins/verify/skills/playwright-cli/SKILL.md): browser driving helper for ad-hoc exploration and Playwright tests.
 
 ### skill
 

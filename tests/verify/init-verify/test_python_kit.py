@@ -1,4 +1,4 @@
-"""Proof Python kit behavior tests (init-proof scaffold --language python).
+"""Proof Python kit behavior tests (init-verify scaffold --language python).
 
 Mapped to TEST_PLAN.md — every class docstring names the Feature,
 every method name is the Scenario in snake_case.
@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-SKILL_DIR = Path(__file__).resolve().parents[3] / "plugins" / "proof" / "skills" / "init-proof"
+SKILL_DIR = Path(__file__).resolve().parents[3] / "plugins" / "verify" / "skills" / "init-verify"
 SCRIPT_PATH = SKILL_DIR / "scripts" / "scaffold.py"
 PY_TEMPLATES = SKILL_DIR / "templates" / "python"
 
@@ -147,6 +147,13 @@ class TestPythonKitScaffoldOutput:
         assert "proof/AGENT.md" in skill and "Playwright CLI" in agent_doc and "@flow" in agent_doc and "defineFeature" not in agent_doc
         assert "pnpm" not in agent_doc and not (repo / ".github/skills/verify-demo-shop/scripts").exists()
 
+    def test_maintain_skill_uses_the_python_commands(self, repo: Path) -> None:
+        run(repo, "both")
+        skill = (repo / ".github/skills/maintain-verify-demo-shop/SKILL.md").read_text()
+        assert "pnpm" not in skill and "TypeScript" not in skill
+        assert f"`{MOLE} features --changed`" in skill and "`APP.source_paths`" in skill and "`proof/features/__init__.py`" in skill
+        assert ".github/skills/verify-demo-shop/features/<name>.md" in skill and "../verify-demo-shop/SKILL.md" in skill
+
     def test_the_component_extractor_prompt_is_embedded_in_the_skill(self, repo: Path) -> None:
         run(repo, "both")
         prompt = (repo / ".github/skills/verify-demo-shop/references/component-extractor.md").read_text()
@@ -170,10 +177,11 @@ class TestPythonKitScaffoldOutput:
         assert 'name="My \\"shop\\""' in (repo / "proof/app.py").read_text()
         assert "# Verify My \"shop\"" in (repo / ".github/skills/verify-my-shop/SKILL.md").read_text()
 
-    def test_the_only_skill_is_named_after_the_app_and_the_app_config_points_at_its_maps(self, repo: Path) -> None:
+    def test_the_skills_are_named_after_the_app_and_the_app_config_points_at_its_maps(self, repo: Path) -> None:
         result = run(repo, "both", name="Demo Shop!")
         assert result["skill"] == "verify-demo-shop"
-        assert sorted(p.name for p in (repo / ".github/skills").iterdir()) == ["verify-demo-shop"]
+        assert sorted(p.name for p in (repo / ".github/skills").iterdir()) == ["maintain-verify-demo-shop", "verify-demo-shop"]
+        assert (repo / ".github/skills/maintain-verify-demo-shop/SKILL.md").read_text().startswith("---\nname: maintain-verify-demo-shop\n")
         assert (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text().startswith("---\nname: verify-demo-shop\n")
         assert 'feature_maps=".github/skills/verify-demo-shop/features"' in (repo / "proof/app.py").read_text()
         assert not list(repo.rglob("verify-mole"))

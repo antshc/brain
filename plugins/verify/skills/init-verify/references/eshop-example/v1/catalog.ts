@@ -1,5 +1,5 @@
 // Reference only (eShop catalog feature): a worked example of one feature proof, written against the proof kit.
-// Not compiled or copied by init-proof. Its adapters are web.ts and api.ts next to this file.
+// Not compiled or copied by init-verify. Its adapters are web.ts and api.ts next to this file.
 import { observe, type ProofKit } from "../../kit";
 import { PAGE_SIZE, adapterFor, type CatalogList, type Surface } from "./surfaces";
 
