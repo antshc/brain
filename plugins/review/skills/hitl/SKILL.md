@@ -52,8 +52,8 @@ Launch two subagents in parallel, one per row, both at `@agentSize`. Each gets `
 
 | Subagent | Task | Output file |
 |---|---|---|
-| Blast radius | Follow [Blast radius](references/blast-radius.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/blast-radius.md` |
-| Changes brief | Follow [Changes brief](references/changes-brief.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/changes-brief.md` |
+| Blast radius | Follow [Blast radius](references/blast-radius.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-blast-radius.md` |
+| Changes brief | Follow [Changes brief](references/changes-brief.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-changes-brief.md` |
 
 Resolve reference paths from this skill's base directory. Each subagent writes its reference's reply verbatim to its output file, creating the folder if missing, and returns only the absolute output path plus `done` or `failed: <reason>`.
 
