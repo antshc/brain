@@ -40,4 +40,4 @@ Same model, in Python: `feature(...).sub_feature(...).scenario(...).flow(...).pr
 
 ## In short
 
-The proof kit defines what a proof is and records its evidence. The mole runs the app and the browser and invokes the proofs. The `verify-mole` skill tells an agent how to use the mole, with one map per feature.
+The proof kit defines what a proof is and records its evidence. The mole runs the app and the browser and invokes the proofs. The `verify-<app>` skill tells an agent how to use the mole, with one map per feature.

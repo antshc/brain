@@ -89,7 +89,7 @@ class TestScaffoldedFiles:
         result = run(repo, "both")
         for created in ("proof/adapters/api.ts", "proof/pages/app-page.ts", "proof/flows/open-app.ts", "proof/checks/example-web.ts", "proof/checks/example-api.ts"):
             assert created in result["created"]
-        assert (repo / ".github/skills/verify-mole/SKILL.md").is_file()
+        assert (repo / ".github/skills/verify-demo-shop/SKILL.md").is_file()
         assert (repo / "mole/mole.ts").is_file()
         assert (repo / "proof/kit/run.ts").is_file()
         assert not (repo / "proof/engine").exists()
@@ -100,7 +100,7 @@ class TestScaffoldedFiles:
         for path in ("proof/features/index.ts", "proof/features/example.ts", "proof/adapters/index.ts", "proof/components/README.md", "proof/features.test.ts"):
             assert (repo / path).is_file(), path
         for path in ("features/README.md", "features/example.md", "scripts/agent.md", "scripts/component-extractor.md"):
-            assert (repo / ".github/skills/verify-mole" / path).is_file(), path
+            assert (repo / ".github/skills/verify-demo-shop" / path).is_file(), path
 
     def test_web_only_has_no_api_adapter_or_api_config(self, repo: Path) -> None:
         run(repo, "web")
@@ -120,7 +120,7 @@ class TestScaffoldedFiles:
         assert 'surfaces: ["api"]' in app
         assert "web: {" not in app and "api: {" in app
         assert "openApp" not in (repo / "proof/features/example.ts").read_text()
-        skill = (repo / ".github/skills/verify-mole/SKILL.md").read_text()
+        skill = (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text()
         assert "screenshot" not in skill and "over HTTP" in skill
 
     @pytest.mark.parametrize("surfaces", ["web", "api", "both"])
@@ -133,7 +133,7 @@ class TestScaffoldedFiles:
 
     def test_skill_drives_the_scenario_loop_with_run_flow_and_receipts(self, repo: Path) -> None:
         run(repo, "both")
-        skill = (repo / ".github/skills/verify-mole/SKILL.md").read_text()
+        skill = (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text()
         for command in ("pnpm mole run", "pnpm mole flow", "pnpm mole receipts", "scripts/agent.md"):
             assert command in skill
         assert "prove --feature" not in skill and "--surface" not in skill
@@ -141,12 +141,12 @@ class TestScaffoldedFiles:
     def test_app_name_is_json_escaped_in_app_ts_and_plain_in_the_skill(self, repo: Path) -> None:
         run(repo, "web", name='Shop "Pro"')
         assert 'name: "Shop \\"Pro\\""' in (repo / "proof/app.ts").read_text()
-        assert "name: verify-mole" in (repo / ".github/skills/verify-mole/SKILL.md").read_text()
-        assert 'Verify Shop "Pro"' in (repo / ".github/skills/verify-mole/SKILL.md").read_text()
+        assert "name: verify-shop-pro\n" in (repo / ".github/skills/verify-shop-pro/SKILL.md").read_text()
+        assert 'Verify Shop "Pro"' in (repo / ".github/skills/verify-shop-pro/SKILL.md").read_text()
 
     def test_example_map_has_one_scenario_paragraph_per_chosen_surface(self, repo: Path) -> None:
         run(repo, "api")
-        map_text = (repo / ".github/skills/verify-mole/features/example.md").read_text()
+        map_text = (repo / ".github/skills/verify-demo-shop/features/example.md").read_text()
         for section in ("## Sub-features", "## How to get to it (user POV)", "## Driving it with Mole", "## Gotchas"):
             assert section in map_text
         assert "**(app-answers | api):**" in map_text and "(API response)" in map_text
@@ -283,9 +283,9 @@ REPO_ROOT = PLUGIN_DIR.parents[1]
 class TestPluginLayout:
     """Feature: Proof Plugin Layout"""
 
-    def test_only_the_four_skills_carry_a_skill_md(self) -> None:
+    def test_only_the_three_skills_carry_a_skill_md(self) -> None:
         found = sorted(p.parent.name for p in PLUGIN_DIR.rglob("SKILL.md"))
-        assert found == ["create-verification-skill", "init-proof", "maintain-proof", "playwright-cli"]
+        assert found == ["init-proof", "maintain-proof", "playwright-cli"]
 
     def test_plugin_manifest_points_at_the_skills_folder(self) -> None:
         manifest = json.loads((PLUGIN_DIR / "plugin.json").read_text())
@@ -299,10 +299,10 @@ class TestPluginLayout:
 
     def test_template_skill_is_renamed_on_scaffold(self, repo: Path) -> None:
         run(repo)
-        assert not list((repo / ".github/skills/verify-mole").glob("*.template.md"))
-        assert (repo / ".github/skills/verify-mole/SKILL.md").is_file()
+        assert not list((repo / ".github/skills/verify-demo-shop").glob("*.template.md"))
+        assert (repo / ".github/skills/verify-demo-shop/SKILL.md").is_file()
 
-    @pytest.mark.parametrize("skill", ["init-proof", "maintain-proof", "create-verification-skill", "playwright-cli"])
+    @pytest.mark.parametrize("skill", ["init-proof", "maintain-proof", "playwright-cli"])
     def test_every_skill_has_name_and_description_frontmatter(self, skill: str) -> None:
         head = (PLUGIN_DIR / "skills" / skill / "SKILL.md").read_text().split("---")[1]
         assert f"name: {skill}" in head and "description:" in head

@@ -463,7 +463,7 @@ def show_help(command: str | None = None) -> int:
     for group, lines in groups.items():
         print(group)
         print("\n".join("  " + line for line in lines) + "\n")
-    print(f"Start with: {MOLE} up --start   (own terminal)   then: {MOLE} doctor\nGuide for agents: .github/skills/verify-mole/SKILL.md")
+    print(f"Start with: {MOLE} up --start   (own terminal)   then: {MOLE} doctor\nGuide for agents: {MAPS.rsplit('/', 1)[0]}/SKILL.md")
     return 0
 
 

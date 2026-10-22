@@ -5,7 +5,7 @@ from proof.flows.app import open_app
 from proof.kit import Feature, feature
 
 
-# Map: .github/skills/verify-mole/features/example.md
+# Map: {{SKILL_DIR}}/features/example.md
 # Flows act, checks observe, and the builder composes them. Reuse flows and checks from proof/flows and proof/checks.
 def example() -> Feature:
     return (

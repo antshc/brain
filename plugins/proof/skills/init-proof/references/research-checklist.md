@@ -45,4 +45,4 @@ Field names are TypeScript (`proof/app.ts`). Python kit (`proof/app.py`): `APP.s
 
 ## Output of the research
 
-A short list per item above: value, source (file:line), and confidence. Use it to fill `proof/app.ts`, to pre-fill the case menu, and to write `verify-mole` (`TODO(proof)` markers).
+A short list per item above: value, source (file:line), and confidence. Use it to fill `proof/app.ts`, to pre-fill the case menu, and to write `verify-<app>` (`TODO(proof)` markers).

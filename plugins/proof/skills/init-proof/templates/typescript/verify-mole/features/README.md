@@ -12,6 +12,24 @@ Four `##` sections, in this order: `Sub-features`, `How to get to it (user POV)`
 - The n-th proof check is the n-th `.proof()` of the scenario's builder, with exactly that evidence. A screenshot needs an assertive source beside it.
 - Flows stay in TypeScript.
 
+## Baseline preconditions
+
+TODO(proof): how the app starts for a proof (URL, env vars, data directory, seed data, auth) and what `{{MOLE}} doctor` must show. Never drive an instance this run did not start.
+
+## Driving conventions
+
+- Prefer ARIA roles and accessible names over CSS selectors or DOM position.
+- Start every scenario from the baseline state unless its Given says otherwise. Restore seeded data after a mutation.
+- Run `{{MOLE}} flow <id>` to look, `{{MOLE}} run <id>` to prove.
+
+## Proof and skip reporting
+
+- A check passes only on the evidence it cites, captured for it and kept in `proof/.runs/mole/`.
+- Report an unreachable path with the attempted command and the unmet precondition. Never report a skipped entry point as verified through another path.
+- Evidence survives cleanup.
+
+## Features
+
 | Feature | Surfaces | Map | Run |
 |---|---|---|---|
 | example | {{SURFACES_TEXT}} | [example.md](example.md) | `{{MOLE}} run example` |

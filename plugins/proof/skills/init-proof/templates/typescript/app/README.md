@@ -14,13 +14,13 @@ Verifies {{APP_NAME}} like a user, scenario by scenario, and writes a receipt wi
 | `flows/` | you | User actions. A flow acts and returns variables; it never decides acceptance. |
 | `checks/` | you | Proof checks. A check observes through declared evidence and returns a finding. |
 | `adapters/` | you | Project evidence sources (`ADAPTERS`). A source with a built-in's id replaces it. |
-| `.github/skills/verify-mole/` | you | The agent skill and one map per feature. |
+| `{{SKILL_DIR}}/` | you | The agent skill and one map per feature. |
 
 ## Concepts
 
 - A **feature** has **sub-features**; each owns **scenarios**: Given/When/Then paths a user takes, on one surface of {{SURFACES_TEXT}}.
 - A scenario composes **flows** and attaches **proof checks**. Each check names the **evidence** it proves itself with: DOM assertion, screenshot, API response, network, console, storage. A PASS or FAIL needs an artifact for every declared source; without one the verdict is ERROR.
-- The **feature map** (`.github/skills/verify-mole/features/<feature>.md`) states each scenario and its proofs in words. `pnpm test:proof` keeps maps and registry in step.
+- The **feature map** (`{{SKILL_DIR}}/features/<feature>.md`) states each scenario and its proofs in words. `pnpm test:proof` keeps maps and registry in step.
 - A **receipt** carries a verdict per scenario (PASS, FAIL, ERROR, STALE), the checks with their evidence artifacts, and a `next` hint. Exit 0 for PASS, 1 for FAIL, 2 for ERROR or STALE.
 - The **revision** is `git HEAD` plus a hash of uncommitted changes under `APP.sourcePaths`. A receipt is bound to it: a stale build makes `run` refuse, and a change mid-run gives STALE.
 - Evidence artifacts are written under `proof/.runs/artifacts/<revision>/<run>/<scenario>/`.
@@ -43,11 +43,11 @@ pnpm test:proof           # maps and registry in step; the mole's self-tests
 pnpm typecheck:proof
 ```
 
-`pnpm mole help` lists every command. The agent loop is in [.github/skills/verify-mole/SKILL.md](../.github/skills/verify-mole/SKILL.md).
+`pnpm mole help` lists every command. The agent loop is in [{{SKILL_DIR}}/SKILL.md](../{{SKILL_DIR}}/SKILL.md).
 
 ## Add a feature
 
-1. Write the map in `.github/skills/verify-mole/features/<name>.md`: four sections, one paragraph per scenario ending in `**Proof:** check (Evidence); ...`. Update `features/README.md`.
+1. Write the map in `{{SKILL_DIR}}/features/<name>.md`: four sections, one paragraph per scenario ending in `**Proof:** check (Evidence); ...`. Update `features/README.md`.
 2. Put selectors in `pages/` (and `components/`), user actions in `flows/`, and acceptance checks in `checks/`.
 3. Write `features/<name>.ts` with `defineFeature`: `touches`, `surfaces`, then `subFeature` and `scenario` with `.flow(...)` and `.proof(...)` in the map's order.
 4. Register it in `features/index.ts`.

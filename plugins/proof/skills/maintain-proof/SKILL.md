@@ -1,11 +1,11 @@
 ---
 name: maintain-proof
-description: Keep a repository's proof kit honest as the app changes — update feature maps, adapters and proofs when source changes, detect drift, and re-prove. Use after changing app code in a repo that has proof/ and .github/skills/verify-mole/, or when proof checks, maps or the registry look out of date.
+description: Keep a repository's proof kit honest as the app changes — update feature maps, adapters and proofs when source changes, detect drift, and re-prove. Use after changing app code in a repo that has proof/ and .github/skills/verify-<app>/, or when proof checks, maps or the registry look out of date.
 ---
 
 # Maintain proof
 
-Applies to a repo scaffolded by `init-proof` (it has `proof/app.ts` or `proof/app.py`, `proof/features/` and `.github/skills/verify-mole/`). Concepts: `init-proof/references/concept.md` in this plugin. Run from the repo root.
+Applies to a repo scaffolded by `init-proof` (it has `proof/app.ts` or `proof/app.py`, `proof/features/` and `.github/skills/verify-<app>/`). Concepts: `init-proof/references/concept.md` in this plugin. Run from the repo root.
 
 Commands below use the TypeScript form. Python kit (`proof/app.py`): `pnpm mole` = `python3 -m mole`; `pnpm prove` = `python3 -m mole.prove_cli`; `pnpm test:proof` = `python3 -m pytest proof/test_features.py`; `pnpm typecheck:proof` = `python3 -m mypy --strict proof mole`; `features/index.ts` = `features/__init__.py`; `APP.sourcePaths` = `APP.source_paths`.
 
@@ -14,7 +14,7 @@ Both kits use the scenario model (feature builder, flows, proof checks, evidence
 ## Loop
 
 1. **Find what moved.** `pnpm mole features --changed` lists the features whose `touches` prefixes your uncommitted changes hit. No feature selected but behavior changed: a feature's `touches` is stale or the behavior has no feature yet (step 4).
-2. **Read the maps** of those features (`.github/skills/verify-mole/features/<name>.md`). The map is the contract; code that now contradicts it is either a regression or a contract change.
+2. **Read the maps** of those features (`.github/skills/verify-<app>/features/<name>.md`). The map is the contract; code that now contradicts it is either a regression or a contract change.
 3. **Decide per change**:
    - *Regression*: fix the app, leave the proof alone.
    - *Intended contract change*: Update the map's scenario paragraph first, then the scenario's flows and proof checks, constants and hints, then page objects only if the page changed (selectors, routes). One edit per layer; never weaken a check to make it pass.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffold the proof kit (proof kit, mole runner, app seams, verify-mole skill) into a repository, in TypeScript or Python.
+"""Scaffold the proof kit (proof kit, mole runner, app seams, verify-<app> skill) into a repository, in TypeScript or Python.
 
 Deterministic copy and render. Never overwrites an existing file: it is reported as skipped.
 TypeScript needs a pnpm repository; Python works in any repository.
@@ -29,20 +29,23 @@ KNOWN_SURFACES = ("web", "api")
 LANGUAGES = ("typescript", "python")
 MIN_PYTHON = (3, 10)
 
+# The one agent skill per repository is named verify-<app>; its folder is filled in per app.
+SKILL_DIR = ".github/skills/{skill}"
+SKILL_TEMPLATE = "verify-mole.SKILL.template.md"
+
 # (template folder under templates/, target folder inside the repository, copied byte for byte?)
 TREES = {
     "typescript": [
         ("typescript/kit", "proof/kit", True),
         ("typescript/mole", "mole", True),
         ("typescript/app", "proof", False),
-        ("typescript/verify-mole", ".github/skills/verify-mole", False),
+        ("typescript/verify-mole", SKILL_DIR, False),
     ],
     "python": [
         ("python/kit", "proof/kit", True),
         ("python/mole", "mole", True),
         ("python/app", "proof", False),
-        ("python/verify-mole", ".github/skills/verify-mole", False),
-        ("python/agents", ".github/agents", False),
+        ("python/verify-mole", SKILL_DIR, False),
     ],
 }
 # Files that exist only when their surface is chosen.
@@ -61,9 +64,9 @@ SURFACE_FILES = {
 }
 # Template names that differ from their target, so no nested SKILL.md inside this plugin is mistaken for a skill.
 RENAMES = {
-    ".github/skills/verify-mole/verify-mole.SKILL.template.md": ".github/skills/verify-mole/SKILL.md",
+    f"{SKILL_DIR}/{SKILL_TEMPLATE}": f"{SKILL_DIR}/SKILL.md",
 }
-# Per-language text that the shared templates (the verify-mole skill and maps) refer to.
+# Per-language text that the shared templates (the verify-<app> skill and maps) refer to.
 COMMAND_PLACEHOLDERS = {
     "typescript": {
         "{{MOLE}}": "pnpm mole",
@@ -123,6 +126,12 @@ def parse_surfaces(value: str) -> list[str]:
     return [name for name in KNOWN_SURFACES if name in names]
 
 
+def skill_name(app_name: str) -> str:
+    """`My "Shop" App` -> `verify-my-shop-app`."""
+    slug = re.sub(r"[^a-z0-9]+", "-", app_name.lower()).strip("-")
+    return f"verify-{slug or 'app'}"
+
+
 def parse_language(value: str) -> str:
     """`typescript` / `ts` / `python` / `py` -> canonical name."""
     language = {"ts": "typescript", "py": "python"}.get(value.strip().lower(), value.strip().lower())
@@ -170,7 +179,10 @@ def render(text: str, surfaces: list[str], app_name: str, language: str = "types
     text = _CODE_BLOCK.sub(block, text)
     text = _MD_BLOCK.sub(block, text)
     text = _MD_INLINE.sub(inline, text)
+    skill = skill_name(app_name)
     values = {
+        "{{SKILL_NAME}}": skill,
+        "{{SKILL_DIR}}": SKILL_DIR.format(skill=skill),
         "{{APP_NAME_JSON}}": json.dumps(app_name),
         "{{APP_NAME}}": app_name,
         "{{SURFACES_LIST}}": ", ".join(json.dumps(name) for name in surfaces),
@@ -187,11 +199,12 @@ def render(text: str, surfaces: list[str], app_name: str, language: str = "types
 
 
 def _copy_tree(repo: Path, surfaces: list[str], app_name: str, language: str, created: list[str], skipped: list[str]) -> None:
+    skill = skill_name(app_name)
     for tree, target_root, verbatim in TREES[language]:
         source_root = TEMPLATES / tree
         for source in sorted(p for p in source_root.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
             relative = f"{target_root}/{source.relative_to(source_root).as_posix()}"
-            relative = RENAMES.get(relative, relative)
+            relative = RENAMES.get(relative, relative).format(skill=skill)
             gate = SURFACE_FILES[language].get(relative)
             if gate and gate not in surfaces:
                 continue
@@ -314,6 +327,7 @@ def scaffold(repo: Path, surfaces: list[str], app_name: str, install: bool = Tru
         "language": language,
         "surfaces": surfaces,
         "app_name": app_name.strip(),
+        "skill": skill_name(app_name.strip()),
         "created": created,
         "skipped": skipped,
         "scripts_added": scripts_added,
@@ -329,7 +343,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repo", required=True, type=Path, help="Repository root (gets proof/).")
     parser.add_argument("--language", default="typescript", help="typescript (pnpm repos only) or python (any repo).")
     parser.add_argument("--surfaces", required=True, help="web, api, both, or a comma list.")
-    parser.add_argument("--app-name", required=True, help="Name shown in receipts and the verify-mole skill.")
+    parser.add_argument("--app-name", required=True, help="Name shown in receipts; the agent skill is named verify-<app-name slug>.")
     parser.add_argument("--no-install", action="store_true", help="Do not install dependencies (`pnpm add -D` or `pip install -r`).")
     args = parser.parse_args(argv)
     try:

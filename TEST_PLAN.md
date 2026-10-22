@@ -1326,10 +1326,10 @@ Scenario: Unresolved placeholder is an error
 ## Feature: Proof Plugin Layout
 
 ```gherkin
-Scenario: Only the four skills carry a skill md
+Scenario: Only the three skills carry a skill md
   Given the proof plugin folder
   When SKILL.md files are listed
-  Then only init-proof, maintain-proof, create-verification-skill and playwright-cli have one
+  Then only init-proof, maintain-proof and playwright-cli have one
 
 Scenario: Plugin manifest points at the skills folder
   Given the proof plugin manifest
