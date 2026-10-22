@@ -10,6 +10,8 @@ Act as **senior-developer review support**: the human leads the review and decid
 
 **MUST NOT** use question tools (e.g. `ask_user`, ask-questions); every question and menu in this skill is plain chat text, then wait for the reply.
 
+**References:** every `references/...` file lives in this skill's own folder (the directory containing this `SKILL.md`). Open it directly at `<skill folder>/references/<name>.md`; **MUST NOT** search for it (glob, grep, or find) from the filesystem root or the repo root, or fall back to the CWD.
+
 ## Input
 
 Parse `{{input}}` as `PR_URL` (`https://github.com/{{OWNER}}/{{REPO}}/pull/{{PR_NUMBER}}`); extract `OWNER`, `REPO`, `PR_NUMBER`.
@@ -55,7 +57,7 @@ Launch two subagents in parallel, one per row, both at `@agentSize`. Each gets `
 | Blast radius | Follow [Blast radius](references/blast-radius.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-blast-radius.md` |
 | Changes brief | Follow [Changes brief](references/changes-brief.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-changes-brief.md` |
 
-Resolve reference paths from this skill's base directory. Each subagent writes its reference's reply verbatim to its output file, creating the folder if missing, and returns only the absolute output path plus `done` or `failed: <reason>`.
+Pass each subagent the absolute path of its reference file under this skill's `references/` folder; it opens that path directly and does not search for it. Each subagent writes its reference's reply verbatim to its output file, creating the folder if missing, and returns only the absolute output path plus `done` or `failed: <reason>`.
 
 Then show the user one Markdown link per output file (absolute path, `/` separators) and the line "Open and read these before the review." Failed subagent → show its reason in place of the link. Done when both files exist or a reason is shown; do not read, summarize, or critique them. Continue to Review loop without waiting for the user to finish reading.
 
