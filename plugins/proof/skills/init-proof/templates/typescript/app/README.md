@@ -14,6 +14,7 @@ Verifies {{APP_NAME}} like a user, scenario by scenario, and writes a receipt wi
 | `flows/` | you | User actions. A flow acts and returns variables; it never decides acceptance. |
 | `checks/` | you | Proof checks. A check observes through declared evidence and returns a finding. |
 | `adapters/` | you | Project evidence sources (`ADAPTERS`). A source with a built-in's id replaces it. |
+| `AGENT.md` | you | The rules agents follow to write scenarios, flows, checks, pages and components. Read it first. |
 | `{{SKILL_DIR}}/` | you | The agent skill and one map per feature. |
 
 ## Concepts

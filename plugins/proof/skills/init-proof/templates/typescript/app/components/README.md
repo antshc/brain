@@ -7,4 +7,4 @@ Before you build a part, search here and in `pages/`. List what exists:
 | Component | Where | What it wraps |
 |---|---|---|
 
-Add a row when you add a component. `{{SKILL_DIR}}/scripts/component-extractor.md` finds repeated UI parts in the app and proposes components.
+Add a row when you add a component. `{{SKILL_DIR}}/references/component-extractor.md` is the prompt of the subagent that finds repeated UI parts in the app and proposes components; [AGENT.md](../AGENT.md) says when to run it.

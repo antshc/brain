@@ -99,8 +99,10 @@ class TestScaffoldedFiles:
         run(repo, "both")
         for path in ("proof/features/index.ts", "proof/features/example.ts", "proof/adapters/index.ts", "proof/components/README.md", "proof/features.test.ts"):
             assert (repo / path).is_file(), path
-        for path in ("features/README.md", "features/example.md", "scripts/agent.md", "scripts/component-extractor.md"):
+        for path in ("features/README.md", "features/example.md", "references/component-extractor.md"):
             assert (repo / ".github/skills/verify-demo-shop" / path).is_file(), path
+        assert (repo / "proof/AGENT.md").is_file()
+        assert not (repo / ".github/skills/verify-demo-shop/scripts").exists()
 
     def test_web_only_has_no_api_adapter_or_api_config(self, repo: Path) -> None:
         run(repo, "web")
@@ -134,7 +136,7 @@ class TestScaffoldedFiles:
     def test_skill_drives_the_scenario_loop_with_run_flow_and_receipts(self, repo: Path) -> None:
         run(repo, "both")
         skill = (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text()
-        for command in ("pnpm mole run", "pnpm mole flow", "pnpm mole receipts", "scripts/agent.md"):
+        for command in ("pnpm mole run", "pnpm mole flow", "pnpm mole receipts", "proof/AGENT.md", "references/component-extractor.md"):
             assert command in skill
         assert "prove --feature" not in skill and "--surface" not in skill
 
@@ -267,6 +269,15 @@ class TestRenderMarkers:
         assert scaffold_module.render(text, ["web", "api"], "n") == "x both y\nz\n"
         assert scaffold_module.render(text, ["web"], "n") == "x  y\nonly\nz\n"
 
+    def test_language_block_and_inline_markers(self) -> None:
+        text = "a <!-- lang: python -->py<!-- /lang: python --><!-- lang: typescript -->ts<!-- /lang: typescript --> b\n<!-- lang: python -->\nonly py\n<!-- /lang: python -->\nz\n"
+        assert scaffold_module.render(text, ["web"], "n", "python") == "a py b\nonly py\nz\n"
+        assert scaffold_module.render(text, ["web"], "n", "typescript") == "a ts b\nz\n"
+
+    def test_unknown_language_marker_is_an_error(self) -> None:
+        with pytest.raises(scaffold_module.ScaffoldError, match="Unknown language marker"):
+            scaffold_module.render("<!-- lang: ruby -->x<!-- /lang: ruby -->", ["web"], "n")
+
     def test_unknown_marker_expression_is_an_error(self) -> None:
         with pytest.raises(scaffold_module.ScaffoldError, match="Unknown surface marker"):
             scaffold_module.render("<!-- surface: cli -->x<!-- /surface: cli -->", ["web"], "n")
@@ -301,6 +312,17 @@ class TestPluginLayout:
         run(repo)
         assert not list((repo / ".github/skills/verify-demo-shop").glob("*.template.md"))
         assert (repo / ".github/skills/verify-demo-shop/SKILL.md").is_file()
+
+    def test_one_shared_verify_mole_template_serves_both_languages(self, repo: Path) -> None:
+        templates = SKILL_DIR / "templates"
+        assert (templates / "verify-mole" / "AGENT.md").is_file()
+        assert (templates / "verify-mole" / "references" / "component-extractor.md").is_file()
+        assert not (templates / "python" / "verify-mole").exists() and not (templates / "typescript" / "verify-mole").exists()
+        run(repo)
+        agent_doc = (repo / "proof/AGENT.md").read_text()
+        assert "defineFeature" in agent_doc and "@flow" not in agent_doc
+        prompt = (repo / ".github/skills/verify-demo-shop/references/component-extractor.md").read_text()
+        assert "<control>.ts" in prompt and "<control>.py" not in prompt
 
     @pytest.mark.parametrize("skill", ["init-proof", "maintain-proof", "playwright-cli"])
     def test_every_skill_has_name_and_description_frontmatter(self, skill: str) -> None:
