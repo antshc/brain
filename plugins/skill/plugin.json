@@ -1,0 +1,6 @@
+{
+  "name": "skill",
+  "version": "1.0.0",
+  "description": "Skill authoring: grill a skill idea into a brief, then write and shrink an agent skill from bundled best practices.",
+  "skills": ["./skills"]
+}
