@@ -58,9 +58,20 @@ Use title `{{initiative-id}}: <summary>` and a standalone `{{initiative-id}}` li
 
 Example rationale: `- Prevent duplicate charges when customers retry timed-out payments.` Avoid code summaries such as `- Add an idempotency check to PaymentService.`
 
-After confirmed worktree removal, invoke code review from SOURCE_ROOT. Pass the PR URL and SOURCE_ROOT. Review fetches the diff and creates a separate fresh detached worktree from that existing repository; it must not clone or reuse the removed implementation worktree. Keep draft/spec open for review failure, unavailable initiative verification, posting failure, stale head or unresolved bug/initiative findings. Do not auto-fix during review.
+After confirmed worktree removal, invoke code review from SOURCE_ROOT. Pass the PR URL and SOURCE_ROOT. Review fetches the diff and creates a separate fresh detached worktree from that existing repository; it must not clone or reuse the removed implementation worktree. Keep draft/spec open for review failure, unavailable initiative verification, unresolved `fail`/`partial` app verification, posting failure, stale head or unresolved bug/initiative findings. Do not auto-fix during review.
 
 Read the final body, target/head branches, draft state, and check results back. Distinguish pending, failed, absent, and passed checks; required pending/failed checks block readiness. Do not claim a nonexistent check passed.
+
+## Verification evidence
+
+Set `EVIDENCE_ROOT` to `HARNESS_ROOT/workspace/REPO.evidence` (sibling of `SOURCE_ROOT`, git-ignored with `workspace/`) and `EVIDENCE_DIR` to `EVIDENCE_ROOT/INITIATIVE_ID/<short HEAD sha>` (HEAD at verification start; the verifier writes `round-N` subfolders inside). Confirm the path stays under `EVIDENCE_ROOT`; create it with `mkdir -p`; never overwrite an existing directory (append a numeric suffix). Evidence survives worktree removal; never delete it.
+
+| Purpose | Command |
+|---|---|
+| Post verdict on spec | `gh issue comment SPEC_NUMBER --repo TRACKER_REPOSITORY --body-file VERDICT_FILE` |
+| Read back | `gh api repos/TRACKER_REPOSITORY/issues/SPEC_NUMBER/comments/COMMENT_ID` |
+
+Write `VERDICT_FILE` outside the repository and copy it to `EVIDENCE_DIR/verdict.md`. Content, terse: final verdict, verified head commit, PR URL, table of check, result, detail, evidence path, fix rounds (fix commit, findings fixed or unfixed, each round's evidence dir), then skipped checks with errors and the absolute `EVIDENCE_DIR` paths noting they are local to the run host. Post exactly one comment per run, after the last round. Take `COMMENT_ID` from `gh issue comment` output URL (`#issuecomment-ID`). The comment never closes or reopens anything; an unresolved `fail`/`partial` verdict keeps the spec open and the PR draft (see SKILL.md finalize).
 
 ## Closure and cleanup
 
