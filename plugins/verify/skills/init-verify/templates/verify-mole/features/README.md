@@ -23,7 +23,7 @@ TODO(proof): how the app starts for a proof (URL, env vars, data directory, seed
 Each map starts with an H1 and one paragraph on the user-visible behavior, then four H2s in order: `Sub-features`, `How to get to it (user POV)`, `Driving it with Mole`, `Gotchas`. Keep selectors, routes and wire details out: only user paths, required state and observable proof.
 <!-- lang: python -->
 
-- `Driving it with Mole`: one line per scenario: `(sub-feature | scenario): **Given** ...; **When** ...; **Then** ...; **Proof** check (Evidence label), check (Label + Label).` The evidence in parentheses is exactly what the check declares.
+- `Driving it with Mole`: one line per scenario: `**(sub-feature | scenario):** **Given** ...; **When** ...; **Then** ...; **Proof** check (Evidence label), check (Label + Label).` The evidence in parentheses is exactly what the check declares.
 <!-- /lang: python -->
 <!-- lang: typescript -->
 

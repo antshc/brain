@@ -27,7 +27,7 @@ SCENARIOS = list(REGISTRY.scenarios.values())
 MAPS = ROOT / APP.feature_maps
 BANNED = [re.compile(pattern) for pattern in (r"localStorage", r"querySelector", r"page\.locator", r"getByRole", r"get_by_role", r"\w\(\)", r"\*\*Evidence\*\*")] + list(APP.map_banned)
 SECTIONS = ("Sub-features", "How to get to it (user POV)", "Driving it with Mole", "Gotchas")
-LINE = re.compile(r"^\((?P<sub>[a-z0-9-]+) \| (?P<scenario>[a-z0-9-]+)\): (?P<body>.*)$")
+LINE = re.compile(r"^\*{0,2}\((?P<sub>[a-z0-9-]+) \| (?P<scenario>[a-z0-9-]+)\):\*{0,2} (?P<body>.*)$")
 
 MAP_FILES = sorted(file.name for file in MAPS.glob("*.md") if file.name != "README.md")
 INDEX = (MAPS / "README.md").read_text()
@@ -81,7 +81,7 @@ def test_the_map_has_its_four_sections_and_a_line_per_sub_feature(name: str) -> 
         assert len(re.findall(rf"^## {re.escape(section)}$", text, re.M)) == 1, f'{name}.md needs exactly one "{section}" section'
     for sub in FEATURES[name].sub_features:
         bare = sub.id.split(".", 1)[1]
-        assert re.search(rf"^- {re.escape(bare)}\b", text, re.M), f"{name}.md does not list the sub-feature {bare}"
+        assert re.search(rf"^- (?:\*\*)?{re.escape(bare)}\b", text, re.M), f"{name}.md does not list the sub-feature {bare}"
 
 
 @pytest.mark.parametrize("name", NAMES)
