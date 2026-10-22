@@ -85,6 +85,13 @@ copilot plugin install aws@brain
 copilot plugin install proof@brain
 ```
 
+### Skill authoring plugin (skill)
+
+```sh
+(copilot plugin uninstall skill@brain >/dev/null 2>&1 || true) && \
+copilot plugin install skill@brain
+```
+
 
 ### Brain engineering skills
 
@@ -234,6 +241,13 @@ Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: a `mol
 - [maintain-proof](plugins/proof/skills/maintain-proof/SKILL.md): keep maps, adapters and proofs honest as the app changes, and re-prove on a fresh build.
 - [create-verification-skill](plugins/proof/skills/create-verification-skill/SKILL.md): generic fallback that generates a verification skill for any stack (CLI, desktop, other surfaces).
 - [playwright-cli](plugins/proof/skills/playwright-cli/SKILL.md): browser driving helper for ad-hoc exploration and Playwright tests.
+
+### skill
+
+Skill authoring from bundled best practices (repo rules, mattpocock writing-for-agents, Agent Skills KBs).
+
+- [grill-skill](plugins/skill/skills/grill-skill/SKILL.md): interview one question at a time to define purpose, triggers, contract, variant, and constraints; outputs a confirmed skill brief for you to pass to `/write-skill`. Manual-only.
+- [write-skill](plugins/skill/skills/write-skill/SKILL.md): write mode drafts the skill (workflow, probes, or free-form template) then shrinks it, each in a fresh subagent; shrink mode only tightens existing skill, agent, or instructions files while preserving behavior. Manual-only.
 
 ### engineering
 

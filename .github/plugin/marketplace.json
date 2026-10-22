@@ -53,6 +53,11 @@
             "name": "proof",
             "source": "./plugins/proof",
             "description": "Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: mole CLI, receipts, web and API surface adapters, feature maps, and the init-proof setup skill."
+        },
+        {
+            "name": "skill",
+            "source": "./plugins/skill",
+            "description": "Skill authoring: grill a skill idea into a brief, then write and shrink an agent skill from bundled best practices."
         }
     ]
 }
