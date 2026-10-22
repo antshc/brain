@@ -29,7 +29,7 @@ Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, 
 | `description` | yes | Third person; target 100–300 chars; state **when → responsibility → result**; include 3–6 distinctive trigger keywords. |
 | `disable-model-invocation` | no | `true` = human-only; omit when model or other skills must discover it. |
 
-**Description characters:** plain text, single line, max 1024 chars. Separate clauses with `.`, `;`, or `,`. **MUST NOT** use:
+**Description characters:** plain text, max 1024 chars. Separate clauses with `.`, `;`, or `,`. **MUST NOT** use:
 
 | Character | Why |
 |---|---|
@@ -38,9 +38,9 @@ Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, 
 | `: ` (colon + space) | YAML reads it as a nested mapping key |
 | ` #` (space + hash) | YAML starts a comment; rest of description dropped |
 | Leading `-` `?` `:` `[` `]` `{` `}` `,` `&` `*` `!` `\|` `>` `'` `"` `%` `@` `` ` `` | YAML indicator; plain scalar cannot start with it |
-| Tabs, line breaks, leading/trailing whitespace | Multiline/indent parse errors |
+| Tabs, line breaks in a plain scalar, leading/trailing whitespace | Multiline/indent parse errors |
 
-Unavoidable YAML-special character → wrap whole value in single quotes, doubling inner `'` (`'repo''s'`).
+**YAML safety:** frontmatter MUST parse as YAML; a plain scalar containing `: ` or ` #` breaks parsing and the skill silently disappears. Write `description` (and any value with `: `, quotes, backticks, `#`, or a leading `[`, `{`, `*`, `&`, `!`, `%`, `@`) as a folded block scalar: `description: >-` then the text indented two spaces on the next line. Never use `: ` inside a plain scalar.
 
 Name skills by existing verb-prefix family. Start a new family only when needed.
 
