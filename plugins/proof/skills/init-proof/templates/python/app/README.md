@@ -14,6 +14,7 @@ Verifies {{APP_NAME}} like a user, scenario by scenario, and writes a receipt wi
 | `checks/` | you | Named checks. Each declares the evidence it needs. |
 | `adapters/` | you | Evidence sources beyond the browser: database and logs. |
 | `features/surfaces/` | you | One adapter per surface. Turns a call into that surface's wire details and returns one shape. |
+| `AGENT.md` | you | The rules agents follow to write scenarios, flows, checks, pages and components. Read it first. |
 | `{{SKILL_DIR}}/` | you | The agent skill and one map per feature. |
 
 ## Concepts

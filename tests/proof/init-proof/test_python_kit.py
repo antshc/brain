@@ -98,7 +98,7 @@ class TestPythonKitScaffoldOutput:
             "proof/features/__init__.py", "proof/features/example.py", "proof/features/surfaces/web.py", "proof/features/surfaces/api.py",
             "proof/flows/app.py", "proof/pages/home.py", "proof/checks/app.py", "proof/components/dropdown.py", "proof/components/modal.py",
             "proof/components/table.py", "proof/adapters/database.py", "proof/adapters/logs.py",
-            ".github/skills/verify-demo-shop/SKILL.md", ".github/skills/verify-demo-shop/scripts/agent.md", ".github/skills/verify-demo-shop/scripts/component-extractor.md",
+            ".github/skills/verify-demo-shop/SKILL.md", "proof/AGENT.md", ".github/skills/verify-demo-shop/references/component-extractor.md",
         ):
             assert path in result["created"]
         assert not (repo / ".github/agents").exists()
@@ -143,14 +143,18 @@ class TestPythonKitScaffoldOutput:
         assert f"`{MOLE} doctor`" in skill and "`proof/app.py`" in skill
         example = (repo / ".github/skills/verify-demo-shop/features/example.md").read_text()
         assert f"`{MOLE} run example`" in example and "prove --feature" not in skill + example
-        assert "scripts/agent.md" in skill and "Playwright CLI" in (repo / ".github/skills/verify-demo-shop/scripts/agent.md").read_text()
+        agent_doc = (repo / "proof/AGENT.md").read_text()
+        assert "proof/AGENT.md" in skill and "Playwright CLI" in agent_doc and "@flow" in agent_doc and "defineFeature" not in agent_doc
+        assert "pnpm" not in agent_doc and not (repo / ".github/skills/verify-demo-shop/scripts").exists()
 
     def test_the_component_extractor_prompt_is_embedded_in_the_skill(self, repo: Path) -> None:
         run(repo, "both")
-        prompt = (repo / ".github/skills/verify-demo-shop/scripts/component-extractor.md").read_text()
+        prompt = (repo / ".github/skills/verify-demo-shop/references/component-extractor.md").read_text()
         assert "proof/components/" in prompt and "Playwright CLI" in prompt and f"`{MOLE} run <id>`" in prompt and "{{" not in prompt
-        agent_doc = (repo / ".github/skills/verify-demo-shop/scripts/agent.md").read_text()
-        assert "component-extractor.md" in agent_doc
+        assert "<control>.py" in prompt and "<control>.ts" not in prompt
+        skill = (repo / ".github/skills/verify-demo-shop/SKILL.md").read_text()
+        assert "references/component-extractor.md" in skill and "subagent" in skill
+        assert "references/component-extractor.md" in (repo / "proof/AGENT.md").read_text()
 
     def test_kit_and_mole_are_copied_byte_for_byte(self, repo: Path) -> None:
         run(repo, "both")

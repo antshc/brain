@@ -42,10 +42,10 @@ Use `ask_user` (never ask in plain text), one form:
 python3 "<skillDir>/scripts/scaffold.py" --repo "$REPO_PATH" --language "<typescript|python>" --surfaces "<web|api|both>" --app-name "<name>"
 ```
 
-It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, and for the chosen surfaces `proof/adapters/`, `pages/`, `flows/`, `checks/`, `proof/README.md`) and the verify-<app> skill (the only skill it creates; never a `verify-mole` one), and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
+It copies the independent proof lib to `proof/kit/` and the runner that uses it to `mole/`, renders the app seams (`proof/` app config, `proof/features/`, `proof/AGENT.md`, and for the chosen surfaces `proof/adapters/`, `pages/`, `flows/`, `checks/`, `proof/README.md`) and the verify-<app> skill from the one shared `templates/verify-mole/` (the only skill it creates; never a `verify-mole` one). `proof/AGENT.md` holds the scenario-authoring rules; the skill's `references/component-extractor.md` is the subagent prompt for missing UI controls, and gitignores `proof/.runs/`. It never overwrites: existing files are returned in `skipped`.
 
-- typescript: also seeds `proof/components/` and ships `scripts/agent.md` and `scripts/component-extractor.md` in the verify-<app> skill; adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript` (approving esbuild's build script).
-- python: also seeds `proof/components/`, ships `scripts/agent.md` and `scripts/component-extractor.md` in the verify-<app> skill; writes `proof/requirements.txt` (`playwright`, `pytest`, `mypy`) and runs `python3 -m pip install -r proof/requirements.txt` into the active environment; also gitignores `__pycache__/`. A repo that manages dependencies elsewhere (venv, uv, poetry) activates that environment first.
+- typescript: also seeds `proof/components/`; adds the pnpm scripts, `proof/tsconfig.json`, and runs `pnpm add -D` for missing `tsx @playwright/test @types/node typescript` (approving esbuild's build script).
+- python: also seeds `proof/components/`; writes `proof/requirements.txt` (`playwright`, `pytest`, `mypy`) and runs `python3 -m pip install -r proof/requirements.txt` into the active environment; also gitignores `__pycache__/`. A repo that manages dependencies elsewhere (venv, uv, poetry) activates that environment first.
 
 A non-zero exit means the repo was refused; relay `error`. If `install` is not `installed`/`nothing to install`, fix it before step 7. Keep the JSON: it feeds the final report.
 
@@ -88,8 +88,8 @@ Write the one project-local skill, aimed at a cold agent that has never seen the
 
 For each chosen case, following the "Add a feature" steps in `proof/README.md`:
 
-1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read [scripts/agent.md](../../../.github/skills/verify-<app>/scripts/agent.md) in the generated skill and follow it.
-2. Missing reusable UI parts (dropdown, modal, table, form): run a subagent with the prompt in `.github/skills/verify-<app>/scripts/component-extractor.md`; pass the capability needed and the inventory in `proof/components/README.md`. Review the files it returns.
+1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read `proof/AGENT.md` in the repo and follow it.
+2. Missing reusable UI parts (dropdown, modal, table, form): launch a subagent whose prompt is the body of `.github/skills/verify-<app>/references/component-extractor.md`; pass the capability needed and the inventory in `proof/components/README.md`. Review the files it returns.
 3. Write the map `.github/skills/verify-<app>/features/<feature>.md` in the four-section format of `features/README.md`: sub-features, how a user gets there, one unbulleted `**(sub | scenario):**` paragraph per scenario with `**Proof:** check (evidence)`, gotchas. Add its row to `features/README.md`. User words only; no selectors, routes or wire details.
 4. Write page objects, flows and checks in `proof/pages/`, `flows/`, `checks/`; evidence adapters in `proof/adapters/` only when the kit's sources (DOM assertion, API response, network, console, storage, screenshot) do not reach the result.
 5. Write `proof/features/<feature>.ts` with `defineFeature`: `touches`, `surfaces`, sub-features, scenarios composing `.flow()` and `.proof()` in the map's order. Register it in `proof/features/index.ts`.
@@ -98,8 +98,8 @@ For each chosen case, following the "Add a feature" steps in `proof/README.md`:
 
 For each chosen case, following the "Add a scenario" steps in `proof/README.md`:
 
-1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read [scripts/agent.md](../../../.github/skills/verify-<app>/scripts/agent.md) in the generated skill and follow it.
-2. Missing reusable UI parts (dropdown, modal, table, form): run a new subagent session with the prompt in `.github/skills/verify-<app>/scripts/component-extractor.md`; pass the control needed, the feature and page, and the `proof/components/` inventory. Review the components and scenario draft it returns.
+1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read `proof/AGENT.md` in the repo and follow it.
+2. Missing reusable UI parts (dropdown, modal, table, form): launch a new subagent session whose prompt is the body of `.github/skills/verify-<app>/references/component-extractor.md`; pass the control needed, the feature and page, and the `proof/components/` inventory. Review the components and scenario draft it returns.
 3. Write the map `.github/skills/verify-<app>/features/<feature>.md` in the four-section format of `features/README.md`: sub-features, how a user gets there, one unbulleted `**(sub | scenario):**` paragraph per scenario with `**Proof** check (Evidence labels)`, gotchas. Add its row to `features/README.md`. User words only; no selectors, routes or wire details.
 4. Write page objects, flows and checks in `proof/pages/`, `flows/`, `checks/`; evidence adapters in `proof/adapters/` only when the kit's sources (screenshot, network log, API response) do not reach the result.
 5. Write `proof/features/<feature>.py` with the builder: `touches`, `surfaces`, sub-features, scenarios composing flows and checks in the map's order. Register it in `proof/features/__init__.py`.

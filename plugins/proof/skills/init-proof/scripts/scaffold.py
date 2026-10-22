@@ -9,7 +9,10 @@ Surface markers in templates keep a section only when its expression holds for t
   Python      # <surface: api>  ...  # </surface: api>        (own lines)
   Markdown    <!-- surface: web+api -->  ...  <!-- /surface: web+api -->   (own lines or inline)
 Expressions: web, api, web+api (all listed chosen), web-only, api-only (exactly that surface).
-Markers do not nest.
+Markers do not nest, except that a language section may hold surface markers.
+
+Markdown templates shared by both languages keep a section only for one language:
+  <!-- lang: python -->  ...  <!-- /lang: python -->   (own lines or inline; python or typescript)
 """
 
 from __future__ import annotations
@@ -33,19 +36,19 @@ MIN_PYTHON = (3, 10)
 SKILL_DIR = ".github/skills/{skill}"
 SKILL_TEMPLATE = "verify-mole.SKILL.template.md"
 
-# (template folder under templates/, target folder inside the repository, copied byte for byte?)
+# (template folder under templates/, target folder inside the repository, copied byte for byte?); verify-mole is shared by both languages
 TREES = {
     "typescript": [
         ("typescript/kit", "proof/kit", True),
         ("typescript/mole", "mole", True),
         ("typescript/app", "proof", False),
-        ("typescript/verify-mole", SKILL_DIR, False),
+        ("verify-mole", SKILL_DIR, False),
     ],
     "python": [
         ("python/kit", "proof/kit", True),
         ("python/mole", "mole", True),
         ("python/app", "proof", False),
-        ("python/verify-mole", SKILL_DIR, False),
+        ("verify-mole", SKILL_DIR, False),
     ],
 }
 # Files that exist only when their surface is chosen.
@@ -62,9 +65,11 @@ SURFACE_FILES = {
         "proof/features/surfaces/api.py": "api",
     },
 }
-# Template names that differ from their target, so no nested SKILL.md inside this plugin is mistaken for a skill.
+# Template names that differ from their target: no nested SKILL.md inside this plugin is mistaken for a skill, and
+# the scenario-authoring rules live in proof/ beside the code they govern.
 RENAMES = {
     f"{SKILL_DIR}/{SKILL_TEMPLATE}": f"{SKILL_DIR}/SKILL.md",
+    f"{SKILL_DIR}/AGENT.md": "proof/AGENT.md",
 }
 # Per-language text that the shared templates (the verify-<app> skill and maps) refer to.
 COMMAND_PLACEHOLDERS = {
@@ -104,7 +109,9 @@ _EXPR = r"([a-z]+(?:\+[a-z]+)*(?:-only)?)"
 _CODE_BLOCK = re.compile(rf"^[ \t]*(?://|\#) <surface: {_EXPR}>[ \t]*\n(.*?)^[ \t]*(?://|\#) </surface: \1>[ \t]*\n", re.S | re.M)
 _MD_BLOCK = re.compile(rf"^[ \t]*<!-- surface: {_EXPR} -->[ \t]*\n(.*?)^[ \t]*<!-- /surface: \1 -->[ \t]*\n", re.S | re.M)
 _MD_INLINE = re.compile(rf"<!-- surface: {_EXPR} -->(.*?)<!-- /surface: \1 -->", re.S)
-_LEFTOVER = re.compile(r"<surface:|</surface:|<!-- /?surface:|\{\{[A-Z_]+\}\}")
+_LANG_BLOCK = re.compile(r"^[ \t]*<!-- lang: ([a-z]+) -->[ \t]*\n(.*?)^[ \t]*<!-- /lang: \1 -->[ \t]*\n", re.S | re.M)
+_LANG_INLINE = re.compile(r"<!-- lang: ([a-z]+) -->(.*?)<!-- /lang: \1 -->", re.S)
+_LEFTOVER = re.compile(r"<surface:|</surface:|<!-- /?surface:|<!-- /?lang:|\{\{[A-Z_]+\}\}")
 
 
 class ScaffoldError(Exception):
@@ -168,7 +175,7 @@ def _active(expression: str, surfaces: list[str]) -> bool:
 
 
 def render(text: str, surfaces: list[str], app_name: str, language: str = "typescript") -> str:
-    """Drop sections whose surface is not chosen, strip the markers, fill the placeholders."""
+    """Drop sections whose language or surface is not chosen, strip the markers, fill the placeholders."""
 
     def block(match: re.Match[str]) -> str:
         return match.group(2) if _active(match.group(1), surfaces) else ""
@@ -176,6 +183,13 @@ def render(text: str, surfaces: list[str], app_name: str, language: str = "types
     def inline(match: re.Match[str]) -> str:
         return match.group(2) if _active(match.group(1), surfaces) else ""
 
+    def language_section(match: re.Match[str]) -> str:
+        if match.group(1) not in LANGUAGES:
+            raise ScaffoldError(f"Unknown language marker '{match.group(1)}'")
+        return match.group(2) if match.group(1) == language else ""
+
+    text = _LANG_BLOCK.sub(language_section, text)
+    text = _LANG_INLINE.sub(language_section, text)
     text = _CODE_BLOCK.sub(block, text)
     text = _MD_BLOCK.sub(block, text)
     text = _MD_INLINE.sub(inline, text)

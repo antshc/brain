@@ -1179,7 +1179,7 @@ Scenario: Both surfaces create the api adapter and the web page object
 Scenario: Scaffold creates the scenario model layout
   Given a pnpm repository and surfaces web and api
   When scaffold runs
-  Then features, adapters, components, the self-test file and the skill's feature README, example map, agent.md and component-extractor.md exist
+  Then features, adapters, components, the self-test file, proof/AGENT.md and the skill's feature README, example map and references/component-extractor.md exist, and the skill has no scripts folder
 
 Scenario: Web only has no api adapter or api config
   Given surfaces web only
@@ -1199,7 +1199,7 @@ Scenario: No marker or placeholder is left in any file
 Scenario: Skill drives the scenario loop with run flow and receipts
   Given surfaces web and api
   When scaffold runs
-  Then the verify-mole skill names mole run, flow, receipts and scripts/agent.md, and no longer names prove --feature or --surface
+  Then the verify-mole skill names mole run, flow, receipts, proof/AGENT.md and references/component-extractor.md, and no longer names prove --feature or --surface
 
 Scenario: App name is json escaped in app ts and plain in the skill
   Given an app name containing quotes
@@ -1309,6 +1309,16 @@ Scenario: Markdown inline and block markers
   When it is rendered for both surfaces and for web
   Then only the sections whose expression holds remain
 
+Scenario: Language block and inline markers
+  Given Markdown guarded by python and typescript markers, inline and as a block
+  When it is rendered for python and for typescript
+  Then only the sections of the chosen language remain, without markers
+
+Scenario: Unknown language marker is an error
+  Given a marker naming an unknown language
+  When it is rendered
+  Then rendering fails
+
 Scenario: Unknown marker expression is an error
   Given a marker naming an unknown surface
   When it is rendered
@@ -1345,6 +1355,11 @@ Scenario: Template skill is renamed on scaffold
   Given a scaffolded repository
   When the verify-mole folder is listed
   Then it holds SKILL.md and no template-named file
+
+Scenario: One shared verify-mole template serves both languages
+  Given the init-proof templates and a typescript scaffold
+  When the templates and the scaffolded files are listed
+  Then verify-mole exists once with AGENT.md and references/component-extractor.md, no per-language verify-mole folder exists, and the typescript wording lands in proof/AGENT.md and the extractor
 
 Scenario: Every skill has name and description frontmatter
   Given each proof skill
@@ -1407,7 +1422,7 @@ Scenario: Old python is refused and untouched
 Scenario: Both surfaces create the kit, mole, adapters and skill
   Given a repository and surfaces web and api
   When scaffold runs for python
-  Then the python kit, mole, app config, both adapters, requirements, tests, flows, pages, checks, components, evidence adapters, the verify-mole skill with its scenario-authoring rules and the component-extractor agent are created and no TypeScript file is
+  Then the python kit, mole, app config, both adapters, requirements, tests, flows, pages, checks, components, evidence adapters, the verify-mole skill, proof/AGENT.md with the scenario-authoring rules and the references/component-extractor.md subagent prompt are created and no TypeScript file is
 
 Scenario: Web only has no api adapter or api config
   Given surfaces web only
@@ -1434,10 +1449,10 @@ Scenario: Verify mole skill and maps use the python commands
   When the verify-mole files are read
   Then they name python3 -m mole run, proof/app.py and the scenario-authoring rules, and never pnpm or prove --feature
 
-Scenario: The agent template names the component extractor and its rules
+Scenario: The component extractor prompt is embedded in the skill
   Given a python scaffold
-  When the component-extractor agent is read
-  Then it has the name component-extractor, writes to proof/components/ and explores with Playwright CLI
+  When references/component-extractor.md, the skill and proof/AGENT.md are read
+  Then the prompt writes python controls to proof/components/ and explores with Playwright CLI, and the skill and AGENT.md tell the agent to launch a subagent with it
 
 Scenario: Kit and mole are copied byte for byte
   Given a python scaffold
