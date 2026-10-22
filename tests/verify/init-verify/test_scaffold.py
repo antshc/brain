@@ -1,4 +1,4 @@
-"""Proof init-proof scaffold script behavior tests.
+"""Proof init-verify scaffold script behavior tests.
 
 Mapped to TEST_PLAN.md — every class docstring names the Feature,
 every method name is the Scenario in snake_case.
@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-SKILL_DIR = Path(__file__).resolve().parents[3] / "plugins" / "proof" / "skills" / "init-proof"
+SKILL_DIR = Path(__file__).resolve().parents[3] / "plugins" / "verify" / "skills" / "init-verify"
 SCRIPT_PATH = SKILL_DIR / "scripts" / "scaffold.py"
 
 spec = importlib.util.spec_from_file_location("proof_scaffold", SCRIPT_PATH)
@@ -294,24 +294,26 @@ REPO_ROOT = PLUGIN_DIR.parents[1]
 class TestPluginLayout:
     """Feature: Proof Plugin Layout"""
 
-    def test_only_the_three_skills_carry_a_skill_md(self) -> None:
+    def test_only_the_two_skills_carry_a_skill_md(self) -> None:
         found = sorted(p.parent.name for p in PLUGIN_DIR.rglob("SKILL.md"))
-        assert found == ["init-proof", "maintain-proof", "playwright-cli"]
+        assert found == ["init-verify", "playwright-cli"]
 
     def test_plugin_manifest_points_at_the_skills_folder(self) -> None:
         manifest = json.loads((PLUGIN_DIR / "plugin.json").read_text())
-        assert manifest["name"] == "proof"
+        assert manifest["name"] == "verify"
         assert manifest["skills"] == ["./skills"]
 
     def test_marketplace_lists_the_plugin(self) -> None:
         marketplace = json.loads((REPO_ROOT / ".github" / "plugin" / "marketplace.json").read_text())
-        entry = next(p for p in marketplace["plugins"] if p["name"] == "proof")
-        assert entry["source"] == "./plugins/proof"
+        entry = next(p for p in marketplace["plugins"] if p["name"] == "verify")
+        assert entry["source"] == "./plugins/verify"
 
     def test_template_skill_is_renamed_on_scaffold(self, repo: Path) -> None:
         run(repo)
         assert not list((repo / ".github/skills/verify-demo-shop").glob("*.template.md"))
         assert (repo / ".github/skills/verify-demo-shop/SKILL.md").is_file()
+        assert not list((repo / ".github/skills/maintain-verify-demo-shop").glob("*.template.md"))
+        assert (repo / ".github/skills/maintain-verify-demo-shop/SKILL.md").is_file()
 
     def test_one_shared_verify_mole_template_serves_both_languages(self, repo: Path) -> None:
         templates = SKILL_DIR / "templates"
@@ -324,7 +326,7 @@ class TestPluginLayout:
         prompt = (repo / ".github/skills/verify-demo-shop/references/component-extractor.md").read_text()
         assert "<control>.ts" in prompt and "<control>.py" not in prompt
 
-    @pytest.mark.parametrize("skill", ["init-proof", "maintain-proof", "playwright-cli"])
+    @pytest.mark.parametrize("skill", ["init-verify", "playwright-cli"])
     def test_every_skill_has_name_and_description_frontmatter(self, skill: str) -> None:
         head = (PLUGIN_DIR / "skills" / skill / "SKILL.md").read_text().split("---")[1]
         assert f"name: {skill}" in head and "description:" in head

@@ -1,6 +1,6 @@
 # eShop example (reference only)
 
-eShop is the repository this kit was extracted from: a .NET Aspire AppHost, a Blazor storefront (web) and a catalog API behind a mobile-bff proxy (api). These files show what `init-proof` leaves for you to write in the TypeScript scenario model; they are not compiled or copied.
+eShop is the repository this kit was extracted from: a .NET Aspire AppHost, a Blazor storefront (web) and a catalog API behind a mobile-bff proxy (api). These files show what `init-verify` leaves for you to write in the TypeScript scenario model; they are not compiled or copied.
 
 | File | Seam it shows |
 |---|---|

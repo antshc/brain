@@ -56,6 +56,6 @@ pnpm typecheck:proof
 
 ## Upgrading from the v1 kit
 
-v1 had `FEATURES` entries with `prove(kit)`, `features/surfaces/`, `kit.check` and `drive` hooks, and `pnpm mole prove --feature`. There is no compatibility mode: re-run `/init-proof`, which replaces `kit/` and `mole/`, then move each v1 check into a `defineProof`, each adapter call into a page object or flow, and each map into the four-section format.
+v1 had `FEATURES` entries with `prove(kit)`, `features/surfaces/`, `kit.check` and `drive` hooks, and `pnpm mole prove --feature`. There is no compatibility mode: re-run `/init-verify`, which replaces `kit/` and `mole/`, then move each v1 check into a `defineProof`, each adapter call into a page object or flow, and each map into the four-section format.
 
 Environment: `PROOF_URL` (app URL), `PROOF_API_URL` (API base URL), `MOLE_DIR` (isolates a second mole instance). Receipts go to `proof/.runs/` (gitignored). Needs Node 20.12 or newer.

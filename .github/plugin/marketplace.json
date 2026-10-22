@@ -50,9 +50,9 @@
             "description": "AWS documentation, SDK reference, and implementation-constraint research skills."
         },
         {
-            "name": "proof",
-            "source": "./plugins/proof",
-            "description": "Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: mole CLI, receipts, web and API surface adapters, feature maps, and the init-proof setup skill."
+            "name": "verify",
+            "source": "./plugins/verify",
+            "description": "Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: mole CLI, receipts, web and API surface adapters, feature maps, and the init-verify setup skill."
         },
         {
             "name": "skill",

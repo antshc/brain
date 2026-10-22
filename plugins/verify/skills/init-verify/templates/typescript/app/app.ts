@@ -1,7 +1,7 @@
 import type { AppConfig } from "../mole/config";
 
 // The one file that says what this app is. The mole reads it; every value comes from the codebase, not a guess.
-// Resolve each TODO(proof) from the repo (see the init-proof research checklist), then delete the marker.
+// Resolve each TODO(proof) from the repo (see the init-verify research checklist), then delete the marker.
 export const APP: AppConfig = {
   name: {{APP_NAME_JSON}},
   // TODO(proof): the URL the app answers on locally. PROOF_URL overrides it.
