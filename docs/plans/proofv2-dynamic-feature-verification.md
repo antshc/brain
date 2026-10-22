@@ -9,11 +9,11 @@ Use a Markdown feature map with sub-features and compact plain-language BDD scen
 ## Decisions
 
 1. **Copy TypeScript Mole, not Snack.** Start from `plugins/proof/skills/init-proof/templates/typescript/mole/`. Make Mole v2 the single high-level navigation, scenario execution, evidence collection, and receipt runtime. Adopt the useful Snack responsibilities from the handoff without adding a second CLI.
-2. **Preserve the reference feature-map layout.** One Markdown file per feature with `Sub-features`, `How to get to it (user POV)`, `Driving it with Mole`, and `Gotchas`. Under `Driving it with Mole`, write one unbulleted paragraph per scenario, labeled `(sub-feature-id | scenario-id):`. Use compact **Given**, **When**, **Then** clauses separated by semicolons, followed inline by **Proof** and **Evidence**; no separate Flow/Proof/Evidence lists, pipes between clauses, selectors, method names, or YAML manifest.
+2. **Preserve the reference feature-map layout.** One Markdown file per feature with `Sub-features`, `How to get to it (user POV)`, `Driving it with Mole`, and `Gotchas`. Under `Driving it with Mole`, write one unbulleted paragraph per scenario, labeled `(sub-feature-id | scenario-id):`. Use compact **Given**, **When**, **Then** clauses separated by semicolons, followed by a single inline **Proof** clause. Each proof check names its required evidence in parentheses, e.g. `API contains product (API response)`; do not write a separate **Evidence** clause/list, pipes between clauses, selectors, method names, or YAML manifest.
 3. **Run checks from dynamically built scenarios.** The agent authors persisted TypeScript feature-builder modules. Each sub-feature owns one or more named scenarios, each composing reusable flows and attaching proof checks at the correct step. Mole imports the feature registry and executes those checks; it does not infer acceptance rules from the app's current output.
 4. **One implementation of each action.** Interactive `mole flow` and automated `mole run` call the same Page Objects and flows. Proof checks observe state; they do not duplicate navigation.
 5. **Reusable components are code.** A discovery subagent extracts observed controls (dropdowns, modals, tables, forms, tabs, pagination, date pickers, etc.) into project-local TypeScript. Reuse before creating new abstractions.
-6. **Pluggable evidence.** Browser, network, storage, and API collectors ship in the MVP. Database, logs, and test-result collectors use project-owned adapters. Prefer durable business-state readback over screenshots or transient events.
+6. **Every check proves itself with evidence.** Every `ProofCheck` MUST declare its evidence source, capture/persist at least one supporting artifact, and return evidence reference(s) with its verdict. No evidence means ERROR, never PASS. Browser, network, storage, and API collectors ship in the MVP; database, logs, and test-result collectors use project-owned adapters. Prefer durable business-state readback over screenshots or transient events.
 7. **Fresh, auditable runs.** Interactive exploration can reuse a named session; a proving run gets a fresh isolated visitor context, a pinned app revision, step-scoped observations, and append-only receipts. A changed revision makes prior PASS stale.
 8. **Playwright CLI supports authoring and troubleshooting.** The Verify skill tells the agent to explore reachable UI with Playwright CLI before implementing new or changed scenario flows. It also supports investigation of failing scenarios, broken selectors, and Mole diagnostics. Persist discoveries in Page Objects/components/flows; Mole remains the executable scenario/proof/evidence runtime.
 9. **TypeScript for all Proof v2 code.** Mole CLI/runtime, dynamic builders, reusable components, Page Objects, flows, checks, collectors/adapters, scripts, and automated tests MUST be authored in TypeScript. Do not introduce Python or handwritten JavaScript implementations for Proof v2. Markdown instructions/feature maps and JSON tooling configuration remain declarative files; generated JavaScript build output is not source.
@@ -89,15 +89,15 @@ Open the product catalog, select a product, and navigate to the shopping cart.
 
 ## Driving it with Mole
 
-**(add-product | success):** **Given** product is available; **When** customer adds it to cart; **Then** cart contains product. **Proof:** API contains product and UI displays product. **Evidence:** API response, screenshot.
+**(add-product | success):** **Given** product is available; **When** customer adds it to cart; **Then** cart contains product. **Proof:** API contains product (API response); UI displays product (DOM assertion, screenshot).
 
-**(add-product | out-of-stock):** **Given** product is unavailable; **When** customer attempts to add it; **Then** cart remains unchanged. **Proof:** Cart API contains no new item. **Evidence:** API response.
+**(add-product | out-of-stock):** **Given** product is unavailable; **When** customer attempts to add it; **Then** cart remains unchanged. **Proof:** Cart API contains no new item (API response).
 
-**(update-quantity | success):** **Given** cart contains product; **When** customer changes quantity to 2; **Then** quantity and total are updated. **Proof:** API returns expected quantity and total. **Evidence:** API response, screenshot.
+**(update-quantity | success):** **Given** cart contains product; **When** customer changes quantity to 2; **Then** quantity and total are updated. **Proof:** API returns quantity 2 (API response); cart displays correct total (DOM assertion, screenshot).
 
-**(remove-product | success):** **Given** cart contains product; **When** customer removes it; **Then** product disappears. **Proof:** API and UI no longer contain product. **Evidence:** API response, screenshot.
+**(remove-product | success):** **Given** cart contains product; **When** customer removes it; **Then** product disappears. **Proof:** API no longer contains product (API response); UI no longer displays product (DOM assertion, screenshot).
 
-**(persist-cart | reload):** **Given** cart contains product; **When** customer reloads page; **Then** cart retains its contents. **Proof:** API and UI retain product and quantity. **Evidence:** API response, screenshot.
+**(persist-cart | reload):** **Given** cart contains product; **When** customer reloads page; **Then** cart retains its contents. **Proof:** API retains product and quantity (API response); UI retains product and quantity (DOM assertion, screenshot).
 
 ## Gotchas
 
@@ -107,9 +107,9 @@ Open the product catalog, select a product, and navigate to the shopping cart.
 - Start network capture before actions whose requests matter.
 ```
 
-The Markdown contract is authoritative. Each `(sub-feature-id | scenario-id):` is a stable, unique key within its feature: `shopping-cart.add-product.success`. The single pipe separates IDs **only in the label**; do not use pipes to separate **Given**, **When**, **Then**, **Proof**, or **Evidence**. Scenario entries MUST be unbulleted, with no `Scenario:` prefix. **Proof** describes the observable assertion; **Evidence** names the required artifacts. Flow details belong in reusable TypeScript code, while the BDD clauses state behavior.
+The Markdown contract is authoritative. Each `(sub-feature-id | scenario-id):` is a stable, unique key within its feature: `shopping-cart.add-product.success`. The single pipe separates IDs **only in the label**; do not use pipes to separate **Given**, **When**, **Then**, or **Proof**. Scenario entries MUST be unbulleted, with no `Scenario:` prefix. Each semicolon-separated assertion in **Proof** MUST immediately name its supporting evidence in parentheses. Do not use a standalone **Evidence** field; checks and their evidence form one acceptance contract. Flow details belong in reusable TypeScript code, while the BDD clauses state behavior.
 
-The map validator MUST require one **Given**, **When**, **Then**, **Proof**, and **Evidence** in every scenario paragraph. The builder MUST reject duplicate IDs, scenarios referencing unknown sub-features, missing/extra/stale mapped scenarios, or proof/evidence requirements without corresponding executable checks/collectors. Preserve the Markdown text and revision/hash in each receipt.
+The map validator MUST require **Given**, **When**, **Then**, and at least one **Proof** check with named evidence in every scenario paragraph. It MUST reject a check without evidence or an orphan evidence declaration. The builder MUST reject duplicate IDs, scenarios referencing unknown sub-features, missing/extra/stale mapped scenarios, or mapped checks without corresponding executable assertions and collectors. Preserve the Markdown text and revision/hash in each receipt.
 
 ## Dynamic feature builder
 
@@ -138,8 +138,8 @@ export default defineFeature("shopping-cart", feature => {
 - `Feature` groups sub-features; `SubFeature` groups named `Scenario` definitions; `Scenario` supplies ordered `Flow` and `Proof` steps.
 - `FlowContext` holds the active Playwright page, named browser session, typed scenario variables (e.g. selected product ID), and safe runtime helpers.
 - `Flow` performs actual user interactions and returns serializable context additions; it MUST NOT decide business acceptance.
-- `Proof` receives the active context plus evidence adapter access, records focused expected/actual values, and MUST NOT navigate or mutate the app.
-- `EvidenceAdapter` declares availability, scope, read/capture methods, and artifact metadata. Missing required adapters produce ERROR, never PASS.
+- `ProofCheck` receives active context and evidence adapters, declares one or more required evidence sources, evaluates focused expected/actual values, persists supporting artifacts, and returns a `ProofResult` with verdict plus per-check evidence references. It MUST NOT navigate or mutate the app.
+- `EvidenceAdapter` declares availability, scope, read/capture methods, and artifact metadata. Each evaluated `ProofResult` MUST reference its own captured observation artifact, including FAIL results; PASS additionally requires evidence that supports the asserted outcome (not merely a screenshot collected elsewhere). When evidence cannot be captured, return ERROR with a diagnostic artifact if possible, never PASS. A screenshot alone cannot automatically prove a UI requirement without a verified assertion or review.
 - The builder produces a registry keyed by stable `feature.sub-feature.scenario` IDs from Markdown labels. `mole run <feature>.<sub-feature>.<scenario>` runs one; `mole run <feature>.<sub-feature>` runs all mapped scenarios of that sub-feature; `mole run <feature>` runs all scenarios, with a fresh isolated context for each.
 - A check is authored before implementing the feature. The agent may modify a locator/flow after UI changes, but MUST NOT loosen acceptance criteria to turn red into green.
 
@@ -148,12 +148,12 @@ export default defineFeature("shopping-cart", feature => {
 1. Select feature/sub-feature/scenario IDs and confirm Markdown-to-registry synchronization.
 2. Run `doctor`; confirm app readiness, prerequisites, enabled collectors, and matching built revision.
 3. Start an isolated visitor and initialize collectors **before** actions whose network or log events matter.
-4. Execute each selected scenario's flows in order. At a `.proof(...)` checkpoint, collect observations from the same run, evaluate checks matching its inline **Proof**, and store artifacts required by inline **Evidence**.
-5. Save step results, flow traces, screenshots/API readbacks and failures as immutable run artifacts; persist one aggregate receipt plus per-check details.
+4. Execute each selected scenario's flows in order. At a `.proof(...)` checkpoint, each check collects its declared supporting evidence from the same run, evaluates the assertion, and persists its artifact reference(s) with its own verdict. Collectors for transient network/log events MUST be active before their triggering action.
+5. Save step results, flow traces, screenshots/API readbacks and failures as immutable run artifacts; persist one aggregate receipt plus per-check results (check ID, expected/actual, verdict, evidence source, artifact IDs, capture time). Evaluated FAIL must also retain the observed failing evidence; lack of required evidence is ERROR. Reject aggregate PASS if any check lacks its own required evidence.
 6. Detect a source or served-build revision change during the run: ERROR/STALE; never reuse the earlier PASS.
 7. Close only run-owned resources; preserve all receipts, including failed attempts.
 
-Verdicts: `PASS` (all required checks and artifacts), `FAIL` (observed requirement violated), `ERROR`/`CAN'T TELL` (environment/collector cannot verify), `NOT_REACHED` (later checkpoint skipped after an earlier stop). An absent required UI control can produce FAIL when the app and scenario preconditions are valid; missing infrastructure produces ERROR. Screenshots may need separate human/agent semantic review and are not automatically proof of behavior.
+Verdicts: `PASS` (assertion verified and its supporting evidence captured), `FAIL` (observed requirement violated, with the observed failure captured when possible), `ERROR`/`CAN'T TELL` (environment/collector or required evidence cannot verify), `NOT_REACHED` (later checkpoint skipped after an earlier stop). An absent required UI control can produce FAIL when the app and scenario preconditions are valid; missing infrastructure produces ERROR. Screenshots may need separate human/agent semantic review and are not automatically proof of behavior.
 
 Prefer narrow API/resource matching (e.g. selected product ID and quantity) over entire JSON equality. Use database readback only when a suitable public API cannot establish the result. Explicitly assert browser errors if they affect completion; merely collecting them does not fail a scenario.
 
@@ -177,7 +177,7 @@ The generated Verify skill MUST explicitly read `scripts/agent.md` (a reference 
 2. Search existing components, Page Objects, flows, and checks before authoring anything.
 3. **Before authoring new or changed browser scenarios/flows, use Playwright CLI to explore the available app:** navigate as a user, inspect accessibility snapshots, verify stable locators and control behavior, and identify reusable parts. If the target GUI is not implemented yet, inspect source instead; define expected behavior, mark UI selectors unverified, and do not fabricate observations.
 4. Call the discovery subagent for missing reusable controls; pass CLI observations and component inventory. Persist verified discoveries in TypeScript Page Objects/components/flows rather than ephemeral CLI snapshots.
-5. Persist new flows and builder definitions; write unbulleted `(sub-feature-id | scenario-id):` Markdown lines with compact **Given**/**When**/**Then**/**Proof**/**Evidence** clauses. Keep flows in TypeScript, not Markdown.
+5. Persist new flows and builder definitions; write unbulleted `(sub-feature-id | scenario-id):` Markdown lines with compact **Given**/**When**/**Then** and **Proof** clauses. Every proof assertion MUST identify its evidence in parentheses; do not write a separate **Evidence** clause. Keep flows in TypeScript, not Markdown.
 6. Execute `mole doctor`, then selected scenario(s). **Use Playwright CLI when useful to troubleshoot failed steps, missing elements, navigation, and Mole errors**; compare its observations with Mole receipts, then repair flows/checks without weakening acceptance rules.
 7. Rerun proving through Mole on a fresh isolated context/revision. CLI exploration MUST NOT produce PASS verdicts or replace required Mole evidence. Do not declare completion with stale, partial, or missing required evidence. After two failed repair attempts at the same check, return the receipt and ask for human input.
 
@@ -206,20 +206,20 @@ mole down                    Stop only resources started by Mole
 4. Replace static feature drive/proof wiring with imported feature builders and a validated registry, including scenario-level coverage and Markdown-to-builder matching.
 5. Implement shared interactive-flow/scenario execution, isolated proving contexts, checkpoint timing, collectors, and receipts.
 6. Implement reusable component/Page Object/flow directories and `component-extractor` subagent, with Playwright CLI exploration guidance and generated-code validation.
-7. Generate compact feature maps with the four required sections and unbulleted `(sub-feature | scenario):` entries, project-local Verify skill and `scripts/agent.md` requiring Playwright CLI UI exploration where available and allowing scenario/Mole troubleshooting; add map-to-registry consistency tests.
+7. Generate compact feature maps with four required sections, unbulleted `(sub-feature | scenario):` entries, and per-check inline evidence under **Proof**; generate project-local Verify skill and `scripts/agent.md` requiring Playwright CLI UI exploration where available and allowing scenario/Mole troubleshooting; add map-to-registry and proof-to-evidence consistency tests.
 8. Test an e-commerce cart feature with TypeScript tests across failing-before-implementation, passing-after-implementation and stale-revision runs; exercise a dropdown, modal, and table reused across scenarios.
-9. Run TypeScript type checking and relevant tests for the runtime, generated flows, checks, adapters, and scaffold; verify no handwritten JavaScript/Python logic was introduced.
+9. Run TypeScript type checking and relevant tests for the runtime, generated flows, checks, adapters, and scaffold; verify no handwritten JavaScript/Python logic was introduced. Test missing evidence, wrong evidence attribution, and failed capture: none may produce PASS.
 
 ## Completion criteria
 
 - The new plugin installs independently; Proof v1 still installs and passes its tests.
 - All Proof v2 executable source and tests (Mole, builders, UI components, flows, checks, adapters, and scaffolding) are TypeScript and pass type checking.
-- Feature maps retain four reference sections; unbulleted `(sub-feature | scenario):` lines contain **Given**, **When**, **Then**, **Proof**, and **Evidence** inline, with no pipe delimiters inside scenario clauses.
+- Feature maps retain four reference sections; unbulleted `(sub-feature | scenario):` lines contain **Given**, **When**, **Then**, and **Proof**. Every proof check names its evidence inline in parentheses; there is no separate **Evidence** clause.
 - Dynamically built scenarios run their registered checks at the correct checkpoints, including multiple scenarios per sub-feature, not through a duplicate test path.
 - The Verify skill instructs Playwright CLI exploration before new/changed browser scenario code (when the GUI exists) and allows CLI-assisted troubleshooting; these observations never replace Mole proof evidence.
 - The discovery subagent persists reusable TypeScript controls and the agent reuses them across flows.
 - Interactive navigation and proof runs share flow implementations but proof runs use isolated visitor state.
-- Browser/API evidence and actionable receipts survive cleanup and are bound to a single revision.
+- Every evaluated check has its own persisted observation artifact and receipt reference (including FAIL); PASS requires supporting evidence, while missing evidence yields ERROR. Browser/API artifacts survive cleanup and are bound to one revision.
 - Missing UI, missing prerequisites, incomplete evidence and stale receipts cannot yield PASS.
 
 ## Non-goals
