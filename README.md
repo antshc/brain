@@ -186,6 +186,7 @@ Code and technical solution review skills with modular standards and guidance.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
 - [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from a standalone `[#{{initiative-id}}]` marker in the PR description; accepts a user PR URL or an implement-spec call and fetches the diff into a fresh detached review worktree without cloning.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
+- [blast-radius](plugins/review/skills/blast-radius/SKILL.md): find what a change could break elsewhere and prove the one safety fact by running real code. Sourced from [cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack/skills/blast-radius); manual-only.
 
 ### dig
 
