@@ -16,7 +16,16 @@ Use a Markdown feature map with sub-features and compact plain-language BDD scen
 6. **Pluggable evidence.** Browser, network, storage, and API collectors ship in the MVP. Database, logs, and test-result collectors use project-owned adapters. Prefer durable business-state readback over screenshots or transient events.
 7. **Fresh, auditable runs.** Interactive exploration can reuse a named session; a proving run gets a fresh isolated visitor context, a pinned app revision, step-scoped observations, and append-only receipts. A changed revision makes prior PASS stale.
 8. **Playwright CLI supports authoring and troubleshooting.** The Verify skill tells the agent to explore reachable UI with Playwright CLI before implementing new or changed scenario flows. It also supports investigation of failing scenarios, broken selectors, and Mole diagnostics. Persist discoveries in Page Objects/components/flows; Mole remains the executable scenario/proof/evidence runtime.
-9. **Keep `proof` v1 intact.** Do not overwrite its templates or generated project files. `proofv2` installs side-by-side with distinct names and paths.
+9. **TypeScript for all Proof v2 code.** Mole CLI/runtime, dynamic builders, reusable components, Page Objects, flows, checks, collectors/adapters, scripts, and automated tests MUST be authored in TypeScript. Do not introduce Python or handwritten JavaScript implementations for Proof v2. Markdown instructions/feature maps and JSON tooling configuration remain declarative files; generated JavaScript build output is not source.
+10. **Keep `proof` v1 intact.** Do not overwrite its templates or generated project files. `proofv2` installs side-by-side with distinct names and paths.
+
+## TypeScript implementation boundary
+
+- **Runtime:** Copy and refactor the existing Node.js TypeScript Mole implementation. Keep one CLI and shared runtime contracts in `.ts` files; reuse its current TypeScript execution/build tooling where suitable.
+- **Generated project code:** `verify/features`, `components`, `pages`, `flows`, `checks`, `adapters`, and any executable `scripts` MUST contain TypeScript source (`.ts`), including project-specific database/log/test-result adapters.
+- **Plugin tooling and tests:** Scaffolding/generation helpers, CLI tests, scenario tests, component tests, adapter tests, and contract validation MUST be TypeScript. Run TypeScript type checking and relevant tests as completion gates.
+- **Non-code files:** `SKILL.md`, `agent.md`, feature maps, receipts, `package.json`, and `tsconfig.json` may use Markdown/JSON. Application repositories may use any language; only Proof v2's integration code is TypeScript. Generated JavaScript distribution files, if required by Node, are build artifacts and MUST NOT be manually maintained.
+- **Playwright CLI:** CLI exploration can run its documented commands, but persisted reusable navigation and proof logic MUST be TypeScript imported by Mole.
 
 ## Runtime responsibilities
 
@@ -41,6 +50,7 @@ Mole uses Playwright's TypeScript API directly for imported scenarios. The agent
     shopping-cart.md
   scripts/
     agent.md               # explicitly loaded scenario-authoring instructions
+    setup.ts               # TypeScript project bootstrap, if needed
 verify/
   features/
     index.ts               # generated/maintained registry
@@ -51,7 +61,10 @@ verify/
   checks/                  # durable assertion functions
   adapters/                # project-specific evidence sources
   .runs/                   # gitignored observations and receipts
-mole/                      # v2 runtime copied/refactored from TypeScript Mole
+mole/                      # TypeScript CLI/runtime copied/refactored from TypeScript Mole
+  *.ts                     # command, browser, collector, receipt, and runner source
+package.json               # Node scripts and dependencies
+tsconfig.json              # strict TypeScript type checking
 ```
 
 The plugin sources live under `plugins/proofv2/` with `plugin.json`, `skills/init-proofv2`, `skills/verify`, `skills/maintain-proofv2`, templates, and `agents/component-extractor.agent.md`. Register the new plugin in `.github/plugin/marketplace.json`.
@@ -187,18 +200,20 @@ mole down                    Stop only resources started by Mole
 
 ## Work packages
 
-1. Create `plugins/proofv2` skeleton, marketplace entry and separate `init-proofv2` scaffold. Copy v1 TypeScript Mole source without touching v1.
-2. Preserve Mole lifecycle, doctor, revision, CDP/event logging and receipt history; add regression tests before refactoring.
+1. Create `plugins/proofv2` skeleton, marketplace entry and separate `init-proofv2` scaffold. Copy v1 TypeScript Mole source without touching v1; keep all new executable plugin/scaffold logic in TypeScript.
+2. Preserve Mole lifecycle, doctor, revision, CDP/event logging and receipt history; add TypeScript regression tests before refactoring.
 3. Introduce typed `Feature`, `SubFeature`, `Scenario`, `ScenarioStep`, `FlowContext`, `Flow`, `ProofCheck`, `EvidenceAdapter`, and `Receipt` contracts.
 4. Replace static feature drive/proof wiring with imported feature builders and a validated registry, including scenario-level coverage and Markdown-to-builder matching.
 5. Implement shared interactive-flow/scenario execution, isolated proving contexts, checkpoint timing, collectors, and receipts.
 6. Implement reusable component/Page Object/flow directories and `component-extractor` subagent, with Playwright CLI exploration guidance and generated-code validation.
 7. Generate compact feature maps with the four required sections and unbulleted `(sub-feature | scenario):` entries, project-local Verify skill and `scripts/agent.md` requiring Playwright CLI UI exploration where available and allowing scenario/Mole troubleshooting; add map-to-registry consistency tests.
-8. Test an e-commerce cart feature across failing-before-implementation, passing-after-implementation and stale-revision runs; exercise a dropdown, modal, and table reused across scenarios.
+8. Test an e-commerce cart feature with TypeScript tests across failing-before-implementation, passing-after-implementation and stale-revision runs; exercise a dropdown, modal, and table reused across scenarios.
+9. Run TypeScript type checking and relevant tests for the runtime, generated flows, checks, adapters, and scaffold; verify no handwritten JavaScript/Python logic was introduced.
 
 ## Completion criteria
 
 - The new plugin installs independently; Proof v1 still installs and passes its tests.
+- All Proof v2 executable source and tests (Mole, builders, UI components, flows, checks, adapters, and scaffolding) are TypeScript and pass type checking.
 - Feature maps retain four reference sections; unbulleted `(sub-feature | scenario):` lines contain **Given**, **When**, **Then**, **Proof**, and **Evidence** inline, with no pipe delimiters inside scenario clauses.
 - Dynamically built scenarios run their registered checks at the correct checkpoints, including multiple scenarios per sub-feature, not through a duplicate test path.
 - The Verify skill instructs Playwright CLI exploration before new/changed browser scenario code (when the GUI exists) and allows CLI-assisted troubleshooting; these observations never replace Mole proof evidence.
@@ -209,7 +224,7 @@ mole down                    Stop only resources started by Mole
 
 ## Non-goals
 
-- Python runtime in the v2 MVP.
+- Python runtime, Python scaffolding, or handwritten JavaScript runtime modules in the v2 MVP.
 - Runtime LLM interpretation of uncompiled Markdown as an executable test; Markdown remains the acceptance contract, not the runner.
 - Replacing existing unit/integration/E2E test suites.
 - A second Snack executable or Playwright-control stack.
