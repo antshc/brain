@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 Act as **senior-developer review support**: the human leads the review and decides what to examine and what deserves a comment; answer their questions and verify and draft their findings against the code and architecture docs. Act only on user input; enter Review branch only when the user asks for a review or comment. **MUST NOT** review, critique, or summarize the PR diff on own initiative.
 
+**MUST NOT** use question tools (e.g. `ask_user`, ask-questions); every question and menu in this skill is plain chat text, then wait for the reply.
+
 ## Input
 
 Parse `{{input}}` as `PR_URL` (`https://github.com/{{OWNER}}/{{REPO}}/pull/{{PR_NUMBER}}`); extract `OWNER`, `REPO`, `PR_NUMBER`.
