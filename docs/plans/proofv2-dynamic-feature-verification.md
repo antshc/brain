@@ -15,7 +15,8 @@ Use a Markdown feature map with sub-features and compact plain-language BDD scen
 5. **Reusable components are code.** A discovery subagent extracts observed controls (dropdowns, modals, tables, forms, tabs, pagination, date pickers, etc.) into project-local TypeScript. Reuse before creating new abstractions.
 6. **Pluggable evidence.** Browser, network, storage, and API collectors ship in the MVP. Database, logs, and test-result collectors use project-owned adapters. Prefer durable business-state readback over screenshots or transient events.
 7. **Fresh, auditable runs.** Interactive exploration can reuse a named session; a proving run gets a fresh isolated visitor context, a pinned app revision, step-scoped observations, and append-only receipts. A changed revision makes prior PASS stale.
-8. **Keep `proof` v1 intact.** Do not overwrite its templates or generated project files. `proofv2` installs side-by-side with distinct names and paths.
+8. **Playwright CLI supports authoring and troubleshooting.** The Verify skill tells the agent to explore reachable UI with Playwright CLI before implementing new or changed scenario flows. It also supports investigation of failing scenarios, broken selectors, and Mole diagnostics. Persist discoveries in Page Objects/components/flows; Mole remains the executable scenario/proof/evidence runtime.
+9. **Keep `proof` v1 intact.** Do not overwrite its templates or generated project files. `proofv2` installs side-by-side with distinct names and paths.
 
 ## Runtime responsibilities
 
@@ -28,7 +29,7 @@ Use a Markdown feature map with sub-features and compact plain-language BDD scen
 | `runProof` always creates its own page | Move browser-context ownership to the scenario runner; checks observe the active scenario context. |
 | Latest and historical receipts | Keep; add scenario/sub-feature ID, step, flow trace, expected/actual, observation provenance, and artifact references. |
 
-Mole uses Playwright's TypeScript API directly for imported scenarios. Playwright CLI remains an optional exploration/discovery instrument. This avoids the `run-code` restriction on imports in reusable multi-file flows.
+Mole uses Playwright's TypeScript API directly for imported scenarios. The agent MUST use Playwright CLI to inspect the reachable UI before authoring new/changed browser flows, when a live UI is available; it MAY use the CLI during scenario troubleshooting and Mole failure diagnosis. Playwright CLI is an agent-side inspection tool, not a runtime dependency or substitute for Mole's proof checks. This avoids the `run-code` restriction on imports in reusable multi-file flows.
 
 ## Generated project structure
 
@@ -148,7 +149,7 @@ Prefer narrow API/resource matching (e.g. selected product ID and quantity) over
 `agents/component-extractor.agent.md` is called during initialization and whenever a flow needs a missing or stale UI capability. It:
 
 1. Reads the current component/Page Object/flow inventory.
-2. Inspects source and live UI with Playwright, including accessibility roles, behavior, and repeated patterns.
+2. Uses Playwright CLI to inspect reachable live UI (accessibility snapshots, roles, navigation, and control behavior), alongside source inspection. If the UI does not exist yet, records the missing surface and leaves selectors unverified.
 3. Reuses or creates project-local components for controls such as dropdowns, modals, tables, forms, tabs, pagination, and date pickers.
 4. Persists scoped TypeScript files, focused component tests, and a concise inventory/usage report.
 5. Reports unverified components when the GUI does not yet exist; never invents observed selectors or silently weakens proofs.
@@ -161,10 +162,11 @@ The generated Verify skill MUST explicitly read `scripts/agent.md` (a reference 
 
 1. Read the feature map and select relevant scenarios under their sub-features.
 2. Search existing components, Page Objects, flows, and checks before authoring anything.
-3. Call the discovery subagent for missing reusable controls.
-4. Persist new flows and builder definitions; write unbulleted `(sub-feature-id | scenario-id):` Markdown lines with compact **Given**/**When**/**Then**/**Proof**/**Evidence** clauses. Keep flows in TypeScript, not Markdown.
-5. Execute `mole doctor`, then the selected scenario(s), inspect every failed/missing check and its artifacts, and re-run on a fresh revision.
-6. Do not declare completion with stale, partial, or missing required evidence. After two failed repair attempts at the same check, return the receipt and ask for human input.
+3. **Before authoring new or changed browser scenarios/flows, use Playwright CLI to explore the available app:** navigate as a user, inspect accessibility snapshots, verify stable locators and control behavior, and identify reusable parts. If the target GUI is not implemented yet, inspect source instead; define expected behavior, mark UI selectors unverified, and do not fabricate observations.
+4. Call the discovery subagent for missing reusable controls; pass CLI observations and component inventory. Persist verified discoveries in TypeScript Page Objects/components/flows rather than ephemeral CLI snapshots.
+5. Persist new flows and builder definitions; write unbulleted `(sub-feature-id | scenario-id):` Markdown lines with compact **Given**/**When**/**Then**/**Proof**/**Evidence** clauses. Keep flows in TypeScript, not Markdown.
+6. Execute `mole doctor`, then selected scenario(s). **Use Playwright CLI when useful to troubleshoot failed steps, missing elements, navigation, and Mole errors**; compare its observations with Mole receipts, then repair flows/checks without weakening acceptance rules.
+7. Rerun proving through Mole on a fresh isolated context/revision. CLI exploration MUST NOT produce PASS verdicts or replace required Mole evidence. Do not declare completion with stale, partial, or missing required evidence. After two failed repair attempts at the same check, return the receipt and ask for human input.
 
 ## Proposed CLI
 
@@ -190,8 +192,8 @@ mole down                    Stop only resources started by Mole
 3. Introduce typed `Feature`, `SubFeature`, `Scenario`, `ScenarioStep`, `FlowContext`, `Flow`, `ProofCheck`, `EvidenceAdapter`, and `Receipt` contracts.
 4. Replace static feature drive/proof wiring with imported feature builders and a validated registry, including scenario-level coverage and Markdown-to-builder matching.
 5. Implement shared interactive-flow/scenario execution, isolated proving contexts, checkpoint timing, collectors, and receipts.
-6. Implement reusable component/Page Object/flow directories and `component-extractor` subagent, with generated-code validation.
-7. Generate compact feature maps with the four required sections and unbulleted `(sub-feature | scenario):` entries, project-local Verify skill and `scripts/agent.md`; add map-to-registry consistency tests.
+6. Implement reusable component/Page Object/flow directories and `component-extractor` subagent, with Playwright CLI exploration guidance and generated-code validation.
+7. Generate compact feature maps with the four required sections and unbulleted `(sub-feature | scenario):` entries, project-local Verify skill and `scripts/agent.md` requiring Playwright CLI UI exploration where available and allowing scenario/Mole troubleshooting; add map-to-registry consistency tests.
 8. Test an e-commerce cart feature across failing-before-implementation, passing-after-implementation and stale-revision runs; exercise a dropdown, modal, and table reused across scenarios.
 
 ## Completion criteria
@@ -199,6 +201,7 @@ mole down                    Stop only resources started by Mole
 - The new plugin installs independently; Proof v1 still installs and passes its tests.
 - Feature maps retain four reference sections; unbulleted `(sub-feature | scenario):` lines contain **Given**, **When**, **Then**, **Proof**, and **Evidence** inline, with no pipe delimiters inside scenario clauses.
 - Dynamically built scenarios run their registered checks at the correct checkpoints, including multiple scenarios per sub-feature, not through a duplicate test path.
+- The Verify skill instructs Playwright CLI exploration before new/changed browser scenario code (when the GUI exists) and allows CLI-assisted troubleshooting; these observations never replace Mole proof evidence.
 - The discovery subagent persists reusable TypeScript controls and the agent reuses them across flows.
 - Interactive navigation and proof runs share flow implementations but proof runs use isolated visitor state.
 - Browser/API evidence and actionable receipts survive cleanup and are bound to a single revision.
