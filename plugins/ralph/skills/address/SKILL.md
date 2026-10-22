@@ -1,6 +1,6 @@
 ---
 name: address
-description: Address the review discussion on a pull request — group its comments into issues, investigate each against the code, fix what needs fixing, and reply to every thread. Rerunnable: a run with nothing left to answer stops at the gate. Use when given a PR URL and asked to handle its review comments.
+description: Address the review discussion on a pull request; group its comments into issues, investigate each against the code, fix what needs fixing, and reply to every thread. Rerunnable, a run with nothing left to answer stops at the gate. Use when given a PR URL and asked to handle its review comments.
 argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 ---
 
