@@ -78,11 +78,11 @@ copilot plugin install ms@brain
 copilot plugin install aws@brain
 ```
 
-### Proof plugin (proof)
+### Verify plugin (verify)
 
 ```sh
-(copilot plugin uninstall proof@brain >/dev/null 2>&1 || true) && \
-copilot plugin install proof@brain
+(copilot plugin uninstall verify@brain >/dev/null 2>&1 || true) && \
+copilot plugin install verify@brain
 ```
 
 ### Skill authoring plugin (skill)
