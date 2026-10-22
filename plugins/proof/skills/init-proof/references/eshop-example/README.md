@@ -1,14 +1,18 @@
 # eShop example (reference only)
 
-eShop is the repository this kit was extracted from: a .NET Aspire AppHost, a Blazor storefront (web) and a catalog API behind a mobile-bff proxy (api). These files are a worked example of what `/init-proof` leaves for you to write; they are not compiled or copied.
+eShop is the repository this kit was extracted from: a .NET Aspire AppHost, a Blazor storefront (web) and a catalog API behind a mobile-bff proxy (api). These files show what `init-proof` leaves for you to write in the TypeScript scenario model; they are not compiled or copied.
 
 | File | Seam it shows |
 |---|---|
 | `app.ts` | `proof/app.ts`: AppHost start command, SDK prerequisite, `aspire describe` API discovery, Blazor settle and snapshot hooks. |
-| `types.ts` | `proof/features/surfaces/types.ts`: one shape per contract (`CatalogList`, `ProductShow`) shared by every surface. |
-| `web.ts` | `proof/features/surfaces/web.ts`: all selectors, routes and URL state of the storefront. |
-| `api.ts` | `proof/features/surfaces/api.ts`: versioning, 0-based paging, ids to names, hidden from features. |
-| `catalog.ts` | `proof/features/catalog.ts`: the contract checked on each surface, plus a block for what only the web has. |
-| `catalog.md` | the feature map: Contract, Driving it, Web only, Gotchas. |
+| `adapters/api.ts` | `proof/adapters/api.ts`: the `api-response` source with the proxy's `api-version` query. |
+| `components/filter-group.ts` | `proof/components/`: a reusable part (a group of filter tags). |
+| `pages/catalog-page.ts` | `proof/pages/`: all selectors, routes and URL rules of the storefront catalog. |
+| `flows/browse-catalog.ts` | `proof/flows/`: user actions that return variables, never a verdict. |
+| `checks/catalog.ts` | `proof/checks/`: proof checks that observe through declared evidence and return a Finding. |
+| `features/catalog.ts` | `proof/features/catalog.ts`: `defineFeature` with sub-features, scenarios, flows and proofs. |
+| `catalog.md` | the feature map: four sections, one paragraph per scenario with its evidence. |
 
-Differences from the generic kit: eShop's `mole catalog list` and `mole product show` were hard-coded commands. In the generic kit they are a feature's `drive` hook (`{ usage, summary, run(call) }` in `proof/features/index.ts`), so `pnpm mole catalog list --page 2 --surface api` works the same way. eShop also had an optional LLM `judge` command; it is not part of the kit.
+`v1/` keeps the older per-surface adapter shape (`observe`, `kit.check`, `drive` hooks) that the Python kit still uses: `types.ts`, `web.ts`, `api.ts`, `catalog.ts` and the Contract-style `catalog.md`.
+
+eShop also had an optional LLM `judge` command; it is not part of the kit.

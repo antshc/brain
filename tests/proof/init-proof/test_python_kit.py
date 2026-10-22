@@ -95,8 +95,10 @@ class TestPythonKitScaffoldOutput:
         result = run(repo, "both")
         for path in (
             "mole/mole.py", "mole/__main__.py", "proof/kit/run.py", "proof/app.py", "proof/requirements.txt", "proof/test_features.py",
-            "proof/features/__init__.py", "proof/features/surfaces/web.py", "proof/features/surfaces/api.py",
-            ".github/skills/verify-mole/SKILL.md",
+            "proof/features/__init__.py", "proof/features/example.py", "proof/features/surfaces/web.py", "proof/features/surfaces/api.py",
+            "proof/flows/app.py", "proof/pages/home.py", "proof/checks/app.py", "proof/components/dropdown.py", "proof/components/modal.py",
+            "proof/components/table.py", "proof/adapters/database.py", "proof/adapters/logs.py",
+            ".github/skills/verify-mole/SKILL.md", ".github/skills/verify-mole/scripts/agent.md", ".github/agents/component-extractor.agent.md",
         ):
             assert path in result["created"]
         assert not list((repo / "proof").rglob("*.ts"))
@@ -138,7 +140,14 @@ class TestPythonKitScaffoldOutput:
             assert "pnpm" not in path.read_text(), f"pnpm left in {path.relative_to(repo)}"
         skill = (repo / ".github/skills/verify-mole/SKILL.md").read_text()
         assert f"`{MOLE} doctor`" in skill and "`proof/app.py`" in skill
-        assert f"prove: {MOLE} prove --feature example" in (repo / ".github/skills/verify-mole/features/example.md").read_text()
+        example = (repo / ".github/skills/verify-mole/features/example.md").read_text()
+        assert f"`{MOLE} run example`" in example and "prove --feature" not in skill + example
+        assert "scripts/agent.md" in skill and "Playwright CLI" in (repo / ".github/skills/verify-mole/scripts/agent.md").read_text()
+
+    def test_the_agent_template_names_the_component_extractor_and_its_rules(self, repo: Path) -> None:
+        run(repo, "both")
+        agent = (repo / ".github/agents/component-extractor.agent.md").read_text()
+        assert agent.startswith("---\nname: component-extractor\n") and "proof/components/" in agent and "Playwright CLI" in agent
 
     def test_kit_and_mole_are_copied_byte_for_byte(self, repo: Path) -> None:
         run(repo, "both")
@@ -156,8 +165,10 @@ class TestPythonKitScaffoldOutput:
 
     def test_example_map_lists_exactly_the_chosen_surfaces(self, repo: Path) -> None:
         run(repo, "api")
-        frontmatter = (repo / ".github/skills/verify-mole/features/example.md").read_text().split("---")[1]
-        assert "surfaces:\n  - api" in frontmatter and "web" not in frontmatter
+        example = (repo / ".github/skills/verify-mole/features/example.md").read_text()
+        assert "(API response)" in example and "network log" not in example
+        assert 'surfaces=["api"]' in (repo / "proof/features/example.py").read_text()
+        assert "NetworkLog" not in (repo / "proof/checks/app.py").read_text()
 
     def test_unresolved_todo_markers_remain_for_the_research_step(self, repo: Path) -> None:
         run(repo, "both")
@@ -257,7 +268,7 @@ class TestPythonKitEngine:
 
     def test_selftest_catches_a_map_that_drifted_from_the_registry(self, repo: Path) -> None:
         self._scaffold(repo)
-        (repo / ".github/skills/verify-mole/features/orphan.md").write_text("---\nfeature: orphan\n---\n")
+        (repo / ".github/skills/verify-mole/features/orphan.md").write_text("# orphan\n")
         result = self._python(repo, "-m", "pytest", "proof/test_features.py", "-q", "-p", "no:cacheprovider", check=False)
         assert result.returncode != 0 and "every_feature_has_a_map" in result.stdout
 
@@ -273,7 +284,7 @@ class TestPythonKitEngine:
     def test_help_lists_commands_with_the_python_invocation(self, repo: Path) -> None:
         self._scaffold(repo)
         out = self._python(repo, "-m", "mole", "help").stdout
-        assert f"Usage: {MOLE} <command>" in out and "prove [--feature NAME]" in out
+        assert f"Usage: {MOLE} <command>" in out and "run [id ...]" in out and "flow <id>" in out and "prove [--feature" not in out
 
     def test_unknown_command_exits_2_with_a_next_step(self, repo: Path) -> None:
         self._scaffold(repo)
@@ -323,6 +334,194 @@ http.server.HTTPServer(("127.0.0.1", int(sys.argv[1])), Handler).serve_forever()
 """
 
 
+SHOP_SERVER = '''\
+import http.server, sys
+
+PAGE = b"""<html><head><title>Shop</title></head><body><h1>Shop</h1>
+<label>Sort by <select aria-label="Sort by" id="sort"><option>Name</option><option>Price</option></select></label>
+<table aria-label="Products"><thead><tr><th>Name</th><th>Price</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table>
+<div role="dialog" aria-label="Product details" id="details" hidden></div>
+<script>
+const products = [{name: 'Mug', price: 20}, {name: 'Pen', price: 10}, {name: 'Lamp', price: 30}];
+const rows = document.getElementById('rows');
+const details = document.getElementById('details');
+function render(items) {
+  rows.innerHTML = '';
+  for (const item of items) {
+    const row = rows.insertRow();
+    row.insertCell().textContent = item.name;
+    row.insertCell().textContent = String(item.price);
+    const button = document.createElement('button');
+    button.textContent = 'Details';
+    button.onclick = () => { details.textContent = item.name + ' details'; details.hidden = false; };
+    row.insertCell().appendChild(button);
+  }
+}
+render(products);
+document.getElementById('sort').onchange = (event) => {
+  const byPrice = event.target.value === 'Price';
+  render([...products].sort((a, b) => byPrice ? b.price - a.price : a.name.localeCompare(b.name)));
+};
+</script></body></html>"""
+
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        body = b'{"ok": true}' if self.path == "/health" else PAGE
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json" if self.path == "/health" else "text/html")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, *args):
+        pass
+
+
+http.server.HTTPServer(("127.0.0.1", int(sys.argv[1])), Handler).serve_forever()
+'''
+
+SHOP_FILES = {
+    "proof/pages/shop.py": '''\
+from __future__ import annotations
+
+from proof.components import Dropdown, Modal, Table
+from proof.kit import FlowContext
+
+
+class ShopPage:
+    def __init__(self, context: FlowContext) -> None:
+        self.context = context
+        self.sort = Dropdown(context.page, "Sort by")
+        self.products = Table(context.page, "Products")
+        self.details = Modal(context.page, "Product details")
+
+    def open(self) -> None:
+        self.context.goto("/")
+
+    def open_details(self, name: str) -> None:
+        self.products.row_with(name).get_by_role("button", name="Details").click()
+''',
+    "proof/flows/shop.py": '''\
+from __future__ import annotations
+
+from proof.kit import FlowContext, flow
+from proof.pages.shop import ShopPage
+
+
+@flow("shop.open")
+def open_shop(context: FlowContext) -> None:
+    ShopPage(context).open()
+
+
+@flow("shop.sort-by-price")
+def sort_by_price(context: FlowContext) -> None:
+    ShopPage(context).sort.choose("Price")
+
+
+@flow("shop.open-details")
+def open_details(context: FlowContext) -> None:
+    ShopPage(context).open_details("Mug")
+''',
+    "proof/adapters/shop.py": '''\
+from __future__ import annotations
+
+from typing import Any
+
+from proof.kit import FlowContext
+from proof.pages.shop import ShopPage
+
+
+class ProductsTable:
+    name = "products"
+    label = "products table"
+    suffix = ".json"
+
+    def capture(self, context: FlowContext) -> Any:
+        return {"rows": ShopPage(context).products.rows()}
+
+
+class DetailsDialog:
+    name = "details"
+    label = "details dialog"
+    suffix = ".json"
+
+    def capture(self, context: FlowContext) -> Any:
+        details = ShopPage(context).details
+        return {"open": details.is_open(), "text": details.text() if details.is_open() else ""}
+''',
+    "proof/checks/shop.py": '''\
+from __future__ import annotations
+
+from proof.adapters.shop import DetailsDialog, ProductsTable
+from proof.kit import Assessment, BrowserSnapshot, Observations, ProofCheck
+
+
+def prices_ascend() -> ProofCheck:
+    def assess(observed: Observations) -> Assessment:
+        prices = [int(row[1]) for row in observed["products"]["rows"]]
+        return Assessment(prices == sorted(prices), "prices ascend", prices, "Sorting by price left the products out of order.")
+
+    return ProofCheck("prices-ascend", (ProductsTable(),), assess)
+
+
+def dialog_names_product() -> ProofCheck:
+    def assess(observed: Observations) -> Assessment:
+        dialog = observed["details"]
+        return Assessment(bool(dialog["open"]) and "Mug" in dialog["text"], "an open dialog naming Mug", dialog)
+
+    return ProofCheck("dialog-names-product", (DetailsDialog(), BrowserSnapshot()), assess)
+''',
+    "proof/features/shop.py": '''\
+from __future__ import annotations
+
+from proof.checks.shop import dialog_names_product, prices_ascend
+from proof.flows.shop import open_details, open_shop, sort_by_price
+from proof.kit import Feature, feature
+
+
+def shop() -> Feature:
+    return (
+        feature("shop", touches=["src/"], surfaces=["web"])
+        .sub_feature("catalog")
+        .scenario("sorted-by-price")
+        .flow(open_shop)
+        .flow(sort_by_price)
+        .proof(prices_ascend())
+        .scenario("product-details")
+        .flow(open_shop)
+        .flow(open_details)
+        .proof(dialog_names_product())
+        .build()
+    )
+''',
+    ".github/skills/verify-mole/features/shop.md": """\
+# shop
+
+The product catalog.
+
+## Sub-features
+
+- catalog: the product list, its sorting and the details of one product.
+
+## How to get to it (user POV)
+
+- Open the shop's home page.
+
+## Driving it with Mole
+
+(catalog | sorted-by-price): **Given** the shop lists three products; **When** the user sorts by price; **Then** the cheapest comes first; **Proof** prices ascend (products table).
+
+(catalog | product-details): **Given** the shop lists three products; **When** the user opens the details of the mug; **Then** a dialog names the mug; **Proof** the dialog names the product (details dialog + browser snapshot).
+
+Run it: `python3 -m mole run shop`.
+
+## Gotchas
+
+- The list is rendered by the page, so a check reads it after the sort.
+""",
+}
+
+
 @pytest.mark.skipif(not _chromium_installed(), reason="playwright Chromium is not installed")
 class TestPythonKitEndToEnd:
     """Feature: Proof Python Kit End To End"""
@@ -344,41 +543,66 @@ class TestPythonKitEndToEnd:
     def _mole(self, repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run([sys.executable, "-m", "mole", *args], cwd=repo, capture_output=True, text=True, timeout=120)
 
-    def test_up_start_doctor_prove_stale_and_down(self, app_repo: Path) -> None:
+    def _python(self, repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+        return subprocess.run([sys.executable, *args], cwd=repo, capture_output=True, text=True, check=check)
+
+    def _up(self, repo: Path) -> subprocess.Popen[str]:
         up = subprocess.Popen(
             [sys.executable, "-m", "mole", "up", "--start", "--headless"],
-            cwd=app_repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+            cwd=repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
+        session = repo / "proof/.runs/mole/session.json"
+        deadline = time.monotonic() + 90
+        while not session.exists() and time.monotonic() < deadline:
+            assert up.poll() is None, up.stderr.read() if up.stderr else "up exited"
+            time.sleep(0.5)
+        assert session.exists()
+        return up
+
+    def _down(self, repo: Path, up: subprocess.Popen[str]) -> None:
+        try:
+            self._mole(repo, "down")
+        finally:
+            if up.poll() is None:
+                up.terminate()
+            up.communicate(timeout=60)
+
+    def test_up_start_doctor_run_receipts_stale_and_down(self, app_repo: Path) -> None:
+        up = self._up(app_repo)
         session = app_repo / "proof/.runs/mole/session.json"
         try:
-            deadline = time.monotonic() + 90
-            while not session.exists() and time.monotonic() < deadline:
-                assert up.poll() is None, up.stderr.read() if up.stderr else "up exited"
-                time.sleep(0.5)
-            assert session.exists()
-
             doctor = self._mole(app_repo, "doctor")
             assert doctor.returncode == 0, doctor.stdout
             assert json.loads(doctor.stdout)["ok"] is True
 
-            proved = self._mole(app_repo, "prove")
-            receipt = json.loads(proved.stdout)
-            assert proved.returncode == 0 and receipt["verdict"] == "PASS"
-            assert receipt["surfaces"] == ["web", "api"] and receipt["pageErrors"] == []
+            proved = self._mole(app_repo, "run")
+            summary = json.loads(proved.stdout)
+            assert proved.returncode == 0 and summary["verdict"] == "PASS", proved.stdout
+            receipt = summary["scenarios"][0]
+            assert receipt["scenario"] == "example.smoke.app-answers" and receipt["surfaces"] == ["web", "api"] and receipt["pageErrors"] == []
             assert Path(receipt["screenshot"]).is_file()
-            assert [check["pass"] for check in receipt["checks"]] == [True, True]
+            assert [check["verdict"] for check in receipt["checks"]] == ["PASS"]
+            for reference in receipt["checks"][0]["evidence"]:
+                assert (Path(receipt["artifacts"]) / reference["artifact"]).is_file()
+            assert [entry["status"] for entry in receipt["trace"]] == ["done", "done"]
 
-            only_api = json.loads(self._mole(app_repo, "prove", "--surface", "api").stdout)
-            assert only_api["surfaces"] == ["api"] and "screenshot" not in only_api
-            assert any("web surface did not run" in line for line in only_api["next"])
+            by_id = json.loads(self._mole(app_repo, "run", "example.smoke").stdout)
+            assert by_id["verdict"] == "PASS"
+            refused = self._mole(app_repo, "run", "no-such-id")
+            assert refused.returncode == 2 and "example.smoke.app-answers" in refused.stderr
+            assert "`prove` is now `run`" in self._mole(app_repo, "prove").stderr
 
-            assert json.loads(self._mole(app_repo, "snapshot").stdout)["heading"] == "Hello"
+            assert json.loads(self._mole(app_repo, "flow", "app.open").stdout)["heading"] == "Hello"
             assert json.loads(self._mole(app_repo, "api", "get", "/health").stdout)["body"] == {"ok": True}
+            assert "PASS for the current source" in json.loads(self._mole(app_repo, "receipts").stdout)["receipts"][0]["status"]
+            listed = json.loads(self._mole(app_repo, "features").stdout)["features"][0]
+            assert listed["subFeatures"][0]["scenarios"][0]["id"] == "example.smoke.app-answers"
 
             (app_repo / "src/server.py").write_text(SERVER + "# changed\n")
-            stale = self._mole(app_repo, "prove")
+            stale = self._mole(app_repo, "run")
             assert stale.returncode == 2 and "A proof would describe code that is not running" in stale.stderr
             assert "STALE" in self._mole(app_repo, "doctor").stdout
+            assert "STALE" in json.loads(self._mole(app_repo, "receipts").stdout)["receipts"][0]["status"]
 
             down = self._mole(app_repo, "down")
             assert json.loads(down.stdout)["ok"] is True
@@ -388,22 +612,73 @@ class TestPythonKitEndToEnd:
                 up.terminate()
             up.communicate(timeout=60)
 
-    def test_a_failing_check_is_a_fail_receipt_with_its_hint(self, app_repo: Path) -> None:
-        feature = app_repo / "proof/features/example.py"
-        feature.write_text(feature.read_text().replace("status.ok, True,", "status.ok, False,"))
-        up = subprocess.Popen(
-            [sys.executable, "-m", "mole", "up", "--start", "--headless"],
-            cwd=app_repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-        )
-        session = app_repo / "proof/.runs/mole/session.json"
+    def test_a_failing_check_is_a_fail_receipt_with_its_hint_and_kept_evidence(self, app_repo: Path) -> None:
+        check = app_repo / "proof/checks/app.py"
+        check.write_text(check.read_text().replace("0 < status < 500", "status == 999"))
+        up = self._up(app_repo)
         try:
-            deadline = time.monotonic() + 90
-            while not session.exists() and time.monotonic() < deadline:
-                time.sleep(0.5)
-            proved = self._mole(app_repo, "prove", "--surface", "api")
-            receipt = json.loads(proved.stdout)
-            assert proved.returncode == 1 and receipt["verdict"] == "FAIL"
-            assert "did not answer well" in receipt["next"][0]
+            proved = self._mole(app_repo, "run")
+            summary = json.loads(proved.stdout)
+            receipt = summary["scenarios"][0]
+            assert proved.returncode == 1 and summary["verdict"] == "FAIL"
+            assert "did not answer well" in summary["next"][0]
+            assert receipt["checks"][0]["verdict"] == "FAIL"
+            assert (Path(receipt["artifacts"]) / receipt["checks"][0]["evidence"][0]["artifact"]).is_file()
         finally:
-            self._mole(app_repo, "down")
-            up.communicate(timeout=60)
+            self._down(app_repo, up)
+
+    def test_a_check_that_declares_no_evidence_cannot_pass(self, app_repo: Path) -> None:
+        check = app_repo / "proof/checks/app.py"
+        text = check.read_text()
+        start = text.index("    return ProofCheck(")
+        check.write_text(text[:start] + '    return ProofCheck("app-answers", (), lambda _: Assessment(True, "x", "x"))\n')
+        result = self._python(app_repo, "-c", "from proof.features import REGISTRY", check=False)
+        assert result.returncode != 0 and "declares no evidence" in result.stderr
+
+    def _shop(self, repo: Path) -> None:
+        for relative, body in SHOP_FILES.items():
+            target = repo / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(body)
+        index = repo / "proof/features/__init__.py"
+        index.write_text(index.read_text().replace("from .example import example", "from .example import example\nfrom .shop import shop").replace("example(),", "example(), shop(),"))
+        readme = repo / ".github/skills/verify-mole/features/README.md"
+        row = f"`{MOLE} run example` |\n"
+        readme.write_text(readme.read_text().replace(row, f"{row}| shop | web | [shop.md](shop.md) | `{MOLE} run shop` |\n", 1))
+        for command in (["add", "-A"], ["commit", "-qm", "shop"]):
+            subprocess.run(["git", *command], cwd=repo, check=True)
+
+    def test_a_scenario_fails_before_the_fix_passes_after_it_and_goes_stale_on_the_next_edit(self, app_repo: Path) -> None:
+        self._shop(app_repo)
+        selftest = self._python(app_repo, "-m", "pytest", "proof/test_features.py", "-q", "-p", "no:cacheprovider", check=False)
+        assert selftest.returncode == 0, selftest.stdout + selftest.stderr
+        server = app_repo / "src/server.py"
+        server.write_text(SHOP_SERVER)
+
+        up = self._up(app_repo)
+        try:
+            before = self._mole(app_repo, "run", "shop")
+            summary = json.loads(before.stdout)
+            sorted_scenario = next(item for item in summary["scenarios"] if item["scenario"] == "shop.catalog.sorted-by-price")
+            assert before.returncode == 1 and sorted_scenario["verdict"] == "FAIL", before.stdout
+            details = next(item for item in summary["scenarios"] if item["scenario"] == "shop.catalog.product-details")
+            assert details["verdict"] == "PASS"
+            assert sorted_scenario["checks"][0]["actual"] == [30, 20, 10]
+        finally:
+            self._down(app_repo, up)
+
+        server.write_text(SHOP_SERVER.replace("b.price - a.price", "a.price - b.price"))
+        up = self._up(app_repo)
+        try:
+            after = self._mole(app_repo, "run", "shop")
+            summary = json.loads(after.stdout)
+            assert after.returncode == 0 and summary["verdict"] == "PASS", after.stdout
+            assert {item["scenario"] for item in summary["scenarios"]} == {"shop.catalog.sorted-by-price", "shop.catalog.product-details"}
+            first = summary["scenarios"][0]
+            assert [entry["id"] for entry in first["trace"]][:2] == ["shop.open", "shop.sort-by-price"]
+
+            server.write_text(server.read_text() + "# edited after the proof\n")
+            stale = self._mole(app_repo, "run", "shop")
+            assert stale.returncode == 2 and "A proof would describe code that is not running" in stale.stderr
+        finally:
+            self._down(app_repo, up)

@@ -1,25 +1,28 @@
 # Proof kit and mole
 
-Drives {{APP_NAME}} like a user, records facts, and writes a receipt with a verdict. It complements the repo's own tests: those assert and stop at the first failure, while a proof records every fact and tells you what to fix.
+Verifies {{APP_NAME}} like a user, scenario by scenario, and writes a receipt with a verdict. It complements the repo's own tests: those assert and stop at the first failure, while a scenario records every check with its evidence and tells you what to fix.
 
 ## Layout
 
 | Path | Owner | What it is |
 |---|---|---|
-| `kit/` | the kit | The independent proof lib: `types.py`, `surfaces.py`, `features.py`, `receipt.py`, `run.py`. It imports nothing from the app or the mole. Do not edit; an upgrade replaces this folder. |
-| `../mole/` | the kit | The runner at the repository root: `mole.py` (CLI), `prove_cli.py`, `runtime.py`, `receipts.py`, `config.py`, `feature.py`, `selftest.py`. It uses the kit, never the reverse. Do not edit; an upgrade replaces this folder. |
+| `kit/` | the kit | The independent proof lib: `types.py`, `builder.py`, `surfaces.py`, `features.py`, `evidence.py`, `receipt.py`, `run.py`. It imports nothing from the app or the mole. Do not edit; an upgrade replaces this folder. |
+| `../mole/` | the kit | The runner at the repository root: `mole.py` (CLI), `commands.py`, `runner.py`, `receipts.py`, `prove_cli.py`, `runtime.py`, `config.py`, `selftest.py`. It uses the kit, never the reverse. Do not edit; an upgrade replaces this folder. |
 | `app.py` | you | `APP`: the URL, start command, source paths, API discovery and page hooks. The only place the mole learns about this app. |
-| `features/` | you | One proof per feature, registered in `features/__init__.py`. |
-| `features/surfaces/` | you | One adapter per surface. Turns a feature call into that surface's wire details and returns one shape. |
+| `features/` | you | One module per feature: sub-features and scenarios, registered in `features/__init__.py`. |
+| `flows/`, `pages/`, `components/` | you | Reusable user steps, page objects and widget helpers (dropdown, table, modal) the scenarios call. |
+| `checks/` | you | Named checks. Each declares the evidence it needs. |
+| `adapters/` | you | Evidence sources beyond the browser: database and logs. |
+| `features/surfaces/` | you | One adapter per surface. Turns a call into that surface's wire details and returns one shape. |
 | `.github/skills/verify-mole/` | you | The agent skill and one map per feature. |
 
 ## Concepts
 
-- A **feature** is a behavior contract, proved on one or more **surfaces**: `web` (the app in a real Chrome over CDP) and `api` (HTTP). Supported here: {{SURFACES_TEXT}}.
-- The **kit** (`proof/kit/`) is a lib: it knows what a proof and a receipt are, and gets the features, surfaces, revision and commands to suggest passed in. The **mole** (`mole/`) is the runner: it starts and drives the app, supplies those, and saves the receipts.
-- A **surface adapter** returns the same shape on every surface, so a rule is written once and checked everywhere. `check()` never raises; a check is named `feature/surface: rule`.
-- A **receipt** is PASS, FAIL or ERROR (exit 0, 1, 2) with the revision, features, surfaces, checks with hints, `pageErrors` and a screenshot.
-- The **revision** is `git HEAD` plus a hash of uncommitted changes under `APP.source_paths`. A stale build makes `prove` refuse.
+- A **feature** groups **sub-features**; a **scenario** is `feature.sub-feature.scenario`: Given, When, Then, written in Python by the builder, proved on {{SURFACES_TEXT}}.
+- A scenario is **steps** (flows, page and component calls) and **checkpoints**. Each **check** declares the **evidence** it needs (screenshot, network log, API response, database, logs) and passes only when every declared source is cited and on disk.
+- A failing or erroring step stops the scenario: later steps are `not_reached`; the other checks in the same checkpoint still run.
+- A **receipt** per scenario is PASS, FAIL or ERROR (exit 0, 1, 2), with the revision, steps, checks with hints and evidence paths. Latest receipts are in `proof/.runs/receipts/latest/`, history beside them.
+- The **revision** is `git HEAD` plus a hash of uncommitted changes under `APP.source_paths`. A stale build makes `run` refuse, and a revision change mid-run is an ERROR.
 
 ## Run it
 
@@ -31,21 +34,23 @@ python3 -m playwright install chromium   # once
 {{MOLE}} up --start      # own terminal: runs the app, waits until it is ready, opens Chrome
 {{MOLE}} up              # or attach to an app you already run (--url for another URL)
 {{MOLE}} doctor          # is this instance worth driving?
-{{MOLE}} prove           # every feature on every surface; --feature, --surface narrow it
+{{MOLE}} features        # feature, sub-feature and scenario ids; --changed: only features your edits touch
+{{MOLE}} run             # every scenario; give feature, sub-feature or scenario ids to narrow it
+{{MOLE}} flow <id>       # run one flow to explore a state
+{{MOLE}} receipts        # latest verdicts, STALE when the source moved on
 {{MOLE}} down            # stop what up started
-{{PROVE}}                # the same proof in a throwaway browser against a running app
+{{PROVE}}                # the same run in a throwaway browser against a running app
 {{TEST_PROOF}}           # maps and registry in step; your adapter tests
 {{TYPECHECK_PROOF}}
 ```
 
-`{{MOLE}} help` lists every command, including `{{MOLE}} <feature> <verb>` for features with a `drive` hook. The agent loop is in [.github/skills/verify-mole/SKILL.md](../.github/skills/verify-mole/SKILL.md).
+`{{MOLE}} help` lists every command. The agent loop is in [.github/skills/verify-mole/SKILL.md](../.github/skills/verify-mole/SKILL.md).
 
-## Add a feature
+## Add a scenario
 
-1. Write the contract in `.github/skills/verify-mole/features/<name>.md` (frontmatter: `feature`, `prove`, `touches`, `surfaces`; sections `## Contract` and `## Driving it`; update `features/README.md`).
-2. Extend the adapters in `features/surfaces/` with the calls the contract needs, returning one shape per surface.
-3. Write `features/<name>.py`: loop over `kit.surfaces`, call the adapter through `observe()`, and `kit.check(name, actual, expected, hint)`.
-4. Register it in `features/__init__.py` as a `MoleFeature` with its `surfaces` and `touches`.
-5. Run `{{TEST_PROOF}}`, then `{{MOLE}} prove --feature <name>`.
+1. Write the map in `.github/skills/verify-mole/features/<feature>.md` (four sections; one `(sub | scenario): **Given** … **When** … **Then** … **Proof** check (Evidence labels)` line per scenario; update `features/README.md`).
+2. Add the flows, page and component calls it needs under `flows/`, `pages/`, `components/`; add checks under `checks/` with their evidence.
+3. Write `features/<feature>.py` with the builder and register it in `features/__init__.py`.
+4. Run `{{TEST_PROOF}}`, then `{{MOLE}} run <feature>.<sub-feature>.<scenario>`.
 
-Environment: `PROOF_URL` (app URL), `PROOF_API_URL` (API base URL), `MOLE_DIR` (isolates a second mole instance); a `.env` at the repository root is read too. Receipts and screenshots go to `proof/.runs/` (gitignored). Needs Python 3.10 or newer and Linux or macOS.
+Environment: `PROOF_URL` (app URL), `PROOF_API_URL` (API base URL), `MOLE_DIR` (isolates a second mole instance); a `.env` at the repository root is read too. Receipts and artifacts go to `proof/.runs/` (gitignored). Needs Python 3.10 or newer and Linux or macOS.

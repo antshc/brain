@@ -1,19 +1,22 @@
 from __future__ import annotations
 
-from mole.commands import MOLE
-from proof.kit import ProofKit, observe
-
-from .surfaces import adapter_for
+from proof.checks.app import app_answers
+from proof.flows.app import open_app
+from proof.kit import Feature, feature
 
 
 # Map: .github/skills/verify-mole/features/example.md
-# The contract is checked through each surface's adapter, so a rule is written once and proved everywhere.
-def prove_example(kit: ProofKit) -> None:
-    for surface in kit.surfaces:
-
-        def name(rule: str) -> str:
-            return f"example/{surface}: {rule}"
-
-        status = observe(kit, name("reaches the app"), lambda: adapter_for(surface, kit).app.status())
-        if status:
-            kit.check(name("the app answers"), status.ok, True, f"The {surface} surface did not answer well. Is the app up and the build fresh? {MOLE} doctor")
+# Flows act, checks observe, and the builder composes them. Reuse flows and checks from proof/flows and proof/checks.
+def example() -> Feature:
+    return (
+        feature(
+            "example",
+            touches=["src/"],  # TODO(proof): the path prefixes of this feature's files
+            surfaces=[{{SURFACES_LIST}}],
+        )
+        .sub_feature("smoke")
+        .scenario("app-answers")
+        .flow(open_app)
+        .proof(app_answers())
+        .build()
+    )

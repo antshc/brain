@@ -1,16 +1,17 @@
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { ADAPTERS } from "../proof/adapters";
 import { FEATURES } from "../proof/features";
-import { coverage, isStale, type Receipt, type Surface } from "../proof/kit";
+import { buildRegistry, builtinAdapters, coverage, isStale, mergeAdapters, type Receipt } from "../proof/kit";
 
-// What the agent must still do before it may report: a subset of features or surfaces is not a full proof.
-export function coverageNotes(run: { features: string[]; surfaces: Surface[] }): string[] {
-  const { partialFeatures, skippedSurfaces } = coverage(FEATURES, run);
-  return [
-    ...(partialFeatures ? [`Only ${run.features.join(", ")} was proved. Run pnpm mole prove with no --feature before you report.`] : []),
-    ...(skippedSurfaces.length ? [`The ${skippedSurfaces.join(", ")} surface did not run, so it is not proved. Run pnpm mole prove with no --surface before you report.`] : []),
-  ];
+export const adapters = () => mergeAdapters(builtinAdapters(), ADAPTERS);
+export const registry = () => buildRegistry(FEATURES, adapters());
+
+// What the agent must still do before it may report: a subset of the scenarios is not a full proof.
+export function coverageNotes(ran: string[]): string[] {
+  const { partial, missing } = coverage(registry(), ran);
+  return partial ? [`${missing.length} scenario(s) did not run, so they are not proved. Run pnpm mole run with no target before you report.`] : [];
 }
 
 // `latest` is what doctor reads. The history is appended, never overwritten: failures stay next to the final green.
@@ -21,15 +22,21 @@ export async function saveReceipt(dir: string, latest: string, receipt: Receipt)
   await writeFile(join(dir, "receipts", `${receipt.at.replace(/[:.]/g, "-")}-${receipt.revision ?? "unknown"}.json`), json);
 }
 
+export async function readReceipts(dir: string, target?: string): Promise<Receipt[]> {
+  const folder = join(dir, "receipts");
+  const files = existsSync(folder) ? (await readdir(folder)).filter(name => name.endsWith(".json")).sort() : [];
+  const receipts: Receipt[] = [];
+  for (const file of files) receipts.push(JSON.parse(await readFile(join(folder, file), "utf8")));
+  return target ? receipts.filter(receipt => receipt.scenarios.some(scenario => scenario.id === target || scenario.id.startsWith(`${target}.`))) : receipts;
+}
+
 // Is the last receipt about the code that is there now? For doctor.
 export async function proofStatus(latest: string, source: string | null): Promise<{ status: string; next?: string }> {
   const receipt: Receipt | null = existsSync(latest) ? JSON.parse(await readFile(latest, "utf8")) : null;
-  if (!receipt) return { status: "none yet", next: "pnpm mole prove" };
+  if (!receipt) return { status: "none yet", next: "pnpm mole run" };
   if (isStale(receipt, source)) {
-    return { status: `STALE: the last receipt says ${receipt.verdict} for ${receipt.revision}, but the source is now ${source}. That proof is for code that no longer exists.`, next: "pnpm mole prove" };
+    return { status: `STALE: the last receipt says ${receipt.verdict} for ${receipt.revision}, but the source is now ${source}. That proof is for code that no longer exists.`, next: "pnpm mole run" };
   }
-  const { partialFeatures, skippedSurfaces } = coverage(FEATURES, { features: receipt.features ?? Object.keys(FEATURES), surfaces: receipt.surfaces ?? [] });
-  const partial = receipt.features && partialFeatures ? `, only ${receipt.features.join(", ")}: run pnpm mole prove for all` : "";
-  const skipped = receipt.surfaces && skippedSurfaces.length ? `, only the ${receipt.surfaces.join(", ")} surface: run pnpm mole prove with no --surface` : "";
-  return { status: `${receipt.verdict} for the current source (${source}) at ${receipt.at}${partial}${skipped}`, ...(receipt.verdict !== "PASS" ? { next: receipt.next[0] } : {}) };
+  const partial = coverage(registry(), receipt.scenarios.map(scenario => scenario.id)).partial ? `, only ${receipt.scenarios.length} scenario(s): run pnpm mole run for all` : "";
+  return { status: `${receipt.verdict} for the current source (${source}) at ${receipt.at}${partial}`, ...(receipt.verdict !== "PASS" ? { next: receipt.next[0] } : {}) };
 }

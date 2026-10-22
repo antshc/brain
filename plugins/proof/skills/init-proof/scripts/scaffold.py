@@ -35,20 +35,24 @@ TREES = {
         ("typescript/kit", "proof/kit", True),
         ("typescript/mole", "mole", True),
         ("typescript/app", "proof", False),
-        ("verify-mole", ".github/skills/verify-mole", False),
+        ("typescript/verify-mole", ".github/skills/verify-mole", False),
     ],
     "python": [
         ("python/kit", "proof/kit", True),
         ("python/mole", "mole", True),
         ("python/app", "proof", False),
-        ("verify-mole", ".github/skills/verify-mole", False),
+        ("python/verify-mole", ".github/skills/verify-mole", False),
+        ("python/agents", ".github/agents", False),
     ],
 }
 # Files that exist only when their surface is chosen.
 SURFACE_FILES = {
     "typescript": {
-        "proof/features/surfaces/web.ts": "web",
-        "proof/features/surfaces/api.ts": "api",
+        "proof/adapters/api.ts": "api",
+        "proof/checks/example-api.ts": "api",
+        "proof/checks/example-web.ts": "web",
+        "proof/flows/open-app.ts": "web",
+        "proof/pages/app-page.ts": "web",
     },
     "python": {
         "proof/features/surfaces/web.py": "web",

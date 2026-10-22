@@ -29,7 +29,7 @@ Field names are TypeScript (`proof/app.ts`). Python kit (`proof/app.py`): `APP.s
 
 - [ ] The base URL and prefix: same origin as the web app, a proxy, or a separate port. If discovered at runtime (service discovery, random ports) write `APP.api.discover`.
 - [ ] The routes: OpenAPI/Swagger file, controllers, route files, `.http` files, README. Pick read-only `GET` routes.
-- [ ] Wire details an adapter must hide: versioning (header or `api-version` query), 0- vs 1-based paging, ids vs names, envelope shapes, auth headers.
+- [ ] Wire details an evidence adapter or check must hide: versioning (header or `api-version` query), 0- vs 1-based paging, ids vs names, envelope shapes, auth headers.
 - [ ] A health route for `APP.api.probe`; otherwise any answer below 500 counts.
 - [ ] Error contract: the status for a missing resource (404) and for invalid input (400 or 422).
 
