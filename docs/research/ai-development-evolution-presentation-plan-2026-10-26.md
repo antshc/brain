@@ -42,10 +42,10 @@ Source research: [AI Development Evolution Research (2026-10-25)](./ai-developme
 - **Content:**
   1. **Prompt & Context Engineering (slate):** Humans drive the work using reusable knowledge and instructions.
   2. **Agentic Development (blue):** Agents act on bounded engineering tasks and verify results.
-  3. **Agentic Workflows (amber):** A process coordinates dependent SDLC activities, agents, and gates.
-  4. **Agentic Software Factories (green):** Persistent event intake and durable orchestration operate delivery under human governance.
+  3. **Agentic Workflows (amber):** Coordinate agents and engineering activities to complete a defined process.
+  4. **Agentic Software Factories (green):** Operate repeatable software delivery across work items, workflows, policies, and feedback.
 - **Visual:** Four hand-drawn stations along a single evolution path, with a one-line difference and control owner at each station.
-- **Caveat:** The four stages are the source research's conceptual taxonomy, not an established industry standard.
+- **Caveat:** The four stages are a presentation taxonomy, not an industry standard or strict linear maturity ladder. Event triggers, persistent state, and human approvals can exist in Stage 3 workflows; Stage 4 manages delivery across runs.
 
 ### 3. GitHub Popularity and the Four-Stage Landscape
 
@@ -57,34 +57,35 @@ Source research: [AI Development Evolution Research (2026-10-25)](./ai-developme
   3. Garry Tan / gstack, **137,622 stars**, **20,402 forks** (Stage 3).
   4. Addy Osmani / Agent Skills, **110,342 stars**, **11,516 forks** (Stage 3).
   5. Lauren Tan / pstack, **13,971 stars**, **1,396 forks** for the entire Cursor Plugins repository (Stage 2 with Stage 3 features).
-- **Additional placements:** SSSF and super-board primarily at Stage 3; Warp Factories at Stage 4; Atlassian AI SDLC as a Stage 4 operating model; Teamwork Graph as a context foundation.
+- **Additional placements:** SSSF primarily at Stage 3; super-board is a Stage 3/factory-leaning boundary case; Warp Factories is a Stage 4 platform example; Atlassian AI SDLC is a Stage 4 operating-model example, not a single factory product; Teamwork Graph is a context foundation.
 - **Visual:** Hand-drawn horizontal ranking bars on one side and an aligned four-stage project landscape on the other.
-- **Caveats:** pstack's metrics are a proxy for Cursor Plugins, not individual pstack popularity. Stars and forks do not demonstrate product quality or maturity. Warp Factories was described as early access in the research.
+- **Caveats:** pstack's metrics are a proxy for Cursor Plugins, not individual pstack popularity. Stars and forks do not demonstrate product quality or maturity. Stage assignments are interpretive and can overlap. Warp Factories is early access.
 
 ### 4. Agentic Workflow
 
-- **Key message:** A workflow controls the engineering sequence, delegation, and gates for a bounded run.
-- **Content:** Human/workflow trigger, specification, planning, implementation, verification, code review, and delivery. Highlight dependencies, fan-out/fan-in, and human approvals.
-- **Visual:** A sketch-style SDLC conveyor belt with specialized agents at stations and verification gates between phases.
-- **Distinction:** A workflow can run autonomously once started without continuously listening for new external work.
+- **Key message:** A workflow coordinates one bounded engineering process, regardless of how it starts.
+- **Content:** Manual, API, event, or scheduled trigger; specification, planning, implementation, verification, review, and PR handoff. Highlight dependencies, fan-out/fan-in, retries, checkpoints, and human approvals.
+- **Visual:** A sketch-style SDLC conveyor belt with specialized agents at stations and verification gates between phases, clearly labeled as *one workflow run*.
+- **Distinction:** A workflow may be durable, event-triggered, and autonomous within scope. Those capabilities do not alone make it a factory.
 
 ### 5. Agentic Software Factory
 
-- **Key message:** The factory operates the delivery lifecycle persistently and responds to new work and feedback.
-- **Content:** GitHub/user/scheduled events, intake, durable queue/state, orchestrator, isolated agent runs, deterministic checks, human approvals, release, observability, and feedback.
-- **Visual:** A large hand-drawn software factory with incoming events, agent workstations, gates, an output conveyor, and a monitoring loop.
-- **Examples:** Warp Factories and Atlassian's AI SDLC operating-model architecture, with their maturity and evidence limitations preserved.
+- **Key message:** A factory operates repeatable delivery across many work items and workflows under shared governance and measurement.
+- **Content:** User/issues/PRs/incidents/scheduled inputs; standardized intake, priorities, policies, durable work-item state, multiple workflow runs, isolated execution, explicit CI/security gates, human approvals, PR handoff, operational metrics, and evaluated improvement.
+- **Visual:** A large hand-drawn software factory showing multiple incoming work streams feeding shared management, three reusable Stage 3 workflow stations, approved PR outputs, and a measurement/feedback loop. Draw deployment and production monitoring as optional downstream integrations.
+- **Examples:** Warp Factories (early-access platform; returns PRs and does not merge) and Atlassian's AI SDLC (operating-model architecture, not a standalone factory product).
+- **Reference:** Use the [Stage 3 vs. Stage 4 comparison screenshot](./ai-development-evolution-presentation-plan-2026-10-26/1000017425.jpg) for conceptual structure only; it contains phone UI chrome and is not a slide-ready image.
 
 ### 6. Core Principles of Agentic Systems
 
-- **Key message:** Reusable execution mechanisms underpin workflows and factories; durable event-driven operation completes the factory model.
+- **Key message:** Workflows and factories share execution mechanisms; cross-run governance, delivery metrics, and systematic improvement characterize the factory operating model.
 - **Content:**
   - **Loop:** Execute, check results, retry or stop.
   - **Fan-out / Fan-in:** Parallelize independent work, then gather outcomes.
   - **Agent Team:** Assign bounded responsibilities to specialized agents.
-  - **Ledger:** Persist state, decisions, evidence, and progress beyond one session.
-  - **Self-improvement:** Use failures, reviews, and telemetry to improve later runs.
-  - **Deterministic Gates:** Require explicit, verifiable conditions before transitions.
+  - **Ledger:** Persist state, decisions, evidence, and progress; useful in both workflows and factories.
+  - **Self-improvement:** Evaluate failures, reviews, and telemetry; propose and validate changes before adoption.
+  - **Deterministic Gates:** Enforce explicit CI/test/policy conditions; distinguish from probabilistic agent reviews and human judgment.
 - **Visual:** Six hand-drawn mechanisms arranged around a simple orchestration sketch. Each mechanism has one icon and one short explanation.
 
 ### 7. Matt Pocock's Skills: Composable Agentic Workflows
