@@ -6,9 +6,9 @@
 
 ## Executive finding
 
-The useful distinction is **instructions → task execution → process orchestration → an operating system for software delivery**. A skills collection can cover many stages; its highest-level commands do not necessarily turn it into an always-running factory. Conversely, a product called a “factory” may implement only agentic workflows today.
+The useful distinction is **instructions → bounded agent task → coordinated workflow → managed software production**. Stage 3 automates execution of an engineering process; Stage 4 operates repeatable delivery across work items, workflows, policies, measurement, and improvement. Factories compose workflows rather than replace them.
 
-This four-stage model is a **conceptual taxonomy**, not a formal industry standard. Anthropic distinguishes predefined *workflows* from agents that dynamically direct actions; Atlassian describes an AI-native SDLC that combines enterprise context, workflow changes, measurement, and human judgment. [Anthropic](https://www.anthropic.com/research/building-effective-agents) · [Atlassian AI SDLC playbook](https://www.atlassian.com/blog/ai-at-work/ai-sdlc-transformation-playbook)
+This four-stage model is a **presentation taxonomy, not an industry standard, certification, or necessary linear maturity path**. Event triggers, durable state, and human approvals may exist in Stage 3 workflows; none alone establishes a factory. Anthropic distinguishes predefined *workflows* from dynamically directed *agents*. Microsoft documents durable, event-driven agent workflows. Factory and Atlassian describe the factory at the broader production/operating-model level. [Anthropic](https://www.anthropic.com/research/building-effective-agents) · [Microsoft Durable Extension](https://learn.microsoft.com/en-us/agent-framework/hosting/durable-extension) · [Factory](https://factory.com/articles/what-is-a-software-factory) · [Atlassian AI SDLC playbook](https://www.atlassian.com/blog/ai-at-work/ai-sdlc-transformation-playbook)
 
 ## Stage 1 — Prompt & Context Engineering
 
@@ -27,50 +27,57 @@ This four-stage model is a **conceptual taxonomy**, not a formal industry standa
 - **Typical mechanisms:** Tool access, TDD, debugging loops, browser/UI verification, code-review subagents, parallel attempts.
 - **Why this is a separate stage:** The AI now *acts on the environment* and verifies outcomes instead of returning advice or generated text.
 - **Primary example:** [Lauren Tan (poteto)'s pstack](https://github.com/cursor/plugins/tree/main/pstack). Its `poteto-mode` routes to engineering disciplines such as architecture, adversarial investigation, TDD, parallel `swarm`/`arena`, and PR babysitting. This is primarily an agentic engineering toolkit rather than a persistent SDLC runtime.
-- **Important nuance:** pstack also includes an **optional, dormant** `benny` automation pack for Slack-triggered triage and bounded bug fixes. That is a Stage 4-style integration when explicitly installed on Cursor Automations; it is not proof that pstack's core skills continuously run by themselves. [pstack README](https://github.com/cursor/plugins/blob/main/pstack/README.md) · [benny automation specification](https://github.com/cursor/plugins/blob/main/pstack/automations/benny/FOR_AGENTS.md)
+- **Important nuance:** pstack also includes an **optional, dormant** `benny` automation pack for Slack-triggered triage and bounded bug fixes. That adds automated work intake when explicitly installed on Cursor Automations, but a trigger alone does not establish a factory-wide operating model. [pstack README](https://github.com/cursor/plugins/blob/main/pstack/README.md) · [benny automation specification](https://github.com/cursor/plugins/blob/main/pstack/automations/benny/FOR_AGENTS.md)
 
 ## Stage 3 — Agentic Workflows
 
-- **What changes:** Individual agent tasks become a governed SDLC process: intake, specification, planning, implementation, testing, review, and handoff.
-- **Control:** A human or defined workflow typically initiates a run; the workflow determines the steps, agents, dependencies, quality gates, and approvals.
-- **Typical mechanisms:** Reusable process skills, task graphs, worktrees, phased execution, typed agent handoffs, automated review and evidence gates.
-- **Why this is a separate stage:** The unit of automation shifts from **one task** to **a sequence of dependent engineering activities**.
+- **What changes:** Agent tasks become a coordinated, bounded engineering process (for example: specify → implement → verify → review → PR). A workflow need not cover every SDLC phase.
+- **Control:** A human, event, or schedule may initiate a run; the workflow coordinates steps, agents, dependencies, quality gates, and approvals. Agents may make dynamic choices within those steps.
+- **Typical mechanisms:** Reusable process skills, task graphs, parallel worktrees, typed handoffs, retries, durable checkpoints, event triggers, and evidence gates.
+- **Why this is a separate stage:** The unit of automation shifts from **one engineering task** to **a coordinated process with a defined outcome**. Long-running, event-triggered, or durable execution does not by itself imply a factory.
+- **Industry nuance:** Anthropic defines an agentic workflow more broadly as LLMs/tools orchestrated through predefined code paths. Our Stage 3 narrows that concept to engineering workflows. Microsoft explicitly supports durable agent workflows, checkpoints, external events, and human-in-the-loop waits. [Anthropic](https://www.anthropic.com/research/building-effective-agents) · [Microsoft](https://learn.microsoft.com/en-us/agent-framework/hosting/durable-extension)
 
 ### Sources classified primarily at Stage 3
 
-1. **[Matt Pocock — Skills](https://github.com/mattpocock/skills).** `/to-spec`, `/to-tickets`, `/implement`, and `/implement-spec` coordinate work from a spec through task-graph implementation, parallel subagents, and review. The documentation deliberately emphasizes small composable human-invoked skills rather than an always-on process owner. **Reason:** process-level coordination exists, but no autonomous event-driven factory runtime is provided by the repository.
-2. **[Affaan Mustafa — Everything Claude Code (ECC)](https://github.com/affaan-m/ECC).** A broad agent harness with specialized subagents, reusable skills, rules, hooks, and orchestration scripts. Its README reports 71 agents, 311 skills, and 97 maintained command shims at the time of review. **Reason:** substantial reusable engineering execution infrastructure, but skill/harness breadth does not alone establish continuously triggered end-to-end factory operations.
-3. **[Garry Tan — gstack](https://github.com/garrytan/gstack).** Explicit sprint sequence: Think → Plan → Build → Review → Test → Ship → Reflect. Role-oriented engineering, product, design, QA, and release skills, with parallel sprint support. **Reason:** coherent multi-phase engineering process, generally initiated and steered by a human.
-4. **[Addy Osmani — Agent Skills](https://github.com/addyosmani/agent-skills).** Twenty-five reusable skills and nine lifecycle commands across Define → Plan → Build → Verify → Review → Ship. `/build auto` can plan and complete the implementation in a bounded autonomous pass after approval. **Reason:** workflow composition and verification gates, not a standalone persistent event-processing platform.
-5. **[Super Simple Software Factory (SSSF)](https://github.com/antshc/super-simple-software-factory/tree/main/.claude/skills/sssf).** Deterministic Python owns phase sequencing, typed envelopes, gate checks, retries, and SQLite run traces while coding agents work inside bounded steps. The documented v1 uses Pi; Claude Code integration is a stub and the visualizer is planned for a later pass. **Reason:** an agentic workflow engine / factory prototype, but the reviewed skill does not establish an always-on event-triggered SDLC.
-6. **[EricTechPro — super-board](https://github.com/EricTechPro/super-board).** GitHub Project board as durable task state, autonomous Build → QA → Review waves, merge guards, evidence, and resume. It is started with `/super-board run`, which can drain a board. **Reason:** an advanced bridge toward factories; the documented default is a user-started autonomous workflow, not proof of continuously listening to external events.
+1. **[Matt Pocock — Skills](https://github.com/mattpocock/skills).** `/to-spec`, `/to-tickets`, `/implement`, and `/implement-spec` coordinate work from a spec through task-graph implementation, parallel subagents, and review. The documentation deliberately emphasizes small composable human-invoked skills rather than an always-on process owner. **Reason:** process-level coordination exists, but the repository does not document a shared cross-work-item delivery operating system with factory-wide governance and measurement.
+2. **[Affaan Mustafa — Everything Claude Code (ECC)](https://github.com/affaan-m/ECC).** A broad agent harness with specialized subagents, reusable skills, rules, hooks, and orchestration scripts. Its README reports 71 agents, 311 skills, and 97 maintained command shims at the time of review. **Reason:** substantial execution infrastructure, but skill/harness breadth does not alone establish managed cross-run production, shared governance, and measured outcomes.
+3. **[Garry Tan — gstack](https://github.com/garrytan/gstack).** Explicit sprint sequence: Think → Plan → Build → Review → Test → Ship → Reflect. Role-oriented engineering, product, design, QA, and release skills, with parallel sprint support. **Reason:** coherent multi-phase engineering process; the documented scope primarily coordinates bounded runs rather than a managed portfolio of work.
+4. **[Addy Osmani — Agent Skills](https://github.com/addyosmani/agent-skills).** Twenty-five reusable skills and nine lifecycle commands across Define → Plan → Build → Verify → Review → Ship. `/build auto` can plan and complete the implementation in a bounded autonomous pass after approval. **Reason:** workflow composition and verification gates are present; the collection is not itself documented as a managed production platform.
+5. **[Super Simple Software Factory (SSSF)](https://github.com/antshc/super-simple-software-factory/tree/main/.claude/skills/sssf).** Deterministic Python owns phase sequencing, typed envelopes, gate checks, retries, and SQLite run traces while coding agents work inside bounded steps. The documented v1 uses Pi; Claude Code integration is a stub and the visualizer is planned for a later pass. **Reason:** an agentic workflow engine / factory prototype with durable traces, but the reviewed skill does not establish cross-work-item governance, operational measurement, and managed delivery as a service.
+6. **[EricTechPro — super-board](https://github.com/EricTechPro/super-board).** GitHub Project board as durable task state, autonomous Build → QA → Review waves, merge guards, evidence, and resume. It is started with `/super-board run`, which can drain a board. **Reason:** a factory-leaning case with board-level durable work and guardrails. Its user-started default is not disqualifying; classify provisionally because broader production policies, measurement, and feedback are not fully established by the reviewed documentation.
 
-**Boundary case:** pstack spans Stage 2 and parts of Stage 3 because `poteto-mode` coordinates specialized practices and PR follow-up. The optional `benny` automation extends into Stage 4 mechanisms.
+**Boundary case:** pstack spans Stage 2 and parts of Stage 3 because `poteto-mode` coordinates specialized practices and PR follow-up. The optional `benny` automation adds event-driven intake, a capability also available in Stage 3.
 
 ## Stage 4 — Agentic Software Factories
 
-- **What changes:** A persistent system accepts work from external events and coordinates agents over the delivery lifecycle without a person invoking every task.
-- **Control:** Human governance sets objectives, risk boundaries, and approval gates; the system controls intake, scheduling, execution environments, retries, handoffs, evidence, monitoring, and continued progression.
-- **Typical mechanisms:** Webhooks and schedules; durable queues/state; isolated compute; integrations with issue trackers and source control; permission and approval policies; observability; evaluation; continuous feedback.
-- **Why this is a separate stage:** The unit of automation becomes **software delivery as an ongoing operational service**, not just a manually started workflow.
+- **What changes:** A managed production system coordinates repeatable software delivery across incoming work items and multiple workflows, with shared policies, traceable outcomes, and systematic measurement.
+- **Control:** People define intent, governance, risk boundaries, and approval authority; the system handles standardized intake, scheduling, isolated execution, recovery, handoffs, and evidence within those boundaries.
+- **Typical mechanisms:** Human requests, APIs, webhooks or schedules; durable work-item state; orchestration and recovery; shared context and permissions; policy/CI gates; audit and operational metrics; evaluation-driven improvements.
+- **Why this is a separate stage:** The unit of management becomes **delivery as a repeatable, governed service across runs**, rather than a single workflow execution. Automated triggers and durability are common but neither necessary nor sufficient individually. A factory can hand off reviewed PRs without owning production deployment.
+- **Industry nuance:** Software factories predate AI; the core idea is standardized, repeatable production. Agentic factories add tool-using agents to that operating model. [Factory](https://factory.com/articles/what-is-a-software-factory) · [Atlassian](https://www.atlassian.com/blog/ai-at-work/ai-sdlc-transformation-playbook)
 
 ### Sources classified primarily at Stage 4
 
-1. **[Warp Factories](https://www.warp.dev/factories)** (separate from the general [Warp open-source agentic development environment](https://github.com/warpdotdev/warp)). Its first-party documentation describes factories-as-code, triggers from existing tools, a foreman-led triage → spec → implement → verify → ship → monitor path, sandboxes, agent/model choice, evaluations, benchmarks, approvals, and self-improvement. **Reason:** it explicitly combines event-based intake, operational execution, governance, and feedback. **Maturity caveat:** the factory offering advertises early access; product claims are not independent performance verification.
+1. **[Warp Factories](https://www.warp.dev/factories)** (separate from the general [Warp open-source agentic development environment](https://github.com/warpdotdev/warp)). Its first-party documentation describes factories-as-code, triggers from existing tools, a foreman-led triage → spec → implement → verify → ship → monitor path, sandboxes, agent/model choice, evaluations, benchmarks, approvals, and self-improvement. **Reason:** it connects multiple work sources to a managed agent delivery system, shared definitions, governance, visibility, and run evaluation. **Boundary:** Warp says its factory normally returns reviewed PRs and never merges on a team's behalf; its factory dashboard is not evidence of production monitoring for every application. **Maturity caveat:** early access; claims are not independent performance verification. [Warp overview](https://docs.warp.dev/factories/)
 2. **[Atlassian AI SDLC transformation playbook](https://www.atlassian.com/blog/ai-at-work/ai-sdlc-transformation-playbook)**, with [Jira](https://www.atlassian.com/software/jira), [Rovo](https://www.atlassian.com/software/rovo), and [Teamwork Graph](https://www.atlassian.com/platform/teamwork-graph). The playbook integrates connected context and measurement with planning, design, development, review, and proactive maintenance. Jira supplies tracked work and approvals; Teamwork Graph supplies permission-aware organizational context. **Reason:** this is a Stage 4 *operating-model architecture*, not evidence that Teamwork Graph alone is a complete factory product. Atlassian reports internal governed agent loops and outcomes, but these are vendor-reported results.
 
-### Minimum credible factory boundary
+### Factory evaluation dimensions (not a binary checklist)
 
-The following checks distinguish a deployed factory from a good skill collection or one-off workflow:
+| Dimension | Workflow-level capability (Stage 3 possible) | Factory-level operating concern (Stage 4) |
+| --- | --- | --- |
+| Unit of management | One bounded run | Stream/portfolio of work items and repeated runs |
+| Intake | Manual, API, event, or scheduled start | Standardized prioritization, routing, and identity across work sources |
+| Orchestration | Steps, agents, retries, fan-out/fan-in | Coordinating reusable workflows, dependencies, capacity, and recovery across work |
+| State | Can persist sessions and checkpoints | Traceable work items, decisions, evidence, and outcomes across runs |
+| Governance | Per-run tests and approval gates | Consistent risk policies, permissions, approvals, and auditability |
+| Measurement | Execution success, duration, cost | Delivery throughput, lead time, quality, cost, and business outcomes |
+| Feedback | Learn from a completed run | Evaluate patterns and improve reusable instructions, tests, and policies under review |
 
-1. Work can enter automatically from an event or schedule.
-2. Runs, dependencies, progress, and recovery state persist beyond one agent session.
-3. Execution is isolated and permissions are bounded.
-4. Verifiable tests, checks, evidence, and human approvals govern transitions.
-5. Monitoring, traces, failure detection, and audit history are available.
-6. Feedback from CI, PRs, or production can generate follow-up work and improve the process.
+This comparison is a **reasoned architectural heuristic**, not a formal industry classification. Automated event intake is useful but does not alone make a factory. Production deployment/monitoring and self-modification are optional scope choices, not universal prerequisites. [Microsoft](https://learn.microsoft.com/en-us/agent-framework/hosting/durable-extension) · [Warp](https://docs.warp.dev/factories/) · [Factory](https://factory.com/articles/what-is-a-software-factory) · [Atlassian](https://www.atlassian.com/blog/ai-at-work/ai-sdlc-transformation-playbook)
 
-This is a proposed evaluation rubric synthesized from the Warp and Atlassian descriptions, **not an industry certification checklist**.
+**Visual reference (not a slide asset):** The attached Stage 3 vs. Stage 4 comparison captures the intended conceptual hierarchy. It includes mobile UI chrome; do not reuse it directly as a production slide.
+
+![Stage 3 bounded engineering workflow compared with Stage 4 managed software delivery](./ai-development-evolution-presentation-plan-2026-10-26/1000017425.jpg)
 
 ## GitHub popularity — five named skills creators
 
@@ -105,7 +112,7 @@ The stars ordering is Matt → Affaan → Garry → Addy → Cursor Plugins prox
 - Matt, Addy, Garry, and Affaan document repeatable multi-step engineering processes.
 - SSSF documents deterministic phase control, typed handoffs, and verification gates.
 - super-board documents board-driven task waves and a start/resume command.
-- Warp markets a persistent, event-driven factory control plane and a triage-to-monitor lifecycle.
+- Warp documents connected work sources, coordinated agents, reviewed-PR output, shared configuration, and run evaluation. It does not claim to merge on behalf of the user.
 - Atlassian presents context + measurement + workflow shifts as two connected requirements of AI-native delivery.
 
 ### Interpretations, not independently verified claims
@@ -113,13 +120,15 @@ The stars ordering is Matt → Affaan → Garry → Addy → Cursor Plugins prox
 - Placing an individual project in a stage is an architectural inference based on the reviewed documentation, not a vendor-issued certification.
 - Repository stars and forks cannot show which project creates higher quality software or which has more active production installations.
 - Vendor-reported improvements (such as Atlassian's Teamwork Graph benchmark or Warp's cost stories) should not be treated as independent cross-vendor benchmarks.
-- Branding a package a “factory” does not establish event-driven durability, monitored operation, or production readiness.
+- Branding a package a “factory” does not prove standardized cross-work-item delivery, operational governance, measurable results, or production readiness.
+- Event-driven durability can be implemented inside workflows; it is not a factory-exclusive boundary.
+- A factory's output may be a reviewed pull request; automatic merging, deployment, and production monitoring are not universally required.
 
 ## Bottom line
 
 **Facts:** The most-starred standalone skills repository in this set is Matt Pocock's (302,868); the most-forked is Affaan Mustafa's ECC (42,762). The pstack comparison is only a Cursor Plugins repository proxy. The documented open-source skill collections and manually started agent pipelines mainly occupy **Stages 2–3**, while Warp Factories and Atlassian's AI-native SDLC architecture address the broader **Stage 4** operating model.
 
-**Reasoned conclusion:** The decisive move from *agentic workflows* to *agentic software factories* is not adding more prompts, skills, or subagents. It is adding persistent **event intake, durable state, governed execution, verification, observability, and feedback** so the SDLC can progress as a service under human oversight.
+**Reasoned conclusion:** Stage 3 **executes a defined engineering process**; Stage 4 **operates repeatable software delivery** across work items and workflows with shared governance, traceability, measurement, and reviewed improvement. Event triggers, durable execution, and production integrations are useful supporting capabilities, not a universal pass/fail definition.
 
 ## Resource list
 
@@ -141,6 +150,9 @@ The stars ordering is Matt → Affaan → Garry → Addy → Cursor Plugins prox
 - [Anthropic — Building effective agents](https://www.anthropic.com/research/building-effective-agents): workflow/agent architectural distinction.
 - [OpenAI — Agents guide](https://developers.openai.com/api/docs/guides/agents): tools, state, orchestration, runtime boundaries.
 - [OpenAI — Guardrails and human review](https://developers.openai.com/api/docs/guides/agents/guardrails-approvals): checks and human approval boundaries.
+- [Microsoft — Agent Framework Durable Extension](https://learn.microsoft.com/en-us/agent-framework/hosting/durable-extension): durable, event-driven workflows and human approvals can be workflow capabilities.
+- [Factory — What is a software factory?](https://factory.com/articles/what-is-a-software-factory): standardized repeatable delivery, traceability, measurement, and continuous feedback.
+- [Warp — Factories overview](https://docs.warp.dev/factories/): work intake, default agents, handoff to reviewed PR, permissions, and run evaluation.
 
 ### GitHub popularity data
 
