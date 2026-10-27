@@ -5,5 +5,8 @@
         "**/bin": true,
         "**/obj": true,
         "**/TestResults": true,
+    },
+    "chat.agentSkillsLocations": {
+        "~/.copilot/installed-plugins/brain/wf/skills": true
     }
 }
