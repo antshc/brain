@@ -1,6 +1,7 @@
 ---
 name: grill-design
-description: Stress-tests a plan or design through a relentless interview, surfacing domain terminology, feature decisions, assumptions, and ADRs. Use for grill design, grilling design, or domain-modeling interview. Not for implementation; closes with a spec or design handoff.
+description: >-
+  Stress-tests a plan or design through a relentless interview, resolving decisions and recording glossary terms, assumptions, and ADRs. Use to grill a design, run a domain-modeling interview, or resolve a Wayfinder grilling ticket. Closes with a spec or design handoff, not implementation.
 ---
 
 # Grill Design
