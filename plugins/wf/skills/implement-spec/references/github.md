@@ -57,7 +57,6 @@ Push to the confirmed Git remote with `git push --set-upstream REMOTE INTEGRATIO
 | Update coverage | `gh pr edit PR_NUMBER --repo SOURCE_REPOSITORY --body-file PR_FILE` |
 | Read PR | `gh pr view PR_NUMBER --repo SOURCE_REPOSITORY --json url,title,body,headRefOid,isDraft,baseRefName,headRefName,state` |
 | Inspect checks | `gh pr checks PR_NUMBER --repo SOURCE_REPOSITORY` |
-| Mark ready | `gh pr ready PR_NUMBER --repo SOURCE_REPOSITORY` |
 
 Create the draft only after a verified ticket commit exists ahead of the base. Reuse a matching PR rather than duplicating it; preserve user-authored PR content when updating coverage. Use separate `Closes OWNER/REPO#NUMBER` lines for implemented tickets with their owning repositories. Reference the spec without a closing keyword until finalization gates pass; then add its closing reference. Never add closing references for skipped tickets.
 
@@ -68,9 +67,9 @@ Use title `{{initiative-id}}: <summary>` and a standalone `{{initiative-id}}` li
 
 Example rationale: `- Prevent duplicate charges when customers retry timed-out payments.` Avoid code summaries such as `- Add an idempotency check to PaymentService.`
 
-After confirmed worktree removal, invoke code review from SOURCE_ROOT. Pass the PR URL and SOURCE_ROOT. Review fetches the diff and creates a separate fresh detached worktree from that existing repository; it must not clone or reuse the removed implementation worktree. Keep draft/spec open for review failure, unavailable initiative verification, unresolved `fail`/`partial` app verification, posting failure, stale head or unresolved bug/initiative findings. Do not auto-fix during review.
+After confirmed worktree removal, invoke code review from SOURCE_ROOT. Pass the PR URL and SOURCE_ROOT. Review fetches the diff and creates a separate fresh detached worktree from that existing repository; it must not clone or reuse the removed implementation worktree. Keep the spec open for review failure, unavailable initiative verification, unresolved `fail`/`partial` app verification, posting failure, stale head or unresolved bug/initiative findings. Do not auto-fix during review.
 
-Read the final body, target/head branches, draft state, and check results back. Distinguish pending, failed, absent, and passed checks; required pending/failed checks block readiness. Do not claim a nonexistent check passed.
+Read the final body, target/head branches, draft state, and check results back. Distinguish pending, failed, absent, and passed checks; required pending/failed checks block spec closure. Confirm `isDraft` is `true`; the PR is never marked ready by this skill. Do not claim a nonexistent check passed.
 
 ## Verification evidence
 
