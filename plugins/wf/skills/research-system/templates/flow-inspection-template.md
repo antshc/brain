@@ -5,7 +5,7 @@
 - Question, Scope, and Summary use domain anchors — capability, feature, functional slices, actor, action, object, outcome, and named systems — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
 - Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the skill. A bare service name is not evidence.
 - Every diagram node, Flow row, boundary claim, and Conclusion statement traces to a Fact. Quote the deciding line whenever it settles a claim on sight.
-- Executing code and a probed correlation id prove the chain; deployment diagrams, READMEs, comments, and team knowledge state only intent. Record mismatches as Facts.
+- Executing code and a correlation id traced at runtime prove the chain; deployment diagrams, READMEs, comments, and team knowledge state only intent. Record mismatches as Facts.
 - Scope is one end-to-end chain. Each deployable appears once as one lane with 1–5 ordered major-step nodes; deeper internal mechanisms belong to optional Behavior follow-ups.
 
 - Capability: {{stable product ability the flow realizes}}
@@ -52,7 +52,7 @@
 
 ## Facts
 
-**Rules:** One row per confirmed chain claim. Include ordering, retries, duplication, transactional scope, and what survives a lane failure when they affect the outcome. A runtime probe Fact records the rerunnable command, correlation id, confirmed lanes or handoffs, and log or trace evidence. Prefer facts that contradict the assumed topology.
+**Rules:** One row per confirmed chain claim. Include ordering, retries, duplication, transactional scope, and what survives a lane failure when they affect the outcome. A runtime check Fact records the rerunnable command, correlation id, confirmed lanes or handoffs, and log or trace evidence. Prefer facts that contradict the assumed topology.
 
 | # | Fact | Evidence |
 |---|---|---|
@@ -62,16 +62,16 @@
 
 ### Assumptions
 
-**Rules:** Plausible but unconfirmed claims, including every crossing missing its emit site, receive site, or binding. A deployable named in diagrams but not confirmed by executing source belongs here when crossing evidence suggests it exists; when its absence could change chain completeness or the framed answer, record that consequence under Unknowns too. `What would verify it` is a concrete command, probe, search, or file to open.
+**Rules:** Plausible but unconfirmed claims, including every crossing missing its emit site, receive site, or binding. A deployable named in diagrams but not confirmed by executing source belongs here when crossing evidence suggests it exists; when its absence could change chain completeness or the framed answer, record that consequence under Unknowns too. `What would verify it` is a concrete command, runtime check, search, or file to open.
 
 | # | Assumption | Why unverified | What would verify it |
 |---|---|---|---|
 
 ### Unknowns
 
-**Rules:** Missing information that could change the chain-level answer. `Next probe` names the exact search, command, runtime probe, or file to open. When runtime confirmation matters and no chain probe ran, record the rerunnable probe here.
+**Rules:** Missing information that could change the chain-level answer. `Next check` names the exact search, command, runtime check, or file to open. When runtime confirmation matters and no chain check ran, record the rerunnable check here.
 
-| # | Unknown | Next probe |
+| # | Unknown | Next check |
 |---|---|---|
 
 ## Behavior follow-ups

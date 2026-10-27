@@ -3,7 +3,7 @@ name: {{skillName|lowercase-hyphenated, matches folder, verb-prefix family}}
 description: {{description|third person, 100 to 300 chars, when then responsibility then result, 3 to 6 trigger keywords, no forbidden description characters}}
 ---
 <!-- @: Add `disable-model-invocation: true` to frontmatter only for user-invoked skills. -->
-<!-- @: Pick one variant per Variant selection; keep its body section, delete the other two and every directive. -->
+<!-- @: Pick body blocks per Block selection; delete unused blocks and every directive. -->
 
 # {{Title}}
 
@@ -18,25 +18,36 @@ description: {{description|third person, 100 to 300 chars, when then responsibil
 
 - **MUST** {{constraint}}. {{mechanism}}. Rationale: {{rationale}}. If {{blocker}}, {{failurePolicy|fail closed, controlled fallback, or graceful degradation}}.
 
-<!-- @: VARIANT workflow — order mandatory. -->
+<!-- @: Block selection: Workflow by default; add Loop, Tactics, Reference only when the task needs them; free-form sections only when the output itself dictates structure. -->
+<!-- @: BLOCK Workflow: ordered steps; add the branch step only when cases need different steps. -->
 ## Workflow
 
-1. {{step|Imperative action}}. *Done when* {{completionCondition|checkable, exhaustive where it matters}}.
-2. {{step}}. *Done when* {{completionCondition}}.
+1. Determine the case: **{{caseA|observable condition}}?** → {{caseASteps|steps or section}}; **{{caseB}}?** → {{caseBSteps}}. *Done when* one case is selected.
+2. {{step|Imperative action}}. *Done when* {{completionCondition|checkable, exhaustive where it matters}}.
 
-<!-- @: VARIANT probes — agent chooses path among predefined probes. -->
-## Probes
+<!-- @: BLOCK Loop: repeat-until work (interview, review, validate then fix). -->
+## {{loopName|Loop named for its activity, e.g. Interview or Review}}
 
-Select and combine probes by their trigger; run each selected probe to its result. Skip probes whose trigger is absent and record why.
+Repeat until {{exitCondition|observable stop, e.g. user confirms or validator passes}}. Every pass:
 
-| Probe | Use when | Result |
-|---|---|---|
-| **{{probeName|leading word}}** | {{trigger|observable condition}} | {{result|evidence or artifact it yields}} |
+1. {{passStep|Action run on every pass}}. *Done when* {{completionCondition}}.
 
-<!-- @: VARIANT free-form — neither fits; agent designs body sections around the output contract. -->
-## {{sectionName|Section serving the output contract}}
+<!-- @: BLOCK Tactics: unordered situational techniques; each applies only while its trigger holds. -->
+## Tactics
 
-{{content|Steps, reference, or decision criteria the task needs}}
+Re-check triggers {{cadence|once at start, after every answer, or after every new fact}}.
+
+**{{tacticName|leading word}}** — when {{trigger|observable condition}}, {{action}}. Yields {{result|evidence or artifact}}.
+
+<!-- @: BLOCK Reference: definitions or rules consulted on demand; name the section for its content; disclose branch-only material. -->
+## {{referenceName|Section named for its content}}
+
+{{reference|Definitions, rules, decision criteria}}
+
+## Examples
+<!-- @: Input then output pairs when output style or quality matters; delete otherwise. -->
+
+- {{example|Input → expected output}}
 
 ## Output
 
@@ -53,5 +64,3 @@ Select and combine probes by their trigger; run each selected probe to its resul
 <!-- @: Observable result conditions; delete if step criteria already prove the result. Add a final completeness sweep only for multi-part work. -->
 
 - {{criterion|Checkable condition on files, output, or state}}
-
-<!-- @: Variant selection: workflow if steps must run in a fixed order; probes if the agent picks among known techniques by situation; free-form if the task is creative or its structure follows the output itself. -->

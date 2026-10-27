@@ -11,7 +11,7 @@ The document carries a mermaid diagram of the confirmed mechanism. A capability 
 5. **Hypothesize** — write the mechanism as a testable chain (`OrderController.Create` → `OrderService.Place` → `OrdersRepository.Insert`). Each hypothesis names the next thing to confirm.
 6. **Rank by risk** — confirm in this order: does this path actually execute for the framed case (vs. a dead or superseded lookalike) → which triggers reach it, and what each does differently before they converge → which provider actually serves it and what it falls back to (see Providers and fallback) → config/feature-flag branching → error and edge cases → async ordering → performance → naming.
 7. **Trace deep, narrow** — go-to-definition, find-references, call hierarchy along that one chain instead of reading whole files. Drop a branch the moment it is irrelevant.
-8. **Probe** when static reading can't settle a claim — which branch fires, runtime-computed config, async ordering.
+8. **Run a runtime check** when static reading can't settle a claim — which branch fires, runtime-computed config, async ordering.
 9. **Record on confirmation** — write each Fact with its citation immediately, and prune the branches it rules out.
 
 **Done when** every in-scope trigger reaches a cited convergence point, every step from there to an observable outcome carries a citation, every outcome and selectable provider with its fallback edge is accounted for, every call leaving the deployable is recorded as an outcome carrying its contract, the diagram accounts for every recorded Fact, and the remaining unknowns can't change the answer.

@@ -49,7 +49,7 @@
 
 | Attribute | Type | Required | Values / format | Source | Evidence |
 |---|---|---|---|---|---|
-| {{name}} | {{type}} | {{yes \| no}} | {{enum, encoding, key prefix grammar}} | {{file reference}} | {{file reference or probed item}} |
+| {{name}} | {{type}} | {{yes \| no}} | {{enum, encoding, key prefix grammar}} | {{file reference}} | {{file reference or item read at runtime}} |
 
 ## Ownership
 
@@ -113,9 +113,9 @@
 
 ## Unknowns
 
-**Rules:** `Next probe` names the exact query, command, or file.
+**Rules:** `Next check` names the exact query, command, or file.
 
-| # | Unknown | Next probe |
+| # | Unknown | Next check |
 |---|---|---|
 
 ## Conclusion

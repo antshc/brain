@@ -18,7 +18,7 @@ Include the details that materially change the investigation:
 - Name important branches such as feature flags, provider selection, retries, failures, fallbacks, or asynchronous paths.
 - Ask for current **as-built** behavior. Use a design or review skill when the goal is a proposed change or a before-and-after delta.
 - Mention suspected mocks, emulators, or development-only stores so the inspection can distinguish wiring from production behavior.
-- Request a probe when static code cannot settle a runtime claim, and say which commands or environments are safe to use.
+- Request a runtime check when static code cannot settle a runtime claim, and say which commands or environments are safe to use.
 - Provide an output path only when the default location under `docs/ongoing/` is unsuitable.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
@@ -60,7 +60,7 @@ Use the Data axis when the answer turns on one item type and its store.
 
 **Ownership and consistency**
 
-> Inspect the `Session` item and its production store. Determine the key design, authoritative writer, readers, serialization shape, consistency guarantees, concurrent-write behavior, expiry, and deletion path. Distinguish production configuration from local emulators and identify any claim that requires a runtime probe.
+> Inspect the `Session` item and its production store. Determine the key design, authoritative writer, readers, serialization shape, consistency guarantees, concurrent-write behavior, expiry, and deletion path. Distinguish production configuration from local emulators and identify any claim that requires a runtime check.
 
 **Migration safety**
 
@@ -75,7 +75,7 @@ Use the Data axis when the answer turns on one item type and its store.
 - Separate facts you need proved from suspicions you want checked. For example: "Verify whether `InMemoryOrderStore` is development-only."
 - State access constraints before inspection begins, including unavailable repositories, prohibited environments, or commands that must not run.
 - Let evidence determine the conclusion. Avoid embedding the expected answer as if it were already true.
-- Ask for unknowns to be named as concrete next probes instead of filled with inference.
+- Ask for unknowns to be named as concrete next checks instead of filled with inference.
 
 ## It is working if
 
@@ -84,4 +84,4 @@ Use the Data axis when the answer turns on one item type and its store.
 - The trace has a named entry point and a defensible stopping boundary.
 - Real implementations are separated from mocks, stubs, emulators, and local-only configuration.
 - Cross-process boundaries identify both sides of the contract.
-- Unsettled runtime behavior ends in a concrete probe, not a guess.
+- Unsettled runtime behavior ends in a concrete runtime check, not a guess.

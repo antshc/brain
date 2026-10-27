@@ -26,7 +26,7 @@ Run after repairs so newly synced rows are included. Check each relevant row for
 
 ## Final reconciliation and handoff
 
-Re-read the request and map every interview obligation to evidence: questions/answers, decisions/assumptions, inline records, corrections/drift, triggered verification and external-source probes, and index updates.
+Re-read the request and map every interview obligation to evidence: questions/answers, decisions/assumptions, inline records, corrections/drift, triggered verification and external-source tactics, and index updates.
 
 Every `asked`, `corrected`, or `drift` entry must have `repaired:` / `resolved:` evidence or appear in the open-items report with blocker and next action. Report pending writes separately; a failed write, unresolved question, or verification marker is not success.
 

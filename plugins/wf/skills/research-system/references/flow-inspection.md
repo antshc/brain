@@ -26,7 +26,7 @@ Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm c
 3. **Walk lane by lane** — per deployable record what it receives, 1–5 ordered major steps, and what it emits. A major step is a boundary-relevant responsibility needed to explain how the inbound contract becomes the outbound contract; collapse implementation details that do not change that explanation. Read only enough client call sites, routes, publish/subscribe calls, SDK use, auth configuration, error handling, and IaC bindings to prove the steps and next crossing; leave deeper internal mechanism for a Behavior-axis run.
 4. **Classify every edge** — continuable or terminal (see Boundary). Continue when the next deployable's executing source opens and its behavior can change the framed outcome. Otherwise close a confirmed crossing as terminal with `no source access` or `out of framed scope — {{reason}}`; keep an unconfirmed crossing in Gaps.
 5. **Complete the chain** — reach a terminal for every in-scope branch before examining any lane internally. Record outcome-irrelevant siblings as terminal by scope and cycles as handoffs back to an existing lane.
-6. **Probe the chain** (see Chain probe) — one real correlation id beats any amount of static reading for proving the lanes actually connect. Record the command, correlation id, and confirmed handoffs as Facts; when no probe runs and runtime confirmation matters, record the exact probe in Unknowns.
+6. **Check the chain at runtime** (see Chain check) — one real correlation id beats any amount of static reading for proving the lanes actually connect. Record the command, correlation id, and confirmed handoffs as Facts; when no runtime check runs and runtime confirmation matters, record the exact check in Unknowns.
 7. **Draw and render the chain** — the swimlane is part of the deliverable, not an illustration added afterwards. Draw each deployable once as one lane containing 1–5 ordered major-step nodes; arrows between lanes carry boundary contracts.
 8. **Offer Behavior follow-ups** — after the chain is complete, apply the Behavior follow-up gate. Run the **Behavior** axis only when the user asks for a listed follow-up; pass its question verbatim, its inbound contract as the entry point, and its expected outbound contracts as the observable-outcome boundary.
 
@@ -65,9 +65,9 @@ For internal boundaries, cite both sides. For external boundaries, cite the call
 
 Guessed topology is the default failure of cross-service tracing, and this rule is what makes it falsifiable.
 
-## Chain probe
+## Chain check
 
-Issue one real request carrying a correlation id, then collect that id across every deployable's logs or distributed trace. Every handoff the id lights up becomes a Fact in one action, and lanes the static read missed surface here. Record the correlation id and the command issued so the trace is re-runnable; handoffs the probe never lit stay assumptions.
+Issue one real request carrying a correlation id, then collect that id across every deployable's logs or distributed trace. Every handoff the id lights up becomes a Fact in one action, and lanes the static read missed surface here. Record the correlation id and the command issued so the trace is re-runnable; handoffs the check never lit stay assumptions.
 
 ## Behavior follow-up gate
 

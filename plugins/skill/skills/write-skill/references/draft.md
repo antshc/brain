@@ -13,7 +13,7 @@ Write or rewrite one skill from a brief or request. Apply every rule in [best-pr
 1. **Load rules.** Read best-practices.md, wording.md, and the template in full, plus repository agent-skill instructions (e.g. `.github/instructions/*skill*.instructions.md`) when present; repository rules win on conflict. *Done when* all are read.
 2. **Resolve identity.** Set name (verb-prefix family, matches folder), target path, plugin, invocation mode, callers. Check the environment for name collisions and neighbouring skills to compose with instead of duplicating. *Done when* name and path are unique and invocation mode is justified by callers.
 3. **Inventory (rewrite only).** List every rule, step, constraint, failure behavior, pointer, and completion criterion of the existing skill. *Done when* every sentence maps to an item.
-4. **Select variant.** Apply Variant selection from the template: workflow, probes, or free-form. *Done when* one variant is chosen with a one-line reason.
+4. **Select blocks.** Apply Block selection from the template: Workflow by default; add Loop, Tactics, or Reference only when the task needs them; free-form sections only when the output dictates structure. *Done when* each chosen block has a one-line reason.
 5. **Write description.** Front-load the leading word; one trigger per branch; 3–6 keywords; check every forbidden description character. *Done when* it states when, responsibility, result and passes the character table.
 6. **Fill body.** Fill every placeholder; delete unused sections and all `<!-- @: -->` directives of the template. Apply instruction precision: constraint pattern for critical rules, a failure policy per critical step, degrees of freedom matched to task risk, output contract with no-result and incomplete outcomes. *Done when* no placeholder or template directive remains and each step has a checkable completion condition.
 7. **Disclose and place resources.** Push branch-specific or bulky reference behind conditionally worded pointers into `references/`; scaffolds into `templates/`; fragile repeated operations into `scripts/`. Copy any needed resource into this skill's folder. *Done when* every link resolves inside the skill folder and `SKILL.md` body is under 300 lines.
@@ -23,6 +23,6 @@ Write or rewrite one skill from a brief or request. Apply every rule in [best-pr
 ## Return
 
 - Created or modified file paths (absolute).
-- Name, invocation mode, variant with reason.
+- Name, invocation mode, blocks with reasons.
 - Assumptions made for gaps in the input.
 - Rewrite only: inventory items changed or removed, each with reason.

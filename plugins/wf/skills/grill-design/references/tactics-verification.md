@@ -1,6 +1,6 @@
-# Verification Probes
+# Verification Scope
 
-This probe inspects and proposes coverage; code and tests remain read-only. "Change" means a design change, not a source edit.
+This tactic inspects and proposes coverage; code and tests remain read-only. "Change" means a design change, not a source edit.
 
 ## Coverage categories
 
