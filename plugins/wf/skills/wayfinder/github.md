@@ -65,6 +65,16 @@ Read again to confirm the current user is the sole claimant before work. A confl
 
 **Returns:** confirmed assignment.
 
+## Unassign ticket
+
+**Reads:** `{{issueNumber}}`.
+
+```
+gh issue edit {{issueNumber}} --repo {{trackerRepository}} --remove-assignee "@me"
+```
+
+**Returns:** confirmed no current-user assignee after **Read ticket**; the open ticket returns to the frontier.
+
 ## Comment on ticket
 
 **Reads:** `{{issueNumber}}`, `{{body}}` (resolution/evidence).
