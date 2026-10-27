@@ -68,16 +68,16 @@
 
 ## Assumptions
 
-**Rules:** plausible but unconfirmed. `What would verify it` is a concrete action — a command, a probe, a file to open — not "investigate further".
+**Rules:** plausible but unconfirmed. `What would verify it` is a concrete action — a command, a runtime check, a file to open — not "investigate further".
 
 | # | Assumption | Why unverified | What would verify it |
 |---|---|---|---|
 
 ## Unknowns
 
-**Rules:** `Next probe` names the exact search, command, or file to open.
+**Rules:** `Next check` names the exact search, command, or file to open.
 
-| # | Unknown | Next probe |
+| # | Unknown | Next check |
 |---|---|---|
 
 ## Conclusion

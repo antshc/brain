@@ -10,7 +10,7 @@ The unit is one data boundary: the governed item type, its authoritative writer,
 4. **Attribute every write to its writer** — find-references on the store binding and the grant that permits the write, across every repo that could hold one.
 5. **Read the shape off the write path** — the persisted attribute set is whatever the serializer emits, which drifts from what the model class declares: ignored members, custom converters, nulls dropped on write, and older items written by older code.
 6. **Settle each dimension** — Schemas, Ownership, Consistency, Migrations, Concurrency, Retention. Each section below names what to establish and the failure it catches.
-7. **Probe when static reading can't settle it** — read one real item and diff its attributes against the model, run the query and check whether it scanned, write twice concurrently and see which guard fires.
+7. **Run a runtime check when static reading can't settle it** — read one real item and diff its attributes against the model, run the query and check whether it scanned, write twice concurrently and see which guard fires.
 
 **Done when** every access pattern names the key or index that serves it and every key and index names a pattern that needs it; every item type names its sole writer and its readers; every read states its consistency and its lag sources; every in-flight attribute change states its backfill and completion signal; every racing write states its guard; every item type states its retention; and the remaining unknowns can't change the answer.
 

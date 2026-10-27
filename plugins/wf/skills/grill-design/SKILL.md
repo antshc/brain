@@ -1,6 +1,6 @@
 ---
 name: grill-design
-description: Stress-tests a plan or design through a relentless interview, surfacing domain terminology, feature decisions, assumptions, and ADRs. Use for grill design, grilling design, or domain-modeling probes. Not for implementation; closes with a spec or design handoff.
+description: Stress-tests a plan or design through a relentless interview, surfacing domain terminology, feature decisions, assumptions, and ADRs. Use for grill design, grilling design, or domain-modeling interview. Not for implementation; closes with a spec or design handoff.
 ---
 
 # Grill Design
@@ -39,7 +39,7 @@ Integrate lookup evidence into the frontier and touched surface; integrate recor
 
 ## Interview
 
-Probe the design until the user confirms shared understanding. Maintain the full **decision tree** and **frontier** internally: every unresolved question whose prerequisites are settled. Hold questions with pending prerequisites.
+Grill the design until the user confirms shared understanding. Maintain the full **decision tree** and **frontier** internally: every unresolved question whose prerequisites are settled. Hold questions with pending prerequisites.
 
 Before selecting the next question, look up facts available from the environment and apply *Decision states*: a checklist-backed Feature Assumption leaves the frontier. Select one ready question with its stable ID, descriptive title, and recommended answer with reasoning. Phrase it so **"yes" accepts its recommendation**; allow disagreement or another choice without treating silence as approval.
 
@@ -57,7 +57,7 @@ Before **every question**, including fact-gap, term, ADR-scope, and close questi
 ➡️ <recommended answer and reason>
 ```
 
-After every answer, record it and perform required inline writes; re-check triggered probes and affected decision keys. When the answer changes evidence or dependencies, rebuild assumptions and the frontier before selecting the next question. Withdraw obsolete questions, defer blocked ones, and preserve stable IDs. Unanswered questions remain pending, never implicitly accepted. Newly unblocked dependents become eligible immediately; do not wait for other frontier questions to be answered.
+After every answer, record it and perform required inline writes; run *Every turn*, re-check *Tactics* triggers and affected decision keys. When the answer changes evidence or dependencies, rebuild assumptions and the frontier before selecting the next question. Withdraw obsolete questions, defer blocked ones, and preserve stable IDs. Unanswered questions remain pending, never implicitly accepted. Newly unblocked dependents become eligible immediately; do not wait for other frontier questions to be answered.
 
 Use the code-lookup contract to obtain environmental facts rather than asking the user to research them. Running lookups are unsettled prerequisites: hold their dependent questions and select one other ready question without waiting. If a lookup fails or stays inconclusive, follow *Gotchas* rather than inventing a fact. Index loading, lookups, and ledger/record writes still use their required tools.
 
@@ -103,19 +103,9 @@ Unknown applicability alone creates a fact-gap prerequisite, not a policy decisi
 - Re-fetch an artifact when first needed or when its required evidence is no longer available in context. Prefer reuse after a confirmed write; re-read when verification or a detected change requires it, not on a schedule.
 - Authority: `GLOSSARY.md` / `ARCHITECTURE.md` / ADR / Concept > code > external sources. Surface unresolved conflicts, including conflicts within the same rank; apply only explicit recorded overrides, otherwise ask rather than silently choosing an authority.
 
-## Probes
+## Every turn
 
-Re-check each probe's trigger after every user answer or new fact. A later answer can invalidate an earlier interpretation.
-
-**Glossary conflict** — when the user's term clashes with `GLOSSARY.md`, cite the definition and ask which meaning applies.
-
-**Fuzzy language** — when a term is vague or overloaded, propose a precise canonical term and resolve it with the user.
-
-**Concrete scenarios** — when a domain relationship, boundary, or invariant is asserted as fact, invent edge cases that expose its limits.
-
-**Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [probes-verification.md](./references/probes-verification.md) and apply the coverage-category check.
-
-**External source** — when seeded from an explicit external link or reference, load [probes-external-source.md](./references/probes-external-source.md); track and reconcile it throughout the session.
+Run in order after every user answer or new fact, before the next question; each step no-ops when it has nothing new.
 
 **Scan and match** — append newly surfaced terms and repo-relative verbatim file/folder paths to the ledger, including lookup results.
 * Nothing new → reason over the current index; no scan or surface write.
@@ -133,14 +123,28 @@ Extract mandates, prohibitions, open choices, and default clauses from the body 
 * Supersession → identify the outdated rule; repair a Concept during closing, or rewrite a user-reversed ADR inline.
 * Out of scope → explain why the record does not apply.
 
-**Code cross-reference** — when the user states how something works, use the lookup contract to check user-facing, application, integration, and persistence boundaries: validation, constraints, models, schemas, contracts, relationships, and logic. Surface contradictions with both the claim/record anchor and code `path:line` or symbol evidence. A contradiction against a Concept/ADR is Drift; log both sources. Missing proof → label `unverified`, retain the fact gap, and avoid presenting it as an established contradiction.
-
 **Record inline** — resolve terms and architectural decisions in the turn answered, before the next question:
 * Explicitly resolved term → use the record contract's `term` mode.
 * Explicitly resolved decision → load `adr` mode and check its gate; pass → write; miss → Feature Decision in the ledger.
 * Model resolution → Feature Assumption in the ledger, not an ADR.
 
 Existing Concept repairs belong to closing; other reusable rules remain ledger-only. Apply *Gotchas* when a write is blocked. Question sequencing does not delay authorized inline writes.
+
+## Tactics
+
+Re-check each tactic's trigger after every user answer or new fact. A later answer can invalidate an earlier interpretation.
+
+**Glossary conflict** — when the user's term clashes with `GLOSSARY.md`, cite the definition and ask which meaning applies.
+
+**Fuzzy language** — when a term is vague or overloaded, propose a precise canonical term and resolve it with the user.
+
+**Concrete scenarios** — when a domain relationship, boundary, or invariant is asserted as fact, invent edge cases that expose its limits.
+
+**Code cross-reference** — when the user states how something works, use the lookup contract to check user-facing, application, integration, and persistence boundaries: validation, constraints, models, schemas, contracts, relationships, and logic. Surface contradictions with both the claim/record anchor and code `path:line` or symbol evidence. A contradiction against a Concept/ADR is Drift; log both sources. Missing proof → label `unverified`, retain the fact gap, and avoid presenting it as an established contradiction.
+
+**Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [tactics-verification.md](./references/tactics-verification.md) and apply the coverage-category check.
+
+**External source** — when seeded from an explicit external link or reference, load [tactics-external-source.md](./references/tactics-external-source.md); track and reconcile it throughout the session.
 
 ## Gotchas
 
@@ -158,7 +162,7 @@ When the user asks to close, confirms closure, or requests implementation, load 
 
 ## Completion criteria
 
-- The user ended the grill; the sweep accounts for every question, decision, gap, and triggered probe.
+- The user ended the grill; the sweep accounts for every question, decision, gap, and triggered tactic.
 - Each `asked`, `corrected`, or `drift` line is repaired/resolved with evidence, or explicitly reported open with a blocker and next action.
 - Required records and indexes are confirmed written, or individually reported pending; source code, tests, configuration, and scaffolding remain unchanged.
 - The persisted ledger and handoff identify decisions, assumptions, evidence, unanswered questions, verification scope, blockers, and next action. Report closure as incomplete when storage, writes, or checks remain blocked.

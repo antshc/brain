@@ -142,7 +142,7 @@ Plugins bundle related skills (and, for `crew`, agents). Follow a link to read a
 
 Common everyday workflow automation skills. Expected to be useful to all developers.
 
-- [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview and domain-modeling probe set that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
+- [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview with situational tactics that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
 - [wayfinder](plugins/wf/skills/wayfinder/SKILL.md): plan work larger than one session as a shared map of decision tickets, resolved one at a time.
 - [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a GitHub spec issue, with explicit offline Markdown publishing when needed.
 - [to-stories](plugins/wf/skills/to-stories/SKILL.md): turn requirements, `/to-spec` output, or `/to-zdesign` output into an ordered story list, owning numbered headings, dependencies, Jira metadata, and one `/draft-story` run per story.
@@ -244,8 +244,8 @@ Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: a `mol
 
 Skill authoring from bundled best practices (repo rules, mattpocock writing-for-agents, Agent Skills KBs).
 
-- [grill-skill](plugins/skill/skills/grill-skill/SKILL.md): interview one question at a time to define purpose, triggers, contract, variant, and constraints; outputs a confirmed skill brief for you to pass to `/write-skill`. Manual-only.
-- [write-skill](plugins/skill/skills/write-skill/SKILL.md): write mode drafts the skill (workflow, probes, or free-form template) then shrinks it, each in a fresh subagent; shrink mode only tightens existing skill, agent, or instructions files while preserving behavior. Manual-only.
+- [grill-skill](plugins/skill/skills/grill-skill/SKILL.md): interview one question at a time to define purpose, triggers, contract, body blocks, and constraints; outputs a confirmed skill brief for you to pass to `/write-skill`. Manual-only.
+- [write-skill](plugins/skill/skills/write-skill/SKILL.md): write mode drafts the skill (template with composable Workflow, Loop, Tactics, and Reference blocks) then shrinks it, each in a fresh subagent; shrink mode only tightens existing skill, agent, or instructions files while preserving behavior. Manual-only.
 
 ### engineering
 

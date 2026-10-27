@@ -96,18 +96,18 @@ IaC and migration files are executing code. An entity class is a *declaration* o
 
 ## Claim types
 
-- **FACT** — confirmed against code, a test, or a probe; carries a citation.
+- **FACT** — confirmed against code, a test, or a runtime check; carries a citation.
 - **ASSUMPTION** — plausible, unconfirmed; state why, and what would verify it.
-- **UNKNOWN** — a named gap, stated as a concrete next probe.
+- **UNKNOWN** — a named gap, stated as a concrete next check.
 - **CONCLUSION** — the explanation the facts support.
 
 ## File references
 
-Format every repository file mention in the inspection document as a filename-only link followed by visible line numbers: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Keep only the start-line anchor inside the target; hide the full relative path there and keep the complete line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply this format in prose, tables, Facts, Gaps, and probes, not only Evidence fields. Place each citation immediately after the claim it supports — never pool citations at the end. Quote the deciding line when short enough to settle the claim on sight. A bare path, symbol, table, or service name is not a citation.
+Format every repository file mention in the inspection document as a filename-only link followed by visible line numbers: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Keep only the start-line anchor inside the target; hide the full relative path there and keep the complete line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply this format in prose, tables, Facts, Gaps, and runtime checks, not only Evidence fields. Place each citation immediately after the claim it supports — never pool citations at the end. Quote the deciding line when short enough to settle the claim on sight. A bare path, symbol, table, or service name is not a citation.
 
-## Probes
+## Runtime checks
 
-Static reading settles what the code *can* do; a probe settles what it *does*. Reach for one whenever a claim cannot be closed by reading: run the test, add a temporary log, call the endpoint, read the stored item, collect a correlation id across logs. Discard the probe, keep the result.
+Static reading settles what the code *can* do; a runtime check settles what it *does*. Reach for one whenever a claim cannot be closed by reading: run the test, add a temporary log, call the endpoint, read the stored item, collect a correlation id across logs. Discard the check, keep the result.
 
 ## Gotchas
 

@@ -25,7 +25,7 @@ Own skill authoring end to end: the draft phase writes, the shrink phase tighten
 2. **Draft phase** (write mode). Launch a fresh subagent instructed to read and follow `references/draft.md`, given the input verbatim, the target path, and absolute paths of `references/draft.md`, `references/best-practices.md`, `references/wording.md`, and `templates/SKILL.template.md`. It returns per draft.md Return. *Done when* every returned path exists on disk.
 3. **Shrink phase.** Launch a new fresh subagent instructed to read and follow `references/shrink.md` on the drafted paths (write mode) or given paths (shrink mode), given absolute paths of `references/shrink.md`, `references/wording.md`, and `references/best-practices.md`. It returns per shrink.md Return. *Done when* the report lists every file with before → after counts.
 4. **Final check.** Read the result files. Confirm Completion criteria; fix a failing item by re-running the owning phase with the defect named. *Done when* all criteria hold or a remaining defect is reported.
-5. **Report.** Return paths, mode, variant and invocation mode (write mode), assumptions, shrink deltas, flagged items.
+5. **Report.** Return paths, mode, blocks and invocation mode (write mode), assumptions, shrink deltas, flagged items.
 
 ## Completion criteria
 

@@ -35,8 +35,8 @@ Record each answer into the brief; rebuild later questions when an answer change
 | 4 | **Triggers** | Distinct branches, 3–6 keywords users type | One trigger per branch; collapse synonyms |
 | 5 | **Inputs** | Each input, source, required or optional, resolution when missing | Derive from environment over asking at runtime |
 | 6 | **Output contract** | Artifacts, format, location, no-result and incomplete outcomes | Explicit outcome for each edge case |
-| 7 | **Variant** | workflow, probes, or free-form | See Variant |
-| 8 | **Steps or probes** | Outline with a checkable completion condition each | Demanding, exhaustive criteria where it matters |
+| 7 | **Blocks** | Workflow, Loop, Tactics, Reference, or free-form | See Blocks |
+| 8 | **Steps and tactics** | Outline with a checkable completion condition or trigger each | Demanding, exhaustive criteria where it matters |
 | 9 | **Degrees of freedom** | What must stay true vs agent's choice | Exploration high; migration and destructive ops low |
 | 10 | **Hard constraints** | MUST/MUST NOT rules, mechanism, failure policy each | Fail closed for mandatory mechanisms; fallback or degradation otherwise |
 | 11 | **Gotchas** | External tools, APIs, platform quirks | Only knowledge not findable by looking |
@@ -44,10 +44,14 @@ Record each answer into the brief; rebuild later questions when an answer change
 | 13 | **Completion** | Result conditions; completeness sweep needed? | Sweep only for multi-part work |
 | 14 | **Placement** | Plugin or folder, name in verb-prefix family | Existing plugin and family first |
 
-## Variant
+## Blocks
 
-- **workflow** — steps must run in a fixed order.
-- **probes** — agent picks among known techniques by situation.
+Default to Workflow; combine others only when needed.
+
+- **Workflow** — steps run in a fixed order; optional first branch step routes cases to different steps.
+- **Loop** — repeat-until work: interview, review, validate then fix.
+- **Tactics** — unordered techniques, each applied when its trigger holds.
+- **Reference** — definitions or rules consulted on demand.
 - **free-form** — creative task, or structure follows the output itself.
 
 ## Skill brief
@@ -61,8 +65,8 @@ Record each answer into the brief; rebuild later questions when an answer change
 - Triggers: {{branches and keywords}}
 - Inputs: {{name, source, required|optional, missing handling}}
 - Output: {{artifacts, format, location}}; no result: {{outcome}}; incomplete: {{outcome}}
-- Variant: {{workflow|probes|free-form}}; reason: {{reason}}
-- Steps or probes: {{outline with completion conditions}}
+- Blocks: {{Workflow|Loop|Tactics|Reference|free-form, one or more}}; reason: {{reason per block}}
+- Steps and tactics: {{outline with completion conditions or triggers}}
 - Degrees of freedom: {{fixed vs free}}
 - Constraints: {{MUST/MUST NOT, mechanism, failure policy}}
 - Gotchas: {{items or none}}

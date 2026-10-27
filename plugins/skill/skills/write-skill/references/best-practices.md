@@ -79,6 +79,13 @@ Every step ends on a **completion criterion**: the condition that tells the agen
 - **Clarity** — can the agent tell done from not-done? A vague bound ("understanding reached") invites **premature completion**: ending a step early because attention slips to _being done_, pulled by visible **post-completion steps**.
 - **Demand** — how much it requires. "Every modified model accounted for" forces **legwork** where "produce a change list" does not. Demand also binds flat reference ("every rule applied").
 - Strongest criteria are both checkable and exhaustive.
+
+**Body blocks** — compose; default to Workflow, add others only when needed:
+
+- **Workflow** — ordered steps. When cases need different steps, make step 1 a branch: "**New file?** → Creation steps; **Existing file?** → Editing steps".
+- **Loop** — repeat-until work (interview, review, validate → fix → repeat). State the exit condition and the steps every pass runs; a step that always runs belongs in the loop, not in Tactics.
+- **Tactics** — unordered techniques, each with an observable trigger, an action, and a result; state when triggers are re-checked. Use bold-lead lines, not tables, so a tactic can carry bullets and pointers.
+- **Examples** — input → output pairs when output style or quality matters; examples outperform descriptions of style.
 - Defend premature completion in order: sharpen the bound first; only if irreducibly fuzzy _and_ the rush is observed, split the sequence. Hiding later steps works only across a real context boundary (hand-off or subagent); an inline call clears nothing.
 
 **`## Completion criteria` section** — add when the result is not self-evident. List observable, checkable conditions on the produced result (files, output, state), not effort. Without them the agent stops at "steps ran" and claims success on a wrong or empty result.
