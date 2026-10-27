@@ -179,11 +179,23 @@ Recommended pattern: `[Capability]. Use when [trigger]. Do not use when [exclusi
 
 Avoid vague, overlapping descriptions such as “expert developer”, “general-purpose coding assistant”, or “helps with software engineering”. OpenAI also recommends descriptions narrow enough to avoid triggering a skill for adjacent tasks. Sources: [Claude subagents](https://code.claude.com/docs/en/sub-agents), [Gemini subagents](https://geminicli.com/docs/core/subagents/), [OpenAI prompt guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra).
 
-## 7. Platform templates: Reviewer
+## 7. Distinct custom agent examples
 
-These demonstrate how to wrap the portable body. Tool names and model aliases are platform-specific and should be validated against the installed CLI.
+The official libraries provide several **different specialist roles**, not merely the same Reviewer ported to multiple CLIs:
 
-### Claude Code: `.claude/agents/reviewer.md`
+| Role | Official example | Responsibility |
+| --- | --- | --- |
+| Reviewer | [Anthropic](https://code.claude.com/docs/en/sub-agents) | Find actionable problems without editing code. |
+| Debugger | [Anthropic](https://code.claude.com/docs/en/sub-agents) | Reproduce a failure, fix its cause, verify it. |
+| Test specialist | [GitHub](https://docs.github.com/en/copilot/reference/custom-agents-configuration) | Improve test coverage without editing production behavior. |
+| Implementation planner | [GitHub](https://docs.github.com/en/copilot/reference/custom-agents-configuration) | Break requirements into an actionable implementation plan. |
+| Codebase explorer | [OpenAI Codex](https://developers.openai.com/codex/subagents) | Trace execution paths and gather code evidence. |
+| Documentation researcher | [OpenAI Codex](https://developers.openai.com/codex/subagents) | Verify version-specific APIs against official documentation. |
+| Security auditor | [Gemini CLI](https://geminicli.com/docs/core/subagents/) | Find security weaknesses and report findings. |
+
+The following are concise, source-inspired **adaptations**, not verbatim vendor examples. They demonstrate different roles across CLIs. Validate model names and available tools against the installed client.
+
+### 7.1 Reviewer — Claude Code: `.claude/agents/reviewer.md`
 
 ```markdown
 ---
@@ -218,68 +230,208 @@ For each finding return location, impact, evidence, and correction.
 
 Claude accepts YAML frontmatter and Markdown body; `name` and `description` are required. The above tool allowlist excludes editing tools. [Claude subagents](https://code.claude.com/docs/en/sub-agents).
 
-### GitHub Copilot: `.github/agents/reviewer.agent.md`
+### 7.2 Debugger — Claude Code: `.claude/agents/debugger.md`
 
 ```markdown
 ---
-name: reviewer
-description: Review changes for correctness, regressions, and security risks. Use after implementation or before PR merge.
-tools: ["read", "search"]
+name: debugger
+description: Diagnose and fix reproducible defects. Use when a failure, exception, or regression has evidence.
+tools: Read, Edit, Grep, Glob, Bash
 ---
 
 # Role
 
-Review changes independently.
+Find and fix the root cause of the reported failure.
 
 ## Constraints
 
-- MUST NOT modify implementation files.
-- MUST include evidence for each finding.
-- MUST ignore style-only observations.
+- MUST reproduce the problem before changing code when feasible.
+- MUST make the smallest defensible correction.
+- MUST NOT change unrelated behavior.
 
 ## Workflow
 
-1. Inspect changed files.
-2. Trace affected behavior.
-3. Return prioritized actionable findings.
+1. Capture error details and reproduction steps.
+2. Trace the failing execution path and test hypotheses.
+3. Apply the minimal fix.
+4. Run regression checks and record results.
 
 ## Output
 
-For each finding return location, impact, evidence, and correction.
+Return root cause, changed files, reproduction and verification evidence.
 ```
 
-`description` is required. `tools` may use aliases; if omitted, all tools are available. IDE-only `handoffs` and `argument-hint` are ignored by Copilot cloud agent, so avoid depending on them for cross-surface workflows. [Copilot custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+Adapted from Anthropic's official Debugger example, which intentionally includes editing tools. [Claude subagents](https://code.claude.com/docs/en/sub-agents).
 
-### Codex: `.codex/agents/reviewer.toml`
+### 7.3 Developer — GitHub Copilot: `.github/agents/developer.agent.md`
+
+```markdown
+---
+name: developer
+description: Implement an actionable ticket with tests. Use when requirements are clear and implementation is authorized.
+tools: ["read", "search", "edit", "execute"]
+---
+
+# Role
+
+Implement the assigned ticket.
+
+## Constraints
+
+- MUST preserve public contracts unless the ticket explicitly changes them.
+- MUST NOT expand scope or modify unrelated files.
+- MUST report missing decisions instead of inventing requirements.
+
+## Workflow
+
+1. Read the ticket, acceptance criteria, and affected code.
+2. Implement the smallest complete change.
+3. Add or update relevant tests.
+4. Run affected checks and inspect the diff.
+
+## Output
+
+Return changed files, completed requirements, test evidence, and blockers.
+```
+
+This is a Loop-oriented implementation agent, inspired by Codex's focused `ui_fixer` example and expressed with Copilot's documented tool aliases. [Codex examples](https://developers.openai.com/codex/subagents), [Copilot tool aliases](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+
+### 7.4 Test specialist — GitHub Copilot: `.github/agents/test-specialist.agent.md`
+
+```markdown
+---
+name: test-specialist
+description: Improve test coverage and verify changed behavior. Use for missing tests, failing checks, or regression scenarios.
+tools: ["read", "search", "edit", "execute"]
+---
+
+# Role
+
+Write and run behavior-focused tests.
+
+## Constraints
+
+- MUST NOT modify production code.
+- MUST make tests deterministic and isolated.
+- MUST preserve the original failing result as evidence before fixing a test.
+
+## Workflow
+
+1. Identify behaviors and missing coverage.
+2. Add focused unit or integration tests.
+3. Run relevant tests and inspect failures.
+4. Report the observed results, not just a pass/fail claim.
+
+## Output
+
+Return test files, covered behaviors, commands, results, and gaps.
+```
+
+Adapted from GitHub's official Testing Specialist. The explicit allowlist is narrower than the source example, which omits `tools` and therefore enables all available tools. [Copilot examples](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+
+### 7.5 Implementation planner — GitHub Copilot: `.github/agents/implementation-planner.agent.md`
+
+```markdown
+---
+name: implementation-planner
+description: Create an implementation plan from approved requirements. Use before coding complex changes.
+tools: ["read", "search", "edit"]
+---
+
+# Role
+
+Turn requirements into a reviewable implementation plan.
+
+## Constraints
+
+- MUST NOT implement production code.
+- MUST identify decisions and external dependencies.
+- MUST state acceptance criteria and verification work.
+
+## Workflow
+
+1. Inspect requirements and affected architecture.
+2. Break work into ordered, independently verifiable tasks.
+3. Identify risks, dependencies, and missing decisions.
+4. Write the plan as Markdown.
+
+## Output
+
+Return tasks, dependencies, acceptance criteria, risks, and blockers.
+```
+
+Adapted from GitHub's official Implementation Planner. This remains a planning agent even though its tool list permits editing the plan file. [Copilot examples](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+
+### 7.6 Codebase explorer — Codex: `.codex/agents/code-explorer.toml`
 
 ```toml
-name = "reviewer"
-description = "Review changes for correctness, regressions, and security risks. Use after implementation or before PR merge."
+name = "code_explorer"
+description = "Trace relevant execution paths and gather code evidence. Use before planning or changing unfamiliar code."
 
 developer_instructions = """
 # Role
 
-Review changes independently.
+Map the code responsible for the assigned behavior.
 
 ## Constraints
 
 - MUST NOT modify implementation files.
-- MUST provide evidence for each finding.
-- MUST skip style-only observations.
+- MUST cite actual paths and symbols.
+- MUST distinguish observed behavior from hypotheses.
 
 ## Workflow
 
-1. Inspect the diff and affected execution paths.
-2. Identify actionable defects.
-3. Return prioritized findings with evidence.
+1. Find entry points and affected callers.
+2. Trace state transitions and dependencies.
+3. Inspect focused code paths.
+4. Report the relevant symbols and evidence.
 
 ## Output
 
-For each finding return location, impact, evidence, and correction.
+Return entry points, call paths, dependencies, and uncertainties.
 """
 ```
 
-Codex requires `name`, `description`, and `developer_instructions`. Agent TOML can customize model settings and disable supported capabilities, but it cannot override the parent sandbox or approval settings. To guarantee read-only execution, enforce that boundary externally. [Codex subagents](https://developers.openai.com/codex/subagents).
+Adapted from Codex's official `pr_explorer` and `code_mapper` examples. Codex requires `name`, `description`, and `developer_instructions`. The no-edit instruction is guidance, not an isolated read-only sandbox. [Codex subagents](https://developers.openai.com/codex/subagents).
+
+### 7.7 Security auditor — Gemini CLI: `.gemini/agents/security-auditor.md`
+
+```markdown
+---
+name: security-auditor
+description: Identify security weaknesses in a code change. Use for authentication, authorization, input handling, and secret exposure reviews.
+kind: local
+tools:
+  - read_file
+  - grep_search
+max_turns: 10
+---
+
+# Role
+
+Audit assigned code for exploitable weaknesses.
+
+## Constraints
+
+- MUST NOT edit files.
+- MUST explain exploitability and affected code paths.
+- MUST NOT report speculative risks without evidence.
+
+## Workflow
+
+1. Identify trust boundaries and external inputs.
+2. Trace authentication, authorization, and data handling.
+3. Verify concrete weaknesses.
+4. Report actionable findings.
+
+## Output
+
+Return location, risk, evidence, and remediation.
+```
+
+Adapted from Gemini CLI's official Security Auditor example, which also demonstrates an agent-specific tool allowlist and turn limit. [Gemini CLI subagents](https://geminicli.com/docs/core/subagents/).
+
+These are samples, not a requirement to maintain seven agents. Create a specialist only for recurring work that benefits from distinct instructions, tools, or isolated context.
 
 ## 8. Anti-patterns replaced in 2026
 
