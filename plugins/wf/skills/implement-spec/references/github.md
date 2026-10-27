@@ -12,6 +12,16 @@ Use `gh` for GitHub I/O and Git for branches/worktrees.
 - Replace placeholders with resolved argument values; quote paths and branch names. Use `--repo ISSUE_REPOSITORY` on issue commands and `--repo SOURCE_REPOSITORY` on PR commands. Use the confirmed source checkout/remote for Git commands, even when issue repositories differ.
 - Report authentication, permission, network, and validation failures. Preserve local commits and partial remote results; never claim publication, passing checks, or closure after a failed operation.
 
+## Create spec
+
+Only for plan.md or description input (no spec URL). Run after the `gh` checks in **Prerequisites** and before its label routing; `HARNESS_ROOT` as defined there.
+
+1. `TRACKER_REPOSITORY` = `gh repo view --json nameWithOwner --jq .nameWithOwner` at `HARNESS_ROOT`. `@summary` = plan.md first heading, else first description sentence, trimmed to one line.
+2. **Ask the user** once, in one question/input form, before the planner runs: target repository `owner/repo` (suggest the `origin` of the single git checkout under `HARNESS_ROOT/workspace/`, when exactly one exists) and initiative ID (suggest none; required). **MUST NOT** guess either value or proceed without an answer; validate the ID per **Prerequisites** `INITIATIVE_ID` rules and re-ask on an invalid one. Set `SOURCE_REPOSITORY` and `INITIATIVE_ID` from the answers. `BASE_BRANCH` = `gh repo view SOURCE_REPOSITORY --json defaultBranchRef --jq .defaultBranchRef.name`.
+3. Ensure labels `repo:target:SOURCE_REPOSITORY` and `repo:base:BASE_BRANCH` exist: `gh label list --repo TRACKER_REPOSITORY --search NAME`; missing → `gh label create NAME --repo TRACKER_REPOSITORY`.
+4. Body file (outside the repo) = full plan.md or description text verbatim, then a `Source: <plan.md path | inline description>` line. `gh issue create --repo TRACKER_REPOSITORY --title "INITIATIVE_ID: @summary" --body-file BODY_FILE --label "repo:target:SOURCE_REPOSITORY,repo:base:BASE_BRANCH"`.
+5. Read back title, labels, body. Done when the spec URL resolves and continues as the run's spec input.
+
 ## Read the task graph
 
 | Purpose | Command |
@@ -25,7 +35,7 @@ Use `gh` for GitHub I/O and Git for branches/worktrees.
 
 Read every page. Resolve explicit parent/blocker references in issue bodies too; honor explicit repository qualifiers for external issues. Tickets inherit the spec's source/base; conflicting ticket routing requires resolution. Use text relationships only when native capabilities are confirmed unavailable, and report that mode. A 404 alone can mean an inaccessible or incorrect resource; do not silently interpret it as an empty graph.
 
-Maintain a run-local mapping of ticket, blockers, status, integrated commit, and validation evidence, with the single shared worktree/branch recorded once. Tickets are closed as completed once their implementation is integrated (see **Closure and cleanup**); a ticket closed by this run counts as satisfied. Schedule one ticket at a time; dependants require committed, validated blocker implementations on the integration branch. Do not use open-issue counts alone as the frontier.
+Maintain a run-local mapping of ticket, blockers, status, integrated commit, and validation evidence, with the single shared worktree/branch recorded once. Tickets are closed as completed once their implementation is integrated (see **Closure and cleanup**); a ticket closed by this run counts as satisfied. Schedule one ticket at a time, or per `parallel` mode in [parallel.md](./parallel.md) with each ticket's worktree/branch recorded too; dependants require committed, validated blocker implementations on the integration branch. Do not use open-issue counts alone as the frontier.
 
 ## Single worktree lifecycle
 
@@ -33,7 +43,7 @@ Maintain a run-local mapping of ticket, blockers, status, integrated commit, and
 2. Inspect `git worktree list --porcelain`, branch refs, and the destination. Create only the missing parent directories. If the path or proposed integration branch exists, stop for explicit resume or selection of a unique run suffix; never overwrite, reset, or reuse unrelated work.
 3. Verify `workspace/` is ignored by the harness repository with `git -C HARNESS_ROOT check-ignore -q workspace/`; when not ignored, stop and report rather than editing harness ignore files.
 4. Fetch the confirmed source remote/base and record its resolved commit as `BASE_COMMIT`; report fetch failures rather than using a stale base. Run `git -C SOURCE_ROOT worktree add -b INTEGRATION_BRANCH WORKTREE_PATH BASE_COMMIT`. Verify the worktree is clean and `HEAD` is on the new integration branch at that commit.
-5. Run all ticket implementation, commits, checks, and the chore pass in `WORKTREE_PATH`. A delegated implementer receives that exact path/branch and one ticket; wait for completion and verify its result before another writer starts. Commit each verified ticket directly on the integration branch; no ticket-branch merge is needed. Preserve failed/incomplete changes and stop advancement.
+5. Run all ticket implementation, commits, checks, and the chore pass in `WORKTREE_PATH`. A delegated implementer receives that exact path/branch and one ticket; wait for completion and verify its result before another writer starts. Commit each verified ticket directly on the integration branch; no ticket-branch merge is needed (`parallel` mode: ticket worktrees per [parallel.md](./parallel.md), cherry-picked onto the integration branch). Preserve failed/incomplete changes and stop advancement.
 6. After final validation and a successful push, confirm the worktree is clean, implementation/chore work is complete, and all local commits are present on the remote PR branch. Remove only that run-owned worktree with `git -C SOURCE_ROOT worktree remove WORKTREE_PATH`, without force. Preserve dirty, unpushed, or incomplete work and report its exact path/branch. Keep the integration branch; do not delete `WORKTREES_ROOT`.
 
 ## Pull request lifecycle
