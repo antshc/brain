@@ -18,6 +18,7 @@ Run from the tracker repository: the current repository for a single repo, the d
 | `wayfinder:experiment` | `5319e7` | Experiment decision |
 | `wayfinder:grilling` | `fbca04` | Grilling decision |
 | `wayfinder:task` | `d93f0b` | Manual-work decision |
+| `wayfinder:contract-design` | `c5def5` | Contract-design decision |
 
 **Returns:** the resolved tracker repository and confirmed label names.
 

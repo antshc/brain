@@ -40,13 +40,14 @@ class CreateLabelsTest(unittest.TestCase):
             if call.args[0][:3] == ["gh", "label", "create"]
         ]
 
-    def test_creates_all_eight_baseline_labels(self) -> None:
+    def test_creates_all_nine_baseline_labels(self) -> None:
         self.assertEqual(
             [name for name, _, _ in self.labels],
             [
                 "hitl", "spec", "bug", "wayfinder:map",
                 "wayfinder:research", "wayfinder:experiment",
                 "wayfinder:grilling", "wayfinder:task",
+                "wayfinder:contract-design",
             ],
         )
         created = self.check_setup([])

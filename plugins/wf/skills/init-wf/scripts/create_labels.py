@@ -15,6 +15,7 @@ LABELS: list[tuple[str, str, str]] = [
     ("wayfinder:experiment", "5319e7", "Experiment-type decision ticket"),
     ("wayfinder:grilling", "fbca04", "Grilling-type decision ticket"),
     ("wayfinder:task", "d93f0b", "Manual-work decision ticket"),
+    ("wayfinder:contract-design", "c5def5", "Contract-design decision ticket"),
 ]
 
 
