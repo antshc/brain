@@ -1,7 +1,7 @@
 ---
 name: to-tickets
-description: Breaks a Spec issue into agent-executable tracer-bullet vertical slices and, after user approval, publishes them as GitHub sub-issues with native blockers and parallel waves. Use when cutting a spec or plan.md into tickets, sub-issues, AFK/HITL slices, or offline Markdown tickets.
-argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`] | offline {{localSpecPath}}"
+description: Breaks a Spec issue into agent-executable tracer-bullet vertical slices and, after user approval or in non-interactive auto mode, publishes them as GitHub sub-issues with native blockers and parallel waves. Use when cutting a spec or plan.md into tickets, sub-issues, AFK/HITL slices, or offline Markdown tickets.
+argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`] [auto] | offline {{localSpecPath}}"
 disable-model-invocation: true
 ---
 
@@ -13,16 +13,17 @@ Turn one Spec into user-approved, self-contained tracer-bullet tickets linked to
 
 - `{{specIssueNumber}}` — parent Spec issue; required online.
 - `[implementationDetails]` — inline text or file path (e.g. `plan.md`, `/memories/session/plan.md`); replaces the spec body as slicing source.
+- `[auto]` — non-interactive caller mode; only when a caller skill passes it explicitly (e.g. `implement-spec` planner). Asks nothing, skips approval, omits `hitl`.
 - `offline {{localSpecPath}}` — explicit offline mode; needs local spec content plus Initiative/source-repository metadata.
 
 Load [github.md](./references/github.md) before any GitHub read/write or offline save.
 
 ## Constraints
 
-- **Approval guard:** **MUST NOT** create, label, link, or save tickets (GitHub issues or `docs/tickets/` files) until the user explicitly approves the current breakdown in step 4. Silence, partial feedback, corrections, and ambiguous replies are not approval. Any slice change after approval needs re-presentation and re-approval. Before approval, only read and draft. Rationale: published tickets create tracker state the user must clean up.
+- **Approval guard:** **MUST NOT** create, label, link, or save tickets (GitHub issues or `docs/tickets/` files) until the user explicitly approves the current breakdown in step 4. Silence, partial feedback, corrections, and ambiguous replies are not approval. Any slice change after approval needs re-presentation and re-approval. Before approval, only read and draft. Rationale: published tickets create tracker state the user must clean up. **`auto` exception:** the caller's explicit `auto` invocation is the approval; skip step 4's questions and publish the drafted breakdown.
 - **MUST NOT** close or modify the parent Spec issue.
 - **Source precedence:** spec (or supplied implementation details) is authoritative for behavior and requirements; matched Concepts/ADRs for implementation patterns and policies; code for current state. On conflict, surface it in step 4; do not silently pick a side.
-- **Label guard:** every created ticket **MUST** carry `hitl`, whatever its HITL/AFK type. **MUST NOT** create or apply an `afk` label or any label encoding HITL/AFK type. Rationale: `implement-spec` skips `hitl` tickets; the user removes `hitl` to release a reviewed ticket for execution.
+- **Label guard:** every created ticket **MUST** carry `hitl`, whatever its HITL/AFK type. **MUST NOT** create or apply an `afk` label or any label encoding HITL/AFK type. Rationale: `implement-spec` skips `hitl` tickets; the user removes `hitl` to release a reviewed ticket for execution. **`auto` exception:** apply `{{repoLabel}}` only, never `hitl` (caller executes tickets immediately); the `afk` ban still holds.
 - Use offline publishing only when explicitly requested or after a reported GitHub/tool/authentication failure. **MUST NOT** report offline or partial output as GitHub success.
 
 ## Workflow
@@ -35,7 +36,7 @@ Determine mode:
 - **Online, spec + implementation details:** resolve `{{trackerRepository}}` and read the spec as above; slicing source = implementation details (read file paths; use inline text directly).
 - **Explicit offline:** follow **Offline publishing** in [github.md](./references/github.md); use the supplied local spec and metadata; skip all GitHub lookups.
 
-Set `{{repoLabel}}` to the spec's single `repo:target:<owner>/<name>` label (offline: from metadata). Missing `{{specIssueNumber}}` online, missing offline spec/metadata, or zero/several routing labels → ask the user; **MUST NOT** invent values.
+Set `{{repoLabel}}` to the spec's single `repo:target:<owner>/<name>` label (offline: from metadata). Missing `{{specIssueNumber}}` online, missing offline spec/metadata, or zero/several routing labels → ask the user; **MUST NOT** invent values. In `auto` mode, stop and report the missing value instead of asking.
 
 *Done when* slicing source, `{{specIssueNumber}}`, `{{repoLabel}}`, and (online) `{{trackerRepository}}` are known.
 
@@ -81,7 +82,9 @@ Present a numbered list; per slice show:
 
 Then print the parallel map as `Wave n: {{slices}}`, uncovered requirements, and source conflicts.
 
-Ask in ordinary conversation; **MUST NOT** use question/input tools:
+**`auto` mode:** print the breakdown and parallel map, ask nothing, and continue to step 5.
+
+Otherwise ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 - Does the granularity feel right (too coarse / too fine)?
 - Are blockers and waves correct? Does any wave have two slices editing the same code?
@@ -90,7 +93,7 @@ Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 **On correction:** apply it, recompute blockers and waves, print the full updated breakdown and parallel map, then end the turn awaiting approval. **MUST NOT** publish in the same turn as a correction.
 
-*Done when* the user explicitly approves the current breakdown.
+*Done when* the user explicitly approves the current breakdown, or (`auto`) the breakdown is printed.
 
 ### 5. Publish tickets
 
@@ -103,7 +106,7 @@ Branch on mode:
 - **Offline:** save approved bodies and the symbolic dependency map via **Offline publishing** in [github.md](./references/github.md); skip GitHub steps below.
 - **Online:**
   1. Run **Reconcile reruns** in [github.md](./references/github.md); reuse matched children, create only missing ones.
-  2. Per missing slice, run **Create sub-ticket** with `parentIssueNumber` = `{{specIssueNumber}}` and label `hitl,{{repoLabel}}` (per **Label guard**).
+  2. Per missing slice, run **Create sub-ticket** with `parentIssueNumber` = `{{specIssueNumber}}` and label `hitl,{{repoLabel}}`, or `{{repoLabel}}` only in `auto` mode (per **Label guard**).
   3. After every ticket exists, run **Link blocking** per slice with blockers: `issueNumber` = slice, `blockedBy` = its blockers' issue numbers; link only missing edges.
 
 **Failures:**
@@ -113,5 +116,5 @@ Branch on mode:
 
 ## Completion criteria
 
-- **Online:** every approved slice has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}`, no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final map as `Wave n: #{{issue}}, …`.
+- **Online:** every approved slice has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}` (`auto`: `{{repoLabel}}` only, no `hitl`), no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final map as `Wave n: #{{issue}}, …`.
 - **Offline or partial:** report local paths and unpublished/partially published status; no invented GitHub issue numbers.
