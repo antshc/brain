@@ -65,7 +65,7 @@ Prepare inputs, schedule tickets, launch subagents, verify results, publish GitH
 
 **Only this `SKILL.md` launches planner, implementer, verifier, and chore agents**, including background calls and rework. Agent bodies and reference procedures return launch requests/control here; they never create subagents. Resolve paths before changing into a source worktree:
 
-- `SKILL_ROOT` = absolute directory containing this skill's `SKILL.md`, independent of caller CWD; `AGENTS_ROOT=SKILL_ROOT/agents`; `REFERENCES_ROOT=SKILL_ROOT/references`.
+- Resolve `agents/` and `references/` from this skill's base directory, never the caller CWD, as absolute paths: `AGENTS_ROOT=<skill base directory>/agents`; `REFERENCES_ROOT=<skill base directory>/references`.
 - Validate selected agent body and all five reference files exist and are readable. Missing/unreadable paths → stop/report exact path; never infer from ticket CWD or inline contents.
 - Fill every placeholder in the selected body, then attach `referencesRoot=REFERENCES_ROOT`, `referenceManifest` below, and role-specific `requiredReferences`. Pass issue/worktree/commit/evidence context as pointers rather than duplicated reference contents.
 
