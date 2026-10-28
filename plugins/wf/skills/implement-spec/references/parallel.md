@@ -8,7 +8,7 @@ Parallel mode procedure. Load only when `mode` is `parallel` or `plan`.
 
 ## Plan
 
-1. **Spawn planner.** Fill [plan.md](./plan.md): `{{specJson}}`, `{{ticketsJson}}` from the run-local map (with `hitl` labels), `{{sourceRoot}}` = `SOURCE_ROOT`, `{{baseCommit}}` = `BASE_COMMIT`, `{{maxParallel}}`, `{{notesDir}}` = exploration notes dir, `{{breakdown}}` = `false`, `{{specRef}}` = spec ref, `{{implementationDetails}}` = `None`, `{{harnessRoot}}` = `HARNESS_ROOT`. Launch a fresh read-only planner subagent on the latest Opus model (currently `claude-opus-5.5`), medium reasoning effort. Skip this spawn when SKILL.md *Bootstrap tickets* already ran the planner this run; reuse its result. Done when it returns valid JSON; on `failed` or invalid JSON, stop and report.
+1. **Plan source.** Planner runs only in SKILL.md *Bootstrap tickets* (spec had zero sub-issues); reuse its result. Spec already had sub-issues → **MUST NOT** spawn a planner; build the plan inline from the run-local map: `hitl` tickets and transitive dependants `deferred`; wave 0 = ready tickets, wave N = tickets whose blockers are all in earlier waves; split waves larger than `MAX_PARALLEL` into consecutive waves; critical path = longest blocker chain; no `conflicts`, paths `-`. Cherry-pick conflicts at merge go through Run step 5 rework. Done when the plan exists.
 2. **Return the plan.** Render the result to the user as a table, then the critical path and deferred tickets:
 
    | Wave | Ticket | Blockers | Paths | Note |
