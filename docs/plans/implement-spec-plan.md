@@ -1,6 +1,6 @@
 # Implement-Spec Entry Flow Refactor Plan
 
-**Status:** Proposed — not implemented
+**Status:** Implemented
 
 **Scope:** `plugins/wf/skills/implement-spec` and removal of `auto` from `plugins/wf/skills/to-tickets`; `plugins/af` unchanged
 
@@ -14,8 +14,8 @@ Make input-type detection the first action, embed a self-contained **Breakdown I
 
 1. **Plan input** (`plan.md` or inline description): ask for target repository, target/base branch, and initiative ID; validate them; create the routed GitHub spec; run **Breakdown Initiative**.
 2. **Spec input** (GitHub issue): resolve routing and inspect native sub-issues first. Existing tickets skip breakdown; zero sub-issues trigger **Breakdown Initiative**.
-3. **Breakdown Initiative**: a fresh planner subagent follows `implement-spec/references/breakdown.md` directly. Before slicing, it fetches artifacts explicitly attached or linked from the spec; each resulting ticket receives the artifact pieces relevant to its scope. The orchestrator then re-reads the graph and shows tickets, waves, and critical path. No runtime `/to-tickets` invocation; the orchestrator never creates tickets inline.
-4. **Execution**: `sequential` remains the default; `parallel` retains `schedule=waves|graph` and `max-parallel=3` by default. `mode=plan` becomes unsupported and must fail explicitly, without creating execution worktrees or a PR.
+3. **Breakdown Initiative**: a fresh planner subagent follows `implement-spec/references/breakdown.md` directly. Before slicing, it fetches artifacts explicitly attached or linked from the spec; each resulting ticket receives the artifact pieces relevant to its scope. The orchestrator then re-reads the graph and shows the blocker graph, ready frontier, and critical path. No runtime `/to-tickets` invocation; the orchestrator never creates tickets inline.
+4. **Execution**: `sequential` remains the default; `parallel` uses graph scheduling only and `max-parallel=3` by default; optional `schedule=graph` is a compatibility alias and other schedules are rejected. `mode=plan` becomes unsupported and must fail explicitly, without creating execution worktrees or a PR.
 5. **Standalone `/to-tickets`**: remove its `auto` input and every no-approval/no-`hitl` exception. Retain human-approved online/offline flows and their existing `hitl` policy.
 6. **Scope**: leave all `plugins/af` skills unchanged. Leave the post-implementation pipeline and its draft-only policy unchanged.
 7. **Subagent ownership**: only `implement-spec/SKILL.md` launches planner, implementer, verifier, and chore subagents. Every launch passes discoverable absolute paths for the skill's bundled references; each subagent loads the references required by its role before acting.
