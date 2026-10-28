@@ -63,15 +63,13 @@ def test_agent_migration_and_absolute_load_contract(role, old, required):
     for value in required:
         assert f'`{value}`' in body
     expected = {'planner': (['baseCommit',
-                  'breakdown',
                   'harnessRoot',
                   'implementationDetails',
                   'maxParallel',
                   'notesDir',
                   'sourceRoot',
                   'specJson',
-                  'specRef',
-                  'ticketsJson'],
+                  'specRef'],
                  '554906fb5eb68990beff72e23d961b4b34bf47fe92e78584cea9d42c7b7c4759'),
      'implementer': (['commitSubjectPrefix',
                       'featureBranch',
@@ -163,3 +161,19 @@ def test_downstream_order_and_guards():
     assert 'no `conflicts`, paths `-`' not in parallel
     assert 'serialize overlapping tickets' in parallel
     assert 'mode=plan' not in parallel
+
+
+def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
+    planner = (ROOT / 'agents/planner.md').read_text()
+    placeholders = set(re.findall(r"\{\{([^}|]+)(?:\|[^}]*)?\}\}", planner))
+    assert not {'ticketsJson', 'breakdown'} & placeholders
+    assert 'zero native sub-issues' in planner
+    assert 'initial invocation' in planner and 'return `failed` without ticket writes' in planner
+    assert 'reconcile only the prior run' in planner
+    assert 'internal `ticketGraph`' in planner
+    assert 'from the fetched `ticketGraph`' in planner
+    caller = MAIN.split('## Breakdown Initiative')[1].split('## Constraints')[0]
+    assert '{{ticketsJson}}' not in caller
+    assert '{{breakdown}}' not in caller
+    assert '{{ticketsJson}}' in (ROOT / 'agents/verifier.md').read_text()
+    assert '`{{ticketsJson}}` = spec and integrated tickets' in MAIN
