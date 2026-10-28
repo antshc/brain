@@ -6,7 +6,7 @@ Load only for `mode=sequential` (the default), after graph validation and integr
 
 ### Preconditions
 
-- *Ticket publication*, *Pull request lifecycle*, and *Closure and cleanup* loaded; `SOURCE_ROOT`, `WORKTREE_PATH`, `INTEGRATION_BRANCH`, `BASE_BRANCH`, `BASE_COMMIT`, `INITIATIVE_ID`, and `RUN_DIR` resolved.
+- publication.md loaded (*Ticket publication*, *Pull request*, *Closure*); `SOURCE_ROOT`, `WORKTREE_PATH`, `INTEGRATION_BRANCH`, `BASE_BRANCH`, `BASE_COMMIT`, `INITIATIVE_ID`, and `RUN_DIR` resolved.
 - **One** clean integration worktree and branch for the run, per worktrees *Integration writes*; no per-ticket branches/worktrees.
 
 ### Run

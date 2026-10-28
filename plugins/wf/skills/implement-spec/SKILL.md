@@ -15,20 +15,44 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 - `mode`: `sequential` (default) | `parallel`.
 - `max-parallel=<positive integer>`: parallel only; default 3. Scheduling always follows the ticket graph.
 
+## GitHub operations
+
+`GH_TOOL` = `python3 <skill base directory>/scripts/spec_gh.py`, resolved as an absolute path before changing into a worktree. Only the orchestrator and planner call it. JSON on stdout; exit `0` ok · `1` GitHub/tool failure · `2` invalid input or unresolved routing · `3` read-back `problems`. Non-zero → report the error, stop dependent work, never claim publication, passing checks, or closure.
+
+| Intent | Command |
+|---|---|
+| Prerequisites, routing, `INITIATIVE_ID`, `SOURCE_ROOT`, `RUN_DIR` | `GH_TOOL preflight --spec REF` |
+| Create spec from plan/description | `GH_TOOL spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N` |
+| Read spec, tickets, comments, blockers; frontier | `GH_TOOL graph read --spec REF --out RUN_DIR` |
+| Recompute frontier | `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done REF…` |
+| Create and link ticket (planner) | `GH_TOOL ticket create --spec REF --title T --body-file F` |
+| Blocker edges, edit body (planner) | `GH_TOOL issue block REF --by REF…` · `GH_TOOL issue edit-body REF --body-file F` |
+| Evidence or verdict comment | `GH_TOOL issue comment REF --body-file F` |
+| Close implemented ticket | `GH_TOOL issue close REF --commit SHA --branch B --pr URL` |
+| Publish or update draft PR | `GH_TOOL pr publish --source-repository R --base B --head H --title T --initiative-id I --rationale-file F --closes REF… --refs REF…` |
+| Split PR diff per file (chore) | `GH_TOOL pr diff-split --pr URL` |
+| Read back PR | `GH_TOOL pr read --source-repository R --head H --initiative-id I --expect-closes REF…` |
+
+- Tracker repository = the spec's. Source repository = exactly one `repo:target:` label; base = exactly one `repo:base:` label; `INITIATIVE_ID` = spec title prefix before the first `:`. Missing or conflicting routing → resolve explicitly before writes (`--source-repository`/`--base-branch` only for a user-confirmed older unlabeled spec).
+- Track every issue as `OWNER/REPO#NUMBER` in its owning repository; bare references inherit the containing issue's repository; stop on ambiguity. Tickets may live outside the tracker.
+- Empty or 404 reads are failures, never an empty graph. Text relationships only when native sub-issues/blockers are confirmed unavailable; report that mode.
+- Run-local map: ticket identity, owner, blockers, status, integrated commit, validation evidence; the integration worktree/branch once and, in parallel mode, each ticket's. A ticket closed by this run counts as satisfied; dependants need committed, validated blocker implementations on the integration branch. Never use open-issue counts alone.
+- Body files live outside the repository; remove only those this run created.
+
 ## Workflow
 
-1. Detect input type, load [github_setup.md](./references/github_setup.md) and [breakdown.md](./references/breakdown.md), then prepare input:
-   → A: Plan file or inline description → Run *Prepare Plan*.
-   → B: GitHub spec issue → Run *Prepare Spec*.
+1. Detect input type, then prepare input:
+   → A: Plan file or inline description → load [breakdown.md](./references/breakdown.md); run *Prepare Plan* (ends with `spec create`), then continue as B.
+   → B: GitHub spec issue → `GH_TOOL preflight --spec URL` (`HARNESS_ROOT`, `SOURCE_ROOT`, routing, `INITIATIVE_ID`, `RUN_DIR`), then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; **MUST NOT** run the planner or create tickets. Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative*.
    → Unsupported or ambiguous input: ask for valid input; stop.
-   → Handed off to *Breakdown Initiative* → load [github_graph.md](./references/github_graph.md); run *Breakdown Initiative*.
 
    Launch planner (only from *Breakdown Initiative*) → [planner.md](./agents/planner.md) subagent from `SOURCE_ROOT`:
-   refs `breakdown`, `ticket-body-template`, `github_setup` · latest Opus (prefer `claude-opus-5.5`), medium reasoning · rework none.
-   Before: fetch validated `BASE_BRANCH`, record `BASE_COMMIT`; resolve `HARNESS_ROOT`; create `RUN_DIR` and `NOTES_DIR` = `RUN_DIR/notes` outside the repository; save spec + comments to `RUN_DIR/spec.json`. Done when checkout and base match routing.
+   refs `breakdown` · latest Opus (prefer `claude-opus-5.5`), medium reasoning · rework none.
+   Before: fetch validated `BASE_BRANCH`, record `BASE_COMMIT`; create `NOTES_DIR` = `RUN_DIR/notes` outside the repository; `RUN_DIR/spec.json` exists from `graph read`. Done when checkout and base match routing.
 
    | Placeholder | Value |
    |---|---|
+   | `{{ghTool}}` | `GH_TOOL` (absolute) |
    | `{{specRef}}` | spec `OWNER/REPO#NUMBER` |
    | `{{specFile}}` | `RUN_DIR/spec.json` |
    | `{{implementationDetails}}` | plan path or `None` |
@@ -40,22 +64,22 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    Verify: per Breakdown Initiative; record actual model/effort or unavailable-model failure.
    → `failed`, invalid JSON, empty `created`, or incomplete GitHub operations: report actual partial state; stop; never claim success.
 
-2. Read the complete ticket graph (spec, tickets, comments, blockers, parents) and save its files per *Read the task graph*; retain explicit `OWNER/REPO#NUMBER` identities.
+2. Re-run `GH_TOOL graph read --spec REF --out RUN_DIR` after any breakdown: complete graph (spec, tickets, comments, blockers, parents) saved under `RUN_DIR`; retain explicit `OWNER/REPO#NUMBER` identities.
 
-3. Validate scope, routing, and dependencies per *Graph validation* ([github_graph.md](./references/github_graph.md); load if not loaded).
+3. Validate the graph: reject `frontier.cycles` (name them) and tickets without scope; resolve `problems` (routing conflicts) and `frontier.needs_resolution` (cancelled, duplicate, external blockers) before writes; `hitl` tickets and their dependants are `deferred`; verify closed blockers' results exist in `BASE_COMMIT`. Record each ticket's identity, owner, status, scope, blockers, and evidence in the run-local map. Show the *Graph report* after Breakdown Initiative and in parallel mode.
 
 4. Explore implementation scope and test seams as needed; save shared notes under `RUN_DIR/notes` and pass pointers. Reuse planner evidence (graph, footprints, conflicts) when available; otherwise derive it from the graph and source checkout without a planner. Bound every runnable ticket's scope before selection.
 
 5. Execute selected mode:
    - Validate `mode` and `MAX_PARALLEL` before creating any branch or worktree.
    - Create the integration branch and worktree per [Integration setup](./references/worktrees.md#integration-setup).
-   - Load [github_publication.md](./references/github_publication.md) (both modes).
+   - Load [publication.md](./references/publication.md) (both modes; also covers verdict, verification, and closure used later).
    - Load **only** the selected mode reference:
      → C: Sequential → Run [Sequential Implementation](./references/sequential.md#sequential-implementation).
      → D: Parallel → Run [Parallel Implementation](./references/parallel.md#parallel-implementation); isolate tickets per [Ticket worktrees](./references/worktrees.md#ticket-worktrees).
 
    Launch implementer → [implementer.md](./agents/implementer.md) subagent per ticket in its worktree:
-   refs `github_setup` · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent, ≤2 rounds.
+   refs none · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent, ≤2 rounds.
 
    | Placeholder | Sequential | Parallel |
    |---|---|---|
@@ -72,7 +96,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    → Still invalid after 2 rounds: preserve branch/worktree and report the blocker; stop advancing that ticket.
    Integrate and publish per the mode reference.
 
-6. Run *Frontier check*.
+6. **Frontier check.** Refresh `graph read`, then `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done <integrated refs>` after each publication. A blocker is satisfied only when integrated in this run or verified in the base. Unfinished tickets but none ready → report each unready ticket and why (open `hitl`, unresolved external dependency); preserve all work and the draft PR; keep the spec open; stop before chore, verification, review, actualize/cleanup, or finalization. Never force progress or declare completion.
 
 7. Launch chore → [chore.md](./agents/chore.md) subagent in `WORKTREE_PATH`:
    refs `fetch-diff` · rework none.
@@ -93,8 +117,8 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    → No result or failed: record none/failed; continue.
 
 8. Launch verifier → [verifier.md](./agents/verifier.md) subagent in `WORKTREE_PATH`:
-   refs `github_setup` · rework none (internal: ≤3 verifications, ≤2 fix attempts per finding, one commit per fix).
-   Before: load [github_finalize.md](./references/github_finalize.md); detect harness (read-only) in `.github/skills/*/SKILL.md`, `.claude/skills/*/SKILL.md`, `.agents/skills/*/SKILL.md`, keeping skills whose `description` says they launch/drive the app to prove behavior and capture evidence; set `EVIDENCE_DIR` per *Verification evidence*.
+   refs none · rework none (internal: ≤3 verifications, ≤2 fix attempts per finding, one commit per fix).
+   Before: detect harness (read-only) in `.github/skills/*/SKILL.md`, `.claude/skills/*/SKILL.md`, `.agents/skills/*/SKILL.md`, keeping skills whose `description` says they launch/drive the app to prove behavior and capture evidence; set `EVIDENCE_DIR` per publication *Verification evidence*.
    → No harness: record `verification skipped: no verification harness`; no subagent, no comment.
    → Subagents unavailable: record skip reason; never drive the app in the orchestrator.
 
@@ -113,10 +137,10 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
    Verify: `HEAD` = last `result.rounds[].fixCommit` (or `@prevHead`), exactly one `fix(...)` commit per fix round, clean, `result.verification` names executed checks, `EVIDENCE_DIR` holds cited files, valid JSON; proof framework untouched.
    → Missing evidence/invalid JSON, or app fails launch/health: verdict `inconclusive` with error; do not troubleshoot.
-   After: push fix commits and update PR coverage per *Pull request lifecycle*; post one spec comment per *Verification evidence*; read back, or record failure with `EVIDENCE_DIR/verdict.md` saved.
+   After: push fix commits and update PR coverage per publication *Pull request*; post one spec comment per publication *Verification evidence*; read back, or record failure with `EVIDENCE_DIR/verdict.md` saved.
    → Final `fail`/`partial`: list unfixed findings with reason and attempts, name unfinished tickets; keep spec open and PR draft; continue.
 
-9. Run *Publication verification* ([github_finalize.md](./references/github_finalize.md); load if not loaded).
+9. Run *Publication verification* ([publication.md](./references/publication.md)).
 
 10. Run code review → *`code-review` skill for GitHub pull requests, bugs, quality attributes, code smells, and initiative coverage* from `SOURCE_ROOT`:
     inputs PR URL, `SOURCE_ROOT` · foreground; wait until every axis has an outcome.
@@ -134,32 +158,36 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
 ## Subagent launch contract
 
-**Only this `SKILL.md` launches agents**, including background calls and rework, and controls scheduling, integration, publication, and closure; every launch and rework follows this contract. Agent bodies and references return control here; they never create subagents.
+**Only this skill launches agents**, including background calls and rework, and controls scheduling, integration, publication, and closure; every launch and rework follows this contract. Agent bodies and references return control here; they never create subagents.
 
 - Resolve `AGENTS_ROOT=<skill base directory>/agents` and `REFERENCES_ROOT=<skill base directory>/references` as absolute paths before changing into a worktree; never from caller CWD.
 - Validate the agent body and every manifest file are readable. Missing/unreadable → stop/report exact path.
 - Fill every placeholder in the body; attach `referencesRoot`, `referenceManifest`, and the step's `refs` as absolute `requiredReferences`. Pass pointers only per *Pointer handoff*.
 - Supply tools, permissions, and model settings at launch, never in agent frontmatter. Agents never gain scheduling, publishing, closure, merging, or cross-ticket authority.
 
-`referenceManifest` lists every `.md` file under `REFERENCES_ROOT`, keyed by its relative path without `.md`: `github_setup` → `REFERENCES_ROOT/github_setup.md`, `fetch-diff` → `REFERENCES_ROOT/fetch-diff.md`.
+`referenceManifest` lists every `.md` file under `REFERENCES_ROOT`, keyed by its relative path without `.md`: `breakdown` → `REFERENCES_ROOT/breakdown.md`, `fetch-diff` → `REFERENCES_ROOT/fetch-diff.md`.
 
 Launch line legend: `refs` = `requiredReferences` (manifest keys); pass only the listed files, never a whole folder; run style defaults to foreground, one fresh agent; `rework` names who reworks and the round cap.
 
 ## Constraints
 
-- **GitHub:** **MUST** load [github_setup.md](./references/github_setup.md) before any GitHub action, including step 1 preparation; use its *Prerequisites* `gh` checks and failure handling. Load each other `references/github_*.md` file only at the step that links it. Missing/unreadable reference → stop/report.
+- **GitHub:** **MUST** perform every GitHub issue, PR, label, and graph operation through `GH_TOOL` per *GitHub operations*, never raw `gh`; load [publication.md](./references/publication.md) at step 5. Missing/unreadable reference or `GH_TOOL` → stop/report.
 - **Repository identity:** preserve each issue's `OWNER/REPO#NUMBER`; route issue reads/comments/closures to its owning repository, and Git/implementation/PR operations only to the resolved source repository. Resolve ambiguity before writes; **MUST NOT** infer ownership from checkout, PR repository, or matching issue number.
 - **HITL:** re-read labels at selection. Skip `hitl` tickets without implementation, delegation, comments, closure, or closing references. An open skipped ticket never satisfies dependants; only closed tickets with results verified in the integration base do. Reference skipped tickets without closing keywords; keep the spec open while any remain open.
 - **One ticket = one subagent:** fresh implementer per ticket; sequential waits for each result, parallel caps concurrency. Rework uses that ticket's existing agent, at most two rounds. **MUST NOT** implement inline, batch tickets, or reuse agents across tickets. Missing subagents → stop/report; app verification has its own skip policy in step 8.
 - **Implementation focus:** at most one quick confirmation of environment/network/Docker/port/registry/external-service failure; use test seams (unit tests, fakes, mocks, in-memory/stubs) and record skipped check/error. Infrastructure-only failures do not block when evidence suffices; code-caused failures do. **MUST NOT** troubleshoot infrastructure during implementation or app verification.
 - **Proof framework:** verification fixes change only app code/tests. Check each fix commit against matched verification skill folders, feature maps, journeys, harness scripts/helpers, seed data, and checked cases. A proof-framework change invalidates the fix: undo with `git revert --no-edit`, never reset; record the finding unfixed as a framework gap.
 - **Draft-only:** PR stays draft; **MUST NOT** merge or mark ready (`gh pr ready`). User controls readiness.
-- **Pointer handoff:** subagents load their own task data. Save every spec/ticket/comment/commit-log read a subagent can reuse under `RUN_DIR` per *Read the task graph*; refresh a file before each launch that uses it. Before each worktree agent launch, write `git -C WORKTREE_PATH log --reverse --format='%H %s%n%n%b' BASE_COMMIT..HEAD` (or `None yet.`) to `RUN_DIR/commits/<HEAD sha>.txt` if absent and record `@prevHead`. Pass pointers (paths, `OWNER/REPO#NUMBER` refs, commit ranges); **MUST NOT** inline bodies, comments, or logs into prompts. Missing/unreadable pointer file → agents holding `github_setup` load the issue from its ref; others return `failed` with the path.
+- **Pointer handoff:** subagents load their own task data. Save every spec/ticket/comment/commit-log read a subagent can reuse under `RUN_DIR` (`graph read` writes spec and ticket files); refresh a file before each launch that uses it. Before each worktree agent launch, write `git -C WORKTREE_PATH log --reverse --format='%H %s%n%n%b' BASE_COMMIT..HEAD` (or `None yet.`) to `RUN_DIR/commits/<HEAD sha>.txt` if absent and record `@prevHead`. Pass pointers (paths, `OWNER/REPO#NUMBER` refs, commit ranges); **MUST NOT** inline bodies, comments, or logs into prompts. Missing/unreadable pointer file → agents return `failed` with the path; the orchestrator refreshes it and reworks.
 - **Worktree isolation:** **MUST** follow [worktrees.md](./references/worktrees.md) for every worktree create, write, actualize, and removal; never reset or discard existing work.
+
+## Graph report
+
+Table of ticket, blocked by (`none` = explicit root), paths, conflicts (blocker → dependent); then ready frontier, critical path, deferred tickets with reason. Every node listed, including deferred tickets' blocker edges.
 
 ## Output
 
-- Breakdown Initiative or parallel mode → first: ticket blocker graph/conflicts, critical path, deferred tickets.
+- Breakdown Initiative or parallel mode → first: *Graph report*.
 - Spec URL, created tickets, planner model/effort; PR URL/state.
 - Per ticket: integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
 - Chore commits; verification verdict, checks, fix commits, per-round `EVIDENCE_DIR`, spec comment ID or skip reason.

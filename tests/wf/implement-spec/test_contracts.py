@@ -11,22 +11,16 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 ROOT = REPO / 'plugins/wf/skills/implement-spec'
 MAIN = (ROOT / 'SKILL.md').read_text()
-GITHUB_FILES = ('setup', 'graph', 'publication', 'finalize')
 
 
-def _joined(folder: str, names: tuple[str, ...]) -> str:
-    return '\n'.join((ROOT / f'references/{folder}_{name}.md').read_text() for name in names)
-
-
-BREAKDOWN = (ROOT / 'references/breakdown.md').read_text() + (ROOT / 'references/ticket-body-template.md').read_text()
-GITHUB = _joined('github', GITHUB_FILES)
+BREAKDOWN = (ROOT / 'references/breakdown.md').read_text()
+GITHUB = '\n'.join((ROOT / path).read_text() for path in ('SKILL.md', 'references/publication.md', 'references/breakdown.md'))
 
 
 def test_exact_layout_and_local_links():
     assert {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*') if p.is_file()} == {
-        'SKILL.md', *(f'agents/{role}.md' for role in ('planner', 'implementer', 'verifier', 'chore')),
-        *(f'references/{name}.md' for name in ('breakdown', 'ticket-body-template', 'sequential', 'parallel', 'fetch-diff', 'worktrees')),
-        *(f'references/github_{name}.md' for name in GITHUB_FILES),
+        'SKILL.md', 'scripts/spec_gh.py', *(f'agents/{role}.md' for role in ('planner', 'implementer', 'verifier', 'chore')),
+        *(f'references/{name}.md' for name in ('breakdown', 'sequential', 'parallel', 'fetch-diff', 'worktrees', 'publication')),
     }
     for path in ROOT.rglob('*.md'):
         for target in re.findall(r'\]\(([^)]+)\)', path.read_text()):
@@ -59,9 +53,9 @@ def test_plan_branch_is_answered_validated_persisted_and_read_back():
 
 
 @pytest.mark.parametrize('role,old,required', [
-    ('planner', 'plan', ('breakdown', 'ticket-body-template', 'github_setup')),
-    ('implementer', 'implement', ('github_setup',)),
-    ('verifier', 'verify', ('github_setup',)),
+    ('planner', 'plan', ('breakdown',)),
+    ('implementer', 'implement', ()),
+    ('verifier', 'verify', ()),
     ('chore', 'chore', ('fetch-diff',)),
 ])
 def test_agent_migration_and_absolute_load_contract(role, old, required):
@@ -116,7 +110,7 @@ def test_agent_migration_and_absolute_load_contract(role, old, required):
 
 def test_launch_manifest_has_every_reference_and_role():
     handoff = MAIN.split('## Subagent launch contract')[1]
-    assert 'REFERENCES_ROOT/github_setup.md' in handoff
+    assert 'REFERENCES_ROOT/breakdown.md' in handoff
     assert 'REFERENCES_ROOT/fetch-diff.md' in handoff
     for role in ('planner', 'implementer', 'verifier', 'chore'):
         assert f'agents/{role}.md' in handoff
