@@ -92,7 +92,7 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 | Syntax | Meaning | Example |
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
-| *italic* | Skill invocation phrase | *Run `fetch-page` skill to fetch the Confluence page as Markdown.* |
+| *italic* | Skill invocation phrase | *Run Skill tool for `fetch-page` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
