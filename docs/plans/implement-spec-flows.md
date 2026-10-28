@@ -1,6 +1,6 @@
 # Implement-Spec Flows
 
-**Status:** Proposed — not implemented
+**Status:** Implemented
 
 **Implementation plan:** [Implement-Spec Entry Flow Refactor Plan](./implement-spec-plan.md)
 
@@ -69,7 +69,7 @@ Flow: /implement-spec
 ```text
 1. Fetch validated base commit.
 2. Launch fresh planner subagent with the bundled planner template.
-3. Planner loads references/breakdown-initiative.md and its bundled references.
+3. Planner loads references/breakdown.md and its bundled references.
 4. Apply the embedded online-only, non-interactive ticket workflow:
    → Explore applicable Concepts/ADRs and code/test seams.
    → Draft vertical slices with complete issue bodies.
@@ -84,7 +84,7 @@ Flow: /implement-spec
 
 ## Subflow C: Sequential Implementation
 
-Proposed procedure: [`references/Sequential.md`](../../plugins/wf/skills/implement-spec/references/Sequential.md).
+Procedure: [`references/sequential.md`](../../plugins/wf/skills/implement-spec/references/sequential.md).
 
 ```text
 1. For each ready non-hitl ticket:
