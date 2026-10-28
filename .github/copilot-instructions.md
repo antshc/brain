@@ -39,7 +39,7 @@ A skill may own its own Python code inside its own folder; its tests live under 
 ### Tests
 
 - Tests for `tools/src/` live in `tools/tests/unit/` and `tools/tests/integration/`, mirroring `tools/src/`.
-- Tests for skill-owned Python live in `tests/<plugin>/<skill>/` (no `skills/` segment). Run each folder separately — skills share module and test basenames: `python3 -m pytest tests/atl/fetch-page`, or all via `python3 .github/scripts/run-python-tests.py`.
+- Tests for skill-owned Python live in `tests/<plugin>/<skill>/` (no `skills/` segment). Run each folder separately — skills share module and test basenames: `python3 -m pytest tests/atl/fetch-page`, or all via `python3 .github/scripts/run-python-tests.py` (`--unit-only` skips integration tests, as CI does).
 - Every test under `tools/tests/` is traceable to a scenario in `TEST_PLAN.md`:
   - Test class docstring → Feature name (e.g., `"Feature: Comment Label Detection"`).
   - Test method name → Scenario name in snake_case; add `# Scenario: ...` comment below the def.
