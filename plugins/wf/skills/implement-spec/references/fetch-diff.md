@@ -4,7 +4,7 @@ Split the current pull request diff into per-file diffs for the chore or bug-rev
 
 ## Fetch the diff per file
 
-**MUST** write outside `HARNESS_ROOT`, `SOURCE_ROOT`, and `WORKTREE_PATH`; subagents commit from the worktree, which must stay clean.
+**MUST** write outside `HARNESS_ROOT`, `SOURCE_ROOT`, and `WORKTREE_PATH`; the worktree must stay clean for subagent commits.
 
 ```bash
 diff_dir="$(mktemp -d)" &&
@@ -22,7 +22,7 @@ outfile { print > outfile }
 ' && echo "$diff_dir"
 ```
 
-Requires GNU `awk` (`gawk`; three-argument `match`). If `gh pr diff` fails or `_manifest.tsv` is missing or empty, stop that phase and report; never run the subagent without a diff.
+Requires GNU `awk` (`gawk`; three-argument `match`). `gh pr diff` fails or `_manifest.tsv` is missing or empty → stop that phase and report; never run the subagent without a diff.
 
 ## Return to caller
 

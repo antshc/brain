@@ -109,6 +109,8 @@ Define what the agent must produce: artifacts, format, ordering, location. Inclu
 - **Incomplete** — e.g. report "Review incomplete" plus missing evidence; never guess.
 - **Unverified** — mark assumptions and unverified candidates separately from verified results.
 
+**Structured response** (JSON/YAML an agent returns): open with a `| Field | Content |` table giving each field's meaning, allowed values, and empty case; then one compact example showing every field once (one array item each), not an exhaustive instance; then the failure shape. The table plus example must suffice to reconstruct any valid response.
+
 ## When to split
 
 Give each skill one purpose nameable in one phrase. Each cut spends a load, so split only when it earns it:
@@ -169,8 +171,12 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 | `templates/` | scaffolds to fill or modify |
 
 - Keep up to two category files at skill root; otherwise use the matching resource folder. Name linked files for what they hold.
-- **Bundled paths** resolve from the skill base directory, never caller CWD. Example: **Run `./scripts/run.py` from this skill's base directory**.
+- **Bundled paths** resolve from the skill base directory, never caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
 - **Skill-local resources:** each skill **MUST** bundle required resource files inside its own folder; **MUST NOT** read, link, or execute resource files from another skill's folder. Copy required resources in. Invoking another skill remains allowed.
+- **Keep references one level deep:** `SKILL.md` links every reference file directly; a reference **MUST NOT** send the agent on to another file. Citing a section of a file `SKILL.md` already loads, by its exact heading, is allowed. Rationale: agents may only partly read (`head -100`) files reached through a reference chain. Sources: [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) ("Avoid deeply nested references"); [Agent Skills spec](https://agentskills.io/specification) ("File references").
+- **Hand-back by action:** a reference returns control by naming the action and the target section's exact heading, never the file name or a step number. Example: "Return control to the orchestrator for *Frontier check*."
+- **Long references:** a reference file over 100 lines starts with a `## Contents` list naming every section by its exact heading. Rationale: a partial preview still shows the full scope. Source: [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) ("Structure longer reference files with a table of contents").
+- **Read references fully:** every pointer to a reference requires reading the whole file; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
 - Use scripts for repetitive or fragile operations. Prefer Python over shell-specific scripts; use the repository-supported Python command.
 - New plugin → register it in the repository's plugin marketplace/manifest in the same change.
 
