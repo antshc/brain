@@ -1,6 +1,6 @@
 # Implement-Spec Flows
 
-**Status:** Proposed — not implemented
+**Status:** Implemented
 
 **Implementation plan:** [Implement-Spec Entry Flow Refactor Plan](./implement-spec-plan.md)
 
@@ -69,7 +69,7 @@ Flow: /implement-spec
 ```text
 1. Fetch validated base commit.
 2. Launch fresh planner subagent with the bundled planner template.
-3. Planner loads references/breakdown-initiative.md and its bundled references.
+3. Planner loads references/breakdown.md and its bundled references.
 4. Apply the embedded online-only, non-interactive ticket workflow:
    → Explore applicable Concepts/ADRs and code/test seams.
    → Draft vertical slices with complete issue bodies.
@@ -77,14 +77,14 @@ Flow: /implement-spec
    → Link native parents/blockers and verify readback.
    → Never call /to-tickets or request breakdown approval.
 5. Re-read and validate created tickets and dependencies.
-6. Calculate conflicts, execution waves, and critical path.
-7. Show tickets, waves, and deferred items.
+6. Calculate the blocker graph, ready frontier, conflicts, and critical path.
+7. Show the ticket-to-blocker graph, ready frontier, and deferred items.
 8. Return
 ```
 
 ## Subflow C: Sequential Implementation
 
-Proposed procedure: [`references/Sequential.md`](../../plugins/wf/skills/implement-spec/references/Sequential.md).
+Procedure: [`references/sequential.md`](../../plugins/wf/skills/implement-spec/references/sequential.md).
 
 ```text
 1. For each ready non-hitl ticket:
@@ -102,19 +102,20 @@ Proposed procedure: [`references/Sequential.md`](../../plugins/wf/skills/impleme
 ## Subflow D: Parallel Implementation
 
 ```text
-1. Derive dependency waves, conflicts, critical path, and deferred tickets.
-2. Schedule with waves (default) or graph; max-parallel=3 by default.
-3. For each eligible wave or ready graph slot:
+1. Derive the blocker graph, conflicts, critical path, and deferred tickets.
+2. Schedule from the graph only; max-parallel=3 by default.
+3. Whenever a ready, non-conflicting ticket and worker slot exist:
    → In parallel:
       → Create one isolated branch/worktree per ready ticket.
       → Launch one fresh implementer per ticket.
       → Implement with TDD, run checks, commit exactly once.
       → Verify each result; rework max 2 rounds.
-   → Join completed implementations when required by schedule.
+   → Process each completed implementation without waiting for unrelated workers.
    → Cherry-pick verified ticket commits into integration serially.
    → On conflict: Rework/rebase through that ticket's agent.
    → Run affected integration checks.
-   → Push and create/update draft PR; publish evidence and close integrated tickets.
+   → After each validated integration, push and update draft PR; publish evidence and close the integrated ticket.
+   → Recompute readiness; start newly unblocked work while unrelated workers continue.
    → Remove clean ticket worktrees/branches; preserve blocked work.
 4. Return
 ```

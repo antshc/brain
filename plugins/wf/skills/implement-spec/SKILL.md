@@ -1,84 +1,215 @@
 ---
 name: implement-spec
-description: "Implements a GitHub spec ticket graph, or a plan.md or description auto-broken into tickets by a planner subagent, on one integration branch; sequential or parallel waves in per-ticket worktrees; then app verification, chore pass, and code review. Honors routing labels and hitl skips."
+description: Implements a GitHub spec or plan through a routed ticket graph; orchestrates sequential or parallel delivery, app verification, chore, and independent code review into one draft PR.
 disable-model-invocation: true
 ---
 
-Orchestrate: select, delegate, verify, record. The goal is the whole spec implemented on one **integration branch** in one run-owned worktree at `<repo-root>/workspace/<repo>.worktrees/<initiative-id>`, with a reviewed **draft** PR referencing every implemented issue.
+# Implement Spec
+
+Orchestrate a routed ticket graph into one integration branch and draft PR. Run steps in order; load each linked reference only when its step is reached, never ahead.
 
 ## Inputs
 
-- Spec issue URL `https://github.com/OWNER/REPO/issues/NUMBER`; its sub-issues are the **tickets**, linked by blocking relationships (the **task graph**).
-- Or a session plan.md path, or inline description text, or a spec with zero sub-issues: handled by **Bootstrap tickets** (step 1). plan.md or description input asks the user for target repository and initiative ID before creating the spec; a spec with zero sub-issues goes straight to the planner.
-- Spec labels `repo:target:<owner/repo>` (source repository) and `repo:base:<branch>` (PR base).
-- Source-root `GLOSSARY.md` when present; use its vocabulary.
+- GitHub spec issue URL `https://github.com/OWNER/REPO/issues/NUMBER`, plan file path, or inline plan/description. Native sub-issues are **tickets**; native blockers form the **ticket graph**.
+- Spec routing: `repo:target:<owner/repo>` and `repo:base:<branch>`; use source-root `GLOSSARY.md` vocabulary when present.
+- Harness: run from `HARNESS_ROOT` (a git checkout) holding the source repository's primary checkout at `HARNESS_ROOT/workspace/<REPO>` with `origin` = the source repository; `workspace/` git-ignored. Missing → `preflight` exits `2`; report and stop.
+- `mode`: `sequential` (default, recommended) | `parallel` (experimental; use only when asked).
+- `max-parallel=<positive integer>`: parallel only; default 3. Scheduling always follows the ticket graph.
 
-- `[mode]`: `sequential` (default) | `parallel` | `plan`. `parallel` adds one worktree per ticket and waves; `plan` returns the plan and stops. A planner subagent runs only in Bootstrap (spec without sub-issues); a spec with sub-issues skips planning and waves come from its blocker graph. Optional `schedule=waves|graph` and `max-parallel=<n>` (default 3) apply to `parallel`.
+## GitHub operations
 
-## Constraints
+`GH_TOOL` = `python3 <skill base directory>/scripts/spec_gh.py`, resolved as an absolute path before changing into a worktree. Only the orchestrator and planner call it. JSON on stdout; exit `0` ok · `1` GitHub/tool failure · `2` invalid input or unresolved routing · `3` read-back `problems`. Non-zero → report the error, stop dependent work, never claim publication, passing checks, or closure.
 
-- **GitHub reference:** **MUST** load [GitHub reference](./references/github.md) before any GitHub action, including reads, and run GitHub I/O through `gh` per its prerequisites, procedures, and failure handling. If it cannot be loaded, stop and report.
-- **Repository guard:** spec and tickets may live outside the source repository. **MUST** keep each issue's `OWNER/REPO#NUMBER` identity, route issue reads/comments/closures to its owning repository, and route Git, implementation, and PR operations only to the resolved source repository. **MUST NOT** infer an issue's repository from the checkout, PR repository, or a matching number; resolve ambiguous ownership before writing.
-- **HITL guard:** a ticket labeled `hitl` is **skipped**. **MUST NOT** implement, delegate, comment on, close, or add a closing reference for it. Re-read labels at each selection. A skipped ticket is not a satisfied blocker; its dependants stay unready unless it is closed and its result is in the integration base. While one stays open, keep the spec open and reference it in the PR without a closing keyword.
-- **Breakdown guard:** tickets are created only by the planner subagent through `to-tickets` `auto` mode, never inline by the orchestrator. They carry no `hitl` label and are executable immediately; pre-existing `hitl` tickets keep the HITL guard. Bootstrap asks the user only the *Create spec* question (target repository, initiative ID) for plan.md or description input; ticket breakdown asks nothing.
-- **One ticket = one subagent:** **MUST** launch a fresh implementer subagent per ticket; in `sequential` mode one at a time, waiting for its result before the next; in `parallel` mode up to `max-parallel` concurrently per [parallel.md](./references/parallel.md). Verification fixes (step 8) use one fresh verifier-fixer subagent, never an implementer reuse. **MUST NOT** implement tickets in the orchestrator context, batch tickets, or reuse a previous ticket's subagent. Rationale: isolates ticket context and keeps the orchestrator's context for scheduling and verification. If subagents are unavailable, stop and report; never substitute direct implementation.
-- **Prompt templates:** **MUST** build each subagent prompt from its bundled template with every `{{placeholder}}` filled — [implement.md](./references/implement.md) per ticket, [chore.md](./references/chore.md) for the chore pass, [verify.md](./references/verify.md) for app verification and fixes, [plan.md](./references/plan.md) for the planner in Bootstrap only. Pass context pointers (issue refs, paths, commits), not duplicated content.
-- **Implementation focus guard:** stay on ticket work. **MUST NOT** troubleshoot environment, network, Docker, port, registry, or external-service problems; make at most one quick confirmation attempt, verify through test seams (unit tests, fakes, mocks, in-memory/stub implementations), and record the skipped check and its error in the ticket evidence. Infrastructure-only failures do not block advancement; failures caused by the ticket's code do. `implement.md` and `verify.md` carry this guard to implementers and the verifier.
-- **Proof framework guard:** verification fixes **MUST NOT** change the repository's verification skills, feature maps, journeys, harness scripts, seed data, or the cases they check; only app code and its tests. Step 8 checks each fix commit's changed files against the matched verification skill folders and their harness paths; a commit that touches them is invalid: undo it with `git revert --no-edit` (no reset), then record its findings as unfixed (framework gap).
-- **Draft-only PR:** the PR **MUST** stay a draft for the whole run; **MUST NOT** run `gh pr ready` or otherwise mark it ready for review. The user marks it ready.
-- **Single worktree:** in `sequential` mode use the same integration branch and worktree for every ticket, fix, and chore pass; **MUST NOT** create per-ticket branches/worktrees. In `parallel` mode only, each in-flight ticket gets its own run-owned worktree and branch off the integration head; the integration worktree stays the only place for merges, publishing, verification, fixes, and chore. In every mode **MUST NOT** use merger subagents, reset or discard existing work, or merge the PR.
-- **Parallel isolation:** in `parallel` mode never run two writers in one worktree, never launch tickets that the plan marks as conflicting, and merge ticket commits into the integration branch one at a time. Rationale: concurrent writers in one tree corrupt state; serialized merges keep one verified commit per ticket.
+| Intent | Command |
+|---|---|
+| Prerequisites, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH`, `SOURCE_ROOT`, `RUN_DIR` (no fetch; no `BASE_COMMIT`) | `GH_TOOL preflight --spec REF` |
+| Create spec from plan/description | `GH_TOOL spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N` |
+| Read spec, tickets, comments, blockers; frontier | `GH_TOOL graph read --spec REF --out RUN_DIR` |
+| Recompute frontier | `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done REF…` |
+| Create and link ticket (planner) | `GH_TOOL ticket create --spec REF --title T --body-file F` |
+| Blocker edges, edit body (planner) | `GH_TOOL issue block REF --by REF…` · `GH_TOOL issue edit-body REF --body-file F` |
+| Evidence or verdict comment | `GH_TOOL issue comment REF --body-file F` |
+| Close implemented ticket | `GH_TOOL issue close REF --commit SHA --branch B --pr URL` |
+| Publish or update draft PR | `GH_TOOL pr publish --source-repository R --base B --head H --title T --initiative-id I --rationale-file F --closes REF… --refs REF…` |
+| Split PR diff per file (chore) | `GH_TOOL pr diff-split --pr URL` |
+| Read back PR | `GH_TOOL pr read --source-repository R --head H --initiative-id I --expect-closes REF…` |
+
+`REF…` = one or more space-separated values after one flag (`--done A B`); repeating the flag (`--done A --done B`) also works.
+
+- Tracker repository = the spec's. Source repository = exactly one `repo:target:` label; base = exactly one `repo:base:` label; `INITIATIVE_ID` = spec title prefix before the first `:`. Missing or conflicting routing → resolve explicitly before writes (`--source-repository`/`--base-branch` only for a user-confirmed older unlabeled spec).
+- Track every issue as `OWNER/REPO#NUMBER` in its owning repository; bare references inherit the containing issue's repository; stop on ambiguity. Tickets may live outside the tracker.
+- Empty or 404 reads are failures, never an empty graph. Text relationships only when native sub-issues/blockers are confirmed unavailable; report that mode.
+- Run-local map: ticket identity, owner, blockers, status, integrated commit, validation evidence; the integration worktree/branch once and, in parallel mode, each ticket's. A ticket closed by this run counts as satisfied; dependants need committed, validated blocker implementations on the integration branch. Never use open-issue counts alone.
+- Body files live outside the repository; remove only those this run created.
 
 ## Workflow
 
-1. **Read the graph.** Read the spec and all tickets with comments, parent links, and blockers. Resolve tracker repository, source repository, and base per the GitHub reference; resolve missing or conflicting routing before writing. Mark `hitl` tickets skipped. Reject cycles or tickets without scope. Treat a closed blocker as satisfied only when its result is in the integration base; cancelled or duplicate issues require explicit resolution. Done when every ticket has status, blockers, and owning repository in a run-local map.
-   **Bootstrap tickets** (only when the input is a plan.md or description, or the spec has zero sub-issues; a spec with sub-issues **MUST NOT** run the planner):
-   1. Spec with zero sub-issues → skip to 2. plan.md or description → create the spec per GitHub reference *Create spec*, which first asks the user for target repository and initiative ID; it becomes the run's spec.
-   2. Resolve routing as above; fetch `BASE_BRANCH` and record `BASE_COMMIT` (step 3 reuses it).
-   3. Fill [plan.md](./references/plan.md) with `{{breakdown}}` = `true`, `{{specRef}}` = spec `OWNER/REPO#NUMBER`, `{{implementationDetails}}` = plan.md path or `None`, `{{harnessRoot}}` = `HARNESS_ROOT`, `{{ticketsJson}}` = `[]`, `{{sourceRoot}}`, `{{baseCommit}}`, `{{maxParallel}}`, `{{notesDir}}` as in [parallel.md](./references/parallel.md), `{{specJson}}` = spec read. Launch a fresh planner subagent on the latest Opus model (currently `claude-opus-5.5`), medium reasoning effort. `failed`, invalid JSON, or empty `created` → stop and report.
-   4. Re-read the graph (repeat step 1's reads), then return the ticket list and wave table (format in parallel.md *Return the plan*) to the user and continue without waiting. Done when the run-local map holds the created tickets.
-2. **Explore** only as needed to establish ticket scope and test seams. Delegate bounded exploration when separate context is warranted; save shared notes outside the repo and pass their paths as pointers. Done when each ticket's scope is clear enough to delegate.
-3. **Create the worktree** per GitHub reference *Single worktree lifecycle*; set `@initiativeId` from the spec title prefix before the first `:` and record `BASE_COMMIT` (reuse Bootstrap's when set). Done when the worktree is clean and `HEAD` is the new integration branch at `BASE_COMMIT`.
-4. **Delegate one ticket.** In `parallel` or `plan` mode, *load [parallel.md](./references/parallel.md)* and follow its Plan and Run sections instead of steps 4 to 7 (`plan` mode skips step 3's worktree: fetch the base and record `BASE_COMMIT` only). Otherwise: Select one ready, non-`hitl` ticket from the **frontier**. Record `@prevHead` = worktree `HEAD`. Fill `implement.md`:
+1. Detect input type, then prepare input:
+   → A: Plan file or inline description → load [breakdown.md](./references/breakdown.md); run *Prepare Plan* (ends with `spec create`), then continue as B.
+   → B: GitHub spec issue → `GH_TOOL preflight --spec URL` (`HARNESS_ROOT`, `SOURCE_ROOT`, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH` = `integration_branch`, `RUN_DIR`), then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; **MUST NOT** run the planner or create tickets. Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative*.
+   → Unsupported or ambiguous input: ask for valid input; stop.
+
+   Launch planner (only from *Breakdown Initiative*) → [planner.md](./agents/planner.md) subagent from `SOURCE_ROOT`:
+   refs `breakdown` · latest Opus (prefer `claude-opus-5.5`), medium reasoning · rework none.
+   Before: fetch validated `BASE_BRANCH`, record `BASE_COMMIT`; create `NOTES_DIR` = `RUN_DIR/notes` outside the repository; `RUN_DIR/spec.json` exists from `graph read`. Done when checkout and base match routing.
 
    | Placeholder | Value |
    |---|---|
-   | `{{worktreePath}}` | `WORKTREE_PATH` |
-   | `{{featureBranch}}` | integration branch |
-   | `{{targetBranch}}` | `BASE_BRANCH` |
-   | `{{ticketJson}}` | ticket's `gh issue view` JSON plus a `comments` array from the comments read; include `OWNER/REPO#NUMBER` |
-   | `{{initiativeCommits}}` | `git -C WORKTREE_PATH log --reverse --format='%H %s%n%n%b' BASE_COMMIT..HEAD`, or `None yet.` |
-   | `{{commitSubjectPrefix}}` | `ccode(<initiativeId> <OWNER/REPO#NUMBER>): ` |
+   | `{{ghTool}}` | `GH_TOOL` (absolute) |
+   | `{{specRef}}` | spec `OWNER/REPO#NUMBER` |
+   | `{{specFile}}` | `RUN_DIR/spec.json` |
+   | `{{implementationDetails}}` | plan path or `None` |
+   | `{{harnessRoot}}` | `HARNESS_ROOT` |
+   | `{{sourceRoot}}` | `SOURCE_ROOT` |
+   | `{{baseCommit}}` | `BASE_COMMIT` |
+   | `{{notesDir}}` | `NOTES_DIR` |
 
-   Launch a fresh subagent with the filled prompt. Done when it returns the final JSON object.
-5. **Verify the result.** For `completed`: `HEAD` equals `result.commit`, exactly one commit since `@prevHead`, subject starts with the prefix, worktree clean, and `result.verification` names executed checks and results. Run cheap confirmations yourself when evidence is thin. On a mismatch or `failed`, send rework to the same ticket's subagent, at most two rounds; then stop advancing, preserve the work, and report. Done when the ticket is **integrated** (verified commit on the integration branch) or the run is stopped.
-6. **Publish the ticket.** Right after the first ticket is integrated and before delegating the next, push and open the draft PR against `BASE_BRANCH` (reuse an existing matching one); after each later ticket, push and extend coverage. Use title `{{initiative-id}}: <summary>` and a standalone `{{initiative-id}}` line as the body's first line, replacing the placeholder with `INITIATIVE_ID`; preserve it first on updates. Do not add an initiative-source field. Apply the GitHub reference’s PR description rules: terse rationale bullets answering “Why?”. Close the ticket as completed. Done when push, PR body, and closure are read back; the draft PR URL exists before step 7 starts.
-7. **Repeat.** Recompute the frontier and repeat steps 4–6 for the next ready ticket. A blocker is satisfied when its implementation is integrated in this run or verified in the base; external blockers need verified resolution. When unfinished tickets remain but none are ready, report the blockers, preserve the work, and stop without cleanup/review/finalization; keep the PR draft and spec open.
-8. **Verify the app and fix gaps** once all in-scope tickets are integrated and pushed, before the chore pass. *Load [verify.md](./references/verify.md)*. **Detect** (read-only, in `WORKTREE_PATH`): scan `.github/skills/*/SKILL.md`, `.claude/skills/*/SKILL.md`, `.agents/skills/*/SKILL.md`; keep skills whose frontmatter `description` says they launch and drive the app to prove behavior and capture evidence. None matched → skip: no subagent, no comment, record `verification skipped: no verification harness`. Subagents unavailable → skip and record the reason; never drive the app in the orchestrator. Otherwise run one verify-and-fix subagent:
-   1. **Launch.** Set `EVIDENCE_DIR` per the GitHub reference *Verification evidence* and record `@prevHead`. Fill `verify.md`: `{{featureBranch}}`, `{{pullRequestUrl}}`, `{{worktreePath}}`, `{{targetBranch}}` as above; `{{evidenceDir}}` = `EVIDENCE_DIR`; `{{verificationSkills}}` = matched `SKILL.md` absolute paths, one per line; `{{specJson}}` / `{{ticketsJson}}` = spec and integrated tickets as in step 4 (with comments); `{{branchCommits}}` = the `{{initiativeCommits}}` log; `{{commitSubjectPrefix}}` = `fix(<initiativeId>): `. Launch a fresh subagent. It verifies the app, fixes code-caused failures, and re-verifies, at most 3 verifications and 2 fix attempts per finding (2 fix rounds), one commit per fix, never touching the proof framework; a finding unfixed after 2 attempts is recorded and the run continues; the orchestrator never drives the app or fixes code itself.
-   2. **Check.** `HEAD` equals the last `result.rounds[].fixCommit` (or `@prevHead` when none), exactly one commit per fix round since `@prevHead` with the `fix(...)` subject, worktree clean, `result.verification` names executed checks, `EVIDENCE_DIR` holds the files its checks cite, JSON valid. Missing evidence or invalid JSON downgrades the verdict to `inconclusive`; preserve and report a moved head or dirty worktree (step 10 stops on it). An app that cannot launch or fails its health check gives `inconclusive` with the error; do not troubleshoot. When fix commits exist, push and update PR coverage.
-   3. **Publish verdict.** Post one comment on the spec per the GitHub reference, covering the final verdict, every round's evidence path, and each fix commit. Done when the comment is read back, the failure to post is recorded with `EVIDENCE_DIR/verdict.md` saved, or the skip is recorded. A final `fail` or `partial` verdict stays unresolved: list each unfixed finding with its reason and attempts in the comment, name the unfinished tickets, keep the PR draft and spec open, and continue to the next phases without stopping.
-9. **Chore pass** once verification is settled. *Load [fetch-diff.md](./references/fetch-diff.md)* and split the PR diff into `@diffDir`. Record `@prevHead`. Fill `chore.md`: `{{featureBranch}}`, `{{pullRequestUrl}}`, `{{worktreePath}}`, `{{targetBranch}}` as above; `{{diffDir}}` = `@diffDir`; `{{branchCommits}}` = the `{{initiativeCommits}}` log; `{{commitSubjectPrefix}}` = `chore(<initiativeId>): `. Launch a fresh chore subagent. Verify: zero or one commit since `@prevHead`, matching subject when present, worktree clean, checks reported. Push, then remove `@diffDir`. Report its out-of-scope findings; do not act on them. Done when the chore result is verified and pushed or recorded as none/failed.
-10. **Publish and remove worktree.** Confirm all implementation/chore work is verified, clean and pushed; read back the draft PR, initiative metadata, ticket coverage and checks. Preserve `SOURCE_ROOT`, PR URL and final head outside the worktree. Change CWD to `SOURCE_ROOT`; remove only the run-owned worktree per the GitHub reference, without force. Verify it is absent from disk and `git worktree list`. If dirty, unpushed, incomplete, or removal fails, preserve/report it and stop before review. Done when the PR exists at the pushed head and implementation worktree removal is confirmed.
-11. **Code review.** From `SOURCE_ROOT`, *run `code-review` skill for GitHub pull requests, bugs, quality attributes, code smells, and initiative coverage*, passing the PR URL and `SOURCE_ROOT`. **MUST** run only after step 10; never substitute the former bug-fix pass or reuse the removed implementation worktree. The skill selects models, fetches the PR diff and creates a separate fresh detached review worktree from `SOURCE_ROOT` without cloning, delegates read-only axes, and posts findings. If unavailable, report the blocker. Done when every axis, finding, posting result, and selection fallback has a recorded outcome.
-12. **Finalize.** Recheck PR head, required checks, metadata, coverage, and that the PR is still a draft. Leave the PR as a draft. Close the spec only when every in-scope ticket is integrated/closed, no `hitl` ticket is open, review completed at the current head, initiative verification passed, app verification is not `fail`/`partial`, and no unresolved bug/initiative findings remain. Failed/incomplete/skipped initiative review, posting failures, an unresolved `fail`/`partial` app verdict, or known unresolved earlier bug/initiative concerns keep the spec open. Report quality/smell suggestions separately. Review does not fix code automatically; hand off findings. Keep the branch and PR. Done when remote state is read back or blockers are explicit.
+   Verify: per Breakdown Initiative; record actual model/effort or unavailable-model failure.
+   → `failed`, invalid JSON, empty `created`, or incomplete GitHub operations: report actual partial state; stop; never claim success.
+
+2. Re-run `GH_TOOL graph read --spec REF --out RUN_DIR` after any breakdown: complete graph (spec, tickets, comments, blockers, parents) saved under `RUN_DIR`; retain explicit `OWNER/REPO#NUMBER` identities.
+
+3. Validate the graph: reject `frontier.cycles` (name them) and tickets without scope; resolve `problems` (routing conflicts) and `frontier.needs_resolution` (cancelled, duplicate, external blockers) before writes; `hitl` tickets and their dependants are `deferred`; verify closed blockers' results exist in `BASE_COMMIT`. Record each ticket's identity, owner, status, scope, blockers, and evidence in the run-local map. Show the *Graph report* after Breakdown Initiative and in parallel mode.
+
+4. Explore implementation scope and test seams as needed; save shared notes under `RUN_DIR/notes` and pass pointers. Reuse planner evidence (graph, footprints, conflicts) when available; otherwise derive it from the graph and source checkout without a planner. Bound every runnable ticket's scope before selection.
+
+5. Execute selected mode:
+   - Validate `mode` and `MAX_PARALLEL` before creating any branch or worktree.
+   - Create the integration branch and worktree per [Integration setup](./references/worktrees.md#integration-setup).
+   - Load [publication.md](./references/publication.md) (both modes; also covers verdict, verification, and closure used later).
+   - Load **only** the selected mode reference:
+     → C: Sequential → Run [Sequential Implementation](./references/sequential.md#sequential-implementation).
+     → D: Parallel → Run [Parallel Implementation](./references/parallel.md#parallel-implementation); isolate tickets per [Ticket worktrees](./references/worktrees.md#ticket-worktrees).
+
+   Launch implementer → [implementer.md](./agents/implementer.md) subagent per ticket in its worktree:
+   refs none · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent, ≤2 rounds.
+
+   | Placeholder | Sequential | Parallel |
+   |---|---|---|
+   | `{{worktreePath}}` | `WORKTREE_PATH` | `TICKET_WORKTREE(n)` |
+   | `{{featureBranch}}` | `INTEGRATION_BRANCH` | `TICKET_BRANCH(n)` |
+   | `{{targetBranch}}` | `BASE_BRANCH` | `INTEGRATION_BRANCH` |
+   | `{{ticketRef}}` | `OWNER/REPO#NUMBER` | same |
+   | `{{ticketFile}}` | `RUN_DIR/tickets/<OWNER>_<REPO>_<NUMBER>.json` | same |
+   | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` | same (integration log) |
+   | `{{commitSubjectPrefix}}` | `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): ` | same |
+
+   Verify in the ticket's worktree: `HEAD` = `result.commit`, exactly one commit since `@prevHead`, subject prefix, clean and on its branch, `result.verification` names executed checks and results including skipped infrastructure checks and errors; thin evidence → run cheap confirmations.
+   → Invalid JSON, `failed`, missing evidence, or mismatched commit: rework; recheck after each round.
+   → Still invalid after 2 rounds: preserve branch/worktree and report the blocker; stop advancing that ticket.
+   Integrate and publish per the mode reference.
+
+6. **Frontier check.** Refresh `graph read`, then `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done <integrated refs>` after each publication. A blocker is satisfied only when integrated in this run or verified in the base. Unfinished tickets but none ready → report each unready ticket and why (open `hitl`, unresolved external dependency); preserve all work and the draft PR; keep the spec open; stop before chore, verification, review, actualize/cleanup, or finalization. Never force progress or declare completion.
+
+7. Launch chore → [chore.md](./agents/chore.md) subagent in `WORKTREE_PATH`:
+   refs `fetch-diff` · rework none.
+   Before: load [fetch-diff.md](./references/fetch-diff.md); split PR diff into `@diffDir`.
+
+   | Placeholder | Value |
+   |---|---|
+   | `{{featureBranch}}` | `INTEGRATION_BRANCH` |
+   | `{{pullRequestUrl}}` | PR URL |
+   | `{{worktreePath}}` | `WORKTREE_PATH` |
+   | `{{targetBranch}}` | `BASE_BRANCH` |
+   | `{{diffDir}}` | `@diffDir` |
+   | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` |
+   | `{{commitSubjectPrefix}}` | `chore(<INITIATIVE_ID>): ` |
+
+   Verify: ≤1 commit since `@prevHead`, subject match, clean, checks reported.
+   After: push; remove `@diffDir`; report out-of-scope findings without acting.
+   → No result or failed: record none/failed; continue.
+
+8. Launch verifier → [verifier.md](./agents/verifier.md) subagent in `WORKTREE_PATH`:
+   refs none · rework none (internal: ≤3 verifications, ≤2 fix attempts per finding, one commit per fix).
+   Before: detect harness (read-only) in `.github/skills/*/SKILL.md`, `.claude/skills/*/SKILL.md`, `.agents/skills/*/SKILL.md`, keeping skills whose `description` says they launch/drive the app to prove behavior and capture evidence; set `EVIDENCE_DIR` per publication *Verification evidence*.
+   → No harness: record `verification skipped: no verification harness`; no subagent, no comment.
+   → Subagents unavailable: record skip reason; never drive the app in the orchestrator.
+
+   | Placeholder | Value |
+   |---|---|
+   | `{{featureBranch}}` | `INTEGRATION_BRANCH` |
+   | `{{pullRequestUrl}}` | PR URL |
+   | `{{worktreePath}}` | `WORKTREE_PATH` |
+   | `{{targetBranch}}` | `BASE_BRANCH` |
+   | `{{evidenceDir}}` | `EVIDENCE_DIR` |
+   | `{{verificationSkills}}` | matched `SKILL.md` absolute paths, one per line |
+   | `{{specFile}}` | `RUN_DIR/spec.json` |
+   | `{{ticketFiles}}` | integrated ticket file paths, one per line |
+   | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` |
+   | `{{commitSubjectPrefix}}` | `fix(<INITIATIVE_ID>): ` |
+
+   Verify: `HEAD` = last `result.rounds[].fixCommit` (or `@prevHead`), exactly one `fix(...)` commit per fix round, clean, `result.verification` names executed checks, `EVIDENCE_DIR` holds cited files, valid JSON; proof framework untouched.
+   → Missing evidence/invalid JSON, or app fails launch/health: verdict `inconclusive` with error; do not troubleshoot.
+   After: push fix commits and update PR coverage per publication *Pull request*; post one spec comment per publication *Verification evidence*; read back, or record failure with `EVIDENCE_DIR/verdict.md` saved.
+   → Final `fail`/`partial`: list unfixed findings with reason and attempts, name unfinished tickets; keep spec open and PR draft; continue.
+
+9. Run *Publication verification* ([publication.md](./references/publication.md)).
+
+10. Run code review → *`code-review` skill for GitHub pull requests, bugs, quality attributes, code smells, and initiative coverage* from `SOURCE_ROOT`:
+    inputs PR URL, `SOURCE_ROOT` · foreground; wait until every axis has an outcome.
+    Review creates its own fresh detached worktree from `SOURCE_ROOT` without cloning; **MUST NOT** review inside or reuse the integration worktree. Review never fixes code.
+    Record: axes, findings, posting results, models/fallbacks, reviewed head.
+    → Unavailable: report the blocker; keep spec open.
+
+11. Run [Actualize and cleanup](./references/worktrees.md#actualize-and-cleanup).
+    → New commits after review: reviewed head is stale; closure gates keep the spec open.
+    → Unresolvable conflict, failed push, or failed removal: preserve and report path/branch; keep spec open; continue to step 12.
+
+12. Finalize per *Closure gates*; report per *Output*; check *Completion criteria*.
+    → All closure gates pass: close spec; verify remote state.
+    → Otherwise: keep spec open and report findings.
+
+## Subagent launch contract
+
+**Only this skill launches agents**, including background calls and rework, and controls scheduling, integration, publication, and closure; every launch and rework follows this contract. Agent bodies and references return control here; they never create subagents.
+
+- Resolve `AGENTS_ROOT=<skill base directory>/agents` and `REFERENCES_ROOT=<skill base directory>/references` as absolute paths before changing into a worktree; never from caller CWD.
+- Validate the agent body and every manifest file are readable. Missing/unreadable → stop/report exact path.
+- Fill every placeholder in the body; attach `referencesRoot`, `referenceManifest`, and the step's `refs` as absolute `requiredReferences`. Pass pointers only per *Pointer handoff*.
+- Supply tools, permissions, and model settings at launch, never in agent frontmatter. Agents never gain scheduling, publishing, closure, merging, or cross-ticket authority.
+
+`referenceManifest` lists every `.md` file under `REFERENCES_ROOT`, keyed by its relative path without `.md`: `breakdown` → `REFERENCES_ROOT/breakdown.md`, `fetch-diff` → `REFERENCES_ROOT/fetch-diff.md`.
+
+Launch line legend: `refs` = `requiredReferences` (manifest keys); pass only the listed files, never a whole folder; run style defaults to foreground, one fresh agent; `rework` names who reworks and the round cap.
+
+## Constraints
+
+- **GitHub:** **MUST** perform every GitHub issue, PR, label, and graph operation through `GH_TOOL` per *GitHub operations*, never raw `gh`; load [publication.md](./references/publication.md) at step 5. Missing/unreadable reference or `GH_TOOL` → stop/report.
+- **Repository identity:** preserve each issue's `OWNER/REPO#NUMBER`; route issue reads/comments/closures to its owning repository, and Git/implementation/PR operations only to the resolved source repository. Resolve ambiguity before writes; **MUST NOT** infer ownership from checkout, PR repository, or matching issue number.
+- **HITL:** re-read labels at selection. Skip `hitl` tickets without implementation, delegation, comments, closure, or closing references. An open skipped ticket never satisfies dependants; only closed tickets with results verified in the integration base do. Reference skipped tickets without closing keywords; keep the spec open while any remain open.
+- **One ticket = one subagent:** fresh implementer per ticket; sequential waits for each result, parallel caps concurrency. Rework uses that ticket's existing agent, at most two rounds. **MUST NOT** implement inline, batch tickets, or reuse agents across tickets. Missing subagents → stop/report; app verification has its own skip policy in step 8.
+- **Implementation focus:** at most one quick confirmation of environment/network/Docker/port/registry/external-service failure; use test seams (unit tests, fakes, mocks, in-memory/stubs) and record skipped check/error. Infrastructure-only failures do not block when evidence suffices; code-caused failures do. **MUST NOT** troubleshoot infrastructure during implementation or app verification.
+- **Proof framework:** verification fixes change only app code/tests. Check each fix commit against matched verification skill folders, feature maps, journeys, harness scripts/helpers, seed data, and checked cases. A proof-framework change invalidates the fix: undo with `git revert --no-edit`, never reset; record the finding unfixed as a framework gap.
+- **Draft-only:** PR stays draft; **MUST NOT** merge or mark ready (`gh pr ready`). User controls readiness.
+- **Pointer handoff:** subagents load their own task data. Save every spec/ticket/comment/commit-log read a subagent can reuse under `RUN_DIR` (`graph read` writes spec and ticket files); refresh a file before each launch that uses it. Before each worktree agent launch, write `git -C WORKTREE_PATH log --reverse --format='%H %s%n%n%b' BASE_COMMIT..HEAD` (or `None yet.`) to `RUN_DIR/commits/<HEAD sha>.txt` if absent and record `@prevHead`. Pass pointers (paths, `OWNER/REPO#NUMBER` refs, commit ranges); **MUST NOT** inline bodies, comments, or logs into prompts. Missing/unreadable pointer file → agents return `failed` with the path; the orchestrator refreshes it and reworks.
+- **Worktree isolation:** **MUST** follow [worktrees.md](./references/worktrees.md) for every worktree create, write, actualize, and removal; never reset or discard existing work.
+
+## Graph report
+
+Table of ticket, blocked by (`none` = explicit root), paths, conflicts (blocker → dependent); then ready frontier, critical path, deferred tickets with reason. Every node listed, including deferred tickets' blocker edges.
 
 ## Output
 
-Report: spec URL and tickets created by Bootstrap (when run), with planner model and effort; in `parallel` and `plan` modes and after Bootstrap the wave table (planner's after Bootstrap, else graph-derived), critical path, and deferred tickets first; PR URL and state; per ticket — integrated commit and evidence, closure, or blocker; skipped `hitl` tickets with the dependants they block; chore commits; verification verdict, per-check results, fix commits, `EVIDENCE_DIR` per round, spec comment ID (or skip reason); review axis outcomes, findings/comment IDs, model choices and fallbacks; skipped infrastructure checks; worktree status.
+- Breakdown Initiative or parallel mode → first: *Graph report*.
+- Spec URL, created tickets, planner model/effort; PR URL/state.
+- Per ticket: integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
+- Chore commits; verification verdict, checks, fix commits, per-round `EVIDENCE_DIR`, spec comment ID or skip reason.
+- Review axes, findings, comment IDs, models/fallbacks; actualize commits/merge result; skipped infrastructure checks; worktree status.
+- No runnable tickets: report graph/blockers; never claim implementation.
+- Incomplete: name missing evidence, partial GitHub writes, preserved work; distinguish unverified state from read-back success.
+
+## Gotchas
+
+- References are grouped by phase; a cited heading (*X*) resolves only within files already loaded at that step. Load a reference when its step links it, read it to end of file, and continue truncated reads by range; a partial read counts as not loaded.
+- A closed issue may be cancelled or duplicate rather than implemented; verify the result exists in the integration base or branch. On resume, a ticket closed by an earlier run is satisfied only if its commit is on the integration branch.
+- A ticket commit is not complete until the cumulative integration result passes relevant checks.
+- Treat external blockers separately from run-local integrated work; never bypass unresolved external dependencies.
 
 ## Completion criteria
 
-- Bootstrap (when run) created tickets only via the planner's `to-tickets` `auto` call, without `hitl`, asked the user nothing beyond the *Create spec* target-repository and initiative-ID question, and showed the ticket list before implementation.
-- No `hitl` ticket was implemented, closed, or given a closing reference.
-- Each integrated ticket has one verified commit by its own subagent, evidence comment, and completed closure on its owning repository; no unimplemented issue is closed or reported as closed.
-- Chore commits are pushed; the PR exists and implementation worktree removal was verified before the code-review skill ran with independent reviewers.
-- Source repository and PR base match the routing labels or an agreed resolution; the PR title prefix and first body ID equal `INITIATIVE_ID` and references every implemented ticket; the PR is still a draft; pending/failed checks are reported accurately.
-- When a project-local app-verification skill exists, a fresh verifier subagent ran on the integrated head before the chore pass, fixed code-caused failures (max 2 attempts per finding) without changing the proof framework and re-verified, unfixed findings are recorded with reasons, evidence persists outside the worktree, and one verdict comment with evidence paths is on the spec; otherwise the skip is reported. An unresolved `fail`/`partial` verdict keeps the PR draft and spec open.
-- The spec is closed only after finalization gates pass; review blockers and unresolved bug/initiative findings keep it open.
-- In `parallel` mode each integrated ticket was merged as exactly one cherry-picked commit, no two writers shared a worktree, and every ticket worktree/branch is removed or reported; `plan` mode created no worktree, branch, or PR.
-- The worktree is removed or explicitly accounted for, with no user work discarded.
-
-## Completeness sweep
-
-Last: map every spec requirement and ticket to implementation, tests, and relevant docs. Resolve gaps or report explicit deferrals before declaring completion.
+- Each integrated ticket has exactly one verified commit from its own implementer, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or given a closing reference.
+- Source repository/base match routing; PR title prefix and bare first body line equal `INITIATIVE_ID`; every implemented ticket is covered; PR is draft; pending/failed checks are reported accurately.
+- Chore preceded app verification; chore commits verified and pushed. Verification left the proof framework unchanged, preserved evidence outside the worktree, and recorded its verdict or skip; unresolved `fail`/`partial` keeps the spec open.
+- Code review ran from `SOURCE_ROOT` in its own detached worktree before actualize; integration worktree actualized, pushed, and removal confirmed, or preserved and reported.
+- Spec closed only when every closure gate passes. No reference-loading failure ignored; subagents received pointers, not inlined task data; user work intact.
+- Completeness sweep, last: re-read the request; map every spec requirement/ticket to code, tests, docs, configuration, and relevant failure/compatibility evidence. Resolve gaps or report explicit deferrals before declaring completion.
