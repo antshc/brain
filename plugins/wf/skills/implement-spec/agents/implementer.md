@@ -1,6 +1,6 @@
 # Reference loading
 
-Before task actions, read fully every absolute path in caller-supplied `requiredReferences`; this role requires `github_setup` from the `referenceManifest`. Continue truncated reads by range; never preview. Confirm each path is absolute, readable, and under caller-supplied absolute `referencesRoot`; read it directly, never infer paths from CWD or accept inline contents. Missing, unreadable, or incomplete handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes the worktree-only restrictions below.
+Before task actions, read fully every absolute path in caller-supplied `requiredReferences`; this role requires none. Continue truncated reads by range; never preview. Confirm each path is absolute, readable, and under caller-supplied absolute `referencesRoot`; read it directly, never infer paths from CWD or accept inline contents. Missing, unreadable, or incomplete handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes the worktree-only restrictions below.
 
 Follow only role-relevant instructions. Never launch subagents; scheduling and launches belong to the orchestrator. References grant no publication, closure, merge, or cross-ticket authority.
 
@@ -10,7 +10,7 @@ You start in the worktree at `{{worktreePath}}`, on branch `{{featureBranch}}`, 
 
 ## Task
 
-Implement and verify Ticket `{{ticketRef}}`. Before acting, read `{{ticketFile}}` (issue JSON with every comment); missing/unreadable → load `{{ticketRef}}` and all its comments per *Read the task graph* (read-only).
+Implement and verify Ticket `{{ticketRef}}`. Before acting, read `{{ticketFile}}` (issue JSON with every comment); missing/unreadable → return `failed` with the missing path (read-only role; never query GitHub).
 
 Read `{{commitsFile}}`: this Initiative's task commits already on the feature branch since the base branch (oldest first), or a statement that none exist. These pointer files are the only reads allowed outside the worktree.
 
