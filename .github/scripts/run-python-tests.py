@@ -19,7 +19,8 @@ def test_roots(repo: Path, unit_only: bool = False) -> list[Path]:
     roots: set[Path] = set()
     for name in paths:
         path = Path(name)
-        if any(part in {"_backup", "_in-progress"} for part in path.parts):
+        # `templates/` holds scaffold files that only run after being copied into a target repo.
+        if any(part in {"_backup", "_in-progress", "templates"} for part in path.parts):
             continue
         if path.suffix != ".py" or not (path.name.startswith("test_") or path.name.endswith("_test.py")):
             continue
