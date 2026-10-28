@@ -1,37 +1,27 @@
-Parallel mode procedure. Load only when `mode` is `parallel` or `plan`.
+# Parallel
 
-## Settings
+Experimental. Load only for `mode=parallel`, after graph validation and integration setup. The orchestrator owns launches, *Frontier check*, and every later phase.
 
-- `MAX_PARALLEL`: default 3; user may override.
-- `schedule`: `waves` (default) | `graph`.
-- `TICKET_BRANCH(n)` = `INTEGRATION_BRANCH-t<n>`; `TICKET_WORKTREE(n)` = `WORKTREES_ROOT/INITIATIVE_ID-t<n>`, where `n` is the ticket number. Confirm each path stays under `WORKTREES_ROOT`; never reuse an existing path or branch.
+## Scope and scheduling
 
-## Plan
+1. **Graph source.** Planner runs only in Breakdown Initiative (spec had zero sub-issues); reuse its blocker graph and conflicts. Spec already had sub-issues → **MUST NOT** spawn a planner; derive the graph inline from the run-local map: reject cycles; mark `hitl` tickets and unsatisfied transitive dependants `deferred`; initial ready frontier = non-deferred tickets whose blockers are verified in the base; critical path = longest blocker chain; derive `conflicts` from source footprints and shared hot files/contracts, serializing overlaps conservatively before launch. Conflicts restrict concurrency; never invent blocker edges to represent the worker cap. Done when graph, readiness and conflict evidence exist.
+2. **Report the graph** per *Graph report*, with paths and conflicts, before the first launch.
 
-1. **Plan source.** Planner runs only in SKILL.md *Bootstrap tickets* (spec had zero sub-issues); reuse its result. Spec already had sub-issues → **MUST NOT** spawn a planner; build the plan inline from the run-local map: `hitl` tickets and transitive dependants `deferred`; wave 0 = ready tickets, wave N = tickets whose blockers are all in earlier waves; split waves larger than `MAX_PARALLEL` into consecutive waves; critical path = longest blocker chain; no `conflicts`, paths `-`. Cherry-pick conflicts at merge go through Run step 5 rework. Done when the plan exists.
-2. **Return the plan.** Render the result to the user as a table, then the critical path and deferred tickets:
+## Parallel Implementation
 
-   | Wave | Ticket | Blockers | Paths | Note |
-   |---|---|---|---|---|
-   | 0 | acme/shop#12 | none | `src/Export/Schema/` | |
-   | 0 | acme/shop#13 | none | `src/Api/Auth/` | |
-   | 1 | acme/shop#14 | none | `src/Export/Schema/` | conflict:#12 |
-   | 1 | acme/shop#15 | #12 | `src/Export/Writer/` | |
+Implementers never write in the integration worktree.
 
-   Deferred: `#16` hitl; `#17` blocked-by `#16`.
-3. `mode=plan`: stop after the plan; no worktree, branch, or PR. Otherwise continue.
+1. **Slot.** Launch ticket `n` whenever it is ready (blockers integrated), non-`hitl`, has no `conflicts` pair with an in-flight ticket, and fewer than `MAX_PARALLEL` are in flight. Verify and integrate each completed ticket as it settles, without waiting for unrelated in-flight tickets. Keep a completed worker's slot/conflict reservation until its integration settles. Recompute the frontier after each validated integration and publication.
+2. **Create the ticket worktree** per worktrees *Ticket worktrees*; record `@prevHead(n)`.
+3. **Delegate.** Return control to the orchestrator for *Launch implementer* (Parallel column) with the eligible tickets: one fresh background implementer per ticket. Done when each returns its final JSON.
+4. **Verify and rework** per *Launch implementer*, against `TICKET_WORKTREE(n)` and `@prevHead(n)`.
+5. **Merge sequentially.** In the integration worktree, one verified ticket at a time (critical path first): `git cherry-pick <result.commit>`; the integration head gains exactly one commit with the ticket's subject. On conflict: `git cherry-pick --abort`, then rework that ticket's subagent to rebase `TICKET_BRANCH(n)` onto the integration head, resolve, rerun its checks, and keep one commit; re-verify and re-pick. After two failed rounds, preserve the worktree, mark the ticket and its dependants blocked, and continue other tickets. **MUST NOT** use merge commits, force, or reset.
+6. **Post-merge check.** Run the cheapest affected build/test in the integration worktree; a failure the merged ticket caused goes back to its subagent as rework (new commit on the ticket branch, re-pick).
+7. **Publish** per *Ticket publication*.
+8. **Clean the ticket worktree** per worktrees *Ticket worktrees*.
 
-## Run
+Done when each integrated ticket has exactly one serialized cherry-picked commit, writers stayed isolated, and ticket branches/worktrees are removed or reported. Once the frontier is exhausted, return control to the orchestrator for *Frontier check*.
 
-Use the integration worktree only for merging, publishing, verification, and chore. Implementers never write there.
+## Readiness example
 
-1. **Slot.** Launch ticket `n` only when it is ready (blockers integrated), non-`hitl`, has no `conflicts` pair with an in-flight ticket, and fewer than `MAX_PARALLEL` are in flight. `waves`: launch the whole wave, wait for every ticket of the wave to settle, then merge. `graph`: launch whenever a slot and a ready non-conflicting ticket exist; merge each as it settles, then recompute the frontier.
-2. **Create the ticket worktree.** `git -C SOURCE_ROOT worktree add -b TICKET_BRANCH(n) TICKET_WORKTREE(n) <integration HEAD>`; verify clean and `HEAD` equals the integration head. Record `@prevHead(n)`.
-3. **Delegate.** Fill `implement.md` as in step 4 with `{{worktreePath}}` = `TICKET_WORKTREE(n)`, `{{featureBranch}}` = `TICKET_BRANCH(n)`, `{{targetBranch}}` = `INTEGRATION_BRANCH`, `{{initiativeCommits}}` = integration log. Launch each as a background subagent in one message so they run concurrently. Done when each returns its final JSON.
-4. **Verify per ticket.** As step 5, against `TICKET_WORKTREE(n)`: `HEAD` equals `result.commit`, exactly one commit since `@prevHead(n)`, subject prefix, clean. Rework goes to that ticket's subagent, at most two rounds.
-5. **Merge sequentially.** In the integration worktree, one ticket at a time, in wave order (critical path first): `git cherry-pick <result.commit>`; the integration head gains exactly one commit with the ticket's subject. On conflict: `git cherry-pick --abort`, then send the ticket's subagent a rework asking it to rebase `TICKET_BRANCH(n)` onto the integration head, resolve, rerun its checks, and keep one commit; re-verify and re-pick. After two failed rounds, preserve the worktree, mark the ticket and its dependants blocked, and continue other tickets. **MUST NOT** use merger subagents, merge commits, force, or reset.
-6. **Post-merge check.** After the last merge of a wave (or each merge in `graph`), run the cheapest affected build/test in the integration worktree; a failure that the merged ticket caused goes back to that ticket's subagent as rework (new commit on the ticket branch, re-pick).
-7. **Publish and close.** As step 6, once per merged batch: push, open or update the draft PR, close each integrated ticket.
-8. **Clean ticket worktrees.** After a ticket is integrated, `git -C SOURCE_ROOT worktree remove TICKET_WORKTREE(n)` without force and delete its run-owned branch with `git -C SOURCE_ROOT branch -D TICKET_BRANCH(n)` (cherry-picked commits are not ancestors, so `-d` refuses). Preserve dirty or unmerged ones and report path/branch.
-
-Steps 8 to 12 of the main workflow run unchanged once the frontier is exhausted.
+A and B have no blockers; C is blocked only by A. Start A and B when capacity permits. After A is verified, integrated, checked and published, C may start while B still runs, provided C conflicts with no in-flight ticket. A finished worker alone does not satisfy its dependants. No ticket ready but workers in flight → wait for a result; report a blocked frontier only when no worker can make progress.

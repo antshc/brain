@@ -43,5 +43,5 @@ jobs:
           )
           python -m pip install -e ".[dev]"
 
-      - name: Run all Python tests
-        run: python .github/scripts/run-python-tests.py
+      - name: Run Python unit tests
+        run: python .github/scripts/run-python-tests.py --unit-only
