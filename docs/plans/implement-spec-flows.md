@@ -84,6 +84,8 @@ Flow: /implement-spec
 
 ## Subflow C: Sequential Implementation
 
+Proposed procedure: [`references/Sequential.md`](../../plugins/wf/skills/implement-spec/references/Sequential.md).
+
 ```text
 1. For each ready non-hitl ticket:
    → Launch a fresh implementer subagent for that ticket only.
