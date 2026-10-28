@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import re
 import hashlib
+import json
+import re
 from pathlib import Path
 
 import pytest
@@ -65,12 +66,11 @@ def test_agent_migration_and_absolute_load_contract(role, old, required):
     expected = {'planner': (['baseCommit',
                   'harnessRoot',
                   'implementationDetails',
-                  'maxParallel',
                   'notesDir',
                   'sourceRoot',
                   'specJson',
                   'specRef'],
-                 '554906fb5eb68990beff72e23d961b4b34bf47fe92e78584cea9d42c7b7c4759'),
+                 None),
      'implementer': (['commitSubjectPrefix',
                       'featureBranch',
                       'initiativeCommits',
@@ -100,7 +100,8 @@ def test_agent_migration_and_absolute_load_contract(role, old, required):
     placeholders, response_hash = expected[role]
     assert set(placeholders) <= set(re.findall(r"\{\{([^}|]+)(?:\|[^}]*)?\}\}", body))
     responses = "\n".join(re.findall(r"```json\n(.*?)\n```", body, re.S))
-    assert hashlib.sha256(responses.encode()).hexdigest() == response_hash
+    if response_hash is not None:
+        assert hashlib.sha256(responses.encode()).hexdigest() == response_hash
 
 
 def test_launch_manifest_has_every_reference_and_role():
@@ -177,3 +178,46 @@ def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
     assert '{{breakdown}}' not in caller
     assert '{{ticketsJson}}' in (ROOT / 'agents/verifier.md').read_text()
     assert '`{{ticketsJson}}` = spec and integrated tickets' in MAIN
+
+
+def test_graph_only_outputs_and_scheduler_guards():
+    for skill in (ROOT, REPO / 'plugins/wf/skills/to-tickets'):
+        for path in skill.rglob('*.md'):
+            assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
+    parallel = (ROOT / 'references/parallel.md').read_text()
+    for text in ('Graph scheduling only', 'reject every other schedule before side effects',
+                 'fewer than `MAX_PARALLEL`', 'blockers integrated',
+                 'has no `conflicts` pair with an in-flight ticket',
+                 'do not wait for unrelated in-flight tickets', 'After each merge',
+                 'after each validated integration', 'while B still runs',
+                 'A finished worker alone does not satisfy its dependants',
+                 'no ticket is ready but workers remain in flight',
+                 'Keep a completed worker', 'until integration settles'):
+        assert text in parallel
+    assert 'Optional `schedule=graph`' in MAIN
+    assert 'reject any other schedule before side effects' in MAIN
+    assert '| Ticket | Blocked by |' in parallel
+    assert 'default 3' in parallel
+
+
+def test_planner_emits_complete_graph_without_batches_or_worker_cap():
+    planner = (ROOT / 'agents/planner.md').read_text()
+    assert '{{maxParallel}}' not in planner + MAIN
+    examples = [json.loads(block) for block in re.findall(r'```json\n(.*?)\n```', planner, re.S)]
+    result = examples[0]['result']
+    assert set(result) == {'tickets', 'ready', 'conflicts', 'criticalPath', 'created', 'deferred'}
+    tickets = {ticket['ref']: ticket for ticket in result['tickets']}
+    assert len(tickets) == len(result['tickets'])
+    deferred = {ticket['ref'] for ticket in result['deferred']}
+    assert set(result['created']) | deferred <= tickets.keys()
+    for ticket in tickets.values():
+        assert set(ticket) == {'ref', 'blockers', 'paths', 'hot'}
+        assert set(ticket['blockers']) <= tickets.keys()
+    assert set(result['ready']) == {
+        ref for ref, ticket in tickets.items() if not ticket['blockers'] and ref not in deferred
+    }
+    assert any(ticket['blockers'] for ticket in tickets.values())
+    assert set(result['criticalPath']) <= tickets.keys()
+    for pair in result['conflicts']:
+        assert {pair['a'], pair['b']} <= tickets.keys()
+    assert examples[1]['status'] == 'failed'

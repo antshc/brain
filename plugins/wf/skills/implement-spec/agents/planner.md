@@ -12,7 +12,6 @@ Plan implementation of a Spec's Ticket graph. Read-only, except ticket publicati
 
 - Spec: `{{specJson}}`
 - Source checkout (read-only): `{{sourceRoot}}`; base commit `{{baseCommit}}`
-- Max concurrent tickets per wave: `{{maxParallel}}`
 - Exploration notes (pointers): `{{notesDir}}`
 - Tracker checkout: `{{harnessRoot}}`; verify its tracker repository equals `{{specRef}}`'s owning repository before ticket writes.
 - Spec ref `{{specRef}}` (`OWNER/REPO#NUMBER`); implementation details `{{implementationDetails|plan.md path or None}}`
@@ -32,8 +31,8 @@ Called only when the spec has zero native sub-issues. A spec with existing sub-i
 1. **Graph.** Build blocker edges from the fetched `ticketGraph`. `hitl` tickets and their transitive dependants are `deferred`; closed blockers whose result is in the base are satisfied. Reject cycles: return `status: failed` naming the cycle.
 2. **Footprint.** Per ticket, predict touched paths (files or folders) from its scope and the code at `{{baseCommit}}`: read affected code, tests, shared registries, DI/composition roots, config, lockfiles, generated files, migrations. Mark shared hot files.
 3. **Conflicts.** Two tickets conflict when footprints share a path, a hot file, or one changes a contract the other consumes.
-4. **Waves.** Wave 0 = ready tickets. Wave N = tickets whose blockers are all in earlier waves. Within a wave, push the later conflicting ticket into the next wave (`reason: conflict:#x`). Split waves larger than `{{maxParallel}}` into consecutive waves (`reason: cap`).
-5. **Critical path.** Longest blocker chain; order tickets on it first within a wave.
+4. **Ready frontier.** List non-deferred tickets whose blockers are satisfied in the fetched base. Conflicts restrict simultaneous execution, not dependency direction; preserve them separately from blocker edges. The orchestrator enforces its concurrency cap at runtime.
+5. **Critical path.** Longest blocker chain; prioritize ready tickets on it when selecting the next work.
 
 ## Rules
 
@@ -49,20 +48,91 @@ End your final message with exactly one JSON object.
 {
   "status": "completed",
   "result": {
-    "waves": [
-      {"wave": 0, "tickets": [
-        {"ref": "acme/shop#12", "blockers": [], "paths": ["src/Export/Schema/"], "hot": [], "reason": null},
-        {"ref": "acme/shop#13", "blockers": [], "paths": ["src/Api/Auth/"], "hot": [], "reason": null}
-      ]},
-      {"wave": 1, "tickets": [
-        {"ref": "acme/shop#14", "blockers": [], "paths": ["src/Export/Schema/", "src/Di/Registry.cs"], "hot": ["src/Di/Registry.cs"], "reason": "conflict:acme/shop#12"},
-        {"ref": "acme/shop#15", "blockers": ["acme/shop#12"], "paths": ["src/Export/Writer/"], "hot": [], "reason": null}
-      ]}
+    "tickets": [
+      {
+        "ref": "acme/shop#12",
+        "blockers": [],
+        "paths": [
+          "src/Export/Schema/"
+        ],
+        "hot": []
+      },
+      {
+        "ref": "acme/shop#13",
+        "blockers": [],
+        "paths": [
+          "src/Api/Auth/"
+        ],
+        "hot": []
+      },
+      {
+        "ref": "acme/shop#14",
+        "blockers": [],
+        "paths": [
+          "src/Export/Schema/",
+          "src/Di/Registry.cs"
+        ],
+        "hot": [
+          "src/Di/Registry.cs"
+        ]
+      },
+      {
+        "ref": "acme/shop#15",
+        "blockers": [
+          "acme/shop#12"
+        ],
+        "paths": [
+          "src/Export/Writer/"
+        ],
+        "hot": []
+      },
+      {
+        "ref": "acme/shop#16",
+        "blockers": [],
+        "paths": [],
+        "hot": []
+      },
+      {
+        "ref": "acme/shop#17",
+        "blockers": [
+          "acme/shop#16"
+        ],
+        "paths": [],
+        "hot": []
+      }
     ],
-    "conflicts": [{"a": "acme/shop#12", "b": "acme/shop#14", "evidence": "src/Export/Schema/ both"}],
-    "criticalPath": ["acme/shop#12", "acme/shop#15"],
-    "created": ["acme/shop#12", "acme/shop#13", "acme/shop#14", "acme/shop#15"],
-    "deferred": [{"ref": "acme/shop#16", "reason": "hitl"}, {"ref": "acme/shop#17", "reason": "blocked-by:acme/shop#16"}]
+    "ready": [
+      "acme/shop#12",
+      "acme/shop#13",
+      "acme/shop#14"
+    ],
+    "conflicts": [
+      {
+        "a": "acme/shop#12",
+        "b": "acme/shop#14",
+        "evidence": "src/Export/Schema/ both"
+      }
+    ],
+    "criticalPath": [
+      "acme/shop#12",
+      "acme/shop#15"
+    ],
+    "created": [
+      "acme/shop#12",
+      "acme/shop#13",
+      "acme/shop#14",
+      "acme/shop#15"
+    ],
+    "deferred": [
+      {
+        "ref": "acme/shop#16",
+        "reason": "hitl"
+      },
+      {
+        "ref": "acme/shop#17",
+        "reason": "blocked-by:acme/shop#16"
+      }
+    ]
   }
 }
 ```
@@ -73,4 +143,4 @@ or, when planning failed:
 {"status": "failed", "result": {"reason": "<why>"}}
 ```
 
-`created` lists tickets made by Breakdown Initiative; this agent has no breakdown-skip mode. Example reading: `#12` and `#13` run together in wave 0; `#14` has no blockers but shares `src/Export/Schema/` with `#12`, so it moves to wave 1 beside `#15` (blocked by `#12`); `#16` is `hitl`, so it and its dependant `#17` are deferred.
+`tickets[].blockers` is the directed dependency graph: each blocker must be integrated before that ticket starts. `ready` is the initial dependency-ready frontier, not a promise of concurrent execution; `conflicts` excludes simultaneous writers. `created` lists tickets made by Breakdown Initiative; this agent has no breakdown-skip mode. Example: start #12 and #13; #14 conflicts with #12. Once #12 is integrated, #15 can start while #13 is still running, subject to the concurrency cap and conflicts. #16 is `hitl`; it and #17 remain deferred.

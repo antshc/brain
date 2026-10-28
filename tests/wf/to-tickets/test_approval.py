@@ -26,3 +26,19 @@ def test_online_offline_and_corrections_require_explicit_approval():
         assert text in SKILL
     assert 'Silence, partial feedback, corrections, and ambiguous replies are not approval' in SKILL
     assert 'Offline or partial' in SKILL
+
+
+def test_publishes_blocker_graph_online_and_offline():
+    assert 'acyclic **blocker graph**' in SKILL
+    assert 'from blocker to dependent' in SKILL
+    assert 'Reject cycles and missing blocker nodes' in SKILL
+    assert '`Slice | Blocked by`' in SKILL
+    assert '`Ticket | Blocked by`' in SKILL
+    assert 'none` for roots' in SKILL
+    assert 'fully qualified issue identities' in SKILL
+    assert 'recompute the blocker graph and ready frontier' in SKILL
+    assert 'symbolic blocker graph' in SKILL
+    assert 'native link confirmed by reread' in SKILL
+    github = (ROOT / 'references/github.md').read_text()
+    assert 'symbolic blocker graph adjacency (including roots)' in github
+    assert 'initial ready frontier' in github
