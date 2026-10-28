@@ -1,6 +1,6 @@
 # Parallel
 
-Load only for `mode=parallel`, after graph validation and integration setup. The orchestrator owns launches, *Frontier check*, and every later phase.
+Experimental. Load only for `mode=parallel`, after graph validation and integration setup. The orchestrator owns launches, *Frontier check*, and every later phase.
 
 ## Scope and scheduling
 

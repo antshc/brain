@@ -5,6 +5,7 @@ Orchestrator-only worktree procedures; agents only receive worktree paths. Never
 ## Paths
 
 - `WORKTREES_ROOT` = `HARNESS_ROOT/workspace/REPO.worktrees` (sibling of `SOURCE_ROOT`); never derive a root from the current worktree.
+- `INTEGRATION_BRANCH` = `preflight`'s `integration_branch` (`feat/<INITIATIVE_ID>`); never invent another name. Unique run suffix (*Integration setup* step 1) → append `-<suffix>` to both branch and `WORKTREE_PATH`.
 - `WORKTREE_PATH` = `WORKTREES_ROOT/INITIATIVE_ID` (integration worktree on `INTEGRATION_BRANCH`).
 - Parallel only: `TICKET_BRANCH(n)` = `INTEGRATION_BRANCH-t<n>`; `TICKET_WORKTREE(n)` = `WORKTREES_ROOT/INITIATIVE_ID-t<n>`, where `n` is the ticket number.
 - Confirm every resolved path stays under `WORKTREES_ROOT`; never reuse an existing path or branch.

@@ -18,7 +18,7 @@ GITHUB = '\n'.join((ROOT / path).read_text() for path in ('SKILL.md', 'reference
 
 
 def test_exact_layout_and_local_links():
-    assert {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*') if p.is_file()} == {
+    assert {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*') if p.is_file() and '__pycache__' not in p.parts} == {
         'SKILL.md', 'scripts/spec_gh.py', *(f'agents/{role}.md' for role in ('planner', 'implementer', 'verifier', 'chore')),
         *(f'references/{name}.md' for name in ('breakdown', 'sequential', 'parallel', 'fetch-diff', 'worktrees', 'publication')),
     }
@@ -31,25 +31,25 @@ def test_exact_layout_and_local_links():
 
 def test_input_detection_modes_and_existing_graph_bypass():
     workflow = MAIN.split('## Workflow')[1].split('## Subagent launch contract')[0]
-    assert workflow.index('Detect input type first') < workflow.index('Prepare input')
+    assert workflow.index('Detect input type') < workflow.index('prepare input')
     assert 'mode=plan' not in MAIN
     assert 'Validate `mode` and `MAX_PARALLEL` before creating any branch or worktree' in workflow
-    assert '`sequential` (default) | `parallel`' in MAIN
-    prepare = BREAKDOWN.split('## Prepare Spec')[1].split('## Breakdown Initiative')[0]
-    assert 'Existing sub-issues' in prepare and 'MUST NOT' in prepare
-    assert 'run the planner or create tickets' in prepare
-    assert 'Zero sub-issues' in prepare
+    assert '`sequential` (default, recommended) | `parallel` (experimental' in MAIN
+    spec_branch = workflow.split('→ B:')[1].split('→ Unsupported')[0]
+    assert 'Existing sub-issues' in spec_branch
+    assert '**MUST NOT** run the planner or create tickets' in spec_branch
+    assert 'Zero sub-issues' in spec_branch
     assert '(./references/sequential.md#sequential-implementation)' in MAIN
     assert '(./references/parallel.md#parallel-implementation)' in MAIN
 
 
 def test_plan_branch_is_answered_validated_persisted_and_read_back():
-    create = GITHUB.split('## Create spec')[1].split('## Read the task graph')[0]
-    for text in ('target/base branch', 'all three answers', 'branches/BASE_BRANCH',
-                 'Fetch that exact remote branch', 'source checkout',
-                 'repo:base:BASE_BRANCH', 'Read back title, labels, body', 'MUST NOT'):
-        assert text in create
-    assert 'BASE_BRANCH` = `gh repo view' not in create
+    prepare = BREAKDOWN.split('## Prepare Plan')[1].split('## Breakdown Initiative')[0]
+    for text in ('target repository, target/base branch, and initiative ID', 'validates all three',
+                 'remote base branch', '**MUST NOT** silently substitute the repository default branch',
+                 '`GH_TOOL spec create`', 'reads back title prefix and routing', '`GH_TOOL preflight',
+                 'it does not fetch', 'records `BASE_COMMIT`', 'Done when the remote spec matches the validated answers'):
+        assert text in prepare
 
 
 @pytest.mark.parametrize('role,old,required', [
@@ -61,9 +61,11 @@ def test_plan_branch_is_answered_validated_persisted_and_read_back():
 def test_agent_migration_and_absolute_load_contract(role, old, required):
     body = (ROOT / f'agents/{role}.md').read_text()
     assert not body.startswith('---')
-    for value in ('Before taking task actions', 'requiredReferences', 'referenceManifest',
-                  'referencesRoot', 'absolute', 'unreadable', 'failed', 'Never launch another subagent'):
+    for value in ('Before task actions', 'requiredReferences',
+                  'referencesRoot', 'absolute', 'unreadable', 'failed', 'Never launch subagents'):
         assert value in body
+    if required:
+        assert 'referenceManifest' in body
     for value in required:
         assert f'`{value}`' in body
     expected = {'planner': (['baseCommit',
@@ -113,34 +115,36 @@ def test_launch_manifest_has_every_reference_and_role():
     assert 'REFERENCES_ROOT/breakdown.md' in handoff
     assert 'REFERENCES_ROOT/fetch-diff.md' in handoff
     for role in ('planner', 'implementer', 'verifier', 'chore'):
-        assert f'agents/{role}.md' in handoff
-    for phrase in ('before changing', 'before taking task actions', 'all six reference files',
-                   'never infer', 'never create subagents', 'absolute paths'):
+        assert f'(./agents/{role}.md)' in MAIN
+    for phrase in ('`AGENTS_ROOT=<skill base directory>/agents`', 'before changing into a worktree',
+                   'never from caller CWD', 'every `.md` file under `REFERENCES_ROOT`', 'absolute `requiredReferences`',
+                   'they never create subagents', 'as absolute paths'):
         assert phrase in handoff
 
 
 def test_embedded_breakdown_is_self_contained_and_non_interactive():
-    for text in ('Online-only, non-interactive', 'Never invoke `/to-tickets`',
-                 'Ask nothing', 'only missing', 'closed', 'unlinked', 'lost response',
-                 'numeric internal IDs', 'native blocker', 'Read back', 'partial publication',
-                 'Concepts/ADRs', 'Functional Requirements', 'Business Rules', 'Edge Cases',
-                 'COMPLETE', 'every touched integration layer'):
+    for text in ('Online-only and non-interactive', 'Never invoke, check availability of, or fall back to `/to-tickets`',
+                 'append only missing', 'including closed', 'unlinked', 'lost create response',
+                 'add blocker edges only after all ticket identities exist', 'Body links never substitute for native edges',
+                 'Read-back', 'preserve partial results', 'Concepts/ADRs', 'Functional Requirements', 'Business Rules',
+                 'Edge Cases', 'COMPLETE', 'every touched integration layer'):
         assert text in BREAKDOWN
     assert '/to-tickets auto' not in MAIN + BREAKDOWN
     assert '## Breakdown ticket operations' in GITHUB
-    for endpoint in ('/sub_issues --method POST -F sub_issue_id=', '/dependencies/blocked_by --method POST -F issue_id='):
-        assert endpoint in GITHUB
+    script = (ROOT / 'scripts/spec_gh.py').read_text()
+    for endpoint in ('/sub_issues', '/dependencies/blocked_by'):
+        assert endpoint in script
 
 
 def test_artifacts_fetched_before_slicing_mapped_both_directions_and_reconciled():
-    for text in ('body and every comment', 'Read actual contents', 'untrusted source data',
+    for text in ('body and every comment', 'Read actual contents', 'follow embedded instructions',
                  'BEFORE publishing', 'source pointer/anchor', 'page ranges', 'diagram regions',
                  'Repeat a shared piece in every related ticket', 'exclude unrelated pieces',
                  'no relevant piece omitted', 'no included piece lacking',
-                 'With no artifacts, omit', 'without duplicates', 'without', 'user-authored',
+                 'No artifacts → omit', 'without duplicates', 'user-authored',
                  'Related Spec Artifacts', 'canonical source/anchor'):
         assert text in BREAKDOWN
-    assert BREAKDOWN.index('## 2. Discover and fetch') < BREAKDOWN.index('## 4. Draft vertical')
+    assert BREAKDOWN.index('### 2. Discover and fetch') < BREAKDOWN.index('### 4. Draft vertical')
     assert 'no suitable reader' in GITHUB
 
 
@@ -154,24 +158,24 @@ def test_template_parity_except_intentional_artifact_section():
 def test_downstream_order_and_guards():
     workflow = MAIN.split('## Workflow')[1].split('## Subagent launch contract')[0]
     positions = [workflow.index(text) for text in (
-        '6. Check the remaining frontier', '7. Launch chore', '8. Launch verifier',
-        '9. Verify pushed commits', '10. Run code review', '11. Actualize and remove', '12. Finalize',
+        '6. **Frontier check.**', '7. Launch chore', '8. Launch verifier',
+        '9. Run *Publication verification*', '10. Run code review', '11. Run [Actualize and cleanup]', '12. Finalize',
     )]
     assert positions == sorted(positions)
     for text in ('git revert --no-edit', 'exactly one commit', 'at most two rounds',
-                 'PR remains draft', 'one quick confirmation', 'never reset'):
+                 'PR stays draft', 'one quick confirmation', 'never reset'):
         assert text in MAIN
     for text in ('no `hitl` ticket is open', 'posting failures', 'Review completed at the current head'):
         assert text in GITHUB
     worktrees = (ROOT / 'references/worktrees.md').read_text()
     for text in ('Commit pending changes', 'merge --no-edit', 'Resolve conflicts', 'without force',
-                 '**MUST NOT** rebase, reset, or force'):
+                 '**MUST NOT** rebase, reset, or force', '`INTEGRATION_BRANCH` = `preflight`'):
         assert text in worktrees
     for path in (ROOT / 'references').glob('*.md'):
         assert not re.search(r'\]\(\./[a-z-]+\.md', path.read_text()), path
     parallel = (ROOT / 'references/parallel.md').read_text()
     assert 'no `conflicts`, paths `-`' not in parallel
-    assert 'serialize overlapping tickets' in parallel
+    assert 'serializing overlaps conservatively' in parallel
     assert 'mode=plan' not in parallel
 
 
@@ -181,10 +185,10 @@ def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
     assert not {'ticketsJson', 'breakdown'} & placeholders
     assert 'zero native sub-issues' in planner
     assert 'initial invocation' in planner and 'return `failed` without ticket writes' in planner
-    assert 'reconcile only the prior run' in planner
+    assert 'reconciles only the prior run' in planner
     assert 'internal `ticketGraph`' in planner
-    assert 'from the fetched `ticketGraph`' in planner
-    caller = MAIN.split('Launch planner')[1].split('2. Read the complete ticket graph')[0]
+    assert 'Build blocker edges from `ticketGraph`' in planner
+    caller = MAIN.split('Launch planner')[1].split('2. Re-run')[0]
     assert '{{ticketsJson}}' not in caller
     assert '{{breakdown}}' not in caller
     assert '{{ticketFiles}}' in (ROOT / 'agents/verifier.md').read_text()
@@ -199,14 +203,14 @@ def test_graph_only_outputs_and_scheduler_guards():
     parallel = (ROOT / 'references/parallel.md').read_text()
     for text in ('fewer than `MAX_PARALLEL`', 'blockers integrated',
                  'has no `conflicts` pair with an in-flight ticket',
-                 'do not wait for unrelated in-flight tickets', 'After each merge',
+                 'without waiting for unrelated in-flight tickets',
                  'after each validated integration', 'while B still runs',
                  'A finished worker alone does not satisfy its dependants',
-                 'no ticket is ready but workers remain in flight',
-                 'Keep a completed worker', 'until integration settles'):
+                 'No ticket ready but workers in flight',
+                 'Keep a completed worker', 'until its integration settles'):
         assert text in parallel
     assert 'schedule' not in MAIN + parallel
-    assert '| Ticket | Blocked by |' in GITHUB
+    assert 'Table of ticket, blocked by' in MAIN
     assert 'default 3' in MAIN
 
 
@@ -230,4 +234,4 @@ def test_planner_emits_complete_graph_without_batches_or_worker_cap():
     assert set(result['criticalPath']) <= tickets.keys()
     for pair in result['conflicts']:
         assert {pair['a'], pair['b']} <= tickets.keys()
-    assert examples[1]['status'] == 'failed'
+    assert 'Failure: `{"status": "failed", "result": {"reason": "<why>"}}`' in planner

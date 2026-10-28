@@ -98,6 +98,7 @@ def test_full_run_lifecycle(sandbox: Sandbox):
     code, pre, err = sandbox.tool("preflight", "--spec", SPEC)
     assert code == 0, err
     assert (pre["source_repository"], pre["base_branch"], pre["initiative_id"]) == ("acme/shop", "main", "PAY-12")
+    assert pre["integration_branch"] == "feat/PAY-12"
     assert pre["source_root"].endswith("workspace/shop") and pre["run_dir"].endswith("workspace/shop.runs/1")
 
     code, graph, err = sandbox.tool("graph", "read", "--spec", SPEC, "--out", str(sandbox.run_dir))

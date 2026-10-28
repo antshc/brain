@@ -12,7 +12,8 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
 - GitHub spec issue URL `https://github.com/OWNER/REPO/issues/NUMBER`, plan file path, or inline plan/description. Native sub-issues are **tickets**; native blockers form the **ticket graph**.
 - Spec routing: `repo:target:<owner/repo>` and `repo:base:<branch>`; use source-root `GLOSSARY.md` vocabulary when present.
-- `mode`: `sequential` (default) | `parallel`.
+- Harness: run from `HARNESS_ROOT` (a git checkout) holding the source repository's primary checkout at `HARNESS_ROOT/workspace/<REPO>` with `origin` = the source repository; `workspace/` git-ignored. Missing → `preflight` exits `2`; report and stop.
+- `mode`: `sequential` (default, recommended) | `parallel` (experimental; use only when asked).
 - `max-parallel=<positive integer>`: parallel only; default 3. Scheduling always follows the ticket graph.
 
 ## GitHub operations
@@ -21,7 +22,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
 | Intent | Command |
 |---|---|
-| Prerequisites, routing, `INITIATIVE_ID`, `SOURCE_ROOT`, `RUN_DIR` | `GH_TOOL preflight --spec REF` |
+| Prerequisites, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH`, `SOURCE_ROOT`, `RUN_DIR` (no fetch; no `BASE_COMMIT`) | `GH_TOOL preflight --spec REF` |
 | Create spec from plan/description | `GH_TOOL spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N` |
 | Read spec, tickets, comments, blockers; frontier | `GH_TOOL graph read --spec REF --out RUN_DIR` |
 | Recompute frontier | `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done REF…` |
@@ -33,6 +34,8 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 | Split PR diff per file (chore) | `GH_TOOL pr diff-split --pr URL` |
 | Read back PR | `GH_TOOL pr read --source-repository R --head H --initiative-id I --expect-closes REF…` |
 
+`REF…` = one or more space-separated values after one flag (`--done A B`); repeating the flag (`--done A --done B`) also works.
+
 - Tracker repository = the spec's. Source repository = exactly one `repo:target:` label; base = exactly one `repo:base:` label; `INITIATIVE_ID` = spec title prefix before the first `:`. Missing or conflicting routing → resolve explicitly before writes (`--source-repository`/`--base-branch` only for a user-confirmed older unlabeled spec).
 - Track every issue as `OWNER/REPO#NUMBER` in its owning repository; bare references inherit the containing issue's repository; stop on ambiguity. Tickets may live outside the tracker.
 - Empty or 404 reads are failures, never an empty graph. Text relationships only when native sub-issues/blockers are confirmed unavailable; report that mode.
@@ -43,7 +46,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
 1. Detect input type, then prepare input:
    → A: Plan file or inline description → load [breakdown.md](./references/breakdown.md); run *Prepare Plan* (ends with `spec create`), then continue as B.
-   → B: GitHub spec issue → `GH_TOOL preflight --spec URL` (`HARNESS_ROOT`, `SOURCE_ROOT`, routing, `INITIATIVE_ID`, `RUN_DIR`), then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; **MUST NOT** run the planner or create tickets. Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative*.
+   → B: GitHub spec issue → `GH_TOOL preflight --spec URL` (`HARNESS_ROOT`, `SOURCE_ROOT`, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH` = `integration_branch`, `RUN_DIR`), then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; **MUST NOT** run the planner or create tickets. Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative*.
    → Unsupported or ambiguous input: ask for valid input; stop.
 
    Launch planner (only from *Breakdown Initiative*) → [planner.md](./agents/planner.md) subagent from `SOURCE_ROOT`:
