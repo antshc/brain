@@ -179,7 +179,6 @@ Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugin
 AFK PR review and autonomous development loop.
 
 - [dev](plugins/ralph/skills/dev/SKILL.md): pick the next open issue, implement it, and commit the result.
-- [address](plugins/ralph/skills/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
 - [fix](plugins/ralph/skills/fix/SKILL.md): apply suggested changes from review comments.
 - [create-worktree](plugins/ralph/skills/create-worktree/SKILL.md) / [delete-worktree](plugins/ralph/skills/delete-worktree/SKILL.md): create/reuse or remove an isolated git worktree per feature branch.
 - [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
@@ -189,6 +188,7 @@ AFK PR review and autonomous development loop.
 
 Code and technical solution review skills with modular standards and guidance.
 
+- [address](plugins/review/skills/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
 - [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from a standalone `[#{{initiative-id}}]` marker in the PR description; accepts a user PR URL or an implement-spec call and fetches the diff into a fresh detached review worktree without cloning.

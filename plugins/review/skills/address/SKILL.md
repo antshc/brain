@@ -32,18 +32,16 @@ Done when `action` is `proceed` and the working set is in hand.
 
 **Load `references/github-api.md` now.** Every `gh` invocation in this run is copied from it, and nothing below restates one.
 
-1. Run `/harness` skill from cwd. Unavailable, or exits reporting `missing` — use cwd as `$HARNESS_REPO_PATH`. Exits reporting `invalid` — **exit** and report. Otherwise `HARNESS_REPO_PATH := harnessRepoPath` from its emitted JSON.
-2. Derive the checkout for `{{owner}}/{{repo}}` (the PR's repository, from §0): equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/{{repo}}`. Confirm the checkout exists and its own `origin` normalizes to `{{owner}}/{{repo}}` — missing or a clone of another repository → **stop** before touching any review thread, post no replies, and report why. Never read `repos` to make this decision.
-3. Run `/create-worktree` skill with `$CODEBASE_REPO_PATH $baseRef $headRef`. Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
-4. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`. A non-pass build → **exit** and report. Never fix threads on a broken build.
+1. Derive `CODEBASE_REPO_PATH` for `{{owner}}/{{repo}}` (the PR's repository, from §0): the Git repository of the current directory (`git rev-parse --show-toplevel`) whose `origin` remote (`git remote get-url origin`) normalizes to `{{owner}}/{{repo}}`. Missing, or a clone of another repository → **stop** before touching any review thread, post no replies, and report why.
+2. Create an isolated checkout of the PR branch outside the repository: `WORKTREE_PATH := <parent of CODEBASE_REPO_PATH>/.worktrees/{{repo}}-pr-{{number}}`. Run `git -C "$CODEBASE_REPO_PATH" fetch origin "$headRef" "$baseRef"`, then `git -C "$CODEBASE_REPO_PATH" worktree add -b "$headRef" "$WORKTREE_PATH" "origin/$headRef"`. An existing path or local `$headRef` branch → **stop** and report; never reuse or reset either. Switch into `WORKTREE_PATH`.
 
-Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef` and the build gate has passed.
+Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef` and `HEAD` equals `origin/$headRef`.
 
 ## 2. Learn how this repo verifies itself
 
-Read `README.md`, `AGENTS.md`, and `copilot-instructions.md` for this repo's build and test commands; record them as `$buildCommand` and `$testCommand`.
+Read `README.md`, `AGENTS.md`, and `copilot-instructions.md` for this repo's build and test commands; record them as `$buildCommand` and `$testCommand`. Run `$buildCommand` once, unchanged. A failing build → **exit** and report; never fix threads on a broken build.
 
-Done when each holds a real command or is recorded as absent. Absent → say so in the final report and resolve issues without that gate.
+Done when each holds a real command or is recorded as absent, and the build passed or is absent. Absent → say so in the final report and resolve issues without that gate.
 
 ## 3. Read the working set
 
@@ -116,7 +114,7 @@ Done when every thread in the working set carries exactly one new comment author
 
 ## 9. Cleanup
 
-Run `/delete-worktree` skill with `$CODEBASE_REPO_PATH $WORKTREE_PATH $headRef`.
+Leave `WORKTREE_PATH`, then `git -C "$CODEBASE_REPO_PATH" worktree remove "$WORKTREE_PATH"` without force and `git -C "$CODEBASE_REPO_PATH" branch -d "$headRef"`. A dirty worktree or a refused deletion → preserve it and report the path and branch.
 
 Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is gone; the remote branch and the PR are untouched.
 
