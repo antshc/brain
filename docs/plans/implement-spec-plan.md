@@ -1,6 +1,6 @@
 # Implement-Spec Entry Flow Refactor Plan
 
-**Status:** Proposed — not implemented
+**Status:** Implemented
 
 **Scope:** `plugins/wf/skills/implement-spec` and removal of `auto` from `plugins/wf/skills/to-tickets`; `plugins/af` unchanged
 

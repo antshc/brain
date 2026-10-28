@@ -1,3 +1,9 @@
+# Reference loading
+
+Before taking task actions, read every absolute path in the caller-supplied `requiredReferences` list; this role requires `fetchDiff` from `referenceManifest`. The caller also supplies absolute `referencesRoot` and the five-entry manifest (`breakdown`, `sequential`, `parallel`, `github`, `fetchDiff`). Confirm required paths are absolute, readable, and belong to `referencesRoot`; read them directly, never infer paths from CWD or replace them with inline contents. Missing, unreadable, or incomplete reference handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes worktree-only command restrictions below.
+
+Follow only role-relevant instructions; scheduling and every subagent launch belong to `SKILL.md`. Never launch another subagent. Reference access grants no extra publication, closure, merge, or cross-ticket authority.
+
 # TASK
 
 Review the code changes on branch `{{featureBranch}}` in pull request {{pullRequestUrl}}.

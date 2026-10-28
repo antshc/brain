@@ -15,7 +15,7 @@ Load this reference only for `mode=sequential` (the default), after input prepar
 
 1. **Select one ticket.** Recompute the ready frontier from the run-local graph. Choose one in-scope, non-`hitl` ticket whose blockers are satisfied. If none is ready while unfinished tickets remain, run *Blocked frontier* below. Done when one eligible ticket is selected or the run stops.
 2. **Record the integration tip.** Confirm `WORKTREE_PATH` is clean and on `INTEGRATION_BRANCH`; record `@prevHead` = `HEAD`. Do not start a second writer in this worktree. Done when the starting commit and branch are verified.
-3. **Delegate one ticket.** Read its issue and all comments. Fill [implement.md](./implement.md) with every placeholder:
+3. **Delegate one ticket.** Read its issue and all comments. Fill [implementer.md](../agents/implementer.md) with every placeholder:
 
    | Placeholder | Value |
    | --- | --- |
@@ -26,7 +26,7 @@ Load this reference only for `mode=sequential` (the default), after input prepar
    | `{{initiativeCommits}}` | `git -C WORKTREE_PATH log --reverse --format='%H %s%n%n%b' BASE_COMMIT..HEAD`, or `None yet.` |
    | `{{commitSubjectPrefix}}` | `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): ` |
 
-   Launch a **fresh implementer subagent** for this ticket only and wait for its final JSON. The implementer uses TDD/test seams, makes exactly one commit, and never pushes, publishes, or closes issues. Done when its result is available.
+   Return the selected ticket and filled prompt to `SKILL.md`; only that orchestrator launches a **fresh implementer subagent** with the absolute reference handoff and waits for its final JSON. The implementer uses TDD/test seams, makes exactly one commit, and never pushes, publishes, or closes issues. Done when its result is available.
 4. **Verify its result.** For `status=completed`, require all of:
    - Worktree `HEAD` equals `result.commit` and exactly one commit follows `@prevHead`.
    - Commit subject begins with the required ticket-specific prefix.
