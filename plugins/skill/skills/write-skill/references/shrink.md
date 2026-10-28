@@ -9,7 +9,7 @@ Make agent-facing files shorter and more consistent while preserving every behav
 ## Constraints
 
 - **MUST** preserve every behavior: rules, steps, order, constraints, MUST/MUST NOT guardrails, failure behaviors, pointers and their conditions, skill invocations, completion criteria, output contract.
-- Keep code blocks, commands, paths, identifiers, placeholders, template directives, and frontmatter keys literal.
+- Keep code blocks, commands, paths, identifiers, placeholders, template directives, and frontmatter keys literal. Exception: compact a structured-response example per *Output contract* in best-practices.md, preserving every field.
 - Change meaning only to merge duplicates; add no new rules.
 
 ## Steps
