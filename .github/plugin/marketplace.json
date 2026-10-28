@@ -57,7 +57,7 @@
         {
             "name": "skill",
             "source": "./plugins/skill",
-            "description": "Skill authoring: grill a skill idea into a brief, then write and shrink an agent skill from bundled best practices."
+            "description": "Skill authoring: grill a skill idea into a brief, then write and shrink an agent skill, or write a custom coding agent, from bundled best practices."
         }
     ]
 }
