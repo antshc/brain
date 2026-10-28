@@ -202,13 +202,15 @@ def cmd_preflight(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     source = args.source_repository or single_label(labels, TARGET_PREFIX)
     base = args.base_branch or single_label(labels, BASE_PREFIX)
     verified = verify_source(gh, source, base)
+    initiative_id = initiative_id_of(issue["title"])
     return {
         "spec": str(ref),
         "tracker_repository": ref.repo,
         "title": issue["title"],
         "state": issue["state"],
         "base_branch": base,
-        "initiative_id": initiative_id_of(issue["title"]),
+        "initiative_id": initiative_id,
+        "integration_branch": f"feat/{initiative_id}",
         **verified,
         **resolve_checkout(gh, harness_root, verified["source_repository"], ref.number),
     }
@@ -624,7 +626,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = command("graph", "frontier", cmd_graph_frontier)
     p.add_argument("--graph", required=True)
-    p.add_argument("--done", action="append", default=[])
+    p.add_argument("--done", action="extend", nargs="+", default=[])
 
     p = command("ticket", "create", cmd_ticket_create)
     for flag in ("spec", "title", "body-file"):
@@ -632,7 +634,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = command("issue", "block", cmd_issue_block)
     p.add_argument("ref")
-    p.add_argument("--by", action="append", required=True)
+    p.add_argument("--by", action="extend", nargs="+", required=True)
 
     for name, handler in (("edit-body", cmd_issue_edit_body), ("comment", cmd_issue_comment)):
         p = command("issue", name, handler)
@@ -647,8 +649,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = command("pr", "publish", cmd_pr_publish)
     for flag in ("source-repository", "base", "head", "title", "initiative-id", "rationale-file"):
         p.add_argument(f"--{flag}", required=True)
-    p.add_argument("--closes", action="append", default=[])
-    p.add_argument("--refs", action="append", default=[])
+    p.add_argument("--closes", action="extend", nargs="+", default=[])
+    p.add_argument("--refs", action="extend", nargs="+", default=[])
     p.add_argument("--evidence-file")
 
     p = command("pr", "diff-split", cmd_pr_diff_split)
@@ -660,7 +662,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--number", type=int)
     p.add_argument("--head")
     p.add_argument("--initiative-id")
-    p.add_argument("--expect-closes", action="append", default=[])
+    p.add_argument("--expect-closes", action="extend", nargs="+", default=[])
     return parser
 
 

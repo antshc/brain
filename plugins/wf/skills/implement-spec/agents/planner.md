@@ -58,12 +58,18 @@ End your final message with exactly one JSON object:
 
 ```json
 {"status": "completed", "result": {
-  "tickets": [{"ref": "acme/shop#15", "blockers": ["acme/shop#12"], "paths": ["src/Export/Writer/", "src/Di/Registry.cs"], "hot": ["src/Di/Registry.cs"]}],
-  "ready": ["acme/shop#12"],
+  "tickets": [
+    {"ref": "acme/shop#12", "blockers": [], "paths": ["src/Export/Schema/", "src/Di/Registry.cs"], "hot": ["src/Di/Registry.cs"]},
+    {"ref": "acme/shop#14", "blockers": [], "paths": ["src/Export/Schema/"], "hot": []},
+    {"ref": "acme/shop#15", "blockers": ["acme/shop#12"], "paths": ["src/Export/Writer/", "src/Di/Registry.cs"], "hot": ["src/Di/Registry.cs"]},
+    {"ref": "acme/shop#16", "blockers": [], "paths": [], "hot": []},
+    {"ref": "acme/shop#17", "blockers": ["acme/shop#16"], "paths": ["src/Export/Writer/"], "hot": []}
+  ],
+  "ready": ["acme/shop#12", "acme/shop#14"],
   "conflicts": [{"a": "acme/shop#12", "b": "acme/shop#14", "evidence": "src/Export/Schema/ both"}],
   "criticalPath": ["acme/shop#12", "acme/shop#15"],
-  "created": ["acme/shop#12"],
-  "deferred": [{"ref": "acme/shop#17", "reason": "blocked-by:acme/shop#16"}]
+  "created": ["acme/shop#12", "acme/shop#14", "acme/shop#15", "acme/shop#17"],
+  "deferred": [{"ref": "acme/shop#16", "reason": "hitl"}, {"ref": "acme/shop#17", "reason": "blocked-by:acme/shop#16"}]
 }}
 ```
 

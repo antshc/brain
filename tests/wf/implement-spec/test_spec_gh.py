@@ -113,6 +113,7 @@ class TestPreflight:
         result = spec_gh.cmd_preflight(Gh(runner), args)
         assert result["source_repository"] == "acme/shop" and result["base_branch"] == "release/1"
         assert result["initiative_id"] == "PAY-12"
+        assert result["integration_branch"] == "feat/PAY-12"
         assert result["run_dir"].endswith("workspace/shop.runs/1")
         assert result["source_root"].endswith("workspace/shop")
 
@@ -396,6 +397,23 @@ def test_graph_frontier_command_reads_saved_graph(tmp_path, capsys):
     assert spec_gh.main(["graph", "frontier", "--graph", str(path), "--done", "a/b#1"], gh=Gh(FakeRunner({}))) == 0
     assert json.loads(capsys.readouterr().out)["ready"] == ["a/b#2"]
     assert spec_gh.main(["graph", "frontier", "--graph", str(tmp_path / "missing.json")], gh=Gh(FakeRunner({}))) == 2
+
+
+@pytest.mark.parametrize("argv", [
+    ["graph", "frontier", "--graph", "g.json", "--done", "a/b#1", "a/b#2"],
+    ["graph", "frontier", "--graph", "g.json", "--done", "a/b#1", "--done", "a/b#2"],
+])
+def test_multi_value_flags_accept_space_separated_and_repeated(argv):
+    assert spec_gh.build_parser().parse_args(argv).done == ["a/b#1", "a/b#2"]
+
+
+def test_pr_and_block_flags_accept_space_separated_refs():
+    parser = spec_gh.build_parser()
+    publish = parser.parse_args(["pr", "publish", "--source-repository", "a/b", "--base", "main", "--head", "h", "--title", "t",
+                                 "--initiative-id", "I", "--rationale-file", "r", "--closes", "a/b#1", "a/b#2", "--refs", "a/b#3"])
+    assert (publish.closes, publish.refs) == (["a/b#1", "a/b#2"], ["a/b#3"])
+    assert parser.parse_args(["pr", "read", "--source-repository", "a/b", "--expect-closes", "a/b#1", "a/b#2"]).expect_closes == ["a/b#1", "a/b#2"]
+    assert parser.parse_args(["issue", "block", "a/b#3", "--by", "a/b#1", "a/b#2"]).by == ["a/b#1", "a/b#2"]
 
 
 class TestInstructionsUseRealCommands:

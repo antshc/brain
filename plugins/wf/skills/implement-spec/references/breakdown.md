@@ -14,7 +14,7 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 ## Prepare Plan
 
 1. Ask for **target repository, target/base branch, and initiative ID**; `GH_TOOL spec create` validates all three, the source repository, and the remote base branch. **MUST NOT** silently substitute the repository default branch. Done when all answers and routing are verified.
-2. `GH_TOOL spec create` with the plan/description as `--body-file` (it creates the `repo:target:`/`repo:base:` labels and reads back title prefix and routing; `problems` → stop). Then `GH_TOOL preflight --spec <new spec>` fetches the exact remote base (`BASE_COMMIT`) and validates the checkout. Done when the remote spec matches the validated answers.
+2. `GH_TOOL spec create` with the plan/description as `--body-file` (it creates the `repo:target:`/`repo:base:` labels and reads back title prefix and routing; `problems` → stop). Then `GH_TOOL preflight --spec <new spec>` validates routing, the remote base branch, and the checkout; it does not fetch. The orchestrator fetches `BASE_BRANCH` and records `BASE_COMMIT` before launching the planner. Done when the remote spec matches the validated answers.
 3. Return control to the orchestrator for *Breakdown Initiative*. Done when created/reconciled tickets and native links are read back.
 
 ## Breakdown Initiative
