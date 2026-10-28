@@ -69,8 +69,13 @@ Flow: /implement-spec
 ```text
 1. Fetch validated base commit.
 2. Launch fresh planner subagent with the bundled planner template.
-3. Planner invokes /to-tickets auto.
-4. Publish vertical-slice sub-tickets, parent links, and blockers.
+3. Planner loads references/breakdown-initiative.md and its bundled references.
+4. Apply the embedded online-only, non-interactive ticket workflow:
+   → Explore applicable Concepts/ADRs and code/test seams.
+   → Draft vertical slices with complete issue bodies.
+   → Reconcile existing children, create missing tickets without hitl labels.
+   → Link native parents/blockers and verify readback.
+   → Never call /to-tickets or request breakdown approval.
 5. Re-read and validate created tickets and dependencies.
 6. Calculate conflicts, execution waves, and critical path.
 7. Show tickets, waves, and deferred items.
