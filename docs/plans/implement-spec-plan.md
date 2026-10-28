@@ -18,6 +18,7 @@ Make input-type detection the first action, embed a self-contained **Breakdown I
 4. **Execution**: `sequential` remains the default; `parallel` retains `schedule=waves|graph` and `max-parallel=3` by default. `mode=plan` becomes unsupported and must fail explicitly, without creating execution worktrees or a PR.
 5. **Standalone `/to-tickets`**: remove its `auto` input and every no-approval/no-`hitl` exception. Retain human-approved online/offline flows and their existing `hitl` policy.
 6. **Scope**: leave all `plugins/af` skills unchanged. Leave the post-implementation pipeline and its draft-only policy unchanged.
+7. **Subagent ownership**: only `implement-spec/SKILL.md` launches planner, implementer, verifier, and chore subagents. Every launch passes discoverable absolute paths for the skill's bundled references; each subagent loads the references required by its role before acting.
 
 ## Implementation steps
 
@@ -29,8 +30,9 @@ Make input-type detection the first action, embed a self-contained **Breakdown I
 6. **Separate execution references and remove plan-only mode** — Rename `references/Sequential.md` to lowercase `references/sequential.md`; route default sequential execution through it. Retain `references/parallel.md` for parallel scheduling. Delete `plan` from the `implement-spec` mode contract, workflow branches, output, and completion criteria; remove `mode=plan` termination and worktree exceptions. Reject obsolete `mode=plan` explicitly.
 7. **Update discovery** — Correct the stale `implement-spec` link in [`README.md`](../../README.md) to the `wf` path. Do not change the `af` implementations or marketplace registration.
 8. **Author main skill and agent bodies** — Use [`/write-skill`](../../plugins/skill/skills/write-skill/SKILL.md) for `implement-spec/SKILL.md`. Use [`/write-agent`](../../plugins/skill/skills/write-agent/SKILL.md) for the content of each `agents/*.md`, but **omit all agent frontmatter**: these are internal prompt bodies, not independently registered coding agents. Preserve all behavior and prompt placeholders while moving existing prompt files into `agents/` (mapping below).
-9. **Add regression coverage** — Add tests under `tests/wf/implement-spec/` for routing, embedded-reference completeness, non-interactive ticket publication, native links/reconciliation, supported modes, no planner for an already-ticketed spec, agent prompt placeholders, no agent frontmatter, and preserved downstream guards. Add `tests/wf/to-tickets/` tests for approval-required behavior and rejection of `auto`; follow existing repository test conventions.
-10. **Validate** — Run focused tests and repository consistency checks. Search `wf` for obsolete `/to-tickets auto`, `Bootstrap tickets`, `mode=plan`, and plan-only exceptions; verify every new relative link, renamed prompt, template, and Graph/PR guard. Remove obsolete prompt/reference files only after their content is accounted for.
+9. **Pass references at every subagent launch** — In `SKILL.md`, resolve absolute paths from the `implement-spec/` skill root before changing into a source worktree. Construct the launch prompt from the selected `agents/<role>.md` body and include `referencesRoot`, a manifest of the five absolute reference-file paths, and the role's `requiredReferences`. Require the subagent to open/read those files before work; never infer paths from its current working directory or inline the reference contents. Stop/report missing or unreadable required files.
+10. **Add regression coverage** — Add tests under `tests/wf/implement-spec/` for routing, embedded-reference completeness, non-interactive ticket publication, native links/reconciliation, supported modes, no planner for an already-ticketed spec, agent prompt placeholders, no agent frontmatter, absolute reference handoff/loading, and preserved downstream guards. Add `tests/wf/to-tickets/` tests for approval-required behavior and rejection of `auto`; follow existing repository test conventions.
+11. **Validate** — Run focused tests and repository consistency checks. Search `wf` for obsolete `/to-tickets auto`, `Bootstrap tickets`, `mode=plan`, and plan-only exceptions; verify every new relative link, renamed prompt, template, and Graph/PR guard. Remove obsolete prompt/reference files only after their content is accounted for.
 
 ## Target skill structure
 
@@ -61,6 +63,14 @@ The root is `plugins/wf/skills/implement-spec/`. Keep this structure exact; do n
 3. **Prompt migration:** Move `references/plan.md` → `agents/planner.md`, `references/implement.md` → `agents/implementer.md`, `references/verify.md` → `agents/verifier.md`, and `references/chore.md` → `agents/chore.md`. Preserve every prompt placeholder, output JSON contract, validation guard, and failure rule; update callers before removing old paths.
 4. **Reference migration:** Consolidate the automated ticket workflow and issue template into `references/breakdown.md`; lowercase `references/Sequential.md` → `references/sequential.md`; retain `github.md`, `parallel.md`, and `fetch-diff.md`. Keep the ticket template semantically consistent with standalone `/to-tickets` unless divergence is intentional and tested.
 
+### Subagent invocation and reference loading
+
+1. **Caller:** `implement-spec/SKILL.md` owns every subagent launch, including parallel/background calls. `agents/*.md` are prompt bodies; neither an agent body nor a reference file independently creates another subagent.
+2. **Resolve paths:** From the invoking skill's own directory (not the repository root or ticket worktree), resolve `SKILL_ROOT`, `AGENTS_ROOT=SKILL_ROOT/agents`, and `REFERENCES_ROOT=SKILL_ROOT/references`. Validate the selected agent body and all five reference paths; pass absolute paths so the subagent can locate them from any worktree.
+3. **Launch contract:** Build the role prompt from `agents/<role>.md` with its placeholders filled. Include `referencesRoot`, a manifest mapping `breakdown`, `sequential`, `parallel`, `github`, and `fetchDiff` to their absolute Markdown paths, and a role-specific `requiredReferences` list. Pass issue, worktree, commit, and evidence context as pointers rather than duplicating reference contents.
+4. **Subagent load:** Each agent body explicitly instructs its subagent to read every `requiredReferences` path **before taking task actions**, then follow only its role-relevant instructions. Missing/unreadable paths are a failure returned to the orchestrator, not a reason to guess the location or silently skip the reference. The planner must load `breakdown.md` and `github.md`; define other roles' required subsets in their agent bodies without delegating orchestrator-only scheduling or publication authority.
+5. **Boundary:** `SKILL.md` still owns ticket selection, sequential/parallel scheduling, GitHub publication, verification of subagent results, and finalization. Passing a reference path never grants a subagent permission to publish, close issues, merge, or change other tickets.
+
 ## Acceptance scenarios
 
 | Input | Required behavior |
@@ -68,6 +78,7 @@ The root is `plugins/wf/skills/implement-spec/`. Keep this structure exact; do n
 | Plan file or inline description | Ask repository, branch, initiative ID → create spec → Breakdown Initiative |
 | Spec with no sub-issues | Breakdown Initiative → validate created graph |
 | Spec with sub-issues | Reuse graph; no planner or ticket creation |
+| Subagent launch from any worktree | `SKILL.md` passes absolute reference manifest and required subset; subagent loads required files before work |
 | Embedded Breakdown Initiative | No questions; publish immediately through bundled online GitHub procedures; new tickets have no `hitl` label |
 | Standalone `/to-tickets` | Present breakdown, wait for explicit approval, publish `hitl` tickets; `auto` unsupported |
 | `mode=sequential` or no mode | One fresh ticket implementer at a time in the integration worktree |
@@ -83,6 +94,7 @@ The root is `plugins/wf/skills/implement-spec/`. Keep this structure exact; do n
 - **Embedded-reference drift:** Keep the full ticket body template and spec/Concept/ADR precedence; validate copied template parity until intentional divergence is approved.
 - **Approval regression:** Standalone `/to-tickets` must never inherit the embedded no-approval path. Only `implement-spec`'s planner can publish without approval.
 - **Agent-format mismatch:** `/write-agent` normally requires frontmatter; use it for instruction-body drafting only. Validate that final `agents/*.md` files contain no frontmatter and that the orchestrator supplies runtime tools/models/permissions.
+- **Reference lookup drift:** Never rely on the subagent's CWD for `./references/`; resolve absolute paths in `SKILL.md`, verify existence before launch, and fail explicitly if a required reference cannot be loaded.
 - **Unexpected implementation from an old `mode=plan` caller:** Reject that mode rather than treating it as sequential.
 - **Cross-plugin drift:** `af` remains intentionally out of scope; only the two named `wf` skills and their docs/tests change.
 - **Regressions after ticket integration:** Retain commit evidence, HITL exclusions, app-verification limits, independent code review, and draft-only PR behavior.
