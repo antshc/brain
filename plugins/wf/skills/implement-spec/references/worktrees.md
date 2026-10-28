@@ -4,7 +4,7 @@ Orchestrator-only worktree procedures; agents only receive worktree paths. Never
 
 ## Paths
 
-- `WORKTREES_ROOT` = `HARNESS_ROOT/workspace/REPO.worktrees` (sibling of `SOURCE_ROOT`); never derive a root from the current worktree.
+- `WORKTREES_ROOT`: find a `.worktrees` directory in `HARNESS_ROOT` (`find HARNESS_ROOT -path HARNESS_ROOT/workspace -prune -o -name .git -prune -o -type d -name .worktrees -print -prune`). One found → use it; none → `HARNESS_ROOT/tmp/.worktrees`; several → stop and ask which to use. Never derive a root from the current worktree.
 - `INTEGRATION_BRANCH` = `preflight`'s `integration_branch` (`feat/<INITIATIVE_ID>`); never invent another name. Unique run suffix (*Integration setup* step 1) → append `-<suffix>` to both branch and `WORKTREE_PATH`.
 - `WORKTREE_PATH` = `WORKTREES_ROOT/INITIATIVE_ID` (integration worktree on `INTEGRATION_BRANCH`).
 - Parallel only: `TICKET_BRANCH(n)` = `INTEGRATION_BRANCH-t<n>`; `TICKET_WORKTREE(n)` = `WORKTREES_ROOT/INITIATIVE_ID-t<n>`, where `n` is the ticket number.
@@ -13,7 +13,7 @@ Orchestrator-only worktree procedures; agents only receive worktree paths. Never
 ## Integration setup
 
 1. Inspect `git -C SOURCE_ROOT worktree list --porcelain`, branch refs, and the destination. Create only missing parent directories. Existing path or proposed integration branch → stop for explicit resume or a unique run suffix.
-2. Verify `workspace/` is ignored: `git -C HARNESS_ROOT check-ignore -q workspace/`. Not ignored → stop and report; never edit harness ignore files.
+2. Verify `WORKTREES_ROOT` is ignored: `git -C HARNESS_ROOT check-ignore -q WORKTREES_ROOT/`. Not ignored → stop and report; never edit harness ignore files.
 3. Fetch the confirmed source remote/base; record its commit as `BASE_COMMIT` (reuse Breakdown Initiative's value when set). Fetch failure → report; never use a stale base.
 4. `git -C SOURCE_ROOT worktree add -b INTEGRATION_BRANCH WORKTREE_PATH BASE_COMMIT`. Verify clean, on `INTEGRATION_BRANCH`, `HEAD` = `BASE_COMMIT`.
 
