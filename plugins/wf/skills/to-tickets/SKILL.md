@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: Breaks a Spec issue into agent-executable tracer-bullet vertical slices and, after explicit user approval, publishes them as GitHub sub-issues with native blockers and parallel waves. Use when cutting a spec or plan.md into tickets, sub-issues, AFK/HITL slices, or offline Markdown tickets.
+description: Breaks a Spec issue into agent-executable tracer-bullet vertical slices and, after explicit user approval, publishes them as GitHub sub-issues with a native blocker dependency graph. Use when cutting a spec or plan.md into tickets, sub-issues, AFK/HITL slices, or offline Markdown tickets.
 argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`] | offline {{localSpecPath}}"
 disable-model-invocation: true
 ---
@@ -63,11 +63,11 @@ Break the slicing source into **tracer bullet** slices: thin vertical paths thro
 - Prefactoring slices come first.
 - Name each slice's verification seam (e.g. an integration test observing the database layer); prefer the highest seam that still exercises the slice end-to-end.
 - Type each slice `HITL` (needs human interaction, e.g. architectural decision or design review) or `AFK` (implementable and mergeable without humans). Prefer AFK.
-- Slices in one wave must not edit the same code; merge them or add a blocker.
+- Slices that edit the same code must be merged or ordered with a blocker; independent slices may run concurrently.
 
 </vertical-slice-rules>
 
-Derive the **parallel map** from blockers: wave 1 = slices without blockers; wave n = slices whose blockers all sit in earlier waves.
+Build an acyclic **blocker graph**: nodes are all slices; each directed edge runs from blocker to dependent. Use stable slice IDs before publication, then map them to issue identities. Reject cycles and missing blocker nodes; include roots with no blockers. Identify the initial ready frontier separately; do not assign execution batches.
 
 *Done when* every spec Functional Requirement, Business Rule, and Edge Case maps to at least one slice or is flagged as uncovered.
 
@@ -78,20 +78,19 @@ Present a numbered list; per slice show:
 - **Title**: short descriptive name
 - **Type**: HITL | AFK
 - **Blocked by**: slices that must complete first
-- **Wave**: parallel execution wave
 - **Functional Requirements covered**: spec requirement numbers addressed (full verbatim text is copied into each ticket in step 5)
 
-Then print the parallel map as `Wave n: {{slices}}`, uncovered requirements, and source conflicts.
+Then print the blocker graph as a table `Slice | Blocked by` with one row per slice, using `none` for roots; list the initial ready frontier, uncovered requirements, and source conflicts.
 
 
 Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 - Does the granularity feel right (too coarse / too fine)?
-- Are blockers and waves correct? Does any wave have two slices editing the same code?
+- Are blocker edges correct and acyclic? Are overlapping edits merged or ordered?
 - Should any slices be merged or split?
 - Are HITL/AFK types correct?
 
-**On correction:** apply it, recompute blockers and waves, print the full updated breakdown and parallel map, then end the turn awaiting approval. **MUST NOT** publish in the same turn as a correction.
+**On correction:** apply it, recompute the blocker graph and ready frontier, print the full updated breakdown and graph, then end the turn awaiting approval. **MUST NOT** publish in the same turn as a correction.
 
 *Done when* the user explicitly approves the current breakdown.
 
@@ -103,7 +102,7 @@ Render each ticket body from [issue-template.md](./references/issue-template.md)
 
 Branch on mode:
 
-- **Offline:** save approved bodies and the symbolic dependency map via **Offline publishing** in [github.md](./references/github.md); skip GitHub steps below.
+- **Offline:** save approved bodies and the symbolic blocker graph via **Offline publishing** in [github.md](./references/github.md); skip GitHub steps below.
 - **Online:**
   1. Run **Reconcile reruns** in [github.md](./references/github.md); reuse matched children, create only missing ones.
   2. Per missing slice, run **Create sub-ticket** with `parentIssueNumber` = `{{specIssueNumber}}` and label `hitl,{{repoLabel}}` (per **Label guard**).
@@ -116,5 +115,5 @@ Branch on mode:
 
 ## Completion criteria
 
-- **Online:** every approved slice has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}`, no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final map as `Wave n: #{{issue}}, …`.
+- **Online:** every approved slice has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}`, no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final blocker graph as `Ticket | Blocked by`, with fully qualified issue identities and `none` for roots; include every ticket and confirmed edge.
 - **Offline or partial:** report local paths and unpublished/partially published status; no invented GitHub issue numbers.
