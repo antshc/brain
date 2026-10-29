@@ -43,6 +43,16 @@ Resolve every path from this skill's base directory. Read each file fully when i
 
 Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent.
 
+## Repo docs
+
+Read the repo's architecture, relevant ADRs and Concepts, and glossary before grounding; skip absent ones.
+
+- Sketch MUST conform to accepted ADRs and Concepts.
+- Use glossary terms for names; no synonyms.
+- Place modules per the documented architecture.
+- Deviation → record conflict and reason in rationale open questions; raise in Phase C.
+- Pass doc paths to every subagent.
+
 ## Start
 
 Open a todolist with one entry per phase before starting.
@@ -54,7 +64,7 @@ Open a todolist with one entry per phase before starting.
 
 ## Phase A: Ground the problem
 
-Build a real mental model of every system the new code touches. Run the `how/how.md` procedure over the relevant subsystems. Naming a file isn't grounding. Produce the architectural explanation `how/how.md` prescribes. If the design redefines ownership or layering, also run the `why/why.md` procedure on the existing shape so the rationale becomes a constraint, not a guess.
+Build a real mental model of every system the new code touches, starting from Repo docs. Run the `how/how.md` procedure over the relevant subsystems. Naming a file isn't grounding. Produce the architectural explanation `how/how.md` prescribes. If the design redefines ownership or layering, also run the `why/why.md` procedure on the existing shape so the rationale becomes a constraint, not a guess.
 
 Skip Phase A only when the work is genuinely greenfield with no surrounding system to integrate.
 
@@ -66,7 +76,7 @@ Take the runners from the `architect runners` role in `models.md`. Alias and rej
 
 Design it twice. Require at least two structurally distinct candidates before synthesis, even when the first looks sufficient. This is the *Exhaust the design space* principle made concrete. Whole-shape alternatives, not point fixes inside one shape.
 
-Screen every candidate against `references/design-red-flags.md` before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
+Screen every candidate against `references/design-red-flags.md` and the Repo docs rules before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
 
 Compare viable candidates on interface depth. Prefer the design that hides more complexity behind a smaller, simpler public surface. A rich interface can keep call chains short by concentrating capability instead of scattering it across layers.
 
@@ -81,7 +91,7 @@ Each round:
 1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
 2. Offer three replies: **accept**, **corrections** (free text), or **interrogate**. Stop and wait for the user.
 3. Act on the reply:
-   - **Corrections** → apply them directly; never re-run arena, even for shape changes. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md`; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
+   - **Corrections** → apply them directly; never re-run arena, even for shape changes. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
    - **Accept** → go to Phase D.
 
