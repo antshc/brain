@@ -26,7 +26,7 @@ Close each ticket with `GH_TOOL issue close REF --commit SHA --branch INTEGRATIO
 
 ## Verification evidence
 
-`EVIDENCE_ROOT` = `HARNESS_ROOT/workspace/REPO.evidence` (sibling of `SOURCE_ROOT`, git-ignored with `workspace/`); `EVIDENCE_DIR` = `EVIDENCE_ROOT/INITIATIVE_ID/<short HEAD sha>` (HEAD at verification start; the verifier writes `round-N` inside). Confirm the path stays under `EVIDENCE_ROOT`; `mkdir -p`; never overwrite (append a numeric suffix). Evidence survives worktree removal; never delete it.
+`EVIDENCE_ROOT` = `preflight`'s `evidence_root` (outside the worktrees, git-ignored or outside the checkout); `EVIDENCE_DIR` = `EVIDENCE_ROOT/INITIATIVE_ID/<short HEAD sha>` (HEAD at verification start; the verifier writes `round-N` inside). Confirm the path stays under `EVIDENCE_ROOT`; `mkdir -p`; never overwrite (append a numeric suffix). Evidence survives worktree removal; never delete it.
 
 Write `VERDICT_FILE` outside the repository and copy it to `EVIDENCE_DIR/verdict.md`. Terse content: final verdict, verified head commit, PR URL, table of check, result, detail, evidence path, fix rounds (fix commit, findings fixed or unfixed, each round's evidence dir), then skipped checks with errors and the absolute `EVIDENCE_DIR` paths noting they are local to the run host. Post exactly one comment per run, after the last round: `GH_TOOL issue comment SPEC_REF --body-file VERDICT_FILE`; record the returned comment ID. The comment never closes or reopens anything.
 
