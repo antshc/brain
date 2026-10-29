@@ -1,12 +1,12 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module structure before code, synthesize competing multi-model design candidates, loop user corrections into the sketch, then hand off to spec or implement against the sketch. Use for /architect, architect this, design this, or non-trivial work where jumping to code would lock in the wrong shape.
+  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, loop user corrections into the sketch, then hand off to spec or implement against the sketch. Use for /architect, architect this, design this, or non-trivial work where jumping to code would lock in the wrong shape.
 ---
 
 # Architect
 
-Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Synthesize across multiple model perspectives, review the sketch with the user until accepted, then hand off to spec or fill in code against the sketch. Write production code only after the user replies **implement**.
+Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Use one runner by default or synthesize multiple model perspectives, review the sketch with the user until accepted, then hand off to spec or fill in code against the sketch. Write production code only after the user replies **implement**.
 
 ## Bundled files
 
@@ -54,6 +54,10 @@ Read the repo's architecture, relevant ADRs and Concepts, and glossary before gr
 - Deviation → record conflict and reason in rationale open questions; raise in Phase C.
 - Pass doc paths to every subagent.
 
+## Options
+
+Accept `arena-agents=1|2|3`; default `1`. Reject other values before launching arena runners. Pass the resolved count to Phase B; retain it for arena re-runs unless the user changes it.
+
 ## Start
 
 Open a todolist with one entry per phase before starting.
@@ -77,7 +81,7 @@ Run the `arena/arena.md` procedure with the design-sketch task and the Phase A g
 
 Take the runners from the `architect runners` role in `models.md`. Alias and rejected entries follow the runner rules in arena Phase A.
 
-Design it twice. Require at least two structurally distinct candidates before synthesis, even when the first looks sufficient. This is the *Exhaust the design space* principle made concrete. Whole-shape alternatives, not point fixes inside one shape.
+With multiple runners, require structurally distinct candidates before synthesis, per *Exhaust the design space*. Whole-shape alternatives, not point fixes inside one shape.
 
 Screen every candidate against `references/design-red-flags.md` and the Repo docs rules before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
 

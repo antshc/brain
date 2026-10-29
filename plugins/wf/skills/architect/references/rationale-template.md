@@ -16,7 +16,7 @@ The prose that ships alongside the type sketch. One page. Sentence-case headings
 
 ## Synthesis decision
 
-*Filled in by arena Phase E. Records which candidate became the base and why, what was adapted from each of the others, and what was rejected and why.*
+*Filled in by the orchestrator from arena's synthesis note. Record adoption for a single candidate; otherwise record base selection, grafts, and rejected ideas. Include the run details required by arena Outputs.*
 
 ## Tradeoffs accepted
 
