@@ -89,13 +89,21 @@ Loop until the user explicitly accepts the sketch. Ask in plain chat; MUST NOT u
 Each round:
 
 1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
-2. Offer three replies: **accept**, **corrections** (free text), or **interrogate**. Stop and wait for the user.
+2. Offer these replies verbatim, then stop and wait for the user:
+   ```
+   Reply with one:
+   - **corrections**: `Q2 → keep per-tenant tables` (edits sketch, design, rationale; no arena re-run)
+   - **interrogate**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
+   - **ask**: `why does X own Y?` (grounds the answer, then corrections)
+   - **accept**: hand off to `/to-spec`
+   ```
 3. Act on the reply:
    - **Corrections** → apply them directly; never re-run arena, even for shape changes. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
+   - **Ask** → answer from Phase A grounding, running `how/how.md` or `why/why.md` when needed; present the answer, then start the next round.
    - **Accept** → go to Phase D.
 
-Ambiguous reply → ask which of the three it is; never treat it as acceptance.
+Ambiguous reply → ask which of the four it is; never treat it as acceptance.
 
 ## Phase D: Hand off
 
