@@ -136,6 +136,46 @@ swimlane-beta TB
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
+### Story to direct implementation
+
+Starts from one existing User story with no spec: `/sharpen` hardens it, `/architect` sketches the code, and the **implement** reply makes `/architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
+
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: wf-story-to-direct-implementation-swimlane
+swimlane-beta TB
+  accTitle: Story to direct implementation responsibility
+  accDescr: Shows one User story sharpened, sketched and reviewed by architect, then implemented by architect against the accepted sketch, with scrap and redesign on repeated friction.
+
+  subgraph story [Story hardening]
+    userStory([User story])
+    sharpen[1 - sharpen]
+  end
+
+  subgraph design [Design]
+    sketch[2 - architect<br/>ground and sketch]
+    review{3 - architect review<br/>reply?}
+    specFlow([Story to implementation flow])
+  end
+
+  subgraph implementation [Implementation]
+    scaffold[4 - architect implement<br/>scaffold commit]
+    fillIn[5 - Fill in code against sketch<br/>surface deviations]
+    friction{6 - Repeated friction?}
+    done([Implementation])
+    scrap[6a.1 - Scrap sketch<br/>re-ground and subtract]
+    loopBack([Next iteration - back to step 2])
+  end
+
+  userStory --> sharpen -->|sharpened story| sketch --> review
+  review -->|implement| scaffold --> fillIn --> friction
+  friction -->|no| done
+  review -->|accept| specFlow
+  friction -->|yes| scrap --> loopBack
+
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
 ## Skills
 
 | Group                                     | Purpose                                      | Current skills                                                                            |
@@ -145,7 +185,7 @@ swimlane-beta TB
 | **research-**                             | Gather external/domain evidence              | `research`, `define-research`, `research-system`                                          |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-nuget-source`                                                                    |
 | **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
-| **architect**                             | Sketch, synthesize, review; hand off to spec | `architect`                                                                               |
+| **architect**                             | Sketch, synthesize, review; hand off to spec or implement | `architect`                                                                               |
 | **draft-**                                | Author standalone working artifacts          | `draft-bug`, `draft-story`                                                                |
 | **record-**                               | Record settled architecture or render bodies | `record-architecture`                                                                     |
 | **doc-**                                  | Render existing knowledge                    | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`        |
