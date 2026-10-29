@@ -8,14 +8,18 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 
 ```
 /architect add a GSI on orders by customerId + createdAt, no downtime during backfill
+/architect arena-agents=2 design retries
+/architect arena-agents=3 design retries
 ```
+
+`arena-agents`: 1–3, default 1. One candidate skips the judge and grafting; multiple viable candidates use the cross-family judge. The parent architect screens and verifies in both cases.
 
 ## Flow
 
 | Phase | What happens | Output |
 |---|---|---|
 | A Ground | `how` explains the touched subsystems; `why` adds history and rationale when the design redefines ownership or layering | grounding notes |
-| B Sketch | `arena`: 3 models design in parallel, a cross-family judge scores, best base wins, good ideas grafted | usage sketch, module map, types, rationale |
+| B Sketch | `arena`: one runner by default; with 2–3, compare candidates and graft good ideas | usage sketch, module map, types, rationale |
 | C Review | loop until you reply **accept** or **implement**; otherwise **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
 | D Hand off | after **accept**, run `/to-spec` | spec issue |
 | E Implement | after **implement**: scaffold commit, then fill in code in the current branch; deviations surfaced to you | scaffold commit, code |
@@ -29,7 +33,7 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 |---|---|---|
 | `how` | you need a mental model of existing code before designing | `/architect how does the webhook delivery pipeline work, then design retries` |
 | `why` | you must know why code has its shape before changing it (history, PRs, tickets, incidents) | `/architect why is billing split from orders? then redesign the boundary` |
-| `arena` | you want competing whole-shape designs, not one model's first idea | automatic in Phase B; no request needed |
+| `arena` | you want a design candidate or competing whole-shape designs | automatic in Phase B; use `arena-agents=2` or `3` for comparison |
 | corrections | the sketch is close; you want a direct edit, no re-run | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked before accepting; findings need a run as proof | see below |
 | `prototype` | one uncertain part needs real code to settle; builds a throwaway in a worktree with the `experiment` skill, then interrogates it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |

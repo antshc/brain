@@ -1,10 +1,10 @@
 # Architect runner prompt
 
-The orchestrator passes this file through to every parallel candidate runner during Phase B and fills in the variable inputs around it: the task, the Phase A grounding artifacts, the isolated working directory, and the path to write outputs. The working directory is a git worktree when available, otherwise a per-runner subdirectory under the sketch dir. What matters is independence between candidates.
+The orchestrator passes this file through to every candidate runner during Phase B and fills in the variable inputs around it: the task, the Phase A grounding artifacts, the isolated working directory, and the path to write outputs. The working directory is a git worktree when available, otherwise a per-runner subdirectory under the sketch dir. What matters is independence between candidates.
 
-You are producing one candidate design in architect's parallel exploration. Read the architect `SKILL.md` and `references/principles.md` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package: type sketch, function signatures, module map, and prose rationale shaped per `references/rationale-template.md` (path passed by the orchestrator).
+You are producing one candidate design in architect's exploration. Read the architect `SKILL.md` and `references/principles.md` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package: type sketch, function signatures, module map, and prose rationale shaped per `references/rationale-template.md` (path passed by the orchestrator).
 
-Apply the following discipline. The orchestrator compares candidates on these axes to pick a base.
+Apply the following discipline. The orchestrator evaluates candidates on these axes.
 
 - Caller's usage first. Write the README-style usage and two or three real call sites before the types, then derive the type sketch from them. The usage is the spec. The two must agree, so reconcile the sketch to the usage, not the reverse.
 - Data structures first. Get the core types right and the code becomes obvious. Trace each dominant access pattern through the proposed structure. If the answer is "we'll add a map / index / cache later," the structure is wrong.
@@ -17,4 +17,4 @@ Apply the following discipline. The orchestrator compares candidates on these ax
 - Idempotent state transitions where applicable, per *Make operations idempotent*. Ask what happens if the operation runs twice or crashes halfway.
 - Short call chains. If tracing the flow needs more than three files, flatten the hierarchy, per *Laziness protocol* and *Minimize reader load*.
 
-You are one of the parallel runners, each on a different model. Produce the best design your model can make. Don't hedge against the others. Differences between candidates are the signal used to pick a base and graft. Converging on a safe-looking middle defeats the exploration.
+Produce the best design your model can make, including alternatives considered and rejected. When other runners participate, don't hedge against them: differences between candidates inform base selection and grafting.
