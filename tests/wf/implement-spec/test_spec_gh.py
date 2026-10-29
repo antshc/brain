@@ -117,6 +117,40 @@ class TestPreflight:
         assert result["run_dir"].endswith("workspace/shop.runs/1")
         assert result["source_root"].endswith("workspace/shop")
 
+    def single_repo_runner(self, tmp_path, ignored):
+        (tmp_path / ".git").mkdir(parents=True)
+        return FakeRunner({
+            "gh --version": "gh 2", "gh auth status": "ok",
+            "api repos/acme/specs/issues/1": json.dumps(
+                issue(1, "PAY-12: Refunds", labels=["repo:target:acme/shop", "repo:base:main"], repo="acme/specs")),
+            "gh repo view acme/shop": json.dumps({"nameWithOwner": "acme/shop", "defaultBranchRef": {"name": "main"}}),
+            "branches/main": "{}",
+            "remote get-url origin": "https://github.com/acme/shop.git",
+            "check-ignore": (0 if ignored else 1, "", ""),
+        })
+
+    def test_single_repo_layout_uses_harness_as_source_root(self, tmp_path):
+        args, _ = self.args(tmp_path)
+        result = spec_gh.cmd_preflight(Gh(self.single_repo_runner(tmp_path, ignored=True)), args)
+        assert result["source_root"] == str(tmp_path)
+        assert result["run_dir"] == str(tmp_path / "workspace" / "shop.runs" / "1")
+        assert result["evidence_root"] == str(tmp_path / "workspace" / "shop.evidence")
+
+    def test_single_repo_layout_falls_back_outside_checkout_when_not_ignored(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        args, _ = self.args(repo)
+        result = spec_gh.cmd_preflight(Gh(self.single_repo_runner(repo, ignored=False)), args)
+        assert result["run_dir"] == str(tmp_path / "shop.runs" / "1")
+        assert result["evidence_root"] == str(tmp_path / "shop.evidence")
+
+    def test_single_repo_layout_rejects_mismatched_origin(self, tmp_path):
+        runner = self.single_repo_runner(tmp_path, ignored=True)
+        runner.responses["remote get-url origin"] = "git@github.com:other/repo.git"
+        args, _ = self.args(tmp_path)
+        with pytest.raises(UsageError, match="not a primary checkout"):
+            spec_gh.cmd_preflight(Gh(runner), args)
+
     def test_conflicting_routing_labels_stop(self, tmp_path):
         runner = self.runner(tmp_path, ["repo:target:a/b", "repo:target:c/d", "repo:base:main"])
         args, _ = self.args(tmp_path)

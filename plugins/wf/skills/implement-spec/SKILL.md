@@ -12,7 +12,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
 - GitHub spec issue URL `https://github.com/OWNER/REPO/issues/NUMBER`, plan file path, or inline plan/description. Native sub-issues are **tickets**; native blockers form the **ticket graph**.
 - Spec routing: `repo:target:<owner/repo>` and `repo:base:<branch>`; use source-root `GLOSSARY.md` vocabulary when present.
-- Harness: run from `HARNESS_ROOT` (a git checkout) holding the source repository's primary checkout at `HARNESS_ROOT/workspace/<REPO>` with `origin` = the source repository; `workspace/` git-ignored. Missing → `preflight` exits `2`; report and stop.
+- Harness: run from `HARNESS_ROOT` (a git checkout). Either it holds the source repository's primary checkout at `HARNESS_ROOT/workspace/<REPO>` (`origin` = the source repository; `workspace/` git-ignored), or it is itself the source repository's primary checkout (single-repo: `SOURCE_ROOT` = `HARNESS_ROOT`; run and evidence dirs go under git-ignored `HARNESS_ROOT/workspace/`, else beside `HARNESS_ROOT`). Neither → `preflight` exits `2`; report and stop.
 - `mode`: `sequential` (default, recommended) | `parallel` (experimental; use only when asked).
 - `max-parallel=<positive integer>`: parallel only; default 3. Scheduling always follows the ticket graph.
 
@@ -22,7 +22,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
 | Intent | Command |
 |---|---|
-| Prerequisites, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH`, `SOURCE_ROOT`, `RUN_DIR` (no fetch; no `BASE_COMMIT`) | `GH_TOOL preflight --spec REF` |
+| Prerequisites, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH`, `SOURCE_ROOT`, `RUN_DIR`, `EVIDENCE_ROOT` (no fetch; no `BASE_COMMIT`) | `GH_TOOL preflight --spec REF` |
 | Create spec from plan/description | `GH_TOOL spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N` |
 | Read spec, tickets, comments, blockers; frontier | `GH_TOOL graph read --spec REF --out RUN_DIR` |
 | Recompute frontier | `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done REF…` |

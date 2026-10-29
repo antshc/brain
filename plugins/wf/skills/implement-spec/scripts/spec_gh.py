@@ -213,23 +213,46 @@ def verify_source(gh: Gh, source_repo: str, base_branch: str) -> dict[str, Any]:
     return {"source_repository": info["nameWithOwner"], "default_branch": (info.get("defaultBranchRef") or {}).get("name")}
 
 
+def origin_matches(gh: Gh, root: Path, source_repo: str) -> bool:
+    origin = gh.git("-C", str(root), "remote", "get-url", "origin").strip()
+    return bool(re.search(rf"[:/]{re.escape(source_repo)}(\.git)?/?$", origin, re.IGNORECASE))
+
+
+def is_ignored(gh: Gh, root: Path, path: Path) -> bool:
+    try:
+        gh.git("-C", str(root), "check-ignore", "-q", str(path))
+    except GhError:
+        return False
+    return True
+
+
 def resolve_checkout(gh: Gh, harness_root: Path, source_repo: str, spec_number: int) -> dict[str, str]:
-    workspace = harness_root / "workspace"
-    if not workspace.is_dir():
-        raise UsageError(f"{workspace} not found")
     name = source_repo.split("/")[1]
-    source_root = workspace / name
-    if not (source_root / ".git").is_dir():
-        raise UsageError(f"{source_root} is not a primary checkout")
-    origin = gh.git("-C", str(source_root), "remote", "get-url", "origin").strip()
-    if not re.search(rf"[:/]{re.escape(source_repo)}(\.git)?/?$", origin, re.IGNORECASE):
-        raise UsageError(f"origin {origin} does not match {source_repo}")
-    runs = workspace / f"{name}.runs"
+    workspace = harness_root / "workspace"
+    split_root = workspace / name
+    if (split_root / ".git").is_dir():
+        source_root, base_dir = split_root, workspace
+    elif (harness_root / ".git").is_dir() and origin_matches(gh, harness_root, source_repo):
+        # Single-repo layout: the harness checkout is the source repository's primary checkout.
+        source_root = harness_root
+        base_dir = workspace if is_ignored(gh, harness_root, workspace / f"{name}.runs") else harness_root.parent
+    elif not workspace.is_dir():
+        raise UsageError(f"{workspace} not found and {harness_root} is not a primary checkout of {source_repo}")
+    else:
+        raise UsageError(f"{split_root} is not a primary checkout")
+    if not origin_matches(gh, source_root, source_repo):
+        raise UsageError(f"origin of {source_root} does not match {source_repo}")
+    runs = base_dir / f"{name}.runs"
     candidate, suffix = runs / str(spec_number), 1
     while candidate.exists():
         suffix += 1
         candidate = runs / f"{spec_number}-{suffix}"
-    return {"harness_root": str(harness_root), "source_root": str(source_root), "run_dir": str(candidate)}
+    return {
+        "harness_root": str(harness_root),
+        "source_root": str(source_root),
+        "run_dir": str(candidate),
+        "evidence_root": str(base_dir / f"{name}.evidence"),
+    }
 
 
 def cmd_preflight(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
