@@ -15,8 +15,7 @@ Flow: Idea → Implementation
 
 Subflow A: Simple Flow
 
-1. /to-spec
-2. Architect Potato → Attach sketch to spec
+1. /to-spec or the /architect first + to-spec with sketch of the code
 3. /implement-spec parallel
 4. Return
 
@@ -26,9 +25,8 @@ Subflow B: Complex Flow
 1. /to-zdesign
 2. /to-stories
 3. For each story:
-   → /grill-design
+   → /architect
 4. /to-spec
-5. Architect Potato → Attach sketch to spec
-6. /implement-spec parallel
+6. /implement-spec sequential/parallel
 7. Return
 ```
