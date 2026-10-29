@@ -23,7 +23,36 @@ Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.
 
 Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
-3. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow **Publish spec** in [github.md](./github.md) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+3. Architect design — apply only when an architect skill run happened in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Architect design** below.
+
+4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow **Publish spec** in [github.md](./github.md) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+
+5. Architect run → after the issue is verified, follow **Attach design artifacts** in [github.md](./github.md) with the issue number and the bundle manifest. Offline → follow its offline branch instead.
+
+## Architect design
+
+Classify the run's outputs by role, never by file name:
+
+- **Synthesized design** — the final design package; its synthesis decision names the base candidate.
+- **Base candidate** — the candidate the synthesis decision builds on; its `design` document and `sketch` tree. Synthesis decision names none or several → ask the user which candidate is the base.
+- **Excluded** — losing candidates, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
+
+Map the synthesized design, then the base candidate's design, into the body; the synthesis wins on conflict:
+
+- Problem and caller usage → **Problem Statement** and **Solution**, user-facing.
+- Behavior the design commits to → **Requirements**, solution agnostic.
+- Module shape, types, invariants, tradeoffs, rejected alternatives, synthesis decision → **Implementation Decisions** as prose, after the **Design sketch** decision.
+- Open questions and risks → **Further Notes**.
+
+The body MUST NOT name the architect skill, candidate labels, or the run's local paths.
+
+Wrap the base candidate's sketch — never another candidate's — into artifacts:
+
+```
+python3 ./scripts/bundle_artifacts.py --sketch <base candidate sketch path> --out-dir <new empty temp dir outside the repository>
+```
+
+Exit 2 → report stderr and stop before publishing; never drop a sketch file to make it pass. The printed manifest lists each artifact's `name`, `type`, and `file`; the first is the **Sketch index** mapping each sketch path to its artifact names. Draft the **Design sketch** decision with every manifest name and `{{artifactUrl}}` placeholders that publication fills.
 
 <spec-template>
 
@@ -84,6 +113,11 @@ Boundary conditions and their expected handling. Each edge case should be in the
 </details>
 
 ## Implementation Decisions
+
+<!-- Omit the Design sketch decision when no architect run happened. -->
+
+- **Design sketch (binding):** the selected design sketch is attached to this issue as artifacts. Use it as the map for where logic goes and how code is structured: its types, signatures, module boundaries, and file locations. Start from the **Sketch index**. When the sketch conflicts with the Requirements or the codebase, the Requirements win; choose the option that best fits them.
+  - [{{artifactName}}]({{artifactUrl}}) — one entry per artifact, Sketch index first.
 
 A list of implementation decisions that were made. This can include:
 

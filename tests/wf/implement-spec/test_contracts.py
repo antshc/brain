@@ -148,6 +148,24 @@ def test_artifacts_fetched_before_slicing_mapped_both_directions_and_reconciled(
     assert 'no suitable reader' in GITHUB
 
 
+def test_design_sketch_artifacts_drive_breakdown_and_implementation():
+    contract = BREAKDOWN.split('## Design sketch contract')[1].split('## Breakdown ticket operations')[0]
+    for text in ('Sketch index', 'Every sketch file maps to at least one ticket', 'blocks publication',
+                 'Requirement wins', 'without asking', 'Sketch deviation:'):
+        assert text in contract
+    assert "`spec.json` `artifacts`" in BREAKDOWN and 'RUN_DIR/artifacts' in BREAKDOWN
+    rule = BREAKDOWN.split('<related-spec-artifacts-rule>')[1].split('</related-spec-artifacts-rule>')[0]
+    assert 'Design sketch artifacts' in rule
+    implementer = (ROOT / 'agents/implementer.md').read_text()
+    for text in ('{{specArtifactsDir}}/index.json', 'Use the sketch as the map', 'never ask'):
+        assert text in implementer
+    assert 'deviations' not in implementer
+    assert '{{specArtifactsDir}}' in (ROOT / 'agents/planner.md').read_text()
+    assert 'specArtifactsDir' not in (ROOT / 'agents/chore.md').read_text()
+    assert MAIN.count('| `{{specArtifactsDir}}` | `RUN_DIR/artifacts`') == 2
+    assert 'deviations' not in MAIN + (ROOT / 'references/publication.md').read_text()
+
+
 def test_template_parity_except_intentional_artifact_section():
     standalone = (REPO / 'plugins/wf/skills/to-tickets/references/issue-template.md').read_text()
     embedded = BREAKDOWN[BREAKDOWN.index('<issue-template>'):]

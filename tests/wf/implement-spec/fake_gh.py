@@ -77,6 +77,13 @@ def api(state: dict, args: list[str]) -> bool:
     endpoint = next(arg for arg in args if arg.startswith("repos/"))
     method = opt(args, "--method", "GET")
     field = opt(args, "-F", "")
+    match = re.fullmatch(r"repos/([^/]+/[^/]+)/issues/(\d+)/artifacts\?per_page=(\d+)&page=(\d+)", endpoint)
+    if match:
+        repo, number, size, page = match.group(1), int(match.group(2)), int(match.group(3)), int(match.group(4))
+        get_issue(state, repo, number)
+        items = state.get("artifacts", {}).get(f"{repo}#{number}", [])
+        print(json.dumps(items[(page - 1) * size:page * size]))
+        return False
     match = re.fullmatch(r"repos/([^/]+/[^/]+)/branches/(.+)", endpoint)
     if match:
         if unquote(match.group(2)) not in state["repos"].get(match.group(1), {}).get("branches", []):

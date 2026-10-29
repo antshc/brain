@@ -94,6 +94,22 @@ SPEC = "acme/specs#1"
 PR_ARGS = ["--source-repository", "acme/shop", "--base", "main", "--head", "feat/pay-12", "--initiative-id", "PAY-12"]
 
 
+def test_graph_read_saves_every_spec_artifact_across_pages(tmp_path: Path):
+    state = seed()
+    state["artifacts"] = {SPEC: [
+        {"id": 5000 + n, "number": n, "type": "plan" if n == 1 else "generic", "name": f"part {n}", "body": f"content {n}",
+         "html_url": f"https://github.com/acme/specs/issues/1/artifacts/{n}", "updated_at": None}
+        for n in range(1, 103)
+    ]}
+    box = Sandbox(tmp_path, state)
+    code, graph, err = box.tool("graph", "read", "--spec", SPEC, "--out", str(box.run_dir))
+    assert code == 0, err
+    records = graph["spec"]["artifacts"]
+    assert [r["number"] for r in records] == list(range(1, 103))
+    assert Path(records[-1]["file"]).read_text() == "content 102"
+    assert json.loads((box.run_dir / "spec.json").read_text())["artifacts"] == records
+
+
 def test_full_run_lifecycle(sandbox: Sandbox):
     code, pre, err = sandbox.tool("preflight", "--spec", SPEC)
     assert code == 0, err
