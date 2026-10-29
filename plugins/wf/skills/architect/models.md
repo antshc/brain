@@ -6,9 +6,9 @@ For `architect runners`, the ordered list is a model pool; arena selects seats p
 
 | Role | Value | Fallback |
 |---|---|---|
-| architect runners | claude-opus-5.5 high, gpt-6.1-sol high, mai-code-1.1-flash high | claude-opus-5 high, gpt-6-sol high, mai-code-1.1-flash high |
-| arena cross-judge pool | gpt-6.1-sol xhigh, claude-opus-5.5 xhigh, mai-code-1.1-flash xhigh | claude-opus-5.5 xhigh, mai-code-1.1-flash xhigh |
-| interrogate reviewers | claude-sonnet-5.5 high, gpt-6-luna medium, mai-code-1.1-flash medium | claude-opus-5 medium, gpt-6-sol medium, mai-code-1.1-flash medium |
+| architect runners | claude-opus-5.5 high, gpt-6.1-sol high, grok-4.7 high | claude-opus-5 high, gpt-6-sol high, grok-4.7 high |
+| arena cross-judge pool | gpt-6.1-sol xhigh, claude-opus-5.5 xhigh, grok-4.7 xhigh | claude-opus-5.5 xhigh, grok-4.7 xhigh |
+| interrogate reviewers | claude-sonnet-5.5 high, gpt-6-luna medium, grok-4.7 medium | claude-opus-5 medium, gpt-6-sol medium, grok-4.7 medium |
 | prototype builder | claude-sonnet-5.5 high | gpt-6-luna medium |
 | how explorer | claude-haiku-5.5 high | gemini-3.8-flash high |
 | how explainer | claude-opus-5.5 medium | claude-opus-5 medium |
