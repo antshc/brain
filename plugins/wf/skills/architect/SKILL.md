@@ -39,6 +39,10 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief |
 | [interrogate/interrogate.md](interrogate/interrogate.md) | Phase C adversarial pressure |
 
+## Artifact location
+
+Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent.
+
 ## Start
 
 Open a todolist with one entry per phase before starting.
