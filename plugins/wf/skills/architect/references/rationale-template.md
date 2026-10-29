@@ -28,8 +28,8 @@ The prose that ships alongside the type sketch. One page. Sentence-case headings
 
 ## Open questions and risks
 
-*Things you noticed during the sketch that the human needs to weigh in on, and risks worth flagging before implementation starts. Phrase as questions, not assertions, so the human's answer is the resolution rather than a comment.*
+*Things you noticed during the sketch that the human needs to weigh in on, and risks worth flagging during review. Phrase as questions, not assertions, so the human's answer is the resolution rather than a comment.*
 
 ## Next implementation step
 
-*The first thing to build against the sketch. One sentence. What you'd start writing immediately after synthesis (or after Phase D sign-off, if a checkpoint was opted into).*
+*The first thing to build against the accepted sketch once the spec is implemented. One sentence.*
