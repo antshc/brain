@@ -6,9 +6,9 @@ Model per subagent role. Value format: `<model> <effort>`; pass the model as `mo
 |---|---|---|
 | architect runners | claude-opus-5.5 high, gpt-6.1-sol high, grok-4.7 high | claude-opus-5 high, gpt-6-sol high, grok-4.6 high |
 | arena cross-judge pool | gpt-6.1-sol xhigh, claude-opus-5.5 xhigh, grok-4.7 xhigh | claude-opus-5.5 xhigh, grok-4.7 xhigh |
-| interrogate reviewers | claude-sonnet-5.5 high, gpt-6-luna medium, grok-4.7 low | claude-opus-5 high, gpt-6-sol high, grok-4.6 high |
-| prototype builder | claude-opus-5.5 high | claude-opus-5 high |
+| interrogate reviewers | claude-sonnet-5.5 high, gpt-6-luna medium, grok-4.7 low | claude-opus-5 medium, gpt-6-sol medium, grok-4.6 medium |
+| prototype builder | claude-sonnet-5.5 high | gpt-6-luna medium |
 | how explorer | claude-haiku-5.5 high | gemini-3.8-flash high |
-| how explainer | claude-opus-5.5 high | claude-opus-5 high |
-| why investigators | claude-sonnet-5.5 medium | claude-sonnet-5 medium |
+| how explainer | claude-opus-5.5 medium | claude-opus-5 medium |
+| why investigators | claude-sonnet-5.5 high  | claude-sonnet-5 high  |
 | why synthesizer | claude-opus-5.5 medium | claude-opus-5 medium |
