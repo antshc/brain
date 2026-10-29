@@ -38,6 +38,7 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [arena/arena.md](arena/arena.md) | Phase B |
 | [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief |
 | [interrogate/interrogate.md](interrogate/interrogate.md) | Phase C, user picks interrogate |
+| [prototype/prototype.md](prototype/prototype.md) | Phase C, user picks prototype |
 
 ## Artifact location
 
@@ -84,7 +85,7 @@ Arena returns one synthesized design package. Its synthesis decision fills the r
 
 ## Phase C: Review loop
 
-Loop until the user explicitly accepts the sketch. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. Never write production code.
+Loop until the user explicitly accepts the sketch. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. Never write production code. Prototype code is disposable evidence kept in a worktree, never part of the sketch.
 
 Each round:
 
@@ -94,16 +95,18 @@ Each round:
    Reply with one:
    - **corrections**: `Q2 → keep per-tenant tables` (edits sketch, design, rationale; no arena re-run)
    - **interrogate**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
+   - **prototype**: `GSI backfill; target: DynamoDB Local` (throwaway build in a worktree, then interrogated)
    - **ask**: `why does X own Y?` (grounds the answer, then corrections)
    - **accept**: hand off to `/to-spec`
    ```
 3. Act on the reply:
    - **Corrections** → apply them directly; never re-run arena, even for shape changes. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
+   - **Prototype** → run the `prototype/prototype.md` procedure on the question in the reply. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, running `how/how.md` or `why/why.md` when needed; present the answer, then start the next round.
    - **Accept** → go to Phase D.
 
-Ambiguous reply → ask which of the four it is; never treat it as acceptance.
+Ambiguous reply → ask which of the five it is; never treat it as acceptance.
 
 ## Phase D: Hand off
 
