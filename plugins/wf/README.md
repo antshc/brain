@@ -63,4 +63,4 @@ flowchart TD
 | **record-**                               | Record settled architecture or render bodies | `record-architecture`                                                                     |
 | **doc-**                                  | Render existing knowledge                    | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`        |
 | **docs- / setup-** | Workflow plugin documentation infrastructure | `bootstrap-docs`, `index-docs`, `init-wf`               |
-| **normalize-**                            | Rewrite/reshape content                      | `normalize-requirements`                                                                  |
+| **normalize-**                            | Rewrite/reshape content                      | `normalize-requirements`, `sharpen`                                                       |
