@@ -16,7 +16,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 |---|---|---|
 | A Ground | `how` explains the touched subsystems; `why` adds history and rationale when the design redefines ownership or layering | grounding notes |
 | B Sketch | `arena`: 3 models design in parallel, a cross-family judge scores, best base wins, good ideas grafted | usage sketch, module map, types, rationale |
-| C Review | loop until you reply **accept**; otherwise **corrections**, **interrogate**, or **ask** | `review-log.md` |
+| C Review | loop until you reply **accept**; otherwise **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
 | D Hand off | run `/to-spec`, then optionally `/implement-spec <spec issue URL>` | spec issue, draft PR |
 
 Artifacts: `<repo-root>/tmp/architect-<slug>/`.
@@ -30,6 +30,7 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 | `arena` | you want competing whole-shape designs, not one model's first idea | automatic in Phase B; no request needed |
 | corrections | the sketch is close; you want a direct edit, no re-run | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked before accepting; findings need a run as proof | see below |
+| `prototype` | one uncertain part needs real code to settle; builds a throwaway in a worktree with the `experiment` skill, then interrogates it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
 | accept | the sketch is right | `accept` |
 
 Reply in plain chat. An ambiguous reply is never treated as accept.
@@ -75,6 +76,14 @@ Tips:
 - Default scope with no scope named: branch diff from merge base through the working tree.
 - Output: Intent, verified Findings (command, output, how it breaks intent, finders), Dropped counts per adversary. "No verified findings" is a valid result.
 
+## Prototype
+
+One question, one throwaway build. A builder subagent runs the `experiment` skill in its own worktree (code changes allowed there), the skill reruns its command, then `interrogate` attacks the prototype diff. Evidence returns as proposed corrections; the sketch stays `not implemented` and no prototype code enters it. The worktree is removed after the round; `prototype.patch` and `report.md` stay under `tmp/architect-<slug>/prototype/`.
+
+```
+prototype: does a second GSI creation fail while the first backfills? target: DynamoDB Local on :8000
+```
+
 ## Files
 
 | Path | Role |
@@ -83,4 +92,5 @@ Tips:
 | `how/`, `why/` | grounding procedures and prompts |
 | `arena/` | multi-model synthesis procedure and runner prompt |
 | `interrogate/` | adversarial review procedure |
+| `prototype/` | throwaway prototype plus interrogate procedure |
 | `references/` | principles, red flags, rationale template, subagent rules |
