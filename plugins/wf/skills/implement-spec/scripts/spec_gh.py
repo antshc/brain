@@ -7,7 +7,7 @@ Exit codes: 0 ok, 1 GitHub/tool failure, 2 invalid input or unresolved routing,
 
     preflight   --spec REF [--harness-root P] [--source-repository R --base-branch B]
     spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N
-    graph read  --spec REF --out RUN_DIR
+    graph read  --spec REF --out RUN_DIR      (also saves spec issue artifacts under RUN_DIR/artifacts, indexed by name in index.json)
     graph frontier --graph FILE [--done REF ...]
     ticket create --spec REF --title T --body-file F
     issue block REF --by REF [--by REF ...]
@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -39,6 +40,9 @@ BLOCK_BEGIN = "<!-- implement-spec:begin -->"
 BLOCK_END = "<!-- implement-spec:end -->"
 TARGET_PREFIX = "repo:target:"
 BASE_PREFIX = "repo:base:"
+ARTIFACTS_API_VERSION = "2026-03-10"
+ARTIFACTS_PAGE_SIZE = 100
+ARTIFACTS_INDEX = "index.json"
 Runner = Callable[[list[str]], tuple[int, str, str]]
 
 
@@ -121,6 +125,45 @@ def read_issue(gh: Gh, ref: Ref) -> dict[str, Any]:
 
 def read_comments(gh: Gh, ref: Ref) -> list[dict[str, Any]]:
     return gh.pages(f"repos/{ref.repo}/issues/{ref.number}/comments")
+
+
+def read_artifacts(gh: Gh, ref: Ref) -> tuple[list[dict[str, Any]], str | None]:
+    """Issue artifacts (public preview). The endpoint returns a bare array without Link headers, so pages are looped manually."""
+    artifacts: list[dict[str, Any]] = []
+    page = 1
+    while True:
+        try:
+            batch = gh.json(
+                "api", "-H", f"X-GitHub-Api-Version: {ARTIFACTS_API_VERSION}",
+                f"repos/{ref.repo}/issues/{ref.number}/artifacts?per_page={ARTIFACTS_PAGE_SIZE}&page={page}",
+            )
+        except GhError as exception:
+            if page == 1 and re.search(r"HTTP (404|410)", str(exception)):
+                return [], f"issue artifacts unavailable for {ref}: {exception}"
+            raise
+        artifacts.extend(batch or [])
+        if len(batch or []) < ARTIFACTS_PAGE_SIZE:
+            return artifacts, None
+        page += 1
+
+
+def save_artifacts(artifacts: list[dict[str, Any]], directory: Path) -> list[dict[str, Any]]:
+    if directory.exists():
+        shutil.rmtree(directory)
+    records: list[dict[str, Any]] = []
+    for artifact in artifacts:
+        slug = re.sub(r"[^a-z0-9]+", "-", artifact["name"].lower()).strip("-") or "artifact"
+        suffix = ".html" if artifact["type"] == "embedded_html" else ".md"
+        path = directory / f"{artifact['number']:03d}-{slug}{suffix}"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(artifact.get("body") or "", encoding="utf-8")
+        records.append({
+            "number": artifact["number"], "name": artifact["name"], "type": artifact["type"],
+            "url": artifact.get("html_url"), "updated_at": artifact.get("updated_at"), "file": str(path),
+        })
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / ARTIFACTS_INDEX).write_text(json.dumps(records, indent=2), encoding="utf-8")
+    return records
 
 
 def labels_of(issue: dict[str, Any]) -> list[str]:
@@ -250,7 +293,12 @@ def cmd_graph_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     spec_ref = parse_ref(args.spec)
     spec = read_issue(gh, spec_ref)
     spec_labels = labels_of(spec)
-    write_json(out / "spec.json", {"ref": str(spec_ref), "issue": spec, "comments": read_comments(gh, spec_ref)})
+    raw_artifacts, artifacts_note = read_artifacts(gh, spec_ref)
+    artifacts = save_artifacts(raw_artifacts, out / "artifacts")
+    write_json(out / "spec.json", {
+        "ref": str(spec_ref), "issue": spec, "comments": read_comments(gh, spec_ref),
+        "artifacts": artifacts, "artifacts_note": artifacts_note,
+    })
     routing = {prefix: next((label for label in spec_labels if label.startswith(prefix)), None) for prefix in (TARGET_PREFIX, BASE_PREFIX)}
     tickets: list[dict[str, Any]] = []
     problems: list[str] = []
@@ -269,7 +317,10 @@ def cmd_graph_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
             "labels": labels, "hitl": "hitl" in labels, "blocked_by": blockers, "file": str(path),
         })
     graph: dict[str, Any] = {
-        "spec": {"ref": str(spec_ref), "title": spec["title"], "state": spec["state"], "labels": spec_labels, "file": str(out / "spec.json")},
+        "spec": {
+            "ref": str(spec_ref), "title": spec["title"], "state": spec["state"], "labels": spec_labels, "file": str(out / "spec.json"),
+            "artifacts": artifacts, "artifacts_dir": str(out / "artifacts"), "artifacts_note": artifacts_note,
+        },
         "tickets": tickets,
         "problems": problems,
     }

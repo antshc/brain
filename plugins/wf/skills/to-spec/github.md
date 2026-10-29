@@ -28,12 +28,32 @@ Missing baseline `spec` label → *run `init-wf` skill for wf setup and GitHub i
 
 **Returns:** verified spec issue number and URL. Tickets later become native sub-issues of this spec.
 
+## Attach design artifacts
+
+**Reads:** verified `{{issueNumber}}` created by this run, `{{trackerRepository}}`, and the bundle manifest.
+
+1. `gh --version` below 2.103.2 → stop attaching; report that issue artifacts need gh ≥ 2.103.2 and leave the manifest in place for a retry. Never paste sketch files into the body or comments instead.
+2. List existing artifacts once: `gh issue artifact list {{issueNumber}} -R {{trackerRepository}} --json number,name,type,url`.
+3. For each manifest entry in order: name absent → create it; name present → replace its body. Never create a duplicate name.
+   ```
+   gh issue artifact create {{issueNumber}} --body-file <file> --name "<name>" --type <type> -R {{trackerRepository}}
+   gh issue artifact edit {{issueNumber}} <artifactNumber> --body-file <file> -R {{trackerRepository}}
+   ```
+4. List again; every manifest name MUST be present with its type. Fill each `{{artifactUrl}}` in the **Design sketch** decision with its `url`, write the body to a temporary file, and `gh issue edit {{issueNumber}} --repo {{trackerRepository}} --body-file <file>`.
+5. Read the issue back; confirm no `{{artifactUrl}}` remains. Remove temporary files and the bundle dir.
+
+Partial failure → report attached and missing names, the bundle dir, and the published issue URL; the spec remains published. Rerunning this section resumes safely.
+
+**Returns:** artifact count and names attached to the spec issue.
+
 ## Offline publishing
 
 On explicit offline selection, skip GitHub operations. On missing tools, authentication, or API failure, report the failed operation and any known remote changes before saving locally. Save the rendered spec to `docs/specs/{{initiativeIdSlug}}.md`, retaining Initiative, source repository, base branch, and intended title in local metadata. Preserve an existing differing file rather than overwriting it without approval.
 
 If creation may have reached GitHub before failing, reconcile with **Publish spec**'s lookup before retrying. If reconciliation is unavailable, mark the local copy's publication state unknown; never report it as unpublished with certainty or create another remote issue blindly. Return the local path and explicit offline/unknown status, not a GitHub success.
 
+Architect run offline → copy each manifest file to `docs/specs/{{initiativeIdSlug}}/artifacts/` under its manifest file name, write the manifest there, and replace each `{{artifactUrl}}` with the relative artifact path. Attach them with **Attach design artifacts** once the spec is published.
+
 ## Gotchas
 
-Use argument values, not shell interpolation, for user text. Quote values containing whitespace; multiline bodies use `--body-file`. A duplicate spec is a stop condition, not an outage triggering fallback. Do not substitute Jira or a local tracker backend.
+Use argument values, not shell interpolation, for user text. Quote values containing whitespace; multiline bodies use `--body-file`. A duplicate spec is a stop condition, not an outage triggering fallback. Do not substitute Jira or a local tracker backend. Artifact names come from the manifest verbatim; gh strips some characters, so match names after read-back, not before. Attach artifacts only to the issue this run created, never to a duplicate found by the lookup.

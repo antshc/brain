@@ -63,6 +63,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    | `{{sourceRoot}}` | `SOURCE_ROOT` |
    | `{{baseCommit}}` | `BASE_COMMIT` |
    | `{{notesDir}}` | `NOTES_DIR` |
+   | `{{specArtifactsDir}}` | `RUN_DIR/artifacts` (spec issue artifacts and `index.json` from `graph read`) |
 
    Verify: per Breakdown Initiative; record actual model/effort or unavailable-model failure.
    → `failed`, invalid JSON, empty `created`, or incomplete GitHub operations: report actual partial state; stop; never claim success.
@@ -93,6 +94,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    | `{{ticketFile}}` | `RUN_DIR/tickets/<OWNER>_<REPO>_<NUMBER>.json` | same |
    | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` | same (integration log) |
    | `{{commitSubjectPrefix}}` | `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): ` | same |
+   | `{{specArtifactsDir}}` | `RUN_DIR/artifacts` | same |
 
    Verify in the ticket's worktree: `HEAD` = `result.commit`, exactly one commit since `@prevHead`, subject prefix, clean and on its branch, `result.verification` names executed checks and results including skipped infrastructure checks and errors; thin evidence → run cheap confirmations.
    → Invalid JSON, `failed`, missing evidence, or mismatched commit: rework; recheck after each round.
@@ -186,7 +188,7 @@ Launch line legend: `refs` = `requiredReferences` (manifest keys); pass only the
 
 ## Graph report
 
-Table of ticket, blocked by (`none` = explicit root), paths, conflicts (blocker → dependent); then ready frontier, critical path, deferred tickets with reason. Every node listed, including deferred tickets' blocker edges.
+Table of ticket, blocked by (`none` = explicit root), paths, conflicts (blocker → dependent); then ready frontier, critical path, deferred tickets with reason. Every node listed, including deferred tickets' blocker edges. Then spec artifact count (length of `graph.spec.artifacts`) or `artifacts_note`, and design sketch coverage from the planner notes when a sketch exists.
 
 ## Output
 

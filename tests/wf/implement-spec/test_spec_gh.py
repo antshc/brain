@@ -136,6 +136,7 @@ class TestGraphRead:
         child = issue(5, "slice", labels=["repo:target:other/repo"], repo="acme/specs")
         blocker = issue(4, "dep", state="closed", reason="completed", repo="acme/specs")
         runner = FakeRunner({
+            "issues/1/artifacts": "[]",
             "issues/1/comments": "[[]]", "issues/1/sub_issues": json.dumps([[child]]),
             "issues/5/comments": "[[]]", "issues/5/dependencies/blocked_by": json.dumps([[blocker]]),
             "api repos/acme/specs/issues/1": json.dumps(spec),
@@ -146,6 +147,66 @@ class TestGraphRead:
         assert (tmp_path / "run" / "tickets" / "acme_specs_5.json").exists()
         assert graph["frontier"]["ready"] == ["acme/specs#5"]
         assert "conflicts" in graph["problems"][0]
+
+
+def artifact(number: int, name: str, body: str, kind: str = "generic") -> dict:
+    return {
+        "id": 900 + number, "number": number, "type": kind, "name": name, "body": body,
+        "html_url": f"https://github.com/acme/specs/issues/1/artifacts/{number}", "updated_at": "2026-10-01T00:00:00Z",
+    }
+
+
+class TestSpecArtifacts:
+    def read(self, tmp_path, artifact_responses: dict[str, tuple[int, str, str] | str]):
+        spec = issue(1, "PAY-12: X", labels=["repo:target:acme/shop", "repo:base:main"], repo="acme/specs")
+        runner = FakeRunner({
+            **artifact_responses,
+            "issues/1/comments": "[[]]", "issues/1/sub_issues": "[[]]",
+            "api repos/acme/specs/issues/1": json.dumps(spec),
+        })
+        args = spec_gh.build_parser().parse_args(["graph", "read", "--spec", "acme/specs#1", "--out", str(tmp_path / "run")])
+        return spec_gh.cmd_graph_read(Gh(runner), args), runner
+
+    def test_artifacts_saved_and_listed_in_spec_and_graph(self, tmp_path):
+        items = [artifact(1, "Sketch index", "# index", "plan"), artifact(2, "src/A b.txt", "body two"),
+                 artifact(3, "view.html", "<p>x</p>", "embedded_html")]
+        graph, runner = self.read(tmp_path, {"issues/1/artifacts?per_page=100&page=1": json.dumps(items)})
+        records = graph["spec"]["artifacts"]
+        assert [Path(r["file"]).name for r in records] == ["001-sketch-index.md", "002-src-a-b-txt.md", "003-view-html.html"]
+        assert Path(records[1]["file"]).read_text() == "body two"
+        assert records[0] | {"file": None} == {
+            "number": 1, "name": "Sketch index", "type": "plan", "file": None,
+            "url": "https://github.com/acme/specs/issues/1/artifacts/1", "updated_at": "2026-10-01T00:00:00Z",
+        }
+        saved = json.loads((tmp_path / "run" / "spec.json").read_text())
+        assert saved["artifacts"] == records and saved["artifacts_note"] is None
+        assert json.loads((tmp_path / "run" / "artifacts" / "index.json").read_text()) == records
+        assert any("X-GitHub-Api-Version" in call for call in runner.calls)
+
+    def test_pages_until_short_page(self, tmp_path):
+        first = [artifact(n, f"file {n}", str(n)) for n in range(1, 101)]
+        graph, runner = self.read(tmp_path, {
+            "artifacts?per_page=100&page=1": json.dumps(first),
+            "artifacts?per_page=100&page=2": json.dumps([artifact(101, "last", "101")]),
+        })
+        assert len(graph["spec"]["artifacts"]) == 101
+        assert sum("/artifacts?" in call for call in runner.calls) == 2
+
+    def test_unavailable_endpoint_is_empty_with_note(self, tmp_path):
+        graph, _ = self.read(tmp_path, {"issues/1/artifacts": (1, "", "gh: Not Found (HTTP 404)")})
+        assert graph["spec"]["artifacts"] == []
+        assert "unavailable" in graph["spec"]["artifacts_note"]
+
+    def test_other_artifact_errors_fail(self, tmp_path):
+        with pytest.raises(GhError):
+            self.read(tmp_path, {"issues/1/artifacts": (1, "", "gh: Server Error (HTTP 500)")})
+
+    def test_rerun_drops_stale_artifact_files(self, tmp_path):
+        stale = tmp_path / "run" / "artifacts" / "009-old.md"
+        stale.parent.mkdir(parents=True)
+        stale.write_text("old")
+        self.read(tmp_path, {"issues/1/artifacts": "[]"})
+        assert not stale.exists()
 
 
 class TestIssueOps:
