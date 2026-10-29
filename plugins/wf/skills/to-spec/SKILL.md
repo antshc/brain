@@ -43,9 +43,12 @@ The solution to the problem, from the user's perspective.
 
 <!-- Writing style: non-technical, solution agnostic -->
 
-One subsection per Requirement set. Each groups a Stakeholder requirement with its own Functional Requirements, Business Rules, and Edge Cases. Repeat the `### {{n}}. {{stakeholderRequirement}}` block for every Requirement set covering the Initiative.
+One subsection per Requirement set. Each groups a Stakeholder requirement with its own Functional Requirements, Business Rules, and Edge Cases. Repeat the `### {{n}}. {{stakeholderRequirement}}` heading and its `<details>` block for every Requirement set covering the Initiative.
 
 ### {{n}}. {{stakeholderRequirement}}
+
+<details>
+<summary>{{n}}. {{stakeholderRequirement}}</summary>
 
 **Functional Requirements**
 
@@ -77,6 +80,8 @@ Invariants that must always hold, independent of any single user action. Each ru
 Boundary conditions and their expected handling. Each edge case should be in the format of:
 
 {{n}}. {{boundaryCondition}} → {{expectedHandling}}.
+
+</details>
 
 ## Implementation Decisions
 
