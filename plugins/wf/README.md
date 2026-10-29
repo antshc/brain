@@ -58,6 +58,7 @@ flowchart TD
 | **research-**                             | Gather external/domain evidence              | `research`, `define-research`, `research-system`                                          |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-nuget-source`                                                                    |
 | **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
+| **architect**                             | Sketch, synthesize, and implement a design   | `architect`                                                                               |
 | **draft-**                                | Author standalone working artifacts          | `draft-bug`, `draft-story`                                                                |
 | **record-**                               | Record settled architecture or render bodies | `record-architecture`                                                                     |
 | **doc-**                                  | Render existing knowledge                    | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`        |
