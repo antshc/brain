@@ -66,6 +66,38 @@ swimlane-beta TB
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
+### Story to implementation
+
+Starts from one existing User story: `/sharpen` hardens it, `/architect` sketches the code, `/to-spec` writes the spec, and `/implement-spec` implements it.
+
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: wf-story-to-implementation-swimlane
+swimlane-beta TB
+  accTitle: Story to implementation responsibility
+  accDescr: Shows one User story sharpened, sketched by architect, turned into a spec, and implemented by implement-spec.
+
+  subgraph story [Story hardening]
+    userStory([User story])
+    sharpen[1 - sharpen]
+  end
+
+  subgraph design [Design]
+    architect[2 - architect<br/>code sketch]
+    toSpec[3 - to-spec]
+    spec[(4 - Spec)]
+  end
+
+  subgraph implementation [Implementation]
+    implementSpec[5 - implement-spec]
+    done([Implementation])
+  end
+
+  userStory --> sharpen -->|sharpened story| architect --> toSpec --> spec -->|spec| implementSpec --> done
+
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
 ## Skills
 
 | Group                                     | Purpose                                      | Current skills                                                                            |
