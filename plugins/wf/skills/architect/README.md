@@ -1,6 +1,6 @@
 # architect
 
-Human quick reference. Sketch types, signatures, and module structure before code; never writes production code. Agent rules live in [SKILL.md](SKILL.md).
+Human quick reference. Sketch types, signatures, and module structure before code; writes production code only after you reply **implement**. Agent rules live in [SKILL.md](SKILL.md).
 
 ## Use
 
@@ -16,8 +16,10 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 |---|---|---|
 | A Ground | `how` explains the touched subsystems; `why` adds history and rationale when the design redefines ownership or layering | grounding notes |
 | B Sketch | `arena`: 3 models design in parallel, a cross-family judge scores, best base wins, good ideas grafted | usage sketch, module map, types, rationale |
-| C Review | loop until you reply **accept**; otherwise **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
-| D Hand off | run `/to-spec`, then optionally `/implement-spec <spec issue URL>` | spec issue, draft PR |
+| C Review | loop until you reply **accept** or **implement**; otherwise **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
+| D Hand off | after **accept**, run `/to-spec` | spec issue |
+| E Implement | after **implement**: scaffold commit, then fill in code in the current branch; deviations surfaced to you | scaffold commit, code |
+| F Scrap | repeated friction during E (same workaround, escape-hatch types, repeated deviations): re-ground, subtract, re-run B and C | new sketch |
 
 Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 
@@ -31,9 +33,10 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 | corrections | the sketch is close; you want a direct edit, no re-run | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked before accepting; findings need a run as proof | see below |
 | `prototype` | one uncertain part needs real code to settle; builds a throwaway in a worktree with the `experiment` skill, then interrogates it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
-| accept | the sketch is right | `accept` |
+| accept | the sketch is right; you want a spec | `accept` |
+| implement | the sketch is right; build it now in this branch, no spec | `implement` |
 
-Reply in plain chat. An ambiguous reply is never treated as accept.
+Reply in plain chat. An ambiguous reply is never treated as accept or implement.
 
 ## Open questions and risks
 
@@ -45,6 +48,7 @@ Phrased as questions; your answer resolves them. Nothing moves until you reply. 
 | Risk unproven | `interrogate, scope: risk 1 ...` + intent + runnable target | adversaries try to prove it; verified findings return as proposed corrections |
 | You don't know | ask in chat, or request `how`/`why` | facts first, then `corrections` |
 | Acceptable | `accept` | Phase D |
+| Build now | `implement` | Phase E |
 
 Resolve shape-changing items (ownership, boundaries, data keys) before accepting. ADR, Concept, or glossary conflicts need a decision: change the design or knowingly accept the deviation.
 

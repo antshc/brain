@@ -1,12 +1,12 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module structure before code, synthesize competing multi-model design candidates, loop user corrections into the sketch, then hand off to spec. Use for /architect, architect this, design this, or non-trivial work where jumping to code would lock in the wrong shape.
+  Sketch types, signatures, and module structure before code, synthesize competing multi-model design candidates, loop user corrections into the sketch, then hand off to spec or implement against the sketch. Use for /architect, architect this, design this, or non-trivial work where jumping to code would lock in the wrong shape.
 ---
 
 # Architect
 
-Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Synthesize across multiple model perspectives, review the sketch with the user until accepted, then hand off to spec and implementation. Never write production code.
+Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Synthesize across multiple model perspectives, review the sketch with the user until accepted, then hand off to spec or fill in code against the sketch. Write production code only after the user replies **implement**.
 
 ## Bundled files
 
@@ -42,7 +42,7 @@ Resolve every path from this skill's base directory. Read each file fully when i
 
 ## Artifact location
 
-Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent.
+Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent. Phase E code goes in the repo's working tree, not the artifact root.
 
 ## Repo docs
 
@@ -61,7 +61,9 @@ Open a todolist with one entry per phase before starting.
 1. Ground
 2. Sketch
 3. Review
-4. Hand off
+4. Hand off or Implement
+
+Add a Scrap entry when Phase F triggers.
 
 ## Phase A: Ground the problem
 
@@ -85,7 +87,7 @@ Arena returns one synthesized design package. Its synthesis decision fills the r
 
 ## Phase C: Review loop
 
-Loop until the user explicitly accepts the sketch. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. Never write production code. Prototype code is disposable evidence kept in a worktree, never part of the sketch.
+Loop until the user explicitly replies **accept** or **implement**. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. MUST NOT write production code in this phase. Prototype code is disposable evidence kept in a worktree, never part of the sketch.
 
 Each round:
 
@@ -98,6 +100,7 @@ Each round:
    - **prototype**: `GSI backfill; target: DynamoDB Local` (throwaway build in a worktree, then interrogated)
    - **ask**: `why does X own Y?` (grounds the answer, then corrections)
    - **accept**: hand off to `/to-spec`
+   - **implement**: build against the sketch in this working tree (skips `/to-spec`)
    ```
 3. Act on the reply:
    - **Corrections** → apply them directly; never re-run arena, even for shape changes. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
@@ -105,15 +108,46 @@ Each round:
    - **Prototype** → run the `prototype/prototype.md` procedure on the question in the reply. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, running `how/how.md` or `why/why.md` when needed; present the answer, then start the next round.
    - **Accept** → go to Phase D.
+   - **Implement** → go to Phase E.
 
-Ambiguous reply → ask which of the five it is; never treat it as acceptance.
+Ambiguous reply → ask which of the six it is; never treat it as acceptance or implement.
 
 ## Phase D: Hand off
 
 Stop. Tell the user the accepted sketch is ready and to run `/to-spec` with the target branch and Initiative ID; that skill turns the synthesized design and base candidate sketch from this conversation into a published spec issue. Do not draft the spec yourself.
 
-After the spec issue is published, offer to run `/implement-spec <spec issue URL>` to implement the spec through its ticket graph into a draft PR. Run it only when the user confirms.
+## Phase E: Implement against the sketch
+
+Work in the current working tree and branch. The synthesized sketch is the contract.
+
+1. Scaffold: write the accepted sketch's types, signatures, and `not implemented` bodies into their target modules; commit as its own commit, per *Foundational thinking*. Done when the scaffold commit exists.
+2. Fill in: replace `not implemented` bodies with code and pseudocode with logic. Planned, scoped breakage during fill-in is fine, per *Outcome-oriented execution*. Done when no `not implemented` body from the sketch remains and the repo's build and tests pass.
+3. Deviations: when code needs something the sketch didn't anticipate (new parameter, type, dependency, module), stop and classify it: sketch wrong, requirement missed, or implementation overreaching. Surface it to the user in chat; never absorb it silently. Apply the agreed change to the sketch, synthesized design, and rationale, and append it to `review-log.md`.
+4. Watch for Phase F tells throughout; on a pattern, go to Phase F.
+
+## Phase F: Scrap when the architecture is wrong
+
+If implementation keeps producing friction the sketch can't absorb, throw the sketch out. Don't bolt fixes onto a wrong design, per *Redesign from first principles* and *Fix root causes*.
+
+The signal is a pattern, not single instances. Tells:
+
+- Same shape of workaround repeating across unrelated code.
+- Multiple unrelated edge cases each needing special-case branches.
+- Types needing escape hatches (`any`, casts, optional fields always set in practice) to compile.
+- The "we need a lock" reflex when the sketch said the state wasn't shared.
+- Callers needing the abstraction's internal rules to use it.
+- Two or more independent Phase E deviations of the same shape.
+
+Use judgment. A few edge cases don't condemn an architecture. Complexity in the data is not complexity in the design.
+
+When you scrap:
+
+1. Tell the user which tells fired, with file evidence; append to `review-log.md`.
+2. Run the `how/how.md` procedure over what's been built.
+3. Redesign as if the new constraints had been day-one assumptions, per *Redesign from first principles*.
+4. Subtract before adding, per *Subtract before you add*. The new sketch is smaller than the old one before it grows.
+5. Return to Phase B and re-run arena, then Phase C review.
 
 ## Outputs
 
-The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `references/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every accepted correction; `review-log.md` records each round.
+The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `references/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every accepted correction and Phase E deviation; `review-log.md` records each round. After **implement**: a scaffold commit, then working code filling it in the current branch.
