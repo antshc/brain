@@ -23,30 +23,47 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
-flowchart TD
-    W{"wayfinder or grill-design<br/>resolve unknowns"}
-    S["to-spec"]
-    SPEC[("Spec")]
-    ZD["to-zdesign<br/>synthesize or merge feature design"]
-    DESIGN[("Feature design")]
-    STORIES["to-stories<br/>assemble requirements, spec, or design into stories"]
-    GRILL{"grill-design<br/>interview & sharpen, one story at a time"}
-    TICKETS["to-tickets<br/>cut each story into agent-ready GitHub issues"]
+%% diagram-id: wf-idea-to-implementation-swimlane
+swimlane-beta TB
+  accTitle: Idea to implementation responsibility
+  accDescr: Shows discovery choosing a simple or complex path, each producing a spec that implement-spec turns into an implementation.
 
-    W -- no unknowns left --> S
-    S --> SPEC
-    SPEC -- direct --> TICKETS
-    SPEC --> STORIES
+  subgraph discovery [Discovery]
+    idea([Idea])
+    resolve[1 - Resolve unknowns<br/>wayfinder or grill-design]
+    choosePath{2 - Choose path}
+  end
 
-    W -- no unknowns left --> ZD
-    SPEC --> ZD
-    ZD --> DESIGN
+  subgraph simple [Simple path - SMPL]
+    sketchFirst{2a.1 - Sketch code first?}
+    smplArchitect[2a.1a.1 - architect<br/>code sketch]
+    smplToSpec[2a.2 - to-spec]
+    smplSpec[(2a.3 - Spec)]
+  end
 
-    DESIGN --> STORIES
-    STORIES --> GRILL
-    GRILL --> TICKETS
+  subgraph complex [Complex path - CMPLX]
+    toZdesign[2b.1 - to-zdesign<br/>synthesize or merge feature design]
+    design[(2b.2 - Feature design)]
+    toStories[2b.3 - to-stories<br/>assemble design into stories]
+    cmplxArchitect[2b.4 - architect<br/>for each story]
+    cmplxToSpec[2b.5 - to-spec]
+    cmplxSpec[(2b.6 - Spec)]
+  end
 
-    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+  subgraph implementation [Implementation]
+    implementSpec[3 - implement-spec<br/>sequential or parallel]
+    done([Implementation])
+  end
+
+  idea --> resolve -->|no unknowns left| choosePath
+  choosePath -->|simple| sketchFirst
+  sketchFirst -->|no| smplToSpec
+  sketchFirst -->|yes| smplArchitect --> smplToSpec
+  smplToSpec --> smplSpec -->|parallel| implementSpec
+  choosePath -->|complex| toZdesign --> design --> toStories --> cmplxArchitect --> cmplxToSpec --> cmplxSpec -->|sequential or parallel| implementSpec
+  implementSpec --> done
+
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
 ## Skills
