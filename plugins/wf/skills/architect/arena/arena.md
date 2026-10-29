@@ -39,6 +39,15 @@ If the candidates converge on one shape, that is strong agreement. Note it and s
 
 Verify the synthesized artifact like any other output, per *Prove it works* in `references/principles.md`. If verification finds a problem the arena missed, either Phase A was wrong (re-frame and re-run) or a candidate caught it and you missed the graft (go back to Phase E). Don't paper over it.
 
+## Re-run for corrections
+
+Caller: architect Phase C `corrections` reply carrying `arena`. Run Phases A–F once more with these changes:
+
+- Phase A: the task is the original task plus the corrections as hard constraints; the corrected current design is extra grounding. Rubric adds one criterion per correction. Keep the resolved `arena-agents` count unless the user changed it.
+- Output location: `<artifact-root>/arena-r<k>/candidate-<n>/`, `k` = re-run number from 1. Never overwrite earlier candidates.
+- Phase D–E: the corrected current design joins as the incumbent candidate; scoring includes the corrections criteria, so an incumbent that ignores a correction loses on it.
+- Output: the new synthesis note and design under `arena-r<k>/`; the incumbent stays untouched until the user picks.
+
 ## Outputs
 
 One synthesized artifact, with a short synthesis note alongside naming the base and why, the cross-judge's verdict or that Phase C skipped the judge, each graft with its source candidate, what was rejected and why, any convergence or dropouts, requested and completed runner counts, models and fallbacks used, the reason for any skipped judge, and screening and verification results. With one viable candidate, keep the same sketch, synthesized design, and rationale outputs; record adoption without comparison or grafting.

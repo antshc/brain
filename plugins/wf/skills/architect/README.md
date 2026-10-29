@@ -34,7 +34,7 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 | `how` | you need a mental model of existing code before designing | `/architect how does the webhook delivery pipeline work, then design retries` |
 | `why` | you must know why code has its shape before changing it (history, PRs, tickets, incidents) | `/architect why is billing split from orders? then redesign the boundary` |
 | `arena` | you want a design candidate or competing whole-shape designs | automatic in Phase B; use `arena-agents=2` or `3` for comparison |
-| corrections | the sketch is close; you want a direct edit, no re-run | `corrections: make Retry a policy object, drop the scheduler interface` |
+| corrections | the sketch is close; you want a direct edit, no re-run (add `; arena` for a fresh candidate) | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked before accepting; findings need a run as proof | see below |
 | `prototype` | one uncertain part needs real code to settle; builds a throwaway in a worktree with the `experiment` skill, then interrogates it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
 | accept | the sketch is right; you want a spec | `accept` |

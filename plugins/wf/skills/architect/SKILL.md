@@ -99,7 +99,7 @@ Each round:
 2. Offer these replies verbatim, then stop and wait for the user:
    ```
    Reply with one:
-   - **corrections**: `Q2 → keep per-tenant tables` (edits sketch, design, rationale; no arena re-run)
+   - **corrections**: `Q2 → keep per-tenant tables` (edits sketch, design, rationale; add `; arena` to also run a new arena that creates a new candidate)
    - **interrogate**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
    - **prototype**: `GSI backfill; target: DynamoDB Local` (throwaway build in a worktree, then interrogated)
    - **ask**: `why does X own Y?` (grounds the answer, then corrections)
@@ -107,7 +107,8 @@ Each round:
    - **implement**: build against the sketch in this working tree (skips `/to-spec`)
    ```
 3. Act on the reply:
-   - **Corrections** → apply them directly; never re-run arena, even for shape changes. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
+   - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
+   - **Corrections with `arena`** → apply as above, then run the `arena/arena.md` *Re-run for corrections* procedure with the corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
    - **Prototype** → run the `prototype/prototype.md` procedure on the question in the reply. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, running `how/how.md` or `why/why.md` when needed; present the answer, then start the next round.
