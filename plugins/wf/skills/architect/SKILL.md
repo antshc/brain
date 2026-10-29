@@ -1,12 +1,12 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module structure before code, synthesize competing multi-model design candidates, then implement against the chosen sketch. Use for /architect, architect this, design this, or non-trivial work where jumping to code would lock in the wrong shape.
+  Sketch types, signatures, and module structure before code, synthesize competing multi-model design candidates, loop user corrections into the sketch, then hand off to spec. Use for /architect, architect this, design this, or non-trivial work where jumping to code would lock in the wrong shape.
 ---
 
 # Architect
 
-Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Synthesize across multiple model perspectives, then fill in code against the chosen sketch.
+Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Synthesize across multiple model perspectives, review the sketch with the user until accepted, then hand off to spec and implementation. Never write production code.
 
 ## Bundled files
 
@@ -19,7 +19,7 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [references/subagents.md](references/subagents.md) | spawning any subagent |
 | [references/design-red-flags.md](references/design-red-flags.md) | Phase B screening |
 | [references/rationale-template.md](references/rationale-template.md) | writing Outputs; give to every runner |
-| [how/how.md](how/how.md) | Phase A grounding; scrap step 1 |
+| [how/how.md](how/how.md) | Phase A grounding |
 | [how/explorer-prompt.md](how/explorer-prompt.md) | `how/how.md` spawns explorers |
 | [how/explainer-prompt.md](how/explainer-prompt.md) | `how/how.md` spawns the explainer |
 | [why/why.md](why/why.md) | Phase A, design redefines ownership or layering |
@@ -35,13 +35,13 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [why/sources/sentry.md](why/sources/sentry.md) | error tracking investigator |
 | [why/sources/databricks.md](why/sources/databricks.md) | product analytics investigator |
 | [why/sources/incident-postmortem.md](why/sources/incident-postmortem.md) | target code looks defensive |
-| [arena/arena.md](arena/arena.md) | Phase B; scrap step 4 |
+| [arena/arena.md](arena/arena.md) | Phase B |
 | [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief |
-| [interrogate/interrogate.md](interrogate/interrogate.md) | Phase C adversarial pressure |
+| [interrogate/interrogate.md](interrogate/interrogate.md) | Phase C, user picks interrogate |
 
 ## Artifact location
 
-Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent.
+Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent.
 
 ## Start
 
@@ -49,9 +49,8 @@ Open a todolist with one entry per phase before starting.
 
 1. Ground
 2. Sketch
-3. Agree
-4. Implement
-5. Scrap
+3. Review
+4. Hand off
 
 ## Phase A: Ground the problem
 
@@ -73,42 +72,27 @@ Compare viable candidates on interface depth. Prefer the design that hides more 
 
 Arena returns one synthesized design package. Its synthesis decision fills the rationale's "Synthesis decision" section.
 
-## Phase C: Agree (opt-in)
+## Phase C: Review loop
 
-Default: proceed directly to implementation with the synthesized design. No human checkpoint.
+Loop until the user explicitly accepts the sketch. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. Never write production code.
 
-Opt in to a checkpoint when the invoker explicitly asks: "/architect with checkpoint," "stop and show me before implementing," or similar. Then surface the synthesized design and pause for sign-off.
+Each round:
 
-The synthesis can ship as its own commit either way, as the "scaffold first" mode of the *Foundational thinking* principle. Planned and scoped breakage during fill-in is fine, per the *Outcome-oriented execution* principle. For adversarial pressure on the design before implementing, run the `interrogate/interrogate.md` procedure on the synthesized sketch.
+1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
+2. Offer three replies: **accept**, **corrections** (free text), or **interrogate**. Stop and wait for the user.
+3. Act on the reply:
+   - **Corrections** → apply them directly; never re-run arena, even for shape changes. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `references/design-red-flags.md`; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
+   - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
+   - **Accept** → go to Phase D.
 
-If the human pushes back on the shape (in a checkpoint or after the fact), treat that as Phase A evidence. Re-ground and re-run Phase B before writing more code.
+Ambiguous reply → ask which of the three it is; never treat it as acceptance.
 
-## Phase D: Implement against the sketch
+## Phase D: Hand off
 
-Replace `not implemented` bodies with code, pseudocode with logic. The synthesized sketch is the contract. Deviations from it are signal to surface, not friction to absorb silently. If a function needs a parameter the sketch didn't anticipate, ask whether the sketch was wrong, the requirement was missed, or the implementation is overreaching.
+Stop. Tell the user the accepted sketch is ready and to run `/to-spec` with the target branch and Initiative ID; that skill turns the synthesized design and base candidate sketch from this conversation into a published spec issue. Do not draft the spec yourself.
 
-## Phase E: Scrap when the architecture is wrong
-
-If implementation keeps producing friction the sketch can't absorb, throw the sketch out. Don't bolt fixes onto a wrong design, per the *Redesign from first principles* and *Fix root causes* principles.
-
-The signal is a *pattern*, not single instances. Tells:
-
-- The same shape of workaround appearing repeatedly across unrelated code.
-- Multiple unrelated edge cases that all need special-case branches.
-- Types that need escape hatches (`any`, casts, optional fields always set in practice) to compile.
-- The "we need a lock" reflex when the sketch said the state wasn't shared.
-- Callers having to know the abstraction's internal rules to use it.
-- Two or more independent Phase D deviations of the same shape across the implementation.
-
-Use judgment. A few edge cases don't condemn an architecture. Some problems are legitimately complex. Complexity in the data is not complexity in the design.
-
-When you scrap:
-
-1. Re-run the `how/how.md` procedure over what's been built.
-2. Redesign as if the new constraints had been day-one assumptions, per *Redesign from first principles*.
-3. Subtract before adding, per the *Subtract before you add* principle. The new sketch should be smaller than the old one before it grows.
-4. Return to Phase B and re-run arena.
+After the spec issue is published, offer to run `/implement-spec <spec issue URL>` to implement the spec through its ticket graph into a draft PR. Run it only when the user confirms.
 
 ## Outputs
 
-The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `references/rationale-template.md`, including the usage sketch and the synthesis decision.
+The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `references/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every accepted correction; `review-log.md` records each round.
