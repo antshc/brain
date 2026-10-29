@@ -66,6 +66,44 @@ swimlane-beta TB
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
+### Design and story breakdown
+
+Resolves unknowns with `/wayfinder` (work too big for one session) or `/grill-design` (one session), synthesizes the feature design with `/to-zdesign`, then breaks the design into User stories with `/to-stories`.
+
+```mermaid
+%%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
+%% diagram-id: wf-design-to-stories-swimlane
+swimlane-beta TB
+  accTitle: Design and story breakdown responsibility
+  accDescr: Shows unknowns resolved by wayfinder or grill-design, a feature design synthesized by to-zdesign, and the design broken down into User stories by to-stories.
+
+  subgraph discovery [Discovery]
+    idea([Idea])
+    effortSize{1 - Fits one session?}
+    wayfinder[1a.1 - wayfinder<br/>chart and resolve decision tickets]
+    grillDesign[1b.1 - grill-design<br/>interview in one session]
+  end
+
+  subgraph design [Design]
+    toZdesign[2 - to-zdesign<br/>synthesize or merge feature design]
+    designDoc[(3 - Feature design)]
+  end
+
+  subgraph breakdown [Story breakdown]
+    toStories[4 - to-stories<br/>assemble ordered story list]
+    draftStory[[5 - draft-story<br/>once per story]]
+    stories[/6 - User stories/]
+    done([Stories ready])
+  end
+
+  idea --> effortSize
+  effortSize -->|no| wayfinder -->|no unknowns left| toZdesign
+  effortSize -->|yes| grillDesign -->|no unknowns left| toZdesign
+  toZdesign --> designDoc -->|design| toStories --> draftStory --> stories --> done
+
+  classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
 ### Story to implementation
 
 Starts from one existing User story: `/sharpen` hardens it, `/architect` sketches the code, `/to-spec` writes the spec, and `/implement-spec` implements it.
