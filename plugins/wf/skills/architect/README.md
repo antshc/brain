@@ -18,9 +18,9 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 
 | Phase | What happens | Output |
 |---|---|---|
-| A Ground | `how` explains the touched subsystems; `why` adds history and rationale when the design redefines ownership or layering | grounding notes |
+| A Ground | `how` explains the touched subsystems; `why` adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
 | B Sketch | `arena`: one runner by default; with 2–3, compare candidates and graft good ideas | usage sketch, module map, types, rationale |
-| C Review | loop until you reply **accept** or **implement**; otherwise **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
+| C Review | resolve technical questions and challenge material claims automatically, then loop until you reply **accept** or **implement**; otherwise **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
 | D Hand off | after **accept**, run `/to-spec` | spec issue |
 | E Implement | after **implement**: scaffold commit, then fill in code in the current branch; deviations surfaced to you | scaffold commit, code |
 | F Scrap | repeated friction during E (same workaround, escape-hatch types, repeated deviations): re-ground, subtract, re-run B and C | new sketch |
@@ -36,7 +36,7 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 | `arena` | you want a design candidate or competing whole-shape designs | automatic in Phase B; use `arena-agents=2` or `3` for comparison |
 | corrections | the sketch is close; you want a direct edit, no re-run (add `; arena` for a fresh candidate) | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked before accepting; findings need a run as proof | see below |
-| `prototype` | one uncertain part needs real code to settle; builds a throwaway in a worktree with the `experiment` skill, then interrogates it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
+| `prototype` | one uncertain part needs observation; Experiment selects a command, script, test, simulation, or throwaway app, then Interrogate checks it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
 | accept | the sketch is right; you want a spec | `accept` |
 | implement | the sketch is right; build it now in this branch, no spec | `implement` |
 
@@ -44,7 +44,9 @@ Reply in plain chat. An ambiguous reply is never treated as accept or implement.
 
 ## Open questions and risks
 
-Phrased as questions; your answer resolves them. Nothing moves until you reply. Unanswered ones carry into the spec.
+Architect resolves source facts through Research and runtime uncertainty through Experiment before review. Material falsifiable claims automatically trigger Interrogate when a safe runnable target exists. Examples: SDK-version contracts need research; CLI capabilities or concurrency need execution; retry duplication needs an adversarial probe. Research owns its specialist fan-out.
+
+Unchanged evidence and existing Interrogate coverage are reused; changes recheck only affected assumptions. Review presents evidence, limitations, unresolved questions, and proposed corrections. You decide intent, tradeoffs, and corrections; unanswered questions carry into the spec.
 
 | Your call | Reply | Result |
 |---|---|---|
@@ -66,7 +68,7 @@ Interrogate Risk 1 in a separate reply: a mixed reply may trigger a clarifying q
 
 ## Interrogate
 
-Three adversaries (different model families) try to break the change in their own worktrees. A finding survives only if its command, rerun by the skill, shows the failure and the failure breaks your intent. Reports findings; applies nothing. You then accept proposed corrections one by one.
+Runs automatically for material falsifiable claims with a safe target, or on request. Three adversaries (different model families) use Experiment to select executable probes and try to break the change in their own worktrees. A finding survives only if its command, rerun by the skill, shows the failure and the failure breaks your intent. Reports findings; applies nothing. You then accept proposed corrections one by one.
 
 ```
 interrogate
@@ -86,7 +88,7 @@ Tips:
 
 ## Prototype
 
-One question, one throwaway build. A builder subagent runs the `experiment` skill in its own worktree (code changes allowed there), the skill reruns its command, then `interrogate` attacks the prototype diff. Evidence returns as proposed corrections; the sketch stays `not implemented` and no prototype code enters it. The worktree is removed after the round; `prototype.patch` and `report.md` stay under `tmp/architect-<slug>/prototype/`.
+One question, one minimal experiment. A builder subagent runs the `experiment` skill in its own worktree (code changes allowed there), the skill reruns its command, then `interrogate` attacks the diff or the command and observation. Evidence returns as proposed corrections; the sketch stays `not implemented` and no prototype code enters it. The worktree is removed after the round; `report.md` and a patch only when code was created stay under `tmp/architect-<slug>/prototype/<question-id>-<revision>-<attempt>/`.
 
 ```
 prototype: does a second GSI creation fail while the first backfills? target: DynamoDB Local on :8000
@@ -101,4 +103,5 @@ prototype: does a second GSI creation fail while the first backfills? target: Dy
 | `arena/` | multi-model synthesis procedure and runner prompt |
 | `interrogate/` | adversarial review procedure |
 | `prototype/` | throwaway prototype plus interrogate procedure |
-| `references/` | principles, red flags, rationale template, subagent rules |
+| `references/` | evidence routing, principles, red flags, rationale template, subagent rules |
+
