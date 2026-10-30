@@ -19,22 +19,28 @@ You start in the worktree at `{{worktreePath}}`, on branch `{{featureBranch}}`, 
 Implement the Ticket using the smallest change that satisfies its requirements.
 
 1. Explore the relevant code, callers, tests, and established implementation patterns.
+   - Take build and test commands from repository instructions (`README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DEVELOPMENT.md`, `.github/*`) before discovering them by trial.
    - Find the smallest build unit owning the changed files (e.g. .NET: the affected `.csproj`, never the solution) and the test projects that reference it; locate tests by references and coverage, not folder proximity.
+   - Stop exploring once affected symbols, callers, boundaries, and test counterparts are known.
 2. Identify expected behavior, affected contracts, and verification criteria.
 3. Select a testing strategy based on risk:
-   - Bug: reproduce with a failing regression test.
+   - Bug: write a regression test and observe it fail for the reported reason before fixing.
    - Complex logic: use test-first development for critical behavior.
+   - Public contract change (API, serialization, service interface): pin the contract with tests (shape, serialization, compatibility) before implementing.
    - Straightforward feature: implement and add focused acceptance tests.
-   - Refactor: preserve behavior with characterization tests.
+   - Refactor: preserve intended behavior with characterization tests; note suspected accidental behavior in key decisions instead of locking it in.
    - Mechanical change: use existing tests and deterministic checks when sufficient.
 4. Reuse existing models and utilities. Respect architectural boundaries. Avoid speculative abstractions.
    - Repository-defined coding and test conventions for each affected language win over neighboring code on conflict.
+   - Run the repository's existing analyzers, linters, and architecture tests for affected projects; fix findings instead of suppressing them.
    - Design sketch quoted → apply Design sketch.
-5. Implement a focused change and run incremental builds and relevant tests.
+5. Implement a focused change and run incremental builds and relevant tests after meaningful increments.
    - Use each affected stack's own build and test tooling, scoped to affected projects (e.g. .NET: filtered `dotnet test`; `dotnet build` on the affected `.csproj` only when tests do not compile it or non-test artifacts changed).
+   - Confirm each filtered run executed the expected tests (count > 0, new and changed tests included).
    - Changed integration boundary → apply Integration boundary. Errors → apply Failure handling.
-6. Add necessary regression, boundary, and integration tests. Do not weaken tests to obtain a pass.
-7. Report changed behavior, executed checks, outcomes, and unresolved risks in the commit body and `verification`.
+6. Add necessary regression, boundary, and integration tests. Do not weaken tests to obtain a pass; changing an existing assertion requires a Ticket requirement, cited in key decisions.
+7. Before committing, rerun every affected test project once on the final working tree; `verification` reports this run.
+8. Report test strategy, changed behavior, executed checks, outcomes, and unresolved risks in the commit body and `verification`. Mark each check `passed`, `failed`, `unavailable` (with error), or `not run` (with reason).
 
 **MUST NOT** claim verification without observed results.
 **MUST NOT** run the entire test suite after every edit.
@@ -58,14 +64,15 @@ Applies when the Ticket's **Related Spec Artifacts** quote design sketch excerpt
 ### Failure handling
 
 - Same error after three correction cycles → respond `failed` (partial).
-- Missing SDK, dependency, credential, or network access prevents required verification → respond `failed` (blocked).
-- Environment, network, Docker, port, or external-service failure → one quick confirmation attempt only; no diagnosis, reconfiguration, or workarounds. Verify through fakes, mocks, or in-memory seams and record the skipped check with its error in `verification`. Infrastructure-only failure never justifies `failed`.
+- Environment, network, Docker, port, missing SDK/dependency/credential, or external-service failure → one quick confirmation attempt only; no diagnosis, reconfiguration, or workarounds. Verify through fakes, mocks, or in-memory seams and record the check as `unavailable` with its error in `verification`.
+- No fake, mock, in-memory, or other observable seam can verify the changed behavior → respond `failed` (blocked). Otherwise infrastructure-only failure never justifies `failed`.
 
 ## Commit
 
 Make exactly one commit in the worktree with subject `{{commitSubjectPrefix}}<one-line message>` and a concise body carrying:
 
 - key decisions made;
+- test strategy and verification summary;
 - files changed;
 - blockers or notes for the next iteration.
 
@@ -81,7 +88,7 @@ Make exactly one commit in the worktree with subject `{{commitSubjectPrefix}}<on
 End your final message with exactly one JSON object carrying:
 
 ```json
-{"status": "completed", "result": {"commit": "<full commit SHA>", "summary": "<one-line summary>", "verification": "<exact commands, executed tests and results, seams proved, skipped infrastructure checks, unresolved risks>"}}
+{"status": "completed", "result": {"commit": "<full commit SHA>", "summary": "<one-line summary>", "verification": "<test strategy; exact commands with executed test counts; each check passed|failed|unavailable|not run with error or reason; seams proved; unresolved risks>"}}
 ```
 
 or, if the Ticket could not be finished:
