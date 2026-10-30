@@ -30,16 +30,16 @@ Runs only when the spec has zero native sub-issues. Existing sub-issues on an in
 ## What to do
 
 1. **Graph.** Build blocker edges from `ticketGraph`. `hitl` tickets and their transitive dependants are `deferred`; closed blockers whose result is in the base are satisfied. Cycle → return `status: failed` naming it.
-2. **Footprint.** Per ticket, predict touched paths (files or folders) from its scope and the code at `{{baseCommit}}`: read affected code, tests, shared registries, DI/composition roots, config, lockfiles, generated files, migrations. Mark shared hot files.
-3. **Conflicts.** `kind: "file"`: footprints share a path or hot file; excluded from simultaneous execution. A ticket whose change another ticket consumes (contract, API, schema, runtime behaviour) is NOT a file conflict: if the consumer is wrong or untestable before the producer lands, add a blocker edge from producer to consumer; otherwise record `kind: "soft"` (advisory only, never blocks scheduling). Never record a pair as a conflict without a shared path.
+2. **Footprint.** Per ticket, predict touched paths (files or folders) from its scope and the code at `{{baseCommit}}`: read affected code, tests, shared registries, DI/composition roots, config, lockfiles, generated files, migrations. Mark shared hot files. Footprint not determinable → `paths: null`, never `[]`.
+3. **Conflicts.** Only between non-deferred tickets not ordered by a blocker path (direct or transitive). `kind: "file"`: footprints share a path or hot file; excluded from simultaneous execution. Paths share when equal or one is an ancestor of the other. `paths: null` → `file` conflict with every such ticket, `evidence: "unknown footprint"`. A ticket whose change another ticket consumes (contract, API, schema, runtime behaviour) is NOT a file conflict: if the consumer is wrong or untestable before the producer lands, add a blocker edge from producer to consumer; otherwise record `kind: "soft"` (advisory only, never blocks scheduling). Never record a `file` conflict without a shared path or unknown footprint.
 4. **Ready frontier.** List non-deferred tickets whose blockers are satisfied in the fetched base. Keep conflicts separate from blocker edges; they restrict simultaneous execution, not dependency direction.
-5. **Critical path.** Longest blocker chain; prioritize ready tickets on it.
+5. **Critical path.** Longest blocker chain among non-deferred tickets; prioritize ready tickets on it.
 
 ## Rules
 
 - Prefer a false conflict over a missed one; a merge conflict costs more than a serialized ticket.
-- Cite the shared path (or hot file) for every `file` conflict; a ticket reference alone is invalid evidence. A `soft` entry cites the contract symbol or module.
-- A ticket in more than 3 conflict pairs → say so in the planning notes and say whether merging, splitting or a blocker edge is cleaner.
+- Cite the shared path, hot file, or `unknown footprint` for every `file` conflict; a ticket reference alone is invalid evidence. A `soft` entry cites the contract symbol or module.
+- A ticket in more than 3 conflict pairs → say so in `notes` and say whether merging, splitting or a blocker edge is cleaner.
 - Reference tickets as `OWNER/REPO#NUMBER`; never restate Ticket content.
 
 ## Response
@@ -48,13 +48,15 @@ Runs only when the spec has zero native sub-issues. Existing sub-issues on an in
 |---|---|
 | `tickets[]` | One entry per ticket, deferred included. |
 | `tickets[].blockers` | Directed dependency graph: each blocker is integrated before the ticket starts; `[]` = root. |
-| `tickets[].paths` | Predicted footprint (files or folders); `[]` when unknown or none. |
-| `tickets[].hot` | Shared hot files from `paths`; `[]` when none. |
+| `tickets[].paths` | Predicted footprint (files or folders); `[]` = verified none; `null` = unknown. |
+| `tickets[].hot` | Shared hot files from `paths`; `[]` when none or unknown. |
 | `ready` | Initial dependency-ready frontier; not a promise of concurrent execution. |
-| `conflicts[]` | Pairs `a`/`b` with `kind` `file` (excluded from simultaneous execution; `evidence` = shared path or hot file) or `soft` (advisory; `evidence` = contract symbol or module). |
-| `criticalPath` | Longest blocker chain, root first. |
+| `conflicts[]` | Non-deferred, blocker-unordered pairs `a`/`b` with `kind` `file` (excluded from simultaneous execution; `evidence` = shared path, hot file, or `unknown footprint`) or `soft` (advisory; `evidence` = contract symbol or module); `[]` when none. |
+| `criticalPath` | Longest blocker chain among non-deferred tickets, root first. |
 | `created` | Tickets made by Breakdown Initiative. |
 | `deferred[]` | `reason`: `hitl` or `blocked-by:OWNER/REPO#NUMBER`. |
+| `coverage` | `requirements`, `artifacts`, `sketch`: mapped/total as `"n/m"`; `sketch` `null` without a Design sketch. |
+| `notes[]` | Sketch deviations, conflict-dense tickets, other planning findings; `[]` when none. |
 
 End your final message with exactly one JSON object:
 
@@ -62,16 +64,22 @@ End your final message with exactly one JSON object:
 {"status": "completed", "result": {
   "tickets": [
     {"ref": "acme/shop#12", "blockers": [], "paths": ["src/Export/Schema/", "src/Di/Registry.cs"], "hot": ["src/Di/Registry.cs"]},
-    {"ref": "acme/shop#14", "blockers": [], "paths": ["src/Export/Schema/"], "hot": []},
+    {"ref": "acme/shop#14", "blockers": [], "paths": ["src/Export/Schema/Field.cs"], "hot": []},
     {"ref": "acme/shop#15", "blockers": ["acme/shop#12"], "paths": ["src/Export/Writer/", "src/Di/Registry.cs"], "hot": ["src/Di/Registry.cs"]},
     {"ref": "acme/shop#16", "blockers": [], "paths": [], "hot": []},
-    {"ref": "acme/shop#17", "blockers": ["acme/shop#16"], "paths": ["src/Export/Writer/"], "hot": []}
+    {"ref": "acme/shop#17", "blockers": ["acme/shop#16"], "paths": ["src/Export/Writer/"], "hot": []},
+    {"ref": "acme/shop#18", "blockers": ["acme/shop#15"], "paths": null, "hot": []}
   ],
   "ready": ["acme/shop#12", "acme/shop#14"],
-  "conflicts": [{"a": "acme/shop#12", "b": "acme/shop#14", "kind": "file", "evidence": "src/Export/Schema/ both"}],
-  "criticalPath": ["acme/shop#12", "acme/shop#15"],
-  "created": ["acme/shop#12", "acme/shop#14", "acme/shop#15", "acme/shop#17"],
-  "deferred": [{"ref": "acme/shop#16", "reason": "hitl"}, {"ref": "acme/shop#17", "reason": "blocked-by:acme/shop#16"}]
+  "conflicts": [
+    {"a": "acme/shop#12", "b": "acme/shop#14", "kind": "file", "evidence": "src/Export/Schema/ contains src/Export/Schema/Field.cs"},
+    {"a": "acme/shop#14", "b": "acme/shop#18", "kind": "file", "evidence": "unknown footprint"}
+  ],
+  "criticalPath": ["acme/shop#12", "acme/shop#15", "acme/shop#18"],
+  "created": ["acme/shop#12", "acme/shop#14", "acme/shop#15", "acme/shop#17", "acme/shop#18"],
+  "deferred": [{"ref": "acme/shop#16", "reason": "hitl"}, {"ref": "acme/shop#17", "reason": "blocked-by:acme/shop#16"}],
+  "coverage": {"requirements": "9/9", "artifacts": "4/4", "sketch": null},
+  "notes": ["acme/shop#18 footprint unknown: generated client paths not determinable at base"]
 }}
 ```
 

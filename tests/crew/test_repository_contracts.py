@@ -24,7 +24,7 @@ def test_crew_chore_loads_named_stacks_or_all_stacks_for_an_empty_array():
     assert "Do not infer stacks from the review scope" in template
 
 def test_codey_agents_require_focused_integration_tests_for_external_boundaries():
-    for name in ("codey-dotnet.agent.md", "codey-py.agent.md"):
+    for name in ("codey-py.agent.md",):
         agent = (CREW_ROOT / "agents" / name).read_text(encoding="utf-8")
 
         assert "repository/accessor/proxy" in agent

@@ -26,7 +26,7 @@ Use `bin/crew_diff/_manifest.json` as the initial change-set ledger. An empty ma
 
 Parse the top-level `stacks` array from `bin/crew_diff/_manifest.json` and pass it unchanged to `/crew-chore` as `STACKS`. Use `/crew-chore`'s stack-loading guidance: a nonempty array loads the named stack files, while an empty array loads every configured stack file. Do not independently infer stacks from paths, patches, file contents, or repository markers. Apply each loaded rule only where relevant, retain rule conflicts as findings, and use observed conventions where no loaded rule applies. Report missing named stack files as discovery gaps. Emit `Review rules: [stack files]`.
 
-When `crew-memory` skill is available, follow `crew-memory` skill' skill **Read Gotchas** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
+When `crew-memory` skill is available, follow `crew-memory` skill **Read Gotchas** before cleanup and apply every loaded directive. Do not contradict a directive without retaining the conflict as a finding. When the skill is unavailable, do nothing.
 
 Read every manifest path's listed diff first, then its complete current file when present and only the neighboring code needed to establish local conventions. Review deleted paths from their diffs. Emit `Observed conventions: [summary]`.
 
@@ -34,7 +34,7 @@ When an applicable `/crew-chore` rule cannot be fulfilled without a minimal comp
 
 ### 4. Review and clean up
 
-Review only for behavior-preserving cleanup. Apply a candidate only when it is unambiguous, provably behavior-preserving, and consistent with loaded rules and observed conventions. Leave every ambiguous candidate, possible behavior change, or convention conflict untouched and retain it as a finding.
+Review only for behavior-preserving cleanup. Apply a candidate only when it is unambiguous, provably behavior-preserving, consistent with loaded rules, observed conventions, and architectural constraints (layer and dependency direction, architecture tests, analyzers), and covered by an existing test or build/static check that can verify it. Leave every ambiguous candidate, possible behavior change, convention conflict, or uncovered candidate untouched and retain it as a finding.
 
 Emit `Applied: [files]` or `Applied: none`, followed by `Findings (not applied): [findings]` or `Findings (not applied): none`. Never touch a file only to record a finding.
 
@@ -44,16 +44,16 @@ No applied cleanup continues directly to **Update gotchas**, **Discard artifacts
 
 1. Collect the files changed by cleanup. For each cleanup, name the observable behavior or static property that must remain intact, and the affected build/test unit for every stack touched.
 2. Derive commands from repository build markers, the affected projects, and existing tests. Classify the verification boundary: treat a repository, accessor, proxy, client, gateway, or adapter that communicates with a database, cloud provider/service, external API/SDK, message broker, filesystem, or network service as an integration boundary. If cleanup touches a repository/accessor/proxy or another such external integration and existing integration/functional-slice tests cover that boundary, include the smallest matching existing boundary-test subset even when unit tests pass. When `testing-integrations` skill is available, *run `testing-integrations` skill to pick the minimal seam and run the existing DB/cloud component or functional slice integration test* for the touched boundary, without adding or updating tests; it is the source of truth for available integration/functional-slice test kinds, exact commands/filters, required setup/environment, and covered seams; do not invent a test command it already defines. Use unit tests for local behavior, then required focused boundary tests. Never add tests; a cleanup with no existing covering test, or build check for a static property, is unverified.
-3. Run the fastest relevant tests first — filtered unit tests, then the required minimal filtered integration/functional-slice tests. Confirm that every intended test actually executed and passed; a successful command that collected or ran no intended tests is not verification. Run a build on affected projects when tests do not compile them or non-test artifacts changed. Add checks only for a concrete coverage gap; avoid a repository-wide suite by default.
-4. If a slice test cannot run, fall back to the fastest test that can still prove the behavior, and record the behavior it leaves unverified. Inspect changed-file diagnostics when available. Fix cleanup errors and rerun affected checks, stopping after three correction cycles for the same error. If no runnable check can establish that a cleanup is safe, treat it as unverified.
-5. Record exact commands, executed test names/results, seams proved, and remaining gaps. Distinguish pre-existing warnings; never claim checks that did not run.
+3. Apply all cleanup, then run the fastest relevant tests once for the batch — filtered unit tests, then the required minimal filtered integration/functional-slice tests. Confirm that every intended test actually executed and passed; a successful command that collected or ran no intended tests is not verification. Run a build on affected projects when tests do not compile them or non-test artifacts changed. Add checks only for a concrete coverage gap; run a repository-wide suite only when the cleanup's impact requires it. **MUST NOT** skip a required check to save time.
+4. If a slice test cannot run, fall back to the fastest test that can still prove the behavior, and record the behavior it leaves unverified. Inspect changed-file diagnostics when available. Fix cleanup errors and rerun affected checks, stopping after three correction cycles for the same error. **MUST NOT** change a test's assertions, expected values, or skip markers to get green. If no runnable check can establish that a cleanup is safe, treat it as unverified.
+5. Record exact commands, executed test names, seams proved, and remaining gaps; mark each check `passed | failed | unavailable | not run`. Distinguish pre-existing warnings; never report an intended or skipped check as passed.
 
 - Passing checks keep the cleanup and produce `STATUS: complete`.
 - An environment failure or an error remaining after the correction limit makes the review `failed`: leave the unverified cleanup applied, move it from `Applied` into `Findings`, and record the failure in NOTES.
 
 ### 6. Update gotchas
 
-When `crew-memory` skill is available, follow `crew-memory` skill' skill **Write Gotchas** before reporting every outcome, including `skipped` and `failed`. When the skill is unavailable, perform no gotchas work and report `GOTCHAS UPDATED: none`.
+When `crew-memory` skill is available, follow `crew-memory` skill **Write Gotchas** before reporting every outcome, including `skipped` and `failed`. When the skill is unavailable, perform no gotchas work and report `GOTCHAS UPDATED: none`.
 
 ### 7. Discard artifacts
 

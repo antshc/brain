@@ -54,13 +54,6 @@ Applies when the Ticket's **Related Spec Artifacts** quote design sketch excerpt
 - Use the sketch as the map: types, signatures, module boundaries, and file locations. Fill `not implemented` bodies and pseudocode with real code. Excerpt looks truncated → look up its artifact name in `{{specArtifactsDir}}/index.json` and read that `file`.
 - Sketch conflicts with the Ticket's requirements, its `Sketch deviation` decisions, repository conventions, or compiling code → never ask; choose the option that best fits the requirements, then the sketch's intent, and note it in the commit body's key decisions.
 
-### Integration boundary
-
-- Integration boundary: code talking to a database, cloud service, external API/SDK, message broker, filesystem, or network service.
-- Changed boundary with existing integration tests → those tests are required even when unit tests pass.
-- *Run `testing-integrations` skill to pick the minimal seam and run the DB/cloud component or functional slice integration test, reproducing failures*; use the commands and Cloud Safety gate it defines.
-- Higher seam cannot run → use the next observable seam and record the behavior left unverified.
-
 ### Failure handling
 
 - Same error after three correction cycles → respond `failed` (partial).
