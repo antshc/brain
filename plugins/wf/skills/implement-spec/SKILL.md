@@ -120,6 +120,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    Verify: ≤1 commit since `@prevHead`, subject match, clean, checks reported; record actual model/effort or unavailable-model failure.
    After: push; remove `@diffDir`; report out-of-scope findings without acting.
    → No result or failed: record none/failed; continue.
+   Done when chore changes are committed (one `chore(<INITIATIVE_ID>): ` commit, or none needed), pushed to `INTEGRATION_BRANCH`, remote head equals `HEAD`, and the worktree is clean.
 
 8. Launch verifier → [verifier.md](./agents/verifier.md) subagent in `WORKTREE_PATH`:
    refs none · rework none (internal: ≤3 verifications, ≤2 fix attempts per finding, one commit per fix).
