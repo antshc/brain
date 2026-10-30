@@ -5,7 +5,7 @@
 
 ## What to build
 <what-to-build-rule>
-- Self-contained: describe enough of the end-to-end behavior that an implementing agent needs no further repo exploration to understand what to build.
+- State included outcome, explicit exclusions, and enough behavior context to understand the task; leave implementation discovery to the implementer.
 - For functional changes, describe behavior across all touched integration layers, not a layer-by-layer breakdown. For structural changes, describe the complete relocation and required reference updates without introducing logic changes.
 - Avoid specific file paths or code snippets — they go stale fast. Exception: structural relocation tasks must identify intended source and destination paths.
 - Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
@@ -15,7 +15,7 @@
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code or the spec.
 - Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions. For structural work, include checks of intended locations, updated references, and unchanged regression behavior.
-- Use the domain language of the spec or `GLOSSARY.md`; apply the solution-agnostic rule — no file paths, class/variable names, or other implementation details.
+- Use the domain language of the spec or `GLOSSARY.md`; keep functional criteria solution-agnostic. Structural criteria may name exact source/destination paths, namespaces, symbols, and project references needed to prove the relocation.
 - State the exact expected outcome — never vague words like "works", "correctly", "properly", "as expected".
 - Fold every applicable Business Rule (`If {{condition}}, {{invariant}}`), Edge Case (`{{boundaryCondition}} → {{expectedHandling}}`), and relevant error condition into its own criterion here, rephrased per the format above — do not create separate sections for them.
 </acceptance-criteria-rule>
@@ -47,9 +47,9 @@
 
 ## Implementation Decisions
 <implementation-decisions-rule>
-- Preserve integration constraints and assumptions required for implementation.
+- State producer contracts and supplying tickets when applicable, compatibility constraints, and assumptions; distinguish observed contracts from assumptions needing confirmation.
 - Use short technical statements and implementation-oriented language.
-- No specific file paths or code snippets (they become outdated quickly).
+- Avoid file paths or code snippets except exact structural relocation constraints.
 </implementation-decisions-rule>
 
 - {{implementationDecision1}}
@@ -84,9 +84,10 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 
 ## Verify section
 
-This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes.
+List tests to add, update, and run for this task.
 - *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. Include the commands that will run the integration or REST API automation tests.
 - For functional changes, test external behavior, not implementation details. For structural tasks, verify intended paths/references and unchanged behavior using existing regression/API integration tests; add tests only where coverage is insufficient.
-- List which modules will be tested and prior art for the tests.
+- Map every criterion to a concrete check, exact command/manual action, prerequisites, expected result, and retained evidence. Name affected test modules and prior art; report unavailable prerequisites, never invent commands.
+- Default to existing API integration tests for API behavior; add focused contract, concurrency, retry, or boundary checks where the API seam cannot adequately expose the risk. For structural work, include deterministic location/reference checks and existing regression tests.
 
 </issue-template>

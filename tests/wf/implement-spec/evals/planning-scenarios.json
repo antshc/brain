@@ -1,0 +1,95 @@
+[
+  {
+    "id": "api-feature",
+    "request": "Add GET /orders/{id}. Return 200 with id and total for an existing order and 404 for a missing order. Keep existing routes unchanged.",
+    "files": {
+      "src/orders/api.py": "def register(app, store):\n    @app.get('/orders')\n    def list_orders(): return store.list()\n",
+      "src/orders/store.py": "class Store:\n    def list(self): return list(self.orders.values())\n    def find(self, id): return self.orders.get(id)\n",
+      "tests/orders/test_api.py": "# Existing API fixture: app with a real SQLite Store; client.get('/orders') returns 200.\n# Command: python3 -m pytest tests/orders/test_api.py\n"
+    },
+    "existingTickets": []
+  },
+  {
+    "id": "pure-relocation",
+    "request": "Move src/orders/store.py to src/orders/persistence/store.py. Update imports and package references. Preserve all behavior and public HTTP contracts; no new business logic.",
+    "files": {
+      "src/orders/api.py": "from orders.store import Store\n",
+      "src/orders/store.py": "class Store:\n    def find(self, id): return self.orders.get(id)\n",
+      "pyproject.toml": "[tool.setuptools.packages.find]\nwhere = ['src']\n",
+      "tests/orders/test_api.py": "from orders.store import Store\n# Existing endpoint regression cases cover found/missing.\n# Command: python3 -m pytest tests/orders/test_api.py\n"
+    },
+    "existingTickets": []
+  },
+  {
+    "id": "shared-contract",
+    "request": "Add a nullable correlation_id persistence column, then expose it in independent order and invoice API modules. Existing clients and rows must remain compatible. Migration can be independently applied and verified; order and invoice modules have separate integration suites.",
+    "files": {
+      "migrations/001.sql": "CREATE TABLE records (id INTEGER PRIMARY KEY, kind TEXT NOT NULL);\n",
+      "src/orders/api.py": "# Reads kind='order' records with id only.\n",
+      "src/invoices/api.py": "# Reads kind='invoice' records with id only.\n",
+      "tests/migrations/test_schema.py": "# Existing harness applies migrations to a populated SQLite database.\n# Command: python3 -m pytest tests/migrations/test_schema.py\n",
+      "tests/orders/test_api.py": "# Command: python3 -m pytest tests/orders/test_api.py\n",
+      "tests/invoices/test_api.py": "# Command: python3 -m pytest tests/invoices/test_api.py\n"
+    },
+    "existingTickets": []
+  },
+  {
+    "id": "shared-hot-file",
+    "request": "Add a missing-order metric and an unrelated invoice-export metric. Each is independently verifiable; neither consumes the other's code. Both metrics require edits to the existing shared registration file. No feature requires a public contract change.",
+    "files": {
+      "src/metrics/registry.py": "METRICS = {'orders.created': 'counter'}\n",
+      "src/orders/api.py": "# Missing order branch returns 404.\n",
+      "src/invoices/export.py": "# export(invoice) returns CSV bytes.\n",
+      "tests/orders/test_api.py": "# Counter state observable via metrics fixture.\n# Command: python3 -m pytest tests/orders/test_api.py\n",
+      "tests/invoices/test_export.py": "# Command: python3 -m pytest tests/invoices/test_export.py\n"
+    },
+    "existingTickets": []
+  },
+  {
+    "id": "missing-dependency",
+    "request": "Analyze the existing ticket graph for implementing format-v2 invoice export. Do not publish or edit tickets. Identify prerequisites from current code and ticket scope.",
+    "files": {
+      "src/invoices/reader.py": "def read(row): return {'amount': row['amount']}\n",
+      "src/invoices/export.py": "from .reader import read\ndef export(row): return str(read(row)['amount'])\n",
+      "tests/invoices/test_export.py": "# Format-v1 tests only; format-v2 requires currency from reader.\n# Command: python3 -m pytest tests/invoices/test_export.py\n"
+    },
+    "existingTickets": [
+      {
+        "ref": "acme/shop#2",
+        "title": "Reader contract",
+        "body": "Expose currency in the reader's returned record; preserve amount.",
+        "blockers": []
+      },
+      {
+        "ref": "acme/shop#3",
+        "title": "Format-v2 export",
+        "body": "Consume reader currency to render amount and currency.",
+        "blockers": []
+      }
+    ]
+  },
+  {
+    "id": "discovered-cycle",
+    "request": "Reanalyze unfinished work after the supplied integration finding. Do not publish or edit tickets. Report whether execution can proceed under the existing contracts.",
+    "files": {
+      "src/contracts.py": "# Current architecture: A requires B's persisted result.\n# Integration finding: B also requires A's new result to build and verify.\n# No compatible existing contract, stub, or independent migration is specified.\n",
+      "tests/test_contracts.py": "# Both contract checks require real producer output.\n# Command: python3 -m pytest tests/test_contracts.py\n"
+    },
+    "existingTickets": [
+      {
+        "ref": "acme/shop#2",
+        "title": "A",
+        "body": "Consume B's new persisted result.",
+        "blockers": [
+          "acme/shop#3"
+        ]
+      },
+      {
+        "ref": "acme/shop#3",
+        "title": "B",
+        "body": "Produce the persisted result; integration finding requires A's new result.",
+        "blockers": []
+      }
+    ]
+  }
+]
