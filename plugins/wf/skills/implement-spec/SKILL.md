@@ -72,7 +72,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 
 3. Validate the graph: reject `frontier.cycles` (name them) and tickets without scope; resolve `problems` (routing conflicts) and `frontier.needs_resolution` (cancelled, duplicate, external blockers) before writes; `hitl` tickets and their dependants are `deferred`; verify closed blockers' results exist in `BASE_COMMIT`. Record each ticket's identity, owner, status, scope, blockers, and evidence in the run-local map. Show the *Graph report* after Breakdown Initiative and in parallel mode.
 
-4. Explore implementation scope and test seams as needed; save shared notes under `RUN_DIR/notes` and pass pointers. Reuse planner evidence (graph, footprints, conflicts) when available; otherwise derive it from the graph and source checkout without a planner. Bound every runnable ticket's scope before selection.
+4. Explore implementation scope and test seams as needed; save shared notes under `RUN_DIR/notes` and pass pointers. Reuse planner evidence (graph, footprints, conflicts) when available; planner conflicts without `kind` are `file` only when evidence names a path, otherwise `soft`; otherwise derive it from the graph and source checkout without a planner. Bound every runnable ticket's scope before selection.
 
 5. Execute selected mode:
    - Validate `mode` and `MAX_PARALLEL` before creating any branch or worktree.
@@ -188,7 +188,7 @@ Launch line legend: `refs` = `requiredReferences` (manifest keys); pass only the
 
 ## Graph report
 
-Table of ticket, blocked by (`none` = explicit root), paths, conflicts (blocker → dependent); then ready frontier, critical path, deferred tickets with reason. Every node listed, including deferred tickets' blocker edges. Then spec artifact count (length of `graph.spec.artifacts`) or `artifacts_note`, and design sketch coverage from the planner notes when a sketch exists.
+Table of ticket, blocked by (`none` = explicit root), paths, conflicts with kind (`file`/`soft`) and a per-ticket conflict count; then ready frontier, critical path, deferred tickets with reason. Every node listed, including deferred tickets' blocker edges. Then spec artifact count (length of `graph.spec.artifacts`) or `artifacts_note`, and design sketch coverage from the planner notes when a sketch exists.
 
 ## Output
 
