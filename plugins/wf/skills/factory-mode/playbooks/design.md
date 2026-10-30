@@ -12,6 +12,4 @@
 4. Design it. `to-zdesign` is human-only: ask the user to run `/to-zdesign` with the spec, Wayfinder map or grill-design context, and any existing design to create or extend the authoritative feature design. Done when the design file exists and holds every resolved decision.
 5. Check the design against the decisions from step 2; surface any decision lost, contradicted, or still open.
 
-Next: the `architect` playbook per story or slice.
-
 **Reply:** decisions resolved and how (grill, ticket, prototype), spec and design links, open decisions, recommended next step.

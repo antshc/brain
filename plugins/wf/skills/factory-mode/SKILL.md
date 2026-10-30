@@ -1,7 +1,7 @@
 ---
 name: factory-mode
 description: >-
-  Operating mode for engineering tasks; restates the goal, routes to a playbook (investigation, bug fix, design, architect, refactoring, prototype), applies principles, delegates deliberately, verifies on the real artifact. Use for /factory-mode, /factory-mode help, or requests to work in this style.
+  Operating mode for engineering tasks; restates the goal, routes to a playbook (investigation, bug fix, design, feature, refactoring, prototype), applies principles, delegates deliberately, verifies on the real artifact. Use for /factory-mode, /factory-mode help, or requests to work in this style.
 disable-model-invocation: true
 ---
 
@@ -126,7 +126,7 @@ Invoked at the end of every code-shipping playbook.
   - `## Blast radius`: who or what it touches; why safe or risky.
   - `## Verification`: 1–3 bullets, each a real run and its outcome.
 - **Draft.** Open as draft: `gh pr create --draft --base {{targetBranch}}`. Run `gh pr view {{number}}` before stating PR status.
-- **Review.** *Run `code-review` skill to review the pull request with independent reviewers* when the user asks or the Architect playbook requires it.
+- **Review.** *Run `code-review` skill to review the pull request with independent reviewers* when the user asks or the Feature playbook requires it.
 - Post the URL and continue; do not babysit unless asked.
 
 ## Playbooks
@@ -138,10 +138,10 @@ Open a todo list whose first items are the matched playbook's steps, copied verb
 | Investigation | Read-only question: how does X work, why is Y built this way, are we sure about Z, X or Y | [playbooks/investigation.md](playbooks/investigation.md) |
 | Bug fix | Reported defect to reproduce, root-cause, and fix with runtime evidence | [playbooks/bug-fix.md](playbooks/bug-fix.md) |
 | Design | Unresolved unknowns before building: grill or Wayfinder, then spec and feature design | [playbooks/design.md](playbooks/design.md) |
-| Architect | New or changed behavior: autonomous sketch, spec, implementation, verification, review, address, and bug diagnosis; optional design checkpoint | [playbooks/architect.md](playbooks/architect.md) |
+| Feature | New or changed behavior: autonomous sketch, spec, implementation, verification, review, address, and bug diagnosis; optional design checkpoint | [playbooks/feature.md](playbooks/feature.md) |
 | Refactoring | Behavior-preserving change to structure (rename, extract, inline, dedupe, move) | [playbooks/refactoring.md](playbooks/refactoring.md) |
 | Prototype | Throwaway sketch to settle a design or empirical fork by observation | [playbooks/prototype.md](playbooks/prototype.md) |
 
-For Architect only, after a complete implementation handoff, read [Post-implementation](references/post-implementation.md) fully; execute its named sections from the playbook. At *App verification*, read [Verifier](agents/verifier.md) fully before launch. Resolve both from this skill's base directory; missing/unreadable → preserve/report and stop dependent work. Architect overrides generic PR title/body/opening instructions: reuse the handed-off PR; preserve initiative routing, draft state, rationale, and coverage.
+For Feature only, after a complete implementation handoff, read [Post-implementation](references/post-implementation.md) fully; execute its named sections from the playbook. At *App verification*, read [Verifier](agents/verifier.md) fully before launch. Resolve both from this skill's base directory; missing/unreadable → preserve/report and stop dependent work. Feature overrides generic PR title/body/opening instructions: reuse the handed-off PR; preserve initiative routing, draft state, rationale, and coverage.
 
 No playbook fits → follow Non-negotiables and Principles directly and say so.

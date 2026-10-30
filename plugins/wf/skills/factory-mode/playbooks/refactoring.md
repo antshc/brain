@@ -1,8 +1,8 @@
 ### Refactoring
 
-**You own the contract. The structure changes; the behavior does not.** Distinct from the `architect` playbook (adds behavior) and the `bug-fix` playbook (corrects it).
+**You own the contract. The structure changes; the behavior does not.** Feature development adds behavior; bug fixing corrects it.
 
-Cleanup reveals a missing feature or real bug → split it out; ship the structural change first against the pinned contract. A redesign is allowed; name it and route to the `architect` playbook.
+Cleanup reveals a missing feature or real bug → report it separately; ship the structural change first against the pinned contract. A behavior-preserving redesign is allowed; name it.
 
 1. Pin the behavior contract. Research current behavior and callers through Non-negotiables, then write a characterization test, snapshot, or equivalence harness capturing current behavior before structure moves. Type check and lint are not a pin. Done when the pin runs green on the untouched code.
 2. Name the structure the code is missing (**Model the domain**). Boring code stays when the shape is already clear and local. The reshape must delete branches or invalid states, not add indirection.

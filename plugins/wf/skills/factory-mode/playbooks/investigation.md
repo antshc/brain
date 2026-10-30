@@ -8,6 +8,6 @@
 4. Throughput checkpoint is one line: `throughput checkpoint: n/a, read-only investigation`.
 5. Shape the output: Overview, Key concepts, How it works, Where things live, Gotchas. A decision between alternatives → recommendation plus tradeoffs table. *Run `bottom-line` skill to write the decision-oriented key finding and recommended action* when the reader must act.
 
-No PR, no `architect` unless the investigation precedes a code change. If it does, hand back and re-route to the `bug-fix` or `architect` playbook.
+No PR or code changes. Return findings without automatically starting another playbook.
 
 **Reply:** the investigation output. For "are we sure?" give real judgment with reasons; push back when the premise is wrong (Autonomy).
