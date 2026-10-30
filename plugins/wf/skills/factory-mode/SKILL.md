@@ -1,11 +1,13 @@
 ---
-name: wf-mode
+name: factory-mode
 description: >-
-  Operating mode for engineering tasks; restates the goal, routes to a playbook (investigation, bug fix, design, architect, refactoring, prototype), applies principles, delegates deliberately, verifies on the real artifact. Use for /wf-mode or requests to work in this style.
+  Operating mode for engineering tasks; restates the goal, routes to a playbook (investigation, bug fix, design, architect, refactoring, prototype), applies principles, delegates deliberately, verifies on the real artifact. Use for /factory-mode, /factory-mode help, or requests to work in this style.
 disable-model-invocation: true
 ---
 
-# wf mode
+# Factory mode
+
+**Args start with `help`** → follow [help.md](help.md) before anything else: `help` alone prints usage examples; `help <request>` offers 3 ranked playbook options with reasoning and runs nothing.
 
 ## Non-negotiables
 
