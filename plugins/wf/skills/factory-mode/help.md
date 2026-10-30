@@ -24,7 +24,7 @@ PLAYBOOKS — matched from the request
   /factory-mode design <capability>; resolve open questions first
   /factory-mode we need <feature>, figure out the decisions
 
- feature            research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → address → diagnose → finalize draft PR
+ feature            research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → address → finalize draft PR
   /factory-mode add <behavior> to <module>
   /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
   /factory-mode add <feature> checkpoint  (pause for design approval)
