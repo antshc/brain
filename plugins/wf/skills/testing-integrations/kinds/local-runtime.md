@@ -1,6 +1,6 @@
 # Local Runtime Playbook
 
-**Kind:** run a local instance of the application (local stack: app services + emulated dependencies + UI) and test it from outside like a user, without the integration testing framework (that is [functional-slice](functional-slice.md)). Ladder rungs 6–7: REST API first, web GUI last.
+**Kind:** run a local instance of the application (local stack: app services + emulated dependencies + UI) and test it from outside like a user, without the integration testing framework (that is `functional-slice` kind). Ladder rungs 6–7: REST API first, web GUI last.
 
 **Trigger:** Real user behavior must be shown on a running app and no lower rung (component, functional-slice incl. real cloud) can show it; or the user asks for the running app.
 

@@ -1,8 +1,8 @@
 # Functional Slice Playbook
 
-**Kind:** integration testing framework run. Ladder rungs 3–5. The test project starts and owns its environment (mock / fake config, in-process compose, real cloud) and asserts behavior through the app's public boundary (REST / API). Not [local-runtime](local-runtime.md): no separately started local app instance, no manual driving.
+**Kind:** integration testing framework run. Ladder rungs 3–5. The test project starts and owns its environment (mock / fake config, in-process compose, real cloud) and asserts behavior through the app's public boundary (REST / API). Not `local-runtime` kind: no separately started local app instance, no manual driving.
 
-**Trigger:** Behavior spans components end to end through the public API, and a [component](component.md) test cannot show it. Or the request names functional-slice tests.
+**Trigger:** Behavior spans components end to end through the public API, and a `component` kind test cannot show it. Or the request names functional-slice tests.
 
 ## Steps
 

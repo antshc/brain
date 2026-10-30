@@ -51,7 +51,7 @@ Minimal seam that reproduces the problem or covers the regression. Stop at the f
 
 Off the ladder: **experiment** — any rung, when the task is an uncertain question ("does / how does X behave") rather than a test, or the behavior must be known before a test can be written.
 
-**Select autonomously.** Never ask the user which rung, kind, environment, suite, or test scope to use: walk the ladder, pick the lowest rung that can show the behavior, and the narrowest filter (single test; for several matching tests, the cheapest one that proves the behavior) that answers the request. Ask only when the request itself is unintelligible, or for the safety confirmations in [Autonomy](#autonomy). Widen scope only on user request.
+**Select autonomously.** Never ask the user which rung, kind, environment, suite, or test scope to use: walk the ladder, pick the lowest rung that can show the behavior, and the narrowest filter (single test; for several matching tests, the cheapest one that proves the behavior) that answers the request. Ask only when the request itself is unintelligible, or for the safety confirmations in **Autonomy**. Widen scope only on user request.
 
 State the chosen rung and why each lower rung cannot show the behavior. **Done when:** rung + one-line reason per skipped rung written.
 
@@ -106,8 +106,7 @@ Shared by every kind that touches a real cloud account. Each step has a checkabl
 
 Read-only calls (identity, list, describe) and rung 2 test runs skip step 3.
 
-
-## Done when
+## Completion criteria
 
 - component / functional-slice test run: command exited **and** total / passed / failed summary read and reported, with environment, filter, results path.
 - local-runtime / experiment: evidence artifact (response, receipt, screenshot, log line, CLI output) captured for each claim.

@@ -48,9 +48,9 @@ Repo commands, environments, and filters are discovered from the repo docs at ru
 
 ## help <request>
 
-1. **Discover.** Run SKILL.md Discover. **Done when:** `suites` table built.
+1. **Discover.** Run **Discover (automatic, always first)**. **Done when:** `suites` table built.
 2. **Locate the behavior.** Map the request to code and tests: existing tests covering it (names via search), owning suite, whether it crosses a real cloud boundary, local environment support (mock covers it or not). **Done when:** covering tests listed, or `none` + nearest suite.
-3. **Build 3 options** from the SKILL.md ladder: the lowest rung that can show the behavior plus the next two viable rungs, each a different kind or environment, with a strategy (reproduce / regression) when the request implies it. Note why lower rungs were skipped. Behavior is an open question → one option may be an experiment (state its option: logic / runtime / integration / ui). Cover a gap with "write a new test in <suite>" as an option when no test exists. **Done when:** 3 distinct options.
+3. **Build 3 options** from **Choose the kind — ladder**: the lowest rung that can show the behavior plus the next two viable rungs, each a different kind or environment, with a strategy (reproduce / regression) when the request implies it. Note why lower rungs were skipped. Behavior is an open question → one option may be an experiment (state its option: logic / runtime / integration / ui). Cover a gap with "write a new test in <suite>" as an option when no test exists. **Done when:** 3 distinct options.
 4. **Print**, per option:
    - **Option N — <name>** (kind [+ strategy], environment)
    - **What it proves / misses:** behavior covered vs blind spots (mocked boundaries, real IAM, timing)
