@@ -1,7 +1,6 @@
 ---
 name: implement-spec
 description: Implements a GitHub spec or plan through a routed ticket graph; orchestrates sequential or parallel delivery, app verification, chore, and independent code review into one draft PR.
-disable-model-invocation: true
 ---
 
 # Implement Spec
