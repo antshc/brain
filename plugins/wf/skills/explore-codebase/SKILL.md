@@ -24,23 +24,23 @@ The caller owns what the exploration produces — a named skill owns its own pro
 
 ## Read-only contract
 
-Exploration is strictly read-only. Do not edit source, documentation, configuration, generated files, `$HARNESS_REPO_PATH/graphify-out/`, or any target-repo `graphify-out/`.
+Exploration is strictly read-only. Do not edit source, documentation, configuration, generated files, `@repoRoot/graphify-out/`, or any target-repo `graphify-out/`.
 
 The one exception is `@outputArtifact` — write that file, and nothing else.
 
 ## Resolve the repository root
 
-Resolve `HARNESS_REPO_PATH` once with `git rev-parse --show-toplevel`; stop if cwd is not inside a Git repository.
+Set `@repoRoot` to the output of `git rev-parse --show-toplevel`, run once from the agent session's launch folder, not the current CWD; stop if the launch folder is not inside a Git repository. Resolve every harness path below from `@repoRoot`. **MUST NOT** re-resolve `@repoRoot` from a git worktree or nested repo (e.g. code repo under `workspace/`) after a `cd`; those are checkouts to search, not the harness root.
 
-Every harness-side search is bounded to `$HARNESS_REPO_PATH`, never above it. A supporting repository the index names is searched inside its own path, however far outside the harness that sits — never by widening the harness search.
+Every harness-side search is bounded to `@repoRoot`, never above it. A supporting repository the index names is searched inside its own path, however far outside the harness that sits — never by widening the harness search.
 
 ## Resolve the target
 
 Preserve every repository or service name in the question.
 
-**Building-block index** — MUST use for the navigation, and the only map of the supporting repositories: they sit outside the harness, at paths nothing on disk advertises. Read `$HARNESS_REPO_PATH/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved; a matching row's `Location` cell maps a Deployable name — or its Trigger condition — to a local path (`workspace/<repo>[/subpath]` or absolute) and an `origin` URL. Consult the `Shared dependency ownership` table the same way for a dependency more than one Deployable uses, and the `Terminal infrastructure boundaries` table for where tracing stops. This is the only reader of those tables — never search the filesystem for a fallback index file. A path a row names but the disk lacks is unresolved, not a licence to guess a neighbouring one.
+**Building-block index** — MUST use for the navigation, and the only map of the supporting repositories: they sit outside the harness, at paths nothing on disk advertises. Read `@repoRoot/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved; a matching row's `Location` cell maps a Deployable name — or its Trigger condition — to a local path (`workspace/<repo>[/subpath]` or absolute) and an `origin` URL. Consult the `Shared dependency ownership` table the same way for a dependency more than one Deployable uses, and the `Terminal infrastructure boundaries` table for where tracing stops. This is the only reader of those tables — never search the filesystem for a fallback index file. A path a row names but the disk lacks is unresolved, not a licence to guess a neighbouring one.
 
-**Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `$HARNESS_REPO_PATH` itself for documentation, the main codebase repository under `$HARNESS_REPO_PATH/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk. A name the list has no path for routes to the GitHub tools.
+**Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `@repoRoot` itself for documentation, the main codebase repository under `@repoRoot/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk. A name the list has no path for routes to the GitHub tools.
 
 **Graph coverage** — read `graphify-out/manifest.json` under each enumerated checkout, where present. These are graphs over one multi-repo codebase, not a preference order: pick the graph whose manifest names the resolved target; several naming it are one codebase seen from different cuts — take the widest. Settle exactly one value, `GRAPH_PATH=<absolute path>` or `GRAPH=none`.
 
@@ -53,8 +53,8 @@ Report a name that resolves to neither a local checkout nor a GitHub repository 
 Before source, read the contract material for the resolved target, nearest owner first. `GLOSSARY.md` carries terminology; `ARCHITECTURE.md`, `DEPLOYMENT.md`, and `README.md` carry ownership and runtime boundaries; `*.swagger.json` carries REST contracts; `*.configuration-tweaks.md` carries configuration surfaces.
 
 1. The target checkout's own copies of those files.
-2. The `$HARNESS_REPO_PATH` document whose folder or filename names that target — a `$HARNESS_REPO_PATH/**/` glob returns one set per documented service, so match on the name rather than reading them all.
-3. `$HARNESS_REPO_PATH`'s root-level copies, for terminology and boundaries spanning services.
+2. The `@repoRoot` document whose folder or filename names that target — a `@repoRoot/**/` glob returns one set per documented service, so match on the name rather than reading them all.
+3. `@repoRoot`'s root-level copies, for terminology and boundaries spanning services.
 
 Each level supersedes the one below it for claims about that target. A question spanning deployables reads level 3 plus levels 1-2 of every involved target, and names the contract behind each claim.
 
@@ -85,3 +85,7 @@ Each level supersedes the one below it for claims about that target. A question 
 ## Return the verdict
 
 Default `@outputShape`: one concise verdict with target-relative files, relevant symbols, evidence, and unresolved uncertainty.
+
+## Gotchas
+
+- CWD drifts after `cd` into a worktree or nested repo; `git rev-parse --show-toplevel` there returns that sub repo, hiding launch-folder `ARCHITECTURE.md`, contracts, and the `Deployables` index. Keep the launch-folder `@repoRoot`.
