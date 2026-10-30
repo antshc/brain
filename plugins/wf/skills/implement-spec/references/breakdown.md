@@ -50,7 +50,7 @@ Explore touched code until current behavior, integration layers, and test seams 
 
 Draft tracer bullets: each slice delivers a narrow COMPLETE, demoable/verifiable path through every touched integration layer (schema, API, UI, tests), not horizontal layers. Prefactoring comes first. Name the highest test seam still exercising the whole slice. Classify slices HITL or AFK for planning only; prefer AFK; neither becomes a label. An unresolved human decision stops publication; never invent an answer.
 
-Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Merge overlapping slices or serialize them with blockers; never schedule shared file writes together. A ticket that changes a contract another ticket consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a slice; uncovered scope blocks publication. Render complete ticket bodies with *Ticket body template*, not summaries or requirement numbers alone.
+Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Overlapping slices → merge them, move the shared edit into one slice, or record a `file` conflict; a shared path alone never becomes a blocker edge; never schedule shared file writes together. A ticket that changes a contract another ticket consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a slice; uncovered scope blocks publication. Render complete ticket bodies with *Ticket body template*, not summaries or requirement numbers alone.
 
 For EVERY ticket, map EVERY artifact piece relevant to its behavior, acceptance criteria or implementation decisions. Repeat a shared piece in every related ticket; exclude unrelated pieces. Check both directions: no relevant piece omitted, no included piece lacking a stated relationship. Each Related Spec Artifacts entry holds the piece or bounded excerpt, canonical source/anchor, and a short explanation tying it to the requirement or criterion. Keep non-text links/embeds readable. No artifacts → omit that section. Design sketch present → also apply *Design sketch contract*.
 
@@ -71,7 +71,7 @@ Applies when the spec's Implementation Decisions hold a binding **Design sketch*
 3. Every sketch file maps to at least one ticket: an exact excerpt (or the whole file when short) under **Related Spec Artifacts**, with its sketch path, artifact name, and artifact URL. A sketch file mapped to no ticket blocks publication.
 4. Sketch paths are intended target locations; quote them in Related Spec Artifacts even though Implementation Decisions avoid file paths.
 5. Sketch conflicts with a Requirement, a Concept/ADR, or current code → the Requirement wins first, then Concepts/ADRs. Choose the option that best fits them and the sketch's intent without asking; record `Sketch deviation: {{what}} — {{chosen}} because {{reason}}` in that ticket's Implementation Decisions. Never drop a sketch type, signature, or boundary silently.
-6. Report sketch coverage (files mapped/total) and every deviation in the planner output notes.
+6. Report sketch coverage (files mapped/total) in planner output `coverage.sketch` and every deviation in `notes`.
 
 ## Breakdown ticket operations
 

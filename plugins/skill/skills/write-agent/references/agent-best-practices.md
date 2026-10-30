@@ -12,6 +12,7 @@ Cross-vendor synthesis (Claude Code, GitHub Copilot, OpenAI Codex, Grok Build, G
 - Tools and permissions
 - Verification
 - Coding agents
+- Planner agents
 - Anti-patterns
 - Checklist
 
@@ -122,6 +123,50 @@ Constraints every coding agent carries:
 - MUST NOT skip required checks to save time.
 - RETURN changed behavior, commands run, per-check status, tests not run, unresolved risks.
 
+## Planner agents
+
+Apply to agents that decompose a feature, spec, or plan into tasks for independent implementers (parallel workers, worktrees). Synthesis of Cursor, OpenAI Symphony, Copilot, Anthropic agent-teams practice, October 2026; benchmark on representative features before imposing thresholds.
+
+- **Goal:** accepted, integrated behavior per elapsed hour; not task count, agent count, or commits. A sequential graph is a valid result.
+- **Role split:** planner owns requirement coverage, exploration, task contracts, blocker graph, conflict prediction, critical path. Scheduler owns DAG validation, slots, worktrees, dispatch, retries. Implementer owns one task. Integrator owns serialized merges and post-merge checks. Verifier owns integrated acceptance. Planner tools: read, search; no edit, no execute beyond read-only inspection. Rationale: workers cannot repair a planner's invented facts or scope creep.
+- **Graph is data:** output a machine-readable task graph the scheduler consumes; deterministic code validates acyclicity and schedules. Prose plans alone are not executable.
+
+Decomposition:
+
+1. Inventory behaviors, rules, edge cases, acceptance criteria, existing tickets; flag contradictions.
+2. Map affected code at the base revision: entry points, callers, contracts, composition roots, migrations, tests, ADRs, similar solutions.
+3. Put unstable shared contracts (API, schema, interface, migration) in a prerequisite task.
+4. Draft the fewest vertical slices covering all requirements; each has an observable result, a test seam, bounded write ownership.
+5. Add a blocker edge only when the consumer cannot be implemented or verified against the base without the producer.
+6. Predict write conflicts separately: shared files, DI registrations, manifests, lockfiles, migrations, generated output.
+7. Validate: acyclic, every requirement covered, no unowned shared write surface, verification feasible, acceptance actionable.
+
+| Decision | When |
+|---|---|
+| Split | Behaviors have independent acceptance and write surfaces; unrelated modules; uncertain contract needs investigation first |
+| Keep together | Same critical files; untestable in isolation; split creates heavy communication |
+| Sequence | Schema, public API, shared abstraction, or migration must exist before consumer compiles or verifies |
+| Horizontal split | Only for independent module migrations, mechanical repo-wide edits, stable interface implementations |
+
+- Size by coupling, context load, time to feedback, integration risk; never by fixed files, lines, or tasks per worker.
+- Tests ship with each behavior slice; no standalone "write tests" task per coding task. Independent black-box verification may be a downstream task.
+- **Readiness:** a worker identifies behavior, permitted scope, real source context, contracts, executable checks, handoff format without asking another worker.
+
+Constraints every planner carries:
+
+- MUST ground paths, interfaces, test seams in the base revision. Rationale: invented interfaces fail at integration.
+- MUST map every requirement and acceptance criterion to a task and a verification seam. Rationale: decomposition must not reduce scope.
+- MUST resolve shared contracts before parallel consumers start. Rationale: consumers need compatible assumptions.
+- MUST distinguish blocker edges from write conflicts. Rationale: they constrain scheduling differently.
+- MUST keep write ownership non-overlapping for concurrently ready tasks. Rationale: worktrees isolate directories, not integration semantics.
+- MUST preserve existing valid tickets, blockers, completed work when replanning; revise only affected unfinished tasks. Rationale: prevents duplicate work and history loss.
+- MUST NOT create tasks or edges to fill worker capacity, even if the plan looks faster. Rationale: coordination can exceed speedup.
+- MUST NOT turn shared reads, similarity, or a worker cap into blocker edges. Rationale: false dependencies lengthen the critical path.
+- MUST NOT edit implementation code, manage worktrees, or guess product decisions; IF a decision is missing, THEN return it as an open question or a bounded investigation task.
+- SHOULD reuse existing models, utilities, vocabulary, layering, ADRs; minimize refactoring.
+
+Scheduler and integration guidance (record as workflow or gate, not planner prose): modest concurrency cap (start ~3); critical-path priority among ready tasks; integrate each task as it settles, not in fixed waves; a dependent starts only after its producer is integrated and verified; one worktree per in-flight task from the integrated base; serialized cherry-picks; isolate build outputs, ports, services per worktree; green PR gate required.
+
 ## Anti-patterns
 
 | Avoid | Replace with |
@@ -133,6 +178,11 @@ Constraints every coding agent carries:
 | Full solution suite after every edit | Affected build plus filtered tests; broad suites in CI |
 | Diff-only reviewer without execute | Reviewer with repo navigation and execute, no edit |
 | "Tests pass" without per-check status | `passed`, `failed`, `unavailable`, `not run` per check |
+| Planner maximizing agents or tasks | Fewest coherent slices; sequential graph when coupling is high |
+| One agent planning, implementing, reviewing | Separate planner, implementer, verifier roles |
+| Layer-per-task split (entities, services, controllers, tests) | Vertical behavioral slices after shared contracts |
+| Static plan never revised | Targeted replanning of affected unfinished tasks |
+| Peer-to-peer file locking between workers | Ownership decided in the plan and scheduler |
 
 ## Checklist
 
@@ -145,9 +195,10 @@ Constraints every coding agent carries:
 - Workflow short; each step has an observable result.
 - Verification names executable checks and the evidence to record; per-check status required.
 - Coding agent: test strategy selected by change risk; fast-feedback scope bounded; Coding agents constraints present; independent verification left to verifier, reviewer, CI.
+- Planner agent: no edit tools; task graph output per planner output template; blockers separate from conflicts; requirement coverage mapped; Planner agents constraints present; scheduling left to workflow.
 - Completion defines done, blocked behavior, and escalation.
 - Output contract fits the next actor.
 - No anti-pattern from the table; no secrets.
 - Routing testable: a request for a sibling's role would not select this agent, and vice versa.
 
-Sources: [Anthropic best practices](https://code.claude.com/docs/en/best-practices), [Claude subagents](https://code.claude.com/docs/en/sub-agents), [Claude extension layers](https://code.claude.com/docs/en/features-overview), [OpenAI prompt guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra), [Codex subagents](https://developers.openai.com/codex/subagents), [Codex customization](https://developers.openai.com/codex/customization/overview), [Copilot custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration), [Copilot customization comparison](https://docs.github.com/en/copilot/concepts/customizations/comparing-customizations), [Grok Build subagents](https://docs.x.ai/build/features/subagents), [Gemini CLI subagents](https://geminicli.com/docs/core/subagents/), [OpenAI harness engineering](https://openai.com/index/harness-engineering/), [OpenAI verifying code at scale](https://alignment.openai.com/scaling-code-verification/), [Cursor scaling agents](https://cursor.com/blog/scaling-agents), [GitHub cloud agent best results](https://docs.github.com/en/copilot/tutorials/cloud-agent/get-the-best-results), [Google testing levels](https://testing.googleblog.com/2021/06/how-much-testing-is-enough.html).
+Sources: [Anthropic best practices](https://code.claude.com/docs/en/best-practices), [Claude subagents](https://code.claude.com/docs/en/sub-agents), [Claude extension layers](https://code.claude.com/docs/en/features-overview), [OpenAI prompt guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra), [Codex subagents](https://developers.openai.com/codex/subagents), [Codex customization](https://developers.openai.com/codex/customization/overview), [Copilot custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration), [Copilot customization comparison](https://docs.github.com/en/copilot/concepts/customizations/comparing-customizations), [Grok Build subagents](https://docs.x.ai/build/features/subagents), [Gemini CLI subagents](https://geminicli.com/docs/core/subagents/), [OpenAI harness engineering](https://openai.com/index/harness-engineering/), [OpenAI verifying code at scale](https://alignment.openai.com/scaling-code-verification/), [Cursor scaling agents](https://cursor.com/blog/scaling-agents), [Cursor self-driving codebases](https://prod.cursor.com/blog/self-driving-codebases), [OpenAI Symphony](https://openai.com/index/open-source-codex-orchestration-symphony/), [Copilot delegating and parallelizing](https://docs.github.com/en/copilot/concepts/agent-capabilities/choosing-and-delegating-agent-work/delegating-and-parallelizing-work-with-agents), [Claude agent teams](https://code.claude.com/docs/en/agent-teams), [git worktree](https://git-scm.com/docs/git-worktree), [GitHub cloud agent best results](https://docs.github.com/en/copilot/tutorials/cloud-agent/get-the-best-results), [Google testing levels](https://testing.googleblog.com/2021/06/how-much-testing-is-enough.html).

@@ -236,7 +236,8 @@ def test_planner_emits_complete_graph_without_batches_or_worker_cap():
     assert '{{maxParallel}}' not in planner + MAIN
     examples = [json.loads(block) for block in re.findall(r'```json\n(.*?)\n```', planner, re.S)]
     result = examples[0]['result']
-    assert set(result) == {'tickets', 'ready', 'conflicts', 'criticalPath', 'created', 'deferred'}
+    assert set(result) == {'tickets', 'ready', 'conflicts', 'criticalPath', 'created', 'deferred', 'coverage', 'notes'}
+    assert set(result['coverage']) == {'requirements', 'artifacts', 'sketch'}
     tickets = {ticket['ref']: ticket for ticket in result['tickets']}
     assert len(tickets) == len(result['tickets'])
     deferred = {ticket['ref'] for ticket in result['deferred']}
@@ -248,9 +249,34 @@ def test_planner_emits_complete_graph_without_batches_or_worker_cap():
         ref for ref, ticket in tickets.items() if not ticket['blockers'] and ref not in deferred
     }
     assert any(ticket['blockers'] for ticket in tickets.values())
-    assert set(result['criticalPath']) <= tickets.keys()
+    assert any(ticket['paths'] is None for ticket in tickets.values())
+    assert set(result['criticalPath']) <= tickets.keys() - deferred
+
+    def ancestors(ref):
+        found, stack = set(), list(tickets[ref]['blockers'])
+        while stack:
+            blocker = stack.pop()
+            if blocker not in found:
+                found.add(blocker)
+                stack.extend(tickets[blocker]['blockers'])
+        return found
+
+    def shares(left, right):
+        return left == right or left.startswith(right.rstrip('/') + '/') or right.startswith(left.rstrip('/') + '/')
+
+    def file_conflict(a, b):
+        pa, pb = tickets[a]['paths'], tickets[b]['paths']
+        return pa is None or pb is None or any(shares(x, y) for x in pa for y in pb)
+
+    candidates = sorted(tickets.keys() - deferred)
+    expected = {
+        frozenset((a, b)) for i, a in enumerate(candidates) for b in candidates[i + 1:]
+        if a not in ancestors(b) and b not in ancestors(a) and file_conflict(a, b)
+    }
+    file_pairs = {frozenset((p['a'], p['b'])) for p in result['conflicts'] if p['kind'] == 'file'}
+    assert file_pairs == expected
     for pair in result['conflicts']:
-        assert {pair['a'], pair['b']} <= tickets.keys()
+        assert {pair['a'], pair['b']} <= tickets.keys() - deferred
         assert pair['kind'] in {'file', 'soft'}
     assert 'Failure: `{"status": "failed", "result": {"reason": "<why>"}}`' in planner
 
