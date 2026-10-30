@@ -6,15 +6,15 @@
 ## What to build
 <what-to-build-rule>
 - Self-contained: describe enough of the end-to-end behavior that an implementing agent needs no further repo exploration to understand what to build.
-- Describe behavior across all integration layers touched by this slice, not a layer-by-layer breakdown.
-- Avoid specific file paths or code snippets — they go stale fast.
+- For functional changes, describe behavior across all touched integration layers, not a layer-by-layer breakdown. For structural changes, describe the complete relocation and required reference updates without introducing logic changes.
+- Avoid specific file paths or code snippets — they go stale fast. Exception: structural relocation tasks must identify intended source and destination paths.
 - Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 </what-to-build-rule>
 
 ## Acceptance criteria
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code or the spec.
-- Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions.
+- Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions. For structural work, include checks of intended locations, updated references, and unchanged regression behavior.
 - Use the domain language of the spec or `GLOSSARY.md`; apply the solution-agnostic rule — no file paths, class/variable names, or other implementation details.
 - State the exact expected outcome — never vague words like "works", "correctly", "properly", "as expected".
 - Fold every applicable Business Rule (`If {{condition}}, {{invariant}}`), Edge Case (`{{boundaryCondition}} → {{expectedHandling}}`), and relevant error condition into its own criterion here, rephrased per the format above — do not create separate sections for them.
@@ -75,7 +75,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 
 ## Affected layers & modules
 <affected-layers-rule>
-- State which layers/modules this slice touches and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
+- State which layers/modules this task touches (or relocates) and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
 - Source layer headings and Cross-Module Dependency Rules from the Concept or ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
 - If the slice belongs to a specific building block, also scan the `Deployables` table (under `Building blocks` in `ARCHITECTURE.md`) and load the matching block's record (`docs/building-blocks/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
 </affected-layers-rule>
@@ -86,7 +86,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 
 This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes.
 - *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. Include the commands that will run the integration or REST API automation tests.
-- Only test external behavior, not implementation details.
+- For functional changes, test external behavior, not implementation details. For structural tasks, verify intended paths/references and unchanged behavior using existing regression/API integration tests; add tests only where coverage is insufficient.
 - List which modules will be tested and prior art for the tests.
 
 </issue-template>

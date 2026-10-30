@@ -4,7 +4,7 @@ Experimental. Load only for `mode=parallel`, after graph validation and integrat
 
 ## Scope and scheduling
 
-1. **Graph source.** Planner runs only in Breakdown Initiative (spec had zero sub-issues); reuse its blocker graph and conflicts. Spec already had sub-issues → **MUST NOT** spawn a planner; derive the graph inline from the run-local map: reject cycles; mark `hitl` tickets and unsatisfied transitive dependants `deferred`; initial ready frontier = non-deferred tickets whose blockers are verified in the base; critical path = longest blocker chain; derive `file` conflicts from source footprints and shared hot files, serializing them before launch; contract consumers become blocker edges only when order matters, otherwise `soft`. Conflicts restrict concurrency; never invent blocker edges to represent the worker cap. Done when graph, readiness and conflict evidence exist.
+1. **Graph source.** Reuse the planner's blocker graph, footprints, conflicts, and per-ticket implementer recommendations. For existing sub-issues the planner ran in read-only `analyze` mode; for zero sub-issues it ran in `breakdown` mode. Reject cycles; mark `hitl` tickets and unsatisfied transitive dependants `deferred`; verify the ready frontier and critical path against the fetched base. `file` conflicts serialize concurrent writes; contract consumers become blocker edges only when order matters, otherwise `soft`. Never invent blocker edges to represent the worker cap. Done when graph, readiness, conflict evidence, and implementer recommendations exist.
 2. **Report the graph** per *Graph report*, with paths and conflicts, before the first launch.
 
 ## Parallel Implementation

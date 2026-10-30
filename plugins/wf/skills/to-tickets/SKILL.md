@@ -1,13 +1,13 @@
 ---
 name: to-tickets
-description: Breaks a Spec issue into agent-executable tracer-bullet vertical slices and, after explicit user approval, publishes them as GitHub sub-issues with a native blocker dependency graph. Use when cutting a spec or plan.md into tickets, sub-issues, AFK/HITL slices, or offline Markdown tickets.
+description: Breaks a Spec issue into codebase-informed, agent-executable implementation tasks and, after explicit user approval, publishes them as GitHub sub-issues with a native blocker dependency graph. Use when cutting a spec or plan.md into tickets, sub-issues, AFK/HITL slices, or offline Markdown tickets.
 argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`] | offline {{localSpecPath}}"
 disable-model-invocation: true
 ---
 
 # To Tickets
 
-Turn one Spec into user-approved, self-contained tracer-bullet tickets linked to that Spec.
+Turn one Spec into user-approved, self-contained implementation tickets linked to that Spec.
 
 ## Inputs
 
@@ -43,7 +43,7 @@ Set `{{repoLabel}}` to the spec's single `repo:target:<owner>/<name>` label (off
 
 ### 2. Explore code and records
 
-- Explore code the spec touches until you can name current behavior, integration layers, and verification seams. Reuse exploration already done this session.
+- Explore affected code until you can name current behavior, module/folder boundaries, dependencies, shared files, integration layers, and verification seams. For restructuring, inspect project references, namespace/path conventions, build configuration, and existing regression tests. Reuse exploration already done this session.
 - Use `GLOSSARY.md` vocabulary for ticket titles and bodies.
 - Read the `Architecture Decision Records` and `Crosscutting Concepts` indexes in `ARCHITECTURE.md`; open each record relevant to the changed area.
   - **Concepts** (shared domain behavior, implementation patterns, operational policies such as layering, validation, persistence, testing) — slices and their acceptance/testing decisions **MUST** conform.
@@ -52,33 +52,37 @@ Set `{{repoLabel}}` to the spec's single `repo:target:<owner>/<name>` label (off
 
 *Done when* matched Concepts/ADRs, prefactor candidates, and source conflicts are listed.
 
-### 3. Draft vertical slices
+### 3. Select strategy and draft tasks
 
-Break the slicing source into **tracer bullet** slices: thin vertical paths through ALL integration layers end-to-end, not horizontal layer slices.
+Choose task boundaries using the plan/spec and the inspected codebase:
 
-<vertical-slice-rules>
+<task-decomposition-rules>
 
-- Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests).
-- Size slices by behavioral cohesion, context load, and integration risk, not estimated duration. Keep cohesive multi-hour work with one capable implementer; merge trivial work when coordination dominates. Split only at independently verifiable, stable-contract, non-overlapping write boundaries. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
-- A completed slice is demoable or verifiable on its own.
-- Prefactoring slices come first.
-- Name each slice's verification seam (e.g. an integration test observing the database layer); prefer the highest seam that still exercises the slice end-to-end.
-- Type each slice `HITL` (needs human interaction, e.g. architectural decision or design review) or `AFK` (implementable and mergeable without humans). Prefer AFK.
-- For overlapping writes, merge slices, move the shared edit into one slice, or flag a `file` conflict for later serialization. Shared paths alone do not justify a blocker edge; add blockers only when a consumer needs the producer's integrated change to implement or verify. Independent slices may run concurrently.
+- **Functional:** Prefer one complete business capability across touched layers. For small API services with existing API integration tests, keep endpoint, domain, persistence/integration, and tests in a cohesive functional slice. In larger systems use cohesive end-to-end vertical slices, not horizontal layer tasks.
+- **Structural:** Group file/folder moves, renames, namespace and project relocation, and required reference updates by independently movable structural unit. Preserve business behavior and public contracts; do not introduce unrelated logic changes.
+- **Behavior-preserving refactoring:** Group work by coherent implementation boundary and regression coverage; preserve externally observable behavior.
+- **Mixed:** Put truly necessary structural or prefactoring prerequisites before their consumers, without inventing dependencies for shared writes alone.
+- Size by cohesion, context load, integration risk, stable contracts, and write ownership—not estimated duration. Keep multi-hour cohesive work with one capable implementer; merge trivial work when coordination dominates. Split only at independently verifiable, stable-contract, non-overlapping write boundaries. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
+- Each task is independently demonstrable or verifiable. Prefer the highest meaningful, reliable verification seam: existing API integration tests for API behavior; builds and existing regression tests for structural changes; lower-level tests where necessary.
+- Type each task `HITL` (needs human interaction, e.g. architectural decision or design review) or `AFK` (implementable and mergeable without humans). Prefer AFK.
+- For overlapping writes, merge tasks, move the shared edit into one task, or flag a `file` conflict for later serialization. Shared paths alone do not justify a blocker edge; add blockers only when a consumer needs the producer's integrated change to implement or verify. Independent tasks may run concurrently.
 
-</vertical-slice-rules>
+</task-decomposition-rules>
 
-Build an acyclic **blocker graph**: nodes are all slices; each directed edge runs from blocker to dependent. Use stable slice IDs before publication, then map them to issue identities. Reject cycles and missing blocker nodes; include roots with no blockers. Identify the initial ready frontier separately; do not assign execution batches.
+The `implement-spec` planner selects implementer models after reading the ticket graph; do not encode model preferences in ticket bodies.
 
-*Done when* every spec Functional Requirement, Business Rule, and Edge Case maps to at least one slice or is flagged as uncovered.
+Build an acyclic **blocker graph**: nodes are all tasks; each directed edge runs from blocker to dependent. Use stable slice IDs before publication, then map them to issue identities. Reject cycles and missing blocker nodes; include roots with no blockers. Identify the initial ready frontier separately; do not assign execution batches.
+
+*Done when* every spec Functional Requirement, Business Rule, and Edge Case maps to at least one task or is flagged as uncovered.
 
 ### 4. Review the breakdown with the user
 
-Present a numbered list; per slice show:
+Present a numbered list; per task show:
 
 - **Title**: short descriptive name
 - **Type**: HITL | AFK
-- **Blocked by**: slices that must complete first
+- **Blocked by**: tasks that must complete first
+- **Verification seam**: highest meaningful check for this task
 - **Functional Requirements covered**: spec requirement numbers addressed (full verbatim text is copied into each ticket in step 5)
 
 Then print the blocker graph as a table `Slice | Blocked by` with one row per slice, using `none` for roots; list the initial ready frontier, anticipated write conflicts (with shared paths), uncovered requirements, and source conflicts.
@@ -116,5 +120,5 @@ Branch on mode:
 
 ## Completion criteria
 
-- **Online:** every approved slice has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}`, no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final blocker graph as `Ticket | Blocked by`, with fully qualified issue identities and `none` for roots; include every ticket and confirmed edge.
+- **Online:** every approved task has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}`, no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final blocker graph as `Ticket | Blocked by`, with fully qualified issue identities and `none` for roots; include every ticket and confirmed edge.
 - **Offline or partial:** report local paths and unpublished/partially published status; no invented GitHub issue numbers.
