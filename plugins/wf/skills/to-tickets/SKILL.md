@@ -59,7 +59,7 @@ Break the slicing source into **tracer bullet** slices: thin vertical paths thro
 <vertical-slice-rules>
 
 - Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests).
-- Size for one focused implementer session. Prefer 30–120 minutes of estimated agent execution as a soft heuristic, not a gate; estimates may be inaccurate. Merge trivial work when coordination dominates. Split oversized work only at independently verifiable, stable-contract, non-overlapping write boundaries; never force a split solely to hit a duration target, even if it appears faster.
+- Size slices by behavioral cohesion, context load, and integration risk, not estimated duration. Keep cohesive multi-hour work with one capable implementer; merge trivial work when coordination dominates. Split only at independently verifiable, stable-contract, non-overlapping write boundaries. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
 - A completed slice is demoable or verifiable on its own.
 - Prefactoring slices come first.
 - Name each slice's verification seam (e.g. an integration test observing the database layer); prefer the highest seam that still exercises the slice end-to-end.

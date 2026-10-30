@@ -40,7 +40,7 @@ Runs only when the spec has zero native sub-issues. Existing sub-issues on an in
 - Prefer a false conflict over a missed one; a merge conflict costs more than a serialized ticket.
 - Cite the shared path, hot file, or `unknown footprint` for every `file` conflict; a ticket reference alone is invalid evidence. A `soft` entry cites the contract symbol or module.
 - A ticket in more than 3 conflict pairs → say so in `notes` and say whether merging, splitting or a blocker edge is cleaner.
-- Size each ticket for one focused implementer session. Prefer 30–120 minutes of estimated agent execution as a soft heuristic, not a gate; estimates may be inaccurate. Merge trivial work when coordination dominates. Split oversized work only at independently verifiable, stable-contract, non-overlapping write boundaries; never force a split solely to hit a duration target, even if it appears faster.
+- Size tickets by behavioral cohesion, context load, and integration risk, not estimated duration. Keep cohesive multi-hour work with one capable implementer; merge trivial work when coordination dominates. Split only at independently verifiable, stable-contract, non-overlapping write boundaries. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
 - Reference tickets as `OWNER/REPO#NUMBER`; never restate Ticket content.
 
 ## Response
