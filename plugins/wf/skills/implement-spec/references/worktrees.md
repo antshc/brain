@@ -30,7 +30,7 @@ Done when the git check passes and existing editor configs exclude `.worktrees`.
 
 ## Integration writes
 
-- `WORKTREE_PATH` is the sole location for integrated ticket commits, publishing, chore, app verification, and fix commits.
+- `WORKTREE_PATH` is the sole location for integrated ticket commits, publishing, and chore; preserve it for the caller’s post-implementation checks.
 - One writer at a time: start a writer only after the previous result is verified. No merger subagents.
 - Sequential: each verified ticket commit lands directly on `INTEGRATION_BRANCH`.
 - Parallel: implementers write only in their ticket worktrees; verified ticket commits are cherry-picked here one at a time; tickets with a `file` conflict never run concurrently. `soft` conflicts may run concurrently; a textual conflict at cherry-pick goes to the rebase rework round, a contract break to the post-merge check.
@@ -44,15 +44,6 @@ Parallel only.
 2. **Remove after integration:** `git -C SOURCE_ROOT worktree remove TICKET_WORKTREE(n)` without force, then `git -C SOURCE_ROOT branch -D TICKET_BRANCH(n)` (cherry-picked commits are not ancestors, so `-d` refuses).
 3. Dirty, unmerged, or blocked ticket worktrees: preserve and report path/branch.
 
-## Actualize and cleanup
+## Preserve integration worktree
 
-Run after code review. Keep `INTEGRATION_BRANCH`, the PR, and `WORKTREES_ROOT`.
-
-1. **Fetch:** `git -C WORKTREE_PATH fetch REMOTE INTEGRATION_BRANCH`.
-2. **Commit pending changes:** uncommitted changes → stage and commit with subject `chore(<INITIATIVE_ID>): commit pending changes`; record them in the report.
-3. **Merge remote:** `git -C WORKTREE_PATH merge --no-edit REMOTE/INTEGRATION_BRANCH` when the remote head is not an ancestor of `HEAD`. **MUST NOT** rebase, reset, or force.
-4. **Resolve conflicts:** keep both sides' intent; rerun the cheapest affected checks; commit the merge. Unresolvable → `git merge --abort`, preserve, report; skip removal.
-5. **Push:** `git -C WORKTREE_PATH push REMOTE INTEGRATION_BRANCH`. Verify `HEAD` equals the remote head and the worktree is clean.
-6. **Remove:** change CWD to `SOURCE_ROOT`; `git -C SOURCE_ROOT worktree remove WORKTREE_PATH` without force. Verify absent from disk and from `git worktree list`.
-7. **Ticket worktrees:** confirm none remain unless preserved and reported.
-8. Dirty, unpushed, or failed removal → preserve and report exact path/branch.
+Keep `INTEGRATION_BRANCH`, the PR, `WORKTREES_ROOT`, `WORKTREE_PATH`, `RUN_DIR`, and `EVIDENCE_ROOT` after implementation. Return their absolute pointers and clean/pushed status in *Implementation handoff*. The caller owns later synchronization, app verification, code review, integration worktree removal, and spec closure. Dirty, unpushed, blocked, or incomplete work stays preserved with its exact path/branch and reason.

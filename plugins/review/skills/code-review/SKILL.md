@@ -9,7 +9,7 @@ argument-hint: '<PR_URL> [low|medium|high]'
 ## Inputs
 
 - User invocation: PR URL, with an existing local checkout of the PR repository available; optional review level `low`, `medium`, or `high` (default `medium`).
-- Workflow invocation: `implement-spec` passes the PR URL and `SOURCE_ROOT` after removing its implementation worktree. The review skill creates a separate fresh review worktree.
+- Workflow invocation: factory mode’s Architect playbook passes the PR URL and `SOURCE_ROOT` after app verification. The review skill creates a separate fresh review worktree; the integration worktree remains available for later remediation and cleanup.
 - Both entry points use the same acquisition, review, posting and cleanup workflow. Resolve a matching existing repository from explicit `SOURCE_ROOT`, caller checkout, or the harness workspace; ask for its path if absent/ambiguous. **MUST NOT** clone as a fallback.
 
 ## Workflow

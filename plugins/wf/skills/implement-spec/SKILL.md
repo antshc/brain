@@ -1,6 +1,6 @@
 ---
 name: implement-spec
-description: Implements a GitHub spec or plan through a routed ticket graph; orchestrates sequential or parallel delivery, app verification, chore, and independent code review into one draft PR.
+description: Implements a GitHub spec or plan through a routed ticket graph; orchestrates sequential or parallel delivery and chore into one draft PR with a post-implementation handoff.
 ---
 
 # Implement Spec
@@ -27,7 +27,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 | Recompute frontier | `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done REF…` |
 | Create and link ticket (planner) | `GH_TOOL ticket create --spec REF --title T --body-file F` |
 | Blocker edges, edit body (planner) | `GH_TOOL issue block REF --by REF…` · `GH_TOOL issue edit-body REF --body-file F` |
-| Evidence or verdict comment | `GH_TOOL issue comment REF --body-file F` |
+| Ticket evidence comment | `GH_TOOL issue comment REF --body-file F` |
 | Close implemented ticket | `GH_TOOL issue close REF --commit SHA --branch B --pr URL` |
 | Publish or update draft PR | `GH_TOOL pr publish --source-repository R --base B --head H --title T --initiative-id I --rationale-file F --closes REF… --refs REF…` |
 | Split PR diff per file (chore) | `GH_TOOL pr diff-split --pr URL` |
@@ -76,7 +76,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 5. Execute selected mode:
    - Validate `mode` and `MAX_PARALLEL` before creating any branch or worktree.
    - Create the integration branch and worktree per [Integration setup](./references/worktrees.md#integration-setup).
-   - Load [publication.md](./references/publication.md) (both modes; also covers verdict, verification, and closure used later).
+   - Load [publication.md](./references/publication.md) (both modes; ticket publication, read-back, and closure).
    - Load **only** the selected mode reference:
      → C: Sequential → Run [Sequential Implementation](./references/sequential.md#sequential-implementation).
      → D: Parallel → Run [Parallel Implementation](./references/parallel.md#parallel-implementation); isolate tickets per [Ticket worktrees](./references/worktrees.md#ticket-worktrees).
@@ -100,7 +100,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    → Still invalid after 2 rounds: preserve branch/worktree and report the blocker; stop advancing that ticket.
    Integrate and publish per the mode reference.
 
-6. **Frontier check.** Refresh `graph read`, then `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done <integrated refs>` after each publication. A blocker is satisfied only when integrated in this run or verified in the base. Unfinished tickets but none ready → report each unready ticket and why (open `hitl`, unresolved external dependency); preserve all work and the draft PR; keep the spec open; stop before chore, verification, review, actualize/cleanup, or finalization. Never force progress or declare completion.
+6. **Frontier check.** Refresh `graph read`, then `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done <integrated refs>` after each publication. A blocker is satisfied only when integrated in this run or verified in the base. Unfinished tickets but none ready → report each unready ticket and why (open `hitl`, unresolved external dependency); preserve all work and the draft PR; keep the spec open; write *Implementation handoff* with `status: blocked` and partial state before returning, without chore; post-implementation work cannot start. Never force progress or declare completion.
 
 7. Launch chore → [chore.md](./agents/chore.md) subagent in `WORKTREE_PATH`:
    refs `fetch-diff` · `claude-opus-5.5` medium reasoning, fallback `gpt-6.1-sol` medium when rejected · rework none.
@@ -121,49 +121,13 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    → No result or failed: record none/failed; continue.
    Done when chore changes are committed (one `chore(<INITIATIVE_ID>): ` commit, or none needed), pushed to `INTEGRATION_BRANCH`, remote head equals `HEAD`, and the worktree is clean.
 
-8. Launch verifier → [verifier.md](./agents/verifier.md) subagent in `WORKTREE_PATH`:
-   refs none · rework none (internal: ≤3 verifications, ≤2 fix attempts per finding, one commit per fix).
-   Before: detect harness (read-only) in `.github/skills/*/SKILL.md`, `.claude/skills/*/SKILL.md`, `.agents/skills/*/SKILL.md`, keeping skills whose `description` says they launch/drive the app to prove behavior and capture evidence; set `EVIDENCE_DIR` per publication *Verification evidence*.
-   → No harness: record `verification skipped: no verification harness`; no subagent, no comment.
-   → Subagents unavailable: record skip reason; never drive the app in the orchestrator.
+8. Run *Publication verification* ([publication.md](./references/publication.md)), refresh spec/ticket pointers, and write *Implementation handoff*. Preserve the integration worktree, branch, draft PR, and run/evidence directories; keep the spec open. Done when the handoff matches the read-back remote state. Publication failure or unresolved tickets → `blocked`; never report ready from a PR URL alone.
 
-   | Placeholder | Value |
-   |---|---|
-   | `{{featureBranch}}` | `INTEGRATION_BRANCH` |
-   | `{{pullRequestUrl}}` | PR URL |
-   | `{{worktreePath}}` | `WORKTREE_PATH` |
-   | `{{targetBranch}}` | `BASE_BRANCH` |
-   | `{{evidenceDir}}` | `EVIDENCE_DIR` |
-   | `{{verificationSkills}}` | matched `SKILL.md` absolute paths, one per line |
-   | `{{specFile}}` | `RUN_DIR/spec.json` |
-   | `{{ticketFiles}}` | integrated ticket file paths, one per line |
-   | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` |
-   | `{{commitSubjectPrefix}}` | `fix(<INITIATIVE_ID>): ` |
-
-   Verify: `HEAD` = last `result.rounds[].fixCommit` (or `@prevHead`), exactly one `fix(...)` commit per fix round, clean, `result.verification` names executed checks, `EVIDENCE_DIR` holds cited files, valid JSON; proof framework untouched.
-   → Missing evidence/invalid JSON, or app fails launch/health: verdict `inconclusive` with error; do not troubleshoot.
-   After: push fix commits and update PR coverage per publication *Pull request*; post one spec comment per publication *Verification evidence*; read back, or record failure with `EVIDENCE_DIR/verdict.md` saved.
-   → Final `fail`/`partial`: list unfixed findings with reason and attempts, name unfinished tickets; keep spec open and PR draft; continue.
-
-9. Run *Publication verification* ([publication.md](./references/publication.md)).
-
-10. Run code review → *`code-review` skill for GitHub pull requests, bugs, quality attributes, code smells, and initiative coverage* from `SOURCE_ROOT`:
-    inputs PR URL, `SOURCE_ROOT` · foreground; wait until every axis has an outcome.
-    Review creates its own fresh detached worktree from `SOURCE_ROOT` without cloning; **MUST NOT** review inside or reuse the integration worktree. Review never fixes code.
-    Record: axes, findings, posting results, models/fallbacks, reviewed head.
-    → Unavailable: report the blocker; keep spec open.
-
-11. Run [Actualize and cleanup](./references/worktrees.md#actualize-and-cleanup).
-    → New commits after review: reviewed head is stale; closure gates keep the spec open.
-    → Unresolvable conflict, failed push, or failed removal: preserve and report path/branch; keep spec open; continue to step 12.
-
-12. Finalize per *Closure gates*; report per *Output*; check *Completion criteria*.
-    → All closure gates pass: close spec; verify remote state.
-    → Otherwise: keep spec open and report findings.
+9. Report per *Output*; check *Completion criteria*. Standalone `ready` result: `implementation complete; verification and review pending`; `blocked` → report partial implementation and blockers. Factory mode owns post-implementation verification, review, final cleanup, and spec closure.
 
 ## Subagent launch contract
 
-**Only this skill launches agents**, including background calls and rework, and controls scheduling, integration, publication, and closure; every launch and rework follows this contract. Agent bodies and references return control here; they never create subagents.
+**Only this skill launches agents**, including background calls and rework, and controls scheduling, integration, publication, and ticket closure; every launch and rework follows this contract. Agent bodies and references return control here; they never create subagents.
 
 - Resolve `AGENTS_ROOT=<skill base directory>/agents` and `REFERENCES_ROOT=<skill base directory>/references` as absolute paths before changing into a worktree; never from caller CWD.
 - Validate the agent body and every manifest file are readable. Missing/unreadable → stop/report exact path.
@@ -179,24 +143,43 @@ Launch line legend: `refs` = `requiredReferences` (manifest keys); pass only the
 - **GitHub:** **MUST** perform every GitHub issue, PR, label, and graph operation through `GH_TOOL` per *GitHub operations*, never raw `gh`; load [publication.md](./references/publication.md) at step 5. Missing/unreadable reference or `GH_TOOL` → stop/report.
 - **Repository identity:** preserve each issue's `OWNER/REPO#NUMBER`; route issue reads/comments/closures to its owning repository, and Git/implementation/PR operations only to the resolved source repository. Resolve ambiguity before writes; **MUST NOT** infer ownership from checkout, PR repository, or matching issue number.
 - **HITL:** re-read labels at selection. Skip `hitl` tickets without implementation, delegation, comments, closure, or closing references. An open skipped ticket never satisfies dependants; only closed tickets with results verified in the integration base do. Reference skipped tickets without closing keywords; keep the spec open while any remain open.
-- **One ticket = one subagent:** fresh implementer per ticket; sequential waits for each result, parallel caps concurrency. Rework uses that ticket's existing agent, at most two rounds. **MUST NOT** implement inline, batch tickets, or reuse agents across tickets. Missing subagents → stop/report; app verification has its own skip policy in step 8.
-- **Implementation focus:** at most one quick confirmation of environment/network/Docker/port/registry/external-service failure; use test seams (unit tests, fakes, mocks, in-memory/stubs) and record skipped check/error. Infrastructure-only failures do not block when evidence suffices; code-caused failures do. **MUST NOT** troubleshoot infrastructure during implementation or app verification.
-- **Proof framework:** verification fixes change only app code/tests. Check each fix commit against matched verification skill folders, feature maps, journeys, harness scripts/helpers, seed data, and checked cases. A proof-framework change invalidates the fix: undo with `git revert --no-edit`, never reset; record the finding unfixed as a framework gap.
+- **One ticket = one subagent:** fresh implementer per ticket; sequential waits for each result, parallel caps concurrency. Rework uses that ticket's existing agent, at most two rounds. **MUST NOT** implement inline, batch tickets, or reuse agents across tickets. Missing subagents → stop/report.
+- **Implementation focus:** at most one quick confirmation of environment/network/Docker/port/registry/external-service failure; use test seams (unit tests, fakes, mocks, in-memory/stubs) and record skipped check/error. Infrastructure-only failures do not block when evidence suffices; code-caused failures do. **MUST NOT** troubleshoot infrastructure during implementation.
 - **Draft-only:** PR stays draft; **MUST NOT** merge or mark ready (`gh pr ready`). User controls readiness.
 - **Pointer handoff:** subagents load their own task data. Save every spec/ticket/comment/commit-log read a subagent can reuse under `RUN_DIR` (`graph read` writes spec and ticket files); refresh a file before each launch that uses it. Before each worktree agent launch, write `git -C WORKTREE_PATH log --reverse --format='%H %s%n%n%b' BASE_COMMIT..HEAD` (or `None yet.`) to `RUN_DIR/commits/<HEAD sha>.txt` if absent and record `@prevHead`. Pass pointers (paths, `OWNER/REPO#NUMBER` refs, commit ranges); **MUST NOT** inline bodies, comments, or logs into prompts. Missing/unreadable pointer file → agents return `failed` with the path; the orchestrator refreshes it and reworks.
-- **Worktree isolation:** **MUST** follow [worktrees.md](./references/worktrees.md) for every worktree create, write, actualize, and removal; never reset or discard existing work.
+- **Worktree isolation:** **MUST** follow [worktrees.md](./references/worktrees.md) for every worktree create, write, and ticket worktree removal; never reset or discard existing work.
 
 ## Graph report
 
 Table of ticket, blocked by (`none` = explicit root), paths, conflicts with kind (`file`/`soft`) and a per-ticket conflict count; then ready frontier, critical path, deferred tickets with reason. Every node listed, including deferred tickets' blocker edges. Then spec artifact count (length of `graph.spec.artifacts`) or `artifacts_note`, and design sketch coverage from the planner notes when a sketch exists.
+
+## Implementation handoff
+
+Write data-only `RUN_DIR/implementation-handoff.json`; pass its absolute path, never internal scripts/references. Use `null` for unavailable scalar data and `[]` for no entries; missing required state makes `status` `blocked`.
+
+| Field | Content |
+|---|---|
+| `status`, `blockers` | `ready` only after all in-scope tickets and publication checks succeed and chore is verified (including verified no-change); otherwise `blocked` plus reasons. |
+| `specRef`, `specUrl`, `sourceRepository`, `trackerRepository`, `prUrl` | Qualified spec identity and URLs; explicit source/tracker `owner/repo`. |
+| `initiativeId`, `remote`, `integrationBranch`, `baseBranch`, `baseCommit`, `headCommit` | Validated routing, verified source remote, base SHA, final pushed SHA. |
+| `harnessRoot`, `sourceRoot`, `worktreesRoot`, `worktreePath`, `runDir`, `evidenceRoot` | Absolute paths resolved once; roots outside the integration worktree. |
+| `specFile`, `graphFile`, `commitsFile` | Refreshed absolute data pointers; spec/ticket files include title, body, comments; commit log covers `BASE_COMMIT..HEAD`. |
+| `tickets` | Every graph ticket: qualified `ref`, `file`, integrated `commit` or null, `status` (`integrated`, `base-verified`, `deferred`, `blocked`), `evidence` pointers, `evidenceCommentId`, read-back `closure` (`completed` or `open`); empty only with an explicit blocker. |
+| `chore` | `status` (`verified`, `none-needed`, `failed`), `commits`, actual `model`, `effort`, validation `evidence` pointers (including skipped checks/errors). |
+| `publication` | Read-back `verified` boolean, `draft` boolean, `checks` (`passed`, `pending`, `failed`, `absent`), metadata/coverage and posting failures in `problems`. |
+
+```json
+{"status":"ready","blockers":[],"specRef":"tracker/repo#1","specUrl":"https://github.com/tracker/repo/issues/1","sourceRepository":"owner/repo","trackerRepository":"tracker/repo","prUrl":"https://github.com/owner/repo/pull/2","initiativeId":"PAY-12","remote":"origin","integrationBranch":"feat/PAY-12","baseBranch":"main","baseCommit":"<base SHA>","headCommit":"<pushed SHA>","harnessRoot":"/harness","sourceRoot":"/harness/workspace/repo","worktreesRoot":"/harness/.worktrees/repo","worktreePath":"/harness/.worktrees/repo/PAY-12","runDir":"/harness/workspace/runs/PAY-12","evidenceRoot":"/harness/workspace/evidence","specFile":"/harness/workspace/runs/PAY-12/spec.json","graphFile":"/harness/workspace/runs/PAY-12/graph.json","commitsFile":"/harness/workspace/runs/PAY-12/commits/<pushed SHA>.txt","tickets":[{"ref":"tracker/repo#3","file":"/harness/workspace/runs/PAY-12/tickets/tracker_repo_3.json","commit":"<ticket SHA>","status":"integrated","evidence":["/harness/workspace/runs/PAY-12/ticket-3.md"],"evidenceCommentId":123,"closure":"completed"}],"chore":{"status":"none-needed","commits":[],"model":"<actual model>","effort":"medium","evidence":["/harness/workspace/runs/PAY-12/chore.md"]},"publication":{"verified":true,"draft":true,"checks":"pending","problems":[]}}
+```
+
+Failure: same shape, `status: blocked`, concrete `blockers`, partial values preserved, unavailable values `null`; claim publication/closure only after read-back.
 
 ## Output
 
 - Breakdown Initiative or parallel mode → first: *Graph report*.
 - Spec URL, created tickets, planner model/effort; PR URL/state.
 - Per ticket: integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
-- Chore commits and model/effort; verification verdict, checks, fix commits, per-round `EVIDENCE_DIR`, spec comment ID or skip reason.
-- Review axes, findings, comment IDs, models/fallbacks; actualize commits/merge result; skipped infrastructure checks; worktree status.
+- Chore commits and model/effort; skipped infrastructure checks; preserved worktree status; *Implementation handoff* path and status.
 - No runnable tickets: report graph/blockers; never claim implementation.
 - Incomplete: name missing evidence, partial GitHub writes, preserved work; distinguish unverified state from read-back success.
 
@@ -211,7 +194,7 @@ Table of ticket, blocked by (`none` = explicit root), paths, conflicts with kind
 
 - Each integrated ticket has exactly one verified commit from its own implementer, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or given a closing reference.
 - Source repository/base match routing; PR title prefix and bare first body line equal `INITIATIVE_ID`; every implemented ticket is covered; PR is draft; pending/failed checks are reported accurately.
-- Chore preceded app verification; chore commits verified and pushed. Verification left the proof framework unchanged, preserved evidence outside the worktree, and recorded its verdict or skip; unresolved `fail`/`partial` keeps the spec open.
-- Code review ran from `SOURCE_ROOT` in its own detached worktree before actualize; integration worktree actualized, pushed, and removal confirmed, or preserved and reported.
-- Spec closed only when every closure gate passes. No reference-loading failure ignored; subagents received pointers, not inlined task data; user work intact.
+- Chore result and actual model/effort recorded; valid chore changes committed and pushed. A failed or missing result is a handoff blocker, not “none needed.”
+- Handoff pointers readable and refreshed; branch, worktree, and run/evidence directories preserved; spec open and referenced without a closing keyword. No app verifier or code review ran here.
+- No reference-loading failure ignored; subagents received pointers, not inlined task data; user work intact.
 - Completeness sweep, last: re-read the request; map every spec requirement/ticket to code, tests, docs, configuration, and relevant failure/compatibility evidence. Resolve gaps or report explicit deferrals before declaring completion.
