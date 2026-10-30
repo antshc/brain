@@ -19,7 +19,7 @@ Name each principle (Principles) that shaped a decision and the choice it change
 - **Code crossing a function boundary** → *run `architect` skill to sketch types, signatures, and module structure before code.*
 - **Module interface, seam, or testability question** → *run `codebase-design` skill for deep-module vocabulary, seams, and deepening opportunities.*
 - **Contested or unresolved design** → run the `design` playbook.
-- **Locating code** → *run `explore-codebase` skill in a subagent to find where a symbol lives, what calls it, how a flow works.*
+- **Reading legwork, including locating code and answering how/why questions** → **MUST** *run `research` skill to investigate the question against primary sources and save cited findings*, even if direct exploration seems faster or simpler. Pass the original research request verbatim; add a separate grounded question with the known repository/subsystem/symbol or external target, context, exact unknown, and expected evidence. Preserve requested output constraints. Let research own source selection, specialists, and delegation. Rationale: one entry point owns routing and evidence; grounding must preserve user intent.
 - **Nontrivial multi-step** → write the throughput checkpoint (Throughput checkpoint).
 - **Before commit** → *run `crew-commit` skill to commit current work with a message derived from the diff.*
 - **Before review** → strip comments that narrate code (Comments).

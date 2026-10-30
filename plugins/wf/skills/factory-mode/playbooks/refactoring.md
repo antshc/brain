@@ -4,7 +4,7 @@
 
 Cleanup reveals a missing feature or real bug → split it out; ship the structural change first against the pinned contract. A redesign is allowed; name it and route to the `architect` playbook.
 
-1. Pin the behavior contract. Learn it via `explore-codebase`, then write a characterization test, snapshot, or equivalence harness capturing current behavior before structure moves. Type check and lint are not a pin. Done when the pin runs green on the untouched code.
+1. Pin the behavior contract. Research current behavior and callers through Non-negotiables, then write a characterization test, snapshot, or equivalence harness capturing current behavior before structure moves. Type check and lint are not a pin. Done when the pin runs green on the untouched code.
 2. Name the structure the code is missing (**Model the domain**). Boring code stays when the shape is already clear and local. The reshape must delete branches or invalid states, not add indirection.
 3. Name the target shape: module layout, types, call graph if built today (**Foundational thinking**, **Redesign from first principles**). Crosses a function boundary → `architect`. Seam or interface depth question → *run `codebase-design` skill to find deepening opportunities and decide where the seam goes.*
 4. Subtract before you add. Delete dead code, collapse one-caller wrappers, drop redundant validators (**Subtract before you add**). Smallest change reaching the target ships (**Laziness protocol**).
