@@ -11,6 +11,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 ROOT = REPO / 'plugins/wf/skills/implement-spec'
 MAIN = (ROOT / 'SKILL.md').read_text()
+FACTORY = REPO / 'plugins/wf/skills/factory-mode'
 
 
 BREAKDOWN = (ROOT / 'references/breakdown.md').read_text()
@@ -19,7 +20,7 @@ GITHUB = '\n'.join((ROOT / path).read_text() for path in ('SKILL.md', 'reference
 
 def test_exact_layout_and_local_links():
     assert {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*') if p.is_file() and '__pycache__' not in p.parts} == {
-        'SKILL.md', 'scripts/spec_gh.py', *(f'agents/{role}.md' for role in ('planner', 'implementer', 'verifier', 'chore')),
+        'SKILL.md', 'scripts/spec_gh.py', *(f'agents/{role}.md' for role in ('planner', 'implementer', 'chore')),
         *(f'references/{name}.md' for name in ('breakdown', 'sequential', 'parallel', 'fetch-diff', 'worktrees', 'publication')),
     }
     for path in ROOT.rglob('*.md'):
@@ -59,7 +60,8 @@ def test_plan_branch_is_answered_validated_persisted_and_read_back():
     ('chore', 'chore', ('fetch-diff',)),
 ])
 def test_agent_migration_and_absolute_load_contract(role, old, required):
-    body = (ROOT / f'agents/{role}.md').read_text()
+    owner = FACTORY if role == 'verifier' else ROOT
+    body = (owner / f'agents/{role}.md').read_text()
     assert not body.startswith('---')
     for value in ('Before task actions', 'requiredReferences',
                   'referencesRoot', 'absolute', 'unreadable', 'failed', 'Never launch subagents'):
@@ -114,7 +116,7 @@ def test_launch_manifest_has_every_reference_and_role():
     handoff = MAIN.split('## Subagent launch contract')[1]
     assert 'REFERENCES_ROOT/breakdown.md' in handoff
     assert 'REFERENCES_ROOT/fetch-diff.md' in handoff
-    for role in ('planner', 'implementer', 'verifier', 'chore'):
+    for role in ('planner', 'implementer', 'chore'):
         assert f'(./agents/{role}.md)' in MAIN
     for phrase in ('`AGENTS_ROOT=<skill base directory>/agents`', 'before changing into a worktree',
                    'never from caller CWD', 'every `.md` file under `REFERENCES_ROOT`', 'absolute `requiredReferences`',
@@ -173,29 +175,25 @@ def test_template_parity_except_intentional_artifact_section():
     assert embedded == standalone
 
 
-def test_downstream_order_and_guards():
+def test_implementation_stops_at_handoff_and_factory_owns_completion():
     workflow = MAIN.split('## Workflow')[1].split('## Subagent launch contract')[0]
-    positions = [workflow.index(text) for text in (
-        '6. **Frontier check.**', '7. Launch chore', '8. Launch verifier',
-        '9. Run *Publication verification*', '10. Run code review', '11. Run [Actualize and cleanup]', '12. Finalize',
-    )]
-    assert positions == sorted(positions)
-    for text in ('git revert --no-edit', 'exactly one commit', 'at most two rounds',
-                 'PR stays draft', 'one quick confirmation', 'never reset'):
+    assert workflow.index('6. **Frontier check.**') < workflow.index('7. Launch chore')
+    assert 'Launch verifier' not in workflow
+    assert 'Run code review' not in workflow
+    assert './agents/verifier.md' not in MAIN
+    assert 'handoff' in workflow.lower()
+    publication = (ROOT / 'references/publication.md').read_text()
+    assert '## Verification evidence' not in publication
+    assert '## Closure gates' not in publication
+    for text in ('exactly one commit', 'at most two rounds', 'PR stays draft', 'one quick confirmation'):
         assert text in MAIN
-    for text in ('no `hitl` ticket is open', 'posting failures', 'Review completed at the current head'):
-        assert text in GITHUB
-    worktrees = (ROOT / 'references/worktrees.md').read_text()
-    for text in ('Commit pending changes', 'merge --no-edit', 'Resolve conflicts', 'without force',
-                 '**MUST NOT** rebase, reset, or force', '`INTEGRATION_BRANCH` = `preflight`'):
-        assert text in worktrees
-    for path in (ROOT / 'references').glob('*.md'):
-        assert not re.search(r'\]\(\./[a-z-]+\.md', path.read_text()), path
     parallel = (ROOT / 'references/parallel.md').read_text()
     assert 'no `conflicts`, paths `-`' not in parallel
     assert 'derive `file` conflicts from source footprints' in parallel
     assert '`soft` conflicts never block a launch' in parallel
     assert 'mode=plan' not in parallel
+    for path in (ROOT / 'references').glob('*.md'):
+        assert not re.search(r'\]\(\./[a-z-]+\.md', path.read_text()), path
 
 
 def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
@@ -210,8 +208,8 @@ def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
     caller = MAIN.split('Launch planner')[1].split('2. Re-run')[0]
     assert '{{ticketsJson}}' not in caller
     assert '{{breakdown}}' not in caller
-    assert '{{ticketFiles}}' in (ROOT / 'agents/verifier.md').read_text()
-    assert '| `{{ticketFiles}}` | integrated ticket file paths' in MAIN
+    assert '{{ticketFiles}}' in (FACTORY / 'agents/verifier.md').read_text()
+    assert '| `{{ticketFiles}}` | integrated ticket file paths' in (FACTORY / 'references/post-implementation.md').read_text()
     assert not re.search(r'\{\{\w*Json\}\}', MAIN)
 
 
@@ -255,3 +253,62 @@ def test_planner_emits_complete_graph_without_batches_or_worker_cap():
         assert {pair['a'], pair['b']} <= tickets.keys()
         assert pair['kind'] in {'file', 'soft'}
     assert 'Failure: `{"status": "failed", "result": {"reason": "<why>"}}`' in planner
+
+
+def test_factory_owns_verifier_resources_and_local_links():
+    factory_main = (FACTORY / 'SKILL.md').read_text()
+    assert '(references/post-implementation.md)' in factory_main
+    assert '(agents/verifier.md)' in factory_main
+    assert not (ROOT / 'agents/verifier.md').exists()
+    for path in FACTORY.rglob('*.md'):
+        for target in re.findall(r'\]\(([^)]+)\)', path.read_text()):
+            if ':' in target or '{{' in target:
+                continue
+            resolved = (path.parent / target.split('#')[0]).resolve()
+            assert resolved.is_relative_to(FACTORY.resolve()), (path, target)
+            assert resolved.exists(), (path, target)
+    post = (FACTORY / 'references/post-implementation.md').read_text()
+    assert 'implement-spec/scripts' not in post
+    assert 'GH_TOOL' not in post
+    publication = post.split('## Publication verification\n')[1].split('\n## ')[0]
+    assert 'clean' in publication and 'HEAD' in publication
+    assert 'git revert --no-edit' in post
+    assert 'proof-framework' in post.lower()
+
+
+def test_architect_modes_verify_and_review_after_implementation():
+    playbook = (FACTORY / 'playbooks/architect.md').read_text()
+    for heading in ('Interactive', 'Auto'):
+        mode = playbook.split(f'## {heading}\n')[1].split('\n## ')[0]
+        assert mode.index('`implement-spec` skill') < mode.index('*App verification*') < mode.index('*Code review*') < mode.index('*Finalize*')
+        assert '`ready`' in mode and 'blocked/incomplete' in mode
+    post = (FACTORY / 'references/post-implementation.md').read_text()
+    review = post.split('## Code review\n')[1].split('\n## ')[0]
+    assert '`code-review` skill' in review
+    assert 'fresh detached worktree' in review
+    assert 'Review never fixes code' in review
+    finalize = post.split('## Finalize\n')[1].split('\n## ')[0]
+    assert 'posting failure' in post.lower()
+    for text in ('stale', 'pending', 'failed', 'without force'):
+        assert text in finalize
+    assert 'Address/Diagnose' in finalize
+    assert 'two verifier fix attempts' in finalize
+
+
+def test_implementation_handoff_contains_routing_and_durable_data_pointers():
+    handoff = MAIN.split('## Implementation handoff\n')[1].split('\n## ')[0]
+    data = json.loads(re.search(r'```json\n(.*?)\n```', handoff, re.S)[1])
+    assert data['status'] == 'ready'
+    assert data['blockers'] == []
+    assert data['publication']['verified'] is True
+    assert data['publication']['draft'] is True
+    assert data['specRef'].startswith(data['trackerRepository'] + '#')
+    for name in ('harnessRoot', 'sourceRoot', 'worktreesRoot', 'worktreePath', 'runDir', 'evidenceRoot', 'specFile', 'graphFile', 'commitsFile'):
+        assert Path(data[name]).is_absolute()
+    assert not Path(data['runDir']).is_relative_to(data['worktreePath'])
+    assert not Path(data['evidenceRoot']).is_relative_to(data['worktreePath'])
+    ticket = data['tickets'][0]
+    assert {'ref', 'file', 'commit', 'status', 'evidence', 'evidenceCommentId', 'closure'} <= ticket.keys()
+    frontier = MAIN.split('6. **Frontier check.**')[1].split('7. Launch chore')[0]
+    assert 'blocked' in frontier and 'handoff' in frontier.lower()
+    assert 'keep the spec open' in MAIN

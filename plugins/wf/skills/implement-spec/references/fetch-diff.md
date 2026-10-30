@@ -1,6 +1,6 @@
 # Fetch PR Diff
 
-Split the current pull request diff into per-file diffs for the chore or bug-review subagent. Run fresh before each subagent; the diff changes after every push.
+Split the current pull request diff into per-file diffs for the chore subagent. Run fresh before each subagent; the diff changes after every push.
 
 ## Fetch the diff per file
 
