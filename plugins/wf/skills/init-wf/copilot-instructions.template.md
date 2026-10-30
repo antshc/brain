@@ -7,13 +7,13 @@ The reporoot itself plays the role of the **harness** for coding agents: context
 This repo (the **reporoot**) is the **documentation/context repo**, not the codebase.
 
 - **Docs & decisions live at the reporoot:** `GLOSSARY.md` (domain glossary) and `ARCHITECTURE.md` (ADR/Concept indexes and high-level source structure), with ADRs under `docs/adr/` (localized decisions) and Crosscutting Concepts under `docs/concepts/` (shared domain, structural, and operational approaches).
-- **Source code ({{project}}) & git worktrees live in `workspace/`** (git-ignored by the reporoot). The source hierarchy is documented under **Codebase Structure** in `ARCHITECTURE.md`.
+- **Source code ({{project}}) lives in `workspace/`; its git worktrees live in `.worktrees/{{project}}/`** (both git-ignored by the reporoot). The source hierarchy is documented under **Codebase Structure** in `ARCHITECTURE.md`.
 
 Within this file, resolve conflicts in this order: **safety and repository targeting → authoritative sources → navigation → build and validation → documentation conventions.** This ordering scopes only the rules in this file; it does not override `AGENTS.md`, path-scoped instructions, or user instructions. Avoid authoring rules that conflict across instruction files.
 
 ## 2. Safety and repository targeting
 
-You MUST NOT introduce **code changes, build artifacts, or code PRs** into the `{{project-board}}` reporoot; all *code* work happens inside `workspace/{{project}}`, and you MUST NOT make code changes, run builds, or create worktrees anywhere else.
+You MUST NOT introduce **code changes, build artifacts, or code PRs** into the `{{project-board}}` reporoot; all *code* work happens inside `workspace/{{project}}` or its worktrees under `.worktrees/{{project}}/`, and you MUST NOT make code changes, run builds, or create worktrees anywhere else.
 
 Authoring, committing, and opening PRs for docs (`GLOSSARY.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, and other reporoot docs) is allowed in `{{project-board}}`. You MUST NOT commit code or build output there.
 
