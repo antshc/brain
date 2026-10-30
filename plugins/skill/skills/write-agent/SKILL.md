@@ -29,7 +29,7 @@ Own one custom coding agent definition file: create or rewrite it. Writable surf
 4. **Inventory (rewrite only).** List every rule, step, constraint, tool, failure behavior, skill reference, and output field of the existing agent. *Done when* every sentence maps to an item.
 5. **Write description.** Follow Description in `references/agent-best-practices.md`. *Done when* it meets those rules and no sibling description would be selected for the same request.
 6. **Set tools and metadata.** Grant only tools the workflow uses. Add model, effort, turn, or timeout fields only when the input names them. *Done when* every granted tool maps to a workflow step and every edit, execute, or external tool is justified.
-7. **Fill body.** Fill the template per its directives; write constraints per Constraint language and checks per Verification in `references/agent-best-practices.md`. Read `references/examples.md` when choosing section depth or wording. *Done when* no placeholder or `<!-- @: -->` directive remains and each workflow step has an observable result.
+7. **Fill body.** Fill the template per its directives; write constraints per Constraint language and checks per Verification in `references/agent-best-practices.md`; for agents that edit code, also apply Coding agents there. Read `references/examples.md` when choosing section depth or wording. *Done when* no placeholder or `<!-- @: -->` directive remains and each workflow step has an observable result.
 8. **Self-check.** Walk Checklist in `references/agent-best-practices.md`; mark each item applied or not applicable. Rewrite: confirm every inventory item is preserved or deliberately changed per the input. *Done when* no item is unaccounted.
 
 ## Output

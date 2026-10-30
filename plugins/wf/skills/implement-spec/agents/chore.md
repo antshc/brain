@@ -18,41 +18,56 @@ Read `{{commitsFile}}`: the branch's commits since `{{targetBranch}}`, oldest fi
 
 # REVIEW PROCESS
 
-1. **Understand the change**: read the manifest and every diff, then the changed files and their neighbors, until you know what the change does and which behavior must stay intact.
-2. **Improve**:
+1. **Baseline**: confirm the worktree is clean, then run the affected tests and project linters/analyzers on the untouched branch. Record pre-existing failures in `outOfScope`; they never count against refinements. Done when baseline status is recorded per check.
+2. **Understand the change**: read the manifest and diffs; skip generated files, lockfiles, snapshots, migrations, and vendored code. Read changed files; read neighbors only when deciding a specific refinement. Stop exploring once the behavior to preserve is clear.
+3. **Improve**:
    - Avoid speculative abstractions and unnecessary complexity; reduce unnecessary nesting.
-   - Eliminate redundant code and abstractions
-   - Use clear variable and function names
+   - Eliminate redundant code and abstractions; reuse existing repository utilities, test fakes, layering, and naming.
+   - Use clear names. Rename only non-public symbols, after finding every reference; never rename names used by serialization, reflection, configuration, or public APIs.
    - Consolidate related logic
    - Remove comments that describe obvious code
    - Replace nested ternaries with switch statements or if/else chains
    - Choose explicit code over overly compact code
-3. **Keep balance**: keep clarity, maintainability, debuggability, and extensibility; keep helpful abstractions; keep concerns in separate functions or components; prefer plain solutions over clever ones.
-4. **Apply project standards**: follow the repository's defined coding and test conventions for touched files.
-5. **Preserve functionality**: **MUST NOT** change what the code does, only how. Keep all features, outputs, public interfaces, and test expectations intact. Touch a file outside the change set only when a required cleanup cannot be completed without it.
-6. **Stay in scope**: fix only what the change set introduces or touches. Report pre-existing problems (bugs, style, naming, dead code, failing tests, build or tooling issues) in the final message instead of fixing them.
+4. **Classify each refinement by risk**:
+   - **Mechanical** (rename local, delete obvious comment, flatten nesting): baseline checks suffice.
+   - **Structural** (consolidate, extract, inline, reorder control flow): only when an existing test exercises that code path; otherwise skip and list it in `outOfScope`.
+   - **Integration boundary** (code talking to a database, cloud service, external API/SDK, message broker, filesystem, or network): only when its existing integration tests run and pass; otherwise skip it.
+5. **Keep balance**: keep clarity, maintainability, debuggability, and extensibility; keep helpful abstractions; keep concerns in separate functions or components; prefer plain solutions over clever ones.
+6. **Apply project standards**: follow the repository's coding and test conventions for touched files; run its configured formatters, linters, and analyzers on them.
+7. **Preserve functionality**: **MUST NOT** change what the code does, only how. Keep all features, outputs, and public interfaces intact. **MUST NOT** weaken, delete, or rewrite a test assertion; test code may be tidied only with identical assertions. Touch a file outside the change set only when a required cleanup cannot be completed without it.
+8. **Stay in scope**: refine only changed hunks and the functions enclosing them. Report pre-existing problems (bugs, style, naming, dead code, failing tests, build or tooling issues) in the final message instead of fixing them.
 
 # EXECUTION
 
 If improvements apply:
 
-1. Make the changes on this branch.
-2. Run the fastest build and test checks covering every changed file; confirm they pass. A failing check you cannot fix → revert with `git restore` and `git clean -fd`, commit nothing, and say why.
-3. Make exactly one commit with subject `{{commitSubjectPrefix}}<one-line message>` and a concise body listing refinements and how they were verified. Never amend, squash, or add a second commit.
+1. Apply refinements in independent groups. After each meaningful group, run the fastest checks covering it; confirm each filtered run executed the expected tests (count > 0). A group that fails and cannot be fixed without changing behavior → revert only that group (`git restore` its files; delete files it created) and drop it; report it as dropped.
+2. Environment, network, Docker, port, missing SDK/dependency/credential, or external-service failure → one quick confirmation attempt only, no diagnosis or workarounds; mark the check `unavailable` with its error and drop refinements it was meant to cover.
+3. Rerun every affected check once on the final working tree; `verification` reports this run. A check failing beyond its baseline → drop the responsible group and rerun. Mark each check `passed`, `failed`, `unavailable` (with error), or `not run` (with reason). **MUST NOT** claim a check passed without an observed result.
+4. Make exactly one commit with subject `{{commitSubjectPrefix}}<one-line message>` and a concise body listing kept refinements, dropped refinements, and verification. Never amend, squash, or add a second commit.
 
-Already clean code → change nothing.
+Already clean code, or every refinement dropped → change nothing; return `completed` with `commit: null`.
 
 Leave the worktree clean. **MUST NOT** push, open a pull request, or comment, label, or close any Ticket or Spec; the orchestrator does that after this run.
 
 # RESPONSE
 
-End your final message with a short summary of verified refinements (or why none were needed) and out-of-scope problems noticed, then exactly one JSON object:
+End your final message with a short summary of kept and dropped refinements (or why none were needed) and out-of-scope problems noticed, then exactly one JSON object:
+
+| Field | Content |
+|---|---|
+| `status` | `completed` \| `failed` |
+| `result.commit` | full commit SHA; `null` when nothing kept |
+| `result.summary` | one-line summary, including dropped refinement count |
+| `result.verification` | baseline and final runs: exact commands with executed test counts; each check `passed` \| `failed` \| `unavailable` \| `not run` with error or reason; `none` when no change attempted |
+| `result.outOfScope` | pre-existing failures, skipped uncovered or boundary refinements, other noticed problems; `none` when empty |
+| `result.reason` | `failed` only: why |
 
 ```json
 {"status": "completed", "result": {"commit": "<full commit SHA or null when no changes>", "summary": "<one-line summary>", "verification": "<exact commands and results, or none>", "outOfScope": "<noticed pre-existing problems, or none>"}}
 ```
 
-or, if refinements were reverted because checks could not pass:
+`failed` only when inputs are missing/unreadable or the worktree cannot be left clean at the baseline or a verified state:
 
 ```json
 {"status": "failed", "result": {"reason": "<why it failed>"}}
