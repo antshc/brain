@@ -30,7 +30,7 @@ def test_exact_layout_and_local_links():
             assert (path.parent / target.split('#')[0]).exists(), (path, target)
 
 
-def test_input_detection_modes_and_existing_graph_bypass():
+def test_input_detection_modes_and_read_only_existing_graph_analysis():
     workflow = MAIN.split('## Workflow')[1].split('## Subagent launch contract')[0]
     assert workflow.index('Detect input type') < workflow.index('prepare input')
     assert 'mode=plan' not in MAIN
@@ -38,7 +38,8 @@ def test_input_detection_modes_and_existing_graph_bypass():
     assert '`sequential` (default, recommended) | `parallel` (experimental' in MAIN
     spec_branch = workflow.split('→ B:')[1].split('→ Unsupported')[0]
     assert 'Existing sub-issues' in spec_branch
-    assert '**MUST NOT** run the planner or create tickets' in spec_branch
+    assert '`analyze` mode' in spec_branch
+    assert '**MUST NOT** create tickets' in spec_branch
     assert 'Zero sub-issues' in spec_branch
     assert '(./references/sequential.md#sequential-implementation)' in MAIN
     assert '(./references/parallel.md#parallel-implementation)' in MAIN
@@ -129,7 +130,7 @@ def test_embedded_breakdown_is_self_contained_and_non_interactive():
                  'append only missing', 'including closed', 'unlinked', 'lost create response',
                  'add blocker edges only after all ticket identities exist', 'Body links never substitute for native edges',
                  'Read-back', 'preserve partial results', 'Concepts/ADRs', 'Functional Requirements', 'Business Rules',
-                 'Edge Cases', 'COMPLETE', 'every touched integration layer'):
+                 'Edge Cases', 'Functional:', 'across touched layers'):
         assert text in BREAKDOWN
     assert '/to-tickets auto' not in MAIN + BREAKDOWN
     assert '## Breakdown ticket operations' in GITHUB
@@ -146,7 +147,7 @@ def test_artifacts_fetched_before_slicing_mapped_both_directions_and_reconciled(
                  'No artifacts → omit', 'without duplicates', 'user-authored',
                  'Related Spec Artifacts', 'canonical source/anchor'):
         assert text in BREAKDOWN
-    assert BREAKDOWN.index('### 2. Discover and fetch') < BREAKDOWN.index('### 4. Draft vertical')
+    assert BREAKDOWN.index('### 2. Discover and fetch') < BREAKDOWN.index('### 4. Select strategy')
     assert 'no suitable reader' in GITHUB
 
 
@@ -189,7 +190,7 @@ def test_implementation_stops_at_handoff_and_factory_owns_completion():
         assert text in MAIN
     parallel = (ROOT / 'references/parallel.md').read_text()
     assert 'no `conflicts`, paths `-`' not in parallel
-    assert 'derive `file` conflicts from source footprints' in parallel
+    assert '*Effective graph*' in parallel
     assert '`soft` conflicts never block a launch' in parallel
     assert 'mode=plan' not in parallel
     for path in (ROOT / 'references').glob('*.md'):
@@ -236,20 +237,22 @@ def test_planner_emits_complete_graph_without_batches_or_worker_cap():
     assert '{{maxParallel}}' not in planner + MAIN
     examples = [json.loads(block) for block in re.findall(r'```json\n(.*?)\n```', planner, re.S)]
     result = examples[0]['result']
-    assert set(result) == {'tickets', 'ready', 'conflicts', 'criticalPath', 'created', 'deferred', 'coverage', 'notes'}
+    assert set(result) == {'specRef', 'tickets', 'ready', 'conflicts', 'criticalPath', 'created', 'deferred', 'coverage', 'notes'}
+    assert re.fullmatch(r'[\w.-]+/[\w.-]+#\d+', result['specRef'])
     assert set(result['coverage']) == {'requirements', 'artifacts', 'sketch'}
     tickets = {ticket['ref']: ticket for ticket in result['tickets']}
     assert len(tickets) == len(result['tickets'])
     deferred = {ticket['ref'] for ticket in result['deferred']}
     assert set(result['created']) | deferred <= tickets.keys()
     for ticket in tickets.values():
-        assert set(ticket) == {'ref', 'blockers', 'paths', 'hot'}
+        assert set(ticket) == {'ref', 'blockers', 'paths', 'hot', 'implementer'}
+        assert ticket['implementer']['model'] in {'claude-sonnet-5.5', 'claude-opus-5.5'}
+        assert ticket['implementer']['effort'] == {'claude-sonnet-5.5': 'high', 'claude-opus-5.5': 'medium'}[ticket['implementer']['model']]
+        assert ticket['implementer']['reason']
         assert set(ticket['blockers']) <= tickets.keys()
     assert set(result['ready']) == {
         ref for ref, ticket in tickets.items() if not ticket['blockers'] and ref not in deferred
     }
-    assert any(ticket['blockers'] for ticket in tickets.values())
-    assert any(ticket['paths'] is None for ticket in tickets.values())
     assert set(result['criticalPath']) <= tickets.keys() - deferred
 
     def ancestors(ref):
@@ -317,6 +320,7 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     for text in ('stale', 'pending', 'failed', 'without force'):
         assert text in finalize
     assert 'do not restart Address' in finalize
+    assert 'Diagnose' not in finalize
     assert 'two verifier fix attempts' in finalize
 
 
@@ -328,8 +332,9 @@ def test_implementation_handoff_contains_routing_and_durable_data_pointers():
     assert data['publication']['verified'] is True
     assert data['publication']['draft'] is True
     assert data['specRef'].startswith(data['trackerRepository'] + '#')
-    for name in ('harnessRoot', 'sourceRoot', 'worktreesRoot', 'worktreePath', 'runDir', 'evidenceRoot', 'specFile', 'graphFile', 'commitsFile'):
+    for name in ('harnessRoot', 'sourceRoot', 'worktreesRoot', 'worktreePath', 'runDir', 'evidenceRoot', 'specFile', 'graphFile', 'plannerFile', 'modelOutcomesFile', 'commitsFile'):
         assert Path(data[name]).is_absolute()
+    assert Path(data['graphFile']).name == 'effective-graph.json'
     assert not Path(data['runDir']).is_relative_to(data['worktreePath'])
     assert not Path(data['evidenceRoot']).is_relative_to(data['worktreePath'])
     ticket = data['tickets'][0]

@@ -8,7 +8,7 @@ Exit codes: 0 ok, 1 GitHub/tool failure, 2 invalid input or unresolved routing,
     preflight   --spec REF [--harness-root P] [--source-repository R --base-branch B]
     spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N
     graph read  --spec REF --out RUN_DIR      (also saves spec issue artifacts under RUN_DIR/artifacts, indexed by name in index.json)
-    graph frontier --graph FILE [--done REF ...]
+    graph frontier --graph FILE [--planner FILE --out EFFECTIVE_FILE] [--done REF ...]
     ticket create --spec REF --title T --body-file F
     issue block REF --by REF [--by REF ...]
     issue edit-body REF --body-file F
@@ -24,6 +24,7 @@ REF is `OWNER/REPO#NUMBER` or an issue URL.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 import shutil
@@ -424,9 +425,63 @@ def analyse(graph: dict[str, Any], done: set[str]) -> dict[str, Any]:
     }
 
 
+def effective_graph(graph: dict[str, Any], planner: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(planner, dict) or planner.get("status") != "completed":
+        raise UsageError("planner result must have status completed")
+    result = planner.get("result")
+    if not isinstance(result, dict) or result.get("specRef") != graph["spec"]["ref"]:
+        raise UsageError("planner specRef must match the native graph")
+    planned = result.get("tickets")
+    if not isinstance(planned, list):
+        raise UsageError("planner tickets must be a list")
+    effective = copy.deepcopy(graph)
+    tickets = {ticket["ref"]: ticket for ticket in effective["tickets"]}
+    seen: set[str] = set()
+    for ticket in planned:
+        if not isinstance(ticket, dict) or not isinstance(ticket.get("ref"), str):
+            raise UsageError("planner ticket needs a qualified ref")
+        ref = ticket["ref"]
+        if ref not in tickets or ref in seen:
+            raise UsageError(f"unknown or duplicate planner ticket: {ref}")
+        seen.add(ref)
+        blockers = ticket.get("blockers")
+        if not isinstance(blockers, list) or any(not isinstance(blocker, str) for blocker in blockers):
+            raise UsageError(f"{ref}: planner blockers must be a list of qualified refs")
+        if len(set(blockers)) != len(blockers):
+            raise UsageError(f"{ref}: duplicate planner blockers")
+        existing = {blocker["ref"] for blocker in tickets[ref]["blocked_by"]}
+        for blocker in blockers:
+            if blocker == ref:
+                raise UsageError(f"{ref}: self dependency")
+            if blocker in existing:
+                continue
+            if blocker not in tickets:
+                raise UsageError(f"{ref}: unknown planner blocker {blocker}; fetch and resolve external dependencies first")
+            producer = tickets[blocker]
+            tickets[ref]["blocked_by"].append({
+                "ref": blocker, "state": producer["state"], "state_reason": producer.get("state_reason"),
+                "source": "planner",
+            })
+    if seen != tickets.keys():
+        raise UsageError(f"planner recommendations missing tickets: {sorted(tickets.keys() - seen)}")
+    cycles = find_cycles({ref: [blocker["ref"] for blocker in ticket["blocked_by"]] for ref, ticket in tickets.items()})
+    if cycles:
+        raise UsageError(f"effective graph contains dependency cycles: {cycles}")
+    return effective
+
+
 def cmd_graph_frontier(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
-    graph = json.loads(Path(args.graph).read_text(encoding="utf-8"))
-    return analyse(graph, {str(parse_ref(ref)) for ref in args.done})
+    graph_path = Path(args.graph)
+    inputs = [graph_path] + ([Path(args.planner)] if args.planner else [])
+    if args.out and Path(args.out).resolve() in {path.resolve() for path in inputs}:
+        raise UsageError("effective output must not overwrite the native graph or planner result")
+    graph = json.loads(graph_path.read_text(encoding="utf-8"))
+    if args.planner:
+        graph = effective_graph(graph, json.loads(Path(args.planner).read_text(encoding="utf-8")))
+    graph["frontier"] = analyse(graph, {str(parse_ref(ref)) for ref in args.done})
+    if args.out:
+        write_json(Path(args.out), graph)
+    return graph["frontier"]
 
 
 def children_of(gh: Gh, spec: Ref) -> list[dict[str, Any]]:
@@ -700,6 +755,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = command("graph", "frontier", cmd_graph_frontier)
     p.add_argument("--graph", required=True)
+    p.add_argument("--planner")
+    p.add_argument("--out")
     p.add_argument("--done", action="extend", nargs="+", default=[])
 
     p = command("ticket", "create", cmd_ticket_create)
