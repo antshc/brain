@@ -9,7 +9,7 @@ Take the first applicable route per question; reevaluate after each result.
 | Condition | Action |
 |---|---|
 | Reliable evidence answers it for the same sketch revision and environment/version | Reuse; record the answer |
-| Needs facts from codebase, installed packages, cloud/API, or web documentation | Research |
+| Needs facts from the codebase, installed NuGet packages, cloud/API, or web documentation | Research |
 | Needs observed behavior, including a CLI/API command | Experiment |
 | Material falsifiable design claim has a safe runnable target | Interrogate |
 | Needs user intent, policy, tradeoff, or unavailable authority | Preserve for review or report blocker |
@@ -18,9 +18,9 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 ## Research
 
-*Run `research` skill to investigate primary sources via discovered specialists or subagents.* Pass:
+*Run `research` skill to investigate primary sources (codebase, NuGet packages, cloud docs, web) via discovered specialists or subagents.* Research routes codebase and NuGet parts through `explore-codebase`, which resolves targets and runs `inspect-nuget-source` for package types; **MUST NOT** invoke either directly. Pass:
 
-- `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed.
+- `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
 - `@outputShape`: Markdown; one result per topic/source part; location `<repo-root>/tmp/architect-<slug>/research/`; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
 
 Pass `@outputShape` verbatim; Research propagates it to every specialist and owns discovery, classification, and fan-out. **MUST NOT** dispatch separate research agents. Honor stronger specialist artifact-location contracts; index returned paths in the artifact root.

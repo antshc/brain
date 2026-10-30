@@ -21,7 +21,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 
 | Phase | What happens | Output |
 |---|---|---|
-| A Ground | `how` explains the touched subsystems; `why` adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
+| A Ground | `how` explains the touched subsystems via `explore-codebase` subagents; `why` adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
 | B Sketch | `arena`: one runner by default; with 2–3, compare candidates and graft good ideas | usage sketch, module map, types, rationale |
 | C Review | resolve technical questions and challenge material claims automatically, then loop until you reply **accept** or **implement**; otherwise **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
 | D Hand off | after **accept**, run `/to-spec` | spec issue |
@@ -47,7 +47,7 @@ Reply in plain chat. An ambiguous reply is never treated as accept or implement.
 
 ## Open questions and risks
 
-Architect resolves source facts through Research and runtime uncertainty through Experiment before review. Material falsifiable claims automatically trigger Interrogate when a safe runnable target exists. Examples: SDK-version contracts need research; CLI capabilities or concurrency need execution; retry duplication needs an adversarial probe. Research owns its specialist fan-out.
+Architect resolves source facts (codebase, NuGet packages, cloud, web) through Research, which routes codebase and NuGet parts via `explore-codebase` and `inspect-nuget-source`, and runtime uncertainty through Experiment before review. Material falsifiable claims automatically trigger Interrogate when a safe runnable target exists. Examples: SDK-version contracts need research; CLI capabilities or concurrency need execution; retry duplication needs an adversarial probe. Research owns its specialist fan-out.
 
 Open questions and risks remain phrased as questions; your answer resolves intent and tradeoffs. Design corrections wait for your reply. Unanswered ones carry into the spec. Unchanged evidence and existing Interrogate coverage are reused; changes recheck only affected assumptions. Review includes evidence, limitations, and proposed corrections.
 
