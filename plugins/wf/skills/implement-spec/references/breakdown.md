@@ -22,7 +22,7 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 
 1. Return control to the orchestrator for *Launch planner*. Done when its JSON result is returned.
 2. Only the planner writes tickets; never create them inline. Done when publication, artifact coverage, and native links are verified.
-3. Re-run `GH_TOOL graph read`; validate ticket bodies, artifact mappings, parents, and blockers. Show the *Graph report*, then continue without waiting. Done when the run-local graph matches remote state.
+3. Re-run `GH_TOOL graph read`; validate ticket bodies, artifact mappings, parents, and blockers. Return control to the orchestrator for *Effective graph* before the *Graph report*, then continue without waiting. Done when native publication matches remote state and the effective graph preserves planner-discovered blockers.
 
 ## Planner procedure
 
@@ -44,13 +44,22 @@ Partition fetched artifacts into bounded meaningful pieces: document sections, p
 
 ### 3. Explore records and code
 
-Explore touched code until current behavior, integration layers, and test seams are known. Use `GLOSSARY.md` vocabulary. Read relevant Crosscutting Concepts and Architecture Decision Records from `ARCHITECTURE.md` indexes and open their records. Apply shared domain behavior, layering, validation, persistence, testing and operational policies; preserve localized ADR decisions. Identify prefactoring that makes the change easy. Missing applicable decisions or source conflicts block publication. Record applicable Concepts/ADRs and bounded scope paths in planning notes.
+Explore touched code until current behavior, module and folder boundaries, dependencies, shared files, integration layers, and existing test seams are known. For structural changes, inspect project references, namespace/path conventions, build configuration, and regression tests. Use `GLOSSARY.md` vocabulary. Read relevant Crosscutting Concepts and Architecture Decision Records from `ARCHITECTURE.md` indexes and open their records. Apply shared domain behavior, layering, validation, persistence, testing and operational policies; preserve localized ADR decisions. Identify prefactoring that makes the change easy. Missing applicable decisions or source conflicts block publication. Record applicable Concepts/ADRs and bounded scope paths in planning notes.
 
-### 4. Draft vertical slices and map artifacts
+### 4. Select strategy, draft tasks, and map artifacts
 
-Draft tracer bullets: each slice delivers a narrow COMPLETE, demoable/verifiable path through every touched integration layer (schema, API, UI, tests), not horizontal layers. Prefactoring comes first. Name the highest test seam still exercising the whole slice. Classify slices HITL or AFK for planning only; prefer AFK; neither becomes a label. An unresolved human decision stops publication; never invent an answer.
+Choose boundaries from the spec/plan and observed codebase, not a predetermined task size:
 
-Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Overlapping slices → merge them, move the shared edit into one slice, or record a `file` conflict; a shared path alone never becomes a blocker edge; never schedule shared file writes together. A ticket that changes a contract another ticket consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a slice; uncovered scope blocks publication. Render complete ticket bodies with *Ticket body template*, not summaries or requirement numbers alone.
+- **Functional:** Group a complete, independently verifiable business capability across touched layers. For small API services with established API integration tests, prefer functional slices that include endpoint, domain, persistence/integration, and tests. Prefer cohesive end-to-end vertical slices for broader features; allow technical prerequisites (schema migration, compatibility adapter, shared contract) only with named consumers, stable deliverables, and independent verification.
+- **Structural:** Group related file/folder moves, renames, namespaces, project relocation, and required reference updates into independently movable units. Preserve behavior and public contracts; do not introduce unrelated logic changes.
+- **Behavior-preserving refactoring:** Group by cohesive implementation boundaries, preserving observable behavior and contracts.
+- **Mixed:** Put genuinely required structural or prefactoring prerequisites first; do not make mere shared-file writes into blocker edges.
+
+Prefer the fewest cohesive tasks that cover all requirements. Size by cohesion, context load, stable contracts, write ownership, and integration risk—not estimated duration. Keep multi-hour cohesive work with one capable implementer; merge trivial work when coordination dominates. Split at independently verifiable, stable-contract context boundaries. Serialize shared writes; disjoint ownership gates concurrency, not task validity. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
+
+Choose the highest meaningful, reliable verification seam supported by the codebase: existing API integration tests for API behavior; builds and existing regression/API tests for structural changes; lower-level tests where higher seams cannot reliably prove an important rule. Each task must be independently demonstrable or verifiable, with included outcome, exclusions, producer assumptions, and acceptance-to-check evidence mapping per *Ticket body template*. Classify HITL or AFK for planning only; prefer AFK; neither becomes a label. An unresolved human decision stops publication; never invent an answer.
+
+Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Overlapping slices → merge them, move the shared edit into one slice, or record a `file` conflict; a shared path alone never becomes a blocker edge; never schedule shared file writes together. A ticket that changes a contract another ticket consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a task; uncovered scope blocks publication. Render complete ticket bodies with *Ticket body template*, not summaries or requirement numbers alone. The planner returns implementer recommendations separately in its JSON result; do not write them into ticket bodies.
 
 For EVERY ticket, map EVERY artifact piece relevant to its behavior, acceptance criteria or implementation decisions. Repeat a shared piece in every related ticket; exclude unrelated pieces. Check both directions: no relevant piece omitted, no included piece lacking a stated relationship. Each Related Spec Artifacts entry holds the piece or bounded excerpt, canonical source/anchor, and a short explanation tying it to the requirement or criterion. Keep non-text links/embeds readable. No artifacts → omit that section. Design sketch present → also apply *Design sketch contract*.
 
@@ -67,7 +76,7 @@ Inventory sources explicitly linked/attached in the spec body and all comments, 
 Applies when the spec's Implementation Decisions hold a binding **Design sketch** decision or its artifacts include a **Sketch index**. The sketch is the structural map — where logic goes and how code is shaped; the Requirements stay the behavior contract.
 
 1. Read the Sketch index first; it maps each sketch path to its artifact names. Read every listed artifact; a missing or unreadable one stops breakdown.
-2. Slice along the sketch's module boundaries while keeping each slice vertical; prefactoring and scaffolding the sketch defines come first.
+2. Follow the sketch's module boundaries for task ownership; keep functional tasks end-to-end and structural tasks scoped to complete relocations. Prefactoring and scaffolding the sketch defines come first.
 3. Every sketch file maps to at least one ticket: an exact excerpt (or the whole file when short) under **Related Spec Artifacts**, with its sketch path, artifact name, and artifact URL. A sketch file mapped to no ticket blocks publication.
 4. Sketch paths are intended target locations; quote them in Related Spec Artifacts even though Implementation Decisions avoid file paths.
 5. Sketch conflicts with a Requirement, a Concept/ADR, or current code → the Requirement wins first, then Concepts/ADRs. Choose the option that best fits them and the sketch's intent without asking; record `Sketch deviation: {{what}} — {{chosen}} because {{reason}}` in that ticket's Implementation Decisions. Never drop a sketch type, signature, or boundary silently.
@@ -93,17 +102,17 @@ Render every section per its rule; conditional sections only when applicable. Te
 
 ## What to build
 <what-to-build-rule>
-- Self-contained: describe enough of the end-to-end behavior that an implementing agent needs no further repo exploration to understand what to build.
-- Describe behavior across all integration layers touched by this slice, not a layer-by-layer breakdown.
-- Avoid specific file paths or code snippets — they go stale fast.
+- State included outcome, explicit exclusions, and enough behavior context to understand the task; leave implementation discovery to the implementer.
+- For functional changes, describe behavior across all touched integration layers, not a layer-by-layer breakdown. For structural changes, describe the complete relocation and required reference updates without introducing logic changes.
+- Avoid specific file paths or code snippets — they go stale fast. Exception: structural relocation tasks must identify intended source and destination paths.
 - Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 </what-to-build-rule>
 
 ## Acceptance criteria
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code or the spec.
-- Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions.
-- Use the domain language of the spec or `GLOSSARY.md`; apply the solution-agnostic rule — no file paths, class/variable names, or other implementation details.
+- Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions. For structural work, include checks of intended locations, updated references, and unchanged regression behavior.
+- Use the domain language of the spec or `GLOSSARY.md`; keep functional criteria solution-agnostic. Structural criteria may name exact source/destination paths, namespaces, symbols, and project references needed to prove the relocation.
 - State the exact expected outcome — never vague words like "works", "correctly", "properly", "as expected".
 - Fold every applicable Business Rule (`If {{condition}}, {{invariant}}`), Edge Case (`{{boundaryCondition}} → {{expectedHandling}}`), and relevant error condition into its own criterion here, rephrased per the format above — do not create separate sections for them.
 </acceptance-criteria-rule>
@@ -145,9 +154,9 @@ Render every section per its rule; conditional sections only when applicable. Te
 
 ## Implementation Decisions
 <implementation-decisions-rule>
-- Preserve integration constraints and assumptions required for implementation.
+- State producer contracts and supplying tickets when applicable, compatibility constraints, and assumptions; distinguish observed contracts from assumptions needing confirmation.
 - Use short technical statements and implementation-oriented language.
-- No specific file paths or code snippets (they become outdated quickly).
+- Avoid file paths or code snippets except exact structural relocation constraints.
 </implementation-decisions-rule>
 
 - {{implementationDecision1}}
@@ -173,7 +182,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 
 ## Affected layers & modules
 <affected-layers-rule>
-- State which layers/modules this slice touches and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
+- State which layers/modules this task touches (or relocates) and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
 - Source layer headings and Cross-Module Dependency Rules from the Concept or ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
 - If the slice belongs to a specific building block, also scan the `Deployables` table (under `Building blocks` in `ARCHITECTURE.md`) and load the matching block's record (`docs/building-blocks/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
 </affected-layers-rule>
@@ -182,9 +191,10 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 
 ## Verify section
 
-This section is used to verify the code changes. List the tests that will be added, updated, and run to verify the task's changes.
+List tests to add, update, and run for this task.
 - *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. Include the commands that will run the integration or REST API automation tests.
-- Only test external behavior, not implementation details.
-- List which modules will be tested and prior art for the tests.
+- For functional changes, test external behavior, not implementation details. For structural tasks, verify intended paths/references and unchanged behavior using existing regression/API integration tests; add tests only where coverage is insufficient.
+- Map every criterion to a concrete check, exact command/manual action, prerequisites, expected result, and retained evidence. Name affected test modules and prior art; report unavailable prerequisites, never invent commands.
+- Default to existing API integration tests for API behavior; add focused contract, concurrency, retry, or boundary checks where the API seam cannot adequately expose the risk. For structural work, include deterministic location/reference checks and existing regression tests.
 
 </issue-template>

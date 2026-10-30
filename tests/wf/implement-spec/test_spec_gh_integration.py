@@ -179,6 +179,32 @@ def test_hitl_guards(sandbox: Sandbox):
     assert code == 2 and sandbox.state()["prs"] == []
 
 
+def test_planner_dependencies_survive_real_graph_refresh_without_tracker_writes(sandbox: Sandbox):
+    before = sandbox.state()
+    output = str(sandbox.run_dir / "effective-graph.json")
+    for _ in range(2):
+        code, native, err = sandbox.tool("graph", "read", "--spec", SPEC, "--out", str(sandbox.run_dir))
+        assert code == 0, err
+        assert native["frontier"]["ready"] == ["acme/specs#2"]
+        planner = {"status": "completed", "result": {
+            "specRef": SPEC,
+            "tickets": [
+                {"ref": item["ref"], "blockers": ["acme/specs#4"] if item["ref"] == "acme/specs#2" else []}
+                for item in native["tickets"]
+            ],
+        }}
+        planner_file = sandbox.file("planner.json", json.dumps(planner))
+        code, frontier, err = sandbox.tool("graph", "frontier", "--graph", str(sandbox.run_dir / "graph.json"),
+                                          "--planner", planner_file, "--out", output)
+        assert code == 0, err
+        assert frontier["ready"] == []
+        assert {item["ref"] for item in frontier["deferred"]} == {f"acme/specs#{number}" for number in (2, 3, 4, 5)}
+        saved = json.loads(Path(output).read_text())
+        assert saved["frontier"] == frontier
+        assert saved["tickets"][0]["blocked_by"][0]["source"] == "planner"
+    assert sandbox.state() == before
+
+
 def test_pr_publish_rejects_missing_rationale_and_bad_title(sandbox: Sandbox):
     empty = sandbox.file("why.md", "Added a check in PaymentService.\n")
     code, _, err = sandbox.tool("pr", "publish", *PR_ARGS, "--title", "PAY-12: X", "--rationale-file", empty)
