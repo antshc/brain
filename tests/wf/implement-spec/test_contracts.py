@@ -85,7 +85,7 @@ def test_agent_migration_and_absolute_load_contract(role, old, required):
                       'ticketFile',
                       'ticketRef',
                       'worktreePath'],
-                     'cc6785dae95427f44940c45b9f6fdc5f8a1390d3651876252043c2dc40cfcce4'),
+                     'a68c26c86d983eb7deee65a86e3cb3e8f421429ffb249581675c29ac452e4754'),
      'verifier': (['commitsFile',
                    'commitSubjectPrefix',
                    'evidenceDir',
