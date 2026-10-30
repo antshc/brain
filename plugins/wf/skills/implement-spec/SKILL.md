@@ -104,7 +104,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 6. **Frontier check.** Refresh `graph read`, then `GH_TOOL graph frontier --graph RUN_DIR/graph.json --done <integrated refs>` after each publication. A blocker is satisfied only when integrated in this run or verified in the base. Unfinished tickets but none ready → report each unready ticket and why (open `hitl`, unresolved external dependency); preserve all work and the draft PR; keep the spec open; stop before chore, verification, review, actualize/cleanup, or finalization. Never force progress or declare completion.
 
 7. Launch chore → [chore.md](./agents/chore.md) subagent in `WORKTREE_PATH`:
-   refs `fetch-diff` · rework none.
+   refs `fetch-diff` · `claude-opus-5.5` medium reasoning, fallback `gpt-6.1-sol` medium when rejected · rework none.
    Before: load [fetch-diff.md](./references/fetch-diff.md); split PR diff into `@diffDir`.
 
    | Placeholder | Value |
@@ -117,7 +117,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` |
    | `{{commitSubjectPrefix}}` | `chore(<INITIATIVE_ID>): ` |
 
-   Verify: ≤1 commit since `@prevHead`, subject match, clean, checks reported.
+   Verify: ≤1 commit since `@prevHead`, subject match, clean, checks reported; record actual model/effort or unavailable-model failure.
    After: push; remove `@diffDir`; report out-of-scope findings without acting.
    → No result or failed: record none/failed; continue.
 
@@ -195,7 +195,7 @@ Table of ticket, blocked by (`none` = explicit root), paths, conflicts with kind
 - Breakdown Initiative or parallel mode → first: *Graph report*.
 - Spec URL, created tickets, planner model/effort; PR URL/state.
 - Per ticket: integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
-- Chore commits; verification verdict, checks, fix commits, per-round `EVIDENCE_DIR`, spec comment ID or skip reason.
+- Chore commits and model/effort; verification verdict, checks, fix commits, per-round `EVIDENCE_DIR`, spec comment ID or skip reason.
 - Review axes, findings, comment IDs, models/fallbacks; actualize commits/merge result; skipped infrastructure checks; worktree status.
 - No runnable tickets: report graph/blockers; never claim implementation.
 - Incomplete: name missing evidence, partial GitHub writes, preserved work; distinguish unverified state from read-back success.
