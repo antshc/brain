@@ -73,7 +73,9 @@ Keep `SKILL.md` body under 300 lines.
 
 Keep up to two category files at skill root; otherwise use the matching resource folder.
 
-**Bundled paths:** resolve `scripts/`, `references/`, `assets/`, and `templates/` from the skill base directory, never the caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
+**Kind folders:** a skill that routes to several same-kind playbooks MAY group them in a folder named by that kind (plural, lowercase, e.g. `kinds/`, `strategies/`, `modes/`) instead of `references/`. `SKILL.md` links each file directly from a routing table; bundled-path, skill-local, and one-level-deep rules apply unchanged. Name sibling playbooks in prose (`component` kind), never link between them.
+
+**Bundled paths:** resolve `scripts/`, `references/`, `assets/`, `templates/`, and kind folders from the skill base directory, never the caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
 
 **Skill-local resources:** each skill **MUST** bundle required resource files inside its own folder; **MUST NOT** read, link, or execute resource files from another skill's folder. Copy required resources into the consuming skill and update its paths. Invoking another skill remains allowed; accessing its internal files does not.
 
