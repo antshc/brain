@@ -2,7 +2,6 @@
 name: to-spec
 description: Turn the current conversation into a spec and publish it as a GitHub issue or explicit offline Markdown — no interview, just synthesis of what you've already discussed.
 argument-hint: "What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"
-disable-model-invocation: true
 ---
 
 This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
