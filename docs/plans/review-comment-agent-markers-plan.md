@@ -4,13 +4,13 @@ Status: proposed. No implementation changes.
 
 ## Goal
 
-Distinguish human PR discussion from agent-written Code Review findings and Address replies, including when both use the same GitHub login. Keep the rendered comment text unchanged. Scope: Code Review, Address, and the tools discussion-state gate; Ralph is excluded.
+Distinguish human PR discussion from agent-written Code Review findings and Address replies, including when both use the same GitHub login. Keep the rendered comment text unchanged. Scope: Code Review and Address only. The bundled Address script is the runtime implementation; `tools` and Ralph are excluded.
 
 ## Constraints
 
 - **MUST** append exact hidden markers to new Code Review findings and final Address replies. Rationale: classify comments from their content, not their account.
 - **MUST NOT** infer agent identity or whether a thread is answered from the GitHub author, even if the same-author rule seems faster or simpler. Rationale: humans and agents may share credentials.
-- **MUST NOT** change Ralph skills, filters, handlers, or mirrored code. Rationale: Ralph is outside this change, even if updating a shared consumer seems simpler.
+- **MUST NOT** change `tools` or Ralph scripts, filters, handlers, or tests. Rationale: Address invokes its own script; shared-code rewrites are unnecessary even if simpler.
 - **MUST** preserve resolved-thread and pending-draft-review exclusions. Rationale: no spurious work.
 - **MUST NOT** mutate old PR comments, introduce speculative abstraction, or duplicate shared parsing logic. Rationale: minimal, safe migration.
 
@@ -54,14 +54,14 @@ Track the last marked Address answer and all later comments, not whether their a
 
 1. **Code Review publication.** Update `plugins/review/skills/code-review/SKILL.md` and `references/posting.md`. Append `brain:code-review:v1` in the posting layer after the validated finding, without changing reviewer output or review format. Deduplication compares substantive content, not markers.
 2. **Address instructions and replies.** Update `plugins/review/skills/address/SKILL.md` and `references/github-api.md`. Append `brain:address:v1` to every final reply, including no-change and clarification outcomes. Keep progress-only comments distinct from final answers.
-3. **Shared discussion gate.** Update `tools/src/modules/github/pr_discussion_state.py`. Replace login-driven state with marker-driven state. Retain pagination/truncation safeguards and pending-review filtering. Remove redundant acting-login lookup if no remaining consumer needs it.
-4. **Synchronize Address only.** Update `plugins/review/skills/address/scripts/pr_discussion_state.py` from the authoritative `tools` source; verify the two agree. This Address copy currently has `self_opened` logic absent from the shared source, so reconcile the drift intentionally. `.githooks/pre-commit` also mirrors `tools/src/modules/github/` into Ralph; exclude `pr_discussion_state.py` from those Ralph syncs so no Ralph file changes or behavior updates are introduced. Preserve every other hook operation.
+3. **Address discussion gate.** Update only `plugins/review/skills/address/scripts/pr_discussion_state.py`. Replace login-driven state with marker-driven state. Preserve its pagination/truncation safeguards and pending-review filtering. Remove redundant acting-login lookup if no longer needed. This bundled script already differs from the `tools` version (`self_opened` exists only here); do not replace it wholesale from `tools`.
+4. **Decouple hook synchronization.** In `.githooks/pre-commit`, remove only the block that copies `tools/src/modules/github/pr_discussion_state.py` to Address. Rationale: otherwise the pre-commit hook would overwrite the skill-local fix. Keep the Ralph synchronization blocks unchanged; do not alter `tools` or Ralph code.
 
 ## Tests
 
-- In `tools/tests/unit/pr_discussion_state_test.py`: same GitHub login for human/agent; self-authored opening review remains pending; marked answer skips; human or review follow-up reopens; markerless comments remain pending; draft and resolved behavior unchanged.
-- In relevant AFK Address handler tests: pending/answered selection and rerun idempotency use the shared discussion-state classifier.
-- Verify comment posting/read-back preserves the exact final marker, the Address copy matches the shared source, and Ralph files remain untouched.
+- Add focused tests for `plugins/review/skills/address/scripts/pr_discussion_state.py` (e.g., `plugins/review/skills/address/tests/test_pr_discussion_state.py`): same login for human and agent; self-authored opening finding pending; marked answer skips; follow-up reopens; unmarked legacy comments pending; draft/resolved behavior unchanged; rerun idempotency.
+- Verify comment posting/read-back preserves the exact final marker. Verify the pre-commit hook no longer overwrites Address and all existing Ralph synchronization remains unchanged.
+- Do not update `tools/tests/` because `tools/src/modules/github/pr_discussion_state.py` is out of scope.
 
 ## Legacy policy
 
@@ -72,5 +72,5 @@ Unmarked legacy agent comments are indistinguishable from human comments. Treat 
 - Code Review findings and Address replies are tagged automatically while GitHub-rendered prose remains unchanged.
 - Re-running Address after a marked answer skips until a new unmarked human comment or new Code Review finding appears.
 - Shared-account authorship never causes a finding to be skipped or a human reply to be considered answered.
-- No Ralph skill, module, filter, generated copy, or runtime behavior changes.
-- Tests pass; no unrelated workflow changes.
+- No `tools` or Ralph skill, script, test, generated copy, or runtime behavior changes. The Address script owns its classification independently.
+- Address-local tests pass; only the Address synchronization portion of the pre-commit hook changes.
