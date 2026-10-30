@@ -319,7 +319,7 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert 'posting failure' in post.lower()
     for text in ('stale', 'pending', 'failed', 'without force'):
         assert text in finalize
-    assert 'Address' in finalize
+    assert 'do not restart Address' in finalize
     assert 'Diagnose' not in finalize
     assert 'two verifier fix attempts' in finalize
 
