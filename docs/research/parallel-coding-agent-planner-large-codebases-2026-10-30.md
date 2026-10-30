@@ -28,6 +28,32 @@ Optimize **accepted, integrated behavior per elapsed hour**, not task count, age
 
 **Evidence limitation:** Cursor's highest-throughput results are research experiments, not controlled proof of the best settings for every production repository. Vendor recommendations are practitioner guidance. Benchmark the design on representative `brain`/`loop` tasks before imposing hard thresholds.
 
+## Industry best-practices checklist (independent of current implementation)
+
+The following is the complete recommended planner behavior, **whether or not `implement-spec` already implements a particular item**. The repository comparison later in this document is an implementation inventory, not a filter on these practices.
+
+| Priority | Practice | Required planner behavior | Rationale |
+| --- | --- | --- | --- |
+| MUST | Grounded repository exploration | Inspect actual code at the specified base revision, architecture, nearby patterns, callers, and tests before proposing tasks. | Prevent invented contracts and unnecessary new structures. |
+| MUST | Requirement coverage | Map every requirement, rule, edge case, and acceptance criterion to a task and check. | Prevent omissions during decomposition. |
+| MUST | Complete behavioral slices | Prefer independently reviewable, testable capabilities over arbitrary horizontal layers or tiny file edits. | Minimize cross-worker coupling. |
+| MUST | Contract-first prerequisites | Establish unstable shared API/schema/interface decisions before consumers work in parallel. | Prevent incompatible implementations. |
+| MUST | Hard dependency DAG | Specify only genuine producer-before-consumer blockers and reject cycles. | Reveal real parallelism and avoid false serialization. |
+| MUST | Separate file conflicts | Predict shared write paths, including DI, manifests, lockfiles, migrations, and generated output. Keep conflicts separate from blocker edges. | Worktrees isolate working directories, not integration semantics. |
+| MUST | Clear task handoffs | Give every task goal, scope, constraints, relevant source pointers, observable acceptance, verification, blockers, and result format. | Fresh workers need complete bounded context. |
+| MUST | Verifiable integration | Define task-local checks and an integrated acceptance gate; never treat a worker's completion claim as sufficient evidence. | Independently valid pieces can fail together. |
+| MUST | Preserve established architecture | Reuse existing models, utilities, domain vocabulary, layering, and applicable ADRs even if a new abstraction looks simpler. | Reduce maintenance and design drift. |
+| MUST NOT | Artificial parallelism | Never split tightly coupled work just to occupy idle worker slots, even if the plan looks faster. | Overhead can exceed the saved execution time. |
+| MUST NOT | Unverified assumptions | Never invent paths, interfaces, executable test commands, or missing decisions. Surface uncertainty or create a bounded investigation prerequisite. | Avoid propagating speculation into multiple branches. |
+| SHOULD | Critical-path priority | Prefer ready tasks that unblock the longest or most consequential downstream path, subject to ownership conflicts. | Reduce overall completion latency. |
+| SHOULD | Modest concurrency | Start with a small worker cap, then tune using build contention, merge conflicts, and throughput. | More agents are not automatically faster. |
+| SHOULD | Incremental integration | Integrate independently finished tasks as they settle rather than waiting for fixed waves. | Unblock successors sooner and detect incompatibilities earlier. |
+| SHOULD | Targeted replanning | Revise only affected unfinished tasks when a worker discovers new evidence; preserve completed work and its history. | Avoid wasted work and ledger churn. |
+| SHOULD | Model specialization | Select planning, coding, and review models by measured performance on each role, not a single universal ranking. | Different work types have different strengths and cost profiles. |
+| MAY | Scoped subplanners | Delegate repository exploration or very large independent subdomains to planners with explicit ownership and handoffs. | Useful at scale, but additional coordination is not free. |
+
+The checklist synthesizes the cited vendor practices; normative words express the **recommended design contract**, not a claim that every vendor mandates identical behavior.
+
 ## Decomposition method
 
 1. **Inventory the requested behavior.** Read requirements, rules, edge cases, acceptance criteria, relevant artifacts, and existing tickets. Preserve user-defined decisions; flag unresolved contradictions.
@@ -91,6 +117,207 @@ handoff:
 ```
 
 `expected_paths` is a prediction, not an invitation to change code outside ownership. Unexpected shared edits must be reported and reassigned before simultaneous work continues. Acceptance should describe observable behavior; implementation details belong in constraints and context.
+
+## Recommended implementation-task structure
+
+**Recommendation:** Keep a task's enduring **behavior contract** in its ticket body. Keep mutable execution details (worker, worktree path, current commit, scheduler state) in the run ledger. Keep graph edges and conflict evidence in structured metadata or native ticket relationships. This prevents stale implementation instructions and duplicated sources of truth.
+
+### Required task fields
+
+| Group | Field | Guidance |
+| --- | --- | --- |
+| Identity | Task ID and parent spec | Stable reference and traceability; use native ticket identity when available. |
+| Goal | One outcome-oriented title and *What to build* | Describe the behavior to deliver, not a list of files to edit. |
+| Scope | In-scope capability, affected modules, exclusions | Bound work without forbidding necessary discoveries. |
+| Traceability | Requirements and edge cases addressed | Cover exact source requirements and relevant artifact excerpts/anchors. |
+| Contracts | Shared API/schema decisions and constraints | Identify interfaces that must remain stable and any prerequisite contract work. |
+| Acceptance | Observable pass/fail criteria | Include success, boundary, and failure behavior; avoid vague “works correctly.” |
+| Verification | Test seams and grounded commands | Specify how correctness will be observed, including integration boundaries. |
+| Dependencies | Native blockers/task references | Distinguish hard prerequisite implementations from advisory shared context. |
+| Ownership | Predicted write modules/paths, shared hot files | Support safe scheduling; treat predictions as revisable, not an edit whitelist. |
+| Handoff | Expected result and evidence fields | Commit SHA, changed paths, actual checks/outcomes, deviations, blockers. |
+
+### Recommended ticket body
+
+```markdown
+# <Behavior-oriented task title>
+
+## Parent Spec
+<Link or native parent issue>
+
+## What to build
+<One self-contained, observable behavioral slice>
+
+## Acceptance criteria
+- [ ] When <action>, then <observable result>.
+- [ ] If <failure/boundary>, then <expected handling>.
+
+## Requirements addressed
+- <Exact source requirement IDs and text>
+
+## Implementation Decisions
+- <Established contracts, constraints, compatibility rules>
+
+## Related Spec Artifacts
+- <Relevant bounded excerpt or source anchor and relationship>
+
+## Relevant Concepts
+- <Applicable architecture rules and ADR summaries>
+
+## Contracts Delta
+<Only when API, database, or resource contracts change>
+
+## Affected layers & modules
+- <Affected modules and cross-module constraints>
+
+## Verify
+- <Relevant tests, existing examples, commands/seams>
+- <Expected evidence, including integration behavior>
+```
+
+This matches the existing [`brain` ticket-body template](https://github.com/antshc/brain/blob/main/plugins/wf/skills/implement-spec/references/breakdown.md). Do not create a competing template merely for this research.
+
+### Structured planning metadata (outside prose)
+
+```yaml
+task_ref: owner/repo#123
+parent_spec: owner/repo#100
+blockers: [owner/repo#120]
+predicted_paths:
+  - src/Workers/JournalCache/**
+hot_files:
+  - src/Workers/DependencyInjection.cs
+conflicts:
+  - with: owner/repo#124
+    kind: file
+    evidence: src/Workers/DependencyInjection.cs
+ready: false
+```
+
+Store actual branch/worktree location, worker assignment, execution status, integrated SHA, and latest validation result in the scheduler's ledger, not as static ticket requirements. Where native issue blockers are authoritative, metadata should reference them rather than maintain a competing manually edited graph.
+
+### Task-size decision rules
+
+- **Good size:** One coherent independently testable change with a clear end state and a reviewable diff. It may touch several layers within one owned module.
+- **Split when:** Two behaviors have independent acceptance and write surfaces; a task spans unrelated modules; or a distinct uncertain contract requires investigation before implementation.
+- **Keep together when:** Steps share the same critical implementation files, cannot be tested meaningfully in isolation, or separating them creates excessive communication.
+- **Sequence when:** A schema, public API, shared abstraction, migration, or implementation produced by one task must exist before another can compile or verify.
+- **Do not size by:** A fixed number of files, lines, or tasks per worker. Use coupling, context load, time to meaningful feedback, and integration risk.
+- **Do not create “write tests” as a mandatory independent parallel task:** Include focused tests with the behavior. Independent black-box verification can be a separate downstream activity.
+
+**Readiness checklist:** A worker should be able to identify the behavior, permitted scope, real source context, required contracts, executable checks, and handoff format without asking another worker for missing design decisions. If not, improve the ticket or create an explicit prerequisite.
+
+## Example: planner-agent instructions
+
+This is a **complete illustrative agent body**, suitable as a starting point for Claude Code, Copilot, or Codex after adapting each platform's tools and output schema. It is not a drop-in replacement for `brain`'s planner, which already has specific reference-loading, GitHub publication, and JSON contracts.
+
+```markdown
+# Parallel Implementation Planner
+
+## Role
+Decompose a feature into an acyclic graph of bounded,
+independently verifiable implementation tasks.
+Plan only; coding, worktree creation, scheduling, and
+integration belong to the calling workflow.
+
+## Inputs
+- Spec, comments, acceptance criteria, and related artifacts.
+- Existing tickets, native blockers, and current statuses.
+- Source repository, base revision, architecture constraints.
+- Maximum concurrent workers (capacity, not a task target).
+
+## Procedure
+1. Read the complete input and list required behaviors,
+   business rules, edge cases, and acceptance criteria.
+2. Explore relevant code at the base revision:
+   implementations, call sites, module boundaries,
+   contracts, composition roots, migrations, and tests.
+   Follow existing conventions and architecture records.
+3. Identify shared contracts and unresolved decisions.
+   Put prerequisite work first when downstream tasks
+   cannot safely implement against the current base.
+4. Draft the fewest coherent vertical slices that cover
+   all requirements. Each slice must have an observable
+   result, a test seam, and bounded write ownership.
+5. For each task provide:
+   - Goal and requirements covered.
+   - Acceptance and failure/boundary cases.
+   - Scope and predicted files/modules.
+   - Relevant source/artifact pointers and constraints.
+   - Verification commands/seams grounded in the repo.
+   - Hard prerequisite task IDs and expected handoff.
+6. Build blocker edges only when a task cannot be
+   implemented or verified before its producer lands.
+   Keep shared-file conflicts separate from blockers.
+7. Validate DAG cycles, coverage, independent ownership,
+   missing acceptance checks, and unresolved decisions.
+8. Return all tasks, blockers, ready frontier, conflict
+   evidence, critical path, and outstanding questions.
+
+## Constraints
+- MUST preserve existing valid tickets and blocker
+  relationships; do not regenerate them merely to replan.
+  Rationale: avoid duplicate work and loss of history.
+- MUST map every requirement to a task and verification.
+  Rationale: decomposition must not reduce scope.
+- MUST ground paths, interfaces, and test seams in source.
+  Rationale: parallel workers cannot repair invented facts.
+- MUST prioritize behavioral slices over arbitrary layers.
+  Rationale: independently testable tasks integrate better.
+- MUST identify unstable shared contracts as prerequisites.
+  Rationale: consumers need compatible assumptions.
+- MUST distinguish hard blockers from write conflicts.
+  Rationale: they constrain scheduling differently.
+- MUST NOT create artificial tasks or dependency edges to
+  match worker capacity, even if that appears faster.
+  Rationale: coordination and false blockers waste time.
+- MUST NOT modify implementation code or manage worktrees.
+  Rationale: maintain separation from execution control.
+- MUST NOT guess unresolved product decisions.
+  Rationale: silent assumptions invalidate requirements.
+- SHOULD minimize unrelated refactoring and abstractions.
+  Rationale: preserve the repository's established design.
+
+## Output
+Return exactly one structured result:
+- status: completed | blocked
+- tasks: id, goal, requirements, scope, dependencies,
+  acceptance, verification, context, handoff
+- conflicts: task pair, file | soft, concrete evidence
+- ready: initially executable task IDs
+- criticalPath: longest hard-blocker chain
+- openQuestions: blocking questions and required evidence
+
+If no safe parallel decomposition exists, return the
+valid sequential graph. Never invent parallelism.
+```
+
+### Optional structured result example
+
+```json
+{
+  "status": "completed",
+  "tasks": [
+    {
+      "id": "T1",
+      "goal": "Define the cache contract and fallback behavior",
+      "requirements": ["FR-1", "BR-2"],
+      "scope": ["Workers.JournalCache"],
+      "depends_on": [],
+      "acceptance": ["Contract preserves the remote-read fallback"],
+      "verification": ["Contract and compatibility tests"],
+      "context": ["Existing cache reader and architecture ADR"],
+      "handoff": ["Commit SHA", "executed checks", "decisions"]
+    }
+  ],
+  "conflicts": [],
+  "ready": ["T1"],
+  "criticalPath": ["T1"],
+  "openQuestions": []
+}
+```
+
+The example describes the planner's **logical output**. A ticket-backed system should use real issue references, native blocker edges, and the established schema instead of inventing a second task database.
 
 ## Planner, scheduler, implementer, and integrator boundaries
 
