@@ -276,12 +276,11 @@ def test_factory_owns_verifier_resources_and_local_links():
     assert 'proof-framework' in post.lower()
 
 
-def test_architect_modes_verify_and_review_after_implementation():
+def test_architect_workflow_verifies_and_reviews_after_implementation():
     playbook = (FACTORY / 'playbooks/architect.md').read_text()
-    for heading in ('Interactive', 'Auto'):
-        mode = playbook.split(f'## {heading}\n')[1].split('\n## ')[0]
-        assert mode.index('`implement-spec` skill') < mode.index('*App verification*') < mode.index('*Code review*') < mode.index('*Finalize*')
-        assert '`ready`' in mode and 'blocked/incomplete' in mode
+    workflow = playbook.split('## Workflow\n')[1]
+    assert workflow.index('`implement-spec` skill') < workflow.index('*App verification*') < workflow.index('*Code review*') < workflow.index('*Finalize*')
+    assert '`ready`' in workflow and 'blocked/incomplete' in workflow
     post = (FACTORY / 'references/post-implementation.md').read_text()
     review = post.split('## Code review\n')[1].split('\n## ')[0]
     assert '`code-review` skill' in review

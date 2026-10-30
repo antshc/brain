@@ -24,16 +24,10 @@ PLAYBOOKS — matched from the request
   /factory-mode design <capability>; resolve open questions first
   /factory-mode we need <feature>, figure out the decisions
 
- architect          research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → finalize draft PR
+ architect          research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → address → diagnose → finalize draft PR
   /factory-mode add <behavior> to <module>
-  /factory-mode implement <story> against an architect sketch
-
- architect auto     goal: deliver the entire feature autonomously, no questions after start
-                    asks once: Initiative ID, target branch, repository
-                    arena 3 agents → interrogate + research/experiment → to-spec → implement-spec parallel
-                    → verify app → code-review → address → diagnosing-bugs → finalize → show-me-your-work report
-  /factory-mode auto: add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
-  /factory-mode run until done: <feature>
+  /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
+  /factory-mode add <feature> checkpoint  (pause for design approval)
 
  refactoring        pin behavior → subtract → reshape in green steps → prove unchanged
   /factory-mode extract <logic> from <Class> into <module>
@@ -52,13 +46,13 @@ Principles, autonomy, subagent, and reply rules apply to every playbook.
 
 1. **Restate.** Goal, problem, and smallest change that meets it, in 2–3 lines. **Done when:** printed.
 2. **Locate.** Light read-only scan: owning module, existing tests, matching `ARCHITECTURE.md` / `GLOSSARY.md` rows, open unknowns. Names via search only; no subagents. **Done when:** owning area named, or `unknown`.
-3. **Build 3 options** from the Playbooks table, each a different playbook or mode (e.g. `architect` vs `architect auto`, `design` before `architect`, `prototype` first). **Done when:** 3 distinct options.
+3. **Build 3 options** from the Playbooks table, each a different playbook or approach (e.g. `design` before `architect`, `prototype` first, `architect` directly). **Done when:** 3 distinct options.
 4. **Print**, per option:
-   - **Option N — {{playbook}}** ({{mode}})
+   - **Option N — {{playbook}}** ({{approach}})
    - **Delivers / skips:** artifact produced (answer, spec, design, draft PR, decision) vs what it leaves out
    - **Skills called:** in order
    - **Needs:** inputs or access (Initiative ID, target branch, repository, cloud creds)
-   - **Asks you:** when and what, or `none after start`
+   - **Asks you:** required inputs and any explicitly requested checkpoint, or `none`
    - **Reasoning:** why this option fits the request
 5. **Recommend** one option in one line with the deciding reason, then stop. Run nothing until the user picks. **Done when:** options + recommendation printed.
 

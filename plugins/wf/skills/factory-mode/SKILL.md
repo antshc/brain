@@ -138,7 +138,7 @@ Open a todo list whose first items are the matched playbook's steps, copied verb
 | Investigation | Read-only question: how does X work, why is Y built this way, are we sure about Z, X or Y | [playbooks/investigation.md](playbooks/investigation.md) |
 | Bug fix | Reported defect to reproduce, root-cause, and fix with runtime evidence | [playbooks/bug-fix.md](playbooks/bug-fix.md) |
 | Design | Unresolved unknowns before building: grill or Wayfinder, then spec and feature design | [playbooks/design.md](playbooks/design.md) |
-| Architect | New or changed behavior: sketch, spec, implement, verify app, review draft PR; Auto adds arena, self-review, address, and bug diagnosis | [playbooks/architect.md](playbooks/architect.md) |
+| Architect | New or changed behavior: autonomous sketch, spec, implementation, verification, review, address, and bug diagnosis; optional design checkpoint | [playbooks/architect.md](playbooks/architect.md) |
 | Refactoring | Behavior-preserving change to structure (rename, extract, inline, dedupe, move) | [playbooks/refactoring.md](playbooks/refactoring.md) |
 | Prototype | Throwaway sketch to settle a design or empirical fork by observation | [playbooks/prototype.md](playbooks/prototype.md) |
 
