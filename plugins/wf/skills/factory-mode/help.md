@@ -24,7 +24,7 @@ PLAYBOOKS — matched from the request
   /factory-mode design <capability>; resolve open questions first
   /factory-mode we need <feature>, figure out the decisions
 
- architect          research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → address → diagnose → finalize draft PR
+ feature            research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → address → diagnose → finalize draft PR
   /factory-mode add <behavior> to <module>
   /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
   /factory-mode add <feature> checkpoint  (pause for design approval)
@@ -46,7 +46,7 @@ Principles, autonomy, subagent, and reply rules apply to every playbook.
 
 1. **Restate.** Goal, problem, and smallest change that meets it, in 2–3 lines. **Done when:** printed.
 2. **Locate.** Light read-only scan: owning module, existing tests, matching `ARCHITECTURE.md` / `GLOSSARY.md` rows, open unknowns. Names via search only; no subagents. **Done when:** owning area named, or `unknown`.
-3. **Build 3 options** from the Playbooks table, each a different playbook or approach (e.g. `design` before `architect`, `prototype` first, `architect` directly). **Done when:** 3 distinct options.
+3. **Build 3 options** from the Playbooks table, each a different playbook or approach (e.g. `design` before `feature`, `prototype` first, `feature` directly). **Done when:** 3 distinct options.
 4. **Print**, per option:
    - **Option N — {{playbook}}** ({{approach}})
    - **Delivers / skips:** artifact produced (answer, spec, design, draft PR, decision) vs what it leaves out

@@ -276,8 +276,8 @@ def test_factory_owns_verifier_resources_and_local_links():
     assert 'proof-framework' in post.lower()
 
 
-def test_architect_workflow_verifies_and_reviews_after_implementation():
-    playbook = (FACTORY / 'playbooks/architect.md').read_text()
+def test_feature_workflow_verifies_and_reviews_after_implementation():
+    playbook = (FACTORY / 'playbooks/feature.md').read_text()
     workflow = playbook.split('## Workflow\n')[1]
     assert workflow.index('`implement-spec` skill') < workflow.index('*App verification*') < workflow.index('*Code review*') < workflow.index('*Finalize*')
     assert '`ready`' in workflow and 'blocked/incomplete' in workflow

@@ -1,4 +1,4 @@
-### Architect
+### Feature
 
 **You own the design. Sketch, spec, ship.** New or changed behavior goes from an accepted sketch to a spec to a reviewed draft PR.
 
