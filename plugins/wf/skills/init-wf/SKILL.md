@@ -28,6 +28,7 @@ Then:
   Resolve `{{codeRepoName}}`/`{{codeRepoSlug}}` from the nested repo (e.g. `git -C workspace/{{codeRepoName}} remote get-url origin`).
 
   Run `/init-harness` skill from the reporoot so `.github/skills/harness/` exists (the `harness` skill, its settings file, and its pull command) — without it, ralph tooling falls back to treating the harness root as the codebase root.
+- **Both** → git worktrees live in `.worktrees/<repo-name>/<name>` at the reporoot. `git check-ignore -q .worktrees/` fails → `echo "/.worktrees/" >> .gitignore`.
 
 ## 2. Seed the copilot instructions
 
