@@ -59,11 +59,12 @@ Break the slicing source into **tracer bullet** slices: thin vertical paths thro
 <vertical-slice-rules>
 
 - Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests).
+- Size for one focused implementer session. Prefer 30–120 minutes of estimated agent execution as a soft heuristic, not a gate; estimates may be inaccurate. Merge trivial work when coordination dominates. Split oversized work only at independently verifiable, stable-contract, non-overlapping write boundaries; never force a split solely to hit a duration target, even if it appears faster.
 - A completed slice is demoable or verifiable on its own.
 - Prefactoring slices come first.
 - Name each slice's verification seam (e.g. an integration test observing the database layer); prefer the highest seam that still exercises the slice end-to-end.
 - Type each slice `HITL` (needs human interaction, e.g. architectural decision or design review) or `AFK` (implementable and mergeable without humans). Prefer AFK.
-- Slices that edit the same code must be merged or ordered with a blocker; independent slices may run concurrently.
+- For overlapping writes, merge slices, move the shared edit into one slice, or flag a `file` conflict for later serialization. Shared paths alone do not justify a blocker edge; add blockers only when a consumer needs the producer's integrated change to implement or verify. Independent slices may run concurrently.
 
 </vertical-slice-rules>
 
@@ -80,13 +81,13 @@ Present a numbered list; per slice show:
 - **Blocked by**: slices that must complete first
 - **Functional Requirements covered**: spec requirement numbers addressed (full verbatim text is copied into each ticket in step 5)
 
-Then print the blocker graph as a table `Slice | Blocked by` with one row per slice, using `none` for roots; list the initial ready frontier, uncovered requirements, and source conflicts.
+Then print the blocker graph as a table `Slice | Blocked by` with one row per slice, using `none` for roots; list the initial ready frontier, anticipated write conflicts (with shared paths), uncovered requirements, and source conflicts.
 
 
 Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 - Does the granularity feel right (too coarse / too fine)?
-- Are blocker edges correct and acyclic? Are overlapping edits merged or ordered?
+- Are blocker edges genuine producer-consumer dependencies and acyclic? Are overlapping writes handled without artificial blocker edges?
 - Should any slices be merged or split?
 - Are HITL/AFK types correct?
 
