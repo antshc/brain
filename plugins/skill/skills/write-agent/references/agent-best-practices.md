@@ -149,7 +149,7 @@ Decomposition:
 | Horizontal split | Only for independent module migrations, mechanical repo-wide edits, stable interface implementations |
 
 - Size by coupling, context load, time to feedback, integration risk; never by fixed files, lines, or tasks per worker.
-- **Time heuristic:** 30–120 minutes of estimated agent execution per focused task is a tentative starting range, not a hard limit; estimates are unreliable. Merge trivial work when overhead dominates; split large work only at independently verifiable, stable-contract, disjoint-write seams. Never force a split solely for the duration target.
+- **Model-aware task size:** Keep cohesive, even multi-hour, behavior with one capable implementer. Merge trivial work when coordination dominates; split only at independently verifiable, stable-contract, disjoint-write seams. Never split just to shorten runtime or increase worker count. Prefer stronger models for complex work; benchmark cheaper models on bounded tasks using total verified cost and time. Model selection belongs to the workflow.
 - Tests ship with each behavior slice; no standalone "write tests" task per coding task. Independent black-box verification may be a downstream task.
 - **Readiness:** a worker identifies behavior, permitted scope, real source context, contracts, executable checks, handoff format without asking another worker.
 
