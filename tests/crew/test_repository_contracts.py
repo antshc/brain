@@ -29,16 +29,16 @@ def test_codey_agents_require_focused_integration_tests_for_external_boundaries(
 
         assert "repository/accessor/proxy" in agent
         assert "existing integration/functional-slice tests" in agent
-        assert "`/testing-*` skill" in agent
+        assert "*run `testing-integrations` skill" in agent
         assert "source of truth" in agent
         assert "smallest existing test subset" in agent
 
 
-def test_chorey_uses_testing_skill_and_minimal_existing_boundary_tests():
+def test_chorey_uses_testing_integrations_skill_and_minimal_existing_boundary_tests():
     agent = (CREW_ROOT / "agents" / "chorey.agent.md").read_text(encoding="utf-8")
 
     assert "repository/accessor/proxy" in agent
     assert "existing integration/functional-slice tests" in agent
-    assert "`/testing-*` skill" in agent
+    assert "*run `testing-integrations` skill" in agent
     assert "source of truth" in agent
     assert "smallest matching existing boundary-test subset" in agent
