@@ -18,9 +18,9 @@
 | ui | visual / interaction behavior | existing frontend route |
 
    **Done when:** option(s) + artifact named.
-3. **Cloud option** → [cloud.md](../../references/cloud.md) steps 1–3 before running. **Done when:** account verified (+ confirmed for writes).
+3. **Cloud option** → **Cloud Safety** steps 1–3 before running. **Done when:** account verified (+ confirmed for writes).
 4. **Run** — *run `experiment` to answer one uncertain technical question with a minimal throwaway experiment, observing actual behavior of the logic, runtime, SDK/API integration, cloud resource, or UI*; pass the question, option, and the Discover facts (stack, test infra, account). **Done when:** experiment skill reports Question / Method / Observation / Conclusion / Evidence / Cleanup.
-5. **Clean up.** Throwaway code removed; cloud → [cloud.md](../../references/cloud.md) step 5. **Done when:** cleanup reported.
+5. **Clean up.** Throwaway code removed; cloud → **Cloud Safety** step 5. **Done when:** cleanup reported.
 6. **Feed back.** Answer changes the plan → return to the ladder: write or update the test at the lowest rung that now can show the behavior. **Done when:** next rung named, or `none`.
 
 ## Key Rule
