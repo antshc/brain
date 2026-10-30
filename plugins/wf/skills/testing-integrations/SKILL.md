@@ -14,7 +14,7 @@ Integration-test orchestrator. Discover repo facts, pick a **kind** (what runs) 
 
 Repo facts come from the repo, never from this skill. Run before any playbook; reuse findings for the rest of the session.
 
-1. `repoRoot := git rev-parse --show-toplevel` run from the agent session's launch folder, not the current CWD. Resolve every path below from `repoRoot`. **MUST NOT** re-resolve `repoRoot` from a git worktree or nested repo (e.g. code repo under `workspace/`) after a `cd`; those are code roots named by repo instructions, not the Discover root.
+1. Set `@repoRoot` to the output of `git rev-parse --show-toplevel`, run from the agent session's launch folder, not the current CWD. Resolve every path below from `@repoRoot`. **MUST NOT** re-resolve `@repoRoot` from a git worktree or nested repo (e.g. code repo under `workspace/`) after a `cd`; those are code roots named by repo instructions, not the Discover root.
 2. Read repo agent instructions first (`AGENTS.md`, `.github/copilot-instructions.md`, path-scoped instructions): they name the code root, build root, and safety rules.
 3. Scan root-level `*.md` and `docs/` for prose describing **how to run integration tests**, **testing framework**, **functional / E2E tests**, and **how to run the project locally** (local instance, stack, compose, emulator, mock). Prefer a dedicated integration-testing doc when present; fall back to `README*` run sections, then test projects, build scripts, compose files, CI pipelines.
 4. Scan repo skills (`.github/skills/`, `.claude/skills/`, `.agents/skills/`) and user skills for ones that run tests, start the local stack, or run the cloud CLI against dev/test account profiles. Record their names; invoke them by name later, do not copy their content.
@@ -122,7 +122,7 @@ Exit code alone, environment startup, or appliance creation is not completion.
 
 ## Gotchas
 
-- Scoped search empty ≠ absent; re-scan unscoped within `repoRoot` before reporting a suite or doc missing.
-- CWD drifts after `cd` into a worktree or nested repo; `git rev-parse --show-toplevel` there returns that sub repo, hiding launch-folder docs and skills. Keep the launch-folder `repoRoot`.
+- Scoped search empty ≠ absent; re-scan unscoped within `@repoRoot` before reporting a suite or doc missing.
+- CWD drifts after `cd` into a worktree or nested repo; `git rev-parse --show-toplevel` there returns that sub repo, hiding launch-folder docs and skills. Keep the launch-folder `@repoRoot`.
 - `sudo` resets env; repo env vars (accounts files, selectors) vanish. Use the normal user; if forced, `sudo -E`.
 - Scripts that `cd` relative to `$0` break when invoked via relative path; call them by absolute path.
