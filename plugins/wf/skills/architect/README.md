@@ -1,6 +1,6 @@
 # architect
 
-Human quick reference. Sketch types, signatures, and module structure before code; writes production code only after you reply **implement**. Agent rules live in [SKILL.md](SKILL.md).
+Human quick reference. Sketch types, signatures, and module structure before code; writes production code only after you reply **implement**. Agent rules live in [SKILL.md](SKILL.md) and [design/design.md](design/design.md).
 
 ## Use
 
@@ -10,9 +10,12 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 /architect add a GSI on orders by customerId + createdAt, no downtime during backfill
 /architect arena-agents=2 design retries
 /architect arena-agents=3 design retries
+/architect interrogate intent: no rejected writes during backfill; target: DynamoDB Local
 ```
 
 `arena-agents`: 1–3, default 1. One candidate skips the judge and grafting; multiple viable candidates use the cross-family judge. The parent architect screens and verifies in both cases.
+
+`/architect interrogate <request>` runs only Interrogate on the named scope (default: branch diff), skipping all design phases; reports findings and stops.
 
 ## Flow
 
@@ -36,7 +39,7 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 | `arena` | you want a design candidate or competing whole-shape designs | automatic in Phase B; use `arena-agents=2` or `3` for comparison |
 | corrections | the sketch is close; you want a direct edit, no re-run (add `; arena` for a fresh candidate) | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked before accepting; findings need a run as proof | see below |
-| `prototype` | one uncertain part needs observation; Experiment selects a command, script, test, simulation, or throwaway app, then Interrogate checks it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
+| `prototype` | one uncertain part needs observation; Experiment selects a command, script, test, simulation, or throwaway app; add `; interrogate` to have adversaries attack it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
 | accept | the sketch is right; you want a spec | `accept` |
 | implement | the sketch is right; build it now in this branch, no spec | `implement` |
 
@@ -68,7 +71,7 @@ Interrogate Risk 1 in a separate reply: a mixed reply may trigger a clarifying q
 
 ## Interrogate
 
-Runs automatically for material falsifiable claims with a safe target, or on request. Three adversaries (different model families) use Experiment to select executable probes and try to break the change in their own worktrees. A finding survives only if its command, rerun by the skill, shows the failure and the failure breaks your intent. Reports findings; applies nothing. You then accept proposed corrections one by one.
+Runs automatically for material falsifiable claims with a safe target, on request in review, or standalone via `/architect interrogate <request>`. Three adversaries (different model families) use Experiment to select executable probes and try to break the change in their own worktrees. A finding survives only if its command, rerun by the skill, shows the failure and the failure breaks your intent. Reports findings; applies nothing. You then accept proposed corrections one by one.
 
 ```
 interrogate
@@ -88,10 +91,10 @@ Tips:
 
 ## Prototype
 
-One question, one minimal experiment. A builder subagent runs the `experiment` skill in its own worktree (code changes allowed there), the skill reruns its command, then `interrogate` attacks the diff or the command and observation. Evidence returns as proposed corrections; the sketch stays `not implemented` and no prototype code enters it. The worktree is removed after the round; `report.md` and a patch only when code was created stay under `tmp/architect-<slug>/prototype/<question-id>-<revision>-<attempt>/`.
+One question, one minimal experiment. A builder subagent runs the `experiment` skill in its own worktree (code changes allowed there) and the skill reruns its command. Add `; interrogate` to the reply to have `interrogate` attack the diff or the command and observation; otherwise it is skipped. Evidence returns as proposed corrections; the sketch stays `not implemented` and no prototype code enters it. The worktree is removed after the round; `report.md` and a patch only when code was created stay under `tmp/architect-<slug>/prototype/<question-id>-<revision>-<attempt>/`.
 
 ```
-prototype: does a second GSI creation fail while the first backfills? target: DynamoDB Local on :8000
+prototype: does a second GSI creation fail while the first backfills? target: DynamoDB Local on :8000; interrogate
 ```
 
 ## Files
@@ -99,9 +102,10 @@ prototype: does a second GSI creation fail while the first backfills? target: Dy
 | Path | Role |
 |---|---|
 | [models.md](models.md) | model per role; edit to retune |
+| `design/` | design workflow procedure (Phases A–F), evidence routing, red flags, rationale template |
 | `how/`, `why/` | grounding procedures and prompts |
 | `arena/` | multi-model synthesis procedure and runner prompt |
 | `interrogate/` | adversarial review procedure |
-| `prototype/` | throwaway prototype plus interrogate procedure |
-| `references/` | evidence routing, principles, red flags, rationale template, subagent rules |
+| `prototype/` | throwaway prototype procedure, optional interrogate |
+| `references/` | shared principles and subagent rules |
 

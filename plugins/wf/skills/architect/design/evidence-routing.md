@@ -35,7 +35,7 @@ Experiment selects the smallest method: CLI/API command, existing test, script, 
 
 Require a report with question, method, exact reproducible command, actual output, conclusion (`confirmed`, `refuted`, or `inconclusive`), evidence paths, architectural implication, and cleanup. Require a patch only when code was created.
 
-Use loaded Prototype for builder isolation, rerun, adversarial proof, and cleanup. Reuse its built-in Interrogate for that scope/revision; launch no duplicate review.
+Use loaded Prototype for builder isolation, rerun, and cleanup; automatic runs skip its Prove step. Material claims still route to Interrogate below; reuse Prove coverage for the same scope/revision when it ran.
 
 ## Interrogate
 

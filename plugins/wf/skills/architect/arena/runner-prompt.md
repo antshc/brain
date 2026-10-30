@@ -2,7 +2,7 @@
 
 The orchestrator passes this file through to every candidate runner during Phase B and fills in the variable inputs around it: the task, the Phase A grounding artifacts, the isolated working directory, and the path to write outputs. The working directory is a git worktree when available, otherwise a per-runner subdirectory under the sketch dir. What matters is independence between candidates.
 
-You are producing one candidate design in architect's exploration. Read the architect `SKILL.md` and `references/principles.md` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package: type sketch, function signatures, module map, and prose rationale shaped per `references/rationale-template.md` (path passed by the orchestrator).
+You are producing one candidate design in architect's exploration. Read the architect `SKILL.md`, `design/design.md`, and `references/principles.md` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package: type sketch, function signatures, module map, and prose rationale shaped per `design/rationale-template.md` (path passed by the orchestrator).
 
 Apply the following discipline. The orchestrator evaluates candidates on these axes.
 
