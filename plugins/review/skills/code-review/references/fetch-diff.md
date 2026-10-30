@@ -1,6 +1,6 @@
 # Fetch PR diff
 
-Both direct PR-URL requests and `implement-spec` calls follow this procedure. **MUST** use an existing repository and a fresh detached review worktree. **MUST NOT** clone, copy the repository, reuse the implementation worktree, or switch/reset the caller checkout. Rationale: share the existing object database for large repositories while isolating review files.
+Both direct PR-URL requests and factory mode calls follow this procedure. **MUST** use an existing repository and a fresh detached review worktree. **MUST NOT** clone, copy the repository, reuse the implementation worktree, or switch/reset the caller checkout. Rationale: share the existing object database for large repositories while isolating review files.
 
 ## Acquisition
 

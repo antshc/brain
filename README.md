@@ -47,7 +47,7 @@ copilot plugin install af@brain
 - [grill-with-docs](plugins/af/skills/grill-with-docs/SKILL.md): stress-test a design and capture resolved terms in one root `GLOSSARY.md`.
 - [to-spec](plugins/af/skills/to-spec/SKILL.md): synthesise the conversation into a GitHub specification issue.
 - [to-tickets](plugins/af/skills/to-tickets/SKILL.md): publish approved vertical slices with parent links and blocking dependencies.
-- [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph through parallel worktrees and prepare a reviewed PR; requires the external `tdd` and `code-review` skills.
+- [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 
 Delivery skills use `gh` with their own bundled GitHub references; no tracker setup skill is required.
 
@@ -193,7 +193,7 @@ Code and technical solution review skills with modular standards and guidance.
 - [address](plugins/review/skills/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
-- [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from a standalone `[#{{initiative-id}}]` marker in the PR description; accepts a user PR URL or an implement-spec call and fetches the diff into a fresh detached review worktree without cloning.
+- [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from a standalone `[#{{initiative-id}}]` marker in the PR description; accepts a user PR URL or a factory-mode call and fetches the diff into a fresh detached review worktree without cloning.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
 - [blast-radius](plugins/review/skills/blast-radius/SKILL.md): find what a change could break elsewhere and prove the one safety fact by running real code. Sourced from [cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack/skills/blast-radius); manual-only.
 
