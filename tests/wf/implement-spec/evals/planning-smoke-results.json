@@ -1,0 +1,675 @@
+{
+  "specRef": "acme/specs#1",
+  "mode": "draft-only",
+  "created": [],
+  "evidenceLimits": [
+    "Each case uses only its supplied files map, request, and existing tickets.",
+    "Test commands are supplied verification seams, not executed results. Synthetic test files contain comments rather than runnable fixture implementations.",
+    "No architecture records, glossary, routing metadata, installed dependencies, or base commit were supplied; none are invented.",
+    "Model recommendations are separate planning metadata, not proposed ticket-body content."
+  ],
+  "cases": [
+    {
+      "id": "api-feature",
+      "status": "drafted",
+      "strategy": "One cohesive functional slice spanning route, existing lookup contract, response handling, and API integration coverage.",
+      "tasks": [
+        {
+          "id": "API-1",
+          "title": "Return an order by ID",
+          "type": "AFK",
+          "outcome": "Add GET /orders/{id}, returning 200 with the existing order's id and total, or 404 when the lookup finds no order.",
+          "exclusions": [
+            "Order creation or persistence redesign",
+            "Changes to existing routes"
+          ],
+          "blockers": [],
+          "producerAssumptions": [
+            "Observed: Store.find(id) returns self.orders.get(id), providing the required lookup seam.",
+            "Unconfirmed: the stored order representation supplies id and total, and route ID conversion matches the store's key type.",
+            "The supplied test description identifies an API fixture with a real SQLite Store; its implementation is not included."
+          ],
+          "paths": [
+            "src/orders/api.py",
+            "tests/orders/test_api.py"
+          ],
+          "hot": [],
+          "footprintNotes": "The supplied Store already has find; no store edit is required by current evidence. Reassess if the runnable representation cannot supply total.",
+          "verification": [
+            {
+              "criterion": "When an existing order is requested by ID, the response status is 200 and its body contains that order's id and total.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "Runnable existing API/SQLite fixture, seeded order with known id and total, and pytest environment.",
+              "expectedEvidence": "Passing integration assertion against the endpoint's status and decoded response values."
+            },
+            {
+              "criterion": "When an absent order ID is requested, the response status is 404.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "An ID absent from the fixture database.",
+              "expectedEvidence": "Passing missing-order API integration assertion."
+            },
+            {
+              "criterion": "When existing GET /orders regression cases run, their existing responses remain unchanged.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "Retained existing route assertions; add baseline assertions if the described fixture has insufficient coverage.",
+              "expectedEvidence": "Existing route regression cases and new detail-route cases pass together."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Bounded API capability with an existing lookup method and established API integration seam."
+          }
+        }
+      ],
+      "graph": {
+        "edges": [],
+        "ready": ["API-1"],
+        "deferred": [],
+        "conflicts": [],
+        "criticalPath": ["API-1"]
+      },
+      "coverage": [
+        {
+          "requirements": [
+            "Add GET /orders/{id}.",
+            "Return 200 with id and total for an existing order and 404 for a missing order.",
+            "Keep existing routes unchanged."
+          ],
+          "tasks": ["API-1"]
+        }
+      ],
+      "unknowns": [
+        "HTTP framework response conventions, order value representation, and ID conversion must be confirmed during implementation.",
+        "No missing producer task is established by the supplied context."
+      ]
+    },
+    {
+      "id": "pure-relocation",
+      "status": "drafted",
+      "strategy": "One complete structural relocation, including imports, package discovery verification, and existing regression coverage.",
+      "tasks": [
+        {
+          "id": "MOVE-1",
+          "title": "Relocate order storage into the persistence package",
+          "type": "AFK",
+          "outcome": "Move src/orders/store.py to src/orders/persistence/store.py and update affected imports and package references while preserving behavior and public HTTP contracts.",
+          "exclusions": [
+            "New business logic",
+            "Storage redesign",
+            "A compatibility shim at the old path unless a separately established compatibility requirement demands it"
+          ],
+          "blockers": [],
+          "producerAssumptions": [
+            "Observed: API and API tests import orders.store.Store.",
+            "Observed: setuptools package discovery searches src.",
+            "Package initialization conventions are not shown; determine whether a persistence package initializer is needed without assuming one exists."
+          ],
+          "paths": [
+            "src/orders/store.py",
+            "src/orders/persistence/",
+            "src/orders/api.py",
+            "tests/orders/test_api.py",
+            "pyproject.toml"
+          ],
+          "hot": [],
+          "footprintNotes": "pyproject.toml is a conservative possible write: inspect its existing discovery behavior before changing it.",
+          "verification": [
+            {
+              "criterion": "After relocation, the new store module exists and the old module path is absent.",
+              "command": "python3 -c \"from pathlib import Path; assert Path('src/orders/persistence/store.py').is_file(); assert not Path('src/orders/store.py').exists()\"",
+              "prerequisites": "Run from the supplied repository root after the move.",
+              "expectedEvidence": "Exit code 0."
+            },
+            {
+              "criterion": "No supplied source or test import references orders.store or the old store file path.",
+              "command": "rg -n 'orders\\.store|src/orders/store\\.py' src tests pyproject.toml",
+              "prerequisites": "Relocation and import updates completed; rg available.",
+              "expectedEvidence": "No matches; rg exits 1."
+            },
+            {
+              "criterion": "The relocated Store is importable through orders.persistence.store.",
+              "command": "PYTHONPATH=src python3 -c \"from orders.persistence.store import Store; assert callable(Store.find)\"",
+              "prerequisites": "Required package initializers, if applicable, supplied by the relocation.",
+              "expectedEvidence": "Exit code 0 using the intended new module location."
+            },
+            {
+              "criterion": "The configured setuptools discovery includes the relocated store module.",
+              "command": null,
+              "prerequisites": "Confirm the project's actual packaging/build command and dependency environment; no build command was supplied.",
+              "expectedEvidence": "Build or package-content evidence showing orders/persistence/store.py is included.",
+              "gap": "Import success with PYTHONPATH alone does not prove distribution packaging."
+            },
+            {
+              "criterion": "Existing found-order and missing-order HTTP regression assertions retain their previous results.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "Runnable existing regression fixture and updated test imports.",
+              "expectedEvidence": "All existing API regression cases pass without changed behavioral expectations."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Straightforward behavior-preserving relocation with explicit import sites and a known regression seam."
+          }
+        }
+      ],
+      "graph": {
+        "edges": [],
+        "ready": ["MOVE-1"],
+        "deferred": [],
+        "conflicts": [],
+        "criticalPath": ["MOVE-1"]
+      },
+      "coverage": [
+        {
+          "requirements": [
+            "Move src/orders/store.py to src/orders/persistence/store.py.",
+            "Update imports and package references.",
+            "Preserve all behavior and public HTTP contracts; no new business logic."
+          ],
+          "tasks": ["MOVE-1"]
+        }
+      ],
+      "unknowns": [
+        "Actual package initialization conventions and the distribution build command are not supplied."
+      ]
+    },
+    {
+      "id": "shared-contract",
+      "status": "drafted",
+      "strategy": "One independently verifiable schema producer followed by two separate functional API consumers.",
+      "tasks": [
+        {
+          "id": "CORR-1",
+          "title": "Add nullable correlation ID storage",
+          "type": "AFK",
+          "outcome": "Provide an additive migration introducing nullable correlation_id on records while retaining existing rows and existing id/kind storage behavior.",
+          "exclusions": [
+            "Order or invoice API exposure",
+            "Mandatory backfill",
+            "Changes to existing column contracts"
+          ],
+          "blockers": [],
+          "producerAssumptions": [
+            "Observed: records currently contains id and non-null kind.",
+            "Named consumers CORR-2 and CORR-3 require the migrated correlation_id column.",
+            "Producer contract: the migration can be applied to the populated SQLite fixture; preexisting rows have a nullable correlation_id and retain their id/kind.",
+            "The column's data type and migration naming convention are unspecified; settle the shared representation before consumer implementation."
+          ],
+          "paths": [
+            "migrations/",
+            "tests/migrations/test_schema.py"
+          ],
+          "hot": [],
+          "verification": [
+            {
+              "criterion": "When the new migration is applied to an existing populated database, correlation_id exists as a nullable column and existing row IDs and kinds are unchanged.",
+              "command": "python3 -m pytest tests/migrations/test_schema.py",
+              "prerequisites": "Existing populated SQLite migration harness and a settled correlation ID representation.",
+              "expectedEvidence": "Passing migration assertions covering column metadata, retained row contents, and null values for preexisting rows."
+            },
+            {
+              "criterion": "After migration, records can be inserted with correlation_id omitted or null, and a representative non-null value round-trips unchanged.",
+              "command": "python3 -m pytest tests/migrations/test_schema.py",
+              "prerequisites": "Migrated SQLite fixture and representative value matching the settled column contract.",
+              "expectedEvidence": "Passing omission, explicit-null, and non-null persistence assertions."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Bounded additive migration with explicit compatibility requirements and an existing populated-database test harness."
+          }
+        },
+        {
+          "id": "CORR-2",
+          "title": "Expose order correlation IDs",
+          "type": "AFK",
+          "outcome": "Expose persisted correlation_id through the order API, preserving existing fields and order selection behavior and handling existing rows without correlation IDs.",
+          "exclusions": [
+            "Schema migration ownership",
+            "Invoice API changes",
+            "New correlation ID generation or mutation APIs"
+          ],
+          "blockers": ["CORR-1"],
+          "producerAssumptions": [
+            "Consumes CORR-1's integrated nullable records.correlation_id column and settled representation.",
+            "Observed: order API reads records with kind='order'.",
+            "Proposed response contract: add correlation_id with null for rows without a value; confirm because the request does not specify null-versus-omission encoding.",
+            "Existing-client compatibility mechanisms beyond preserving existing fields are not supplied."
+          ],
+          "paths": [
+            "src/orders/api.py",
+            "tests/orders/test_api.py"
+          ],
+          "hot": [],
+          "verification": [
+            {
+              "criterion": "When an order with a persisted correlation ID is read through the order API, its response exposes the same value and retains existing fields.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "CORR-1 integrated, migrated API database fixture, and confirmed response-field representation.",
+              "expectedEvidence": "Passing order API integration assertions for a non-null correlation ID and unchanged existing response values."
+            },
+            {
+              "criterion": "When a preexisting order without a correlation ID is read, the API succeeds and represents the missing value according to the confirmed nullable response contract.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "A pre-migration order retained through migration and a settled null-versus-omission decision.",
+              "expectedEvidence": "Passing compatibility case asserting the exact chosen missing-value representation and existing route behavior."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Cohesive API extension consuming a small stable schema contract, verified through its own integration suite."
+          }
+        },
+        {
+          "id": "CORR-3",
+          "title": "Expose invoice correlation IDs",
+          "type": "AFK",
+          "outcome": "Expose persisted correlation_id through the invoice API, preserving existing fields and invoice selection behavior and handling existing rows without correlation IDs.",
+          "exclusions": [
+            "Schema migration ownership",
+            "Order API changes",
+            "New correlation ID generation or mutation APIs"
+          ],
+          "blockers": ["CORR-1"],
+          "producerAssumptions": [
+            "Consumes CORR-1's integrated nullable records.correlation_id column and settled representation.",
+            "Observed: invoice API reads records with kind='invoice'.",
+            "Use the same confirmed nullable response contract as CORR-2; no consumer implementation dependency is established."
+          ],
+          "paths": [
+            "src/invoices/api.py",
+            "tests/invoices/test_api.py"
+          ],
+          "hot": [],
+          "verification": [
+            {
+              "criterion": "When an invoice with a persisted correlation ID is read through the invoice API, its response exposes the same value and retains existing fields.",
+              "command": "python3 -m pytest tests/invoices/test_api.py",
+              "prerequisites": "CORR-1 integrated, migrated API database fixture, and confirmed response-field representation.",
+              "expectedEvidence": "Passing invoice API integration assertions for a non-null correlation ID and unchanged existing response values."
+            },
+            {
+              "criterion": "When a preexisting invoice without a correlation ID is read, the API succeeds and represents the missing value according to the confirmed nullable response contract.",
+              "command": "python3 -m pytest tests/invoices/test_api.py",
+              "prerequisites": "A pre-migration invoice retained through migration and a settled null-versus-omission decision.",
+              "expectedEvidence": "Passing compatibility case asserting the exact chosen missing-value representation and existing route behavior."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Independent invoice API extension with a narrow schema producer contract and its own integration suite."
+          }
+        }
+      ],
+      "graph": {
+        "edges": [
+          {"from": "CORR-1", "to": "CORR-2", "reason": "Order API reads the new persisted column."},
+          {"from": "CORR-1", "to": "CORR-3", "reason": "Invoice API reads the new persisted column."}
+        ],
+        "ready": ["CORR-1"],
+        "deferred": [],
+        "conflicts": [],
+        "criticalPath": ["CORR-1", "CORR-2"],
+        "equallyLongCriticalPaths": [["CORR-1", "CORR-3"]]
+      },
+      "coverage": [
+        {
+          "requirements": [
+            "Add a nullable correlation_id persistence column.",
+            "Existing rows must remain compatible.",
+            "Migration can be independently applied and verified."
+          ],
+          "tasks": ["CORR-1"]
+        },
+        {
+          "requirements": [
+            "Expose correlation_id in independent order and invoice API modules.",
+            "Existing clients must remain compatible."
+          ],
+          "tasks": ["CORR-2", "CORR-3"]
+        }
+      ],
+      "unknowns": [
+        "Column type, nullable API encoding, and the precise existing-client compatibility expectation are unresolved contract details.",
+        "No shared API registry or persistence helper is supplied; no additional shared write or blocker is assumed.",
+        "Consumer tasks are dependency-blocked, not HITL-deferred. Contract decisions must be settled before claiming fully executable acceptance criteria."
+      ]
+    },
+    {
+      "id": "shared-hot-file",
+      "status": "drafted",
+      "strategy": "Two independently verifiable functional metrics, with shared registration writes serialized through a file conflict.",
+      "tasks": [
+        {
+          "id": "METRIC-1",
+          "title": "Record missing-order requests",
+          "type": "AFK",
+          "outcome": "Register and emit the missing-order metric at the existing missing-order branch while preserving its 404 response.",
+          "exclusions": [
+            "Invoice export instrumentation",
+            "Public API changes",
+            "Metrics framework redesign"
+          ],
+          "blockers": [],
+          "producerAssumptions": [
+            "Observed: the shared registry contains a counter registration and missing orders return 404.",
+            "Proposed metric semantics: one counter increment per missing-order response; exact name and emission API are not supplied.",
+            "The described metrics fixture can expose counter state once its runnable implementation is available."
+          ],
+          "paths": [
+            "src/metrics/registry.py",
+            "src/orders/api.py",
+            "tests/orders/test_api.py"
+          ],
+          "hot": ["src/metrics/registry.py"],
+          "verification": [
+            {
+              "criterion": "For one request taking the missing-order branch, the registered missing-order counter increases by one and the response remains 404.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "Confirmed metric identity/emission convention, runnable metrics fixture, and isolated initial counter state.",
+              "expectedEvidence": "Passing response-status and counter-delta assertions."
+            },
+            {
+              "criterion": "A successful order request does not increment the missing-order counter, and the preexisting orders.created registration remains available.",
+              "command": "python3 -m pytest tests/orders/test_api.py",
+              "prerequisites": "Existing successful-order fixture and access to registry/counter state.",
+              "expectedEvidence": "Passing negative counter assertion, registration assertion, and unchanged API regressions."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Bounded instrumentation at an existing observable API branch; shared registration is a write conflict rather than architectural coupling."
+          }
+        },
+        {
+          "id": "METRIC-2",
+          "title": "Record invoice exports",
+          "type": "AFK",
+          "outcome": "Register and emit the invoice-export metric while preserving export's CSV-byte result.",
+          "exclusions": [
+            "Order instrumentation",
+            "CSV format changes",
+            "Metrics framework redesign"
+          ],
+          "blockers": [],
+          "producerAssumptions": [
+            "Observed: export(invoice) returns CSV bytes.",
+            "Proposed metric semantics: one counter increment per successful export; the request does not establish attempted-versus-successful counting or failed-export handling.",
+            "Metric identity, emission API, and an export-side counter observation fixture must be confirmed."
+          ],
+          "paths": [
+            "src/metrics/registry.py",
+            "src/invoices/export.py",
+            "tests/invoices/test_export.py"
+          ],
+          "hot": ["src/metrics/registry.py"],
+          "verification": [
+            {
+              "criterion": "For one successful export, the registered invoice-export counter increases by one and the returned CSV bytes match the existing regression expectation.",
+              "command": "python3 -m pytest tests/invoices/test_export.py",
+              "prerequisites": "Confirmed metric semantics and identity, existing export fixture, and an available counter observation/reset seam.",
+              "expectedEvidence": "Passing exact CSV-byte and counter-delta assertions."
+            },
+            {
+              "criterion": "Adding the invoice-export metric retains existing registry entries.",
+              "command": "python3 -m pytest tests/invoices/test_export.py",
+              "prerequisites": "A registry observation assertion in the export suite; include the missing-order entry when both changes are integrated.",
+              "expectedEvidence": "Passing registration checks and unchanged export regressions."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Independent instrumentation of a bounded export operation with an existing regression command."
+          }
+        }
+      ],
+      "graph": {
+        "edges": [],
+        "ready": ["METRIC-1", "METRIC-2"],
+        "deferred": [],
+        "conflicts": [
+          {
+            "a": "METRIC-1",
+            "b": "METRIC-2",
+            "kind": "file",
+            "evidence": "src/metrics/registry.py",
+            "resolution": "Serialize the shared-file writes; neither task consumes the other's integrated behavior."
+          }
+        ],
+        "criticalPath": ["METRIC-1"],
+        "equallyLongCriticalPaths": [["METRIC-2"]]
+      },
+      "coverage": [
+        {"requirements": ["Add a missing-order metric."], "tasks": ["METRIC-1"]},
+        {"requirements": ["Add an unrelated invoice-export metric."], "tasks": ["METRIC-2"]},
+        {
+          "requirements": [
+            "Both metrics require edits to the existing shared registration file.",
+            "No feature requires a public contract change."
+          ],
+          "tasks": ["METRIC-1", "METRIC-2"]
+        }
+      ],
+      "unknowns": [
+        "Metric names, emission conventions, and invoice-export counting semantics are not supplied; proposed semantics are assumptions, not observed requirements.",
+        "Both tasks are dependency-ready, but the shared-path conflict prevents simultaneous execution."
+      ]
+    },
+    {
+      "id": "missing-dependency",
+      "status": "analyzed",
+      "strategy": "Preserve both existing ticket identities and infer the missing reader-to-export producer dependency.",
+      "tasks": [
+        {
+          "id": "acme/shop#2",
+          "title": "Reader contract",
+          "type": "AFK",
+          "outcome": "Expose currency in the reader result while preserving amount.",
+          "exclusions": [
+            "Format-v2 rendering",
+            "Unspecified persistence or schema changes"
+          ],
+          "blockers": [],
+          "producerAssumptions": [
+            "Observed: read(row) currently returns only amount.",
+            "Produces the currency-bearing reader contract required by acme/shop#3.",
+            "The input-row currency source and missing-currency policy are not supplied; they must be resolved without inventing a new external ticket."
+          ],
+          "paths": [
+            "src/invoices/reader.py",
+            "tests/invoices/test_reader.py"
+          ],
+          "hot": [],
+          "footprintNotes": "test_reader.py is a proposed focused test module, not an existing supplied file.",
+          "verification": [
+            {
+              "criterion": "For an input record with known amount and currency, read returns the same amount and exposes the same currency.",
+              "command": "python3 -m pytest tests/invoices/test_reader.py",
+              "prerequisites": "Add the proposed focused contract test, establish the input currency contract, and provide pytest.",
+              "expectedEvidence": "Passing reader assertions for both fields without requiring the format-v2 exporter."
+            },
+            {
+              "criterion": "The reader contract change preserves the existing format-v1 export regression expectations.",
+              "command": "python3 -m pytest tests/invoices/test_export.py",
+              "prerequisites": "Runnable existing format-v1 regression cases and fixtures compatible with the agreed currency input policy.",
+              "expectedEvidence": "Existing format-v1 regression cases pass before format-v2 implementation."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Small, independently testable reader contract extension with an explicit named consumer."
+          }
+        },
+        {
+          "id": "acme/shop#3",
+          "title": "Format-v2 export",
+          "type": "AFK",
+          "outcome": "Consume reader currency to render amount and currency in format-v2 export.",
+          "exclusions": [
+            "Reader producer implementation",
+            "Invented delimiters, currency formatting rules, or output-version negotiation"
+          ],
+          "blockers": ["acme/shop#2"],
+          "producerAssumptions": [
+            "Consumes acme/shop#2's integrated reader result containing amount and currency.",
+            "Observed: export currently renders only str(read(row)['amount']).",
+            "Exact format-v2 serialization and any required preservation or selection of format-v1 behavior are unspecified."
+          ],
+          "paths": [
+            "src/invoices/export.py",
+            "tests/invoices/test_export.py"
+          ],
+          "hot": [],
+          "verification": [
+            {
+              "criterion": "For a real reader result containing known amount and currency, export returns the exact agreed format-v2 representation containing both values.",
+              "command": "python3 -m pytest tests/invoices/test_export.py",
+              "prerequisites": "acme/shop#2 integrated and an explicit format-v2 expected-output example or serialization contract.",
+              "expectedEvidence": "Passing exact-output export assertions using the real reader, including the agreed amount and currency representation."
+            }
+          ],
+          "implementer": {
+            "model": "claude-sonnet-5.5",
+            "effort": "high",
+            "reason": "Bounded exporter consumer once the reader contract and exact output expectations are supplied."
+          }
+        }
+      ],
+      "graph": {
+        "nativeEdges": [],
+        "inferredEdges": [
+          {
+            "from": "acme/shop#2",
+            "to": "acme/shop#3",
+            "evidence": "The reader returns amount only; the export ticket and supplied test description require currency from that reader."
+          }
+        ],
+        "ready": ["acme/shop#2"],
+        "deferred": [],
+        "conflicts": [],
+        "criticalPath": ["acme/shop#2", "acme/shop#3"],
+        "created": []
+      },
+      "coverage": [
+        {"requirements": ["Expose currency in the reader's returned record; preserve amount."], "tasks": ["acme/shop#2"]},
+        {"requirements": ["Consume reader currency to render amount and currency."], "tasks": ["acme/shop#3"]}
+      ],
+      "unknowns": [
+        "No labels, issue status, or fetched base evidence are supplied; readiness assumes these are unfinished, non-HITL tickets as presented.",
+        "Graph readiness does not resolve the missing input-currency policy or exact format-v2 serialization contract.",
+        "No tracker writes or replacement tickets are proposed."
+      ]
+    },
+    {
+      "id": "discovered-cycle",
+      "status": "blocked",
+      "reason": "The retained native edge and integration-discovered producer dependency form a cycle: acme/shop#2 -> acme/shop#3 -> acme/shop#2. Execution cannot proceed under the supplied contracts.",
+      "tasks": [
+        {
+          "id": "acme/shop#2",
+          "title": "A",
+          "type": "AFK",
+          "outcome": "Consume B's new persisted result within the existing approved scope.",
+          "exclusions": [
+            "Unspecified compatibility adapter",
+            "Stubs",
+            "Contract redesign without a new decision"
+          ],
+          "blockers": ["acme/shop#3"],
+          "producerAssumptions": [
+            "Native blocker acme/shop#3 supplies the persisted result consumed by A.",
+            "The integration finding also makes B depend on A's new result; no independently available producer contract is supplied."
+          ],
+          "paths": null,
+          "hot": [],
+          "footprintNotes": "contracts.py documents the coupling, but supplied evidence does not identify A's implementation, persistence, or complete write ownership.",
+          "verification": [
+            {
+              "criterion": "A's contract check passes using B's real persisted producer output.",
+              "command": "python3 -m pytest tests/test_contracts.py",
+              "prerequisites": "B's integrated output and a resolved acyclic contract design.",
+              "expectedEvidence": "Passing real-producer contract assertion.",
+              "blocked": "B cannot currently build and verify without A's new result."
+            }
+          ],
+          "implementer": {
+            "model": "claude-opus-5.5",
+            "effort": "medium",
+            "reason": "Evidence establishes architectural producer-consumer coupling and integration risk; recommendation is conditional on resolving the cycle."
+          }
+        },
+        {
+          "id": "acme/shop#3",
+          "title": "B",
+          "type": "AFK",
+          "outcome": "Produce B's persisted result while consuming the A result required by the supplied integration finding.",
+          "exclusions": [
+            "Invented bootstrap data",
+            "Stubs",
+            "An independently applicable migration not established by the supplied context"
+          ],
+          "blockers": ["acme/shop#2"],
+          "producerAssumptions": [
+            "The integration finding states B needs A's new result to build and verify.",
+            "No compatible existing result, stub, or independent migration breaks that dependency."
+          ],
+          "paths": null,
+          "hot": [],
+          "footprintNotes": "B's implementation and persistence paths cannot be determined from the architectural comment and test description.",
+          "verification": [
+            {
+              "criterion": "B's contract check passes using A's real new producer output and produces the persisted result required by A.",
+              "command": "python3 -m pytest tests/test_contracts.py",
+              "prerequisites": "A's integrated output and a resolved acyclic contract design.",
+              "expectedEvidence": "Passing real-producer contract assertion.",
+              "blocked": "A cannot currently complete without B's new persisted result."
+            }
+          ],
+          "implementer": {
+            "model": "claude-opus-5.5",
+            "effort": "medium",
+            "reason": "Circular cross-module integration requirements need architectural resolution before implementation can be assigned safely."
+          }
+        }
+      ],
+      "graph": {
+        "valid": false,
+        "nativeEdges": [
+          {"from": "acme/shop#3", "to": "acme/shop#2"}
+        ],
+        "inferredEdges": [
+          {
+            "from": "acme/shop#2",
+            "to": "acme/shop#3",
+            "evidence": "src/contracts.py: integration finding says B requires A's new result to build and verify; tests require real producer output."
+          }
+        ],
+        "cycle": ["acme/shop#2", "acme/shop#3", "acme/shop#2"],
+        "ready": [],
+        "deferred": [],
+        "conflicts": [],
+        "criticalPath": null,
+        "created": [],
+        "notes": [
+          "The newly discovered dependency must be retained in analysis; silently dropping the native blocker would conceal the cycle.",
+          "Unknown footprints do not produce a file-conflict entry here because the pair is already dependency-ordered and the graph is invalid.",
+          "No HITL label was supplied; cycle-blocked work is not reported as label-deferred work."
+        ]
+      },
+      "requiredResolution": "Provide an approved contract or scope change that breaks the cycle, such as a genuinely independent producer contract or a cohesive replacement execution boundary. Recompute dependencies and footprints before execution; do not modify existing tickets during this analysis.",
+      "unknowns": [
+        "A and B implementation paths, concrete contract shapes, and persistence ownership are unspecified.",
+        "No evidence authorizes a merge, split, dependency removal, or replacement ticket.",
+        "No labels, completed-state evidence, or in-flight reservations were supplied."
+      ]
+    }
+  ]
+}

@@ -22,7 +22,7 @@ Implement the Ticket using the smallest change that satisfies its requirements.
    - Take build and test commands from repository instructions (`README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DEVELOPMENT.md`, `.github/*`) before discovering them by trial.
    - Find the smallest build unit owning the changed files (e.g. .NET: the affected `.csproj`, never the solution) and the test projects that reference it; locate tests by references and coverage, not folder proximity.
    - Stop exploring once affected symbols, callers, boundaries, and test counterparts are known.
-2. Identify expected behavior, affected contracts, and verification criteria.
+2. Confirm outcome, exclusions, producer contracts/assumptions, and acceptance-to-check evidence mapping. Unexpected dependency, material scope/contract/footprint mismatch, unusable verification seam, or capability mismatch → stop dependent edits; preserve work and return `failed` with `planning invalidated:`, evidence and affected scope for caller-owned replanning. Never rewrite tickets or invent prerequisites.
 3. Select a testing strategy based on risk:
    - Bug: write a regression test and observe it fail for the reported reason before fixing.
    - Complex logic: use test-first development for critical behavior.
@@ -40,7 +40,7 @@ Implement the Ticket using the smallest change that satisfies its requirements.
    - Changed integration boundary → apply Integration boundary. Errors → apply Failure handling.
 6. Add necessary regression, boundary, and integration tests. Do not weaken tests to obtain a pass; changing an existing assertion requires a Ticket requirement, cited in key decisions.
 7. Before committing, rerun every affected test project once on the final working tree; `verification` reports this run.
-8. Report test strategy, changed behavior, executed checks, outcomes, and unresolved risks in the commit body and `verification`. Mark each check `passed`, `failed`, `unavailable` (with error), or `not run` (with reason).
+8. Report test strategy, changed behavior, criterion-to-check evidence, executed commands/prerequisites, outcomes, and unresolved risks in the commit body and `verification`. Mark each check `passed`, `failed`, `unavailable` (with error), or `not run` (with reason).
 
 **MUST NOT** claim verification without observed results.
 **MUST NOT** run the entire test suite after every edit.

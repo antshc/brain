@@ -58,12 +58,12 @@ Choose task boundaries using the plan/spec and the inspected codebase:
 
 <task-decomposition-rules>
 
-- **Functional:** Prefer one complete business capability across touched layers. For small API services with existing API integration tests, keep endpoint, domain, persistence/integration, and tests in a cohesive functional slice. In larger systems use cohesive end-to-end vertical slices, not horizontal layer tasks.
+- **Functional:** Prefer one complete business capability across touched layers. For small API services with existing API integration tests, keep endpoint, domain, persistence/integration, and tests in a cohesive functional slice. In larger systems prefer cohesive end-to-end vertical slices. Allow technical prerequisites only with named consumers, a stable deliverable, and independent verification.
 - **Structural:** Group file/folder moves, renames, namespace and project relocation, and required reference updates by independently movable structural unit. Preserve business behavior and public contracts; do not introduce unrelated logic changes.
 - **Behavior-preserving refactoring:** Group work by coherent implementation boundary and regression coverage; preserve externally observable behavior.
 - **Mixed:** Put truly necessary structural or prefactoring prerequisites before their consumers, without inventing dependencies for shared writes alone.
-- Size by cohesion, context load, integration risk, stable contracts, and write ownership—not estimated duration. Keep multi-hour cohesive work with one capable implementer; merge trivial work when coordination dominates. Split only at independently verifiable, stable-contract, non-overlapping write boundaries. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
-- Each task is independently demonstrable or verifiable. Prefer the highest meaningful, reliable verification seam: existing API integration tests for API behavior; builds and existing regression tests for structural changes; lower-level tests where necessary.
+- Size by cohesion, context load, integration risk, stable contracts, and write ownership—not estimated duration. Keep multi-hour cohesive work with one capable implementer; merge trivial work when coordination dominates. Split at independently verifiable, stable-contract context boundaries. Shared writes require serialization, not automatic merging; disjoint write ownership is required for concurrency, not task validity. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
+- Give each task an included outcome, exclusions, producer contracts/assumptions, and acceptance-to-check evidence mapping. Prefer existing API integration tests for API behavior; supplement with focused contract, concurrency, retry, or boundary checks where needed. Structural work uses deterministic location/reference checks and existing regression tests.
 - Type each task `HITL` (needs human interaction, e.g. architectural decision or design review) or `AFK` (implementable and mergeable without humans). Prefer AFK.
 - For overlapping writes, merge tasks, move the shared edit into one task, or flag a `file` conflict for later serialization. Shared paths alone do not justify a blocker edge; add blockers only when a consumer needs the producer's integrated change to implement or verify. Independent tasks may run concurrently.
 
@@ -82,7 +82,9 @@ Present a numbered list; per task show:
 - **Title**: short descriptive name
 - **Type**: HITL | AFK
 - **Blocked by**: tasks that must complete first
-- **Verification seam**: highest meaningful check for this task
+- **Outcome and exclusions**: bounded deliverable and out-of-scope work
+- **Producer contracts/assumptions**: required inputs and unresolved evidence
+- **Verification seam**: criteria-to-check mapping, commands/prerequisites, expected evidence
 - **Functional Requirements covered**: spec requirement numbers addressed (full verbatim text is copied into each ticket in step 5)
 
 Then print the blocker graph as a table `Slice | Blocked by` with one row per slice, using `none` for roots; list the initial ready frontier, anticipated write conflicts (with shared paths), uncovered requirements, and source conflicts.
