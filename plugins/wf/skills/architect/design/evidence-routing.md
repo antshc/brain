@@ -12,7 +12,7 @@ Take the first applicable route per question; reevaluate after each result.
 | Needs facts from the codebase, installed NuGet packages, cloud/API, or web documentation | Research |
 | Needs observed behavior, including a CLI/API command | Experiment |
 | Material falsifiable design claim has a safe runnable target | Interrogate |
-| Needs user intent, policy, tradeoff, or unavailable authority | Preserve for review or report blocker |
+| Needs user intent, policy, tradeoff, or unavailable authority | Recommend and document a reversible choice; ask only when authority is required or a checkpoint was requested |
 
 After resolving questions, screen the synthesized sketch for falsifiable claims affecting correctness, security, reliability, compatibility, or expensive-to-reverse boundaries. Automatically Interrogate each uncovered material claim with a safe runnable target. Derive intent, scope, claim, and target from sketch/user brief. No safe target → record limitation; ask only for necessary permission or business choice.
 
@@ -48,12 +48,12 @@ Record question/claim, sketch revision, environment/version, evidence paths, out
 | Outcome | Action |
 |---|---|
 | Confirmed and compatible | Close factual question; cite evidence in rationale |
-| Refuted or verified finding | Present proposed correction; apply only after user acceptance |
+| Refuted or verified finding | Without checkpoint: apply supported correction and log rationale; with checkpoint: present proposed correction for acceptance |
 | Inconclusive | Preserve unknown, missing evidence, and impact |
 | Tool, permission, or sandbox unavailable | Record blocker; invent no result |
 | Material change | Recheck only invalidated assumptions |
 | Unchanged question, dependencies, and sketch | Reuse evidence and prior Interrogate coverage |
 
-Retry once per question/revision only when new evidence or setup addresses the failure; otherwise record blocker/unknown. **MUST NOT** automatically apply Experiment or Interrogate proposals; only **implement** permits production code.
+Retry once per question/revision only when new evidence or setup addresses the failure; otherwise record blocker/unknown. Without checkpoint, apply evidence-backed Experiment or Interrogate corrections to the sketch; with checkpoint, require approval for proposed corrections. Neither path permits production code before Phase E.
 
-Return control to the orchestrator for **Phase B: Sketch** after Ground, or **Phase C: Review loop** before presenting a round.
+Return control to the orchestrator for **Phase B: Sketch** after Ground, or **Phase C: Review** before continuing.

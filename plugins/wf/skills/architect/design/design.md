@@ -7,7 +7,7 @@ Design procedure of the `architect` skill. Paths resolve from the skill base dir
 - Todo list
 - Phase A: Ground the problem
 - Phase B: Sketch
-- Phase C: Review loop
+- Phase C: Review (optional checkpoint)
 - Phase D: Hand off
 - Phase E: Implement against the sketch
 - Phase F: Scrap when the architecture is wrong
@@ -19,7 +19,7 @@ Open a todolist with one entry per phase before starting.
 
 1. Ground
 2. Sketch
-3. Review
+3. Resolve or Review
 4. Hand off or Implement
 
 Add a Scrap entry when Phase F triggers.
@@ -44,13 +44,13 @@ Compare viable candidates on interface depth. Prefer the design that hides more 
 
 Arena returns one synthesized design package. Its synthesis decision fills the rationale's "Synthesis decision" section.
 
-## Phase C: Review loop
+## Phase C: Review (optional checkpoint)
 
-Loop until the user explicitly replies **accept** or **implement**. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. MUST NOT write production code in this phase. Prototype code is disposable evidence kept in a worktree, never part of the sketch.
+Before continuing, run `design/evidence-routing.md` on open questions and material claims. When the caller requests one overall Interrogate, run it before the checkpoint or handoff, reusing existing coverage. Without checkpoint, apply supported corrections; with checkpoint, present proposals for approval. Record decisions in the sketch, rationale, and `review-log.md`. Never write production code during this phase; prototype code remains disposable evidence in a worktree.
 
-Before each round, run `design/evidence-routing.md` on open questions and material claims.
+**Default: no checkpoint.** Continue to Phase E automatically. When the caller explicitly requests a **design-only handoff** (as Factory Mode does), continue to Phase D instead. Do not wait for an `accept` or `implement` reply.
 
-Each round:
+**Checkpoint requested by the user:** Present the design and wait for approval. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. For each review round:
 
 1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, evidence conclusions and limitations, proposed corrections, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
 2. Offer these replies verbatim, then stop and wait for the user:
@@ -60,8 +60,8 @@ Each round:
    - **interrogate**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
    - **prototype**: `GSI backfill; target: DynamoDB Local` (throwaway build in a worktree; add `; interrogate` to also have adversaries attack it)
    - **ask**: `why does X own Y?` (grounds the answer, then corrections)
-   - **accept**: hand off to `/to-spec`
-   - **implement**: build against the sketch in this working tree (skips `/to-spec`)
+   - **accept**: continue implementation (or the caller's design-only handoff)
+   - **implement**: build against the sketch in this working tree (overrides a design-only handoff)
    ```
 3. Act on the reply:
    - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `design/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
@@ -69,14 +69,14 @@ Each round:
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
    - **Prototype** → run the `prototype/prototype.md` procedure on the question in the reply; run its Prove step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, running `how/how.md` or `why/why.md` when needed; present the answer, then start the next round.
-   - **Accept** → go to Phase D.
+   - **Accept** → go to Phase D for a design-only handoff; otherwise Phase E.
    - **Implement** → go to Phase E.
 
-Ambiguous reply → ask which of the six it is; never treat it as acceptance or implement.
+Before each subsequent checkpoint review round, rerun `design/evidence-routing.md` only for changed questions or claims. Ambiguous reply → ask which of the six it is; never treat it as acceptance or implement.
 
 ## Phase D: Hand off
 
-Stop. Tell the user the accepted sketch is ready and to run `/to-spec` with the target branch and Initiative ID; that skill turns the synthesized design and base candidate sketch from this conversation into a published spec issue. Do not draft the spec yourself.
+Stop the Architect procedure and return the accepted sketch to the caller for `/to-spec`. If standalone, tell the user to run `/to-spec` with the target branch and Initiative ID; that skill turns the synthesized design and base candidate sketch into a published spec issue. Do not draft the spec yourself.
 
 ## Phase E: Implement against the sketch
 
@@ -84,7 +84,7 @@ Work in the current working tree and branch. The synthesized sketch is the contr
 
 1. Scaffold: write the accepted sketch's types, signatures, and `not implemented` bodies into their target modules; commit as its own commit, per *Foundational thinking*. Done when the scaffold commit exists.
 2. Fill in: replace `not implemented` bodies with code and pseudocode with logic. Planned, scoped breakage during fill-in is fine, per *Outcome-oriented execution*. Done when no `not implemented` body from the sketch remains and the repo's build and tests pass.
-3. Deviations: when code needs something the sketch didn't anticipate (new parameter, type, dependency, module), stop and classify it: sketch wrong, requirement missed, or implementation overreaching. Surface it to the user in chat; never absorb it silently. Apply the agreed change to the sketch, synthesized design, and rationale, and append it to `review-log.md`.
+3. Deviations: when code needs something the sketch didn't anticipate (new parameter, type, dependency, module), classify it: sketch wrong, requirement missed, or implementation overreaching. Make evidence-backed corrections, update the sketch, synthesized design, and rationale, and append to `review-log.md`; with checkpoint, surface material changes for approval. Do not silently change user requirements or exceed authorized scope.
 4. Watch for Phase F tells throughout; on a pattern, go to Phase F.
 
 ## Phase F: Scrap when the architecture is wrong
@@ -112,5 +112,5 @@ When you scrap:
 
 ## Outputs
 
-The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `design/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every accepted correction and Phase E deviation; `review-log.md` records each round. After **implement**: a scaffold commit, then working code filling it in the current branch.
+The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `design/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every correction and Phase E deviation; `review-log.md` records each decision. Phase E produces a scaffold commit, then working code filling it in the current branch.
 

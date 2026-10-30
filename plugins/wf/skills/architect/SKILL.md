@@ -1,16 +1,18 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, loop user corrections into the sketch, then hand off to spec or implement against the sketch. Use for /architect, architect this, design this, /architect interrogate to adversarially attack a change without the design phases, or non-trivial work where jumping to code would lock in the wrong shape.
+  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, optionally pause at a user-requested checkpoint, then implement or hand off the sketch. Use for /architect, architect this, design this, /architect interrogate to adversarially attack a change without the design phases, or non-trivial work where jumping to code would lock in the wrong shape.
 ---
 
 # Architect
 
-Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Use one runner by default or synthesize multiple model perspectives, review the sketch with the user until accepted, then hand off to spec or fill in code against the sketch. Write production code only after the user replies **implement**.
+Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Use one runner by default or synthesize multiple model perspectives. Implement against the sketch by default; pause for review only when the user explicitly requests a **checkpoint**. A caller may request a design-only handoff to `/to-spec` instead of direct implementation.
 
 ## Options
 
 Accept `arena-agents=1|2|3`; default `1`. Reject other values before launching arena runners. Pass the resolved count to Phase B; retain it for arena re-runs unless the user changes it.
+
+`checkpoint` (or an explicit request to show the design before implementing) is opt-in only when requested by the user; preserve it when forwarded through a calling skill. Do not infer a checkpoint from ordinary design requests.
 
 ## Standalone interrogate
 
