@@ -23,7 +23,7 @@ There is **no measured evidence in the sources below** that replacing TDD univer
 5. **Provide build/test instructions and prepared environments.** GitHub recommends repository instructions and preinstalled dependencies so Copilot can compile, test, and validate reliably without slow discovery through trial and error. [GitHub, Get the Best Results](https://docs.github.com/en/copilot/tutorials/cloud-agent/get-the-best-results).
 6. **Independent review benefits from whole-repository tools.** OpenAI reports better detection of critical issues and fewer false positives when code reviewers can navigate and execute repository code, versus only reading a diff. [OpenAI, Verifying Code at Scale](https://alignment.openai.com/scaling-code-verification/).
 7. **Optimize test time without deleting test coverage.** In an October 2026 report, OpenAI describes reducing median CI from about 10 to 4.5 minutes; one 63-test suite improved from 592.6 to 29.8 seconds after a missing mock was added. These are case studies, not general speed guarantees. [OpenAI, Maintaining Software with GPT-6](https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family).
-8. **Test at multiple seams.** Google's testing guidance supports unit, integration, and critical-journey E2E testing as complementary layers. [.Google Testing Blog, How Much Testing Is Enough?](https://testing.googleblog.com/2021/06/how-much-testing-is-enough.html).
+8. **Test at multiple seams.** Google's testing guidance supports unit, integration, and critical-journey E2E testing as complementary layers. [Google Testing Blog, How Much Testing Is Enough?](https://testing.googleblog.com/2021/06/how-much-testing-is-enough.html).
 
 ## Options
 
