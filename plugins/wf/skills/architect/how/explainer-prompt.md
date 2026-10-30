@@ -20,7 +20,7 @@ The explorers each investigated a different angle of the same subsystem. Their f
 
 Write an explanation a senior engineer unfamiliar with this area could read and walk away with a solid mental model, understanding the architecture well enough to start working in it confidently.
 
-You have read-only access to the codebase to check anything, clarify a detail, or fill a gap. Use Read, Grep, and Glob as needed. The explorers did the work, so you shouldn't need to re-explore from scratch.
+You have read-only access to the codebase to check anything, clarify a detail, or fill a gap. Use Read, Grep, and Glob as needed. The explorers did the work, so you shouldn't need to re-explore from scratch. C# type or member with no local definition → *run `inspect-nuget-source` skill to resolve the owning NuGet package and verify its real API from XML docs or decompiled assembly*; skill unavailable → flag it as a gap with the package reference you found.
 
 ## Output Format
 
