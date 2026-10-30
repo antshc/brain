@@ -14,6 +14,7 @@ Resolve every path from this skill's base directory. Read each file fully when i
 
 | File | Load when |
 |---|---|
+| [references/evidence-routing.md](references/evidence-routing.md) | Phase A technical questions and every Phase C round, including greenfield |
 | [references/principles.md](references/principles.md) | any step cites a principle by heading |
 | [models.md](models.md) | picking a subagent model for any role |
 | [references/subagents.md](references/subagents.md) | spawning any subagent |
@@ -37,12 +38,12 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [why/sources/incident-postmortem.md](why/sources/incident-postmortem.md) | target code looks defensive |
 | [arena/arena.md](arena/arena.md) | Phase B |
 | [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief |
-| [interrogate/interrogate.md](interrogate/interrogate.md) | Phase C, user picks interrogate |
-| [prototype/prototype.md](prototype/prototype.md) | Phase C, user picks prototype |
+| [interrogate/interrogate.md](interrogate/interrogate.md) | automatic evidence routing or user picks interrogate |
+| [prototype/prototype.md](prototype/prototype.md) | evidence routing selects Experiment or user picks prototype |
 
 ## Artifact location
 
-Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent. Phase E code goes in the repo's working tree, not the artifact root.
+Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent. Research specialist reports may retain a stronger location contract per `references/evidence-routing.md`; index their absolute paths under the artifact root. Phase E code goes in the repo's working tree, not the artifact root.
 
 ## Repo docs
 
@@ -73,7 +74,7 @@ Add a Scrap entry when Phase F triggers.
 
 Build a real mental model of every system the new code touches, starting from Repo docs. Run the `how/how.md` procedure over the relevant subsystems. Naming a file isn't grounding. Produce the architectural explanation `how/how.md` prescribes. If the design redefines ownership or layering, also run the `why/why.md` procedure on the existing shape so the rationale becomes a constraint, not a guess.
 
-Skip Phase A only when the work is genuinely greenfield with no surrounding system to integrate.
+Skip subsystem grounding only when the work is genuinely greenfield with no surrounding system to integrate. Before Phase B, resolve technical questions through `references/evidence-routing.md`, including greenfield work.
 
 ## Phase B: Sketch
 
@@ -93,9 +94,11 @@ Arena returns one synthesized design package. Its synthesis decision fills the r
 
 Loop until the user explicitly replies **accept** or **implement**. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. MUST NOT write production code in this phase. Prototype code is disposable evidence kept in a worktree, never part of the sketch.
 
+Before each round, run `references/evidence-routing.md` on open questions and material claims.
+
 Each round:
 
-1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
+1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, evidence conclusions and limitations, proposed corrections, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
 2. Offer these replies verbatim, then stop and wait for the user:
    ```
    Reply with one:
@@ -156,3 +159,4 @@ When you scrap:
 ## Outputs
 
 The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `references/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every accepted correction and Phase E deviation; `review-log.md` records each round. After **implement**: a scaffold commit, then working code filling it in the current branch.
+
