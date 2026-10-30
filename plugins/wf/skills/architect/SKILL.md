@@ -92,11 +92,13 @@ Arena returns one synthesized design package. Its synthesis decision fills the r
 
 ## Phase C: Review loop
 
-Loop until the user explicitly replies **accept** or **implement**. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. MUST NOT write production code in this phase. Experiment code is disposable evidence kept in a worktree, never part of the sketch.
+Loop until the user explicitly replies **accept** or **implement**. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. MUST NOT write production code in this phase. Prototype code is disposable evidence kept in a worktree, never part of the sketch.
 
-Before each round, run `references/evidence-routing.md` on open questions and material claims. Reuse valid evidence; propose verified failures as corrections without applying them.
+Before each round, run `references/evidence-routing.md` on open questions and material claims.
 
-1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's unresolved questions and risks, evidence conclusions and limitations, proposed corrections, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
+Each round:
+
+1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, evidence conclusions and limitations, proposed corrections, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
 2. Offer these replies verbatim, then stop and wait for the user:
    ```
    Reply with one:

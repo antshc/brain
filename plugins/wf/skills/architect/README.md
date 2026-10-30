@@ -46,7 +46,7 @@ Reply in plain chat. An ambiguous reply is never treated as accept or implement.
 
 Architect resolves source facts through Research and runtime uncertainty through Experiment before review. Material falsifiable claims automatically trigger Interrogate when a safe runnable target exists. Examples: SDK-version contracts need research; CLI capabilities or concurrency need execution; retry duplication needs an adversarial probe. Research owns its specialist fan-out.
 
-Unchanged evidence and existing Interrogate coverage are reused; changes recheck only affected assumptions. Review presents evidence, limitations, unresolved questions, and proposed corrections. You decide intent, tradeoffs, and corrections; unanswered questions carry into the spec.
+Open questions and risks remain phrased as questions; your answer resolves intent and tradeoffs. Design corrections wait for your reply. Unanswered ones carry into the spec. Unchanged evidence and existing Interrogate coverage are reused; changes recheck only affected assumptions. Review includes evidence, limitations, and proposed corrections.
 
 | Your call | Reply | Result |
 |---|---|---|
