@@ -11,7 +11,7 @@ Select mode from the request:
 
 ## Interactive
 
-1. Learn the affected subsystem. *Run `explore-codebase` skill in a subagent to find how the flow works, what calls it, and where config and tests live.* Read `ARCHITECTURE.md` and `GLOSSARY.md` rows that match. Done when every touched module has a file and line.
+1. Research the affected subsystem through Non-negotiables: how the flow works, what calls it, where config and tests live, and matching `ARCHITECTURE.md` and `GLOSSARY.md` rows. Done when every touched module has a file and line.
 2. *Run `architect` skill to sketch types, signatures, and module structure before code, loop corrections into the sketch, and resolve open design questions.* Name the data shape and its organizing structure (**Model the domain**, **Foundational thinking**). Multiple valid shapes → competing candidates (**Exhaust the design space**). Done when the user accepts the sketch.
 3. *Run `to-spec` skill to turn the conversation and accepted sketch into a spec issue* with the target branch and Initiative ID. Done when the spec issue URL exists.
 4. *Run `implement-spec` skill to implement the spec through a routed ticket graph into one draft PR.* Done when complete `ready` handoff exists; blocked/incomplete → report blockers, preserve work, stop post-implementation phases.
@@ -27,7 +27,7 @@ Select mode from the request:
 Trail: *run `show-me-your-work` skill in Log mode to keep the decision trail* at `tmp/factory-mode-{{featureSlug}}/decisions.tsv` from step 1; log every fork, default, prototype result, review verdict, and fix with its evidence.
 
 1. Ask once at the start, in one batch, for the inputs the request does not already give: Initiative ID, target branch, and repository (`owner/name`). Never invent them. Done when all three are set; no further questions after this step.
-2. Learn the affected subsystem with `explore-codebase` as in Interactive step 1.
+2. Research the affected subsystem as in Interactive step 1.
 3. Arena. *Run `architect` skill with `arena-agents=3` to synthesize competing multi-model design candidates into one sketch.* Done when the synthesized sketch and rationale exist.
 4. Close open questions. Act as the reviewer in the `architect` Review loop; reply for the user:
    - `interrogate` once on the synthesized sketch; apply findings backed by evidence.
