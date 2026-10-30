@@ -21,7 +21,7 @@ Select mode from the request:
 
 **Goal: deliver the entire feature autonomously.** No open questions: every question gets an answer you recommend and then apply, with the reason and rejected alternative logged. Impossible to answer (needs access, data, or authority you lack) → log the question as `unanswerable` with the concrete reason why, then continue on the safest reversible path. Never ask the user after step 1; a called skill that asks (e.g. `to-spec` base candidate, `architect` review reply) gets your recommended answer. Decide calls the Principles cover by them; decide product, preference, and operator-only calls by the best recommendation from evidence. Never merge, force-push, or mark the PR ready.
 
-Trail: *run `show-me-your-work` skill in Log mode to keep the decision trail* at `tmp/wf-mode-{{featureSlug}}/decisions.tsv` from step 1; log every fork, default, prototype result, review verdict, and fix with its evidence.
+Trail: *run `show-me-your-work` skill in Log mode to keep the decision trail* at `tmp/factory-mode-{{featureSlug}}/decisions.tsv` from step 1; log every fork, default, prototype result, review verdict, and fix with its evidence.
 
 1. Ask once at the start, in one batch, for the inputs the request does not already give: Initiative ID, target branch, and repository (`owner/name`). Never invent them. Done when all three are set; no further questions after this step.
 2. Learn the affected subsystem with `explore-codebase` as in Interactive step 1.
