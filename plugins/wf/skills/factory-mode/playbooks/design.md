@@ -2,7 +2,7 @@
 
 **You own the destination. Resolve unknowns, then synthesize.** Produces a spec and an authoritative feature design, not code.
 
-1. Research the current state through Non-negotiables: how the affected flow works, where it lives, and matching `ARCHITECTURE.md` and `GLOSSARY.md` rows. Done when the current state is cited.
+1. Research the current state through Non-negotiables: how the affected flow works, where it lives, and relevant architecture documentation and domain terminology. Done when the current state is cited.
 2. Resolve unknowns; pick by size.
    - Fits one session → *run `grill-design` skill to stress-test the design through a relentless interview, resolving decisions and recording glossary terms, assumptions, and ADRs.*
    - Larger than one session → `wayfinder` is human-only: ask the user to run `/wayfinder` with the loose idea to chart decision tickets and resolve them one at a time.
