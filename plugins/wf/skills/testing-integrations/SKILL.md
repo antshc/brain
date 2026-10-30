@@ -90,8 +90,8 @@ Pick one **kind** via the ladder, then add a **strategy** when the task asks for
 ## Autonomy
 
 - Just run: local environments (DB emulator, mock, in-process, local app), read-only cloud calls (identity, list, describe).
-- Just run: rung 2 (component — cloud) test runs on the dev/test account, narrow filter, excluding `CleanUp` categories. Still do cloud.md steps 1–2 and 4–5 (account check, preflight, leftover report).
-- **MUST** confirm first: rung 5 real-environment runs (cost, leaked resources), cloud writes outside a rung 2 test run, cleanup deletes, `sudo`. Cloud steps: [references/cloud.md](references/cloud.md). The confirmation is a single go/no-go on the already-chosen run (account, region, command, cost); do not bundle rung, scope, or environment questions into it.
+- Just run: rung 2 (component — cloud) test runs on the dev/test account, narrow filter, excluding `CleanUp` categories. Still do **Cloud Safety** steps 1–2 and 4–5 (account check, preflight, leftover report).
+- **MUST** confirm first: rung 5 real-environment runs (cost, leaked resources), cloud writes outside a rung 2 test run, cleanup deletes, `sudo`. Cloud steps: **Cloud Safety**. The confirmation is a single go/no-go on the already-chosen run (account, region, command, cost); do not bundle rung, scope, or environment questions into it.
 - Long runs (cloud, full regression) → extended timeout or monitored background process; never assume completion from silence.
 
 ## Cloud Safety

@@ -12,13 +12,13 @@
    - **real cloud** (rung 5), two variants, as the repo supports:
      - **creates real instance:** E2E test provisions the app from an image / artifact in the dev account, runs, tears down.
      - **targets real deployment:** E2E test points at an existing deployed instance (URL / endpoint config).
-     Real cloud → follow [cloud.md](../../references/cloud.md) steps 1–3 first.
+     Real cloud → follow **Cloud Safety** steps 1–3 first.
    **Done when:** environment + selector (env var / flag / config) cited.
-2. **Preflight.** Run `suites.preflight` (container daemon up, required artifacts built; cloud inputs covered by cloud.md). **Done when:** every check prints OK.
+2. **Preflight.** Run `suites.preflight` (container daemon up, required artifacts built; cloud inputs covered by **Cloud Safety**). **Done when:** every check prints OK.
 3. **Filter.** Narrowest `suites.filter`: one test → ticket/trait → area. No test shows the problem → update or add one in the suite, reusing its fixtures. **Done when:** filter string written out.
 4. **Run.** From `suites.runFrom`, set the environment selector, run `suites.run`. Startup >2 min or real cloud → background + monitor. **Done when:** process exited.
 5. **Read summary.** Total / passed / failed / skipped from console or `suites.results`. Failures → test name + first assertion/exception line. **Done when:** numbers reported.
-6. **Tear down** containers left by the framework; real cloud → [cloud.md](../../references/cloud.md) step 5. **Done when:** none left, or kept by request / reported.
+6. **Tear down** containers left by the framework; real cloud → **Cloud Safety** step 5. **Done when:** none left, or kept by request / reported.
 
 ## Key Rule
 
