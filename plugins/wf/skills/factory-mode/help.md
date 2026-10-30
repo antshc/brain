@@ -24,13 +24,13 @@ PLAYBOOKS — matched from the request
   /factory-mode design <capability>; resolve open questions first
   /factory-mode we need <feature>, figure out the decisions
 
- architect          explore → architect sketch → to-spec → implement-spec → verify app → code-review → finalize draft PR
+ architect          research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → finalize draft PR
   /factory-mode add <behavior> to <module>
   /factory-mode implement <story> against an architect sketch
 
  architect auto     goal: deliver the entire feature autonomously, no questions after start
                     asks once: Initiative ID, target branch, repository
-                    arena 3 agents → interrogate + prototype → to-spec → implement-spec
+                    arena 3 agents → interrogate + research/experiment → to-spec → implement-spec parallel
                     → verify app → code-review → address → diagnosing-bugs → finalize → show-me-your-work report
   /factory-mode auto: add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
   /factory-mode run until done: <feature>
