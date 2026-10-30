@@ -193,7 +193,8 @@ def test_downstream_order_and_guards():
         assert not re.search(r'\]\(\./[a-z-]+\.md', path.read_text()), path
     parallel = (ROOT / 'references/parallel.md').read_text()
     assert 'no `conflicts`, paths `-`' not in parallel
-    assert 'serializing overlaps conservatively' in parallel
+    assert 'derive `file` conflicts from source footprints' in parallel
+    assert '`soft` conflicts never block a launch' in parallel
     assert 'mode=plan' not in parallel
 
 
@@ -220,7 +221,7 @@ def test_graph_only_outputs_and_scheduler_guards():
             assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
     parallel = (ROOT / 'references/parallel.md').read_text()
     for text in ('fewer than `MAX_PARALLEL`', 'blockers integrated',
-                 'has no `conflicts` pair with an in-flight ticket',
+                 'has no `file` conflict with an in-flight ticket',
                  'without waiting for unrelated in-flight tickets',
                  'after each validated integration', 'while B still runs',
                  'A finished worker alone does not satisfy its dependants',
@@ -252,4 +253,5 @@ def test_planner_emits_complete_graph_without_batches_or_worker_cap():
     assert set(result['criticalPath']) <= tickets.keys()
     for pair in result['conflicts']:
         assert {pair['a'], pair['b']} <= tickets.keys()
+        assert pair['kind'] in {'file', 'soft'}
     assert 'Failure: `{"status": "failed", "result": {"reason": "<why>"}}`' in planner

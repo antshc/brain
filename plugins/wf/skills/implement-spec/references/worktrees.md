@@ -22,7 +22,7 @@ Orchestrator-only worktree procedures; agents only receive worktree paths. Never
 - `WORKTREE_PATH` is the sole location for integrated ticket commits, publishing, chore, app verification, and fix commits.
 - One writer at a time: start a writer only after the previous result is verified. No merger subagents.
 - Sequential: each verified ticket commit lands directly on `INTEGRATION_BRANCH`.
-- Parallel: implementers write only in their ticket worktrees; verified ticket commits are cherry-picked here one at a time; conflicting tickets never run concurrently.
+- Parallel: implementers write only in their ticket worktrees; verified ticket commits are cherry-picked here one at a time; tickets with a `file` conflict never run concurrently. `soft` conflicts may run concurrently; a textual conflict at cherry-pick goes to the rebase rework round, a contract break to the post-merge check.
 - Failed or incomplete changes: preserve them and stop advancement.
 
 ## Ticket worktrees
