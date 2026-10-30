@@ -9,12 +9,23 @@ Select mode from the request:
 | **Interactive** | default |
 | **Auto** | auto, autonomous, run until done, don't stop, going to bed |
 
+## Resolve open questions (both modes)
+
+For each question raised by the sketch, `architect`, or `interrogate`, preserve its original wording and resolve it before accepting the design:
+
+- **How/why:** run the `research` skill against primary sources. Pass the original research request verbatim and a separate grounded question naming the repository/subsystem/symbol or external target, the unknown, and expected evidence. Apply cited findings to the sketch and rationale; do not silently change the research request.
+- **Observable technical uncertainty:** run the `experiment` skill with one falsifiable question and a real CLI, test, or minimal throwaway app when reading cannot settle it. Apply observed results; use the `prototype` playbook only for comparing design alternatives, not for an already testable fact.
+- **Product/preference:** Interactive → present a recommendation and ask the user; Auto → apply the supported recommendation and log the rejected alternative.
+- **Unanswerable with available access/evidence:** Interactive → surface the blocker; Auto → log `unanswerable` with its reason and proceed only on a safe reversible path.
+
+Record evidence, conclusions, and changes to the sketch/rationale. Never treat a technical how/why question as a user preference.
+
 ## Interactive
 
 1. Research the affected subsystem through Non-negotiables: how the flow works, what calls it, where config and tests live, and relevant architecture documentation and domain terminology. Done when every touched module has a file and line.
-2. *Run `architect` skill to sketch types, signatures, and module structure before code, loop corrections into the sketch, and resolve open design questions.* Name the data shape and its organizing structure (**Model the domain**, **Foundational thinking**). Multiple valid shapes → competing candidates (**Exhaust the design space**). Done when the user accepts the sketch.
+2. *Run `architect` skill to sketch types, signatures, and module structure before code, loop corrections into the sketch, and resolve questions through **Resolve open questions**.* Name the data shape and its organizing structure (**Model the domain**, **Foundational thinking**). Multiple valid shapes → competing candidates (**Exhaust the design space**). Present research/experiment evidence and ask the user for product/preference decisions and sketch acceptance. Done when the user accepts the sketch.
 3. *Run `to-spec` skill to turn the conversation and accepted sketch into a spec issue* with the target branch and Initiative ID. Done when the spec issue URL exists.
-4. *Run `implement-spec` skill to implement the spec through a routed ticket graph into one draft PR.* Done when complete `ready` handoff exists; blocked/incomplete → report blockers, preserve work, stop post-implementation phases.
+4. *Run `implement-spec` skill in parallel mode to implement the spec through a routed ticket graph into one draft PR.* Done when complete `ready` handoff exists; blocked/incomplete → report blockers, preserve work, stop post-implementation phases.
 5. Run *Handoff and synchronization*, then *App verification*. Done when verdict or explicit skip and publication results are retained.
 6. Run *Code review*. Done when every axis has an outcome for the pushed head; retain blockers/findings.
 7. Review the draft PR against the accepted sketch; surface every deviation and open decision. Done when each is reported.
@@ -24,18 +35,17 @@ Select mode from the request:
 
 **Goal: deliver the entire feature autonomously.** No open questions: every question gets an answer you recommend and then apply, with the reason and rejected alternative logged. Impossible to answer (needs access, data, or authority you lack) → log the question as `unanswerable` with the concrete reason why, then continue on the safest reversible path. Never ask the user after step 1; a called skill that asks (e.g. `to-spec` base candidate, `architect` review reply) gets your recommended answer. Decide calls the Principles cover by them; decide product, preference, and operator-only calls by the best recommendation from evidence. Never merge, force-push, or mark the PR ready.
 
-Trail: *run `show-me-your-work` skill in Log mode to keep the decision trail* at `tmp/factory-mode-{{featureSlug}}/decisions.tsv` from step 1; log every fork, default, prototype result, review verdict, and fix with its evidence.
+Trail: *run `show-me-your-work` skill in Log mode to keep the decision trail* at `tmp/factory-mode-{{featureSlug}}/decisions.tsv` from step 1; log every fork, default, research finding, experiment result, review verdict, and fix with its evidence.
 
 1. Ask once at the start, in one batch, for the inputs the request does not already give: Initiative ID, target branch, and repository (`owner/name`). Never invent them. Done when all three are set; no further questions after this step.
 2. Research the affected subsystem as in Interactive step 1.
 3. Arena. *Run `architect` skill with `arena-agents=3` to synthesize competing multi-model design candidates into one sketch.* Done when the synthesized sketch and rationale exist.
 4. Close open questions. Act as the reviewer in the `architect` Review loop; reply for the user:
    - `interrogate` once on the synthesized sketch; apply findings backed by evidence.
-   - `prototype` per remaining open question that an observation can settle; apply the corrections the evidence supports, citing it in the rationale.
-   - Every other question (product, preference, no experiment settles it) → answer with your recommendation, record it and the rejected alternative in the rationale.
+   - For each remaining question, apply **Resolve open questions**: `research` for how/why, `experiment` for observable uncertainty, and an evidence-backed recommendation for product/preference. Apply supported corrections and record the rejected alternatives in the rationale.
    - Reply `accept`. Done when every rationale question carries a recommended answer or an `unanswerable` reason; none is open.
 5. *Run `to-spec` skill to synthesize the accepted sketch into a published spec issue* with the inputs from step 1. Done when the spec issue URL exists.
-6. *Run `implement-spec` skill to implement the spec issue through a routed ticket graph in sequential mode into one draft PR.* Done when complete `ready` handoff exists; blocked/incomplete → report blockers, preserve work, skip post-implementation phases; proceed to Report.
+6. *Run `implement-spec` skill to implement the spec issue through a routed ticket graph in parallel mode into one draft PR.* Done when complete `ready` handoff exists; blocked/incomplete → report blockers, preserve work, skip post-implementation phases; proceed to Report.
 7. Verify app. Run *Handoff and synchronization*, then *App verification*. Done when verdict or explicit skip and publication results are retained.
 8. Review. Run *Code review* once. Done when every axis has an outcome for the pushed head and posting results are retained.
 9. Address. *Run `address` skill to group the PR review comments into issues, investigate each against the code, fix what needs fixing, and reply to every thread.* Each issue gets a fix or a reply closing it with a concrete reason. Done when every thread carries a reply.
@@ -44,4 +54,4 @@ Trail: *run `show-me-your-work` skill in Log mode to keep the decision trail* at
 12. Run *Finalize*. Head changes require fresh verification/review per that section, without another Address/Diagnose cycle. Done when closure/cleanup state is read back or blockers and preserved paths reported.
 13. Report last. *Run `show-me-your-work` skill in Report mode to audit the decision trail against the transcript, get a cross-model review, and print the report.* Done when the trail table and Attention section are printed.
 
-**Reply:** the `show-me-your-work` report, then the accepted sketch, arena synthesis and what each candidate contributed, open questions and how each closed (interrogate, prototype, default), spec and draft PR URLs, app verdict/evidence or skip, final verified/reviewed heads, closure/cleanup status, review findings fixed vs closed with reason, bugs diagnosed with root cause, deviations from the sketch, every recommendation applied with its rejected alternative, every `unanswerable` question with its reason. Tables for design alternatives.
+**Reply:** the `show-me-your-work` report, then the accepted sketch, arena synthesis and what each candidate contributed, open questions and how each closed (interrogate, research, experiment, default), spec and draft PR URLs, app verdict/evidence or skip, final verified/reviewed heads, closure/cleanup status, review findings fixed vs closed with reason, bugs diagnosed with root cause, deviations from the sketch, every recommendation applied with its rejected alternative, every `unanswerable` question with its reason. Tables for design alternatives.
