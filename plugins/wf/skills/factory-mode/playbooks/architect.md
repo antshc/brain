@@ -9,6 +9,8 @@ Select mode from the request:
 | **Interactive** | default |
 | **Auto** | auto, autonomous, run until done, don't stop, going to bed |
 
+In both modes, include **Design preferences** from Principles in every architecture design request, including each arena candidate's brief.
+
 ## Resolve open questions (both modes)
 
 For each question raised by the sketch, `architect`, or `interrogate`, preserve its original wording and resolve it before accepting the design:
