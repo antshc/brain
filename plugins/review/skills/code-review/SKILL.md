@@ -1,14 +1,14 @@
 ---
 name: code-review
-description: 'Reviews GitHub pull requests for bugs, quality attributes, code smells, and initiative coverage using independent reviewers. Selects models by PR risk and posts evidence-backed inline comments.'
-argument-hint: '<PR_URL>'
+description: 'Reviews GitHub pull requests for bugs, quality attributes, code smells, and initiative coverage using independent reviewers. Picks reviewer models from a configurable low/medium/high level and posts evidence-backed inline comments.'
+argument-hint: '<PR_URL> [low|medium|high]'
 ---
 
 # Code review
 
 ## Inputs
 
-- User invocation: PR URL, with an existing local checkout of the PR repository available.
+- User invocation: PR URL, with an existing local checkout of the PR repository available; optional review level `low`, `medium`, or `high` (default `medium`).
 - Workflow invocation: `implement-spec` passes the PR URL and `SOURCE_ROOT` after removing its implementation worktree. The review skill creates a separate fresh review worktree.
 - Both entry points use the same acquisition, review, posting and cleanup workflow. Resolve a matching existing repository from explicit `SOURCE_ROOT`, caller checkout, or the harness workspace; ask for its path if absent/ambiguous. **MUST NOT** clone as a fallback.
 
@@ -22,7 +22,7 @@ argument-hint: '<PR_URL>'
    - Fetch GitHub `title,body` with explicit repository or Jira's full description in the parent. Pass resolved identity and description to the reviewer; retain the resolved source internally without adding it to the PR description.
    - Require a successfully fetched, non-whitespace description; ADF requires nonempty text content, not just a document wrapper. Pass resolved identity, source, and full description to the initiative reviewer. Titles, comments, metadata, and local spec files do not substitute.
    - Spawn `initiative` only when this gate passes. Otherwise record `skipped` with missing, ambiguous, empty, or inaccessible input and continue independent axes; this is unavailable initiative verification, not a pass.
-4. Follow [Reviewer selection](references/reviewer-selection.md) before delegation. Record PR size, complexity triggers, selected model, and fallbacks. Spawn one fresh read-only subagent per eligible axis, in parallel. Give each `REVIEW_REPO`, `REVIEW_HEAD`, `REVIEW_BASE`, `DIFF_DIR` and manifest, PR context, existing comments, shared contract, and absolute axis-reference path. Each reviews the complete change for its axis and returns posting-ready JSON. **MUST NOT** reuse implementer/chore contexts or substitute parent review when delegation is unavailable; report the blocker. Rationale: independent review context limits implementation bias. Subagents must not refetch/check out the diff, edit source, commit, push, or post.
+4. Follow [Reviewer selection](references/reviewer-selection.md) before delegation; it draws each axis's model from the review level's pool in *Model selection*. Record the level and each axis's model, effort, and fallbacks. Spawn one fresh read-only subagent per eligible axis, in parallel. Give each `REVIEW_REPO`, `REVIEW_HEAD`, `REVIEW_BASE`, `DIFF_DIR` and manifest, PR context, existing comments, shared contract, and absolute axis-reference path. Each reviews the complete change for its axis and returns posting-ready JSON. **MUST NOT** reuse implementer/chore contexts or substitute parent review when delegation is unavailable; report the blocker. Rationale: independent review context limits implementation bias. Subagents must not refetch/check out the diff, edit source, commit, push, or post.
 
    | Axis | Spawn condition | Reference and extra input |
    |---|---|---|
@@ -34,6 +34,16 @@ argument-hint: '<PR_URL>'
 5. Collect each result; record failure objects separately from successful findings arrays. Validate the output contract, axis-specific comment format, and diff anchors; return malformed findings to their reviewer for correction before posting. Deduplicate against existing comments and across axes by issue/root cause; use `FILE_PATH` + `LINE_NUMBER` to locate candidate duplicates, not to merge unrelated issues sharing a line. Keep only net-new, actionable findings.
 6. In the parent, post each retained `REVIEW_COMMENT` verbatim using [Posting](references/posting.md), resolved from this skill's base directory; do not reformat or add labels. Use the reviewed head commit and exact manifest path. If the PR head or base has changed, stop posting and report the stale review; do not attach old findings to a new commit. Record each returned comment ID. Do not submit a review.
 7. Report each axis as completed, skipped (reason), or failed; report posted comment IDs and any unposted findings or posting failures. Include retained findings and known existing bug/initiative concerns in the handoff; absence of net-new findings does not prove earlier comments resolved. A failed reviewer or post is not a clean review. After retaining results, follow the fetch reference’s Cleanup procedure to remove only the run-owned review worktree, diff and temporary refs; report preserved paths or cleanup failures.
+
+## Model selection
+
+Model pool per review level. The user picks the level; default `medium`. Each eligible axis gets one entry picked at random from the level's pool. Entry format: `<model> <effort>`; pass the model as `model` and the effort as `reasoning_effort`. An entry of `inherit-parent` or `auto` runs that reviewer on the parent chat model (omit `model` and `reasoning_effort`). Edit **Pool** to retune.
+
+| Level | Pool |
+|---|---|
+| low | claude-sonnet-5.5 medium, gpt-6-luna medium, grok-4.7 medium |
+| medium | claude-opus-5.5 medium, gpt-6.1-sol medium, grok-4.7 medium |
+| high | claude-opus-5.5 high, gpt-6.1-sol high, grok-4.7 high |
 
 ## Shared review contract
 
@@ -54,6 +64,6 @@ argument-hint: '<PR_URL>'
 
 ## Completion criteria
 
-- Bugs, quality, and code smells each ran in a fresh subagent with recorded model selection and outcomes; initiative ran only when the PR-body initiative-description gate passed, otherwise its skip reason is explicit.
+- Bugs, quality, and code smells each ran in a fresh subagent with recorded review level, per-axis model selection, and outcomes; initiative ran only when the PR-body initiative-description gate passed, otherwise its skip reason is explicit.
 - Every posted finding has a validated manifest path, right-side diff line, reviewed commit, and returned comment ID; duplicates are excluded and no review was submitted.
 - Run a closing completeness sweep across eligible axes, initiative requirements, and retained findings. Account for every skipped, failed, or unposted item before reporting completion.
