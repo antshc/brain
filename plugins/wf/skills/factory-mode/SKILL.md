@@ -43,6 +43,7 @@ Apply when the trigger matches; cite by bold name.
 
 **Architecture**
 
+- **Design preferences.** Prefer the smallest change that satisfies the requirements. Apply YAGNI; avoid speculative abstractions and unnecessary complexity. Reuse existing models, utilities, and classes where suitable. Follow the repository’s iDesign layering and existing implementation patterns.
 - **Model the domain.** Stateful or branch-heavy logic. Encode the domain in a structure (state machine, typed model, table/registry, reducer) instead of scattered conditionals.
 - **Boundary discipline.** Validation, errors, adapters. Guard at system boundaries; trust internal types; keep business logic pure.
 - **Type discipline.** Designing types. Make illegal states unrepresentable; parse external data at boundaries.

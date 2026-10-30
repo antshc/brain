@@ -20,7 +20,7 @@ Read `{{commitsFile}}`: the branch's commits since `{{targetBranch}}`, oldest fi
 
 1. **Understand the change**: read the manifest and every diff, then the changed files and their neighbors, until you know what the change does and which behavior must stay intact.
 2. **Improve**:
-   - Reduce unnecessary complexity and nesting
+   - Avoid speculative abstractions and unnecessary complexity; reduce unnecessary nesting.
    - Eliminate redundant code and abstractions
    - Use clear variable and function names
    - Consolidate related logic
