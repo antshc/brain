@@ -38,22 +38,29 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
 - Tracker repository = the spec's. Source repository = exactly one `repo:target:` label; base = exactly one `repo:base:` label; `INITIATIVE_ID` = spec title prefix before the first `:`. Missing or conflicting routing → resolve explicitly before writes (`--source-repository`/`--base-branch` only for a user-confirmed older unlabeled spec).
 - Track every issue as `OWNER/REPO#NUMBER` in its owning repository; bare references inherit the containing issue's repository; stop on ambiguity. Tickets may live outside the tracker.
 - Empty or 404 reads are failures, never an empty graph. Text relationships only when native sub-issues/blockers are confirmed unavailable; report that mode.
-- Run-local map: ticket identity, owner, blockers, status, integrated commit, validation evidence; the integration worktree/branch once and, in parallel mode, each ticket's. A ticket closed by this run counts as satisfied; dependants need committed, validated blocker implementations on the integration branch. Never use open-issue counts alone.
+- Run-local map: ticket identity, owner, blockers, status, planner-selected implementer model/effort, integrated commit, validation evidence; the integration worktree/branch once and, in parallel mode, each ticket's. A ticket closed by this run counts as satisfied; dependants need committed, validated blocker implementations on the integration branch. Never use open-issue counts alone.
 - Body files live outside the repository; remove only those this run created.
+
+## Implementer model routing
+
+Resolve the newest available, runtime-supported Claude Sonnet model with **high** reasoning and Claude Opus model with **medium** reasoning to exact identifiers before agent launches (currently `claude-sonnet-5.5` and `claude-opus-5.5`). `latest` is a preference, not a model alias; do not invent identifiers. Pass valid candidate pairs to the planner.
+
+For each ticket, use only the planner's `tickets[].implementer` recommendation returned for this run. Validate the exact identifier and effort against the available candidates before launch, record the chosen pair and rationale, and keep that pair on rework. Missing, malformed, or unavailable selection → report failure; never infer an executable model from ticket text or silently substitute.
 
 ## Workflow
 
 1. Detect input type, then prepare input:
    → A: Plan file or inline description → load [breakdown.md](./references/breakdown.md); run *Prepare Plan* (ends with `spec create`), then continue as B.
-   → B: GitHub spec issue → `GH_TOOL preflight --spec URL` (`HARNESS_ROOT`, `SOURCE_ROOT`, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH` = `integration_branch`, `RUN_DIR`), then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; **MUST NOT** run the planner or create tickets. Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative*.
+   → B: GitHub spec issue → `GH_TOOL preflight --spec URL` (`HARNESS_ROOT`, `SOURCE_ROOT`, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH` = `integration_branch`, `RUN_DIR`), then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; launch the planner in `analyze` mode (read-only; **MUST NOT** create tickets). Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative* with planner `breakdown` mode.
    → Unsupported or ambiguous input: ask for valid input; stop.
 
-   Launch planner (only from *Breakdown Initiative*) → [planner.md](./agents/planner.md) subagent from `SOURCE_ROOT`:
-   refs `breakdown` · `claude-opus-5.5` medium reasoning · rework none.
-   Before: fetch validated `BASE_BRANCH`, record `BASE_COMMIT`; create `NOTES_DIR` = `RUN_DIR/notes` outside the repository; `RUN_DIR/spec.json` exists from `graph read`. Done when checkout and base match routing.
+   Launch planner (once for either `breakdown` or `analyze`) → [planner.md](./agents/planner.md) subagent from `SOURCE_ROOT`:
+   refs `breakdown` only for `breakdown` mode, none for `analyze` · `claude-opus-5.5` high reasoning · rework none.
+   Before: fetch validated `BASE_BRANCH`, record `BASE_COMMIT`; resolve available implementer candidates per *Implementer model routing*; create `NOTES_DIR` = `RUN_DIR/notes` outside the repository; `RUN_DIR/spec.json` exists from `graph read`. Done when checkout and base match routing.
 
    | Placeholder | Value |
    |---|---|
+   | `{{operation}}` | `breakdown` for zero sub-issues; `analyze` for existing sub-issues |
    | `{{ghTool}}` | `GH_TOOL` (absolute) |
    | `{{specRef}}` | spec `OWNER/REPO#NUMBER` |
    | `{{specFile}}` | `RUN_DIR/spec.json` |
@@ -63,15 +70,16 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    | `{{baseCommit}}` | `BASE_COMMIT` |
    | `{{notesDir}}` | `NOTES_DIR` |
    | `{{specArtifactsDir}}` | `RUN_DIR/artifacts` (spec issue artifacts and `index.json` from `graph read`) |
+   | `{{implementerModels}}` | Exact available Sonnet/high and Opus/medium model/effort candidates |
 
-   Verify: per Breakdown Initiative; record actual model/effort or unavailable-model failure.
-   → `failed`, invalid JSON, empty `created`, or incomplete GitHub operations: report actual partial state; stop; never claim success.
+   Verify: in `breakdown` mode follow *Breakdown Initiative* publication checks; in `analyze` mode require `created: []` and no ticket writes. For both, validate each `tickets[].implementer` against supplied candidates and retain recommendations in the run-local map; record actual planner model/effort or unavailable-model failure.
+   → `failed`, invalid JSON, missing ticket recommendations, or incomplete GitHub operations: report actual partial state; stop; never claim success.
 
-2. Re-run `GH_TOOL graph read --spec REF --out RUN_DIR` after any breakdown: complete graph (spec, tickets, comments, blockers, parents) saved under `RUN_DIR`; retain explicit `OWNER/REPO#NUMBER` identities.
+2. Re-run `GH_TOOL graph read --spec REF --out RUN_DIR` after planner completion: complete graph (spec, tickets, comments, blockers, parents) saved under `RUN_DIR`; retain explicit `OWNER/REPO#NUMBER` identities.
 
 3. Validate the graph: reject `frontier.cycles` (name them) and tickets without scope; resolve `problems` (routing conflicts) and `frontier.needs_resolution` (cancelled, duplicate, external blockers) before writes; `hitl` tickets and their dependants are `deferred`; verify closed blockers' results exist in `BASE_COMMIT`. Record each ticket's identity, owner, status, scope, blockers, and evidence in the run-local map. Show the *Graph report* after Breakdown Initiative and in parallel mode.
 
-4. Explore implementation scope and test seams as needed; save shared notes under `RUN_DIR/notes` and pass pointers. Reuse planner evidence (graph, footprints, conflicts) when available; planner conflicts without `kind` are `file` only when evidence names a path, otherwise `soft`; otherwise derive it from the graph and source checkout without a planner. Bound every runnable ticket's scope before selection.
+4. Explore implementation scope and test seams as needed; save shared notes under `RUN_DIR/notes` and pass pointers. Use the planner's graph, footprints, conflicts, and per-ticket model recommendations; planner conflicts without `kind` are `file` only when evidence names a path, otherwise `soft`. Bound every runnable ticket's scope and validate its preferred implementer per *Implementer model routing* before selection.
 
 5. Execute selected mode:
    - Validate `mode` and `MAX_PARALLEL` before creating any branch or worktree.
@@ -82,7 +90,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
      → D: Parallel → Run [Parallel Implementation](./references/parallel.md#parallel-implementation); isolate tickets per [Ticket worktrees](./references/worktrees.md#ticket-worktrees).
 
    Launch implementer → [implementer.md](./agents/implementer.md) subagent per ticket in its worktree:
-   refs none · `claude-opus-5.5` medium reasoning · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent, ≤2 rounds.
+   refs none · validated per-ticket preferred model/effort from *Implementer model routing* · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent and model/effort, ≤2 rounds.
 
    | Placeholder | Sequential | Parallel |
    |---|---|---|
@@ -178,7 +186,7 @@ Failure: same shape, `status: blocked`, concrete `blockers`, partial values pres
 
 - Breakdown Initiative or parallel mode → first: *Graph report*.
 - Spec URL, created tickets, planner model/effort; PR URL/state.
-- Per ticket: integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
+- Per ticket: chosen implementer model/effort, integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
 - Chore commits and model/effort; skipped infrastructure checks; preserved worktree status; *Implementation handoff* path and status.
 - No runnable tickets: report graph/blockers; never claim implementation.
 - Incomplete: name missing evidence, partial GitHub writes, preserved work; distinguish unverified state from read-back success.
