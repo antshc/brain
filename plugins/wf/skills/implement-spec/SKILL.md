@@ -49,7 +49,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
    → Unsupported or ambiguous input: ask for valid input; stop.
 
    Launch planner (only from *Breakdown Initiative*) → [planner.md](./agents/planner.md) subagent from `SOURCE_ROOT`:
-   refs `breakdown` · latest Opus (prefer `claude-opus-5.5`), medium reasoning · rework none.
+   refs `breakdown` · `claude-opus-5.5` medium reasoning · rework none.
    Before: fetch validated `BASE_BRANCH`, record `BASE_COMMIT`; create `NOTES_DIR` = `RUN_DIR/notes` outside the repository; `RUN_DIR/spec.json` exists from `graph read`. Done when checkout and base match routing.
 
    | Placeholder | Value |
@@ -82,7 +82,7 @@ Orchestrate a routed ticket graph into one integration branch and draft PR. Run 
      → D: Parallel → Run [Parallel Implementation](./references/parallel.md#parallel-implementation); isolate tickets per [Ticket worktrees](./references/worktrees.md#ticket-worktrees).
 
    Launch implementer → [implementer.md](./agents/implementer.md) subagent per ticket in its worktree:
-   refs none · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent, ≤2 rounds.
+   refs none · `claude-opus-5.5` medium reasoning · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent, ≤2 rounds.
 
    | Placeholder | Sequential | Parallel |
    |---|---|---|

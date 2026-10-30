@@ -40,9 +40,10 @@ tools: {{tools}}
 
 ## Verification
 
+<!-- @: Coding agent: add test strategy by change risk and fast-feedback scope per Coding agents. -->
 - Run {{check|affected executable check}}.
-- Confirm {{acceptanceCondition}}.
-- Record {{evidence|command, exit code, logs, or artifact}}.
+- Confirm {{acceptanceCondition|including that intended tests actually ran}}.
+- Record {{evidence|command, exit code, logs, or artifact}} and each check's status: `passed | failed | unavailable | not run`.
 
 ## Completion and failure
 
