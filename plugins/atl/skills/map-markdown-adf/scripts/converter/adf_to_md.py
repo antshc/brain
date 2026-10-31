@@ -1,6 +1,7 @@
 """Atlassian Document Format -> Markdown entrypoint (pure)."""
 from __future__ import annotations
 
+from .patterns import COMMENT_CLOSE_TAG, comment_open_tag
 from .table_grid import validate_table_grid
 
 # Applied innermost-first, so combined marks on one text node wrap in a fixed order
@@ -176,9 +177,33 @@ def render_table_cell(cell: dict) -> str:
     return " ".join(p.replace("\n", " ") for p in parts if p)
 
 
+def _comment_ids(node: dict) -> list[str]:
+    """Inline-comment annotation ids on a node; other annotation types have no Markdown form."""
+    ids = []
+    for mark in node.get("marks", []):
+        attrs = mark.get("attrs", {})
+        if mark.get("type") == "annotation" and attrs.get("annotationType", "inlineComment") == "inlineComment":
+            if attrs.get("id") and attrs["id"] not in ids:
+                ids.append(attrs["id"])
+    return ids
+
+
 def render_inline(nodes: list[dict]) -> str:
     parts = []
+    open_ids: list[str] = []
     for node in nodes:
+        # Keep the longest still-wanted prefix of open comment spans; close the rest, then open
+        # what this node adds. Consecutive nodes sharing an id render as one span.
+        wanted = _comment_ids(node)
+        keep = 0
+        while keep < len(open_ids) and open_ids[keep] in wanted:
+            keep += 1
+        parts.extend(COMMENT_CLOSE_TAG for _ in open_ids[keep:])
+        open_ids = open_ids[:keep]
+        for comment_id in wanted:
+            if comment_id not in open_ids:
+                parts.append(comment_open_tag(comment_id))
+                open_ids.append(comment_id)
         node_type = node.get("type")
         if node_type == "text":
             parts.append(render_text(node))
@@ -192,6 +217,7 @@ def render_inline(nodes: list[dict]) -> str:
             parts.append(render_inline_extension(node))
         else:
             raise NotImplementedError(f"unhandled inline node type '{node_type}'")
+    parts.extend(COMMENT_CLOSE_TAG for _ in open_ids)
     return "".join(parts)
 
 

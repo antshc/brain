@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 
 from .patterns import (
+    COMMENT_OPEN_RE,
     DETAILS_OPEN_RE,
     PANEL_MARKER_RE,
     STATUS_RE,
@@ -44,5 +45,7 @@ def detect_adf_only(markdown: str) -> list[dict]:
 
         if STATUS_RE.search(line):
             found.append({"kind": "status", "line": number})
+        if COMMENT_OPEN_RE.search(line):
+            found.append({"kind": "inlineComment", "line": number})
 
     return found

@@ -12,6 +12,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+from atlassian.errors import ApiError
+from requests.exceptions import RequestException
+
+from . import comment_guard
 from .adf import attachment_node, drawio_node, media_node, substitute_drawio, substitute_markers
 from .attachments import upload_diagrams, upload_files
 from .custom_content import upsert_diagram
@@ -276,6 +280,46 @@ def _publish_without_credentials(
     return result, final_adf
 
 
+_GUARD_ERRORS = (RequestException, ApiError, ValueError)
+
+
+def _plan_comment_guard(credentials: dict[str, str] | None, page_id: str | None, final_adf: dict) -> tuple[dict | None, dict]:
+    """Read which open inline comments this update will detach; never blocks the publish."""
+    if not page_id:
+        return None, {}
+    if not credentials:
+        return None, {"commentGuard": "skipped (no apiToken)"}
+    try:
+        return comment_guard.plan(get_confluence(credentials), page_id, final_adf), {}
+    except _GUARD_ERRORS as exception:
+        return None, {"commentGuard": f"failed ({type(exception).__name__})"}
+
+
+def _apply_comment_guard(
+    guard: dict, credentials: dict[str, str], page_id: str, method: str, assets_dir: str
+) -> dict:
+    """After the publish: REST already published, so post the notice now; an MCP handback
+    leaves the notice file for `notify-comments` to post once the agent has published."""
+    keys: dict = {}
+    if guard["unknownIds"]:
+        keys["unknownCommentIds"] = guard["unknownIds"]
+    if not guard["orphaned"]:
+        return keys
+    keys["orphanedComments"] = [{k: c[k] for k in ("id", "markerRef", "selection")} for c in guard["orphaned"]]
+    storage = comment_guard.notice_storage(guard["orphaned"], f"{site_url(credentials)}/wiki")
+    if method == "mcp":
+        notice_path = Path(assets_dir) / "comment-notice.html"
+        notice_path.parent.mkdir(parents=True, exist_ok=True)
+        notice_path.write_text(storage, encoding="utf-8")
+        keys["orphanNoticePath"] = str(notice_path)
+        return keys
+    try:
+        keys["orphanNoticeCommentId"] = comment_guard.post_notice(get_confluence(credentials), page_id, storage)
+    except _GUARD_ERRORS as exception:
+        keys["commentGuard"] = f"notice failed ({type(exception).__name__})"
+    return keys
+
+
 def publish(
     md_path: str,
     config_path: str,
@@ -316,6 +360,7 @@ def publish(
         drawio_extension_key = load_drawio_extension_key(config_path) if renderer == renderers.DRAWIO else None
 
     credentials = try_load_credentials(config_path)
+    guard, guard_keys = _plan_comment_guard(credentials, page_id, base_adf)
 
     if credentials and (diagrams or local_media):
         result, final_adf = _publish_with_diagrams(
@@ -346,4 +391,7 @@ def publish(
         f.write("\n")
     result["renderer"] = renderer
     result["adfPath"] = out_path
+    result.update(guard_keys)
+    if guard is not None:
+        result.update(_apply_comment_guard(guard, credentials, page_id, result["method"], assets_dir))
     return result
