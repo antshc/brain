@@ -38,9 +38,9 @@ Locate existing architecture docs — overview, Crosscutting Concepts, ADRs — 
 - **Found:** keep loaded for the session; cross-reference every input against it.
 - **Not found:** proceed on code evidence alone.
 
-**4. Run pre-review analyses**
+**4. Run changes brief**
 
-Runs on the user's behalf despite the on-initiative restriction; the human reads the outputs, the assistant does not summarize them.
+Runs on the user's behalf despite the on-initiative restriction; the human reads the output, the assistant does not summarize it.
 
 Set `@diffSize` to `additions + deletions` from `gh pr view <PR_NUMBER> --repo <OWNER>/<REPO> --json additions,deletions`. Set `@agentSize` from `@diffSize`:
 
@@ -50,16 +50,13 @@ Set `@diffSize` to `additions + deletions` from `gh pr view <PR_NUMBER> --repo <
 | 200 to 1000 | medium: standard model |
 | over 1000 | large: most capable model available |
 
-Launch two subagents in parallel, one per row, both at `@agentSize`. Each gets `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL`, `bin/review_diff/` with its `_manifest.tsv`, and the loaded architecture docs; each is read-only on the codebase and writes only its output file.
+Launch one Changes brief subagent at `@agentSize`. Pass `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL`, `bin/review_diff/` with its `_manifest.tsv`, and the loaded architecture docs. It is read-only on the codebase and writes only its output file.
 
-| Subagent | Task | Output file |
-|---|---|---|
-| Blast radius | Follow [Blast radius](references/blast-radius.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-blast-radius.md` |
-| Changes brief | Follow [Changes brief](references/changes-brief.md) for the PR change. | `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-changes-brief.md` |
+Follow [Changes brief](references/changes-brief.md) for the PR change. Write the result to `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-changes-brief.md`.
 
-Pass each subagent the absolute path of its reference file under this skill's `references/` folder; it opens that path directly and does not search for it. Each subagent writes its reference's reply verbatim to its output file, creating the folder if missing, and returns only the absolute output path plus `done` or `failed: <reason>`.
+Pass the subagent the absolute path of the reference file under this skill's `references/` folder; it opens that path directly and does not search for it. It writes the reference's reply verbatim to its output file, creating the folder if missing, and returns only the absolute output path plus `done` or `failed: <reason>`.
 
-Then show the user one Markdown link per output file (absolute path, `/` separators) and the line "Open and read these before the review." Failed subagent → show its reason in place of the link. Done when both files exist or a reason is shown; do not read, summarize, or critique them. Continue to Review loop without waiting for the user to finish reading.
+Then show the user one Markdown link to the output file (absolute path, `/` separators) and the line "Open and read this before the review." Failed subagent → show its reason in place of the link. Done when the file exists or a reason is shown; do not read, summarize, or critique it. Continue to Review loop without waiting for the user to finish reading.
 
 ## Review loop
 
