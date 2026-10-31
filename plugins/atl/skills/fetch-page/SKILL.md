@@ -41,7 +41,7 @@ Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `pag
 
 **Placeholder resolution:**
 1. `{stem}.source.mmd` sidecar attached → verbatim ```mermaid fence only, no image (`publish-page` skill re-renders).
-2. Image, no sidecar → `![<alt or filename>](page.md.assets/<file>)`; if placeholder has `width`/`height`, add `<!-- media-size: width=<w> height=<h> -->` on the next line.
+2. Image, no sidecar → `![<alt or filename>](page.md.assets/<file>)`; if placeholder has `width`/`height`, `display-width`, or `layout`, add `<!-- media-size: [width=<w> height=<h>] [display-width=<n>[%]] [layout=<layout>] -->` on the next line (`publish-page` skill restores display size and position from it).
 3. Other file → `[<filename>](page.md.assets/<file>)`.
 
 Links percent-encoded, relative to `page.md`'s dir. `publish-page` skill re-uploads rule 2/3 references on republish.

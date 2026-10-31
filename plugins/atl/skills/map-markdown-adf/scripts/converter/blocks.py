@@ -13,12 +13,16 @@ from .patterns import (
     PANEL_MARKER_RE,
     SUMMARY_RE,
     TOC_COMMENT_RE,
-    WIDE_TABLE_MARKER_RE,
+    breakout_marker_mark,
+    table_marker_attrs,
 )
 from .table_grid import validate_table_grid
 
 CODE_LANG_ALLOWLIST = {
     "text",
+    "plaintext",
+    "powershell",
+    "go",
     "json",
     "xml",
     "yaml",
@@ -83,7 +87,8 @@ def parse_blocks(lines: list[str]) -> list[dict]:
     blocks: list[dict] = []
     i = 0
     n = len(lines)
-    pending_wide_table = False
+    pending_table_attrs: dict | None = None
+    pending_breakout: dict | None = None
     while i < n:
         line = lines[i]
 
@@ -92,24 +97,31 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             continue
 
         if TOC_COMMENT_RE.match(line):
-            blocks.append(
-                {
-                    "type": "expand",
-                    "attrs": {"title": "Table of Contents"},
-                    "content": [build_toc_extension()],
-                }
-            )
+            toc = {"type": "expand", "attrs": {"title": "Table of Contents"}, "content": [build_toc_extension()]}
+            if pending_breakout:
+                toc["marks"] = [pending_breakout]
+            blocks.append(toc)
+            pending_table_attrs = pending_breakout = None
             i += 1
             continue
 
-        if WIDE_TABLE_MARKER_RE.match(line):
-            pending_wide_table = True
+        marker_table_attrs = table_marker_attrs(line)
+        if marker_table_attrs is not None:
+            pending_table_attrs = marker_table_attrs
             i += 1
             continue
 
-        # The marker (if any) only applies to the very next construct; drop it otherwise.
-        apply_wide_table = pending_wide_table
-        pending_wide_table = False
+        marker_breakout = breakout_marker_mark(line)
+        if marker_breakout is not None:
+            pending_breakout = marker_breakout
+            i += 1
+            continue
+
+        # A marker (if any) only applies to the very next construct; drop it otherwise.
+        apply_table_attrs = pending_table_attrs
+        pending_table_attrs = None
+        apply_breakout = pending_breakout
+        pending_breakout = None
 
         heading_m = HEADING_RE.match(line)
         if heading_m:
@@ -139,6 +151,8 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             node = {"type": "codeBlock", "content": [{"type": "text", "text": "\n".join(code_lines)}]}
             if attrs:
                 node["attrs"] = attrs
+            if apply_breakout:
+                node["marks"] = [apply_breakout]
             blocks.append(node)
             continue
 
@@ -184,12 +198,14 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             content = parse_blocks(inner_lines)
             if not content:
                 content = [{"type": "paragraph", "content": [{"type": "text", "text": ""}]}]
-            blocks.append({"type": "expand", "attrs": {"title": title}, "content": content})
+            expand = {"type": "expand", "attrs": {"title": title}, "content": content}
+            if apply_breakout:
+                expand["marks"] = [apply_breakout]
+            blocks.append(expand)
             continue
 
         if _table_start(lines, i) is not None:
-            layout = "wide" if apply_wide_table else "default"
-            table, i = _parse_table(lines, i, layout)
+            table, i = _parse_table(lines, i, apply_table_attrs or {"layout": "default"})
             blocks.append(table)
             continue
 
@@ -232,7 +248,7 @@ def _is_block_start(line: str, lines: list[str], i: int) -> bool:
         return True
     if DETAILS_OPEN_RE.match(line) or DETAILS_CLOSE_RE.match(line) or SUMMARY_RE.match(line):
         return True
-    if TOC_COMMENT_RE.match(line) or WIDE_TABLE_MARKER_RE.match(line):
+    if TOC_COMMENT_RE.match(line) or table_marker_attrs(line) is not None or breakout_marker_mark(line) is not None:
         return True
     if _table_start(lines, i) is not None:
         return True
@@ -243,8 +259,8 @@ def _is_block_start(line: str, lines: list[str], i: int) -> bool:
 
 def _table_start(lines: list[str], i: int) -> int | None:
     """Indent of a table starting at `lines[i]` (header row + separator), optionally preceded by
-    a `<!-- adf:wide-table -->` marker line; None when no table starts there."""
-    if WIDE_TABLE_MARKER_RE.match(lines[i]):
+    a table marker line (`adf:wide-table` / `adf:table`); None when no table starts there."""
+    if table_marker_attrs(lines[i]) is not None:
         i += 1
     if i + 1 >= len(lines):
         return None
@@ -254,14 +270,17 @@ def _table_start(lines: list[str], i: int) -> int | None:
     return len(row_m.group(1))
 
 
-def _parse_table(lines: list[str], i: int, layout: str) -> tuple[dict, int]:
+def _parse_table(lines: list[str], i: int, table_attrs: dict) -> tuple[dict, int]:
     header_cells = split_table_row(lines[i])
     i += 2
     rows = []
     while i < len(lines) and _TABLE_ROW_RE.match(lines[i]):
         rows.append(split_table_row(lines[i]))
         i += 1
-    return build_table(header_cells, rows, layout=layout), i
+    table = build_table(header_cells, rows, layout=table_attrs.get("layout", "default"))
+    if "width" in table_attrs:
+        table["attrs"]["width"] = table_attrs["width"]
+    return table, i
 
 
 def paragraphs_from_lines(lines: list[str]) -> list[dict]:
@@ -326,8 +345,8 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
             continue
 
         if nested_table_indent(i) is not None:
-            wide = bool(WIDE_TABLE_MARKER_RE.match(line))
-            table, i = _parse_table(lines, i + 1 if wide else i, "wide" if wide else "default")
+            marker = table_marker_attrs(line)
+            table, i = _parse_table(lines, i + 1 if marker is not None else i, marker or {"layout": "default"})
             deferred_tables.append(table)
             continue
 

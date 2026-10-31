@@ -23,10 +23,25 @@ from urllib.parse import quote
 from atlassian import Jira
 
 _ATTACHMENT_PLACEHOLDER_RE = re.compile(
-    r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")? -->'
+    r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")?'
+    r'(?: display-width="([^"]*)")?(?: layout="([^"]*)")? -->'
 )
 
+
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
+
+
+def media_size_comment(width: str | None, height: str | None, display_width: str | None, layout: str | None) -> str:
+    """`<!-- media-size: ... -->` carrying every size/position fact the placeholder had, or "".
+    `publish-page` reads it back so a republished image keeps its size and layout."""
+    parts = []
+    if width and height:
+        parts += [f"width={width}", f"height={height}"]
+    if display_width:
+        parts.append(f"display-width={display_width}")
+    if layout:
+        parts.append(f"layout={layout}")
+    return f"<!-- media-size: {' '.join(parts)} -->" if parts else ""
 
 
 def _looks_like_image(name: str) -> bool:
@@ -145,7 +160,8 @@ def restore_attachments(
         return download_attachment_bytes(jira, attachment)
 
     def _replace(match: re.Match) -> str:
-        alt, width, height = match.group(2), match.group(3), match.group(4)
+        alt = match.group(2)
+        size = media_size_comment(*match.group(3, 4, 5, 6))
         if not alt:
             return "<!-- adf:attachment source unavailable: placeholder carries no filename -->"
         if _resolve(alt) is None:
@@ -153,9 +169,7 @@ def restore_attachments(
         link = _relative_link(assets_dir_name, alt)
         if _looks_like_image(alt):
             image_line = f"![{alt}]({link})"
-            if width and height:
-                return f"{image_line}\n<!-- media-size: width={width} height={height} -->"
-            return image_line
+            return f"{image_line}\n{size}" if size else image_line
         return f"[{alt}]({link})"
 
     return _ATTACHMENT_PLACEHOLDER_RE.sub(_replace, markdown)

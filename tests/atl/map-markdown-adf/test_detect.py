@@ -14,8 +14,11 @@ def test_plain_commonmark_is_markdown_safe(detect_adf_only):
         ("<details>\n<summary>More</summary>\n\nbody\n\n</details>", "expand"),
         ("> [!WARNING]\n> mind the gap", "panel"),
         ("Ticket is [STATUS:Done|green] now.", "status"),
+        ("Ticket is 🟢[Done] now.", "status"),
         ("<!-- adf:toc -->", "toc"),
         ("<!-- adf:wide-table -->\n\n| a |\n| --- |", "wideTable"),
+        ('<!-- adf:table layout="wide" width="960" -->\n\n| a |\n| --- |', "tableLayout"),
+        ('<!-- adf:breakout mode="wide" width="760" -->\n<details>\n<summary>S</summary>\n</details>', "breakout"),
     ],
 )
 def test_each_adf_only_construct_is_detected(detect_adf_only, markdown_text, kind):
@@ -50,3 +53,4 @@ def test_multiple_constructs_report_source_order_and_line_numbers(detect_adf_onl
         ("panel", 3),
         ("status", 6),
     ]
+

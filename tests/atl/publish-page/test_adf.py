@@ -174,3 +174,14 @@ def test_attachment_node_builds_a_media_group_for_a_generic_file():
         "type": "mediaGroup",
         "content": [{"type": "media", "attrs": {"id": "file-1", "type": "file", "collection": "contentId-123"}}],
     }
+
+
+def test_media_node_shows_the_image_at_its_fetched_display_width_and_layout():
+    node = media_node("file-1", "123", alt="a.png", width_height=(1804, 454), display_width=(768, "pixel"), layout="wide")
+    assert node["attrs"] == {"layout": "wide", "width": 768, "widthType": "pixel"}
+    assert node["content"][0]["attrs"]["width"] == 1804
+
+
+def test_media_node_keeps_a_percentage_display_width():
+    node = media_node("file-1", "123", display_width=(50, "percentage"))
+    assert node["attrs"] == {"layout": "center", "width": 50, "widthType": "percentage"}

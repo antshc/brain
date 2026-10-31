@@ -252,3 +252,9 @@ def test_restore_attachments_resolves_image_attachment_with_size_to_an_image_plu
         "![image-20260827-132403.png](work.md.tmp/image-20260827-132403.png)\n"
         "<!-- media-size: width=628 height=256 -->"
     )
+
+
+def test_restore_attachments_carries_display_width_into_the_media_size_comment():
+    md = '<!-- adf:attachment media-id="image-1" alt="a.png" display-width="50%" -->'
+    result = restore_attachments(MagicMock(), "PROJ-1", md, {"a.png": b"png"}, "work.md.tmp")
+    assert result == "![a.png](work.md.tmp/a.png)\n<!-- media-size: display-width=50% -->"

@@ -10,8 +10,11 @@ import re
 from .patterns import (
     COMMENT_OPEN_RE,
     DETAILS_OPEN_RE,
+    EMOJI_STATUS_RE,
     PANEL_MARKER_RE,
     STATUS_RE,
+    BREAKOUT_MARKER_RE,
+    TABLE_MARKER_RE,
     TOC_COMMENT_RE,
     WIDE_TABLE_MARKER_RE,
 )
@@ -39,10 +42,14 @@ def detect_adf_only(markdown: str) -> list[dict]:
             found.append({"kind": "toc", "line": number})
         elif WIDE_TABLE_MARKER_RE.match(line):
             found.append({"kind": "wideTable", "line": number})
+        elif TABLE_MARKER_RE.match(line):
+            found.append({"kind": "tableLayout", "line": number})
+        elif BREAKOUT_MARKER_RE.match(line):
+            found.append({"kind": "breakout", "line": number})
         elif line.lstrip().startswith(">") and PANEL_MARKER_RE.match(_QUOTE_PREFIX_RE.sub("", line, count=1)):
             found.append({"kind": "panel", "line": number})
 
-        if STATUS_RE.search(line):
+        if STATUS_RE.search(line) or EMOJI_STATUS_RE.search(line):
             found.append({"kind": "status", "line": number})
         if COMMENT_OPEN_RE.search(line):
             found.append({"kind": "inlineComment", "line": number})

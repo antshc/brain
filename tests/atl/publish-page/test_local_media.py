@@ -130,3 +130,24 @@ def test_extract_local_media_indexes_multiple_references_in_order(tmp_path):
     assert processed == "\x00MEDIA:0\x00\n\n\x00MEDIA:1\x00\n"
     assert [item["index"] for item in items] == [0, 1]
     assert [item["filename"] for item in items] == ["a.png", "b.pdf"]
+
+
+def test_extract_local_media_captures_display_width_and_layout(tmp_path):
+    (tmp_path / "a.png").write_bytes(b"png")
+    md = "![a.png](a.png)\n<!-- media-size: width=1804 height=454 display-width=768 layout=wide -->\n"
+
+    _, items = extract_local_media(md, tmp_path)
+
+    assert items[0]["width"] == 1804
+    assert items[0]["display_width"] == (768, "pixel")
+    assert items[0]["layout"] == "wide"
+
+
+def test_extract_local_media_reads_a_percentage_display_width_without_natural_size(tmp_path):
+    (tmp_path / "a.png").write_bytes(b"png")
+
+    processed, items = extract_local_media("![a.png](a.png)\n<!-- media-size: display-width=50% -->\n", tmp_path)
+
+    assert processed == "\x00MEDIA:0\x00\n"
+    assert items[0]["display_width"] == (50, "percentage")
+    assert "width" not in items[0]

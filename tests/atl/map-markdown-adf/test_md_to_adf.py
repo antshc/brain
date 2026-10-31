@@ -356,3 +356,27 @@ def test_mixed_marks_and_plain_text(md_to_adf):
         {"type": "text", "text": "code", "marks": [{"type": "code"}]},
         {"type": "text", "text": " here"},
     ]
+
+
+@pytest.mark.parametrize(
+    ("emoji", "color"),
+    [("⚪", "neutral"), ("🟣", "purple"), ("🔵", "blue"), ("🔴", "red"), ("🟡", "yellow"), ("🟢", "green")],
+)
+def test_emoji_status_maps_to_its_color(md_to_adf, emoji, color):
+    node = md_to_adf(f"State {emoji}[In Progress] now")["content"][0]["content"][1]
+    assert node == {"type": "status", "attrs": {"text": "In Progress", "color": color}}
+
+
+def test_emoji_status_accepts_the_variation_selector(md_to_adf):
+    node = md_to_adf("⚪\ufe0f[Todo]")["content"][0]["content"][0]
+    assert node == {"type": "status", "attrs": {"text": "Todo", "color": "neutral"}}
+
+
+def test_emoji_before_a_link_stays_text_and_link(md_to_adf):
+    content = md_to_adf("🟢[docs](https://e.com)")["content"][0]["content"]
+    assert content[0] == {"type": "text", "text": "🟢"}
+    assert content[1]["marks"] == [{"type": "link", "attrs": {"href": "https://e.com"}}]
+
+
+def test_legacy_status_converts_to_the_emoji_form(md_to_adf, adf_to_md):
+    assert adf_to_md(md_to_adf("[STATUS:Done|green] [STATUS:Draft]")).strip() == "🟢[Done] ⚪[Draft]"

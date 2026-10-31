@@ -23,7 +23,7 @@ Stdin Markdown → stdout one ADF document (`{"version": 1, "type": "doc", "cont
 python scripts/map_markdown_adf.py adf-to-md < input.json > output.md
 ```
 
-Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) becomes a `<!-- adf:diagram ... -->` placeholder naming the diagram. A bare `extension` whose `extensionKey` is `toc` (Confluence's table-of-contents macro, standalone or alongside other content — not just as an `expand`'s sole child) becomes `<!-- adf:toc -->`. An `inlineCard` (a Confluence smart link) becomes a normal Markdown link, `[<url>](<url>)`, using its `attrs.url` as both label and destination — the URL is the only stable value a smart card carries; an `inlineCard` with no non-empty `url` raises a clear `ValueError` instead of silently dropping it. A `create-from-template` `inlineExtension` (a Confluence page-creation button) or an `anchor` `inlineExtension` (a Confluence heading bookmark) is ignored because it has no Markdown equivalent. A `media`/`mediaSingle`/`mediaGroup` node (a `mediaGroup` can hold more than one file) becomes a neutral `<!-- adf:attachment ... -->` placeholder per file — it could be a diagram, a plain image, or an arbitrary attached file; classifying and resolving it is `fetch-page` skill's job for a Confluence page (matching by `media-id`) and `fetch-work` skill's job for a Jira issue (matching by filename via `alt` — see its own SKILL.md), not this converter's. When the source `media` node carries both `width` and `height` (an image attached through the Confluence/Jira UI, never a generic-file `mediaGroup` node), the placeholder also carries `width="<w>" height="<h>"` so the caller can pass that reported size along. Every other unrecognized node type still raises `NotImplementedError` — republishing an `inlineCard` this way normalizes its presentation to a plain link while preserving the URL; there is no reverse (`md-to-adf`) direction for a smart card, since Markdown has no way to distinguish one from an ordinary link. Every subprocess rejection (a `ValueError` or `NotImplementedError`) is reported on stderr as `error: <reason>` with a non-zero exit and no Python traceback — the CLI is the one place that ever needs to see the raw exception.
+Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) becomes a `<!-- adf:diagram ... -->` placeholder naming the diagram. A bare `extension` whose `extensionKey` is `toc` (Confluence's table-of-contents macro, standalone or alongside other content — not just as an `expand`'s sole child) becomes `<!-- adf:toc -->`. An `inlineCard` (a Confluence smart link) becomes a normal Markdown link, `[<url>](<url>)`, using its `attrs.url` as both label and destination — the URL is the only stable value a smart card carries; an `inlineCard` with no non-empty `url` raises a clear `ValueError` instead of silently dropping it. A `create-from-template` `inlineExtension` (a Confluence page-creation button) or an `anchor` `inlineExtension` (a Confluence heading bookmark) is ignored because it has no Markdown equivalent. A `media`/`mediaSingle`/`mediaGroup` node (a `mediaGroup` can hold more than one file) becomes a neutral `<!-- adf:attachment ... -->` placeholder per file — it could be a diagram, a plain image, or an arbitrary attached file; classifying and resolving it is `fetch-page` skill's job for a Confluence page (matching by `media-id`) and `fetch-work` skill's job for a Jira issue (matching by filename via `alt` — see its own SKILL.md), not this converter's. When the source `media` node carries both `width` and `height` (an image attached through the Confluence/Jira UI, never a generic-file `mediaGroup` node), the placeholder also carries `width="<w>" height="<h>"` so the caller can pass that reported size along. A `mediaSingle` parent adds its display size as `display-width="<n>"` (pixels) or `display-width="<n>%"` (percentage), and `layout="<layout>"` when not `center`. Every other unrecognized node type still raises `NotImplementedError` — republishing an `inlineCard` this way normalizes its presentation to a plain link while preserving the URL; there is no reverse (`md-to-adf`) direction for a smart card, since Markdown has no way to distinguish one from an ordinary link. Every subprocess rejection (a `ValueError` or `NotImplementedError`) is reported on stderr as `error: <reason>` with a non-zero exit and no Python traceback — the CLI is the one place that ever needs to see the raw exception.
 
 ## Action: Detect ADF-only constructs
 
@@ -31,7 +31,7 @@ Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) become
 python scripts/map_markdown_adf.py detect-adf-only < input.md > report.json
 ```
 
-Stdin Markdown → stdout `{"adfOnly": <bool>, "constructs": [{"kind": ..., "line": <1-based>}]}`, listing every construct marked **ADF-only** in Supported structure, in source order. Kinds are `expand`, `inlineComment`, `panel`, `status`, `toc`, `wideTable`. Markers inside a fenced code block are literal text and go unreported.
+Stdin Markdown → stdout `{"adfOnly": <bool>, "constructs": [{"kind": ..., "line": <1-based>}]}`, listing every construct marked **ADF-only** in Supported structure, in source order. Kinds are `breakout`, `expand`, `inlineComment`, `panel`, `status`, `tableLayout`, `toc`, `wideTable`. Markers inside a fenced code block are literal text and go unreported.
 
 Exits `0` whether or not anything is found — branch on `adfOnly`, not the exit code. `adfOnly: false` means the source is plain CommonMark that a Markdown-accepting writer (e.g. twg `--description-format markdown`) carries intact; `adfOnly: true` means only the ADF from `md-to-adf` carries it.
 
@@ -51,14 +51,16 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | Ordered list | `orderedList` / `listItem` |
 | Blockquote (`>`) | `blockquote` |
 | `> [!INFO]` / `[!NOTE]` / `[!WARNING]` / `[!SUCCESS]` / `[!ERROR]` blockquote | `panel` (`attrs.panelType`) — **ADF-only** |
-| Fenced code block | `codeBlock` (`attrs.language` when recognized) |
+| Fenced code block | `codeBlock` (`attrs.language` when recognized; Confluence stores `bash` as `shell`, read back as `bash`) |
 | Table | `table` / `tableRow` / `tableHeader` / `tableCell` |
 | Horizontal rule (`---`) | `rule` |
 | `<details><summary>` | `expand` (`attrs.title`) — **ADF-only** |
 | `<!-- adf:toc -->` | `expand` + `toc` extension (`md-to-adf`); a bare `toc` extension, standalone or alongside other content in an `expand`, also converts back (`adf-to-md`) — **ADF-only** |
 | `<!-- adf:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
+| `<!-- adf:table [layout="<layout>"] [width="<px>"] -->` before a table | `table.attrs.layout` / `table.attrs.width`; emitted instead of `adf:wide-table` when a width or a non-wide layout must survive — **ADF-only** |
+| `<!-- adf:breakout mode="<wide\|full-width>" [width="<px>"] -->` on the line before `<details>` or a code fence | `breakout` mark on that `expand`/`codeBlock`; ignored before any other block — **ADF-only** |
 | `<!-- adf:diagram drawio="<name>" -->` | `extension` (Draw.io macro) — **ADF-only, `adf-to-md` direction only** |
-| `<!-- adf:attachment media-id="<id>" alt="<alt>" [width="<w>" height="<h>"] -->` | `mediaSingle`/`media`/`mediaGroup` (one placeholder per file) — **ADF-only, `adf-to-md` direction only** |
+| `<!-- adf:attachment media-id="<id>" alt="<alt>" [width="<w>" height="<h>"] [display-width="<n>[%]"] [layout="<layout>"] -->` | `mediaSingle`/`media`/`mediaGroup` (one placeholder per file) — **ADF-only, `adf-to-md` direction only** |
 | n/a (no reverse mapping) | `inlineCard` (Confluence smart link) → `[<url>](<url>)` — **ADF-only, `adf-to-md` direction only** |
 
 A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `  continues here` is one `listItem`, not a list plus a stray paragraph:
@@ -81,7 +83,9 @@ Inside a table cell, `<br>` maps to an ADF `hardBreak` and converts back to `<br
 
 Marks nest and combine onto one text node, innermost first: `` [`Foo.Bar`](href) `` is a single text node carrying `code` **and** `link`, and `**[label](href)**` carries `link` **and** `strong`. A partly marked label splits into several nodes that all keep the outer mark. Both directions agree — `adf-to-md` re-wraps a combined node in the same order. A code span's content is literal, so nothing nests inside it.
 
-`[STATUS:text|color]` maps to the inline `status` node — **ADF-only** (`color` one of `neutral`, `purple`, `blue`, `red`, `yellow`, `green`; defaults to `neutral` when omitted).
+`<emoji>[text]` maps to the inline `status` node — **ADF-only**. The emoji gives the color and renders as a colored dot in any Markdown viewer: `⚪` neutral, `🟣` purple, `🔵` blue, `🔴` red, `🟡` yellow, `🟢` green (e.g. `🔵[In Progress]`). `adf-to-md` writes this form; a status with a color outside the six falls back to `[STATUS:text|color]`.
+
+Legacy `[STATUS:text|color]` (`color` defaults to `neutral`) is still read by `md-to-adf` and `detect-adf-only`, and comes back from a fetch in the emoji form. An emoji directly followed by `[text](url)` stays an emoji plus a link.
 
 `<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->` maps to an `annotation` mark (`annotationType: inlineComment`, `id`) on every text node in the span — **ADF-only**. It anchors a Confluence inline comment; keep it, with its id unchanged, around the text the comment belongs to, or the comment is orphaned on publish.
 

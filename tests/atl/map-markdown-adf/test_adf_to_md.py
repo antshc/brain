@@ -106,12 +106,17 @@ def test_panel(adf_to_md):
 
 def test_status(adf_to_md):
     doc = _doc(_p(_t("Assignee: "), {"type": "status", "attrs": {"text": "In Progress", "color": "blue"}}))
-    assert adf_to_md(doc) == "Assignee: [STATUS:In Progress|blue]"
+    assert adf_to_md(doc) == "Assignee: 🔵[In Progress]"
 
 
 def test_code_block(adf_to_md):
     doc = _doc({"type": "codeBlock", "attrs": {"language": "python"}, "content": [_t("x = 1")]})
     assert adf_to_md(doc) == "```python\nx = 1\n```"
+
+
+def test_code_block_reads_confluence_shell_back_as_bash(adf_to_md):
+    doc = _doc({"type": "codeBlock", "attrs": {"language": "shell"}, "content": [_t("echo hi")]})
+    assert adf_to_md(doc).strip() == "```bash\necho hi\n```"
 
 
 def test_rule(adf_to_md):
@@ -572,3 +577,36 @@ def test_unknown_node_type_still_raises(run_cli):
     result = run_cli("adf-to-md", json.dumps(doc))
     assert result.returncode != 0
     assert "totallyUnknownNode" in result.stderr
+
+
+def _single(attrs: dict) -> dict:
+    return {
+        "type": "mediaSingle",
+        "attrs": attrs,
+        "content": [{"type": "media", "attrs": {"id": "f", "type": "file", "alt": "a.png", "width": 1804, "height": 454}}],
+    }
+
+
+def test_media_single_carries_pixel_display_width_and_non_default_layout(adf_to_md):
+    doc = _doc(_single({"layout": "wide", "width": 768, "widthType": "pixel"}))
+    assert adf_to_md(doc) == (
+        '<!-- adf:attachment media-id="f" alt="a.png" width="1804" height="454" display-width="768" layout="wide" -->'
+    )
+
+
+def test_media_single_marks_percentage_display_width_and_omits_center_layout(adf_to_md):
+    doc = _doc(_single({"layout": "center", "width": 50.0, "widthType": "percentage"}))
+    assert adf_to_md(doc).endswith('display-width="50%" -->')
+    assert "layout=" not in adf_to_md(doc)
+
+
+def test_plaintext_code_block_round_trips(md_to_adf, adf_to_md):
+    source = "```plaintext\nraw text\n```"
+    doc = md_to_adf(source)
+    assert doc["content"][0]["attrs"] == {"language": "plaintext"}
+    assert adf_to_md(doc).strip() == source
+
+
+def test_status_with_an_unknown_color_keeps_the_legacy_form(adf_to_md):
+    doc = _doc(_p({"type": "status", "attrs": {"text": "Odd", "color": "teal"}}))
+    assert adf_to_md(doc) == "[STATUS:Odd|teal]"

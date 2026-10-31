@@ -26,18 +26,23 @@ def media_node(
     page_id: str,
     alt: str | None = None,
     width_height: tuple[int, int] | None = None,
+    display_width: tuple[int | float, str] | None = None,
+    layout: str | None = None,
 ) -> dict:
     """The uploaded-image node — also used one-off under the `drawio` renderer, for a diagram
     Draw.io could not import, and for a local image attachment.
 
-    `alt` and `width_height` are only ever passed for a local image attachment (a diagram
-    never sets them): `alt` carries the original filename, `width_height` the size Confluence
-    reported for it when the page was fetched — set on both `mediaSingle.attrs.width` and the
-    inner `media` node's own `width`/`height`, matching how Confluence represents an image
-    attached by hand. Omitted (a diagram, or a hand-authored image with no known size) keeps
-    today's fixed `768` placeholder width and no `width`/`height` on the inner node.
+    `alt`, `width_height`, `display_width`, and `layout` are only ever passed for a local image
+    attachment (a diagram never sets them): `alt` carries the original filename, `width_height`
+    the size Confluence reported for it when the page was fetched (the inner `media` node's own
+    `width`/`height`), `display_width` the `(width, widthType)` the page showed it at, `layout`
+    its position. `mediaSingle.attrs.width` takes the display width, else the natural width,
+    else today's fixed `768` placeholder.
     """
-    width = width_height[0] if width_height else 768
+    if display_width is not None:
+        width, width_type = display_width
+    else:
+        width, width_type = (width_height[0] if width_height else 768), "pixel"
     media_attrs = {"id": media_id, "type": "file", "collection": f"contentId-{page_id}"}
     if alt is not None:
         media_attrs["alt"] = alt
@@ -45,7 +50,7 @@ def media_node(
         media_attrs["width"], media_attrs["height"] = width_height
     return {
         "type": "mediaSingle",
-        "attrs": {"layout": "center", "width": width, "widthType": "pixel"},
+        "attrs": {"layout": layout or "center", "width": width, "widthType": width_type},
         "content": [{"type": "media", "attrs": media_attrs}],
     }
 
