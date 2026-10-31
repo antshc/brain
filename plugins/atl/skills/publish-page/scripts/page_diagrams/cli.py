@@ -11,6 +11,7 @@ import json
 import sys
 from pathlib import Path
 
+from . import comment_guard
 from .adf import replace_markers, substitute_media
 from .env import get_confluence, load_credentials, load_renderer
 from .mermaid import extract_mermaid, render_diagrams
@@ -121,7 +122,23 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     combine.add_argument("--out", required=True, help="Path to write the combined JSON to")
 
+    notify = sub.add_parser(
+        "notify-comments",
+        help="Post the detached-inline-comment notice `run` wrote (`orphanNoticePath`) as a page "
+        "comment. Run only after the MCP publish of an MCP handback succeeded.",
+    )
+    notify.add_argument("--page-id", required=True, help="Confluence pageId that was published")
+    notify.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
+    notify.add_argument("--notice", required=True, help="`orphanNoticePath` from `run`'s stdout")
+
     return parser
+
+
+def _run_notify_comments(args: argparse.Namespace) -> None:
+    storage = Path(args.notice).read_text(encoding="utf-8")
+    comment_id = comment_guard.post_notice(get_confluence(load_credentials(args.config)), args.page_id, storage)
+    json.dump({"orphanNoticeCommentId": comment_id}, sys.stdout)
+    sys.stdout.write("\n")
 
 
 def _run_extract() -> None:
@@ -292,6 +309,8 @@ def main(argv: list[str] | None = None) -> None:
         _run_run(args)
     elif args.action == "combine":
         _run_combine(args)
+    elif args.action == "notify-comments":
+        _run_notify_comments(args)
     else:
         _run_replace_markers(args)
 

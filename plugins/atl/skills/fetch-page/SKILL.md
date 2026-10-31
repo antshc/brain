@@ -1,6 +1,6 @@
 ---
 name: fetch-page
-description: Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. No Atlassian config required; body-referenced attachments (diagrams, images, files) cache to `.md.assets` when `apiToken` is configured — `--attachments` controls it.
+description: Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. No Atlassian config required; body-referenced attachments (diagrams, images, files) cache to `.md.assets` when `apiToken` is configured — `--attachments` controls it; inline-comment anchors and a `## Comments` section keep comments through republish.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
@@ -25,7 +25,7 @@ Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token requ
    ```bash
    python3 scripts/assemble_page.py --page-id <page_id> --config "<configPath>" --md-path page.md < content.json
    ```
-   Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
+   Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`, `--comments auto|skip`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
 5. **Return** `page.md` unchanged.
 
 ## Input shape
@@ -55,6 +55,14 @@ Links percent-encoded, relative to `page.md`'s dir. `publish-page` skill re-uplo
 - **`auto`** (default) — retrieve when credentials exist. No token → `set apiToken in .atlassian.json.user to restore it` note per placeholder, no assets dir. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` — **MUST NOT** include exception text (may hold signed URL/token).
 - **`skip`** — no credential lookup, no REST; note `attachment retrieval skipped (--attachments skip)`.
 - **`required`** — missing credentials, failure, or unresolvable placeholder → non-zero exit, `Attachment retrieval failed: <reason>` on stderr, no `page.md`.
+
+## Comments
+
+- Body inline comments arrive as `<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->` spans (via `map-markdown-adf` skill); they keep comments attached when `publish-page` skill republishes.
+- **`--comments auto`** (default, needs `apiToken`): appends `## Comments` inside `<!-- adf:ignore:start/end -->` — each inline/footer thread with author, date, plain-text body, replies, Confluence link; inline threads say whether their id is anchored in the body.
+- No token → nothing, or a one-line note when the body has anchors. REST failure → note with safe category only, e.g. `comment retrieval failed (ConnectionError)`; `page.md` still written.
+- **`--comments skip`** — no lookup.
+- MCP `getConfluencePage` ADF may omit annotation marks; if the page has inline comments but no anchors appear, refetch via REST fallback (`atlas_doc_format`).
 
 ## Degraded mode
 

@@ -1,6 +1,6 @@
 ---
 name: publish-page
-description: Create or update a Confluence page from a local Markdown file, running one script that extracts diagrams, converts to ADF, uploads attachments, and publishes — over REST when diagrams are present or the body is large, over MCP otherwise. Use when asked to publish, create, or update a Confluence page from a markdown file.
+description: Create or update a Confluence page from a local Markdown file, running one script that extracts diagrams, converts to ADF, uploads attachments, and publishes — over REST when diagrams are present or the body is large, over MCP otherwise. Keeps inline comments attached via `<!-- adf:comment -->` anchors and posts one page comment when an update detaches any. Use when asked to publish, create, or update a Confluence page from a markdown file.
 argument-hint: '<md_file_path>, [pageId], [spaceId]'
 ---
 
@@ -99,6 +99,7 @@ Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); o
 Stdout JSON:
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published; report.
 - `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"apiToken"}` → Step 4. `missingPrerequisite` only when diagrams became notes.
+- Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId` (REST), `orphanNoticePath` (MCP → Step 5), `unknownCommentIds`, `commentGuard` (`skipped (no apiToken)`, `failed (<category>)`, `notice failed (<category>)`).
 
 **4 — MCP handback.** Read the whole `adfPath` file (pretty-printed so line-truncating reads lose nothing), then:
 
@@ -109,7 +110,25 @@ Stdout JSON:
 
 Body too large to inline, or no matching MCP tool found for Step 4 → re-run with `--threshold-bytes 0` (forces REST for the whole publish, skipping Step 4).
 
-Report page URL; with diagrams, confirm page and attachment list show every image.
+**5 — Comment notice (MCP only).** Step 4 succeeded and stdout had `orphanNoticePath` → run from this skill's directory:
+
+```bash
+python scripts/publish_page_diagrams.py notify-comments --page-id <pageId> --config "<configPath>" --notice <orphanNoticePath>
+```
+
+Report page URL; with diagrams, confirm page and attachment list show every image. Report `orphanedComments` (selection + id) and `unknownCommentIds` when present.
+
+## Inline comments
+
+- A Confluence inline comment stays highlighted only while the published body keeps its anchor: `<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->` (written by `fetch-page` skill; converted by `map-markdown-adf` skill).
+- Body without the anchor → Confluence keeps the comment open but detached from any text. Never deleted.
+- **MUST** keep anchors and ids unchanged when editing; move the span with its text. Delete it only when that text is removed on purpose.
+- Update with token: before publishing, `run` compares the live body's anchors with the new body's. Publish always proceeds.
+- Open comments anchored now but missing after → one page (footer) comment: table of highlighted text, author, excerpt, link, anchor id, plus how to reattach (re-add the span, republish) or resolve.
+- Already-detached comments are never re-reported, so republishing posts no duplicate notice.
+- Anchor id matching no page comment → `unknownCommentIds`; Confluence ignores it. Fix the id or remove the span.
+- Create path → no guard. No token → `commentGuard: "skipped (no apiToken)"`. Guard read failure → publish proceeds, `commentGuard: "failed (<category>)"`.
+- Markdown fetched without anchors (older `fetch-page`, MCP ADF without annotation marks) → refetch with `fetch-page` skill before editing, else every comment detaches.
 
 ## Rules
 
@@ -131,7 +150,7 @@ Report page URL; with diagrams, confirm page and attachment list show every imag
 
 ## Other subcommands
 
-`extract`, `render-attach`, `substitute-media`, `publish-adf`, `combine` = steps `run` chains; each invokable alone for fallback or ad-hoc use (`--help`). `replace-markers` = legacy top-level-only alias for `substitute-media`. `render-attach` supports `png` only; refuses macro renderers, points at `run`.
+`notify-comments` = Step 5. `extract`, `render-attach`, `substitute-media`, `publish-adf`, `combine` = steps `run` chains; each invokable alone for fallback or ad-hoc use (`--help`). `replace-markers` = legacy top-level-only alias for `substitute-media`. `render-attach` supports `png` only; refuses macro renderers, points at `run`.
 
 ## Completion criteria
 

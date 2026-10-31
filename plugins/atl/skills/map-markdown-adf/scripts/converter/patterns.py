@@ -19,3 +19,16 @@ SUMMARY_RE = re.compile(r"^\s*<summary>(.*)</summary>\s*$")
 # combined alternation so parsing and ADF-only detection can never drift apart.
 STATUS_PATTERN = r"\[STATUS:(?P<status_text>[^|\]]+?)(?:\|(?P<status_color>[a-zA-Z]+))?\]"
 STATUS_RE = re.compile(STATUS_PATTERN)
+
+# Inline comment anchor, e.g. `<!-- adf:comment id="a0b9..." -->text<!-- /adf:comment -->`, mapped to
+# the ADF `annotation` mark (`annotationType: inlineComment`). Pairs may nest; ids are opaque.
+COMMENT_OPEN_RE = re.compile(r'<!--\s*adf:comment\s+id="(?P<comment_id>[A-Za-z0-9-]+)"\s*-->')
+COMMENT_CLOSE_RE = re.compile(r"<!--\s*/adf:comment\s*-->")
+COMMENT_TAG_RE = re.compile(f"{COMMENT_OPEN_RE.pattern}|{COMMENT_CLOSE_RE.pattern}")
+
+
+def comment_open_tag(comment_id: str) -> str:
+    return f'<!-- adf:comment id="{comment_id}" -->'
+
+
+COMMENT_CLOSE_TAG = "<!-- /adf:comment -->"

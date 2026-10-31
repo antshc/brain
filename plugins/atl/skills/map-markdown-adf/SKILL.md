@@ -31,7 +31,7 @@ Stdin one ADF document → stdout Markdown. A Draw.io macro (`extension`) become
 python scripts/map_markdown_adf.py detect-adf-only < input.md > report.json
 ```
 
-Stdin Markdown → stdout `{"adfOnly": <bool>, "constructs": [{"kind": ..., "line": <1-based>}]}`, listing every construct marked **ADF-only** in Supported structure, in source order. Kinds are `expand`, `panel`, `status`, `toc`, `wideTable`. Markers inside a fenced code block are literal text and go unreported.
+Stdin Markdown → stdout `{"adfOnly": <bool>, "constructs": [{"kind": ..., "line": <1-based>}]}`, listing every construct marked **ADF-only** in Supported structure, in source order. Kinds are `expand`, `inlineComment`, `panel`, `status`, `toc`, `wideTable`. Markers inside a fenced code block are literal text and go unreported.
 
 Exits `0` whether or not anything is found — branch on `adfOnly`, not the exit code. `adfOnly: false` means the source is plain CommonMark and a caller may publish it as-is with `contentFormat: "markdown"`; `adfOnly: true` means it must convert first.
 
@@ -82,6 +82,12 @@ Inside a table cell, `<br>` maps to an ADF `hardBreak` and converts back to `<br
 Marks nest and combine onto one text node, innermost first: `` [`Foo.Bar`](href) `` is a single text node carrying `code` **and** `link`, and `**[label](href)**` carries `link` **and** `strong`. A partly marked label splits into several nodes that all keep the outer mark. Both directions agree — `adf-to-md` re-wraps a combined node in the same order. A code span's content is literal, so nothing nests inside it.
 
 `[STATUS:text|color]` maps to the inline `status` node — **ADF-only** (`color` one of `neutral`, `purple`, `blue`, `red`, `yellow`, `green`; defaults to `neutral` when omitted).
+
+`<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->` maps to an `annotation` mark (`annotationType: inlineComment`, `id`) on every text node in the span — **ADF-only**. It anchors a Confluence inline comment; keep it, with its id unchanged, around the text the comment belongs to, or the comment is orphaned on publish.
+
+- Pairs nest and may wrap or sit inside other marks; inside a code span the tag is literal.
+- An unterminated open tag or a stray close tag is rejected with `error:`.
+- `adf-to-md` emits one pair per run of nodes sharing the id; a `hardBreak` splits the run. Other annotation types are dropped.
 
 ## Table validation
 

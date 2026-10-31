@@ -16,6 +16,11 @@ never makes a REST call or creates an `.assets` folder, regardless of credential
 - `skip`: no credential lookup, no REST call at all; every placeholder becomes a "skipped" note.
 - `required`: any missing credential or retrieval/publish failure raises instead of degrading,
   and `main()` never writes `--md-path` in that case.
+
+`--comments` controls the trailing `## Comments` section (see `comments.py`):
+- `auto` (default): list the page's comment threads when credentials exist; any failure, or a
+  missing token on a body carrying comment anchors, leaves a short note instead.
+- `skip`: no comment lookup.
 """
 from __future__ import annotations
 
@@ -29,7 +34,14 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from env import get_confluence, load_credentials  # noqa: E402
+from comments import (  # noqa: E402
+    CommentRetrievalError,
+    anchored_comment_ids,
+    comments_note,
+    fetch_comment_threads,
+    render_comments_section,
+)
+from env import get_confluence, load_credentials, site_url  # noqa: E402
 from fetch_diagrams import (  # noqa: E402
     AttachmentRetrievalError,
     fetch_attachment_snapshot,
@@ -45,6 +57,7 @@ from fetch_diagrams import (  # noqa: E402
 _MAP_MARKDOWN_ADF = _SCRIPT_DIR.parents[1] / "map-markdown-adf" / "scripts" / "map_markdown_adf.py"
 
 _ATTACHMENT_MODES = ("auto", "skip", "required")
+_COMMENT_MODES = ("auto", "skip")
 
 
 class ConversionError(Exception):
@@ -124,6 +137,25 @@ def assemble(raw: dict, page_id: str, config_path: str, assets_dir: str, attachm
     return _with_title(markdown, title)
 
 
+def append_comments(markdown: str, page_id: str, config_path: str, comments: str = "auto") -> str:
+    if comments == "skip":
+        return markdown
+    credentials = load_credentials(config_path)
+    if credentials is None:
+        if not anchored_comment_ids(markdown):
+            return markdown
+        section = comments_note("set apiToken in .atlassian.json.user to list them")
+    else:
+        try:
+            threads = fetch_comment_threads(get_confluence(credentials), page_id)
+            section = render_comments_section(threads, markdown, site_url(credentials))
+        except CommentRetrievalError as exception:
+            section = comments_note(f"comment retrieval failed ({exception})")
+    if not section:
+        return markdown
+    return f"{markdown.rstrip()}\n\n{section}"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Assemble a fetched Confluence page's title + Markdown body in one pass."
@@ -145,6 +177,12 @@ def main() -> None:
             "writing --md-path when credentials, retrieval, or cache publication are unavailable"
         ),
     )
+    parser.add_argument(
+        "--comments",
+        choices=_COMMENT_MODES,
+        default="auto",
+        help="Comment listing: auto (default) appends a `## Comments` section when apiToken is set; skip lists none",
+    )
     args = parser.parse_args()
 
     md_path = Path(args.md_path)
@@ -153,6 +191,7 @@ def main() -> None:
     raw = json.loads(sys.stdin.read())
     try:
         markdown = assemble(raw, args.page_id, args.config, assets_dir, args.attachments)
+        markdown = append_comments(markdown, args.page_id, args.config, args.comments)
     except ConversionError as exception:
         print(f"ADF conversion failed: {exception}", file=sys.stderr)
         raise SystemExit(1)
