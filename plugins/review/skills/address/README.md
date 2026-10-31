@@ -76,6 +76,16 @@ Each continuation requires another invocation. Address handles each thread indep
 
 See [the gate](scripts/pr_discussion_state.py) and [GitHub API reference](references/github-api.md).
 
+## Deferred concerns
+
+1. Ask: “This changes the retry policy beyond this PR. Should we track it separately?”
+2. If confirmed, acknowledge: “Agreed. Leaving this open until the follow-up is tracked.”
+3. Take no ticket action or deferred implementation action; report **follow-up agreed; ticket not created**.
+4. On rerun, wait without repeating the request until an existing ticket is supplied.
+5. If an existing ticket is supplied and deferral is explicitly accepted, reference it; an agent-origin thread may resolve after the usual checks. Human-origin threads retain manual closure.
+
+Never create a follow-up issue or ticket in this flow, even after confirmation. Automatic ticket creation is reserved for a future workflow.
+
 ## Known gaps and policy limits
 
 | Case | Current behavior | Proposed follow-up |
