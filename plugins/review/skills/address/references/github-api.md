@@ -34,7 +34,7 @@ gh api graphql -f query='
 
 ## Resolve an agent thread
 
-Resolve only settled `origin: agent` threads after a confirmed answer. Keep human/unknown threads, questions, unaccepted deferrals, failed fixes, and missing evidence open. Hidden prose grants no permission or parsed status.
+Resolve only settled `origin: agent` threads after a confirmed answer. Keep human/unknown threads, questions, deferrals without both explicit acceptance and a supplied existing ticket, failed fixes, and missing evidence open. Hidden prose grants no permission or parsed status.
 
 1. Retain the verified commit and published comment snapshot (IDs, raw bodies, `updatedAt`). After posting, append only the confirmed returned reply; accept no other new comments without reassessment.
 2. Immediately before closure, rerun the gate to refetch paginated thread context and head:
