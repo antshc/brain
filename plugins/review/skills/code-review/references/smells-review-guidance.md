@@ -38,11 +38,6 @@ Use the baseline to identify plausible design concerns, then select evidence tha
 - Emit only when code evidence shows a concrete maintenance cost and a proportionate, behavior-preserving refactor. Check intentional-boundary explanations before reporting; omit preference-only alternatives.
 - Use the shared contract's JSON shape, five-finding limit, diff anchors, deduplication, and explicit failure result.
 
-## Comment format
+## Finding content
 
-Return each `REVIEW_COMMENT` as a posting-ready body: `concrete design issue → maintenance impact → smallest refactor`.
-
-- One issue; name the exact symbols or code paths that demonstrate the pattern. Keep smell names and heuristic classifications internal.
-- Explain the concrete cost to change, understand, or use the code in one sentence; frame the refactor as a suggestion, not a proven defect.
-- Suggest the smallest refactor that reduces that cost while preserving behavior; avoid speculative abstractions.
-- Start with the issue. No classification labels (`Suggestion:`, `Nit:`, `Bug:`) anywhere in the comment. Keep only essential context; remove praise, repetition, hedging, and background.
+Supply the concrete design issue, demonstrated maintenance cost, and smallest behavior-preserving refactor to the shared conversation draft. Name exact symbols/code paths; keep smell names and heuristic classifications internal. Frame the refactor as a suggestion, not a proven defect; avoid speculative abstractions.

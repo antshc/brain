@@ -190,6 +190,7 @@ AFK PR review and autonomous development loop.
 
 Code and technical solution review skills with modular standards and guidance.
 
+- [review-conversation](plugins/review/skills/review-conversation/SKILL.md): shared simple-English findings, replies, and hidden metadata for Code Review, Address, and HITL; preserves human ownership.
 - [address](plugins/review/skills/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.

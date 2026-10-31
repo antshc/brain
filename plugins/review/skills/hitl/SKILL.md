@@ -102,9 +102,9 @@ Drafts, approves, and posts one review comment.
 
 2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability, etc.).
 
-2.2 `IMPROVEMENT` — concrete fix or direction. Follow [Comment format](references/review-comment.md), resolved from this skill's base directory.
+2.2 `IMPROVEMENT` — concrete fix or direction. *Use `review-conversation` skill for review comments, findings, conversation style, and hidden metadata.* Pass kind `finding`, ownership `human`, stage `draft`, and the verified evidence; then stage `final` with the validated visible body before approval.
 
-2.3 `REVIEW_COMMENT` — complete formatted posting body from `IMPROVEMENT`, without classification labels or prefixes.
+2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 
 **3. Human approval**
 
@@ -126,7 +126,7 @@ Show the comment and menu in this format; wait for the user's selection:
 
 **4. Handle the reply**
 
-On approval (1 or 2): follow [Posting](references/posting.md), resolved from this skill's base directory, with `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT`, and the reviewed `COMMIT_ID` to post the inline PR comment. Capture the returned `COMMENT_ID`; add `{FILE_PATH, LINE_NUMBER, REVIEW_COMMENT, COMMENT_ID}` to the **posted queue**. Then, by reply:
+On approval (1 or 2): follow [Posting](references/posting.md), resolved from this skill's base directory, with `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT`, and the reviewed `COMMIT_ID` to post the approved body unchanged, without appending metadata. Capture the returned `COMMENT_ID`; add `{FILE_PATH, LINE_NUMBER, REVIEW_COMMENT, COMMENT_ID}` to the **posted queue**. Then, by reply:
 - **1:** display the posted queue as a numbered list (`FILE_PATH:LINE_NUMBER — REVIEW_COMMENT (COMMENT_ID)` per item), then return to Get the input.
 - **2:** clear the posted queue and end the session.
 - **3:** drop the draft without posting; return to Get the input.

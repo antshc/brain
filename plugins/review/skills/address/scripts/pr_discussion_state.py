@@ -1,32 +1,9 @@
 #!/usr/bin/env python3
-"""Report the answer-state of a pull request's review discussion.
+"""Read-only marker-based PR discussion gate.
 
-Read-only. Fetches every review thread on a PR, drops the resolved ones, and asks one
-question per remaining thread: is its *last* comment authored by the acting user?
-
-  - yes  -> `answered`: this run has nothing to add to it.
-  - no   -> `pending`: someone is waiting on a reply.
-             `first-pass`  - the acting user has never commented in the thread.
-             `follow-up`   - the acting user replied and someone commented after that.
-
-A thread opened by the acting user is a self-note: its opening comment is a task, never an
-answer, so a thread holding only that comment stays `pending` (`origin: "self"`). An acting
-user's own last comment containing `fix!:` likewise bypasses the `answered` state.
-
-The whole discussion coming back `answered` is what makes the calling skill rerunnable:
-the run stops at the gate without reading a single comment body.
-
-Comments still attached to an unsubmitted (`PENDING`) review are ignored entirely, so
-draft-only activity never makes a thread pending and never reopens an already-answered one.
-
-Usage:
-    python3 pr_discussion_state.py <PR URL | owner/repo#N> [--json-out PATH] [--pretty]
-
-Output is one JSON object on stdout carrying `action` ("skip" | "proceed" | "stop"),
-the counts, and the pending threads with their comments and source anchors.
-Exit 0 for "skip" and "proceed", 1 for "stop" and for any failure.
-
-Requires `gh` on PATH, authenticated against the PR's host.
+Published opening agent:comment blocks own agent threads. Later agent:reply blocks
+separate new reply work from unresolved agent-thread reconciliation; no login or
+metadata prose determines completion. Human/unknown threads require manual closure.
 """
 from __future__ import annotations
 
@@ -39,7 +16,8 @@ from typing import Any
 
 PR_URL_RE = re.compile(r"^https?://[^/]+/(?P<owner>[^/]+)/(?P<repo>[^/]+)/pull/(?P<number>\d+)")
 PR_SHORT_RE = re.compile(r"^(?P<owner>[^/\s]+)/(?P<repo>[^/#\s]+)#(?P<number>\d+)$")
-FIX_KEYWORD_RE = re.compile(r"fix!:")
+MARKER_OPENERS = {"<!-- agent:comment": "comment", "<!-- agent:reply": "reply"}
+FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 
 THREADS_QUERY = """
 query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
@@ -60,7 +38,7 @@ query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
           comments(first: 100) {
             totalCount
             pageInfo { hasNextPage }
-            nodes { id author { login } body createdAt diffHunk pullRequestReview { state } }
+            nodes { id author { login } body createdAt updatedAt diffHunk pullRequestReview { state } }
           }
         }
       }
@@ -90,15 +68,11 @@ def parse_pr_ref(raw: str) -> tuple[str, str, int]:
     return match["owner"], match["repo"], int(match["number"])
 
 
-def acting_login() -> str:
-    return run_gh(["api", "user", "-q", ".login"]).strip()
-
-
 def pr_metadata(owner: str, repo: str, number: int) -> dict[str, Any]:
     out = run_gh([
         "pr", "view", str(number),
         "--repo", f"{owner}/{repo}",
-        "--json", "headRefName,baseRefName,state,isDraft,url,author",
+        "--json", "headRefName,baseRefName,headRefOid,state,isDraft,url",
     ])
     return json.loads(out)
 
@@ -106,6 +80,7 @@ def pr_metadata(owner: str, repo: str, number: int) -> dict[str, Any]:
 def fetch_threads(owner: str, repo: str, number: int) -> list[dict[str, Any]]:
     threads: list[dict[str, Any]] = []
     cursor: str | None = None
+    seen_cursors: set[str] = set()
     while True:
         args = [
             "api", "graphql",
@@ -124,6 +99,9 @@ def fetch_threads(owner: str, repo: str, number: int) -> list[dict[str, Any]]:
         if not connection["pageInfo"]["hasNextPage"]:
             return threads
         cursor = connection["pageInfo"]["endCursor"]
+        if not cursor or cursor in seen_cursors:
+            raise GhError("Incomplete thread pagination: missing or repeated cursor")
+        seen_cursors.add(cursor)
 
 
 def resolve_anchor(thread: dict[str, Any]) -> dict[str, Any]:
@@ -160,76 +138,117 @@ def flatten_comments(thread: dict[str, Any]) -> list[dict[str, Any]]:
             "author": (comment.get("author") or {}).get("login"),
             "body": comment.get("body", ""),
             "createdAt": comment.get("createdAt"),
+            "updatedAt": comment.get("updatedAt"),
+            "visibleBody": visible_body(comment.get("body", "")),
         }
         for comment in thread["comments"]["nodes"]
         if not is_pending_review_comment(comment)
     ]
 
 
-def classify(thread: dict[str, Any], login: str) -> dict[str, Any] | None:
+def terminal_block(body: str) -> tuple[str, int] | None:
+    """Recognize a complete terminal block outside Markdown examples and HTML comments."""
+    lines = body.splitlines(keepends=True)
+    nonempty = [i for i, line in enumerate(lines) if line.strip()]
+    if not nonempty or lines[nonempty[-1]].rstrip("\r\n") != "-->":
+        return None
+    last = nonempty[-1]
+    candidates = [i for i in range(last) if lines[i].rstrip("\r\n") in MARKER_OPENERS]
+    if not candidates:
+        return None
+    opening = candidates[-1]
+    # An early closing delimiter or nested block is not one complete terminal block.
+    prose = "".join(lines[opening + 1:last])
+    if "-->" in prose or "<!--" in prose:
+        return None
+    fence: str | None = None
+    fence_length = 0
+    in_comment = False
+    code_ticks = 0
+    for line in lines[:opening]:
+        text = line.rstrip("\r\n")
+        if fence is not None:
+            if re.fullmatch(r" {0,3}" + re.escape(fence) + "{" + str(fence_length) + r",}\s*", text):
+                fence = None
+            continue
+        match = FENCE_RE.match(text)
+        if not in_comment and not code_ticks and match:
+            run, rest = match.groups()
+            if run[0] != "`" or "`" not in rest:
+                fence, fence_length = run[0], len(run)
+                continue
+        # Quoted and indented examples cannot open a top-level HTML comment/code span.
+        if text.startswith((">", "    ", "\t")):
+            continue
+        for token in re.finditer(r"<!--|-->|`+", text):
+            value = token.group()
+            if in_comment:
+                if value == "-->":
+                    in_comment = False
+            elif code_ticks:
+                if value == "`" * code_ticks:
+                    code_ticks = 0
+            elif value == "<!--":
+                in_comment = True
+            elif value.startswith("`"):
+                code_ticks = len(value)
+    if fence is not None or in_comment or code_ticks:
+        return None
+    return MARKER_OPENERS[lines[opening].rstrip("\r\n")], sum(map(len, lines[:opening]))
+
+
+def terminal_marker(body: str) -> str | None:
+    block = terminal_block(body)
+    return block[0] if block else None
+
+
+def visible_body(body: str) -> str:
+    block = terminal_block(body)
+    return body[:block[1]].rstrip() if block else body
+
+
+def classify(thread: dict[str, Any]) -> dict[str, Any] | None:
     comments = flatten_comments(thread)
     if not comments:
         return None
-    truncated = thread["comments"]["pageInfo"]["hasNextPage"]
-    anchor = resolve_anchor(thread)
-    first_hunk = next((c.get("diffHunk") for c in thread["comments"]["nodes"] if c.get("diffHunk")), None)
-
+    connection = thread["comments"]
+    truncated = connection["pageInfo"]["hasNextPage"] or connection["totalCount"] > len(connection["nodes"])
+    origin = "agent" if terminal_marker(comments[0]["body"]) == "comment" else "human/unknown"
+    replies = [i for i, comment in enumerate(comments[1:], 1)
+               if terminal_marker(comment["body"]) == "reply"]
+    last_reply = replies[-1] if replies else None
+    new_comments = comments[last_reply + 1:] if last_reply is not None else comments
     record: dict[str, Any] = {
         "id": thread["id"],
-        "anchor": anchor,
+        "anchor": resolve_anchor(thread),
         "isOutdated": thread["isOutdated"],
         "commentCount": thread["comments"]["totalCount"],
         "truncated": truncated,
-        "lastAuthor": comments[-1]["author"] if comments else None,
-        "lastCommentAt": comments[-1]["createdAt"] if comments else None,
+        "lastAuthor": comments[-1]["author"],
+        "lastCommentAt": comments[-1]["createdAt"],
+        "origin": origin,
+        "state": "pending" if new_comments or truncated else ("reconcile" if origin == "agent" else "answered"),
+        "mode": "follow-up" if replies else "first-pass",
+        "diffHunk": next((c.get("diffHunk") for c in thread["comments"]["nodes"]
+                          if not is_pending_review_comment(c) and c.get("diffHunk")), None),
+        "comments": comments,
+        "newComments": new_comments,
     }
-
-    last_index = len(comments) - 1
-    self_opened = comments[0]["author"] == login
-    self_fix_bypass = comments[-1]["author"] == login and bool(FIX_KEYWORD_RE.search(comments[-1]["body"]))
-    # The opening comment of a self-opened thread is a task, not an answer.
-    only_self_note = self_opened and last_index == 0
-
-    # A truncated thread cannot prove its last comment is ours, so treat it as unanswered.
-    if (
-        comments[-1]["author"] == login
-        and not truncated
-        and not self_fix_bypass
-        and not only_self_note
-    ):
-        record["state"] = "answered"
-        return record
-
-    # Self-notes (opening comment, fix!: comment) are new work to surface, not "my answer already given".
-    mine = [
-        index
-        for index, comment in enumerate(comments)
-        if comment["author"] == login
-        and not (self_fix_bypass and index == last_index)
-        and not (self_opened and index == 0)
-    ]
-    record["state"] = "pending"
-    record["origin"] = "self" if self_opened else "reviewer"
-    record["mode"] = "follow-up" if mine else "first-pass"
-    record["diffHunk"] = first_hunk
-    record["comments"] = comments
-    if mine:
-        record["myLastReply"] = comments[mine[-1]]
-        record["newComments"] = comments[mine[-1] + 1:]
+    if last_reply is not None:
+        record["lastReply"] = comments[last_reply]
     return record
 
 
 def build_state(pr_ref: str) -> tuple[dict[str, Any], int]:
     owner, repo, number = parse_pr_ref(pr_ref)
-    login = acting_login()
     meta = pr_metadata(owner, repo, number)
 
     state: dict[str, Any] = {
         "pr": {"owner": owner, "repo": repo, "number": number, "url": meta.get("url")},
-        "actingLogin": login,
         "prState": meta.get("state"),
         "isDraft": meta.get("isDraft"),
         "headRef": meta.get("headRefName"),
+        "headOid": meta.get("headRefOid"),
         "baseRef": meta.get("baseRefName"),
     }
 
@@ -242,12 +261,21 @@ def build_state(pr_ref: str) -> tuple[dict[str, Any], int]:
 
     raw_threads = fetch_threads(owner, repo, number)
     resolved = [t for t in raw_threads if t["isResolved"]]
-    classified = (classify(t, login) for t in raw_threads if not t["isResolved"])
+    incomplete = [t for t in raw_threads if not t["isResolved"] and (
+        t["comments"]["pageInfo"]["hasNextPage"]
+        or t["comments"]["totalCount"] > len(t["comments"]["nodes"])
+    )]
+    if incomplete:
+        state.update(action="stop", reason="Truncated review comments; full context required",
+                     counts={"total": len(raw_threads), "resolved": len(resolved)}, threads=[])
+        return state, 1
+    classified = (classify(t) for t in raw_threads if not t["isResolved"])
     live = [record for record in classified if record is not None]
 
     answered = [t for t in live if t["state"] == "answered"]
-    first_pass = [t for t in live if t.get("mode") == "first-pass"]
-    follow_up = [t for t in live if t.get("mode") == "follow-up"]
+    first_pass = [t for t in live if t["state"] == "pending" and t["mode"] == "first-pass"]
+    follow_up = [t for t in live if t["state"] == "pending" and t["mode"] == "follow-up"]
+    reconcile = [t for t in live if t["state"] == "reconcile"]
 
     state["counts"] = {
         "total": len(raw_threads),
@@ -255,9 +283,10 @@ def build_state(pr_ref: str) -> tuple[dict[str, Any], int]:
         "answered": len(answered),
         "pendingFirstPass": len(first_pass),
         "pendingFollowUp": len(follow_up),
+        "reconcile": len(reconcile),
     }
-    state["action"] = "skip" if not (first_pass or follow_up) else "proceed"
-    state["threads"] = first_pass + follow_up
+    state["action"] = "skip" if not (first_pass or follow_up or reconcile) else "proceed"
+    state["threads"] = first_pass + follow_up + reconcile
     state["answeredThreads"] = [
         {"id": t["id"], "path": t["anchor"]["path"], "lastAuthor": t["lastAuthor"]} for t in answered
     ]

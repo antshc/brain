@@ -10,6 +10,6 @@ Follow the shared contract; return `AXIS: quality-attributes`. Review the comple
 
 Inspect implementation, usage, configuration and relevant tests. Report only introduced or materially worsened, actionable quality costs; omit preferences and speculative risks. For an already reported defect, include its test scenario in that finding rather than duplicating it here.
 
-## Comment format
+## Finding content
 
-Return `REVIEW_COMMENT`: concrete concern → evidenced quality impact → smallest improvement. One issue; identify symbols/path and applicable conditions. Frame as a suggestion, not a proven bug. No classification labels (`Suggestion:`, `Nit:`, `Bug:`) anywhere in the comment; no praise or background. Use shared JSON, five-finding limit and explicit failure result.
+Supply evidenced quality impact, applicable conditions, symbols/path, and the smallest improvement to the shared conversation draft. Frame it as a suggestion, not a proven bug. Use shared JSON, five-finding limit, and explicit failure result.
