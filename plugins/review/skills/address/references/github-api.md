@@ -14,7 +14,7 @@ The script already reports `headRef`, `baseRef`, and `prState`. Run this only wh
 
 ## Reply to a review thread
 
-Write the reply to its own file first, keyed by thread, so bodies containing backticks, quotes, or newlines survive the shell intact and no thread can ever receive another thread's body:
+Write the complete reply, including its terminal `agent:reply` block, to its own file first, keyed by thread, so bodies containing backticks, quotes, or newlines survive the shell intact and no thread can ever receive another thread's body:
 
 ```bash
 cat > /tmp/pr-{{number}}-{{threadId}}.md <<'BODY'
@@ -30,7 +30,7 @@ gh api graphql -f query='
 ' -f threadId={{threadId}} -F body=@/tmp/pr-{{number}}-{{threadId}}.md
 ```
 
-`-F body=@path` reads the file; `-f` would post the literal string `@path`. Read the returned `comment.body` back and confirm it matches the file before treating the thread as answered.
+`-F body=@path` reads the file; `-f` would post the literal string `@path`. Before treating the thread as answered, confirm returned `comment.body` matches the complete file, including the terminal block and line breaks. If it differs, stop and report the mismatch; do not post a duplicate reply. Confirm rendered prose excludes the metadata while the raw body retains it.
 
 ## PR-level comments
 
