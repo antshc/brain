@@ -18,7 +18,7 @@ read -> save to file -> edit locally -> update from file -> verify
    `--body-only --output-file <path> -o json --include-metadata`. One call
    writes the body to the file and returns the envelope;
    `data.metadata.hasSpaceInstructions` tells you whether a space-instructions
-   read is needed (see `spaces.md`).
+   read is needed (Confluence spaces, *Space Instructions*).
 2. Use the local file at `data.body.outputFile` when present; otherwise save
    `data.body.value` to a local file.
 3. Capture the response's snapshot token (`data.snapshotToken`). Without

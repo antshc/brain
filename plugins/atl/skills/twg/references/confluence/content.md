@@ -4,6 +4,17 @@ description: Create, read, update, move, archive, label, comment on, version, an
 
 # Confluence Content
 
+## Contents
+
+- Content Types
+- Persisted Remix Infographics
+- Non-doc Read-back And Whiteboard Rendering
+- Embed And Smart Link Reads
+- Writes
+- Comments
+- Exports
+- Downloading A Persisted Remix Infographic
+
 Use the unified `confluence content` surface for supported content operations.
 Inspect live help because available content types and operations can differ by
 build profile.
