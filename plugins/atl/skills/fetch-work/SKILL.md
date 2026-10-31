@@ -37,7 +37,7 @@ Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description` over RES
 - Detect: offline recursive scan of ADF for `media` with `attrs.type == "file"` or `attrs.alt` ending `.png|.jpg|.jpeg|.gif|.svg|.webp|.bmp`. No match → no attachment call.
 - Match → download all issue attachments to assets dir (gitignored via `*.tmp`).
 - Resolve each placeholder by `alt` (original filename) against `fields.attachment[].filename`, never `media-id` (REST doesn't expose it).
-  - Image → `![<filename>](work.md.tmp/<file>)`; if `width`/`height` known, next line `<!-- media-size: width=<w> height=<h> -->`.
+  - Image → `![<filename>](work.md.tmp/<file>)`; if `width`/`height`, `display-width`, or `layout` known, next line `<!-- media-size: [width=<w> height=<h>] [display-width=<n>[%]] [layout=<layout>] -->`.
   - Other → `[<filename>](work.md.tmp/<file>)`.
 - Links percent-encoded, relative to `work.md`'s directory. No Draw.io/mermaid-sidecar rule (unlike `fetch-page` skill).
 

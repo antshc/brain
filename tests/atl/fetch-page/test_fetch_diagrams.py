@@ -403,3 +403,14 @@ def test_restore_diagrams_resolves_generic_file_attachment_without_a_size_commen
     result = restore_diagrams(md, snapshot, "page.md.tmp")
 
     assert result == "[notes.pdf](page.md.tmp/notes.pdf)"
+
+
+def test_restore_diagrams_carries_display_width_and_layout_into_the_media_size_comment():
+    snapshot = AttachmentSnapshot(
+        attachments=[{"title": "a.png", "extensions": {"fileId": "image-1"}}], downloaded={"a.png": b"png"}
+    )
+    md = '<!-- adf:attachment media-id="image-1" alt="a.png" width="1804" height="454" display-width="768" layout="wide" -->'
+
+    result = restore_diagrams(md, snapshot, "page.md.assets")
+
+    assert result == "![a.png](page.md.assets/a.png)\n<!-- media-size: width=1804 height=454 display-width=768 layout=wide -->"

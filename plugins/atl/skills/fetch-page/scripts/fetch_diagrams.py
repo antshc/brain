@@ -36,8 +36,10 @@ from requests.exceptions import RequestException
 
 _DRAWIO_PLACEHOLDER_RE = re.compile(r'<!-- adf:diagram drawio="([^"]*)" -->')
 _ATTACHMENT_PLACEHOLDER_RE = re.compile(
-    r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")? -->'
+    r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")?'
+    r'(?: display-width="([^"]*)")?(?: layout="([^"]*)")? -->'
 )
+
 _ANY_PLACEHOLDER_RE = re.compile(r"<!-- adf:(diagram|attachment) ")
 
 SKIPPED_NOTE = "<!-- adf:diagram source unavailable: attachment retrieval skipped (--attachments skip) -->"
@@ -59,6 +61,19 @@ class AttachmentSnapshot:
 
     attachments: list[dict]
     downloaded: dict[str, bytes]
+
+
+def media_size_comment(width: str | None, height: str | None, display_width: str | None, layout: str | None) -> str:
+    """`<!-- media-size: ... -->` carrying every size/position fact the placeholder had, or "".
+    `publish-page` reads it back so a republished image keeps its size and layout."""
+    parts = []
+    if width and height:
+        parts += [f"width={width}", f"height={height}"]
+    if display_width:
+        parts.append(f"display-width={display_width}")
+    if layout:
+        parts.append(f"layout={layout}")
+    return f"<!-- media-size: {' '.join(parts)} -->" if parts else ""
 
 
 def _looks_like_image(name: str) -> bool:
@@ -220,7 +235,8 @@ def restore_diagrams(markdown: str, snapshot: AttachmentSnapshot, assets_dir_nam
         return _fence(text)
 
     def _replace_attachment(match: re.Match) -> str:
-        media_id, alt, width, height = match.group(1), match.group(2), match.group(3), match.group(4)
+        media_id, alt = match.group(1), match.group(2)
+        size = media_size_comment(*match.group(3, 4, 5, 6))
         attachment = _find_by_file_id(attachments, media_id)
         if attachment is None:
             return f'<!-- adf:diagram source unavailable: attachment for media-id="{media_id}" not found -->'
@@ -232,9 +248,7 @@ def restore_diagrams(markdown: str, snapshot: AttachmentSnapshot, assets_dir_nam
         link = _relative_link(assets_dir_name, filename)
         if _looks_like_image(filename) or _looks_like_image(alt):
             image_line = f"![{alt or filename}]({link})"
-            if width and height:
-                return f"{image_line}\n<!-- media-size: width={width} height={height} -->"
-            return image_line
+            return f"{image_line}\n{size}" if size else image_line
         return f"[{filename}]({link})"
 
     markdown = _DRAWIO_PLACEHOLDER_RE.sub(_replace_drawio, markdown)

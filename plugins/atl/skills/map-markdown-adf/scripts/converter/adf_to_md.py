@@ -1,12 +1,16 @@
 """Atlassian Document Format -> Markdown entrypoint (pure)."""
 from __future__ import annotations
 
-from .patterns import COMMENT_CLOSE_TAG, comment_open_tag
+from .patterns import COMMENT_CLOSE_TAG, STATUS_EMOJI, comment_open_tag
 from .table_grid import validate_table_grid
 
 # Applied innermost-first, so combined marks on one text node wrap in a fixed order
 # regardless of the order they appear in `marks` (code+link -> [`text`](href)).
 _MARK_ORDER = ("code", "strike", "em", "strong", "link")
+
+# Confluence stores a `bash` code block as `shell`; read it back as `bash` so the common fence
+# round-trips unchanged (Confluence keeps no distinction between the two).
+_LANGUAGE_ALIASES = {"shell": "bash"}
 
 
 def adf_to_markdown(doc: dict) -> str:
@@ -20,6 +24,34 @@ def render_blocks(nodes: list[dict]) -> str:
 
 
 def render_block(node: dict) -> str:
+    rendered = _render_block_body(node)
+    breakout = next((m for m in node.get("marks", []) if m.get("type") == "breakout"), None)
+    if breakout and rendered:
+        return f"{_breakout_marker(breakout.get('attrs', {}))}\n{rendered}"
+    return rendered
+
+
+def _breakout_marker(attrs: dict) -> str:
+    fields = "".join(f' {key}="{_number(value) if key == "width" else value}"' for key, value in attrs.items())
+    return f"<!-- adf:breakout{fields} -->"
+
+
+def _table_marker(attrs: dict) -> str:
+    """`adf:wide-table` for a plain wide table, `adf:table` when a width or another layout must
+    survive, "" for a default table."""
+    layout, width = attrs.get("layout"), attrs.get("width")
+    if width is None:
+        if layout == "wide":
+            return "<!-- adf:wide-table -->"
+        if layout in (None, "default"):
+            return ""
+    fields = f' layout="{layout}"' if layout not in (None, "default") else ""
+    if width is not None:
+        fields += f' width="{_number(width)}"'
+    return f"<!-- adf:table{fields} -->"
+
+
+def _render_block_body(node: dict) -> str:
     node_type = node.get("type")
     if node_type == "paragraph":
         return render_inline(node.get("content", []))
@@ -40,6 +72,7 @@ def render_block(node: dict) -> str:
         return "\n".join(f"> {line}" if line else ">" for line in lines)
     if node_type == "codeBlock":
         lang = node.get("attrs", {}).get("language", "")
+        lang = _LANGUAGE_ALIASES.get(lang, lang)
         text = "".join(c.get("text", "") for c in node.get("content", []))
         return f"```{lang}\n{text}\n```"
     if node_type == "rule":
@@ -53,9 +86,8 @@ def render_block(node: dict) -> str:
         return f"<details>\n<summary>{title}</summary>\n\n{inner}\n</details>"
     if node_type == "table":
         rendered = render_table(node)
-        if node.get("attrs", {}).get("layout") == "wide":
-            return f"<!-- adf:wide-table -->\n\n{rendered}"
-        return rendered
+        marker = _table_marker(node.get("attrs", {}))
+        return f"{marker}\n\n{rendered}" if marker else rendered
     if node_type == "extension":
         extension_key = node.get("attrs", {}).get("extensionKey", "")
         if extension_key == "toc":
@@ -77,7 +109,7 @@ def render_block(node: dict) -> str:
             (c for c in node.get("content", []) if c.get("type") == "media"), None
         )
         if media_node is not None:
-            return _attachment_placeholder(media_node)
+            return _attachment_placeholder(media_node, node.get("attrs", {}) if node_type == "mediaSingle" else None)
         raise NotImplementedError("unhandled ADF mediaSingle with no media child")
     if node_type == "mediaGroup":
         media_nodes = [c for c in node.get("content", []) if c.get("type") == "media"]
@@ -87,13 +119,15 @@ def render_block(node: dict) -> str:
     raise NotImplementedError(f"unhandled ADF node type '{node_type}'")
 
 
-def _attachment_placeholder(media_node: dict) -> str:
+def _attachment_placeholder(media_node: dict, single_attrs: dict | None = None) -> str:
     """A `media` node's neutral placeholder — could be a diagram, a plain image, or a generic
     file; `/fetch-page` classifies and resolves it, this converter only names it.
 
     Also carries `width`/`height` when the node has both (an image `media` node inside a
     `mediaSingle`, never a `mediaGroup` generic-file node) — the only place Confluence's own
-    reported pixel size is ever captured, so `/fetch-page` can pass it along.
+    reported pixel size is ever captured, so `/fetch-page` can pass it along. A `mediaSingle`
+    parent adds its display size as `display-width` (`<n>` pixels, `<n>%` percentage) and a
+    non-default `layout`, so a republish shows the image at the size and position it had.
     """
     attrs = media_node.get("attrs", {})
     media_id = attrs.get("id", "")
@@ -102,7 +136,19 @@ def _attachment_placeholder(media_node: dict) -> str:
     width, height = attrs.get("width"), attrs.get("height")
     if width is not None and height is not None:
         placeholder += f' width="{width}" height="{height}"'
+    single_attrs = single_attrs or {}
+    display_width = single_attrs.get("width")
+    if display_width is not None:
+        suffix = "%" if single_attrs.get("widthType") == "percentage" else ""
+        placeholder += f' display-width="{_number(display_width)}{suffix}"'
+    layout = single_attrs.get("layout")
+    if layout and layout != "center":
+        placeholder += f' layout="{layout}"'
     return placeholder + " -->"
+
+
+def _number(value: float | int) -> str:
+    return str(int(value)) if float(value).is_integer() else str(value)
 
 
 def render_list(node: dict, ordered: bool, depth: int = 0) -> str:
@@ -240,7 +286,8 @@ def render_status(node: dict) -> str:
     attrs = node.get("attrs", {})
     text = attrs.get("text", "")
     color = attrs.get("color", "neutral")
-    return f"[STATUS:{text}|{color}]"
+    emoji = STATUS_EMOJI.get(color)
+    return f"{emoji}[{text}]" if emoji else f"[STATUS:{text}|{color}]"
 
 
 def render_text(node: dict) -> str:

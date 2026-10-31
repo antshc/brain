@@ -3,11 +3,19 @@ from __future__ import annotations
 
 import re
 
-from .patterns import COMMENT_CLOSE_RE, COMMENT_OPEN_RE, COMMENT_TAG_RE, STATUS_PATTERN
+from .patterns import (
+    COMMENT_CLOSE_RE,
+    COMMENT_OPEN_RE,
+    COMMENT_TAG_RE,
+    EMOJI_STATUS_COLORS,
+    EMOJI_STATUS_PATTERN,
+    STATUS_PATTERN,
+)
 
 _INLINE_RE = re.compile(
     r"`(?P<code_txt>[^`]+)`"
     r"|" + STATUS_PATTERN +
+    r"|" + EMOJI_STATUS_PATTERN +
     r"|\[(?P<link_txt>[^\]]*)\]\((?P<link_href>[^)\s]+)\)"
     r"|\*\*(?P<strong_txt>.+?)\*\*"
     r"|__(?P<strong_u_txt>.+?)__"
@@ -77,6 +85,16 @@ def _parse_inline_marks(text: str) -> list[dict]:
                     "attrs": {
                         "text": m.group("status_text").strip(),
                         "color": (m.group("status_color") or "neutral").lower(),
+                    },
+                }
+            )
+        elif m.group("emoji_status_text") is not None:
+            nodes.append(
+                {
+                    "type": "status",
+                    "attrs": {
+                        "text": m.group("emoji_status_text").strip(),
+                        "color": EMOJI_STATUS_COLORS[m.group("status_emoji")],
                     },
                 }
             )

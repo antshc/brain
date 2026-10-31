@@ -18,16 +18,35 @@ from urllib.parse import unquote, urlparse
 from .patterns import media_marker
 
 # Matches a whole standalone reference line, plus an optional immediately-following
-# `<!-- media-size: ... -->` comment line (written by `/fetch-page` when Confluence reported
-# an image's real pixel size) — mirrors `/fetch-page`'s own one-reference-per-line output
-# convention. `$`/`^` (MULTILINE) match line boundaries without consuming the newline, so a
-# match with no size comment leaves surrounding blank-line structure untouched, same as
-# `extract_mermaid`'s fence replacement.
+# `<!-- media-size: ... -->` comment line (written by `/fetch-page`: `width`/`height` the
+# image's real pixel size, `display-width` (`<n>` or `<n>%`) and `layout` how the page showed
+# it) — mirrors `/fetch-page`'s own one-reference-per-line output convention. `$`/`^`
+# (MULTILINE) match line boundaries without consuming the newline, so a match with no size
+# comment leaves surrounding blank-line structure untouched, same as `extract_mermaid`'s
+# fence replacement.
 _REFERENCE_RE = re.compile(
     r"^(!?)\[([^\]]*)\]\(([^)]*)\)[ \t]*$"
-    r"(\n[ \t]*<!--[ \t]*media-size:[ \t]*width=(\d+)[ \t]+height=(\d+)[ \t]*-->[ \t]*$)?",
+    r"(\n[ \t]*<!--[ \t]*media-size:([^>]*?)-->[ \t]*$)?",
     re.MULTILINE,
 )
+_SIZE_PAIR_RE = re.compile(r"([a-z-]+)=(\S+)")
+_DISPLAY_WIDTH_RE = re.compile(r"\A(\d+(?:\.\d+)?)(%?)\Z")
+
+
+def parse_media_size(text: str) -> dict:
+    """`width`/`height` (ints, only as a pair), `display_width` (`(number, "pixel"|"percentage")`),
+    `layout` (str) — each only when present and well-formed."""
+    pairs = dict(_SIZE_PAIR_RE.findall(text))
+    size: dict = {}
+    if pairs.get("width", "").isdigit() and pairs.get("height", "").isdigit():
+        size["width"], size["height"] = int(pairs["width"]), int(pairs["height"])
+    display = _DISPLAY_WIDTH_RE.match(pairs.get("display-width", ""))
+    if display:
+        number = float(display.group(1))
+        size["display_width"] = (int(number) if number.is_integer() else number, "percentage" if display.group(2) else "pixel")
+    if pairs.get("layout"):
+        size["layout"] = pairs["layout"]
+    return size
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
 
@@ -53,9 +72,9 @@ def extract_local_media(md_text: str, md_dir: Path, start_index: int = 0) -> tup
     `extract_mermaid` pass on the same document.
 
     Returns (processed_markdown, media_items); each item is
-    `{"index", "path", "filename", "is_image", "width"?, "height"?}` — `width`/`height` are
-    only present for an image whose reference line is immediately followed by a
-    `<!-- media-size: width=W height=H -->` comment; that comment line is always consumed
+    `{"index", "path", "filename", "is_image", "width"?, "height"?, "display_width"?, "layout"?}`
+    — the optional keys are only present for an image whose reference line is immediately
+    followed by a `<!-- media-size: ... -->` comment (see `parse_media_size`); that comment line is always consumed
     (dropped from `processed_markdown`) once matched, regardless of whether its values end up
     used, so it never survives into the ADF as a stray paragraph.
 
@@ -80,8 +99,7 @@ def extract_local_media(md_text: str, md_dir: Path, start_index: int = 0) -> tup
             "is_image": is_image,
         }
         if is_image and match.group(4) is not None:
-            item["width"] = int(match.group(5))
-            item["height"] = int(match.group(6))
+            item.update(parse_media_size(match.group(5)))
 
         media_items.append(item)
         marker = media_marker(index)

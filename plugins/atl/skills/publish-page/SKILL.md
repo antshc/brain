@@ -89,7 +89,7 @@ python scripts/publish_page_diagrams.py run \
 
 Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```mermaid fences and standalone local image/file refs (as `fetch-page` skill writes) with markers; convert via *`map-markdown-adf` skill to convert Markdown to Atlassian Document Format (ADF) for Confluence, preserving source wording verbatim* **Action: Convert Markdown to ADF** (CLI only; never import its code); then:
 
-- Diagrams/local attachments → ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `fetch-page` skill-recorded `width`/`height` when present; other file → `mediaGroup`), publish.
+- Diagrams/local attachments → ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `fetch-page` skill-recorded `media-size`: `width`/`height` on the media node, `display-width` and `layout` on the `mediaSingle`; other file → `mediaGroup`), publish.
 - Neither → publish the converted ADF directly.
 
 Exits non-zero naming the cause on: missing `cloudId`/`email`/`apiToken`; missing `mmdc` (diagram path) or `drawio` (`drawio` mode); unsupported/unusable `diagramRenderer`; missing `drawioExtensionKey`; duplicate `%% diagram-id`; leftover marker after substitution. All but the last fail before any page is touched. Fix and re-run; don't work around.

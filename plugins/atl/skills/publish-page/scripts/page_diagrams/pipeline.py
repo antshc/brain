@@ -170,6 +170,8 @@ def _publish_with_diagrams(
                 target_page_id,
                 alt=m["filename"],
                 width_height=(m["width"], m["height"]) if "width" in m else None,
+                display_width=m.get("display_width"),
+                layout=m.get("layout"),
             )
             if m["is_image"]
             else attachment_node(filename_to_file_id[m["filename"]], target_page_id)
