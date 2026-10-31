@@ -28,7 +28,7 @@ Use its JSON as the discussion source: `pr` gives `{{owner}}`, `{{repo}}`, `{{nu
 |---|---|
 | `skip` | Report the counts and no new reply work; **stop** before checkout. |
 | `stop` | Report `reason` verbatim and stop; any unresolved truncated thread blocks the run. |
-| `proceed` | Inspect `threads[]`. For `reconcile`, read full context: wait for unanswered questions without another reply; reassess settled outcomes or failed resolution retries. If only unchanged waiting questions remain, report waiting and stop before checkout. Otherwise continue with actionable threads. |
+| `proceed` | Inspect `threads[]`. For `reconcile`, read full context: wait for unanswered questions or agreed deferrals without a supplied ticket, without another reply; reassess settled outcomes or failed resolution retries. If only unchanged waiting questions or untracked deferrals remain, report waiting and stop before checkout. Otherwise continue with actionable threads. |
 
 Done when actionable reply/reconciliation work is in hand, or waiting/incomplete threads are reported without duplicate replies.
 
@@ -114,9 +114,13 @@ Apply independently per thread:
 | Agent; evidence shows concern satisfied or incorrect | Explain briefly, then resolve. |
 | Agent; clarification or preference needed | Ask one focused question; leave open. |
 | Agent; human clarification arrives | Reassess, fix or answer; resolve only once settled. |
-| Agent; follow-up explicitly accepted and tracked | Explain the real destination; resolve. Unagreed deferral stays open. |
+| Agent; deferral proposed | Ask whether to track separately; leave open. |
+| Agent; deferral confirmed, no existing ticket supplied | Acknowledge only; leave open and report follow-up agreed, ticket not created. |
+| Agent; deferral explicitly accepted and existing ticket supplied | Reference the supplied destination; resolve after the usual checks. |
 | Agent; failed verification, push, reply, or unresolved evidence | Report blocker; leave open for a safe rerun. |
 | Human/unknown; any outcome | Fix or answer; manual closure only. |
+
+**MUST NOT** create a follow-up issue or ticket, even after confirmation or if automatic creation seems faster/simpler. Rationale: this flow records agreement only; ticket creation is reserved for a future workflow. After confirmation, take no ticket action or deferred implementation action. On rerun, wait without repeating the request while no existing ticket is supplied. An accepted but untracked deferral is not settled and must not resolve.
 
 **MUST NOT** infer origin from login or auto-resolve human/unknown threads, even if same-author checks are simpler. Rationale: humans and agents share credentials. Code Review produces findings; Address handles replies and closure, without an agent debate loop.
 
@@ -136,7 +140,7 @@ Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is go
 |---|---|
 | Gate | The `counts` from §0 and the `action` that let the run continue. |
 | Issues | One row per `issue`: `issueId`, class, verdict, commit sha or `none`, threads replied and resolved. |
-| Open threads | Questions/blockers awaiting clarification or evidence; answered human/unknown threads awaiting manual closure. |
+| Open threads | Questions/blockers awaiting clarification or evidence; agreed deferrals awaiting a supplied ticket (follow-up agreed, ticket not created); answered human/unknown threads awaiting manual closure. |
 | Verification | `$buildCommand` and `$testCommand`, or the note that they are absent and which issues went unverified. |
 | Residual findings | Anything the investigation turned up that no reviewer asked about. Reported, not fixed. |
 
