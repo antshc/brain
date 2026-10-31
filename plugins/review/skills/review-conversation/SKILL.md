@@ -43,8 +43,12 @@ For disagreement, use Meaning–Mechanism–Goal internally: understand the conc
 | No change needed | Give the decisive reason; cite evidence when needed to assess it. |
 | Unclear | Ask one focused question that unblocks the decision. |
 | Earlier mistake | Acknowledge it briefly and give the correction. |
-| Deferred | Name the real follow-up destination; invent no tickets or promises. |
+| Deferral proposed | Ask whether to track the concern separately; claim no ticket exists. |
+| Deferral confirmed; no ticket supplied | Acknowledge agreement; say the thread stays open until tracked. |
+| Existing ticket supplied | Name the supplied destination; invent no tickets or promises. |
 | Patch names missing symbols | Name the missing symbol and the smallest edit that meets the intent. |
+
+**MUST NOT** create a follow-up issue or ticket, even after confirmation or if automatic creation seems faster/simpler. Rationale: agreement records intent; ticket creation is not implemented in this review flow. Ask whether separate tracking is wanted; after confirmation, acknowledge only. Refer to an existing ticket only when supplied and real; leave execution and closure to the caller.
 
 ## Hidden metadata
 
@@ -65,7 +69,9 @@ Examples illustrate tone, not mandatory wording. Code Review and HITL share the 
 | No change | This already runs under the per-object lock, so writes to the same entry cannot overlap. |
 | Question | Should cancellation stop the whole job, or only the current read? |
 | Correction | I missed the second caller. It bypasses the lock; fixed that path too. |
-| Deferred | Agreed this would help. Tracked in #123; it changes the retry policy beyond this fix. |
+| Deferral proposed | This changes the retry policy beyond this PR. Should we track it separately? |
+| Deferral confirmed; no ticket | Agreed. Leaving this open until the follow-up is tracked. |
+| Existing ticket supplied | Agreed. The retry-policy change is tracked in #123. |
 | Follow-up | You're right about shutdown. The token reached the queue but not the storage call; fixed that path too. |
 
 Final agent reply:
