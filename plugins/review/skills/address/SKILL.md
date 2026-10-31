@@ -52,7 +52,7 @@ Each entry in `threads[]` carries `id`, `origin` (`reviewer`, or `self` when `$a
 | `mode` | Means | Read |
 |---|---|---|
 | `first-pass` | `$actingLogin` has never commented in this thread. | The whole thread. |
-| `follow-up` | `$actingLogin` replied, and someone commented after. | `newComments` only — `myLastReply` is the answer already given, and repeating it is the one failure mode here. |
+| `follow-up` | `$actingLogin` replied, and someone commented after. | The whole thread; answer the latest concern using `newComments` and `myLastReply` in context, without repeating the earlier explanation. |
 
 Done when every thread's target code has been located from its `anchor`, falling back to `diffHunk` and then to the symbol named in the comment when `basis` is `unknown`.
 
@@ -71,7 +71,7 @@ Done when every thread in the working set belongs to exactly one `issue` and the
 | `chore` | A rename, a typo, wording, formatting, an unused import — the reviewer's instruction is the whole specification. | Step 7 |
 | `substantive` | Behaviour, correctness, design, performance, or security — knowing whether the reviewer is right requires reading the code. | Step 6 |
 
-A `follow-up` issue whose `newComments` raise no fact the earlier answer did not already cover skips the investigation and goes straight to the reply.
+For a `follow-up`, recheck challenged assumptions against the code. Lack of new facts proves neither understanding nor correctness; investigate substantive concerns before replying. If disagreement becomes circular, state the unresolved tradeoff and ask for the decision needed.
 
 Done when every `issue` carries one class.
 
@@ -97,18 +97,9 @@ Done when every `issue` has reached a terminal state and the branch is pushed.
 
 ## 8. Reply
 
-Plain prose, the way an engineer answers a colleague. No prefix tag, no HTML marker, no canned sentence — nothing reads a reply body, so nothing needs to recognise it.
+**Read `references/conversation.md` fully before drafting replies.** Follow its situation guidance and terminal `agent:reply` contract. Claim a fix only after its commit is pushed; report only actual verification.
 
-| Situation | Reply |
-|---|---|
-| Committed and pushed. | `Fixed!` — alone. The reviewer can read the diff. |
-| Fixing it later in this run. | One line saying what you will change; a second comment `Fixed.` once pushed. |
-| Agreed, but it would balloon the PR. | One sentence of agreement, then where it lands — follow-up PR, ticket, next round. |
-| `no-change-needed`. | Two to five sentences of root cause carrying the `path:line` citations, then that you left the code as it is. |
-| Their patch names symbols the repo lacks. | Name the missing symbol, then the smallest edit that meets their intent. |
-| Ambiguous or underdetermined. | Ask outright: quote the phrase, state the reading you would implement. |
-
-Name the exact type, method, or file. Cite the package, pinned version, and where the pin lives when the answer rests on third-party behaviour. Never restate an answer already in the thread, and never restate the reviewer's comment back at them. Match their register — a one-line typo report gets a one-line answer.
+Name the exact type, method, or file when needed to understand the answer. Cite the package, pinned version, and pin location when the answer rests on third-party behaviour. Keep the decisive reason visible; put supporting evidence in hidden prose.
 
 Done when every thread in the working set carries exactly one new comment authored by `$actingLogin` — which is exactly what makes the next run's gate return `skip`. Leave every thread open for the reviewer to close.
 
