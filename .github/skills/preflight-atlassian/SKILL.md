@@ -17,7 +17,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 
 - Publish/create/update a Confluence page from a Markdown file → *run `publish-page` skill to create or update a Confluence page from a local Markdown file, converting to ADF and uploading mermaid diagrams*.
 - Create/update a Jira work item/issue/story/task/bug/epic → *run `publish-work` skill to create or update a Jira work item from a summary and Markdown description*.
-- Fetch a Confluence page as Markdown → *run `fetch-page` skill to fetch a Confluence page as Markdown from its ID, tiny ID, or URL*.
+- Fetch, read, show, or summarize a Confluence page (supplied ID/URL or twg search hit) as Markdown → *run `fetch-page` skill to fetch a Confluence page as Markdown from its ID, tiny ID, or URL*.
 - Fetch a Jira work item as Markdown → *run `fetch-work` skill to fetch a Jira work item as Markdown from its key or URL*.
 
 ## Resolve
@@ -52,8 +52,8 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 
 Apply in every `atl` skill:
 
-- **twg first.** Search, retrieval, and every other Jira/Confluence operation → *follow `twg` skill for Jira workitems, JQL, Confluence pages, CQL, spaces, and people*, running Preflight's `twg` in place of bare `twg`. Never call the Atlassian MCP.
-- **Markdown, not HTML.** Confluence reads `--format md`; Jira/Confluence writes `--description-format markdown` / markdown body format. Never request or send `html`.
+- **twg first.** Search and every other Jira/Confluence operation, except Confluence page body reads (→ `fetch-page` skill, also for search hits) → *follow `twg` skill for Jira workitems, JQL, Confluence pages, CQL, spaces, and people*, running Preflight's `twg` in place of bare `twg`. Never call the Atlassian MCP.
+- **Markdown, not HTML.** Confluence twg fallback reads `--format md` (only if `fetch-page` is unavailable or fails; warn it is lossy: diagrams, media, comments may be missing); Jira/Confluence writes `--description-format markdown` / markdown body format. Never request or send `html`.
 - **REST + ADF exceptions.** Page/work-item bodies that must round-trip `map-markdown-adf` constructs (`<details>`, panels, status, TOC, wide tables, inline-comment anchors, diagrams, attachments) → `fetch-page`, `publish-page`, `fetch-work`, `publish-work` skills only; their scripts move ADF over REST. Never read or write those bodies through twg.
 - JQL/CQL searches use resolved `maxResults`/`limit` as `--limit`, unless the caller bundles its own extraction script and declares a higher cap.
 - Large twg result → `-o json --output-file <file>.json`, `cd` there, extract with Python (`read_file` silently truncates lines at ~2000 chars). Unknown shape → `print(json.dumps(d, indent=2)[:2000])`.

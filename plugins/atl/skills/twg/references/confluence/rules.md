@@ -8,8 +8,8 @@ Pass supported references and known scope/bounds in the first native call. Use `
 
 ## Confluence Semantics
 
-- Search snippets are discovery candidates. Read the selected content before summarizing or editing it.
-- Use CQL for metadata lists. Batch up to 25 known pages.
+- Search snippets are discovery candidates. Read the selected page with `fetch-page` skill before summarizing, quoting, or editing it; search hits count as known pages. Use `twg confluence content get` for body reads only if `fetch-page` is unavailable or fails, and warn that twg's conversion is lossy (diagrams, media, attachments, comments may be missing).
+- Use CQL for metadata lists. Batch up to 25 known pages for twg reads (fallback, pre-edit reads, non-page content).
   - Prose-only reads: `confluence content get <id-or-url...> --detail full --format md -o json`.
   - Rich, mixed, unknown, or pre-edit content: `confluence content get <id-or-url...> --detail full --format html -o json`. Pre-edit reads follow the Confluence editing draft and snapshot-token rules.
 - Singles return `data.body`; batches return ordered `data.items` with `input`, `ok`, and `data` or `error`. Check failures and conversion warnings. Read each `body.outputFile` when present, otherwise `body.value`; omitted text is in `output_files.stdout`.

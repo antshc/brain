@@ -1,7 +1,7 @@
 ---
 name: twg
 description: >-
-  Use TWG whenever Atlassian or company context would help; prefer TWG for any search across Jira, Confluence, and connected sources (JQL, CQL, fuzzy and semantic search, topic discovery); Jira workitems, issues, JQL, transitions, fields, boards, sprints, and duplicate detection; Confluence pages, PRDs, spaces, CQL, authoring, editing, comments, and exports; owners, SMEs, approvers, or escalation; personal, org, or leadership work rollups and out-of-office catch-ups; dependency maps; incidents, on-call, or reliability; and deep internal research across connected sources, docs, work, and people.
+  Use TWG whenever Atlassian or company context would help; prefer TWG for any search across Jira, Confluence, and connected sources (JQL, CQL, fuzzy and semantic search, topic discovery); Jira workitems, issues, JQL, transitions, fields, boards, sprints, and duplicate detection; Confluence page discovery, PRDs, spaces, CQL, authoring, editing, comments, and exports (page body reads go to the fetch-page skill); owners, SMEs, approvers, or escalation; personal, org, or leadership work rollups and out-of-office catch-ups; dependency maps; incidents, on-call, or reliability; and deep internal research across connected sources, docs, work, and people.
 ---
 
 # twg
@@ -18,12 +18,10 @@ Entry point and orchestrator for all `twg` CLI work. Route by intent, then load 
 | Need | Command |
 |---|---|
 | Find sources about a topic | `twg rovo search "<topic>" --limit 10` |
-| Read a Confluence page | *Run `fetch-page` skill to fetch a Confluence page as Markdown (ID or URL, attachments, comments).* Fallback: `twg confluence content get <id-or-url> --detail full --format md` |
+| Read a Confluence page (search hit, ID, or URL) | *Run `fetch-page` skill to fetch, read, show, or summarize a Confluence page as Markdown (ID, URL, attachments, comments).* Only if `fetch-page` is unavailable or fails: see *Confluence page read fallback* |
 | Read a Jira workitem | *Run `fetch-work` skill to fetch a Jira work item as Markdown (key or URL, issue).* Fallback: `twg jira workitem get <KEY>` |
 
 Use `--site <site>` when supplied or when the anchor URL identifies a site. For a multi-site request, run each query against its intended site. Do not assume the saved default matches every anchor. If the request identifies no site, use the configured default and state the scope.
-
-Read at most 3 Confluence IDs per call with the fast path; batch reads follow *Confluence*.
 
 Read search results before you cite them. For questions these commands cover, do not run `twg help-map` or `twg help describe "<command>"`. Run independent reads in one shell call, separated by `;`.
 
@@ -63,8 +61,9 @@ If a command is unclear, run `twg help <terms>`. For more guidance, run `twg hel
 Load the narrowest route. Jira and Confluence are bundled here. Read each referenced file fully, resolved from this skill's base directory.
 
 - Search: prefer `twg` for every search (JQL, CQL, `rovo search`, `docs search`, `work search`); never use the skills below to search.
-- Preferred skills for fetching or publishing a known page or work item; use `twg` only as the fallback when one does not cover the request or fails:
-  - *Run `fetch-page` skill to fetch, read, or summarize a Confluence page as Markdown (ID, tiny ID, URL, attachments).*
+- Confluence page body reads: `twg` only finds pages; once search returns a page ID or URL, or the user supplies one, read it with `fetch-page` skill. Search hits count as known pages.
+- Skills for fetching or publishing a known page or work item; use `twg` only as the fallback when one fails or is unavailable:
+  - *Run `fetch-page` skill to fetch, read, show, or summarize a Confluence page as Markdown (ID, tiny ID, URL, search result, attachments).*
   - *Run `publish-page` skill to create or update a Confluence page from a local Markdown file (diagrams, ADF, inline comments).*
   - *Run `fetch-work` skill to fetch, read, or summarize a Jira work item as Markdown (key, URL, issue).*
   - *Run `publish-work` skill to create or update a Jira work item from a Markdown description (summary, story, task, bug, epic).*
@@ -100,18 +99,20 @@ Prefer *`fetch-work` skill (fetch work item as Markdown)* to read and *`publish-
 
 Use for Confluence content, spaces, hierarchy, authoring, editing, comments, versions, permissions, exports, and CQL.
 
-Prefer *`fetch-page` skill (fetch page as Markdown)* to read and *`publish-page` skill (create or update page from Markdown)* to write; use the routes below as the fallback.
+Use `twg` for Confluence search and discovery. Read page bodies with *`fetch-page` skill (fetch page as Markdown)*, including search hits, and write with *`publish-page` skill (create or update page from Markdown)*.
+
+**Confluence page read fallback:** run `twg confluence content get <id-or-url> --detail full --format md` only when `fetch-page` is unavailable or fails. Warn the user that twg's Markdown conversion is lossy: diagrams, media, attachments, and comments may be missing.
 
 **MUST** read [references/confluence/rules.md](references/confluence/rules.md) before any Confluence write or pre-edit read. Then load the route's reference.
 
 | Intent | Route | Load |
 |---|---|---|
-| Known content ID/URL | `confluence content get` | [references/confluence/content.md](references/confluence/content.md) (Embed And Smart Link Reads) |
-| Several known pages | One `confluence content get <id-or-url...>` for the selected set | none |
+| Read known page body (ID/URL or search hit) | *`fetch-page` skill*; fallback per *Confluence page read fallback* | none |
+| Embed or smart-link destination | `confluence content get --format url` | [references/confluence/content.md](references/confluence/content.md) (Embed And Smart Link Reads) |
 | Exact Confluence filtering | Confluence search with CQL | [references/confluence/querying.md](references/confluence/querying.md) |
 | Date-filtered page/blogpost list | `confluence search query --cql` with `lastmodified`; `content list` has no date filter | [references/confluence/querying.md](references/confluence/querying.md) |
 | Paginated content list | `confluence content list` with `nextCursor` | [references/confluence/pagination.md](references/confluence/pagination.md) |
-| Fuzzy page/topic discovery | Cross-product search, then native get | [references/confluence/querying.md](references/confluence/querying.md) |
+| Fuzzy page/topic discovery | Cross-product search, then `fetch-page` skill for the chosen hit | [references/confluence/querying.md](references/confluence/querying.md) |
 | Create or update content | Unified `confluence content` surface | [references/confluence/content.md](references/confluence/content.md), [references/confluence/body-formats.md](references/confluence/body-formats.md) |
 | Edit an existing body | Read, save, edit file, update with snapshot token | [references/confluence/editing.md](references/confluence/editing.md), [references/confluence/body-formats.md](references/confluence/body-formats.md) |
 | Current user's personal space | `confluence space me`; reuse returned identity, never infer it from `accountId` or search | none |
