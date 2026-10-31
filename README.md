@@ -38,19 +38,6 @@ copilot plugin install skill@brain
 
 </details>
 
-### Planning and delivery plugin (af)
-
-```sh
-copilot plugin install af@brain
-```
-
-- [grill-with-docs](plugins/af/skills/grill-with-docs/SKILL.md): stress-test a design and capture resolved terms in one root `GLOSSARY.md`.
-- [to-spec](plugins/af/skills/to-spec/SKILL.md): synthesise the conversation into a GitHub specification issue.
-- [to-tickets](plugins/af/skills/to-tickets/SKILL.md): publish approved vertical slices with parent links and blocking dependencies.
-- [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
-
-Delivery skills use `gh` with their own bundled GitHub references; no tracker setup skill is required.
-
 ### Diagnosis plugin (dig)
 
 ```sh
@@ -150,6 +137,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [to-stories](plugins/wf/skills/to-stories/SKILL.md): turn requirements, `/to-spec` output, or `/to-zdesign` output into an ordered story list, owning numbered headings, dependencies, Jira metadata, and one `/draft-story` run per story.
 - [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one standalone story body with its formatted title, requirements, acceptance criteria, and optional technical notes.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
+- [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
 - [doc-architecture-diagram](plugins/wf/skills/doc-architecture-diagram/SKILL.md), [doc-behavior-diagram](plugins/wf/skills/doc-behavior-diagram/SKILL.md), [doc-code-diagram](plugins/wf/skills/doc-code-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
