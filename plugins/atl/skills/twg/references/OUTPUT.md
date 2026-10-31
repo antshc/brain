@@ -4,6 +4,16 @@ description: Handle agent JSON envelopes, compact summaries, output files, and l
 
 # Agent Output
 
+## Contents
+
+- Agent Mode
+- Envelope Shape
+- Reading Rule
+- Output Size Controls
+- Projections
+- Output Files
+- Sandboxed Pipeline Logs
+
 ## Agent Mode
 
 When the host sets `TWG_AGENT_DEFAULTS=1`, non-help commands run in agent mode.
@@ -87,7 +97,6 @@ Read more output or refetch only when that evidence does not contain or support 
 `stdout_shape` is a sample schema, not a full inventory. It includes only a few example string values per field.
 For `context` commands, external links often appear near the end of relationship arrays and can be absent from samples.
 For relationship or URL discovery, use sufficient inline or compact records, or a permitted projection of `output_files.stdout`.
-See `twg-context-discovery/SKILL.md` for the related workflow.
 
 ## Output Size Controls
 

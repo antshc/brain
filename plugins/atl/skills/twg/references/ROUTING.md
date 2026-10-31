@@ -77,11 +77,6 @@ use Jira workitem commands for JSM approval semantics.
 
 - Known Jira or Confluence object: native read plus context when relationships
   matter.
-- Jira issue to implementation: `twg-engineering-work`.
-- Topic, dependency, owner, or expert discovery: `twg-context-discovery`.
-- Project, goal, team, or executive synthesis: `twg-status-rollups`.
-- Incident, runbook, asset, capacity, or reliability question:
-  `twg-operational-health`.
 
 Stop expanding when another call would not change the answer's status, risk,
 responsibility, dependency, or next action.

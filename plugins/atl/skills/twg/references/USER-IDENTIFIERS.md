@@ -4,11 +4,18 @@ description: Mixed-identity manager chains, direct reports, reporting peers, and
 
 # User Identifiers And Hierarchy Handoffs
 
+## Contents
+
+- Routes
+- Ambiguous Names
+- Hierarchy
+- Exact Actor Sets
+- Partial Results
+- Context And Collaborators
+
 Keep the IDs, site, and time window that a command returns, and reuse them. Replace placeholders
 with returned values. Check focused `twg help describe "<command>"` for availability.
 
-[Routes](#routes) · [Hierarchy](#hierarchy) · [Actor sets](#exact-actor-sets) ·
-[Partial results](#partial-results) · [Context/collaborators](#context-and-collaborators)
 
 ## Routes
 
@@ -187,4 +194,4 @@ Membership alone does not establish recent activity. Keep collaborators separate
 reporting peers; preserve IDs/scores. Names or ID formats prove neither identity
 equivalence nor distinctness. Never infer providers from opaque IDs or treat scores
 as confidence without a documented definition. Collaborators and PR queries require
-1P subjects; see `../../twg-status-rollups/references/personal-work-summary.md` for PRs.
+1P subjects.

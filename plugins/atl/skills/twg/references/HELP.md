@@ -4,6 +4,15 @@ description: Discover unloaded TWG reference guidance and inspect exact command 
 
 # Help Discovery
 
+## Contents
+
+- Skill Discovery
+- Map, Plan, Describe
+- Help Search
+- Command Selection Rules
+- Common Discovery Patterns
+- Compatibility Alias Guard
+
 TWG separates skill discovery from command discovery. Skills explain product
 semantics and workflow strategy. Command help explains exact commands,
 arguments, flags, choices, defaults, and examples.
@@ -16,7 +25,7 @@ skill is unclear:
 
 ```bash
 twg help discover-skills "snapshot token editing"
-twg help discover-skills "JQL sprint prioritization" --skill twg-jira
+twg help discover-skills "JQL sprint prioritization"
 ```
 
 Discovery searches reference titles and curated frontmatter descriptions, not
@@ -26,18 +35,9 @@ yet own references. By default, the response contains one primary skill and at
 most two close alternatives (three results total). An explicit positive
 `--limit` may return additional qualifying alternatives.
 
-Follow `next.loadSkill` and `next.loadReference` when present. Loading a skill
-returns its full `SKILL.md` and reference index without loading every reference
-body:
-
-```bash
-twg help describe "skill:twg-confluence"
-twg help describe "skill:twg-confluence/references/editing.md"
-```
-
-This is content retrieval, not automatic host-agent activation. After selecting
-a skill, use ordinary command help for the rest of the workflow. Rediscover only
-when the user's intent materially changes.
+Follow `next.loadReference` when present. After selecting a reference, use
+ordinary command help for the rest of the workflow. Rediscover only when the
+user's intent materially changes.
 
 ## Map, Plan, Describe
 
@@ -194,9 +194,8 @@ twg -o text help describe "jira workitem query"
 | Assets / CMDB                                | `twg help assets`, then inspect object schema/type help before AQL                                                                                                                                  |
 
 For manager-chain/direct-report/peer selectors, partial person results, or
-person-to-artifact handoffs, load `USER-IDENTIFIERS.md`. It includes command and
-output recipes, selector boundaries, and the distinction between positional
-`context user` and first-party-only `collaborators`.
+person-to-artifact handoffs, return control to the orchestrator for *Routing*
+(People).
 
 For org, team, leadership, and dependency synthesis, do not fall back to
 implementation-only exploration just because the prompt says "graph",
