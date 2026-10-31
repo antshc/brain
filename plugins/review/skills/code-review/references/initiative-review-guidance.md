@@ -16,11 +16,8 @@ Account for every supplied requirement using implementation and wiring evidence.
 
 Conclude internally for each candidate: confirmed gap or no issue found. Emit only actionable findings under the shared contract; anchor comments on changed right-side lines, not on initiative text or off-diff evidence.
 
-## Comment format
+## Finding content
 
-Return each `REVIEW_COMMENT` as a posting-ready body: `requirement gap → impact → fix`.
+Supply the requirement gap, concrete impact, and smallest correction to the shared conversation draft. Name the exact symbol or code path and state the required behavior: quote the supplied issue/ticket description text verbatim when available, otherwise restate it. Never add the initiative ID, link, or URL.
 
-- One gap; name the exact symbol or code path and state the required behavior: quote the supplied issue/ticket description text verbatim when available, otherwise restate it. Never add the initiative ID, link, or URL.
-- Contrast required and implemented behavior. For scope creep, state the intended scope explicitly rather than treating an unmapped symbol as proof.
-- Explain the unmet behavior or out-of-scope effect in one sentence; suggest the smallest change that meets the requirement or removes the extra behavior.
-- Start with the gap. No classification labels (`Suggestion:`, `Nit:`, `Bug:`) anywhere in the comment. Keep only essential context; remove praise, repetition, hedging, and background.
+Contrast required and implemented behavior. For scope creep, state the intended scope explicitly rather than treating an unmapped symbol as proof. Suggest the smallest change that meets the requirement or removes the extra behavior.

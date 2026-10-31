@@ -74,7 +74,7 @@ Done when each actionable thread belongs to exactly one `issue` and counts match
 | `chore` | A rename, a typo, wording, formatting, an unused import — the reviewer's instruction is the whole specification. | Step 7 |
 | `substantive` | Behaviour, correctness, design, performance, or security — knowing whether the reviewer is right requires reading the code. | Step 6 |
 
-For a `follow-up`, recheck challenged assumptions against the code. Lack of new facts proves neither understanding nor correctness; investigate substantive concerns before replying. If disagreement becomes circular, state the unresolved tradeoff and ask for the decision needed.
+For a `follow-up`, recheck challenged assumptions against the code. Lack of new facts proves neither understanding nor correctness; investigate substantive concerns before replying.
 
 Done when every `issue` carries one class.
 
@@ -100,9 +100,9 @@ Done when each issue has an evidence-backed outcome or explicit blocker, and any
 
 ## 8. Reply
 
-**Read `references/conversation.md` fully before drafting replies.** Follow its situation guidance and terminal `agent:reply` contract. Claim a fix only after its commit is pushed; report only actual verification.
+*Use `review-conversation` skill for review comments, replies, conversation style, and hidden metadata.* Pass kind `reply`, ownership `agent`, stage `draft`, latest concern, and verified outcome; then stage `final` with the validated visible body. Claim a fix only after its commit is pushed; report only actual verification.
 
-Name the exact type, method, or file when needed to understand the answer. Cite the package, pinned version, and pin location when the answer rests on third-party behaviour. Keep the decisive reason visible; put supporting evidence in hidden prose.
+Name the exact type, method, or file when needed to understand the answer. Cite the package, pinned version, and pin location when the answer rests on third-party behaviour.
 
 Post one final marked answer per pending thread. Require no GraphQL `errors`, a returned comment ID, and exact complete-body read-back before treating it as confirmed. A failed or uncertain reply leaves the thread open; refetch before retrying to avoid duplicates. A reconciliation retry needs no new reply solely to resolve an existing answer.
 

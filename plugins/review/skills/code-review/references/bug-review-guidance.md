@@ -16,8 +16,8 @@ Report only when all hold: introduced by this diff; concrete triggering input/st
 
 Exclude speculation, unrelated pre-existing bugs, intentional changes without demonstrated defects, style and duplicate root causes. Keep unsupported candidates out of findings. When missing context prevents required coverage, return the shared failure object with unchecked scope; never return `[]` as a substitute for incomplete review. Do not claim checks ran unless executed. Use only authorized, safe checks; do not modify source or external state.
 
-## Comment format
+## Finding content
 
-Start with a concise imperative title, followed by one paragraph: trigger → incorrect behavior → impact → smallest correction. **MUST NOT** add severity/priority markers (such as `[P0]`, `[P1]`, `[P2]`, `[P3]`) or any classification label (`Bug:`, `Suggestion:`, `Nit:`) anywhere in the title or body. Cite exact symbols/code evidence; anchor the smallest relevant changed right-side line. One actionable defect per comment.
+Include the trigger, incorrect behavior, and impact in the shared conversation draft. Cite exact symbols/code evidence; anchor the smallest relevant changed right-side line. One actionable defect per comment.
 
 Return every qualifying net-new defect, ordered by impact; no five-finding limit. Return `[]` only after complete review with no qualifying net-new findings. Quality/design suggestions belong to other axes.
