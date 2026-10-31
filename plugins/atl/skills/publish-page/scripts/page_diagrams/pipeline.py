@@ -73,21 +73,13 @@ def convert_markdown_to_adf(processed_md: str) -> dict:
     return json.loads(result.stdout)
 
 
-def try_load_credentials(config_path: str) -> dict[str, str] | None:
-    """Non-fatal probe: `None` when the Atlassian config is missing/incomplete, never raises."""
-    try:
-        return load_credentials(config_path)
-    except SystemExit:
-        return None
-
-
 def _diagram_note_node(name: str) -> dict:
     return {
         "type": "paragraph",
         "content": [
             {
                 "type": "text",
-                "text": f"[Diagram '{name}' not rendered: apiToken is not configured in .atlassian.json.user]",
+                "text": f"[Diagram '{name}' upload pending]",
             }
         ],
     }
@@ -96,7 +88,7 @@ def _diagram_note_node(name: str) -> dict:
 def substitute_diagram_notes(
     adf: dict, diagrams: list[dict], local_media: list[dict] | None = None
 ) -> tuple[dict, int]:
-    """Replace every marker paragraph with a note naming the missing token prerequisite."""
+    """Replace every marker paragraph with a placeholder note until its upload lands."""
     names_by_index = {str(d["index"]): d["name"] for d in diagrams}
     if local_media:
         names_by_index.update({str(m["index"]): m["filename"] for m in local_media})
@@ -221,21 +213,7 @@ def _publish_text_only(
     page_id: str | None,
     space_id: str | None,
     title: str,
-    threshold_bytes: int,
 ) -> tuple[dict, dict]:
-    size_bytes = adf_body_size(base_adf)
-
-    if size_bytes <= threshold_bytes:
-        result = {
-            "method": "mcp",
-            "sizeBytes": size_bytes,
-            "pageId": page_id,
-            "spaceId": space_id,
-            "title": title,
-            "diagramsRendered": 0,
-        }
-        return result, base_adf
-
     confluence = get_confluence(credentials)
     if page_id:
         version = get_page_version(confluence, page_id)
@@ -249,57 +227,28 @@ def _publish_text_only(
         "method": "rest",
         "pageId": target_page_id,
         "title": title,
-        "sizeBytes": size_bytes,
+        "sizeBytes": adf_body_size(base_adf),
         "diagrams": 0,
         "attachments": 0,
     }
     return result, base_adf
 
 
-def _publish_without_credentials(
-    base_adf: dict,
-    diagrams: list[dict],
-    local_media: list[dict],
-    page_id: str | None,
-    space_id: str | None,
-    title: str,
-) -> tuple[dict, dict]:
-    result = {
-        "method": "mcp",
-        "pageId": page_id,
-        "spaceId": space_id,
-        "title": title,
-        "diagramsRendered": 0,
-    }
-    if diagrams or local_media:
-        final_adf, _ = substitute_diagram_notes(base_adf, diagrams, local_media)
-        result["missingPrerequisite"] = "apiToken"
-    else:
-        final_adf = base_adf
-    result["sizeBytes"] = adf_body_size(final_adf)
-    return result, final_adf
-
-
 _GUARD_ERRORS = (RequestException, ApiError, ValueError)
 
 
-def _plan_comment_guard(credentials: dict[str, str] | None, page_id: str | None, final_adf: dict) -> tuple[dict | None, dict]:
+def _plan_comment_guard(credentials: dict[str, str], page_id: str | None, final_adf: dict) -> tuple[dict | None, dict]:
     """Read which open inline comments this update will detach; never blocks the publish."""
     if not page_id:
         return None, {}
-    if not credentials:
-        return None, {"commentGuard": "skipped (no apiToken)"}
     try:
         return comment_guard.plan(get_confluence(credentials), page_id, final_adf), {}
     except _GUARD_ERRORS as exception:
         return None, {"commentGuard": f"failed ({type(exception).__name__})"}
 
 
-def _apply_comment_guard(
-    guard: dict, credentials: dict[str, str], page_id: str, method: str, assets_dir: str
-) -> dict:
-    """After the publish: REST already published, so post the notice now; an MCP handback
-    leaves the notice file for `notify-comments` to post once the agent has published."""
+def _apply_comment_guard(guard: dict, credentials: dict[str, str], page_id: str) -> dict:
+    """After the publish: post one notice listing the comments the update detached."""
     keys: dict = {}
     if guard["unknownIds"]:
         keys["unknownCommentIds"] = guard["unknownIds"]
@@ -307,12 +256,6 @@ def _apply_comment_guard(
         return keys
     keys["orphanedComments"] = [{k: c[k] for k in ("id", "markerRef", "selection")} for c in guard["orphaned"]]
     storage = comment_guard.notice_storage(guard["orphaned"], f"{site_url(credentials)}/wiki")
-    if method == "mcp":
-        notice_path = Path(assets_dir) / "comment-notice.html"
-        notice_path.parent.mkdir(parents=True, exist_ok=True)
-        notice_path.write_text(storage, encoding="utf-8")
-        keys["orphanNoticePath"] = str(notice_path)
-        return keys
     try:
         keys["orphanNoticeCommentId"] = comment_guard.post_notice(get_confluence(credentials), page_id, storage)
     except _GUARD_ERRORS as exception:
@@ -328,16 +271,12 @@ def publish(
     title: str | None,
     assets_dir: str,
     out_path: str,
-    threshold_bytes: int,
     mermaid_bg: str = "white",
 ) -> dict:
-    """Run extract -> md-to-adf -> create/attach -> substitute -> publish end to end.
-
-    Forces a REST publish whenever diagrams or local attachments are present and credentials
-    are configured — attachment upload already needs the REST client, so publishing over it
-    too is free regardless of `threshold_bytes`. Always writes the final ADF to `out_path`,
-    pretty-printed (`json.dump(..., indent=2)`) so it stays readable through
-    line-truncating file readers.
+    """Run extract -> md-to-adf -> create/attach -> substitute -> publish end to end, always
+    over REST. Credentials are mandatory; a missing key raises `SystemExit` naming it before
+    any page is touched. Always writes the final ADF to `out_path`, pretty-printed
+    (`json.dump(..., indent=2)`) so it stays readable through line-truncating file readers.
     """
     renderer = load_renderer(config_path)
     swimlane_drawio_enabled = load_swimlane_drawio_enabled(config_path)
@@ -359,10 +298,10 @@ def publish(
         # Resolved up front so a missing key fails before any page is created or updated.
         drawio_extension_key = load_drawio_extension_key(config_path) if renderer == renderers.DRAWIO else None
 
-    credentials = try_load_credentials(config_path)
+    credentials = load_credentials(config_path)
     guard, guard_keys = _plan_comment_guard(credentials, page_id, base_adf)
 
-    if credentials and (diagrams or local_media):
+    if diagrams or local_media:
         result, final_adf = _publish_with_diagrams(
             base_adf,
             diagrams,
@@ -377,14 +316,8 @@ def publish(
             drawio_extension_key,
             swimlane_drawio_enabled,
         )
-    elif credentials:
-        result, final_adf = _publish_text_only(
-            base_adf, credentials, page_id, space_id, resolved_title, threshold_bytes
-        )
     else:
-        result, final_adf = _publish_without_credentials(
-            base_adf, diagrams, local_media, page_id, space_id, resolved_title
-        )
+        result, final_adf = _publish_text_only(base_adf, credentials, page_id, space_id, resolved_title)
 
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(final_adf, f, indent=2)
@@ -393,5 +326,5 @@ def publish(
     result["adfPath"] = out_path
     result.update(guard_keys)
     if guard is not None:
-        result.update(_apply_comment_guard(guard, credentials, page_id, result["method"], assets_dir))
+        result.update(_apply_comment_guard(guard, credentials, page_id))
     return result

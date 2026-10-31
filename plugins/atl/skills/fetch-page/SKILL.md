@@ -1,42 +1,38 @@
 ---
 name: fetch-page
-description: Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. No Atlassian config required; body-referenced attachments (diagrams, images, files) cache to `.md.assets` when `apiToken` is configured — `--attachments` controls it; inline-comment anchors and a `## Comments` section keep comments through republish.
+description: >-
+  Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. Reads real ADF over REST and converts via map-markdown-adf; body-referenced attachments (diagrams, images, files) cache to `.md.assets`, `--attachments` controls it; inline-comment anchors and a `## Comments` section keep comments through republish. Needs `apiToken` in `.atlassian.json.user`.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
 # Fetch Page
 
-Return a Confluence **Page** as Markdown. MCP fetches the body; REST (token required) only for body-referenced attachments.
+Return a Confluence **Page** as Markdown. REST reads the real ADF body, attachments, and comments; *`map-markdown-adf` skill converts ADF back to Markdown, preserving source wording verbatim*. Not twg: its Markdown export drops `map-markdown-adf` constructs and comment anchors.
 
 ## Prerequisites
 
 - `atlassian-python-api` installed by `init-atl` skill; if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. This skill installs nothing.
-- Attachment caching and mermaid restore need `apiToken` in `.atlassian.json.user` (see `preflight-atlassian` skill). Without it: no downloads; placeholders become notes.
+- `cloudId`, `email`, `apiToken` in `.atlassian.json.user` (see `preflight-atlassian` skill). Missing → script exits non-zero naming them; report and stop.
 
 ## Workflow
 
-1. **Preflight.** *Run `preflight-atlassian` skill to resolve cloudId, default project key, default space id, and token availability from `.atlassian.json.user` config* **Action: Resolve**; keep `configPath`.
-2. **Parse `{{input}}`.** URL `<site>` wins as `cloudId`; else Preflight's.
-   - `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<site>`, `<page_id>`.
-   - `https://<site>/wiki/x/<tiny_id>` → `<site>`, `<page_id> := <tiny_id>`.
-   - Bare numeric or tiny ID → `<page_id>` as-is.
-3. **Fetch.** `getConfluencePage` with `cloudId`, `pageId: <page_id>`, `contentFormat: "adf"`. Guard truncation per Preflight; no matching MCP tool → REST fallback per Preflight. Result lands at `content.json` (title/body at `content.nodes[0].title` / `.body`; don't explore).
-4. **Assemble** from this skill's base directory:
+1. **Preflight.** *Run `preflight-atlassian` skill to resolve site, credentialed twg command, and token availability from `.atlassian.json.user` config* **Action: Resolve**; keep `configPath`, `site`, `twg`.
+2. **Parse `{{input}}`.** URL `<site>` differing from Preflight `site` → pass `--site https://<site>`.
+   - `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<page_id>`.
+   - Bare numeric ID → `<page_id>` as-is.
+   - Tiny link `https://<site>/wiki/x/<tiny_id>`, or bare tiny ID → URL `<site>/wiki/x/<tiny_id>`; resolve with `<twg> confluence content get <url> --detail summary -o json --output-file tiny.json` → `<page_id> := data.id`.
+3. **Fetch and assemble** from this skill's base directory:
    ```bash
-   python3 scripts/assemble_page.py --page-id <page_id> --config "<configPath>" --md-path page.md < content.json
+   python3 scripts/assemble_page.py --page-id <page_id> --config "<configPath>" --md-path page.md [--site https://<site>]
    ```
-   Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`, `--comments auto|skip`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
-5. **Return** `page.md` unchanged.
+   Fetches title + ADF over REST v2 (`body-format=atlas_doc_format`). Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`, `--comments auto|skip`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`. REST failure → `Page fetch failed: <category>`, no `page.md`.
+4. **Return** `page.md` unchanged.
 
-## Input shape
-
-- Feed `assemble_page.py` the saved `getConfluencePage` result as-is; never hand-build `content.json`.
-- REST fallback (`atlas_doc_format.value` is a JSON string): `json.loads` it first, then write `{"content":{"nodes":[{"title":<title>,"body":<parsed object>}]}}`. A string `body` → `ADF body must be a parsed JSON object` error, no `page.md`.
-- Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `page.md` or retry with edited ADF.
+Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `page.md` or retry with edited ADF.
 
 ## Attachments
 
-**Detection:** offline recursive scan of raw ADF; no match → no REST call regardless of token or mode. Matches:
+**Detection:** offline recursive scan of raw ADF; no match → no attachment call regardless of mode. Matches:
 - `media` with `attrs.type == "file"`;
 - `media` with `attrs.alt` ending `.png|.jpg|.jpeg|.gif|.svg|.webp|.bmp`;
 - `extension` with `attrs.extensionKey` containing `drawio`.
@@ -52,17 +48,16 @@ Links percent-encoded, relative to `page.md`'s dir. `publish-page` skill re-uplo
 
 ## `--attachments` modes
 
-- **`auto`** (default) — retrieve when credentials exist. No token → `set apiToken in .atlassian.json.user to restore it` note per placeholder, no assets dir. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` — **MUST NOT** include exception text (may hold signed URL/token).
-- **`skip`** — no credential lookup, no REST; note `attachment retrieval skipped (--attachments skip)`.
-- **`required`** — missing credentials, failure, or unresolvable placeholder → non-zero exit, `Attachment retrieval failed: <reason>` on stderr, no `page.md`.
+- **`auto`** (default) — retrieve. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` — **MUST NOT** include exception text (may hold signed URL/token).
+- **`skip`** — no attachment REST call; note `attachment retrieval skipped (--attachments skip)`.
+- **`required`** — failure or unresolvable placeholder → non-zero exit, `Attachment retrieval failed: <reason>` on stderr, no `page.md`.
 
 ## Comments
 
 - Body inline comments arrive as `<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->` spans (via `map-markdown-adf` skill); they keep comments attached when `publish-page` skill republishes.
-- **`--comments auto`** (default, needs `apiToken`): appends `## Comments` inside `<!-- adf:ignore:start/end -->` — each inline/footer thread with author, date, plain-text body, replies, Confluence link; inline threads say whether their id is anchored in the body.
-- No token → nothing, or a one-line note when the body has anchors. REST failure → note with safe category only, e.g. `comment retrieval failed (ConnectionError)`; `page.md` still written.
+- **`--comments auto`** (default): appends `## Comments` inside `<!-- adf:ignore:start/end -->` — each inline/footer thread with author, date, plain-text body, replies, Confluence link; inline threads say whether their id is anchored in the body.
+- REST failure → note with safe category only, e.g. `comment retrieval failed (ConnectionError)`; `page.md` still written.
 - **`--comments skip`** — no lookup.
-- MCP `getConfluencePage` ADF may omit annotation marks; if the page has inline comments but no anchors appear, refetch via REST fallback (`atlas_doc_format`).
 
 ## Degraded mode
 

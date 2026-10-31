@@ -5,7 +5,7 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-from page_diagrams import cli, comment_guard
+from page_diagrams import comment_guard
 from page_diagrams.pipeline import publish
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
@@ -100,7 +100,7 @@ def _write_md(tmp_path, body: str):
     return md
 
 
-def _publish(tmp_path, md, page_id: str | None = "1", threshold: int = 0) -> dict:
+def _publish(tmp_path, md, page_id: str | None = "1") -> dict:
     return publish(
         md_path=str(md),
         config_path=str(tmp_path / "cfg.json"),
@@ -109,7 +109,6 @@ def _publish(tmp_path, md, page_id: str | None = "1", threshold: int = 0) -> dic
         title=None,
         assets_dir=str(tmp_path / "assets"),
         out_path=str(tmp_path / "final.json"),
-        threshold_bytes=threshold,
     )
 
 
@@ -117,7 +116,7 @@ def _publish(tmp_path, md, page_id: str | None = "1", threshold: int = 0) -> dic
 def test_rest_update_posts_one_notice_after_publishing(tmp_path):
     confluence = _FakeConfluence(("kept", "dropped"), [_comment("10", "kept"), _comment("11", "dropped")])
     md = _write_md(tmp_path, '<!-- adf:comment id="kept" -->a<!-- /adf:comment --> b')
-    with patch("page_diagrams.pipeline.try_load_credentials", return_value=CREDS), patch(
+    with patch("page_diagrams.pipeline.load_credentials", return_value=CREDS), patch(
         "page_diagrams.pipeline.get_confluence", return_value=confluence
     ), patch("page_diagrams.pipeline.get_page_version", return_value=3), patch(
         "page_diagrams.pipeline.update_page_adf"
@@ -136,7 +135,7 @@ def test_rest_update_posts_one_notice_after_publishing(tmp_path):
 def test_update_keeping_every_anchor_posts_nothing(tmp_path):
     confluence = _FakeConfluence(("kept",), [_comment("10", "kept")])
     md = _write_md(tmp_path, 'edited <!-- adf:comment id="kept" -->a<!-- /adf:comment -->')
-    with patch("page_diagrams.pipeline.try_load_credentials", return_value=CREDS), patch(
+    with patch("page_diagrams.pipeline.load_credentials", return_value=CREDS), patch(
         "page_diagrams.pipeline.get_confluence", return_value=confluence
     ), patch("page_diagrams.pipeline.get_page_version", return_value=3), patch("page_diagrams.pipeline.update_page_adf"):
         result = _publish(tmp_path, md)
@@ -145,26 +144,11 @@ def test_update_keeping_every_anchor_posts_nothing(tmp_path):
 
 
 @pytest.mark.real_comment_guard
-def test_mcp_handback_writes_the_notice_for_notify_comments(tmp_path):
-    confluence = _FakeConfluence(("dropped",), [_comment("11", "dropped")])
-    md = _write_md(tmp_path, "plain")
-    with patch("page_diagrams.pipeline.try_load_credentials", return_value=CREDS), patch(
-        "page_diagrams.pipeline.get_confluence", return_value=confluence
-    ):
-        result = _publish(tmp_path, md, threshold=10**6)
-    assert result["method"] == "mcp"
-    assert confluence.posted == []
-    notice = tmp_path / "assets" / "comment-notice.html"
-    assert result["orphanNoticePath"] == str(notice)
-    assert "focusedCommentId=11" in notice.read_text()
-
-
-@pytest.mark.real_comment_guard
 def test_guard_read_failure_still_publishes(tmp_path):
     confluence = MagicMock()
     confluence.get.side_effect = RequestsConnectionError("https://x/?token=secret")
     md = _write_md(tmp_path, "plain")
-    with patch("page_diagrams.pipeline.try_load_credentials", return_value=CREDS), patch(
+    with patch("page_diagrams.pipeline.load_credentials", return_value=CREDS), patch(
         "page_diagrams.pipeline.get_confluence", return_value=confluence
     ), patch("page_diagrams.pipeline.get_page_version", return_value=3), patch("page_diagrams.pipeline.update_page_adf") as update:
         result = _publish(tmp_path, md)
@@ -172,20 +156,9 @@ def test_guard_read_failure_still_publishes(tmp_path):
     assert result["commentGuard"] == "failed (ConnectionError)"
 
 
-def test_guard_skips_without_token_and_on_create(tmp_path):
+def test_guard_skips_on_create(tmp_path):
     md = _write_md(tmp_path, "plain")
-    with patch("page_diagrams.pipeline.try_load_credentials", return_value=None):
-        assert _publish(tmp_path, md)["commentGuard"] == "skipped (no apiToken)"
+    with patch("page_diagrams.pipeline.load_credentials", return_value=CREDS), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=MagicMock()
+    ), patch("page_diagrams.pipeline.create_page_adf", return_value={"id": "5"}):
         assert "commentGuard" not in _publish(tmp_path, md, page_id=None)
-
-
-def test_notify_comments_posts_the_saved_notice(tmp_path, capsys):
-    notice = tmp_path / "comment-notice.html"
-    notice.write_text("<p>n</p>")
-    confluence = _FakeConfluence((), [])
-    with patch("page_diagrams.cli.load_credentials", return_value=CREDS), patch(
-        "page_diagrams.cli.get_confluence", return_value=confluence
-    ):
-        cli.main(["notify-comments", "--page-id", "1", "--config", "cfg", "--notice", str(notice)])
-    assert json.loads(capsys.readouterr().out) == {"orphanNoticeCommentId": "999"}
-    assert confluence.posted[0]["body"] == {"representation": "storage", "value": "<p>n</p>"}

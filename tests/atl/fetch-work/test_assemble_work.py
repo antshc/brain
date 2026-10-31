@@ -1,11 +1,7 @@
 import json
 from unittest.mock import MagicMock
 
-from assemble_work import assemble, convert_adf_to_markdown, extract_fields, format_header
-
-
-def _raw(key: str, fields: dict) -> dict:
-    return {"issues": {"nodes": [{"key": key, "fields": fields}]}}
+from assemble_work import assemble, convert_adf_to_markdown, format_header
 
 
 def _fields(**overrides) -> dict:
@@ -14,7 +10,7 @@ def _fields(**overrides) -> dict:
         "status": {"name": "New"},
         "issuetype": {"name": "Bug"},
         "assignee": {"displayName": "Anton Shcherbyna"},
-        "description": "plain description text",
+        "description": {"type": "doc", "version": 1, "content": []},
     }
     fields.update(overrides)
     return fields
@@ -31,11 +27,6 @@ def _image_body() -> dict:
             }
         ],
     }
-
-
-def test_extract_fields_reads_the_documented_json_path():
-    fields = _fields()
-    assert extract_fields(_raw("PROJ-5881", fields)) == fields
 
 
 def test_format_header_matches_the_documented_output_shape():
@@ -69,26 +60,18 @@ def test_convert_adf_to_markdown_shells_out_to_map_markdown_adf(monkeypatch):
     assert json.loads(captured["input"]) == body
 
 
-def test_assemble_uses_the_mcp_description_directly_and_notes_blob_images_without_credentials(
-    monkeypatch,
-):
-    monkeypatch.setattr("assemble_work.load_credentials", lambda config_path: None)
+def test_assemble_returns_the_header_alone_for_an_empty_description(monkeypatch):
+    convert = MagicMock()
+    monkeypatch.setattr("assemble_work.convert_adf_to_markdown", convert)
 
-    fields = _fields(
-        description="text\n\n![](blob:https://media.staging.atl-paas.net/?type=file&id=abc)"
-    )
-    result = assemble(_raw("PROJ-5881", fields), "PROJ-5881", "/repo", "/repo/work.md.tmp")
+    result = assemble("PROJ-5881", _fields(description=None), MagicMock(), "/repo/work.md.tmp")
 
-    assert result.startswith("# PROJ-5881 — ")
-    assert "apiToken" in result
-    assert "blob:" not in result
+    assert result.endswith("**Assignee:** Anton Shcherbyna\n\n")
+    convert.assert_not_called()
 
 
-def test_assemble_fetches_real_adf_and_resolves_attachments_when_token_available(monkeypatch, tmp_path):
+def test_assemble_converts_real_adf_and_resolves_attachments(monkeypatch, tmp_path):
     jira = MagicMock()
-    monkeypatch.setattr("assemble_work.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"})
-    monkeypatch.setattr("assemble_work.get_jira", lambda credentials: jira)
-    monkeypatch.setattr("assemble_work.fetch_description_adf", lambda jira_, key: _image_body())
     monkeypatch.setattr(
         "assemble_work.convert_adf_to_markdown",
         lambda body: '<!-- adf:attachment media-id="img-1" alt="shot.png" -->',
@@ -100,9 +83,8 @@ def test_assemble_fetches_real_adf_and_resolves_attachments_when_token_available
         lambda jira_, key, markdown, downloaded, assets_dir_name: "![shot.png](work.md.tmp/shot.png)",
     )
 
-    fields = _fields()
     assets_dir = tmp_path / "work.md.tmp"
-    result = assemble(_raw("PROJ-5881", fields), "PROJ-5881", "/repo", str(assets_dir))
+    result = assemble("PROJ-5881", _fields(description=_image_body()), jira, str(assets_dir))
 
     assert result == (
         "# PROJ-5881 — Case Number Input Mask - Swagger and GUI are not Aligned\n"
@@ -112,21 +94,13 @@ def test_assemble_fetches_real_adf_and_resolves_attachments_when_token_available
     save_attachments.assert_called_once_with(jira, "PROJ-5881", str(assets_dir))
 
 
-def test_assemble_skips_attachment_handling_when_token_available_but_no_reference_present(
-    monkeypatch, tmp_path
-):
-    monkeypatch.setattr("assemble_work.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"})
-    monkeypatch.setattr("assemble_work.get_jira", lambda credentials: MagicMock())
-    monkeypatch.setattr(
-        "assemble_work.fetch_description_adf",
-        lambda jira_, key: {"type": "doc", "version": 1, "content": []},
-    )
+def test_assemble_skips_attachment_handling_when_no_reference_present(monkeypatch, tmp_path):
     monkeypatch.setattr("assemble_work.convert_adf_to_markdown", lambda body: "Plain text body.\n")
     save_attachments = MagicMock()
     monkeypatch.setattr("assemble_work.save_attachments", save_attachments)
 
     assets_dir = tmp_path / "work.md.tmp"
-    result = assemble(_raw("PROJ-5881", _fields()), "PROJ-5881", "/repo", str(assets_dir))
+    result = assemble("PROJ-5881", _fields(), MagicMock(), str(assets_dir))
 
     assert result.endswith("Plain text body.\n")
     save_attachments.assert_not_called()

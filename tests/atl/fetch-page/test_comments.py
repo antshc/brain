@@ -85,26 +85,16 @@ def test_render_is_empty_without_comments():
     assert render_comments_section([], "body", "https://s") == ""
 
 
-def test_append_comments_skip_never_reads_credentials(monkeypatch):
-    monkeypatch.setattr(assemble_page, "load_credentials", lambda _: pytest.fail("credential lookup"))
-    assert assemble_page.append_comments("body\n", "1", "cfg", "skip") == "body\n"
+def test_append_comments_skip_makes_no_comment_calls():
+    confluence = _FakeConfluence({}, fail=True)
+    assert assemble_page.append_comments("body\n", "1", confluence, "https://s.example", "skip") == "body\n"
 
 
-def test_append_comments_without_token_notes_only_when_body_has_anchors(monkeypatch):
-    monkeypatch.setattr(assemble_page, "load_credentials", lambda _: None)
-    assert assemble_page.append_comments("body\n", "1", "cfg") == "body\n"
-    anchored = assemble_page.append_comments('<!-- adf:comment id="r" -->x<!-- /adf:comment -->\n', "1", "cfg")
-    assert "Comments not listed: set apiToken in .atlassian.json.user to list them." in anchored
-
-
-def test_append_comments_appends_section_or_failure_note(monkeypatch):
-    monkeypatch.setattr(assemble_page, "load_credentials", lambda _: {"site": "s.example", "email": "e", "token": "t"})
-    monkeypatch.setattr(assemble_page, "get_confluence", lambda _: _confluence())
-    listed = assemble_page.append_comments("# T\n\nbody\n", "1", "cfg")
+def test_append_comments_appends_section_or_failure_note():
+    listed = assemble_page.append_comments("# T\n\nbody\n", "1", _confluence(), "https://s.example")
     assert listed.startswith("# T\n\nbody\n\n<!-- adf:ignore:start -->\n## Comments")
     assert "https://s.example/wiki/spaces/S/pages/1/T" in listed
 
-    monkeypatch.setattr(assemble_page, "get_confluence", lambda _: _FakeConfluence({}, fail=True))
-    failed = assemble_page.append_comments("body\n", "1", "cfg")
+    failed = assemble_page.append_comments("body\n", "1", _FakeConfluence({}, fail=True), "https://s.example")
     assert "Comments not listed: comment retrieval failed (ConnectionError)." in failed
     assert "secret" not in failed

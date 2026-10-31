@@ -1,80 +1,98 @@
-"""CLI-level tests for `--md-path`/`--assets-dir` wiring, invoked as a real subprocess
-(mirroring `/map-markdown-adf`'s `run_cli` fixture pattern)."""
+"""CLI-level tests for `main()`: argument wiring, credential gate, and error framing. The REST
+client is stubbed; ADF->Markdown still runs `/map-markdown-adf`'s real CLI."""
 import json
-import subprocess
-import sys
-from pathlib import Path
+from unittest.mock import MagicMock
 
-_SCRIPT = (
-    Path(__file__).resolve().parents[3] / "plugins" / "atl" / "skills" / "fetch-page" / "scripts" / "assemble_page.py"
-)
+import pytest
+
+import assemble_page
+
+CREDENTIALS = {"site": "https://s.example", "email": "e", "token": "t"}
 
 
-def _run(args: list[str], stdin_text: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(_SCRIPT), *args],
-        input=stdin_text,
-        capture_output=True,
-        text=True,
+def _page(title: str, body: dict) -> dict:
+    return {"title": title, "body": {"atlas_doc_format": {"value": json.dumps(body)}}}
+
+
+@pytest.fixture
+def confluence(monkeypatch):
+    client = MagicMock()
+    client.get.return_value = _page("Simple Page", {"type": "doc", "version": 1, "content": []})
+    monkeypatch.setattr(assemble_page, "load_credentials", lambda config_path: CREDENTIALS)
+    monkeypatch.setattr(assemble_page, "get_confluence", lambda credentials: client)
+    return client
+
+
+def _main(tmp_path, *extra: str) -> None:
+    assemble_page.main(
+        ["--page-id", "123", "--config", str(tmp_path / "cfg"), "--md-path", str(tmp_path / "page.md"), "--comments", "skip", *extra]
     )
 
 
-def _raw(title: str, body: dict) -> str:
-    return json.dumps({"content": {"nodes": [{"title": title, "body": body}]}})
+def test_main_writes_markdown_to_md_path_with_default_assets_dir(confluence, tmp_path):
+    _main(tmp_path)
 
-
-def _config(tmp_path) -> str:
-    return str(tmp_path / ".atlassian.json.user")
-
-
-def test_main_writes_markdown_to_md_path_with_default_assets_dir(tmp_path):
-    md_path = tmp_path / "page.md"
-    raw = _raw("Simple Page", {"type": "doc", "version": 1, "content": []})
-
-    result = _run(["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path)], raw)
-
-    assert result.returncode == 0, result.stderr
-    assert md_path.read_text() == "# Simple Page\n\n\n"
-    # a page with no attachment reference never creates the default assets folder
+    assert (tmp_path / "page.md").read_text() == "# Simple Page\n\n\n"
     assert not (tmp_path / "page.md.assets").exists()
+    confluence.get.assert_called_once_with("/api/v2/pages/123", params={"body-format": "atlas_doc_format"})
 
 
-def test_main_accepts_an_explicit_assets_dir_override(tmp_path):
-    md_path = tmp_path / "page.md"
+def test_main_accepts_an_explicit_assets_dir_override(confluence, tmp_path):
     assets_dir = tmp_path / "custom-assets"
-    raw = _raw("Simple Page", {"type": "doc", "version": 1, "content": []})
 
-    result = _run(
-        [
-            "--page-id",
-            "123",
-            "--config",
-            _config(tmp_path),
-            "--md-path",
-            str(md_path),
-            "--assets-dir",
-            str(assets_dir),
-        ],
-        raw,
-    )
+    _main(tmp_path, "--assets-dir", str(assets_dir))
 
-    assert result.returncode == 0, result.stderr
-    assert md_path.read_text() == "# Simple Page\n\n\n"
+    assert (tmp_path / "page.md").read_text() == "# Simple Page\n\n\n"
     assert not assets_dir.exists()
 
 
-def test_main_reports_a_sanitized_conversion_failure_without_a_traceback_and_writes_nothing(tmp_path):
-    md_path = tmp_path / "page.md"
-    body = {"type": "doc", "version": 1, "content": [{"type": "totallyUnknownNode"}]}
-    raw = _raw("Broken Page", body)
+def test_main_site_overrides_the_configured_site(monkeypatch, tmp_path):
+    seen = {}
+    client = MagicMock()
+    client.get.return_value = _page("Simple Page", {"type": "doc", "version": 1, "content": []})
+    monkeypatch.setattr(assemble_page, "load_credentials", lambda config_path: CREDENTIALS)
+    monkeypatch.setattr(assemble_page, "get_confluence", lambda credentials: seen.setdefault("c", credentials) and client)
 
-    result = _run(["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path)], raw)
+    _main(tmp_path, "--site", "https://other.example")
 
-    assert result.returncode != 0
-    assert "ADF conversion failed:" in result.stderr
-    assert "totallyUnknownNode" in result.stderr
-    assert "Traceback" not in result.stderr
-    assert not md_path.exists()
+    assert seen["c"]["site"] == "https://other.example"
+
+
+def test_main_fails_naming_credentials_when_config_is_incomplete(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(assemble_page, "load_credentials", lambda config_path: None)
+
+    with pytest.raises(SystemExit):
+        _main(tmp_path)
+
+    assert "apiToken" in capsys.readouterr().err
+    assert not (tmp_path / "page.md").exists()
+
+
+def test_main_reports_a_safe_fetch_failure_and_writes_nothing(confluence, tmp_path, capsys):
+    from requests.exceptions import ConnectionError as RequestsConnectionError
+
+    confluence.get.side_effect = RequestsConnectionError("https://secret.example/?token=abc")
+
+    with pytest.raises(SystemExit):
+        _main(tmp_path)
+
+    err = capsys.readouterr().err
+    assert "Page fetch failed: ConnectionError" in err
+    assert "secret" not in err
+    assert not (tmp_path / "page.md").exists()
+
+
+def test_main_reports_a_sanitized_conversion_failure_without_a_traceback_and_writes_nothing(confluence, tmp_path, capsys):
+    confluence.get.return_value = _page("Broken Page", {"type": "doc", "version": 1, "content": [{"type": "totallyUnknownNode"}]})
+
+    with pytest.raises(SystemExit):
+        _main(tmp_path)
+
+    err = capsys.readouterr().err
+    assert "ADF conversion failed:" in err
+    assert "totallyUnknownNode" in err
+    assert "Traceback" not in err
+    assert not (tmp_path / "page.md").exists()
 
 
 def _attachment_reference_body() -> dict:
@@ -85,53 +103,29 @@ def _attachment_reference_body() -> dict:
     }
 
 
-def test_main_attachments_skip_makes_no_credential_or_rest_calls(tmp_path):
-    md_path = tmp_path / "page.md"
-    raw = _raw("Diagram Page", _attachment_reference_body())
+def test_main_attachments_skip_makes_no_attachment_calls(confluence, tmp_path):
+    confluence.get.return_value = _page("Diagram Page", _attachment_reference_body())
 
-    result = _run(
-        ["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path), "--attachments", "skip"],
-        raw,
-    )
+    _main(tmp_path, "--attachments", "skip")
 
-    assert result.returncode == 0, result.stderr
-    assert "skipped" in md_path.read_text()
+    assert "skipped" in (tmp_path / "page.md").read_text()
     assert not (tmp_path / "page.md.assets").exists()
+    confluence.get_attachments_from_content.assert_not_called()
 
 
-def test_main_attachments_required_fails_without_writing_when_credentials_are_missing(tmp_path):
-    md_path = tmp_path / "page.md"
-    raw = _raw("Diagram Page", _attachment_reference_body())
+def test_main_attachments_required_fails_without_writing_when_retrieval_fails(confluence, tmp_path, capsys):
+    from requests.exceptions import SSLError
 
-    result = _run(
-        [
-            "--page-id",
-            "123",
-            "--config",
-            _config(tmp_path),
-            "--md-path",
-            str(md_path),
-            "--attachments",
-            "required",
-        ],
-        raw,
-    )
+    confluence.get.return_value = _page("Diagram Page", _attachment_reference_body())
+    confluence.get_attachments_from_content.side_effect = SSLError("boom")
 
-    assert result.returncode != 0
-    assert "Attachment retrieval failed:" in result.stderr
-    assert "Traceback" not in result.stderr
-    assert not md_path.exists()
-    assert not (tmp_path / "page.md.assets").exists()
+    with pytest.raises(SystemExit):
+        _main(tmp_path, "--attachments", "required")
 
-
-def test_main_attachments_auto_default_degrades_with_a_missing_credential_note(tmp_path):
-    md_path = tmp_path / "page.md"
-    raw = _raw("Diagram Page", _attachment_reference_body())
-
-    result = _run(["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path)], raw)
-
-    assert result.returncode == 0, result.stderr
-    assert "apiToken" in md_path.read_text()
+    err = capsys.readouterr().err
+    assert "Attachment retrieval failed:" in err
+    assert "Traceback" not in err
+    assert not (tmp_path / "page.md").exists()
     assert not (tmp_path / "page.md.assets").exists()
 
 
@@ -203,20 +197,16 @@ def _synthetic_fixture_body() -> dict:
     }
 
 
-def test_main_converts_the_synthetic_cross_skill_fixture_with_no_preprocessing(tmp_path):
-    """Runs the real CLI end to end on a fixture shaped like the page that originally failed —
+
+def test_main_converts_the_synthetic_cross_skill_fixture_with_no_preprocessing(confluence, tmp_path):
+    """Runs `main` end to end on a fixture shaped like the page that originally failed —
     no `jq` or other ADF preprocessing needed.
     """
-    md_path = tmp_path / "page.md"
-    raw = _raw("PROJ Monitoring GUI Alerts + Tasks", _synthetic_fixture_body())
+    confluence.get.return_value = _page("PROJ Monitoring GUI Alerts + Tasks", _synthetic_fixture_body())
 
-    result = _run(
-        ["--page-id", "123", "--config", _config(tmp_path), "--md-path", str(md_path), "--attachments", "skip"],
-        raw,
-    )
+    _main(tmp_path, "--attachments", "skip")
 
-    assert result.returncode == 0, result.stderr
-    markdown = md_path.read_text()
+    markdown = (tmp_path / "page.md").read_text()
     assert "<!-- adf:toc -->" in markdown
     assert "[https://example.atlassian.net/wiki/x/AbCdE](https://example.atlassian.net/wiki/x/AbCdE)" in markdown
     assert "- task one" in markdown

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from conftest import CLOUD_ID, issue, page
+from conftest import issue, page
 
 from brief_daily.payload import cutoff_from, nodes, parse_timestamp, to_date, truncated
 
@@ -30,36 +30,18 @@ def test_cutoff_counts_back_from_the_injected_now():
     assert cutoff_from(30, now=now) == datetime(2026, 8, 20, tzinfo=timezone.utc)
 
 
-def test_reads_the_flat_issues_list_the_live_mcp_returns():
-    flat_page = {"issues": [issue("PROJ-1", comments=[])], "isLast": True}
-    assert [node["key"] for node in nodes([flat_page], cloud_id=CLOUD_ID)] == ["PROJ-1"]
+def test_reads_the_issues_under_data():
+    assert [node["key"] for node in nodes([page([issue("PROJ-1", comments=[])])])] == ["PROJ-1"]
 
 
-def test_reads_a_legacy_nested_nodes_envelope():
-    nested_page = {"issues": {"nodes": [issue("PROJ-1", comments=[])]}}
-    assert [node["key"] for node in nodes([nested_page], cloud_id=CLOUD_ID)] == ["PROJ-1"]
+def test_merges_issues_across_pages():
+    pages = [page([issue("PROJ-1", comments=[])]), page([issue("PROJ-2", comments=[])])]
+    assert [node["key"] for node in nodes(pages)] == ["PROJ-1", "PROJ-2"]
 
 
-def test_synthesizes_web_url_from_cloud_id_and_key():
-    flat_page = {"issues": [issue("PROJ-1", comments=[])], "isLast": True}
-    assert nodes([flat_page], cloud_id=CLOUD_ID)[0]["webUrl"] == f"{CLOUD_ID}/browse/PROJ-1"
-
-
-def test_keeps_an_existing_web_url_instead_of_overwriting_it():
-    with_url = issue("PROJ-1", comments=[])
-    with_url["webUrl"] = "https://other.atlassian.net/browse/PROJ-1"
-    flat_page = {"issues": [with_url], "isLast": True}
-    assert nodes([flat_page], cloud_id=CLOUD_ID)[0]["webUrl"] == "https://other.atlassian.net/browse/PROJ-1"
-
-
-def test_truncated_reads_isLast_on_the_flat_shape():
+def test_truncated_reads_page_info_on_the_last_page():
     assert truncated([page([issue("PROJ-1", comments=[])], has_next=True)]) is True
     assert truncated([page([issue("PROJ-1", comments=[])], has_next=False)]) is False
-
-
-def test_truncated_reads_pageInfo_on_the_legacy_nested_shape():
-    nested_page = {"issues": {"nodes": [], "pageInfo": {"hasNextPage": True}}}
-    assert truncated([nested_page]) is True
 
 
 def test_truncated_is_false_for_no_pages():

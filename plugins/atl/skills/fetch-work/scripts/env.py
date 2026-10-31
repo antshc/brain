@@ -3,8 +3,7 @@ The config path comes from `/preflight-atlassian`'s Locate command (`configPath`
 rebuilt or searched for here.
 
 A Jira-flavored copy of `/fetch-page`'s own `env.py` — never imported across skill folders
-(Concept 0009). A missing credential here is `/fetch-work`'s degraded mode, not a hard failure,
-so `load_credentials` returns `None` instead of raising.
+(Concept 0009). `load_credentials` returns `None` on a missing credential so the CLI can name it.
 """
 from __future__ import annotations
 

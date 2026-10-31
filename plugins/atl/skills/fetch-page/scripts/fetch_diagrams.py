@@ -1,6 +1,5 @@
 """Cache a fetched page's attachments to disk and resolve its diagram/attachment placeholders
-(I/O: Confluence REST via `atlassian-python-api` — the one thing the Atlassian MCP does not
-expose for attachment content).
+(I/O: Confluence REST via `atlassian-python-api`).
 
 `/map-markdown-adf`'s `adf-to-md` turns every Draw.io macro into a `<!-- adf:diagram
 drawio="<name>" -->` placeholder, and every `media`/`mediaSingle`/`mediaGroup` node into a
@@ -41,7 +40,6 @@ _ATTACHMENT_PLACEHOLDER_RE = re.compile(
 )
 _ANY_PLACEHOLDER_RE = re.compile(r"<!-- adf:(diagram|attachment) ")
 
-NO_TOKEN_NOTE = "<!-- adf:diagram source unavailable: set apiToken in .atlassian.json.user to restore it -->"
 SKIPPED_NOTE = "<!-- adf:diagram source unavailable: attachment retrieval skipped (--attachments skip) -->"
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
@@ -242,11 +240,6 @@ def restore_diagrams(markdown: str, snapshot: AttachmentSnapshot, assets_dir_nam
     markdown = _DRAWIO_PLACEHOLDER_RE.sub(_replace_drawio, markdown)
     markdown = _ATTACHMENT_PLACEHOLDER_RE.sub(_replace_attachment, markdown)
     return markdown
-
-
-def restore_diagrams_without_credentials(markdown: str) -> str:
-    """Degraded mode: no token configured, so every placeholder gets a note instead of a fence."""
-    return _replace_all_placeholders(markdown, NO_TOKEN_NOTE)
 
 
 def restore_diagrams_skipped(markdown: str) -> str:

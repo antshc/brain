@@ -1,5 +1,4 @@
-"""Attachment upload + fileId read-back (I/O: Confluence REST client, via `atlassian-python-api`
-— the one thing the Atlassian MCP does not expose).
+"""Attachment upload + fileId read-back (I/O: Confluence REST client, via `atlassian-python-api`).
 
 Only touches `confluence`; tested by passing a stub with `attach_file`/`get`.
 """

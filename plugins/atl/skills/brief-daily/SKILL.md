@@ -1,37 +1,45 @@
 ---
 name: brief-daily
-description: Report the current Jira user's blocked work items and open items where they're @mentioned in a comment, over a period defaulting to the last month. Use when asked for a daily briefing, standup update, or to show blocked or mentioned Jira items. Works against any connected Jira site — no project key or site configuration required.
+description: >-
+  Report the current Jira user's blocked work items and open items where they're @mentioned in a comment, over a period defaulting to the last month. Use when asked for a daily briefing, standup update, or to show blocked or mentioned Jira items. Queries Jira through the twg CLI; no project key required.
 argument-hint: '[period] (e.g. "2 weeks", "3 months"; default: 1 month)'
 ---
 
 # Brief Daily
 
-Two read-only Jira reports: work items blocked and assigned to the current user, and open items where the current user is `@mentioned` in a comment. Output is chat markdown only — never writes to a file, never calls a Jira write tool.
+Two read-only Jira reports: work items blocked and assigned to the current user, and open items where the current user is `@mentioned` in a comment. Output is chat markdown only — never writes a report file, never runs a twg write command.
 
-Budget: **two searches and two script runs**. Query B projects `comment`, so every comment body arrives with its issue — a per-issue `getJiraIssue` follow-up is the N+1 this skill exists to avoid. Both searches go out in one turn, then both scripts run in one turn.
+Budget: **two searches and two script runs**. Query B requests `comment`, so every comment body arrives with its issue — a per-issue follow-up read is the N+1 this skill exists to avoid. Both searches go out in one shell call, then both scripts run in one shell call.
 
 ## Workflow
 
-**1 — Preflight.** *Run `preflight-atlassian` skill to resolve cloudId, default project key, default space id, and token availability from `.atlassian.json.user` config* **Action: Resolve**. It returns `cloudId`, `accountId` and `displayName` — this skill resolves none of them itself.
+**1 — Preflight.** *Run `preflight-atlassian` skill to resolve site, credentialed twg command, and identity from `.atlassian.json.user` config* **Action: Resolve**. It returns `twg` and `accountId` — this skill resolves neither itself. Searches follow *`twg` skill for Jira workitems and JQL* through Preflight's `twg`.
 
 **2 — Resolve period.** Parse `{{input}}`: empty → default `1 month`. Convert it into a JQL relative-date modifier in **days only** — never the `M` (month) unit (see Gotchas) — using 1 month ≈ 30 days: `1 month` → `-30d`, `"2 weeks"` → `-14d`, `"3 months"` → `-90d`. Keep the day count: it is Step 5's `--cutoff-days`.
 
-**3 — Query A: blocked items assigned to me.** `searchJiraIssuesUsingJql` with `cloudId`, `jql: 'assignee = currentUser() AND (status = "Blocked" OR flagged = Impediment) AND updated >= <cutoffJql> ORDER BY updated DESC'`, `maxResults: 25`. Paginate per Pagination. Renders as section 1 of the output template.
+**3 — Query A: blocked items assigned to me.**
+```bash
+<twg> jira workitem query --jql 'assignee = currentUser() AND (status = "Blocked" OR flagged = Impediment) AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,issuetype,priority,updated --limit 25 -o json --output-file queryA-1.json
+```
+Renders as section 1 of the output template.
 - **Fallback:** some Jira instances have no `"Blocked"` status literal and the clause errors — retry with `jql: 'flagged = Impediment AND updated >= <cutoffJql> ORDER BY updated DESC'`, record the dropped clause under Excluded, and never fail the whole report over it.
-- No matching MCP tool for `searchJiraIssuesUsingJql` → REST fallback per Preflight (`GET /rest/api/3/search/jql`).
 
-**4 — Query B: mentions.** `searchJiraIssuesUsingJql` with `cloudId`, `fields: ["summary","status","comment"]`, `jql: 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC'`, `maxResults: 25`. Search by Preflight's `accountId`, never display name — a display-name search both false-positives on comments the user authored and misses real `@mentions`. Issue this in the same turn as Step 3.
+**4 — Query B: mentions.**
+```bash
+<twg> jira workitem query --jql 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,comment --limit 25 -o json --output-file queryB-1.json
+```
+Search by Preflight's `accountId`, never display name — a display-name search both false-positives on comments the user authored and misses real `@mentions`. Issue this in the same shell call as Step 3, separated by `;`.
 
-**Pagination** (Steps 3 and 4): `maxResults` caps each call, not the result set. Page via `nextPageToken: d["nextPageToken"]` until `d["isLast"]` is `true` or 5 pages. Keep every page's `content.json` path — the scripts merge them, so pass one `--content` per page rather than merging by hand. Both scripts report `"truncated": true` when the last page still had more.
+**Pagination** (Steps 3 and 4): `--limit` caps each call, not the result set. Page with `--after <pageInfo.nextCursor>` into `query<A|B>-<n>.json` until `pageInfo.hasNextPage` is `false` or 5 pages. Pass one `--content` per page rather than merging by hand. Both scripts report `"truncated": true` when the last page still had more.
 
-**5 — Extract.** Both searches spill to `content.json` (see Gotchas). `cd` to this skill's `scripts/` directory and run both in one turn:
+**5 — Extract.** `cd` to this skill's `scripts/` directory and run both in one shell call:
 
 ```bash
-python3 blocked.py --content <queryA.json> --cloud-id <cloudId>
-python3 mentions.py --content <queryB.json> --cloud-id <cloudId> --account-id <accountId> --display-name "<displayName>" --cutoff-days <N>
+python3 blocked.py --content <queryA-1.json> [--content <queryA-2.json> ...]
+python3 mentions.py --content <queryB-1.json> [--content ...] --account-id <accountId> --cutoff-days <N>
 ```
 
-`blocked.py` prints `{"rows": [...], "truncated": bool}` for section 1. `mentions.py` prints the buckets below, each row carrying `key`, `url`, `summary`, `status`, `mentionedBy`, `mentionedOn` — plus `answeredOn` and `answeredBy` where they apply. It keeps only comments mentioning `displayName` and `created` on or after the cutoff — JQL has no comment-date operator, so that filter runs after fetch, never in the JQL — then takes each issue's **latest** surviving mention and buckets it by what follows:
+`blocked.py` prints `{"rows": [...], "truncated": bool}` for section 1. `mentions.py` prints the buckets below, each row carrying `key`, `url`, `summary`, `status`, `mentionedBy`, `mentionedOn` — plus `answeredOn` and `answeredBy` where they apply. It keeps only comments whose ADF holds a `mention` node for `accountId` and `created` on or after the cutoff — JQL has no comment-date operator, so that filter runs after fetch, never in the JQL — then takes each issue's **latest** surviving mention and buckets it by what follows:
 
 | JSON key | Rule | Renders as |
 |---|---|---|
@@ -84,17 +92,13 @@ No reply from you is visible via the API for these. Comment reactions are invisi
 
 **The scripts resolve `brief_daily/` relative to the current directory** — run them from anywhere else and the import fails. `cd` to the directory holding this `SKILL.md`, then `cd scripts`, and call them by bare filename.
 
-**Every search and most issue reads spill to a `content.json` path instead of returning inline** — `read_file` truncates a long line at roughly 2000 characters and loses the rest silently. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `preflight-atlassian` skill **Standing MCP usage rules**.
+**Always pass `-o json --output-file <path>` to twg** — run by an agent, twg otherwise prints a YAML envelope pointing at spill files, not the payload, and `read_file` truncates long lines at roughly 2000 characters. Pass the path to `blocked.py`/`mentions.py` rather than reading it, per `preflight-atlassian` skill **Standing usage rules**.
 
-**`issues` is a flat list, not a nested `nodes` envelope** — verified against this MCP: `d["issues"]` is the issue list directly (`d["issues"][0]["fields"]["comment"]["comments"]` is the comment thread), and `d["isLast"]` — not `d["issues"]["pageInfo"]["hasNextPage"]` — signals whether more pages remain. Treating `issues` as `{"nodes": [...], "pageInfo": {...}}` raises `TypeError: list indices must be integers or slices, not str` on the first row. `payload.py`'s `nodes()`/`truncated()` detect both shapes, so the scripts themselves never need this distinction.
+**twg flattens Jira fields onto each issue** — `data.issues[i].summary`, `.status`, `.comment.comments`, plus a ready browse `url`; there is no `fields` wrapper. Pagination is `pageInfo.hasNextPage`/`nextCursor` at the top level.
 
-**No issue carries a `webUrl`** — the flat response gives you `key` and `fields` only; `blocked.py`/`mentions.py` still read `node["webUrl"]`, so `payload.py` synthesizes it as `<cloudId>/browse/<key>` from the `--cloud-id` you pass on the command line. Both scripts now require `--cloud-id`.
+**A mention is an ADF `mention` node whose `attrs.id` is the mentioned `accountId`** — comment bodies arrive as ADF, so `mentions.py` matches the mention and reply authorship on `accountId` alone; a display name in plain text never counts.
 
-**A mention's `data-id` is a positional placeholder, not an `accountId`** — a mention renders as `<custom data-type="mention" data-id="id-0">@Display Name</custom>`, where `id-0`, `id-1`, `id-2` restart per comment and map back to nothing. The comment carries `author.accountId` (a real id) but no legend for the mentioned party, so **matching the mention on `accountId` finds nothing and drops every candidate, producing a falsely empty report**. `mentions.py` matches the mention on `displayName` and reply authorship on `author.accountId`, which is why it needs both.
-
-**`responseContentFormat: "adf"` changes nothing on this search** — verified against this MCP: the `adf` and default responses were byte-identical across all 38 comment bodies, both returning the `<custom …>` string form rather than an ADF document tree. Asking for it buys no `attrs.id` to match on.
-
-**Searching `comment ~ "<display name>"` false-positives on the user's own authored comments and misses real `@mentions`** — Jira indexes `@mentions` by `accountId`; the JQL always searches by Preflight's `accountId`, even though the body match uses the display name.
+**Searching `comment ~ "<display name>"` false-positives on the user's own authored comments and misses real `@mentions`** — Jira indexes `@mentions` by `accountId`; the JQL always searches by Preflight's `accountId`.
 
 **JQL has no operator for "unanswered since mention"** — JQL narrows candidates; `mentions.py`'s per-comment timestamp and author check decides the bucket.
 
@@ -102,12 +106,12 @@ No reply from you is visible via the API for these. Comment reactions are invisi
 
 **Comment emoji reactions are invisible via the `comment` field** — a mention can be acknowledged with a reaction and no reply ever appears, so a row in section 2 is "no reply visible", not "ignored". Section 2 says so and the report moves on.
 
-**An issue's comment thread can come back shorter than its own `total`** — the `comment` envelope carries `total`, `startAt` and `maxResults`, and a mention sitting in an unreturned slice would read as absent. `mentions.py` reports those keys under `partialComments`.
+**An issue's comment thread can come back shorter than its own `total`** — twg returns the newest 20 comments; the `comment` envelope carries `total`, `startAt` and `maxResults`, and a mention sitting in an unreturned slice would read as absent. `mentions.py` reports those keys under `partialComments`.
 
 **Not every Jira workflow defines a `"Blocked"` status literal** — the clause can error outright rather than return zero rows; Step 3's fallback retries with `flagged = Impediment` alone.
 
-**The JQL relative-date modifier's `M` (month) unit silently returns zero matches instead of erroring** — confirmed against this MCP: `updated >= -1M` returns no rows for an issue updated days ago, while `updated >= -30d` returns it. Step 2 converts every period to `-Nd` for this reason.
+**The JQL relative-date modifier's `M` (month) unit silently returns zero matches instead of erroring** — confirmed live: `updated >= -1M` returns no rows for an issue updated days ago, while `updated >= -30d` returns it. Step 2 converts every period to `-Nd` for this reason.
 
 ## Degraded mode
 
-No **Atlassian config** → Preflight's `cloudId` is empty and its Step 2 resolves it (asking when ambiguous). All other steps unchanged.
+No **Atlassian config** → Preflight asks for `site`; twg needs `email`/`apiToken` (or its own saved login). `<twg>` exit `127` → report missing "twg CLI". All other steps unchanged.

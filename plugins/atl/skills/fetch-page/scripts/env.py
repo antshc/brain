@@ -3,9 +3,9 @@ The config path comes from `/preflight-atlassian`'s Locate command (`configPath`
 rebuilt or searched for here.
 
 This is a fetch-side copy of `/publish-page`'s `page_diagrams/env.py`, trimmed to what a
-read-only attachment download needs — never imported across skill folders (Concept 0009). It
-differs from that copy in one deliberate way: a missing credential here is `/fetch-page`'s
-degraded mode, not a hard failure, so `load_credentials` returns `None` instead of raising.
+read-only page and attachment download needs — never imported across skill folders (Concept 0009).
+It differs from that copy in one deliberate way: `load_credentials` returns `None` on a missing
+credential so the CLI can name it instead of raising.
 """
 from __future__ import annotations
 

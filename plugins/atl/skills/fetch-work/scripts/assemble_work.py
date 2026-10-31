@@ -1,14 +1,11 @@
-"""Assemble a fetched Jira issue's header + Markdown body in one pass (I/O: shells out to
-`/map-markdown-adf`'s CLI for ADF->Markdown, then reuses this skill's own `fetch_attachments`
-module for attachment caching and placeholder resolution) — replaces the old fetch-then-convert
-turn chain with a single call.
+"""Fetch a Jira issue over REST and assemble its header + Markdown body in one pass (I/O: Jira
+REST via `atlassian-python-api`, shells out to `/map-markdown-adf`'s CLI for ADF->Markdown, then
+reuses this skill's own `fetch_attachments` module for attachment caching and placeholder
+resolution).
 
-Reads the raw `getJiraIssue` tool result from stdin; the issue's fields live at
-`issues.nodes[0].fields` (a stable shape confirmed live against PROJ-5881). That MCP result never
-carries real ADF for `description` (verified live — see `fetch_attachments.fetch_description_adf`'s
-docstring), only an already-flattened Markdown-ish string with empty `alt` text on every embedded
-image, so it is used as-is only in the no-token branch; the token branch instead fetches the real
-ADF directly over REST and converts that.
+REST v3 returns the real ADF `description`, so every `map-markdown-adf` construct survives the
+round trip. Credentials (`cloudId`/`email`/`apiToken`) are mandatory; `--site` overrides the
+configured site for an issue URL on another site.
 """
 from __future__ import annotations
 
@@ -24,19 +21,14 @@ if str(_SCRIPT_DIR) not in sys.path:
 
 from env import get_jira, load_credentials  # noqa: E402
 from fetch_attachments import (  # noqa: E402
-    fetch_description_adf,
+    fetch_issue,
     has_attachment_placeholder,
     has_attachment_reference,
-    replace_blob_image_refs_without_credentials,
     restore_attachments,
     save_attachments,
 )
 
 _MAP_MARKDOWN_ADF = _SCRIPT_DIR.parents[1] / "map-markdown-adf" / "scripts" / "map_markdown_adf.py"
-
-
-def extract_fields(raw: dict) -> dict:
-    return raw["issues"]["nodes"][0]["fields"]
 
 
 def convert_adf_to_markdown(body: dict) -> str:
@@ -61,19 +53,13 @@ def format_header(issue_key: str, fields: dict) -> str:
     )
 
 
-def assemble(raw: dict, issue_key: str, config_path: str, assets_dir: str) -> str:
-    fields = extract_fields(raw)
+def assemble(issue_key: str, fields: dict, jira, assets_dir: str) -> str:
     header = format_header(issue_key, fields)
+    adf_body = fields.get("description")
+    if not adf_body:
+        return header
 
-    credentials = load_credentials(config_path)
-    if credentials is None:
-        body = replace_blob_image_refs_without_credentials(fields.get("description") or "")
-        return header + body
-
-    jira = get_jira(credentials)
-    adf_body = fetch_description_adf(jira, issue_key)
     markdown = convert_adf_to_markdown(adf_body)
-
     if has_attachment_reference(adf_body):
         downloaded = save_attachments(jira, issue_key, assets_dir)
         if has_attachment_placeholder(markdown):
@@ -85,23 +71,34 @@ def assemble(raw: dict, issue_key: str, config_path: str, assets_dir: str) -> st
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Assemble a fetched Jira issue's header + Markdown body in one pass."
+        description="Fetch a Jira issue over REST and assemble its header + Markdown body in one pass."
     )
-    parser.add_argument("--issue-key", required=True, help="Jira issue key the issue was fetched from")
+    parser.add_argument("--issue-key", required=True, help="Jira issue key to fetch")
     parser.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
         "--assets-dir",
         help="Directory to cache this issue's attachments into (default: `<md-path>.tmp`)",
     )
+    parser.add_argument("--site", help="Site URL overriding the configured `cloudId` (issue URL on another site)")
     args = parser.parse_args()
+
+    credentials = load_credentials(args.config)
+    if credentials is None:
+        print(
+            "error: .atlassian.json.user needs cloudId, email, and apiToken to fetch a work item",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+    if args.site:
+        credentials = {**credentials, "site": args.site}
 
     md_path = Path(args.md_path)
     assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.name}.tmp")
 
-    raw = json.loads(sys.stdin.read())
-    markdown = assemble(raw, args.issue_key, args.config, assets_dir)
-    md_path.write_text(markdown)
+    jira = get_jira(credentials)
+    fields = fetch_issue(jira, args.issue_key)
+    md_path.write_text(assemble(args.issue_key, fields, jira, assets_dir))
 
 
 if __name__ == "__main__":

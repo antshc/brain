@@ -1,31 +1,28 @@
 """Query B classification: bucket each issue by whether its latest @mention was answered.
 
-Mentions are matched on display name, not `accountId`: the MCP renders a mention as
-`<custom data-type="mention" data-id="id-0">@Display Name</custom>`, where `data-id` is a
-per-comment positional placeholder with no mapping back to an account. Reply authorship
-still uses `author.accountId`, which is the real identifier.
+twg returns comment bodies as ADF, where a mention is a `mention` node whose `attrs.id` is the
+mentioned `accountId`; mentions and reply authorship both match on `accountId`.
 """
 from __future__ import annotations
 
-import re
 from datetime import datetime
 from typing import Any
 
 from .payload import comments, comments_truncated, parse_timestamp, to_date
 
 
-def mention_pattern(display_name: str) -> re.Pattern[str]:
-    return re.compile(
-        r'<custom data-type="mention"[^>]*>@' + re.escape(display_name) + r"</custom>"
-    )
+def mentions_account(adf: Any, account_id: str) -> bool:
+    if isinstance(adf, dict):
+        if adf.get("type") == "mention" and (adf.get("attrs") or {}).get("id") == account_id:
+            return True
+        return any(mentions_account(value, account_id) for value in adf.values())
+    if isinstance(adf, list):
+        return any(mentions_account(item, account_id) for item in adf)
+    return False
 
 
-def _mentions(node: dict[str, Any], pattern: re.Pattern[str]) -> list[dict[str, Any]]:
-    return [
-        comment
-        for comment in comments(node)
-        if isinstance(comment.get("body"), str) and pattern.search(comment["body"])
-    ]
+def _mentions(node: dict[str, Any], account_id: str) -> list[dict[str, Any]]:
+    return [comment for comment in comments(node) if mentions_account(comment.get("body"), account_id)]
 
 
 def _earliest_reply(
@@ -46,10 +43,8 @@ def classify(
     nodes: list[dict[str, Any]],
     *,
     account_id: str,
-    display_name: str,
     cutoff: datetime,
 ) -> dict[str, Any]:
-    pattern = mention_pattern(display_name)
     buckets: dict[str, list[dict[str, Any]]] = {
         "unanswered": [],
         "answeredByYou": [],
@@ -59,7 +54,7 @@ def classify(
     partial_comments: list[str] = []
 
     for node in nodes:
-        found = _mentions(node, pattern)
+        found = _mentions(node, account_id)
         if not found:
             continue
         in_window = [m for m in found if parse_timestamp(m["created"]) >= cutoff]
@@ -76,9 +71,9 @@ def classify(
 
         entry = {
             "key": node["key"],
-            "url": node["webUrl"],
-            "summary": node["fields"].get("summary"),
-            "status": (node["fields"].get("status") or {}).get("name"),
+            "url": node["url"],
+            "summary": node.get("summary"),
+            "status": (node.get("status") or {}).get("name"),
             "mentionedBy": mention["author"]["displayName"],
             "mentionedOn": to_date(mention["created"]),
         }

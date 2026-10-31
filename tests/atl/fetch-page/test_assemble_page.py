@@ -4,18 +4,22 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from requests.exceptions import ConnectionError as RequestsConnectionError
+
 from assemble_page import (
     ConversionError,
+    PageFetchError,
     assemble,
     convert_adf_to_markdown,
     default_assets_dir,
     extract_title_and_body,
+    fetch_page,
 )
 from fetch_diagrams import AttachmentRetrievalError
 
 
-def _raw(title: str, body: dict) -> dict:
-    return {"content": {"nodes": [{"title": title, "body": body}]}}
+def _page(title: str, body: dict) -> dict:
+    return {"title": title, "body": {"atlas_doc_format": {"value": json.dumps(body), "representation": "atlas_doc_format"}}}
 
 
 def _drawio_body() -> dict:
@@ -37,12 +41,38 @@ def test_default_assets_dir_appends_assets_to_the_full_markdown_name():
     assert default_assets_dir(Path("docs/page.md")) == Path("docs/page.md.assets")
 
 
-def test_extract_title_and_body_reads_the_documented_json_path():
+def test_extract_title_and_body_parses_the_rest_v2_adf_string():
     body = {"type": "doc", "version": 1, "content": []}
-    title, extracted_body = extract_title_and_body(_raw("Behavior Diagram", body))
+    title, extracted_body = extract_title_and_body(_page("Behavior Diagram", body))
 
     assert title == "Behavior Diagram"
     assert extracted_body == body
+
+
+def test_extract_title_and_body_rejects_a_non_object_body():
+    page = {"title": "T", "body": {"atlas_doc_format": {"value": "[]"}}}
+
+    with pytest.raises(ConversionError, match="must be a JSON object"):
+        extract_title_and_body(page)
+
+
+def test_fetch_page_reads_rest_v2_with_atlas_doc_format():
+    body = {"type": "doc", "version": 1, "content": []}
+    confluence = MagicMock()
+    confluence.get.return_value = _page("Behavior Diagram", body)
+
+    assert fetch_page(confluence, "123") == ("Behavior Diagram", body)
+    confluence.get.assert_called_once_with("/api/v2/pages/123", params={"body-format": "atlas_doc_format"})
+
+
+def test_fetch_page_raises_a_safe_category_on_request_failure():
+    confluence = MagicMock()
+    confluence.get.side_effect = RequestsConnectionError("https://secret.example/?token=abc")
+
+    with pytest.raises(PageFetchError) as excinfo:
+        fetch_page(confluence, "123")
+
+    assert str(excinfo.value) == "ConnectionError"
 
 
 def test_convert_adf_to_markdown_shells_out_to_map_markdown_adf(monkeypatch):
@@ -77,15 +107,13 @@ def test_convert_adf_to_markdown_raises_sanitized_conversion_error_without_a_tra
 
 def test_assemble_skips_attachment_handling_for_a_page_with_no_references(monkeypatch, tmp_path):
     monkeypatch.setattr("assemble_page.convert_adf_to_markdown", lambda body: "Presentation text.\n")
-    load_credentials = MagicMock()
-    monkeypatch.setattr("assemble_page.load_credentials", load_credentials)
+    confluence = MagicMock()
 
-    raw = _raw("Simple Page", {"type": "doc", "version": 1, "content": []})
     assets_dir = tmp_path / "page.md.tmp"
-    result = assemble(raw, "123", "/repo", str(assets_dir))
+    result = assemble("Simple Page", {"type": "doc", "version": 1, "content": []}, "123", confluence, str(assets_dir))
 
     assert result == "# Simple Page\n\nPresentation text.\n"
-    load_credentials.assert_not_called()
+    confluence.assert_not_called()
     assert not assets_dir.exists()
 
 def test_assemble_saves_attachments_and_restores_diagrams_when_reference_present_and_token_available(
@@ -95,11 +123,7 @@ def test_assemble_saves_attachments_and_restores_diagrams_when_reference_present
         "assemble_page.convert_adf_to_markdown",
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
-    monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
-    )
     confluence = MagicMock()
-    monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: confluence)
     snapshot = MagicMock()
     fetch_attachment_snapshot = MagicMock(return_value=snapshot)
     publish_attachment_cache = MagicMock()
@@ -110,9 +134,8 @@ def test_assemble_saves_attachments_and_restores_diagrams_when_reference_present
         lambda markdown, snapshot_, assets_dir_name: "```mermaid\nflowchart TD; A-->B;\n```",
     )
 
-    raw = _raw("Complex Page", _drawio_body())
     assets_dir = tmp_path / "page.md.tmp"
-    result = assemble(raw, "123", "/repo", str(assets_dir))
+    result = assemble("Complex Page", _drawio_body(), "123", confluence, str(assets_dir))
 
     assert result == "# Complex Page\n\n```mermaid\nflowchart TD; A-->B;\n```"
     fetch_attachment_snapshot.assert_called_once_with(confluence, "123")
@@ -125,26 +148,11 @@ def test_assemble_does_not_duplicate_a_title_the_body_already_carries_as_h1(monk
         lambda body: "# Behavior Diagram\n\nPresentation text.\n",
     )
 
-    raw = _raw("Behavior Diagram", {"type": "doc", "version": 1, "content": []})
-    result = assemble(raw, "123", "/repo", str(tmp_path / "page.md.tmp"))
+    result = assemble(
+        "Behavior Diagram", {"type": "doc", "version": 1, "content": []}, "123", MagicMock(), str(tmp_path / "page.md.tmp")
+    )
 
     assert result == "# Behavior Diagram\n\nPresentation text.\n"
-
-
-def test_assemble_degrades_when_reference_present_and_no_token(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        "assemble_page.convert_adf_to_markdown",
-        lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
-    )
-    monkeypatch.setattr("assemble_page.load_credentials", lambda config_path: None)
-
-    raw = _raw("Complex Page", _drawio_body())
-    assets_dir = tmp_path / "page.md.tmp"
-    result = assemble(raw, "123", "/repo", str(assets_dir))
-
-    assert "apiToken" in result
-    assert "```mermaid" not in result
-    assert not assets_dir.exists()
 
 
 def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_path):
@@ -182,14 +190,9 @@ def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_p
             '<!-- adf:attachment media-id="file-1" alt="" -->'
         ),
     )
-    monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
-    )
-    monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: confluence)
 
-    raw = _raw("Diagrams Page", _drawio_body())
     assets_dir = tmp_path / "page.md.tmp"
-    result = assemble(raw, "123", "/repo", str(assets_dir))
+    result = assemble("Diagrams Page", _drawio_body(), "123", confluence, str(assets_dir))
 
     assert "```mermaid\nflowchart TD; A-->B;\n```" in result
     assert "![Screenshot.png](page.md.tmp/Screenshot.png)" in result
@@ -200,60 +203,35 @@ def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_p
     confluence.get_attachments_from_content.assert_called_once()
 
 
-def test_assemble_skip_mode_makes_no_credential_or_confluence_calls(monkeypatch, tmp_path):
+def test_assemble_skip_mode_makes_no_attachment_calls(monkeypatch, tmp_path):
     monkeypatch.setattr(
         "assemble_page.convert_adf_to_markdown",
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
-    load_credentials = MagicMock()
-    get_confluence = MagicMock()
-    monkeypatch.setattr("assemble_page.load_credentials", load_credentials)
-    monkeypatch.setattr("assemble_page.get_confluence", get_confluence)
+    confluence = MagicMock()
 
-    raw = _raw("Complex Page", _drawio_body())
     assets_dir = tmp_path / "page.md.tmp"
-    result = assemble(raw, "123", "/repo", str(assets_dir), attachments="skip")
+    result = assemble("Complex Page", _drawio_body(), "123", confluence, str(assets_dir), attachments="skip")
 
     assert "skipped" in result
     assert "```mermaid" not in result
-    load_credentials.assert_not_called()
-    get_confluence.assert_not_called()
+    confluence.get_attachments_from_content.assert_not_called()
     assert not assets_dir.exists()
 
-
-def test_assemble_required_mode_raises_and_writes_nothing_when_credentials_are_missing(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        "assemble_page.convert_adf_to_markdown",
-        lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
-    )
-    monkeypatch.setattr("assemble_page.load_credentials", lambda config_path: None)
-
-    raw = _raw("Complex Page", _drawio_body())
-    assets_dir = tmp_path / "page.md.tmp"
-
-    with pytest.raises(AttachmentRetrievalError):
-        assemble(raw, "123", "/repo", str(assets_dir), attachments="required")
-
-    assert not assets_dir.exists()
 
 def test_assemble_auto_mode_degrades_safely_on_attachment_retrieval_failure(monkeypatch, tmp_path):
     monkeypatch.setattr(
         "assemble_page.convert_adf_to_markdown",
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
-    monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
-    )
-    monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: MagicMock())
 
     def fake_fetch_snapshot(confluence, page_id):
         raise AttachmentRetrievalError("SSLError")
 
     monkeypatch.setattr("assemble_page.fetch_attachment_snapshot", fake_fetch_snapshot)
 
-    raw = _raw("Complex Page", _drawio_body())
     assets_dir = tmp_path / "page.md.tmp"
-    result = assemble(raw, "123", "/repo", str(assets_dir))
+    result = assemble("Complex Page", _drawio_body(), "123", MagicMock(), str(assets_dir))
 
     assert "SSLError" in result
     assert "```mermaid" not in result
@@ -269,21 +247,16 @@ def test_assemble_required_mode_propagates_attachment_retrieval_failure_and_writ
         "assemble_page.convert_adf_to_markdown",
         lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
     )
-    monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
-    )
-    monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: MagicMock())
 
     def fake_fetch_snapshot(confluence, page_id):
         raise AttachmentRetrievalError("ConnectTimeout")
 
     monkeypatch.setattr("assemble_page.fetch_attachment_snapshot", fake_fetch_snapshot)
 
-    raw = _raw("Complex Page", _drawio_body())
     assets_dir = tmp_path / "page.md.tmp"
 
     with pytest.raises(AttachmentRetrievalError):
-        assemble(raw, "123", "/repo", str(assets_dir), attachments="required")
+        assemble("Complex Page", _drawio_body(), "123", MagicMock(), str(assets_dir), attachments="required")
 
     assert not assets_dir.exists()
 
@@ -295,10 +268,6 @@ def test_assemble_required_mode_raises_when_attachment_placeholder_cannot_be_res
         "assemble_page.convert_adf_to_markdown",
         lambda body: '<!-- adf:attachment media-id="missing" alt="missing.png" -->',
     )
-    monkeypatch.setattr(
-        "assemble_page.load_credentials", lambda config_path: {"site": "x", "email": "e", "token": "t"}
-    )
-    monkeypatch.setattr("assemble_page.get_confluence", lambda credentials: MagicMock())
     monkeypatch.setattr("assemble_page.fetch_attachment_snapshot", lambda confluence, page_id: MagicMock())
     monkeypatch.setattr("assemble_page.publish_attachment_cache", lambda snapshot, assets_dir: None)
     monkeypatch.setattr(
@@ -308,14 +277,11 @@ def test_assemble_required_mode_raises_when_attachment_placeholder_cannot_be_res
         ),
     )
 
-    raw = _raw(
-        "Complex Page",
-        {
-            "type": "doc",
-            "version": 1,
-            "content": [{"type": "media", "attrs": {"id": "missing", "type": "file"}}],
-        },
-    )
+    body = {
+        "type": "doc",
+        "version": 1,
+        "content": [{"type": "media", "attrs": {"id": "missing", "type": "file"}}],
+    }
 
     with pytest.raises(AttachmentRetrievalError, match="unresolved attachment reference"):
-        assemble(raw, "123", "/repo", str(tmp_path / "page.md.tmp"), attachments="required")
+        assemble("Complex Page", body, "123", MagicMock(), str(tmp_path / "page.md.tmp"), attachments="required")
