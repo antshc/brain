@@ -12,7 +12,8 @@ that invocation. Internal HTTP reads are not additional harness model turns.
 
 - Confluence content selectors accept advertised IDs, matching ARIs and URLs.
   Exact titles additionally require `--reference-space` (space ID/key/ARI/URL/name).
-  Use native batches for several known pages. Inspect ordered failures.
+  Use native batches for several known pages only when reading via the
+  `fetch-page` fallback, pre-edit reads, or metadata. Inspect ordered failures.
 - Confluence space selectors accept IDs, keys, matching ARIs/URLs or exact names
   in the selected site. Docs/Rovo space filters use the same space selectors.
 - Atlas project/goal gets accept repeatable `--id` as well as existing positionals:

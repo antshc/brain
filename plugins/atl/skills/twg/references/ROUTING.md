@@ -45,7 +45,8 @@ limits. Native internal lookups do not authorize broader scope or writes.
   Query surfaces are for discovery, filtering, or compatibility shortcuts.
 
 Use search results as candidates, not final facts. Hydrate the few selected
-anchors with native reads or typed context.
+anchors with native reads or typed context; read selected Confluence pages
+with `fetch-page` skill.
 
 ## Product Boundaries
 

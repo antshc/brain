@@ -1,13 +1,13 @@
 ---
 name: fetch-page
 description: >-
-  Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page. Reads real ADF over REST and converts via map-markdown-adf; body-referenced attachments (diagrams, images, files) cache to `.md.assets`, `--attachments` controls it; inline-comment anchors and a `## Comments` section keep comments through republish. Needs `apiToken` in `.atlassian.json.user`.
+  Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page, including a page ID or URL returned by a twg search. Reads real ADF over REST and converts via map-markdown-adf; body-referenced attachments (diagrams, images, files) cache to `.md.assets`, `--attachments` controls it; inline-comment anchors and a `## Comments` section keep comments through republish. Not for search; use twg. Needs `apiToken` in `.atlassian.json.user`.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
 # Fetch Page
 
-Return a Confluence **Page** as Markdown. REST reads the real ADF body, attachments, and comments; *`map-markdown-adf` skill converts ADF back to Markdown, preserving source wording verbatim*. Not twg: its Markdown export drops `map-markdown-adf` constructs and comment anchors.
+Return a Confluence **Page** as Markdown. REST reads the real ADF body, attachments, and comments; *`map-markdown-adf` skill converts ADF back to Markdown, preserving source wording verbatim*. Not twg: its Markdown export drops `map-markdown-adf` constructs and comment anchors. Use for every page body read, including search hits and directly supplied IDs/URLs; twg only searches. Fall back to `twg confluence content get` only if this skill is unavailable or fails, and warn that it is lossy (diagrams, media, comments may be missing).
 
 ## Prerequisites
 

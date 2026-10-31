@@ -137,7 +137,7 @@ connector result by provider identity.
 
    | Destination                                                                                    | Action                                                                                         |
    | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-   | A Confluence path such as `<site>.atlassian.net/wiki/...`                                      | Read it with `twg confluence content get "<url>"`. Do not search Rovo.                         |
+   | A Confluence path such as `<site>.atlassian.net/wiki/...`                                      | Read it with `fetch-page` skill (fallback `twg confluence content get "<url>"`, lossy). Do not search Rovo. |
    | A Jira issue path such as `<site>.atlassian.net/browse/<KEY>`                                  | Read it with `twg jira workitem get <KEY> --site <site>`. Do not search Rovo.                  |
    | Another Atlassian product                                                                      | Hand off to that product's native skill and command when available; otherwise report and stop. |
    | A connector-backed provider such as `docs.google.com` or `drive.google.com` for `google-drive` | Continue to step 3.                                                                            |
