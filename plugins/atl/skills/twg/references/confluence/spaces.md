@@ -8,10 +8,7 @@ Use `confluence space` for space metadata and lifecycle. Use `confluence tree`
 for graph-backed hierarchy reads.
 
 This reference covers operating on a space: creating one space, reading it,
-updating it, archiving it, and moving content within it. To **bootstrap a whole
-space** — pick a blueprint, propose a folder/page tree from a brief, an existing
-space, or a repository, and write the space's instructions — load
-`twg-space-creation` instead.
+updating it, archiving it, and moving content within it.
 
 ## Space Operations
 
