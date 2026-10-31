@@ -34,4 +34,4 @@ Not covered from Markdown: Confluence smart links (`inlineCard`) and Draw.io mac
 ## Tests
 
 - Offline (CI): `python3 -m pytest tests/atl/regression` — runs the fixture through the real converter, simulates fetch-page's substitutions, and proves every check passes on a healthy round trip and fails on a lost construct.
-- Live: `ATL_REGRESSION_RUN=plugins/atl/regression/runs/<runId> python3 -m pytest tests/atl/regression -k integration` — one test per capability against a real run; skipped when the variable is unset.
+- Live: `ATL_REGRESSION_RUN=tests/atl/regression/runs/<runId> python3 -m pytest tests/atl/regression -k integration` — one test per capability against a real run; skipped when the variable is unset.

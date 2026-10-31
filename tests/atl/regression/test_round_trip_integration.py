@@ -1,7 +1,7 @@
 """Live round-trip regression: checks a real run directory produced by
-`plugins/atl/regression/run-regression.prompt.md`. Skipped unless `ATL_REGRESSION_RUN` names it.
+`tests/atl/regression/run-regression.prompt.md`. Skipped unless `ATL_REGRESSION_RUN` names it.
 
-    ATL_REGRESSION_RUN=plugins/atl/regression/runs/<runId> python3 -m pytest tests/atl/regression -k integration
+    ATL_REGRESSION_RUN=tests/atl/regression/runs/<runId> python3 -m pytest tests/atl/regression -k integration
 """
 from __future__ import annotations
 
