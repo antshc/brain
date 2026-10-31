@@ -17,12 +17,12 @@ Pick the plugin bundles you need. Each block uninstalls any stale version first,
 copilot plugin install wf@brain && \
 (copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
 copilot plugin install crew@brain && \
-(copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
-copilot plugin install ralph@brain && \
 (copilot plugin uninstall review@brain >/dev/null 2>&1 || true) && \
 copilot plugin install review@brain && \
 (copilot plugin uninstall skill@brain >/dev/null 2>&1 || true) && \
-copilot plugin install skill@brain
+copilot plugin install skill@brain && \
+(copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
+copilot plugin install ralph@brain
 ```
 
 <details>
