@@ -1,6 +1,13 @@
 # Plan: Identify PR review agents with hidden HTML comment markers
 
-Status: proposed. No implementation changes.
+Status: superseded. No implementation changes.
+
+Use these connected plans instead:
+
+1. [Address conversation and hidden comments](address-conversation-hidden-comments-plan.md).
+2. [Code Review–Address communication and closure](code-review-address-communication-plan.md).
+
+The content below is historical; its marker contract and implementation steps are superseded.
 
 ## Goal
 
