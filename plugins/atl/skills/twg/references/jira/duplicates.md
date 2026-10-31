@@ -4,11 +4,23 @@ description: Detect duplicate Jira issues across a bounded scope with semantic c
 
 # Jira Duplicate Detection
 
+## Contents
+
+- Safety Boundary
+- Candidate Scope
+- Duplicate Meaning
+- Target Comparison
+- Candidate Retrieval
+- Evaluation Gates
+- Hard False Positive Filters
+- Confidence and Selection
+- Output
+
 Use this decision policy with existing TWG capabilities. It does not replace
 JQL querying, `jira workitem similar`, or native workitem reads.
 
-Load `references/querying.md` when the prompt needs a bounded Jira candidate
-set. Use live `twg help` for exact command grammar.
+When the prompt needs a bounded Jira candidate set, return to the orchestrator's
+*Jira* routing and load querying. Use live `twg help` for exact command grammar.
 
 Detect whether a target Jira issue duplicates another issue in the requested
 scope. Base the decision on semantic meaning, not an exact text match. Search

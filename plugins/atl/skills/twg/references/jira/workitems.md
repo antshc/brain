@@ -4,7 +4,7 @@ description: Read and mutate Jira workitems, comments, links, watchers, attachme
 
 # Jira Workitems
 
-Use this reference after `twg-jira` has selected the Jira workitem surface.
+Use this reference after *Jira* routing selected the workitem surface.
 Inspect live help for the exact command contract.
 
 ## Reads
@@ -48,7 +48,7 @@ Before a create or update:
 4. Run the mutation after approval.
 5. Read back the item and report the stable key and URL.
 
-For links, discover the supported link type before writing. For comments and descriptions, follow `rich-content.md`.
+For links, discover the supported link type before writing. For comments and descriptions, return to the orchestrator's *Jira* routing and load rich content.
 
 Do not combine unrelated field, transition, link, and comment changes in one
 opaque operation. Keep each result independently verifiable.
