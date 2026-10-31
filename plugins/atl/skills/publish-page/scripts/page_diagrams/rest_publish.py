@@ -1,6 +1,5 @@
-"""Large-document REST publish fallback (I/O: Confluence REST client, via
-`atlassian-python-api` — the MCP's inline-body publish tools mangle/truncate bodies past
-roughly 100-300KB, so a large ADF document needs to go over the REST v2 pages API instead.
+"""ADF page publish over the Confluence REST v2 pages API (I/O: Confluence REST client, via
+`atlassian-python-api`).
 
 Only touches `confluence`; tested by passing a stub with `get`/`put`/`post`, mirroring
 `attachments.py`'s low-level `.get()` pattern.

@@ -1,8 +1,7 @@
 """Detect Markdown constructs that only ADF can express (pure).
 
-Jira accepts `contentFormat: "markdown"` for plain CommonMark, but the markers below have no
-Markdown equivalent and arrive as literal text — a caller that finds any of them must convert to
-ADF instead. Patterns are shared with the converter so detection and parsing cannot drift.
+Markdown writers carry plain CommonMark, but the markers below have no Markdown equivalent and
+arrive as literal text — a caller that finds any of them must convert to ADF instead. Patterns are shared with the converter so detection and parsing cannot drift.
 """
 from __future__ import annotations
 

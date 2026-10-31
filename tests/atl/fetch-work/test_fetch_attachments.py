@@ -1,17 +1,15 @@
 from unittest.mock import MagicMock
 
 from fetch_attachments import (
-    NO_TOKEN_NOTE,
+    ISSUE_FIELDS,
     _relative_link,
     download_attachment_bytes,
-    fetch_description_adf,
+    fetch_issue,
     find_attachment_reference_nodes,
     has_attachment_placeholder,
     has_attachment_reference,
     list_attachments,
-    replace_blob_image_refs_without_credentials,
     restore_attachments,
-    restore_attachments_without_credentials,
     save_attachments,
 )
 
@@ -27,7 +25,7 @@ def _jira(attachments=None, downloads=None, description=None):
         params = kwargs.get("params")
         if params == {"fields": "attachment"}:
             return {"fields": {"attachment": attachments or []}}
-        if params == {"fields": "description"}:
+        if params == {"fields": ISSUE_FIELDS}:
             return {"fields": {"description": description}}
         return downloads[path]
 
@@ -89,14 +87,14 @@ def test_has_attachment_reference_true_and_false():
     assert has_attachment_reference(matching) is True
 
 
-def test_fetch_description_adf_calls_rest_v3_with_description_field():
+def test_fetch_issue_calls_rest_v3_with_header_and_description_fields():
     adf = {"type": "doc", "version": 1, "content": []}
     jira = _jira(description=adf)
 
-    result = fetch_description_adf(jira, "PROJ-5881")
+    result = fetch_issue(jira, "PROJ-5881")
 
-    assert result == adf
-    jira.get.assert_called_once_with("rest/api/3/issue/PROJ-5881", params={"fields": "description"})
+    assert result["description"] == adf
+    jira.get.assert_called_once_with("rest/api/3/issue/PROJ-5881", params={"fields": ISSUE_FIELDS})
 
 
 def test_list_attachments_calls_rest_v3_with_attachment_field():
@@ -254,35 +252,3 @@ def test_restore_attachments_resolves_image_attachment_with_size_to_an_image_plu
         "![image-20260827-132403.png](work.md.tmp/image-20260827-132403.png)\n"
         "<!-- media-size: width=628 height=256 -->"
     )
-
-
-def test_restore_attachments_without_credentials_replaces_every_placeholder_with_a_note():
-    md = (
-        '<!-- adf:attachment media-id="file-1" alt="a.png" -->\n\n'
-        '<!-- adf:attachment media-id="file-2" alt="b.png" -->'
-    )
-    result = restore_attachments_without_credentials(md)
-
-    assert result.count("apiToken") == 2
-    assert NO_TOKEN_NOTE in result
-
-
-def test_restore_attachments_without_credentials_leaves_plain_markdown_untouched():
-    md = "# Title\n\nJust text.\n"
-    assert restore_attachments_without_credentials(md) == md
-
-
-def test_replace_blob_image_refs_without_credentials_swaps_blob_markers_for_the_note():
-    md = (
-        "before\n\n![](blob:https://media.staging.atl-paas.net/?type=file&id=abc)\n\nafter\n\n"
-        "![](blob:https://media.staging.atl-paas.net/?type=file&id=def)"
-    )
-    result = replace_blob_image_refs_without_credentials(md)
-
-    assert result.count(NO_TOKEN_NOTE) == 2
-    assert "blob:" not in result
-
-
-def test_replace_blob_image_refs_without_credentials_leaves_plain_markdown_untouched():
-    md = "# Title\n\nJust text, no embedded images.\n"
-    assert replace_blob_image_refs_without_credentials(md) == md

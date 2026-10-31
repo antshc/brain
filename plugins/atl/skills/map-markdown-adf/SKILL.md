@@ -33,7 +33,7 @@ python scripts/map_markdown_adf.py detect-adf-only < input.md > report.json
 
 Stdin Markdown → stdout `{"adfOnly": <bool>, "constructs": [{"kind": ..., "line": <1-based>}]}`, listing every construct marked **ADF-only** in Supported structure, in source order. Kinds are `expand`, `inlineComment`, `panel`, `status`, `toc`, `wideTable`. Markers inside a fenced code block are literal text and go unreported.
 
-Exits `0` whether or not anything is found — branch on `adfOnly`, not the exit code. `adfOnly: false` means the source is plain CommonMark and a caller may publish it as-is with `contentFormat: "markdown"`; `adfOnly: true` means it must convert first.
+Exits `0` whether or not anything is found — branch on `adfOnly`, not the exit code. `adfOnly: false` means the source is plain CommonMark that a Markdown-accepting writer (e.g. twg `--description-format markdown`) carries intact; `adfOnly: true` means only the ADF from `md-to-adf` carries it.
 
 ## Preserved verbatim
 

@@ -97,7 +97,7 @@ def load_drawio_extension_key(config_path: str) -> str:
         raise ValueError(
             f"diagramRenderer=drawio needs {DRAWIO_EXTENSION_KEY} in .atlassian.json.user; it embeds "
             "the Draw.io app id and environment id, which differ per site. To find it, read a page "
-            "that already carries a Draw.io diagram with contentFormat=adf and copy the diagram "
+            "that already carries a Draw.io diagram as raw ADF (REST v2 body-format=atlas_doc_format) and copy the diagram "
             "node's attrs.extensionKey."
         )
     if not _EXTENSION_KEY_RE.match(key):

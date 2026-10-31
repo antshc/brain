@@ -1,6 +1,6 @@
 """Cache a fetched Jira issue's attachments to disk and resolve its embedded-image placeholders
-(I/O: Jira REST via `atlassian-python-api` — the one thing the Atlassian MCP does not expose for
-either real ADF descriptions or attachment content).
+(I/O: Jira REST via `atlassian-python-api`, which returns the real ADF description and attachment
+content).
 
 `/map-markdown-adf`'s `adf-to-md` turns every `media`/`mediaSingle`/`mediaGroup` node into a
 neutral `<!-- adf:attachment media-id="<id>" alt="<alt>" -->` placeholder (see its SKILL.md's
@@ -11,9 +11,8 @@ id mapping to make, so every placeholder here resolves by matching its `alt` aga
 `/publish-page`-style mermaid sidecar, so unlike `/fetch-page`'s equivalent module, there is no
 diagram branch at all here — every reference resolves to either a Markdown image or a plain link.
 
-Every failure mode degrades to a one-line note instead of raising — a missing attachment (the
-description references a file no longer attached) or a missing token never fails the rest of the
-fetch.
+A missing attachment (the description references a file no longer attached) degrades to a
+one-line note instead of failing the rest of the fetch.
 """
 from __future__ import annotations
 
@@ -25,11 +24,6 @@ from atlassian import Jira
 
 _ATTACHMENT_PLACEHOLDER_RE = re.compile(
     r'<!-- adf:attachment media-id="([^"]*)" alt="([^"]*)"(?: width="(\d+)" height="(\d+)")? -->'
-)
-_BLOB_IMAGE_RE = re.compile(r"!\[\]\(blob:[^)]*\)")
-
-NO_TOKEN_NOTE = (
-    "<!-- adf:attachment source unavailable: set apiToken in .atlassian.json.user to resolve embedded images -->"
 )
 
 _IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp")
@@ -67,13 +61,13 @@ def has_attachment_reference(body: dict) -> bool:
     return bool(find_attachment_reference_nodes(body))
 
 
-def fetch_description_adf(jira: Jira, issue_key: str) -> dict:
-    """Direct REST v3 call for the issue's real ADF description — the Atlassian MCP's
-    `getJiraIssue` never returns real ADF (verified live against PROJ-5881), only an already-
-    flattened Markdown-ish string with empty `alt` text on every embedded image.
-    """
-    resp = jira.get(f"rest/api/3/issue/{issue_key}", params={"fields": "description"})
-    return resp["fields"]["description"]
+ISSUE_FIELDS = "summary,status,issuetype,assignee,description"
+
+
+def fetch_issue(jira: Jira, issue_key: str) -> dict:
+    """REST v3 issue fields: header fields plus the real ADF `description`."""
+    resp = jira.get(f"rest/api/3/issue/{issue_key}", params={"fields": ISSUE_FIELDS})
+    return resp["fields"]
 
 
 def list_attachments(jira: Jira, issue_key: str) -> list[dict]:
@@ -165,16 +159,3 @@ def restore_attachments(
         return f"[{alt}]({link})"
 
     return _ATTACHMENT_PLACEHOLDER_RE.sub(_replace, markdown)
-
-
-def restore_attachments_without_credentials(markdown: str) -> str:
-    """Degraded mode: no token configured, so every placeholder gets a note instead of a file."""
-    return _ATTACHMENT_PLACEHOLDER_RE.sub(NO_TOKEN_NOTE, markdown)
-
-
-def replace_blob_image_refs_without_credentials(markdown: str) -> str:
-    """The no-token, no-real-ADF branch: the MCP's already Markdown-ish `fields.description`
-    string carries each embedded image as `![](blob:https://media...&id=<uuid>&...)` rather than
-    an `/map-markdown-adf` placeholder — swap that pattern directly for the same note instead.
-    """
-    return _BLOB_IMAGE_RE.sub(NO_TOKEN_NOTE, markdown)

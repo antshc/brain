@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from page_diagrams.cli import DEFAULT_THRESHOLD_BYTES, main
+from page_diagrams.cli import main
 
 
 def config_path(tmp_path) -> str:
@@ -215,17 +215,7 @@ def test_substitute_media_exits_on_leftover_marker(capsys):
     assert "MEDIA:0" in err
 
 
-def test_publish_adf_small_body_signals_mcp(capsys):
-    adf = {"type": "doc", "content": []}
-    payload = json.dumps({"adf": adf})
-    with patch("sys.stdin.read", return_value=payload):
-        main(["publish-adf", "--page-id", "123", "--threshold-bytes", "200000"])
-    out = json.loads(capsys.readouterr().out)
-    assert out["method"] == "mcp"
-    assert out["thresholdBytes"] == 200000
-
-
-def test_publish_adf_large_body_updates_existing_page(tmp_path, capsys):
+def test_publish_adf_updates_existing_page(tmp_path, capsys):
     write_config(tmp_path, {'cloudId': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     adf = {"type": "doc", "content": []}
     payload = json.dumps({"adf": adf})
@@ -242,7 +232,6 @@ def test_publish_adf_large_body_updates_existing_page(tmp_path, capsys):
                 "--page-id", "123",
                 "--title", "Title",
                 "--config", config_path(tmp_path),
-                "--threshold-bytes", "1",
             ]
         )
 
@@ -252,7 +241,7 @@ def test_publish_adf_large_body_updates_existing_page(tmp_path, capsys):
     assert out == {"method": "rest", "pageId": "123", "sizeBytes": len(json.dumps(adf).encode("utf-8"))}
 
 
-def test_publish_adf_large_body_creates_new_page(tmp_path, capsys):
+def test_publish_adf_creates_new_page(tmp_path, capsys):
     write_config(tmp_path, {'cloudId': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
     adf = {"type": "doc", "content": []}
     payload = json.dumps({"adf": adf})
@@ -267,48 +256,12 @@ def test_publish_adf_large_body_creates_new_page(tmp_path, capsys):
                 "--space-id", "space-1",
                 "--title", "Title",
                 "--config", config_path(tmp_path),
-                "--threshold-bytes", "1",
             ]
         )
 
     mock_create.assert_called_once_with(confluence, "space-1", "Title", adf)
     out = json.loads(capsys.readouterr().out)
     assert out == {"method": "rest", "pageId": "456", "sizeBytes": len(json.dumps(adf).encode("utf-8"))}
-
-
-def test_publish_adf_default_threshold_is_50000(capsys):
-    assert DEFAULT_THRESHOLD_BYTES == 50_000
-    adf = {"type": "doc", "content": []}
-    payload = json.dumps({"adf": adf})
-    with patch("sys.stdin.read", return_value=payload):
-        main(["publish-adf", "--page-id", "123"])
-    out = json.loads(capsys.readouterr().out)
-    assert out["method"] == "mcp"
-    assert out["thresholdBytes"] == 50_000
-
-
-def test_publish_adf_threshold_zero_forces_rest_regardless_of_size(tmp_path, capsys):
-    write_config(tmp_path, {'cloudId': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
-    adf = {"type": "doc", "content": []}
-    payload = json.dumps({"adf": adf})
-
-    confluence = MagicMock()
-    with patch("sys.stdin.read", return_value=payload), patch(
-        "page_diagrams.cli.get_confluence", return_value=confluence
-    ), patch("page_diagrams.cli.get_page_version", return_value=1), patch(
-        "page_diagrams.cli.update_page_adf", return_value={"id": "123"}
-    ):
-        main(
-            [
-                "publish-adf",
-                "--page-id", "123",
-                "--title", "Title",
-                "--config", config_path(tmp_path),
-                "--threshold-bytes", "0",
-            ]
-        )
-    out = json.loads(capsys.readouterr().out)
-    assert out["method"] == "rest"
 
 
 def test_combine_with_media_ids_writes_combined_payload(tmp_path):
@@ -348,7 +301,7 @@ def test_run_with_diagrams_and_creds_creates_placeholder_then_publishes(tmp_path
 
     confluence = MagicMock()
     with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
-        "page_diagrams.pipeline.try_load_credentials", return_value={"site": "x", "email": "y", "token": "z"}
+        "page_diagrams.pipeline.load_credentials", return_value={"site": "x", "email": "y", "token": "z"}
     ), patch("page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
         "page_diagrams.pipeline.create_page_adf", return_value={"id": "789"}
     ) as mock_create, patch(
@@ -368,7 +321,6 @@ def test_run_with_diagrams_and_creds_creates_placeholder_then_publishes(tmp_path
                 "--config", config_path(tmp_path),
                 "--assets-dir", str(tmp_path / "assets"),
                 "--out", str(out_path),
-                "--threshold-bytes", "999999999",
             ]
         )
 
@@ -398,7 +350,7 @@ def test_run_with_diagrams_and_page_id_updates_in_place_no_placeholder(tmp_path,
 
     confluence = MagicMock()
     with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
-        "page_diagrams.pipeline.try_load_credentials", return_value={"site": "x", "email": "y", "token": "z"}
+        "page_diagrams.pipeline.load_credentials", return_value={"site": "x", "email": "y", "token": "z"}
     ), patch("page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
         "page_diagrams.pipeline.create_page_adf"
     ) as mock_create, patch(
@@ -428,59 +380,20 @@ def test_run_with_diagrams_and_page_id_updates_in_place_no_placeholder(tmp_path,
     assert out["pageId"] == "123"
 
 
-def test_run_with_no_creds_substitutes_notes_and_writes_pretty_printed_adf(tmp_path, capsys):
+def test_run_without_credentials_fails_naming_the_missing_keys_before_touching_a_page(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# My Page\n\n```mermaid\ngraph TD; A-->B;\n```\n")
-    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
-    out_path = tmp_path / "final.json"
 
-    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
-        main(
-            [
-                "run",
-                "--md-path", str(md_path),
-                "--page-id", "123",
-                "--config", config_path(tmp_path),
-                "--out", str(out_path),
-            ]
-        )
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value={"content": []}), patch(
+        "page_diagrams.pipeline.get_confluence"
+    ) as get_confluence, pytest.raises(SystemExit) as excinfo:
+        main(["run", "--md-path", str(md_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
-    out = json.loads(capsys.readouterr().out)
-    assert out["method"] == "mcp"
-    assert out["missingPrerequisite"] == "apiToken"
-    assert out["diagramsRendered"] == 0
-
-    written_text = out_path.read_text()
-    assert "apiToken" in written_text
-    assert len(written_text.splitlines()) > 1
+    assert "apiToken" in str(excinfo.value)
+    get_confluence.assert_not_called()
 
 
-def test_run_no_diagrams_under_threshold_returns_mcp(tmp_path, capsys):
-    md_path = tmp_path / "page.md"
-    md_path.write_text("# Title\n\nSome text\n")
-    write_config(tmp_path, {'cloudId': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
-    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
-    out_path = tmp_path / "final.json"
-
-    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
-        main(
-            [
-                "run",
-                "--md-path", str(md_path),
-                "--page-id", "123",
-                "--config", config_path(tmp_path),
-                "--out", str(out_path),
-                "--threshold-bytes", "999999",
-            ]
-        )
-
-    out = json.loads(capsys.readouterr().out)
-    assert out["method"] == "mcp"
-    assert out["pageId"] == "123"
-    assert out["diagramsRendered"] == 0
-
-
-def test_run_no_diagrams_over_threshold_returns_rest(tmp_path, capsys):
+def test_run_no_diagrams_publishes_over_rest_and_writes_pretty_printed_adf(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\nSome text\n")
     write_config(tmp_path, {'cloudId': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
@@ -499,7 +412,6 @@ def test_run_no_diagrams_over_threshold_returns_rest(tmp_path, capsys):
                 "--page-id", "123",
                 "--config", config_path(tmp_path),
                 "--out", str(out_path),
-                "--threshold-bytes", "1",
             ]
         )
 
@@ -508,6 +420,7 @@ def test_run_no_diagrams_over_threshold_returns_rest(tmp_path, capsys):
     out = json.loads(capsys.readouterr().out)
     assert out["method"] == "rest"
     assert out["pageId"] == "123"
+    assert len(out_path.read_text().splitlines()) > 1
 
 
 def test_run_reports_mmdc_missing(tmp_path, capsys):
@@ -538,7 +451,11 @@ def test_run_defaults_artifacts_to_md_filename_tmp_beside_the_source(tmp_path, c
     md_path.write_text("# Title\n\nSome text\n")
     base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
 
-    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
+    write_config(tmp_path, {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"})
+
+    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=MagicMock()
+    ), patch("page_diagrams.pipeline.get_page_version", return_value=1), patch("page_diagrams.pipeline.update_page_adf"):
         main(["run", "--md-path", str(md_path), "--page-id", "123", "--config", config_path(tmp_path)])
 
     tmp_dir = tmp_path / "design.md.tmp"

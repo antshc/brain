@@ -45,17 +45,20 @@ def test_strip_title_heading_leaves_a_valid_body_when_only_the_title_remains():
 def test_publish_does_not_include_the_title_heading_in_the_body(tmp_path):
     md_path = tmp_path / "doc.md"
     md_path.write_text("# My Page\n\nBody text.\n")
+    write_config(tmp_path, {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"})
     out_path = tmp_path / "final.json"
-    result = publish(
-        md_path=str(md_path),
-        config_path=str(tmp_path / ".atlassian.json.user"),
-        page_id=None,
-        space_id="SPACE",
-        title=None,
-        assets_dir=str(tmp_path / "assets"),
-        out_path=str(out_path),
-        threshold_bytes=50_000,
-    )
+    with patch("page_diagrams.pipeline.get_confluence", return_value=MagicMock()), patch(
+        "page_diagrams.pipeline.create_page_adf", return_value={"id": "1"}
+    ):
+        result = publish(
+            md_path=str(md_path),
+            config_path=str(tmp_path / ".atlassian.json.user"),
+            page_id=None,
+            space_id="SPACE",
+            title=None,
+            assets_dir=str(tmp_path / "assets"),
+            out_path=str(out_path),
+        )
     assert result["title"] == "My Page"
     body = json.loads(out_path.read_text())["content"]
     assert [n["type"] for n in body] == ["paragraph"]
@@ -112,7 +115,7 @@ def test_substitute_diagram_notes_replaces_top_level_marker():
     result, replaced = substitute_diagram_notes(adf, diagrams)
     assert replaced == 1
     text = result["content"][0]["content"][0]["text"]
-    assert "apiToken" in text
+    assert "upload pending" in text
     assert "00-title" in text
 
 
@@ -131,7 +134,7 @@ def test_substitute_diagram_notes_replaces_marker_nested_inside_expand():
     assert replaced == 1
     nested = result["content"][0]["content"][0]
     assert nested["type"] == "paragraph"
-    assert "apiToken" in nested["content"][0]["text"]
+    assert "upload pending" in nested["content"][0]["text"]
 
 
 def _write_page(tmp_path, renderer=None, extension_key=None):
@@ -155,7 +158,6 @@ def _publish(md_path, tmp_path):
         title=None,
         assets_dir=str(tmp_path / "assets"),
         out_path=str(tmp_path / "final.json"),
-        threshold_bytes=0,
     )
 
 
@@ -363,26 +365,3 @@ def test_publish_uploads_local_attachments_with_no_diagrams_present(tmp_path):
     assert result["method"] == "rest"
     assert result["diagrams"] == 0
     assert result["attachments"] == 2
-
-
-def test_publish_without_credentials_notes_local_media_when_no_diagrams_present(tmp_path):
-    md_path = _write_local_media_page(tmp_path)
-    base_adf = {"content": [_marker_paragraph(0), _marker_paragraph(1)]}
-
-    with patch("page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf):
-        result = publish(
-            md_path=str(md_path),
-            config_path=str(tmp_path / ".atlassian.json.user"),
-            page_id="123",
-            space_id=None,
-            title=None,
-            assets_dir=str(tmp_path / "assets"),
-            out_path=str(tmp_path / "final.json"),
-            threshold_bytes=0,
-        )
-
-    assert result["method"] == "mcp"
-    assert result["missingPrerequisite"] == "apiToken"
-    note_texts = [n["content"][0]["text"] for n in base_adf["content"]]
-    assert any("screenshot.png" in t for t in note_texts)
-    assert any("notes.pdf" in t for t in note_texts)

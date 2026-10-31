@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """One-command publish pipeline for `publish-page`: extract -> convert -> create/attach ->
-substitute -> publish, over the `run` subcommand (see ./page_diagrams/pipeline.py). Forces
-a REST publish whenever mermaid diagrams are present, since attachment upload needs
-`atlassian-python-api` regardless of body size; falls back to an MCP handback for small,
-diagram-free bodies or when no `apiToken` is configured -- see ../SKILL.md for
-the full workflow.
+substitute -> publish, over the `run` subcommand (see ./page_diagrams/pipeline.py). Every
+publish goes over Confluence REST via `atlassian-python-api`; `apiToken` is mandatory -- see
+../SKILL.md for the full workflow.
 
 Usage:
     python3 publish_page_diagrams.py run --md-path design.md --page-id <id> \
         --config <configPath> --out final_adf.json
 
-Requires `mmdc` (@mermaid-js/mermaid-cli) on PATH and `atlassian-python-api` (installed
-once by ../../init-atl/requirements.txt via /init-atl) whenever a REST publish is needed; credentials are read from
+Requires `atlassian-python-api` (installed once by ../../init-atl/requirements.txt via
+/init-atl), plus `mmdc` (@mermaid-js/mermaid-cli) on PATH when diagrams are present; credentials are read from
 `.atlassian.json.user` inside the script -- never passed as CLI args or literals.
 
 This file is a thin entrypoint; the pipeline lives in ./page_diagrams/, split along its seams

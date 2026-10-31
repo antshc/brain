@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Bucket @mentions from a Query B spill file and print the buckets as JSON.
+"""Bucket @mentions from Query B twg pages and print the buckets as JSON.
 
 Usage:
     python3 mentions.py --content <path> [--content <path> ...] \
-        --account-id <id> --display-name <name> [--cutoff-days 30]
+        --account-id <id> [--cutoff-days 30]
 """
 from __future__ import annotations
 

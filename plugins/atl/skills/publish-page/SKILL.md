@@ -1,19 +1,20 @@
 ---
 name: publish-page
-description: Create or update a Confluence page from a local Markdown file, running one script that extracts diagrams, converts to ADF, uploads attachments, and publishes — over REST when diagrams are present or the body is large, over MCP otherwise. Keeps inline comments attached via `<!-- adf:comment -->` anchors and posts one page comment when an update detaches any. Use when asked to publish, create, or update a Confluence page from a markdown file.
+description: >-
+  Create or update a Confluence page from a local Markdown file, running one script that extracts diagrams, converts to ADF via map-markdown-adf, uploads attachments, and publishes over Confluence REST. Keeps inline comments attached via `<!-- adf:comment -->` anchors and posts one page comment when an update detaches any. Use when asked to publish, create, or update a Confluence page from a markdown file.
 argument-hint: '<md_file_path>, [pageId], [spaceId]'
 ---
 
 # Publish Page
 
-Publish local Markdown to a Confluence page via one `run` command: extract → convert → attach → substitute → publish. Diagrams or local attachments → always REST (upload needs token). Otherwise small body → MCP, large → REST.
+Publish local Markdown to a Confluence page via one `run` command: extract → convert → attach → substitute → publish, always over REST. Not twg: only `map-markdown-adf` skill carries `<details>`, panels, status, TOC, wide tables, inline-comment anchors, and diagrams intact.
 
 ## Prerequisites
 
-- `atlassian-python-api` — installed by `init-atl` skill; if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. Needed by every REST path.
-- Diagrams or local attachments → **MUST** have `apiToken` configured in `.atlassian.json.user`.
+- `atlassian-python-api` — installed by `init-atl` skill; if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first.
+- **MUST** have `cloudId`, `email`, `apiToken` in `.atlassian.json.user`; `run` exits non-zero naming any missing key before touching a page.
 - Diagram present → **MUST** have `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli`; verify `mmdc --version`. Headless Chrome libs (Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.
-- Diagram-free source: small → MCP only; large → REST, no `mmdc`.
+- Diagram-free source → no `mmdc`.
 
 ## Diagram renderer
 
@@ -29,7 +30,7 @@ Publish local Markdown to a Confluence page via one `run` command: extract → c
 
 ### `drawioExtensionKey`
 
-`drawio` mode only. Format `<appId>/<envId>/static/drawio`; per site/install, no default. Find it: read a page already holding a Draw.io diagram with `contentFormat: "adf"`, copy the node's `attrs.extensionKey`. Missing/malformed → fails before any page is touched.
+`drawio` mode only. Format `<appId>/<envId>/static/drawio`; per site/install, no default. Find it: read the raw ADF (REST v2 `body-format=atlas_doc_format`) of a page already holding a Draw.io diagram, copy the node's `attrs.extensionKey`. Missing/malformed → fails before any page is touched.
 
 Per diagram `drawio` publishes: `.drawio` attachment (editable XML), `.drawio.png` preview, app custom content record, ADF extension node. Republish finds the record by page + diagram name and bumps it.
 
@@ -67,14 +68,14 @@ Ids are permanent: rename/delete orphans the attachment and record (`run` never 
 
 - **mdPath** — required; local Markdown path.
 - **pageId** — optional; update that page instead of creating.
-- **spaceId** — optional; resolved in Step 2.
+- **spaceId** — optional; numeric Confluence space id, resolved in Step 2.
 - **title** — optional; defaults to first `#` heading. Update writes title too → differing heading **renames** page; pass existing title to keep it. A leading level-1 heading is never published in the body — Confluence shows the title itself (`fetch-page` re-adds `# <title>` on fetch).
 
 ## Workflow
 
-**1 — Preflight.** *Run `preflight-atlassian` skill to resolve cloudId, default project key, default space id, and token availability from `.atlassian.json.user` config* **Action: Resolve**; keep `cloudId`, `configPath`.
+**1 — Preflight.** *Run `preflight-atlassian` skill to resolve site, default space id, credentialed twg command, and token availability from `.atlassian.json.user` config* **Action: Resolve**; keep `configPath`, `twg`. `tokenAvailable` false → report missing `apiToken`, stop.
 
-**2 — Resolve target.** `pageId` → update, `--page-id`. Else create, `--space-id` from first hit: supplied `spaceId` → Preflight `defaultSpaceId` (report) → `getConfluenceSpaces` `limit: 10`: one → use, report; several → ask (Preflight Ambiguity rule).
+**2 — Resolve target.** `pageId` → update, `--page-id`. Else create, `--space-id` from first hit: supplied `spaceId` → Preflight `defaultSpaceId` (report) → `<twg> confluence space list --limit <limit>`: one → use, report; several → ask, never choose silently. Space key, not numeric id (e.g. `ZIC`, `~<accountId>`) → `<twg> confluence space list --keys <key> -o json` → `data[0].id`; REST v2 create rejects keys.
 
 **3 — Run.** From this skill's directory (see Gotchas):
 
@@ -88,47 +89,30 @@ python scripts/publish_page_diagrams.py run \
 
 Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```mermaid fences and standalone local image/file refs (as `fetch-page` skill writes) with markers; convert via *`map-markdown-adf` skill to convert Markdown to Atlassian Document Format (ADF) for Confluence, preserving source wording verbatim* **Action: Convert Markdown to ADF** (CLI only; never import its code); then:
 
-- Diagrams/local attachments + token → REST: ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `fetch-page` skill-recorded `width`/`height` when present; other file → `mediaGroup`), publish.
-- Neither + token → REST if ADF > `--threshold-bytes` (default 50KB = safe MCP-inline size), else MCP handback.
-- No token → markers become notes naming `apiToken`; always MCP handback.
+- Diagrams/local attachments → ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `fetch-page` skill-recorded `width`/`height` when present; other file → `mediaGroup`), publish.
+- Neither → publish the converted ADF directly.
 
-Exits non-zero naming the cause on: missing `mmdc` (diagram path) or `drawio` (`drawio` mode); unsupported/unusable `diagramRenderer`; missing `drawioExtensionKey`; duplicate `%% diagram-id`; leftover marker after substitution. All but the last fail before any page is touched. Fix and re-run; don't work around.
+Exits non-zero naming the cause on: missing `cloudId`/`email`/`apiToken`; missing `mmdc` (diagram path) or `drawio` (`drawio` mode); unsupported/unusable `diagramRenderer`; missing `drawioExtensionKey`; duplicate `%% diagram-id`; leftover marker after substitution. All but the last fail before any page is touched. Fix and re-run; don't work around.
 
 Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); override with `--assets-dir`, `--out`.
 
 Stdout JSON:
-- `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published; report.
-- `{"method":"mcp","adfPath":...,"sizeBytes":...,"pageId":...,"spaceId":...,"title":...,"diagramsRendered":0,"renderer":...,"missingPrerequisite":"apiToken"}` → Step 4. `missingPrerequisite` only when diagrams became notes.
-- Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId` (REST), `orphanNoticePath` (MCP → Step 5), `unknownCommentIds`, `commentGuard` (`skipped (no apiToken)`, `failed (<category>)`, `notice failed (<category>)`).
+- `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published.
+- Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId`, `unknownCommentIds`, `commentGuard` (`failed (<category>)`, `notice failed (<category>)`).
 
-**4 — MCP handback.** Read the whole `adfPath` file (pretty-printed so line-truncating reads lose nothing), then:
-
-- Update → `updateConfluencePage`: `cloudId`, `pageId`, `body`, `contentFormat: "adf"`, `title` if changed.
-- Create → `createConfluencePage`: `cloudId`, `spaceId`, `title`, `body`, `contentFormat: "adf"`.
-
-**`body` MUST be the literal stringified ADF JSON**, never a file reference (`{"adf_file": ...}` → opaque 400).
-
-Body too large to inline, or no matching MCP tool found for Step 4 → re-run with `--threshold-bytes 0` (forces REST for the whole publish, skipping Step 4).
-
-**5 — Comment notice (MCP only).** Step 4 succeeded and stdout had `orphanNoticePath` → run from this skill's directory:
-
-```bash
-python scripts/publish_page_diagrams.py notify-comments --page-id <pageId> --config "<configPath>" --notice <orphanNoticePath>
-```
-
-Report page URL; with diagrams, confirm page and attachment list show every image. Report `orphanedComments` (selection + id) and `unknownCommentIds` when present.
+**4 — Report** page URL; with diagrams, confirm page and attachment list show every image. Report `orphanedComments` (selection + id) and `unknownCommentIds` when present.
 
 ## Inline comments
 
 - A Confluence inline comment stays highlighted only while the published body keeps its anchor: `<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->` (written by `fetch-page` skill; converted by `map-markdown-adf` skill).
 - Body without the anchor → Confluence keeps the comment open but detached from any text. Never deleted.
 - **MUST** keep anchors and ids unchanged when editing; move the span with its text. Delete it only when that text is removed on purpose.
-- Update with token: before publishing, `run` compares the live body's anchors with the new body's. Publish always proceeds.
+- Update: before publishing, `run` compares the live body's anchors with the new body's. Publish always proceeds.
 - Open comments anchored now but missing after → one page (footer) comment: table of highlighted text, author, excerpt, link, anchor id, plus how to reattach (re-add the span, republish) or resolve.
 - Already-detached comments are never re-reported, so republishing posts no duplicate notice.
 - Anchor id matching no page comment → `unknownCommentIds`; Confluence ignores it. Fix the id or remove the span.
-- Create path → no guard. No token → `commentGuard: "skipped (no apiToken)"`. Guard read failure → publish proceeds, `commentGuard: "failed (<category>)"`.
-- Markdown fetched without anchors (older `fetch-page`, MCP ADF without annotation marks) → refetch with `fetch-page` skill before editing, else every comment detaches.
+- Create path → no guard. Guard read failure → publish proceeds, `commentGuard: "failed (<category>)"`.
+- Markdown fetched without anchors (older `fetch-page`, or a twg Markdown export) → refetch with `fetch-page` skill before editing, else every comment detaches.
 
 ## Rules
 
@@ -136,12 +120,11 @@ Report page URL; with diagrams, confirm page and attachment list show every imag
 - Named `pageId` → update in place; create only when none named.
 - Never choose a space silently.
 - Out of scope: non-mermaid diagram formats, bulk publishing.
-- Verify publish read-only (fetch page back); **MUST NOT** re-run `updateConfluencePage`/`createConfluencePage` with test content — overwrites real publish.
+- Verify publish read-only (fetch page back); **MUST NOT** re-run `run`/`publish-adf` with test content — overwrites real publish.
 
 ## Degraded mode
 
-- No Atlassian config → Preflight resolves `cloudId`, Step 2 resolves `spaceId`; diagram-free source publishes normally.
-- No token + diagrams → text publishes via MCP; result names missing prerequisite.
+- No Atlassian config or no token → nothing published; report missing `cloudId`/`email`/`apiToken`.
 - Any Step 3 failure → nothing published; fix and re-run. `diagramRenderer=mermaid` → switch to `png` or `drawio` to publish now.
 
 ## Gotchas
@@ -150,12 +133,10 @@ Report page URL; with diagrams, confirm page and attachment list show every imag
 
 ## Other subcommands
 
-`notify-comments` = Step 5. `extract`, `render-attach`, `substitute-media`, `publish-adf`, `combine` = steps `run` chains; each invokable alone for fallback or ad-hoc use (`--help`). `replace-markers` = legacy top-level-only alias for `substitute-media`. `render-attach` supports `png` only; refuses macro renderers, points at `run`.
+`extract`, `render-attach`, `substitute-media`, `publish-adf`, `combine` = steps `run` chains; each invokable alone for ad-hoc use (`--help`). `replace-markers` = legacy top-level-only alias for `substitute-media`. `render-attach` supports `png` only; refuses macro renderers, points at `run`.
 
 ## Completion criteria
 
-- Live: `getConfluencePage` with `body-format: atlas_doc_format`. `png` → `"type": "media"` count = diagram count; 2 attachments per diagram (`.png`, `.source.mmd`). `drawio` → count `"type": "extension"` with `static/drawio`; 3 attachments per diagram (`.drawio`, `.drawio.png`, `.source.mmd`).
-- Confirm MCP response shape empirically before asserting top-level keys (e.g. `title`/`version`).
+- Live: REST v2 `GET /wiki/api/v2/pages/<pageId>?body-format=atlas_doc_format`. `png` → `"type": "media"` count = diagram count; 2 attachments per diagram (`.png`, `.source.mmd`). `drawio` → count `"type": "extension"` with `static/drawio`; 3 attachments per diagram (`.drawio`, `.drawio.png`, `.source.mmd`).
 - Raw REST probes MUST use `<site>/wiki/...`; `site_url()` returns bare site, only `atlassian-python-api` adds `/wiki` (else 404 `No endpoint POST /rest/api/content`).
-- MCP-only path and token-free degradation: manual verification only.
 

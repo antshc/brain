@@ -11,15 +11,14 @@ def _named(field: Any) -> str | None:
 
 
 def row(node: dict[str, Any]) -> dict[str, Any]:
-    fields = node["fields"]
     return {
         "key": node["key"],
-        "url": node["webUrl"],
-        "summary": fields.get("summary"),
-        "type": _named(fields.get("issuetype")),
-        "status": _named(fields.get("status")),
-        "priority": _named(fields.get("priority")),
-        "updated": to_date(fields["updated"]) if fields.get("updated") else None,
+        "url": node["url"],
+        "summary": node.get("summary"),
+        "type": _named(node.get("issuetype")),
+        "status": _named(node.get("status")),
+        "priority": _named(node.get("priority")),
+        "updated": to_date(node["updated"]) if node.get("updated") else None,
     }
 
 

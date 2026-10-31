@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print the blocked-items rows from a Query A spill file as JSON.
+"""Print the blocked-items rows from Query A twg pages as JSON.
 
 Usage:
     python3 blocked.py --content <path> [--content <path> ...]

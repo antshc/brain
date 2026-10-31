@@ -16,7 +16,6 @@ from fetch_diagrams import (
     restore_diagrams,
     restore_diagrams_failed,
     restore_diagrams_skipped,
-    restore_diagrams_without_credentials,
 )
 
 
@@ -350,22 +349,6 @@ def test_restore_diagrams_notes_when_media_id_has_no_matching_attachment():
 
     assert "unknown-file" in result
     assert "not found" in result
-
-
-def test_restore_diagrams_without_credentials_replaces_every_placeholder_with_a_note():
-    md = (
-        '<!-- adf:diagram drawio="order-flow.drawio" -->\n\n'
-        '<!-- adf:attachment media-id="file-1" alt="" -->'
-    )
-    result = restore_diagrams_without_credentials(md)
-
-    assert result.count("apiToken") == 2
-    assert "```mermaid" not in result
-
-
-def test_restore_diagrams_without_credentials_leaves_plain_markdown_untouched():
-    md = "# Title\n\nJust text.\n"
-    assert restore_diagrams_without_credentials(md) == md
 
 
 def test_restore_diagrams_skipped_replaces_every_placeholder_with_a_skipped_note():

@@ -2,7 +2,7 @@
 publish-page subcommand. `run` (see pipeline.py) chains the full pipeline — extract,
 Markdown<->ADF conversion, attachment upload, marker substitution, and publish; the
 older per-step subcommands (`extract`/`render-attach`/`substitute-media`/`publish-adf`)
-remain for the MCP/degraded fallback and ad-hoc use — see ../../SKILL.md.
+remain for ad-hoc use — see ../../SKILL.md. Every publish goes over REST.
 """
 from __future__ import annotations
 
@@ -11,7 +11,6 @@ import json
 import sys
 from pathlib import Path
 
-from . import comment_guard
 from .adf import replace_markers, substitute_media
 from .env import get_confluence, load_credentials, load_renderer
 from .mermaid import extract_mermaid, render_diagrams
@@ -20,12 +19,6 @@ from .patterns import strip_ignored_sections
 from .pipeline import publish
 from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
 from . import renderers
-
-# Default ceiling above which publish-adf/run switch to REST instead of MCP. The
-# practical limit here is what an agent can safely inline into an MCP tool argument, not
-# a Confluence/MCP transport limit — pass 0 to always force REST.
-DEFAULT_THRESHOLD_BYTES = 50_000
-
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Diagram rendering and attachment upload for publish-page.")
@@ -67,27 +60,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     publish_adf = sub.add_parser(
         "publish-adf",
-        help="Auto-detect ADF body size (stdin: {\"adf\": ...}) and either publish it directly via "
-        "REST v2 (when over threshold) or signal back to use the MCP publish call (when under it).",
+        help="Publish an ADF body (stdin: {\"adf\": ...}) via Confluence REST v2.",
     )
     publish_adf.add_argument("--page-id", help="Confluence pageId to update (update path)")
     publish_adf.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
     publish_adf.add_argument("--title", help="Page title (create path, or update path when the title changed)")
-    publish_adf.add_argument("--config", help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
-    publish_adf.add_argument(
-        "--threshold-bytes",
-        type=int,
-        default=DEFAULT_THRESHOLD_BYTES,
-        help=f"ADF byte-size threshold above which REST publish is used instead of MCP (default: "
-        f"{DEFAULT_THRESHOLD_BYTES}). The practical ceiling here is what an agent can safely inline "
-        f"into an MCP tool argument, not Confluence/MCP transport itself — pass 0 to always force REST.",
-    )
+    publish_adf.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
 
     run = sub.add_parser(
         "run",
         help="Full pipeline in one call: extract -> md-to-adf -> create/attach -> substitute -> "
-        "publish. Forces a REST publish whenever diagrams are present, regardless of "
-        "--threshold-bytes; falls back to an MCP handback for small, diagram-free bodies.",
+        "publish, over Confluence REST.",
     )
     run.add_argument("--md-path", required=True, help="Path to the local Markdown file to publish")
     target = run.add_mutually_exclusive_group(required=True)
@@ -100,14 +83,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Directory to write rendered .mmd/.png files into (default: <md path>.tmp)",
     )
     run.add_argument("--out", help="Path to write the final ADF to (default: <assets dir>/final-adf.json)")
-    run.add_argument(
-        "--threshold-bytes",
-        type=int,
-        default=DEFAULT_THRESHOLD_BYTES,
-        help=f"ADF byte-size threshold above which a diagram-free body is published via REST instead "
-        f"of MCP (default: {DEFAULT_THRESHOLD_BYTES}); ignored (forced to 0) whenever diagrams are "
-        f"present. Pass 0 to always force REST.",
-    )
     run.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
 
     combine = sub.add_parser(
@@ -122,23 +97,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     combine.add_argument("--out", required=True, help="Path to write the combined JSON to")
 
-    notify = sub.add_parser(
-        "notify-comments",
-        help="Post the detached-inline-comment notice `run` wrote (`orphanNoticePath`) as a page "
-        "comment. Run only after the MCP publish of an MCP handback succeeded.",
-    )
-    notify.add_argument("--page-id", required=True, help="Confluence pageId that was published")
-    notify.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
-    notify.add_argument("--notice", required=True, help="`orphanNoticePath` from `run`'s stdout")
-
     return parser
-
-
-def _run_notify_comments(args: argparse.Namespace) -> None:
-    storage = Path(args.notice).read_text(encoding="utf-8")
-    comment_id = comment_guard.post_notice(get_confluence(load_credentials(args.config)), args.page_id, storage)
-    json.dump({"orphanNoticeCommentId": comment_id}, sys.stdout)
-    sys.stdout.write("\n")
 
 
 def _run_extract() -> None:
@@ -221,12 +180,6 @@ def _run_publish_adf(args: argparse.Namespace) -> None:
     payload = json.loads(sys.stdin.read())
     adf = payload["adf"]
     size_bytes = adf_body_size(adf)
-
-    if size_bytes <= args.threshold_bytes:
-        json.dump({"method": "mcp", "sizeBytes": size_bytes, "thresholdBytes": args.threshold_bytes}, sys.stdout)
-        sys.stdout.write("\n")
-        return
-
     credentials = load_credentials(args.config)
     confluence = get_confluence(credentials)
 
@@ -262,7 +215,6 @@ def _run_run(args: argparse.Namespace) -> None:
             title=args.title,
             assets_dir=assets_dir,
             out_path=out_path,
-            threshold_bytes=args.threshold_bytes,
             mermaid_bg=args.mermaid_bg,
         )
     except FileNotFoundError:
@@ -309,8 +261,6 @@ def main(argv: list[str] | None = None) -> None:
         _run_run(args)
     elif args.action == "combine":
         _run_combine(args)
-    elif args.action == "notify-comments":
-        _run_notify_comments(args)
     else:
         _run_replace_markers(args)
 
