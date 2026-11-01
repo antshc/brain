@@ -14,7 +14,7 @@ automatic retries or continuation.
 
 ### Additional idea-framing and planning skills
 
-These are **optional entry points**, not mandatory steps in every feature flow.
+These are **optional entry points**, not mandatory steps in every feature flow. The diagrams label them on their conditional paths.
 
 | Collection | Skill | Role |
 | --- | --- | --- |
@@ -26,6 +26,7 @@ These are **optional entry points**, not mandatory steps in every feature flow.
 ## 1. Addy Osmani: spec to safe rollout
 
 The repository explicitly defines `/spec`, `/plan`, `/build`, `/review`, and `/ship`.
+`interview-me` is the conditional intake when the user's intent is unclear.
 `/build` processes the next task; `/build auto` processes all tasks after one plan
 approval. Both retain per-task tests, verification, and commits. The review is
 five-axis; `/ship` also performs readiness checks and produces a go/no-go decision.
@@ -37,24 +38,28 @@ unconditional side effect of the `/ship` command.
 %% diagram-id: addy-feature-development-flow
 flowchart TD
     start(["Start"])
-    spec["1 - Define feature and acceptance criteria /spec"]
-    plan["2 - Break spec into verifiable tasks /plan"]
-    task["3 - Select next dependency-ready task /build"]
-    build["4 - Build vertical slice with RED then GREEN"]
-    verify["5 - Test, build, commit, mark task complete"]
-    remaining{"6 - Tasks remaining?"}
-    next(["Next task - back to step 3"])
-    review["7 - Review correctness, clarity, architecture, security, performance"]
-    blockers{"8 - Blocking findings?"}
-    fix(["Resolve findings - back to step 4"])
-    ship["9 - Pre-launch checks and go/no-go /ship"]
-    rollout["10 - Deploy, monitor, gradually release with rollback ready"]
+    unclear{"1 - User intent unclear?"}
+    interview["1a.1 - interview-me: clarify intent"]
+    spec["2 - spec-driven-development /spec"]
+    plan["3 - planning-and-task-breakdown /plan"]
+    task["4 - incremental-implementation /build: select task"]
+    build["5 - test-driven-development: RED then GREEN"]
+    verify["6 - incremental-implementation: test, build, commit"]
+    remaining{"7 - Tasks remaining?"}
+    next(["Next task - back to step 4"])
+    review["8 - code-review-and-quality /review"]
+    blockers{"9 - Blocking findings?"}
+    fix(["Resolve findings - back to step 5"])
+    ship["10 - shipping-and-launch /ship: go/no-go"]
+    rollout["11 - shipping-and-launch: staged rollout and monitoring"]
     done(["End"])
 
-    start --> spec --> plan --> task --> build --> verify --> remaining
+    start --> unclear
+    unclear -- No --> spec --> plan --> task --> build --> verify --> remaining
     remaining -- No --> review --> blockers
     blockers -- No --> ship
     ship -. "on approved deploy" .-> rollout --> done
+    unclear -- Yes --> interview --> spec
     remaining -- Yes --> next
     blockers -- Yes --> fix
 
@@ -75,7 +80,7 @@ Sources: [`using-agent-skills`](https://github.com/addyosmani/agent-skills/blob/
 
 ## 2. Matt Pocock: idea to reviewed implementation
 
-`ask-matt` defines the main route. The initial grilling records domain terms in
+`ask-matt` defines the main route. `wayfinder` is an optional planning detour for large unresolved efforts. The initial grilling records domain terms in
 `GLOSSARY.md` and decisions in ADRs. A runnable design question can detour through
 `prototype` and return with evidence. A small job can use `implement` directly;
 a multi-session job becomes `to-spec` and `to-tickets` first. Tickets are vertical
@@ -88,32 +93,35 @@ in parallel worktrees on an integration branch.
 %% diagram-id: matt-feature-development-flow
 flowchart TD
     start(["Start"])
-    grill["1 - Grill idea and record domain decisions"]
+    grill["1 - grill-with-docs: clarify idea and domain"]
     empirical{"2 - Runnable design question?"}
-    prototype["2a.1 - Prototype and carry findings back"]
+    prototype["2a.1 - prototype: test and bring findings back"]
     size{"3 - Multi-session build?"}
-    spec["3a.1 - Publish spec /to-spec"]
-    tickets["3a.2 - Create tracer-bullet ticket graph /to-tickets"]
-    strategy{"3a.3 - Parallel frontier?"}
-    parallel["3a.3a.1 - Orchestrate integration branch /implement-spec"]
-    sequential["3a.3b.1 - Implement per ticket in fresh context"]
-    direct["3b.1 - Implement small job in current context"]
-    implement["4 - Implement behavior with /tdd at agreed seams"]
-    review["5 - Review Standards and Spec against diff"]
-    pr["6 - Present PR with proof and merge danger"]
-    retro["7 - Improve agent environment /retro"]
+    fog{"3a.1 - Major unknown decisions?"}
+    wayfinder["3a.1a.1 - wayfinder: resolve decision tickets"]
+    spec["3a.2 - to-spec: publish spec"]
+    tickets["3a.3 - to-tickets: create blocker graph"]
+    strategy{"3a.4 - Parallel frontier?"}
+    parallel["3a.4a.1 - implement-spec: integration branch"]
+    sequential["3a.4b.1 - implement: one ticket at a time"]
+    direct["3b.1 - implement: small task in current context"]
+    implement["4 - tdd: build behavior at agreed seams"]
+    review["5 - code-review: Standards and Spec"]
+    pr["6 - pr: proof and merge risk"]
+    retro["7 - retro: improve agent environment"]
     done(["End"])
 
     start --> grill --> empirical
     empirical -- No --> size
-    size -- Yes --> spec --> tickets --> strategy
+    size -- Yes --> fog
+    fog -- No --> spec --> tickets --> strategy
     strategy -- Yes --> parallel --> implement
-    implement --> review --> pr
-    pr -. "on retrospective request" .-> retro --> done
-    pr --> done
+    implement --> review --> pr --> done
     empirical -- Yes --> prototype --> size
+    fog -- Yes --> wayfinder --> spec
     size -- No --> direct --> implement
     strategy -- No --> sequential --> implement
+    pr -. "on retrospective request" .-> retro --> done
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
@@ -137,7 +145,8 @@ Sources: [`ask-matt`](https://github.com/mattpocock/skills/blob/main/skills/engi
 
 ## 3. Cursor pstack: design-led feature playbook
 
-`poteto-mode` routes new or changed behavior to the `Feature` playbook. The
+`poteto-mode` routes new or changed behavior to the `Feature` playbook.
+`in-your-own-words` and `sharpen` are separately user-invoked framing skills, not required Feature steps. The
 lead agent owns design and review, and assigns code-writing to an implementation
 subagent. `how` grounds the existing subsystem; `architect` uses competing
 sketches before selecting a design. A throughput checkpoint names blockers,
@@ -149,19 +158,27 @@ Verification must use the actual surface, not merely a successful compile.
 %% diagram-id: pstack-feature-development-flow
 flowchart TD
     start(["Start"])
-    how["1 - Ground affected subsystem /how"]
-    architect["2 - Explore and synthesize design /architect"]
-    checkpoint["3 - Map blockers, workstreams, shared state, decomposition"]
-    delegate["4 - Delegate scoped code-writing to implementer"]
-    verify["5 - Verify on actual runtime or user surface"]
-    commits["6 - Order small verifiable commits and stack follow-ups"]
-    contested{"7 - Design contested?"}
-    interrogate["7a.1 - Adversarial review /interrogate"]
-    pr["8 - Clean diff and open explained PR"]
+    restate{"1 - User requested goal restatement?"}
+    ownWords["1a.1 - in-your-own-words: restate problem"]
+    deepen{"2 - User requested task sharpening?"}
+    sharpen["2a.1 - sharpen: deepen prompt and evidence"]
+    how["3 - how: ground affected subsystem"]
+    architect["4 - architect: synthesize competing designs"]
+    checkpoint["5 - poteto-mode Feature: map blockers and workstreams"]
+    delegate["6 - poteto-mode Feature: delegate scoped code"]
+    verify["7 - principle-prove-it-works: verify actual surface"]
+    commits["8 - principle-sequence-verifiable-units: small commits"]
+    contested{"9 - Design contested?"}
+    interrogate["9a.1 - interrogate: adversarial review"]
+    pr["10 - poteto-mode Opening a PR"]
     done(["End - PR opened"])
 
-    start --> how --> architect --> checkpoint --> delegate --> verify --> commits --> contested
+    start --> restate
+    restate -- No --> deepen
+    deepen -- No --> how --> architect --> checkpoint --> delegate --> verify --> commits --> contested
     contested -- No --> pr --> done
+    restate -- Yes --> ownWords --> deepen
+    deepen -- Yes --> sharpen --> how
     contested -- Yes --> interrogate --> pr
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
