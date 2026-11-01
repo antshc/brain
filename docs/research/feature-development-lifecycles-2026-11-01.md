@@ -12,6 +12,17 @@ automatic retries or continuation.
 | [Matt Pocock — skills](https://github.com/mattpocock/skills) | Grill → Spec/Tickets when needed → Implement → Review → PR → Retro | Domain language, tracer-bullet tickets, explicit blockers, fresh contexts |
 | [Cursor — pstack](https://github.com/cursor/plugins/tree/main/pstack) | How → Architect → Decompose → Delegate → Verify → PR | Design alternatives, implementation delegation, runtime proof |
 
+### Additional idea-framing and planning skills
+
+These are **optional entry points**, not mandatory steps in every feature flow.
+
+| Collection | Skill | Role |
+| --- | --- | --- |
+| Addy Osmani | [`interview-me`](https://github.com/addyosmani/agent-skills/blob/main/skills/interview-me/SKILL.md) | Ask one question at a time to discover user intent before the spec when requirements are unclear. |
+| Matt Pocock | [`wayfinder`](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md) | Map and resolve decision tickets for efforts too large or uncertain for one session; hand off to `to-spec` when clear. |
+| Cursor pstack | [`in-your-own-words`](https://github.com/cursor/plugins/blob/main/pstack/skills/in-your-own-words/SKILL.md) | Restate the user's goal and underlying problem to check understanding. |
+| Cursor pstack | [`sharpen`](https://github.com/cursor/plugins/blob/main/pstack/skills/sharpen/SKILL.md) | Deepen task rigor and rewrite the prompt with better evidence and validation, without expanding its scope. |
+
 ## 1. Addy Osmani: spec to safe rollout
 
 The repository explicitly defines `/spec`, `/plan`, `/build`, `/review`, and `/ship`.
