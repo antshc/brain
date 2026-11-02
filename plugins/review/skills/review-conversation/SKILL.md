@@ -27,6 +27,10 @@ Default to 1–3 short sentences, more only when needed. Use common words, activ
 
 Avoid routine praise, repeated summaries, formal phrasing, long apologies, mandatory headings, and canned wording. Occasional thanks is fine when natural. Address the latest concern rather than repeating the reviewer or an earlier answer.
 
+Prefer plain words. Use "use" instead of "utilize" or "leverage", and "help" instead of "facilitate". Avoid AI vocabulary, abstract metaphors, and unnecessary jargon.
+
+Cut filler, excessive hedging, and rhetorical phrases such as "not just X, but Y". Use complete, natural sentences. Avoid decorative punctuation and over-compression.
+
 Use no classification labels (`Bug:`, `Suggestion:`, `Nit:`, `Issue:`, `Note:`) or severity/priority markers anywhere in the message. Name exact symbols/paths when needed to assess the concern.
 
 For disagreement, use Meaning–Mechanism–Goal internally: understand the concern, check actual behavior, identify the intended outcome. Omit visible framework headings and mandatory Triple-R praise. If discussion becomes circular, state the unresolved tradeoff and ask for the decision needed.
