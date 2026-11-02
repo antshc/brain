@@ -16,4 +16,5 @@
 - `apiToken` is mandatory: no `atl` content skill reads or publishes without it, and twg uses it via `TWG_USER`/`TWG_TOKEN`/`TWG_SITE` injected by `preflight-atlassian`'s `scripts/twg_cred.py`, which redacts the credentials from output.
 - `plugins/atl/.mcp.json` is deleted; `publish-page` drops its MCP handback, `--threshold-bytes`, and `notify-comments`.
 - twg commands request Markdown, never HTML.
+- Exception: `address-page-comments` edits a commented page in place with twg targeted edits (`content update --edits-file`, HTML node values against a `--draft --format html` read). twg preserves untouched nodes exactly, so inline-comment anchors, macros, and diagrams survive; full-body replacement through twg stays forbidden.
 - `publish-page` keeps `mmdc` and `atlassian-python-api>=5.0.5`; each skill builds a `ConfluenceCloud` client on `<site>/wiki` and uploads attachments over REST, since 5.x dropped the implicit `/wiki` and `Confluence.attach_file()`.

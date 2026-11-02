@@ -205,6 +205,7 @@ Atlassian workflow skills.
 - [preflight-atlassian](plugins/atl/skills/init-atl/preflight-atlassian.SKILL.template.md): `init-atl` template generated per-repo into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
 - [fetch-work](plugins/atl/skills/fetch-work/SKILL.md) / [publish-work](plugins/atl/skills/publish-work/SKILL.md): fetch or create/update a Jira work item.
 - [fetch-page](plugins/atl/skills/fetch-page/SKILL.md) / [publish-page](plugins/atl/skills/publish-page/SKILL.md): fetch or create/update a Confluence page.
+- [address-page-comments](plugins/atl/skills/address-page-comments/SKILL.md): address open Confluence page review comments; edit the page in place with twg targeted edits, reply per thread, and answer comments whose anchor text was removed in a page comment.
 - [map-markdown-adf](plugins/atl/skills/map-markdown-adf/SKILL.md): convert Markdown to/from Atlassian Document Format, and detect the constructs only ADF can express.
 
 ### ms
