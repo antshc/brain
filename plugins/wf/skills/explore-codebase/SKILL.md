@@ -42,7 +42,7 @@ Preserve every repository or service name in the question.
 
 **Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `@repoRoot` itself for documentation, the main codebase repository under `@repoRoot/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk. A name the list has no path for routes to the GitHub tools.
 
-**Graph coverage** — read `graphify-out/manifest.json` under each enumerated checkout, where present. These are graphs over one multi-repo codebase, not a preference order: pick the graph whose manifest names the resolved target; several naming it are one codebase seen from different cuts — take the widest. Settle exactly one value, `GRAPH_PATH=<absolute path>` or `GRAPH=none`.
+**Graph coverage** — read `graphify-out/manifest.json` under each enumerated checkout, where present. These are graphs over one multi-repo codebase, not a preference order: pick the graph whose manifest names the resolved target; several naming it are one codebase seen from different cuts — take the widest. Settle exactly one graph, or none.
 
 Report a name that resolves to neither a local checkout nor a GitHub repository as unresolved.
 
@@ -77,10 +77,12 @@ Each level supersedes the one below it for claims about that target. A question 
 
 **Graphify** — local checkouts only: the target checkout itself, plus any other deployable or supporting repository that is checked out locally. A target with no local checkout stays on the GitHub tools.
 
-- MUST use when resolution settled a `GRAPH_PATH` **and** the question is one a graph answers — architecture, relationships, an A-to-B connection or flow. A symbol, literal, config, or test lookup goes straight to LSP and grep.
-- `GRAPH=none` means no graph covers the target — continue with normal exploration; never re-scan for a manifest the resolution step already ruled out.
-- On a `GRAPH_PATH` and a matching question, query that graph before LSP, grep, or semantic search: `graphify query` for broad architecture or relationship questions, `graphify path` for an A-to-B connection or flow, and `graphify explain` for one graph concept. A missing Graphify node is never evidence of absence — settle decisive behavior and absence claims in source.
-- Graphify stays read-only. Never build or update a missing graph, install Graphify, or run reflection, vocabulary-sidecar, `save-result`, add, watch, export, feedback, or any other write-producing operation. If the graph, command, or answer is unavailable or unhelpful, continue with normal exploration.
+- MUST use when Graph coverage selected a graph **and** the answer depends on relationships rather than one known item: architecture/orientation, multi-hop or cross-module/cross-repo flow, impact/blast radius, concept→code mapping with unknown names, doc↔code links, or narrowing a large search space. Known symbol, literal, config, test, or single-file lookups go straight to LSP/grep.
+- Graph selected → **MUST load the `graphify` skill first** when available and follow its query path: health/intent preflight, any workspace reference it names, its routing rules. Its rules supersede the defaults below.
+- `graphify` skill unavailable → query that graph directly: `graphify query` for broad architecture or relationship questions, `graphify path` for an A-to-B connection or flow, `graphify explain` for one graph concept.
+- No graph covers the target → continue with normal exploration; never re-scan for a manifest Graph coverage already ruled out.
+- Graph narrows and orients; LSP/grep locate; source proves. A missing Graphify node is never evidence of absence; settle decisive behavior and absence claims in source. Code changed after the graph build → trust source.
+- Read-only either way: the read-only contract overrides the `graphify` skill. Never build or update a graph, install Graphify, or run reflection, vocabulary-sidecar, `save-result`, add, watch, export, feedback, or any other write-producing operation. Graph, skill, or answer unavailable or unhelpful → continue with normal exploration.
 
 ## Return the verdict
 
@@ -89,3 +91,4 @@ Default `@outputShape`: one concise verdict with target-relative files, relevant
 ## Gotchas
 
 - CWD drifts after `cd` into a worktree or nested repo; `git rev-parse --show-toplevel` there returns that sub repo, hiding launch-folder `ARCHITECTURE.md`, contracts, and the `Deployables` index. Keep the launch-folder `@repoRoot`.
+- Tool skills (`graphify`, `inspect-nuget-source`) are tool selection, not caller work — load them when routing picks them; never wait for the caller to name them in `@work`.
