@@ -12,7 +12,7 @@ The scope is what the user names. Otherwise it is the branch diff from its merge
 
 ## Fan out
 
-Run Phase A steps 3 and 4 and Phase B of `arena/arena.md`, with four changes. Take the runners from the `interrogate reviewers` role in `models.md`. Copy the scope's uncommitted changes into each worktree. Spawn each adversary as `general-purpose`. In place of the arena task and rationale, give each adversary the scope, the intent, and this brief:
+Run Phase A steps 3 and 4 and Phase B of `arena/arena.md`, with four changes. Take the runners from the `interrogate reviewers` role in `models.md`; N is the caller's `adversaries` count (1–3), default 1, never `arena-agents`. Copy the scope's uncommitted changes into each worktree. Spawn each adversary as `general-purpose`. In place of the arena task and rationale, give each adversary the scope, the intent, and this brief:
 
 > *Run `experiment` skill to test uncertain technical behavior through observation.* Pass the claim, intent, scope, runnable target, success/refutation criteria, prior evidence, and safety limits. Invoke it directly, without the Prototype wrapper or nested Interrogate; reuse valid reproductions and preserve them until coordinator verification. Keep state local or in authorized sandboxes; never use destructive production targets or expand credentials/permissions.
 
