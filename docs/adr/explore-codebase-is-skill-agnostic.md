@@ -16,6 +16,6 @@ Agnosticism covers the caller's `@work` only. Tool selection includes tool skill
 
 - Target resolution, the codebase index, and tool selection stay in one place — the subagent loads them from the skill instead of a caller brief.
 - Each caller states its delegation shape (single, parallel, sequential) and consolidation; callers with several tracks (`define-concept`) hold that procedure once in their own skill.
-- The read-only contract carries one generic exception: the caller's `@outputArtifact`.
+- The read-only contract carries one generic exception, the caller's `@outputArtifact`, plus a per-user `rg` install when missing — a tool prerequisite outside every repository.
 - The explore-agent fallback lacks the skill's routing rules; the caller accepts weaker target resolution there.
 - `explore-codebase` names tool skills it routes to; adding a delegable work skill still needs no edit here.
