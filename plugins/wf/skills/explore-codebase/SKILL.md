@@ -26,7 +26,7 @@ The caller owns what the exploration produces — a named skill owns its own pro
 
 Exploration is strictly read-only. Do not edit source, documentation, configuration, generated files, `@repoRoot/graphify-out/`, or any target-repo `graphify-out/`.
 
-The one exception is `@outputArtifact` — write that file, and nothing else.
+Exceptions: write `@outputArtifact` and nothing else; install `rg` per-user when missing (see Select tools by question shape).
 
 ## Resolve the repository root
 
@@ -63,7 +63,8 @@ Each level supersedes the one below it for claims about that target. A question 
 **Local checkout**
 
 - Use LSP definitions, references, implementations, and call hierarchy for known symbols.
-- Use exact grep for literals, configuration, errors, and test names.
+- Use exact grep for literals, configuration, errors, and test names — the harness grep tool, else `rg` in the shell (faster, skips binaries; `-t <lang>`/`-g <glob>` to narrow); plain `grep -r` only when the install below fails.
+- `rg` missing (`command -v rg` empty) → install it once per-user, no sudo: fetch the latest `BurntSushi/ripgrep` release asset for the platform (`x86_64-unknown-linux-musl`, `aarch64-unknown-linux-gnu`, `<arch>-apple-darwin` `.tar.gz`; `x86_64-pc-windows-msvc` `.zip`), verify it against its `.sha256` asset, extract only the `rg` binary to `~/.local/bin/` (Windows: `%LOCALAPPDATA%\Programs\ripgrep\`), and run it by absolute path if that folder is not on `PATH`. Checksum mismatch, no network, or any failure → skip the install and fall back to `grep -r`; never use sudo or a system package manager.
 - Use semantic search for fuzzy concepts or unknown ownership.
 - Use targeted reads to verify final evidence.
 - For a C# type absent from local source, Run `/inspect-nuget-source` skill rather than broadening the search across the disk.
@@ -92,3 +93,4 @@ Default `@outputShape`: one concise verdict with target-relative files, relevant
 
 - CWD drifts after `cd` into a worktree or nested repo; `git rev-parse --show-toplevel` there returns that sub repo, hiding launch-folder `ARCHITECTURE.md`, contracts, and the `Deployables` index. Keep the launch-folder `@repoRoot`.
 - Tool skills (`graphify`, `inspect-nuget-source`) are tool selection, not caller work — load them when routing picks them; never wait for the caller to name them in `@work`.
+- grep tool and `rg` skip gitignored and hidden files (generated code, build output, `graphify-out/`, vendored folders). Before claiming something is absent, re-search with `rg -uu` or confirm the path is not ignored.
