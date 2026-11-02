@@ -12,7 +12,7 @@ For each question raised by the sketch, `architect`, or `interrogate`, preserve 
 - **Observable technical uncertainty:** run the `experiment` skill with one falsifiable question and a real CLI, test, or minimal throwaway app when reading cannot settle it. Apply observed results; use the `prototype` playbook only for comparing design alternatives, not for an already testable fact.
 - **Product/preference:** apply the supported recommendation and log the rejected alternative.
 - **Unanswerable with available access/evidence:** log `unanswerable` with its reason and proceed only on a safe reversible path.
-- **New risk discovered:** when a resolution (research, experiment, or prototype) surfaces a material risk or changes the sketch, run `interrogate` again on the revised scope, including any prototype or `experiment` artifact, with the same `interrogate reviewers` models. Reuse coverage for an unchanged scope/revision. Loop until no new risk appears.
+- **New risk discovered:** when a resolution (research, experiment, or prototype) surfaces a material risk or changes the sketch, run `interrogate` again on the revised scope, including any prototype or `experiment` artifact, taking models in order from the `interrogate reviewers` role. Pick `adversaries` from the risk: `3` when it changes the sketch's shape, crosses a boundary (data, concurrency, security, public contract), or is hard to reverse; `1` when it is local to one part with an unchanged contract. Log the count and its reason. Reuse coverage for an unchanged scope/revision. Loop until no new risk appears.
 
 Record evidence, conclusions, and changes to the sketch/rationale. Never treat a technical how/why question as a user preference.
 
