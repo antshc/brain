@@ -12,7 +12,8 @@ import sys
 from pathlib import Path
 
 from .adf import replace_markers, substitute_media
-from .env import get_confluence, load_credentials, load_renderer
+from .confluence_client import get_confluence
+from .env import load_credentials, load_renderer
 from .mermaid import extract_mermaid, render_diagrams
 from .attachments import upload_diagrams
 from .patterns import strip_ignored_sections
@@ -198,6 +199,15 @@ def _run_publish_adf(args: argparse.Namespace) -> None:
     sys.stdout.write("\n")
 
 
+def _warn_partial_removals(result: dict) -> None:
+    for removal in result.get("partialCommentRemovals", []):
+        print(
+            f"warning: comment anchor {removal['id']} spanned {removal['before']} blocks, now "
+            f"{removal['after']}; edit or remove all spans together",
+            file=sys.stderr,
+        )
+
+
 def _run_run(args: argparse.Namespace) -> None:
     md_path = Path(args.md_path)
     # Artifacts sit beside the source as `<md filename>.tmp`, suffix included, so the folder
@@ -228,6 +238,7 @@ def _run_run(args: argparse.Namespace) -> None:
         print(f"error: {e}", file=sys.stderr)
         raise SystemExit(1)
 
+    _warn_partial_removals(result)
     json.dump(result, sys.stdout)
     sys.stdout.write("\n")
 

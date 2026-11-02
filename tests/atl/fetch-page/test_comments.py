@@ -1,12 +1,15 @@
 """`comments.py` and `append_comments`: list a page's comment threads as an ignored Markdown section."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import assemble_page
 import pytest
 from comments import (
     CommentRetrievalError,
     fetch_comment_threads,
     render_comments_section,
+    shared_anchor_blocks,
     storage_to_text,
 )
 from requests.exceptions import ConnectionError as RequestsConnectionError
@@ -98,3 +101,28 @@ def test_append_comments_appends_section_or_failure_note():
     failed = assemble_page.append_comments("body\n", "1", _FakeConfluence({}, fail=True), "https://s.example")
     assert "Comments not listed: comment retrieval failed (ConnectionError)." in failed
     assert "secret" not in failed
+
+
+_FIXTURE = Path(__file__).parent / "fixtures" / "shared-anchor.md"
+_SHARED_ID = "1e1cb525-8cdd-4497-8fce-7213342df598"
+
+
+def test_shared_anchor_blocks_lists_ids_on_more_than_one_block():
+    assert shared_anchor_blocks(_FIXTURE.read_text()) == {_SHARED_ID: 2}
+
+
+def test_shared_anchor_blocks_ignores_the_comments_section():
+    markdown = _FIXTURE.read_text() + (
+        '<!-- adf:ignore:start -->\n<!-- adf:comment id="7f3a0c2e-1111-4222-8333-944455556666" -->x'
+        "<!-- /adf:comment -->\n<!-- adf:ignore:end -->\n"
+    )
+
+    assert shared_anchor_blocks(markdown) == {_SHARED_ID: 2}
+
+
+def test_render_notes_a_shared_anchor_id_in_the_comments_section():
+    section = render_comments_section([], _FIXTURE.read_text(), "https://s.example")
+
+    assert "## Comments" in section
+    assert f"id `{_SHARED_ID}` spans 2 blocks; edit or remove all together" in section
+    assert "7f3a0c2e-1111-4222-8333-944455556666` spans" not in section

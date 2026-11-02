@@ -11,7 +11,7 @@ Return a Confluence **Page** as Markdown. REST reads the real ADF body, attachme
 
 ## Prerequisites
 
-- `atlassian-python-api` installed by `init-atl` skill; if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. This skill installs nothing.
+- `atlassian-python-api>=5.0.5` installed by `init-atl` skill; missing or other version (script exits `atlassian-python-api >=5.0.5 required, found <version>; run init-atl`), *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. This skill installs nothing.
 - `cloudId`, `email`, `apiToken` in `.atlassian.json.user` (see `preflight-atlassian` skill). Missing → script exits non-zero naming them; report and stop.
 
 ## Workflow
@@ -25,7 +25,7 @@ Return a Confluence **Page** as Markdown. REST reads the real ADF body, attachme
    ```bash
    python3 scripts/assemble_page.py --page-id <page_id> --config "<configPath>" --md-path page.md [--site https://<site>]
    ```
-   Fetches title + ADF over REST v2 (`body-format=atlas_doc_format`). Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`, `--comments auto|skip`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`. REST failure → `Page fetch failed: <category>`, no `page.md`.
+   Fetches title + ADF over REST v2 (`body-format=atlas_doc_format`). Optional: `--assets-dir <dir>` (default `page.md.assets`), `--attachments auto|skip|required`, `--comments auto|skip`. Converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`. REST failure → `Page fetch failed: <category>`, no `page.md`; category = exception class + HTTP status, plus a hint for 404 (`check site URL and page id; wrong API base?`) and 401/403 (`check email/apiToken`).
 4. **Return** `page.md` unchanged.
 
 Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `page.md` or retry with edited ADF.
@@ -48,7 +48,7 @@ Links percent-encoded, relative to `page.md`'s dir. `publish-page` skill re-uplo
 
 ## `--attachments` modes
 
-- **`auto`** (default) — retrieve. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` — **MUST NOT** include exception text (may hold signed URL/token).
+- **`auto`** (default) — retrieve. Listing/download/publish failure (TLS, timeout, HTTP, disk) → keep title/body; note with safe category only, e.g. `attachment retrieval failed (SSLError)` or `(HTTPError 403: check email/apiToken)` — **MUST NOT** include exception text (may hold signed URL/token).
 - **`skip`** — no attachment REST call; note `attachment retrieval skipped (--attachments skip)`.
 - **`required`** — failure or unresolvable placeholder → non-zero exit, `Attachment retrieval failed: <reason>` on stderr, no `page.md`.
 
@@ -56,6 +56,8 @@ Links percent-encoded, relative to `page.md`'s dir. `publish-page` skill re-uplo
 
 - Body inline comments arrive as `<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->` spans (via `map-markdown-adf` skill); they keep comments attached when `publish-page` skill republishes.
 - **`--comments auto`** (default): appends `## Comments` inside `<!-- adf:ignore:start/end -->` — each inline/footer thread with author, date, plain-text body, replies, Confluence link; inline threads say whether their id is anchored in the body.
+- Shared anchor: one comment over several blocks (e.g. two bullets) fetches as the same id on each → `## Comments` notes `id X spans N blocks; edit or remove all together`.
+- **MUST** edit or remove every span of a shared id together; removing only some leaves the comment attached or detached unpredictably (`publish-page` warns).
 - REST failure → note with safe category only, e.g. `comment retrieval failed (ConnectionError)`; `page.md` still written.
 - **`--comments skip`** — no lookup.
 

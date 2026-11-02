@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -162,3 +163,51 @@ def test_guard_skips_on_create(tmp_path):
         "page_diagrams.pipeline.get_confluence", return_value=MagicMock()
     ), patch("page_diagrams.pipeline.create_page_adf", return_value={"id": "5"}):
         assert "commentGuard" not in _publish(tmp_path, md, page_id=None)
+
+
+
+
+
+
+_FIXTURES = Path(__file__).parent / "fixtures"
+_SHARED_ID = "1e1cb525-8cdd-4497-8fce-7213342df598"
+
+
+def _fixture_adf(name: str) -> dict:
+    from page_diagrams.pipeline import convert_markdown_to_adf
+
+    return convert_markdown_to_adf((_FIXTURES / name).read_text())
+
+
+def test_comment_block_counts_counts_distinct_blocks_per_id():
+    counts = comment_guard.comment_block_counts(_fixture_adf("shared-anchor-old.md"))
+    assert counts == {_SHARED_ID: 2, "7f3a0c2e-1111-4222-8333-944455556666": 1}
+
+
+def test_partial_removal_of_a_shared_id_is_reported():
+    removals = comment_guard.partial_removals(_fixture_adf("shared-anchor-old.md"), _fixture_adf("shared-anchor-new-partial.md"))
+    assert removals == [{"id": _SHARED_ID, "before": 2, "after": 1}]
+
+
+def test_removing_every_span_of_a_shared_id_is_not_a_partial_removal():
+    assert comment_guard.partial_removals(_fixture_adf("shared-anchor-old.md"), _fixture_adf("shared-anchor-new-both.md")) == []
+
+
+@pytest.mark.real_comment_guard
+def test_run_warns_on_stderr_for_a_partial_removal(tmp_path, capsys):
+    from page_diagrams import cli
+
+    live = _fixture_adf("shared-anchor-old.md")
+    confluence = _FakeConfluence((), [_comment("10", _SHARED_ID)])
+    confluence.live = live
+    md = tmp_path / "page.md"
+    md.write_text((_FIXTURES / "shared-anchor-new-partial.md").read_text())
+    with patch("page_diagrams.pipeline.load_credentials", return_value=CREDS), patch(
+        "page_diagrams.pipeline.get_confluence", return_value=confluence
+    ), patch("page_diagrams.pipeline.get_page_version", return_value=3), patch("page_diagrams.pipeline.update_page_adf"):
+        cli.main(["run", "--md-path", str(md), "--page-id", "1", "--config", str(tmp_path / "cfg.json")])
+
+    captured = capsys.readouterr()
+    result = json.loads(captured.out)
+    assert result["partialCommentRemovals"] == [{"id": _SHARED_ID, "before": 2, "after": 1}]
+    assert f"warning: comment anchor {_SHARED_ID} spanned 2 blocks, now 1" in captured.err

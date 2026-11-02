@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import os
 import stat
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
-import twg
+import twg_cred as twg
 
 FAKE_TWG = """#!/usr/bin/env python3
 import json, os, sys
@@ -75,8 +77,8 @@ def test_main_reports_a_missing_twg(tmp_path, monkeypatch, capsys):
 
     exit_code = twg.main(["whoami"], config_path=tmp_path / "missing.json")
 
-    assert exit_code == twg.MISSING_TWG_EXIT_CODE
-    assert "twg CLI not found" in capsys.readouterr().err
+    assert exit_code == 127
+    assert capsys.readouterr().err == "error: twg CLI not found\n"
 
 
 def test_find_twg_falls_back_to_the_default_install_directory(tmp_path, monkeypatch):
@@ -86,3 +88,68 @@ def test_find_twg_falls_back_to_the_default_install_directory(tmp_path, monkeypa
     binary.write_text("")
 
     assert twg.find_twg(home=tmp_path, local_app_data="") == str(binary)
+
+
+SCRIPT = Path(twg.__file__)
+
+
+def test_config_flag_is_stripped_and_used_and_env_stays_in_the_child(fake_twg, tmp_path, capsysbinary, monkeypatch):
+    for name in ("TWG_USER", "TWG_TOKEN", "TWG_SITE"):
+        monkeypatch.delenv(name, raising=False)
+    config = _config(tmp_path, email="me@x.com", apiToken="secret-token", cloudId="https://org.atlassian.net/")
+
+    exit_code = twg.main(["--config", str(config), "whoami", "-o", "json"], config_path=tmp_path / "unused.json")
+
+    out, err = capsysbinary.readouterr()
+    payload = json.loads(out)
+    assert exit_code == 3
+    assert payload["args"] == ["whoami", "-o", "json"]
+    assert payload["token"] == "<redacted>" and payload["site"] == "org.atlassian.net"
+    assert not {"TWG_USER", "TWG_TOKEN", "TWG_SITE"} & set(os.environ)
+    assert b"secret-token" not in out + err and b"me@x.com" not in out + err
+
+
+def test_config_equals_form_is_accepted(fake_twg, tmp_path, capsysbinary):
+    config = _config(tmp_path, cloudId="https://org.atlassian.net")
+
+    twg.main([f"--config={config}", "whoami"], config_path=tmp_path / "unused.json")
+
+    assert json.loads(capsysbinary.readouterr().out)["args"] == ["whoami"]
+
+
+@pytest.mark.parametrize("content", ["{not json", "[1, 2]", "\udcff"])
+def test_malformed_config_prints_only_the_safe_message(fake_twg, tmp_path, capsys, content):
+    config = tmp_path / "bad.json"
+    if content == "\udcff":
+        config.write_bytes(b"\xff\xfe secret-token")
+    else:
+        config.write_text(content + ' "secret-token"')
+
+    exit_code = twg.main(["--config", str(config), "whoami"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert captured.err == "error: unreadable or malformed Atlassian config\n"
+    assert "secret-token" not in captured.out + captured.err
+
+
+def test_script_runs_from_any_cwd_and_forwards_the_exit_code(fake_twg, tmp_path):
+    config = _config(tmp_path, email="me@x.com", apiToken="secret-token", cloudId="org.atlassian.net")
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--config", str(config), "jira", "workitem", "query"],
+        cwd=elsewhere,
+        capture_output=True,
+        env=os.environ.copy(),
+    )
+
+    assert result.returncode == 3
+    assert json.loads(result.stdout)["args"] == ["jira", "workitem", "query"]
+    assert b"secret-token" not in result.stdout + result.stderr
+    assert b"me@x.com" not in result.stdout + result.stderr
+
+
+def test_default_config_resolves_beside_skill_md_not_the_cwd():
+    assert twg.CONFIG_PATH == SCRIPT.resolve().parents[1] / ".atlassian.json.user"

@@ -19,7 +19,7 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from env import get_jira, load_credentials  # noqa: E402
+from env import get_jira, load_credentials, require_supported_library  # noqa: E402
 from fetch_attachments import (  # noqa: E402
     fetch_issue,
     has_attachment_placeholder,
@@ -83,6 +83,7 @@ def main() -> None:
     parser.add_argument("--site", help="Site URL overriding the configured `cloudId` (issue URL on another site)")
     args = parser.parse_args()
 
+    require_supported_library()
     credentials = load_credentials(args.config)
     if credentials is None:
         print(

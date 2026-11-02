@@ -29,10 +29,12 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import quote
+from typing import Any
 from uuid import uuid4
 
-from atlassian import Confluence
 from requests.exceptions import RequestException
+
+from confluence_client import error_label
 
 _DRAWIO_PLACEHOLDER_RE = re.compile(r'<!-- adf:diagram drawio="([^"]*)" -->')
 _ATTACHMENT_PLACEHOLDER_RE = re.compile(
@@ -117,8 +119,11 @@ def _sidecar_title(diagram_filename: str) -> str:
     return f"{stem}.source.mmd"
 
 
-def list_attachments(confluence: Confluence, page_id: str) -> list[dict]:
-    resp = confluence.get_attachments_from_content(page_id, limit=200, expand="extensions.fileId")
+def list_attachments(confluence: Any, page_id: str) -> list[dict]:
+    resp = confluence.get(
+        f"/rest/api/content/{page_id}/child/attachment",
+        params={"limit": 200, "expand": "extensions.fileId"},
+    )
     return resp.get("results", [])
 
 
@@ -126,22 +131,22 @@ def _find_by_file_id(attachments: list[dict], file_id: str) -> dict | None:
     return next((a for a in attachments if a.get("extensions", {}).get("fileId") == file_id), None)
 
 
-def download_attachment_bytes(confluence: Confluence, attachment: dict) -> bytes:
+def download_attachment_bytes(confluence: Any, attachment: dict) -> bytes:
     """Always bytes, so binary attachments (`.png`, `.drawio`) aren't corrupted by a text decode."""
     content = confluence.get(attachment["_links"]["download"], not_json_response=True)
     return content if isinstance(content, bytes) else content.encode("utf-8")
 
 
-def fetch_attachment_snapshot(confluence: Confluence, page_id: str) -> AttachmentSnapshot:
+def fetch_attachment_snapshot(confluence: Any, page_id: str) -> AttachmentSnapshot:
     """List every attachment on the page and download every attachment's bytes, once. Any TLS,
     timeout, HTTP, or connection failure raises `AttachmentRetrievalError` naming only the
-    exception's class.
+    exception's class and HTTP status.
     """
     try:
         attachments = list_attachments(confluence, page_id)
         downloaded = {a["title"]: download_attachment_bytes(confluence, a) for a in attachments}
     except RequestException as exception:
-        raise AttachmentRetrievalError(type(exception).__name__) from None
+        raise AttachmentRetrievalError(error_label(exception)) from None
     return AttachmentSnapshot(attachments=attachments, downloaded=downloaded)
 
 

@@ -3,7 +3,7 @@
 `<!-- adf:comment id="..." -->` anchors the body carries.
 
 Every REST failure raises `CommentRetrievalError` carrying only a safe category (the exception
-class name) — never the original exception text, which may carry a URL or token.
+class name and HTTP status) — never the original exception text, which may carry a URL or token.
 """
 from __future__ import annotations
 
@@ -12,7 +12,10 @@ from html.parser import HTMLParser
 
 from requests.exceptions import RequestException
 
+from confluence_client import error_label
+
 _ANCHOR_RE = re.compile(r'<!--\s*adf:comment\s+id="([A-Za-z0-9-]+)"\s*-->')
+_IGNORED_RE = re.compile(r"<!-- adf:ignore:start -->.*?<!-- adf:ignore:end -->", re.DOTALL)
 _BLOCK_TAGS = {"p", "br", "li", "div", "h1", "h2", "h3", "h4", "h5", "h6", "tr"}
 _PAGE_LIMIT = 100
 
@@ -48,6 +51,17 @@ def storage_to_text(storage: str) -> str:
 
 def anchored_comment_ids(markdown: str) -> set[str]:
     return set(_ANCHOR_RE.findall(markdown))
+
+
+def shared_anchor_blocks(markdown: str) -> dict[str, int]:
+    """Anchor ids found on more than one block (Markdown line) -> block count, in body order.
+    One Confluence comment spanning two list items fetches as the same id on two bullets."""
+    body = _IGNORED_RE.sub("", markdown)
+    blocks: dict[str, int] = {}
+    for line in body.splitlines():
+        for anchor_id in dict.fromkeys(_ANCHOR_RE.findall(line)):
+            blocks[anchor_id] = blocks.get(anchor_id, 0) + 1
+    return {anchor_id: count for anchor_id, count in blocks.items() if count > 1}
 
 
 def _get_all(confluence, path: str) -> list[dict]:
@@ -111,7 +125,7 @@ def fetch_comment_threads(confluence, page_id: str) -> list[dict]:
                 threads.append(_thread(confluence, comment, kind, authors))
         return threads
     except RequestException as exception:
-        raise CommentRetrievalError(type(exception).__name__) from None
+        raise CommentRetrievalError(error_label(exception)) from None
 
 
 def _quote(text: str) -> str:
@@ -130,8 +144,9 @@ def _heading(thread: dict, anchored: set[str]) -> str:
 
 
 def render_comments_section(threads: list[dict], markdown: str, site: str) -> str:
-    """Empty string when the page has no comments."""
-    if not threads:
+    """Empty string when the page has no comments and no shared anchor ids."""
+    shared = shared_anchor_blocks(markdown)
+    if not threads and not shared:
         return ""
     anchored = anchored_comment_ids(markdown)
     lines = [
@@ -142,6 +157,9 @@ def render_comments_section(threads: list[dict], markdown: str, site: str) -> st
         '`<!-- adf:comment id="..." -->...<!-- /adf:comment -->` span in the body, id unchanged, '
         "to keep its inline comment attached.",
     ]
+    if shared:
+        lines.append("")
+        lines += [f"- Shared anchor: id `{anchor_id}` spans {count} blocks; edit or remove all together." for anchor_id, count in shared.items()]
     for thread in threads:
         lines += ["", _heading(thread, anchored), ""]
         lines.append(f"- **{thread['author']}** ({thread['created']}): {thread['text']}")

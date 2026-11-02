@@ -1,13 +1,29 @@
-"""Attachment upload + fileId read-back (I/O: Confluence REST client, via `atlassian-python-api`).
+"""Attachment upload + fileId read-back (I/O: Confluence REST v1 under `/wiki`, via the
+client from `confluence_client.py`).
 
-Only touches `confluence`; tested by passing a stub with `attach_file`/`get`.
+Only touches `confluence`; tested by passing a stub with `put`/`get`.
 """
 from __future__ import annotations
 
-from atlassian import Confluence
+import mimetypes
+from typing import Any
+
+_UPLOAD_HEADERS = {"X-Atlassian-Token": "no-check", "Accept": "application/json"}
 
 
-def upload_files(confluence: Confluence, page_id: str, files: list[dict]) -> dict:
+def attach_file(confluence: Any, path: str, filename: str, page_id: str) -> None:
+    """Create the attachment, or add a new version of a same-named one (`PUT .../child/attachment`)."""
+    content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+    with open(path, "rb") as handle:
+        confluence.put(
+            f"/rest/api/content/{page_id}/child/attachment",
+            headers=_UPLOAD_HEADERS,
+            files={"file": (filename, handle, content_type)},
+            data={"minorEdit": "true"},
+        )
+
+
+def upload_files(confluence: Any, page_id: str, files: list[dict]) -> dict:
     """Upload every `{"path", "filename"}` entry, then re-read metadata for the media-service
     fileIds. Returns {filename: fileId}. Re-uploading a same-named file creates a new
     attachment *version*, so the fileId is never cached across runs — always read back after
@@ -17,7 +33,7 @@ def upload_files(confluence: Confluence, page_id: str, files: list[dict]) -> dic
         return {}
 
     for f in files:
-        confluence.attach_file(f["path"], name=f["filename"], page_id=page_id)
+        attach_file(confluence, f["path"], f["filename"], page_id)
 
     resp = confluence.get(
         f"/rest/api/content/{page_id}/child/attachment",
@@ -32,7 +48,7 @@ def upload_files(confluence: Confluence, page_id: str, files: list[dict]) -> dic
     return file_ids
 
 
-def upload_diagrams(confluence: Confluence, page_id: str, diagrams: list[dict]) -> dict:
+def upload_diagrams(confluence: Any, page_id: str, diagrams: list[dict]) -> dict:
     """Upload every file the renderer produced, then re-read metadata for the media-service fileIds.
 
     Reads each diagram's `attachments` list rather than a single `filename`, because the

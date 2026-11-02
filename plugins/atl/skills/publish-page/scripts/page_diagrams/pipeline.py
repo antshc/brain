@@ -19,8 +19,8 @@ from . import comment_guard
 from .adf import attachment_node, drawio_node, media_node, substitute_drawio, substitute_markers
 from .attachments import upload_diagrams, upload_files
 from .custom_content import upsert_diagram
+from .confluence_client import get_confluence
 from .env import (
-    get_confluence,
     load_credentials,
     load_drawio_extension_key,
     load_renderer,
@@ -254,6 +254,8 @@ def _apply_comment_guard(guard: dict, credentials: dict[str, str], page_id: str)
     keys: dict = {}
     if guard["unknownIds"]:
         keys["unknownCommentIds"] = guard["unknownIds"]
+    if guard.get("partial"):
+        keys["partialCommentRemovals"] = guard["partial"]
     if not guard["orphaned"]:
         return keys
     keys["orphanedComments"] = [{k: c[k] for k in ("id", "markerRef", "selection")} for c in guard["orphaned"]]

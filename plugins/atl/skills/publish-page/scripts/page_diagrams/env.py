@@ -9,8 +9,6 @@ import json
 import re
 from pathlib import Path
 
-from atlassian import Confluence
-
 from . import renderers
 
 DRAWIO_EXTENSION_KEY = "drawioExtensionKey"
@@ -52,15 +50,6 @@ def site_url(credentials: dict[str, str]) -> str:
     if not site.startswith(("http://", "https://")):
         site = f"https://{site}"
     return site
-
-
-def get_confluence(credentials: dict[str, str]) -> Confluence:
-    return Confluence(
-        url=site_url(credentials),
-        username=credentials["email"],
-        password=credentials["token"],
-        cloud=True,
-    )
 
 
 def load_renderer(config_path: str) -> str:

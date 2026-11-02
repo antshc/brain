@@ -8,9 +8,47 @@ A publish-side copy of `/fetch-work`'s own `env.py` — never imported across sk
 from __future__ import annotations
 
 import json
+import re
+from importlib import metadata
 from pathlib import Path
+from typing import Any
 
-from atlassian import Jira
+LIBRARY = "atlassian-python-api"
+MIN_VERSION = "5.0.5"
+MAX_VERSION: str | None = None
+
+
+def _version_tuple(version: str) -> tuple[int, int, int]:
+    parts = []
+    for piece in version.split(".")[:3]:
+        digits = re.match(r"\d+", piece)
+        parts.append(int(digits.group()) if digits else 0)
+    parts += [0] * (3 - len(parts))
+    return parts[0], parts[1], parts[2]
+
+
+def installed_version() -> str | None:
+    try:
+        return metadata.version(LIBRARY)
+    except metadata.PackageNotFoundError:
+        return None
+
+
+def version_error(found: str | None) -> str | None:
+    """The user-facing message when `found` is outside the supported range, else `None`."""
+    supported = found is not None and _version_tuple(found) >= _version_tuple(MIN_VERSION)
+    if supported and MAX_VERSION is not None:
+        supported = _version_tuple(found) < _version_tuple(MAX_VERSION)
+    if supported:
+        return None
+    supported_range = f"{MIN_VERSION}-{MAX_VERSION}" if MAX_VERSION else f">={MIN_VERSION}"
+    return f"{LIBRARY} {supported_range} required, found {found or 'none'}; run init-atl"
+
+
+def require_supported_library() -> None:
+    message = version_error(installed_version())
+    if message:
+        raise SystemExit(message)
 
 
 def load_config(config_path: str) -> dict:
@@ -40,7 +78,10 @@ def site_url(credentials: dict[str, str]) -> str:
     return site
 
 
-def get_jira(credentials: dict[str, str]) -> Jira:
+def get_jira(credentials: dict[str, str]) -> Any:
+    require_supported_library()
+    from atlassian import Jira
+
     return Jira(
         url=site_url(credentials),
         username=credentials["email"],

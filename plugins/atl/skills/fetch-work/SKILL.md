@@ -11,7 +11,7 @@ Return a Jira **Work item** as Markdown from key or URL. REST reads the real ADF
 
 ## Prerequisites
 
-- `atlassian-python-api` installed by `init-atl` skill (plugin-wide); if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. This skill installs nothing.
+- `atlassian-python-api>=5.0.5` installed by `init-atl` skill (plugin-wide); missing or other version (script exits `atlassian-python-api >=5.0.5 required, found <version>; run init-atl`), *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first. This skill installs nothing.
 - `cloudId`, `email`, `apiToken` in `.atlassian.json.user` (see `preflight-atlassian` skill). Missing → script exits non-zero naming them; report and stop.
 
 ## Workflow
