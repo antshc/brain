@@ -100,6 +100,14 @@ copilot plugin marketplace add dotnet/skills
 copilot plugin install dotnet@dotnet-agent-skills
 ```
 
+### JetBrains skills (external)
+
+Installs the `slides` skill (PPTX deck authoring) into the user space (`~/.copilot/skills/`) for GitHub Copilot.
+
+```sh
+gh skill install JetBrains/skills slides --agent github-copilot --scope user -f
+```
+
 ### mattpocock skills (external)
 
 **Productivity**
