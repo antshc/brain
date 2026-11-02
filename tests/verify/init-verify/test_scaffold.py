@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -75,6 +76,32 @@ class TestRepositoryGate:
     def test_package_manager_field_marks_a_pnpm_repo(self, tmp_path: Path) -> None:
         (tmp_path / "package.json").write_text(json.dumps({"packageManager": "pnpm@10.0.0"}))
         assert scaffold_module.is_pnpm_repo(tmp_path)
+
+    def test_missing_node_is_refused_before_scaffold_writes_files(self, repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(scaffold_module.shutil, "which", lambda _command: None)
+        with pytest.raises(scaffold_module.ScaffoldError, match="Node.js 20.12 or newer"):
+            run(repo)
+        assert not (repo / "proof").exists()
+
+    @pytest.mark.parametrize(
+        ("version", "accepted"),
+        [("v20.11.9", False), ("v20.12.0", True), ("v22.0.0", True)],
+    )
+    def test_node_minimum_version_is_enforced(
+        self, repo: Path, monkeypatch: pytest.MonkeyPatch, version: str, accepted: bool
+    ) -> None:
+        monkeypatch.setattr(scaffold_module.shutil, "which", lambda _command: "/usr/bin/node")
+        monkeypatch.setattr(
+            scaffold_module.subprocess,
+            "run",
+            lambda command, **_kwargs: subprocess.CompletedProcess(command, 0, stdout=f"{version}\n", stderr=""),
+        )
+        if accepted:
+            assert run(repo)["language"] == "typescript"
+        else:
+            with pytest.raises(scaffold_module.ScaffoldError, match="found v20.11.9"):
+                run(repo)
+            assert not (repo / "proof").exists()
 
     def test_cli_exits_2_with_error_for_non_pnpm_repo(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
         code = scaffold_module.main(["--repo", str(tmp_path), "--surfaces", "web", "--app-name", "x", "--no-install"])

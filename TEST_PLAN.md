@@ -1137,6 +1137,16 @@ Scenario: Package manager field marks a pnpm repo
   When the repository is checked
   Then it is a pnpm repository
 
+Scenario: Missing Node is refused before scaffolding
+  Given a pnpm repository without Node.js on PATH
+  When scaffold runs for TypeScript
+  Then it is refused and creates no proof files
+
+Scenario: Node minimum version is enforced
+  Given Node.js versions below and at 20.12
+  When scaffold runs for TypeScript
+  Then versions below 20.12 are refused and 20.12 or newer is accepted
+
 Scenario: Cli exits 2 with error for non pnpm repo
   Given a non-pnpm repository
   When the scaffold command runs

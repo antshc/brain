@@ -32,7 +32,7 @@ Commands by language (`<mole>`, `<run>`, `<prove>`, `<test>`, `<typecheck>` belo
 
 Use `ask_user` (never ask in plain text), one form:
 
-- `language`: `typescript` / `python`. Hint: typescript when the repo is a pnpm repository (`package.json` plus `pnpm-lock.yaml`, `pnpm-workspace.yaml` or `packageManager: pnpm@…`, Node 20.12 or newer); otherwise python (Python 3.10 or newer; the app under test may be any stack). typescript is refused in a non-pnpm repo.
+- `language`: `typescript` / `python`. Hint: typescript when the repo is a pnpm repository (`package.json` plus `pnpm-lock.yaml`, `pnpm-workspace.yaml` or `packageManager: pnpm@…`) with Node.js 20.12 or newer; otherwise python (Python 3.10 or newer; the app under test may be any stack). The TypeScript mole runner uses Node.js through `tsx`; the scaffold checks its version before writing files and refuses TypeScript in a non-pnpm repo.
 - `surfaces`: `web` / `api` / `both`. Offer a research hint: web if the repo renders pages or has a frontend; api if it exposes HTTP routes; both when it has each. Respect the choice, even against the hint.
 - `app_name`: default the `package.json` name (or repo folder name).
 
