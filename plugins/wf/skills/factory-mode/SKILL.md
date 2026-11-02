@@ -79,7 +79,7 @@ Apply when the trigger matches; cite by bold name.
 
 - Run the playbook in this chat; delegate steps, never the playbook itself.
 - Brief with file paths, not inlined content; include the restated goal, scope, named data shape, constraints, and success criteria.
-- Leave model and effort to harness defaults unless the user names them.
+- Leave model and effort to harness defaults unless the user names them. Exception: interrogate adversaries take model and effort from the `interrogate reviewers` role in `architect/models.md` (Fallback when rejected), never the parent chat model.
 - Run independent subagents in parallel; serialize shared writes.
 - Own every subagent's output. Review its diff and write your own summary; never pass its report through.
 - Fresh subagent by default for new work, fix rounds, and retries, briefed with consolidated scope (original brief, later directives, prior report). Reuse an agent only when the work needs state it alone holds (uncommitted changes, running process).
