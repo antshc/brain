@@ -16,7 +16,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 
 `arena-agents`: 1–3, default 1. One candidate skips the judge and grafting; multiple viable candidates use the cross-family judge. The parent architect screens and verifies in both cases.
 
-`/architect interrogate <request>` runs only Interrogate on the named scope (default: branch diff), skipping all design phases; reports findings and stops.
+`/architect interrogate <request>` runs only Interrogate on the named scope (default: branch diff), skipping all design phases; reports findings and stops. `adversaries=1`–`3` (default 1) sets the Interrogate adversary count.
 
 ## Flow
 
@@ -73,7 +73,7 @@ With checkpoint, interrogate Risk 1 in a separate reply: a mixed reply may trigg
 
 ## Interrogate
 
-Runs automatically for material falsifiable claims with a safe target, on request in review, or standalone via `/architect interrogate <request>`. Three adversaries (different model families) use Experiment to select executable probes and try to break the change in their own worktrees. A finding survives only if its command, rerun by the skill, shows the failure and the failure breaks your intent. Reports findings; applies nothing. You then accept proposed corrections one by one.
+Runs automatically for material falsifiable claims with a safe target, on request in review, or standalone via `/architect interrogate <request>`. Three adversaries by default (different model families; `adversaries=N` for 1–3) use Experiment to select executable probes and try to break the change in their own worktrees. A finding survives only if its command, rerun by the skill, shows the failure and the failure breaks your intent. Reports findings; applies nothing. You then accept proposed corrections one by one.
 
 ```
 interrogate

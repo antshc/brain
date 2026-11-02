@@ -34,7 +34,8 @@ def test_factory_uses_one_autonomous_feature_flow_and_optional_checkpoint():
     assert "## Interactive" not in playbook
     assert "## Auto" not in playbook
     assert "Select mode" not in playbook
-    assert "arena-agents=3" in playbook
+    assert "arena-agents=1" in playbook
+    assert "`interrogate` with `adversaries=1`" in playbook
     assert "design-only handoff" in playbook
     assert "forward `checkpoint` only when the user explicitly asks" in playbook
     assert playbook.index('`to-spec` skill') < playbook.index('`implement-spec` skill')
