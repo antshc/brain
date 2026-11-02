@@ -1,0 +1,62 @@
+{
+  "routeLinePattern": "^route: (rg|lsp|graphify|github)",
+  "placeholders": {
+    "{{presentLiteral}}": "string literal known to exist in the eval checkout",
+    "{{absentLiteral}}": "string literal known to be absent, including ignored files",
+    "{{symbol}}": "exact Type.Member defined in the eval checkout",
+    "{{deployableA}}": "first deployable named in ARCHITECTURE.md Deployables with a local checkout",
+    "{{deployableB}}": "second deployable covered by the same graphify-out/ graph",
+    "{{remoteOnlyRepo}}": "repository with an origin URL but no local checkout"
+  },
+  "commonChecks": [
+    "loads explore-codebase skill",
+    "verdict first line matches routeLinePattern and equals expectedRoute",
+    "no recursive grep (-r, -R, find -exec grep, xargs grep, rg ... || grep ...)",
+    "no rg install while command -v rg resolves",
+    "no write under graphify-out/ outside cache/; no .vocab.txt; no graphify reflect"
+  ],
+  "cases": [
+    {
+      "id": "rg_shell_literal",
+      "request": "@work: Exact literal `{{presentLiteral}}`: which file defines it?\n@shape: literal\n@depth: quick",
+      "excludedTools": ["grep", "glob"],
+      "expectedRoute": "rg",
+      "checks": ["shell rg used", "verdict cites file:line holding the literal"]
+    },
+    {
+      "id": "rg_shell_absent_literal",
+      "request": "@work: Exact literal `{{absentLiteral}}`: which file defines it?\n@shape: literal\n@depth: quick",
+      "excludedTools": ["grep", "glob"],
+      "expectedRoute": "rg",
+      "checks": ["rg exit 1 treated as no match, not missing binary", "rg -uu recheck", "verdict is exactly NOT FOUND plus searched roots"]
+    },
+    {
+      "id": "rg_backend_literal",
+      "request": "@work: Exact literal `{{presentLiteral}}`: which file defines it?\n@shape: literal\n@depth: quick",
+      "excludedTools": [],
+      "expectedRoute": "rg",
+      "checks": ["harness search tool (grep, rg, or glob by host) used", "no shell grep"]
+    },
+    {
+      "id": "graphify_relationship",
+      "request": "@work: Names unknown: how do {{deployableA}} and {{deployableB}} connect end to end?\n@shape: relationship\n@depth: thorough\n@target: {{deployableA}}, {{deployableB}}",
+      "excludedTools": [],
+      "expectedRoute": "graphify",
+      "checks": ["graphify skill loaded", "graphify query, path, or explain CLI used", "no inline graph.json traversal while CLI on PATH", "source confirms graph claims"]
+    },
+    {
+      "id": "lsp_symbol",
+      "request": "@work: Symbol `{{symbol}}`: who calls it?\n@shape: symbol\n@depth: medium",
+      "excludedTools": [],
+      "expectedRoute": "lsp",
+      "checks": ["no graphify skill or CLI", "LSP references or call hierarchy used before rg"]
+    },
+    {
+      "id": "github_no_checkout",
+      "request": "@work: Names unknown: where does {{remoteOnlyRepo}} define its public API?\n@shape: relationship\n@depth: medium\n@target: {{remoteOnlyRepo}}",
+      "excludedTools": [],
+      "expectedRoute": "github",
+      "checks": ["GitHub tools loaded", "no local filesystem search for the target", "branch staleness carried into verdict"]
+    }
+  ]
+}
