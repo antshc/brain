@@ -29,9 +29,9 @@ Read final artifacts; check cited conclusions and applicable versions. Add findi
 
 ## Experiment
 
-*Run `experiment` skill to test one uncertain technical question by observing actual behavior.* Pass question, falsifiable assumption, observable success/refutation criteria, repo/current sketch/prior evidence, runtime/environment constraints, safety limits, and out-of-scope behavior.
+Read `experiment` skill's Inputs and Workflow first, then *run `experiment` skill to test one uncertain technical question by observing actual behavior*, filling: `@question`; `@criteria` = falsifiable assumption plus observable success/refutation criteria; `@repoFacts` = repo, current sketch, grounding and Research artifact paths, prior evidence; `@limits` = runtime/environment constraints, safety limits, out-of-scope behavior, disposable worktree.
 
-Experiment selects the smallest method: CLI/API command, existing test, script, simulation, process set, throwaway app, or existing UI route. **MUST NOT** require an app or code patch for a CLI-only result. Keep code isolated in disposable worktrees and state local or in authorized sandboxes; **MUST NOT** use destructive production targets or expand credentials/permissions.
+Experiment's Workflow selects the method and artifact; **MUST NOT** prescribe one, and **MUST NOT** require an app or code patch for a CLI-only result. Keep code isolated in disposable worktrees and state local or in authorized sandboxes; **MUST NOT** use destructive production targets or expand credentials/permissions.
 
 Require a report with question, method, exact reproducible command, actual output, conclusion (`confirmed`, `refuted`, or `inconclusive`), evidence paths, architectural implication, and cleanup. Require a patch only when code was created.
 

@@ -6,7 +6,7 @@ Typical questions include ASP.NET Core middleware exception handling, DI scope/d
 
 ## Build
 
-1. Inspect the repository and reuse its runtime, framework, packages, hosting model, scripts, and container setup.
+1. Reuse the runtime, framework, packages, hosting model, scripts, and container setup from the Inspect step's facts; look up only gaps there, never re-search here.
 2. Isolate the mechanism under test.
 3. Choose the smallest runnable artifact:
    - console/CLI app
