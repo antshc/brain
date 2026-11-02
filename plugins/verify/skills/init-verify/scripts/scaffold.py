@@ -2,7 +2,7 @@
 """Scaffold the proof kit (proof kit, mole runner, app seams, verify-<app> and maintain-verify-<app> skills) into a repository, in TypeScript or Python.
 
 Deterministic copy and render. Never overwrites an existing file: it is reported as skipped.
-TypeScript needs a pnpm repository; Python works in any repository.
+TypeScript needs a pnpm repository and Node.js 20.12 or newer; Python works in any repository.
 
 Surface markers in templates keep a section only when its expression holds for the chosen surfaces:
   TypeScript  // <surface: api>  ...  // </surface: api>      (own lines)
@@ -31,6 +31,7 @@ TEMPLATES = SKILL_DIR / "templates"
 KNOWN_SURFACES = ("web", "api")
 LANGUAGES = ("typescript", "python")
 MIN_PYTHON = (3, 10)
+MIN_NODE = (20, 12, 0)
 
 # The agent skills per repository are named verify-<app> and maintain-verify-<app>; their folders are filled in per app.
 SKILL_DIR = ".github/skills/{skill}"
@@ -170,6 +171,27 @@ def is_pnpm_repo(repo: Path) -> bool:
     except json.JSONDecodeError:
         return False
     return isinstance(manager, str) and manager.startswith("pnpm@")
+
+
+def _require_node() -> None:
+    node = shutil.which("node")
+    if node is None:
+        raise ScaffoldError("Node.js 20.12 or newer is required for the TypeScript runner; `node` was not found on PATH.")
+    try:
+        result = subprocess.run([node, "--version"], capture_output=True, text=True)
+    except OSError as exception:
+        raise ScaffoldError(f"Could not check the Node.js version: {exception}") from exception
+    version_text = result.stdout.strip()
+    if result.returncode != 0:
+        raise ScaffoldError(f"Could not check the Node.js version: {_last_line(result)}")
+    match = re.fullmatch(r"v?(\d+)\.(\d+)\.(\d+)(?:[-+][0-9A-Za-z.-]+)?", version_text)
+    if match is None:
+        raise ScaffoldError(f"Could not parse the Node.js version from `{version_text}`.")
+    version = tuple(int(part) for part in match.groups())
+    if version < MIN_NODE:
+        raise ScaffoldError(
+            f"Node.js 20.12 or newer is required for the TypeScript runner; found {version_text}."
+        )
 
 
 def _active(expression: str, surfaces: list[str]) -> bool:
@@ -334,6 +356,8 @@ def scaffold(repo: Path, surfaces: list[str], app_name: str, install: bool = Tru
             f"{repo} is not a pnpm repository (needs package.json and pnpm-lock.yaml, pnpm-workspace.yaml or packageManager: pnpm@...)."
             " Choose python for other stacks."
         )
+    if language == "typescript":
+        _require_node()
     if language == "python" and sys.version_info < MIN_PYTHON:
         raise ScaffoldError(f"The Python kit needs Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or newer; this is {sys.version.split()[0]}.")
     if not app_name.strip():
@@ -369,7 +393,7 @@ def scaffold(repo: Path, surfaces: list[str], app_name: str, install: bool = Tru
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--repo", required=True, type=Path, help="Repository root (gets proof/).")
-    parser.add_argument("--language", default="typescript", help="typescript (pnpm repos only) or python (any repo).")
+    parser.add_argument("--language", default="typescript", help="typescript (pnpm and Node.js 20.12+ required) or python (any repo).")
     parser.add_argument("--surfaces", required=True, help="web, api, both, or a comma list.")
     parser.add_argument("--app-name", required=True, help="Name shown in receipts; the agent skills are named verify-<slug> and maintain-verify-<slug>.")
     parser.add_argument("--no-install", action="store_true", help="Do not install dependencies (`pnpm add -D` or `pip install -r`).")
