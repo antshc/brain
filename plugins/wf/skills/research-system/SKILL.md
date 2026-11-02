@@ -9,7 +9,23 @@ Source of truth is this repo, not the web. Output: one Markdown file, every clai
 
 Inspection documents **as-built** — current state, never a delta.
 
-**MUST** *run `explore-codebase` skill for every codebase lookup — read-only, multi-repo targets, deployables index, installed NuGet packages, symbol, flow, and config evidence*. It owns contract material, target resolution, graph coverage, and tool selection; pass it the lookup question, `@depth`, and named targets, never search directly. This skill structures and cites what it returns; the inspection document is the only file written.
+**MUST** *run `explore-codebase` skill for every codebase lookup — read-only, multi-repo targets, deployables index, graphify, symbol, flow, and config evidence*; never search directly. It owns contract material, target resolution, graph coverage, and tool selection. Spawn one explore subagent per independent lookup; run dependent lookups in order. Pass each this Request:
+
+- `@work`: question, prefixed `Exact literal \`X\`:`, `Symbol \`Type.Member\`:`, or `Names unknown:`.
+- `@shape` and `@depth`: from the table below.
+- `@target`: deployable or repository names as stated.
+- `@outputShape`: `file:line — claim` rows, so citations need no re-search.
+- `[@inputs]`: the graph health line returned by the first lookup.
+
+| Lookup | `@shape` | `@depth` |
+|---|---|---|
+| Flow: handoffs, next handler, deployables a message crosses | `relationship` | `thorough` |
+| Behavior: trigger → executing symbol chain, names unknown | `relationship` | `medium` |
+| Behavior: known symbol's callers, implementations, double vs real | `symbol` | `medium` |
+| Data: writers and readers of an item or store | `relationship` | `medium` |
+| Citation line, config key, route path, table or queue name | `literal` | `quick` |
+
+This skill structures and cites what it returns; the inspection document is the only file written.
 
 ## Axis-specific routing
 
