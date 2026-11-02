@@ -4,7 +4,7 @@ Use when the question is what a page, component, flow, or interaction should loo
 
 ## Build
 
-1. Inspect the existing frontend framework, routing, components, styles, data access, and host page.
+1. Take the frontend framework, routing, components, styles, data access, and host page from the Inspect step's facts; look up only gaps there, never re-search here.
 2. Prefer an existing route/page. Create an experiment route only when no natural host exists.
 3. Reuse the current frontend stack and design system.
 4. Build one minimal variant for behavior validation; build 2-3 materially different variants when comparing design alternatives. Cap at 5.

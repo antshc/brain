@@ -128,7 +128,7 @@ Ask whether to resolve the frontier now. On decline, stop — the map file holds
 On acceptance:
 
 - Run `/research` skill in parallel, one subagent per frontier topic resolved via research. Pass the topic's Question or Claim with its confirm/refute conditions, the Destination, and the Notes verbatim.
-- Offer each frontier experiment to the user one at a time; on acceptance, Run `/experiment` skill with the Claim as the question, its confirm/refute conditions as the observation criteria, and the Notes verbatim.
+- Offer each frontier experiment to the user one at a time; on acceptance, read `experiment` skill's Inputs and Workflow, then Run `/experiment` skill filling `@question` = the Claim, `@criteria` = its confirm/refute conditions, `@repoFacts` = the Notes verbatim plus findings from resolved research topics.
 
 **Done when:** every frontier topic has either returned a result or been declined by the user.
 

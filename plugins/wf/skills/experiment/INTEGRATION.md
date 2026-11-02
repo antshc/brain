@@ -14,7 +14,7 @@ Use when the experiment crosses a real external boundary: SDKs, REST APIs, cloud
 
 ## Cloud
 
-1. Inspect existing AWS/Azure CLI, SDK, IaC, profile/subscription, and environment conventions.
+1. Take AWS/Azure CLI, SDK, IaC, profile/subscription, and environment conventions from `@repoFacts` or the Inspect step's facts; look up only gaps there, never re-search here.
 2. If CLI is available, verify the active identity/account/subscription before resource operations.
 3. Do not install CLIs, log in, create credentials, or reconfigure accounts solely for the experiment.
 4. Use CLI for cloud service/API/resource truth.
