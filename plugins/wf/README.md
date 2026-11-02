@@ -185,7 +185,7 @@ swimlane-beta TB
 | **research-**                             | Gather external/domain evidence              | `research`, `define-research`, `research-system`                                          |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-nuget-source`                                                                    |
 | **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
-| **architect**                             | Sketch, synthesize, review; hand off to spec or implement | `architect`                                                                               |
+| **architect**                             | Sketch, synthesize, review; hand off to spec or implement | `architect`, `code-sketch`                                                                |
 | **draft-**                                | Author standalone working artifacts          | `draft-bug`, `draft-story`                                                                |
 | **record-**                               | Record settled architecture or render bodies | `record-architecture`                                                                     |
 | **doc-**                                  | Render existing knowledge                    | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`        |

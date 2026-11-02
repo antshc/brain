@@ -136,6 +136,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a GitHub spec issue, with explicit offline Markdown publishing when needed.
 - [to-stories](plugins/wf/skills/to-stories/SKILL.md): turn requirements, `/to-spec` output, or `/to-zdesign` output into an ordered story list, owning numbered headings, dependencies, Jira metadata, and one `/draft-story` run per story.
 - [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one standalone story body with its formatted title, requirements, acceptance criteria, and optional technical notes.
+- [code-sketch](plugins/wf/skills/code-sketch/SKILL.md): draft one single-pass code sketch with usage first, types and signatures with `not implemented` bodies, a module map for larger work, and a rationale.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
 - [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
