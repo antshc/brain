@@ -1,7 +1,7 @@
 ---
 name: init-atl
-description: 'First-run setup for this repository''s Atlassian configuration (`.atlassian.json.user`), plus optional generation of repository-level Jira wrapper skills named `pub-<issue-type>`.'
-disable-model-invocation: true
+description: >-
+  First-run setup for this repository's Atlassian configuration (`.atlassian.json.user`) and the `atlassian-python-api` dependency, plus optional generation of repository-level Jira wrapper skills named `pub-` plus the issue type. Use when an atl skill reports a missing config, token, or unsupported atlassian-python-api version.
 ---
 
 # Init Atl
@@ -10,9 +10,9 @@ Sets up `atl` in the current repo (= CWD): copies `preflight-atlassian` skill fr
 
 ## Workflow
 
-**1 — Install deps.** From this skill's base directory: `pip install -r requirements.txt`. Covers every `atl` skill (`atlassian-python-api`).
+**1 — Install deps.** From this skill's base directory: `pip install -U -r requirements.txt`. Covers every `atl` skill (`atlassian-python-api>=5.0.5`); atl scripts exit naming the range on any other version.
 
-**2 — Copy preflight skill.** `skillDir :=` parent of this `SKILL.md`'s absolute path from context. Copy every file under `<skillDir>/assets/preflight-atlassian/` (`SKILL.md`, `scripts/twg.py`) → CWD `.github/skills/preflight-atlassian/`, keeping relative paths, always overwriting; never touch `.atlassian.json.user`.
+**2 — Copy preflight skill.** `skillDir :=` parent of this `SKILL.md`'s absolute path from context. Copy every file under `<skillDir>/assets/preflight-atlassian/` (`SKILL.md`, `scripts/twg_cred.py`); delete a stale `scripts/twg.py` there → CWD `.github/skills/preflight-atlassian/`, keeping relative paths, always overwriting; never touch `.atlassian.json.user`.
 
 ```bash
 python3 -c "
@@ -78,6 +78,6 @@ git check-ignore -q "$configPath" || echo "NOT IGNORED"
 
 ## Completion criteria
 
-- CWD `.github/skills/preflight-atlassian/SKILL.md` and `scripts/twg.py` byte-identical to `assets/preflight-atlassian/`.
+- CWD `.github/skills/preflight-atlassian/SKILL.md` and `scripts/twg_cred.py` byte-identical to `assets/preflight-atlassian/`.
 - Config has every table key; each value is the asked value, else the table default (`maxResults`/`limit` → `10`, `diagramRenderer` → `png`), else omitted (`swimlaneDrawio`); existing values unchanged.
 - `plugins/atl/` unchanged; shell profile and env unchanged.

@@ -8,19 +8,19 @@ from __future__ import annotations
 
 import json
 
-from atlassian import Confluence
+from typing import Any
 
 
 def adf_body_size(adf: dict) -> int:
     return len(json.dumps(adf).encode("utf-8"))
 
 
-def get_page_version(confluence: Confluence, page_id: str) -> int:
+def get_page_version(confluence: Any, page_id: str) -> int:
     resp = confluence.get(f"/api/v2/pages/{page_id}")
     return resp["version"]["number"]
 
 
-def update_page_adf(confluence: Confluence, page_id: str, title: str, adf: dict, version: int) -> dict:
+def update_page_adf(confluence: Any, page_id: str, title: str, adf: dict, version: int) -> dict:
     return confluence.put(
         f"/api/v2/pages/{page_id}",
         data={
@@ -33,7 +33,7 @@ def update_page_adf(confluence: Confluence, page_id: str, title: str, adf: dict,
     )
 
 
-def create_page_adf(confluence: Confluence, space_id: str, title: str, adf: dict) -> dict:
+def create_page_adf(confluence: Any, space_id: str, title: str, adf: dict) -> dict:
     return confluence.post(
         "/api/v2/pages",
         data={

@@ -20,13 +20,22 @@ from fetch_diagrams import (
 
 
 def _confluence(attachments, downloads):
-    """A stub Confluence client: `attachments` is the `get_attachments_from_content` result list,
+    """A stub Confluence client: `attachments` is the `/child/attachment` result list,
     `downloads` maps a download link to the raw bytes/text `get(..., not_json_response=True)` returns.
     """
     confluence = MagicMock()
-    confluence.get_attachments_from_content.return_value = {"results": attachments}
-    confluence.get.side_effect = lambda link, **kwargs: downloads[link]
+
+    def fake_get(link, **kwargs):
+        if link.endswith("/child/attachment"):
+            return {"results": attachments}
+        return downloads[link]
+
+    confluence.get.side_effect = fake_get
     return confluence
+
+
+def _attachment_list_calls(confluence) -> list:
+    return [c for c in confluence.get.call_args_list if str(c.args[0]).endswith("/child/attachment")]
 
 
 def test_has_diagram_placeholder_detects_drawio_and_attachment_markers():
@@ -138,12 +147,12 @@ def test_fetch_attachment_snapshot_lists_and_downloads_once():
     assert snapshot == AttachmentSnapshot(
         attachments=attachments, downloaded={"a.png": b"png-bytes", "b.txt": b"text"}
     )
-    confluence.get_attachments_from_content.assert_called_once()
+    assert [c.args[0] for c in _attachment_list_calls(confluence)] == ["/rest/api/content/123/child/attachment"]
 
 
 def test_fetch_attachment_snapshot_wraps_a_list_failure_with_only_a_safe_category():
     confluence = MagicMock()
-    confluence.get_attachments_from_content.side_effect = SSLError(
+    confluence.get.side_effect = SSLError(
         "https://media.example.atlassian.net/file?token=super-secret-signed-token"
     )
 
@@ -161,9 +170,10 @@ def test_fetch_attachment_snapshot_wraps_a_download_failure_with_only_a_safe_cat
         {"title": "second.png", "_links": {"download": "/download/second.png"}},
     ]
     confluence = MagicMock()
-    confluence.get_attachments_from_content.return_value = {"results": attachments}
 
     def fake_get(link, **kwargs):
+        if link.endswith("/child/attachment"):
+            return {"results": attachments}
         if link == "/download/first.png":
             return b"png-bytes"
         raise ConnectTimeout("https://media.example.atlassian.net/second.png?token=abc")

@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import json
 
-from atlassian import Confluence
+from typing import Any
 
 DIAGRAM_TYPE = "ac:com.mxgraph.confluence.plugins.diagramly:drawio-diagram"
 
@@ -39,13 +39,13 @@ def _body(page_id: str, diagram_name: str, search: str, revision: int) -> str:
     )
 
 
-def page_space_key(confluence: Confluence, page_id: str) -> str:
+def page_space_key(confluence: Any, page_id: str) -> str:
     """The space key of `page_id` — a create without it is rejected, `container` notwithstanding."""
     page = confluence.get(f"/rest/api/content/{page_id}", params={"expand": "space"})
     return page["space"]["key"]
 
 
-def find_diagram(confluence: Confluence, page_id: str, diagram_name: str) -> dict | None:
+def find_diagram(confluence: Any, page_id: str, diagram_name: str) -> dict | None:
     """The page's existing custom content for `diagram_name`, or `None` on a first publish."""
     resp = confluence.get(
         f"/rest/api/content/{page_id}/child/{DIAGRAM_TYPE}",
@@ -57,7 +57,7 @@ def find_diagram(confluence: Confluence, page_id: str, diagram_name: str) -> dic
     return None
 
 
-def upsert_diagram(confluence: Confluence, page_id: str, diagram_name: str, search: str) -> dict:
+def upsert_diagram(confluence: Any, page_id: str, diagram_name: str, search: str) -> dict:
     """Create or update the diagram's custom content; returns `{"id", "revision"}`.
 
     `revision` tracks the custom content version, which the extension node carries as both

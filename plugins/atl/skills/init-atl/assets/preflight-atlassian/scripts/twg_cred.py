@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Run the `twg` CLI with the REST credentials from the sibling `.atlassian.json.user`.
+"""Run the `twg` CLI with the REST credentials from `.atlassian.json.user`.
 
 twg reads `TWG_USER`/`TWG_TOKEN`/`TWG_SITE` as per-process overrides, so the config's
-`email`/`apiToken`/`cloudId` reach twg without a separate `twg login` and never appear on a
-command line. Config values never leave this process: both output streams are redacted.
+`email`/`apiToken`/`cloudId` reach the twg child process only: never this process's
+environment, never a command line. Both output streams are copied with the email and token
+replaced by `<redacted>`; files twg writes via `--output-file` are not redacted.
 
 Usage:
-    python3 twg.py <twg arguments...>
+    python3 twg_cred.py [--config <configPath>] <twg arguments...>
+
+`--config` defaults to `.atlassian.json.user` beside this skill's `SKILL.md`, resolved from
+this file's location, not the cwd.
 """
 from __future__ import annotations
 
@@ -20,12 +24,32 @@ from pathlib import Path
 CONFIG_PATH = Path(__file__).resolve().parents[1] / ".atlassian.json.user"
 REDACTED = b"<redacted>"
 MISSING_TWG_EXIT_CODE = 127
+CONFIG_ERROR = "error: unreadable or malformed Atlassian config"
+
+
+class ConfigError(Exception):
+    """The config exists but cannot be read or parsed; the message never carries its values."""
+
+
+def split_config_arg(args: list[str]) -> tuple[Path | None, list[str]]:
+    """A leading `--config <path>` / `--config=<path>` -> (path, remaining twg args)."""
+    if args and args[0] == "--config" and len(args) > 1:
+        return Path(args[1]), args[2:]
+    if args and args[0].startswith("--config="):
+        return Path(args[0].removeprefix("--config=")), args[1:]
+    return None, args
 
 
 def load_config(config_path: Path) -> dict[str, object]:
     if not config_path.exists():
         return {}
-    return json.loads(config_path.read_text(encoding="utf-8"))
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        raise ConfigError(CONFIG_ERROR) from None
+    if not isinstance(config, dict):
+        raise ConfigError(CONFIG_ERROR)
+    return config
 
 
 def site_host(site: str) -> str:
@@ -66,16 +90,16 @@ def redact(data: bytes, secrets: list[str]) -> bytes:
 
 
 def main(argv: list[str] | None = None, *, config_path: Path = CONFIG_PATH) -> int:
-    args = sys.argv[1:] if argv is None else argv
+    explicit_config, args = split_config_arg(sys.argv[1:] if argv is None else argv)
+    try:
+        config = load_config(explicit_config or config_path)
+    except ConfigError as exception:
+        print(exception, file=sys.stderr)
+        return 1
     binary = find_twg()
     if binary is None:
-        print(
-            "error: twg CLI not found on PATH or in its default install directory; install it, "
-            "then rerun",
-            file=sys.stderr,
-        )
+        print("error: twg CLI not found", file=sys.stderr)
         return MISSING_TWG_EXIT_CODE
-    config = load_config(config_path)
     secrets = [value for value in (str(config.get("email", "")).strip(), str(config.get("apiToken", "")).strip()) if value]
     result = subprocess.run(
         [binary, *args],

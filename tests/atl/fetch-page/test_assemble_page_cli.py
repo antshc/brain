@@ -110,14 +110,20 @@ def test_main_attachments_skip_makes_no_attachment_calls(confluence, tmp_path):
 
     assert "skipped" in (tmp_path / "page.md").read_text()
     assert not (tmp_path / "page.md.assets").exists()
-    confluence.get_attachments_from_content.assert_not_called()
+    assert not [c for c in confluence.get.call_args_list if str(c.args[0]).endswith("/child/attachment")]
 
 
 def test_main_attachments_required_fails_without_writing_when_retrieval_fails(confluence, tmp_path, capsys):
     from requests.exceptions import SSLError
 
-    confluence.get.return_value = _page("Diagram Page", _attachment_reference_body())
-    confluence.get_attachments_from_content.side_effect = SSLError("boom")
+    page = _page("Diagram Page", _attachment_reference_body())
+
+    def fake_get(path, **kwargs):
+        if path.endswith("/child/attachment"):
+            raise SSLError("boom")
+        return page
+
+    confluence.get.side_effect = fake_get
 
     with pytest.raises(SystemExit):
         _main(tmp_path, "--attachments", "required")
@@ -213,3 +219,37 @@ def test_main_converts_the_synthetic_cross_skill_fixture_with_no_preprocessing(c
     assert "| Env | Status |" in markdown
     assert "skipped" in markdown
     assert not (tmp_path / "page.md.assets").exists()
+
+
+def test_main_reports_http_status_and_hint_on_a_404_without_url_or_token(confluence, tmp_path, capsys):
+    import requests
+
+    response = requests.Response()
+    response.status_code = 404
+    confluence.get.side_effect = requests.HTTPError(
+        "404 Client Error for url: https://s.example/wiki/api/v2/pages/123?token=super-secret-token",
+        response=response,
+    )
+
+    with pytest.raises(SystemExit):
+        _main(tmp_path)
+
+    err = capsys.readouterr().err
+    assert "Page fetch failed: HTTPError 404" in err
+    assert "check site URL and page id; wrong API base?" in err
+    assert "https://" not in err
+    assert "super-secret-token" not in err
+    assert not (tmp_path / "page.md").exists()
+
+
+def test_main_prints_the_version_message_on_an_unsupported_library(monkeypatch, tmp_path, capsys):
+    import confluence_client
+
+    monkeypatch.setattr(confluence_client, "installed_version", lambda: "4.0.7")
+    monkeypatch.setattr(assemble_page, "load_credentials", lambda config_path: CREDENTIALS)
+
+    with pytest.raises(SystemExit) as excinfo:
+        _main(tmp_path)
+
+    assert str(excinfo.value) == "atlassian-python-api >=5.0.5 required, found 4.0.7; run init-atl"
+    assert not (tmp_path / "page.md").exists()

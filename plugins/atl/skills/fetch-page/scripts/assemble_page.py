@@ -37,7 +37,12 @@ from comments import (  # noqa: E402
     fetch_comment_threads,
     render_comments_section,
 )
-from env import get_confluence, load_credentials, site_url  # noqa: E402
+from confluence_client import (  # noqa: E402
+    error_label,
+    get_confluence,
+    require_supported_library,
+)
+from env import load_credentials, site_url  # noqa: E402
 from fetch_diagrams import (  # noqa: E402
     AttachmentRetrievalError,
     fetch_attachment_snapshot,
@@ -63,8 +68,9 @@ class ConversionError(Exception):
 
 
 class PageFetchError(Exception):
-    """The REST page read failed. The message names only the exception class — never the
-    raw text, which may carry a signed URL or credential."""
+    """The REST page read failed. The message names only the exception class and HTTP status,
+    plus a fixed hint for 401/403/404 — never the raw text, which may carry a signed URL or
+    credential."""
 
 
 def extract_title_and_body(page: dict) -> tuple[str, dict]:
@@ -80,7 +86,7 @@ def fetch_page(confluence, page_id: str) -> tuple[str, dict]:
     try:
         page = confluence.get(f"/api/v2/pages/{page_id}", params={"body-format": "atlas_doc_format"})
     except RequestException as exception:
-        raise PageFetchError(type(exception).__name__) from None
+        raise PageFetchError(error_label(exception)) from None
     return extract_title_and_body(page)
 
 
@@ -182,6 +188,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--site", help="Site URL overriding the configured `cloudId` (page URL on another site)")
     args = parser.parse_args(argv)
 
+    require_supported_library()
     credentials = load_credentials(args.config)
     if credentials is None:
         print("error: .atlassian.json.user needs cloudId, email, and apiToken to fetch a page", file=sys.stderr)

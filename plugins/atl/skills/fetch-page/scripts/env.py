@@ -12,8 +12,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from atlassian import Confluence
-
 def load_config(config_path: str) -> dict:
     path = Path(config_path)
     if not path.exists():
@@ -40,11 +38,3 @@ def site_url(credentials: dict[str, str]) -> str:
         site = f"https://{site}"
     return site
 
-
-def get_confluence(credentials: dict[str, str]) -> Confluence:
-    return Confluence(
-        url=site_url(credentials),
-        username=credentials["email"],
-        password=credentials["token"],
-        cloud=True,
-    )

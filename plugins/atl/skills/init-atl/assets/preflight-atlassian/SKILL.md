@@ -27,7 +27,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
    - Not found → keys take table Default; keys without Default resolve empty (`site` → step 3, identity → step 5, project key/space id → ask per caller).
    - Found → file value wins; absent keys take Default. `tokenAvailable := email and apiToken both true`.
 3. **site.** `site :=` config `cloudId` (`https://<host>`). Empty and needed → ask developer for `<organization>.atlassian.net`; never guess.
-4. **twg.** `twg := python3 <base>/scripts/twg.py`, `<base>` = this skill's absolute base directory. Runs the `twg` CLI with config `email`/`apiToken`/`cloudId` injected and redacted from output.
+4. **twg.** `twg := python3 <base>/scripts/twg_cred.py`, `<base>` = this skill's absolute base directory; works from any cwd. Optional leading `--config <configPath>`; default is this skill's `.atlassian.json.user`. Injects config `email`/`apiToken`/`cloudId` into the twg child only and redacts email and token from its output. Every atl skill (`twg` skill, `fetch-page`, `publish-page`, `brief-daily`) uses this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
 5. **Identity.** `accountId` and `displayName` both set → skip. Either empty → `<twg> whoami -o json --output-file whoami.json` once, then print only `data.accountId` and `data.name` with Python: success → `accountId`, `displayName`; failure → leave empty, never raise. Exception: `init-atl`'s connectivity gate always calls live, ignoring cache.
 6. **Report** `configPath`, `site`, `twg`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`, `displayName`, `maxResults`, `limit` before the caller's operation.
 
@@ -63,5 +63,5 @@ Apply in every `atl` skill:
 
 - **MUST NOT search the filesystem** (`find`/`grep`/`ls -R`/`os.walk`) for this skill's directory or `.atlassian.json.user`. Base dir = parent of the `SKILL.md` path given in context; config is its sibling.
 - **Long absolute paths in `python3 -c` or heredocs get corrupted by terminal line-wrapping.** `cd` to the directory and use relative filenames; multi-statement code → temp `.py` file run by name.
-- twg run by an agent prints a YAML envelope pointing at spilled files, not the payload; `-o json --output-file <path>` writes the full JSON to a known path.
+- `twg -o json` without `--output-file` prints a pointer line (`stdout=<path>`), not JSON. Always pass `--output-file <path>` and parse that file.
 - `<twg>` redacts stdout/stderr only; a file written by `--output-file` is unredacted (whoami holds `email`). Extract needed fields; never print the whole file.

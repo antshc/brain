@@ -32,9 +32,18 @@ def _drawio_body() -> dict:
 
 def _confluence_stub(attachments, downloads):
     confluence = MagicMock()
-    confluence.get_attachments_from_content.return_value = {"results": attachments}
-    confluence.get.side_effect = lambda link, **kwargs: downloads[link]
+
+    def fake_get(link, **kwargs):
+        if link.endswith("/child/attachment"):
+            return {"results": attachments}
+        return downloads[link]
+
+    confluence.get.side_effect = fake_get
     return confluence
+
+
+def _attachment_list_calls(confluence) -> list:
+    return [c for c in confluence.get.call_args_list if str(c.args[0]).endswith("/child/attachment")]
 
 
 def test_default_assets_dir_appends_assets_to_the_full_markdown_name():
@@ -200,7 +209,7 @@ def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_p
     assert (assets_dir / "order-flow.drawio").read_bytes() == b"drawio-bytes"
     assert (assets_dir / "Screenshot.png").read_bytes() == b"png-bytes"
     assert (assets_dir / "notes.pdf").read_bytes() == b"pdf-bytes"
-    confluence.get_attachments_from_content.assert_called_once()
+    assert len(_attachment_list_calls(confluence)) == 1
 
 
 def test_assemble_skip_mode_makes_no_attachment_calls(monkeypatch, tmp_path):
@@ -215,7 +224,7 @@ def test_assemble_skip_mode_makes_no_attachment_calls(monkeypatch, tmp_path):
 
     assert "skipped" in result
     assert "```mermaid" not in result
-    confluence.get_attachments_from_content.assert_not_called()
+    assert _attachment_list_calls(confluence) == []
     assert not assets_dir.exists()
 
 

@@ -7,7 +7,8 @@ detached from any text. `plan` finds the open comments this publish will detach,
 runs; `post_notice` then leaves one page comment explaining which ones and how to reattach them.
 
 A comment already detached before this publish is not reported again, so republishing never
-repeats a notice.
+repeats a notice. `plan` also reports `partial`: ids whose span covered N blocks before and
+fewer, but not zero, after (one comment over two bullets, one bullet edited away).
 """
 from __future__ import annotations
 
@@ -15,11 +16,18 @@ import html
 import json
 import re
 
-from atlassian import Confluence
+from typing import Any
 
 _PAGE_LIMIT = 100
 _TAG_RE = re.compile(r"<[^>]+>")
 _EXCERPT_CHARS = 200
+_TEXTBLOCKS = {"paragraph", "heading", "codeBlock", "taskItem", "decisionItem"}
+_REATTACH_HELP = (
+    "<p>To reattach a comment, wrap the text it belongs to in the page's Markdown as "
+    "<code>&lt;!-- adf:comment id=\"ANCHOR-ID\" --&gt;text&lt;!-- /adf:comment --&gt;</code> "
+    "using the anchor id above, and publish again. If the comment no longer applies, resolve "
+    "it instead.</p>"
+)
 
 
 def comment_ids(adf: dict | list) -> set[str]:
@@ -42,13 +50,45 @@ def comment_ids(adf: dict | list) -> set[str]:
     return ids
 
 
-def _live_comment_ids(confluence: Confluence, page_id: str) -> set[str]:
+def comment_block_counts(adf: dict | list) -> dict[str, int]:
+    """Inline-comment annotation id -> number of distinct text blocks carrying it."""
+    blocks: dict[str, set[int]] = {}
+    stack: list[tuple[object, int]] = [(adf, 0)]
+    while stack:
+        node, block = stack.pop()
+        if isinstance(node, list):
+            stack.extend((child, block) for child in node)
+            continue
+        if not isinstance(node, dict):
+            continue
+        if node.get("type") in _TEXTBLOCKS:
+            block = id(node)
+        for mark in node.get("marks", []):
+            attrs = mark.get("attrs", {})
+            if mark.get("type") == "annotation" and attrs.get("annotationType", "inlineComment") == "inlineComment" and attrs.get("id"):
+                blocks.setdefault(attrs["id"], set()).add(block)
+        stack.extend((child, block) for child in node.get("content", []))
+    return {anchor_id: len(found) for anchor_id, found in blocks.items()}
+
+
+def partial_removals(live_adf: dict, final_adf: dict) -> list[dict]:
+    """Ids on N blocks in the live body and on fewer, but not zero, in the new body."""
+    before = comment_block_counts(live_adf)
+    after = comment_block_counts(final_adf)
+    return [
+        {"id": anchor_id, "before": count, "after": after[anchor_id]}
+        for anchor_id, count in sorted(before.items())
+        if 0 < after.get(anchor_id, 0) < count
+    ]
+
+
+def _live_adf(confluence: Any, page_id: str) -> dict:
     page = confluence.get(f"/api/v2/pages/{page_id}", params={"body-format": "atlas_doc_format"})
     value = page.get("body", {}).get("atlas_doc_format", {}).get("value") or "{}"
-    return comment_ids(json.loads(value))
+    return json.loads(value)
 
 
-def _inline_comments(confluence: Confluence, page_id: str) -> list[dict]:
+def _inline_comments(confluence: Any, page_id: str) -> list[dict]:
     results: list[dict] = []
     path = f"/api/v2/pages/{page_id}/inline-comments"
     params: dict | None = {"body-format": "storage", "limit": _PAGE_LIMIT}
@@ -61,7 +101,7 @@ def _inline_comments(confluence: Confluence, page_id: str) -> list[dict]:
     return results
 
 
-def _author(confluence: Confluence, account_id: str | None, cache: dict[str, str]) -> str:
+def _author(confluence: Any, account_id: str | None, cache: dict[str, str]) -> str:
     if not account_id:
         return "unknown"
     if account_id not in cache:
@@ -75,11 +115,13 @@ def _excerpt(storage: str) -> str:
     return text if len(text) <= _EXCERPT_CHARS else text[: _EXCERPT_CHARS - 1] + "…"
 
 
-def plan(confluence: Confluence, page_id: str, final_adf: dict) -> dict:
+def plan(confluence: Any, page_id: str, final_adf: dict) -> dict:
     """`orphaned`: open comments anchored now but absent from `final_adf`.
-    `unknownIds`: ids in `final_adf` that match no comment on the page (typo or foreign page)."""
+    `unknownIds`: ids in `final_adf` that match no comment on the page (typo or foreign page).
+    `partial`: ids `final_adf` keeps on fewer blocks than the live body (see `partial_removals`)."""
     final_ids = comment_ids(final_adf)
-    live_ids = _live_comment_ids(confluence, page_id)
+    live_adf = _live_adf(confluence, page_id)
+    live_ids = comment_ids(live_adf)
     comments = _inline_comments(confluence, page_id)
     known = {c.get("properties", {}).get("inlineMarkerRef", "") for c in comments}
     authors: dict[str, str] = {}
@@ -99,7 +141,11 @@ def plan(confluence: Confluence, page_id: str, final_adf: dict) -> dict:
                 "link": comment.get("_links", {}).get("webui", ""),
             }
         )
-    return {"orphaned": orphaned, "unknownIds": sorted(final_ids - known)}
+    return {
+        "orphaned": orphaned,
+        "unknownIds": sorted(final_ids - known),
+        "partial": partial_removals(live_adf, final_adf),
+    }
 
 
 def notice_storage(orphaned: list[dict], base_url: str) -> str:
@@ -124,14 +170,12 @@ def notice_storage(orphaned: list[dict], base_url: str) -> str:
         "<table><tbody>"
         "<tr><th>Highlighted text</th><th>Author</th><th>Comment</th><th>Link</th><th>Anchor id</th></tr>"
         f"{rows}</tbody></table>"
-        "<p>To reattach a comment, wrap the text it belongs to in the page's Markdown as "
-        "<code>&lt;!-- adf:comment id=\"ANCHOR-ID\" --&gt;text&lt;!-- /adf:comment --&gt;</code> "
-        "using the anchor id above, and publish again. If the comment no longer applies, resolve "
-        "it instead.</p>"
+        f"{_REATTACH_HELP}"
     )
 
 
-def post_notice(confluence: Confluence, page_id: str, storage: str) -> str:
+
+def post_notice(confluence: Any, page_id: str, storage: str) -> str:
     created = confluence.post(
         "/api/v2/footer-comments",
         data={"pageId": page_id, "body": {"representation": "storage", "value": storage}},

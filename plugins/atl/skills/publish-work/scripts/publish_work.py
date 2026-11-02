@@ -26,7 +26,7 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from env import get_jira, load_credentials, site_url  # noqa: E402
+from env import get_jira, load_credentials, require_supported_library, site_url  # noqa: E402
 from requests.exceptions import HTTPError, RequestException  # noqa: E402
 
 
@@ -152,6 +152,7 @@ def run(args: argparse.Namespace, jira, site: str) -> dict:
 
 def main(argv: list[str] | None = None) -> None:
     args = build_arg_parser().parse_args(argv)
+    require_supported_library()
     credentials = load_credentials(args.config)
     if credentials is None:
         print("error: .atlassian.json.user needs cloudId, email, and apiToken to publish a work item", file=sys.stderr)

@@ -1,2 +1,1 @@
-# pinned <5: atlassian-python-api 5.x replaced Confluence.attach_file with a Cloud client that lacks it
-atlassian-python-api>=4.0,<5
+atlassian-python-api>=5.0.5

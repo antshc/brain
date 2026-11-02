@@ -11,7 +11,7 @@ Publish local Markdown to a Confluence page via one `run` command: extract → c
 
 ## Prerequisites
 
-- `atlassian-python-api` — installed by `init-atl` skill; if missing, *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first.
+- `atlassian-python-api>=5.0.5` — installed by `init-atl` skill; missing or other version (script exits `atlassian-python-api >=5.0.5 required, found <version>; run init-atl`), *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first.
 - **MUST** have `cloudId`, `email`, `apiToken` in `.atlassian.json.user`; `run` exits non-zero naming any missing key before touching a page.
 - Diagram present → **MUST** have `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli`; verify `mmdc --version`. Headless Chrome libs (Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.
 - Diagram-free source → no `mmdc`.
@@ -98,9 +98,18 @@ Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); o
 
 Stdout JSON:
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published.
-- Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId`, `unknownCommentIds`, `commentGuard` (`failed (<category>)`, `notice failed (<category>)`).
+- Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId`, `unknownCommentIds`, `partialCommentRemovals` `[{id,before,after}]`, `commentGuard` (`failed (<category>)`, `notice failed (<category>)`).
 
-**4 — Report** page URL; with diagrams, confirm page and attachment list show every image. Report `orphanedComments` (selection + id) and `unknownCommentIds` when present.
+**4 — Verify.** Re-fetch into a separate dir and assert, from this skill's directory:
+
+```bash
+python scripts/verify_publish.py --page-id <pageId> --config "<configPath>" \
+  --expect-anchors <n> [--present <file>] [--absent <file>] --verify-dir <workingDir>/verify
+```
+
+`<n>` = expected `adf:comment id` span count; `--present`/`--absent` = one phrase per line (edited phrases / removed phrases). Prints each check `PASS|FAIL <name>`; exit 1 = failed check, 2 = re-fetch failed. Deletes nothing.
+
+**5 — Report** page URL; with diagrams, confirm page and attachment list show every image. Report `orphanedComments` (selection + id), `unknownCommentIds`, `partialCommentRemovals` when present.
 
 ## Inline comments
 
@@ -111,6 +120,7 @@ Stdout JSON:
 - Open comments anchored now but missing after → one page (footer) comment: table of highlighted text, author, excerpt, link, anchor id, plus how to reattach (re-add the span, republish) or resolve.
 - Already-detached comments are never re-reported, so republishing posts no duplicate notice.
 - Anchor id matching no page comment → `unknownCommentIds`; Confluence ignores it. Fix the id or remove the span.
+- Shared id (same id on several blocks) kept on fewer blocks than live, but not zero → stderr `warning: comment anchor <id> spanned N blocks, now M; ...` and `partialCommentRemovals`. Publish proceeds. Remove or keep all spans of an id together.
 - Create path → no guard. Guard read failure → publish proceeds, `commentGuard: "failed (<category>)"`.
 - Markdown fetched without anchors (older `fetch-page`, or a twg Markdown export) → refetch with `fetch-page` skill before editing, else every comment detaches.
 
@@ -120,7 +130,8 @@ Stdout JSON:
 - Named `pageId` → update in place; create only when none named.
 - Never choose a space silently.
 - Out of scope: non-mermaid diagram formats, bulk publishing.
-- Verify publish read-only (fetch page back); **MUST NOT** re-run `run`/`publish-adf` with test content — overwrites real publish.
+- Verify publish read-only (Step 4); **MUST NOT** re-run `run`/`publish-adf` with test content — overwrites real publish.
+- **Order:** publish → Step 4 verify into `<workingDir>/verify/` → only on pass delete working files. Working dir default `<mdPath>.tmp/` (holds outputs); deleting it, or the edited Markdown, before the read-back voids the verification. Failed check → keep every file, report the failing check name.
 
 ## Degraded mode
 
@@ -138,5 +149,6 @@ Stdout JSON:
 ## Completion criteria
 
 - Live: REST v2 `GET /wiki/api/v2/pages/<pageId>?body-format=atlas_doc_format`. `png` → `"type": "media"` count = diagram count; 2 attachments per diagram (`.png`, `.source.mmd`). `drawio` → count `"type": "extension"` with `static/drawio`; 3 attachments per diagram (`.drawio`, `.drawio.png`, `.source.mmd`).
-- Raw REST probes MUST use `<site>/wiki/...`; `site_url()` returns bare site, only `atlassian-python-api` adds `/wiki` (else 404 `No endpoint POST /rest/api/content`).
+- Step 4 `verify_publish.py` exits 0: anchor count, every edited phrase present, every removed phrase absent.
+- Raw REST probes MUST use `<site>/wiki/...`; `site_url()` returns bare site, `confluence_client.wiki_url()` adds `/wiki` (else 404 `No endpoint POST /rest/api/content`).
 
