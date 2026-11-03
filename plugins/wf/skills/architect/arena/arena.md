@@ -8,14 +8,14 @@ Open a todolist with one entry per phase (Frame, Fan out, Cross-judge, Pick, Gra
 
 Every candidate gets the same prompt, so the prompt is the contract.
 
-1. State the artifact each candidate is producing.
+1. State the artifact each candidate is producing: `rationale.md`, `module-map.md`, and `sketch/` source files per *Artifact layout* in `SKILL.md`. Write the task, requirements, and human decisions to `<artifact-root>/task.md`.
 2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
 3. Pick the runners. Use the runner role the caller names in `models.md`. If the value is missing, use its fallback. Select the first N entries, where N is the resolved `arena-agents` count. If the pool has fewer than N entries, fill the remaining seats with its last entry, or the parent model when empty, and say so. An `auto` or `inherit-parent` entry in this line means the parent model, so omit `model` for it. If the subagent tool rejects a configured entry, run that seat on its family's fallback entry and say so. Families go by prefix: `claude-*`, `grok-*`, `gpt-*`, `gemini-*`. If the family has no fallback entry, or the subagent tool rejects it, use the closest valid model of the same family from its error message, or drop the seat and say so when there is none. Keep fallbacks within the selected seats; never add runners beyond N. Pick each subagent's reasoning effort per `references/subagents.md`.
-4. Give each candidate its own output location (a git worktree where possible, otherwise `<repo-root>/tmp/architect-<slug>/arena/candidate-<n>/` per *Artifact location* in `SKILL.md`), per *Separate before serializing shared state* in `references/principles.md`.
+4. Give each candidate its own output directory `<artifact-root>/candidate-<n>/` per *Artifact layout* in `SKILL.md`, and a git worktree for repo reads where possible, per *Separate before serializing shared state* in `references/principles.md`.
 
 ## Phase B: Fan out
 
-Spawn all selected available runners (up to N) in one message with `mode: "background"`, each with the task, the path to the shared grounding, its own output path, and instructions to produce the artifact and a short rationale naming the alternatives it considered and what it rejected.
+Spawn all selected available runners (up to N) in one message with `mode: "background"`, each with the task (`task.md` path), the path to the shared grounding, its own output directory, and instructions to produce the artifact files and a rationale naming the alternatives it considered and what it rejected.
 
 After all runners complete, screen candidates per architect Phase B before judging. Record failed or nonviable candidates as dropouts; continue with viable outputs. With none, report failure and stop. With one, read it end to end, score it against the rubric, adopt it as the base, skip Phases C–E, and continue to Verify. If N was greater than one, explicitly report incomplete comparison.
 
@@ -46,8 +46,8 @@ Caller: architect Phase C `corrections` reply carrying `arena`. Run Phases A–F
 - Phase A: the task is the original task plus the corrections as hard constraints; the corrected current design is extra grounding. Rubric adds one criterion per correction. Keep the resolved `arena-agents` count unless the user changed it.
 - Output location: `<artifact-root>/arena-r<k>/candidate-<n>/`, `k` = re-run number from 1. Never overwrite earlier candidates.
 - Phase D–E: the corrected current design joins as the incumbent candidate; scoring includes the corrections criteria, so an incumbent that ignores a correction loses on it.
-- Output: the new synthesis note and design under `arena-r<k>/`; the incumbent stays untouched until the user picks.
+- Output: the new synthesis under `arena-r<k>/synthesis/`; the incumbent stays untouched until the user picks.
 
 ## Outputs
 
-One synthesized artifact, with a short synthesis note alongside naming the base and why, the cross-judge's verdict or that Phase C skipped the judge, each graft with its source candidate, what was rejected and why, any convergence or dropouts, requested and completed runner counts, models and fallbacks used, the reason for any skipped judge, and screening and verification results. With one viable candidate, keep the same sketch, synthesized design, and rationale outputs; record adoption without comparison or grafting.
+One synthesized artifact in `<artifact-root>/synthesis/` (`rationale.md`, `module-map.md`, `sketch/`), with a short `synthesis-note.md` alongside naming the base and why, the cross-judge's verdict or that Phase C skipped the judge, each graft with its source candidate, what was rejected and why, any convergence or dropouts, requested and completed runner counts, models and fallbacks used, the reason for any skipped judge, and screening and verification results. With one viable candidate, keep the same sketch, synthesized design, and rationale outputs; record adoption without comparison or grafting.
