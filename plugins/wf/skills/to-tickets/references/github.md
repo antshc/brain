@@ -12,6 +12,16 @@ gh issue view {{specIssueNumber}} --repo {{trackerRepository}} --json number,tit
 
 **Returns:** number, title, body, labels, comments. Require the `spec` label and exactly one `repo:target:` label before publication.
 
+## Read design sketch
+
+Optional. **Reads:** the spec's issue artifacts; run only online when the spec body has a **Design sketch** decision. No such decision → skip.
+
+```
+gh api -H "X-GitHub-Api-Version: 2026-03-10" "repos/{{trackerRepository}}/issues/{{specIssueNumber}}/artifacts?per_page=100&page={{page}}"
+```
+
+Loop pages until one returns fewer than 100 items. **Returns:** artifacts with `number`, `name`, `type`, `html_url`, `body`. Find **Sketch index**; read it and every artifact it lists (including `module-map.md` when listed). HTTP 404/410, a missing index, or an unreadable listed artifact → report the exact error and ask the user; never invent sketch content.
+
 ## Labels
 
 Missing baseline `hitl`, `spec`, or `bug` → *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode* in the tracker repository. Ensure the spec's routing label also exists:

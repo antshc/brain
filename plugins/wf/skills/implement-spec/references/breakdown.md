@@ -75,12 +75,12 @@ Inventory sources explicitly linked/attached in the spec body and all comments, 
 
 Applies when the spec's Implementation Decisions hold a binding **Design sketch** decision or its artifacts include a **Sketch index**. The sketch is the structural map — where logic goes and how code is shaped; the Requirements stay the behavior contract.
 
-1. Read the Sketch index first; it maps each sketch path to its artifact names. Read every listed artifact; a missing or unreadable one stops breakdown.
+1. Read the Sketch index first; it maps each file to its artifact names. Read every listed artifact, including `module-map.md` when listed; a missing or unreadable one stops breakdown.
 2. Follow the sketch's module boundaries for task ownership; keep functional tasks end-to-end and structural tasks scoped to complete relocations. Prefactoring and scaffolding the sketch defines come first.
-3. Every sketch file maps to at least one ticket: an exact excerpt (or the whole file when short) under **Related Spec Artifacts**, with its sketch path, artifact name, and artifact URL. A sketch file mapped to no ticket blocks publication.
-4. Sketch paths are intended target locations; quote them in Related Spec Artifacts even though Implementation Decisions avoid file paths.
+3. Every sketch file maps to at least one ticket: an exact excerpt (or the whole file when short) under **Related Spec Artifacts**, with its sketch path, artifact name, and artifact URL. A sketch file mapped to no ticket blocks publication. `module-map.md` is not a sketch file; quote its rows for each ticket's files in the same section.
+4. Sketch files are grouped by module or concern, not by target location. Target repo paths come from `module-map.md` (new, modified, deleted files with their sketch file); without a module map, sketch paths are intended target locations. Quote them in Related Spec Artifacts even though Implementation Decisions avoid file paths. A sketch file holding hook-point snippets for several existing files may map to several tickets, each quoting only its excerpt.
 5. Sketch conflicts with a Requirement, a Concept/ADR, or current code → the Requirement wins first, then Concepts/ADRs. Choose the option that best fits them and the sketch's intent without asking; record `Sketch deviation: {{what}} — {{chosen}} because {{reason}}` in that ticket's Implementation Decisions. Never drop a sketch type, signature, or boundary silently.
-6. Report sketch coverage (files mapped/total) in planner output `coverage.sketch` and every deviation in `notes`.
+6. Report sketch coverage (sketch files mapped/total, excluding `module-map.md`) in planner output `coverage.sketch` and every deviation in `notes`.
 
 ## Breakdown ticket operations
 
@@ -147,7 +147,7 @@ Render every section per its rule; conditional sections only when applicable. Te
 - Omit this section when the spec has no artifacts relevant to this slice.
 - For every relevant piece: bounded excerpt or precise binary location/description, canonical source/anchor and revision when available, and relationship to a requirement or criterion.
 - Repeat shared pieces in every related ticket; exclude unrelated pieces. Preserve readable links/embeds; never invent an image excerpt.
-- Design sketch artifacts: quote the exact sketch excerpt in a fenced block, prefixed with its sketch path, artifact name, and URL; the implementer uses it as the map for where logic goes and how code is structured.
+- Design sketch artifacts: quote the exact sketch excerpt in a fenced block, prefixed with its sketch path, artifact name, and URL, plus the matching `module-map.md` rows (target repo paths); the implementer uses them as the map for where logic goes and how code is structured.
 </related-spec-artifacts-rule>
 
 - {{artifactPiece}} ([{{sourceAnchor}}]({{canonicalSource}}), {{revision}}): {{requirementOrCriterionRelationship}}
