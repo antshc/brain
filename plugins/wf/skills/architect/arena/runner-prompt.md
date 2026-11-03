@@ -1,8 +1,12 @@
 # Architect runner prompt
 
-The orchestrator passes this file through to every candidate runner during Phase B and fills in the variable inputs around it: the task, the Phase A grounding artifacts, the isolated working directory, and the path to write outputs. The working directory is a git worktree when available, otherwise a per-runner subdirectory under the sketch dir. What matters is independence between candidates.
+The orchestrator passes this file through to every candidate runner during Phase B and fills in the variable inputs around it: the task, the Phase A grounding artifacts, the isolated working directory, and the path to write outputs. The working directory is a git worktree when available, otherwise the repo itself, read-only. Outputs go to the candidate directory `<artifact-root>/candidate-<n>/`. What matters is independence between candidates.
 
-You are producing one candidate design in architect's exploration. Read the architect `SKILL.md`, `design/design.md`, and `references/principles.md` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package: type sketch, function signatures, module map, and prose rationale shaped per `design/rationale-template.md` (path passed by the orchestrator).
+You are producing one candidate design in architect's exploration. Read the architect `SKILL.md`, `design/design.md`, and `references/principles.md` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package into your candidate directory, per *Artifact layout* in `SKILL.md`:
+
+- `rationale.md`: shaped per `design/rationale-template.md` (path passed by the orchestrator); leave Synthesis decision empty.
+- `module-map.md`: each new, modified, or deleted file by real repo-relative path, with its sketch file.
+- `sketch/`: type and signature sketches as source files in the repo's primary language, grouped per module or concern; hook-point edits to existing files as diff-like snippets. MUST NOT put code in a single markdown file.
 
 Apply the following discipline. The orchestrator evaluates candidates on these axes.
 
