@@ -19,7 +19,7 @@ Include the details that materially change the investigation:
 - Ask for current **as-built** behavior. Use a design or review skill when the goal is a proposed change or a before-and-after delta.
 - Mention suspected mocks, emulators, or development-only stores so the inspection can distinguish wiring from production behavior.
 - Request a runtime check when static code cannot settle a runtime claim, and say which commands or environments are safe to use.
-- Provide an output path only when the default location under `docs/ongoing/` is unsuitable.
+- Provide an output path only when the default location under `docs/research/` is unsuitable.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
 The skill selects the inspection axis and appropriate diagram from the question. Describe what you need to understand rather than prescribing a diagram type.
