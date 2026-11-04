@@ -38,13 +38,6 @@ copilot plugin install ralph@brain
 
 </details>
 
-### Diagnosis plugin (dig)
-
-```sh
-(copilot plugin uninstall dig@brain >/dev/null 2>&1 || true) && \
-copilot plugin install dig@brain
-```
-
 ### Atlassian plugin (atl)
 
 ```sh
@@ -143,6 +136,8 @@ Plugins bundle related skills (and, for `crew`, agents). Follow a link to read a
 
 ### wf
 
+- [diagnosing-bugs](plugins/wf/skills/diagnosing-bugs/SKILL.md): diagnose hard bugs or performance regressions, and fix them when explicitly requested.
+
 Common everyday workflow automation skills. Expected to be useful to all developers.
 
 - [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview with situational tactics that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
@@ -199,16 +194,6 @@ Code and technical solution review skills with modular standards and guidance.
 - [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from a standalone `[#{{initiative-id}}]` marker in the PR description; accepts a user PR URL or a factory-mode call and fetches the diff into a fresh detached review worktree without cloning.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
 - [blast-radius](plugins/review/skills/blast-radius/SKILL.md): find what a change could break elsewhere and prove the one safety fact by running real code. Sourced from [cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack/skills/blast-radius); manual-only.
-
-### dig
-
-Bug diagnosis skills: root-cause investigation, fix with regression test, and diagnosis handoff.
-
-- [diagnosing-bugs](plugins/dig/skills/diagnosing-bugs/SKILL.md): find the root cause, then fix it behind a regression test and clean up.
-- [diagnosing-root-cause](plugins/dig/skills/diagnosing-root-cause/SKILL.md): reuse prior handoffs, build a red-capable loop, falsify hypotheses, and report a cited root-cause summary; logs to session memory.
-- [draft-root-cause](plugins/dig/skills/draft-root-cause/SKILL.md): render a confirmed diagnosis log as a cited root-cause summary — mechanism chain, evidence, ruled-out hypotheses.
-- [handoff-diagnosis-patch](plugins/dig/skills/handoff-diagnosis-patch/SKILL.md): manual-only; persist a diagnosis as a replayable `patches/<slug>/` bundle that later root-cause runs match.
-- [diagnosis-session-log](plugins/dig/skills/diagnosis-session-log/SKILL.md): own the session log — location, resume check, shared events, entry rules, blocked state.
 
 ### atl
 

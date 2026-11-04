@@ -1,63 +1,21 @@
 ---
-name: diagnosing-root-cause
-description: >-
-  Diagnose and return the confirmed root cause of a hard bug or performance regression without fixing it. Use for 'diagnose', 'debug this', or reports of something broken, throwing, failing, or slow. Use diagnosing-bugs to also fix it.
+name: diagnosing-bugs
+description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow. Also use for explicit bug-fix requests.
 ---
-# Diagnosing Root Cause
 
-A discipline for hard bugs. Skip phases only when explicitly justified. Find and return the confirmed root cause. Never apply the fix, if not asked to do that in further phases.
+# Diagnosing Bugs
 
-**Evidence** is a re-checkable fact: `path:line`, actual probe output, an artifact location (see Artifacts), or an authoritative source with canonical URL. Everything else is a lead.
+A discipline for hard bugs. Skip phases only when explicitly justified.
 
-## Shared hypothesis log
+Diagnose by default. Run Phase 5 only when the user explicitly asks for a fix. In either mode, clean up temporary diagnostic changes in Phase 6.
 
-*Use `diagnosis-session-log` skill to reuse the same shared hypothesis log (`logPath`) of checked hypotheses, verification, and evidence.*
+When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
 ## Redact
 
 This skill has you show commands, outputs and captured artifacts. **Redact every secret first**: write `<REDACTED>` in its place. Build loops against env vars, so the credential stays in the environment rather than in what you show. Captured artifacts carry auth headers: quote only the lines that carry the signal.
 
 If the redacted output is not enough to diagnose the bug, say so and ask the user.
-
-## Artifacts
-
-**Artifact** := any user-supplied analysis input: screenshots/images, log archives (`.zip`, `.tar.gz`, `.7z`), raw log files, HAR files, dumps, recordings. Collect them from attachments and paths in the request or ticket; treat each as a lead source like code.
-
-Intake, after Domain grounding:
-
-1. **Archives:** extract a copy to `repository root/tmp/{{bugSlug}}-artifacts/{{archiveName}}/`; never modify the original. List entries first; then search by symptom text, error codes, correlation/request ids, and the reported time window. Read only matching regions.
-2. **Images:** view every image. Transcribe visible signal verbatim: error text, URL/page, timestamps, ids, UI state. Unreadable or ambiguous image → say so; ask for the original text or a sharper capture.
-3. **Correlate:** align artifact timestamps and ids with each other and with code paths before building the loop; a captured payload or log sequence is input for loop type 5 (replay).
-
-Cite artifact evidence as `{{artifact}}!{{entryPath}}:{{line}}` for archive entries, `{{logFile}}:{{line}}` for raw logs, or `{{image}}` plus the quoted visible text.
-
-Keep `@artifacts` := every artifact used: name, type, what it contributed (or `not relevant`). Pass it to `draft-root-cause`.
-
-**Done when** every supplied artifact is opened (archives extracted and listed, images viewed) and recorded in `@artifacts`.
-
-## Domain grounding (first step)
-
-**Run first, before planning or any other tool call — even when the user's request lists concrete steps.** User-listed steps are inputs to plan with after this step, not a replacement for it.
-
-Exploration means any information gathering: code, tests, logs, tickets (Jira, GitHub), wiki/knowledge pages, external docs. Fetching a ticket or page counts.
-
-Search the repo's **domain docs only**, not code:
-
-1. Locate them by listing the repo's Markdown docs (`**/*.md`) and keeping the ones that describe the domain: glossary, architecture, concepts, services, ADRs. Record the paths found.
-2. Search inside those paths for the business process and domain terms involved (from the request, ticket title, error text) and read the matching sections.
-
-A workspace-wide semantic search does **not** satisfy this step, because it returns code. Hits that aren't doc files don't count.
-
-Use the doc hits to build a mental model and adopt the domain language for navigation, analysis, and the root-cause wording. Doc hits are leads; confirm in code before relying on them.
-
-Repeat whenever exploration enters a new business process or domain area, in any phase.
-
-Run independent questions or topics as parallel read-only exploration subagents.
-
-**Done when**, before the first exploration call, your reply lists:
-
-- **Docs searched:** the doc paths checked, or `no domain docs in repo`.
-- **Domain terms:** the terms/concepts found, each with its doc path, or `none found`.
 
 ## Phase 1: Build a feedback loop
 
@@ -123,7 +81,7 @@ Confirm:
 
 Once it's red, shrink the repro to the **smallest scenario that still goes red**. Cut inputs, callers, config, data, and steps **one at a time**, re-running the loop after each cut, and keep only what's load-bearing for the failure.
 
-Why bother: a minimal repro shrinks the hypothesis space in Phase 3 (fewer moving parts left to suspect) and becomes the clean regression test in further phases.
+Why bother: a minimal repro shrinks the hypothesis space in Phase 3 (fewer moving parts left to suspect) and becomes the clean regression test in Phase 5.
 
 Done when **every remaining element is load-bearing**: removing any one of them makes the loop go green.
 
@@ -131,9 +89,9 @@ Do not proceed until you have reproduced **and** minimised.
 
 ## Phase 3: Hypothesise
 
-Open the log first *(use `diagnosis-session-log` skill to open the shared hypothesis log and continue `H` numbering)*. Drop hypotheses it already records as `falsified`.
+Read [Hypothesis log](references/hypothesis-log.md) and open or resume the log. Continue `H` numbering and skip previously falsified hypotheses for the same bug. Number the ranked hypotheses in log sequence.
 
-Generate **3–5 ranked hypotheses** before testing any of them, numbered `H{{n}}` in log sequence. Single-hypothesis generation anchors on the first plausible idea.
+Generate **3–5 ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea.
 
 Each hypothesis must be **falsifiable**: state the prediction it makes.
 
@@ -157,24 +115,40 @@ Tool preference:
 
 **Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
 
-**Record each result.** After each probe resolves a hypothesis, *use `diagnosis-session-log` skill to append the checked hypothesis entry with prediction, verification, observed fact, evidence, and result*. Write nothing for unchecked hypotheses.
+After each check, append the result per [Hypothesis log](references/hypothesis-log.md), including checks that end blocked. A cause is confirmed when re-checkable evidence connects it to the reproduced symptom through an ordered mechanism and it fits the observations. A blocked probe does not confirm a cause. If the cause remains unconfirmed, clean up and report the blocker, what was checked, and the log path.
 
-## Phase 5: Confirm root cause
+## Phase 5: Fix + regression test
 
-A confirmed hypothesis is the root cause only when:
+Run this phase only for an explicit fix request with a confirmed cause.
 
-1. **Mechanism chain** — cause to symptom in ordered steps, each backed by evidence.
-2. **Fits all facts** — no known observation contradicts it.
-3. **Rivals eliminated** — every ranked `H` from Phase 3 has a log entry; all but the root cause are `falsified` with evidence.
+Write the regression test **before the fix**, but only if there is a **correct seam** for it.
 
-Then **MUST** *run `draft-root-cause` skill to render the final cited root-cause summary* from the shared hypothesis log plus the current run evidence and `@artifacts`: load that skill's file and follow its Gate and template.
+A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
 
-**MUST NOT write the summary yourself**, even when the full evidence chain is already in the session. `draft-root-cause` owns the summary format; a self-written summary that "meets the same requirements" still fails this step.
+**If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Flag this for the next phase.
 
-**Done when** `draft-root-cause` was loaded this run and the summary follows its template.
+If a correct seam exists:
+
+1. Turn the minimised repro into a failing test at that seam.
+2. Watch it fail. If you forced the red by mutating code or a fixture, `diff` against a pristine copy to prove the mutation landed before you trust it.
+3. Apply the fix.
+4. Watch it pass.
+5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
+
+## Phase 6: Cleanup
+
+Required before declaring done:
+
+For both modes, remove temporary `[DEBUG-...]` instrumentation (grep the prefix) and throwaway prototypes (or move prototypes to a clearly-marked debug location).
+
+For a fix, also verify:
+
+- [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
+- [ ] Regression test passes (or absence of seam is documented)
+- [ ] The hypothesis that turned out correct is stated in the commit / PR message, so the next debugger learns
 
 ## Output
 
-Return the summary rendered by `draft-root-cause`, unchanged, directly to the user.
+For a confirmed cause, use [Root-cause report](references/root-cause-report.md) with the hypothesis log and current evidence. Track any user-supplied artifacts used during diagnosis and what each contributed. For a fix, also report the change, regression-test result or missing seam, and verification of the original scenario. Include the hypothesis log path.
 
-MUST NOT save the rendered root-cause summary to a file. Persistence belongs only to an explicitly invoked handoff/persistence workflow.
+Based on [Matt Pocock's diagnosing-bugs](https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs). See [LICENSE](LICENSE).
