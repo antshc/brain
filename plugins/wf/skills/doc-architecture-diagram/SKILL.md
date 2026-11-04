@@ -1,6 +1,7 @@
 ---
 name: doc-architecture-diagram
-description: Documents software architecture with a Mermaid system context, container, component, or deployment diagram. Use for system landscape and scope questions, current-state architecture, architecture decomposition within one deployable, and architecture deltas, including added, removed, or modified components, containers, systems, actors, relationships, hosts, runtimes, or deployment nodes.
+description: >-
+  Document software architecture as a Mermaid C4 system context, container, component, or deployment diagram. Use for system scope, current-state architecture, decomposing one deployable, or architecture deltas. Use doc-behavior-diagram for flows, doc-code-diagram for classes.
 ---
 
 # Architecture Diagram

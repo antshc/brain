@@ -1,6 +1,7 @@
 ---
 name: define-research
-description: Charts a research prompt or context into a research map of one or many research and hypothesis topics under docs/ongoing/, then resolves them through /research or through experiments run by /experiment until the destination is clear. Use to define, split, or scope research before running it, or to resume an existing research map.
+description: >-
+  Chart or resume a research map of research and hypothesis topics under docs/ongoing/, resolved via research or experiment.
 argument-hint: "{{researchPromptOrContext}} | {{researchMapPath}}"
 disable-model-invocation: true
 ---

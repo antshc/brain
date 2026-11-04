@@ -1,6 +1,7 @@
 ---
 name: ralph-build
-description: Build the project in the given workspace. Run after worktree setup, before implementation.
+description: >-
+  Build the project in a given workspace from the harness README build instructions and report pass or fail. Use after worktree setup, before implementation, or when another skill needs a build gate.
 argument-hint: '<harness-repo-path> <workspace-path>'
 ---
 

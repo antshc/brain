@@ -1,6 +1,7 @@
 ---
 name: hitl
-description: Use when a human leads a PR code review and wants findings verified against code and architecture docs. Drafts one review comment at a time, gets human approval, and posts each approved comment as an inline PR comment.
+description: >-
+  Draft human-led PR review comments verified against code and architecture docs, posting each inline after human approval.
 argument-hint: 'PR_URL (e.g., "https://github.com/owner/repo/pull/1245")'
 disable-model-invocation: true
 ---

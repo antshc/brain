@@ -1,6 +1,7 @@
 ---
 name: init-verify
-description: "Install the proof kit (mole CLI, receipts, evidence adapters, scenario builders, feature maps, verify-<app> and maintain-verify-<app> skills) into a repository in TypeScript (pnpm) or Python, research the codebase, ask the language and which surfaces to prove (web, api, both), and generate starter proof cases. Use when the user explicitly asks to set up proof, mole, or agent verification in a repo."
+description: >-
+  Install the mole proof kit into a TypeScript or Python repository and generate starter proof cases for web, api, or both surfaces.
 disable-model-invocation: true
 ---
 

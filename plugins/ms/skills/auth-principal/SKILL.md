@@ -1,6 +1,7 @@
 ---
 name: auth-principal
-description: 'Authorize Azure CLI with a service principal on Windows or Linux. Use when Azure CLI authentication is missing or expired, or when the user mentions "/ms:auth-principal".'
+description: >-
+  Authorize Azure CLI with a service principal on Windows or Linux. Use when az authentication is missing or expired, 'az login fails', or for /ms:auth-principal.
 ---
 
 **Step 0 — Detect OS**

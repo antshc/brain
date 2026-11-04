@@ -1,6 +1,7 @@
 ---
 name: grill-skill
-description: Interview the user to define a new agent skill and produce a confirmed skill brief for /write-skill.
+description: >-
+  Interview the user to define a new agent skill and produce a confirmed skill brief for /write-skill.
 disable-model-invocation: true
 ---
 

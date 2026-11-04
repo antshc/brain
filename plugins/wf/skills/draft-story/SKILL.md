@@ -1,5 +1,6 @@
 ---
-description: Draft one standalone, atomic, testable, implementation-agnostic **User story** body beginning with a formatted Title and carrying Requirements, Acceptance Criteria, and optional Technical notes. Use when the user asks to write, draft, or format one User story, or when another skill needs one story's content.
+description: >-
+  Draft one atomic, testable, implementation-agnostic User story with Title, Requirements, Acceptance Criteria, and optional Technical notes. Use when asked to write, draft, or format a User story, or when another skill needs one story's content.
 name: draft-story
 ---
 

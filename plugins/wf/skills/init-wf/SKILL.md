@@ -1,6 +1,7 @@
 ---
 name: init-wf
-description: One-time wf setup — confirms repository topology, seeds Copilot instructions, bootstraps ARCHITECTURE.md/GLOSSARY.md, and creates GitHub issue labels. Use before the workflow or in labels-only mode to repair missing labels.
+description: >-
+  Set up wf repo topology, Copilot instructions, ARCHITECTURE.md, GLOSSARY.md, and GitHub labels, or repair missing labels.
 disable-model-invocation: true
 ---
 

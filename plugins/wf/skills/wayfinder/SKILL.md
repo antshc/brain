@@ -1,6 +1,7 @@
 ---
 name: wayfinder
-description: Plan work larger than one agent session as a shared GitHub map of decision tickets, and resolve them one at a time until the way to the destination is clear.
+description: >-
+  Chart work larger than one session as a GitHub map of decision tickets and resolve them one at a time.
 argument-hint: "{{looseIdea}} | {{mapIssueNumberOrUrl}} [{{ticketNumber}}]"
 disable-model-invocation: true
 ---

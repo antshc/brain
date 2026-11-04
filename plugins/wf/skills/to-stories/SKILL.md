@@ -1,5 +1,6 @@
 ---
-description: Turn raw requirements, `/to-spec` output, or `/to-zdesign` output into an approved ordered list of atomic User stories with numbered headings, Jira-sync metadata, dependencies, and one `/draft-story` body per story. Use when the user wants stories, backlog-ready items, Acceptance Criteria, or FE/BE-split work from requirements, a spec, or a design.
+description: >-
+  Turn requirements, a spec, or a design into an approved ordered list of atomic User stories with Jira-sync metadata.
 name: to-stories
 disable-model-invocation: true
 ---

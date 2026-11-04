@@ -1,6 +1,7 @@
 ---
 name: doc-behavior-diagram
-description: Document software behavior with a Mermaid flowchart, swimlane diagram, or sequence diagram. Use for process flows, decision paths, config or feature-flag branching, provider selection and fallback, responsibility handoffs and who owns each step, call-chain and interaction order, cross-boundary calls, failure branching, and their deltas.
+description: >-
+  Document software behavior as a Mermaid flowchart, swimlane, or sequence diagram. Use for process flows, decision or feature-flag branching, fallback, responsibility handoffs, call order across boundaries, or behavior deltas. Use doc-architecture-diagram for structure, doc-code-diagram for classes.
 ---
 
 # Behavior Diagram

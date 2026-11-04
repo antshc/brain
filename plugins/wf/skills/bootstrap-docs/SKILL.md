@@ -1,6 +1,7 @@
 ---
 name: bootstrap-docs
-description: Creates missing ARCHITECTURE.md and GLOSSARY.md immediately from bundled formats. Use when a caller's existence check finds either absent; leaves section insertion to index-docs and record directories to record-architecture.
+description: >-
+  Create missing ARCHITECTURE.md and GLOSSARY.md from bundled formats. Use when a caller's existence check finds either absent. Use index-docs for section insertion and record-architecture for record directories.
 ---
 
 # Bootstrap Docs

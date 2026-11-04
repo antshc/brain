@@ -1,7 +1,7 @@
 ---
 name: address-page-comments
 description: >-
-  Addresses open review comments on a Confluence page; edits the page in place with twg targeted edits and replies to each thread in plain natural style. Comments whose inline anchor text was removed get answered in a page comment. Use for a Confluence page URL or ID and review comment follow-ups.
+  Edit a Confluence page in place to settle open review comments and reply to each thread; removed-anchor comments get a page comment. Use for a Confluence page URL or ID with 'address page comments' or 'reply to review comments'. Use fix-confluence-comments to edit without replying.
 argument-hint: '<page_id_or_url> (e.g. "123456789" or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 

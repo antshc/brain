@@ -1,6 +1,7 @@
 ---
 name: explore-codebase
-description: Finds code (where a symbol lives, what calls it, how a flow works, which file holds a literal, config, test, or owner) as a read-only lookup run inside a caller-spawned subagent. The engine for any codebase exploration; the caller reads its Request, forms a question, prompt instruction, or skill to run plus output shape, and spawns the subagent. Use for any "where is", "what calls", "how does this work", or "find the code that..." question about the current repo or a named external codebase, and whenever a task must locate code before it can proceed. Also use when a prompt carries an explore-codebase Request with @work and @depth fields.
+description: >-
+  Find where a symbol lives, what calls it, how a flow works, or which file holds a literal, config, test, or owner, read-only in a caller-spawned subagent. Use for 'where is', 'what calls', 'how does this work', 'find the code that' in this or a named repo, or a Request with @work and @depth.
 ---
 
 # Explore Codebase

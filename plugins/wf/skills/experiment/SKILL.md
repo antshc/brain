@@ -1,6 +1,7 @@
 ---
 name: experiment
-description: Run a minimal throwaway experiment to answer one uncertain technical question by observing actual behavior. Use when asked to test, verify, check, prove, try, or see whether/how something actually behaves and answering requires execution or observation. Covers logic/state, UI/frontend, SDK/API/integration, cloud resources, message brokers, databases, and backend/runtime systems before committing production code.
+description: >-
+  Run a minimal throwaway experiment that answers one uncertain technical question by observing actual behavior. Use when asked to test, verify, prove, or see how something actually behaves in code, UI, SDK/API, cloud, message brokers, or databases before committing production code.
 ---
 
 # Experiment

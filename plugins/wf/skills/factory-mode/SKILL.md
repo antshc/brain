@@ -1,7 +1,7 @@
 ---
 name: factory-mode
 description: >-
-  Operating mode for engineering tasks; restates the goal, routes to a playbook (investigation, bug fix, design, feature, refactoring, prototype), applies principles, delegates deliberately, verifies on the real artifact. Use for /factory-mode, /factory-mode help, or requests to work in this style.
+  Work engineering tasks by restating the goal, routing to a playbook, delegating deliberately, and verifying on the real artifact.
 disable-model-invocation: true
 ---
 

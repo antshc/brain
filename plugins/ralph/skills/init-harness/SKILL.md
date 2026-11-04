@@ -1,6 +1,7 @@
 ---
 name: init-harness
-description: Create or update the harness's repository-level `harness` skill (`.github/skills/harness/`) and its pull command. Run once, from the harness root, for a multi-repo/wrapping workspace.
+description: >-
+  Create or update the repository-level harness skill and its pull command in a multi-repo harness root.
 disable-model-invocation: true
 ---
 

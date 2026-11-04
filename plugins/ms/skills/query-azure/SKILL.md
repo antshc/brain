@@ -1,6 +1,7 @@
 ---
 name: query-azure
-description: Discover, inspect, create, update, and delete real Azure resources with Azure CLI. Use whenever the user asks to list, show, provision, change, or remove Azure resources with `az`, even if they do not explicitly ask for this skill.
+description: >-
+  List, show, create, update, and delete real Azure resources with Azure CLI. Use when the user asks to list, provision, change, or remove Azure resources with az, even without naming this skill. Use search-ms-docs for service behavior and limits.
 compatibility: Requires Azure CLI (`az`) to be installed and authenticated with access to the target Azure subscription.
 ---
 

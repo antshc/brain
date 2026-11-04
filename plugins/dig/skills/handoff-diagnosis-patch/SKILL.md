@@ -1,6 +1,7 @@
 ---
 name: handoff-diagnosis-patch
-description: Persist a finished diagnosis as a replayable repo bundle — repro patch and one rendered diagnosis file with matching signals and scenario — under patches/<slug>/.
+description: >-
+  Persist a finished diagnosis as a replayable patches/slug bundle with a repro patch and one diagnosis file.
 disable-model-invocation: true
 argument-hint: "[bugSlug]"
 ---

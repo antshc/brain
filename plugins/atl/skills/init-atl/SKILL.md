@@ -1,7 +1,7 @@
 ---
 name: init-atl
 description: >-
-  First-run setup for this repository's Atlassian configuration (`.atlassian.json.user`) and the `atlassian-python-api` dependency, plus optional generation of repository-level Jira wrapper skills named `pub-` plus the issue type. Use when an atl skill reports a missing config, token, or unsupported atlassian-python-api version.
+  Set up this repo's Atlassian config (.atlassian.json.user), the atlassian-python-api dependency, and optional pub- Jira wrapper skills per issue type. Use for first-run atl setup, or when an atl skill reports a missing config, token, or unsupported atlassian-python-api version.
 ---
 
 # Init Atl

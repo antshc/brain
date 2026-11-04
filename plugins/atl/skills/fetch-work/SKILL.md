@@ -1,7 +1,7 @@
 ---
 name: fetch-work
 description: >-
-  Fetch a Jira work item as Markdown from its key or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Jira work item/issue by key or URL. Reads real ADF over REST and converts via map-markdown-adf; embedded images/files are cached to a `.tmp` folder beside the Markdown and linked. Needs `apiToken` in `.atlassian.json.user`.
+  Fetch a Jira work item as Markdown from its key or URL, with every long field in full and embedded images cached beside it. Use when asked to fetch, read, show, or summarize a Jira work item or issue. Use fetch-page for Confluence pages.
 argument-hint: '<work_item_key_or_url> (e.g. "PROJ-123" or "https://<site>.atlassian.net/browse/PROJ-123")'
 ---
 

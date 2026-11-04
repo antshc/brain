@@ -1,6 +1,7 @@
 ---
 name: search-ms-code-samples
-description: Finds official Microsoft code samples and verifies SDK APIs, signatures, and migrations. Use for Microsoft SDK, .NET library, Azure client library, or Microsoft API implementation, debugging, and review.
+description: >-
+  Find official Microsoft code samples and verify SDK APIs, signatures, and migrations. Use when implementing, debugging, or reviewing code against a Microsoft SDK, .NET library, Azure client library, or Microsoft API. Use search-ms-docs for concepts and configuration.
 compatibility: Primarily uses the Microsoft Learn MCP Server (https://learn.microsoft.com/api/mcp); if that is unavailable, fall back to the mslearn CLI (`npx @microsoft/learn-cli`).
 ---
 

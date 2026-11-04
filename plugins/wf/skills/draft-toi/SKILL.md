@@ -1,6 +1,7 @@
 ---
 name: draft-toi
-description: Drafts a feature Transfer of Information (TOI) locally from the bundled template, grounded in workspace docs and codebase exploration, in plain English, with real tweak keys, GUI and REST API scenarios, and an optional swimlane. Use for a TOI, feature handover, or knowledge transfer.
+description: >-
+  Draft a feature Transfer of Information (TOI) locally from workspace docs and codebase, with real tweak keys, GUI and REST API scenarios, and an optional swimlane. Use for 'write a TOI', feature handover, or knowledge transfer.
 ---
 
 # Draft TOI

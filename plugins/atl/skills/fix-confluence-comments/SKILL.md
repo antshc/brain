@@ -1,7 +1,7 @@
 ---
 name: fix-confluence-comments
 description: >-
-  Address inline comments on a Confluence page by editing its Markdown so every comment stays attached or is removed on purpose, never lost or overwritten. Use when asked to fix, address, or resolve Confluence page comments, or apply review feedback to a Confluence page. Fetches, edits, checks shared anchors, republishes, and verifies before cleanup.
+  Edit a Confluence page's Markdown and republish so every inline comment stays attached or is removed on purpose, never lost. Use when asked to fix, address, or resolve Confluence page comments, or apply review feedback to a page. Use address-page-comments to also reply to threads.
 argument-hint: '<page_id_or_url>'
 ---
 

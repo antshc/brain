@@ -1,6 +1,7 @@
 ---
 name: to-crew
-description: "Delegate an implementation task to the matching Codey agent from a task description, session plan, or GitHub issue, then review with Chorey and update the related issue — mirroring ralph:dev's flow for a single task. Never commits; the user commits its own work. Use when the user asks Codey to implement a change."
+description: >-
+  Delegate one task to the matching Codey agent, review it with Chorey, and update the related issue; never commit.
 argumentHint: "<description> | @plan | <github-issue-url>"
 disable-model-invocation: true
 ---

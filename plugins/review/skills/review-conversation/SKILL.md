@@ -1,6 +1,7 @@
 ---
 name: review-conversation
-description: Formats review comments, findings, and replies in a shared conversation style. Use from Code Review, Address, or HITL for simple English and hidden metadata while preserving human ownership and caller approval rules.
+description: >-
+  Format review comments, findings, and replies in one shared conversation style with simple English and hidden metadata. Use when code-review, address, or hitl needs a finding or reply body that preserves human ownership and caller approval rules.
 ---
 
 # Review conversation

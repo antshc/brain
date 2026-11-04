@@ -1,6 +1,7 @@
 ---
 name: to-tickets
-description: Breaks a Spec issue into codebase-informed, agent-executable implementation tasks and, after explicit user approval, publishes them as GitHub sub-issues with a native blocker dependency graph. Use when cutting a spec or plan.md into tickets, sub-issues, AFK/HITL slices, or offline Markdown tickets.
+description: >-
+  Break a Spec issue into agent-executable tasks published as GitHub sub-issues with a blocker graph, or offline Markdown.
 argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`] | offline {{localSpecPath}}"
 disable-model-invocation: true
 ---

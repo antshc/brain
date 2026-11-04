@@ -1,6 +1,7 @@
 ---
 name: fix
-description: Fix review comments by applying the suggested changes.
+description: >-
+  Apply the suggested changes from a pull request's review comments, push to the PR branch, and reply to each thread. Use for /fix with a PR URL, 'fix review comments', or 'apply PR suggestions'.
 argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 ---
 

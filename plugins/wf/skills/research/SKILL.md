@@ -1,7 +1,7 @@
 ---
 name: research
 description: >-
-  Investigates a question against primary sources (codebase, NuGet packages, AWS and Azure docs and CLIs, or the web) via subagents and discovered research-* specialists, saving cited findings as Markdown. Use to research a topic, gather docs or API facts, inspect a system as-built (behavior inside one deployable, a flow across deployables, or a data boundary, cited to file and line), or inspect cloud service constraints (APIs, SDK, IAM/RBAC, quotas, throttling, networking).
+  Investigate a question against primary sources (codebase, NuGet, AWS or Azure docs and CLIs, web) and save cited findings as Markdown. Use for 'research X', docs or API facts, as-built system inspection cited to file and line, or cloud limits like IAM or quotas. Use explore-codebase for code lookup.
 ---
 
 # Research

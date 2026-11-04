@@ -1,7 +1,7 @@
 ---
 name: fetch-page
 description: >-
-  Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, returning every long field in full. Use when asked to fetch, read, show, or summarize a Confluence page, including a page ID or URL returned by a twg search. Reads real ADF over REST and converts via map-markdown-adf; body-referenced attachments (diagrams, images, files) cache to `.md.assets`, `--attachments` controls it; inline-comment anchors and a `## Comments` section keep comments through republish. Not for search; use twg. Needs `apiToken` in `.atlassian.json.user`.
+  Fetch a Confluence page as Markdown from its ID, tiny ID, or URL, with every field in full, attachments cached, and inline-comment anchors kept for republish. Use when asked to fetch, read, show, or summarize a Confluence page or a twg search hit. Use twg for search, fetch-work for Jira.
 argument-hint: '<page_id_or_url> (e.g. "123456789", "Fc1bBw", or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 

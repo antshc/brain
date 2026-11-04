@@ -1,6 +1,7 @@
 ---
 name: technical-design
-description: Review a technical design for missing, contradictory, infeasible, unsafe, or untestable decisions. Use when asked to assess design completeness, find architecture gaps, or decide whether a design is ready for implementation or approval.
+description: >-
+  Review a technical design for missing, contradictory, infeasible, unsafe, or untestable decisions. Use for 'is this design complete', 'find architecture gaps', or 'is this design ready for implementation or approval'.
 ---
 
 # Review solution

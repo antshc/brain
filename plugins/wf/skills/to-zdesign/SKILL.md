@@ -1,6 +1,7 @@
 ---
 name: to-zdesign
-description: Create or incrementally extend an authoritative feature design from spec files, confirmed grill-design conversation context, Wayfinder maps or decision issues, and existing designs. Use for first-pass design synthesis, adding later specs, capturing a completed design conversation, or merging resolved GitHub decisions without losing existing content.
+description: >-
+  Create or extend an authoritative feature design from specs, grill-design context, Wayfinder decisions, and existing designs.
 disable-model-invocation: true
 ---
 

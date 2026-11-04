@@ -1,6 +1,7 @@
 ---
 name: address
-description: Addresses pull request review comments, groups issues, investigates code, fixes verified concerns, and replies naturally. Resolves settled agent threads while preserving manual closure for human threads. Use for a PR URL and review discussion follow-ups.
+description: >-
+  Group PR review comments into issues, investigate them against the code, fix verified concerns, and reply to every thread, resolving settled agent threads but leaving human threads open. Use for a PR URL with 'address review comments', 'handle PR feedback', or review discussion follow-ups.
 argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 ---
 

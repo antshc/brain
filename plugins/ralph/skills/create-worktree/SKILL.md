@@ -1,6 +1,7 @@
 ---
 name: create-worktree
-description: Create or reuse an isolated git worktree for a feature branch in the given codebase repo path, based off the existing origin/<feature-branch> when one exists, otherwise off origin/<target-branch>. Branch detection is the caller's responsibility.
+description: >-
+  Create or reuse an isolated git worktree for a feature branch, based on origin/feature-branch when it exists, otherwise origin/target-branch. Use when another skill needs a worktree in a given codebase repo path; the caller detects branches.
 argument-hint: '<codebase-repo-path> <target-branch> <feature-branch>'
 ---
 

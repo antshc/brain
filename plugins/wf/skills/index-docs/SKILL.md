@@ -1,6 +1,7 @@
 ---
 name: index-docs
-description: Maintains ARCHITECTURE.md structural prose and section skeletons; owns full index load, trigger-generation, scan/match, and row-sync for Markdown Trigger condition tables. Uses caller-supplied metadata for Deployables, ADRs, Concepts, or custom indexes; never creates the file or authors row content.
+description: >-
+  Maintain ARCHITECTURE.md prose, section skeletons, and Trigger condition tables (index load, trigger generation, scan and match, row sync). Use when another skill needs the index loaded or a Deployables, ADR, Concept, or custom row synced. Use record-architecture to author records.
 ---
 
 # Index Docs
