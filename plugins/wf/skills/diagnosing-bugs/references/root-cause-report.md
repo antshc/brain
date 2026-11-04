@@ -1,21 +1,15 @@
----
-name: draft-root-cause
-description: >-
-  Render and print one cited root-cause summary from a confirmed diagnosis's hypothesis log and run evidence; never save it. Use for 'write the root cause', 'summarize the diagnosis', or when another skill needs the summary.
-argument-hint: "[bugSlug]"
----
 # Draft Root Cause
 
 Render and print one root-cause summary. Drafting is transcription: add no new facts and run no probes.
 
 ## Input
 
-Resolve `logPath` per `diagnosis-session-log`'s Location section, or use the log path a caller provides.
+Resolve `logPath` per the [Hypothesis log](hypothesis-log.md), or use the log path a caller provides.
 
 Use:
 - checked hypotheses from the log;
 - current-run evidence for mechanism-chain facts not represented as hypotheses;
-- `@artifacts` from the caller: analysis inputs (images, log archives, logs, HAR, dumps) with what each contributed.
+- analysis inputs (images, log archives, logs, HAR, dumps) with what each contributed.
 
 ## Gate
 
@@ -98,7 +92,7 @@ This reads as a **{{verdict|regression, bug, works as designed, feature request}
 
 | Id | Check | Finding | Source / Reference |
 |---|---|---|---|
-| E1 | {{what was checked}} | {{actual observed fact}} | {{[name:line](path#Lline) | `command` → signal | `archive!entryPath:line` | `image` + quoted text | [title](canonicalUrl)}} |
+| E1 | {{what was checked}} | {{actual observed fact}} | {{[name:line](path#Lline), `command` → signal, `archive!entryPath:line`, `image` + quoted text, or [title](canonicalUrl)}} |
 
 </details>
 
