@@ -107,6 +107,20 @@ gh issue edit {{issueNumber}} --repo {{trackerRepository}} --body-file <file>
 
 **Returns:** verified updated body. Reconcile partial comment/close/map-update failures before retrying so evidence and index entries are not duplicated.
 
+## Prepare a result worktree
+
+**Reads:** captured invocation worktree, branch, repository, and issue number. Verify `origin` points to the tracker repository. From the invocation repository, create an isolated worktree and temporary branch from the invocation branch tip using `git worktree add -b <unique-result-branch> <unused-path> <base-sha>`. Name the branch and path with the ticket number and a unique run suffix. Pass the path to the runner. The runner writes artifacts there. Wayfinder owns integration and cleanup.
+
+## Publish a result
+
+**Reads:** result worktree, verified artifact paths, issue number, and captured invocation branch/worktree.
+
+1. Commit only verified artifact paths in the result worktree. Check the staged diff for unrelated files and temporary resources.
+2. Serialize merges into the captured branch. Verify the original worktree is still on that branch and clean. If it has changed branches or has local changes, preserve the result and report the blocker. Fetch `origin` and compare the captured branch with its remote counterpart before merging. If pushing would publish unrelated local commits, stop and preserve the result unless the user authorized publishing them. Integrate any remote changes, then merge the result. Review the outgoing commits and diff before pushing.
+3. Resolve safe artifact conflicts automatically. Reuse identical content. For independently added artifacts that collide, give the incoming artifact a ticket-number suffix and update links in the incoming artifacts. If both sides edited the same findings or the safe resolution is unclear, abort the in-progress merge, preserve the result branch and worktree, and report the conflict.
+4. Push the captured branch to the same branch name on `origin` with a normal push. Use no pull requests or force pushes. If rejected because the remote advanced, fetch and integrate the new remote head, check for conflicts again, and retry. If access or branch protection blocks publication, preserve the work and report the blocker.
+5. Fetch the remote branch and verify the publication commit is reachable and the artifact paths are present. Use commit-pinned links in the ticket. If the push or ticket write was interrupted, inspect remote history and existing comments before retrying. Resume at the first unconfirmed step. Remove the temporary worktree and branch only after successful publication and ticket linking.
+
 ## Gotchas
 
 Native sub-issues require the internal numeric `id`, not issue `number`; `-F` sends a number. Body links do not create parent/child relationships. Wayfinder's body-based blockers are intentionally distinct from implementation tickets' native blockers.
