@@ -77,6 +77,8 @@ Each ticket is a sub-issue of the map (or of the ticket it's narrower than); its
 <link to the map>
 ```
 
+For research tickets, add `## Research scope` after `## Question` (see Research routing).
+
 Each ticket carries a `wayfinder:<type>` label — one of `research`, `experiment`, `grilling`, `task`, `contract-design` (see Ticket Types).
 
 A session claims a ticket by assigning it to itself, first, before any work, so concurrent sessions skip it. That assignee is the claim: an open, unassigned ticket is unclaimed.
@@ -89,13 +91,30 @@ The answer isn't part of the body — it's recorded as a resolution comment on c
 
 Every ticket is either HITL — human in the loop, worked with a human who speaks for themselves — or AFK, driven by the agent alone. A HITL ticket only resolves through that live exchange; the agent never stands in for the human's side of it.
 
-- **Research** (AFK): Reading documentation, third-party APIs, or local resources like knowledge bases to surface a fact a decision waits on. *Resolved by `research` skill to investigate primary sources and save cited findings.* Use when knowledge outside the current working directory is required.
+- **Research** (AFK): Gather primary-source evidence a decision depends on. *Run `research` skill using the ticket's question and scope* (see Research routing).
 - **Experiment** (HITL): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to: *run `experiment` skill to answer one uncertain technical question by observing actual behavior in a throwaway experiment.* Links the prototype as an asset. Use when "does this call/logic behave as expected" is the key question.
 - **Grilling** (HITL): Conversation. The default case. Always *run `grill-design` skill to resolve the Wayfinder grilling ticket through a relentless one-question-at-a-time interview.* Resolving one may surface decisions narrower than the question itself — child-scoped to it rather than independent frontier items; ticket those as sub-tickets of the grilling ticket (see Tracker operations) via GitHub's native sub-issue relationship, not a fresh body-text field.
 - **Task** (HITL or AFK): Manual work that must happen before a decision can be made — nothing to decide, prototype, or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that does rather than decides — and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
 - **Contract design** (AFK → HITL): Choosing the shape of a contract from radically different designed options. Use instead of Grilling when the question introduces a new contract or interface, an abstraction built on inheritance (base class, interface hierarchy, polymorphic substitution), or a significant change to an existing contract (breaking signature, invariants, error modes, ordering, or seam placement). Two phases, never collapsed into one:
   1. **Options (AFK)** — when the ticket has no options comment yet. *Run `architect` skill's Deep-module design route standalone (no sketch, no implementation) to design the deep-module interface with Design It Twice parallel sub-agents, classify dependencies for deepening, and place the seam*, producing 3+ radically different options plus a recommendation. For each option, *run `doc-code-diagram` skill in delta mode to draw the Mermaid class diagram of contract changes, interfaces, and inheritance*. Write one Markdown options doc where the repo keeps design notes (e.g. `docs/research/<ticket-slug>.md`; match existing convention): per option the interface, delta class diagram, what hides behind the seam, dependency strategy, and trade-offs; then the comparison and recommendation. Comment the doc link and a one-line gist per option on the ticket (**Comment on ticket**), then **Release a ticket**. The ticket stays open; this phase never resolves it.
   2. **Choice (HITL)** — when the options comment exists. Present each option with its diagram, then the recommendation. The user chooses one option or a hybrid; the agent MUST NOT choose for the user. Resolve with the chosen option, its class diagram, the doc link, and a one-line gist of each rejected option and why.
+
+## Research routing
+
+When mapping the frontier or discovering new evidence gaps, consider all four options. Offer the relevant ones to the user and say what each would verify.
+
+| Option | Route | Scope |
+|---|---|---|
+| Web | `web` | Public primary sources, such as specifications and official docs |
+| Cloud | `cloud` | Provider, service, and whether live values matter |
+| Current system | `system` | Repository or deployable being mapped and inspection axis |
+| External system | `system` | Named external repository or deployable and inspection axis. If only public docs are available, offer Web. |
+
+For system inspection, choose `Behavior` for one deployable's behavior, `Flow` for handoffs across deployables, `Data` for a data boundary, or `focused` for an isolated lookup or package API.
+
+Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for System), and the part's question when the ticket spans multiple parts. For Cloud, include the provider, service, and need for live values.
+
+For every research dispatch, pass the ticket's Question as `@question`, Research scope as `@researchScope`, and any requested `@outputShape`. Omit `@researchScope` for older tickets without it.
 
 ## Fog of war
 
@@ -123,8 +142,8 @@ Ruling something out of scope is a scoping act, not a step on the route. When a 
 Load [github.md](./github.md) and follow its GitHub operations for this tracker repository. Keep GitHub-specific commands in this skill's reference; do not configure another backlog backend.
 
 - **Create the map**: **Create ticket** with label `wayfinder:map` and the map body template above.
-- **Create a ticket**: **Create sub-ticket** with `parentIssueNumber` = the map, label `wayfinder:<type>`, body = Question + Blocked by + Part of.
-- **Create a sub-ticket**: **Create sub-ticket** with `parentIssueNumber` = the ticket it's narrower than, label `wayfinder:<type>`, body = Question + Blocked by + Part of. Use when a resolution surfaces a decision that's child-scoped to the ticket just worked, not a fresh frontier item.
+- **Create a ticket**: **Create sub-ticket** with `parentIssueNumber` = the map, label `wayfinder:<type>`, body = Question + Research scope (research only) + Blocked by + Part of.
+- **Create a sub-ticket**: **Create sub-ticket** with `parentIssueNumber` = the ticket it's narrower than, label `wayfinder:<type>`, body = Question + Research scope (research only) + Blocked by + Part of. Use when a resolution surfaces a decision that's child-scoped to the ticket just worked, not a fresh frontier item.
 - **Claim a ticket**: **Assign ticket**.
 - **Release a ticket**: **Unassign ticket**. Use when a session ends without resolving (contract-design Options phase).
 - **Find the frontier**: **List sub-tickets** of the map, then of every open child recursively; keep open tickets with a `wayfinder:<type>` label, and drop any that's assigned, or whose `Blocked by` section names a still-open ticket.
@@ -147,7 +166,7 @@ User invokes with a loose idea.
 2. Map the frontier. *Run `grill-design` skill again to grill the design and resolve the Wayfinder frontier,* breadth-first this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. If this surfaces no fog — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
 3. Create the map (**Create the map** above): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into Not yet specified.
 4. Create the tickets you can specify now (**Create a ticket** above), typing each by the Contract test — then fill in each ticket's `Blocked by` section in a second pass, once every ticket has a number. Everything you can't yet specify stays in the fog — the Not yet specified section.
-5. Fire the research subagents. For each `research` ticket you just created, *run `research` skill to investigate primary sources and save cited findings* in parallel, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
+5. Fire the research subagents. For each `research` ticket you just created, *run `research` skill with the inputs in Research routing* in parallel, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
 6. Stop — charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map
@@ -156,7 +175,7 @@ User invokes with a map (URL or number). A ticket is optional — without one, y
 
 1. Load the map — the low-res view, not every ticket body.
 2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. Claim it (**Claim a ticket** above) before any work.
-3. Resolve it — zoom as needed: fetch the full body of any related or closed ticket on demand; invoke the skill the ticket's type names: *`research` skill to investigate primary sources and save cited findings*, *`experiment` skill to observe actual behavior in a throwaway experiment* (read its Inputs and Workflow first; fill `@question` from the ticket, `@repoFacts` from resolved tickets it names), or *`grill-design` skill to resolve the Wayfinder grilling ticket through a relentless interview*. If in doubt, use *`grill-design` skill*. For `contract-design`, run the phase its Ticket Types entry selects; after the Options phase, stop — skip steps 4–5.
+3. Resolve it — zoom as needed: fetch the full body of any related or closed ticket on demand; invoke the skill the ticket's type names: *`research` skill with the inputs in Research routing*, *`experiment` skill to observe actual behavior in a throwaway experiment* (read its Inputs and Workflow first; fill `@question` from the ticket, `@repoFacts` from resolved tickets it names), or *`grill-design` skill to resolve the Wayfinder grilling ticket through a relentless interview*. If in doubt, use *`grill-design` skill*. For `contract-design`, run the phase its Ticket Types entry selects; after the Options phase, stop — skip steps 4–5.
 4. Record the resolution (**Resolve a ticket** above); append a context pointer to the map's Decisions-so-far.
 5. Add newly-surfaced tickets, typing each by the Contract test. For each: if it's child-scoped to the ticket just resolved — narrower than that question, not a fresh frontier item — create it as a sub-ticket (**Create a sub-ticket** above, `parentIssueNumber` = the ticket just resolved); otherwise create it as an independent ticket (**Create a ticket** above). Either way, graduate any fog the answer has made specifiable, clearing each graduated patch from Not yet specified so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, rule it out of scope rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
