@@ -1,7 +1,7 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, optionally pause at a user-requested checkpoint, then implement or hand off the sketch. Use for /architect, architect this, design this, /architect interrogate to adversarially attack a change without the design phases, or non-trivial work where jumping to code would lock in the wrong shape.
+  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, optionally pause at a user-requested checkpoint, then implement or hand off the sketch. Use for /architect, architect this, design this, /architect interrogate to adversarially attack a change without the design phases, or non-trivial work where jumping to code would lock in the wrong shape. Also designs deep module interfaces, finds deepening opportunities, places seams, and compares Design It Twice options.
 ---
 
 # Architect
@@ -16,7 +16,20 @@ Accept `arena-agents=1|2|3`; default `1`. Reject other values before launching a
 
 ## Standalone interrogate
 
-Request starts with `interrogate` (`/architect interrogate <request>`) → run only the `interrogate/interrogate.md` procedure; skip the design workflow. Read Repo docs; derive scope, intent, and runnable target from the request; default scope per its Frame. Write findings to `interrogate.md` in the artifact root. Present its Output and the findings path, then stop. Write no sketch or production code; apply nothing.
+Request starts with `interrogate` (`/architect interrogate <request>`) → run only the `interrogate/interrogate.md` procedure; skip the design workflow. Read Repo docs; derive scope, intent, and runnable target from the request; default scope per its Frame. Write findings to `interrogate.md` in the artifact root. Verified contract findings → run Deep-module design and add each recommended interface to `interrogate.md` as a proposed fix. Present its Output and the findings path, then stop. Write no sketch or production code; apply nothing.
+
+## Deep-module design
+
+Route here when:
+
+- **User request**: design or deepen a module interface, find deepening opportunities, decide seam placement, or make code more testable or AI-navigable. Run standalone; enter the design workflow only when the user also asks to sketch or implement.
+- **Contract finding**: Interrogate (standalone, automatic, or checkpoint reply) returns a verified finding on a contract: interface, invariant, ordering, error mode, required configuration, seam placement, or adapter. Resolve it here before proposing or applying its correction.
+
+Interrogate itself never runs this route; it only reports findings.
+
+1. Read `references/deep-modules.md`. Done when its vocabulary names the module, interface, seam, and dependency categories.
+2. Run the `references/design-it-twice.md` procedure on the target module. Done when `comparison.md` holds a recommendation.
+3. Hand back per its Hand back section.
 
 ## Design workflow
 
@@ -31,6 +44,8 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [design/design.md](design/design.md) | design workflow (any request except standalone interrogate) |
 | [design/evidence-routing.md](design/evidence-routing.md) | Phase A technical questions and every Phase C round, including greenfield |
 | [references/principles.md](references/principles.md) | any step cites a principle by heading |
+| [references/deep-modules.md](references/deep-modules.md) | Deep-module design route, or a step cites *Deep modules* |
+| [references/design-it-twice.md](references/design-it-twice.md) | Deep-module design route |
 | [models.md](models.md) | picking a subagent model for any role |
 | [references/subagents.md](references/subagents.md) | spawning any subagent |
 | [design/design-red-flags.md](design/design-red-flags.md) | Phase B screening |
@@ -58,7 +73,7 @@ Resolve every path from this skill's base directory. Read each file fully when i
 
 ## Artifact location
 
-Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent. Research specialist reports may retain a stronger location contract per `design/evidence-routing.md`; index their absolute paths under the artifact root. Phase E code goes in the repo's working tree, not the artifact root.
+Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, deep-module options, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent. Research specialist reports may retain a stronger location contract per `design/evidence-routing.md`; index their absolute paths under the artifact root. Phase E code goes in the repo's working tree, not the artifact root.
 
 ### Artifact layout
 
@@ -72,6 +87,7 @@ Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge
     sketch/                    source files, never one markdown holding code
   synthesis/                   same shape as a candidate, plus synthesis-note.md
   arena-r<k>/                  correction re-runs: candidate-<n>/, synthesis/
+  deep-modules/                Deep-module design: problem.md, option-<n>.md, comparison.md
   review-log.md
 ```
 

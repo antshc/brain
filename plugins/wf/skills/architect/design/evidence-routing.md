@@ -49,6 +49,7 @@ Record question/claim, sketch revision, environment/version, evidence paths, out
 |---|---|
 | Confirmed and compatible | Close factual question; cite evidence in rationale |
 | Refuted or verified finding | Without checkpoint: apply supported correction and log rationale; with checkpoint: present proposed correction for acceptance |
+| Verified Interrogate finding on a contract (interface, invariant, ordering, error mode, configuration, seam, adapter) | Derive the correction through Deep-module design in `SKILL.md`, then act as for a verified finding |
 | Inconclusive | Preserve unknown, missing evidence, and impact |
 | Tool, permission, or sandbox unavailable | Record blocker; invent no result |
 | Material change | Recheck only invalidated assumptions |
