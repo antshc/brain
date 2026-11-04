@@ -9,6 +9,7 @@ description: >-
 ## Inputs
 
 - `@question` — research question. Ask if missing.
+- `@researchScope` [optional] — one entry per research part with route (`system`, `cloud`, or `web`), target when known, system axis when applicable (`Behavior`, `Flow`, `Data`, or `focused`), and a part question for multi-part requests. Cloud entries include provider, service, and whether live values matter.
 - `@outputShape` [optional] — requested file count, paths, diagrams, or framing.
 
 ## Constraints
@@ -18,13 +19,13 @@ description: >-
 
 ## Workflow
 
-1. **Route.** Split by evidence owner. System inspection covers repository code, config, and restored NuGet packages. Cloud inspection covers AWS and Azure services, IAM/RBAC, APIs, SDKs, quotas, and resource state, one part per provider. Generic brief covers other providers and external sources. *Done when* every part has a route.
-2. **Brief and dispatch.** Brief from the question and route. Mark missing names, symbols, or account details `unknown`. Spawn one subagent per part with route tools, question, brief, output shape, and applicable contract, reference, and template paths. Resolve absolute paths from the skill base. Parallelize independent parts. Default to one cited Markdown report per part. *Done when* each part has a subagent report or blocker.
+1. **Route.** When `@researchScope` is supplied, use each entry's route, target, applicable axis, and question (or `@question` for a single part). Route `system` to system inspection, `cloud` to cloud inspection for AWS or Azure (generic brief for other providers), and `web` to the generic brief. If a specified target is inaccessible, report that part as blocked and offer any viable alternative. Continue independent parts. Without `@researchScope`, split by evidence owner. System inspection covers repository code, config, and restored NuGet packages. Cloud inspection covers AWS and Azure services, IAM/RBAC, APIs, SDKs, quotas, and resource state, one part per provider. Generic brief covers other providers and external sources. *Done when* every part has a route.
+2. **Brief and dispatch.** Brief each part from its routed question, target, and applicable axis. Mark missing names, symbols, or account details `unknown`. Spawn one subagent per part with route tools, question, brief, output shape, and applicable contract, reference, and template paths. Resolve absolute paths from the skill base. Parallelize independent parts. Default to one cited Markdown report per part. *Done when* each part has a subagent report or blocker.
 3. **Verify.** Check each artifact against Completion criteria. Fix mechanical defects directly. Redispatch evidence defects with the violated constraint first. Route Data and cloud follow-ups as new parts. Offer Behavior follow-ups. Run on request. *Done when* every part and follow-up is accounted for.
 
 ## System inspection
 
-Read [system-inspection.md](system/system-inspection.md) to brief. Select one axis below or request a focused report for an isolated lookup or package API question. Include named deployables or repositories and planned lookups with `@shape` and `@depth` from Codebase lookups. Quote literals and symbols exactly. Subagent reads the contract and any selected axis reference and template in full, applies Codebase lookups, and inspects as built.
+Read [system-inspection.md](system/system-inspection.md) to brief. Use the supplied axis when present (`focused` requests a focused report). Otherwise select one axis below or request a focused report for an isolated lookup or package API question. Include named deployables or repositories and planned lookups with `@shape` and `@depth` from Codebase lookups. Quote literals and symbols exactly. Subagent reads the contract and any selected axis reference and template in full, applies Codebase lookups, and inspects as built.
 
 | Axis | Select for | Reference | Template |
 |---|---|---|---|
