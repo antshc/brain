@@ -81,8 +81,8 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [why/sources/incident-postmortem.md](why/sources/incident-postmortem.md) | target code looks defensive |
 | [arena/arena.md](arena/arena.md) | Phase B |
 | [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief |
-| [interrogate/interrogate.md](interrogate/interrogate.md) | standalone interrogate, automatic evidence routing, user picks interrogate, or prototype requests `interrogate` |
-| [prototype/prototype.md](prototype/prototype.md) | evidence routing selects Experiment or user picks prototype |
+| [interrogate/interrogate.md](interrogate/interrogate.md) | standalone interrogate, automatic evidence routing, user picks interrogate, or prove requests `interrogate` |
+| [prove/prove.md](prove/prove.md) | evidence routing selects Experiment or user picks prove |
 
 ## Artifact location
 
@@ -106,7 +106,7 @@ Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge
 
 - `sketch/` holds real source files in the repo's primary language (e.g. `.cs`), grouped per module or concern; hook-point edits to existing files are diff-like snippets in source files. Prose and code never share a file; `rationale.md` and `module-map.md` link to sketch files.
 - `module-map.md` lists each new, modified, or deleted file by real repo-relative path, with its sketch file.
-- Interrogate and prototype artifacts stay under the artifact root per their procedures.
+- Interrogate and prove artifacts stay under the artifact root per their procedures.
 
 ## Repo docs
 
