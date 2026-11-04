@@ -1,7 +1,3 @@
----
-description: Write a bottom line — the single decision-oriented statement of a research or investigation's key finding, why it matters, and the recommended action. Use when drafting a research document's conclusion, summarizing findings for decision-makers, writing an executive takeaway, or turning investigation results into a recommendation.
-name: bottom-line
----
 # Bottom line
 
 A bottom line answers three questions per investigated subject, in one bullet. Use one or more concise sentences per answer as needed:
@@ -100,3 +96,14 @@ Place the bottom line first, before any method or evidence. Fill this structure;
 - [Order email worker production version check](reports/order-email-worker-node-version.md)
 - [Node.js release schedule](https://nodejs.org/en/about/previous-releases)
 ```
+
+## Related terms
+
+In common industry practice they are different layers, though in this document they overlap.
+
+| Term | Industry meaning | Reader |
+|---|---|---|
+| Bottom line (BLUF / executive summary) | The conclusion and recommendation, placed first and short | Decision-maker |
+| Research outcome / findings / results | What the investigation found, with supporting evidence and detail | Peer or engineer |
+| Action items | Concrete tasks, each with an owner, due date, and status | Doers |
+| Next steps | The high-level sequence of what happens after the research | Everyone |
