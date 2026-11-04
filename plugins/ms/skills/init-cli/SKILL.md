@@ -82,4 +82,4 @@ source ~/.profile
 ```
 
 **Step 7 — Authorize**
-Run `/ms:auth-principal` skill.
+Run `/ms:auth-principal` skill to authorize Azure CLI with the service principal.

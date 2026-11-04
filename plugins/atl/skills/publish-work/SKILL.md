@@ -7,7 +7,7 @@ argument-hint: '<summary>, <issueType>, <description-markdown>, [workItemKey], [
 
 # Publish Work
 
-Create/update a Jira **Work item** over REST v3 with an ADF description. Not twg: only *`map-markdown-adf` skill* carries `<details>`, panels, status lozenges, TOC, and wide tables intact.
+Create/update a Jira **Work item** over REST v3 with an ADF description. Not twg: only *`map-markdown-adf` skill*, converting Markdown to Atlassian Document Format, carries `<details>`, panels, status lozenges, TOC, and wide tables intact.
 
 ## Inputs
 
@@ -52,7 +52,7 @@ Else → **create**:
 python3 scripts/publish_work.py create --config "<configPath>" --project <projectKey> --issue-type "<issueType>" --summary "<summary>" --adf <description.json> [--parent <KEY>] [--fields-json <fields.json>] [--attach <path> ...]
 ```
 
-Stdout `{"key":..., "url":..., "attached":[...], "attachFailed":[{"file","error"}]}` (attachment keys only with `--attach`). Non-zero exit → report stderr (`Jira rejected the request: <Jira message>`); nothing created. Required-field error → *follow `twg` skill for Jira field metadata* with `<twg> jira workitem field create-metadata --space <projectKey> --type "<issueType>"`, ask for the missing values, re-run.
+Stdout `{"key":..., "url":..., "attached":[...], "attachFailed":[{"file","error"}]}` (attachment keys only with `--attach`). Non-zero exit → report stderr (`Jira rejected the request: <Jira message>`); nothing created. Required-field error → *follow `twg` skill to search Jira issue field metadata with the twg CLI* with `<twg> jira workitem field create-metadata --space <projectKey> --type "<issueType>"`, ask for the missing values, re-run.
 
 **6 — Report** `key` and `url`; `attached` filenames; each `attachFailed` file with its error. Never fail the call for an attachment.
 
@@ -62,7 +62,7 @@ Stdout `{"key":..., "url":..., "attached":[...], "attachFailed":[{"file","error"
 
 - **Do not rephrase.** Preserve wording, structure, tables, code, quotes verbatim; only encoding changes.
 - **Mirror source headings** — exact text, level, order. Add none (e.g. `### Story` wrapper, `<summary>` promoted to heading).
-- **Keep ADF-only constructs whole** — never flatten `<details>`, panels, lozenges into headings or paragraphs. Source of truth: rows marked **ADF-only** in `map-markdown-adf` skill's Supported structure table; don't re-derive.
+- **Keep ADF-only constructs whole** — never flatten `<details>`, panels, lozenges into headings or paragraphs. Source of truth: rows marked **ADF-only** in `map-markdown-adf` skill's Supported structure table of constructs only ADF can express; don't re-derive.
 - One physical line per bullet/paragraph.
 - Never invent fields, assignees, priorities, labels, components, custom-field values; `--fields-json`/`--parent` only from supplied values.
 - Confirm with key and `url`; don't repeat description.

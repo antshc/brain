@@ -46,7 +46,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 - The story is atomic and behavior-focused, constituting exactly one Functional slice owned by one Deployable.
 - Requirements lists the Functional requirements addressed.
 - Supplied Feature, Functional slice, Stakeholder requirement, and Functional requirements remain verbatim.
-- Feature, Functional slice, and Stakeholder requirement name behavior and entities, not widgets, screens, or components; `writing-style` skill normalization reported no remaining leak.
+- Feature, Functional slice, and Stakeholder requirement name behavior and entities, not widgets, screens, or components; `writing-style` skill review for leaked implementation in requirements and stories reported no remaining leak.
 - Each criterion implies clear code changes and a QA can confirm pass or fail by testing.
 - Implementation Decisions may name classes, types, objects, or endpoints for navigation, but never a file path or line number.
 - Every changed contract kind has a complete delta that passes `/doc-contracts`' skill own done conditions.

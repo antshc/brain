@@ -70,7 +70,7 @@ Example: spec `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1.3.10
 
 ## 3. Create worktree
 
-Run `/create-worktree` skill:
+Run `/create-worktree` skill to create or reuse an isolated git worktree for the feature branch:
 
 ```
 /create-worktree $CODEBASE_REPO_PATH <target-branch> <feature-branch>
@@ -80,7 +80,7 @@ Parse the output to capture `WORKTREE_PATH` and `BRANCH`; assign the latter to `
 
 ## 4. Build
 
-Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`:
+Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH` to build the project in the worktree and report pass or fail:
 
 A non-pass build → **exit** and report. Never enter the orchestrator loop on a broken build.
 

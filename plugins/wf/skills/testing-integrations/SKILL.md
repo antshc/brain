@@ -65,7 +65,7 @@ Pick one **kind** via the ladder, then add a **strategy** when the task asks for
 | --- | --- | --- |
 | component | One accessor/adapter against its real dependency: DB emulator or cloud SDK. Smallest seam. | [kinds/component.md](kinds/component.md) |
 | functional-slice | Integration testing framework: test project owns and starts its environment (mock / fake config / in-process / real cloud: new instance or existing deployment) and asserts end to end through the public API. Distinct from local-runtime. | [kinds/functional-slice.md](kinds/functional-slice.md) |
-| experiment | Runs the `experiment` skill for one uncertain question; the skill owns option and artifact. Off the ladder. | [kinds/experiment.md](kinds/experiment.md) |
+| experiment | Runs the `experiment` skill for one uncertain technical question, observing actual behavior; the skill owns option and artifact. Off the ladder. | [kinds/experiment.md](kinds/experiment.md) |
 | local-runtime | Separately started local app instance (local stack) exercised like a user, no test framework: REST API first, web GUI last. | [kinds/local-runtime.md](kinds/local-runtime.md) |
 
 ### Strategies (how to test)

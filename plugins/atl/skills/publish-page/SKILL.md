@@ -7,7 +7,7 @@ argument-hint: '<md_file_path>, [pageId], [spaceId]'
 
 # Publish Page
 
-Publish local Markdown to a Confluence page via one `run` command: extract → convert → attach → substitute → publish, always over REST. Not twg: only `map-markdown-adf` skill carries `<details>`, panels, status, TOC, wide tables, inline-comment anchors, and diagrams intact.
+Publish local Markdown to a Confluence page via one `run` command: extract → convert → attach → substitute → publish, always over REST. Not twg: only `map-markdown-adf` skill, converting Markdown to Atlassian Document Format, carries `<details>`, panels, status, TOC, wide tables, inline-comment anchors, and diagrams intact.
 
 ## Prerequisites
 

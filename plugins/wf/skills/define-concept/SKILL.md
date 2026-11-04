@@ -6,7 +6,7 @@ description: >-
 
 # Define Concept
 
-Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `explore-codebase` skill owns in-subagent lookup (unavailable → explore agent); `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
+Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `explore-codebase` skill owns in-subagent read-only lookup (where a symbol lives, what calls it, how a flow works) (unavailable → explore agent); `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
 
 ## Evidence
 

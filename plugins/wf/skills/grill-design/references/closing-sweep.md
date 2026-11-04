@@ -16,7 +16,7 @@ Inspect each gap, including previously resolved gaps invalidated by later answer
 * **Correction** — user corrected an assumption based on a Concept default → repair that key. For ADR corrections, surface the conflict and use the user's resolution in `adr` mode; do not autonomously rewrite its decision.
 * **Drift** — inspect both the record anchor and code evidence. Missing proof stays unverified/open. For a confirmed Concept discrepancy, correct the key or mark the anchor "verify — may drift"; that marker records uncertainty, not a completed repair. An ADR discrepancy needs the user's decision before rewrite.
 
-A Concept repair covered by a user answer needs no second approval. A key change no answer covers remains the model's call: write it, log its evidence, and report it in the closing `[assumed]` list. *Run `record-architecture` skill for settled architecture Concepts* in `concept-record` mode; let it sync the index. Append `repaired:` only after both results are confirmed.
+A Concept repair covered by a user answer needs no second approval. A key change no answer covers remains the model's call: write it, log its evidence, and report it in the closing `[assumed]` list. *Run `record-architecture` skill to record the settled architecture Concept body* in `concept-record` mode; let it sync the index. Append `repaired:` only after both results are confirmed.
 
 If the user corrects an answer after an ADR was written, reopen the linked question/gap and route the reversal through `adr` mode. Preserve the prior ADR choice as rejected; do not treat an earlier successful write as proof of the new decision.
 
