@@ -41,6 +41,7 @@ Evidence MUST be one or more of:
 
 - code evidence: `path:line`;
 - probe evidence: command/request plus the actual redacted signal output;
+- artifact evidence: `archive!entryPath:line`, `logFile:line`, or image name plus quoted visible text;
 - authoritative-source evidence: the checked statement plus its canonical URL.
 
 When an authoritative source is used to verify the hypothesis, the URL MUST be present in the same hypothesis entry.
@@ -64,6 +65,6 @@ Secrets MUST be represented by environment-variable names or `<REDACTED>`. Keep 
 - Prediction: {{observable result if true}}
 - Verification: {{how it was checked}}
 - Fact: {{actual observed fact}}
-- Evidence: {{path:line | command/request → redacted signal | authoritative statement + canonical URL}}
+- Evidence: {{path:line | command/request → redacted signal | archive!entryPath:line | image + quoted text | authoritative statement + canonical URL}}
 - Result: {{confirmed | falsified | blocked}}
 ```

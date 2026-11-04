@@ -14,7 +14,8 @@ Resolve `logPath` per `diagnosis-session-log`'s Location section, or use the log
 
 Use:
 - checked hypotheses from the log;
-- current-run evidence for mechanism-chain facts not represented as hypotheses.
+- current-run evidence for mechanism-chain facts not represented as hypotheses;
+- `@artifacts` from the caller: analysis inputs (images, log archives, logs, HAR, dumps) with what each contributed.
 
 ## Gate
 
@@ -31,6 +32,7 @@ Fill the Template:
 - **Root cause & mechanism** — confirmed hypothesis plus ordered mechanism chain.
 - **Evidence** — deciding facts and their evidence.
 - **Ruled out** — falsified hypotheses and their deciding evidence.
+- **Artifacts** — every analysis input artifact, including ones found not relevant.
 - **Known gap / tracking** — only when supported by current evidence.
 
 Every mechanism claim MUST cite re-checkable evidence via its Evidence row id (`E1`, `E2`, …). Unsupported claims are omitted or marked `Unknown`.
@@ -72,12 +74,19 @@ If an authoritative source was used, preserve its canonical URL.
 
 | Id | Check | Finding | Source / Reference |
 |---|---|---|---|
-| E1 | {{what was checked}} | {{actual observed fact}} | {{[name:line](path#Lline) | `command` → signal | [title](canonicalUrl)}} |
+| E1 | {{what was checked}} | {{actual observed fact}} | {{[name:line](path#Lline) | `command` → signal | `archive!entryPath:line` | `image` + quoted text | [title](canonicalUrl)}} |
 
 ## Ruled out
 
 <!-- @: one line per falsified hypothesis; omit section if none -->
 - **{{hypothesis}}** — {{observed fact that falsified it}} ({{evidence}})
+
+## Artifacts
+
+<!-- @: one row per analysis input artifact; omit section if none supplied -->
+| Artifact | Type | Used for |
+|---|---|---|
+| {{name or path; archive entries as archive!entryPath}} | {{screenshot \| log archive \| log \| HAR \| dump \| recording}} | {{what it showed or proved; cite Evidence row ids; `not relevant` if unused}} |
 
 ## Known gap / tracking
 
