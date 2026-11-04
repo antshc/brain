@@ -5,6 +5,7 @@ Design principles cited by heading across this skill. Each section opens with wh
 ## Contents
 
 - Boundary discipline
+- Deep modules
 - Encode lessons in structure
 - Exhaust the design space
 - Fix root causes
@@ -46,6 +47,16 @@ Code organization:
 **The tests:**
 - "Is this data crossing a system boundary right now?" If not, validation is redundant.
 - "Can this be a pure function that the shell just calls?" If yes, extract it.
+
+## Deep modules
+
+Apply when shaping or changing a contract: interface, invariant, error mode, seam, or adapter.
+
+Put much behaviour behind a small interface. Callers and tests cross the same seam. Add a seam only when two adapters vary across it. Delete-test every module: if complexity just moves to callers, it was earning its keep; if it vanishes, it was a pass-through.
+
+**Why:** depth gives callers leverage and maintainers locality; shallow contracts leak complexity into every call site.
+
+A broken contract found by Interrogate is resolved through Deep-module design in `SKILL.md`, not patched in place.
 
 ## Encode lessons in structure
 

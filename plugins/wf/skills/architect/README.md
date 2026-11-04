@@ -12,6 +12,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 /architect arena-agents=2 design retries
 /architect arena-agents=3 design retries
 /architect interrogate intent: no rejected writes during backfill; target: DynamoDB Local
+/architect deep-module design: deepen the order pricing cluster; where should the seam go?
 ```
 
 `arena-agents`: 1–3, default 1. One candidate skips the judge and grafting; multiple viable candidates use the cross-family judge. The parent architect screens and verifies in both cases.
@@ -41,6 +42,7 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 | `checkpoint` | you want to approve the sketch before implementation or handoff | `/architect checkpoint design retries` |
 | corrections | during a checkpoint, edit the sketch without re-running Arena (add `; arena` for a fresh candidate) | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked; findings need a run as proof | see below |
+| deep-module design | you want a deeper module interface, a seam placed, or testability improved; also resolves contract findings from Interrogate via Design It Twice (3+ radically different interfaces, compared on depth, locality, seam placement) | `/architect deep-module design: deepen the retry cluster` |
 | `prototype` | one uncertain part needs observation; Experiment selects a command, script, test, simulation, or throwaway app; add `; interrogate` to have adversaries attack it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
 | accept | approve a checkpoint and continue the requested flow | `accept` |
 | implement | at a checkpoint, implement directly even if the caller requested a design-only handoff | `implement` |
