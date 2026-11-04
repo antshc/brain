@@ -37,12 +37,12 @@
         {
             "name": "ms",
             "source": "./plugins/ms",
-            "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, resource operation, and implementation-constraint research skills."
+            "description": "Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills."
         },
         {
             "name": "aws",
             "source": "./plugins/aws",
-            "description": "AWS documentation, SDK reference, and implementation-constraint research skills."
+            "description": "AWS documentation and SDK reference skills."
         },
         {
             "name": "verify",

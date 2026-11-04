@@ -1,6 +1,6 @@
 {
   "name": "wf",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Common everyday workflow automation skills. Expected to be useful to all developers.",
   "skills": ["./skills"]
 }
