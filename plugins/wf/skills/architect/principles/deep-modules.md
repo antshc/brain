@@ -4,6 +4,7 @@ Vocabulary and rules for designing **deep modules**: much behaviour behind a sma
 
 ## Contents
 
+- Principle
 - Vocabulary
 - Relationships
 - Deep vs shallow
@@ -13,6 +14,16 @@ Vocabulary and rules for designing **deep modules**: much behaviour behind a sma
 - Seam discipline
 - Testing strategy
 - Rejected framings
+
+## Principle
+
+Apply when shaping or changing a contract: interface, invariant, error mode, seam, or adapter.
+
+Put much behaviour behind a small interface. Callers and tests cross the same seam. Add a seam only when two adapters vary across it. Delete-test every module: if complexity just moves to callers, it was earning its keep; if it vanishes, it was a pass-through.
+
+**Why:** depth gives callers leverage and maintainers locality; shallow contracts leak complexity into every call site.
+
+A broken contract found by Interrogate is resolved through Deep-module design in `SKILL.md`, not patched in place.
 
 ## Vocabulary
 

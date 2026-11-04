@@ -10,8 +10,8 @@ Every candidate gets the same prompt, so the prompt is the contract.
 
 1. State the artifact each candidate is producing: `rationale.md`, `module-map.md`, and `sketch/` source files per *Artifact layout* in `SKILL.md`. Write the task, requirements, and human decisions to `<artifact-root>/task.md`.
 2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
-3. Pick the runners. Use the runner role the caller names in `models.md`. If the value is missing, use its fallback. Select the first N entries, where N is the resolved `arena-agents` count. If the pool has fewer than N entries, fill the remaining seats with its last entry, or the parent model when empty, and say so. An `auto` or `inherit-parent` entry in this line means the parent model, so omit `model` for it. If the subagent tool rejects a configured entry, run that seat on its family's fallback entry and say so. Families go by prefix: `claude-*`, `grok-*`, `gpt-*`, `gemini-*`. If the family has no fallback entry, or the subagent tool rejects it, use the closest valid model of the same family from its error message, or drop the seat and say so when there is none. Keep fallbacks within the selected seats; never add runners beyond N. Pick each subagent's reasoning effort per `references/subagents.md`.
-4. Give each candidate its own output directory `<artifact-root>/candidate-<n>/` per *Artifact layout* in `SKILL.md`, and a git worktree for repo reads where possible, per *Separate before serializing shared state* in `references/principles.md`.
+3. Pick the runners. Use the runner role the caller names in `models.md`. If the value is missing, use its fallback. Select the first N entries, where N is the resolved `arena-agents` count. If the pool has fewer than N entries, fill the remaining seats with its last entry, or the parent model when empty, and say so. An `auto` or `inherit-parent` entry in this line means the parent model, so omit `model` for it. If the subagent tool rejects a configured entry, run that seat on its family's fallback entry and say so. Families go by prefix: `claude-*`, `grok-*`, `gpt-*`, `gemini-*`. If the family has no fallback entry, or the subagent tool rejects it, use the closest valid model of the same family from its error message, or drop the seat and say so when there is none. Keep fallbacks within the selected seats; never add runners beyond N. Pick each subagent's reasoning effort per `arena/subagents.md`.
+4. Give each candidate its own output directory `<artifact-root>/candidate-<n>/` per *Artifact layout* in `SKILL.md`, and a git worktree for repo reads where possible, per *Separate before serializing shared state* in `principles/separate-before-serializing-shared-state.md`.
 
 ## Phase B: Fan out
 
@@ -27,17 +27,17 @@ With at least two viable candidates, after all Phase B candidates complete, choo
 
 Read every candidate end to end before picking. Score each against the rubric criterion by criterion, not on holistic feel, and compare with the cross-judge when Phase C ran one. Agreement on the base confirms the pick. Disagreement means one of you is biased or the rubric was ambiguous. Read both rationales before deciding.
 
-Pick the base a future maintainer can extend most easily without breaking invariants. When two feel tied, prefer the cleaner boundary or smaller API, per *Laziness protocol* in `references/principles.md`.
+Pick the base a future maintainer can extend most easily without breaking invariants. When two feel tied, prefer the cleaner boundary or smaller API, per *Laziness protocol* in `principles/laziness-protocol.md`.
 
 ## Phase E: Graft
 
-Walk each losing candidate once more for what is worth porting into the base, usually one or two things per candidate, not most of it. Fold each graft in by hand, per *Redesign from first principles* in `references/principles.md`, so the result stays coherent under one mental model. Don't paste mechanically.
+Walk each losing candidate once more for what is worth porting into the base, usually one or two things per candidate, not most of it. Fold each graft in by hand, per *Redesign from first principles* in `principles/redesign-from-first-principles.md`, so the result stays coherent under one mental model. Don't paste mechanically.
 
 If the candidates converge on one shape, that is strong agreement. Note it and ship the consensus shape. No graft is needed. If they wildly diverge, Phase A was under-specified. Reframe and re-run rather than averaging the divergence.
 
 ## Phase F: Verify
 
-Verify the synthesized artifact like any other output, per *Prove it works* in `references/principles.md`. If verification finds a problem the arena missed, either Phase A was wrong (re-frame and re-run) or a candidate caught it and you missed the graft (go back to Phase E). Don't paper over it.
+Verify the synthesized artifact like any other output, per *Prove it works* in `principles/prove-it-works.md`. If verification finds a problem the arena missed, either Phase A was wrong (re-frame and re-run) or a candidate caught it and you missed the graft (go back to Phase E). Don't paper over it.
 
 ## Re-run for corrections
 

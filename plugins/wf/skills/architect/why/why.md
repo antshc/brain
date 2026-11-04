@@ -4,7 +4,7 @@ Rationale procedure of the `architect` skill. Paths resolve from the skill base 
 
 Investigate the motivation and intent behind code. The companion `how/how.md` procedure answers what the code does and how it works. `why` answers what forces led to its shape.
 
-Each spawn below names a role in `models.md`. Set `model` to the role's value in `models.md`, or to its fallback if the value is missing. Leave `model` unset when the value is `auto` or `inherit-parent`. If the subagent tool rejects a model, use the fallback and say so. If it rejects the fallback, use the closest valid model of the same family from its error message. Pick each subagent's reasoning effort per `references/subagents.md`.
+Each spawn below names a role in `models.md`. Set `model` to the role's value in `models.md`, or to its fallback if the value is missing. Leave `model` unset when the value is `auto` or `inherit-parent`. If the subagent tool rejects a model, use the fallback and say so. If it rejects the fallback, use the closest valid model of the same family from its error message. Pick each subagent's reasoning effort per `arena/subagents.md`.
 
 Every spawn is `general-purpose`. **Do not use `explore`.** It has no MCP access, which disables the MCP-backed investigators and the synthesizer's citation spot-checks. Investigators still shouldn't write anything.
 
