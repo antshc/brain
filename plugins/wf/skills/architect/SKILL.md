@@ -27,8 +27,8 @@ Route here when:
 
 Interrogate itself never runs this route; it only reports findings.
 
-1. Read `references/deep-modules.md`. Done when its vocabulary names the module, interface, seam, and dependency categories.
-2. Run the `references/design-it-twice.md` procedure on the target module. Done when `comparison.md` holds a recommendation.
+1. Read `principles/deep-modules.md`. Done when its vocabulary names the module, interface, seam, and dependency categories.
+2. Run the `principles/design-it-twice.md` procedure on the target module. Done when `comparison.md` holds a recommendation.
 3. Hand back per its Hand back section.
 
 ## Design workflow
@@ -43,11 +43,24 @@ Resolve every path from this skill's base directory. Read each file fully when i
 |---|---|
 | [design/design.md](design/design.md) | design workflow (any request except standalone interrogate) |
 | [design/evidence-routing.md](design/evidence-routing.md) | Phase A technical questions and every Phase C round, including greenfield |
-| [references/principles.md](references/principles.md) | any step cites a principle by heading |
-| [references/deep-modules.md](references/deep-modules.md) | Deep-module design route, or a step cites *Deep modules* |
-| [references/design-it-twice.md](references/design-it-twice.md) | Deep-module design route |
+| [principles/boundary-discipline.md](principles/boundary-discipline.md) | a step cites *Boundary discipline* |
+| [principles/encode-lessons-in-structure.md](principles/encode-lessons-in-structure.md) | a step cites *Encode lessons in structure* |
+| [principles/exhaust-the-design-space.md](principles/exhaust-the-design-space.md) | a step cites *Exhaust the design space* |
+| [principles/fix-root-causes.md](principles/fix-root-causes.md) | a step cites *Fix root causes* |
+| [principles/foundational-thinking.md](principles/foundational-thinking.md) | a step cites *Foundational thinking* |
+| [principles/in-your-own-words.md](principles/in-your-own-words.md) | a step cites *In your own words* |
+| [principles/laziness-protocol.md](principles/laziness-protocol.md) | a step cites *Laziness protocol* |
+| [principles/make-operations-idempotent.md](principles/make-operations-idempotent.md) | a step cites *Make operations idempotent* |
+| [principles/minimize-reader-load.md](principles/minimize-reader-load.md) | a step cites *Minimize reader load* |
+| [principles/outcome-oriented-execution.md](principles/outcome-oriented-execution.md) | a step cites *Outcome-oriented execution* |
+| [principles/prove-it-works.md](principles/prove-it-works.md) | a step cites *Prove it works* |
+| [principles/redesign-from-first-principles.md](principles/redesign-from-first-principles.md) | a step cites *Redesign from first principles* |
+| [principles/separate-before-serializing-shared-state.md](principles/separate-before-serializing-shared-state.md) | a step cites *Separate before serializing shared state* |
+| [principles/subtract-before-you-add.md](principles/subtract-before-you-add.md) | a step cites *Subtract before you add* |
+| [principles/deep-modules.md](principles/deep-modules.md) | Deep-module design route, or a step cites *Deep modules* |
+| [principles/design-it-twice.md](principles/design-it-twice.md) | Deep-module design route |
 | [models.md](models.md) | picking a subagent model for any role |
-| [references/subagents.md](references/subagents.md) | spawning any subagent |
+| [arena/subagents.md](arena/subagents.md) | spawning any subagent |
 | [design/design-red-flags.md](design/design-red-flags.md) | Phase B screening |
 | [design/rationale-template.md](design/rationale-template.md) | writing Outputs; give to every runner |
 | [how/how.md](how/how.md) | Phase A grounding |

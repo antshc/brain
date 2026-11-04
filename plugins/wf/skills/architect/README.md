@@ -108,8 +108,8 @@ prototype: does a second GSI creation fail while the first backfills? target: Dy
 | [models.md](models.md) | model per role; edit to retune |
 | `design/` | design workflow procedure (Phases A–F), evidence routing, red flags, rationale template |
 | `how/`, `why/` | grounding procedures and prompts |
-| `arena/` | multi-model synthesis procedure and runner prompt |
+| `arena/` | multi-model synthesis procedure, runner prompt, subagent rules |
 | `interrogate/` | adversarial review procedure |
 | `prototype/` | throwaway prototype procedure, optional interrogate |
-| `references/` | shared principles and subagent rules |
+| `principles/` | one file per design principle, deep-module vocabulary, Design It Twice |
 
