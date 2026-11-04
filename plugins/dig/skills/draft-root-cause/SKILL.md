@@ -72,9 +72,14 @@ If an authoritative source was used, preserve its canonical URL.
 
 ## Evidence
 
+<details>
+<summary>Evidence table</summary>
+
 | Id | Check | Finding | Source / Reference |
 |---|---|---|---|
 | E1 | {{what was checked}} | {{actual observed fact}} | {{[name:line](path#Lline) | `command` → signal | `archive!entryPath:line` | `image` + quoted text | [title](canonicalUrl)}} |
+
+</details>
 
 ## Ruled out
 
