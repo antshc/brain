@@ -27,7 +27,7 @@ If none is confirmed, stop and report that the root cause is not established.
 
 Fill the Template:
 
-- **Summary of issue** — reported symptom vs actual behavior.
+- **Summary of issue** — setup, reported symptom vs actual behavior, current system behaviour per surface, assessment against design, and verdict.
 - **Impact** — who and what is affected, how much, business consequence, and what is not affected.
 - **Root cause & mechanism** — confirmed hypothesis plus ordered mechanism chain.
 - **Evidence** — deciding facts and their evidence.
@@ -47,6 +47,18 @@ If an authoritative source was used, preserve its canonical URL.
 - **MUST NOT:** class, method, or variable names; file paths or `path:line`; internal component, module, or service-class names.
 - Code-level references belong only in Evidence, Ruled out, and Known gap / tracking.
 
+## Writing style
+
+- Short plain sentences, one fact each; present tense for system behavior; no hedging or filler.
+- Open with the concrete setup, then what the user sees vs what the system does.
+- Name pages, tabs, wizards, states, and fields exactly as the product shows them; bold them in bullets.
+- Bold the deciding qualifier in a contrast (**no**, **some**, **only**).
+- Put REST endpoints and contract names in backticks.
+- Lead sub-blocks with a bold sentence label ending in `.` (`**Current system behaviour.**`, `**Assessment.**`), not extra headings.
+- List per-surface rules or per-layer changes as bullets: `- **Surface:** behavior.`
+- State timing and cadence as numbers (`every 5 minutes`).
+- End Summary of issue with a one-line bold verdict: **regression**, **bug**, **works as designed**, or **feature request**.
+
 ## Template
 
 ```markdown
@@ -55,7 +67,16 @@ If an authoritative source was used, preserve its canonical URL.
 
 ## Summary of issue
 
-{{2-5 sentences|what was reported vs what actually happened; business language}}
+{{2-5 sentences|setup, what was reported vs what actually happened; business language}}
+
+**Current system behaviour.** {{one line|context of the rules below}}
+- **{{surface|page, tab, or state}}:** {{when it shows what; bold deciding qualifier}}
+
+<!-- @: Assessment states whether reported expectation matches design and, if not, what each layer would need -->
+**Assessment.** {{1-2 sentences|design vs reported expectation}}
+- **{{layer|Backend, Frontend, …}}:** {{needed change}}
+
+This reads as a **{{verdict|regression, bug, works as designed, feature request}}**{{, not a …|optional contrast}}.
 
 ## Impact
 
