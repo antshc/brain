@@ -46,7 +46,7 @@ Arena returns one synthesized design package. Its synthesis decision fills the r
 
 ## Phase C: Review (optional checkpoint)
 
-Before continuing, run `design/evidence-routing.md` on open questions and material claims. When the caller requests one overall Interrogate, run it before the checkpoint or handoff, reusing existing coverage. Without checkpoint, apply supported corrections; with checkpoint, present proposals for approval. Record decisions in the sketch, rationale, and `review-log.md`. Never write production code during this phase; prototype code remains disposable evidence in a worktree.
+Before continuing, run `design/evidence-routing.md` on open questions and material claims. When the caller requests one overall Interrogate, run it before the checkpoint or handoff, reusing existing coverage. Without checkpoint, apply supported corrections; with checkpoint, present proposals for approval. Record decisions in the sketch, rationale, and `review-log.md`. Never write production code during this phase; proof code remains disposable evidence in a worktree.
 
 **Default: no checkpoint.** Continue to Phase E automatically. When the caller explicitly requests a **design-only handoff** (as Factory Mode does), continue to Phase D instead. Do not wait for an `accept` or `implement` reply.
 
@@ -58,7 +58,7 @@ Before continuing, run `design/evidence-routing.md` on open questions and materi
    Reply with one:
    - **corrections**: `Q2 → keep per-tenant tables` (edits sketch, design, rationale; add `; arena` to also run a new arena that creates a new candidate)
    - **interrogate**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
-   - **prototype**: `GSI backfill; target: DynamoDB Local` (throwaway build in a worktree; add `; interrogate` to also have adversaries attack it)
+   - **prove**: `GSI backfill; target: DynamoDB Local` (real evidence via the smallest run: command, test, script, or throwaway prototype in a worktree; add `; interrogate` to also have adversaries attack it)
    - **ask**: `why does X own Y?` (grounds the answer, then corrections)
    - **accept**: continue implementation (or the caller's design-only handoff)
    - **implement**: build against the sketch in this working tree (overrides a design-only handoff)
@@ -67,7 +67,7 @@ Before continuing, run `design/evidence-routing.md` on open questions and materi
    - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place, then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `design/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Corrections with `arena`** → apply as above, then run the `arena/arena.md` *Re-run for corrections* procedure with the corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Resolve verified contract findings through Deep-module design in `SKILL.md`. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
-   - **Prototype** → run the `prototype/prototype.md` procedure on the question in the reply; run its Prove step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
+   - **Prove** → run the `prove/prove.md` procedure on the question in the reply; run its Attack step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, running `how/how.md` or `why/why.md` when needed; present the answer, then start the next round.
    - **Accept** → go to Phase D for a design-only handoff; otherwise Phase E.
    - **Implement** → go to Phase E.

@@ -35,7 +35,7 @@ Experiment's Workflow selects the method and artifact; **MUST NOT** prescribe on
 
 Require a report with question, method, exact reproducible command, actual output, conclusion (`confirmed`, `refuted`, or `inconclusive`), evidence paths, architectural implication, and cleanup. Require a patch only when code was created.
 
-Use loaded Prototype for builder isolation, rerun, and cleanup; automatic runs skip its Prove step. Material claims still route to Interrogate below; reuse Prove coverage for the same scope/revision when it ran.
+Use loaded Prove for prover isolation, rerun, and cleanup; automatic runs skip its Attack step. Material claims still route to Interrogate below; reuse Attack coverage for the same scope/revision when it ran.
 
 ## Interrogate
 

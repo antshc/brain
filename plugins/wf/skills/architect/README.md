@@ -25,7 +25,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 |---|---|---|
 | A Ground | `how` explains the touched subsystems via `explore-codebase` subagents; `why` adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
 | B Sketch | `arena`: one runner by default; with 2–3, compare candidates and graft good ideas | usage sketch, module map, types, rationale |
-| C Review | resolve technical questions and challenge material claims automatically; pause only for an explicit checkpoint, then support **accept**, **implement**, **corrections**, **interrogate**, **prototype**, or **ask** | `review-log.md` |
+| C Review | resolve technical questions and challenge material claims automatically; pause only for an explicit checkpoint, then support **accept**, **implement**, **corrections**, **interrogate**, **prove**, or **ask** | `review-log.md` |
 | D Hand off | when the caller requests a design-only handoff, return the sketch for `/to-spec` | design artifacts |
 | E Implement | default: scaffold commit, then fill in code in the current branch; log and resolve deviations | scaffold commit, code |
 | F Scrap | repeated friction during E (same workaround, escape-hatch types, repeated deviations): re-ground, subtract, re-run B and C | new sketch |
@@ -43,7 +43,7 @@ Artifacts: `<repo-root>/tmp/architect-<slug>/`.
 | corrections | during a checkpoint, edit the sketch without re-running Arena (add `; arena` for a fresh candidate) | `corrections: make Retry a policy object, drop the scheduler interface` |
 | `interrogate` | you want the sketch attacked; findings need a run as proof | see below |
 | deep-module design | you want a deeper module interface, a seam placed, or testability improved; also resolves contract findings from Interrogate via Design It Twice (3+ radically different interfaces, compared on depth, locality, seam placement) | `/architect deep-module design: deepen the retry cluster` |
-| `prototype` | one uncertain part needs observation; Experiment selects a command, script, test, simulation, or throwaway app; add `; interrogate` to have adversaries attack it | `prototype: concurrent GSI creation limit; target: DynamoDB Local` |
+| `prove` | one uncertain part needs real evidence; Experiment selects the smallest sufficient method (command, script, test, simulation, or throwaway prototype); add `; interrogate` to have adversaries attack it | `prove: concurrent GSI creation limit; target: DynamoDB Local` |
 | accept | approve a checkpoint and continue the requested flow | `accept` |
 | implement | at a checkpoint, implement directly even if the caller requested a design-only handoff | `implement` |
 
@@ -93,12 +93,12 @@ Tips:
 - Default scope with no scope named: branch diff from merge base through the working tree.
 - Output: Intent, verified Findings (command, output, how it breaks intent, finders), Dropped counts per adversary. "No verified findings" is a valid result.
 
-## Prototype
+## Prove
 
-One question, one minimal experiment. A builder subagent runs the `experiment` skill in its own worktree (code changes allowed there) and the skill reruns its command. Add `; interrogate` to the reply to have `interrogate` attack the diff or the command and observation; otherwise it is skipped. Evidence returns as proposed corrections; the sketch stays `not implemented` and no prototype code enters it. The worktree is removed after the round; `report.md` and a patch only when code was created stay under `tmp/architect-<slug>/prototype/<question-id>-<revision>-<attempt>/`.
+One question, proven or refuted by real evidence: observed output, never reasoning alone. A prover subagent runs the `experiment` skill in its own worktree (code changes allowed there); Experiment picks the smallest method that settles it, and a throwaway prototype is only one option. The skill reruns its command. Add `; interrogate` to the reply to have `interrogate` attack the diff or the command and observation; otherwise it is skipped. Evidence returns as proposed corrections; the sketch stays `not implemented` and no proof code enters it. The worktree is removed after the round; `report.md` and a patch only when code was created stay under `tmp/architect-<slug>/prove/<question-id>-<revision>-<attempt>/`.
 
 ```
-prototype: does a second GSI creation fail while the first backfills? target: DynamoDB Local on :8000; interrogate
+prove: does a second GSI creation fail while the first backfills? target: DynamoDB Local on :8000; interrogate
 ```
 
 ## Files
@@ -110,6 +110,6 @@ prototype: does a second GSI creation fail while the first backfills? target: Dy
 | `how/`, `why/` | grounding procedures and prompts |
 | `arena/` | multi-model synthesis procedure, runner prompt, subagent rules |
 | `interrogate/` | adversarial review procedure |
-| `prototype/` | throwaway prototype procedure, optional interrogate |
+| `prove/` | evidence procedure via Experiment (command to prototype), optional interrogate |
 | `principles/` | one file per design principle, deep-module vocabulary, Design It Twice |
 
