@@ -4,7 +4,7 @@ Breadth first, depth later. One deployable and its functional slice are one lane
 
 Map each handoff to a row, then verify sender, wire contract, receiver, and deployment or configuration binding. Stop at a terminal infrastructure boundary only after recording the operation, protocol, authentication, errors, and relevant configuration.
 
-**Output:** exactly one file, `docs/research/<slug>/{{slug}}-chain.md`. A chain run writes no other document.
+**Output:** exactly one file, `docs/research/{{slug}}-chain.md`. A chain run writes no other document.
 
 ## Contents
 

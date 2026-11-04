@@ -4,7 +4,7 @@ The document carries a mermaid diagram of the confirmed mechanism. A capability 
 
 Route to one owning deployable and stop at effects leaving it. For an API, start with Swagger, then trace controller, DTO, validation, and outbound calls.
 
-**Output:** `docs/research/<slug>/{{slug}}.md`, or `docs/research/<slug>/{{chainSlug}}-{{n}}-{{deployable}}.md` when the brief asks for a lane of an existing chain.
+**Output:** `docs/research/{{slug}}.md`, or `docs/research/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` when the brief asks for a lane of an existing chain.
 
 ## Diagram
 
