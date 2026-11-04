@@ -153,7 +153,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [normalize-requirements](plugins/wf/skills/normalize-requirements/SKILL.md): strip implementation artifacts out of requirement or story text.
 - [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): read-only codebase lookup run inside a caller-spawned subagent; callers fall back to the explore agent when the skill is unavailable.
 - [experiment](plugins/wf/skills/experiment/SKILL.md): run a throwaway experiment to answer a design question.
-- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams.
+- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template.
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
@@ -217,21 +217,19 @@ Atlassian workflow skills.
 
 ### ms
 
-Microsoft documentation, SDK reference, Azure CLI setup, authentication, resource operation, and implementation-constraint research skills.
+Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills.
 
 - [init-cli](plugins/ms/skills/init-cli/SKILL.md) / [auth-principal](plugins/ms/skills/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
 - [query-azure](plugins/ms/skills/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
 - [search-ms-docs](plugins/ms/skills/search-ms-docs/SKILL.md): query official Microsoft documentation.
 - [search-ms-code-samples](plugins/ms/skills/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.
-- [research-azure](plugins/ms/skills/research-azure/SKILL.md): research Azure implementation constraints — operations, SDK, RBAC, networking, quotas, retries, failures — with provider evidence.
 
 ### aws
 
-AWS documentation, SDK reference, and implementation-constraint research skills.
+AWS documentation and SDK reference skills.
 
 - [search-aws-docs](plugins/aws/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
 - [search-aws-sdk-nuget](plugins/aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
-- [research-aws](plugins/aws/skills/research-aws/SKILL.md): research AWS implementation constraints — APIs, SDK, IAM, networking, quotas, retries, failures — with provider evidence.
 
 ### verify
 

@@ -11,7 +11,7 @@ Review decisions, not document style. A section may have any name or location. D
 
 1. Read the design and its linked requirements, ADRs, diagrams, and constraints.
 2. Identify the change boundary: actors, capabilities, affected components, data, integrations, deployment units, and environments.
-3. Verify material current-system claims against available evidence. For behavior inside one deployable, across deployables, or in the data model: per independent claim, *run `research` skill to inspect the system as-built — behavior, cross-deployable flow, or data boundary, cited to file and line* with the claim as `@question` and its output shape as `@outputShape`. Use `/research-aws` or `/research-azure` skill for provider constraints only when the claim affects the verdict.
+3. Verify material current-system claims against available evidence. For behavior inside one deployable, across deployables, or in the data model: per independent claim, *run `research` skill to inspect the system as-built — behavior, cross-deployable flow, or data boundary, cited to file and line* with the claim as `@question` and its output shape as `@outputShape`. For AWS or Azure provider constraints, only when the claim affects the verdict, *run `research` skill to inspect cloud service constraints — APIs, SDK, IAM/RBAC, quotas, throttling, networking* with the claim as `@question`.
 4. Trace each goal and requirement to architecture, runtime behavior, verification, rollout, and an implementation step. Record broken links.
 5. Evaluate every category below. Use `Covered`, `Gap`, `Unknown`, or `Not applicable`.
 6. Report prioritized, non-duplicated findings. Do not rewrite the design unless asked.
