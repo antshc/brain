@@ -38,16 +38,16 @@ Structure and cite returned evidence. Write only the inspection document.
 
 ## Axes
 
-A capability is a stable product ability realized by features and functional slices. Each slice belongs to one deployable. Behavior inspects one slice. Flow traces contracts across slices in different deployables. Data inspects one data boundary. Load only the selected axis reference and template. For isolated lookups or package API questions, write a focused Markdown report with cited findings and unknowns in the repository research location unless `@outputShape` sets the path.
+A capability is a stable product ability realized by features and functional slices. Each slice belongs to one deployable. Behavior inspects one slice. Flow traces contracts across slices in different deployables. Data inspects one data boundary. Load only the selected axis reference and template. For isolated lookups or package API questions, write a focused Markdown report with cited findings and unknowns in `docs/research/` unless `@outputShape` sets the path.
 
-Write one file at the axis reference's output path directly in `docs/researches/<slug>` unless `@outputShape` names a location. Fill the axis template, obey its `**Rules**` blocks, and remove them from the result.
+Write one file at the axis reference's output path directly in `docs/research/<slug>` unless `@outputShape` names a location. Fill the axis template, obey its `**Rules**` blocks, and remove them from the result.
 
 Run the diagram’s owning skill for syntax and style before drafting. Render every Mermaid block before completion.
 
 ## Crossing axes
 
 - End Flow at the chain document. Add a Behavior follow-up only when a lane's internal decision determines the framed outcome and boundary contracts leave it unexplained. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
-- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/researches/<slug>/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the question verbatim, start at its inbound contract, bound outcomes by expected outbound contracts, and link the result from the follow-up row.
+- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/research/<slug>/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the question verbatim, start at its inbound contract, bound outcomes by expected outbound contracts, and link the result from the follow-up row.
 - In Flow or Behavior, report a Data follow-up to the orchestrator when a persistence question depends on ownership, keys, consistency, migration, concurrency, retention, or deletion.
 - Report managed-service semantics, quotas, and API parameters to the orchestrator as cloud follow-ups.
 

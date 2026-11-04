@@ -71,7 +71,7 @@ Never pool citations under a generic Sources section — it hides which claim is
 
 ## Output
 
-Write `docs/researches/<slug>/<slug>-<provider>.md` (`aws` | `azure`) unless `@outputShape` names a location. Flat path, no subfolder. Fill the template, obeying its `**Rules**` blocks and deleting every one of them from the result.
+Write `docs/research/<slug>/<slug>-<provider>.md` (`aws` | `azure`) unless `@outputShape` names a location. Flat path, no subfolder. Fill the template, obeying its `**Rules**` blocks and deleting every one of them from the result.
 
 ## Done
 

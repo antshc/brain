@@ -43,7 +43,7 @@ Read [cloud-inspection.md](cloud/cloud-inspection.md) to brief. Include provider
 
 ## Generic brief
 
-Use a general-purpose subagent with web access. Cite each claim in place from its primary source (official docs, source code, specifications, or first-party APIs). Write to the repository research location (e.g., `docs/research/`) or choose and report a path when no convention exists.
+Use a general-purpose subagent with web access. Cite each claim in place from its primary source (official docs, source code, specifications, or first-party APIs). Write to `docs/research/` unless `@outputShape` names a location.
 
 ## Output
 
