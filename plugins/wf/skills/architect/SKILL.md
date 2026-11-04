@@ -1,7 +1,7 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, optionally pause at a user-requested checkpoint, then implement or hand off the sketch. Use for /architect, architect this, design this, /architect interrogate to adversarially attack a change without the design phases, or non-trivial work where jumping to code would lock in the wrong shape. Also designs deep module interfaces, finds deepening opportunities, places seams, and compares Design It Twice options.
+  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, optionally pause at a user-requested checkpoint, then implement or hand off the sketch. Use for /architect, architect this, design this, /architect sketch to write only the sketch without implementing, /architect interrogate to adversarially attack a change without the design phases, or non-trivial work where jumping to code would lock in the wrong shape. Also designs deep module interfaces, finds deepening opportunities, places seams, and compares Design It Twice options.
 ---
 
 # Architect
@@ -22,7 +22,7 @@ Request starts with `interrogate` (`/architect interrogate <request>`) → run o
 
 Route here when:
 
-- **User request**: design or deepen a module interface, find deepening opportunities, decide seam placement, or make code more testable or AI-navigable. Run standalone; enter the design workflow only when the user also asks to sketch or implement.
+- **User request**: design or deepen a module interface, find deepening opportunities, decide seam placement, or make code more testable or AI-navigable. Run standalone; user also asks to sketch → Sketch only; to implement → Design workflow.
 - **Contract finding**: Interrogate (standalone, automatic, or checkpoint reply) returns a verified finding on a contract: interface, invariant, ordering, error mode, required configuration, seam placement, or adapter. Resolve it here before proposing or applying its correction.
 
 Interrogate itself never runs this route; it only reports findings.
@@ -30,6 +30,10 @@ Interrogate itself never runs this route; it only reports findings.
 1. Read `principles/deep-modules.md`. Done when its vocabulary names the module, interface, seam, and dependency categories.
 2. Run the `principles/design-it-twice.md` procedure on the target module. Done when `comparison.md` holds a recommendation.
 3. Hand back per its Hand back section.
+
+## Sketch only
+
+Route here when the user asks only for a sketch (`/architect sketch <request>`, "write the sketch", "sketch it, don't implement"), or asks to sketch a Deep-module design recommendation. Run the `sketch/sketch.md` procedure; never run the design workflow. Done when its Completion criteria hold.
 
 ## Design workflow
 
@@ -41,7 +45,8 @@ Resolve every path from this skill's base directory. Read each file fully when i
 
 | File | Load when |
 |---|---|
-| [design/design.md](design/design.md) | design workflow (any request except standalone interrogate) |
+| [design/design.md](design/design.md) | Design workflow, or Sketch only resume |
+| [sketch/sketch.md](sketch/sketch.md) | Sketch only route |
 | [design/evidence-routing.md](design/evidence-routing.md) | Phase A technical questions and every Phase C round, including greenfield |
 | [principles/boundary-discipline.md](principles/boundary-discipline.md) | a step cites *Boundary discipline* |
 | [principles/encode-lessons-in-structure.md](principles/encode-lessons-in-structure.md) | a step cites *Encode lessons in structure* |
@@ -61,8 +66,8 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [principles/design-it-twice.md](principles/design-it-twice.md) | Deep-module design route |
 | [models.md](models.md) | picking a subagent model for any role |
 | [arena/subagents.md](arena/subagents.md) | spawning any subagent |
-| [design/design-red-flags.md](design/design-red-flags.md) | Phase B screening |
-| [design/rationale-template.md](design/rationale-template.md) | writing Outputs; give to every runner |
+| [design/design-red-flags.md](design/design-red-flags.md) | Phase B screening, or `sketch/sketch.md` step 5 |
+| [design/rationale-template.md](design/rationale-template.md) | writing Outputs; give to every runner; `sketch/sketch.md` step 6 |
 | [how/how.md](how/how.md) | Phase A grounding |
 | [how/explorer-prompt.md](how/explorer-prompt.md) | `how/how.md` spawns explorers |
 | [how/explainer-prompt.md](how/explainer-prompt.md) | `how/how.md` spawns the explainer |
@@ -80,7 +85,7 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [why/sources/databricks.md](why/sources/databricks.md) | product analytics investigator |
 | [why/sources/incident-postmortem.md](why/sources/incident-postmortem.md) | target code looks defensive |
 | [arena/arena.md](arena/arena.md) | Phase B |
-| [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief |
+| [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief, or `sketch/sketch.md` step 4 discipline |
 | [interrogate/interrogate.md](interrogate/interrogate.md) | standalone interrogate, automatic evidence routing, user picks interrogate, or prove requests `interrogate` |
 | [prove/prove.md](prove/prove.md) | evidence routing selects Experiment or user picks prove |
 
