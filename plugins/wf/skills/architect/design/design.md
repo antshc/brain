@@ -52,7 +52,7 @@ Before continuing, run `design/evidence-routing.md` on open questions and materi
 
 **Checkpoint requested by the user:** Present the design and wait for approval. Ask in plain chat; MUST NOT use the VS Code ask/questions tool. For each review round:
 
-1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, evidence conclusions and limitations, proposed corrections, and absolute paths of the base candidate's sketch, the synthesized design, and the rationale.
+1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, evidence conclusions and limitations, proposed corrections, and absolute paths of the synthesized sketch, module map, and rationale.
 2. Offer these replies verbatim, then stop and wait for the user:
    ```
    Reply with one:
@@ -64,7 +64,7 @@ Before continuing, run `design/evidence-routing.md` on open questions and materi
    - **implement**: build against the sketch in this working tree (overrides a design-only handoff)
    ```
 3. Act on the reply:
-   - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite the base candidate's sketch in place, then update the synthesized design and rationale (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `design/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
+   - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place, then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `design/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Corrections with `arena`** → apply as above, then run the `arena/arena.md` *Re-run for corrections* procedure with the corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
    - **Prototype** → run the `prototype/prototype.md` procedure on the question in the reply; run its Prove step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
@@ -76,7 +76,7 @@ Before each subsequent checkpoint review round, rerun `design/evidence-routing.m
 
 ## Phase D: Hand off
 
-Stop the Architect procedure and return the accepted sketch to the caller for `/to-spec`. If standalone, tell the user to run `/to-spec` with the target branch and Initiative ID; that skill turns the synthesized design and base candidate sketch into a published spec issue. Do not draft the spec yourself.
+Stop the Architect procedure and return the accepted sketch to the caller for `/to-spec`. If standalone, tell the user to run `/to-spec` with the target branch and Initiative ID; that skill turns `synthesis/` (rationale, module map, sketch) into a published spec issue. Do not draft the spec yourself.
 
 ## Phase E: Implement against the sketch
 
@@ -112,5 +112,5 @@ When you scrap:
 
 ## Outputs
 
-The caller's usage is written first and the type sketch derived from it. One file with new types and signatures for small changes. Module map plus type definitions for larger work. The rationale ships alongside, shaped per `design/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every correction and Phase E deviation; `review-log.md` records each decision. Phase E produces a scaffold commit, then working code filling it in the current branch.
+The caller's usage is written first and the type sketch derived from it. Files follow *Artifact layout* in `SKILL.md`: `synthesis/sketch/` source files (one file for small changes), `synthesis/module-map.md`, and `synthesis/rationale.md` shaped per `design/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every correction and Phase E deviation; `review-log.md` records each decision. Phase E produces a scaffold commit, then working code filling it in the current branch.
 

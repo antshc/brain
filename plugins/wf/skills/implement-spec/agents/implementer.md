@@ -51,7 +51,7 @@ Implement the Ticket using the smallest change that satisfies its requirements.
 
 Applies when the Ticket's **Related Spec Artifacts** quote design sketch excerpts.
 
-- Use the sketch as the map: types, signatures, module boundaries, and file locations. Fill `not implemented` bodies and pseudocode with real code. Excerpt looks truncated → look up its artifact name in `{{specArtifactsDir}}/index.json` and read that `file`.
+- Use the sketch as the map: types, signatures, module boundaries, and file locations; sketch files may be grouped by concern, so take target paths from the quoted module-map rows. Fill `not implemented` bodies and pseudocode with real code. Excerpt looks truncated → look up its artifact name in `{{specArtifactsDir}}/index.json` and read that `file`.
 - Sketch conflicts with the Ticket's requirements, its `Sketch deviation` decisions, repository conventions, or compiling code → never ask; choose the option that best fits the requirements, then the sketch's intent, and note it in the commit body's key decisions.
 
 ### Failure handling

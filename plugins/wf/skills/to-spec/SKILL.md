@@ -30,13 +30,12 @@ Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly o
 
 ## Architect design
 
-Classify the run's outputs by role, never by file name:
+Classify the run's outputs by role, never by file name. The run's artifact root holds `task.md`, `grounding-*.md`, `candidate-<n>/`, and `synthesis/`; each of `candidate-<n>/` and `synthesis/` holds `rationale.md`, `module-map.md`, and `sketch/`.
 
-- **Synthesized design** — the final design package; its synthesis decision names the base candidate.
-- **Base candidate** — the candidate the synthesis decision builds on; its `design` document and `sketch` tree. Synthesis decision names none or several → ask the user which candidate is the base.
-- **Excluded** — losing candidates, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
+- **Synthesized design** — `synthesis/`: its `rationale.md`, `module-map.md`, and `sketch/` are the final design package; its synthesis decision names the base candidate. Correction re-runs: the `arena-r<k>/synthesis/` the user picked.
+- **Excluded** — every `candidate-<n>/` (including the base candidate), `synthesis-note.md`, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
 
-Map the synthesized design, then the base candidate's design, into the body; the synthesis wins on conflict:
+Map the synthesized `rationale.md` into the body; fall back to the base candidate's `rationale.md` only for sections the synthesis leaves empty:
 
 - Problem and caller usage → **Problem Statement** and **Solution**, user-facing.
 - Behavior the design commits to → **Requirements**, solution agnostic.
@@ -45,13 +44,13 @@ Map the synthesized design, then the base candidate's design, into the body; the
 
 The body MUST NOT name the architect skill, candidate labels, or the run's local paths.
 
-Wrap the base candidate's sketch — never another candidate's — into artifacts:
+Wrap the synthesized sketch — never a candidate's — and its module map into artifacts:
 
 ```
-python3 ./scripts/bundle_artifacts.py --sketch <base candidate sketch path> --out-dir <new empty temp dir outside the repository>
+python3 ./scripts/bundle_artifacts.py --sketch <synthesis/sketch path> --module-map <synthesis/module-map.md path> --out-dir <new empty temp dir outside the repository>
 ```
 
-Exit 2 → report stderr and stop before publishing; never drop a sketch file to make it pass. The printed manifest lists each artifact's `name`, `type`, and `file`; the first is the **Sketch index** mapping each sketch path to its artifact names. Draft the **Design sketch** decision with every manifest name and `{{artifactUrl}}` placeholders that publication fills.
+Exit 2 → report stderr and stop before publishing; never drop a sketch file to make it pass. The printed manifest lists each artifact's `name`, `type`, and `file`; the first is the **Sketch index** mapping each file to its artifact names. Draft the **Design sketch** decision with every manifest name and `{{artifactUrl}}` placeholders that publication fills.
 
 <spec-template>
 
@@ -115,7 +114,7 @@ Boundary conditions and their expected handling. Each edge case should be in the
 
 <!-- Omit the Design sketch decision when no architect run happened. -->
 
-- **Design sketch (binding):** the selected design sketch is attached to this issue as artifacts. Use it as the map for where logic goes and how code is structured: its types, signatures, module boundaries, and file locations. Start from the **Sketch index**. When the sketch conflicts with the Requirements or the codebase, the Requirements win; choose the option that best fits them.
+- **Design sketch (binding):** the selected design sketch is attached to this issue as artifacts. Use it as the map for where logic goes and how code is structured: its types, signatures, module boundaries, and file locations. Start from the **Sketch index**; the module map, when attached, maps sketch files to target locations. When the sketch conflicts with the Requirements or the codebase, the Requirements win; choose the option that best fits them.
   - [{{artifactName}}]({{artifactUrl}}) — one entry per artifact, Sketch index first.
 
 A list of implementation decisions that were made. This can include:

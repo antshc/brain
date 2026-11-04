@@ -55,6 +55,16 @@
 - {{implementationDecision1}}
 - {{implementationDecision2}}
 
+## Related Spec Artifacts
+<!-- Omit this section entirely when no design sketch was read or no piece is relevant to this slice. -->
+<related-spec-artifacts-rule>
+- Per relevant sketch file: the exact excerpt in a fenced block, prefixed with its sketch path, artifact name, and URL, plus the matching `module-map.md` rows (target repo paths) when a module map exists.
+- Repeat a shared piece in every related ticket; exclude unrelated pieces. Never paste whole large files.
+- The implementer uses these as the map for where logic goes and how code is structured; Requirements stay the behavior contract.
+</related-spec-artifacts-rule>
+
+- {{artifactPiece}} ([{{artifactName}}]({{artifactUrl}})): {{requirementOrCriterionRelationship}}
+
 ## Relevant Concepts
 <relevant-concepts-rule>
 - Mandatory whenever at least one Concept or ADR applies to this slice.

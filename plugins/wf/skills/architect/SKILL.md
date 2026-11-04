@@ -60,6 +60,25 @@ Resolve every path from this skill's base directory. Read each file fully when i
 
 Write every artifact — grounding, `how`/`why` outputs, arena candidates, judge verdict, synthesis note, sketch, rationale, interrogate findings, review log — under `<repo-root>/tmp/architect-<slug>/`, where `<repo-root>`. Never write them to the session folder or system `/tmp`. Pass absolute paths under this root to every subagent. Research specialist reports may retain a stronger location contract per `design/evidence-routing.md`; index their absolute paths under the artifact root. Phase E code goes in the repo's working tree, not the artifact root.
 
+### Artifact layout
+
+```
+<artifact-root>/
+  task.md                      arena task, requirements, human decisions
+  grounding-*.md               Phase A outputs (grounding-how.md, ...)
+  candidate-<n>/               one per runner
+    rationale.md
+    module-map.md
+    sketch/                    source files, never one markdown holding code
+  synthesis/                   same shape as a candidate, plus synthesis-note.md
+  arena-r<k>/                  correction re-runs: candidate-<n>/, synthesis/
+  review-log.md
+```
+
+- `sketch/` holds real source files in the repo's primary language (e.g. `.cs`), grouped per module or concern; hook-point edits to existing files are diff-like snippets in source files. Prose and code never share a file; `rationale.md` and `module-map.md` link to sketch files.
+- `module-map.md` lists each new, modified, or deleted file by real repo-relative path, with its sketch file.
+- Interrogate and prototype artifacts stay under the artifact root per their procedures.
+
 ## Repo docs
 
 Read the repo's architecture, relevant ADRs and Concepts, and glossary before grounding; skip absent ones.
