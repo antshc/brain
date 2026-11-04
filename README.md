@@ -92,6 +92,12 @@ gh skill install antshc/brain engineering/suggest-graphify-improvements --agent 
 gh skill install antshc/brain engineering/remove-zone-identifiers --agent github-copilot --scope user -f
 ```
 
+Repo-level (run from the target repo; `init-wf` offers it), then edit the copy to match the repo's conventions:
+
+```sh
+gh skill install antshc/brain engineering/factory-mode --agent github-copilot --scope project
+```
+
 ### dotnet skill (external)
 
 ```sh
@@ -158,7 +164,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
 - [bootstrap-docs](plugins/wf/skills/bootstrap-docs/SKILL.md) / [index-docs](plugins/wf/skills/index-docs/SKILL.md): create and keep `ARCHITECTURE.md`/`GLOSSARY.md` and their indexes in sync.
-- [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for GitHub issue labels and doc layout; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research/bootstrap-docs remain local, and other skills retain their Jira workflows.
+- [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for GitHub issue labels and doc layout, and offers repo-level `factory-mode` install; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research/bootstrap-docs remain local, and other skills retain their Jira workflows.
 
 ### crew
 
@@ -256,3 +262,4 @@ General-purpose skills not tied to a specific platform.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
+- [factory-mode](skills/engineering/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by `init-wf` and customized by its users.

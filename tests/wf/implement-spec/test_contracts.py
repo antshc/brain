@@ -11,7 +11,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 ROOT = REPO / 'plugins/wf/skills/implement-spec'
 MAIN = (ROOT / 'SKILL.md').read_text()
-FACTORY = REPO / 'plugins/wf/skills/factory-mode'
+FACTORY = REPO / 'skills/engineering/factory-mode'
 
 
 BREAKDOWN = (ROOT / 'references/breakdown.md').read_text()
