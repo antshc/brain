@@ -55,7 +55,7 @@ If an authoritative source was used, preserve its canonical URL.
 
 ## Summary of issue
 
-{{2-3 sentences|what was reported vs what actually happened; business language}}
+{{2-5 sentences|what was reported vs what actually happened; business language}}
 
 ## Impact
 
