@@ -124,6 +124,29 @@ class TestSplit:
             bundle(tree(tmp_path / "s", {"p.html": "<p>" + "x" * 2000 + "</p>"}), max_chars=1000)
 
 
+class TestModuleMap:
+    def test_module_map_bundled_first_after_index(self, tmp_path):
+        sketch = tree(tmp_path / "s", {"01-Core.cs": "class A {}\n"})
+        module_map = tree(tmp_path / "m", {"module-map.md": "# Map\n"}) / "module-map.md"
+        artifacts, _ = bundle(sketch, module_map=module_map)
+        assert [a.name for a in artifacts] == ["Sketch index", "module-map.md", "01-Core.cs"]
+        assert "| `module-map.md` | `module-map.md` |" in artifacts[0].body
+
+    def test_missing_module_map_fails(self, tmp_path):
+        sketch = tree(tmp_path / "s", {"a.cs": "class A {}\n"})
+        with pytest.raises(BundleError, match="module map not found"):
+            bundle(sketch, module_map=tmp_path / "absent.md")
+
+    def test_cli_accepts_module_map(self, tmp_path):
+        sketch = tree(tmp_path / "s", {"a.cs": "class A {}\n"})
+        module_map = tree(tmp_path / "m", {"module-map.md": "# Map\n"}) / "module-map.md"
+        done = subprocess.run(
+            [sys.executable, str(SCRIPT), "--sketch", str(sketch), "--module-map", str(module_map),
+             "--out-dir", str(tmp_path / "out")], capture_output=True, text=True)
+        assert done.returncode == 0, done.stderr
+        assert [e["name"] for e in json.loads(done.stdout)["artifacts"]] == ["Sketch index", "module-map.md", "a.cs"]
+
+
 class TestCli:
     def run(self, *args: str) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True, text=True)

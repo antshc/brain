@@ -33,7 +33,7 @@ Reject an explicit `auto` argument as unsupported before any publication; do not
 
 Determine mode:
 
-- **Online, spec only:** resolve the tracker repository once from the docs/harness root (current repository for single-repo work) with `gh repo view --json nameWithOwner --jq .nameWithOwner` → `{{trackerRepository}}` (tracker, not the source repository). Fetch via **Read spec** in [github.md](./references/github.md); slicing source = issue title, body, and comments.
+- **Online, spec only:** resolve the tracker repository once from the docs/harness root (current repository for single-repo work) with `gh repo view --json nameWithOwner --jq .nameWithOwner` → `{{trackerRepository}}` (tracker, not the source repository). Fetch via **Read spec** in [github.md](./references/github.md); slicing source = issue title, body, and comments. Spec body has a **Design sketch** decision → also run **Read design sketch** there.
 - **Online, spec + implementation details:** resolve `{{trackerRepository}}` and read the spec as above; slicing source = implementation details (read file paths; use inline text directly).
 - **Explicit offline:** follow **Offline publishing** in [github.md](./references/github.md); use the supplied local spec and metadata; skip all GitHub lookups.
 
@@ -75,6 +75,14 @@ Build an acyclic **blocker graph**: nodes are all tasks; each directed edge runs
 
 *Done when* every spec Functional Requirement, Business Rule, and Edge Case maps to at least one task or is flagged as uncovered.
 
+**Design sketch (only when read in step 1):**
+
+- Sketch files are grouped by module or concern; target repo paths come from `module-map.md` (new, modified, deleted files with their sketch file). Without a module map, sketch paths are intended target locations.
+- Follow the sketch's module boundaries for task ownership; prefactoring and scaffolding the sketch defines come first.
+- Every sketch file (not `module-map.md`) maps to at least one task; list unmapped files in step 4 as uncovered.
+- Sketch conflicts with a Requirement, Concept/ADR, or current code → Requirement wins, then Concepts/ADRs; surface the conflict in step 4 and record `Sketch deviation: {{what}} — {{chosen}} because {{reason}}` in that task's Implementation Decisions. Never drop a sketch type, signature, or boundary silently.
+- No sketch → none of this applies; omit **Related Spec Artifacts** from tickets.
+
 ### 4. Review the breakdown with the user
 
 Present a numbered list; per task show:
@@ -105,7 +113,7 @@ Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 Before any write, confirm the approval guard holds for the current breakdown; otherwise return to step 4.
 
-Render each ticket body from [issue-template.md](./references/issue-template.md) verbatim — every section, each drafted per its `<...-rule>`. Copy each addressed requirement's spec text verbatim into **Requirements addressed**; numbers alone are insufficient.
+Render each ticket body from [issue-template.md](./references/issue-template.md) verbatim — every section (Contracts Delta and Related Spec Artifacts only when they apply), each drafted per its `<...-rule>`. Copy each addressed requirement's spec text verbatim into **Requirements addressed**; numbers alone are insufficient.
 
 Branch on mode:
 
@@ -122,5 +130,5 @@ Branch on mode:
 
 ## Completion criteria
 
-- **Online:** every approved task has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}`, no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final blocker graph as `Ticket | Blocked by`, with fully qualified issue identities and `none` for roots; include every ticket and confirmed edge.
+- **Online:** every approved task has exactly one child issue under `{{specIssueNumber}}` labeled `hitl` and `{{repoLabel}}`, no `afk` label; each body contains every template section (Contracts Delta only when a contract is touched; Related Spec Artifacts only when a sketch was read); every approved **Blocked by** edge is a native link confirmed by reread; parent Spec unchanged. Report the final blocker graph as `Ticket | Blocked by`, with fully qualified issue identities and `none` for roots; include every ticket and confirmed edge.
 - **Offline or partial:** report local paths and unpublished/partially published status; no invented GitHub issue numbers.

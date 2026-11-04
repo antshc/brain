@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Wrap every file of a design sketch as one GitHub issue artifact body, plus a sketch index.
 
-    bundle_artifacts.py --sketch PATH --out-dir DIR [--max-chars N]
+    bundle_artifacts.py --sketch PATH --out-dir DIR [--module-map FILE] [--max-chars N]
 
-PATH is one sketch file or the sketch root directory. Writes one body file per artifact into DIR
+PATH is one sketch file or the sketch root directory; FILE is the module map that maps sketch files
+to target repo paths, bundled ahead of the sketch files. Writes one body file per artifact into DIR
 (absent or empty) and `manifest.json`; prints the manifest on stdout. Content-agnostic: never
 interprets file contents. Exit codes: 0 ok, 2 invalid input (binary file, name collision,
 oversized HTML, non-empty DIR); errors go to stderr and nothing is written.
@@ -160,14 +161,22 @@ def index_artifact(files: list[SketchFile], artifacts: list[Artifact]) -> Artifa
         rows.append(f"| `{file.relative}` | {', '.join(f'`{name}`' for name in names)} |")
     body = "\n".join([
         f"# {INDEX_NAME}", "",
-        "Selected design sketch. Each sketch file is one artifact on this issue; sketch paths mirror intended target locations.", "",
+        "Selected design sketch. Each file is one artifact on this issue. A module map, when listed, maps sketch files to intended target locations; otherwise sketch paths mirror them.", "",
         "| Sketch path | Artifact |", "|---|---|", *rows, "",
     ])
     return Artifact(INDEX_NAME, "plan", body, None, 1, 1)
 
 
-def bundle(sketch: Path, max_chars: int = DEFAULT_MAX_CHARS) -> tuple[list[Artifact], list[dict[str, str]]]:
+def bundle(
+    sketch: Path, max_chars: int = DEFAULT_MAX_CHARS, module_map: Path | None = None,
+) -> tuple[list[Artifact], list[dict[str, str]]]:
     files, skipped = collect(sketch)
+    if module_map is not None:
+        if not module_map.is_file():
+            raise BundleError(f"module map not found: {module_map}")
+        map_files, map_skipped = collect(module_map)
+        files = [*map_files, *files]
+        skipped = [*map_skipped, *skipped]
     artifacts = [artifact for file in files for artifact in wrap(file, max_chars)]
     index = index_artifact(files, artifacts)
     owners: dict[str, str | None] = {}
@@ -200,10 +209,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Wrap design sketch files as issue artifact bodies.")
     parser.add_argument("--sketch", required=True, type=Path)
     parser.add_argument("--out-dir", required=True, type=Path)
+    parser.add_argument("--module-map", type=Path)
     parser.add_argument("--max-chars", type=int, default=DEFAULT_MAX_CHARS)
     args = parser.parse_args(argv)
     try:
-        artifacts, skipped = bundle(args.sketch, args.max_chars)
+        artifacts, skipped = bundle(args.sketch, args.max_chars, args.module_map)
         manifest = write(artifacts, skipped, args.out_dir)
     except BundleError as exception:
         print(f"bundle_artifacts: {exception}", file=sys.stderr)
