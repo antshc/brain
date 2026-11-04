@@ -1,7 +1,7 @@
 ---
 name: writing-style
 description: >-
-  Writes, edits, or reviews prose against loaded style references. Use for writing-style, technical writing, unslop, docs, RFCs, readmes, PR descriptions, commit messages, or cutting AI tells. Returns text that a tired engineer understands on the first read.
+  Writes, edits, or reviews prose against loaded style references. Use for technical writing, unslop, docs, PR descriptions, commit messages, AI tells, or normalizing requirements and stories of leaked implementation artifacts. Returns text a tired engineer understands on first read.
 ---
 
 # Writing style
@@ -25,6 +25,7 @@ Orchestrator. Pick the task row, read each listed reference fully (no previews),
 | Write a PR description or commit message | [references/docs-and-prs.md](references/docs-and-prs.md), [references/sentences-google.md](references/sentences-google.md), [references/ai-tells.md](references/ai-tells.md) |
 | Review or tighten existing text | [references/ai-tells.md](references/ai-tells.md), [references/rhythm.md](references/rhythm.md), [references/ambiguity-global-english.md](references/ambiguity-global-english.md) |
 | Unslop only, remove AI tells | [references/ai-tells.md](references/ai-tells.md) |
+| Normalize requirements, capabilities, features, functional slices, or stories (scrub implementation artifacts) | [references/solution-agnostic.md](references/solution-agnostic.md), [references/solution-agnostic-terms.md](references/solution-agnostic-terms.md); its Output replaces Pipeline |
 | Another skill needs text written through this style | The row matching the text kind |
 
 Doc-mode choice (tutorial, how-to, reference, explanation) applies to whole documents only. Skip `references/modes-diataxis.md` for short text.
