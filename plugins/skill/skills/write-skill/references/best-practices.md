@@ -11,8 +11,21 @@ Structure and content rules for agent-facing documents: `SKILL.md`, bundled refe
 | Key | Required | Rule |
 |---|---|---|
 | `name` | yes | Lowercase, hyphenated, matches folder name. Name by existing verb-prefix family; start a new family only when needed. |
-| `description` | yes | Third person; target 100–300 chars; state **when → responsibility → result**; include 3–6 distinctive trigger keywords. |
+| `description` | yes | See Description shape. |
 | `disable-model-invocation` | no | `true` = human-only; omit when model or other skills must discover it. |
+
+**Description shape:** **what → when → [redirect]**, 60–300 chars.
+
+1. **What:** one sentence, imperative verb first, naming the concrete result (`Publish …`, `Return one report`).
+2. **When:** `Use when …` or `Use for /name, 'phrase', …` with 2–5 triggers in words users type; quoted phrases beat abstract keywords.
+3. **Redirect** (optional): point to the nearest sibling (``Use `why` for motivation.``) or `Skip when …`.
+
+Omit process detail (`using bundled best practices`, `from a brief`) unless it sets the skill apart. User-invoked skills: the What sentence only.
+
+| Invocation | Example |
+|---|---|
+| Model-invoked | `Investigate a question against primary sources and save cited findings as Markdown. Use for /research, 'research X', 'gather docs on Y', or delegating reading legwork. Use why for design rationale.` |
+| User-invoked | `Write, rewrite, or shrink an agent skill and its bundled references.` |
 
 **Description characters:** plain text, max 1024 chars. Separate clauses with `.`, `;`, or `,`. **MUST NOT** use:
 
