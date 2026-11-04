@@ -28,9 +28,9 @@ Before spawning investigators, build the seed context inline: file paths and lin
 
 ### Discovery
 
-Before spawning investigators, list the MCP servers available in this session (the `github-mcp-server-*` and other MCP tools your tool list shows). Read the tool names, not any config file.
+Before spawning investigators, list the MCP servers and installed skills available in this session (the `github-mcp-server-*`, other MCP tools, and skill names your tool list shows). Read names and descriptions, not credential or config files.
 
-Map each available MCP to one evidence category:
+Map available evidence providers to these categories:
 
 1. Source control history
 2. Issue / ticket tracker
@@ -40,22 +40,26 @@ Map each available MCP to one evidence category:
 6. Error / exception tracking
 7. Product analytics warehouse
 
-Source control is always available through git and `gh`. For the other six, classify using the MCP name, server instructions, tool names, and resource descriptors. If an MCP could fit more than one category, choose the one matching its primary evidence. Record ambiguous cases in the coverage map.
+Source control is always available through git and `gh`. For the other six, classify using MCP names, server instructions, tool names, skill descriptions, and resource descriptors. If a provider fits more than one category, choose its primary evidence, except for the Atlassian pair below. Record ambiguous cases in the coverage map.
 
-Spawn one investigator per category that has a matching MCP, all in a single message so they run concurrently, each owning exactly one tool or MCP. Don't ask one agent to cover multiple MCPs. `model`: the `why investigators` role.
+When both `preflight-atlassian` and `twg` skills are installed, run `preflight-atlassian` **Resolve** once. Use its credentialed `twg` launcher and site in two independent investigators: **Jira** for issue / ticket tracker, **Confluence** for long-form documents. Both use `why/sources/atlassian.md` with their own category's procedure. If `tokenAvailable` is false or the site/launcher is unavailable, mark both categories inaccessible with the exact prerequisite; never read credentials, start login, or silently switch identity. Do not spawn a second provider for either category. If the skills are absent, retain ordinary MCP discovery for those categories.
+
+Spawn one investigator per category with an available provider, all in a single message so they run concurrently, each owning one category and one provider. Atlassian's credentialed launcher may be shared by its Jira and Confluence investigators, but each must search and report only its assigned product. Don't ask one investigator to cover multiple categories or MCPs. `model`: the `why investigators` role.
 
 Each investigator's prompt is `why/investigator-prompt.md` filled in, plus:
-- the category playbook `why/sources/<source>.md` for the selected MCP, adapted from the examples in `why/source-playbook.md`
+- the category playbook `why/sources/<source>.md` for the selected provider, adapted from the examples in `why/source-playbook.md`
 - `why/sources/incident-postmortem.md` **if the target code looks defensive** (null checks, retry logic, timeout handling, rate limiting, feature flags, egress guards, OOM handlers)
 - the code anchor and the user's original question
+
+After the initial results, pass relevant Jira-to-Confluence and Confluence-to-Jira links to the opposite investigator for targeted follow-up reads. Keep each finding under its owning category; do not duplicate evidence.
 
 ### Investigator roster, one per available evidence category
 
 Each category below is uniquely positioned to surface one shape of "why", shown after "Best at". Use it to know what to expect back, to name a gap when a category returns empty, and, only in the rare provably-irrelevant case, to justify a skip.
 
 1. **Source control** (git history, `gh` for PRs, code comments, tests). Always spawn, the only guaranteed source. Best at *implementation-time rationale captured during review*.
-2. **Issue / ticket tracker** (e.g. Linear, Jira, GitHub Issues, Plane, Shortcut MCP). Best at *the product or business forcing function*. Strongest when the why is external to engineering.
-3. **Long-form documents** (e.g. Notion, Confluence, Google Docs, Coda MCP). Best at *long-form design rationale*, written out before it becomes code.
+2. **Issue / ticket tracker** (e.g. Atlassian `twg`/Jira, Linear, GitHub Issues, Plane, Shortcut MCP). Best at *the product or business forcing function*. Strongest when the why is external to engineering.
+3. **Long-form documents** (e.g. Atlassian `twg`/Confluence, Notion, Google Docs, Coda MCP). Best at *long-form design rationale*, written out before it becomes code.
 4. **Real-time team chat** (e.g. Slack, Discord, Microsoft Teams, Mattermost MCP). Best at *real-time deliberation that never reached a doc*. Especially important when the source control, ticket, and doc paper trail is thin.
 5. **Infrastructure observability** (e.g. Datadog, New Relic, Honeycomb, Grafana, Splunk MCP). Best at *infrastructure and runtime reality that motivated the code*. Strongest when the target reacts to an infra signal (timeouts, retries, rate limits, circuit breakers).
 6. **Error / exception tracking** (e.g. Sentry, Rollbar, Bugsnag, Airbrake MCP). Best at *the specific exceptions and error trajectories that motivated defensive or corrective code*. Strongest for catch blocks, null guards, type checks, retries, and other defenses.
@@ -65,7 +69,7 @@ Each category below is uniquely positioned to surface one shape of "why", shown 
 
 Only with an **explicit, written justification** that goes in the final Sources Consulted. Two valid reasons:
 
-- **No MCP is available for that category** in this environment. Flag it as a gap, not a choice: "Real-time team chat skipped. No matching MCP available, so the conversational record was not searchable."
+- **No matching provider is available for that category**, or its required credentials are unavailable. Flag it as a gap, not a choice: "Real-time team chat skipped. No matching MCP available, so the conversational record was not searchable."
 - **The source is provably irrelevant**, not just "probably irrelevant." A high bar: "Error / exception tracking skipped. Target is a build-time script with no runtime code path."
 
 If your scope assessment suggests a single-commit trivial target where the PR description already contains the complete answer, you may answer inline **only after** confirming all seven available category searches would be redundant. Say so explicitly. This should be rare.
