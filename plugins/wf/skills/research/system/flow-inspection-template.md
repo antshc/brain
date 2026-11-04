@@ -3,7 +3,7 @@
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
 - Question, Scope, and Summary use domain anchors — capability, feature, functional slices, actor, action, object, outcome, and named systems — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
-- Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the skill. A bare service name is not evidence.
+- Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the system-inspection reference. A bare service name is not evidence.
 - Every diagram node, Flow row, boundary claim, and Conclusion statement traces to a Fact. Quote the deciding line whenever it settles a claim on sight.
 - Executing code and a correlation id traced at runtime prove the chain; deployment diagrams, READMEs, comments, and team knowledge state only intent. Record mismatches as Facts.
 - Scope is one end-to-end chain. Each deployable appears once as one lane with 1–5 ordered major-step nodes; deeper internal mechanisms belong to optional Behavior follow-ups.
@@ -23,7 +23,7 @@
 
 ## Chain
 
-**Rules:** Draw and render one Mermaid swimlane per **Flow — cross-deployable chain** in the skill. Give every deployable one lane containing 1–5 ordered nodes for its major steps, place terminal systems at diagram edges, and label every cross-lane arrow with its boundary contract. Put all terminal nodes in the titled `Terminal boundaries` lane; label each node with the target name only. Every node and arrow traces to a Fact; tables below carry citations.
+**Rules:** Draw and render one Mermaid swimlane per **Diagram** in the Flow axis reference. Give every deployable one lane containing 1–5 ordered nodes for its major steps, place terminal systems at diagram edges, and label every cross-lane arrow with its boundary contract. Put all terminal nodes in the titled `Terminal boundaries` lane; label each node with the target name only. Every node and arrow traces to a Fact; tables below carry citations.
 
 {{diagram}}
 

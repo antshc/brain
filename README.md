@@ -153,8 +153,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [normalize-requirements](plugins/wf/skills/normalize-requirements/SKILL.md): strip implementation artifacts out of requirement or story text.
 - [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): read-only codebase lookup run inside a caller-spawned subagent; callers fall back to the explore agent when the skill is unavailable.
 - [experiment](plugins/wf/skills/experiment/SKILL.md): run a throwaway experiment to answer a design question.
-- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo.
-- [research-system](plugins/wf/skills/research-system/SKILL.md): inspect a system as-built along the capability, deployables, or data axis, cited to `file:line`, with diagrams.
+- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams.
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.

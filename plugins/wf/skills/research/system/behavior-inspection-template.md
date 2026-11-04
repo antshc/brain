@@ -3,7 +3,7 @@
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
 - Question, Scope, and Summary use domain anchors — capability, feature, functional slice, actor, action, object, outcome, named external system — without source paths, routes, code symbols, configuration keys, or implementation-layer terms.
-- Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the skill. A bare symbol name is not evidence.
+- Summary claims cite numbered Facts; every repository file mention and technical claim elsewhere carries a file reference per **File references** in the system-inspection reference. A bare symbol name is not evidence.
 - Quote the deciding line whenever it is short enough to settle the claim on sight.
 - Executing code proves behavior; tests, comments, and docs state only intent — record any mismatch as a finding.
 - Nothing reaches the diagram, tables, or conclusion without a Fact behind it.
@@ -26,7 +26,7 @@
 
 ## Mechanism
 
-**Rules:** pick, label, and split the diagram per **Behavior — one deployable** in the skill; the owning diagram skill's template governs syntax and styling — do not compose a Mermaid skeleton from this template. Every node traces back to a Fact row; the tables below carry the citations. Give each extra diagram a `### {{question this diagram answers}}` subsection.
+**Rules:** pick, label, and split the diagram per **Diagram** in the Behavior axis reference; the owning diagram skill's template governs syntax and styling — do not compose a Mermaid skeleton from this template. Every node traces back to a Fact row; the tables below carry the citations. Give each extra diagram a `### {{question this diagram answers}}` subsection.
 
 {{diagram}}
 

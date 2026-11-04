@@ -182,7 +182,7 @@ swimlane-beta TB
 | ----------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | **define- / discover-**                   | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `experiment`, `explore-codebase` |
 | **probe-**                                | Auto-discover facts in a system and record them | —                                                                                      |
-| **research-**                             | Gather external/domain evidence              | `research`, `define-research`, `research-system`                                          |
+| **research-**                             | Gather external/domain evidence              | `research`, `define-research`                                                             |
 | **inspect-**                              | Inspect implementations and artifacts        | `inspect-nuget-source`                                                                    |
 | **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
 | **architect**                             | Sketch, synthesize, review; hand off to spec or implement | `architect`, `code-sketch`                                                                |
