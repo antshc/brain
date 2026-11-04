@@ -1,7 +1,7 @@
 ---
 name: init-wf
 description: >-
-  Set up wf repo topology, Copilot instructions, ARCHITECTURE.md, GLOSSARY.md, and GitHub labels, or repair missing labels.
+  Set up wf repo topology, Copilot instructions, ARCHITECTURE.md, GLOSSARY.md, GitHub labels, and repo-level factory-mode, or repair missing labels.
 disable-model-invocation: true
 ---
 
@@ -46,6 +46,16 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 Follow [github.md](./github.md) **Setup labels**. Done when all nine baseline labels exist in the tracker repository.
 
+## 5. Install factory-mode
+
+Ask the user whether to install the `factory-mode` skill at repo level; it holds the repo-level engineering instructions (principles, design preferences, playbooks). Yes → run from the reporoot:
+
+```bash
+gh skill install antshc/brain engineering/factory-mode --agent github-copilot --scope project
+```
+
+Already installed → skip; never overwrite (no `-f`), the repo copy carries user edits. Then tell the user to edit the installed `SKILL.md` and playbooks to align with the repo's conventions (layering, patterns, build/verify commands), and to use the `sync-skill` skill to pull upstream improvements later.
+
 ## Completion criteria
 
 - Topology confirmed; `workspace/` split (if any) set up.
@@ -53,3 +63,4 @@ Follow [github.md](./github.md) **Setup labels**. Done when all nine baseline la
 - Copilot instructions seeded in `.github/copilot-instructions.md`, placeholders resolved, no duplicate sections.
 - `ARCHITECTURE.md` and `GLOSSARY.md` exist.
 - All nine GitHub baseline labels exist; labels-only mode requires only this condition.
+- User asked about `factory-mode`; if accepted, it is installed at project scope.

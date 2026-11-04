@@ -9,6 +9,10 @@ disable-model-invocation: true
 
 **Args start with `help`** → follow [help.md](help.md) before anything else: `help` alone prints usage examples; `help <request>` offers 3 ranked playbook options with reasoning and runs nothing.
 
+## Repo instructions
+
+This skill is the repo-level engineering instruction set, installed per repo by `init-wf` and owned by the repo's users. Its Principles, Design preferences, Autonomy, and playbooks state this repo's conventions; repo edits are intentional drift and win over upstream. *Run `sync-skill` skill to merge upstream skill improvements into the local customized version, preserving intentional drift.*
+
 ## Non-negotiables
 
 Name each principle (Principles) that shaped a decision and the choice it changed in the reply.
