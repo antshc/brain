@@ -1,6 +1,7 @@
 ---
 name: code-review
-description: 'Reviews GitHub pull requests for bugs, quality attributes, code smells, and initiative coverage using independent reviewers. Picks reviewer models from a configurable low/medium/high level and posts evidence-backed inline comments.'
+description: >-
+  Review a GitHub pull request with independent reviewers for bugs, quality attributes, code smells, and initiative coverage, then post evidence-backed inline comments. Use for 'review this PR' or a PR URL with a low, medium, or high review level. Use address to answer existing threads.
 argument-hint: '<PR_URL> [low|medium|high]'
 ---
 

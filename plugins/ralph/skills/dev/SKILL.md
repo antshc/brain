@@ -1,6 +1,7 @@
 ---
 name: dev
-description: AFK development loop — implements approved sub-tickets of a spec issue, commits and pushes, then opens a draft pull request.
+description: >-
+  Implement approved sub-tickets of a spec issue in an AFK loop, commit and push, then open a draft pull request. Use for /dev, 'implement this spec', or 'run the AFK loop' on a spec issue number or URL.
 argument-hint: '<spec-issue-number-or-url>'
 ---
 

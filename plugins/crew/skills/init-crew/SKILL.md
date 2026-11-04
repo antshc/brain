@@ -1,6 +1,7 @@
 ---
 name: init-crew
-description: "Initialize Crew conventions when the user explicitly requests setup in a repository. Copy selected stack Copilot instructions, offer repository-local Chore rules skills, and create shared gotchas memory without overwriting repository conventions."
+description: >-
+  Initialize Crew in a repository with stack Copilot instructions, Chore rules skills, and shared gotchas memory.
 disable-model-invocation: true
 ---
 

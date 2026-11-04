@@ -1,6 +1,7 @@
 ---
 name: map-markdown-adf
-description: Convert Markdown to Atlassian Document Format (ADF) and back, and detect the constructs only ADF can express, through the single shared conversion capability for the `atl` plugin. Use when a skill needs to send Markdown to Jira/Confluence as ADF, needs to read a fetched ADF body back as Markdown, or needs to decide whether Markdown alone will carry a document. Preserves source wording verbatim — never summarizes, corrects, or reinterprets content.
+description: >-
+  Convert Markdown to Atlassian Document Format (ADF) and back, and detect constructs only ADF can express, preserving source wording verbatim. Use when a skill needs to send Markdown to Jira or Confluence as ADF, read a fetched ADF body as Markdown, or decide if Markdown alone suffices.
 ---
 
 # Map Markdown <-> ADF

@@ -1,7 +1,7 @@
 ---
 name: writing-style
 description: >-
-  Writes, edits, or reviews prose against loaded style references. Use for technical writing, unslop, docs, PR descriptions, commit messages, AI tells, normalizing requirements and stories of leaked implementation artifacts, or a research bottom line. Returns text clear on first read.
+  Write, edit, or review prose against loaded style references so it reads clear on first read. Use for technical docs, PR descriptions, commit messages, 'unslop' or AI tells, scrubbing leaked implementation from requirements and stories, or a research bottom line.
 ---
 
 # Writing style

@@ -1,6 +1,7 @@
 ---
 name: define-concept
-description: Define an arc42 Crosscutting Concept — suggest which Concept to add or extend when none is described, or check a described one against the recorded Concepts — then resolve it through questioning and read-only codebase inspection and record it. Use when asked to define, add, or improve a Concept, to find which Concept is missing or most valuable to write next, or to turn an observed recurring practice into a Concept.
+description: >-
+  Define or extend an arc42 Crosscutting Concept through questioning and read-only codebase inspection, then record it. Use when asked to define, add, or improve a Concept, check one against recorded Concepts, find which Concept to write next, or turn a recurring practice into one.
 ---
 
 # Define Concept

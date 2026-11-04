@@ -1,6 +1,7 @@
 ---
 name: delete-worktree
-description: Remove a git worktree and delete its local feature branch once development on it is finished. Never touches the remote branch or an open PR.
+description: >-
+  Remove a git worktree and delete its local feature branch, never the remote branch or an open PR. Use when development on a worktree branch is finished, such as after its PR is pushed.
 argument-hint: '<codebase-repo-path> <worktree-path> <branch>'
 ---
 

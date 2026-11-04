@@ -1,6 +1,7 @@
 ---
 name: doc-code-diagram
-description: Document implementation-level code structure with a Mermaid class diagram. Use for class responsibilities, fields, methods, inheritance, interfaces, which types implement an interface, dependencies, composition, aggregation, and class-level deltas.
+description: >-
+  Document implementation-level code structure as a Mermaid class diagram. Use for class responsibilities, fields, methods, inheritance, which types implement an interface, composition, or class-level deltas. Use doc-architecture-diagram for deployables, doc-behavior-diagram for flows.
 ---
 
 # Code Diagram

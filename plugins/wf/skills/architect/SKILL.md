@@ -1,7 +1,7 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module structure before code, produce one design candidate or synthesize competing multi-model candidates, optionally pause at a user-requested checkpoint, then implement or hand off the sketch. Use for /architect, architect this, design this, /architect sketch to write only the sketch without implementing, /architect interrogate to adversarially attack a change without the design phases, or non-trivial work where jumping to code would lock in the wrong shape. Also designs deep module interfaces, finds deepening opportunities, places seams, and compares Design It Twice options.
+  Sketch types, signatures, and module boundaries before code, then implement or hand off the sketch. Use for /architect, 'design this', '/architect sketch', '/architect interrogate' to attack a change, deep module or seam design, or non-trivial work needing shape first.
 ---
 
 # Architect

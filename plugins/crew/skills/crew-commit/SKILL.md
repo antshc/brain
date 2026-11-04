@@ -1,6 +1,7 @@
 ---
 name: crew-commit
-description: "Commit current staged or unstaged work after a Codey task completes, or when the user asks to commit it. Derive the message from Codey's report or the diff; require confirmation for partial or blocked work."
+description: >-
+  Commit current staged or unstaged work with a ccode-prefixed message derived from Codey's report or the diff. Use after a Codey task completes or when the user says 'commit it'. Require confirmation for partial or blocked work.
 ---
 
 Commit all uncommitted changes using the format below.

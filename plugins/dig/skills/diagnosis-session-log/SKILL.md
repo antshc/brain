@@ -1,6 +1,7 @@
 ---
 name: diagnosis-session-log
-description: Own the shared hypothesis log for diagnosis runs — defaulting to repository root/tmp/{{bugSlug}}-diagnosis.md — and record only checked hypotheses with their verification, observed fact, evidence, and result.
+description: >-
+  Open and append the shared hypothesis log for diagnosis runs, default repository root/tmp/{{bugSlug}}-diagnosis.md, recording only checked hypotheses with verification, observed fact, evidence, and result. Use when another diagnosis skill needs the log or its logPath.
 ---
 # Track Diagnosis Hypotheses
 

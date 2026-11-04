@@ -1,7 +1,7 @@
 ---
 name: publish-page
 description: >-
-  Create or update a Confluence page from a local Markdown file, running one script that extracts diagrams, converts to ADF via map-markdown-adf, uploads attachments, and publishes over Confluence REST. Keeps inline comments attached via `<!-- adf:comment -->` anchors and posts one page comment when an update detaches any. Use when asked to publish, create, or update a Confluence page from a markdown file.
+  Create or update a Confluence page from a local Markdown file with diagrams and attachments, keeping inline comments attached via adf:comment anchors. Use when asked to publish, create, or update a Confluence page from a markdown file. Use publish-work for Jira work items.
 argument-hint: '<md_file_path>, [pageId], [spaceId]'
 ---
 

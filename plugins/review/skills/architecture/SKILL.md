@@ -1,6 +1,7 @@
 ---
 name: architecture
-description: Audit architecture drift between ARCHITECTURE.md (excluding ADRs) plus the SSR docs and the actual codebase. Use when the user wants to check whether the code still matches the documented architecture, audit SSR compliance, or find where the implementation has diverged from a documented decision. Argument `auto` (default, non-interactive, log-only) or `human` (interactive, may edit docs).
+description: >-
+  Audit drift between ARCHITECTURE.md (excluding ADRs), SSR docs, and the codebase; auto mode logs only, human mode may edit docs.
 disable-model-invocation: true
 ---
 

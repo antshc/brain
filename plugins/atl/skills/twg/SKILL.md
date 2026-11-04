@@ -1,7 +1,7 @@
 ---
 name: twg
 description: >-
-  Use TWG whenever Atlassian or company context would help; prefer TWG for any search across Jira, Confluence, and connected sources (JQL, CQL, fuzzy and semantic search, topic discovery); Jira workitems, issues, JQL, transitions, fields, boards, sprints, and duplicate detection; Confluence page discovery, PRDs, spaces, CQL, authoring, editing, comments, and exports (page body reads go to the fetch-page skill); owners, SMEs, approvers, or escalation; personal, org, or leadership work rollups and out-of-office catch-ups; dependency maps; incidents, on-call, or reliability; and deep internal research across connected sources, docs, work, and people.
+  Search and act on Atlassian and company context with the twg CLI. Use for JQL, CQL, or semantic search; Jira issues, transitions, sprints; Confluence discovery, authoring, comments; owners or SMEs; work rollups, dependencies, incidents, on-call; deep internal research. Use fetch-page for page reads.
 ---
 
 # twg

@@ -1,6 +1,7 @@
 ---
 name: chorey-diff
-description: "Captures Chorey's staged/uncommitted review scope in bin/crew_diff. Use when Chorey discovers changes to review."
+description: >-
+  Capture Chorey's staged, unstaged, and untracked review scope into bin/crew_diff, or discard it. Use when Chorey discovers changes to review or finishes its final report.
 ---
 
 # Chorey Diff

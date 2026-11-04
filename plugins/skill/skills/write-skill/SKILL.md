@@ -1,6 +1,7 @@
 ---
 name: write-skill
-description: Write or rewrite an agent skill from a brief or request using bundled best practices, then shrink it; or only shrink an existing file.
+description: >-
+  Write, rewrite, or shrink an agent skill and its bundled references.
 disable-model-invocation: true
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: publish-work
 description: >-
-  Create or update a Jira work item from a summary and a Markdown description, converting via map-markdown-adf and publishing ADF over Jira REST with one script, attachments included. Use when asked to create, open, file, or update a Jira work item/issue/story/task/bug/epic. Needs `apiToken` in `.atlassian.json.user`.
+  Create or update a Jira work item from a summary and Markdown description, attachments included. Use when asked to create, open, file, or update a Jira work item, issue, story, task, bug, or epic. Use publish-page for Confluence pages.
 argument-hint: '<summary>, <issueType>, <description-markdown>, [workItemKey], [projectKey], [parent], [attachments]'
 ---
 

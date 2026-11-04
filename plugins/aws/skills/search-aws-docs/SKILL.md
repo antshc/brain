@@ -1,6 +1,7 @@
 ---
 name: search-aws-docs
-description: Queries official AWS documentation for service concepts, API references, configuration, limits, regional availability, and best practices. Use for AWS questions, including code-adjacent API details.
+description: >-
+  Query official AWS documentation for service concepts, API references, configuration, limits, regional availability, and best practices. Use for AWS questions, 'is X available in region Y', or code-adjacent AWS API details.
 context: fork
 compatibility: Requires AWS Documentation MCP Server (https://knowledge-mcp.global.api.aws)
 ---

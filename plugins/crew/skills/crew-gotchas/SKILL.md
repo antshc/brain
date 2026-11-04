@@ -1,6 +1,7 @@
 ---
 name: crew-gotchas
-description: "Uses with the crew codey and chorey agents. Apply repository-local gotcha rules and produce reusable rule updates from implementation or review friction. Use through crew-memory skill. Use when Gotchas, **Read Gotchas**, **Write Gotchas** mentioned"
+description: >-
+  Apply repository-local gotcha rules and write reusable rule updates from implementation or review friction for the crew Codey and Chorey agents. Use through crew-memory skill when Gotchas, Read Gotchas, or Write Gotchas is mentioned.
 ---
 
 # Gotchas

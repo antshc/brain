@@ -1,6 +1,7 @@
 ---
 name: record-architecture
-description: Records settled architecture as ADRs, Concepts, Deployables, deployment topology, or glossary terms; renders concept bodies and decision bullets without persistence. Use to document architecture, not discover unresolved decisions.
+description: >-
+  Record settled architecture as an ADR, Concept, Deployable, deployment topology, or glossary term, or render a concept body or decision bullet without saving. Use for 'record an ADR', 'add a glossary term', 'document this Deployable', or 'deployment view'. Use grill-design for open decisions.
 argument-hint: "mode: adr | building-block | deployment-view | term | concept-body | concept-record | decision-bullet"
 ---
 

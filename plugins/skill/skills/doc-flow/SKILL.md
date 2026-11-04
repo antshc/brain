@@ -1,6 +1,7 @@
 ---
 name: doc-flow
-description: Draft or revise workflows as compact numbered pseudocode. Use for `flow!`, doc-flow, process flows, branching execution paths, skill handoffs, subflows, and subprocesses.
+description: >-
+  Draft or revise a workflow as compact numbered pseudocode with named subflows. Use for `flow!`, doc-flow, process flows, branching execution paths, skill handoffs, or subprocesses.
 ---
 
 # Doc Flow

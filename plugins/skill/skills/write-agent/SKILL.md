@@ -1,6 +1,7 @@
 ---
 name: write-agent
-description: Writes or rewrites a custom coding agent definition, including planner agents that decompose features into parallel task graphs, from a brief using bundled best practices, with a routing description, least-privilege tools, bounded scope, and an evidence-based output contract.
+description: >-
+  Write or rewrite a custom coding agent definition, including planner agents that decompose features into parallel task graphs.
 disable-model-invocation: true
 ---
 

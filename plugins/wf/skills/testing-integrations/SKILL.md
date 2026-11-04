@@ -1,7 +1,7 @@
 ---
 name: testing-integrations
 description: >-
-  Picks the minimal seam to test the current repo: DB/cloud component tests, functional slice on mock, real cloud, then local app via REST or GUI. Applies reproduce or regression strategies; reads run commands from repo docs. Use for integration test, functional slice, flaky test, regression.
+  Pick the minimal seam to test the current repo (DB or cloud component tests, functional slice on mock, real cloud, local app via REST or GUI) and prove it with evidence. Use for 'integration test', 'functional slice', 'flaky test', 'reproduce a bug', or 'regression test'.
 ---
 
 # testing-integrations

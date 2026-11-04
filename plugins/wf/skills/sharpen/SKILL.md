@@ -1,7 +1,7 @@
 ---
 name: sharpen
 description: >-
-  Sharpens a task prompt before work starts. Use for /sharpen, deepen a task, restate goals, in your own words, or clarify what the user is really asking; restates the goal or rewrites the prompt deeper, not bigger.
+  Rewrite a task prompt deeper, not bigger, or restate the user's real goal before work starts. Use for /sharpen, 'deepen this task', 'in your own words', or 'what am I really asking'.
 ---
 
 # Sharpen

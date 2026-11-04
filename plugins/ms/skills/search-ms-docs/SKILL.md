@@ -1,6 +1,7 @@
 ---
 name: search-ms-docs
-description: Queries official Microsoft documentation for concepts, tutorials, configuration, limits, quotas, and best practices. Use for Microsoft technology questions that do not require implementation samples.
+description: >-
+  Query official Microsoft documentation for concepts, tutorials, configuration, limits, quotas, and best practices. Use for Microsoft technology questions that need no implementation samples. Use search-ms-code-samples for API signatures and code.
 compatibility: Primarily uses the Microsoft Learn MCP Server (https://learn.microsoft.com/api/mcp); if that is unavailable, fall back to the mslearn CLI (`npx @microsoft/learn-cli`).
 ---
 

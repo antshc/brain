@@ -1,7 +1,7 @@
 ---
 name: brief-daily
 description: >-
-  Report the current Jira user's blocked work items and open items where they're @mentioned in a comment, over a period defaulting to the last month. Use when asked for a daily briefing, standup update, or to show blocked or mentioned Jira items. Queries Jira through the twg CLI; no project key required.
+  Report the current Jira user's blocked work items and open items where they're @mentioned in a comment, over a period defaulting to the last month. Use for 'daily briefing', 'standup update', 'what's blocked', or 'where was I mentioned'.
 argument-hint: '[period] (e.g. "2 weeks", "3 months"; default: 1 month)'
 ---
 

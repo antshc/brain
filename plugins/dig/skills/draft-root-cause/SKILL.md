@@ -1,6 +1,7 @@
 ---
 name: draft-root-cause
-description: Render one cited root-cause summary from a confirmed diagnosis using the shared hypothesis log and current run evidence. Print it; do not save it.
+description: >-
+  Render and print one cited root-cause summary from a confirmed diagnosis's hypothesis log and run evidence; never save it. Use for 'write the root cause', 'summarize the diagnosis', or when another skill needs the summary.
 argument-hint: "[bugSlug]"
 ---
 # Draft Root Cause

@@ -1,6 +1,7 @@
 ---
 name: diagnosing-root-cause
-description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow.
+description: >-
+  Diagnose and return the confirmed root cause of a hard bug or performance regression without fixing it. Use for 'diagnose', 'debug this', or reports of something broken, throwing, failing, or slow. Use diagnosing-bugs to also fix it.
 ---
 # Diagnosing Root Cause
 

@@ -1,5 +1,6 @@
 ---
-description: Use when asked to fix, repair, or debug-and-fix a hard bug — confirms the root cause, writes a regression test at the correct seam, applies the fix, verifies, and cleans up.
+description: >-
+  Fix a hard bug by confirming its root cause, writing a regression test at the correct seam, applying the fix, and verifying. Use when asked to 'fix this bug', repair, or debug-and-fix. Use diagnosing-root-cause to diagnose without fixing.
 name: diagnosing-bugs
 argument-hint: "{{bugDescription}}"
 ---
