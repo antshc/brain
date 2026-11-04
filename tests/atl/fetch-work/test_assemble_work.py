@@ -63,11 +63,21 @@ def test_convert_adf_to_markdown_shells_out_to_map_markdown_adf(monkeypatch):
 def test_assemble_returns_the_header_alone_for_an_empty_description(monkeypatch):
     convert = MagicMock()
     monkeypatch.setattr("assemble_work.convert_adf_to_markdown", convert)
+    monkeypatch.setattr("assemble_work.save_attachments", MagicMock(return_value={}))
 
     result = assemble("PROJ-5881", _fields(description=None), MagicMock(), "/repo/work.md.tmp")
 
     assert result.endswith("**Assignee:** Anton Shcherbyna\n\n")
     convert.assert_not_called()
+
+
+def test_assemble_appends_attachments_section_for_an_empty_description(monkeypatch, tmp_path):
+    monkeypatch.setattr("assemble_work.save_attachments", MagicMock(return_value={"trace.txt": b"t"}))
+    fields = _fields(description=None, attachment=[{"filename": "trace.txt", "size": 1}])
+
+    result = assemble("PROJ-5881", fields, MagicMock(), str(tmp_path / "work.md.tmp"), "all")
+
+    assert result.endswith("**Assignee:** Anton Shcherbyna\n\n## Attachments\n\n- [trace.txt](work.md.tmp/trace.txt)\n")
 
 
 def test_assemble_converts_real_adf_and_resolves_attachments(monkeypatch, tmp_path):
@@ -82,26 +92,51 @@ def test_assemble_converts_real_adf_and_resolves_attachments(monkeypatch, tmp_pa
         "assemble_work.restore_attachments",
         lambda jira_, key, markdown, downloaded, assets_dir_name: "![shot.png](work.md.tmp/shot.png)",
     )
+    attachments = [{"filename": "shot.png", "size": 1}]
 
     assets_dir = tmp_path / "work.md.tmp"
-    result = assemble("PROJ-5881", _fields(description=_image_body()), jira, str(assets_dir))
+    result = assemble("PROJ-5881", _fields(description=_image_body(), attachment=attachments), jira, str(assets_dir))
 
     assert result == (
         "# PROJ-5881 — Case Number Input Mask - Swagger and GUI are not Aligned\n"
         "**Status:** New · **Type:** Bug · **Assignee:** Anton Shcherbyna\n\n"
         "![shot.png](work.md.tmp/shot.png)"
     )
-    save_attachments.assert_called_once_with(jira, "PROJ-5881", str(assets_dir))
+    save_attachments.assert_called_once_with(jira, attachments, str(assets_dir), {"shot.png"})
 
 
-def test_assemble_skips_attachment_handling_when_no_reference_present(monkeypatch, tmp_path):
+def test_assemble_by_default_downloads_only_embedded_and_lists_the_rest(monkeypatch, tmp_path):
+    jira = MagicMock()
     monkeypatch.setattr("assemble_work.convert_adf_to_markdown", lambda body: "Plain text body.\n")
-    save_attachments = MagicMock()
+    save_attachments = MagicMock(return_value={})
     monkeypatch.setattr("assemble_work.save_attachments", save_attachments)
+    attachments = [{"filename": "logs.zip", "size": 2048}]
 
     assets_dir = tmp_path / "work.md.tmp"
-    result = assemble("PROJ-5881", _fields(), MagicMock(), str(assets_dir))
+    result = assemble("PROJ-5881", _fields(attachment=attachments), jira, str(assets_dir))
 
-    assert result.endswith("Plain text body.\n")
-    save_attachments.assert_not_called()
-    assert not assets_dir.exists()
+    assert result.endswith("Plain text body.\n\n## Attachments\n\n- `logs.zip` · 2.0 KB · not downloaded\n")
+    save_attachments.assert_called_once_with(jira, attachments, str(assets_dir), set())
+
+
+def test_assemble_with_all_downloads_every_attachment(monkeypatch, tmp_path):
+    jira = MagicMock()
+    monkeypatch.setattr("assemble_work.convert_adf_to_markdown", lambda body: "Plain text body.\n")
+    save_attachments = MagicMock(return_value={"shot.png": b"png"})
+    monkeypatch.setattr("assemble_work.save_attachments", save_attachments)
+    attachments = [{"filename": "shot.png", "size": 3}]
+
+    assets_dir = tmp_path / "work.md.tmp"
+    result = assemble("PROJ-5881", _fields(attachment=attachments), jira, str(assets_dir), "all")
+
+    assert result.endswith("Plain text body.\n\n## Attachments\n\n- ![shot.png](work.md.tmp/shot.png)\n")
+    save_attachments.assert_called_once_with(jira, attachments, str(assets_dir), None)
+
+
+def test_assemble_adds_no_section_when_the_issue_has_no_attachments(monkeypatch, tmp_path):
+    monkeypatch.setattr("assemble_work.convert_adf_to_markdown", lambda body: "Plain text body.\n")
+    monkeypatch.setattr("assemble_work.save_attachments", MagicMock(return_value={}))
+
+    result = assemble("PROJ-5881", _fields(), MagicMock(), str(tmp_path / "work.md.tmp"), "all")
+
+    assert result.endswith("**Assignee:** Anton Shcherbyna\n\nPlain text body.\n")

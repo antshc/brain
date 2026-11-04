@@ -13,6 +13,10 @@ diagram branch at all here — every reference resolves to either a Markdown ima
 
 A missing attachment (the description references a file no longer attached) degrades to a
 one-line note instead of failing the rest of the fetch.
+
+Attachments load on demand: by default only those the description embeds are downloaded; the
+rest are listed by name and size. `--attachments all` downloads every one (screenshots and log
+archives are often only attached, never placed in the description).
 """
 from __future__ import annotations
 
@@ -52,35 +56,16 @@ def has_attachment_placeholder(markdown: str) -> bool:
     return bool(_ATTACHMENT_PLACEHOLDER_RE.search(markdown))
 
 
-def find_attachment_reference_nodes(node: object) -> list[dict]:
-    """Recursively scan a raw ADF (sub)tree for a `media` node that references an attached file:
-    a generic-file node, or an image node (its `alt` names an image file). Pure/offline, no REST
-    — used only to decide whether it's worth touching Jira attachments at all.
-    """
-    found: list[dict] = []
-    if isinstance(node, dict):
-        node_type = node.get("type")
-        attrs = node.get("attrs") or {}
-        if node_type == "media":
-            if attrs.get("type") == "file" or _looks_like_image(attrs.get("alt", "")):
-                found.append(node)
-        for value in node.values():
-            found.extend(find_attachment_reference_nodes(value))
-    elif isinstance(node, list):
-        for item in node:
-            found.extend(find_attachment_reference_nodes(item))
-    return found
+def referenced_filenames(markdown: str) -> set[str]:
+    """Filenames (`alt`) of every `<!-- adf:attachment ... -->` placeholder the body embeds."""
+    return {match.group(2) for match in _ATTACHMENT_PLACEHOLDER_RE.finditer(markdown) if match.group(2)}
 
 
-def has_attachment_reference(body: dict) -> bool:
-    return bool(find_attachment_reference_nodes(body))
-
-
-ISSUE_FIELDS = "summary,status,issuetype,assignee,description"
+ISSUE_FIELDS = "summary,status,issuetype,assignee,description,attachment"
 
 
 def fetch_issue(jira: Jira, issue_key: str) -> dict:
-    """REST v3 issue fields: header fields plus the real ADF `description`."""
+    """REST v3 issue fields: header fields, the real ADF `description`, and attachment metadata."""
     resp = jira.get(f"rest/api/3/issue/{issue_key}", params={"fields": ISSUE_FIELDS})
     return resp["fields"]
 
@@ -105,21 +90,52 @@ def download_attachment_bytes(jira: Jira, attachment: dict) -> bytes:
     return content if isinstance(content, bytes) else content.encode("utf-8")
 
 
-def save_attachments(jira: Jira, issue_key: str, assets_dir: str) -> dict[str, bytes]:
-    """Download every attachment on the issue once and cache it under `assets_dir` (created only
-    when the issue actually has attachments), returning `{filename: bytes}` so callers can
-    resolve placeholders from memory instead of a second network round-trip.
+def save_attachments(
+    jira: Jira, attachments: list[dict], assets_dir: str, filenames: set[str] | None = None
+) -> dict[str, bytes]:
+    """Download the attachments named in `filenames` (every one when None) and cache them under
+    `assets_dir` (created only when something is downloaded), returning `{filename: bytes}` so
+    callers can resolve placeholders from memory instead of a second network round-trip.
     """
-    attachments = list_attachments(jira, issue_key)
-    if not attachments:
+    selected = [a for a in attachments if filenames is None or a["filename"] in filenames]
+    if not selected:
         return {}
     Path(assets_dir).mkdir(parents=True, exist_ok=True)
     downloaded: dict[str, bytes] = {}
-    for attachment in attachments:
+    for attachment in selected:
         content = download_attachment_bytes(jira, attachment)
         downloaded[attachment["filename"]] = content
         (Path(assets_dir) / attachment["filename"]).write_bytes(content)
     return downloaded
+
+
+def _human_size(size: int | None) -> str:
+    if size is None:
+        return "size unknown"
+    for unit in ("B", "KB", "MB"):
+        if size < 1024:
+            return f"{size:.0f} {unit}" if unit == "B" else f"{size:.1f} {unit}"
+        size /= 1024
+    return f"{size:.1f} GB"
+
+
+def attachments_section(
+    attachments: list[dict], downloaded: dict[str, bytes], referenced: set[str], assets_dir: str
+) -> str:
+    """`## Attachments` listing every attachment the body doesn't embed: a link when downloaded,
+    else name and size only. "" when nothing to list."""
+    assets_dir_name = Path(assets_dir).name
+    lines: list[str] = []
+    for attachment in attachments:
+        filename = attachment["filename"]
+        if filename in referenced:
+            continue
+        if filename not in downloaded:
+            lines.append(f"- `{filename}` · {_human_size(attachment.get('size'))} · not downloaded")
+            continue
+        link = _relative_link(assets_dir_name, filename)
+        lines.append(f"- ![{filename}]({link})" if _looks_like_image(filename) else f"- [{filename}]({link})")
+    return "## Attachments\n\n" + "\n".join(lines) + "\n" if lines else ""
 
 
 def _relative_link(assets_dir_name: str, filename: str) -> str:

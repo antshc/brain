@@ -1,7 +1,7 @@
 ---
 name: fetch-work
 description: >-
-  Fetch a Jira work item as Markdown from its key or URL, with every long field in full and embedded images cached beside it. Use when asked to fetch, read, show, or summarize a Jira work item or issue. Use fetch-page for Confluence pages.
+  Fetch a Jira work item as Markdown from its key or URL, with every long field in full and all images, attachments, and extracted zip logs cached beside it. Use when asked to fetch, read, show, or summarize a Jira work item or issue, or get its attachments. Use fetch-page for Confluence pages.
 argument-hint: '<work_item_key_or_url> (e.g. "PROJ-123" or "https://<site>.atlassian.net/browse/PROJ-123")'
 ---
 
@@ -28,17 +28,18 @@ Return a Jira **Work item** as Markdown from key or URL. REST reads the real ADF
 python3 scripts/assemble_work.py --issue-key <key> --config "<configPath>" --md-path work.md [--site https://<site>]
 ```
 
-Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description` over REST v3; converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (media nodes → placeholders); applies Attachment rules. Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body. `--assets-dir <dir>` overrides cache dir (default `work.md.tmp`, beside `work.md`).
+Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description` over REST v3; converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (media nodes → placeholders); applies Attachment rules. Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body, then `## Attachments` when any. `--assets-dir <dir>` overrides cache dir (default `work.md.tmp`, beside `work.md`).
 
-**4 — Return** `work.md` contents unchanged.
+**4 — Return** `work.md` contents unchanged, plus the assets dir path when `## Attachments` or body links point into it. Read a linked image or log file from the assets dir when the task needs it.
 
 ## Attachment rules
 
-- Detect: offline recursive scan of ADF for `media` with `attrs.type == "file"` or `attrs.alt` ending `.png|.jpg|.jpeg|.gif|.svg|.webp|.bmp`. No match → no attachment call.
-- Match → download all issue attachments to assets dir (gitignored via `*.tmp`).
-- Resolve each placeholder by `alt` (original filename) against `fields.attachment[].filename`, never `media-id` (REST doesn't expose it).
+- Always download every issue attachment to assets dir (gitignored via `*.tmp`); no attachments → no assets dir.
+- `.zip` → also extract to `<assets dir>/<file>.zip.extracted/` (absolute and `..` member paths stripped). Invalid zip → kept, not extracted.
+- Resolve each body placeholder by `alt` (original filename) against `fields.attachment[].filename`, never `media-id` (REST doesn't expose it).
   - Image → `![<filename>](work.md.tmp/<file>)`; if `width`/`height`, `display-width`, or `layout` known, next line `<!-- media-size: [width=<w> height=<h>] [display-width=<n>[%]] [layout=<layout>] -->`.
   - Other → `[<filename>](work.md.tmp/<file>)`.
+- `## Attachments` (after body) lists each attachment the body doesn't embed, plus every `.zip` with its extracted files as nested links: image → `- ![<filename>](...)`, zip → `- [<file>.zip](...) · extracted to ...` then `  - [<member>](...)`, invalid zip → `· not a valid zip, not extracted`, other → `- [<filename>](...)`. Nothing to list → no section.
 - Links percent-encoded, relative to `work.md`'s directory. No Draw.io/mermaid-sidecar rule (unlike `fetch-page` skill).
 
 ## Degraded mode

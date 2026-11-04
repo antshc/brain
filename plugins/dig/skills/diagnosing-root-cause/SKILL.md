@@ -7,7 +7,7 @@ description: >-
 
 A discipline for hard bugs. Skip phases only when explicitly justified. Find and return the confirmed root cause. Never apply the fix, if not asked to do that in further phases.
 
-**Evidence** is a re-checkable fact: `path:line`, actual probe output, or an authoritative source with canonical URL. Everything else is a lead.
+**Evidence** is a re-checkable fact: `path:line`, actual probe output, an artifact location (see Artifacts), or an authoritative source with canonical URL. Everything else is a lead.
 
 ## Shared hypothesis log
 
@@ -18,6 +18,22 @@ A discipline for hard bugs. Skip phases only when explicitly justified. Find and
 This skill has you show commands, outputs and captured artifacts. **Redact every secret first**: write `<REDACTED>` in its place. Build loops against env vars, so the credential stays in the environment rather than in what you show. Captured artifacts carry auth headers: quote only the lines that carry the signal.
 
 If the redacted output is not enough to diagnose the bug, say so and ask the user.
+
+## Artifacts
+
+**Artifact** := any user-supplied analysis input: screenshots/images, log archives (`.zip`, `.tar.gz`, `.7z`), raw log files, HAR files, dumps, recordings. Collect them from attachments and paths in the request or ticket; treat each as a lead source like code.
+
+Intake, after Domain grounding:
+
+1. **Archives:** extract a copy to `repository root/tmp/{{bugSlug}}-artifacts/{{archiveName}}/`; never modify the original. List entries first; then search by symptom text, error codes, correlation/request ids, and the reported time window. Read only matching regions.
+2. **Images:** view every image. Transcribe visible signal verbatim: error text, URL/page, timestamps, ids, UI state. Unreadable or ambiguous image → say so; ask for the original text or a sharper capture.
+3. **Correlate:** align artifact timestamps and ids with each other and with code paths before building the loop; a captured payload or log sequence is input for loop type 5 (replay).
+
+Cite artifact evidence as `{{artifact}}!{{entryPath}}:{{line}}` for archive entries, `{{logFile}}:{{line}}` for raw logs, or `{{image}}` plus the quoted visible text.
+
+Keep `@artifacts` := every artifact used: name, type, what it contributed (or `not relevant`). Pass it to `draft-root-cause`.
+
+**Done when** every supplied artifact is opened (archives extracted and listed, images viewed) and recorded in `@artifacts`.
 
 ## Domain grounding (first step)
 
@@ -151,7 +167,7 @@ A confirmed hypothesis is the root cause only when:
 2. **Fits all facts** — no known observation contradicts it.
 3. **Rivals eliminated** — every ranked `H` from Phase 3 has a log entry; all but the root cause are `falsified` with evidence.
 
-Then **MUST** *run `draft-root-cause` skill to render the final cited root-cause summary* from the shared hypothesis log plus the current run evidence: load that skill's file and follow its Gate and template.
+Then **MUST** *run `draft-root-cause` skill to render the final cited root-cause summary* from the shared hypothesis log plus the current run evidence and `@artifacts`: load that skill's file and follow its Gate and template.
 
 **MUST NOT write the summary yourself**, even when the full evidence chain is already in the session. `draft-root-cause` owns the summary format; a self-written summary that "meets the same requirements" still fails this step.
 

@@ -3,12 +3,12 @@ from unittest.mock import MagicMock
 from fetch_attachments import (
     ISSUE_FIELDS,
     _relative_link,
+    attachments_section,
     download_attachment_bytes,
     fetch_issue,
-    find_attachment_reference_nodes,
     has_attachment_placeholder,
-    has_attachment_reference,
     list_attachments,
+    referenced_filenames,
     restore_attachments,
     save_attachments,
 )
@@ -39,52 +39,13 @@ def test_has_attachment_placeholder_detects_marker():
     assert not has_attachment_placeholder("plain text, no attachments")
 
 
-def test_find_attachment_reference_nodes_detects_generic_file_media():
-    body = {
-        "type": "doc",
-        "content": [
-            {"type": "mediaGroup", "content": [{"type": "media", "attrs": {"id": "f1", "type": "file"}}]}
-        ],
-    }
-    nodes = find_attachment_reference_nodes(body)
-    assert len(nodes) == 1
-    assert nodes[0]["attrs"]["id"] == "f1"
-
-
-def test_find_attachment_reference_nodes_detects_image_media_by_alt_extension():
-    body = {
-        "type": "doc",
-        "content": [
-            {
-                "type": "mediaSingle",
-                "content": [
-                    {"type": "media", "attrs": {"id": "f2", "alt": "image-20260827-132403.png"}}
-                ],
-            }
-        ],
-    }
-    nodes = find_attachment_reference_nodes(body)
-    assert len(nodes) == 1
-    assert nodes[0]["attrs"]["id"] == "f2"
-
-
-def test_find_attachment_reference_nodes_ignores_a_plain_doc():
-    body = {
-        "type": "doc",
-        "content": [
-            {"type": "paragraph", "content": [{"type": "text", "text": "no attachments here"}]},
-        ],
-    }
-    assert find_attachment_reference_nodes(body) == []
-
-
-def test_has_attachment_reference_true_and_false():
-    assert has_attachment_reference({"type": "doc", "content": []}) is False
-    matching = {
-        "type": "doc",
-        "content": [{"type": "media", "attrs": {"id": "f1", "type": "file"}}],
-    }
-    assert has_attachment_reference(matching) is True
+def test_referenced_filenames_collects_every_placeholder_alt():
+    md = (
+        '<!-- adf:attachment media-id="1" alt="shot.png" -->\n'
+        '<!-- adf:attachment media-id="2" alt="" -->\n'
+        '<!-- adf:attachment media-id="3" alt="notes.pdf" width="1" height="2" -->'
+    )
+    assert referenced_filenames(md) == {"shot.png", "notes.pdf"}
 
 
 def test_fetch_issue_calls_rest_v3_with_header_and_description_fields():
@@ -143,24 +104,35 @@ def test_save_attachments_writes_every_attachment_and_returns_bytes_map(tmp_path
         "rest/api/3/attachment/content/1": b"png-bytes",
         "rest/api/3/attachment/content/2": "text",
     }
-    jira = _jira(attachments=attachments, downloads=downloads)
+    jira = _jira(downloads=downloads)
     assets_dir = tmp_path / "work.md.tmp"
 
-    result = save_attachments(jira, "PROJ-5881", str(assets_dir))
+    result = save_attachments(jira, attachments, str(assets_dir))
 
     assert result == {"a.png": b"png-bytes", "b.txt": b"text"}
     assert (assets_dir / "a.png").read_bytes() == b"png-bytes"
     assert (assets_dir / "b.txt").read_bytes() == b"text"
 
 
-def test_save_attachments_skips_mkdir_when_attachment_list_is_empty(tmp_path):
-    jira = _jira(attachments=[])
+def test_save_attachments_downloads_only_the_named_filenames(tmp_path):
+    attachments = [{"filename": "a.png", "id": "1"}, {"filename": "logs.zip", "id": "2"}]
+    jira = _jira(downloads={"rest/api/3/attachment/content/1": b"png-bytes"})
     assets_dir = tmp_path / "work.md.tmp"
 
-    result = save_attachments(jira, "PROJ-5881", str(assets_dir))
+    result = save_attachments(jira, attachments, str(assets_dir), {"a.png"})
 
-    assert result == {}
+    assert result == {"a.png": b"png-bytes"}
+    assert not (assets_dir / "logs.zip").exists()
+
+
+def test_save_attachments_skips_mkdir_when_nothing_is_selected(tmp_path):
+    jira = _jira()
+    assets_dir = tmp_path / "work.md.tmp"
+
+    assert save_attachments(jira, [], str(assets_dir)) == {}
+    assert save_attachments(jira, [{"filename": "a.png", "id": "1"}], str(assets_dir), set()) == {}
     assert not assets_dir.exists()
+    jira.get.assert_not_called()
 
 
 def test_relative_link_percent_encodes_spaces():
@@ -258,3 +230,43 @@ def test_restore_attachments_carries_display_width_into_the_media_size_comment()
     md = '<!-- adf:attachment media-id="image-1" alt="a.png" display-width="50%" -->'
     result = restore_attachments(MagicMock(), "PROJ-1", md, {"a.png": b"png"}, "work.md.tmp")
     assert result == "![a.png](work.md.tmp/a.png)\n<!-- media-size: display-width=50% -->"
+
+
+def _meta(*filenames: str) -> list[dict]:
+    return [{"filename": name, "size": 2048} for name in filenames]
+
+
+def test_attachments_section_links_downloaded_unreferenced_attachments(tmp_path):
+    downloaded = {"shot.png": b"png", "other.png": b"png", "trace log.txt": b"t"}
+    attachments = _meta("shot.png", "other.png", "trace log.txt")
+
+    section = attachments_section(attachments, downloaded, {"shot.png"}, str(tmp_path / "work.md.tmp"))
+
+    assert section == (
+        "## Attachments\n\n"
+        "- ![other.png](work.md.tmp/other.png)\n"
+        "- [trace log.txt](work.md.tmp/trace%20log.txt)\n"
+    )
+
+
+def test_attachments_section_lists_not_downloaded_attachments_by_name_and_size(tmp_path):
+    attachments = [
+        {"filename": "shot.png", "size": 10},
+        {"filename": "logs.zip", "size": 5 * 1024 * 1024},
+        {"filename": "trace.txt", "size": 300},
+        {"filename": "nosize.bin"},
+    ]
+
+    section = attachments_section(attachments, {"shot.png": b"png"}, {"shot.png"}, str(tmp_path / "work.md.tmp"))
+
+    assert section == (
+        "## Attachments\n\n"
+        "- `logs.zip` · 5.0 MB · not downloaded\n"
+        "- `trace.txt` · 300 B · not downloaded\n"
+        "- `nosize.bin` · size unknown · not downloaded\n"
+    )
+
+
+def test_attachments_section_is_empty_when_every_attachment_is_embedded(tmp_path):
+    section = attachments_section(_meta("shot.png"), {"shot.png": b"png"}, {"shot.png"}, str(tmp_path / "work.md.tmp"))
+    assert section == ""

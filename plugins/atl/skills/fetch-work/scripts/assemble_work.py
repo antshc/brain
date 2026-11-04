@@ -21,9 +21,10 @@ if str(_SCRIPT_DIR) not in sys.path:
 
 from env import get_jira, load_credentials, require_supported_library  # noqa: E402
 from fetch_attachments import (  # noqa: E402
+    attachments_section,
     fetch_issue,
     has_attachment_placeholder,
-    has_attachment_reference,
+    referenced_filenames,
     restore_attachments,
     save_attachments,
 )
@@ -53,20 +54,25 @@ def format_header(issue_key: str, fields: dict) -> str:
     )
 
 
-def assemble(issue_key: str, fields: dict, jira, assets_dir: str) -> str:
+def assemble(issue_key: str, fields: dict, jira, assets_dir: str, attachments_mode: str = "embedded") -> str:
     header = format_header(issue_key, fields)
     adf_body = fields.get("description")
-    if not adf_body:
-        return header
+    markdown = convert_adf_to_markdown(adf_body) if adf_body else ""
+    referenced = referenced_filenames(markdown)
 
-    markdown = convert_adf_to_markdown(adf_body)
-    if has_attachment_reference(adf_body):
-        downloaded = save_attachments(jira, issue_key, assets_dir)
-        if has_attachment_placeholder(markdown):
-            assets_dir_name = Path(assets_dir).name
-            markdown = restore_attachments(jira, issue_key, markdown, downloaded, assets_dir_name)
+    attachments = fields.get("attachment") or []
+    wanted = None if attachments_mode == "all" else referenced
+    downloaded = save_attachments(jira, attachments, assets_dir, wanted)
+    if has_attachment_placeholder(markdown):
+        markdown = restore_attachments(jira, issue_key, markdown, downloaded, Path(assets_dir).name)
 
-    return header + markdown
+    section = attachments_section(attachments, downloaded, referenced, assets_dir)
+    if not section:
+        return header + markdown
+    if not markdown:
+        return header + section
+    body = markdown.rstrip("\n")
+    return f"{header}{body}\n\n{section}"
 
 
 def main() -> None:
@@ -79,6 +85,13 @@ def main() -> None:
     parser.add_argument(
         "--assets-dir",
         help="Directory to cache this issue's attachments into (default: `<md-path>.tmp`)",
+    )
+    parser.add_argument(
+        "--attachments",
+        choices=("embedded", "all"),
+        default="embedded",
+        help="`embedded` (default): download only attachments the description embeds, list the rest; "
+        "`all`: download every attachment",
     )
     parser.add_argument("--site", help="Site URL overriding the configured `cloudId` (issue URL on another site)")
     args = parser.parse_args()
@@ -99,7 +112,7 @@ def main() -> None:
 
     jira = get_jira(credentials)
     fields = fetch_issue(jira, args.issue_key)
-    md_path.write_text(assemble(args.issue_key, fields, jira, assets_dir))
+    md_path.write_text(assemble(args.issue_key, fields, jira, assets_dir, args.attachments))
 
 
 if __name__ == "__main__":
