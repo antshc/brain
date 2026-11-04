@@ -1,6 +1,6 @@
 # Research System
 
-Prompt examples and recommendations for getting precise, evidence-backed results from the `research-system` skill.
+Prompt examples and recommendations for getting precise, evidence-backed results from the `research` skill when it inspects a codebase (Behavior, Flow, or Data axis).
 
 ## Write a strong instruction
 

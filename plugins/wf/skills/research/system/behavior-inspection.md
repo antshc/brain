@@ -2,6 +2,30 @@
 
 The document carries a mermaid diagram of the confirmed mechanism. A capability is the stable product ability; a feature and its functional slice realize it. This axis records one deployable's responsibility in that slice, framed as actor + action + object. The trace starts at this unit's triggers and stops at its observable outcomes.
 
+Route to one owning deployable and stop at effects leaving it. For an API, start with Swagger, then trace controller, DTO, validation, and outbound calls.
+
+**Output:** `docs/researches/<slug>/{{slug}}.md`, or `docs/researches/<slug>/{{chainSlug}}-{{n}}-{{deployable}}.md` when the brief asks for a lane of an existing chain.
+
+## Diagram
+
+Pick the diagram from what the question asks, then run its owning skill.
+
+| Inspection topic | Draw | Skill |
+|---|---|---|
+| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `doc-behavior-diagram` |
+| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `doc-behavior-diagram` |
+| who owns each step and where responsibility changes — handoffs across layer, modules, or teams | a **swimlane diagram** | `doc-behavior-diagram` |
+| which deployable-local functional slices and external systems a flow connects | a **container diagram** | `doc-architecture-diagram` |
+| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `doc-architecture-diagram` |
+| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `doc-architecture-diagram` |
+| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `doc-code-diagram` |
+
+A traced behavior defaults to the **sequence diagram**; *run `doc-behavior-diagram` skill for the sequence diagram's interaction order, call chain, and failure branching* before drafting it.
+
+Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep file references in the tables; use class, method, or file names with exact lines in the diagram only when the brief asks for them.
+
+Default to one: triggers enter as parallel participants meeting at the convergence point, observable outcomes leave from it. Split only when triggers diverge, selection needs a flowchart, outcomes fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
+
 ## Workflow
 
 1. **Frame** — name the capability, feature, functional slice, actor, action, object, trigger(s), and exact behavior in domain language. "When does the system reject an expired session?" beats "how does auth work?".
@@ -30,7 +54,7 @@ A behavior may have several providers behind one outcome — picked by config, f
 
 Where the wiring hides: implementations of one interface resolved by factory, keyed registration, or injected collection · separate clients chained by an orchestrator or decorator · fallback in a resilience policy, HTTP handler, or gateway, leaving the call site a single call.
 
-Cite each with a file reference per **File references** in the skill:
+Cite each with a file reference per **File references**:
 
 - **Registry** — where the set of sources is registered.
 - **Selector** — config key/flag read, value per source, default when absent, and whether it is read per call or once at startup.

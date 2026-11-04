@@ -2,6 +2,12 @@
 
 The unit is one data boundary: the governed item type, its authoritative writer, readers, and storage semantics. The boundary can cut across services and repositories.
 
+Identify the item and store first, then route every writer and reader through lookups. Verify keys, ownership, consistency, migration, concurrency, and retention in executing source.
+
+**Output:** `docs/researches/<slug>/{{slug}}-data.md`
+
+**Diagram:** none by default; the store, key, and shape tables carry the answer. When the brief asks for one, pick it from the question and run its owning skill: `doc-behavior-diagram` for access order or branching, `doc-architecture-diagram` for ownership or deployment boundaries, `doc-code-diagram` for item types and their relationships. Keep evidence in the tables.
+
 ## Workflow
 
 1. **Frame** — name the decision the data has to support. "Can two checkouts reserve the same seat?" beats "how is the booking table modeled?".

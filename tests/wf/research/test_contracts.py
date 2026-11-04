@@ -6,7 +6,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 SKILLS = REPO / 'plugins/wf/skills'
-RESEARCH = (SKILLS / 'research-system/SKILL.md').read_text()
+RESEARCH = (SKILLS / 'research/system/system-inspection.md').read_text()
 EXPLORE = (SKILLS / 'explore-codebase/SKILL.md').read_text()
 
 

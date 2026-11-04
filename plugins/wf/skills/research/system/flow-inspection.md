@@ -2,6 +2,31 @@
 
 Breadth first, depth later. One deployable and its functional slice are one lane; the chain connects related slices through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. **One chain run produces one document.** Depth inside a lane belongs to the **Behavior** axis, offered as a follow-up once the chain is complete.
 
+Map each handoff to a row, then verify sender, wire contract, receiver, and deployment or configuration binding. Stop at a terminal infrastructure boundary only after recording the operation, protocol, authentication, errors, and relevant configuration.
+
+**Output:** exactly one file, `docs/researches/<slug>/{{slug}}-chain.md`. A chain run writes no other document.
+
+## Contents
+
+- Diagram
+- Tiers
+- Deployable eligibility
+- Workflow
+- Boundary
+- Integration contract
+- Handoff evidence
+- Chain check
+- Behavior follow-up gate
+- Gotchas
+
+## Diagram
+
+Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. *Follow `doc-behavior-diagram` skill's **Swimlane Diagram** for lane ownership, handoffs, and responsibility changes* and open its swimlane template before drafting.
+
+Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
+
+Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; *run `doc-architecture-diagram` skill for the container diagram's deployables and relationships*.
+
 ## Tiers
 
 | | This axis — chain | Behavior axis — lane |

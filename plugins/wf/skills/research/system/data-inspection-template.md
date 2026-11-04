@@ -2,7 +2,7 @@
 
 **Rules** — apply while filling this scaffold, then delete this block and every `**Rules:**` line from the result.
 
-- Every repository file mention and claim carries a file reference per **File references** in the skill — a write call site, a query call site, an IaC/migration line, or a grant. A bare table or attribute name is not evidence.
+- Every repository file mention and claim carries a file reference per **File references** in the system-inspection reference — a write call site, a query call site, an IaC/migration line, or a grant. A bare table or attribute name is not evidence.
 - Stored items outrank entity classes; IaC and migrations outrank READMEs and diagrams. Record every mismatch as a finding rather than resolving it silently.
 - Access patterns and keys are filled as a pair: every pattern names what serves it, every key and index names a pattern that needs it. Leftovers on either side are findings.
 - Use `—` where a dimension genuinely does not apply to an item type; leave nothing blank.
