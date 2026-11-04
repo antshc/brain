@@ -21,7 +21,7 @@ Flow over `fetch-page` and `publish-page` skills. Goal: every inline comment kee
 4. **Jira context** only when a comment names bugs, stories, or releases: *run `preflight-atlassian` skill to resolve the credentialed twg command from `.atlassian.json.user` config*, then read-only lookups through it. Never write to Jira.
 5. **Edit** `tmp/<pageId>/page.md`. Re-run step 2: each `@sharedIds` id has all spans or none. Record `@expectedAnchors` (span count), `@presentPhrases` (edited text), `@absentPhrases` (removed text) as one-phrase-per-line files in `tmp/<pageId>/`.
 6. **Publish.** *Run `publish-page` skill to update the Confluence page from a local Markdown file, keeping inline comments attached via adf:comment anchors* with the page id and the existing title. Publish posts at most one detached-comment notice. Done when stdout JSON has `pageId`; `partialCommentRemovals` present → fix the Markdown, republish.
-7. **Verify.** `publish-page` skill **Action: Verify** with `--expect-anchors @expectedAnchors`, the phrase files, `--verify-dir tmp/<pageId>/verify`. Pass → delete `tmp/<pageId>/`. Fail → keep `tmp/<pageId>/`, report the failing check name, stop.
+7. **Verify.** Run `publish-page` skill **Action: Verify** to confirm inline comments stay attached on the republished Confluence page, with `--expect-anchors @expectedAnchors`, the phrase files, `--verify-dir tmp/<pageId>/verify`. Pass → delete `tmp/<pageId>/`. Fail → keep `tmp/<pageId>/`, report the failing check name, stop.
 8. **Report:** kept, removed, ambiguous answers, open questions, detached comments (`orphanedComments`), verification result.
 
 ## Rules

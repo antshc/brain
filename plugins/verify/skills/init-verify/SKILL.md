@@ -89,7 +89,7 @@ Write the one project-local skill, aimed at a cold agent that has never seen the
 
 For each chosen case, following the "Add a feature" steps in `proof/README.md`:
 
-1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read `proof/AGENT.md` in the repo and follow it.
+1. Explore the running app when the UI exists: *Run `playwright-cli` skill to automate a browser: navigate, snapshot, and confirm locators*. Read `proof/AGENT.md` in the repo and follow it.
 2. Missing reusable UI parts (dropdown, modal, table, form): launch a subagent whose prompt is the body of `.github/skills/verify-<app>/references/component-extractor.md`; pass the capability needed and the inventory in `proof/components/README.md`. Review the files it returns.
 3. Write the map `.github/skills/verify-<app>/features/<feature>.md` in the four-section format of `features/README.md`: sub-features, how a user gets there, one unbulleted `**(sub | scenario):**` paragraph per scenario with `**Proof:** check (evidence)`, gotchas. Add its row to `features/README.md`. User words only; no selectors, routes or wire details.
 4. Write page objects, flows and checks in `proof/pages/`, `flows/`, `checks/`; evidence adapters in `proof/adapters/` only when the kit's sources (DOM assertion, API response, network, console, storage, screenshot) do not reach the result.
@@ -99,7 +99,7 @@ For each chosen case, following the "Add a feature" steps in `proof/README.md`:
 
 For each chosen case, following the "Add a scenario" steps in `proof/README.md`:
 
-1. Explore the running app when the UI exists: *Run `playwright-cli` skill to navigate, snapshot and confirm locators*. Read `proof/AGENT.md` in the repo and follow it.
+1. Explore the running app when the UI exists: *Run `playwright-cli` skill to automate a browser: navigate, snapshot, and confirm locators*. Read `proof/AGENT.md` in the repo and follow it.
 2. Missing reusable UI parts (dropdown, modal, table, form): launch a new subagent session whose prompt is the body of `.github/skills/verify-<app>/references/component-extractor.md`; pass the control needed, the feature and page, and the `proof/components/` inventory. Review the components and scenario draft it returns.
 3. Write the map `.github/skills/verify-<app>/features/<feature>.md` in the four-section format of `features/README.md`: sub-features, how a user gets there, one unbulleted `**(sub | scenario):**` paragraph per scenario with `**Proof** check (Evidence labels)`, gotchas. Add its row to `features/README.md`. User words only; no selectors, routes or wire details.
 4. Write page objects, flows and checks in `proof/pages/`, `flows/`, `checks/`; evidence adapters in `proof/adapters/` only when the kit's sources (screenshot, network log, API response) do not reach the result.

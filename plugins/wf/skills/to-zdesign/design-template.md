@@ -86,7 +86,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 **{{the flow title| Cross Deployable Flow}}**
 
-<!-- An optional section. Include only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram**; one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
+<!-- An optional section. Include only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram** to document cross-deployable responsibility handoffs as a Mermaid swimlane; one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
 
 {{crossDeployableFlowDiagram}}
 

@@ -16,12 +16,12 @@ Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://githu
   eval "$(gh pr view <number> --repo <owner>/<repo> --json headRefName,baseRefName \
     -q '"branch=\(.headRefName)\ntarget_branch=\(.baseRefName)"')"
   ```
-4. Run `/create-worktree` skill:
+4. Run `/create-worktree` skill to create or reuse an isolated git worktree for the PR branch:
    ```
   /create-worktree $CODEBASE_REPO_PATH $target_branch $branch
    ```
    Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
-5. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH`:
+5. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH` to build the project in the worktree and report pass or fail:
    A non-pass build → **exit** and report. Never fix threads on a broken build.
 6. Run thread fetch from inside the worktree: `python3 <skill-directory>/github/fetch_threads.py <pr_url>`
 
@@ -53,7 +53,7 @@ Output is a JSON array of actionable threads. Each thread has this structure:
 
 ## 3. Verify
 
-- Run `/ralph-build` skill, then run the tests for changed files.
+- Run `/ralph-build` skill to build the project and report pass or fail, then run the tests for changed files.
 
 ## 4. Commit, push
 

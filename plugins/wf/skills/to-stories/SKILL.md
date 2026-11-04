@@ -55,7 +55,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 - The proposed table was explicitly approved before any story body was drafted.
 - Every input requirement is traced to every Functional slice that implements it, without unexplained duplication.
 - Story count matches the approved table row for row, and numbering follows table order.
-- Run `/draft-story` skill exactly once per approved row; each run produces exactly one body.
+- Run `/draft-story` skill exactly once per approved row to draft one atomic, testable User story with Acceptance Criteria; each run produces exactly one body.
 - Every heading matches `## Story {{n}} — {{deployableKind}} {{[TAG]}} {{stakeholderRequirement}}`, omitting the Initiative tag and its following space when absent.
 - Each body Title repeats the row's optional Initiative tag, Deployable kind, and verbatim Stakeholder requirement in `/draft-story`'s required order and format.
 - Jira ID and Epic ID use supplied values or `TBD`.

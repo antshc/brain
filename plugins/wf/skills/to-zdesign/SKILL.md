@@ -47,7 +47,7 @@ The reader-facing architecture-representation section is arc42's Building Block 
 
 Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold.
 
-Include the optional bold `Cross Deployable Flow` section only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram**, one lane per deployable, 1-5 major steps per lane.
+Include the optional bold `Cross Deployable Flow` section only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram** to document cross-deployable responsibility handoffs as a Mermaid swimlane, one lane per deployable, 1-5 major steps per lane.
 
 A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**`. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for the slice's flow visualization. MUST load [decision-bullet.md](./decision-bullet.md) with the file-reading tool before rendering the slice's architectural decisions; append one compact bullet per decision under `**Decisions**`. Keep method-level behavior in `Detailed Design`.
 
