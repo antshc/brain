@@ -1,6 +1,6 @@
 ---
 name: {{skillName|lowercase-hyphenated, matches folder, verb-prefix family}}
-description: {{description|third person, 100 to 300 chars, when then responsibility then result, 3 to 6 trigger keywords, no forbidden description characters}}
+description: {{description|imperative What sentence with concrete result, then Use when or Use for /name with 2 to 5 user phrases, optional sibling redirect; 60 to 300 chars; no forbidden description characters}}
 ---
 <!-- @: Add `disable-model-invocation: true` to frontmatter only for user-invoked skills. -->
 <!-- @: Pick body blocks per Block selection; delete unused blocks and every directive. -->

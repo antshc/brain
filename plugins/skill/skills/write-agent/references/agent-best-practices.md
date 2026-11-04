@@ -37,9 +37,9 @@ Each layer owns one thing. An agent defines **who**; put other content in its ow
 
 The description is a **routing interface**: it drives automatic selection (Claude Code, Gemini CLI, Copilot). Keep it short, concrete, exclusive.
 
-- Pattern: `[Capability]. Use when [trigger]. Do not use when [exclusion].`
-- One observable outcome; triggers in words users type.
-- Exclusion names the nearest sibling's territory.
+- Pattern: `[Capability]. Use when [trigger]. Do not use when [exclusion].` or `… Use [sibling] for [territory].`
+- Capability: imperative verb first, one observable outcome; triggers in words users type.
+- Exclusion or redirect names the nearest sibling's territory; prefer a redirect when a sibling owns it.
 - Reject vague, overlapping text: "expert developer", "general-purpose coding assistant", "helps with software engineering".
 - YAML-safe: quote the value or use a folded block scalar (`description: >-`) when it contains `: `, ` #`, backticks, or a leading YAML indicator.
 

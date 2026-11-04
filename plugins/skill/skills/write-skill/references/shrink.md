@@ -17,7 +17,7 @@ Make agent-facing files shorter and more consistent while preserving every behav
 1. **Inventory.** Number every behavior item per file. *Done when* every sentence maps to an item or is marked no-op or duplicate candidate.
 2. **Rewrite.** Go sentence by sentence: rule first, imperative active voice, terse, positive phrasing, normative MUST only for hard rules, consistent terms, one physical line per paragraph. *Done when* every sentence was visited.
 3. **Collapse.** Merge duplicate meanings into the authoritative place, replace repeated triads or gestures with leading words, co-locate scattered rules. *Done when* each meaning appears once per skill.
-4. **Prune.** Delete whole sentences failing the No-op test and lines without relevance. *Done when* every remaining sentence changes behavior.
+4. **Prune.** Delete whole sentences failing the No-op test and lines without relevance. In a description, cut process detail (`using bundled …`, `from a brief`) unless it sets the skill apart. *Done when* every remaining sentence changes behavior.
 5. **Re-verify.** Map the inventory 1:1 against the result; restore any lost item. Check description characters, name matches folder, links resolve, `SKILL.md` body under 300 lines. *Done when* every inventory item is present and checks pass.
 
 ## Return
