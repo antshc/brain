@@ -1,8 +1,6 @@
 # System inspection
 
-Inspector contract for a codebase part. Source of truth is this repo, not the web. Output: one Markdown file, every claim cited with a filename-only file reference whose line numbers remain visible.
-
-Inspection documents **as-built**: current state, never a delta.
+Inspect the **as-built** state using target repositories and restored packages as primary sources. Write one Markdown file with cited claims. Use File references for repository citations.
 
 ## Contents
 
@@ -17,7 +15,7 @@ Inspection documents **as-built**: current state, never a delta.
 
 ## Codebase lookups
 
-**MUST** *run `explore-codebase` skill for every codebase lookup — read-only, multi-repo targets, deployables index, graphify, symbol, flow, and config evidence*; never search directly. It owns contract material, target resolution, graph coverage, and tool selection. Start from the brief's planned lookups; add any it missed. Spawn one explore subagent per independent lookup; run dependent lookups in order. Pass each this Request:
+**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one read-only subagent per independent lookup. Sequence dependent lookups. Instruct each to *run `explore-codebase` skill for symbol, callers, flow, literal, or config evidence*. If the skill is unavailable, spawn the explore agent with the same Request and read-only contract. Pass each Request:
 
 - `@work`: question, prefixed `Exact literal \`X\`:`, `Symbol \`Type.Member\`:`, or `Names unknown:`.
 - `@shape` and `@depth`: from the table below.
@@ -31,32 +29,35 @@ Inspection documents **as-built**: current state, never a delta.
 | Behavior: trigger → executing symbol chain, names unknown | `relationship` | `medium` |
 | Behavior: known symbol's callers, implementations, double vs real | `symbol` | `medium` |
 | Data: writers and readers of an item or store | `relationship` | `medium` |
+| Isolated symbol or package call site | `symbol` | `quick` |
 | Citation line, config key, route path, table or queue name | `literal` | `quick` |
 
-The inspector structures and cites what lookups return; the inspection document is the only file written.
+For NuGet-owned claims or evidence, delegate a lookup to *run `inspect-nuget-source` skill to verify the package API or behavior from XML docs or decompiled code*. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
+
+Structure and cite returned evidence. Write only the inspection document.
 
 ## Axes
 
-Three axes, one per unit of inspection. A capability is the stable product ability in context; its features and functional slices realize it. One functional slice belongs to one deployable: Behavior inspects that slice, Flow traces the contracts connecting related slices across deployables, Data inspects one data boundary. Load only the brief's axis reference and template; leave the other two unread.
+A capability is a stable product ability realized by features and functional slices. Each slice belongs to one deployable. Behavior inspects one slice. Flow traces contracts across slices in different deployables. Data inspects one data boundary. Load only the selected axis reference and template. For isolated lookups or package API questions, write a focused Markdown report with cited findings and unknowns in the repository research location unless `@outputShape` sets the path.
 
-Write to the axis reference's output path unless `@outputShape` names a location. Every path is flat: one file directly in `docs/researches/<slug>`, no subfolder. Fill the axis template, obeying its `**Rules**` blocks and deleting every one of them from the result.
+Write one file at the axis reference's output path directly in `docs/researches/<slug>` unless `@outputShape` names a location. Fill the axis template, obey its `**Rules**` blocks, and remove them from the result.
 
-Before drafting any diagram, run its owning skill for syntax and styling; never compose Mermaid from memory. Render every Mermaid block before declaring the inspection complete.
+Run the diagram’s owning skill for syntax and style before drafting. Render every Mermaid block before completion.
 
 ## Crossing axes
 
-- A Flow run ends at the chain document. Add a Behavior follow-up only when the framed outcome depends on a lane's internal decision and its boundary contracts do not explain it. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
-- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/researches/<slug>/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the follow-up question verbatim, use its inbound contract as the entry point, use its expected outbound contracts to bound observable outcomes, and link the result from that follow-up row.
-- A Flow or Behavior inspection that reaches a persistence question whose correctness depends on ownership, keys, consistency, migration, concurrency, retention, or deletion → report it as a Data follow-up for the orchestrator.
-- Provider semantics, quotas, and API parameters behind a managed service belong to the provider, not this repo → report them as a cloud follow-up for the orchestrator.
+- End Flow at the chain document. Add a Behavior follow-up only when a lane's internal decision determines the framed outcome and boundary contracts leave it unexplained. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
+- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/researches/<slug>/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the question verbatim, start at its inbound contract, bound outcomes by expected outbound contracts, and link the result from the follow-up row.
+- In Flow or Behavior, report a Data follow-up to the orchestrator when a persistence question depends on ownership, keys, consistency, migration, concurrency, retention, or deletion.
+- Report managed-service semantics, quotas, and API parameters to the orchestrator as cloud follow-ups.
 
 ## Evidence ladder
 
 Executing source > passing test exercising this exact path > repo docs (ADR, Concept, README, ARCHITECTURE.md) > config/schema defaults > commit or PR description > code comment > inference.
 
-Tests, comments, and docs state *intent*; only executing code proves *behavior*. When they disagree, record the mismatch as a finding.
+Tests, comments, and docs state *intent*. Executing code proves *behavior*. Record mismatches as findings.
 
-IaC and migration files are executing code. An entity class is a *declaration* of shape; the serializer that writes it is the *behavior*.
+IaC and migration files are executing code. Entity classes *declare* shape. Serializers determine write *behavior*.
 
 ## Claim types
 
@@ -67,14 +68,14 @@ IaC and migration files are executing code. An entity class is a *declaration* o
 
 ## File references
 
-Format every repository file mention in the inspection document as a filename-only link followed by visible line numbers: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Keep only the start-line anchor inside the target; hide the full relative path there and keep the complete line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply this format in prose, tables, Facts, Gaps, and runtime checks, not only Evidence fields. Place each citation immediately after the claim it supports — never pool citations at the end. Quote the deciding line when short enough to settle the claim on sight. A bare path, symbol, table, or service name is not a citation.
+Use filename-only links with visible line numbers for every repository file mention: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Put the relative path and start-line anchor in the target. Keep the full line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply in prose, tables, Facts, Gaps, runtime checks, and Evidence fields. Place each citation immediately after its claim. Quote a short deciding line when it settles the claim. A bare path, symbol, table, or service name is not a citation.
 
 ## Runtime checks
 
-Static reading settles what the code *can* do; a runtime check settles what it *does*. Reach for one whenever a claim cannot be closed by reading: run the test, add a temporary log, call the endpoint, read the stored item, collect a correlation id across logs. Discard the check, keep the result.
+Static reading proves possible behavior. Verify actual behavior with a runtime check when reading leaves a claim open: run the test, add a temporary log, call the endpoint, read stored data, or correlate logs by ID. Discard the check and keep the result.
 
 ## Gotchas
 
-- **A `block` mermaid diagram rejects rhombus/diamond node shapes (`{"label"}`)** — the renderer throws. Use `flowchart` for decision shapes.
-- **A trace that ends in a double proves the wiring, not the behavior** — an environment, profile, or flag that swaps a real dependency for a mock, stub, in-memory fake, or recorded response makes the contract real and the behavior fictional. Record the double as its own Fact and follow the real implementation for behavior claims.
-- **A local development store is not the production store** — an emulator, in-memory fake, or single-node instance answers consistency, lag, and expiry questions differently from the real one, so those claims need production configuration as evidence.
+- **A `block` mermaid diagram rejects rhombus/diamond node shapes (`{"label"}`)**. Use `flowchart` for decision shapes.
+- **A trace that ends in a double proves the wiring, not the behavior** — an environment, profile, or flag may substitute a mock, stub, in-memory fake, or recorded response. Record the double as its own Fact and follow the real implementation for behavior claims.
+- **Use production configuration for consistency, lag, and expiry claims.** An emulator, in-memory fake, or single-node instance can behave differently.
