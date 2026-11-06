@@ -1,6 +1,6 @@
 # Plan: Consolidate `blast-radius` into self-contained `verify-fix`
 
-Status: **Planning only — do not implement this plan while reading it.**
+Status: **Implemented.** See [migration and validation report](verify-fix-implementation-report.md).
 
 Repository: `antshc/brain`  
 Target plugin: `plugins/review`  
