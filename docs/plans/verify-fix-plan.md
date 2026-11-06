@@ -10,7 +10,7 @@ Primary new skill: `plugins/review/skills/verify-fix/SKILL.md`
 
 Create one self-contained skill that reviews an implemented bug fix and gathers executable evidence that the fix corrects the reported defect without breaking relevant existing behavior. It must also support two explicitly requested **standalone subflows**: impact analysis (the former `blast-radius` behavior) and test assessment. Users should not have to run the complete verification workflow to ask either focused question.
 
-The previous proposal delegated impact analysis to the separate `blast-radius` skill and reused references from other skills. **That design is superseded.** A fresh agent session must be able to execute any mode by reading only `verify-fix/SKILL.md` and its own `references/`. Copy and adapt the necessary procedural guidance; do not rely on invoking `blast-radius`, `code-review`, `diagnosing-bugs`, `how`, `why`, `writing-style`, or another skill.
+The previous proposal delegated impact analysis to the separate `blast-radius` skill and reused references from other skills. **That design is superseded.** A fresh agent session must be able to execute any mode by reading only `verify-fix/SKILL.md` and its own `references/`. Copy the relevant, previously tested instructions **verbatim wherever possible**, preserving wording, ordering, examples, and gates. Adapt only what is necessary for self-contained operation and the new mode boundaries. Do not rely on invoking `blast-radius`, `code-review`, `diagnosing-bugs`, `how`, `why`, `writing-style`, or another skill.
 
 Why: a generic “review the fix” prompt encourages optimistic, diff-only conclusions. The new skill must force a risk-oriented investigation, meaningful tests, execution, and an evidence-backed verdict, while keeping lightweight focused requests fast.
 
@@ -18,11 +18,24 @@ Why: a generic “review the fix” prompt encourages optimistic, diff-only conc
 
 Read the current files from the target branch, since they may have changed since this plan was written:
 
-1. `plugins/review/skills/blast-radius/SKILL.md` — **primary source** for impact-analysis behavior. Preserve its distinguishing ideas: inspect indirect effects missed by symbol search; find and prove the one or two critical safety facts; inspect external library source, pinned versions, timing, wire/storage formats, consumers, and downstream effects; distinguish confirmed risks from cleared risks; show actual executed proof and its confidence level. Its evidence ladder is: assertion → cited source → traced impossibility → executed test/script → running-app reproduction. Adapt, do not mechanically copy references to the `how`, `why`, `writing-style`, or `arena` capabilities.
+1. `plugins/review/skills/blast-radius/SKILL.md` — **primary source** for impact-analysis behavior. Preserve its distinguishing ideas: inspect indirect effects missed by symbol search; find and prove the one or two critical safety facts; inspect external library source, pinned versions, timing, wire/storage formats, consumers, and downstream effects; distinguish confirmed risks from cleared risks; show actual executed proof and its confidence level. Its evidence ladder is: assertion → cited source → traced impossibility → executed test/script → running-app reproduction. **Move its procedure almost verbatim** into `references/impact-analysis.md`; replace only its cross-skill invocations/links and any incompatible mode/output instructions.
 2. `plugins/review/skills/code-review/references/bug-review-guidance.md` — incorporate its concise correctness, reliability, compatibility, security, and performance inspection dimensions and evidence discipline. **Do not copy** the PR inline-comment schema, reviewer axis contract, or read-only limits that conflict with test writing.
-3. `plugins/wf/skills/diagnosing-bugs/SKILL.md` — incorporate the minimized reproduction, correct test seam, red-on-pre-fix/green-on-fixed verification, original-scenario rerun, and deterministic feedback-loop principles. **Do not copy** the entire diagnosis/hypothesis process: this skill starts with an existing fix, not a new investigation.
+3. `plugins/wf/skills/diagnosing-bugs/SKILL.md` — **reuse the relevant tested instructions as close to verbatim as possible**, especially the redaction rules, Phase 1 feedback-loop options and loop-tightening, Phase 2 reproduction/minimization, the performance baseline advice, Phase 5 correct-seam and red/green test rules, and Phase 6 cleanup/verification. Preserve the original examples and commands where applicable. Do **not** copy the entire hypothesis-generation/instrumentation workflow: this skill verifies an existing fix. Preserve source attribution and the required MIT license notice when copying substantial text from this skill.
 4. `plugins/review/skills/code-review/SKILL.md`, `plugins/review/plugin.json`, and repository conventions — inspect integration and auto-discovery. Do not turn `verify-fix` into a PR-comment posting skill.
 5. Search the **whole repository** for references to `blast-radius` as a skill name or path before removing it. Update genuine invocations/documentation; ordinary prose such as “blast radius of this change” need not be renamed.
+
+## Verbatim migration policy — important implementation constraint
+
+The two source skills have been exercised previously. Treat their instructions as tested behavior, **not draft prose for a fresh rewrite**. Minimize semantic drift:
+
+- **MUST reuse exact instructions** from `blast-radius/SKILL.md` for its risk investigation, evidence ladder, executable-proof requirement, and confirmed/cleared/unproven reporting. Keep ordering and examples except where the new `impact` mode needs different entry/exit wording.
+- **MUST reuse exact relevant instructions** from `diagnosing-bugs/SKILL.md` for building and tightening a reproducible test signal, selecting a correct test seam, comparing pre-fix and post-fix behavior, rerunning the original scenario, and cleaning up diagnostic changes. Extract them into `verify-fix` references rather than replacing them with one-line summaries.
+- **MUST retain tested constraints and guardrails**, including no unsupported claims, real-code checks, deterministic reproducibility, and the rule that a shallow test can create false confidence.
+- **MUST make only minimal necessary adaptations**: route three modes, replace references to other skills with local instructions, avoid diagnosing a bug from scratch, make post-fix test creation permissible, and reconcile output/side-effect contracts. Preserve original technical examples and procedural order wherever compatible.
+- **MUST retain attribution and applicable license terms.** The current `diagnosing-bugs/LICENSE` is MIT (Copyright 2026 Matt Pocock) and requires its copyright and permission notice for copied substantial portions. Keep a copy of the required notice with the resulting skill and retain source attribution.
+- **MUST document migration deviations in the implementation report**, with original section, destination section, and the reason for any nontrivial rewrite or omission. Verify that every relevant source instruction is either migrated unchanged or explicitly accounted for. Do not paraphrase merely for style, concision, or perceived optimization.
+
+This preserves the behavior already tested in the source skills while making `verify-fix` independently runnable. It does **not** mean concatenating the entire `diagnosing-bugs` skill: diagnosis-only phases remain in their original skill.
 
 ## Public interface and mode routing
 
@@ -82,10 +95,12 @@ plugins/review/skills/
   verify-fix/
     SKILL.md                         # Router, full/focused flow, invariants, verdict gate
     references/
-      impact-analysis.md            # Adapted complete blast-radius method and proof ladder
+      impact-analysis.md            # Near-verbatim blast-radius method and proof ladder
+      bug-reproduction.md           # Near-verbatim relevant diagnosing-bugs feedback/red-green rules
       test-assessment.md            # Mapping risks to tests, seam/coverage judgment
       verification-strategies.md    # Conditional test technique selection and execution
       verification-report.md        # Mode-specific report contracts/evidence rules
+    LICENSE                          # Preserve source MIT notice for substantial copied text
   blast-radius/SKILL.md              # REMOVE after migration verification
 ```
 
@@ -94,18 +109,19 @@ Keep references one level deep and loaded by the relevant mode; the router itsel
 ## Implementation sequence
 
 1. Re-read source files and search all references on the target branch.
-2. Draft self-contained `SKILL.md`, mode routing, and references. Preserve distinct source behavior, not irrelevant historical wording.
+2. Copy the tested blast-radius and relevant diagnosing-bugs instruction sections nearly verbatim into local references. Add only the routing, mode boundaries, and verification-specific instructions required for self-containment. Record and justify material deviations.
 3. Test routing against six representative prompts: full verification, implicit blast radius, explicit `impact`, implicit test assessment, explicit `assess-tests`, and ambiguous scope requiring clarification.
 4. Test full-mode evidence gate on a representative bug fix and ensure read-only modes do not edit tests or production files.
-5. Compare migrated impact guidance against the original `blast-radius` point by point; only then remove `blast-radius/SKILL.md` and update references.
+5. Compare migrated instructions against both original source skills section by section, recording unchanged copies, necessary adaptations, and intentionally excluded diagnosis-only steps. Check the required MIT notice. Only then remove `blast-radius/SKILL.md` and update references.
 6. Validate skill metadata, links, markdown style, and repo-specific skill checks; report exact changed paths and test outcomes.
 
 ## Acceptance criteria
 
 - One discoverable `verify-fix` under `plugins/review`, with **three independent modes** and no runtime reliance on another skill.
-- Existing `blast-radius` capabilities retained in `impact` mode and original skill retired after migration.
+- Existing, previously tested `blast-radius` instructions retained as close to verbatim as possible in `impact` mode and original skill retired only after point-by-point comparison.
 - `assess-tests` works independently, with no test-writing side effect by default.
 - `full` reviews correctness, adds missing meaningful tests where feasible, runs relevant existing and new tests, and returns evidence-backed verdicts.
+- Relevant, previously tested `diagnosing-bugs` reproduction and regression-test instructions are incorporated nearly verbatim, with retained attribution/license notice and documented deviations.
 - No production-code changes, PR posting, or unexpected repo mutations from the verification skill.
 - A fresh implementer can follow this plan and the source paths without needing this conversation.
 
