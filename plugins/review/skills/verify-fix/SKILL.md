@@ -74,4 +74,4 @@ Run a closing completeness sweep: re-read the requested scope and map each oblig
 
 ## Attribution
 
-Impact method adapted from Cursor pstack's blast-radius; reproduction/regression-test instructions adapted from [Matt Pocock's diagnosing-bugs](https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs). Retain the bundled [MIT notice](LICENSE). These are source attributions, not runtime dependencies.
+Impact method adapted from Cursor pstack's blast-radius; reproduction/regression-test instructions adapted from [Matt Pocock's diagnosing-bugs](https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs). These are source attributions, not runtime dependencies.
