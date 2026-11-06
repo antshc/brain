@@ -31,6 +31,15 @@ Accept a diff, commit, branch, local change, or PR checkout; optional explicit f
 
 Identify repository instructions, target/head, pre-fix baseline, original bug/repro if available, changed paths, affected behavior, and test entry points. Pin commit IDs for committed targets; record local diff/state for uncommitted targets. For PRs, read title/body and commits through available read-only GitHub tooling; compare the checked-out head against the PR baseline. If the target changes during verification, reassess affected evidence before reporting.
 
+### PR worktree
+
+For every PR target, inspect and test the full PR source in an isolated worktree before running the selected mode.
+
+1. Resolve the repository's main checkout and reuse its `.worktrees/` directory; create it if absent. Inspect `git worktree list` and choose a unique run-owned child path; never overwrite an existing worktree.
+2. Fetch the PR head, including fork PRs, and pin its commit SHA. Create the checkout with `git worktree add --detach <repo>/.worktrees/verify-fix-pr-<number>-<run-id> <PR_HEAD_SHA>`. Confirm its HEAD matches the pinned PR head; leave the caller's branch and dirty changes untouched. If acquisition fails, report the blocker rather than review a different revision.
+3. Run source inspection and checks from that worktree. Create any pre-fix comparison worktree under the same `.worktrees/` directory at a distinct run-owned path.
+4. Remove only clean worktrees created by this run. Preserve worktrees containing new or updated tests or other unexported work; report their paths. Never force-remove a dirty worktree or delete the shared `.worktrees/` directory.
+
 When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
 Done when scope and baseline are explicit, or ambiguity has been returned for clarification. Missing original-defect evidence is a stated limitation; do not invent it.
