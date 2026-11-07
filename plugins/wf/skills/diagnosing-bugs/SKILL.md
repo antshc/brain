@@ -99,6 +99,8 @@ Each hypothesis must be **falsifiable**: state the prediction it makes.
 
 If you cannot state the prediction, the hypothesis is a vibe: discard or sharpen it.
 
+If the bug appears only after a restart, rank persisted state first: config files, caches, lock files, serialized state.
+
 **Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it; proceed with your ranking if the user is AFK.
 
 ## Phase 4: Instrument
@@ -115,7 +117,7 @@ Tool preference:
 
 **Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
 
-After each check, append the result per [Hypothesis log](references/hypothesis-log.md), including checks that end blocked. A cause is confirmed when re-checkable evidence connects it to the reproduced symptom through an ordered mechanism and it fits the observations. A blocked probe does not confirm a cause. If the cause remains unconfirmed, clean up and report the blocker, what was checked, and the log path.
+After each check, append the result per [Hypothesis log](references/hypothesis-log.md), including checks that end blocked. A cause is confirmed when re-checkable evidence connects it to the reproduced symptom through an ordered mechanism and it fits the observations. The chain MUST end at the **first wrong decision**: keep asking "why" until the answer is code doing something it should not, or failing to handle a state it should handle, not a consequence of an earlier step. A blocked probe does not confirm a cause. If the cause remains unconfirmed, clean up and report the blocker, what was checked, and the log path.
 
 ## Phase 5: Fix + regression test
 
@@ -131,9 +133,20 @@ If a correct seam exists:
 
 1. Turn the minimised repro into a failing test at that seam.
 2. Watch it fail. If you forced the red by mutating code or a fixture, `diff` against a pristine copy to prove the mutation landed before you trust it.
-3. Apply the fix.
+3. Apply the fix per Fix location.
 4. Watch it pass.
-5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
+5. Search for the same faulty pattern elsewhere; fix every instance or list the ones left.
+6. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
+
+Without a seam, run steps 3, 5, and 6.
+
+### Fix location
+
+Fix at the root cause, not where the symptom surfaced. Decide by the triggering state:
+
+- **Legitimate state** (system may be in it): the code that broke on it is the root cause; handle the state there.
+- **Illegitimate state** (should never exist): fix whatever produced it. A guard, retry, swallowed error, clamped value, or discarded state at the break point hides the bug; MUST NOT ship one as the fix.
+- A workaround needing a paragraph-long justifying comment signals the wrong location; fix the code instead.
 
 ## Phase 6: Cleanup
 
@@ -149,6 +162,8 @@ For a fix, also verify:
 
 ## Output
 
-For a confirmed cause, use [Root-cause report](references/root-cause-report.md) with the hypothesis log and current evidence. Track any user-supplied artifacts used during diagnosis and what each contributed. For a fix, also report the change, regression-test result or missing seam, and verification of the original scenario. Include the hypothesis log path.
+For a confirmed cause, use [Root-cause report](references/root-cause-report.md) with the hypothesis log and current evidence. Track any user-supplied artifacts used during diagnosis and what each contributed. For a fix, also report the change, regression-test result or missing seam, other instances of the pattern fixed or left, and verification of the original scenario. Include the hypothesis log path.
+
+If the deciding fact took a deep dig to find, propose a cheap always-on signal (log line, metric, assertion, error message) that would have shown it at first look.
 
 Based on [Matt Pocock's diagnosing-bugs](https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs). See [LICENSE](LICENSE).

@@ -28,6 +28,7 @@ Fill the Template:
 - **Ruled out** — falsified hypotheses and their deciding evidence.
 - **Artifacts** — every analysis input artifact, including ones found not relevant.
 - **Known gap / tracking** — only when supported by current evidence.
+- **Prevention** — other instances of the same fault and a cheap always-on signal that would have shown the deciding fact; only when supported by current evidence.
 
 Every mechanism claim MUST cite re-checkable evidence via its Evidence row id (`E1`, `E2`, …). Unsupported claims are omitted or marked `Unknown`.
 
@@ -112,6 +113,12 @@ This reads as a **{{verdict|regression, bug, works as designed, feature request}
 
 <!-- @: omit section if unsupported -->
 {{ticket id, TODO path:line, or upstream issue URL}}
+
+## Prevention
+
+<!-- @: omit section if unsupported -->
+- **Same fault elsewhere:** {{path:line list or `none found`; cite Evidence row ids}}
+- **Signal:** {{cheap always-on log, metric, assertion, or error message that would have shown the deciding fact}}
 ```
 
 ## Redact
