@@ -10,11 +10,11 @@ Orchestrator. Pick the task row, read each listed reference fully (no previews),
 
 ## Top rules
 
-- **Cut every word that does no work.** "In order to" is "to". "It is important to note that" is nothing.
-- **Use the short, everyday word.** "Use", not "utilize". "Do", not "perform". A long word must buy its length with precision.
+- **Cut words that add no information.**
+- **Prefer everyday words.** Use a longer word when it is more precise.
 - **When a rule makes a sentence worse, fix the sentence another way or leave it alone.** A sentence that follows every rule and sounds machine-written has failed.
 - **The codebase is the word list.** Write the real symbol, file, flag, or command name, not a synonym or a description.
-- **Don't invent jargon.** Use words a developer says out loud: "move", "delete", "a budget that only decreases", not "evacuate", "ratchet", "endgame". A named pattern is fine when the doc defines it on first use.
+- **Describe the operation in plain language.** Define named patterns on first use.
 
 ## Routing
 
@@ -35,4 +35,4 @@ Doc-mode choice (tutorial, how-to, reference, explanation) applies to whole docu
 
 1. Draft with the structure and sentence references.
 2. Apply Unslop last. Preserve meaning and tone.
-3. Hand back the text. For a review, list each fix with its rule number from `references/unslop.md`.
+3. Hand back the text. For a review, list each fix with its guideline heading from `references/unslop.md`.

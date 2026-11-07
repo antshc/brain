@@ -1,62 +1,29 @@
----
-name: unslop
-description: Cut AI tells from any writing.
-disable-model-invocation: true
----
-
 # Unslop
 
-Edit text to remove AI patterns. Scan for the patterns below, then rewrite. Preserve meaning and match the intended tone.
+Edit the supplied prose for its audience. Keep the author's meaning, level of certainty, and intended tone. Treat code, commands, citations, identifiers, quotations, and captured output as source material.
 
-## Patterns to detect and fix
+## Ground each claim
 
-Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
+Name the source of an attributed claim. Drop unsupported assertions and loose trailing clauses that imply an effect the text never establishes. Describe behavior through the actor, action, and observable result. Close with a finding, decision, or next action when the text has one.
 
-### Content
+- **Before.** The migration improves operational confidence, supporting better recovery.
+- **After.** The migration records the last completed batch so the worker can resume after a restart.
 
-3. **Superficial -ing phrases.** "highlighting...", "ensuring...", "reflecting...", "showcasing...", "fostering...". Delete or expand with real sources.
-5. **Vague attributions.** "Experts believe", "Industry reports suggest", "Some critics argue". Name the source or delete.
+## Make the sentence easy to parse
 
-### Language
+Name the actor where it matters. Use direct verbs and everyday words. Give one idea its own sentence when a clause is hard to follow. Replace vague intensifiers with a measurement when one is available. Use complete sentences where shorthand would make the reader reconstruct the thought. Leave passive voice where the actor is unknown or irrelevant.
 
-7. **AI vocabulary.** Additionally, crucial, delve, enduring, enhance, fostering, garner, interplay, intricate, landscape (abstract), pivotal, showcase, tapestry (abstract), testament, underscore, vibrant. Replace with plain words.
-8. **Fancy ways to say "is".** "serves as", "stands as", "boasts", "features". Say "is" or "has".
-9. **"Not just X, but Y."** State the point directly instead.
-10. **Rule of three.** Don't force ideas into groups of three. Use the natural number.
-11. **Synonym cycling.** Protagonist, main character, central figure, hero all in one paragraph. Pick one, repeat it.
-12. **False ranges.** "from X to Y" where X and Y aren't on a meaningful scale. List topics directly.
+- **Before.** Restoration was successfully facilitated by the worker in a relatively short timeframe.
+- **After.** The worker restored the snapshot in 18 seconds.
 
-### Style
+## Keep terms and structure literal
 
-13. **Em dash overuse.** Avoid em dashes entirely. Use periods or commas only (no parentheses, no en dashes, no hyphen-as-dash substitutes). If a thought needs separation, end the sentence or use a comma.
-14. **Colon overuse.** Colons are fine before a list or example, not as mid-sentence connectors. "If you're coming from traditional automation: instead of registering event handlers, you describe conditions" adds nothing with the colon. Rewrite to let the point stand on its own without comparison framing. "Describing when the scheduler should fire works best as plain English." Same meaning, no crutch punctuation.
-15. **Boldface overuse.** Don't bold every proper noun or acronym.
-16. **Inline-header lists.** The tell is a bold label and colon that restates the line: "**Performance:** Performance improved...". Convert those to prose. A bold lead-in that ends in a period, names the item, and is followed by genuinely new detail ("**Schema in TypeScript.** Tables live in one file.") is fine, not a tell.
-17. **Title case headings.** Use sentence case.
-18. **Decorative emojis.** Remove from headings and bullets.
-19. **Curly quotes.** Use straight quotes.
+Repeat the same name for the same thing. Use the actual component name or describe what it does when a metaphor would make the reader guess. Group items by their relationship and let that determine the list length. Use a range only when its endpoints belong to the same scale. State a contrast only when the reader needs both sides.
 
-### Communication artifacts
+## Clear the page
 
-20. **Chatbot phrases.** "I hope this helps!", "Let me know if...", "Of course!", "Certainly!", "Found the smoking gun!" Remove.
-22. **Sycophantic tone.** "Great question! You're absolutely right!" Respond directly.
+Use sentence case for headings and straight quotation marks in prose. Use bold for information the reader needs to spot and avoid decorative emoji. Remove list labels that repeat their own sentence. Use a colon to introduce a list or an example. When thoughts need separation, use a period or a comma where the grammar allows.
 
-### Filler
+## Read it as the recipient
 
-23. **Filler phrases.** "In order to" becomes "To". "Due to the fact that" becomes "Because". Delete "It is important to note that".
-24. **Excessive hedging.** "could potentially possibly be argued that it might" becomes "may".
-25. **Generic conclusions.** "The future looks bright." State specific plans or facts.
-
-### Jargon
-
-26. **Abstract metaphor nouns.** Substrate (base), wedge, wedge in (add), vector (way, method), locus, vantage, nexus, primitive as a noun, harness as a metaphor, surface as in "API surface", bedrock, scaffolding as a metaphor, modality, paradigm, gold-plating (more than the job needs), ratchet as a metaphor (the mechanism's real name, or a limit that only tightens), evacuate for moving code (move out), endgame (the last phase), north star, flywheel. These read as technical but usually have a plainer concrete word. Pick the concrete word.
-
-### Plain speech
-
-27. **Say what it does, not how it feels.** "the database stays close at hand", "SQL you can read", "types that follow your schema" name a feeling. The fix names the mechanism or a number: "`.toSQL()` returns the exact string sent to the database", "a column rename fails the build". Ask what the sentence tells the reader to do or know, then write that. If you can't restate it as a concrete instruction, fact, or number, cut it. One more check: if the sentence could appear unchanged in another project's docs, it says nothing about this one. Cut it.
-28. **Shorten or split dense sentences.** If the reader has to backtrack to parse a sentence, break it in two or drop clauses. One idea per sentence.
-29. **Active voice.** Prefer it. Catch "is/are/was/were + past participle" and name the actor: "queries are validated" becomes "the compiler validates queries", "the file is parsed by the loader" becomes "the loader parses the file". Passive is fine only when the actor is unknown or genuinely doesn't matter.
-30. **Cut adverbs, or use a stronger verb.** "runs quickly" becomes "is fast" or the number, and "significantly improves" becomes the measured delta. An adverb propping up a weak verb means the verb is wrong.
-31. **Prefer the plain word.** "utilize" and "leverage" become "use", "facilitate" becomes "help", "numerous" becomes "many", "in the event that" becomes "if". The fancier synonym is rarely clearer.
-32. **Mannered prose.** Metaphor or flourish where a literal phrase exists: aphorisms ("wire it or delete it"), rhetorical fragments for effect, personified code ("the plan holds it"), figurative verbs ("rides along", "stands on"), stock framing phrases. "A dial worth turning" becomes "a parameter worth varying". Say what you mean. Rule 26 covers the metaphor nouns.
-33. **Over-compression.** Dropped articles, verbless fragments, symbol-speak, and abbreviations that make the reader decode instead of read. "Parser rejects bad date → exit 2, no write" becomes "The parser rejects a bad date, exits with code 2, and writes nothing." Write whole sentences with their articles and verbs, and spell out arrows and abbreviations.
+Remove greetings, praise, canned closings, and verbal padding when they add no information. Keep qualifiers that change the claim and remove stacked qualifiers that repeat it. Read the revision once for natural rhythm, then compare it with the input for changes to facts, scope, or confidence.
