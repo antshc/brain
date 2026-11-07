@@ -1,7 +1,7 @@
 ---
 name: fetch-work
 description: >-
-  Fetch a Jira work item as Markdown from its key or URL, with every long field in full and all images, attachments, and extracted zip logs cached beside it. Use when asked to fetch, read, show, or summarize a Jira work item or issue, or get its attachments. Use fetch-page for Confluence pages.
+  Fetch a Jira work item as Markdown with attachments and a linked comments file. Use when asked to fetch, read, show, or summarize a Jira work item or issue, or get its attachments or comments. Use fetch-page for Confluence pages.
 argument-hint: '<work_item_key_or_url> (e.g. "PROJ-123" or "https://<site>.atlassian.net/browse/PROJ-123")'
 ---
 
@@ -30,7 +30,15 @@ python3 scripts/assemble_work.py --issue-key <key> --config "<configPath>" --md-
 
 Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description` over REST v3; converts via *`map-markdown-adf` skill to convert Atlassian Document Format (ADF) back to Markdown, preserving source wording verbatim* **Action: Convert ADF to Markdown** (media nodes → placeholders); applies Attachment rules. Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body, then `## Attachments` when any. `--assets-dir <dir>` overrides cache dir (default `work.md.tmp`, beside `work.md`).
 
-**4 — Return** `work.md` contents unchanged, plus the assets dir path when `## Attachments` or body links point into it. Read a linked image or log file from the assets dir when the task needs it.
+**4 — Fetch comments.** *Run `twg` skill for Jira workitem comments via CLI*, using Preflight's credentialed `twg` command and the same site as the work item:
+
+```bash
+twg jira workitem get <key> --comments --site https://<site> -o json > work.comments.json
+```
+
+Save complete command output unchanged beside `work.md`; no parser or extraction. For another Markdown filename, use `<stem>.comments.json` beside it. Confirm command success and no comment-retrieval error in the output, then append `## Comments` with `[Comments](work.comments.json)` to `work.md` (relative link matching the saved filename). Keep the file and link even when no comments exist. On failure, report it and append a comments-retrieval failure note instead of a success link; keep the fetched work item.
+
+**5 — Return** `work.md` contents unchanged, including its comments reference or failure note, plus the assets dir path when `## Attachments` or body links point into it. Read the linked comments, image, or log file when the task needs it.
 
 ## Attachment rules
 
@@ -50,4 +58,4 @@ Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description` over RES
 ## Gotchas
 
 - **MUST NOT `find`/`grep`/`ls -R` to locate this skill's directory.** Use the parent of the `SKILL.md` path you were given.
-- Comments, links, or other fields beyond the header → *follow `twg` skill for Jira workitems* with Preflight's `twg` (`jira workitem get <key> --comments`); never patch them into `work.md`.
+- Keep comment output in the linked sidecar; only its reference or retrieval failure note goes into `work.md`. Other fields beyond the header → *follow `twg` skill for Jira workitems via CLI* with Preflight's credentialed command.
