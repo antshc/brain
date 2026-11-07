@@ -32,11 +32,11 @@ Skip subsystem grounding only when the work is genuinely greenfield with no surr
 
 ## Phase B: Sketch
 
-Run the `arena/arena.md` procedure with the design-sketch task and the Phase A grounding artifacts. Pass `arena/runner-prompt.md` as each runner's prompt, plus the absolute paths of `SKILL.md`, `design/design.md`, `design/rationale-template.md`, and every `principles/` file cited in `arena/runner-prompt.md`.
+Run the `arena/arena.md` procedure with the design-sketch task and the Phase A grounding artifacts. Pass `arena/runner-prompt.md` as each runner's prompt, plus the absolute paths of `SKILL.md`, `design/design.md`, and `design/rationale-template.md`.
 
 Take the runners from the `architect runners` role in `models.md`. Alias and rejected entries follow the runner rules in arena Phase A.
 
-With multiple runners, require structurally distinct candidates before synthesis, per *Exhaust the design space* in `principles/exhaust-the-design-space.md`. Whole-shape alternatives, not point fixes inside one shape.
+With multiple runners, require structurally distinct candidates before synthesis, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Exhaust the design space` principle*. Whole-shape alternatives, not point fixes inside one shape.
 
 Screen every candidate against `design/design-red-flags.md` and the Repo docs rules before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
 
@@ -82,14 +82,14 @@ Stop the Architect procedure and return the accepted sketch to the caller for `/
 
 Work in the current working tree and branch. The synthesized sketch is the contract.
 
-1. Scaffold: write the accepted sketch's types, signatures, and `not implemented` bodies into their target modules; commit as its own commit, per *Foundational thinking* in `principles/foundational-thinking.md`. Done when the scaffold commit exists.
-2. Fill in: replace `not implemented` bodies with code and pseudocode with logic. Planned, scoped breakage during fill-in is fine, per *Outcome-oriented execution* in `principles/outcome-oriented-execution.md`. Done when no `not implemented` body from the sketch remains and the repo's build and tests pass.
+1. Scaffold: write the accepted sketch's types, signatures, and `not implemented` bodies into their target modules; commit as its own commit, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Foundational thinking` principle*. Done when the scaffold commit exists.
+2. Fill in: replace `not implemented` bodies with code and pseudocode with logic. Planned, scoped breakage during fill-in is fine, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Outcome-oriented execution` principle*. Done when no `not implemented` body from the sketch remains and the repo's build and tests pass.
 3. Deviations: when code needs something the sketch didn't anticipate (new parameter, type, dependency, module), classify it: sketch wrong, requirement missed, or implementation overreaching. Make evidence-backed corrections, update the sketch, synthesized design, and rationale, and append to `review-log.md`; with checkpoint, surface material changes for approval. Do not silently change user requirements or exceed authorized scope.
 4. Watch for Phase F tells throughout; on a pattern, go to Phase F.
 
 ## Phase F: Scrap when the architecture is wrong
 
-If implementation keeps producing friction the sketch can't absorb, throw the sketch out. Don't bolt fixes onto a wrong design, per *Redesign from first principles* in `principles/redesign-from-first-principles.md` and *Fix root causes* in `principles/fix-root-causes.md`.
+If implementation keeps producing friction the sketch can't absorb, throw the sketch out. Don't bolt fixes onto a wrong design, per *run `principles` skill; read its body in full, then load in full the files its Index maps to the `Redesign from first principles` and `Fix root causes` principles*.
 
 The signal is a pattern, not single instances. Tells:
 
@@ -106,8 +106,8 @@ When you scrap:
 
 1. Tell the user which tells fired, with file evidence; append to `review-log.md`.
 2. Run the `how/how.md` procedure over what's been built.
-3. Redesign as if the new constraints had been day-one assumptions, per *Redesign from first principles* in `principles/redesign-from-first-principles.md`.
-4. Subtract before adding, per *Subtract before you add* in `principles/subtract-before-you-add.md`. The new sketch is smaller than the old one before it grows.
+3. Redesign as if the new constraints had been day-one assumptions, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Redesign from first principles` principle*.
+4. Subtract before adding, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Subtract before you add` principle*. The new sketch is smaller than the old one before it grows.
 5. Return to Phase B and re-run arena, then Phase C review.
 
 ## Outputs

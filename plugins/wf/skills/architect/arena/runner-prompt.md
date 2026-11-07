@@ -2,7 +2,7 @@
 
 The orchestrator passes this file through to every candidate runner during Phase B and fills in the variable inputs around it: the task, the Phase A grounding artifacts, the isolated working directory, and the path to write outputs. The working directory is a git worktree when available, otherwise the repo itself, read-only. Outputs go to the candidate directory `<artifact-root>/candidate-<n>/`. What matters is independence between candidates.
 
-You are producing one candidate design in architect's exploration. Read the architect `SKILL.md`, `design/design.md`, and every principle file the orchestrator passes from `principles/` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package into your candidate directory, per *Artifact layout* in `SKILL.md`:
+You are producing one candidate design in architect's exploration. Read the architect `SKILL.md` and `design/design.md` in full first; the orchestrator passes their paths. That's the workflow you're inside. Output a candidate design package into your candidate directory, per *Artifact layout* in `SKILL.md`:
 
 - `rationale.md`: shaped per `design/rationale-template.md` (path passed by the orchestrator); leave Synthesis decision empty.
 - `module-map.md`: each new, modified, or deleted file by real repo-relative path, with its sketch file.
@@ -13,12 +13,12 @@ Apply the following discipline. The orchestrator evaluates candidates on these a
 - Caller's usage first. Write the README-style usage and two or three real call sites before the types, then derive the type sketch from them. The usage is the spec. The two must agree, so reconcile the sketch to the usage, not the reverse.
 - Data structures first. Get the core types right and the code becomes obvious. Trace each dominant access pattern through the proposed structure. If the answer is "we'll add a map / index / cache later," the structure is wrong.
 - Interface depth. Compare the capability hidden behind the public surface relative to the size of that surface. Prefer a simple interface that pulls complexity into the callee, even when the implementation becomes less simple. Do not put transport or wire types on the public API. Parse into domain types behind the interface.
-- Shared state: if two actors might both write, ask "what happens?" If the answer isn't "nothing," default to per-actor state with a merge at the read boundary, per *Separate before serializing shared state* in `principles/separate-before-serializing-shared-state.md`.
+- Shared state: if two actors might both write, ask "what happens?" If the answer isn't "nothing," default to per-actor state with a merge at the read boundary, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Separate before serializing shared state` principle*.
 - Make boundaries visible. `not implemented` errors for bodies, `// TODO` pseudocode for tricky logic, doc comments stating intent and invariants. A reader should trace data from input to output by reading types and signatures alone.
-- Encode invariants in types: hard-to-misuse types > runtime checks > prose comments, per *Encode lessons in structure* in `principles/encode-lessons-in-structure.md`.
-- Validate at boundaries, trust types inside, per *Boundary discipline* in `principles/boundary-discipline.md`. Business logic as pure functions. The shell stays thin.
+- Encode invariants in types: hard-to-misuse types > runtime checks > prose comments, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Encode lessons in structure` principle*.
+- Validate at boundaries, trust types inside, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Boundary discipline` principle*. Business logic as pure functions. The shell stays thin.
 - Single source of truth per invariant. Derive instead of sync.
-- Idempotent state transitions where applicable, per *Make operations idempotent* in `principles/make-operations-idempotent.md`. Ask what happens if the operation runs twice or crashes halfway.
-- Short call chains. If tracing the flow needs more than three files, flatten the hierarchy, per *Laziness protocol* in `principles/laziness-protocol.md` and *Minimize reader load* in `principles/minimize-reader-load.md`.
+- Idempotent state transitions where applicable, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Make operations idempotent` principle*. Ask what happens if the operation runs twice or crashes halfway.
+- Short call chains. If tracing the flow needs more than three files, flatten the hierarchy, per *run `principles` skill; read its body in full, then load in full the files its Index maps to the `Laziness protocol` and `Minimize reader load` principles*.
 
 Produce the best design your model can make, including alternatives considered and rejected. When other runners participate, don't hedge against them: differences between candidates inform base selection and grafting.
