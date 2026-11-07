@@ -193,7 +193,7 @@ Code and technical solution review skills with modular standards and guidance.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
 - [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from a standalone `[#{{initiative-id}}]` marker in the PR description; accepts a user PR URL or a factory-mode call and fetches the diff into a fresh detached review worktree without cloning.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
-- [verify-fix](plugins/review/skills/verify-fix/SKILL.md): verify bug fixes with executable evidence; supports standalone impact analysis (blast radius) and test assessment. Includes the tested pstack impact method and Matt Pocock reproduction guidance.
+- [test-gaps](plugins/review/skills/test-gaps/SKILL.md): map a change's risks to existing tests, judge assertion strength, and return prioritized missing test cases. Invoke as `review:test-gaps`.
 
 ### atl
 
