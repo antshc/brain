@@ -44,6 +44,6 @@ Step 4 is usually one small script that imports the same library the app ships a
 - **Cleared.** What you checked and why it's fine.
 - **Before you merge.** The cheapest test or repro that catches the real bug, including the script you wrote.
 
-*Run `writing-style` skill to review prose and remove AI tells* using **Unslop only** on the assembled report. Apply upstream Unslop to prose only. Preserve citations, commands, observed output, proof status, and risk judgments. Strip private details before sharing publicly.
+*Run `writing-style` skill to review prose and remove AI tells* using **Unslop only** on the assembled report. Edit prose only. Preserve citations, commands, observed output, proof status, and risk judgments. Strip private details before sharing publicly.
 
 **Reply:** the writeup above, with the one safety fact either proven or marked unproven.
