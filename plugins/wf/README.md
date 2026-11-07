@@ -4,6 +4,8 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-spec/SKILL.md), [to-tickets](skills/to-tickets/SKILL.md)) supports GitHub only. Each skill bundles its own GitHub reference; [init-wf](skills/init-wf/SKILL.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [bootstrap-docs](skills/bootstrap-docs/SKILL.md) remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
+[subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) owns How for current code behavior and Why for historical rationale alongside its existing inspection routes.
+
 [grill-design](skills/grill-design/SKILL.md) owns session-ledger operations through its [track-ledger reference](skills/grill-design/references/track-ledger.md), including ownership, resumable questions, and pending writes. It loads closing, verification, and external-source procedures on demand from its bundled references; `track-ledger` is not a standalone skill or command.
 
 Its interview presents the entire ready decision frontier as one numbered batch per round, with recommendations phrased for "yes" to accept. Dependent questions wait for later rounds; partial answers leave the remaining ready questions together for batched follow-up. Inline recording and user-controlled closure remain unchanged.

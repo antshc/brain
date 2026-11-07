@@ -12,7 +12,7 @@ The scope is what the user names. Otherwise it is the branch diff from its merge
 
 ## Fan out
 
-Run Phase A steps 3 and 4 and Phase B of `arena/arena.md`, with four changes. Take the runners from the `interrogate reviewers` role in `models.md`; N is the caller's `adversaries` count (1–3), default 1, never `arena-agents`. Copy the scope's uncommitted changes into each worktree. Spawn each adversary as `general-purpose`. In place of the arena task and rationale, give each adversary the scope, the intent, and this brief:
+*Run `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Use the ordered `interrogate reviewers` pool and the caller's `adversaries` count (1–3, default 1, independent of `arena-agents`). Give each general-purpose reviewer an isolated worktree with the scope's uncommitted changes, the scope and intent, and this brief:
 
 > Read `experiment` skill's Inputs and Workflow before starting, then *run `experiment` skill to test uncertain technical behavior through observation*, filling `@question` = the claim, `@criteria` = success/refutation criteria, `@repoFacts` = intent, scope, runnable target, and prior evidence, `@limits` = safety limits and your worktree. Invoke it directly, without the Prove wrapper or nested Interrogate; reuse valid reproductions and preserve them until coordinator verification. Keep state local or in authorized sandboxes; never use destructive production targets or expand credentials/permissions.
 
@@ -20,9 +20,9 @@ Run Phase A steps 3 and 4 and Phase B of `arena/arena.md`, with four changes. Ta
 
 ## Verify
 
-Verify each finding per arena Phase F by rerunning its command. Keep a finding when the output shows the failure and the failure breaks the intent. Drop the rest. Merge findings that share a root cause.
+Verify each finding by rerunning its command in the reviewer's worktree. Keep a finding when the output shows the failure and the failure breaks the intent. Drop the rest. Merge findings that share a root cause.
 
-Skip arena Phases C, D, and E. Adversaries find different failures, so the verdict keeps every verified finding, not one adversary's list.
+Keep every verified finding across reviewers.
 
 ## Output
 

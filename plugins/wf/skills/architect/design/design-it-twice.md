@@ -18,7 +18,7 @@ Standalone → show `problem.md` to the user, then continue immediately without 
 
 ## Spawn designers
 
-Spawn 3+ designers in parallel per `arena/subagents.md`, models from the `architect runners` role in `models.md`. Each MUST produce a **radically different** interface.
+*Run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch** with 3+ designer briefs and the ordered `architect runners` pool. Each MUST produce a **radically different** interface.
 
 Give each a separate technical brief: file paths, coupling details, dependency categories, what sits behind the seam, absolute paths of `design/deep-modules.md` and the repo glossary, and its output path `option-<n>.md`. Assign one constraint per designer:
 

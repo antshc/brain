@@ -1,10 +1,10 @@
 # How
 
-Grounding procedure of the `architect` skill. Paths resolve from the skill base directory.
+Grounding procedure of the Research skill. Paths resolve from the skill base directory.
 
 Explore the codebase to answer "how does X work?" questions. Produce architectural explanations at the level of a senior engineer onboarding onto a subsystem, enough to build a working mental model, not so much that it reads like annotated source code.
 
-Every spawn is a read-only subagent (`agent_type: explore`, or `general-purpose` with a brief that forbids edits when the explorer needs MCP). Explorers use the `how explorer` role and every explainer uses the `how explainer` role. Set `model` to the role's value in `models.md`, or to its fallback if the value is missing. Leave `model` unset when the value is `auto` or `inherit-parent`. If the subagent tool rejects a model, use the fallback and say so. If it rejects the fallback, use the closest valid model of the same family from its error message. Pick each subagent's reasoning effort per `arena/subagents.md`.
+For each stage, *run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch**. Explorers use `how explorer` and explainers use `how explainer`. Require read-only access: use `explore`, or `general-purpose` with edits forbidden if MCP is needed. Use the role fallback on rejection, then the closest valid model of the same family.
 
 **Spawn as `explore-codebase` request.** Read `explore-codebase` skill's **Request**; form per spawn: `@work` = the filled prompt template as prompt instruction (verbatim); `@depth` = `thorough` for explorers, `medium` for the simple-path explainer, `quick` for the synthesizing explainer; `[@target]` = repositories or services the question names; `@outputShape` = the template's Output section. Spawn each subagent with its request verbatim, instructing it to *run `explore-codebase` skill for the read-only lookup — resolve target, locate symbols, callers, flow, config evidence*. Skill unavailable → spawn with the filled prompt template alone, as below.
 
@@ -27,7 +27,7 @@ Once all explorers have returned, spawn one explainer with `how/explainer-prompt
 
 ## 4. Present
 
-Present the explainer's output. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.
+Return the explainer's output to Research. Require `file:line` evidence for code claims, and mark gaps. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.
 
 ## Output format
 

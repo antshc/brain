@@ -32,6 +32,6 @@ def test_lookup_depths_match_explore_enum():
 
 
 def test_request_lists_required_fields():
-    request = RESEARCH.split('Pass each this Request:')[1].split('| Lookup |')[0]
+    request = RESEARCH.split('Pass each Request:')[1].split('| Lookup |')[0]
     for field in ('@work', '@shape', '@depth', '@target', '@outputShape'):
         assert f'`{field}`' in request, field

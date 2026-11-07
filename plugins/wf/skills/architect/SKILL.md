@@ -64,27 +64,8 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Subtract before you add` principle* | a step cites *Subtract before you add* |
 | [design/deep-modules.md](design/deep-modules.md) | Deep-module design route |
 | [design/design-it-twice.md](design/design-it-twice.md) | Deep-module design route |
-| [models.md](models.md) | picking a subagent model for any role |
-| [arena/subagents.md](arena/subagents.md) | spawning any subagent |
 | [design/design-red-flags.md](design/design-red-flags.md) | Phase B screening, or `sketch/sketch.md` step 5 |
 | [design/rationale-template.md](design/rationale-template.md) | writing Outputs; give to every runner; `sketch/sketch.md` step 6 |
-| [how/how.md](how/how.md) | Phase A grounding |
-| [how/explorer-prompt.md](how/explorer-prompt.md) | `how/how.md` spawns explorers |
-| [how/explainer-prompt.md](how/explainer-prompt.md) | `how/how.md` spawns the explainer |
-| [why/why.md](why/why.md) | Phase A, design redefines ownership or layering |
-| [why/epistemics.md](why/epistemics.md) | `why/why.md` operating posture and synthesis |
-| [why/investigator-prompt.md](why/investigator-prompt.md) | `why/why.md` spawns investigators |
-| [why/synthesizer-prompt.md](why/synthesizer-prompt.md) | `why/why.md` spawns the synthesizer |
-| [why/source-playbook.md](why/source-playbook.md) | mapping an MCP to its category playbook |
-| [why/sources/code-archaeology.md](why/sources/code-archaeology.md) | source control investigator |
-| [why/sources/linear.md](why/sources/linear.md) | issue tracker investigator |
-| [why/sources/notion.md](why/sources/notion.md) | long-form documents investigator |
-| [why/sources/slack.md](why/sources/slack.md) | team chat investigator |
-| [why/sources/datadog.md](why/sources/datadog.md) | infrastructure observability investigator |
-| [why/sources/sentry.md](why/sources/sentry.md) | error tracking investigator |
-| [why/sources/databricks.md](why/sources/databricks.md) | product analytics investigator |
-| [why/sources/incident-postmortem.md](why/sources/incident-postmortem.md) | target code looks defensive |
-| [arena/arena.md](arena/arena.md) | Phase B |
 | [arena/runner-prompt.md](arena/runner-prompt.md) | Phase B runner brief, or `sketch/sketch.md` step 4 discipline |
 | [interrogate/interrogate.md](interrogate/interrogate.md) | standalone interrogate, automatic evidence routing, user picks interrogate, or prove requests `interrogate` |
 | [prove/prove.md](prove/prove.md) | evidence routing selects Experiment or user picks prove |

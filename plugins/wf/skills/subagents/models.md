@@ -14,3 +14,4 @@ For `architect runners`, the ordered list is a model pool; arena selects seats p
 | how explainer | claude-opus-5.5 medium | claude-opus-5 medium |
 | why investigators | claude-sonnet-5.5 high  | claude-sonnet-5 high  |
 | why synthesizer | claude-opus-5.5 medium | claude-opus-5 medium |
+| swarm workers | inherit-parent | inherit-parent |

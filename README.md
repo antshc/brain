@@ -154,7 +154,8 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [writing-style](plugins/wf/skills/writing-style/SKILL.md): write, review, or unslop prose; normalize requirement or story text by stripping implementation artifacts.
 - [explore-codebase](plugins/wf/skills/explore-codebase/SKILL.md): read-only codebase lookup run inside a caller-spawned subagent; callers fall back to the explore agent when the skill is unavailable.
 - [experiment](plugins/wf/skills/experiment/SKILL.md): run a throwaway experiment to answer a design question.
-- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template.
+- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template. Includes How for current behavior and Why for historical rationale.
+- [subagents](plugins/wf/skills/subagents/SKILL.md): dispatch independent workers, select model roles, compare Arena candidates, and run Swarm partitions or races.
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
@@ -188,6 +189,7 @@ AFK PR review and autonomous development loop.
 Code and technical solution review skills with modular standards and guidance.
 
 - [review-conversation](plugins/review/skills/review-conversation/SKILL.md): shared simple-English findings, replies, and hidden metadata for Code Review, Address, and HITL; preserves human ownership.
+- [blast-radius](plugins/review/skills/blast-radius/SKILL.md): trace downstream breakage, run the decisive proof, and report verified risks.
 - [address](plugins/review/skills/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.

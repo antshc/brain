@@ -23,7 +23,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 
 | Phase | What happens | Output |
 |---|---|---|
-| A Ground | `how` explains the touched subsystems via `explore-codebase` subagents; `why` adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
+| A Ground | Research How explains the touched subsystems; Research Why adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
 | B Sketch | `arena`: one runner by default; with 2–3, compare candidates and graft good ideas | usage sketch, module map, types, rationale |
 | C Review | resolve technical questions and challenge material claims automatically; pause only for an explicit checkpoint, then support **accept**, **implement**, **corrections**, **interrogate**, **prove**, or **ask** | `review-log.md` |
 | D Hand off | when the caller requests a design-only handoff, return the sketch for `/to-spec` | design artifacts |
@@ -105,10 +105,10 @@ prove: does a second GSI creation fail while the first backfills? target: Dynamo
 
 | Path | Role |
 |---|---|
-| [models.md](models.md) | model per role; edit to retune |
 | `design/` | design workflow procedure (Phases A–F), evidence routing, red flags, rationale template, deep-module vocabulary, Design It Twice |
-| `how/`, `why/` | grounding procedures and prompts |
-| `arena/` | multi-model synthesis procedure, runner prompt, subagent rules |
+| [Research](../research/SKILL.md) | How and Why grounding |
+| [Subagents](../subagents/SKILL.md) | Arena, dispatch and model roles |
+| `arena/runner-prompt.md` | architecture runner and sketch discipline |
 | `interrogate/` | adversarial review procedure |
 | `prove/` | evidence procedure via Experiment (command to prototype), optional interrogate |
 
