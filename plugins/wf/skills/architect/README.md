@@ -106,10 +106,9 @@ prove: does a second GSI creation fail while the first backfills? target: Dynamo
 | Path | Role |
 |---|---|
 | [models.md](models.md) | model per role; edit to retune |
-| `design/` | design workflow procedure (Phases A–F), evidence routing, red flags, rationale template |
+| `design/` | design workflow procedure (Phases A–F), evidence routing, red flags, rationale template, deep-module vocabulary, Design It Twice |
 | `how/`, `why/` | grounding procedures and prompts |
 | `arena/` | multi-model synthesis procedure, runner prompt, subagent rules |
 | `interrogate/` | adversarial review procedure |
 | `prove/` | evidence procedure via Experiment (command to prototype), optional interrogate |
-| `principles/` | one file per design principle, deep-module vocabulary, Design It Twice |
 

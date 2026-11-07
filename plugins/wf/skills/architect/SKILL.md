@@ -27,8 +27,8 @@ Route here when:
 
 Interrogate itself never runs this route; it only reports findings.
 
-1. Read `principles/deep-modules.md`. Done when its vocabulary names the module, interface, seam, and dependency categories.
-2. Run the `principles/design-it-twice.md` procedure on the target module. Done when `comparison.md` holds a recommendation.
+1. Read `design/deep-modules.md`. Done when its vocabulary names the module, interface, seam, and dependency categories.
+2. Run the `design/design-it-twice.md` procedure on the target module. Done when `comparison.md` holds a recommendation.
 3. Hand back per its Hand back section.
 
 ## Sketch only
@@ -48,22 +48,22 @@ Resolve every path from this skill's base directory. Read each file fully when i
 | [design/design.md](design/design.md) | Design workflow, or Sketch only resume |
 | [sketch/sketch.md](sketch/sketch.md) | Sketch only route |
 | [design/evidence-routing.md](design/evidence-routing.md) | Phase A technical questions and every Phase C round, including greenfield |
-| [principles/boundary-discipline.md](principles/boundary-discipline.md) | a step cites *Boundary discipline* |
-| [principles/encode-lessons-in-structure.md](principles/encode-lessons-in-structure.md) | a step cites *Encode lessons in structure* |
-| [principles/exhaust-the-design-space.md](principles/exhaust-the-design-space.md) | a step cites *Exhaust the design space* |
-| [principles/fix-root-causes.md](principles/fix-root-causes.md) | a step cites *Fix root causes* |
-| [principles/foundational-thinking.md](principles/foundational-thinking.md) | a step cites *Foundational thinking* |
-| [principles/in-your-own-words.md](principles/in-your-own-words.md) | a step cites *In your own words* |
-| [principles/laziness-protocol.md](principles/laziness-protocol.md) | a step cites *Laziness protocol* |
-| [principles/make-operations-idempotent.md](principles/make-operations-idempotent.md) | a step cites *Make operations idempotent* |
-| [principles/minimize-reader-load.md](principles/minimize-reader-load.md) | a step cites *Minimize reader load* |
-| [principles/outcome-oriented-execution.md](principles/outcome-oriented-execution.md) | a step cites *Outcome-oriented execution* |
-| [principles/prove-it-works.md](principles/prove-it-works.md) | a step cites *Prove it works* |
-| [principles/redesign-from-first-principles.md](principles/redesign-from-first-principles.md) | a step cites *Redesign from first principles* |
-| [principles/separate-before-serializing-shared-state.md](principles/separate-before-serializing-shared-state.md) | a step cites *Separate before serializing shared state* |
-| [principles/subtract-before-you-add.md](principles/subtract-before-you-add.md) | a step cites *Subtract before you add* |
-| [principles/deep-modules.md](principles/deep-modules.md) | Deep-module design route, or a step cites *Deep modules* |
-| [principles/design-it-twice.md](principles/design-it-twice.md) | Deep-module design route |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Boundary discipline` principle* | a step cites *Boundary discipline* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Encode lessons in structure` principle* | a step cites *Encode lessons in structure* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Exhaust the design space` principle* | a step cites *Exhaust the design space* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Fix root causes` principle* | a step cites *Fix root causes* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Foundational thinking` principle* | a step cites *Foundational thinking* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `In your own words` principle* | a step cites *In your own words* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Laziness protocol` principle* | a step cites *Laziness protocol* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Make operations idempotent` principle* | a step cites *Make operations idempotent* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Minimize reader load` principle* | a step cites *Minimize reader load* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Outcome-oriented execution` principle* | a step cites *Outcome-oriented execution* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Prove it works` principle* | a step cites *Prove it works* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Redesign from first principles` principle* | a step cites *Redesign from first principles* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Separate before serializing shared state` principle* | a step cites *Separate before serializing shared state* |
+| *Run `principles` skill; read its body in full, then load in full the file its Index maps to the `Subtract before you add` principle* | a step cites *Subtract before you add* |
+| [design/deep-modules.md](design/deep-modules.md) | Deep-module design route |
+| [design/design-it-twice.md](design/design-it-twice.md) | Deep-module design route |
 | [models.md](models.md) | picking a subagent model for any role |
 | [arena/subagents.md](arena/subagents.md) | spawning any subagent |
 | [design/design-red-flags.md](design/design-red-flags.md) | Phase B screening, or `sketch/sketch.md` step 5 |

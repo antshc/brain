@@ -1,6 +1,4 @@
-# Foundational thinking
-
-Apply before writing logic: choosing core types and data structures, sequencing scaffold-vs-feature work, asking what concurrent actors share.
+# Foundational Thinking
 
 **Structural decisions** protect option value. **Code-level decisions** protect simplicity.
 

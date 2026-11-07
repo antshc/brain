@@ -8,7 +8,7 @@ Adversaries try to break a change or a design. A finding survives only when a ru
 
 For automatic routing, use the supplied sketch scope, material claim, intent, and runnable target; otherwise keep the defaults below.
 
-The scope is what the user names. Otherwise it is the branch diff from its merge base with the base branch, through the working tree. State the intent per *In your own words* in `principles/in-your-own-words.md`, from the user's message, the commits, and the PR description. Ask the user when the intent is unclear.
+The scope is what the user names. Otherwise it is the branch diff from its merge base with the base branch, through the working tree. State the intent per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `In your own words` principle*, from the user's message, the commits, and the PR description. Ask the user when the intent is unclear.
 
 ## Fan out
 
