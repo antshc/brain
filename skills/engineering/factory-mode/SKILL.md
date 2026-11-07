@@ -18,12 +18,12 @@ This skill is the repo-level engineering instruction set, installed per repo by 
 Name each principle (Principles) that shaped a decision and the choice it changed in the reply.
 
 - **First message on a task** → restate the goal, the problem, and, if the task ships a change, the smallest change expected to meet it. Do not wait for confirmation. Evidence rules out the requested change → show it and stop. Restate the goal in every subagent brief, PR `## Why`, and final reply (skip for a fully specified one-line edit). *Run `sharpen` skill to restate goals in your own words when the ask is vague or layered.*
-- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → run the `research` skill to investigate against primary sources and answer from cited findings. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → run the `experiment` skill for a minimal throwaway experiment and let observed behavior decide. Compare competing design alternatives with the `prototype` playbook when needed. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
+- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → run the `experiment` skill for a minimal throwaway experiment and let observed behavior decide. Compare competing design alternatives with the `prototype` playbook when needed. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
 - **Any code** → name the data shape and its organizing structure first (**Model the domain**).
 - **Code crossing a function boundary** → *run `architect` skill to sketch types, signatures, and module structure before code.*
 - **Module interface, seam, or testability question** → *run `architect` skill's Deep-module design route for deep-module vocabulary, seam placement, deepening opportunities, and Design It Twice interface options.*
 - **Contested or unresolved design** → run the `design` playbook.
-- **Reading legwork, including locating code and answering how/why questions** → **MUST** *run `research` skill to investigate the question against primary sources and save cited findings*, even if direct exploration seems faster or simpler. Pass the original research request verbatim; add a separate grounded question with the known repository/subsystem/symbol or external target, context, exact unknown, and expected evidence. Preserve requested output constraints. Let research own source selection, specialists, and delegation. Rationale: one entry point owns routing and evidence; grounding must preserve user intent.
+- **Reading legwork, including locating code and answering how/why questions** → **MUST** *run `research` skill to investigate the question against primary sources and save cited findings*, even if direct exploration seems faster or simpler. Pass the original research request verbatim; add a separate grounded question with the known repository/subsystem/symbol or external target, context, exact unknown, and expected evidence. Use **How** for current code behavior, **Why** for historical rationale, or standard inspection for external sources and structured scope. Preserve requested output constraints. Let research own source selection, specialists, and delegation. Rationale: one entry point owns routing and evidence; grounding must preserve user intent.
 - **Nontrivial multi-step** → write the throughput checkpoint (Throughput checkpoint).
 - **Before commit** → *run `crew-commit` skill to commit current work with a message derived from the diff.*
 - **Before review** → strip comments that narrate code (Comments).
@@ -82,11 +82,9 @@ Apply when the trigger matches; cite by bold name.
 ## Subagents
 
 - Run the playbook in this chat; delegate steps, never the playbook itself.
-- Brief with file paths, not inlined content; include the restated goal, scope, named data shape, constraints, and success criteria.
-- Leave model and effort to harness defaults unless the user names them. Exception: interrogate adversaries take model and effort from the `interrogate reviewers` role in `architect/models.md` (Fallback when rejected), never the parent chat model.
-- Run independent subagents in parallel; serialize shared writes.
-- Own every subagent's output. Review its diff and write your own summary; never pass its report through.
-- Fresh subagent by default for new work, fix rounds, and retries, briefed with consolidated scope (original brief, later directives, prior report). Reuse an agent only when the work needs state it alone holds (uncommitted changes, running process).
+- *Run `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Brief with file paths, the restated goal, scope, named data shape, constraints, and success criteria.
+- Use harness model and effort defaults unless the user names them. For Interrogate, pass the adversary count to Architect so it uses the configured `interrogate reviewers` role.
+- Review worker diffs and own the summary.
 
 ## Throughput checkpoint
 

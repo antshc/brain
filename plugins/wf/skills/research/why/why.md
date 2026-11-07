@@ -1,12 +1,10 @@
 # Why
 
-Rationale procedure of the `architect` skill. Paths resolve from the skill base directory.
+Rationale procedure of the Research skill. Paths resolve from the skill base directory.
 
 Investigate the motivation and intent behind code. The companion `how/how.md` procedure answers what the code does and how it works. `why` answers what forces led to its shape.
 
-Each spawn below names a role in `models.md`. Set `model` to the role's value in `models.md`, or to its fallback if the value is missing. Leave `model` unset when the value is `auto` or `inherit-parent`. If the subagent tool rejects a model, use the fallback and say so. If it rejects the fallback, use the closest valid model of the same family from its error message. Pick each subagent's reasoning effort per `arena/subagents.md`.
-
-Every spawn is `general-purpose`. **Do not use `explore`.** It has no MCP access, which disables the MCP-backed investigators and the synthesizer's citation spot-checks. Investigators still shouldn't write anything.
+At each dispatch, *run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch**. Use `general-purpose` with read-only instructions for MCP access and citation spot-checks. Use the role fallback on rejection, then the closest valid model of the same family.
 
 ## Operating Posture
 
@@ -20,7 +18,7 @@ If the target is vague ("why do we do it this way?" with no clear referent), mak
 
 ## Step 2. Establish the Code Anchor
 
-Before spawning investigators, build the seed context inline: file paths and line ranges, key symbols (functions, classes, constants), the last few commits touching the target, PR numbers from merge commits (pattern `(#1234)` in the subject line), and any linked ticket IDs. Run `git blame -L <start>,<end> <file>` for last-touch commits, `git log --follow -p -- <file>` for full history with patches through renames, `git log --oneline -20 -- <file>` for recent commits with PR numbers visible, and `git log -1 --format=%B <commit>` to extract PR numbers. Then pull the PR bodies and discussion for any substantive commit: `gh pr view <number> --json title,body,author,createdAt,mergedAt,labels,closingIssuesReferences,comments,reviews`. This anchor goes to every investigator and to the synthesizer.
+Dispatch one read-only worker with the `why investigators` role to build the seed context: file paths and line ranges, key symbols (functions, classes, constants), the last few commits touching the target, PR numbers from merge commits (pattern `(#1234)` in the subject line), and any linked ticket IDs. Run `git blame -L <start>,<end> <file>` for last-touch commits, `git log --follow -p -- <file>` for full history with patches through renames, `git log --oneline -20 -- <file>` for recent commits with PR numbers visible, and `git log -1 --format=%B <commit>` to extract PR numbers. Then pull the PR bodies and discussion for any substantive commit: `gh pr view <number> --json title,body,author,createdAt,mergedAt,labels,closingIssuesReferences,comments,reviews`. Start with any PR or commit explicitly supplied by the caller. Return the cited anchor and any access gaps. For the Why code anchor action, stop here. For full Why, pass the anchor to every investigator and the synthesizer.
 
 ## Step 3. Spawn Parallel Investigators
 
@@ -42,7 +40,7 @@ Map available evidence providers to these categories:
 
 Source control is always available through git and `gh`. For the other six, classify using MCP names, server instructions, tool names, skill descriptions, and resource descriptors. If a provider fits more than one category, choose its primary evidence, except for the Atlassian pair below. Record ambiguous cases in the coverage map.
 
-When both `preflight-atlassian` and `twg` skills are installed, run `preflight-atlassian` **Resolve** once. Use its credentialed `twg` launcher and site in two independent investigators: **Jira** for issue / ticket tracker, **Confluence** for long-form documents. Both use `why/sources/atlassian.md` with their own category's procedure. If `tokenAvailable` is false or the site/launcher is unavailable, mark both categories inaccessible with the exact prerequisite; never read credentials, start login, or silently switch identity. Do not spawn a second provider for either category. If the skills are absent, retain ordinary MCP discovery for those categories.
+When both `preflight-atlassian` and `twg` skills are installed, *run `preflight-atlassian` skill to resolve the credentialed TWG launcher and site* using **Resolve** once. Use its credentialed `twg` launcher and site in two independent investigators: **Jira** for issue / ticket tracker, **Confluence** for long-form documents. Both use `why/sources/atlassian.md` with their own category's procedure. If `tokenAvailable` is false or the site/launcher is unavailable, mark both categories inaccessible with the exact prerequisite; never read credentials, start login, or silently switch identity. Do not spawn a second provider for either category. If the skills are absent, retain ordinary MCP discovery for those categories.
 
 Spawn one investigator per category with an available provider, all in a single message so they run concurrently, each owning one category and one provider. Atlassian's credentialed launcher may be shared by its Jira and Confluence investigators, but each must search and report only its assigned product. Don't ask one investigator to cover multiple categories or MCPs. `model`: the `why investigators` role.
 
@@ -51,7 +49,7 @@ Each investigator's prompt is `why/investigator-prompt.md` filled in, plus:
 - `why/sources/incident-postmortem.md` **if the target code looks defensive** (null checks, retry logic, timeout handling, rate limiting, feature flags, egress guards, OOM handlers)
 - the code anchor and the user's original question
 
-After the initial results, pass relevant Jira-to-Confluence and Confluence-to-Jira links to the opposite investigator for targeted follow-up reads. Keep each finding under its owning category; do not duplicate evidence.
+After the initial results, dispatch targeted Jira-to-Confluence and Confluence-to-Jira follow-ups with the earlier findings and relevant links, scoped to the receiving product. Keep each finding under its owning category; do not duplicate evidence.
 
 ### Investigator roster, one per available evidence category
 
@@ -85,7 +83,7 @@ Spawn one synthesizer. `model`: the `why synthesizer` role. It gets:
 
 ## Step 5. Present
 
-Present the synthesizer's output to the user. You may lightly edit for clarity or add context from the conversation, but **do not rewrite the confidence language**.
+Return the synthesizer's output to Research for the requested report. You may lightly edit for clarity or add context from the conversation, but **do not rewrite the confidence language**.
 
 ## Output Format
 

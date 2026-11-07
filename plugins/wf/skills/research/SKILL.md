@@ -1,7 +1,7 @@
 ---
 name: research
 description: >-
-  Research primary sources and save cited findings as Markdown. Use for 'research X', 'how is this system built', 'verify this NuGet API', or 'check this cloud limit'.
+  Investigate primary sources and save cited findings as Markdown. Use for 'research X', 'how does this code work', 'why was this built this way', 'verify this NuGet API', or 'check this cloud limit'.
 ---
 
 # Research
@@ -9,6 +9,8 @@ description: >-
 ## Inputs
 
 - `@question` — research question. Ask if missing.
+- `@mode` [optional] — `how` or `why`.
+- `@whyDepth` [optional] — `anchor` for code and PR context only, or `full` (default). Use only with `why`.
 - `@researchScope` [optional] — one entry per research part with route (`system`, `cloud`, or `web`), target when known, system axis when applicable (`Behavior`, `Flow`, `Data`, or `focused`), and a part question for multi-part requests. Cloud entries include provider, service, and whether live values matter.
 - `@outputShape` [optional] — requested file count, paths, diagrams, or framing.
 
@@ -17,10 +19,24 @@ description: >-
 - **MUST** delegate source reading. Parent routes, briefs, and verifies to keep raw evidence in subagent context. If delegation is unavailable, report the blocker.
 - **MUST** pass `@outputShape` verbatim to every subagent. It takes precedence over report defaults.
 
+## Entry routes
+
+`/research how <question>` and `/research why <question>` set the corresponding mode. Reject conflicting explicit mode and scope, or Why depth on any other route. With no explicit mode, use Workflow and preserve the existing scoped or inferred inspection routes.
+
+| Action | Load in full | Return |
+| --- | --- | --- |
+| **How** | [How](how/how.md), [explainer prompt](how/explainer-prompt.md), [explorer prompt](how/explorer-prompt.md) on the complex path | Cited explanation of current behavior. |
+| **Why code anchor** (`@mode=why`, `@whyDepth=anchor`) | [Why](why/why.md). Execute through Establish the Code Anchor. | Cited symbols, commits, PRs, linked tickets and gaps. Stop after the anchor. |
+| **Why** (`@mode=why`) | [Why](why/why.md), [epistemics](why/epistemics.md), [investigator prompt](why/investigator-prompt.md), [synthesizer prompt](why/synthesizer-prompt.md), [source playbook](why/source-playbook.md) | Cited rationale, source coverage and confidence. |
+
+For full Why, load only the relevant source playbooks in full: [code archaeology](why/sources/code-archaeology.md), [Atlassian](why/sources/atlassian.md), [Linear](why/sources/linear.md), [Notion](why/sources/notion.md), [Slack](why/sources/slack.md), [Datadog](why/sources/datadog.md), [Sentry](why/sources/sentry.md), [Databricks](why/sources/databricks.md), and [incident postmortems](why/sources/incident-postmortem.md) for defensive code.
+
+For How or Why, pass the original question, named targets or refs, and `@outputShape` to each brief. Keep evidence workers read-only. The Research coordinator verifies citations, saves the Markdown output to the requested path or `docs/research/<slug>.md`, and returns its path and any gaps. A caller may request the Why code anchor inline. If evidence is missing, report the gap with any verified results.
+
 ## Workflow
 
 1. **Route.** When `@researchScope` is supplied, use each entry's route, target, applicable axis, and question (or `@question` for a single part). Route `system` to system inspection, `cloud` to cloud inspection for AWS or Azure (generic brief for other providers), and `web` to the generic brief. If a specified target is inaccessible, report that part as blocked and offer any viable alternative. Continue independent parts. Without `@researchScope`, split by evidence owner. System inspection covers repository code, config, and restored NuGet packages. Cloud inspection covers AWS and Azure services, IAM/RBAC, APIs, SDKs, quotas, and resource state, one part per provider. Generic brief covers other providers and external sources. *Done when* every part has a route.
-2. **Brief and dispatch.** Brief each part from its routed question, target, and applicable axis. Mark missing names, symbols, or account details `unknown`. Spawn one subagent per part with route tools, question, brief, output shape, and applicable contract, reference, and template paths. Resolve absolute paths from the skill base. Parallelize independent parts. Default to one cited Markdown report per part. *Done when* each part has a subagent report or blocker.
+2. **Brief and dispatch.** Brief each part from its routed question, target, and applicable axis. Mark missing names, symbols, or account details `unknown`. For one worker per part, *run `subagents` skill to dispatch independent workers with isolated outputs* using **Dispatch**. Pass route tools, question, brief, output shape, and applicable contract, reference, and template paths. Resolve absolute paths from the skill base. Parallelize independent parts. Default to one cited Markdown report per part. *Done when* each part has a subagent report or blocker.
 3. **Verify.** Check each artifact against Completion criteria. Fix mechanical defects directly. Redispatch evidence defects with the violated constraint first. Route Data and cloud follow-ups as new parts. Offer Behavior follow-ups. Run on request. *Done when* every part and follow-up is accounted for.
 
 ## System inspection

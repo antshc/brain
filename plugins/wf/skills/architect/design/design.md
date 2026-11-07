@@ -26,15 +26,13 @@ Add a Scrap entry when Phase F triggers.
 
 ## Phase A: Ground the problem
 
-Build a real mental model of every system the new code touches, starting from Repo docs. Run the `how/how.md` procedure over the relevant subsystems. Naming a file isn't grounding. Produce the architectural explanation `how/how.md` prescribes. If the design redefines ownership or layering, also run the `why/why.md` procedure on the existing shape so the rationale becomes a constraint, not a guess.
+Build a mental model of touched subsystems from Repo docs and code. *Run `research` skill to investigate primary sources and save cited findings* using **How**. Pass the relevant subsystems, repo docs and `@outputShape` for `<artifact-root>/grounding-how.md`. When ownership or layering changes, call **Why** with the existing boundary and `@outputShape` for `<artifact-root>/grounding-why.md`. Treat supported rationale as a constraint.
 
 Skip subsystem grounding only when the work is genuinely greenfield with no surrounding system to integrate. Before Phase B, resolve technical questions through `design/evidence-routing.md`, including greenfield work.
 
 ## Phase B: Sketch
 
-Run the `arena/arena.md` procedure with the design-sketch task and the Phase A grounding artifacts. Pass `arena/runner-prompt.md` as each runner's prompt, plus the absolute paths of `SKILL.md`, `design/design.md`, and `design/rationale-template.md`.
-
-Take the runners from the `architect runners` role in `models.md`. Alias and rejected entries follow the runner rules in arena Phase A.
+*Run `subagents` skill to compare independent candidates and synthesize findings* using **Arena**. Pass the design task, Phase A grounding, `architect runners` role, resolved `arena-agents` count, rubric inputs, screening rules below, and Artifact layout from Architect. Use the artifact root for Arena outputs. Pass `arena/runner-prompt.md` and the absolute paths to Architect's `SKILL.md`, this procedure and the rationale template as runner inputs. Require the candidate and synthesis directories to contain `rationale.md`, `module-map.md`, and `sketch/`. Verify consistency against Artifact layout, Repo docs, and the caller's design criteria.
 
 With multiple runners, require structurally distinct candidates before synthesis, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Exhaust the design space` principle*. Whole-shape alternatives, not point fixes inside one shape.
 
@@ -65,10 +63,10 @@ Before continuing, run `design/evidence-routing.md` on open questions and materi
    ```
 3. Act on the reply:
    - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place, then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `design/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
-   - **Corrections with `arena`** → apply as above, then run the `arena/arena.md` *Re-run for corrections* procedure with the corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
+   - **Corrections with `arena`** → apply as above, then *run `subagents` skill to compare independent candidates and synthesize findings* using **Arena** with the corrected incumbent, next revision number, same Phase B contract, and corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Resolve verified contract findings through Deep-module design in `SKILL.md`. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
    - **Prove** → run the `prove/prove.md` procedure on the question in the reply; run its Attack step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
-   - **Ask** → answer from Phase A grounding, running `how/how.md` or `why/why.md` when needed; present the answer, then start the next round.
+   - **Ask** → answer from Phase A grounding, using Phase A's Research call in **How** or **Why** mode when needed, with a distinct grounding output for the new question; present the answer, then start the next round.
    - **Accept** → go to Phase D for a design-only handoff; otherwise Phase E.
    - **Implement** → go to Phase E.
 
@@ -105,7 +103,7 @@ Use judgment. A few edge cases don't condemn an architecture. Complexity in the 
 When you scrap:
 
 1. Tell the user which tells fired, with file evidence; append to `review-log.md`.
-2. Run the `how/how.md` procedure over what's been built.
+2. Use Phase A's Research **How** call over what was built. Save revised grounding beside the original and pass it into the new Phase B.
 3. Redesign as if the new constraints had been day-one assumptions, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Redesign from first principles` principle*.
 4. Subtract before adding, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Subtract before you add` principle*. The new sketch is smaller than the old one before it grows.
 5. Return to Phase B and re-run arena, then Phase C review.
