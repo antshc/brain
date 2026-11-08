@@ -38,7 +38,7 @@ Done when actionable reply/reconciliation work is in hand, or waiting/incomplete
 **Load `references/github-api.md` now.** Every `gh` invocation in this run is copied from it, and nothing below restates one.
 
 1. Derive `CODEBASE_REPO_PATH` for `{{owner}}/{{repo}}` (the PR's repository, from §0): the Git repository of the current directory (`git rev-parse --show-toplevel`) whose `origin` remote (`git remote get-url origin`) normalizes to `{{owner}}/{{repo}}`. Missing, or a clone of another repository → **stop** before touching any review thread, post no replies, and report why.
-2. Create an isolated checkout of the PR branch: load `references/worktree-root.md` from `{{skillDir}}`, resolve `WORKTREES_ROOT`, and run its Ignore steps. `WORKTREE_PATH := $WORKTREES_ROOT/pr-{{number}}`. Run `git -C "$CODEBASE_REPO_PATH" fetch origin "$headRef" "$baseRef"`, then `git -C "$CODEBASE_REPO_PATH" worktree add -b "$headRef" "$WORKTREE_PATH" "origin/$headRef"`. An existing path or local `$headRef` branch → **stop** and report; never reuse or reset either. Switch into `WORKTREE_PATH`. `git -C "$CODEBASE_REPO_PATH" fetch origin "$headRef" "$baseRef"`, then `git -C "$CODEBASE_REPO_PATH" worktree add -b "$headRef" "$WORKTREE_PATH" "origin/$headRef"`. An existing path or local `$headRef` branch → **stop** and report; never reuse or reset either. Switch into `WORKTREE_PATH`.
+2. Capture `HARNESS_ROOT` from the launch context before changing directories. Fetch the PR head and base from verified `origin`; verify the local head ref equals the captured `headOid`. *Run `worktrees` skill to create an isolated worktree* on `$headRef` from that SHA, with `CODEBASE_REPO_PATH` as source, leaf `pr-{{number}}` and a unique run ID. Save its ownership record in a run-owned temp directory outside all checkouts. Set the branch upstream to `origin/$headRef`, then enter the returned `WORKTREE_PATH`. Collision or mismatch → stop and report.
 
 Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef` and `HEAD` equals `origin/$headRef`.
 
@@ -131,7 +131,7 @@ Done when each actionable thread has a confirmed answer and independent closure 
 
 ## 9. Cleanup
 
-If setup created a worktree, leave `WORKTREE_PATH`, then `git -C "$CODEBASE_REPO_PATH" worktree remove "$WORKTREE_PATH"` without force and `git -C "$CODEBASE_REPO_PATH" branch -d "$headRef"`. A dirty worktree or a refused deletion → preserve it and report the path and branch.
+If setup created a worktree, leave `WORKTREE_PATH` and verify the remote PR head equals the verified local HEAD. *Run `worktrees` skill to remove the finished worktree* with the saved record and verified HEAD. After verified removal, delete the local branch with `git -C "$CODEBASE_REPO_PATH" branch -d "$headRef"`. Preserve and report blocked cleanup and any remaining path or branch.
 
 Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is gone; the remote branch and the PR are untouched.
 

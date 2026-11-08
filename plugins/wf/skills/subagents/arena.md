@@ -20,7 +20,7 @@ Every candidate gets the same prompt, so the prompt is the contract.
 1. Confirm the artifact contract and runner brief from the caller. Write the task, requirements, and human decisions to `<output-root>/task.md`.
 2. Derive 3–6 gradeable criteria from the caller's rubric inputs. Candidates see the task and contract.
 3. Resolve the requested runner role and ordered panel count (1–3, default 1). When no role is provided and independent model perspectives are needed, choose distinct supported model families and report unavailable seats. Use Model selection for named pools and fallbacks.
-4. Give each candidate an isolated output under `<output-root>/candidate-<n>/` and a git worktree for repository reads where possible. A shared checkout is read-only. Pass the task, grounding, candidate brief and output path through Dispatch.
+4. Give each candidate an isolated output under `<output-root>/candidate-<n>/` and request a detached worktree through Dispatch for repository reads where possible. A shared checkout is read-only. Pass the task, grounding, candidate brief and output path through Dispatch.
 
 ## Phase B: Fan out
 
