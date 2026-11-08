@@ -8,8 +8,8 @@ Orchestrator-only worktree procedures. Implementation workers run in the launch 
 - `WORKTREES_ROOT` = `HARNESS_ROOT/.worktrees/<REPO>`, `<REPO>` = source repository name from `OWNER/REPO`. Same root for both layouts: harness repo only (`SOURCE_ROOT` = `HARNESS_ROOT`) and harness with sub-repositories (`SOURCE_ROOT` = `HARNESS_ROOT/workspace/<REPO>`). Never derive a root from the current worktree or `SOURCE_ROOT`. `HARNESS_ROOT/.worktrees/` or its `<REPO>/` child already exists → reuse it; absent → create it (`mkdir -p`).
 - `INTEGRATION_BRANCH` = `preflight`'s `integration_branch` (`feat/<INITIATIVE_ID>`); never invent another name. Unique run suffix (*Integration setup* step 1) → append `-<suffix>` to both branch and `WORKTREE_PATH`.
 - `WORKTREE_PATH` = `WORKTREES_ROOT/INITIATIVE_ID` (integration worktree on `INTEGRATION_BRANCH`).
-- Parallel only: `TICKET_BRANCH(n)` = `INTEGRATION_BRANCH-t<n>`; `TICKET_WORKTREE(n)` = `WORKTREES_ROOT/INITIATIVE_ID-t<n>`, where `n` is the ticket number.
-- Confirm every resolved path stays under `WORKTREES_ROOT`; never reuse an existing worktree path (the `INITIATIVE_ID` leaf) or branch.
+- Parallel only: use the effective graph ticket’s `key` (derived from its full qualified ref) for `TICKET_BRANCH(key)` = `INTEGRATION_BRANCH-<key>` and `TICKET_WORKTREE(key)` = `WORKTREES_ROOT/<integration worktree leaf>-<key>`. The leaf includes any run suffix. Reject paths or refs already owned by another ticket.
+- Confirm every resolved path stays under `WORKTREES_ROOT`; reuse existing paths or branches only after explicit resume verifies their recorded ownership.
 
 ## Worktree root setup
 
@@ -25,7 +25,7 @@ Done when the git check passes and existing editor configs exclude `.worktrees`.
 
 1. Inspect `git -C SOURCE_ROOT worktree list --porcelain`, branch refs, and the destination. Create only missing parent directories. Existing path or proposed integration branch → stop for explicit resume or a unique run suffix.
 2. Run *Worktree root setup*.
-3. Fetch the confirmed source remote/base; record its commit as `BASE_COMMIT` (reuse Breakdown Initiative's value when set). Fetch failure → report; never use a stale base.
+3. Confirm the preflight-pinned `BASE_COMMIT` exists locally. Use this exact commit without fetching or resolving the branch again. If the pinned object is unavailable, stop.
 4. `git -C SOURCE_ROOT worktree add -b INTEGRATION_BRANCH WORKTREE_PATH BASE_COMMIT`. Verify clean, on `INTEGRATION_BRANCH`, `HEAD` = `BASE_COMMIT`.
 
 ## Integration writes
@@ -40,8 +40,8 @@ Done when the git check passes and existing editor configs exclude `.worktrees`.
 
 Parallel only.
 
-1. **Create:** `git -C SOURCE_ROOT worktree add -b TICKET_BRANCH(n) TICKET_WORKTREE(n) <integration HEAD>`. Verify clean and `HEAD` equals the integration head; record `@prevHead(n)`.
-2. **Remove after integration:** `git -C SOURCE_ROOT worktree remove TICKET_WORKTREE(n)` without force, then `git -C SOURCE_ROOT branch -D TICKET_BRANCH(n)` (cherry-picked commits are not ancestors, so `-d` refuses).
+1. **Create:** `git -C SOURCE_ROOT worktree add -b TICKET_BRANCH(key) TICKET_WORKTREE(key) <integration HEAD>`. Verify clean and `HEAD` equals the integration head; record `@prevHead(key)`.
+2. **Remove after integration:** `git -C SOURCE_ROOT worktree remove TICKET_WORKTREE(key)` without force, then `git -C SOURCE_ROOT branch -D TICKET_BRANCH(key)` (cherry-picked commits are not ancestors, so `-d` refuses).
 3. Dirty, unmerged, or blocked ticket worktrees: preserve and report path/branch.
 
 ## Preserve integration worktree

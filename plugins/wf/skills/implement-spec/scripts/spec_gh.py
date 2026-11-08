@@ -5,15 +5,17 @@ Self-contained: stdlib only, shells out to `gh` and `git`. Errors go to stderr.
 Exit codes: 0 ok, 1 GitHub/tool failure, 2 invalid input or unresolved routing,
 3 completed but read-back verification reported `problems`.
 
-    preflight   --spec REF [--harness-root P] [--source-repository R --base-branch B]
+    preflight   (--spec REF | --source-repository R --base-branch B --initiative-id I)
+                [--harness-root P] [--mode MODE] [--max-parallel N] [--pin-base]
+    run checkpoint --run-dir DIR --input FILE
     spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N
     graph read  --spec REF --out RUN_DIR      (also saves spec issue artifacts under RUN_DIR/artifacts, indexed by name in index.json)
     graph frontier --graph FILE [--planner FILE --out EFFECTIVE_FILE] [--done REF ...]
     ticket create --spec REF --title T --body-file F
     issue block REF --by REF [--by REF ...]
     issue edit-body REF --body-file F
-    issue comment REF --body-file F
-    issue close REF (--commit SHA --branch B [--pr URL] | --comment TEXT)
+    issue comment REF --body-file F [--run-id ID]
+    issue close REF (--run-id ID --evidence-comment N | --commit SHA --branch B [--pr URL] | --comment TEXT)
     pr publish  --source-repository R --base B --head H --title T --initiative-id I
                 --rationale-file F [--closes REF ...] [--refs REF ...] [--evidence-file F]
     pr read     --source-repository R (--number N | --head H) [--initiative-id I] [--expect-closes REF ...]
@@ -25,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import re
 import shutil
@@ -44,6 +47,7 @@ BASE_PREFIX = "repo:base:"
 ARTIFACTS_API_VERSION = "2026-03-10"
 ARTIFACTS_PAGE_SIZE = 100
 ARTIFACTS_INDEX = "index.json"
+RUN_ID_PATTERN = r"[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*"
 Runner = Callable[[list[str]], tuple[int, str, str]]
 
 
@@ -64,9 +68,9 @@ class Ref:
         return f"{self.repo}#{self.number}"
 
     @property
-    def file_stem(self) -> str:
-        owner, name = self.repo.split("/")
-        return f"{owner}_{name}_{self.number}"
+    def key(self) -> str:
+        digest = hashlib.sha256(str(self).lower().encode("ascii")).hexdigest()[:24]
+        return f"t{self.number}-{digest}"
 
 
 def parse_ref(text: str, default_repo: str | None = None) -> Ref:
@@ -208,10 +212,16 @@ def ensure_label(gh: Gh, repo: str, name: str, *, color: str | None = None, desc
     return True
 
 
-def verify_source(gh: Gh, source_repo: str, base_branch: str) -> dict[str, Any]:
+def verify_source(gh: Gh, source_repo: str, base_branch: str, *, pin_base: bool = False) -> dict[str, Any]:
     info = gh.json("repo", "view", source_repo, "--json", "nameWithOwner,defaultBranchRef")
-    gh.text("api", f"repos/{source_repo}/branches/{quote(base_branch, safe='')}")
-    return {"source_repository": info["nameWithOwner"], "default_branch": (info.get("defaultBranchRef") or {}).get("name")}
+    branch = gh.json("api", f"repos/{source_repo}/branches/{quote(base_branch, safe='')}")
+    result = {"source_repository": info["nameWithOwner"], "default_branch": (info.get("defaultBranchRef") or {}).get("name")}
+    if pin_base:
+        sha = (branch.get("commit") or {}).get("sha")
+        if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{40}", sha):
+            raise GhError(f"no valid base commit for {source_repo}:{base_branch}")
+        result["base_commit"] = sha
+    return result
 
 
 def origin_matches(gh: Gh, root: Path, source_repo: str) -> bool:
@@ -227,7 +237,7 @@ def is_ignored(gh: Gh, root: Path, path: Path) -> bool:
     return True
 
 
-def resolve_checkout(gh: Gh, harness_root: Path, source_repo: str, spec_number: int) -> dict[str, str]:
+def resolve_checkout(gh: Gh, harness_root: Path, source_repo: str, spec_number: int | None) -> dict[str, str | None]:
     name = source_repo.split("/")[1]
     workspace = harness_root / "workspace"
     split_root = workspace / name
@@ -244,43 +254,105 @@ def resolve_checkout(gh: Gh, harness_root: Path, source_repo: str, spec_number: 
     if not origin_matches(gh, source_root, source_repo):
         raise UsageError(f"origin of {source_root} does not match {source_repo}")
     runs = base_dir / f"{name}.runs"
-    candidate, suffix = runs / str(spec_number), 1
-    while candidate.exists():
-        suffix += 1
-        candidate = runs / f"{spec_number}-{suffix}"
+    candidate = None
+    if spec_number is not None:
+        candidate, suffix = runs / str(spec_number), 1
+        while candidate.exists():
+            suffix += 1
+            candidate = runs / f"{spec_number}-{suffix}"
     return {
         "harness_root": str(harness_root),
         "source_root": str(source_root),
-        "run_dir": str(candidate),
+        "run_dir": str(candidate) if candidate is not None else None,
         "evidence_root": str(base_dir / f"{name}.evidence"),
     }
 
 
 def cmd_preflight(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
+    if args.max_parallel is not None and (args.mode != "parallel" or args.max_parallel < 1):
+        raise UsageError("--max-parallel requires parallel mode and a positive integer")
+    if args.spec:
+        if args.initiative_id or bool(args.source_repository) != bool(args.base_branch):
+            raise UsageError("--spec accepts only paired --source-repository and --base-branch overrides")
+    elif not (args.source_repository and args.base_branch and args.initiative_id):
+        raise UsageError("provide --spec or --source-repository, --base-branch and --initiative-id")
+
     gh.text("--version")
     gh.text("auth", "status")
-    harness_root = Path(args.harness_root or gh.git("rev-parse", "--show-toplevel").strip())
-    default_repo = None
-    if "/" not in args.spec:
-        default_repo = gh.text("repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner").strip()
-    ref = parse_ref(args.spec, default_repo)
-    issue = read_issue(gh, ref)
-    labels = labels_of(issue)
-    source = args.source_repository or single_label(labels, TARGET_PREFIX)
-    base = args.base_branch or single_label(labels, BASE_PREFIX)
-    verified = verify_source(gh, source, base)
-    initiative_id = initiative_id_of(issue["title"])
+    harness_root = Path(args.harness_root or gh.git("rev-parse", "--show-toplevel").strip()).resolve()
+    ref, issue = None, {}
+    if args.spec:
+        default_repo = None
+        if "/" not in args.spec:
+            default_repo = gh.text("repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner").strip()
+        ref = parse_ref(args.spec, default_repo)
+        issue = read_issue(gh, ref)
+        labels = labels_of(issue)
+        source = args.source_repository or single_label(labels, TARGET_PREFIX)
+        base = args.base_branch or single_label(labels, BASE_PREFIX)
+        initiative_id = initiative_id_of(issue["title"])
+    else:
+        source, base = args.source_repository, args.base_branch
+        initiative_id = validate_initiative_id(args.initiative_id)
+
+    verified = verify_source(gh, source, base, pin_base=args.pin_base)
+    checkout = resolve_checkout(gh, harness_root, verified["source_repository"], ref.number if ref else None)
+    integration_branch = f"feat/{initiative_id}"
+    if args.pin_base:
+        root, sha = checkout["source_root"], verified["base_commit"]
+        gh.git("-C", root, "check-ref-format", "--branch", integration_branch)
+        gh.git("-C", root, "fetch", "--no-tags", "--no-write-fetch-head", "origin", sha)
+        gh.git("-C", root, "cat-file", "-e", f"{sha}^{{commit}}")
     return {
-        "spec": str(ref),
-        "tracker_repository": ref.repo,
-        "title": issue["title"],
-        "state": issue["state"],
+        "spec": str(ref) if ref else None,
+        "tracker_repository": ref.repo if ref else None,
+        "title": issue.get("title"),
+        "state": issue.get("state"),
         "base_branch": base,
         "initiative_id": initiative_id,
-        "integration_branch": f"feat/{initiative_id}",
+        "integration_branch": integration_branch,
         **verified,
-        **resolve_checkout(gh, harness_root, verified["source_repository"], ref.number),
+        **checkout,
     }
+
+
+def cmd_run_checkpoint(_gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
+    run_dir = Path(args.run_dir).resolve()
+    path = run_dir / "publication-checkpoint.json"
+    checkpoint = json.loads(Path(args.input).read_text(encoding="utf-8"))
+    identity = checkpoint.get("run") if isinstance(checkpoint, dict) else None
+    fields = ("id", "specRef", "sourceRepository", "baseBranch", "baseCommit", "integrationBranch", "worktreePath")
+    if not isinstance(identity, dict) or any(not isinstance(identity.get(field), str) or not identity[field] for field in fields):
+        raise UsageError("checkpoint is missing run identity")
+    mode, cap = identity.get("mode"), identity.get("maxParallel")
+    if mode not in ("sequential", "parallel") or (
+        cap is not None and (mode != "parallel" or type(cap) is not int or cap < 1)
+    ):
+        raise UsageError("invalid checkpoint execution mode or worker cap")
+    if not re.fullmatch(RUN_ID_PATTERN, identity["id"]) or not re.fullmatch(r"[0-9a-f]{40}", identity["baseCommit"]):
+        raise UsageError("invalid checkpoint run id or base SHA")
+    parse_ref(identity["specRef"])
+    tickets = checkpoint.get("tickets")
+    if not isinstance(tickets, dict):
+        raise UsageError("checkpoint tickets must be keyed by ticket key")
+    for key, ticket in tickets.items():
+        if not isinstance(ticket, dict) or not isinstance(ticket.get("ref"), str) or parse_ref(ticket["ref"]).key != key:
+            raise UsageError(f"checkpoint key does not match ticket identity: {key}")
+    if path.exists():
+        previous = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(previous, dict) or not isinstance(previous.get("tickets"), dict):
+            raise UsageError(f"invalid existing checkpoint: {path}")
+        if previous.get("run") != identity or previous["tickets"].keys() - tickets.keys():
+            raise UsageError("checkpoint must preserve run identity and recorded tickets")
+        for key, ticket in previous["tickets"].items():
+            if not isinstance(ticket, dict) or ticket.get("ref") != tickets[key]["ref"]:
+                raise UsageError(f"checkpoint must preserve the recorded ticket identity: {key}")
+    run_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=run_dir) as temporary:
+        draft = Path(temporary) / path.name
+        write_json(draft, checkpoint)
+        draft.replace(path)
+    return {"file": str(path)}
 
 
 def cmd_spec_create(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
@@ -309,7 +381,8 @@ def cmd_spec_create(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
 
 
 def blocker_record(blocker: dict[str, Any]) -> dict[str, Any]:
-    return {"ref": str(ref_of_api(blocker)), "state": blocker["state"], "state_reason": blocker.get("state_reason")}
+    return {"ref": str(ref_of_api(blocker)), "state": blocker["state"], "state_reason": blocker.get("state_reason"),
+            "hitl": "hitl" in labels_of(blocker)}
 
 
 def cmd_graph_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
@@ -326,11 +399,20 @@ def cmd_graph_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     routing = {prefix: next((label for label in spec_labels if label.startswith(prefix)), None) for prefix in (TARGET_PREFIX, BASE_PREFIX)}
     tickets: list[dict[str, Any]] = []
     problems: list[str] = []
+    keys: set[str] = set()
     for child in children_of(gh, spec_ref):
         ref = ref_of_api(child)
+        key = ref.key
+        if key in keys:
+            raise UsageError(f"duplicate or colliding ticket key for {ref}: {key}")
+        keys.add(key)
         blockers = [blocker_record(item) for item in gh.pages(f"repos/{ref.repo}/issues/{ref.number}/dependencies/blocked_by")]
         labels = labels_of(child)
-        path = out / "tickets" / f"{ref.file_stem}.json"
+        path = out / "tickets" / f"{key}.json"
+        if path.exists():
+            stored_ref = json.loads(path.read_text(encoding="utf-8")).get("ref")
+            if not isinstance(stored_ref, str) or stored_ref.lower() != str(ref).lower():
+                raise UsageError(f"ticket snapshot {path} belongs to {stored_ref}, not {ref}")
         write_json(path, {"ref": str(ref), "issue": child, "comments": read_comments(gh, ref), "blocked_by": blockers})
         for prefix, expected in routing.items():
             own = next((label for label in labels if label.startswith(prefix)), None)
@@ -338,7 +420,7 @@ def cmd_graph_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
                 problems.append(f"{ref}: routing label {own} conflicts with spec {expected}")
         tickets.append({
             "ref": str(ref), "title": child["title"], "state": child["state"], "state_reason": child.get("state_reason"),
-            "labels": labels, "hitl": "hitl" in labels, "blocked_by": blockers, "file": str(path),
+            "labels": labels, "hitl": "hitl" in labels, "blocked_by": blockers, "key": key, "file": str(path),
         })
     graph: dict[str, Any] = {
         "spec": {
@@ -379,10 +461,13 @@ def find_cycles(edges: dict[str, list[str]]) -> list[list[str]]:
 
 def analyse(graph: dict[str, Any], done: set[str]) -> dict[str, Any]:
     tickets = {ticket["ref"]: ticket for ticket in graph["tickets"]}
-    complete = {
-        ref for ref, ticket in tickets.items()
-        if ref in done or (ticket["state"] == "closed" and ticket["state_reason"] == "completed")
-    }
+
+    def can_verify(ticket: dict[str, Any]) -> bool:
+        if ticket["state"] == "closed":
+            return ticket["state_reason"] == "completed"
+        return not ticket.get("hitl", False)
+
+    complete = {ref for ref, ticket in tickets.items() if ref in done and can_verify(ticket)}
     edges = {ref: [blocker["ref"] for blocker in ticket["blocked_by"]] for ref, ticket in tickets.items()}
 
     def defer_reason(ref: str, seen: frozenset[str] = frozenset()) -> str | None:
@@ -402,15 +487,27 @@ def analyse(graph: dict[str, Any], done: set[str]) -> dict[str, Any]:
     for ref, ticket in tickets.items():
         if ref in complete or ref in deferred:
             continue
+        if ticket["state"] == "closed":
+            reason = ticket["state_reason"]
+            needs_resolution.append({"ref": ref, "state_reason": reason,
+                                     "reason": "unverified-closed" if reason == "completed" else "closed-without-completion"})
+            continue
         unmet = []
         for blocker in ticket["blocked_by"]:
-            if blocker["ref"] in complete or blocker["ref"] in done:
+            blocker_ref = blocker["ref"]
+            external = blocker_ref not in tickets
+            current = tickets.get(blocker_ref, blocker)
+            if blocker_ref in complete or (external and blocker_ref in done and can_verify(current)):
                 continue
-            if blocker["ref"] not in tickets and blocker["state"] == "closed" and blocker["state_reason"] == "completed":
-                continue
-            unmet.append(blocker["ref"])
-            if blocker["state"] == "closed" and blocker["state_reason"] != "completed":
-                needs_resolution.append({"ref": ref, "blocker": blocker["ref"], "state_reason": blocker["state_reason"]})
+            unmet.append(blocker_ref)
+            reason = current["state_reason"]
+            resolution = {"ref": ref, "blocker": blocker_ref, "state_reason": reason}
+            if current["state"] == "closed":
+                if reason == "completed":
+                    resolution["reason"] = "unverified-closed"
+                needs_resolution.append(resolution)
+            elif external:
+                needs_resolution.append({**resolution, "reason": "open-external"})
         if unmet:
             blocked.append({"ref": ref, "unmet": unmet})
         else:
@@ -543,28 +640,70 @@ def cmd_issue_edit_body(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     return {"ref": str(ref), "problems": problems}
 
 
+def marked_evidence(gh: Gh, ref: Ref, run_id: str) -> tuple[str, dict[str, Any] | None]:
+    if not re.fullmatch(RUN_ID_PATTERN, run_id):
+        raise UsageError("invalid run id for ticket evidence")
+    marker = f"<!-- implement-spec:evidence {run_id} {ref.key} -->"
+    matches = [comment for comment in read_comments(gh, ref) if marker in comment.get("body", "").splitlines()]
+    if len(matches) > 1:
+        raise UsageError(f"{ref}: multiple evidence comments for run {run_id}")
+    return marker, matches[0] if matches else None
+
+
 def cmd_issue_comment(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     ref = parse_ref(args.ref)
-    url = gh.text("issue", "comment", str(ref.number), "--repo", ref.repo, "--body-file", args.body_file).strip().splitlines()[-1]
+    source = Path(args.body_file)
+    expected = source.read_text(encoding="utf-8").strip()
+    with tempfile.TemporaryDirectory() as temporary:
+        if args.run_id:
+            issue = read_issue(gh, ref)
+            if "hitl" in labels_of(issue):
+                raise UsageError(f"{ref} is hitl; never post evidence from the run")
+            marker, existing = marked_evidence(gh, ref, args.run_id)
+            expected = f"{expected}\n\n{marker}"
+            if existing:
+                if existing["body"].strip() != expected:
+                    raise UsageError(f"{ref}: marked evidence differs from the recorded body")
+                comment_id = existing["id"]
+                url = existing.get("html_url") or f"https://github.com/{ref.repo}/issues/{ref.number}#issuecomment-{comment_id}"
+                return {"ref": str(ref), "url": url, "id": comment_id, "problems": []}
+            if issue["state"] != "open":
+                raise UsageError(f"{ref} is closed; reconcile its evidence before posting")
+            source = Path(temporary) / "evidence.md"
+            source.write_text(expected, encoding="utf-8")
+        output = gh.text("issue", "comment", str(ref.number), "--repo", ref.repo, "--body-file", str(source))
+    url = output.strip().split("\n")[-1]
     match = re.search(r"#issuecomment-(\d+)", url)
     if not match:
         raise GhError(f"no comment id in gh output: {url}")
     body = gh.json("api", f"repos/{ref.repo}/issues/comments/{match.group(1)}").get("body", "")
-    expected = Path(args.body_file).read_text(encoding="utf-8").strip()
     return {"ref": str(ref), "url": url, "id": int(match.group(1)), "problems": [] if body.strip() == expected else ["comment body differs"]}
 
 
 def cmd_issue_close(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     ref = parse_ref(args.ref)
-    if "hitl" in labels_of(read_issue(gh, ref)):
+    issue = read_issue(gh, ref)
+    if "hitl" in labels_of(issue):
         raise UsageError(f"{ref} is hitl; never close it from the run")
-    if args.comment:
-        comment = args.comment
+    close_args = ["issue", "close", str(ref.number), "--repo", ref.repo, "--reason", "completed"]
+    if args.run_id or args.evidence_comment is not None:
+        if not args.run_id or not args.evidence_comment or any((args.commit, args.branch, args.pr, args.comment)):
+            raise UsageError("workflow closure requires only --run-id and --evidence-comment")
+        _, evidence = marked_evidence(gh, ref, args.run_id)
+        if not evidence or evidence["id"] != args.evidence_comment:
+            raise UsageError(f"{ref}: expected marked evidence comment {args.evidence_comment}")
+        if issue["state"] == "closed":
+            if issue.get("state_reason") != "completed":
+                raise UsageError(f"{ref}: closed without completion; preserve tracker state")
+            return {"ref": str(ref), "state": "closed", "state_reason": "completed"}
+    elif args.comment:
+        close_args += ["--comment", args.comment]
     elif args.commit and args.branch:
         comment = f"Implemented in {args.commit} on {args.branch}" + (f" ({args.pr})." if args.pr else ".")
+        close_args += ["--comment", comment]
     else:
-        raise UsageError("provide --comment, or --commit and --branch")
-    gh.text("issue", "close", str(ref.number), "--repo", ref.repo, "--reason", "completed", "--comment", comment)
+        raise UsageError("provide --comment, --commit and --branch, or workflow evidence")
+    gh.text(*close_args)
     issue = read_issue(gh, ref)
     if issue["state"] != "closed" or issue.get("state_reason") != "completed":
         raise GhError(f"{ref} not closed as completed: {issue['state']}/{issue.get('state_reason')}")
@@ -643,11 +782,11 @@ def read_pr(gh: Gh, repo: str, number: int, initiative_id: str | None, expect_cl
     }
 
 
-def find_pr(gh: Gh, repo: str, head: str) -> dict[str, Any] | None:
-    found = gh.json("pr", "list", "--repo", repo, "--head", head, "--state", "open",
-                    "--json", "number,url,isDraft,baseRefName,headRefName,body")
+def find_pr(gh: Gh, repo: str, head: str, *, state: str = "open") -> dict[str, Any] | None:
+    found = gh.json("pr", "list", "--repo", repo, "--head", head, "--state", state,
+                    "--json", "number,url,title,state,isDraft,baseRefName,headRefName,body")
     if len(found) > 1:
-        raise UsageError(f"{len(found)} open PRs for head {head}; resolve manually")
+        raise UsageError(f"{len(found)} matching PRs for head {head}; resolve manually")
     return found[0] if found else None
 
 
@@ -657,9 +796,14 @@ def cmd_pr_publish(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
         raise UsageError(f"title must start with '{initiative}: '")
     closes = [str(parse_ref(ref)) for ref in args.closes]
     for ref in map(parse_ref, closes):
-        if "hitl" in labels_of(read_issue(gh, ref)):
+        issue = read_issue(gh, ref)
+        if "hitl" in labels_of(issue):
             raise UsageError(f"{ref} is hitl; never add a closing reference to it")
-    existing = find_pr(gh, args.source_repository, args.head)
+        if issue["state"] == "closed" and issue.get("state_reason") != "completed":
+            raise UsageError(f"{ref}: closed without completion; never add a closing reference to it")
+    existing = find_pr(gh, args.source_repository, args.head, state="all")
+    if existing and (existing.get("state", "OPEN") != "OPEN" or not existing["isDraft"]):
+        raise UsageError(f"existing PR #{existing['number']} is not an open draft")
     if existing and existing["baseRefName"] != args.base:
         raise UsageError(f"existing PR #{existing['number']} targets {existing['baseRefName']}, expected {args.base}")
     old_body = (existing["body"] or "") if existing else ""
@@ -673,9 +817,10 @@ def cmd_pr_publish(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
         body_file = Path(tmp) / "pr.md"
         body_file.write_text(body, encoding="utf-8")
         if existing:
-            gh.text("pr", "edit", str(existing["number"]), "--repo", args.source_repository,
-                    "--title", args.title, "--body-file", str(body_file))
             number = existing["number"]
+            if old_body != body or existing.get("title") != args.title:
+                gh.text("pr", "edit", str(number), "--repo", args.source_repository,
+                        "--title", args.title, "--body-file", str(body_file))
         else:
             url = gh.text("pr", "create", "--repo", args.source_repository, "--base", args.base, "--head", args.head,
                           "--draft", "--title", args.title, "--body-file", str(body_file)).strip().splitlines()[-1]
@@ -730,7 +875,7 @@ def build_parser() -> argparse.ArgumentParser:
     groups = parser.add_subparsers(dest="group", required=True)
     nested = {
         group: groups.add_parser(group).add_subparsers(dest="action", required=True)
-        for group in ("spec", "graph", "ticket", "issue", "pr")
+        for group in ("spec", "graph", "ticket", "issue", "pr", "run")
     }
 
     def command(group: str | None, name: str, handler: Callable[..., dict[str, Any]]) -> argparse.ArgumentParser:
@@ -739,10 +884,18 @@ def build_parser() -> argparse.ArgumentParser:
         return sub
 
     p = command(None, "preflight", cmd_preflight)
-    p.add_argument("--spec", required=True)
+    p.add_argument("--spec")
     p.add_argument("--harness-root")
     p.add_argument("--source-repository")
     p.add_argument("--base-branch")
+    p.add_argument("--initiative-id")
+    p.add_argument("--mode", choices=("sequential", "parallel"), default="sequential")
+    p.add_argument("--max-parallel", type=int)
+    p.add_argument("--pin-base", action="store_true")
+
+    p = command("run", "checkpoint", cmd_run_checkpoint)
+    p.add_argument("--run-dir", required=True)
+    p.add_argument("--input", required=True)
 
     p = command("spec", "create", cmd_spec_create)
     for flag in ("source-repository", "base-branch", "initiative-id", "summary", "body-file", "source-note"):
@@ -771,11 +924,14 @@ def build_parser() -> argparse.ArgumentParser:
         p = command("issue", name, handler)
         p.add_argument("ref")
         p.add_argument("--body-file", required=True)
+        if name == "comment":
+            p.add_argument("--run-id")
 
     p = command("issue", "close", cmd_issue_close)
     p.add_argument("ref")
-    for flag in ("commit", "branch", "pr", "comment"):
+    for flag in ("commit", "branch", "pr", "comment", "run-id"):
         p.add_argument(f"--{flag}")
+    p.add_argument("--evidence-comment", type=int)
 
     p = command("pr", "publish", cmd_pr_publish)
     for flag in ("source-repository", "base", "head", "title", "initiative-id", "rationale-file"):

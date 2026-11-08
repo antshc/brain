@@ -124,7 +124,7 @@ def test_full_run_lifecycle(sandbox: Sandbox):
     assert frontier["blocked"] == [{"ref": "acme/specs#3", "unmet": ["acme/specs#2"]}]
     assert {d["ref"]: d["reason"] for d in frontier["deferred"]} == {
         "acme/specs#4": "hitl", "acme/specs#5": "blocked by acme/specs#4"}
-    assert json.loads((sandbox.run_dir / "tickets" / "acme_specs_2.json").read_text())["comments"] == []
+    assert json.loads(Path(graph["tickets"][0]["file"]).read_text())["comments"] == []
 
     code, after_done, err = sandbox.tool("graph", "frontier", "--graph", str(sandbox.run_dir / "graph.json"), "--done", "acme/specs#2")
     assert code == 0, err
@@ -135,7 +135,8 @@ def test_full_run_lifecycle(sandbox: Sandbox):
     code, closed, err = sandbox.tool("issue", "close", "acme/specs#2", "--commit", "abc123", "--branch", "feat/pay-12", "--pr", "http://pr")
     assert code == 0 and closed["state_reason"] == "completed", err
     code, graph, _ = sandbox.tool("graph", "read", "--spec", SPEC, "--out", str(sandbox.run_dir))
-    assert graph["frontier"]["done"] == ["acme/specs#2"] and graph["frontier"]["ready"] == ["acme/specs#3"]
+    assert graph["frontier"]["done"] == [] and graph["frontier"]["ready"] == []
+    assert any(item["reason"] == "unverified-closed" for item in graph["frontier"]["needs_resolution"])
 
     rationale = sandbox.file("why.md", "- Prevent duplicate charges when customers retry timed-out payments.\n")
     title = ["--title", "PAY-12: Refunds"]
@@ -297,3 +298,113 @@ def test_pr_diff_split_end_to_end(sandbox: Sandbox):
     state["diff"] = ""
     sandbox.write_state(state)
     assert sandbox.tool("pr", "diff-split", "--pr", "9")[0] == 1
+
+
+def test_plan_preflight_is_read_only_and_rejects_invalid_execution_options(sandbox):
+    before = sandbox.state()
+    args = ("preflight", "--source-repository", "acme/shop", "--base-branch", "main", "--initiative-id", "PAY-12")
+    code, _, err = sandbox.tool(*args, "--mode", "invalid")
+    assert code == 2 and "mode" in err
+    code, _, err = sandbox.tool(*args, "--max-parallel", "0", "--mode", "parallel")
+    assert code == 2 and "max-parallel" in err
+    code, pre, err = sandbox.tool(*args)
+    assert code == 0, err
+    assert pre["spec"] is None and pre["source_root"].endswith("workspace/shop")
+    assert sandbox.state() == before
+
+
+def test_graph_uses_distinct_snapshot_keys_for_same_number_across_repositories(sandbox):
+    state = sandbox.state()
+    refs = [issue(state, repo, title, [], parent=SPEC)
+            for repo, title in (("a_b/c", "first"), ("a/b_c", "second"))]
+    sandbox.write_state(state)
+    code, graph, err = sandbox.tool("graph", "read", "--spec", SPEC, "--out", str(sandbox.run_dir))
+    assert code == 0, err
+    tickets = [ticket for ticket in graph["tickets"] if ticket["ref"] in refs]
+    assert len({ticket["key"] for ticket in tickets}) == 2
+    for ticket in tickets:
+        path = Path(ticket["file"])
+        assert path.stem == ticket["key"]
+        assert json.loads(path.read_text())["ref"] == ticket["ref"]
+
+
+@pytest.mark.parametrize("lost_command", ["pr create", "issue comment", "issue close"])
+def test_publication_recovers_lost_response_without_duplicate_writes(sandbox, lost_command):
+    ref = "acme/specs#2"
+    rationale = sandbox.file("why.md", "- Prevent duplicate charges.\n")
+    evidence = sandbox.file("evidence.md", "tests passed")
+    publish = ("pr", "publish", *PR_ARGS, "--title", "PAY-12: Refunds",
+               "--rationale-file", rationale, "--closes", ref)
+    comment = ("issue", "comment", ref, "--body-file", evidence, "--run-id", "run-1")
+    state = sandbox.state()
+    state["lose_response"] = lost_command
+    sandbox.write_state(state)
+
+    def retry(args):
+        code, result, err = sandbox.tool(*args)
+        if " ".join(args[:2]) == {"pr create": "pr publish"}.get(lost_command, lost_command):
+            assert code == 1 and "lost response" in err
+            code, result, err = sandbox.tool(*args)
+        assert code == 0, err
+        return result
+
+    retry(publish)
+    posted = retry(comment)
+    close = ("issue", "close", ref, "--run-id", "run-1", "--evidence-comment", str(posted["id"]))
+    assert retry(close)["state_reason"] == "completed"
+    state = sandbox.state()
+    assert len(state["prs"]) == len(state["comments"]) == 1
+
+
+def test_preflight_fetches_exact_sha_and_worktree_uses_it_after_base_advances(sandbox):
+    upstream = sandbox.root / "upstream" / "acme" / "shop.git"
+    upstream.parent.mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", "-b", "main", str(upstream)], check=True)
+    checkout = sandbox.harness / "workspace" / "shop"
+
+    def git(repo, *args):
+        return subprocess.check_output(["git", "-C", str(repo), *args], text=True).strip()
+
+    git(checkout, "remote", "set-url", "origin", str(upstream))
+    git(upstream, "-c", "user.name=Test", "-c", "user.email=test@example.com",
+        "commit", "-q", "--allow-empty", "-m", "initial")
+    pinned = git(upstream, "rev-parse", "HEAD")
+    state = sandbox.state()
+    state["branch_heads"] = {"acme/shop:main": pinned}
+    sandbox.write_state(state)
+    code, pre, err = sandbox.tool("preflight", "--spec", SPEC, "--pin-base")
+    assert code == 0, err
+    assert pre["base_commit"] == pinned
+
+    git(upstream, "-c", "user.name=Test", "-c", "user.email=test@example.com",
+        "commit", "-q", "--allow-empty", "-m", "advanced")
+    tip = git(upstream, "rev-parse", "HEAD")
+    worktree = sandbox.root / "integration"
+    git(checkout, "worktree", "add", "-b", pre["integration_branch"], str(worktree), pre["base_commit"])
+    assert git(worktree, "rev-parse", "HEAD") == pinned != tip
+    assert git(worktree, "merge-base", "--is-ancestor", pinned, "HEAD") == ""
+
+
+def test_checkpoint_persists_progress_and_refuses_changed_identity(sandbox):
+    code, graph, err = sandbox.tool("graph", "read", "--spec", SPEC, "--out", str(sandbox.run_dir))
+    assert code == 0, err
+    ticket = graph["tickets"][0]
+    run = {"id": "run-1", "specRef": SPEC, "sourceRepository": "acme/shop", "baseBranch": "main",
+           "baseCommit": "a" * 40, "integrationBranch": "feat/PAY-12", "worktreePath": str(sandbox.root / "wt"),
+           "mode": "sequential", "maxParallel": None}
+    data = {"run": run, "tickets": {ticket["key"]: {"ref": ticket["ref"], "commit": "b" * 40}}}
+
+    def checkpoint():
+        return sandbox.tool("run", "checkpoint", "--run-dir", str(sandbox.run_dir),
+                            "--input", sandbox.file("checkpoint-input.json", json.dumps(data)))
+
+    code, result, err = checkpoint()
+    assert code == 0, err
+    saved = Path(result["file"])
+    assert json.loads(saved.read_text()) == data
+    data["tickets"][ticket["key"]]["pushedHead"] = "b" * 40
+    assert checkpoint()[0] == 0
+    previous = saved.read_bytes()
+    run["integrationBranch"] = "feat/wrong"
+    assert checkpoint()[0] == 2
+    assert saved.read_bytes() == previous

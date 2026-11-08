@@ -14,9 +14,9 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 
 ## Prepare Plan
 
-1. Ask for **target repository, target/base branch, and initiative ID**; `GH_TOOL spec create` validates all three, the source repository, and the remote base branch. **MUST NOT** silently substitute the repository default branch. Done when all answers and routing are verified.
-2. `GH_TOOL spec create` with the plan/description as `--body-file` (it creates the `repo:target:`/`repo:base:` labels and reads back title prefix and routing; `problems` → stop). Then `GH_TOOL preflight --spec <new spec>` validates routing, the remote base branch, and the checkout; it does not fetch. The orchestrator fetches `BASE_BRANCH` and records `BASE_COMMIT` before launching the planner. Done when the remote spec matches the validated answers.
-3. Return control to the orchestrator for *Breakdown Initiative*. Done when created/reconciled tickets and native links are read back.
+1. Resolve **target repository, target/base branch, and initiative ID** from the request. Ask only for missing values. **MUST NOT** silently substitute the repository default branch.
+2. After validating execution options and runtime capabilities, run `GH_TOOL preflight --source-repository R --base-branch B --initiative-id I --mode MODE --pin-base` with the supplied worker cap, if any. It validates routing and checkout and records `BASE_COMMIT` before any tracker write.
+3. Run `GH_TOOL spec create` with the plan/description as `--body-file`; it creates the routing labels and reads back title prefix and routing. Run `GH_TOOL preflight --spec REF --mode MODE` with the same execution options, without `--pin-base`, to bind the spec and run directory. Require the same routing and checkout. Done when the remote spec matches the validated answers and the pinned base is retained.
 
 ## Breakdown Initiative
 
@@ -44,7 +44,7 @@ Partition fetched artifacts into bounded meaningful pieces: document sections, p
 
 ### 3. Explore records and code
 
-Explore touched code until current behavior, module and folder boundaries, dependencies, shared files, integration layers, and existing test seams are known. For structural changes, inspect project references, namespace/path conventions, build configuration, and regression tests. Use `GLOSSARY.md` vocabulary. Read relevant Crosscutting Concepts and Architecture Decision Records from `ARCHITECTURE.md` indexes and open their records. Apply shared domain behavior, layering, validation, persistence, testing and operational policies; preserve localized ADR decisions. Identify prefactoring that makes the change easy. Missing applicable decisions or source conflicts block publication. Record applicable Concepts/ADRs and bounded scope paths in planning notes.
+Read tracked source, tests, and architecture records at the pinned commit via `git ls-tree`, `git grep`, and `git show` or a verified checkout at that SHA. Explore touched code until current behavior, module and folder boundaries, dependencies, shared files, integration layers, and existing test seams are known. For structural changes, inspect project references, namespace/path conventions, build configuration, and regression tests. Use `GLOSSARY.md` vocabulary. Read relevant Crosscutting Concepts and Architecture Decision Records from `ARCHITECTURE.md` indexes and open their records. Apply shared domain behavior, layering, validation, persistence, testing and operational policies; preserve localized ADR decisions. Identify prefactoring that makes the change easy. Missing applicable decisions or source conflicts block publication. Record applicable Concepts/ADRs and bounded scope paths in planning notes.
 
 ### 4. Select strategy, draft tasks, and map artifacts
 

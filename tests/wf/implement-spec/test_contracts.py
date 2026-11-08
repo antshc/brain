@@ -48,11 +48,12 @@ def test_input_detection_modes_and_read_only_existing_graph_analysis():
 
 def test_plan_branch_is_answered_validated_persisted_and_read_back():
     prepare = BREAKDOWN.split('## Prepare Plan')[1].split('## Breakdown Initiative')[0]
-    for text in ('target repository, target/base branch, and initiative ID', 'validates all three',
-                 'remote base branch', '**MUST NOT** silently substitute the repository default branch',
-                 '`GH_TOOL spec create`', 'reads back title prefix and routing', '`GH_TOOL preflight',
-                 'it does not fetch', 'records `BASE_COMMIT`', 'Done when the remote spec matches the validated answers'):
+    for text in ('target repository, target/base branch, and initiative ID',
+                 '**MUST NOT** silently substitute the repository default branch',
+                 'reads back title prefix and routing', 'records `BASE_COMMIT`',
+                 'without `--pin-base`', 'the pinned base is retained'):
         assert text in prepare
+    assert prepare.index('--pin-base') < prepare.index('`GH_TOOL spec create`')
 
 
 @pytest.mark.parametrize('role,old,required', [
@@ -168,7 +169,7 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert '`result.commit` is null' in launch
     assert 'never publish' in launch
     assert 'validated per-ticket preferred model/effort' in launch
-    assert launch.index('*Implementation focus* evidence gate to `result.verification`') < launch.index('Integrate and publish')
+    assert launch.index('*Implementation focus* evidence gate to `result.verification`') < launch.index('Integrate verified commits')
     assert 'same material risk' in agent and 'same material risk' in MAIN
 
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
@@ -314,7 +315,7 @@ def test_graph_only_outputs_and_scheduler_guards():
         for path in skill.rglob('*.md'):
             assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
     parallel = (ROOT / 'references/parallel.md').read_text()
-    for text in ('fewer than `MAX_PARALLEL`', 'blockers integrated',
+    for text in ('fewer than `MAX_PARALLEL`', 'blockers verified by the effective frontier',
                  'has no `file` conflict with an in-flight ticket',
                  'without waiting for unrelated in-flight tickets',
                  'after each validated integration', 'while B still runs',
@@ -437,3 +438,15 @@ def test_implementation_handoff_contains_routing_and_durable_data_pointers():
     frontier = MAIN.split('6. **Frontier check.**')[1].split('7. Launch chore')[0]
     assert 'blocked' in frontier and 'handoff' in frontier.lower()
     assert 'keep the spec open' in MAIN
+
+
+def test_no_change_handoff_bypasses_pr_and_preserves_closure_gate_for_mixed_runs():
+    frontier = MAIN.split('6. **Frontier check.**')[1].split('7. Launch chore')[0]
+    assert '`already-satisfied`' in frontier
+    assert 'verified on `BASE_COMMIT`' in frontier
+    assert 'without chore or PR operations' in frontier
+    feature = (FACTORY / 'playbooks/feature.md').read_text()
+    assert feature.index('For `already-satisfied`') < feature.index('6. Integration tests.')
+    assert 'null PR/pushed head' in feature
+    post = (FACTORY / 'references/post-implementation.md').read_text()
+    assert 'open no-change ticket' in post and 'read-back completed closure' in post
