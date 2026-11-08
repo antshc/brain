@@ -74,7 +74,9 @@ class TestFrontier:
         assert result["ready"] == ["a#1"]
         assert result["blocked"] == [{"ref": "a#2", "unmet": ["a#1"]}]
         assert {d["ref"]: d["reason"] for d in result["deferred"]} == {"a#3": "hitl", "a#4": "blocked by a#3"}
-        assert result["done"] == ["a#5"]
+        assert result["done"] == []
+        assert result["needs_resolution"] == [{"ref": "a#5", "state_reason": "completed", "reason": "unverified-closed"}]
+        assert spec_gh.analyse(graph, {"a#5"})["done"] == ["a#5"]
 
     def test_done_set_unblocks_dependants(self):
         result = spec_gh.analyse(self.graph(ticket("a#1"), ticket("a#2", blockers=["a#1"])), {"a#1"})
@@ -178,8 +180,9 @@ class TestGraphRead:
         args = spec_gh.build_parser().parse_args(["graph", "read", "--spec", "acme/specs#1", "--out", str(tmp_path / "run")])
         graph = spec_gh.cmd_graph_read(Gh(runner), args)
         assert (tmp_path / "run" / "spec.json").exists()
-        assert (tmp_path / "run" / "tickets" / "acme_specs_5.json").exists()
-        assert graph["frontier"]["ready"] == ["acme/specs#5"]
+        assert Path(graph["tickets"][0]["file"]).is_file()
+        assert graph["frontier"]["ready"] == []
+        assert graph["frontier"]["needs_resolution"][0]["reason"] == "unverified-closed"
         assert "conflicts" in graph["problems"][0]
 
 
@@ -519,7 +522,7 @@ class TestInstructionsUseRealCommands:
 
         found = []
         for path in self.ROOT.rglob("*.md"):
-            for match in re.finditer(r"(?:`GH_TOOL|\{\{ghTool\}\}) ((?:preflight|spec|graph|ticket|issue|pr)\b(?: (?:create|read|frontier|block|edit-body|comment|close|publish|diff-split)\b)?)", path.read_text()):
+            for match in re.finditer(r"(?:`GH_TOOL|\{\{ghTool\}\}) ((?:preflight|spec|graph|ticket|issue|pr|run)\b(?: (?:create|read|frontier|block|edit-body|comment|close|publish|diff-split|checkpoint)\b)?)", path.read_text()):
                 found.append(tuple(match.group(1).split()))
         return found
 

@@ -129,3 +129,26 @@ def test_targeted_reanalysis_changes_only_updated_recommendations():
     result = spec_gh.analyse(spec_gh.effective_graph(native, revised), {A})
     assert result["ready"] == [B, C]
     assert planner["result"]["tickets"][2]["blockers"] == [B]
+
+
+@pytest.mark.parametrize("external", [False, True])
+def test_tracker_closure_requires_explicit_verification(external):
+    native = graph()
+    blocker = {"ref": A, "state": "closed", "state_reason": "completed"}
+    native["tickets"][0].update(blocker)
+    native["tickets"][1]["blocked_by"] = [blocker]
+    if external:
+        native["tickets"].pop(0)
+    result = spec_gh.analyse(native, set())
+    assert result["ready"] == [C]
+    assert {"ref": B, "blocker": A, "state_reason": "completed", "reason": "unverified-closed"} in result["needs_resolution"]
+    assert spec_gh.analyse(native, {A})["ready"] == [B, C]
+
+
+def test_stale_done_cannot_release_open_hitl_or_cancelled_ticket():
+    native = graph()
+    native["tickets"][0]["hitl"] = True
+    native["tickets"][1].update(state="closed", state_reason="not_planned")
+    result = spec_gh.analyse(spec_gh.effective_graph(native, plan()), {A, B})
+    assert result["ready"] == []
+    assert result["done"] == []

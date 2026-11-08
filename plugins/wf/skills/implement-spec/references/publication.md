@@ -1,32 +1,46 @@
 # Publication
 
-Per-ticket publication, PR read-back, ticket closure, and implementation handoff. Every GitHub call is a `GH_TOOL` command (see *GitHub operations*); `0` exit = read back and verified.
+Both modes use the same publication checkpoints after the orchestrator validates a ticket commit on the integration branch. Every GitHub call uses `GH_TOOL`. Read back every write before claiming success.
 
-## Pull request
+## Publication checkpoint
 
-Push with `git push --set-upstream REMOTE INTEGRATION_BRANCH`; later pushes must succeed before reporting the PR current. Publish and update with `GH_TOOL pr publish`, only after a verified ticket commit exists ahead of the base. It always creates a draft, reuses a matching PR, preserves user-authored body text, and accumulates `Closes` lines.
+The orchestrator is the sole writer. Keep `RUN_DIR/publication-checkpoint.json` outside the integration worktree. Save it atomically with `GH_TOOL run checkpoint --run-dir RUN_DIR --input FILE` using a separate input file. Remove only temporary input files this run owns.
 
-- **Initiative ID:** title `{{initiative-id}}: <summary>` with the resolved `INITIATIVE_ID` substituted literally (e.g. `PAY-12`). The tool puts that ID alone on the body's first line (code review takes the first ID as the initiative) and replaces legacy `[#ID]`, `Initiative:` and `Initiative source:` markers. **MUST NOT** add an initiative-source URL.
-- **Rationale file (`--rationale-file`):** terse `- ` bullets; each answers "Why?" (why the work is needed, which problem or risk it addresses) from spec/ticket evidence. **MUST NOT** describe code changes, list files or symbols, or reproduce a commit log. One bullet per reason. No reason in the source → report the missing rationale; never invent one. Good: `- Prevent duplicate charges when customers retry timed-out payments.` Bad: `- Add an idempotency check to PaymentService.`
-- **Links:** `--closes` only implemented tickets, never skipped ones. The spec stays in `--refs`; spec closure belongs to the caller after post-implementation checks. Ticket evidence or blocker text goes in `--evidence-file`, never in the bullets.
-- **Read back:** `GH_TOOL pr read ... --expect-closes <implemented tickets>`; confirm each bullet answers "Why?". Exit `3` or a wrong first line, base/head, or `is_draft` ≠ `true` blocks success. Report `checks.status` accurately (`pending`, `failed`, `absent`, `passed`); required pending/failed checks block spec closure; never claim a nonexistent check passed.
+- `run` holds a generated stable `id` (UUID or alphanumeric segments separated by hyphens), `specRef`, `sourceRepository`, `baseBranch`, `baseCommit`, `integrationBranch`, `worktreePath`, `mode`, and `maxParallel`. Save before the first worker launch and preserve the identity on resume.
+- `tickets` is an object keyed by the effective graph ticket's `key`. Each entry holds `ref` and records verified state as it advances: `commit`, `verifiedAt`, `evidence` paths, `pushedHead`, `prNumber` and `prUrl`, `evidenceCommentId`, and `closure`. Use null for unknown values. Persist the exact body file and publication inputs before sending a write. Record the launch base and worktree/branch when preserving unfinished work.
+- Record no-change evidence under the same ticket key, with a null commit and the exact checked SHA. No-change has no remote publication checkpoints. Record verified chore evidence and the SHA before its push so that an interrupted push can also be reconciled.
 
 ## Ticket publication
 
-After each verified integration:
+1. **Validated locally.** Record the exact integration SHA and evidence. Require a clean integration worktree, the expected branch and ancestry, and the approved result. Refresh the ticket labels/state before advancing. HITL or closed without completion → preserve and block the affected ticket.
+2. **Pushed.** Inspect the remote head and push `git push --set-upstream REMOTE INTEGRATION_BRANCH` only when the remote is absent or at the expected prior head and the update is a fast-forward. If it already equals the verified integration SHA, record it without pushing. Confirm the remote head and record it. Unexpected head → preserve and block.
+3. **Draft PR verified.** Use *Pull request* with the pushed SHA. Record the verified PR number and URL.
+4. **Evidence verified.** Use `GH_TOOL issue comment REF --body-file F --run-id ID` in the ticket's owning repository. The body records the integration SHA, validation, and PR URL. Keep its exact text for retries. The helper reuses the matching marked comment and reads back new comments. Duplicate markers or changed text require reconciliation. Record the comment ID.
+5. **Closure verified.** Apply *Closure*. Update the checkpoint and make the verified completion available to the frontier. In sequential mode finish publication before starting another ticket. In parallel mode retain the reservation until integration and publication settle. If publication fails, preserve the checkpoint and withhold further integration writes while the remote state is uncertain.
 
-1. Mark the ticket integrated in the run-local map.
-2. Push `INTEGRATION_BRANCH`; after the first integrated commit, publish the draft PR; sequential mode does so before starting the next ticket.
-3. Post ticket evidence and PR pointer with `issue comment` in the ticket's owning repository, then close it per *Closure*.
-4. Read back push, PR body, comment, and closure before reporting success.
+## Pull request
+
+Use `GH_TOOL pr publish` only with a verified commit ahead of the base and confirmed pushed head. It creates a draft, reuses a matching open draft, preserves user-authored body text, and accumulates closing references for implemented tickets.
+
+- **Initiative ID.** Use the literal initiative ID in the title prefix `{{initiative-id}}: <summary>` and alone on the first body line. The tool replaces legacy ID and initiative-source markers. Omit an initiative-source URL.
+- **Rationale.** Supply terse `- ` bullets in `--rationale-file`, one per reason grounded in spec or ticket evidence. Explain the problem or risk the work addresses. Exclude implementation details, file and symbol lists, and commit logs. Missing rationale blocks publication. Put ticket evidence and blocker text in `--evidence-file`.
+- **Links.** Use `--closes` only for tickets with verified integrated commits. Keep the spec and skipped tickets in `--refs`; exclude no-change tickets from closing references.
+- **Read back.** Use `GH_TOOL pr read --source-repository R --head H --initiative-id I --expect-closes REF…`. Compare draft state, base, branch, pushed SHA, rationale, and coverage. Report checks as `pending`, `failed`, `absent`, or `passed`. Required pending or failed checks block spec closure.
 
 ## Closure
 
-Close each ticket with `GH_TOOL issue close REF --commit SHA --branch INTEGRATION_BRANCH --pr PR_URL` right after its commit and validation evidence are verified on the integration branch and the evidence comment is posted; the tool closes as `completed`, verifies the state, and refuses `hitl` issues. Keep the spec open; return its identity and validation state in the implementation handoff. Never close an issue whose commit or validation is missing, or that was skipped, cancelled, or deferred. PR closing keywords stay as a merge-time backstop.
+After the integration SHA, pushed head, PR and evidence comment are verified, run `GH_TOOL issue close REF --run-id ID --evidence-comment N`. The helper verifies the marked comment belongs to this ticket and run, closes as completed, and reads back the state. It reuses a completed closure only with matching evidence. Keep the spec open. No-change, skipped, deferred, or cancelled tickets retain their observed tracker state.
+
+## Resume publication
+
+1. Read the recorded checkpoint from the explicit `RUN_DIR`. Match its spec, source, routing, branch, and mode to current read-only preflight. Verify the pinned SHA is locally available and the recorded worktree is registered on the recorded branch. A verified run suffix is part of that identity. Use the recorded worker cap. Do not repin the base. A legacy run may resume only when the same facts can be reconstructed from existing handoff, Git, and tracker evidence. Validate legacy snapshot refs and branch/worktree ownership before reusing any recorded path.
+2. Reconcile the local and remote integration heads against the recorded base and verified SHAs. Inspect every unsettled result and its evidence before counting it as done. Unexpected commits, dirty or ambiguous state, or missing proof → preserve work and return the exact blocker. Reconcile pending publications before new launches. Resume unfinished local work only when its identity and recorded starting state can be established.
+3. Resume *Ticket publication* from the first step without verified read-back. After a lost push response, compare the remote head before retrying. After a lost PR response, query by recorded number or qualified source/head and validate metadata before any retry. For evidence or closure, reuse the same run ID, input body, and comment ID. Read back the exact evidence body again before retrying closure. Checkpoint each recovered step. Recheck ticket labels and terminal state before writes. If a previously verified closure changed, preserve tracker state and report the mismatch.
+4. Refresh graph and recompute completion evidence. Retain the checkpoint, worktree, and all evidence on a blocked exit. Resume chore only from verified recorded state; preserve any unverified local changes.
 
 ## Publication verification
 
-1. Confirm implementation and chore changes are verified, committed, and pushed; worktree clean. Missing/failed chore output remains a blocker; distinguish verified no-change.
-2. `GH_TOOL pr read` with `--initiative-id` and `--expect-closes` for every implemented ticket: title/first-line ID, rationale bullets, coverage, target/head branches, draft state, checks. Keep the spec reference non-closing.
-3. Refresh `GH_TOOL graph read`; preserve every qualified ticket identity, validation/evidence pointer, read-back evidence comment and closure, and blocker in the handoff.
-4. Preserve `SOURCE_ROOT`, PR URL, final pushed head, `RUN_DIR`, `EVIDENCE_ROOT`, integration branch/worktree, and routing pointers outside the integration worktree. Missing push, coverage, metadata, or unreadable pointer → fix and re-read or return a blocked handoff with spec open.
+1. Confirm implementation and chore changes are verified, committed, and pushed with a clean worktree. Distinguish verified chore no-change from missing evidence.
+2. Use `GH_TOOL pr read` with `--initiative-id` and `--expect-closes` for every integrated ticket. Confirm the draft PR points to the exact pushed head and the spec reference has no closing keyword.
+3. Refresh `GH_TOOL graph read`. Preserve each qualified ticket identity, validation and evidence pointers, observed closure, and blocker in the handoff. Mixed runs report verified no-change separately. Keep an open no-change ticket visible for the caller's spec closure gate.
+4. Preserve the source, PR, final pushed SHA, worktree, checkpoint, and run/evidence pointers. Missing push, coverage, metadata, or unreadable evidence → fix and read back, or return a blocked handoff with spec open.

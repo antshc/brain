@@ -88,7 +88,8 @@ def api(state: dict, args: list[str]) -> bool:
     if match:
         if unquote(match.group(2)) not in state["repos"].get(match.group(1), {}).get("branches", []):
             fail("gh: Branch not found (HTTP 404)")
-        print("{}")
+        sha = state.get("branch_heads", {}).get(f"{match.group(1)}:{unquote(match.group(2))}")
+        emit({"commit": {"sha": sha}} if sha else {}, args)
         return False
     match = re.fullmatch(r"repos/([^/]+/[^/]+)/issues/comments/(\d+)", endpoint)
     if match:
@@ -201,7 +202,12 @@ def run(args: list[str], state: dict) -> bool:
 def main() -> None:
     state = json.loads(STATE.read_text())
     if run(sys.argv[1:], state):
+        lost_response = state.get("lose_response") == " ".join(sys.argv[1:3])
+        if lost_response:
+            del state["lose_response"]
         STATE.write_text(json.dumps(state))
+        if lost_response:
+            fail("lost response after write")
 
 
 if __name__ == "__main__":
