@@ -11,7 +11,7 @@ Run on explicit user invocation. Install into the repository from which the skil
 
 ## Select stacks
 
-Read `codey-<stack>.agent.md` in this plugin's `agents/` directory to discover the installed roster. Present the available stack rule files for the stack ids (`ai`, `dotnet`, `py`) and let the user choose one or more. No choice means create nothing. Do not infer or offer stacks outside that roster.
+Present the stack rule options from the template table below (`ai`, `dotnet`, `py`) and let the user choose one or more. No choice means create nothing.
 
 ## Copy missing files
 

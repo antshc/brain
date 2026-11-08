@@ -1,6 +1,6 @@
 # Crew
 
-Crew ships `codey-py`, `codey-ai`, and `codey-dotnet` for implementation and `chorey` for behavior-preserving cleanup.
+Crew ships `codey-py` and `codey-dotnet` for implementation and `chorey` for behavior-preserving cleanup.
 
 - `to-crew` and `ralph:dev` select a stack agent from its description and use `general-purpose` when no installed agent matches. `to-crew` mirrors `ralph:dev`'s per-task flow on a single task: stage Codey's changes, review them with Chorey, then close, comment on, or label the related issue from Codey's `STATUS`. Unlike `ralph:dev`, `to-crew` never commits — every change from both agents stays staged and uncommitted for the user. Chorey requires `/crew-chore`, passes it the aggregate stacks detected by `chorey-diff`, and uses an empty stack array to load every configured repository-local stack rule file.
 - Each Codey agent owns input, implementation, focused verification, gotchas, and its five-field status report. Codey agents select a risk-based test strategy per changed behavior (failing reproduction for bugs, test-first for uncertain logic, characterization before refactors, contract-first for public contracts, test-after for clear features, existing checks for covered mechanical edits), never weaken a valid test to get green, and mark each check `passed`, `failed`, `unavailable`, or `not run`. The .NET agent finds affected projects and runs focused checks. Python and AI agents use compact flows.
