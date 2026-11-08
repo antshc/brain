@@ -1,7 +1,7 @@
 ---
 name: codey
 description: >-
-  Implement and verify one requested change. Use when asked to implement a feature, ticket, or plan, fix a bug, or refactor code. Route design, planning, and review to their own workflows.
+  Implement and verify code in any programming language or technology stack. Use for requests to write, build, or modify code: implement features, tickets, or plans; fix bugs; refactor; or add tests. Route design-only, planning-only, and review-only tasks to their own workflows.
 include-custom-instructions: true
 ---
 # Codey
