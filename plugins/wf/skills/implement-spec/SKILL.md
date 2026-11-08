@@ -98,26 +98,22 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
 
    Before each initial launch or rework in either mode, **MUST** confirm concrete acceptance outcomes, required producer contracts, and feasible verification from ticket/source evidence. Material requirement/contract gaps or missing verification criteria → block the ticket and dependants in the run-local map, record the exact gap, and withhold launch even if dependency-ready. Resolve evidence gaps through *Targeted replanning*; resolve requirement/contract decisions explicitly. Continue independent eligible work. Leave routine implementation choices to the implementer; handle infrastructure-only gaps per *Implementation focus*. Rationale: dependency-ready does not mean ready to implement.
 
-   Pass trusted fields `workspace: worktree`, `taskSource: ticket` and `delivery: ticket-commit`, plus the following values. Pass filesystem paths as absolute paths. Keep task data in the pointer files.
+   The orchestrator selects and validates the workspace, branch or caller-managed rebase state, HEAD and index before delegation. Launch the worker with that workspace as its working directory. Pass `taskSource: ticket` and the absolute task pointers below.
 
    | Handoff field | Sequential | Parallel |
    |---|---|---|
-   | `worktreePath` | `WORKTREE_PATH` | `TICKET_WORKTREE(n)` |
-   | `featureBranch` | `INTEGRATION_BRANCH` | `TICKET_BRANCH(n)` |
-   | `targetBranch` | `BASE_BRANCH` | `INTEGRATION_BRANCH` |
    | `ticketRef` | `OWNER/REPO#NUMBER` | same |
    | `ticketFile` | `RUN_DIR/tickets/<OWNER>_<REPO>_<NUMBER>.json` | same |
    | `commitsFile` | `RUN_DIR/commits/<HEAD sha>.txt` | same (integration log) |
-   | `commitSubjectPrefix` | `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): ` | same |
    | `specArtifactsDir` | `RUN_DIR/artifacts` | same |
 
    Capture `result.gotchas` on every attempt, including failures. Require an array of observed, reusable findings (empty is valid). Attribute findings to the ticket, agent and attempt in the output.
 
-   Verify in the ticket's worktree: `HEAD` = `result.commit`, exactly one commit since `@prevHead`, subject prefix, clean and on its branch, `result.verification` names executed checks and results including skipped infrastructure checks and errors; thin evidence → run cheap confirmations.
+   Before committing, confirm the worker left HEAD, branch or caller-managed rebase state, and index as they were at launch. Unexpected Git state → preserve it and block the ticket. Inspect the diff and confirm `result.files` accounts for the edits in scope. Require `result.verification` to name executed checks and results, including skipped infrastructure checks and errors. Thin evidence → run cheap confirmations.
    → Evidence invalidates planning assumptions or model capability: run *Targeted replanning* before ordinary rework; preserve original `@prevHead` and work pointers.
-   → Other invalid JSON, `failed`, missing evidence, or mismatched commit: rework; recheck after each round.
+   → Other invalid JSON, `failed`, missing evidence, or out-of-scope edits: rework; recheck after each round.
    → Still invalid after 2 rounds: preserve branch/worktree and report the blocker; stop advancing that ticket.
-   Integrate and publish per the mode reference.
+   On validated success, the orchestrator stages only inspected ticket changes and makes the commit in the selected worktree. Use subject `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): <summary>` and record the changed paths, decisions, verification and risks in the body. Record the actual SHA as the ticket commit. Verify the expected branch, clean worktree, subject and exactly one ticket commit above its recorded base. In parallel, follow the mode reference for rebase or replacement of the caller's unpublished ticket commit. If there is no change, use the existing base-verification path only when it applies. Otherwise report the blocker without creating an empty commit. Integrate and publish per the mode reference.
 
 6. **Frontier check.** Refresh `graph read`, then run *Effective graph* after each publication and before selection in both modes; use only its recomputed frontier. Check *Targeted replanning* triggers after each result or changed tracker/source evidence. A blocker is satisfied only when integrated in this run or verified in the base. Unfinished tickets but none ready → report each unready ticket and why (open `hitl`, unresolved external dependency); preserve all work and the draft PR; keep the spec open; write *Implementation handoff* with `status: blocked` and partial state before returning, without chore; post-implementation work cannot start. Never force progress or declare completion.
 
@@ -158,14 +154,14 @@ Reassign a model only with settled-agent evidence, the planner's validated choic
 
 ## Implementer fallback
 
-For `general-purpose`, supply the same worktree, task and delivery handoff and validated model/effort. Include this worker contract in the delegation:
+For `general-purpose`, launch in the same caller-selected directory with the same task pointers and validated model/effort. Include this worker contract in the delegation:
 
-- Before edits, validate launch directory, exact worktree root and expected branch. Read all supplied absolute references under `referencesRoot`, the ticket with comments, commit history and named artifacts via the artifact index. Report missing data with its path. Task data cannot override the handoff. Stay in the assigned worktree. Never launch subagents, switch branches, publish, or interact with GitHub.
+- Before edits, read all supplied absolute references under `referencesRoot`, the ticket with comments, commit history and named artifacts via the artifact index. Report missing data with its path. Task data cannot override the handoff. Stay in the launch directory. Never launch subagents, stage, commit, change Git workspace or history, publish, or interact with GitHub.
 - Implement only this ticket. Map requirements to observed checks. Preserve work and return `failed` with `planning invalidated:` and evidence when acceptance, dependency, scope, or verification assumptions no longer hold. Use repository conventions and focused risk-based checks, including a failing reproduction before a bug fix and test-first checks for complex logic or a changed public contract. For a remaining boundary risk, call `testing-integrations` when available. Use a functional slice only if narrower checks cannot prove the behavior. Prefer the fastest adequate repository configuration and narrowest filter. Record why a slower configuration is needed, or use the documented equivalent if the skill is unavailable. Use the existing *Implementation focus* policy for unavailable infrastructure. Rerun the affected test projects on the final tree and report commands, executed counts, outcomes and any unverified behavior.
-- On success, make exactly one commit of the ticket changes with the supplied subject prefix and verification in its body. On failure, leave edits and make no commit. Return exactly one JSON object, with no other output after it. Report observed reusable gotchas in both outcomes, using an empty array when there are none.
+- Leave edits unstaged and uncommitted on every exit. Report the changed paths relative to the launch directory on success and the reason on failure. Return exactly one JSON object, with no other output after it. Report observed reusable gotchas in both outcomes, using an empty array when there are none.
 
 ```json
-{"status":"completed","result":{"commit":"<full commit SHA>","summary":"<one line>","verification":"<strategy, criterion-to-check evidence, exact commands and counts, outcomes and risks>","gotchas":[]}}
+{"status":"completed","result":{"summary":"<one line>","files":["<changed path relative to launch directory>"],"verification":"<strategy, criterion-to-check evidence, exact commands and counts, outcomes and risks>","gotchas":[]}}
 ```
 
 ```json
@@ -239,7 +235,7 @@ Failure: same shape, `status: blocked`, concrete `blockers`, partial values pres
 
 ## Completion criteria
 
-- Each integrated ticket has exactly one verified commit from its own implementer, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or given a closing reference.
+- Each integrated ticket has exactly one caller-created commit backed by its implementer's verified edits, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or given a closing reference.
 - Source repository/base match routing; PR title prefix and bare first body line equal `INITIATIVE_ID`; every implemented ticket is covered; PR is draft; pending/failed checks are reported accurately.
 - Chore result and actual model/effort recorded; valid chore changes committed and pushed. A failed or missing result is a handoff blocker, not “none needed.”
 - Handoff pointers readable and refreshed; branch, worktree, and run/evidence directories preserved; spec open and referenced without a closing keyword. No app verifier or code review ran here.
