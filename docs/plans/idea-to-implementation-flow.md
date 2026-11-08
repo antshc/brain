@@ -22,7 +22,7 @@ Subflow A: Simple Flow
 
 Subflow B: Complex Flow
 
-1. /to-zdesign
+1. /draft-artifact design
 2. /to-stories
 3. For each story:
    → /architect

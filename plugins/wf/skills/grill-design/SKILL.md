@@ -18,7 +18,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 **Only the user ends the grill.** The grill MUST end only on a user request or confirmation, not a finished record, empty frontier, or clean sweep. When the tree appears resolved, report it, ask to close, and wait.
 
-**Implementation is a handoff.** When the user asks to build, including a one-line fix, announce closing and run the closing sweep. Then route the saved context to the requested output: *Run `to-spec` skill to synthesize the conversation into a spec published as a GitHub issue or offline Markdown*; or *Run `to-zdesign` skill to capture a completed design conversation as an authoritative feature design*. Execution belongs to the handoff, outside the grill.
+**Implementation is a handoff.** When the user asks to build, including a one-line fix, announce closing and run the closing sweep. Then route the saved context to the requested output: *Run `to-spec` skill to synthesize the conversation into a spec published as a GitHub issue or offline Markdown*; or *Run `draft-artifact` skill to create or update the requested authoritative feature design using the Feature design tactic*. Execution belongs to the handoff, outside the grill.
 
 ## Session start
 

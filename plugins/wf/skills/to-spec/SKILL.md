@@ -1,7 +1,7 @@
 ---
 name: to-spec
 description: >-
-  Synthesize the current conversation into a spec and publish it as a GitHub issue or offline Markdown, with no interview. Use for 'write a spec', 'turn this into a PRD', or 'publish the spec'. Use to-zdesign for a feature design, to-stories for User stories, to-tickets for implementation tasks.
+  Synthesize the current conversation into a spec and publish it as a GitHub issue or offline Markdown, with no interview. Use for 'write a spec', 'turn this into a PRD', or 'publish the spec'. Use draft-artifact for a feature design, to-stories for User stories, to-tickets for implementation tasks.
 argument-hint: "What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"
 ---
 

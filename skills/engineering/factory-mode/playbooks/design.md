@@ -14,7 +14,7 @@
    3. Approve → exit the loop and suggest the `to-spec` handoff with the approved sketch and rationale paths.
    Done when the user approves the sketch or the step is skipped.
 4. Spec it. *Run `to-spec` skill to synthesize the resolved decisions into a published spec* with the target branch, Initiative ID, and the approved sketch and rationale paths when step 3 ran. Done when the spec issue URL or offline Markdown path exists.
-5. Design it. `to-zdesign` is human-only: ask the user to run `/to-zdesign` with the spec, Wayfinder map or grill-design context, and any existing design to create or extend the authoritative feature design. Done when the design file exists and holds every resolved decision.
+5. Design it. Ask the user to run `/draft-artifact design` with the spec, Wayfinder map or grill-design context, and any existing design to create or extend the authoritative feature design. Done when the design file exists and holds every resolved decision.
 6. Check the design against the decisions from step 2; surface any decision lost, contradicted, or still open.
 
 **Reply:** decisions resolved and how (grill, ticket, prototype), approved sketch paths when sketched, spec and design links, open decisions, recommended next step.

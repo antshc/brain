@@ -20,7 +20,7 @@ PLAYBOOKS — matched from the request
   /factory-mode fix <symptom> when <trigger>
   /factory-mode <Class.Method> throws <error> on <input>
 
- design             resolve unknowns (grill-design or wayfinder) → to-spec → to-zdesign; no code
+ design             resolve unknowns (grill-design or wayfinder) → to-spec → /draft-artifact design; no code
   /factory-mode design <capability>; resolve open questions first
   /factory-mode we need <feature>, figure out the decisions
 

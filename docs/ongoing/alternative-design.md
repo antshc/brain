@@ -9,7 +9,7 @@ Produce an evidence-backed, decision-complete ZDesign with four composable stage
 1. `wayfinder` finds the path to the solution.
 2. `research-*` establishes facts and constraints.
 3. `grill-design` challenges the solution and resolves decisions.
-4. `to-zdesign` synthesizes the authoritative design.
+4. `/draft-artifact design` synthesizes the authoritative design.
 
 This replaces a mandatory chain of narrow design skills with an iterative decision workflow.
 
@@ -34,7 +34,7 @@ Loose feature or problem
   decisions, and expose gaps
           |
           v
-     to-zdesign
+     /draft-artifact design
   Synthesize the authoritative
   implementation-ready design
 ```
@@ -138,7 +138,7 @@ Consume the Wayfinder path and research evidence.
 
 Grilling is complete when the user ends the session after the decision tree is resolved. It does not compose the final ZDesign.
 
-## 4. `to-zdesign` — Synthesize the Design
+## 4. `/draft-artifact design` — Synthesize the Design
 
 Run when the Wayfinder frontier is empty, or remaining questions and risks are explicitly accepted.
 
@@ -197,6 +197,6 @@ The previous `current-system`, `integration-design`, `runtime-design`, `cloud-de
 
 - research establishes the relevant facts and constraints;
 - `grill-design` makes and challenges decisions across those dimensions;
-- `to-zdesign` assembles the applicable results into the final artifact.
+- `/draft-artifact design` assembles the applicable results into the final artifact.
 
 Create a dedicated skill only when a dimension requires reusable domain-specific research behavior that the existing research skills cannot express.
