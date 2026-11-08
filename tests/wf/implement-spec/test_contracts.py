@@ -240,8 +240,11 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
 def test_template_parity_except_intentional_artifact_section():
     standalone = (REPO / 'plugins/wf/skills/to-tickets/references/issue-template.md').read_text()
     embedded = BREAKDOWN[BREAKDOWN.index('<issue-template>'):]
-    embedded = re.sub(r'## Related Spec Artifacts\n.*?(?=## Implementation Decisions)', '', embedded, flags=re.S)
-    assert embedded == standalone
+    artifact_section = re.compile(r'^## Related Spec Artifacts\n.*?(?=^## )', re.M | re.S)
+    embedded_core, embedded_sections = artifact_section.subn('', embedded)
+    standalone_core, standalone_sections = artifact_section.subn('', standalone)
+    assert embedded_sections == standalone_sections == 1
+    assert embedded_core == standalone_core
 
 
 def test_implementation_stops_at_handoff_and_factory_owns_completion():
