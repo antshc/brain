@@ -1,10 +1,4 @@
----
-name: test-gaps
-description: >-
-  Map a change's risks to existing tests and return prioritized missing test cases. Use for 'assess tests', 'test coverage gaps', 'missing regression tests', or 'are these tests enough'. Use blast-radius for what a change could break.
----
-
-# Test gaps
+# Test assessment
 
 Map each behavior a change affects to the existing test that protects it, judge whether that test would really fail on a regression, and return prioritized gaps.
 
