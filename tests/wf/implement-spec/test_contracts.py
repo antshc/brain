@@ -122,21 +122,26 @@ def test_wf_codey_is_registered_for_implementation_tasks():
     assert plugin['agents'] == ['./agents']
     frontmatter = CODEY.read_text().split('---', 2)[1]
     assert 'name: codey' in frontmatter
-    assert 'Use for implementation tasks' in frontmatter
+    assert 'Implement and verify one requested change' in frontmatter
+    assert 'Route design, planning, and review to their own workflows' in frontmatter
+
+
+def test_codey_prefers_the_explicit_direct_task_over_session_memory():
+    direct = CODEY.read_text().split('- **Direct task**', 1)[1].split('- **Ticket**', 1)[0]
+    assert direct.index('`## TASK`') < direct.index('explicit plain-text request') < direct.index('/memories/session/plan.md')
+    assert 'only when neither is supplied' in direct
+    assert 'Missing or empty resolved task → `blocked`' in direct
 
 
 def test_codey_selects_focused_integration_tests_by_risk():
     agent = CODEY.read_text()
     boundary = agent.split('### Integration boundary', 1)[1].split('### Failure handling', 1)[0]
     assert 'If there is no material integration gap, skip the skill' in boundary
-    assert 'When a material integration gap remains, call `testing-integrations`' in boundary
-    assert 'functional slice through the public entry point when narrower checks cannot prove the behavior' in boundary
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
-    for test_kind in ('focused database component test', 'focused cloud component test'):
-        assert test_kind in boundary and test_kind in fallback
-    assert 'narrowest filter' in boundary
-    assert boundary.index('start with mock or fake') < boundary.index('Use the real SDK')
-    assert 'only when evidence shows' in boundary
+    for body in (boundary, fallback):
+        assert '*run `testing-integrations` skill to pick the minimal seam for a DB or cloud component test or a functional slice*' in body
+        assert 'fastest adequate configuration, narrowest filter, documented test directory within the workspace, and safety gates' in body
+        assert "repository's documented equivalent and safety rules" in body
 
 
 def test_named_worker_and_fallback_share_the_ticket_contract():
@@ -154,6 +159,8 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert launch.index('Inspect the diff') < launch.index('the orchestrator stages')
     assert 'exactly one ticket commit' in launch
     assert 'validated per-ticket preferred model/effort' in launch
+    assert launch.index('*Implementation focus* evidence gate to `result.verification`') < launch.index('the orchestrator stages')
+    assert 'same material risk' in agent and 'same material risk' in MAIN
 
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
     for value in ('Before task actions', 'requiredReferences', 'referencesRoot', 'absolute',
@@ -165,10 +172,13 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     agent_results = re.findall(r"```json\n(.*?)\n```", agent, re.S)
     fallback_results = re.findall(r"```json\n(.*?)\n```", fallback, re.S)
     assert agent_results == fallback_results
+    agent_table = re.findall(r'^\|.*\|$', agent, re.M)
+    assert agent_table == re.findall(r'^\|.*\|$', fallback, re.M)
     outcomes = {result['status']: result['result'] for result in map(json.loads, agent_results)}
     assert set(outcomes['completed']) == {'summary', 'files', 'verification', 'gotchas'}
     assert set(outcomes['failed']) == {'reason', 'gotchas'}
-    assert all(outcome['gotchas'] == [] for outcome in outcomes.values())
+    assert len(outcomes['completed']['gotchas']) == 1
+    assert outcomes['failed']['gotchas'] == []
 
 
 def test_parallel_caller_commits_after_integration_checks_and_owns_rework():
