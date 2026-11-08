@@ -14,6 +14,8 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 
 [to-zdesign](skills/to-zdesign/SKILL.md) renders slice decision bullets from its own local [decision reference](skills/to-zdesign/decision-bullet.md), without invoking the recording skill.
 
+[git-conventions](skills/git-conventions/SKILL.md) provides branch, commit, PR, and review comment formats. Install WF alongside Review for Code Review, Address, and HITL. Worktree and hosting operations remain in their existing workflows.
+
 ## Skill flow
 
 1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/to-zdesign` directly).

@@ -115,7 +115,7 @@ class TestPreflight:
         result = spec_gh.cmd_preflight(Gh(runner), args)
         assert result["source_repository"] == "acme/shop" and result["base_branch"] == "release/1"
         assert result["initiative_id"] == "PAY-12"
-        assert result["integration_branch"] == "feat/PAY-12"
+        assert result["integration_branch"] is None
         assert result["run_dir"].endswith("workspace/shop.runs/1")
         assert result["source_root"].endswith("workspace/shop")
 
@@ -307,56 +307,62 @@ class TestTicketCreate:
 class TestPrBody:
     def test_rationale_must_be_bullets(self):
         with pytest.raises(UsageError, match="rationale"):
-            spec_gh.build_body("PAY-12", "Added a check\n", [], [], "", "")
+            spec_gh.build_body("PAY-12", "Added a check\n", "Cap retries", "Test passed", [], "")
         with pytest.raises(UsageError):
-            spec_gh.build_body("PAY-12", "", [], [], "", "")
+            spec_gh.build_body("PAY-12", "", "Cap retries", "Test passed", [], "")
 
     def test_initiative_id_first_line_and_links(self):
-        body = spec_gh.build_body("PAY-12", "- Prevent duplicate charges.\n", ["acme/shop#3"], ["acme/specs#1"], "", "")
-        assert body.splitlines()[0] == "PAY-12"
-        assert "Closes acme/shop#3" in body and "Refs acme/specs#1" in body
+        body = spec_gh.build_body("acme/specs#1", "- Prevent duplicate charges.\n", "Cap retries",
+                                  "Test passed", ["acme/shop#3", "acme/specs#1"], "")
+        assert body.splitlines()[0] == "[acme/specs#1]"
+        assert "Refs acme/shop#3" in body and "Refs acme/specs#1" in body
+        assert all(f"## {heading}" in body for heading in ("Why", "What changed", "Verification", "References"))
+        assert "Closes " not in body
 
     def test_user_text_drops_legacy_markers_and_managed_block(self):
         old = (
             "[#12]\nInitiative: PAY-12\nInitiative source: http://x\nPAY-12\n"
-            f"{spec_gh.BLOCK_BEGIN}\n- old\n{spec_gh.BLOCK_END}\nMy own note\n"
+            f"{spec_gh.BLOCK_BEGIN}\n- old\n{spec_gh.BLOCK_END}\nInitiative: my own note\n"
         )
-        assert spec_gh.user_text(old, "PAY-12") == "My own note"
+        assert spec_gh.user_text(old, "PAY-12") == "Initiative: my own note"
 
     def test_block_refs_only_read_managed_block(self):
         body = f"Closes a/b#1\n{spec_gh.BLOCK_BEGIN}\nCloses a/b#2\nRefs a/b#3\n{spec_gh.BLOCK_END}"
-        assert spec_gh.block_refs(body, "Closes") == ["a/b#2"]
-        assert spec_gh.block_refs(body, "Refs") == ["a/b#3"]
+        assert spec_gh.block_refs(body) == ["a/b#2", "a/b#3"]
 
 
 class TestPrPublish:
     def args(self, tmp_path, *extra):
         rationale = tmp_path / "why.md"
         rationale.write_text("- Prevent duplicate charges.\n")
+        changes = tmp_path / "changes.md"
+        changes.write_text("Cap retries.\n")
+        evidence = tmp_path / "evidence.md"
+        evidence.write_text("Regression test passed.\n")
         return spec_gh.build_parser().parse_args([
             "pr", "publish", "--source-repository", "acme/shop", "--base", "main", "--head", "feat",
-            "--title", "PAY-12: Refunds", "--initiative-id", "PAY-12", "--rationale-file", str(rationale), *extra])
+             "--title", "[PAY-12] fix: cap retries", "--initiative-id", "PAY-12", "--rationale-file", str(rationale),
+            "--changes-file", str(changes), "--evidence-file", str(evidence), *extra])
 
-    def view(self, body, draft=True):
+    def view(self, body, draft=True, title="[PAY-12] fix: cap retries"):
         return json.dumps({
-            "url": "https://github.com/acme/shop/pull/9", "title": "PAY-12: Refunds", "body": body, "headRefOid": "abc",
+            "url": "https://github.com/acme/shop/pull/9", "title": title, "body": body, "headRefOid": "abc",
             "isDraft": draft, "baseRefName": "main", "headRefName": "feat", "state": "OPEN",
         })
 
     def test_creates_draft_and_verifies(self, tmp_path):
-        body = "PAY-12\n\nCloses acme/shop#3\n"
+        body = f"[PAY-12]\n\n{spec_gh.BLOCK_BEGIN}\nRefs acme/shop#3\n{spec_gh.BLOCK_END}\n"
         runner = FakeRunner({
-            "api repos/acme/shop/issues/3": json.dumps(issue(3, "t", state="closed", reason="completed")),
             "pr list": "[]", "pr create": "https://github.com/acme/shop/pull/9",
             "pr view": self.view(body), "pr checks": (1, "", "no checks reported on the 'feat' branch"),
         })
-        result = spec_gh.cmd_pr_publish(Gh(runner), self.args(tmp_path, "--closes", "acme/shop#3"))
+        result = spec_gh.cmd_pr_publish(Gh(runner), self.args(tmp_path, "--refs", "acme/shop#3"))
         assert "--draft" in next(c for c in runner.calls if "pr create" in c)
         assert result["created"] and result["problems"] == [] and result["checks"]["status"] == "absent"
 
-    def test_update_preserves_user_text_and_accumulates_closes(self, tmp_path):
+    def test_update_preserves_user_text_and_migrates_closing_references(self, tmp_path):
         old = f"PAY-12\n\n{spec_gh.BLOCK_BEGIN}\n- old\nCloses acme/shop#2\n{spec_gh.BLOCK_END}\n\nMy note\n"
-        existing = [{"number": 9, "url": "u", "isDraft": True, "baseRefName": "main", "headRefName": "feat", "body": old}]
+        existing = [{"number": 9, "url": "u", "isDraft": True, "baseRefName": "main", "headRefName": "feat", "title": "PAY-12: Refunds", "body": old}]
         written: list[str] = []
 
         def runner(args):
@@ -365,19 +371,19 @@ class TestPrPublish:
                 written.append(Path(args[args.index("--body-file") + 1]).read_text())
                 return 0, "", ""
             return FakeRunner({
-                "api repos/acme/shop/issues/3": json.dumps(issue(3, "t")),
-                "pr list": json.dumps(existing), "pr view": self.view("PAY-12\n\nCloses acme/shop#2\nCloses acme/shop#3\n"),
+                "pr list": json.dumps(existing), "pr view": self.view(written[0] if written else old),
                 "pr checks": json.dumps([{"name": "ci", "bucket": "pending"}]),
             })(args)
 
-        result = spec_gh.cmd_pr_publish(Gh(runner), self.args(tmp_path, "--closes", "acme/shop#3"))
-        assert "Closes acme/shop#2" in written[0] and "Closes acme/shop#3" in written[0] and "My note" in written[0]
-        assert written[0].startswith("PAY-12\n")
+        result = spec_gh.cmd_pr_publish(Gh(runner), self.args(tmp_path, "--refs", "acme/shop#3"))
+        assert "Refs acme/shop#2" in written[0] and "Refs acme/shop#3" in written[0] and "My note" in written[0]
+        assert "Closes " not in written[0]
+        assert written[0].startswith("[PAY-12]\n")
         assert result["checks"]["status"] == "pending" and not result["created"]
 
     def test_read_reports_problems(self):
         runner = FakeRunner({
-            "pr view": self.view("[#1]\nPAY-12\n", draft=False), "pr checks": json.dumps([{"name": "ci", "bucket": "fail"}]),
+            "pr view": self.view("[PAY-12]\n", draft=False, title="[OTHER-8] fix: cap retries"), "pr checks": json.dumps([{"name": "ci", "bucket": "fail"}]),
         })
         result = spec_gh.read_pr(Gh(runner), "acme/shop", 9, "PAY-12", ["acme/shop#3"])
         assert len(result["problems"]) == 3 and result["checks"]["failed"] == ["ci"]
@@ -508,9 +514,9 @@ def test_multi_value_flags_accept_space_separated_and_repeated(argv):
 def test_pr_and_block_flags_accept_space_separated_refs():
     parser = spec_gh.build_parser()
     publish = parser.parse_args(["pr", "publish", "--source-repository", "a/b", "--base", "main", "--head", "h", "--title", "t",
-                                 "--initiative-id", "I", "--rationale-file", "r", "--closes", "a/b#1", "a/b#2", "--refs", "a/b#3"])
-    assert (publish.closes, publish.refs) == (["a/b#1", "a/b#2"], ["a/b#3"])
-    assert parser.parse_args(["pr", "read", "--source-repository", "a/b", "--expect-closes", "a/b#1", "a/b#2"]).expect_closes == ["a/b#1", "a/b#2"]
+                                 "--initiative-id", "I", "--rationale-file", "r", "--changes-file", "c", "--evidence-file", "e", "--refs", "a/b#1", "a/b#2", "--refs", "a/b#3"])
+    assert publish.refs == ["a/b#1", "a/b#2", "a/b#3"]
+    assert parser.parse_args(["pr", "read", "--source-repository", "a/b", "--expect-refs", "a/b#1", "a/b#2"]).expect_refs == ["a/b#1", "a/b#2"]
     assert parser.parse_args(["issue", "block", "a/b#3", "--by", "a/b#1", "a/b#2"]).by == ["a/b#1", "a/b#2"]
 
 

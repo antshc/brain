@@ -149,6 +149,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one standalone story body with its formatted title, requirements, acceptance criteria, and optional technical notes.
 - [code-sketch](plugins/wf/skills/code-sketch/SKILL.md): draft one single-pass code sketch with usage first, types and signatures with `not implemented` bodies, a module map for larger work, and a rationale.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
+- [git-conventions](plugins/wf/skills/git-conventions/SKILL.md): branch, commit, PR, and review comment formats.
 - [worktrees](plugins/wf/skills/worktrees/SKILL.md): inspect, create, reuse, or remove local Git worktrees with ownership checks. Install `wf` for Code Review and Address worktree operations.
 - [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
@@ -190,12 +191,12 @@ AFK PR review and autonomous development loop.
 
 Code and technical solution review skills with modular standards and guidance.
 
-- [review-conversation](plugins/review/skills/review-conversation/SKILL.md): shared simple-English findings, replies, and hidden metadata for Code Review, Address, and HITL; preserves human ownership.
+- Code Review, Address, and HITL load formatting from [Git Conventions](plugins/wf/skills/git-conventions/SKILL.md). Install WF with `copilot plugin install wf@brain` before using these Review skills.
 - [blast-radius](plugins/review/skills/blast-radius/SKILL.md): trace downstream breakage, run the decisive proof, and report verified risks.
 - [address](plugins/review/skills/address/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
-- [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from a standalone `[#{{initiative-id}}]` marker in the PR description; accepts a user PR URL or a factory-mode call and fetches the diff into a fresh detached review worktree without cloning.
+- [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from the PR description’s leading `[initiative-id]` marker or a supported legacy body ID; accepts a user PR URL or a factory-mode call and fetches the diff into a fresh detached review worktree without cloning.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
 - [test-gaps](plugins/review/skills/test-gaps/SKILL.md): map a change's risks to existing tests, judge assertion strength, and return prioritized missing test cases. Invoke as `review:test-gaps`.
 

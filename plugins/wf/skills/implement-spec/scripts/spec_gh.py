@@ -6,7 +6,7 @@ Exit codes: 0 ok, 1 GitHub/tool failure, 2 invalid input or unresolved routing,
 3 completed but read-back verification reported `problems`.
 
     preflight   (--spec REF | --source-repository R --base-branch B --initiative-id I)
-                [--harness-root P] [--mode MODE] [--max-parallel N] [--pin-base]
+                [--harness-root P] [--mode MODE] [--max-parallel N] [--integration-branch H] [--pin-base]
     run checkpoint --run-dir DIR --input FILE
     spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N
     graph read  --spec REF --out RUN_DIR      (also saves spec issue artifacts under RUN_DIR/artifacts, indexed by name in index.json)
@@ -17,8 +17,8 @@ Exit codes: 0 ok, 1 GitHub/tool failure, 2 invalid input or unresolved routing,
     issue comment REF --body-file F [--run-id ID]
     issue close REF (--run-id ID --evidence-comment N | --commit SHA --branch B [--pr URL] | --comment TEXT)
     pr publish  --source-repository R --base B --head H --title T --initiative-id I
-                --rationale-file F [--closes REF ...] [--refs REF ...] [--evidence-file F]
-    pr read     --source-repository R (--number N | --head H) [--initiative-id I] [--expect-closes REF ...]
+                --rationale-file F --changes-file F --evidence-file F [--refs REF ...]
+    pr read     --source-repository R (--number N | --head H) [--initiative-id I] [--expect-refs REF ...]
     pr diff-split --pr URL_OR_NUMBER [--source-repository R]
 
 REF is `OWNER/REPO#NUMBER` or an issue URL.
@@ -277,6 +277,12 @@ def cmd_preflight(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     elif not (args.source_repository and args.base_branch and args.initiative_id):
         raise UsageError("provide --spec or --source-repository, --base-branch and --initiative-id")
 
+    branch = args.integration_branch
+    if branch is not None and not re.fullmatch(r"(?:feat|fix)/[a-z0-9]+(?:-[a-z0-9]+)*", branch):
+        raise UsageError("integration branch must be a lowercase feat/<slug> or fix/<slug>")
+    if args.pin_base and branch is None:
+        raise UsageError("--pin-base requires --integration-branch")
+
     gh.text("--version")
     gh.text("auth", "status")
     harness_root = Path(args.harness_root or gh.git("rev-parse", "--show-toplevel").strip()).resolve()
@@ -297,10 +303,9 @@ def cmd_preflight(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
 
     verified = verify_source(gh, source, base, pin_base=args.pin_base)
     checkout = resolve_checkout(gh, harness_root, verified["source_repository"], ref.number if ref else None)
-    integration_branch = f"feat/{initiative_id}"
     if args.pin_base:
         root, sha = checkout["source_root"], verified["base_commit"]
-        gh.git("-C", root, "check-ref-format", "--branch", integration_branch)
+        gh.git("-C", root, "check-ref-format", "--branch", branch)
         gh.git("-C", root, "fetch", "--no-tags", "--no-write-fetch-head", "origin", sha)
         gh.git("-C", root, "cat-file", "-e", f"{sha}^{{commit}}")
     return {
@@ -310,7 +315,7 @@ def cmd_preflight(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
         "state": issue.get("state"),
         "base_branch": base,
         "initiative_id": initiative_id,
-        "integration_branch": integration_branch,
+        "integration_branch": branch,
         **verified,
         **checkout,
     }
@@ -338,6 +343,12 @@ def cmd_run_checkpoint(_gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     for key, ticket in tickets.items():
         if not isinstance(ticket, dict) or not isinstance(ticket.get("ref"), str) or parse_ref(ticket["ref"]).key != key:
             raise UsageError(f"checkpoint key does not match ticket identity: {key}")
+    branches = [ticket["branch"] for ticket in tickets.values() if "branch" in ticket]
+    if any(not isinstance(branch, str) or not branch for branch in branches):
+        raise UsageError("invalid recorded worker branch")
+    if len(set(branches)) != len(branches) or identity["integrationBranch"] in branches:
+        raise UsageError("checkpoint worker branches must be distinct")
+
     if path.exists():
         previous = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(previous, dict) or not isinstance(previous.get("tickets"), dict):
@@ -347,6 +358,9 @@ def cmd_run_checkpoint(_gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
         for key, ticket in previous["tickets"].items():
             if not isinstance(ticket, dict) or ticket.get("ref") != tickets[key]["ref"]:
                 raise UsageError(f"checkpoint must preserve the recorded ticket identity: {key}")
+            for field in ("branch", "worktreePath"):
+                if field in ticket and ticket[field] != tickets[key].get(field):
+                    raise UsageError(f"checkpoint must preserve recorded worker {field}: {key}")
     run_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=run_dir) as temporary:
         draft = Path(temporary) / path.name
@@ -716,28 +730,56 @@ def managed_block(body: str) -> str:
 
 
 def user_text(body: str, initiative_id: str) -> str:
-    body = re.sub(rf"{re.escape(BLOCK_BEGIN)}.*?{re.escape(BLOCK_END)}", "", body, flags=re.DOTALL)
-    kept = [
-        line for line in body.splitlines()
-        if line.strip() != initiative_id
-        and not re.match(r"\s*\[#[^\]]+\]", line)
-        and not re.match(r"\s*Initiative( source)?:", line)
-    ]
-    return "\n".join(kept).strip()
+    lines = body.splitlines(keepends=True)
+    while lines:
+        line = lines[0].strip()
+        if line not in ("", initiative_id, f"[{initiative_id}]") and not (
+            re.fullmatch(r"\[#\d+\]", line) or re.match(r"Initiative(?: source)?:", line)
+        ):
+            break
+        lines.pop(0)
+    managed_pattern = rf"{re.escape(BLOCK_BEGIN)}.*?{re.escape(BLOCK_END)}"
+    return re.sub(managed_pattern, "", "".join(lines), count=1, flags=re.DOTALL).strip("\r\n")
 
 
-def block_refs(body: str, keyword: str) -> list[str]:
-    return re.findall(rf"^{keyword} ({REPO_PATTERN}#\d+)\s*$", managed_block(body), flags=re.MULTILINE)
+def block_refs(body: str) -> list[str]:
+    return re.findall(rf"^(?:Refs|Closes) ({REPO_PATTERN}#\d+)[ \t]*$", managed_block(body), flags=re.MULTILINE)
 
 
-def build_body(initiative_id: str, rationale: str, closes: list[str], refs: list[str], evidence: str, extra: str) -> str:
+def pr_initiative(value: str) -> str:
+    if re.fullmatch(rf"(?:{REPO_PATTERN})?#\d+", value):
+        return value
+    if re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_.-]*", value):
+        return value
+    raise UsageError(f"invalid PR initiative ID: {value!r}")
+
+
+def valid_pr_title(title: str, initiative: str) -> bool:
+    prefix = f"[{initiative}] "
+    return title.startswith(prefix) and bool(
+        re.fullmatch(r"[a-z]+(?:\([a-z0-9]+(?:[._/-][a-z0-9]+)*\))?!?: \S[^\r\n]*", title[len(prefix):])
+    )
+
+
+def build_body(initiative: str, rationale: str, changes: str, evidence: str, refs: list[str], extra: str) -> str:
     bullets = [line.rstrip() for line in rationale.splitlines() if line.strip()]
     if not bullets or any(not line.startswith("- ") for line in bullets):
         raise UsageError("rationale must be non-empty `- ` bullets that each answer Why?; report missing rationale, never invent it")
-    links = [f"Closes {ref}" for ref in closes] + [f"Refs {ref}" for ref in refs]
-    parts = ["\n".join(bullets), "\n".join(links), f"## Evidence\n\n{evidence.strip()}" if evidence.strip() else ""]
-    block = "\n\n".join(part for part in parts if part)
-    return f"{initiative_id}\n\n{BLOCK_BEGIN}\n{block}\n{BLOCK_END}\n" + (f"\n{extra}\n" if extra else "")
+    if not changes.strip() or not evidence.strip():
+        raise UsageError("What changed and Verification must be non-empty")
+    parts = [
+        "## Why\n\n" + "\n".join(bullets),
+        f"## What changed\n\n{changes.strip()}",
+        f"## Verification\n\n{evidence.strip()}",
+    ]
+    if refs:
+        parts.append("## References\n\n" + "\n".join(f"Refs {ref}" for ref in refs))
+    block = "\n\n".join(parts)
+    if BLOCK_BEGIN in block or BLOCK_END in block:
+        raise UsageError("PR content contains a reserved managed-block marker")
+    if re.search(r"\b(?:close[sd]?|fix(?:es|ed)?|resolve[sd]?)[ :]+(?:[\w./-]+)?#\d+\b", block, re.IGNORECASE):
+        raise UsageError("PR content contains an issue-closing keyword; use a plain reference")
+    return f"[{initiative}]\n\n{BLOCK_BEGIN}\n{block}\n{BLOCK_END}\n" + (f"\n{extra}\n" if extra else "")
 
 
 def sorted_unique(items: list[str]) -> list[str]:
@@ -758,27 +800,30 @@ def pr_checks(gh: Gh, repo: str, number: int) -> dict[str, Any]:
     return result
 
 
-def read_pr(gh: Gh, repo: str, number: int, initiative_id: str | None, expect_closes: list[str]) -> dict[str, Any]:
+def read_pr(gh: Gh, repo: str, number: int, initiative_id: str | None, expect_refs: list[str]) -> dict[str, Any]:
     pr = gh.json("pr", "view", str(number), "--repo", repo,
                  "--json", "url,title,body,headRefOid,isDraft,baseRefName,headRefName,state")
     body = pr["body"] or ""
     first_line = next((line.strip() for line in body.splitlines() if line.strip()), "")
-    closes = re.findall(rf"^Closes ({REPO_PATTERN}#\d+)\s*$", body, flags=re.MULTILINE)
+    marker = re.fullmatch(r"\[([^\[\]]+)\]", first_line)
+    body_id = marker[1] if marker else first_line
+    refs = sorted_unique(block_refs(body))
     problems = []
     if initiative_id:
-        if first_line != initiative_id:
-            problems.append(f"first body line is {first_line!r}, expected {initiative_id!r}")
-        if not pr["title"].startswith(f"{initiative_id}: "):
-            problems.append("title lacks initiative prefix")
+        legacy = not marker and pr["title"].startswith(f"{initiative_id}: ")
+        if body_id != initiative_id or (not marker and not legacy):
+            problems.append(f"first body initiative is {body_id!r}, expected {initiative_id!r}")
+        if not legacy and not valid_pr_title(pr["title"], initiative_id):
+            problems.append("title lacks the expected initiative and conventional subject")
     if not pr["isDraft"]:
         problems.append("PR is not draft")
-    missing = [str(parse_ref(ref)) for ref in expect_closes if str(parse_ref(ref)) not in closes]
+    missing = [str(parse_ref(ref)) for ref in expect_refs if str(parse_ref(ref)) not in refs]
     if missing:
-        problems.append(f"missing Closes lines: {missing}")
+        problems.append(f"missing managed references: {missing}")
     return {
         "number": number, "url": pr["url"], "title": pr["title"], "state": pr["state"], "is_draft": pr["isDraft"],
         "base": pr["baseRefName"], "head": pr["headRefName"], "head_sha": pr["headRefOid"],
-        "first_body_id": first_line, "closes": closes, "checks": pr_checks(gh, repo, number), "problems": problems,
+        "first_body_id": body_id, "refs": refs, "checks": pr_checks(gh, repo, number), "problems": problems,
     }
 
 
@@ -791,28 +836,29 @@ def find_pr(gh: Gh, repo: str, head: str, *, state: str = "open") -> dict[str, A
 
 
 def cmd_pr_publish(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
-    initiative = validate_initiative_id(args.initiative_id)
-    if not args.title.startswith(f"{initiative}: "):
-        raise UsageError(f"title must start with '{initiative}: '")
-    closes = [str(parse_ref(ref)) for ref in args.closes]
-    for ref in map(parse_ref, closes):
-        issue = read_issue(gh, ref)
-        if "hitl" in labels_of(issue):
-            raise UsageError(f"{ref} is hitl; never add a closing reference to it")
-        if issue["state"] == "closed" and issue.get("state_reason") != "completed":
-            raise UsageError(f"{ref}: closed without completion; never add a closing reference to it")
+    initiative = pr_initiative(args.initiative_id)
+    if not valid_pr_title(args.title, initiative):
+        raise UsageError(f"title must start with '[{initiative}] ' followed by a conventional commit subject")
     existing = find_pr(gh, args.source_repository, args.head, state="all")
     if existing and (existing.get("state", "OPEN") != "OPEN" or not existing["isDraft"]):
         raise UsageError(f"existing PR #{existing['number']} is not an open draft")
     if existing and existing["baseRefName"] != args.base:
         raise UsageError(f"existing PR #{existing['number']} targets {existing['baseRefName']}, expected {args.base}")
     old_body = (existing["body"] or "") if existing else ""
-    all_closes = sorted_unique(closes + block_refs(old_body, "Closes"))
-    refs = sorted_unique([str(parse_ref(ref)) for ref in args.refs] + block_refs(old_body, "Refs"))
-    refs = [ref for ref in refs if ref not in all_closes]
-    evidence = Path(args.evidence_file).read_text(encoding="utf-8") if args.evidence_file else ""
-    body = build_body(initiative, Path(args.rationale_file).read_text(encoding="utf-8"), all_closes, refs, evidence,
-                      user_text(old_body, initiative))
+    if existing:
+        old_title = existing["title"]
+        first_line = next((line.strip() for line in old_body.splitlines() if line.strip()), "")
+        matches = (
+            old_title.startswith(f"{initiative}: ") and first_line == initiative
+        ) or (
+            valid_pr_title(old_title, initiative) and first_line == f"[{initiative}]"
+        )
+        if not matches:
+            raise UsageError(f"existing PR #{existing['number']} has conflicting initiative metadata")
+    refs = sorted_unique([str(parse_ref(ref)) for ref in args.refs] + block_refs(old_body))
+    body = build_body(initiative, Path(args.rationale_file).read_text(encoding="utf-8"),
+                      Path(args.changes_file).read_text(encoding="utf-8"), Path(args.evidence_file).read_text(encoding="utf-8"),
+                      refs, user_text(old_body, initiative))
     with tempfile.TemporaryDirectory() as tmp:
         body_file = Path(tmp) / "pr.md"
         body_file.write_text(body, encoding="utf-8")
@@ -825,7 +871,7 @@ def cmd_pr_publish(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
             url = gh.text("pr", "create", "--repo", args.source_repository, "--base", args.base, "--head", args.head,
                           "--draft", "--title", args.title, "--body-file", str(body_file)).strip().splitlines()[-1]
             number = int(url.rstrip("/").rsplit("/", 1)[-1])
-    result = read_pr(gh, args.source_repository, number, initiative, all_closes)
+    result = read_pr(gh, args.source_repository, number, initiative, refs)
     result["created"] = not existing
     return result
 
@@ -837,7 +883,7 @@ def cmd_pr_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
         if not pr:
             raise UsageError("no open PR found; pass --number or a --head with an open PR")
         number = pr["number"]
-    return read_pr(gh, args.source_repository, number, args.initiative_id, args.expect_closes)
+    return read_pr(gh, args.source_repository, number, args.initiative_id, args.expect_refs)
 
 
 def split_diff(diff: str) -> list[tuple[str, str]]:
@@ -892,6 +938,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--mode", choices=("sequential", "parallel"), default="sequential")
     p.add_argument("--max-parallel", type=int)
     p.add_argument("--pin-base", action="store_true")
+    p.add_argument("--integration-branch")
 
     p = command("run", "checkpoint", cmd_run_checkpoint)
     p.add_argument("--run-dir", required=True)
@@ -934,11 +981,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--evidence-comment", type=int)
 
     p = command("pr", "publish", cmd_pr_publish)
-    for flag in ("source-repository", "base", "head", "title", "initiative-id", "rationale-file"):
+    for flag in ("source-repository", "base", "head", "title", "initiative-id", "rationale-file", "changes-file", "evidence-file"):
         p.add_argument(f"--{flag}", required=True)
-    p.add_argument("--closes", action="extend", nargs="+", default=[])
     p.add_argument("--refs", action="extend", nargs="+", default=[])
-    p.add_argument("--evidence-file")
 
     p = command("pr", "diff-split", cmd_pr_diff_split)
     p.add_argument("--pr", required=True)
@@ -949,7 +994,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--number", type=int)
     p.add_argument("--head")
     p.add_argument("--initiative-id")
-    p.add_argument("--expect-closes", action="extend", nargs="+", default=[])
+    p.add_argument("--expect-refs", action="extend", nargs="+", default=[])
     return parser
 
 
