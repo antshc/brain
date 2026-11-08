@@ -1,6 +1,6 @@
-# Address conversation flows
+# Address PR comments conversation flows
 
-[Address](SKILL.md) investigates PR review discussions, fixes verified concerns, and replies using [Git Conventions](../../../wf/skills/git-conventions/SKILL.md).
+[Address PR comments](SKILL.md) investigates PR review discussions, fixes verified concerns, and replies using [Git Conventions](../../../wf/skills/git-conventions/SKILL.md).
 
 These flows describe PR #172 behavior. The gaps below are limitations and proposed follow-ups, not implemented guarantees.
 
@@ -21,7 +21,7 @@ Flow: Review conversation
 2. Reviewer opens a thread.
    → A: /code-review finding → Run Agent Review
    → B: Human finding → Run Human Review
-3. On each later /address invocation:
+3. On each later /address-pr-comments invocation:
    → Read full thread.
    → Reevaluate new concerns and answers.
 4. End
@@ -31,13 +31,13 @@ Subflow A: Agent Review
 
 1. /code-review posts finding with agent:comment.
    → Same account as PR author is allowed.
-2. /address investigates.
+2. /address-pr-comments investigates.
    → Fix clear: implement → verify → push → reply → resolve.
    → Finding incorrect: explain evidence → resolve.
    → Decision missing: ask focused question → leave open.
 3. Author answers in a new comment.
    → Same account is allowed.
-4. /address reevaluates against code and answer.
+4. /address-pr-comments reevaluates against code and answer.
    → Enough information: fix or explain → resolve when settled.
    → Still unclear: ask focused question → leave open.
 5. No answer:
@@ -49,13 +49,13 @@ Subflow B: Human Review
 
 1. Human posts unmarked finding.
    → Direct comment or human-approved /hitl comment.
-2. /address investigates.
+2. /address-pr-comments investigates.
    → Agree: implement → verify → push → reply.
    → Unclear: ask focused question.
    → Disagree: explain decisive evidence.
 3. Leave thread open for manual closure.
 4. Reviewer answers or challenges the reply.
-5. /address reevaluates the full conversation.
+5. /address-pr-comments reevaluates the full conversation.
    → Valid concern: fix → verify → push → reply.
    → Missing decision: ask focused question.
    → Disagreement remains: explain tradeoff and request decision.

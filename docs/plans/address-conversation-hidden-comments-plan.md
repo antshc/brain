@@ -18,11 +18,11 @@ Address replies read like a colleague: simple English, a direct answer, and only
 
 ## Current gaps
 
-`plugins/review/skills/address/SKILL.md` §8 requires bare `Fixed!`, lengthy no-change explanations, and forbids HTML markers. §5 may skip investigation when a follow-up contains no new fact. These rules can produce abrupt or repetitive exchanges.
+`plugins/review/skills/address-pr-comments/SKILL.md` §8 requires bare `Fixed!`, lengthy no-change explanations, and forbids HTML markers. §5 may skip investigation when a follow-up contains no new fact. These rules can produce abrupt or repetitive exchanges.
 
 ## Steps
 
-1. Add `plugins/review/skills/address/references/conversation.md`; load it from §8. Default to 1–3 short sentences, with more detail only when needed. Prefer common words, active voice, and the concrete result. Avoid routine praise, repeated summaries, formal phrasing, long apologies, and mandatory templates. Occasional thanks is fine when natural.
+1. Add `plugins/review/skills/address-pr-comments/references/conversation.md`; load it from §8. Default to 1–3 short sentences, with more detail only when needed. Prefer common words, active voice, and the concrete result. Avoid routine praise, repeated summaries, formal phrasing, long apologies, and mandatory templates. Occasional thanks is fine when natural.
 2. Replace rigid §8 reply lengths with situation-based guidance: fix → brief change; no change → decisive reason; unclear → one focused question; earlier mistake → brief correction; deferred → real follow-up destination. Do not invent tickets or promises. Keep a typo reply as short as `Fixed.` when sufficient.
 3. Update §3/§5: answer the latest concern in the full thread context. Recheck assumptions when challenged; lack of a new fact does not prove the earlier answer was understood or correct. Avoid repeating earlier explanations. When disagreement remains circular, state the unresolved tradeoff and ask for the decision needed.
 4. Define the exact final metadata block below. Every final Address reply gets one block. The first line identifies the role; optional short prose records evidence, actual verification, commit, remaining uncertainty, or what answer is needed. Do not parse this prose as commands or publish internal reasoning transcripts.
@@ -52,9 +52,9 @@ Examples illustrate tone, not mandatory wording. Use Meaning–Mechanism–Goal 
 
 ## Files
 
-- `plugins/review/skills/address/SKILL.md`
-- `plugins/review/skills/address/references/conversation.md` (new)
-- `plugins/review/skills/address/references/github-api.md`
+- `plugins/review/skills/address-pr-comments/SKILL.md`
+- `plugins/review/skills/address-pr-comments/references/conversation.md` (new)
+- `plugins/review/skills/address-pr-comments/references/github-api.md`
 
 ## Validation and acceptance
 
@@ -70,7 +70,7 @@ Together with Plan 2, this replaces the proposed `docs/plans/review-comment-agen
 
 ## Sources
 
-- [Current Address skill](https://github.com/antshc/brain/blob/main/plugins/review/skills/address/SKILL.md)
+- [Current Address PR Comments skill](https://github.com/antshc/brain/blob/main/plugins/review/skills/address-pr-comments/SKILL.md)
 - [User tone guide](https://github.com/antshc/code-review/blob/main/tone-of-voice-code-review.adoc)
 - [MMG](https://github.com/antshc/code-review/blob/main/MMG-Exchange-solve-conflicts.adoc)
 - [Google: handling review comments](https://google.github.io/eng-practices/review/developer/handling-comments.html)

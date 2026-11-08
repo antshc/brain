@@ -60,13 +60,13 @@ Track the last marked Address answer and all later comments, not whether their a
 ## Implementation sequence
 
 1. **Code Review publication.** Update `plugins/review/skills/code-review/SKILL.md` and `references/posting.md`. Append `brain:code-review:v1` in the posting layer after the validated finding, without changing reviewer output or review format. Deduplication compares substantive content, not markers.
-2. **Address instructions and replies.** Update `plugins/review/skills/address/SKILL.md` and `references/github-api.md`. Append `brain:address:v1` to every final reply, including no-change and clarification outcomes. Keep progress-only comments distinct from final answers.
-3. **Address discussion gate.** Update only `plugins/review/skills/address/scripts/pr_discussion_state.py`. Replace login-driven state with marker-driven state. Preserve its pagination/truncation safeguards and pending-review filtering. Remove redundant acting-login lookup if no longer needed. This bundled script already differs from the `tools` version (`self_opened` exists only here); do not replace it wholesale from `tools`.
+2. **Address instructions and replies.** Update `plugins/review/skills/address-pr-comments/SKILL.md` and `references/github-api.md`. Append `brain:address:v1` to every final reply, including no-change and clarification outcomes. Keep progress-only comments distinct from final answers.
+3. **Address discussion gate.** Update only `plugins/review/skills/address-pr-comments/scripts/pr_discussion_state.py`. Replace login-driven state with marker-driven state. Preserve its pagination/truncation safeguards and pending-review filtering. Remove redundant acting-login lookup if no longer needed. This bundled script already differs from the `tools` version (`self_opened` exists only here); do not replace it wholesale from `tools`.
 4. **Decouple hook synchronization.** In `.githooks/pre-commit`, remove only the block that copies `tools/src/modules/github/pr_discussion_state.py` to Address. Rationale: otherwise the pre-commit hook would overwrite the skill-local fix. Keep the Ralph synchronization blocks unchanged; do not alter `tools` or Ralph code.
 
 ## Tests
 
-- Add focused tests for `plugins/review/skills/address/scripts/pr_discussion_state.py` (e.g., `plugins/review/skills/address/tests/test_pr_discussion_state.py`): same login for human and agent; self-authored opening finding pending; marked answer skips; follow-up reopens; unmarked legacy comments pending; draft/resolved behavior unchanged; rerun idempotency.
+- Add focused tests for `plugins/review/skills/address-pr-comments/scripts/pr_discussion_state.py` (e.g., `plugins/review/skills/address-pr-comments/tests/test_pr_discussion_state.py`): same login for human and agent; self-authored opening finding pending; marked answer skips; follow-up reopens; unmarked legacy comments pending; draft/resolved behavior unchanged; rerun idempotency.
 - Verify comment posting/read-back preserves the exact final marker. Verify the pre-commit hook no longer overwrites Address and all existing Ralph synchronization remains unchanged.
 - Do not update `tools/tests/` because `tools/src/modules/github/pr_discussion_state.py` is out of scope.
 
