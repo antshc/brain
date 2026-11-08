@@ -19,9 +19,9 @@ Flow: Review conversation
 
 1. Developer agent creates PR.
 2. Reviewer opens a thread.
-   → A: /code-review finding → Run Agent Review
+   → A: /review-feat finding → Run Agent Review
    → B: Human finding → Run Human Review
-3. On each later /address-pr-comments invocation:
+3. On each later /address-pr invocation:
    → Read full thread.
    → Reevaluate new concerns and answers.
 4. End
@@ -29,15 +29,15 @@ Flow: Review conversation
 
 Subflow A: Agent Review
 
-1. /code-review posts finding with agent:comment.
+1. /review-feat posts finding with agent:comment.
    → Same account as PR author is allowed.
-2. /address-pr-comments investigates.
+2. /address-pr investigates.
    → Fix clear: implement → verify → push → reply → resolve.
    → Finding incorrect: explain evidence → resolve.
    → Decision missing: ask focused question → leave open.
 3. Author answers in a new comment.
    → Same account is allowed.
-4. /address-pr-comments reevaluates against code and answer.
+4. /address-pr reevaluates against code and answer.
    → Enough information: fix or explain → resolve when settled.
    → Still unclear: ask focused question → leave open.
 5. No answer:
@@ -48,14 +48,14 @@ Subflow A: Agent Review
 Subflow B: Human Review
 
 1. Human posts unmarked finding.
-   → Direct comment or human-approved /hitl comment.
-2. /address-pr-comments investigates.
+   → Direct comment or human-approved /review-hitl comment.
+2. /address-pr investigates.
    → Agree: implement → verify → push → reply.
    → Unclear: ask focused question.
    → Disagree: explain decisive evidence.
 3. Leave thread open for manual closure.
 4. Reviewer answers or challenges the reply.
-5. /address-pr-comments reevaluates the full conversation.
+5. /address-pr reevaluates the full conversation.
    → Valid concern: fix → verify → push → reply.
    → Missing decision: ask focused question.
    → Disagreement remains: explain tradeoff and request decision.

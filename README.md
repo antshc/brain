@@ -23,15 +23,13 @@ Replace `wf` with `atl`, `crew`, `ms`, `ralph`, or `verify`. In an open Copilot 
 
 Pick the plugin bundles you need. Each block uninstalls any stale version first, then installs the current one.
 
-### Workflow plugins (wf, crew, ralph, review)
+### Workflow plugins (wf, crew, ralph)
 
 ```sh
 (copilot plugin uninstall wf@brain >/dev/null 2>&1 || true) && \
 copilot plugin install wf@brain && \
 (copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
 copilot plugin install crew@brain && \
-(copilot plugin uninstall review@brain >/dev/null 2>&1 || true) && \
-copilot plugin install review@brain && \
 (copilot plugin uninstall skill@brain >/dev/null 2>&1 || true) && \
 copilot plugin install skill@brain && \
 (copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
@@ -42,6 +40,7 @@ copilot plugin install ralph@brain
 <summary>Uninstall deprecated plugins</summary>
 
 ```sh
+(copilot plugin uninstall review@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall droid@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall solution@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall learn-aws@brain >/dev/null 2>&1 || true) && \
@@ -176,6 +175,12 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
 - [index-docs](plugins/wf/skills/index-docs/SKILL.md): initialize missing `ARCHITECTURE.md` and `GLOSSARY.md`, and maintain architecture indexes.
+- [review-fix](plugins/wf/skills/review-fix/SKILL.md): review fixes for blast radius and regression-test gaps; focused impact, tests, or combined analysis.
+- [address-pr](plugins/wf/skills/address-pr/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
+- [review-hitl](plugins/wf/skills/review-hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
+- [review-architecture](plugins/wf/skills/review-architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
+- [review-feat](plugins/wf/skills/review-feat/SKILL.md): independent bug, quality, code-smell and initiative reviewers; posts evidence-backed PR findings.
+- [review-design](plugins/wf/skills/review-design/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `wf:review-design`.
 - [WF installer](plugins/wf/install/install.md): one-time repo setup for GitHub issue labels and doc layout, and offers repo-level `factory-mode` install; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research and docs initialization remain local, and other skills retain their Jira workflows.
 
 ### crew
@@ -199,17 +204,6 @@ AFK PR review and autonomous development loop.
 - [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
 - [Ralph installer](plugins/ralph/install/install.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
 
-### review
-
-Code and technical solution review skills with modular standards and guidance.
-
-- Code Review, Address PR Comments, and HITL load formatting from [Git Conventions](plugins/wf/skills/git-conventions/SKILL.md). Install WF with `copilot plugin install wf@brain` before using these Review skills.
-- [fix-review](plugins/review/skills/fix-review/SKILL.md): review fixes for blast radius and regression-test gaps; focused impact, tests, or combined analysis with on-demand references.
-- [address-pr-comments](plugins/review/skills/address-pr-comments/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
-- [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
-- [architecture-review](plugins/review/skills/architecture-review/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
-- [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from the PR description’s leading `[initiative-id]` marker or a supported legacy body ID; accepts a user PR URL or a factory-mode call and fetches the diff into a fresh detached review worktree without cloning.
-- [design-review](plugins/review/skills/design-review/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:design-review`.
 
 ### atl
 

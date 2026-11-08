@@ -1,5 +1,5 @@
 ---
-name: fix-review
+name: review-fix
 description: >-
   Review an implemented fix or change for downstream breakage and missing regression tests. Use for 'review this fix', 'blast radius', 'what could this break', 'assess tests', 'test coverage gaps', or 'are these tests enough'.
 ---

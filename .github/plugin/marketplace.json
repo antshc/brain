@@ -5,11 +5,6 @@
     },
     "plugins": [
         {
-            "name": "review",
-            "source": "./plugins/review",
-            "description": "Code and technical solution review skills with modular standards and guidance."
-        },
-        {
             "name": "wf",
             "source": "./plugins/wf",
             "description": "Common everyday workflow automation skills. Expected to be useful to all developers."
