@@ -1,6 +1,6 @@
 # Address PR comments conversation flows
 
-[Address PR comments](SKILL.md) investigates PR review discussions, fixes verified concerns, and replies using [Git Conventions](../../../wf/skills/git-conventions/SKILL.md).
+[Address PR comments](../playbooks/comments.md) investigates PR review discussions, fixes verified concerns, and replies using [Git Conventions](../../git-conventions/SKILL.md).
 
 These flows describe PR #172 behavior. The gaps below are limitations and proposed follow-ups, not implemented guarantees.
 
@@ -19,9 +19,9 @@ Flow: Review conversation
 
 1. Developer agent creates PR.
 2. Reviewer opens a thread.
-   → A: /review-feat finding → Run Agent Review
+   → A: /review code finding → Run Agent Review
    → B: Human finding → Run Human Review
-3. On each later /address-pr invocation:
+3. On each later /review comments invocation:
    → Read full thread.
    → Reevaluate new concerns and answers.
 4. End
@@ -29,15 +29,15 @@ Flow: Review conversation
 
 Subflow A: Agent Review
 
-1. /review-feat posts finding with agent:comment.
+1. /review code posts finding with agent:comment.
    → Same account as PR author is allowed.
-2. /address-pr investigates.
+2. /review comments investigates.
    → Fix clear: implement → verify → push → reply → resolve.
    → Finding incorrect: explain evidence → resolve.
    → Decision missing: ask focused question → leave open.
 3. Author answers in a new comment.
    → Same account is allowed.
-4. /address-pr reevaluates against code and answer.
+4. /review comments reevaluates against code and answer.
    → Enough information: fix or explain → resolve when settled.
    → Still unclear: ask focused question → leave open.
 5. No answer:
@@ -48,14 +48,14 @@ Subflow A: Agent Review
 Subflow B: Human Review
 
 1. Human posts unmarked finding.
-   → Direct comment or human-approved /review-hitl comment.
-2. /address-pr investigates.
+   → Direct comment or human-approved /review hitl comment.
+2. /review comments investigates.
    → Agree: implement → verify → push → reply.
    → Unclear: ask focused question.
    → Disagree: explain decisive evidence.
 3. Leave thread open for manual closure.
 4. Reviewer answers or challenges the reply.
-5. /address-pr reevaluates the full conversation.
+5. /review comments reevaluates the full conversation.
    → Valid concern: fix → verify → push → reply.
    → Missing decision: ask focused question.
    → Disagreement remains: explain tradeoff and request decision.
@@ -74,7 +74,7 @@ Each continuation requires another invocation. Address handles each thread indep
 - Before resolution, refetch complete comments and current head; changed context requires reassessment. Confirm resolution through API read-back.
 - Human-origin threads remain open after fixes, disagreement, clarification, and acceptance until a human closes them.
 
-See [the gate](scripts/pr_discussion_state.py) and [GitHub API reference](references/github-api.md).
+See [the gate](../scripts/pr_discussion_state.py) and [GitHub API reference](github-api.md).
 
 ## Deferred concerns
 

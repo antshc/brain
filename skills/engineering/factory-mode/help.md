@@ -28,7 +28,7 @@ PLAYBOOKS — matched from the request
   /factory-mode stories from <requirements or spec>
   /factory-mode break <feature design> into User stories
 
- feature            research → architect sketch → resolve questions → /design spec → implement-spec parallel → verify app → review-feat → address-pr → finalize draft PR
+ feature            research → architect sketch → resolve questions → /design spec → implement-spec parallel → verify app → /review code → /review comments → finalize draft PR
   /factory-mode add <behavior> to <module>
   /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
   /factory-mode add <feature> checkpoint  (pause for design approval)

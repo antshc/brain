@@ -1,4 +1,4 @@
-# Test assessment
+# Tests gap
 
 Map each behavior a change affects to the existing test that protects it, judge whether that test would really fail on a regression, and return prioritized gaps.
 
@@ -11,12 +11,12 @@ Accept a diff, commit, branch, local change, or PR; optional bug report or origi
 - **MUST NOT** edit production code or tests. Recommend cases; write none.
 - Read-only by default. Run a narrow diagnostic test only when needed to judge a claimed assertion; report its exact command and result. **MUST NOT** run the whole suite.
 - **MUST** preserve unrelated dirty worktree changes; never reset/clean the user's checkout.
-- **MUST NOT** post PR comments, commit, or push.
+- **MUST NOT** post PR comments, commit, or push, or deploy.
 - **MUST** redact secrets, credentials, and customer data from quoted evidence.
 
 ## Scope
 
-Identify repository instructions, target head, baseline, original defect if available, changed paths, affected observable behavior, and test entry points. Pin commit IDs for committed targets; record local diff state for uncommitted ones. For PRs, read title, body, and commits through read-only GitHub tooling and inspect the PR head, not the caller's branch. Read `GLOSSARY.md` (if it exists) and ADRs in the touched area.
+Use the confirmed and plausible risks from Blast radius when the user requests both analyses. Identify repository instructions, target head, baseline, original defect if available, changed paths, affected observable behavior, and test entry points. Pin commit IDs for committed targets; record local diff state for uncommitted ones. For PRs, read title, body, and commits through read-only GitHub tooling and inspect the PR head, not the caller's branch. Read `GLOSSARY.md` (if it exists) and ADRs in the touched area.
 
 Done when target, baseline, and affected behaviors are explicit, or ambiguity is returned for clarification. Missing original-defect evidence is a stated limitation; do not invent it.
 
@@ -33,7 +33,7 @@ Done when target, baseline, and affected behaviors are explicit, or ambiguity is
 |---|---|---|---|
 | Concrete failure mechanism | Test identifier and `file:line`, or none found | Reaches mechanism and fails on wrong observable output, or limitation | Specific input → expected result, or no identified gap |
 
-Follow the table with: scope and baseline inspected, any diagnostic command run with its result, and limitations. No gaps found means only the inspected risks have suitable tests, not that the change is verified.
+Recheck the pinned head before reporting when remote state may have changed. Follow the table with: scope and baseline inspected, any diagnostic command run with its result, and limitations. No gaps found means only the inspected risks have suitable tests, not that the change is verified.
 
 ## Completion criteria
 

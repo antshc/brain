@@ -1,8 +1,8 @@
 # GitHub API
 
-Every `gh` invocation this skill makes by hand. Copy each verbatim and substitute `{{owner}}`, `{{repo}}`, `{{number}}`, `{{threadId}}`.
+Use these commands in the comments playbook. Copy each verbatim and substitute `{{owner}}`, `{{repo}}`, `{{number}}`, `{{threadId}}`.
 
-The review threads themselves are **not** fetched here. `scripts/pr_discussion_state.py` owns that query and pagination, and hands back the working set — see §0 of `SKILL.md`.
+The review threads themselves are **not** fetched here. `scripts/pr_discussion_state.py` owns that query and pagination, and hands back the working set — see step 0 of the [comments playbook](../playbooks/comments.md).
 
 ## PR metadata
 

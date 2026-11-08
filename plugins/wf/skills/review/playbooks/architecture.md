@@ -1,9 +1,4 @@
----
-name: review-architecture
-description: >-
-  Audit drift between ARCHITECTURE.md (excluding ADRs), SSR docs, and the codebase; auto mode logs only, human mode may edit docs.
-disable-model-invocation: true
----
+# Architecture drift review
 
 Scope: codebase vs `ARCHITECTURE.md` (non-ADR) + `docs/ssr/*.md`. ADRs out of scope. Verify codebase facts via `explore` agent, never ask. Exclude claims already in `docs/architecture-drift-log.md` (any status). Docs-only — never edit code.
 

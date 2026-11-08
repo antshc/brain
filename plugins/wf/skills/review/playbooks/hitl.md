@@ -1,17 +1,10 @@
----
-name: review-hitl
-description: >-
-  Draft human-led PR review comments verified against code and architecture docs, posting each inline after human approval.
-argument-hint: 'PR_URL (e.g., "https://github.com/owner/repo/pull/1245")'
-disable-model-invocation: true
----
 # Review assistant
 
 Act as **senior-developer review support**: the human leads the review and decides what to examine and what deserves a comment; answer their questions and verify and draft their findings against the code and architecture docs. Act only on user input; enter Review branch only when the user asks for a review or comment. **MUST NOT** review, critique, or summarize the PR diff on own initiative.
 
 **MUST NOT** use question tools (e.g. `ask_user`, ask-questions); every question and menu in this skill is plain chat text, then wait for the reply.
 
-**References:** every `references/...` file lives in this skill's own folder (the directory containing this `SKILL.md`). Open it directly at `<skill folder>/references/<name>.md`; **MUST NOT** search for it (glob, grep, or find) from the filesystem root or the repo root, or fall back to the CWD.
+**References:** resolve each reference from the review skill directory (the directory containing `SKILL.md`); **MUST NOT** search for it (glob, grep, or find) from the filesystem root or the repo root, or fall back to the CWD.
 
 ## Input
 
@@ -27,7 +20,7 @@ Run once per session, before Review loop. Steps 1 to 3 complete before step 4.
 
 If `git status --porcelain` is non-empty, stop and ask the user before checkout.
 
-Follow [Fetch PR diff](references/fetch-diff.md), resolved from this skill's base directory, with `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL` to check out the PR branch and fetch its diff per file into `bin/review_diff/` with a path manifest. Capture the checked-out commit as `COMMIT_ID` with `git rev-parse HEAD`. Done when the manifest exists and the reviewed commit is recorded.
+Follow [Fetch PR diff](../references/fetch-diff.md#hitl), using the HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
 
 **2. Load existing review comments**
 
@@ -51,9 +44,9 @@ Set `@diffSize` to `additions + deletions` from `gh pr view <PR_NUMBER> --repo <
 | 200 to 1000 | medium: standard model |
 | over 1000 | large: most capable model available |
 
-Launch one Changes brief subagent at `@agentSize`. Pass `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL`, `bin/review_diff/` with its `_manifest.tsv`, and the loaded architecture docs. It is read-only on the codebase and writes only its output file.
+Launch one Changes brief subagent at `@agentSize`. Pass `OWNER`, `REPO`, `PR_NUMBER`, `PR_URL`, `DIFF_DIR` and `MANIFEST`, and the loaded architecture docs. It is read-only on the codebase and writes only its output file.
 
-Follow [Changes brief](references/changes-brief.md) for the PR change. Write the result to `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-changes-brief.md`.
+Follow [Changes brief](../references/changes-brief.md) for the PR change. Write the result to `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/pr-{{PR_NUMBER}}-changes-brief.md`.
 
 Pass the subagent the absolute path of the reference file under this skill's `references/` folder; it opens that path directly and does not search for it. It writes the reference's reply verbatim to its output file, creating the folder if missing, and returns only the absolute output path plus `done` or `failed: <reason>`.
 
@@ -81,7 +74,7 @@ Drafts, approves, and posts one review comment.
 **1. Analyse**
 
 1.1 **Anchor** — resolve from the input:
-   - `FILE_PATH`: match the input to a file in `bin/review_diff/`, then take the real repo-relative path from `bin/review_diff/_manifest.tsv`; never derive it from the flattened filename. Ambiguous → ask the user.
+   - `FILE_PATH`: match the input to a patch in `DIFF_DIR`, then take the real repo-relative path from `MANIFEST`. Ambiguous → ask the user.
    - `LINE_NUMBER`: from the diff (right-side new-file line; last line of a multi-line range). Undeterminable → ask the user.
 
 1.2 **Evidence** — gather definitions, usages, callers; confirm the issue is real in actual code. **Default to an `Explore` subagent; reserve direct reads for anchor-precision.** `Explore` returns a condensed verdict, keeping raw tool output out of main context.
@@ -124,7 +117,7 @@ Show the comment and menu in this format; wait for the user's selection:
 
 **4. Handle the reply**
 
-On approval (1 or 2): follow [Posting](references/posting.md), resolved from this skill's base directory, with `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT`, and the reviewed `COMMIT_ID` to post the approved body unchanged, without appending metadata. Capture the returned `COMMENT_ID`; add `{FILE_PATH, LINE_NUMBER, REVIEW_COMMENT, COMMENT_ID}` to the **posted queue**. Then, by reply:
+On approval (1 or 2): follow [Posting](../references/posting.md#hitl), with `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT`, and the reviewed `COMMIT_ID` to post the approved body unchanged, without appending metadata. Capture the returned `COMMENT_ID`; add `{FILE_PATH, LINE_NUMBER, REVIEW_COMMENT, COMMENT_ID}` to the **posted queue**. Then, by reply:
 - **1:** display the posted queue as a numbered list (`FILE_PATH:LINE_NUMBER — REVIEW_COMMENT (COMMENT_ID)` per item), then return to Get the input.
 - **2:** clear the posted queue and end the session.
 - **3:** drop the draft without posting; return to Get the input.
@@ -135,7 +128,7 @@ On approval (1 or 2): follow [Posting](references/posting.md), resolved from thi
 
 Answers a code question; never drafts or posts.
 
-1. **Explore:** delegate to a read-only `Explore` subagent. Pass the question, `OWNER/REPO#PR_NUMBER`, `bin/review_diff/`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed. Thoroughness by question complexity:
+1. **Explore:** delegate to a read-only `Explore` subagent. Pass the question, `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed. Thoroughness by question complexity:
    - `quick` — single symbol/file lookup (where is X, what does Y return).
    - `medium` — one flow or caller chain within one component.
    - `thorough` — cross-component flow, multiple call paths, or design/why questions.
