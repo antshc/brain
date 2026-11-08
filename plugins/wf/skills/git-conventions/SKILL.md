@@ -15,3 +15,7 @@ Select the tactic named by the caller and read its reference. Return formatted t
 | Draft PR | Verified head/base, initiative ID, change intent, summary, rationale, changes, verification, and optional references | [Pull requests](references/pull-requests.md) |
 | Read PR initiative | PR title and description | [Pull requests](references/pull-requests.md) |
 | Draft or finalize review comment | Kind, ownership, stage, verified evidence, and validated visible body for final | [Review comments](references/review-comments.md) |
+
+For **Draft commit** and **Draft PR**, apply the `writing-style` skill's **Write a PR description or commit message** route to the prose after following the selected convention. Keep the required subject, initiative marker, section names, and evidence intact.
+
+For a **draft** review comment, apply the `writing-style` skill's **Unslop only** route to the visible prose after following **Review comments**. For a **final** comment, preserve the caller's validated visible body verbatim and add the required hidden metadata. Do not apply writing edits to parsed PR metadata or branch names.
