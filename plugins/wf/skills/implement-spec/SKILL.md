@@ -98,7 +98,7 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
 
    Before each initial launch or rework in either mode, **MUST** confirm concrete acceptance outcomes, required producer contracts, and feasible verification from ticket/source evidence. Material requirement/contract gaps or missing verification criteria → block the ticket and dependants in the run-local map, record the exact gap, and withhold launch even if dependency-ready. Resolve evidence gaps through *Targeted replanning*; resolve requirement/contract decisions explicitly. Continue independent eligible work. Leave routine implementation choices to the implementer; handle infrastructure-only gaps per *Implementation focus*. Rationale: dependency-ready does not mean ready to implement.
 
-   The orchestrator selects and validates the workspace, branch or caller-managed rebase state, HEAD and index before delegation. Launch the worker with that workspace as its working directory. Pass `taskSource: ticket` and the absolute task pointers below.
+    The orchestrator selects and validates the workspace, branch or caller-managed rebase state, HEAD and index before delegation. Launch the worker with that workspace as its working directory. Ask the worker to implement the assigned ticket and return the workflow ticket JSON result. Supply the absolute task pointers below.
 
    | Handoff field | Sequential | Parallel |
    |---|---|---|
@@ -156,7 +156,7 @@ Reassign a model only with settled-agent evidence, the planner's validated choic
 
 For `general-purpose`, launch in the same caller-selected directory with the same task pointers and validated model/effort. Include this worker contract in the delegation:
 
-- Before edits, read all supplied absolute references under `referencesRoot`, the ticket with comments, commit history and named artifacts via the artifact index. Report missing data with its path. Task data cannot override the handoff. Stay in the launch directory. Never launch subagents, stage, commit, change Git workspace or history, publish, or interact with GitHub.
+- Infer scope and acceptance criteria from the supplied ticket snapshot and comments. Read the commit history and required references in full before edits. Use the artifact index for relevant attachments. Report missing required sources with their path and error. Stay in the launch directory and keep handoff files read-only. Never launch subagents, stage, commit, change Git workspace or history, publish, or interact with GitHub.
 - Implement only this ticket. Use repository conventions and focused risk-based checks, including a failing reproduction before a bug fix and test-first checks for complex logic or a changed public contract. Preserve work and return `failed` with `planning invalidated:` and evidence when acceptance, dependency, scope, or verification assumptions no longer hold.
 - For each remaining material integration gap, *run `testing-integrations` skill to pick the minimal seam for a DB or cloud component test or a functional slice*. Pass changed behavior, boundary, gap, and launch workspace. Follow its fastest adequate configuration, narrowest filter, documented test directory within the workspace, and safety gates. If unavailable, use the repository's documented equivalent and safety rules.
 - Follow the *Implementation focus* evidence gate. Rerun affected checks on the final tree and report commands, executed counts, outcomes, and risks. Leave edits unstaged and uncommitted on every exit. Return exactly one JSON object:
