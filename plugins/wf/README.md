@@ -2,7 +2,7 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
-The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-spec/SKILL.md), [to-tickets](skills/to-tickets/SKILL.md)) supports GitHub only. Each skill bundles its own GitHub reference; [init-wf](skills/init-wf/SKILL.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [bootstrap-docs](skills/bootstrap-docs/SKILL.md) remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-spec/SKILL.md), [to-tickets](skills/to-tickets/SKILL.md)) supports GitHub only. Each skill bundles its own GitHub reference; [init-wf](skills/init-wf/SKILL.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [index-docs](skills/index-docs/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
 [subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) owns How for current code behavior and Why for historical rationale alongside its existing inspection routes.
 
@@ -21,7 +21,7 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/to-zdesign` directly).
 2. **Spec synthesis** — `/to-spec` synthesizes the spec from the resolved Wayfinder decisions or grill-design conversation, the step right after the discovery loop; a spec can feed `/to-tickets` directly or go on into design synthesis.
 3. **Design synthesis** — `/to-zdesign` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
-4. **Story breakdown** — `/to-stories` accepts requirements, `/to-spec` output, or `/to-zdesign` output and assembles an ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`/draft-story`](skills/draft-story/SKILL.md) once per story for that story's formatted title and body, while `/draft-story` also runs standalone for one User story.
+4. **Story breakdown** — `/to-stories` accepts requirements, `/to-spec` output, or `/to-zdesign` output and assembles an ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row for its formatted title and body. Use `/draft-artifact story` for a standalone User story.
 5. **Story hardening** — `/grill-design` interviews and sharpens each story, run once per story.
 6. **Ticket cut** — `/to-tickets` slices each hardened story into agent-executable GitHub issues.
 
@@ -95,7 +95,7 @@ swimlane-beta TB
 
   subgraph breakdown [Story breakdown]
     toStories[4 - to-stories<br/>assemble ordered story list]
-    draftStory[[5 - draft-story<br/>once per story]]
+    draftStory[[5 - draft-artifact story<br/>once per approved row]]
     stories[/6 - User stories/]
     done([Stories ready])
   end
@@ -110,7 +110,7 @@ swimlane-beta TB
 
 ### Story to implementation
 
-Starts from one existing User story: `/sharpen` hardens it, `/architect` sketches the code, `/to-spec` writes the spec, and `/implement-spec` implements it.
+Starts from one existing User story: `/writing-style sharpen` hardens it, `/architect` sketches the code, `/to-spec` writes the spec, and `/implement-spec` implements it.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -121,7 +121,7 @@ swimlane-beta TB
 
   subgraph story [Story hardening]
     userStory([User story])
-    sharpen[1 - sharpen]
+    sharpen[1 - writing-style sharpen]
   end
 
   subgraph design [Design]
@@ -142,7 +142,7 @@ swimlane-beta TB
 
 ### Story to direct implementation
 
-Starts from one existing User story with no spec: `/sharpen` hardens it, `/architect` sketches the code, and the **implement** reply makes `/architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
+Starts from one existing User story with no spec: `/writing-style sharpen` hardens it, `/architect` sketches the code, and the **implement** reply makes `/architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -153,7 +153,7 @@ swimlane-beta TB
 
   subgraph story [Story hardening]
     userStory([User story])
-    sharpen[1 - sharpen]
+    sharpen[1 - writing-style sharpen]
   end
 
   subgraph design [Design]
@@ -182,16 +182,18 @@ swimlane-beta TB
 
 ## Skills
 
-| Group                                     | Purpose                                      | Current skills                                                                            |
-| ----------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **define- / discover-**                   | Resolve concept scope and other unknowns     | `define-concept`, `wayfinder`, `grill-design`, `experiment`, `explore-codebase` |
-| **probe-**                                | Auto-discover facts in a system and record them | —                                                                                      |
-| **research-**                             | Gather external/domain evidence              | `research`, `define-research`                                                             |
-| **inspect-**                              | Inspect implementations and artifacts        | `inspect-nuget-source`                                                                    |
-| **to-**                                   | Transform one artifact/state into another    | `to-use-cases`, `to-spec`, `to-zdesign`, `to-stories`, `to-tickets`    |
-| **architect**                             | Sketch, synthesize, review; hand off to spec or implement | `architect`, `code-sketch`                                                                |
-| **draft-**                                | Author standalone working artifacts          | `draft-bug`, `draft-story`                                                                |
-| **record-**                               | Record settled architecture or render bodies | `record-architecture`                                                                     |
-| **doc-**                                  | Render existing knowledge                    | `doc-architecture-diagram`, `doc-behavior-diagram`, `doc-code-diagram`, `doc-contracts`        |
-| **docs- / setup-** | Workflow plugin documentation infrastructure | `bootstrap-docs`, `index-docs`, `init-wf`               |
-| **normalize-**                            | Rewrite/reshape content                      | `sharpen`                                                                       |
+| Task | Entry |
+| --- | --- |
+| Architecture, behavior, or code diagrams | `/doc-diagram <diagram type>` with optional current or delta mode |
+| Initialize docs | `/index-docs Initialize missing docs` |
+| Story, bug report, or feature handover | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi` |
+| Deepen a task prompt or restate intent | `/writing-style sharpen` |
+
+Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [behavior](skills/doc-diagram/examples/behavior.md), and [code](skills/doc-diagram/examples/code.md).
+
+| Group | Skills |
+| --- | --- |
+| Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase`, `grill-design`, `inspect-nuget-source`, `research`, `wayfinder` |
+| Design and backlog | `architect`, `to-spec`, `to-stories`, `to-tickets`, `to-zdesign` |
+| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
+| Implementation and tooling | `diagnosing-bugs`, `git-conventions`, `implement-spec`, `init-wf`, `principles`, `show-me-your-work`, `subagents`, `worktrees` |

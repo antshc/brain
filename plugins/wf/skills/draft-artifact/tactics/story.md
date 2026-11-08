@@ -1,9 +1,3 @@
----
-description: >-
-  Draft one atomic, testable, implementation-agnostic User story with Title, Requirements, Acceptance Criteria, and optional Technical notes. Use when asked to write, draft, or format a User story, or when another skill needs one story's content.
-name: draft-story
----
-
 Draft and print one standalone **User story** body that advances one **Functional slice**. Own the formatted Title, Requirements, Acceptance Criteria, Implementation Decisions, Contracts Delta, and Technical notes for that body.
 
 **Input:** an optional Initiative tag, required Deployable kind (`[FE]` or `[BE]`), Feature, Functional slice, verbatim Stakeholder requirement, Functional requirements addressed, and any source Business rules, Edge cases, error conditions, and Acceptance criteria needed to draft the story. Anything absent is derived from the standalone requirement text in context.

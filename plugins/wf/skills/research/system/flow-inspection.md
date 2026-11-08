@@ -21,11 +21,11 @@ Map each handoff to a row, then verify sender, wire contract, receiver, and depl
 
 ## Diagram
 
-Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. *Follow `doc-behavior-diagram` skill's **Swimlane Diagram** for lane ownership, handoffs, and responsibility changes* and open its swimlane template before drafting.
+Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. *Follow `doc-diagram` skill's **Swimlane Diagram** for lane ownership, handoffs, and responsibility changes* and open its swimlane template before drafting.
 
 Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
 
-Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; *run `doc-architecture-diagram` skill for the Mermaid C4 container diagram's deployables and relationships*.
+Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; *run `doc-diagram` skill for the Mermaid C4 container diagram's deployables and relationships*.
 
 ## Tiers
 

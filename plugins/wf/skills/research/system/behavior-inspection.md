@@ -12,15 +12,15 @@ Pick the diagram from what the question asks, then run its owning skill.
 
 | Inspection topic | Draw | Skill |
 |---|---|---|
-| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `doc-behavior-diagram` |
-| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `doc-behavior-diagram` |
-| who owns each step and where responsibility changes — handoffs across layer, modules, or teams | a **swimlane diagram** | `doc-behavior-diagram` |
-| which deployable-local functional slices and external systems a flow connects | a **container diagram** | `doc-architecture-diagram` |
-| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `doc-architecture-diagram` |
-| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `doc-architecture-diagram` |
-| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `doc-code-diagram` |
+| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `doc-diagram` |
+| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `doc-diagram` |
+| who owns each step and where responsibility changes — handoffs across layer, modules, or teams | a **swimlane diagram** | `doc-diagram` |
+| which deployable-local functional slices and external systems a flow connects | a **container diagram** | `doc-diagram` |
+| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `doc-diagram` |
+| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `doc-diagram` |
+| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `doc-diagram` |
 
-A traced behavior defaults to the **sequence diagram**; *run `doc-behavior-diagram` skill for the sequence diagram's interaction order, call chain, and failure branching* before drafting it.
+A traced behavior defaults to the **sequence diagram**; *run `doc-diagram` skill for the sequence diagram's interaction order, call chain, and failure branching* before drafting it.
 
 Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep file references in the tables; use class, method, or file names with exact lines in the diagram only when the brief asks for them.
 

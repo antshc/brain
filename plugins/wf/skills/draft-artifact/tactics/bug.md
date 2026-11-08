@@ -1,9 +1,3 @@
----
-name: draft-bug
-description: >-
-  Draft one reproducible bug report from observed behavior and available codebase context. Use when the user asks to write, draft, format, or file a bug, defect, regression, or unexpected-behavior report, or when another skill needs a bug body.
----
-
 # Draft Bug
 
 Draft and print one standalone bug report that defines the affected behavior, reproduction, actual result, expected result, and useful technical context.

@@ -1,6 +1,6 @@
 # Behavior Diagram
 
-Presentation examples for the `doc-behavior-diagram` skill.
+Presentation examples for the `doc-diagram` skill (behavior).
 
 Every step carries a hierarchical number in its label — main path `1 - …`, `2 - …`; a branch off step 3 `3a.1 - …`, `3b.1 - …`. Flowchart and swimlane diagrams stay acyclic and are rendered and checked for element order with `scripts/check_layout.py`.
 

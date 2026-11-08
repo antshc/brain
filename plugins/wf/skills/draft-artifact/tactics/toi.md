@@ -1,12 +1,18 @@
----
-name: draft-toi
-description: >-
-  Draft a feature Transfer of Information (TOI) locally from workspace docs and codebase, with real tweak keys, GUI and REST API scenarios, and an optional swimlane. Use for 'write a TOI', feature handover, or knowledge transfer.
----
-
 # Draft TOI
 
 TOI = engineering hands a developed feature to technical teams (Support, QA, Docs, Training, Field). Not formal training; those teams reuse it to build training, documentation, and labs. Reader did **not** build the feature.
+
+
+## Contents
+
+- Inputs
+- Constraints
+- Workflow
+- Exploration checklist
+- How does it work rules
+- Plain language
+- Gaps
+- Completion criteria
 
 ## Inputs
 
@@ -19,7 +25,7 @@ If `feature` is missing or matches more than one feature, ask the user with the 
 
 ## Constraints
 
-- **MUST** use `./toi-template.md` from this skill's base directory as the single structure source. Read it on every run.
+- **MUST** use the TOI template listed in the router as the single structure source. Read it on every run.
 - **MUST** keep template headings, heading levels, and section order.
 - **MUST** ground every statement in collected evidence. **MUST NOT** invent behavior, numbers, defaults, permissions, or limits. Unverified → record as an open question (see Gaps).
 - **MUST** write every section in plain language per Plain language. No section is exempt.
@@ -85,7 +91,7 @@ Use the docs only as a starting point for keys and defaults; the source call sit
 - Stay high level, at user-visible deployable level. No classes, methods, or internal modules.
 - Start with a brief description of how the feature works: 3–6 sentences in one paragraph. State the trigger, the main steps across the user-visible deployables, and the visible result.
 - The diagram is optional. Add it only when it helps, for example when the flow has handoffs between 2 or more deployables. Skip it for simple flows; the description and scenarios are enough. When skipped, delete the diagram instruction line and the scaffold from the template.
-- When a diagram is added: *run `doc-behavior-diagram` skill for a Mermaid swimlane diagram of responsibility handoffs and who owns each step*, using Swimlane Diagram, solution responsibility, one lane per user-visible deployable (and the user). Use Flowchart instead only when one deployable owns the whole flow. Labels follow Plain language.
+- When a diagram is added: *run `doc-diagram` skill for a Mermaid swimlane diagram of responsibility handoffs and who owns each step*, using Swimlane Diagram, solution responsibility, one lane per user-visible deployable (and the user). Use Flowchart instead only when one deployable owns the whole flow. Labels follow Plain language.
 - Swimlane stays high level: user-visible steps and handoffs only, about 3–7 lanes and 4–10 steps; no internal components, calls, retries, or data stores; collapse internal work into one step or a subprocess.
 - Wrap every diagram in `<details>` with a `<summary>` naming the flow and view, for example `<summary>Guest checkout — Solution Responsibility</summary>`.
 - Group scenarios by client section, in order: GUI, REST API, Other clients (CLI, Postman collection, scripts). Example scenarios: "Place an order as a guest", "Refund an order". One subsection per user-visible scenario under each client that supports it; clients can differ in steps, options, and results. Delete a client section with no scenarios. A scenario missing from a client → state it is not available there.
