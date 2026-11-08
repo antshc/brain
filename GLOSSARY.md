@@ -105,7 +105,7 @@ _Plugins_set_: ralph, crew, wf
 ### Language
 
 **Codey**:
-The implementation agent. Runs one task in its invocation directory and returns the five-field Crew report. `codey-dotnet` also handles `implement-spec` tickets in assigned worktrees and returns a ticket commit and verification evidence.
+The implementation agent. Crew agents run one task in their invocation directory and return the five-field report. The WF agent `wf:codey` also handles `implement-spec` tickets in assigned worktrees and returns a ticket commit and verification evidence.
 _Avoid_: droid, implementer, coder
 
 **Chorey**:
@@ -320,4 +320,4 @@ _Avoid_: checklist.md, agent instructions
 # Relationships
 
 - **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` once via the `harness` skill, derives the `Codebase Repo Path` from the target repository, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Ralph owns the commit and surfaces Codey's gotchas with ticket attribution.
-- **wf → crew**: `implement-spec` delegates to `crew:codey-dotnet` in an assigned ticket workspace with explicit commit authority. It uses `general-purpose` when Codey is unavailable.
+- **wf implementer**: `implement-spec` delegates to `wf:codey` in an assigned ticket workspace with explicit commit authority. It uses `general-purpose` when Codey is unavailable.

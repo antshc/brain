@@ -12,7 +12,7 @@ REPO = Path(__file__).resolve().parents[3]
 ROOT = REPO / 'plugins/wf/skills/implement-spec'
 MAIN = (ROOT / 'SKILL.md').read_text()
 FACTORY = REPO / 'skills/engineering/factory-mode'
-CODEY = REPO / 'plugins/crew/agents/codey-dotnet.agent.md'
+CODEY = REPO / 'plugins/wf/agents/codey.agent.md'
 
 
 BREAKDOWN = (ROOT / 'references/breakdown.md').read_text()
@@ -117,10 +117,29 @@ def test_launch_manifest_has_every_reference_and_role():
         assert phrase in handoff
 
 
+def test_wf_codey_is_registered_for_implementation_tasks():
+    plugin = json.loads((CODEY.parent.parent / 'plugin.json').read_text())
+    assert plugin['agents'] == ['./agents']
+    frontmatter = CODEY.read_text().split('---', 2)[1]
+    assert 'name: codey' in frontmatter
+    assert 'Use for implementation tasks' in frontmatter
+
+
+def test_codey_gates_functional_slice_and_prefers_the_fastest_adequate_config():
+    agent = CODEY.read_text()
+    boundary = agent.split('### Integration boundary', 1)[1].split('### Failure handling', 1)[0]
+    assert 'If there is no material gap, skip the skill and functional slice' in boundary
+    assert 'When a material gap remains, call `testing-integrations`' in boundary
+    assert 'Use a functional slice when narrower checks cannot prove it' in boundary
+    assert 'narrowest filter' in boundary
+    assert boundary.index('Start with mock or fake') < boundary.index('Use the real SDK')
+    assert 'only when evidence shows' in boundary
+
+
 def test_named_worker_and_fallback_share_the_ticket_contract():
     agent = CODEY.read_text()
     launch = MAIN.split('Launch implementer →', 1)[1].split('6. **Frontier check.**', 1)[0]
-    assert launch.index('`crew:codey-dotnet`') < launch.index('`general-purpose`')
+    assert launch.index('`wf:codey`') < launch.index('`general-purpose`')
     assert 'cannot resolve the named agent' in launch
     assert 'failed or invalid result goes through rework' in launch
     for value in ('workspace: worktree', 'taskSource: ticket', 'delivery: ticket-commit'):
