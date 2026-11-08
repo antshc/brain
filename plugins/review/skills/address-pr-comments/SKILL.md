@@ -1,11 +1,11 @@
 ---
-name: address
+name: address-pr-comments
 description: >-
-  Group PR review comments into issues, investigate them against the code, fix verified concerns, and reply to every thread, resolving settled agent threads but leaving human threads open. Use for a PR URL with 'address review comments', 'handle PR feedback', or review discussion follow-ups.
+  Group PR review comments into issues, investigate them against the code, fix verified concerns, and reply to every thread, resolving settled agent threads but leaving human threads open. Use for a PR URL with 'address PR comments', 'address review comments', 'handle PR feedback', or review discussion follow-ups.
 argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 ---
 
-# Address review discussions
+# Address PR comments
 
 **Skill base directory:** `{{skillDir}}` is the absolute path of the directory holding this `SKILL.md`. Load `references/github-api.md` and `references/investigation.md` from there, and run `scripts/pr_discussion_state.py` from there — never via a bare relative path, which resolves against the runtime CWD (a worktree, not the skill folder).
 

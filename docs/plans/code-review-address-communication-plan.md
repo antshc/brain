@@ -64,11 +64,11 @@ A human clarification inside an agent thread does not change its origin. An agen
 
 - `plugins/review/skills/code-review/SKILL.md`
 - `plugins/review/skills/code-review/references/posting.md`
-- `plugins/review/skills/address/SKILL.md`
-- `plugins/review/skills/address/references/github-api.md`
-- `plugins/review/skills/address/references/investigation.md` (only if contract wording needs reconciliation)
-- `plugins/review/skills/address/scripts/pr_discussion_state.py`
-- `plugins/review/skills/address/tests/test_pr_discussion_state.py` (focused tests; new if absent)
+- `plugins/review/skills/address-pr-comments/SKILL.md`
+- `plugins/review/skills/address-pr-comments/references/github-api.md`
+- `plugins/review/skills/address-pr-comments/references/investigation.md` (only if contract wording needs reconciliation)
+- `plugins/review/skills/address-pr-comments/scripts/pr_discussion_state.py`
+- `plugins/review/skills/address-pr-comments/tests/test_pr_discussion_state.py` (focused tests; new if absent)
 - `docs/plans/review-comment-agent-markers-plan.md` (supersession notice when publishing)
 
 ## Validation and acceptance

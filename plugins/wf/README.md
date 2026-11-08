@@ -14,7 +14,7 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 
 The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
-[git-conventions](skills/git-conventions/SKILL.md) provides branch, commit, PR, and review comment formats. Install WF alongside Review for Code Review, Address, and HITL. Worktree and hosting operations remain in their existing workflows.
+[git-conventions](skills/git-conventions/SKILL.md) provides branch, commit, PR, and review comment formats. Install WF alongside Review for Code Review, Address PR Comments, and HITL. Worktree and hosting operations remain in their existing workflows.
 
 ## Skill flow
 
