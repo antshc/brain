@@ -1,5 +1,5 @@
 ---
-name: design-review
+name: review-design
 disable-model-invocation: true
 description: >-
   Review a technical design for missing, contradictory, infeasible, unsafe, or untestable decisions. Use for 'is this design complete', 'find architecture gaps', or 'is this design ready for implementation or approval'.

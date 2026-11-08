@@ -1,5 +1,5 @@
 ---
-name: hitl
+name: review-hitl
 description: >-
   Draft human-led PR review comments verified against code and architecture docs, posting each inline after human approval.
 argument-hint: 'PR_URL (e.g., "https://github.com/owner/repo/pull/1245")'

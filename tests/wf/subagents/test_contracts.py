@@ -24,18 +24,18 @@ def test_research_routes_how_and_why_before_standard_inspection():
     assert skill.index("## Entry routes") < skill.index("## Workflow")
 
 
-def test_fix_review_routes_to_progressively_disclosed_procedures():
-    root = REPO / "plugins/review/skills/fix-review"
+def test_review_fix_routes_to_progressively_disclosed_procedures():
+    root = REPO / "plugins/wf/skills/review-fix"
     skill = (root / "SKILL.md").read_text()
     impact = (root / "references/impact-analysis.md").read_text()
     assessment = (root / "references/test-assessment.md").read_text()
 
-    assert "name: fix-review" in skill
+    assert "name: review-fix" in skill
     assert "Read each selected reference completely" in skill
     for reference in ("impact-analysis.md", "test-assessment.md"):
         assert f"](references/{reference})" in skill
     for retired in ("blast-radius", "test-gaps"):
-        assert not (REPO / "plugins/review/skills" / retired / "SKILL.md").exists()
+        assert not (REPO / "plugins/wf/skills" / retired / "SKILL.md").exists()
 
     assert re.findall(r"\*run `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
         "research", "research", "subagents", "writing-style",

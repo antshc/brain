@@ -1,5 +1,5 @@
 ---
-name: address-pr-comments
+name: address-pr
 description: >-
   Group PR review comments into issues, investigate them against the code, fix verified concerns, and reply to every thread, resolving settled agent threads but leaving human threads open. Use for a PR URL with 'address PR comments', 'address review comments', 'handle PR feedback', or review discussion follow-ups.
 argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'

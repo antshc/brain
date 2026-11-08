@@ -73,7 +73,7 @@ The router selects one operation and loads its exact reference. Each tactic repo
 | Existing shared skills | Remove `git-conventions` and `worktrees` after replacing references | No discoverable aliases; full behavior and tests migrate |
 | WF evidence | `explore-codebase`, `research/why`, `grill-design/references/tactics-external-source.md` | Local search, pinned evidence, confirmation of external edits |
 | WF backlog | `to-spec`, `to-tickets`, `wayfinder`, installer, generated template | Routing labels, blocker semantics, offline mode, label manifest, dispatch approval |
-| Review | `code-review`, `hitl`, `test-gaps`, `address-pr-comments`, review references and docs | Comment text/markers, approval gates, discussion and thread ownership |
+| WF reviews | `review-feat`, `review-hitl`, `review-fix`, `address-pr`, review references and docs | Comment text/markers, approval gates, discussion and thread ownership |
 | Implement Spec | `SKILL.md`, `references/worktrees.md`, planner/publication/sequential/parallel guidance, `scripts/spec_gh.py` | Worktree/commit callers, Codey/Chore isolation, `GH_TOOL`, checkpoints, draft PR and closure evidence |
 | Factory/other | `factory-mode/references/post-implementation.md` and other convention/worktree call sites | Commit format and existing workflow authority |
 | Docs/install/tests | `ARCHITECTURE.md`, concept, READMEs, plugin prerequisites, skill paths, Python/contract tests | Accurate discovery, counts, paths and behavior |

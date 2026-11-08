@@ -55,7 +55,7 @@ def test_other_playbooks_do_not_route_to_feature():
     assert "re-route" not in (FACTORY / "playbooks/investigation.md").read_text()
     assert "route to the" not in (FACTORY / "playbooks/refactoring.md").read_text()
 
-    review = (ROOT.parents[1] / "review/skills/code-review/SKILL.md").read_text()
+    review = (ROOT / "review-feat/SKILL.md").read_text()
     assert "Feature playbook" not in review
     assert "Architect playbook" not in review
     assert "Workflow invocation:" not in review

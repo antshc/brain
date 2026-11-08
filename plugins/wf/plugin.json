@@ -1,7 +1,7 @@
 {
   "name": "wf",
-  "version": "1.0.13",
-  "description": "Common everyday workflow automation skills. Expected to be useful to all developers.",
+  "version": "1.0.14",
+  "description": "Developer workflows, reviews, Git conventions, and documentation automation.",
   "skills": ["./skills"],
   "agents": ["./agents"]
 }

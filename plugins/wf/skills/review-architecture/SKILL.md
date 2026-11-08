@@ -1,5 +1,5 @@
 ---
-name: architecture-review
+name: review-architecture
 description: >-
   Audit drift between ARCHITECTURE.md (excluding ADRs), SSR docs, and the codebase; auto mode logs only, human mode may edit docs.
 disable-model-invocation: true

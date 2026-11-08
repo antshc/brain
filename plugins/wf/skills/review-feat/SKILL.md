@@ -1,7 +1,7 @@
 ---
-name: code-review
+name: review-feat
 description: >-
-  Review a GitHub pull request with independent reviewers for bugs, quality attributes, code smells, and initiative coverage, then post evidence-backed inline comments. Use for 'review this PR' or a PR URL with a low, medium, or high review level. Use address-pr-comments to answer existing threads.
+  Review a GitHub pull request with independent reviewers for bugs, quality attributes, code smells, and initiative coverage, then post evidence-backed inline comments. Use for 'review this PR' or a PR URL with a low, medium, or high review level. Use review address-pr to answer existing threads.
 argument-hint: '<PR_URL> [low|medium|high]'
 ---
 
