@@ -1,6 +1,6 @@
 # Crew agents own their workflows and use codebase instructions
 
-Crew agents (`codey-py`, `codey-ai`, `codey-dotnet`, `chorey`) own their input, implementation, verification, and status, and take their style from the codebase repo's own instructions. This revises the earlier base-agent/flow-skill decision after workflow duplication and per-repository `CODE`/`VERIFY` files proved unnecessary.
+Crew agents (`codey-py`, `codey-dotnet`, `chorey`) own their input, implementation, verification, and status, and take their style from the codebase repo's own instructions. This revises the earlier base-agent/flow-skill decision after workflow duplication and per-repository `CODE`/`VERIFY` files proved unnecessary.
 
 ## Considered Options
 

@@ -168,7 +168,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 
 Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.
 
-Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [codey-ai](plugins/crew/agents/codey-ai.agent.md), [chorey](plugins/crew/agents/chorey.agent.md). Crew agents return gotchas in their reports.
+Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [chorey](plugins/crew/agents/chorey.agent.md). Crew agents return gotchas in their reports.
 
 - [to-crew](plugins/crew/skills/to-crew/SKILL.md): run the Codey subagent for an implementation task.
 - [crew-commit](plugins/crew/skills/crew-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.

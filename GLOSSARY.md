@@ -113,7 +113,7 @@ The maintainability-review agent. Reviews the staged change set in cwd for behav
 _Avoid_: reviewer, refactorer, cleanup agent
 
 **Stack**:
-A technology family a repo's code belongs to — `py`, `dotnet`, `ai` — named by the `codey-<stack>` agent that ships for it and used for `CHORE-<stack>.md` and Copilot instruction templates. The vocabulary is closed: a stack exists only where an agent ships for it. One repo can carry several.
+A family of repository conventions with Copilot instruction and Chore rule templates. Crew ships `py`, `dotnet`, and `ai` templates. One repository can use several stacks.
 _Avoid_: language, platform, toolchain, tech
 
 **Stack agent**:
