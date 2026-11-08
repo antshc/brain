@@ -6,7 +6,7 @@ Follow only role-relevant instructions. Never launch subagents; scheduling and l
 
 # TASK
 
-Refine the code changes on branch `{{featureBranch}}` in pull request {{pullRequestUrl}} for clarity, consistency, and maintainability while preserving exact functionality. You start in the worktree at `{{worktreePath}}`, based on `{{targetBranch}}`; run every command and make every change there.
+Refine the code changes on branch `{{featureBranch}}` in pull request {{pullRequestUrl}} for clarity, consistency, and maintainability while preserving exact functionality. Enter and verify the absolute worktree `{{worktreePath}}` before repository work. Verify the branch is `{{featureBranch}}` and HEAD equals `{{historyTip}}`. Return `failed` with the mismatch or error if setup fails. Run repository commands and make changes there.
 
 # CONTEXT
 
@@ -14,7 +14,7 @@ The pull request diff is split per file in `{{diffDir}}`. `{{diffDir}}/_manifest
 
 **MUST NOT** fetch the diff, files, or comments from `{{pullRequestUrl}}` (no `gh pr diff`, `gh pr view`, `gh api`, `git fetch`, `curl`, or browser); the URL is a label only. `{{diffDir}}` and the worktree are your only sources.
 
-Read `{{commitsFile}}`: the branch's commits since `{{targetBranch}}`, oldest first, with bodies stating intent and verification. Use them to understand intent; never undo or redo work they describe. Missing/unreadable → return `failed` with the path. `{{commitsFile}}` and `{{diffDir}}` are the only reads allowed outside the worktree.
+Use local `git log` on `{{baseCommit}}..{{historyTip}}` to read SHAs, subjects, and bodies, oldest first. Keep only subjects matching `^ccode\([^)]*\):` (`ccode(...):`). Use the messages to understand intent. Empty matches are valid. An unreadable range returns `failed` with the refs and error. `{{diffDir}}` is the only task data read outside the worktree.
 
 # REVIEW PROCESS
 
@@ -44,7 +44,7 @@ If improvements apply:
 1. Apply refinements in independent groups. After each meaningful group, run the fastest checks covering it; confirm each filtered run executed the expected tests (count > 0). A group that fails and cannot be fixed without changing behavior → revert only that group (`git restore` its files; delete files it created) and drop it; report it as dropped.
 2. Environment, network, Docker, port, missing SDK/dependency/credential, or external-service failure → one quick confirmation attempt only, no diagnosis or workarounds; mark the check `unavailable` with its error and drop refinements it was meant to cover.
 3. Rerun every affected check once on the final working tree; `verification` reports this run. A check failing beyond its baseline → drop the responsible group and rerun. Mark each check `passed`, `failed`, `unavailable` (with error), or `not run` (with reason). **MUST NOT** claim a check passed without an observed result.
-4. Make exactly one commit with subject `{{commitSubjectPrefix}}<one-line message>` and a concise body listing kept refinements, dropped refinements, and verification. Never amend, squash, or add a second commit.
+4. When the caller explicitly authorizes a commit, make exactly one commit with subject `{{commitSubjectPrefix}}<one-line message>` and a concise body listing kept refinements, dropped refinements, and verification. Never amend, squash, or add a second commit.
 
 Already clean code, or every refinement dropped → change nothing; return `completed` with `commit: null`.
 

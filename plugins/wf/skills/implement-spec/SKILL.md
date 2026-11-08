@@ -98,42 +98,45 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
 
    Before each initial launch or rework in either mode, **MUST** confirm concrete acceptance outcomes, required producer contracts, and feasible verification from ticket/source evidence. Material requirement/contract gaps or missing verification criteria → block the ticket and dependants in the run-local map, record the exact gap, and withhold launch even if dependency-ready. Resolve evidence gaps through *Targeted replanning*; resolve requirement/contract decisions explicitly. Continue independent eligible work. Leave routine implementation choices to the implementer; handle infrastructure-only gaps per *Implementation focus*. Rationale: dependency-ready does not mean ready to implement.
 
-    The orchestrator selects and validates the workspace, branch or caller-managed rebase state, HEAD and index before delegation. Launch the worker with that workspace as its working directory. Ask the worker to implement the assigned ticket and return the workflow ticket JSON result. Supply the absolute task pointers below.
+   For either worker, select and validate the workspace, branch or caller-managed rebase state, HEAD, and index. Instruct the worker to enter and verify the absolute assigned worktree before repository work. Set it as the runtime working directory where supported. Ask the worker to implement the assigned ticket and return the workflow ticket JSON result. Capture the integration HEAD at each launch for history and record the worker's starting HEAD and index separately. Keep `@prevHead` as the original ticket start and track the validated ticket base separately if rebased.
 
    | Handoff field | Sequential | Parallel |
    |---|---|---|
    | `ticketRef` | `OWNER/REPO#NUMBER` | same |
    | `ticketFile` | `RUN_DIR/tickets/<OWNER>_<REPO>_<NUMBER>.json` | same |
-   | `commitsFile` | `RUN_DIR/commits/<HEAD sha>.txt` | same (integration log) |
+   | `baseCommit` | `BASE_COMMIT` | same |
+   | `historyTip` | captured integration HEAD | same |
    | `specArtifactsDir` | `RUN_DIR/artifacts` | same |
 
    Capture `result.gotchas` on every attempt, including failures. Require an array of observed, reusable findings (empty is valid). Attribute findings to the ticket, agent and attempt in the output.
 
-    Before committing, confirm the worker left HEAD, branch or caller-managed rebase state, and index as they were at launch. Unexpected Git state → preserve it and block the ticket. Inspect the diff and confirm `result.files` accounts for the edits in scope. Apply the *Implementation focus* evidence gate to `result.verification`. Require executed checks and results, including skipped infrastructure checks and errors. Thin evidence → run cheap confirmations before accepting the result.
+   Explicitly ask the worker to commit in both modes, with subject `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): <summary>` and a body recording changed paths, decisions, verification, and risks. Allow one new local ticket commit if none exists. For rework on an identified unpublished ticket commit, authorize amendment of that exact SHA only. During a caller-managed rebase conflict, request edit-only mode and keep staging and rebase continuation with the orchestrator.
+
+   Validate the actual Git state before accepting the result. In commit mode, require that `result.commit` equals `HEAD`, the branch is as expected, the worktree is clean, and there is exactly one ticket commit directly above its recorded base. Check its subject and inspect its full diff against the ticket and `result.files`. When `result.commit` is null, require a verified no-change result, the starting HEAD and a clean worktree, then use the existing base-verification path if it applies. In edit-only rework, require the original HEAD, branch or rebase state, and index to be intact and inspect the edits. Unexpected Git state or unrelated staged changes → preserve them, block the ticket, and never publish it. If this affects the integration worktree, return a blocked handoff before another launch or push. Apply the *Implementation focus* evidence gate to `result.verification` in every case. Require executed checks and results, including skipped infrastructure checks and errors. Thin evidence → run cheap confirmations before accepting the result.
    → Evidence invalidates planning assumptions or model capability: run *Targeted replanning* before ordinary rework; preserve original `@prevHead` and work pointers.
    → Other invalid JSON, `failed`, missing evidence, or out-of-scope edits: rework; recheck after each round.
-   → Still invalid after 2 rounds: preserve branch/worktree and report the blocker; stop advancing that ticket.
-   On validated success, the orchestrator stages only inspected ticket changes and makes the commit in the selected worktree. Use subject `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): <summary>` and record the changed paths, decisions, verification and risks in the body. Record the actual SHA as the ticket commit. Verify the expected branch, clean worktree, subject and exactly one ticket commit above its recorded base. In parallel, follow the mode reference for rebase or replacement of the caller's unpublished ticket commit. If there is no change, use the existing base-verification path only when it applies. Otherwise report the blocker without creating an empty commit. Integrate and publish per the mode reference.
+   → Still invalid after 2 rounds: preserve branch/worktree and report the blocker; stop advancing that ticket. If the integration worktree contains an unverified commit or unexpected Git state, stop the sequential run before any further launches or pushes. Return a blocked handoff with the preserved state.
+   Record the verified SHA as the ticket commit. If base verification does not apply to a no-change result, report the blocker. Skip commit integration and publication for no-change results. Integrate and publish verified commits per the mode reference.
 
 6. **Frontier check.** Refresh `graph read`, then run *Effective graph* after each publication and before selection in both modes; use only its recomputed frontier. Check *Targeted replanning* triggers after each result or changed tracker/source evidence. A blocker is satisfied only when integrated in this run or verified in the base. Unfinished tickets but none ready → report each unready ticket and why (open `hitl`, unresolved external dependency); preserve all work and the draft PR; keep the spec open; write *Implementation handoff* with `status: blocked` and partial state before returning, without chore; post-implementation work cannot start. Never force progress or declare completion.
 
 7. Launch chore → [chore.md](./agents/chore.md) subagent in `WORKTREE_PATH`:
    refs `fetch-diff` · `claude-opus-5.5` medium reasoning, fallback `gpt-6.1-sol` medium when rejected · rework none.
-   Before: load [fetch-diff.md](./references/fetch-diff.md); split PR diff into `@diffDir`.
+   Before: load [fetch-diff.md](./references/fetch-diff.md); split PR diff into `@diffDir`; record `@prevHead` from the integration worktree. Instruct Chore to enter and verify that worktree before repository work and explicitly authorize one local cleanup commit after verification.
 
    | Placeholder | Value |
    |---|---|
    | `{{featureBranch}}` | `INTEGRATION_BRANCH` |
    | `{{pullRequestUrl}}` | PR URL |
    | `{{worktreePath}}` | `WORKTREE_PATH` |
-   | `{{targetBranch}}` | `BASE_BRANCH` |
    | `{{diffDir}}` | `@diffDir` |
-   | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` |
+   | `{{baseCommit}}` | `BASE_COMMIT` |
+   | `{{historyTip}}` | `@prevHead` |
    | `{{commitSubjectPrefix}}` | `chore(<INITIATIVE_ID>): ` |
 
-   Verify: ≤1 commit since `@prevHead`, subject match, clean, checks reported; record actual model/effort or unavailable-model failure.
-   After: push; remove `@diffDir`; report out-of-scope findings without acting.
-   → No result or failed: record none/failed; continue.
+   Verify: `result.commit` equals `HEAD`, exactly one commit since `@prevHead`, subject match, clean worktree, checks reported. A verified no-change result must report null and leave `HEAD` at `@prevHead`. Record actual model/effort or unavailable-model failure.
+   After verified success: push; remove `@diffDir`; report out-of-scope findings without acting.
+   → Missing, failed, or invalid result: record the chore blocker, preserve the worktree, remove `@diffDir`, and continue to the blocked handoff without pushing.
    Done when chore changes are committed (one `chore(<INITIATIVE_ID>): ` commit, or none needed), pushed to `INTEGRATION_BRANCH`, remote head equals `HEAD`, and the worktree is clean.
 
 8. Run *Publication verification* ([publication.md](./references/publication.md)), refresh spec/ticket pointers, and write *Implementation handoff*. Preserve the integration worktree, branch, draft PR, and run/evidence directories; keep the spec open. Done when the handoff matches the read-back remote state. Publication failure or unresolved tickets → `blocked`; never report ready from a PR URL alone.
@@ -154,18 +157,20 @@ Reassign a model only with settled-agent evidence, the planner's validated choic
 
 ## Implementer fallback
 
-For `general-purpose`, launch in the same caller-selected directory with the same task pointers and validated model/effort. Include this worker contract in the delegation:
+For `general-purpose`, give the same assigned worktree, Git range, commit instructions, and validated model/effort. Include this worker contract in the delegation:
 
-- Infer scope and acceptance criteria from the supplied ticket snapshot and comments. Read the commit history and required references in full before edits. Use the artifact index for relevant attachments. Report missing required sources with their path and error. Stay in the launch directory and keep handoff files read-only. Never launch subagents, stage, commit, change Git workspace or history, publish, or interact with GitHub.
+- Enter and verify the assigned worktree before repository work. Infer scope and acceptance criteria from the supplied ticket snapshot and comments. Read required references in full and use the artifact index for relevant attachments. Report missing required sources with their path and error. Keep handoff files read-only. Never launch subagents, switch branches, manage worktrees, run a rebase, publish, or interact with GitHub.
+- Before edits, use local `git log` on the pinned `baseCommit..historyTip` to read SHAs, subjects, and bodies, oldest first. Keep only subjects matching `^ccode\([^)]*\):` (`ccode(...):`). Empty matches are valid. An unreadable range → return `failed` with the refs and error.
 - Implement only this ticket. Use repository conventions and focused risk-based checks, including a failing reproduction before a bug fix and test-first checks for complex logic or a changed public contract. Preserve work and return `failed` with `planning invalidated:` and evidence when acceptance, dependency, scope, or verification assumptions no longer hold.
 - For each remaining material integration gap, *run `testing-integrations` skill to pick the minimal seam for a DB or cloud component test or a functional slice*. Pass changed behavior, boundary, gap, and launch workspace. Follow its fastest adequate configuration, narrowest filter, documented test directory within the workspace, and safety gates. If unavailable, use the repository's documented equivalent and safety rules.
-- Follow the *Implementation focus* evidence gate. Rerun affected checks on the final tree and report commands, executed counts, outcomes, and risks. Leave edits unstaged and uncommitted on every exit. Return exactly one JSON object:
+- Follow the *Implementation focus* evidence gate. Rerun affected checks on the final tree and report commands, executed counts, outcomes, and risks. Leave edits unstaged and uncommitted in edit-only mode. In commit mode, stop before edits if there are pre-existing staged changes. After verification, stage only ticket-owned changes and make one local commit with the supplied subject and body instructions. Amend only the explicitly authorized unpublished SHA at HEAD, with no active rebase or merge. If fresh verification confirms that commit and no edits are needed, return its SHA without amending. Create no empty commit. Preserve work and report failures. Return exactly one JSON object:
 
 | Field | Content |
 |---|---|
 | `status` | `completed` when the evidence gate passes, otherwise `failed`. |
 | `result.summary` | `completed` only. One-line outcome. |
-| `result.files` | `completed` only. Changed paths relative to the launch directory. `[]` for verified no change. |
+| `result.files` | `completed` only. Changed paths relative to the assigned workspace. In commit mode, report the paths in the full ticket commit. `[]` for verified no change. |
+| `result.commit` | `completed` in commit mode only. Full commit SHA, or `null` for verified no change. Omit in edit-only mode. |
 | `result.verification` | `completed` only. Criteria mapped to observed evidence, commands and counts where run, per-check status, and remaining risks. |
 | `result.reason` | `failed` only. Blocker or failure with any observed evidence. |
 | `result.gotchas` | Both outcomes. Array of observed reusable findings. `[]` when none. |
@@ -186,7 +191,7 @@ For `general-purpose`, launch in the same caller-selected directory with the sam
 - Validate every manifest file and any local planner or chore body are readable. Missing/unreadable → stop/report exact path. Fill every placeholder in the local bodies. Resolve the named implementer via the runtime, not `AGENTS_ROOT`.
 - Attach `referencesRoot`, `referenceManifest`, and the step's `refs` as absolute `requiredReferences` to every launch, including the named implementer and fallback. Pass pointers only per *Pointer handoff*.
 - Supply tools, permissions, and model settings at launch, never in agent frontmatter. Agents never gain scheduling, publishing, closure, merging, or cross-ticket authority.
-- Apply worker-only runtime restrictions to `wf:codey` and `general-purpose` on every implementer launch and rework where supported. Limit writes to the selected workspace and approved test scratch, keep handoff files read-only, and allow only needed build/test and read-only inspection commands. Deny Git mutations, GitHub access, publication, and delegation. If the runtime cannot scope a restriction to the worker, record the missing control and retain the worker instructions and pre-commit Git-state check.
+- Apply worker-only runtime restrictions to `wf:codey` and `general-purpose` on every launch and rework where supported. Limit writes to the selected workspace, its Git metadata needed for the authorized local commit, and approved test scratch. Keep handoff files read-only. Allow needed build/test and read-only inspection commands. Allow staging and a local commit only in commit mode, and amendment only when explicitly authorized. Deny other Git mutations, GitHub access, publication, and delegation. If the runtime cannot scope a restriction to the worker, record the missing control and retain the worker instructions and post-run Git-state checks.
 
 `referenceManifest` lists every `.md` file under `REFERENCES_ROOT`, keyed by its relative path without `.md`: `breakdown` → `REFERENCES_ROOT/breakdown.md`, `fetch-diff` → `REFERENCES_ROOT/fetch-diff.md`.
 
@@ -200,7 +205,7 @@ Launch line legend: `refs` = `requiredReferences` (manifest keys); pass only the
 - **One ticket = one subagent:** fresh implementer per ticket; sequential waits for each result, parallel caps concurrency. Ordinary rework uses that ticket's existing agent, at most two rounds; an explicit settled-agent capability reassignment follows *Targeted replanning* within the same total cap. **MUST NOT** implement inline, batch tickets, or reuse agents across tickets. Missing subagents → stop/report.
 - **Implementation focus:** `completed` requires passing evidence on the final tree or observed proof of existing behavior for every material requirement. For environment/network/Docker/port/registry/external-service failure, make at most one quick confirmation. Record the unavailable check and error. A substitute check counts only if it passes and exercises the same material risk. An uncovered material requirement or code-caused failure blocks completion. **MUST NOT** troubleshoot infrastructure during implementation.
 - **Draft-only:** PR stays draft; **MUST NOT** merge or mark ready (`gh pr ready`). User controls readiness.
-- **Pointer handoff:** subagents load their own task data. Save every spec/ticket/comment/commit-log read a subagent can reuse under `RUN_DIR` (`graph read` writes spec and ticket files); refresh a file before each launch that uses it. Before each worktree agent launch, write `git -C WORKTREE_PATH log --reverse --format='%H %s%n%n%b' BASE_COMMIT..HEAD` (or `None yet.`) to `RUN_DIR/commits/<HEAD sha>.txt` if absent and record `@prevHead`. Pass pointers (paths, `OWNER/REPO#NUMBER` refs, commit ranges); **MUST NOT** inline bodies, comments, or logs into prompts. Missing/unreadable pointer file → agents return `failed` with the path; the orchestrator refreshes it and reworks.
+- **Pointer handoff:** save reusable spec, ticket, and comment reads under `RUN_DIR` (`graph read` writes spec and ticket files). Refresh files before each launch that uses them. Pass paths, `OWNER/REPO#NUMBER` refs, and pinned Git ranges. Workers read commit history directly from their worktree. **MUST NOT** inline bodies, comments, or logs into prompts. Missing/unreadable input → agents return `failed` with the path or refs and error. The orchestrator restores the required input before rework.
 - **Worktree isolation:** **MUST** follow [worktrees.md](./references/worktrees.md) for every worktree create, write, and ticket worktree removal; never reset or discard existing work.
 
 ## Graph report
@@ -217,13 +222,13 @@ Write data-only `RUN_DIR/implementation-handoff.json`; pass its absolute path, n
 | `specRef`, `specUrl`, `sourceRepository`, `trackerRepository`, `prUrl` | Qualified spec identity and URLs; explicit source/tracker `owner/repo`. |
 | `initiativeId`, `remote`, `integrationBranch`, `baseBranch`, `baseCommit`, `headCommit` | Validated routing, verified source remote, base SHA, final pushed SHA. |
 | `harnessRoot`, `sourceRoot`, `worktreesRoot`, `worktreePath`, `runDir`, `evidenceRoot` | Absolute paths resolved once; roots outside the integration worktree. |
-| `specFile`, `graphFile`, `plannerFile`, `modelOutcomesFile`, `commitsFile` | Refreshed absolute data pointers; `graphFile` is `effective-graph.json`, planner envelope and model outcome history are retained; spec/ticket files include title, body, comments; commit log covers `BASE_COMMIT..HEAD`. |
+| `specFile`, `graphFile`, `plannerFile`, `modelOutcomesFile` | Refreshed absolute data pointers. `graphFile` is `effective-graph.json`. Keep the planner envelope, model outcomes, and spec/ticket titles, bodies, and comments. |
 | `tickets` | Every graph ticket: qualified `ref`, `file`, integrated `commit` or null, `status` (`integrated`, `base-verified`, `deferred`, `blocked`), `evidence` pointers, `evidenceCommentId`, read-back `closure` (`completed` or `open`); empty only with an explicit blocker. |
 | `chore` | `status` (`verified`, `none-needed`, `failed`), `commits`, actual `model`, `effort`, validation `evidence` pointers (including skipped checks/errors). |
 | `publication` | Read-back `verified` boolean, `draft` boolean, `checks` (`passed`, `pending`, `failed`, `absent`), metadata/coverage and posting failures in `problems`. |
 
 ```json
-{"status":"ready","blockers":[],"specRef":"tracker/repo#1","specUrl":"https://github.com/tracker/repo/issues/1","sourceRepository":"owner/repo","trackerRepository":"tracker/repo","prUrl":"https://github.com/owner/repo/pull/2","initiativeId":"PAY-12","remote":"origin","integrationBranch":"feat/PAY-12","baseBranch":"main","baseCommit":"<base SHA>","headCommit":"<pushed SHA>","harnessRoot":"/harness","sourceRoot":"/harness/workspace/repo","worktreesRoot":"/harness/.worktrees/repo","worktreePath":"/harness/.worktrees/repo/PAY-12","runDir":"/harness/workspace/runs/PAY-12","evidenceRoot":"/harness/workspace/evidence","specFile":"/harness/workspace/runs/PAY-12/spec.json","graphFile":"/harness/workspace/runs/PAY-12/effective-graph.json","plannerFile":"/harness/workspace/runs/PAY-12/planner.json","modelOutcomesFile":"/harness/workspace/runs/PAY-12/model-outcomes.json","commitsFile":"/harness/workspace/runs/PAY-12/commits/<pushed SHA>.txt","tickets":[{"ref":"tracker/repo#3","file":"/harness/workspace/runs/PAY-12/tickets/tracker_repo_3.json","commit":"<ticket SHA>","status":"integrated","evidence":["/harness/workspace/runs/PAY-12/ticket-3.md"],"evidenceCommentId":123,"closure":"completed"}],"chore":{"status":"none-needed","commits":[],"model":"<actual model>","effort":"medium","evidence":["/harness/workspace/runs/PAY-12/chore.md"]},"publication":{"verified":true,"draft":true,"checks":"pending","problems":[]}}
+{"status":"ready","blockers":[],"specRef":"tracker/repo#1","specUrl":"https://github.com/tracker/repo/issues/1","sourceRepository":"owner/repo","trackerRepository":"tracker/repo","prUrl":"https://github.com/owner/repo/pull/2","initiativeId":"PAY-12","remote":"origin","integrationBranch":"feat/PAY-12","baseBranch":"main","baseCommit":"<base SHA>","headCommit":"<pushed SHA>","harnessRoot":"/harness","sourceRoot":"/harness/workspace/repo","worktreesRoot":"/harness/.worktrees/repo","worktreePath":"/harness/.worktrees/repo/PAY-12","runDir":"/harness/workspace/runs/PAY-12","evidenceRoot":"/harness/workspace/evidence","specFile":"/harness/workspace/runs/PAY-12/spec.json","graphFile":"/harness/workspace/runs/PAY-12/effective-graph.json","plannerFile":"/harness/workspace/runs/PAY-12/planner.json","modelOutcomesFile":"/harness/workspace/runs/PAY-12/model-outcomes.json","tickets":[{"ref":"tracker/repo#3","file":"/harness/workspace/runs/PAY-12/tickets/tracker_repo_3.json","commit":"<ticket SHA>","status":"integrated","evidence":["/harness/workspace/runs/PAY-12/ticket-3.md"],"evidenceCommentId":123,"closure":"completed"}],"chore":{"status":"none-needed","commits":[],"model":"<actual model>","effort":"medium","evidence":["/harness/workspace/runs/PAY-12/chore.md"]},"publication":{"verified":true,"draft":true,"checks":"pending","problems":[]}}
 ```
 
 Failure: same shape, `status: blocked`, concrete `blockers`, partial values preserved, unavailable values `null`; claim publication/closure only after read-back.
@@ -246,7 +251,7 @@ Failure: same shape, `status: blocked`, concrete `blockers`, partial values pres
 
 ## Completion criteria
 
-- Each integrated ticket has exactly one caller-created commit backed by its implementer's verified edits, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or given a closing reference.
+- Each integrated ticket has exactly one commit backed by its implementer's verified local ticket commit, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or given a closing reference.
 - Source repository/base match routing; PR title prefix and bare first body line equal `INITIATIVE_ID`; every implemented ticket is covered; PR is draft; pending/failed checks are reported accurately.
 - Chore result and actual model/effort recorded; valid chore changes committed and pushed. A failed or missing result is a handoff blocker, not “none needed.”
 - Handoff pointers readable and refreshed; branch, worktree, and run/evidence directories preserved; spec open and referenced without a closing keyword. No app verifier or code review ran here.
