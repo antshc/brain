@@ -24,11 +24,25 @@ def test_research_routes_how_and_why_before_standard_inspection():
     assert skill.index("## Entry routes") < skill.index("## Workflow")
 
 
-def test_blast_radius_calls_only_its_existing_procedures_and_proves_directly():
-    skill = (REPO / "plugins/review/skills/blast-radius/SKILL.md").read_text()
-    assert re.findall(r"\*run `([a-z-]+)` skill\b", skill, flags=re.IGNORECASE) == [
+def test_fix_review_routes_to_progressively_disclosed_procedures():
+    root = REPO / "plugins/review/skills/fix-review"
+    skill = (root / "SKILL.md").read_text()
+    impact = (root / "references/impact-analysis.md").read_text()
+    assessment = (root / "references/test-assessment.md").read_text()
+
+    assert "name: fix-review" in skill
+    assert "Read each selected reference completely" in skill
+    for reference in ("impact-analysis.md", "test-assessment.md"):
+        assert f"](references/{reference})" in skill
+    for retired in ("blast-radius", "test-gaps"):
+        assert not (REPO / "plugins/review/skills" / retired / "SKILL.md").exists()
+
+    assert re.findall(r"\*run `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
         "research", "research", "subagents", "writing-style",
     ]
     for action in ("Why code anchor", "**How**", "**Arena**", "**Unslop only**"):
-        assert action in skill
-    assert "Write a script or test that runs the real code, run it" in skill
+        assert action in impact
+    assert "Write a script or test that runs the real code, run it" in impact
+    assert "MUST NOT" in assessment and "edit production code or tests" in assessment
+    assert "Seam / assertion quality" in assessment
+    assert "Every gap names input/setup, expected observable result, test level, and priority" in assessment

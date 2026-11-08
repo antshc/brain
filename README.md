@@ -204,13 +204,12 @@ AFK PR review and autonomous development loop.
 Code and technical solution review skills with modular standards and guidance.
 
 - Code Review, Address PR Comments, and HITL load formatting from [Git Conventions](plugins/wf/skills/git-conventions/SKILL.md). Install WF with `copilot plugin install wf@brain` before using these Review skills.
-- [blast-radius](plugins/review/skills/blast-radius/SKILL.md): trace downstream breakage, run the decisive proof, and report verified risks.
+- [fix-review](plugins/review/skills/fix-review/SKILL.md): review fixes for blast radius and regression-test gaps; focused impact, tests, or combined analysis with on-demand references.
 - [address-pr-comments](plugins/review/skills/address-pr-comments/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
 - [hitl](plugins/review/skills/hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [architecture](plugins/review/skills/architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
 - [code-review](plugins/review/skills/code-review/SKILL.md): independent bug, quality, code-smell and initiative reviewers; routes models by PR size/risk and posts evidence-backed findings. Initiative ID comes from the PR description’s leading `[initiative-id]` marker or a supported legacy body ID; accepts a user PR URL or a factory-mode call and fetches the diff into a fresh detached review worktree without cloning.
 - [solution](plugins/review/skills/solution/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `review:solution`.
-- [test-gaps](plugins/review/skills/test-gaps/SKILL.md): map a change's risks to existing tests, judge assertion strength, and return prioritized missing test cases. Invoke as `review:test-gaps`.
 
 ### atl
 
