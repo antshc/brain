@@ -1,6 +1,6 @@
 # Address conversation flows
 
-[Address](SKILL.md) investigates PR review discussions, fixes verified concerns, and replies using [Review conversation](../review-conversation/SKILL.md).
+[Address](SKILL.md) investigates PR review discussions, fixes verified concerns, and replies using [Git Conventions](../../../wf/skills/git-conventions/SKILL.md).
 
 These flows describe PR #172 behavior. The gaps below are limitations and proposed follow-ups, not implemented guarantees.
 

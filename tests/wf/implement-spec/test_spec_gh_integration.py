@@ -80,6 +80,13 @@ class Sandbox:
         path.write_text(text)
         return str(path)
 
+    def pr_files(self, rationale: str) -> list[str]:
+        return [
+            "--rationale-file", rationale,
+            "--changes-file", self.file("changes.md", "Support refunds."),
+            "--evidence-file", self.file("pr-evidence.md", "Regression test passed."),
+        ]
+
     def tool(self, *args: str, cwd: Path | None = None) -> tuple[int, dict | None, str]:
         done = subprocess.run([sys.executable, str(TOOL), *args], capture_output=True, text=True, env=self.env, cwd=cwd or self.harness)
         return done.returncode, (json.loads(done.stdout) if done.stdout.strip() else None), done.stderr
@@ -111,10 +118,10 @@ def test_graph_read_saves_every_spec_artifact_across_pages(tmp_path: Path):
 
 
 def test_full_run_lifecycle(sandbox: Sandbox):
-    code, pre, err = sandbox.tool("preflight", "--spec", SPEC)
+    code, pre, err = sandbox.tool("preflight", "--spec", SPEC, "--integration-branch", "feat/refunds")
     assert code == 0, err
     assert (pre["source_repository"], pre["base_branch"], pre["initiative_id"]) == ("acme/shop", "main", "PAY-12")
-    assert pre["integration_branch"] == "feat/PAY-12"
+    assert pre["integration_branch"] == "feat/refunds"
     assert pre["source_root"].endswith("workspace/shop") and pre["run_dir"].endswith("workspace/shop.runs/1")
 
     code, graph, err = sandbox.tool("graph", "read", "--spec", SPEC, "--out", str(sandbox.run_dir))
@@ -139,9 +146,9 @@ def test_full_run_lifecycle(sandbox: Sandbox):
     assert any(item["reason"] == "unverified-closed" for item in graph["frontier"]["needs_resolution"])
 
     rationale = sandbox.file("why.md", "- Prevent duplicate charges when customers retry timed-out payments.\n")
-    title = ["--title", "PAY-12: Refunds"]
-    code, pr, err = sandbox.tool("pr", "publish", *PR_ARGS, *title, "--rationale-file", rationale,
-                                 "--closes", "acme/specs#2", "--refs", SPEC)
+    title = ["--title", "[PAY-12] feat: support refunds"]
+    code, pr, err = sandbox.tool("pr", "publish", *PR_ARGS, *title, *sandbox.pr_files(rationale),
+                                 "--refs", "acme/specs#2", "--refs", SPEC)
     assert code == 0, err
     assert pr["created"] and pr["is_draft"] and pr["first_body_id"] == "PAY-12" and pr["checks"]["status"] == "absent"
     state = sandbox.state()
@@ -149,20 +156,21 @@ def test_full_run_lifecycle(sandbox: Sandbox):
     state["checks"][str(pr["number"])] = [{"name": "ci", "bucket": "pending"}]
     sandbox.write_state(state)
 
-    code, pr, err = sandbox.tool("pr", "publish", *PR_ARGS, *title, "--rationale-file", rationale, "--closes", "acme/specs#3")
+    code, pr, err = sandbox.tool("pr", "publish", *PR_ARGS, *title, *sandbox.pr_files(rationale), "--refs", "acme/specs#3")
     assert code == 0, err
     body = sandbox.state()["prs"][0]["body"]
     assert not pr["created"] and pr["checks"]["status"] == "pending"
-    assert body.splitlines()[0] == "PAY-12"
-    assert "Closes acme/specs#2" in body and "Closes acme/specs#3" in body and "Refs acme/specs#1" in body
-    assert "My own note" in body and body.count("PAY-12\n") == 1
+    assert body.splitlines()[0] == "[PAY-12]"
+    assert all(f"Refs acme/specs#{number}" in body for number in (1, 2, 3))
+    assert "Closes " not in body
+    assert "My own note" in body and body.count("[PAY-12]\n") == 1
 
     code, read, err = sandbox.tool("pr", "read", "--source-repository", "acme/shop", "--head", "feat/pay-12",
-                                   "--initiative-id", "PAY-12", "--expect-closes", "acme/specs#2", "--expect-closes", "acme/specs#3")
+                                   "--initiative-id", "PAY-12", "--expect-refs", "acme/specs#2", "--expect-refs", "acme/specs#3")
     assert code == 0 and read["problems"] == [], err
     code, read, _ = sandbox.tool("pr", "read", "--source-repository", "acme/shop", "--number", str(pr["number"]),
-                                 "--expect-closes", "acme/specs#99")
-    assert code == 3 and "missing Closes" in read["problems"][0]
+                                 "--expect-refs", "acme/specs#99")
+    assert code == 3 and "missing managed references" in read["problems"][0]
 
     verdict = sandbox.file("verdict.md", "pass")
     code, comment, err = sandbox.tool("issue", "comment", SPEC, "--body-file", verdict)
@@ -175,9 +183,6 @@ def test_hitl_guards(sandbox: Sandbox):
     code, _, err = sandbox.tool("issue", "close", "acme/specs#4", "--comment", "x")
     assert code == 2 and "hitl" in err
     assert sandbox.state()["issues"]["acme/specs#4"]["state"] == "open"
-    rationale = sandbox.file("why.md", "- Reason.\n")
-    code, _, err = sandbox.tool("pr", "publish", *PR_ARGS, "--title", "PAY-12: X", "--rationale-file", rationale, "--closes", "acme/specs#4")
-    assert code == 2 and sandbox.state()["prs"] == []
 
 
 def test_planner_dependencies_survive_real_graph_refresh_without_tracker_writes(sandbox: Sandbox):
@@ -208,17 +213,17 @@ def test_planner_dependencies_survive_real_graph_refresh_without_tracker_writes(
 
 def test_pr_publish_rejects_missing_rationale_and_bad_title(sandbox: Sandbox):
     empty = sandbox.file("why.md", "Added a check in PaymentService.\n")
-    code, _, err = sandbox.tool("pr", "publish", *PR_ARGS, "--title", "PAY-12: X", "--rationale-file", empty)
+    code, _, err = sandbox.tool("pr", "publish", *PR_ARGS, "--title", "[PAY-12] feat: support refunds", *sandbox.pr_files(empty))
     assert code == 2 and "rationale" in err
     good = sandbox.file("good.md", "- Reason.\n")
-    code, _, err = sandbox.tool("pr", "publish", *PR_ARGS, "--title", "No prefix", "--rationale-file", good)
+    code, _, err = sandbox.tool("pr", "publish", *PR_ARGS, "--title", "No prefix", *sandbox.pr_files(good))
     assert code == 2 and "title must start" in err
     assert sandbox.state()["prs"] == []
 
 
 def test_non_draft_pr_is_reported_as_problem(sandbox: Sandbox):
     rationale = sandbox.file("why.md", "- Reason.\n")
-    assert sandbox.tool("pr", "publish", *PR_ARGS, "--title", "PAY-12: X", "--rationale-file", rationale)[0] == 0
+    assert sandbox.tool("pr", "publish", *PR_ARGS, "--title", "[PAY-12] feat: support refunds", *sandbox.pr_files(rationale))[0] == 0
     state = sandbox.state()
     state["prs"][0]["isDraft"] = False
     sandbox.write_state(state)
@@ -333,8 +338,8 @@ def test_publication_recovers_lost_response_without_duplicate_writes(sandbox, lo
     ref = "acme/specs#2"
     rationale = sandbox.file("why.md", "- Prevent duplicate charges.\n")
     evidence = sandbox.file("evidence.md", "tests passed")
-    publish = ("pr", "publish", *PR_ARGS, "--title", "PAY-12: Refunds",
-               "--rationale-file", rationale, "--closes", ref)
+    publish = ("pr", "publish", *PR_ARGS, "--title", "[PAY-12] feat: support refunds",
+               *sandbox.pr_files(rationale), "--refs", ref)
     comment = ("issue", "comment", ref, "--body-file", evidence, "--run-id", "run-1")
     state = sandbox.state()
     state["lose_response"] = lost_command
@@ -372,7 +377,7 @@ def test_preflight_fetches_exact_sha_and_worktree_uses_it_after_base_advances(sa
     state = sandbox.state()
     state["branch_heads"] = {"acme/shop:main": pinned}
     sandbox.write_state(state)
-    code, pre, err = sandbox.tool("preflight", "--spec", SPEC, "--pin-base")
+    code, pre, err = sandbox.tool("preflight", "--spec", SPEC, "--pin-base", "--integration-branch", "fix/refunds")
     assert code == 0, err
     assert pre["base_commit"] == pinned
 
@@ -381,6 +386,7 @@ def test_preflight_fetches_exact_sha_and_worktree_uses_it_after_base_advances(sa
     tip = git(upstream, "rev-parse", "HEAD")
     worktree = sandbox.root / "integration"
     git(checkout, "worktree", "add", "-b", pre["integration_branch"], str(worktree), pre["base_commit"])
+    assert pre["integration_branch"] == "fix/refunds"
     assert git(worktree, "rev-parse", "HEAD") == pinned != tip
     assert git(worktree, "merge-base", "--is-ancestor", pinned, "HEAD") == ""
 
@@ -391,8 +397,10 @@ def test_checkpoint_persists_progress_and_refuses_changed_identity(sandbox):
     ticket = graph["tickets"][0]
     run = {"id": "run-1", "specRef": SPEC, "sourceRepository": "acme/shop", "baseBranch": "main",
            "baseCommit": "a" * 40, "integrationBranch": "feat/PAY-12", "worktreePath": str(sandbox.root / "wt"),
-           "mode": "sequential", "maxParallel": None}
-    data = {"run": run, "tickets": {ticket["key"]: {"ref": ticket["ref"], "commit": "b" * 40}}}
+           "mode": "parallel", "maxParallel": None}
+    saved_ticket = {"ref": ticket["ref"], "commit": "b" * 40, "branch": "feat/refunds-worker-01",
+                    "worktreePath": str(sandbox.root / "worker")}
+    data = {"run": run, "tickets": {ticket["key"]: saved_ticket}}
 
     def checkpoint():
         return sandbox.tool("run", "checkpoint", "--run-dir", str(sandbox.run_dir),
@@ -405,6 +413,10 @@ def test_checkpoint_persists_progress_and_refuses_changed_identity(sandbox):
     data["tickets"][ticket["key"]]["pushedHead"] = "b" * 40
     assert checkpoint()[0] == 0
     previous = saved.read_bytes()
+    saved_ticket["branch"] = "feat/refunds-worker-02"
+    assert checkpoint()[0] == 2
+    assert saved.read_bytes() == previous
+    saved_ticket["branch"] = "feat/refunds-worker-01"
     run["integrationBranch"] = "feat/wrong"
     assert checkpoint()[0] == 2
     assert saved.read_bytes() == previous

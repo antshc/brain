@@ -113,23 +113,18 @@ Each playbook's **Reply** line names only its unique content.
 
 Keep a comment only for a non-obvious *why* the code cannot show. No phase-narrating comments in scripts or tests; the assertion or log message documents the step. Applies to every file produced, including delegated diffs.
 
+## Prepare a direct branch
+
+Before editing for Bug Fix or Refactoring, *run `git-conventions` tactic **Name branch*** with the change intent and summary. Verify the target and local/remote ref availability. Create the branch from the target or use a fresh worktree if unrelated changes are present. Reuse the exact recorded branch when continuing an existing PR.
+
 ## Opening a PR
 
-Invoked at the end of every code-shipping playbook.
+For direct code-shipping playbooks. Feature uses the draft from `implement-spec`.
 
-- **Branch.** Work on a feature branch off the target branch; never commit to the target directly. Dirty tree with unrelated work → stash or use a fresh worktree.
-- **Commits.** Commit liberally; rebase into small ordered commits before opening. Each commit landable and telling the story. Amend when the fix belongs in the last commit.
-- **Title.** Conventional Commits `type(scope): subject`, imperative, no trailing period.
-- **Body.** One-minute briefing for a reviewer holding the diff. `##` sections in order; drop empty ones except Scope:
-  - `## Why`: restated goal, problem, approach; 1–3 sentences.
-  - `## What changed`: 1–3 bullets; name a symbol only when it carries the change.
-  - `## Scope`: what it covers and deliberately leaves out.
-  - `## Tradeoffs`: rejected alternatives a reviewer would ask about.
-  - `## Blast radius`: who or what it touches; why safe or risky.
-  - `## Verification`: 1–3 bullets, each a real run and its outcome.
-- **Draft.** Open as draft: `gh pr create --draft --base {{targetBranch}}`. Run `gh pr view {{number}}` before stating PR status.
-- **Review.** *Run `code-review` skill to review the pull request with independent reviewers* when the user asks or the Feature playbook requires it.
-- Post the URL and continue; do not babysit unless asked.
+- *Run `git-conventions` tactic **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
+- *Run `git-conventions` tactic **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
+- Open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. Run `code-review` when requested.
+- Post the URL and continue. Monitor checks when the caller requests it.
 
 ## Playbooks
 
