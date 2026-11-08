@@ -24,6 +24,10 @@ PLAYBOOKS — matched from the request
   /factory-mode design <capability>; resolve open questions first
   /factory-mode we need <feature>, figure out the decisions
 
+ stories            normalize requirements → approve breakdown → draft ordered User stories with Jira metadata
+  /factory-mode stories from <requirements or spec>
+  /factory-mode break <feature design> into User stories
+
  feature            research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → code-review → address → finalize draft PR
   /factory-mode add <behavior> to <module>
   /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>

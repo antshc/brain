@@ -135,6 +135,7 @@ Open a todo list whose first items are the matched playbook's steps, copied verb
 | Investigation | Read-only question: how does X work, why is Y built this way, are we sure about Z, X or Y | [playbooks/investigation.md](playbooks/investigation.md) |
 | Bug fix | Reported defect to reproduce, root-cause, and fix with runtime evidence | [playbooks/bug-fix.md](playbooks/bug-fix.md) |
 | Design | Unresolved unknowns before building: grill or Wayfinder, optional code sketch with correction loop, then spec and feature design | [playbooks/design.md](playbooks/design.md) |
+| Stories | Requirements, spec, or feature design to an approved, ordered User story list with dependencies and Jira metadata; no code | [playbooks/stories.md](playbooks/stories.md) |
 | Feature | New or changed behavior: autonomous sketch, spec, implementation, verification, review, and address; optional design checkpoint | [playbooks/feature.md](playbooks/feature.md) |
 | Refactoring | Behavior-preserving change to structure (rename, extract, inline, dedupe, move) | [playbooks/refactoring.md](playbooks/refactoring.md) |
 | Prototype | Throwaway sketch to settle a design or empirical fork by observation | [playbooks/prototype.md](playbooks/prototype.md) |

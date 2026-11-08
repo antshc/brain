@@ -159,7 +159,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview with situational tactics that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
 - [wayfinder](plugins/wf/skills/wayfinder/SKILL.md): plan work larger than one session as a shared map of decision tickets, resolved one at a time.
 - [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a GitHub spec issue, with explicit offline Markdown publishing when needed.
-- [to-stories](plugins/wf/skills/to-stories/SKILL.md): turn requirements, `/to-spec` output, or feature design output into an ordered story list, owning numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per story.
+- [factory-mode Stories playbook](skills/engineering/factory-mode/playbooks/stories.md): turn requirements, `/to-spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per row. Requires repo-level `factory-mode` installation.
 - [draft-artifact](plugins/wf/skills/draft-artifact/SKILL.md): draft a User story, bug report, feature handover (TOI), or feature design.
 - [code-sketch](plugins/wf/skills/code-sketch/SKILL.md): draft one single-pass code sketch with usage first, types and signatures with `not implemented` bodies, a module map for larger work, and a rationale.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
