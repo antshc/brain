@@ -12,16 +12,16 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 
 [record-architecture](skills/record-architecture/SKILL.md) replaces the seven standalone architecture record/render commands. Its modes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, and `decision-bullet`; the two render-only modes never save files or update indexes. Explicit modes take precedence, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [define-concept](skills/define-concept/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview.
 
-[to-zdesign](skills/to-zdesign/SKILL.md) renders slice decision bullets from its own local [decision reference](skills/to-zdesign/decision-bullet.md), without invoking the recording skill.
+The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
 [git-conventions](skills/git-conventions/SKILL.md) provides branch, commit, PR, and review comment formats. Install WF alongside Review for Code Review, Address, and HITL. Worktree and hosting operations remain in their existing workflows.
 
 ## Skill flow
 
-1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/to-zdesign` directly).
+1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/draft-artifact design` directly).
 2. **Spec synthesis** — `/to-spec` synthesizes the spec from the resolved Wayfinder decisions or grill-design conversation, the step right after the discovery loop; a spec can feed `/to-tickets` directly or go on into design synthesis.
-3. **Design synthesis** — `/to-zdesign` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
-4. **Story breakdown** — `/to-stories` accepts requirements, `/to-spec` output, or `/to-zdesign` output and assembles an ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row for its formatted title and body. Use `/draft-artifact story` for a standalone User story.
+3. **Design synthesis** — `/draft-artifact design` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
+4. **Story breakdown** — `/to-stories` accepts requirements, `/to-spec` output, or `/draft-artifact design` output and assembles an ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row for its formatted title and body. Use `/draft-artifact story` for a standalone User story.
 5. **Story hardening** — `/grill-design` interviews and sharpens each story, run once per story.
 6. **Ticket cut** — `/to-tickets` slices each hardened story into agent-executable GitHub issues.
 
@@ -46,7 +46,7 @@ swimlane-beta TB
   end
 
   subgraph complex [Complex path - CMPLX]
-    toZdesign[2b.1 - to-zdesign<br/>synthesize or merge feature design]
+    toZdesign[2b.1 - draft-artifact design<br/>synthesize or merge feature design]
     design[(2b.2 - Feature design)]
     toStories[2b.3 - to-stories<br/>assemble design into stories]
     cmplxArchitect[2b.4 - architect<br/>for each story]
@@ -72,14 +72,14 @@ swimlane-beta TB
 
 ### Design and story breakdown
 
-Resolves unknowns with `/wayfinder` (work too big for one session) or `/grill-design` (one session), synthesizes the feature design with `/to-zdesign`, then breaks the design into User stories with `/to-stories`.
+Resolves unknowns with `/wayfinder` (work too big for one session) or `/grill-design` (one session), synthesizes the feature design with `/draft-artifact design`, then breaks the design into User stories with `/to-stories`.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: wf-design-to-stories-swimlane
 swimlane-beta TB
   accTitle: Design and story breakdown responsibility
-  accDescr: Shows unknowns resolved by wayfinder or grill-design, a feature design synthesized by to-zdesign, and the design broken down into User stories by to-stories.
+  accDescr: Shows unknowns resolved by wayfinder or grill-design, a feature design synthesized by draft-artifact design, and the design broken down into User stories by to-stories.
 
   subgraph discovery [Discovery]
     idea([Idea])
@@ -89,7 +89,7 @@ swimlane-beta TB
   end
 
   subgraph design [Design]
-    toZdesign[2 - to-zdesign<br/>synthesize or merge feature design]
+    toZdesign[2 - draft-artifact design<br/>synthesize or merge feature design]
     designDoc[(3 - Feature design)]
   end
 
@@ -186,7 +186,7 @@ swimlane-beta TB
 | --- | --- |
 | Architecture, behavior, or code diagrams | `/doc-diagram <diagram type>` with optional current or delta mode |
 | Initialize docs | `/index-docs Initialize missing docs` |
-| Story, bug report, or feature handover | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi` |
+| Story, bug report, feature handover, or feature design | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi`, `/draft-artifact design` |
 | Deepen a task prompt or restate intent | `/writing-style sharpen` |
 
 Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [behavior](skills/doc-diagram/examples/behavior.md), and [code](skills/doc-diagram/examples/code.md).
@@ -194,6 +194,6 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | Group | Skills |
 | --- | --- |
 | Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase`, `grill-design`, `inspect-nuget-source`, `research`, `wayfinder` |
-| Design and backlog | `architect`, `to-spec`, `to-stories`, `to-tickets`, `to-zdesign` |
+| Design and backlog | `architect`, `to-spec`, `to-stories`, `to-tickets` |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `git-conventions`, `implement-spec`, `init-wf`, `principles`, `show-me-your-work`, `subagents`, `worktrees` |

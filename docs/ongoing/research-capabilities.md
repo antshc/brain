@@ -58,4 +58,4 @@ Every research output should contain:
 - implementation impact;
 - evidence beside every non-trivial claim.
 
-Use `FACT`, `LIMIT`, `ASSUMPTION`, and `UNKNOWN` consistently. Research findings become evidence for Wayfinder decisions, `grill-design`, and `to-zdesign`.
+Use `FACT`, `LIMIT`, `ASSUMPTION`, and `UNKNOWN` consistently. Research findings become evidence for Wayfinder decisions, `grill-design`, and `/draft-artifact design`.
