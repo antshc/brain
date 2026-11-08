@@ -54,7 +54,7 @@ Subflow A: Simple Flow
 Subflow B: Complex Flow
 
 1. /draft-artifact design
-2. /to-stories
+2. /factory-mode stories
 3. For each story:
    → /grill-design
 4. /to-spec

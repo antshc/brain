@@ -1,13 +1,8 @@
----
-description: >-
-  Turn requirements, a spec, or a design into an approved ordered list of atomic User stories with Jira-sync metadata.
-name: to-stories
-disable-model-invocation: true
----
+### Stories
 
-Turn conversation, raw requirements, spec or design into an ordered list of atomic, testable **User stories**, broken down by **Functional slice**.
+**You own the breakdown.** Turn conversation, raw requirements, spec or design into an approved ordered list of atomic, testable **User stories**, broken down by **Functional slice**. This playbook produces stories, not code or implementation tickets.
 
-This skill owns source normalization, the proposed breakdown and approval gate, story order and numbers, dependencies, numbered headings, Jira-sync metadata, and final list assembly. *Run `draft-artifact` skill to draft one atomic User story using the Story tactic* exactly once per approved row for its formatted Title and body.
+This playbook owns source normalization, the proposed breakdown and approval gate, story order and numbers, dependencies, numbered headings, Jira-sync metadata, and final list assembly. *Run `draft-artifact` skill to draft one atomic User story using the Story tactic* exactly once per approved row for its formatted Title and body.
 
 ## Vocabulary
 
@@ -48,7 +43,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | {{n}} | {{deployableKind|[FE] or [BE]}} | {{[TAG]|optional}} | {{feature}} | {{functionalSlice}} | {{stakeholderRequirement|verbatim}} | {{functionalRequirements|verbatim references or statements}} | {{businessRules|verbatim or None}} | {{edgeCasesAndErrors|verbatim or None}} | {{sourceAcceptanceCriteria|verbatim or None}} | {{jiraId|supplied or TBD}} | {{epicId|supplied or TBD}} | {{approved in-batch rows|None}} |
 
-## Quality Check
+## Completion criteria
 
 - Raw requirements, `/to-spec` output, and feature design output all normalize into Proposed Breakdown Format.
 - Supplied fields remain verbatim; only absent fields are derived.
@@ -76,3 +71,5 @@ This is the sole composed story-list template. Emit one block per approved row i
 
 {{draftStoryBody|complete output from the row's single **Story** run, beginning with `**Title:**`}}
 ```
+
+**Reply:** the approved ordered story list only, in Output Format.
