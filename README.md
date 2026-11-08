@@ -136,6 +136,8 @@ Plugins bundle related skills (and, for `crew`, agents). Follow a link to read a
 
 ### wf
 
+Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tasks. `implement-spec` delegates tickets to `wf:codey`, with a `general-purpose` fallback.
+
 - [diagnosing-bugs](plugins/wf/skills/diagnosing-bugs/SKILL.md): diagnose hard bugs or performance regressions, and fix them when explicitly requested.
 
 Common everyday workflow automation skills. Expected to be useful to all developers.
@@ -166,7 +168,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 
 Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.
 
-Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [codey-ai](plugins/crew/agents/codey-ai.agent.md), [chorey](plugins/crew/agents/chorey.agent.md). Crew agents return gotchas in their reports. `implement-spec` delegates tickets to `crew:codey-dotnet`, with a `general-purpose` fallback.
+Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [codey-ai](plugins/crew/agents/codey-ai.agent.md), [chorey](plugins/crew/agents/chorey.agent.md). Crew agents return gotchas in their reports.
 
 - [to-crew](plugins/crew/skills/to-crew/SKILL.md): run the Codey subagent for an implementation task.
 - [crew-commit](plugins/crew/skills/crew-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.

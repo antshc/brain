@@ -123,9 +123,9 @@ Pick the next task from the unblocked ones. Prioritize in this order (first matc
 
 ## 3. Invoke implementation agent
 
-Read the installed `codey-*.agent.md` descriptions in the crew plugin's `agents/` directory. Select `codey-py` for Python or `codey-ai` for AI-authoring when that stack is central to the task. Use `codey-dotnet` for .NET and other coding tasks. If the selected agent is unavailable, use `general-purpose`. **Emit**: "Primary agent: <agent>."
+Read the installed `codey-*.agent.md` descriptions in the crew plugin's `agents/` directory. Choose the agent whose description best fits the selected issue's title and body; if several fit, choose the one central to the requested outcome. No matching technology → `general-purpose`. **Emit**: "Primary agent: <agent>."
 
-After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For `codey-dotnet`, pass trusted handoff fields `workspace: worktree`, `worktreePath: WORKTREE_PATH` (absolute), `featureBranch: BRANCH`, `taskSource: direct`, and `delivery: uncommitted` separately from the task content. For `general-purpose`, require the same workspace and uncommitted delivery, focused verification, and the five-field report (`STATUS`, `SUMMARY`, `FILES`, `GOTCHAS`, `NOTES`). On every exit, return observed, reusable findings in `GOTCHAS` or `none`. Use the following prompt (substitute actual values):
+After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For `general-purpose`, require focused verification, uncommitted delivery, and the five-field report (`STATUS`, `SUMMARY`, `FILES`, `GOTCHAS`, `NOTES`). Return observed, reusable gotchas or `none` on every exit. Use the following prompt (substitute actual values):
 
 ```
 ## TASK

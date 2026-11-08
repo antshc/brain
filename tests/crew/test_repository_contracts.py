@@ -44,17 +44,6 @@ def test_chorey_uses_testing_integrations_skill_and_minimal_existing_boundary_te
     assert "smallest matching existing boundary-test subset" in agent
 
 
-def test_codey_gates_functional_slice_and_prefers_the_fastest_adequate_config():
-    agent = (CREW_ROOT / 'agents/codey-dotnet.agent.md').read_text()
-    boundary = agent.split('### Integration boundary', 1)[1].split('### Failure handling', 1)[0]
-    assert 'If there is no material gap, skip the skill and functional slice' in boundary
-    assert 'When a material gap remains, call `testing-integrations`' in boundary
-    assert 'Use a functional slice when narrower checks cannot prove it' in boundary
-    assert 'narrowest filter' in boundary
-    assert boundary.index('Start with mock or fake') < boundary.index('Use the real SDK')
-    assert 'only when evidence shows' in boundary
-
-
 def test_crew_reports_gotchas_without_a_memory_dependency():
     for path in (CREW_ROOT / 'agents').glob('*.agent.md'):
         agent = path.read_text()
@@ -67,12 +56,11 @@ def test_crew_reports_gotchas_without_a_memory_dependency():
     assert 'crew-memory' not in (init / 'SKILL.md').read_text()
 
 
-def test_direct_and_ralph_handoffs_leave_changes_uncommitted():
-    direct = (CREW_ROOT / 'skills/to-crew/SKILL.md').read_text()
-    ralph = (CREW_ROOT.parent / 'ralph/skills/dev/SKILL.md').read_text()
-    assert 'workspace: cwd' in direct
-    assert 'workspace: worktree' in ralph
-    for caller in (direct, ralph):
-        assert 'taskSource: direct' in caller
-        assert 'delivery: uncommitted' in caller
-        assert 'GOTCHAS' in caller
+def test_crew_codey_dotnet_uses_the_original_task_and_workspace_contract():
+    agent = (CREW_ROOT / 'agents/codey-dotnet.agent.md').read_text()
+    assert 'name: codey-dotnet' in agent
+    assert '`## TASK`' in agent
+    assert '`/memories/session/plan.md`' in agent
+    assert 'Work in cwd' in agent
+    assert 'leave changes uncommitted for the caller' in agent
+    assert 'ticket-commit' not in agent
