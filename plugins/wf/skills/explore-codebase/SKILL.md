@@ -1,7 +1,7 @@
 ---
 name: explore-codebase
 description: >-
-  Find where a symbol lives, what calls it, how a flow works, or which file holds a literal, config, test, or owner, read-only in a caller-spawned subagent. Use for 'where is', 'what calls', 'how does this work', 'find the code that' in this or a named repo, or a Request with @work and @depth.
+  Explore codebase symbols, callers, flows, literals, and restored NuGet package APIs or behavior, read-only in a caller-spawned subagent. Use for 'where is', 'what calls', 'how does this work', an unknown C# type, package API verification, or a Request with @work and @depth.
 ---
 
 # Explore Codebase
@@ -14,7 +14,7 @@ Caller forms before spawning; the subagent receives it verbatim:
 
 - `@work` — one of: question | prompt instruction | skill name to run. Instruction and skill name pass **verbatim**, never paraphrased.
 - `@depth` — `quick | medium | thorough`.
-- `[@shape]` — `literal | symbol | relationship`; routing hint. Omitted → classify in Route the lookup.
+- `[@shape]` — `literal | symbol | relationship | nuget`; routing hint. Omitted → classify in Route the lookup.
 - `[@target]` — repository or service names as stated; omitted → current repository.
 - `@outputShape` — caller's return shape; omitted → Return the verdict.
 - `[@outputArtifact]` — the one file the run may write.
@@ -28,7 +28,7 @@ The caller owns what the exploration produces — a named skill owns its own pro
 
 Exploration is strictly read-only. Do not edit source, documentation, configuration, generated files, `@repoRoot/graphify-out/`, or any target-repo `graphify-out/`.
 
-Exceptions: write `@outputArtifact` and nothing else; install `rg` per-user when missing (see Select tools by question shape); `graphify query`/`path`/`explain` updating `graphify-out/cache/`.
+Exceptions: write `@outputArtifact` and nothing else in the repository; install `rg` per-user when missing (see Select tools by question shape); `graphify query`/`path`/`explain` updating `graphify-out/cache/`; NuGet tactic may install `ilspycmd` per-user and persist decompiled files solely in the resolved NuGet package cache.
 
 ## Resolve the repository root
 
@@ -62,16 +62,19 @@ Each level supersedes the one below it for claims about that target. A question 
 
 ### Route the lookup
 
-Before the first search, print one line: `route: rg | lsp | graphify | github — {{reason}}`. `@shape` decides when given; else the first matching row.
+Before the first search, print one line: `route: rg | lsp | graphify | github | nuget — {{reason}}`. `@shape` decides when given; else the first matching row.
 
 | Signal in `@work` | Route |
 |---|---|
+| target has no local checkout | `github`; package cache cannot be inferred from remote source |
+| `@shape: nuget`; restored NuGet package, its API, or behavior | `nuget` — [NuGet tactic](nuget.md) |
 | `@shape: literal`; quoted literal, config key, error text, route path, test name, file glob | `rg` |
 | `@shape: symbol`; exact type or member name, asking definition, references, implementations, callers | `lsp`, then `rg` |
 | `@shape: relationship`; names unknown, "how do … connect", "which modules", "end to end", "flow", "impact", "blast radius", "across A and B", architecture, doc↔code | `graphify` when Graph coverage selected a graph, else `rg` on `GLOSSARY.md` terms |
-| target has no local checkout | `github` |
 
 `@depth: medium | thorough` with no literal or symbol in `@work` → relationship row.
+
+**Tactics.** For `nuget`, read [NuGet source inspection](nuget.md) in full and follow its procedure and evidence checks. For other routes, use the local/GitHub/Graphify instructions below. If a C# type/member has no definition in the target source after `lsp`/`rg -uu`, switch to `nuget` and read that tactic; an unknown package ID is a valid entry state. Report the final route in the verdict.
 
 ### Select tools by question shape
 
@@ -83,7 +86,7 @@ Before the first search, print one line: `route: rg | lsp | graphify | github �
 - `command -v rg` empty, and only then → install it once per-user, no sudo: fetch the latest `BurntSushi/ripgrep` release asset for the platform (`x86_64-unknown-linux-musl`, `aarch64-unknown-linux-gnu`, `<arch>-apple-darwin` `.tar.gz`; `x86_64-pc-windows-msvc` `.zip`), verify it against its `.sha256` asset, extract only the `rg` binary to `~/.local/bin/` (Windows: `%LOCALAPPDATA%\Programs\ripgrep\`), and run it by absolute path if that folder is not on `PATH`. Checksum mismatch, no network, or any failure → `grep -r` is the fallback; never use sudo or a system package manager.
 - Use semantic search for fuzzy concepts or unknown ownership.
 - Use targeted reads to verify final evidence.
-- For a C# type absent from local source, Run `/inspect-nuget-source` skill rather than broadening the search across the disk.
+- For a C# type absent from local source, follow the [NuGet tactic](nuget.md) rather than broadening the search across the disk.
 
 **No local checkout**
 
@@ -117,5 +120,5 @@ Default `@outputShape`: first line repeats the `route:` line; then one concise v
 ## Gotchas
 
 - CWD drifts after `cd` into a worktree or nested repo; `git rev-parse --show-toplevel` there returns that sub repo, hiding launch-folder `ARCHITECTURE.md`, contracts, and the `Deployables` index. Keep the launch-folder `@repoRoot`.
-- Tool skills (`graphify`, `inspect-nuget-source`) are tool selection, not caller work — load them when routing picks them; never wait for the caller to name them in `@work`.
+- `graphify` is a tool skill; NuGet inspection is a local tactic. Route both when evidence requires them; never wait for the caller to name them in `@work`.
 - grep tool and `rg` skip gitignored and hidden files (generated code, build output, `graphify-out/`, vendored folders). Before claiming something is absent, re-search with `rg -uu` or confirm the path is not ignored.
