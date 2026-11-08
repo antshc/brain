@@ -17,7 +17,7 @@ permissions:
 jobs:
   test:
     name: Python tests
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'feat/')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'feat/') || startsWith(github.head_ref, 'fix/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

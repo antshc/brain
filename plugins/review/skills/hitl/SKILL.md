@@ -100,7 +100,7 @@ Drafts, approves, and posts one review comment.
 
 2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability, etc.).
 
-2.2 `IMPROVEMENT` — concrete fix or direction. *Use `review-conversation` skill for review comments, findings, conversation style, and hidden metadata.* Pass kind `finding`, ownership `human`, stage `draft`, and the verified evidence; then stage `final` with the validated visible body before approval.
+2.2 `IMPROVEMENT` — concrete fix or direction. *Run `git-conventions` tactic **Draft or finalize review comment*** with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `git-conventions` install before drafting. Stop and report missing access if neither is available.
 
 2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 

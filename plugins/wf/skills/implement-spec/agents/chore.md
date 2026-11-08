@@ -14,7 +14,7 @@ The pull request diff is split per file in `{{diffDir}}`. `{{diffDir}}/_manifest
 
 **MUST NOT** fetch the diff, files, or comments from `{{pullRequestUrl}}` (no `gh pr diff`, `gh pr view`, `gh api`, `git fetch`, `curl`, or browser); the URL is a label only. `{{diffDir}}` and the worktree are your only sources.
 
-Use local `git log` on `{{baseCommit}}..{{historyTip}}` to read SHAs, subjects, and bodies, oldest first. Keep only subjects matching `^ccode\([^)]*\):` (`ccode(...):`). Use the messages to understand intent. Empty matches are valid. An unreadable range returns `failed` with the refs and error. `{{diffDir}}` is the only task data read outside the worktree.
+Follow the WF ticket history format from `git-conventions` supplied by the orchestrator. Use local `git log` on `{{baseCommit}}..{{historyTip}}` to read SHAs, subjects, and bodies, oldest first. Keep only subjects matching `^ccode\([^)]*\):` (`ccode(...):`). Use the messages to understand intent. Empty matches are valid. An unreadable range returns `failed` with the refs and error. `{{diffDir}}` is the only task data read outside the worktree.
 
 # REVIEW PROCESS
 

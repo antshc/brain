@@ -23,7 +23,7 @@ Orchestrate a routed ticket graph into one integration branch and a draft PR whe
 
 | Intent | Command |
 |---|---|
-| Validate an existing spec or resolved plan; use `--pin-base` once on a new run to fetch the exact `BASE_COMMIT` | `GH_TOOL preflight --spec REF --mode MODE` or `GH_TOOL preflight --source-repository R --base-branch B --initiative-id I --mode MODE` |
+| Validate an existing spec or resolved plan; use `--pin-base --integration-branch H` once on a new run to fetch the exact `BASE_COMMIT` | `GH_TOOL preflight --spec REF --mode MODE` or `GH_TOOL preflight --source-repository R --base-branch B --initiative-id I --mode MODE` |
 | Atomically save publication progress | `GH_TOOL run checkpoint --run-dir RUN_DIR --input FILE` |
 | Create spec from plan/description | `GH_TOOL spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N` |
 | Read spec, tickets, comments, blockers; frontier | `GH_TOOL graph read --spec REF --out RUN_DIR` |
@@ -32,9 +32,9 @@ Orchestrate a routed ticket graph into one integration branch and a draft PR whe
 | Blocker edges, edit body (planner) | `GH_TOOL issue block REF --by REF…` · `GH_TOOL issue edit-body REF --body-file F` |
 | Ticket evidence comment | `GH_TOOL issue comment REF --body-file F --run-id ID` |
 | Close implemented ticket | `GH_TOOL issue close REF --run-id ID --evidence-comment N` |
-| Publish or update draft PR | `GH_TOOL pr publish --source-repository R --base B --head H --title T --initiative-id I --rationale-file F --closes REF… --refs REF…` |
+| Publish or update draft PR | `GH_TOOL pr publish --source-repository R --base B --head H --title T --initiative-id I --rationale-file F --changes-file F --evidence-file F --refs REF…` |
 | Split PR diff per file (chore) | `GH_TOOL pr diff-split --pr URL` |
-| Read back PR | `GH_TOOL pr read --source-repository R --head H --initiative-id I --expect-closes REF…` |
+| Read back PR | `GH_TOOL pr read --source-repository R --head H --initiative-id I --expect-refs REF…` |
 
 `REF…` = one or more space-separated values after one flag (`--done A B`); repeating the flag (`--done A --done B`) also works.
 
@@ -56,7 +56,7 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
 
 1. Detect input type, then prepare input. Validate `mode` and `MAX_PARALLEL` before creating any branch or worktree or writing to the tracker. Check required runtime capabilities (delegation, planner and implementer model availability, and background execution for parallel) before tracker writes.
    → A: Plan file or inline description → load [breakdown.md](./references/breakdown.md); run *Prepare Plan*. Keep its pinned base and continue as B with its read-back spec.
-   → B: GitHub spec issue → `GH_TOOL preflight --spec URL --mode MODE` with the supplied worker cap, if any. Add `--pin-base` for a new run unless A already pinned the base. Use returned `HARNESS_ROOT`, `SOURCE_ROOT`, routing, `INITIATIVE_ID`, `INTEGRATION_BRANCH`, and `RUN_DIR`. For explicit resume, use the recorded run path and load [publication.md](./references/publication.md#resume-publication); reconcile the run before any new write or launch. Then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; launch the planner in `analyze` mode (read-only; **MUST NOT** create tickets). Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative* with planner `breakdown` mode.
+   → B: GitHub spec issue → `GH_TOOL preflight --spec URL --mode MODE` with the supplied worker cap, if any. For a new spec run, *run `git-conventions` tactic **Name branch*** with the work intent and summary from the read-back spec. Verify ref availability in the resolved source repo. Repeat preflight with `--pin-base --integration-branch H` and require matching routing, spec title, and checkout. If A already pinned the base, retain its branch and SHA. Use the returned roots, routing, initiative, and run directory. For explicit resume, use the recorded branch and run path and load [publication.md](./references/publication.md#resume-publication); reconcile the run before any new write or launch. Then `GH_TOOL graph read`. Existing sub-issues → reuse that graph; launch the planner in `analyze` mode (read-only; **MUST NOT** create tickets). Zero sub-issues → load [breakdown.md](./references/breakdown.md) if not loaded; run *Breakdown Initiative* with planner `breakdown` mode.
    → Unsupported or ambiguous input: ask for valid input; stop.
 
    Launch planner (initially for `breakdown` or `analyze`; later only per *Targeted replanning*) → [planner.md](./agents/planner.md) subagent from `SOURCE_ROOT`:
@@ -111,7 +111,7 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
 
    Capture `result.gotchas` on every attempt, including failures. Require an array of observed, reusable findings (empty is valid). Attribute findings to the ticket, agent and attempt in the output.
 
-   Explicitly ask the worker to commit in both modes, with subject `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): <summary>` and a body recording changed paths, decisions, verification, and risks. Allow one new local ticket commit if none exists. For rework on an identified unpublished ticket commit, authorize amendment of that exact SHA only. During a caller-managed rebase conflict, request edit-only mode and keep staging and rebase continuation with the orchestrator.
+   *Run `git-conventions` tactic **Draft commit*** for the WF ticket subject format and body requirements. Explicitly ask the worker to commit in both modes using those instructions. Allow one new local ticket commit if none exists. For rework on an identified unpublished ticket commit, authorize amendment of that exact SHA only. During a caller-managed rebase conflict, request edit-only mode and keep staging and rebase continuation with the orchestrator.
 
    Validate the actual Git state before accepting the result. In commit mode, require that `result.commit` equals `HEAD`, the branch is as expected, the worktree is clean, and there is exactly one ticket commit directly above its recorded base. Check its subject and inspect its full diff against the ticket and `result.files`. When `result.commit` is null, require a verified no-change result, the starting HEAD and a clean worktree, then apply *Completion evidence*. In edit-only rework, require the original HEAD, branch or rebase state, and index to be intact and inspect the edits. Unexpected Git state or unrelated staged changes → preserve them, block the ticket, and never publish it. If this affects the integration worktree, return a blocked handoff before another launch or push. Apply the *Implementation focus* evidence gate to `result.verification` in every case. Require executed checks and results, including skipped infrastructure checks and errors. Thin evidence → run cheap confirmations before accepting the result.
    → Evidence invalidates planning assumptions or model capability: run *Targeted replanning* before ordinary rework; preserve original `@prevHead` and work pointers.
@@ -124,7 +124,7 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
 
 7. Launch chore → [chore.md](./agents/chore.md) subagent in `WORKTREE_PATH`:
    refs `fetch-diff` · `claude-opus-5.5` medium reasoning, fallback `gpt-6.1-sol` medium when rejected · rework none.
-   Before: load [fetch-diff.md](./references/fetch-diff.md); split PR diff into `@diffDir`; record `@prevHead` from the integration worktree. Instruct Chore to enter and verify that worktree before repository work and explicitly authorize one local cleanup commit after verification.
+   Before: *run `git-conventions` tactic **Draft commit*** for a conventional `chore` subject format. Load [fetch-diff.md](./references/fetch-diff.md); split PR diff into `@diffDir`; record `@prevHead` from the integration worktree. Instruct Chore to enter and verify that worktree before repository work and explicitly authorize one local cleanup commit after verification.
 
    | Placeholder | Value |
    |---|---|
@@ -134,12 +134,12 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
    | `{{diffDir}}` | `@diffDir` |
    | `{{baseCommit}}` | `BASE_COMMIT` |
    | `{{historyTip}}` | `@prevHead` |
-   | `{{commitSubjectPrefix}}` | `chore(<INITIATIVE_ID>): ` |
+   | `{{commitSubjectPrefix}}` | `chore: ` |
 
    Verify: `result.commit` equals `HEAD`, exactly one commit since `@prevHead`, subject match, clean worktree, checks reported. A verified no-change result must report null and leave `HEAD` at `@prevHead`. Record actual model/effort or unavailable-model failure.
    After verified success: checkpoint the chore result and SHA before pushing, or reconcile an already verified chore on resume. Confirm the pushed head, remove `@diffDir` if created, and report out-of-scope findings without acting.
    → Missing, failed, or invalid result: record the chore blocker, preserve the worktree, remove `@diffDir`, and continue to the blocked handoff without pushing.
-   Done when chore changes are committed (one `chore(<INITIATIVE_ID>): ` commit, or none needed), pushed to `INTEGRATION_BRANCH`, remote head equals `HEAD`, and the worktree is clean.
+   Done when chore changes are committed (one `chore: ` commit, or none needed), pushed to `INTEGRATION_BRANCH`, remote head equals `HEAD`, and the worktree is clean.
 
 8. Run *Publication verification* ([publication.md](./references/publication.md)), refresh spec/ticket pointers, and write *Implementation handoff*. Preserve the integration worktree, branch, draft PR, and run/evidence directories; keep the spec open. Done when the handoff matches the read-back remote state. Publication failure or unresolved tickets → `blocked`; never report ready from a PR URL alone.
 
@@ -209,7 +209,7 @@ Launch line legend: `refs` = `requiredReferences` (manifest keys); pass only the
 
 - **GitHub:** **MUST** perform every GitHub issue, PR, label, and graph operation through `GH_TOOL` per *GitHub operations*, never raw `gh`; load [publication.md](./references/publication.md) at step 5. Missing/unreadable reference or `GH_TOOL` → stop/report.
 - **Repository identity:** preserve each issue's `OWNER/REPO#NUMBER`; route issue reads/comments/closures to its owning repository, and Git/implementation/PR operations only to the resolved source repository. Resolve ambiguity before writes; **MUST NOT** infer ownership from checkout, PR repository, or matching issue number.
-- **HITL:** re-read labels at selection. Skip `hitl` tickets without implementation, delegation, comments, closure, or closing references. An open skipped ticket never satisfies dependants; only closed tickets with results verified in the integration base do. Reference skipped tickets without closing keywords; keep the spec open while any remain open.
+- **HITL:** re-read labels at selection. Skip `hitl` tickets without implementation, delegation, comments, or closure. An open skipped ticket never satisfies dependants; only closed tickets with results verified in the integration base do. Record skipped tickets separately from implemented coverage; keep the spec open while any remain open.
 - **One ticket = one subagent:** fresh implementer per ticket; sequential waits for each result, parallel caps concurrency. Ordinary rework uses that ticket's existing agent, at most two rounds; an explicit settled-agent capability reassignment follows *Targeted replanning* within the same total cap. **MUST NOT** implement inline, batch tickets, or reuse agents across tickets. Missing subagents → stop/report.
 - **Implementation focus:** `completed` requires passing evidence on the final tree or observed proof of existing behavior for every material requirement. For environment/network/Docker/port/registry/external-service failure, make at most one quick confirmation. Record the unavailable check and error. A substitute check counts only if it passes and exercises the same material risk. An uncovered material requirement or code-caused failure blocks completion. **MUST NOT** troubleshoot infrastructure during implementation.
 - **Draft-only:** PR stays draft; **MUST NOT** merge or mark ready (`gh pr ready`). User controls readiness.
@@ -236,7 +236,7 @@ Write data-only `RUN_DIR/implementation-handoff.json`; pass its absolute path, n
 | `publication` | Read-back `verified` boolean, `draft` boolean, `checks` (`passed`, `pending`, `failed`, `absent`), metadata/coverage and posting failures in `problems`. |
 
 ```json
-{"status":"ready","blockers":[],"specRef":"tracker/repo#1","specUrl":"https://github.com/tracker/repo/issues/1","sourceRepository":"owner/repo","trackerRepository":"tracker/repo","prUrl":"https://github.com/owner/repo/pull/2","initiativeId":"PAY-12","remote":"origin","integrationBranch":"feat/PAY-12","baseBranch":"main","baseCommit":"<base SHA>","headCommit":"<pushed SHA>","harnessRoot":"/harness","sourceRoot":"/harness/workspace/repo","worktreesRoot":"/harness/.worktrees/repo","worktreePath":"/harness/.worktrees/repo/PAY-12","runDir":"/harness/workspace/runs/PAY-12","evidenceRoot":"/harness/workspace/evidence","specFile":"/harness/workspace/runs/PAY-12/spec.json","graphFile":"/harness/workspace/runs/PAY-12/effective-graph.json","plannerFile":"/harness/workspace/runs/PAY-12/planner.json","modelOutcomesFile":"/harness/workspace/runs/PAY-12/model-outcomes.json","tickets":[{"ref":"tracker/repo#3","file":"/harness/workspace/runs/PAY-12/tickets/tracker_repo_3.json","commit":"<ticket SHA>","status":"integrated","verifiedAt":"<ticket SHA>","evidence":["/harness/workspace/runs/PAY-12/ticket-3.md"],"evidenceCommentId":123,"closure":"completed"}],"chore":{"status":"none-needed","commits":[],"model":"<actual model>","effort":"medium","evidence":["/harness/workspace/runs/PAY-12/chore.md"]},"publication":{"verified":true,"draft":true,"checks":"pending","problems":[]}}
+{"status":"ready","blockers":[],"specRef":"tracker/repo#1","specUrl":"https://github.com/tracker/repo/issues/1","sourceRepository":"owner/repo","trackerRepository":"tracker/repo","prUrl":"https://github.com/owner/repo/pull/2","initiativeId":"PAY-12","remote":"origin","integrationBranch":"feat/refunds","baseBranch":"main","baseCommit":"<base SHA>","headCommit":"<pushed SHA>","harnessRoot":"/harness","sourceRoot":"/harness/workspace/repo","worktreesRoot":"/harness/.worktrees/repo","worktreePath":"/harness/.worktrees/repo/refunds","runDir":"/harness/workspace/runs/PAY-12","evidenceRoot":"/harness/workspace/evidence","specFile":"/harness/workspace/runs/PAY-12/spec.json","graphFile":"/harness/workspace/runs/PAY-12/effective-graph.json","plannerFile":"/harness/workspace/runs/PAY-12/planner.json","modelOutcomesFile":"/harness/workspace/runs/PAY-12/model-outcomes.json","tickets":[{"ref":"tracker/repo#3","file":"/harness/workspace/runs/PAY-12/tickets/tracker_repo_3.json","commit":"<ticket SHA>","status":"integrated","verifiedAt":"<ticket SHA>","evidence":["/harness/workspace/runs/PAY-12/ticket-3.md"],"evidenceCommentId":123,"closure":"completed"}],"chore":{"status":"none-needed","commits":[],"model":"<actual model>","effort":"medium","evidence":["/harness/workspace/runs/PAY-12/chore.md"]},"publication":{"verified":true,"draft":true,"checks":"pending","problems":[]}}
 ```
 
 Failure: same shape, `status: blocked`, concrete `blockers`, partial values preserved, unavailable values `null`; claim publication/closure only after read-back.
@@ -260,8 +260,8 @@ Failure: same shape, `status: blocked`, concrete `blockers`, partial values pres
 ## Completion criteria
 
 - `already-satisfied`: every in-scope ticket has evidence at the pinned base, with no unresolved work. Report the observed tracker state and the evidence pointers.
-- For runs with changes, each integrated ticket has exactly one commit backed by its implementer's verified local ticket commit, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or given a closing reference.
-- For runs with changes, source repository/base match routing; PR title prefix and bare first body line equal `INITIATIVE_ID`; every implemented ticket is covered; PR is draft; pending/failed checks are reported accurately.
+- For runs with changes, each integrated ticket has exactly one commit backed by its implementer's verified local ticket commit, an evidence comment, and read-back `completed` closure in its owning repository. No skipped `hitl` ticket was implemented, commented on, closed, or counted as implemented coverage.
+- For runs with changes, source repository/base match routing; PR title prefix and first body line carry the bracketed `INITIATIVE_ID` under the shared convention; every implemented ticket is covered; PR is draft; pending/failed checks are reported accurately.
 - For runs with changes, chore result and actual model/effort recorded; valid chore changes committed and pushed. A failed or missing result is a handoff blocker, not “none needed.”
 - Handoff pointers readable and refreshed; existing branch, worktree, and run/evidence directories preserved; spec open and referenced without a closing keyword. No app verifier or code review ran here.
 - No reference-loading failure ignored; subagents received pointers, not inlined task data; user work intact.
