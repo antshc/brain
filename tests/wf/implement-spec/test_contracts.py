@@ -126,11 +126,14 @@ def test_wf_codey_is_registered_for_implementation_tasks():
     assert 'Route design, planning, and review to their own workflows' in frontmatter
 
 
-def test_codey_prefers_the_explicit_direct_task_over_session_memory():
-    direct = CODEY.read_text().split('- **Direct task**', 1)[1].split('- **Ticket**', 1)[0]
-    assert direct.index('`## TASK`') < direct.index('explicit plain-text request') < direct.index('/memories/session/plan.md')
-    assert 'only when neither is supplied' in direct
-    assert 'Missing or empty resolved task → `blocked`' in direct
+def test_codey_infers_task_context_and_keeps_the_session_plan_fallback():
+    agent = CODEY.read_text()
+    context = agent.split('## Task context', 1)[1].split('## Implementation', 1)[0]
+    assert 'from the request and any supplied ticket or plan' in context
+    assert 'When no task is supplied, use the current session plan' in context
+    assert '`/memories/session/plan.md`' in context
+    assert '## TASK' not in context
+    assert 'Use the ticket JSON when the caller requests a workflow ticket result' in agent
 
 
 def test_codey_selects_focused_integration_tests_by_risk():
@@ -150,8 +153,8 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert launch.index('`wf:codey`') < launch.index('`general-purpose`')
     assert 'cannot resolve the named agent' in launch
     assert 'failed or invalid result goes through rework' in launch
-    assert 'taskSource: ticket' in launch
-    assert 'taskSource: ticket' in agent
+    assert 'return the workflow ticket JSON result' in launch
+    assert 'taskSource' not in launch + agent
     assert 'as its working directory' in launch
     for field in ('worktreePath', 'featureBranch', 'commitSubjectPrefix', 'ticket-commit'):
         assert field not in agent
@@ -163,8 +166,8 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert 'same material risk' in agent and 'same material risk' in MAIN
 
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
-    for value in ('Before task actions', 'requiredReferences', 'referencesRoot', 'absolute',
-                  'unreadable', 'Never launch subagents'):
+    for value in ('ticket snapshot with comments and commit history', 'required references in full',
+                  'read-only', 'unreadable', 'Never launch subagents'):
         assert value in agent
     for value in ('validated model/effort', 'launch directory', 'unstaged and uncommitted', 'testing-integrations'):
         assert value in fallback
@@ -224,7 +227,7 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
     rule = BREAKDOWN.split('<related-spec-artifacts-rule>')[1].split('</related-spec-artifacts-rule>')[0]
     assert 'Design sketch artifacts' in rule
     implementer = CODEY.read_text()
-    for text in ('specArtifactsDir/index.json', 'Use the sketch as the map', 'never ask'):
+    for text in ('artifact index', 'Use the sketch as the map', 'read the relevant source artifact', 'never ask'):
         assert text in implementer
     assert 'deviations' not in implementer
     assert '{{specArtifactsDir}}' in (ROOT / 'agents/planner.md').read_text()
