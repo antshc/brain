@@ -172,11 +172,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
 - [index-docs](plugins/wf/skills/index-docs/SKILL.md): initialize missing `ARCHITECTURE.md` and `GLOSSARY.md`, and maintain architecture indexes.
-- [review-fix](plugins/wf/skills/review-fix/SKILL.md): review fixes for blast radius and regression-test gaps; focused impact, tests, or combined analysis.
-- [address-pr](plugins/wf/skills/address-pr/SKILL.md): group PR review comments into issues, investigate, fix, and reply to every thread.
-- [review-hitl](plugins/wf/skills/review-hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
-- [review-architecture](plugins/wf/skills/review-architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
-- [review-feat](plugins/wf/skills/review-feat/SKILL.md): independent bug, quality, code-smell and initiative reviewers; posts evidence-backed PR findings.
+- [review](plugins/wf/skills/review/SKILL.md): use `code` for PR findings, `comments` for existing threads, `blast-radius` for downstream risk, `tests-gap` for regression coverage, `architecture` for drift, or `hitl` for human-led PR review.
 - [WF installer](plugins/wf/install/install.md): one-time repo setup for GitHub issue labels and doc layout, and offers repo-level `factory-mode` install; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research and docs initialization remain local, and other skills retain their Jira workflows.
 
 ### crew

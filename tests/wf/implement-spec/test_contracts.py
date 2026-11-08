@@ -413,7 +413,7 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert '`ready`' in workflow and 'blocked/incomplete' in workflow
     post = (FACTORY / 'references/post-implementation.md').read_text()
     review = post.split('## Code review\n')[1].split('\n## ')[0]
-    assert '`review-feat` skill' in review
+    assert '`review` skill' in review and '`code` route' in review
     assert 'fresh detached worktree' in review
     assert 'Review never fixes code' in review
     finalize = post.split('## Finalize\n')[1].split('\n## ')[0]

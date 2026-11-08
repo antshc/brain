@@ -123,7 +123,7 @@ For direct code-shipping playbooks. Feature uses the draft from `implement-spec`
 
 - *Run `git-conventions` tactic **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
 - *Run `git-conventions` tactic **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
-- Open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. Run `review-feat` when requested.
+- Open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. Run the `review` skill's `code` route when requested.
 - Post the URL and continue. Monitor checks when the caller requests it.
 
 ## Playbooks

@@ -24,19 +24,29 @@ def test_research_routes_how_and_why_before_standard_inspection():
     assert skill.index("## Entry routes") < skill.index("## Workflow")
 
 
-def test_review_fix_routes_to_progressively_disclosed_procedures():
-    root = REPO / "plugins/wf/skills/review-fix"
+def test_review_loads_playbooks_by_route():
+    root = SKILLS / "review"
     skill = (root / "SKILL.md").read_text()
-    impact = (root / "references/impact-analysis.md").read_text()
-    assessment = (root / "references/test-assessment.md").read_text()
+    playbooks = ("architecture", "blast-radius", "comments", "code", "hitl", "tests-gap")
 
-    assert "name: review-fix" in skill
-    assert "Read each selected reference completely" in skill
-    for reference in ("impact-analysis.md", "test-assessment.md"):
-        assert f"](references/{reference})" in skill
-    for retired in ("blast-radius", "test-gaps"):
-        assert not (REPO / "plugins/wf/skills" / retired / "SKILL.md").exists()
+    assert "name: review\n" in skill
+    assert "Read only the selected playbook" in skill
+    assert "ask which outcome" in skill
+    for route in playbooks:
+        assert f"| `{route}` |" in skill
+        assert f"](playbooks/{route}.md)" in skill
+        assert (root / f"playbooks/{route}.md").is_file()
+    for retired in (
+        "address-pr", "blast-radius", "review-architecture", "review-feat",
+        "review-fix", "review-hitl", "test-gaps",
+    ):
+        assert not (SKILLS / retired / "SKILL.md").exists()
 
+
+def test_review_impact_and_tests_keep_their_analysis_contracts():
+    root = SKILLS / "review/playbooks"
+    impact = (root / "blast-radius.md").read_text()
+    assessment = (root / "tests-gap.md").read_text()
     assert re.findall(r"\*run `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
         "research", "research", "subagents", "writing-style",
     ]
@@ -46,3 +56,26 @@ def test_review_fix_routes_to_progressively_disclosed_procedures():
     assert "MUST NOT" in assessment and "edit production code or tests" in assessment
     assert "Seam / assertion quality" in assessment
     assert "Every gap names input/setup, expected observable result, test level, and priority" in assessment
+
+
+def test_pr_review_routes_share_diff_acquisition_and_preserve_posting_contracts():
+    root = SKILLS / "review"
+    for route in ("code", "hitl"):
+        playbook = (root / f"playbooks/{route}.md").read_text()
+        assert f"](../references/fetch-diff.md#{route})" in playbook
+        assert f"](../references/posting.md#{route})" in playbook
+
+    diff = (root / "references/fetch-diff.md").read_text()
+    assert diff.count("## Build the per-file diff") == 1
+    assert "fresh detached review worktree" in diff
+    assert "gh pr checkout" in diff
+    assert "_manifest.tsv" in diff
+    hitl = (root / "playbooks/hitl.md").read_text()
+    assert hitl.index("**3. Human approval**") < hitl.index("On approval (1 or 2): follow [Posting]")
+    posting = (root / "references/posting.md").read_text()
+    assert "Require explicit human approval" in posting
+    assert "current PR head and base" in posting
+    comments = (root / "playbooks/comments.md").read_text()
+    assert "references/github-api.md" in comments
+    assert (root / "references/github-api.md").is_file()
+    assert all(path.is_file() for path in (root / "references").iterdir())

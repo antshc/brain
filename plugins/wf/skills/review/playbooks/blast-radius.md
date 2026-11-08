@@ -1,10 +1,20 @@
-# Impact analysis
+# Blast radius
 
 Find what a change breaks somewhere else, before it ships. Use for "blast radius of X", "what could this break", or reviewing a small diff you don't trust yet.
 
 Use How and Why from Research to ground what the code does and what led to the change.
 
 Listing the callers is not the job. The agent can grep those in a second. The job is the breakage grep won't show you.
+
+## Scope and constraints
+
+Accept a diff, commit, branch, local change, or PR, with an optional original defect. Identify repository instructions, target head, comparison baseline, changed paths, affected behavior, and relevant test entry points. Ask when the target or baseline is ambiguous.
+
+Pin committed refs to SHAs. For PRs, inspect the actual head and base, title, body, and commits. For local changes, record the dirty-worktree state. Read the glossary and relevant ADRs when present.
+
+- **MUST NOT** edit tracked production code or existing tests, post PR comments, commit, push, deploy, or reset or clean the user's checkout.
+- Run proof scripts or disposable tests in a run-owned location and clean up afterward. Record the exact command, result, and proof level. If safe execution is unavailable, mark the claim unproven.
+- Redact secrets, credentials, and customer data. Distinguish source evidence, observed execution, and inference.
 
 ## Don't trust your own writeup
 
@@ -32,6 +42,8 @@ Step 4 is usually one small script that imports the same library the app ships a
 6. For a big or wide change, *run `subagents` skill to compare independent candidates and synthesize findings* using **Arena** with two or three distinct model perspectives. Pass the same diff, safety question, grounding, and report contract to each reviewer, with isolated outputs under `tmp/blast-radius-<slug>/`. Have reviewers return evidence without starting another Arena. Screen for reproducible proof and cited risks. Merge every distinct supported risk into the report, including findings outside the chosen base.
 
 ## What to hand back
+
+Recheck the pinned head before reporting when remote state may have changed. State scope and baseline, and give every inspected behavior a supported risk verdict or named uncertainty.
 
 - **What it does.** What changed, including the part that isn't obvious.
 - **The one fact it's safe because of.** State it, say which step you got it to, and show the proof. If you couldn't prove it, write unproven.

@@ -1,10 +1,3 @@
----
-name: review-feat
-description: >-
-  Review a GitHub pull request with independent reviewers for bugs, quality attributes, code smells, and initiative coverage, then post evidence-backed inline comments. Use for 'review this PR' or a PR URL with a low, medium, or high review level. Use review address-pr to answer existing threads.
-argument-hint: '<PR_URL> [low|medium|high]'
----
-
 # Code review
 
 ## Inputs
@@ -14,24 +7,24 @@ argument-hint: '<PR_URL> [low|medium|high]'
 
 ## Workflow
 
-1. Parse `<PR_URL>` into `OWNER`, `REPO`, `PR_NUMBER`. Follow [Fetch PR diff](references/fetch-diff.md) from this skill's base directory. Continue only with a pinned `REVIEW_HEAD`, `REVIEW_BASE`, fresh detached `REVIEW_REPO` worktree, `DIFF_DIR`, and complete path manifest.
+1. Parse `<PR_URL>` into `OWNER`, `REPO`, `PR_NUMBER`. Follow [Fetch PR diff](../references/fetch-diff.md#code) using the Code setup. Continue only with a pinned `REVIEW_HEAD`, `REVIEW_BASE`, fresh detached `REVIEW_REPO` worktree, `DIFF_DIR`, and `MANIFEST`.
 2. Retain the fetched PR title/body as scope context. Fetch all inline comments with `gh api --paginate repos/OWNER/REPO/pulls/PR_NUMBER/comments`; retain paths, current/original lines, bodies, and IDs. Confirm the current head/base still match the snapshot; otherwise restart acquisition before delegation.
 3. Resolve the initiative gate in the parent. *Run `git-conventions` tactic **Read PR initiative*** with the PR title and body. Keep the body authoritative. A missing ID or conflicting title marker fails this gate.
    - Resolve the extracted ID using explicit tracker configuration/known tracker identity. A bare `#number` GitHub ID uses the configured tracker repository, otherwise the PR repository; a qualified `owner/repo#number` identifies its repository. For a configured GitHub title-prefix initiative, require one exact ID-prefix match in that tracker. Jira keys resolve through Atlassian tools; verify the returned key matches. When no tracker is configured, a Jira-shaped key uses Jira. Opaque IDs without a mapping, conflicting mappings or multiple matches fail the gate; never guess a source or substitute a different ticket.
    - Fetch GitHub `title,body` with explicit repository or Jira's full description in the parent. Pass resolved identity and description to the reviewer; retain the resolved source internally without adding it to the PR description.
    - Require a successfully fetched, non-whitespace description; ADF requires nonempty text content, not just a document wrapper. Pass resolved identity, source, and full description to the initiative reviewer. Titles, comments, metadata, and local spec files do not substitute.
    - Spawn `initiative` only when this gate passes. Otherwise record `skipped` with missing, ambiguous, empty, or inaccessible input and continue independent axes; this is unavailable initiative verification, not a pass.
-4. Follow [Reviewer selection](references/reviewer-selection.md) before delegation; it draws each axis's model from the review level's pool in *Model selection*. Record the level and each axis's model, effort, and fallbacks. Spawn one fresh read-only subagent per eligible axis, in parallel. Give each `REVIEW_REPO`, `REVIEW_HEAD`, `REVIEW_BASE`, `DIFF_DIR` and manifest, PR context, existing comments, shared contract, and absolute axis-reference path. Pass the shared contract’s `git-conventions` **Draft or finalize review comment** invocation to each reviewer before drafting findings. Each reviews the complete change for its axis and returns posting-ready JSON. **MUST NOT** reuse implementer/chore contexts or substitute parent review when delegation is unavailable; report the blocker. Rationale: independent review context limits implementation bias. Subagents must not refetch/check out the diff, edit source, commit, push, or post.
+4. Follow [Reviewer selection](../references/reviewer-selection.md) before delegation; it draws each axis's model from the review level's pool in *Model selection*. Record the level and each axis's model, effort, and fallbacks. Spawn one fresh read-only subagent per eligible axis, in parallel. Give each `REVIEW_REPO`, `REVIEW_HEAD`, `REVIEW_BASE`, `DIFF_DIR` and manifest, PR context, existing comments, shared contract, and absolute axis-reference path. Pass the shared contract’s `git-conventions` **Draft or finalize review comment** invocation to each reviewer before drafting findings. Each reviews the complete change for its axis and returns posting-ready JSON. **MUST NOT** reuse implementer/chore contexts or substitute parent review when delegation is unavailable; report the blocker. Rationale: independent review context limits implementation bias. Subagents must not refetch/check out the diff, edit source, commit, push, or post.
 
    | Axis | Spawn condition | Reference and extra input |
    |---|---|---|
-   | `bugs` | Always | [Bug rules](references/bug-review-guidance.md) |
-   | `quality-attributes` | Always | [Quality rules](references/quality-review-guidance.md) |
-   | `code-smells` | Always | [Code-smells rules](references/smells-review-guidance.md) |
-   | `initiative` | Step 3 gate passes | [Initiative rules](references/initiative-review-guidance.md); resolved initiative description |
+   | `bugs` | Always | [Bug rules](../references/bug-review-guidance.md) |
+   | `quality-attributes` | Always | [Quality rules](../references/quality-review-guidance.md) |
+   | `code-smells` | Always | [Code-smells rules](../references/smells-review-guidance.md) |
+   | `initiative` | Step 3 gate passes | [Initiative rules](../references/initiative-review-guidance.md); resolved initiative description |
 
 5. Collect each result; record failure objects separately from successful findings arrays. Validate the output contract, shared conversation format, axis-specific evidence, and diff anchors; return malformed findings to their reviewer for correction before posting. Deduplicate against existing comments and across axes by substantive issue/root cause, ignoring terminal agent metadata; use `FILE_PATH` + `LINE_NUMBER` to locate candidate duplicates, not to merge unrelated issues sharing a line. Keep only net-new, actionable findings.
-6. In the parent, *run `git-conventions` tactic **Draft or finalize review comment***. Pass kind `finding`, ownership `agent`, stage `final`, the validated `REVIEW_COMMENT` unchanged, and existing supporting facts. Post its complete body using [Posting](references/posting.md), resolved from this skill's base directory. Do not add reviewer fields solely for optional metadata. Use the reviewed head commit and exact manifest path. If the PR head or base has changed, stop posting and report the stale review; do not attach old findings to a new commit. Record each returned comment ID. Do not submit a review.
+6. In the parent, *run `git-conventions` tactic **Draft or finalize review comment***. Pass kind `finding`, ownership `agent`, stage `final`, the validated `REVIEW_COMMENT` unchanged, and existing supporting facts. Post its complete body using [Posting](../references/posting.md#code). Do not add reviewer fields solely for optional metadata. Use the reviewed head commit and exact manifest path. If the PR head or base has changed, stop posting and report the stale review; do not attach old findings to a new commit. Record each returned comment ID. Do not submit a review.
 7. Report each axis as completed, skipped (reason), or failed; report posted comment IDs and any unposted findings or posting failures. Include retained findings and known existing bug/initiative concerns in the handoff; absence of net-new findings does not prove earlier comments resolved. A failed reviewer or post is not a clean review. After retaining results, follow the fetch reference’s Cleanup procedure to remove only the run-owned review worktree, diff and temporary refs; report preserved paths or cleanup failures.
 
 ## Model selection

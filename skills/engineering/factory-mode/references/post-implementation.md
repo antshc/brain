@@ -65,7 +65,7 @@ Write `VERDICT_FILE` outside the repository; copy to `EVIDENCE_DIR/verdict.md`. 
 
 Run *Publication verification* before review, including when app verification was skipped. Publication failure blocks review acquisition.
 
-Run code review → *`review-feat` skill for GitHub pull requests, bugs, quality attributes, code smells, and initiative coverage* from `SOURCE_ROOT`:
+Run code review → *Run the `review` skill's `code` route for bugs, quality attributes, code smells, and initiative coverage* from `SOURCE_ROOT`:
     inputs PR URL, `SOURCE_ROOT` · foreground; wait until every axis has an outcome.
     Review creates its own fresh detached worktree from `SOURCE_ROOT` without cloning; **MUST NOT** review inside or reuse the integration worktree. Review never fixes code.
     Record: axes, findings, posting results, models/fallbacks, reviewed head.
