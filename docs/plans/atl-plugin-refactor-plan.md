@@ -1,6 +1,6 @@
 # Refactor the ATL plugin
 
-**Status** — Proposed; engineering skill name pending approval. Reviewed `antshc/brain` main. Scope is skill routing, Python consolidation, and caller migration.
+**Status** — Proposed; engineering skill name approved: `daily-briefing`. Reviewed `antshc/brain` main. Scope is skill routing, Python consolidation, and caller migration.
 
 ## Findings
 
@@ -31,20 +31,13 @@ Keep `plugins/atl/skills/address-page-comments/SKILL.md` and its `scripts/commen
 
 The skill calls shared preflight/TWG and may use `atlassian` fetch operations where suitable; it owns review-thread decisions and replies. Ordinary Confluence edits without replies route to `atlassian` Fetch page and Publish page and must never implicitly trigger `address-page-comments`.
 
-### 1.3 Move `brief-daily` to engineering
+### 1.3 Move `brief-daily` to `daily-briefing` in engineering
 
-Move `plugins/atl/skills/brief-daily/` to `skills/engineering/<briefing-skill>/`, including its existing post-processors. Keep it an independently discoverable skill, not a `factory-mode` playbook or an `atlassian` tactic. Follow the factory-mode separation principle only where useful: concise trigger/contract in `SKILL.md`, detailed workflow and output contract in a referenced file. No extra dispatcher for a single workflow.
+Move `plugins/atl/skills/brief-daily/` to `skills/engineering/daily-briefing/`, including its existing post-processors. Keep it an independently discoverable skill, not a `factory-mode` playbook or an `atlassian` tactic. Follow the factory-mode separation principle only where useful: concise trigger/contract in `SKILL.md`, detailed workflow and output contract in a referenced file. No extra dispatcher for a single workflow.
 
-**Name options — user approval pending:**
+**Approved name:** `daily-briefing`. Rename `brief-daily` during relocation; preserve trigger coverage for daily briefing, standup, blockers, and unanswered mentions.
 
-| Candidate | Tradeoff |
-|---|---|
-| `brief-daily` **(recommended)** | Preserves existing name and user triggers; only location changes |
-| `jira-daily-brief` | Most explicit about Jira; adds a rename migration |
-| `daily-briefing` | Natural phrase, but less specific to Jira |
-| `standup-brief` | Concise; can imply a narrower standup-only report |
-
-Use `<briefing-skill>` as the provisional path component until the name is approved. Preserve the current period conversion, two-query budget, pagination, account-ID mention matching, reply buckets, partial-comment warnings, and Markdown chat output. All operations remain read-only. Its prerequisites are the ATL plugin's `twg` capability and the installed `preflight-atlassian` credential resolver; document them and fail explicitly when unavailable.
+Preserve the current period conversion, two-query budget, pagination, account-ID mention matching, reply buckets, partial-comment warnings, and Markdown chat output. All operations remain read-only. Its prerequisites are the ATL plugin's `twg` capability and the installed `preflight-atlassian` credential resolver; document them and fail explicitly when unavailable.
 
 Proposed layout:
 
@@ -78,7 +71,7 @@ plugins/atl/
         scripts/twg_cred.py
 
 skills/engineering/
-  <briefing-skill>/
+  daily-briefing/
     SKILL.md
     references/
       workflow.md             Existing daily query, extraction, and output steps
@@ -107,20 +100,20 @@ Call `python3 <atlassian-skill-dir>/scripts/atl.py` from any working directory. 
 | `map-markdown md-to-adf\|adf-to-md\|detect-adf-only` | `map_markdown_adf.py` and `converter/` | Same stdin/stdout formats and exit behavior. No config, network, or Atlassian dependency needed for offline conversion |
 
 - Move existing behavior first. Switch converter subprocesses and page verification to direct calls inside the package. Share config parsing, site normalization, library version checks and client construction where equivalent. Preserve product-specific URL handling and per-command diagnostics, exit codes, JSON fields and artifact paths.
-- Keep URL/tiny-link resolution, project/space choice, field discovery, and report composition in tactics. Keep daily briefing on TWG with its existing Python post-processors under `skills/engineering/<briefing-skill>/scripts/`. Keep the Draw.io installer beside the publisher as a setup utility.
+- Keep URL/tiny-link resolution, project/space choice, field discovery, and report composition in tactics. Keep daily briefing on TWG with its existing Python post-processors under `skills/engineering/daily-briefing/scripts/`. Keep the Draw.io installer beside the publisher as a setup utility.
 - Carry the created Jira key or Confluence page ID through any failure after creation. Retry attachments or resume by ID, and report uncertain remote state before any create retry. Keep Confluence guard warnings and verification output visible and retain working artifacts when verification fails.
 
 ## 3. Migrate callers before removing old skills
 
 1. Add the CLI and port the existing offline fixtures and command tests. Compare old and new outputs before changing callers.
-2. Add `atlassian` and move only the reusable operation bodies into its references. Retain `address-page-comments` and `comment_state.py` in their current ATL location; update its calls only where the shared operations change. Move `brief-daily` and its scripts into `skills/engineering/<briefing-skill>/`; move its tests from `tests/atl/brief-daily/` to `tests/engineering/brief-daily/`, and update relative script paths and prerequisites. Move the TWG reference tree into `atlassian` and update relative links and body-routing examples. Reuse preflight within a request for the same site when required facts are present.
+2. Add `atlassian` and move only the reusable operation bodies into its references. Retain `address-page-comments` and `comment_state.py` in their current ATL location; update its calls only where the shared operations change. Move `brief-daily` and its scripts into `skills/engineering/daily-briefing/`; move its tests from `tests/atl/brief-daily/` to `tests/engineering/brief-daily/`, and update relative script paths and prerequisites. Move the TWG reference tree into `atlassian` and update relative links and body-routing examples. Reuse preflight within a request for the same site when required facts are present.
 3. Update `install/install.md`, its bundled preflight asset and the checked-in `.github/skills/preflight-atlassian/SKILL.md`. Generate new Jira wrappers that call the **Publish work** tactic. Document how to update existing wrappers while preserving their required fields and local edits. Refresh generated preflight instructions through the ATL installer without changing `.atlassian.json.user`.
 4. Update `wf/research/why` Atlassian source and coordinator handoff plus the `doc-diagram` skill’s architecture, behavior, and code tactics. Keep their Rovo/JQL/CQL fallbacks and publish intent. Update README, architecture, glossary, current ADR terminology, active how-to links and regression prompts. Route daily briefings to the engineering skill and review-thread work to `address-page-comments`; route generic Atlassian operations to `atlassian`. Search active paths for more invocations, script paths and CLI entry points before cutover.
 5. Remove only the absorbed operation skill directories, `fix-confluence-comments`, and the old `plugins/atl/skills/brief-daily/` path after migrating callers. **Do not remove** `address-page-comments`; keep its standalone trigger and tests. Update test imports, subprocess targets, and CI path filters. Document the briefing relocation, preserved review-comment skill, and migration for old slash commands/external wrappers.
 
 ## Acceptance
 
-- Discovery exposes `atlassian`, standalone `address-page-comments`, and the approved engineering `<briefing-skill>`. Setup runs through the explicit ATL installer. Every former task routes to the expected tactic or skill; no combined workflow skill exists. Search-to-fetch uses the full body path and read-only intents issue no mutations.
+- Discovery exposes `atlassian`, standalone `address-page-comments`, and engineering `daily-briefing`. Setup runs through the explicit ATL installer. Every former task routes to the expected tactic or skill; no combined workflow skill exists. Search-to-fetch uses the full body path and read-only intents issue no mutations.
 - `python3 -m pytest tests/atl tests/engineering/brief-daily` passes. Smoke the new CLI from an unrelated working directory, including `--help` and offline conversion without credentials or Atlassian dependencies.
 - Re-run existing Jira create/update, field and attachment cases. Verify comments sidecar success/failure, partial attachment reporting, and read-only ADF verification. Cover post-create failures without duplicate creates.
 - Re-run the Confluence round-trip suite for ADF-only constructs, media dimensions, attachments, PNG/Draw.io sidecars, shared anchors, intended detachment, and phrase verification. Through standalone `address-page-comments`, exercise targeted edits and replies for anchored and orphaned comments, repeat runs, and stale snapshots. Through `atlassian`, exercise ordinary page edits without thread replies. Run live suites only with a designated test project/space.
