@@ -2,7 +2,7 @@
 
 Researched 2026-11-01. These are **documented workflow summaries**, not one universal
 workflow assembled from all available skills. Each Mermaid flowchart is top-to-bottom
-and follows Brain's [`doc-behavior-diagram`](../../plugins/wf/skills/doc-behavior-diagram/SKILL.md)
+and follows Brain's [`doc-diagram`](../../plugins/wf/skills/doc-diagram/SKILL.md) behavior
 conventions. Branches show optional routes; no arrow back to an earlier step implies
 automatic retries or continuation.
 

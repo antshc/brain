@@ -40,7 +40,7 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 3. Bootstrap the docs
 
-*Run `bootstrap-docs` skill for ARCHITECTURE.md and GLOSSARY.md existence-and-creation mechanics* at the docs root (reporoot for a wrapping repo).
+*Run `index-docs` skill to initialize missing ARCHITECTURE.md and GLOSSARY.md files using **Initialize missing docs*** at the docs root (reporoot for a wrapping repo).
 
 ## 4. Set up GitHub labels
 

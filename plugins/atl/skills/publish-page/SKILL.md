@@ -50,7 +50,7 @@ Installs to `~/.local/opt/drawio` + wrapper `~/.local/bin/drawio`; no root/FUSE.
 
 ## Diagram ids
 
-`%% diagram-id: <id>` gives a mermaid fence stable identity: `[a-z0-9-]`, unique per file, after any `---` frontmatter or `%%{init: …}%%`, directly above the diagram-type line. Id = attachment filename + Draw.io record title → republish replaces in place despite reorders or heading edits. `run` strips the line before rendering. Emitted by `doc-architecture-diagram` skill, `doc-behavior-diagram` skill, `doc-code-diagram` skill.
+`%% diagram-id: <id>` gives a mermaid fence stable identity: `[a-z0-9-]`, unique per file, after any `---` frontmatter or `%%{init: …}%%`, directly above the diagram-type line. Id = attachment filename + Draw.io record title → republish replaces in place despite reorders or heading edits. `run` strips the line before rendering. Emitted by the `doc-diagram` skill.
 
 No id → `{index}-{nearest-heading-slug}` naming; reorder or heading rewording → next publish adds a duplicate.
 

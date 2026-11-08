@@ -1,12 +1,16 @@
 ---
 name: index-docs
 description: >-
-  Maintain ARCHITECTURE.md prose, section skeletons, and Trigger condition tables (index load, trigger generation, scan and match, row sync). Use when another skill needs the index loaded or a Deployables, ADR, Concept, or custom row synced. Use record-architecture to author records.
+  Initialize missing ARCHITECTURE.md and GLOSSARY.md files. Maintain ARCHITECTURE.md sections and Trigger condition tables. Use to load an index, generate triggers, scan and match rows, or sync a Deployables, ADR, Concept, or custom row.
 ---
 
 # Index Docs
 
-Own `ARCHITECTURE.md`'s structural prose and its three indexes (`Deployables`, `Architecture Decision Records`, `Crosscutting Concepts`) — the file itself is created by `bootstrap-docs`. Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+Own `ARCHITECTURE.md`'s structural prose and its three indexes (`Deployables`, `Architecture Decision Records`, `Crosscutting Concepts`). Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+
+## Initialize missing docs
+
+Run only when requested. Use the caller's docs root. For a direct request, use the established repository docs root or ask if it is unclear. Read [Initialize missing docs](tactics/initialize-missing-docs.md) in full and open only the formats for missing files: [architecture bootstrap](templates/ARCHITECTURE-BOOTSTRAP-FORMAT.md) and [glossary bootstrap](templates/GLOSSARY-BOOTSTRAP-FORMAT.md). **Load index** and **Scan and match** are read-only.
 
 ## Rules
 

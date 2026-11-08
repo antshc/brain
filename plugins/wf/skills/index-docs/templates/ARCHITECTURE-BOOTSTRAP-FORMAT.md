@@ -1,6 +1,6 @@
 # ARCHITECTURE.md Bootstrap Format
 
-Create only the required sections below. Omit optional Building blocks, Deployment View, Architecture Decision Records, and Crosscutting Concepts sections until `index-docs` inserts them for established content.
+Create only the required sections below. Omit optional Building blocks, Deployment View, Architecture Decision Records, and Crosscutting Concepts sections until **Ensure section exists** inserts them for established content.
 
 ```md
 # {{systemName}} Overview

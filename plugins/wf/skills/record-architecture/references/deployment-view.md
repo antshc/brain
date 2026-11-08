@@ -8,7 +8,7 @@ No approval gate — record the topology as soon as it's identified.
 
 ## Lazy creation
 
-Create `DEPLOYMENT.md` from [DEPLOYMENT-VIEW-FORMAT.md](../templates/DEPLOYMENT-VIEW-FORMAT.md) on the first run; update it in place if it exists. It is not a bootstrap document — `bootstrap-docs` never creates it.
+Create `DEPLOYMENT.md` from [DEPLOYMENT-VIEW-FORMAT.md](../templates/DEPLOYMENT-VIEW-FORMAT.md) on the first run; update it in place if it exists. Deployment view owns creation of this file. The **Initialize missing docs** action covers `ARCHITECTURE.md` and `GLOSSARY.md`.
 
 ## Reuse the building blocks
 

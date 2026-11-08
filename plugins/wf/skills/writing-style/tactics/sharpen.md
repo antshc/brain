@@ -1,16 +1,10 @@
----
-name: sharpen
-description: >-
-  Rewrite a task prompt deeper, not bigger, or restate the user's real goal before work starts. Use for /sharpen, 'deepen this task', 'in your own words', or 'what am I really asking'.
----
-
 # Sharpen
 
 Select mode from the request; default **Deepen**. Run both, Restate first, when the user asks for both.
 
 | Mode | Trigger |
 |---|---|
-| **Deepen** | /sharpen, deepen, rewrite prompt, no mode named |
+| **Deepen** | `/writing-style sharpen`, deepen, rewrite prompt, no mode named |
 | **Restate** | in your own words, restate, what am I trying to solve |
 
 ## Restate

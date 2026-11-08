@@ -77,7 +77,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 {{solutionOverview}}
 
-<!-- A diagram is optional. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. Follow `/doc-architecture-diagram` skill use the Container Diagram (`C4Container`) for deployable building blocks in current mode; Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
+<!-- A diagram is optional. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Run `doc-diagram` skill for a current Mermaid C4 Container Diagram* of deployable building blocks. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
 
 {{architectureRepresentationDiagram}}
 
@@ -86,7 +86,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 **{{the flow title| Cross Deployable Flow}}**
 
-<!-- An optional section. Include only when a flow crosses multiple deployables. Follow `/doc-behavior-diagram` skill **Swimlane Diagram** to document cross-deployable responsibility handoffs as a Mermaid swimlane; one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
+<!-- An optional section. Include only when a flow crosses multiple deployables. *Run `doc-diagram` skill for a Mermaid Swimlane Diagram* of cross-deployable responsibility handoffs, one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
 
 {{crossDeployableFlowDiagram}}
 
@@ -99,7 +99,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 <!-- Repeat the complete functional-slice block once or many times. Each slice owns one behavior and its decisions. Method-level behavior, Contracts details remains in Detailed Design. -->
 
-<!-- Include exactly one current-mode behavior diagram for this slice. Follow `/doc-behavior-diagram` skill **Sequence Diagram** for flows visualization. The diagram title names the behavior without a `Flow Diagram:` or `Sequence Diagram:` prefix. Do not compose a Mermaid skeleton from this template. -->
+<!-- Include exactly one current-mode behavior diagram for this slice. *Run `doc-diagram` skill for a current Mermaid Sequence Diagram* of the slice. The diagram title names the behavior without a `Flow Diagram:` or `Sequence Diagram:` prefix. Do not compose a Mermaid skeleton from this template. -->
 
 {{functionalSliceBehaviorDiagram}}
 

@@ -80,11 +80,11 @@ Use the exact child skill name with a few distinctive keywords from its descript
 
 ### Example
 
-> When documenting software behavior—interactions, decisions, or responsibility handoffs—load and follow `doc-behavior-diagram` skill. Use it to create sequence, flowchart, or swimlane diagrams. Pass the required diagram type, scope, participants, evidence, and requested output location. Confirm it was loaded before drafting.
+> When documenting software behavior—interactions, decisions, or responsibility handoffs—load and follow `doc-diagram` skill in behavior mode. Use it to create sequence, flowchart, or swimlane diagrams. Pass the required diagram type, scope, participants, evidence, and requested output location. Confirm it was loaded before drafting.
 
 ### Terse examples
 
-> For behavior interactions, decisions, or handoffs, load `doc-behavior-diagram` skill. Create the requested sequence, flowchart, or swimlane diagram from the supplied scope and evidence.
+> For behavior interactions, decisions, or handoffs, load `doc-diagram` skill in behavior mode. Create the requested sequence, flowchart, or swimlane diagram from the supplied scope and evidence.
 
 > For an unresolved SDK, API, cloud, database, or broker assumption, load `experiment` skill. Run the smallest real probe, reuse existing integration tests when available, and report the observed result.
 

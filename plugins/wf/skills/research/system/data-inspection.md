@@ -6,7 +6,7 @@ Identify the item and store first, then route every writer and reader through lo
 
 **Output:** `docs/research/{{slug}}-data.md`
 
-**Diagram:** none by default; the store, key, and shape tables carry the answer. When the brief asks for one, pick it from the question and run its owning skill: `doc-behavior-diagram` for access order or branching, `doc-architecture-diagram` for ownership or deployment boundaries, `doc-code-diagram` for item types and their relationships. Keep evidence in the tables.
+**Diagram:** none by default; the store, key, and shape tables carry the answer. When the brief asks for one, select the view from the question and *run `doc-diagram` skill for the Mermaid view*: behavior for access order or branching, architecture for ownership or deployment boundaries, or class for item types and their relationships. Keep evidence in the tables.
 
 ## Workflow
 
