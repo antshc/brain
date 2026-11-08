@@ -90,12 +90,12 @@ def test_agent_migration_and_absolute_load_contract(role, old, required):
                    'verificationSkills',
                    'worktreePath'],
                   'bf82dd8421283a88d6a5f27a9ad31d4dfb259c5920b162b111832bbdaa58aaa9'),
-     'chore': (['commitsFile',
+     'chore': (['baseCommit',
                 'commitSubjectPrefix',
                 'diffDir',
                 'featureBranch',
+                'historyTip',
                 'pullRequestUrl',
-                'targetBranch',
                 'worktreePath'],
                '467273bacfabbe4a0bb79676a0892d379d49791e5dce52ff5988ef5b3d803dcc')}
     placeholders, response_hash = expected[role]
@@ -155,21 +155,27 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert 'failed or invalid result goes through rework' in launch
     assert 'return the workflow ticket JSON result' in launch
     assert 'taskSource' not in launch + agent
-    assert 'as its working directory' in launch
+    assert 'enter and verify the absolute assigned worktree' in launch
     for field in ('worktreePath', 'featureBranch', 'commitSubjectPrefix', 'ticket-commit'):
         assert field not in agent
     assert 'Leave edits unstaged and uncommitted' in agent
-    assert launch.index('Inspect the diff') < launch.index('the orchestrator stages')
+    assert 'current directory by default' in agent
+    assert 'explicitly asks for a commit' in agent
+    assert 'pre-existing staged changes' in agent
+    assert 'Explicitly ask the worker to commit' in launch
     assert 'exactly one ticket commit' in launch
+    assert '`result.commit` equals `HEAD`' in launch
+    assert '`result.commit` is null' in launch
+    assert 'never publish' in launch
     assert 'validated per-ticket preferred model/effort' in launch
-    assert launch.index('*Implementation focus* evidence gate to `result.verification`') < launch.index('the orchestrator stages')
+    assert launch.index('*Implementation focus* evidence gate to `result.verification`') < launch.index('Integrate and publish')
     assert 'same material risk' in agent and 'same material risk' in MAIN
 
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
-    for value in ('ticket snapshot with comments and commit history', 'required references in full',
+    for value in ('ticket snapshot with comments', 'required references in full',
                   'read-only', 'unreadable', 'Never launch subagents'):
         assert value in agent
-    for value in ('validated model/effort', 'launch directory', 'unstaged and uncommitted', 'testing-integrations'):
+    for value in ('validated model/effort', 'assigned worktree', 'unstaged and uncommitted', 'testing-integrations'):
         assert value in fallback
 
     agent_results = re.findall(r"```json\n(.*?)\n```", agent, re.S)
@@ -180,16 +186,34 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     outcomes = {result['status']: result['result'] for result in map(json.loads, agent_results)}
     assert set(outcomes['completed']) == {'summary', 'files', 'verification', 'gotchas'}
     assert set(outcomes['failed']) == {'reason', 'gotchas'}
+    assert '| `result.commit` |' in agent and 'Omit in edit-only mode' in agent
     assert len(outcomes['completed']['gotchas']) == 1
     assert outcomes['failed']['gotchas'] == []
 
 
-def test_parallel_caller_commits_after_integration_checks_and_owns_rework():
+def test_worker_reads_pinned_ccode_history_locally_without_snapshot():
+    agent = CODEY.read_text()
+    chore = (ROOT / 'agents/chore.md').read_text()
+    assert '| `historyTip` | captured integration HEAD | same |' in MAIN
+    assert '`{{baseCommit}}..{{historyTip}}`' in chore
+    for body in (agent, chore, MAIN.split('## Implementer fallback', 1)[1]):
+        for value in ('`git log`', '`ccode(...):`', 'subjects', 'oldest first'):
+            assert value in body
+    assert 'commitsFile' not in agent + MAIN + chore
+    post = (FACTORY / 'references/post-implementation.md').read_text()
+    assert 'write `git -C WORKTREE_PATH log' in post
+
+
+def test_worker_commits_and_caller_owns_parallel_integration():
+    sequential = (ROOT / 'references/sequential.md').read_text()
     parallel = (ROOT / 'references/parallel.md').read_text()
+    assert "worker's local ticket commit" in sequential
+    assert "worker's local ticket commit" in parallel
     assert 'orchestrator applies `git cherry-pick --no-commit' in parallel
     assert parallel.index('build/test on the tentative application') < parallel.index('uses `git commit -C')
     assert 'orchestrator stages the resolution and continues the rebase' in parallel
-    assert 'unpublished ticket commit with `git commit --amend`' in parallel
+    assert 'explicitly authorizes the worker to amend that exact unpublished commit' in parallel
+    assert 'edit-only' in parallel
 
 
 def test_embedded_breakdown_is_self_contained_and_non_interactive():
@@ -403,7 +427,7 @@ def test_implementation_handoff_contains_routing_and_durable_data_pointers():
     assert data['publication']['verified'] is True
     assert data['publication']['draft'] is True
     assert data['specRef'].startswith(data['trackerRepository'] + '#')
-    for name in ('harnessRoot', 'sourceRoot', 'worktreesRoot', 'worktreePath', 'runDir', 'evidenceRoot', 'specFile', 'graphFile', 'plannerFile', 'modelOutcomesFile', 'commitsFile'):
+    for name in ('harnessRoot', 'sourceRoot', 'worktreesRoot', 'worktreePath', 'runDir', 'evidenceRoot', 'specFile', 'graphFile', 'plannerFile', 'modelOutcomesFile'):
         assert Path(data[name]).is_absolute()
     assert Path(data['graphFile']).name == 'effective-graph.json'
     assert not Path(data['runDir']).is_relative_to(data['worktreePath'])

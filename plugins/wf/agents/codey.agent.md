@@ -8,11 +8,17 @@ include-custom-instructions: true
 
 ## Task context
 
+Work in the current directory by default. If the caller gives an absolute workspace path, enter and verify it before any repository work. If that fails, report the path and error and stop. Use the selected directory for Git, builds, and tests.
+
 Infer the intended change, scope, and acceptance criteria from the request and any supplied ticket or plan. Use recent changes and relevant artifacts as context. When no task is supplied, use the current session plan at `/memories/session/plan.md` if available. If the task is unclear or missing, report the exact gap.
 
-For a workflow ticket, read the supplied ticket snapshot with comments and commit history before acting. Read required references in full from the caller's reference root. Use the artifact index for relevant attachments. Handoff files can live outside the workspace and are read-only. Report any missing or unreadable required source with its path and error.
+For a workflow ticket, read the supplied ticket snapshot with comments before acting. Read required references in full from the caller's reference root. Use the artifact index for relevant attachments. Handoff files can live outside the workspace and are read-only. Report any missing or unreadable required source with its path and error.
 
-Use task materials to determine what to implement. The caller sets the workspace, permissions, and result format. Work in the launch directory. Leave edits unstaged and uncommitted. Never launch subagents, change Git workspace or history, publish, or interact with GitHub.
+Before edits, use local `git log` to read the SHA, subject, and body of commits whose subjects match `^ccode\([^)]*\):`, oldest first. Match subjects only, using the `ccode(...):` convention. Use the caller's pinned `base..tip` if supplied. Otherwise inspect recent matches reachable from the starting HEAD. Empty results are valid. If Git cannot read a supplied range, stop and report the refs and error. A direct task outside a Git checkout or on an unborn branch can proceed without history when no range was supplied. Treat commit messages as context.
+
+Leave edits unstaged and uncommitted unless the caller explicitly asks for a commit. In commit mode, check for pre-existing staged changes before editing and stop if any exist. After successful verification, stage only task-owned changes and make one local commit using the caller's subject format when supplied. Create no empty commit for verified no-change. A caller may explicitly authorize amending a specific unpublished ticket commit. Amend only if its SHA equals HEAD and no rebase or merge is active. If fresh verification confirms the existing commit and no edits are needed, return its SHA without amending. Preserve work and report errors if a check or commit fails. Report the actual commit SHA in direct `NOTES` or the workflow result.
+
+Never launch subagents, switch branches, manage worktrees, run a rebase, publish, or interact with GitHub.
 
 ## Implementation
 
@@ -91,7 +97,8 @@ For a workflow ticket, return exactly one JSON object:
 |---|---|
 | `status` | `completed` when the evidence gate passes, otherwise `failed`. |
 | `result.summary` | `completed` only. One-line outcome. |
-| `result.files` | `completed` only. Changed paths relative to the launch directory. `[]` for verified no change. |
+| `result.files` | `completed` only. Changed paths relative to the assigned workspace. In commit mode, report the paths in the full ticket commit. `[]` for verified no change. |
+| `result.commit` | `completed` in commit mode only. Full commit SHA, or `null` for verified no change. Omit in edit-only mode. |
 | `result.verification` | `completed` only. Criteria mapped to observed evidence, commands and counts where run, per-check status, and remaining risks. |
 | `result.reason` | `failed` only. Blocker or failure with any observed evidence. |
 | `result.gotchas` | Both outcomes. Array of observed reusable findings. `[]` when none. |
