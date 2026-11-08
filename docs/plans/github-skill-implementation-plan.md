@@ -1,19 +1,12 @@
-# Consolidate GitHub, Git conventions, and worktrees into one skill
+# Consolidate GitHub, Git conventions, and worktrees into git-toolkit
 
 **Goal.** Replace the proposed `use-github` skill and the existing `git-conventions` and `worktrees` skills with one model-invoked, tactic-based skill. Callers select only the needed tactic; the skill does not orchestrate feature delivery or assume authority to publish, commit, or delete.
 
 **Baseline.** The earlier [Brain snapshot at dff4393](https://github.com/antshc/brain/tree/dff4393bfe089ed44f4547d603478d811cd60fa0) and [GitHub skill proposal](https://chatgpt.com/library?file_id=libfile_989d274a269c8191b37699402923a3e0&account_id=personal) describe the original GitHub-only migration. Recheck the current `main` before implementation: `git-conventions` and `worktrees` now exist and have live WF, Review, and factory callers.
 
-## Name decision (pending)
+## Name
 
-| Candidate | Benefit | Tradeoff |
-| --- | --- | --- |
-| **`git-toolkit` (recommended)** | Describes selectable Git, GitHub, and formatting utilities without implying an end-to-end workflow | Less explicit about GitHub in the name |
-| `git-operations` | Short, operational and clear | Conventions are formatting, not executable operations |
-| `git-and-github` | Makes local Git and remote GitHub scope explicit | Longer and tied to GitHub |
-| `repository-ops` | Can accommodate another forge later | Broad; may imply code exploration or repository administration |
-
-Use `<skill-name>` below until selected. **Do not** publish the new skill or remove old entrypoints before the name is agreed. No compatibility alias: it would retain extra autodiscoverable skills.
+**Selected: `git-toolkit`.** One model-invoked tactic router, not an end-to-end workflow. Do not keep compatibility aliases: they would retain extra autodiscoverable skills.
 
 ## Constraints
 
@@ -25,11 +18,12 @@ Use `<skill-name>` below until selected. **Do not** publish the new skill or rem
 - **MUST** preserve `git-conventions` contracts: `feat/` or `fix/` branch names without ticket IDs; ordinary conventional commits and WF `ccode(...)` commits; leading initiative marker in PR title/body; concise review prose and terminal hidden agent markers. Keep the `writing-style` dependency only for convention prose that already uses it.
 - **MUST** retain caller-specific adapters and policies: Implement Spec's required `GH_TOOL` and checkpoint semantics, Address discussion gates, HITL verbatim approval, Wayfinder body blockers, To Tickets native edges, offline publication and Ralph as a separate migration.
 - **MUST NOT** turn this skill into a Git workflow orchestrator, duplicate full command recipes in callers, broaden mutation permissions, or make GitHub publication a side effect of naming/inspection.
+- **MUST NOT** refactor the Crew plugin (`plugins/crew/**`), its skills, agents, manifests, documentation, or installer. Leave its existing GitHub operations and skill dependencies unchanged. Crew migration may be proposed separately.
 
 ## Proposed structure
 
 ```text
-plugins/wf/skills/<skill-name>/
+plugins/wf/skills/git-toolkit/
   SKILL.md                          # Tactic router; guards, inputs, outputs
   references/
     github/
@@ -61,11 +55,11 @@ The router selects one operation and loads its exact reference. Each tactic repo
 
 ## Implementation order
 
-1. **Choose the name and verify discovery.** Confirm WF, Review + WF, and Crew + WF install paths can discover the selected shared skill by name. Review and Crew have separate manifests without declared WF dependency; document or enforce the prerequisite. Exercise Review-only and Crew-only absence explicitly. Missing shared capability must surface before remote or local mutation.
+1. **Verify discovery.** Confirm WF and Review + WF install paths can discover `git-toolkit`. Review has a separate manifest without a declared WF dependency; document or enforce the prerequisite. Exercise Review-only behavior explicitly. Missing shared capability must surface before remote or local mutation. Do not touch Crew install paths.
 2. **Capture behavior and tests.** Recheck current `main`, existing tests, the GitHub migration proposal, `git-conventions` references, `worktrees` Python helper, and all current caller contracts. Record any path-dependent test fixture or script invocation before moving files.
-3. **Create the shared tactic router.** Add the selected `SKILL.md`, five GitHub references, four convention references and `worktrees.md` as above. Standardize target, intent, expected state, authorization, result, and completeness fields without forcing every tactic into a single rigid schema. Keep review reply, inline finding, and PR conversation operations distinct. Worktree operations use separate absolute harness and source paths.
+3. **Create the shared tactic router.** Add `git-toolkit/SKILL.md`, five GitHub references, four convention references and `worktrees.md` as above. Standardize target, intent, expected state, authorization, result, and completeness fields without forcing every tactic into a single rigid schema. Keep review reply, inline finding, and PR conversation operations distinct. Worktree operations use separate absolute harness and source paths.
 4. **Migrate existing conventions/worktrees callers first.** Redirect branch, commit, PR, review-comment, and worktree references to the new skill; move `scripts/worktrees.py` without changing its JSON/exit/ownership contracts. Keep caller-side fetch, branch setup, integration, publication, run records and editor exclusions. Keep `writing-style` invocation inside conventions tactics. Update Review Address, Code Review, HITL, Implement Spec, factory post-implementation, install guidance and relevant tests.
-5. **Migrate straightforward GitHub callers.** Replace embedded access recipes for repository search, PR context, external sources and explicit Crew issue inputs. Keep local evidence paths and mutation boundaries.
+5. **Migrate straightforward GitHub callers in WF and Review only.** Replace embedded access recipes for repository search, PR context and external sources. Keep local evidence paths and mutation boundaries. Crew retains its current implementation.
 6. **Migrate WF backlog callers.** Move reusable issue, artifact, label and relationship transport to GitHub tactics. Keep each caller's record identities and reconciliation keys. Wayfinder retains body blockers; To Tickets retains native dependencies. Offline paths remain local. Run the Init WF label fixture before altering the manifest.
 7. **Migrate Review and Implement Spec GitHub transport.** Route remote operations through shared tactics or documented required adapters; preserve local diff/worktree acquisition and existing command/JSON/exit contracts. Address keeps discussion gates, HITL human approval, Code Review marker policy and Implement Spec `GH_TOOL`/draft-only/checkpoints. Do not create duplicate remote writers for one action.
 8. **Pilot optional Python GitHub reads.** Only if needed, add read-only thread snapshots and native issue-graph lookup wrapping authenticated `gh`, resolved from the shared skill base. Require explicit repository and object, emit raw IDs/head/edges and completeness as JSON, and wire each shipped command to a real caller. Otherwise defer scripts and keep connector-only runs viable.
@@ -75,10 +69,9 @@ The router selects one operation and loads its exact reference. Each tactic repo
 
 | Area | Files or skills | Preserve |
 | --- | --- | --- |
-| Shared | `<skill-name>/SKILL.md`, `references/{github,conventions}/*`, `references/worktrees.md`, `scripts/worktrees.py`, optional `scripts/github_read.py` | Tactic boundaries, qualified targets, exact payloads, ownership, recoverability, read-back |
+| Shared | `git-toolkit/SKILL.md`, `references/{github,conventions}/*`, `references/worktrees.md`, `scripts/worktrees.py`, optional `scripts/github_read.py` | Tactic boundaries, qualified targets, exact payloads, ownership, recoverability, read-back |
 | Existing shared skills | Remove `git-conventions` and `worktrees` after replacing references | No discoverable aliases; full behavior and tests migrate |
 | WF evidence | `explore-codebase`, `research/why`, `grill-design/references/tactics-external-source.md` | Local search, pinned evidence, confirmation of external edits |
-| Crew | `to-crew/SKILL.md` and install guidance | Only explicit issue inputs authorize issue handling; verdict selects operation |
 | WF backlog | `to-spec`, `to-tickets`, `wayfinder`, installer, generated template | Routing labels, blocker semantics, offline mode, label manifest, dispatch approval |
 | Review | `code-review`, `hitl`, `test-gaps`, `address`, review references and docs | Comment text/markers, approval gates, discussion and thread ownership |
 | Implement Spec | `SKILL.md`, `references/worktrees.md`, planner/publication/sequential/parallel guidance, `scripts/spec_gh.py` | Worktree/commit callers, Codey/Chore isolation, `GH_TOOL`, checkpoints, draft PR and closure evidence |
@@ -87,7 +80,7 @@ The router selects one operation and loads its exact reference. Each tactic repo
 
 ## Verification
 
-- **Discovery.** Exercise WF-only, Review + WF, Crew + WF, Review-only and Crew-only installed setups; simulate an unavailable shared skill. Fail before a mutation when required tactics cannot load. Check old skills are absent from autodiscovery after migration.
+- **Discovery.** Exercise WF-only, Review + WF and Review-only installed setups; simulate an unavailable shared skill. Fail before a mutation when required tactics cannot load. Check old skills are absent from autodiscovery after migration.
 - **Convention regression.** Verify `feat/` vs `fix/` slug and omission of IDs; ordinary and `ccode(...)` commit subjects/history filters; PR initiative marker consistency; exact final visible review body, agent marker count and recognition; writing-style selection.
 - **Worktree safety.** Run the existing Python helper tests in the new path. Exercise clean create/reuse/remove; dirty, ignored/untracked, locked, unowned, misrouted, stale-HEAD and interrupted cases. Verify no force/delete/reset and no regression in ownership JSON and exit codes. Test working directory changes do not break script resolution.
 - **GitHub reads.** Exercise cross-repo targets, pinned search, truncated diffs, paginated issue edges and threads, stale head and denied reads. Missing data must report incompleteness.
@@ -95,4 +88,4 @@ The router selects one operation and loads its exact reference. Each tactic repo
 - **Policy regressions.** Offline makes zero GitHub calls; Wayfinder keeps text blockers; To Tickets native edges; HITL approved text unchanged; Address markers/discussion unchanged; Implement Spec `GH_TOOL`, checkpoints and draft PR unchanged. Worktree tactics never auto-commit or auto-push.
 - **Repository checks.** Run `python3 .github/scripts/run-python-tests.py --unit-only` after staging tests for Git-based discovery; focused Implement Spec, Init WF, Address, worktrees and conventions suites. Validate skill frontmatter, reference paths, scripts, manifests and discovery. Sweep references to both retired skill names.
 
-**Done when** all in-scope GitHub, convention and worktree calls use the selected shared skill or an explicit required caller adapter; there are no dangling references or duplicate discoverable skills; safety, formatting and publication contracts pass; Ralph remains separate.
+**Done when** all in-scope WF, Review and factory GitHub, convention and worktree calls use `git-toolkit` or an explicit required caller adapter; there are no dangling references or duplicate discoverable skills; safety, formatting and publication contracts pass. Crew and Ralph remain unchanged.
