@@ -1,6 +1,6 @@
 # Planning evaluations
 
-Use `planning-scenarios.json` as raw task input for a fresh agent with the current `to-tickets` decomposition rules, planner body, and breakdown reference. Supply each case's `files` as its synthetic repository context and preserve `existingTickets` identities. Draft only; use no live tracker, publication, or implementation. Supply exact runtime-supported model/effort candidates. Do not give the agent this rubric or previous results.
+Use `planning-scenarios.json` as raw task input for a fresh agent with the current `/design tickets` decomposition rules, planner body, and breakdown reference. Supply each case's `files` as its synthetic repository context and preserve `existingTickets` identities. Draft only; use no live tracker, publication, or implementation. Supply exact runtime-supported model/effort candidates. Do not give the agent this rubric or previous results.
 
 Return task outcomes/exclusions, producer assumptions, blocker graph, footprints/conflicts, criterion-to-check mappings, commands/prerequisites/evidence, and model recommendations with reasons. Mark unsupported environment facts and missing commands as unknown.
 

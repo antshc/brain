@@ -1,6 +1,6 @@
 # architect
 
-Human quick reference. Sketch types, signatures, and module structure, then implement by default. Add `checkpoint` to review the design first. Factory Mode requests a design-only handoff to `/to-spec`. Agent rules live in [SKILL.md](SKILL.md) and [design/design.md](design/design.md).
+Human quick reference. Sketch types, signatures, and module structure, then implement by default. Add `checkpoint` to review the design first. Factory Mode requests a design-only handoff to `/design spec`. Agent rules live in [SKILL.md](SKILL.md) and [design/design.md](design/design.md).
 
 ## Use
 
@@ -26,7 +26,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 | A Ground | Research How explains the touched subsystems; Research Why adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
 | B Sketch | `arena`: one runner by default; with 2–3, compare candidates and graft good ideas | usage sketch, module map, types, rationale |
 | C Review | resolve technical questions and challenge material claims automatically; pause only for an explicit checkpoint, then support **accept**, **implement**, **corrections**, **interrogate**, **prove**, or **ask** | `review-log.md` |
-| D Hand off | when the caller requests a design-only handoff, return the sketch for `/to-spec` | design artifacts |
+| D Hand off | when the caller requests a design-only handoff, return the sketch for `/design spec` | design artifacts |
 | E Implement | default: scaffold commit, then fill in code in the current branch; log and resolve deviations | scaffold commit, code |
 | F Scrap | repeated friction during E (same workaround, escape-hatch types, repeated deviations): re-ground, subtract, re-run B and C | new sketch |
 

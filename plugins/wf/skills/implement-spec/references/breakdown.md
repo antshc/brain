@@ -26,7 +26,7 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 
 ## Planner procedure
 
-Online-only and non-interactive; the planner writes tickets only within the orchestrator's breakdown authorization. Never invoke, check availability of, or fall back to `/to-tickets`; never delegate, request approval, add `hitl` or `afk` labels, publish offline, edit/close the parent spec, or create execution branches/worktrees. Missing inputs, unresolved conflicts, unavailable prerequisites, inaccessible relevant artifacts, or incomplete GitHub operations → stop and return `failed`; preserve partial results without claiming success.
+Online-only and non-interactive; the planner writes tickets only within the orchestrator's breakdown authorization. Never invoke, check availability of, or fall back to `/design tickets`; never delegate, request approval, add `hitl` or `afk` labels, publish offline, edit/close the parent spec, or create execution branches/worktrees. Missing inputs, unresolved conflicts, unavailable prerequisites, inaccessible relevant artifacts, or incomplete GitHub operations → stop and return `failed`; preserve partial results without claiming success.
 
 ### 1. Resolve source and routing
 

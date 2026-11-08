@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[3] / 'plugins/wf/skills/to-tickets'
-SKILL = (ROOT / 'SKILL.md').read_text()
+ROOT = Path(__file__).resolve().parents[3] / 'plugins/wf/skills/design'
+SKILL = (ROOT / 'playbooks/tickets.md').read_text()
 
 
 def test_auto_rejected_without_approval_exception():
@@ -13,8 +13,10 @@ def test_auto_rejected_without_approval_exception():
     assert 'auto` exception' not in SKILL
     assert 'non-interactive auto mode' not in SKILL
     assert SKILL.count('`auto`') == 1
-    for reference in (ROOT / 'references').glob('*.md'):
-        assert 'auto`' not in reference.read_text()
+    github = (ROOT / 'references/github.md').read_text()
+    github = github.split('## Ticket operations', 1)[1].split('## Wayfinder operations', 1)[0]
+    assert 'auto`' not in github
+    assert 'auto`' not in (ROOT / 'references/issue-template.md').read_text()
 
 
 def test_online_offline_and_corrections_require_explicit_approval():

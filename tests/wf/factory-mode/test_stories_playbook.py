@@ -31,7 +31,8 @@ def test_current_guidance_has_no_standalone_stories_invocation():
     for relative in (
         "README.md",
         "plugins/wf/README.md",
-        "plugins/wf/skills/to-spec/SKILL.md",
+        "plugins/wf/skills/design/SKILL.md",
+        "plugins/wf/skills/design/playbooks/spec.md",
         "plugins/skill/skills/doc-flow/references/subflow-template.md",
         "docs/plans/idea-to-implementation-flow.md",
     ):

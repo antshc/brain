@@ -1,9 +1,3 @@
----
-name: grill-design
-description: >-
-  Stress-test a plan or design through a relentless interview, recording resolved decisions as glossary terms, assumptions, and ADRs. Use for 'grill this design', a domain-modeling interview, or resolving a Wayfinder grilling ticket. Ends in a spec or design handoff, not implementation.
----
-
 # Grill Design
 
 Own the interview and session design state: when to look up, log, ask, or write. Delegate mechanics through the skill contracts below; apply their procedures without restating them.
@@ -18,11 +12,11 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 **Only the user ends the grill.** The grill MUST end only on a user request or confirmation, not a finished record, empty frontier, or clean sweep. When the tree appears resolved, report it, ask to close, and wait.
 
-**Implementation is a handoff.** When the user asks to build, including a one-line fix, announce closing and run the closing sweep. Then route the saved context to the requested output: *Run `to-spec` skill to synthesize the conversation into a spec published as a GitHub issue or offline Markdown*; or *Run `draft-artifact` skill to create or update the requested authoritative feature design using the Feature design tactic*. Execution belongs to the handoff, outside the grill.
+**Implementation is a handoff.** When the user asks to build, including a one-line fix, announce closing and run the closing sweep before handing off.
 
 ## Session start
 
-1. **Claim state** — load [track-ledger.md](./references/track-ledger.md) before ledger access. Resolve session storage and ownership using its protocol; restore the frontier, answers, pending writes, and blockers. An unknown owner starts fresh without overwriting the old ledger.
+1. **Claim state** — load [track-ledger.md](../references/track-ledger.md) before ledger access. Resolve session storage and ownership using its protocol; restore the frontier, answers, pending writes, and blockers. An unknown owner starts fresh without overwriting the old ledger.
 2. **Check docs** — existence-check `ARCHITECTURE.md` and `GLOSSARY.md`. If either is missing, *Run `index-docs` skill to initialize missing ARCHITECTURE.md and GLOSSARY.md files using **Initialize missing docs** at the same docs root*. Proceed only when both exist; otherwise apply *Gotchas*.
 3. **Load the index** — *Run `index-docs` skill to load the full ARCHITECTURE.md index of Trigger condition tables*, using **Load index** on `ARCHITECTURE.md` with `Summary` omitted; this covers every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. MUST use that operation's Python loader and consume every returned row; MUST NOT substitute manual reads, search, or counts-only output, even if simpler. Rationale: script counts and validation make completeness observable. Log per-table total/loaded counts and source in the ledger's `Index loaded` header. MUST NOT scan/match until every row is loaded; script unavailable or incomplete output → Index failure. Missing sections are optional, not gaps.
 4. **Seed the surface** — extract terms and concrete file/folder paths from the initial request; run *Scan and match*. On resume, apply only newly surfaced inputs; retain same-session match history, reloading needed evidence absent from context.
@@ -143,9 +137,9 @@ Re-check each tactic's trigger after every user answer or new fact. A later answ
 
 **Code cross-reference** — when the user states how something works, use the lookup contract to check user-facing, application, integration, and persistence boundaries: validation, constraints, models, schemas, contracts, relationships, and logic. Surface contradictions with both the claim/record anchor and code `path:line` or symbol evidence. A contradiction against a Concept/ADR is Drift; log both sources. Missing proof → label `unverified`, retain the fact gap, and avoid presenting it as an established contradiction.
 
-**Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [tactics-verification.md](./references/tactics-verification.md) and apply the coverage-category check.
+**Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [tactics-verification.md](../references/tactics-verification.md) and apply the coverage-category check.
 
-**External source** — when seeded from an explicit external link or reference, load [tactics-external-source.md](./references/tactics-external-source.md); track and reconcile it throughout the session.
+**External source** — when seeded from an explicit external link or reference, load [tactics-external-source.md](../references/tactics-external-source.md); track and reconcile it throughout the session.
 
 ## Gotchas
 
@@ -159,7 +153,9 @@ Re-check each tactic's trigger after every user answer or new fact. A later answ
 
 ## Closing sweep
 
-When the user asks to close, confirms closure, or requests implementation, load [closing-sweep.md](./references/closing-sweep.md). Complete its reconciliation, repairs, and trigger refinement before handoff. If the user resumes questioning, persist outstanding work and return to the interview.
+When the user asks to close, confirms closure, or requests implementation, load [closing-sweep.md](../references/closing-sweep.md). Complete its reconciliation, repairs, and trigger refinement before handoff. If the user resumes questioning, persist outstanding work and return to the interview.
+
+After the sweep, pass the saved context to the [Spec playbook](./spec.md) for a requested spec handoff. For a requested authoritative feature design, *run `draft-artifact` skill in `design` mode* with the saved context. If a handoff was requested and its output is unclear, return the saved context and ask which output the user wants.
 
 ## Completion criteria
 

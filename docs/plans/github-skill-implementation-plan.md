@@ -71,8 +71,8 @@ The router selects one operation and loads its exact reference. Each tactic repo
 | --- | --- | --- |
 | Shared | `git-toolkit/SKILL.md`, `references/{github,conventions}/*`, `references/worktrees.md`, `scripts/worktrees.py`, optional `scripts/github_read.py` | Tactic boundaries, qualified targets, exact payloads, ownership, recoverability, read-back |
 | Existing shared skills | Remove `git-conventions` and `worktrees` after replacing references | No discoverable aliases; full behavior and tests migrate |
-| WF evidence | `explore-codebase`, `research/why`, `grill-design/references/tactics-external-source.md` | Local search, pinned evidence, confirmation of external edits |
-| WF backlog | `to-spec`, `to-tickets`, `wayfinder`, installer, generated template | Routing labels, blocker semantics, offline mode, label manifest, dispatch approval |
+| WF evidence | `explore-codebase`, `research/why`, `design/references/tactics-external-source.md` | Local search, pinned evidence, confirmation of external edits |
+| WF backlog | `design/references/github.md` (Spec, Tickets, and Wayfinder), installer, generated template | Routing labels, blocker semantics, offline mode, label manifest, dispatch approval |
 | WF reviews | `review-feat`, `review-hitl`, `review-fix`, `address-pr`, review references and docs | Comment text/markers, approval gates, discussion and thread ownership |
 | Implement Spec | `SKILL.md`, `references/worktrees.md`, planner/publication/sequential/parallel guidance, `scripts/spec_gh.py` | Worktree/commit callers, Codey/Chore isolation, `GH_TOOL`, checkpoints, draft PR and closure evidence |
 | Factory/other | `factory-mode/references/post-implementation.md` and other convention/worktree call sites | Commit format and existing workflow authority |

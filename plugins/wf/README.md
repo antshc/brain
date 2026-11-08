@@ -2,11 +2,11 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
-The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-spec/SKILL.md), [to-tickets](skills/to-tickets/SKILL.md)) supports GitHub only. Each skill bundles its own GitHub reference; [the WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [index-docs](skills/index-docs/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+[Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [index-docs](skills/index-docs/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
 [subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) owns How for current code behavior and Why for historical rationale alongside its existing inspection routes.
 
-[grill-design](skills/grill-design/SKILL.md) owns session-ledger operations through its [track-ledger reference](skills/grill-design/references/track-ledger.md), including ownership, resumable questions, and pending writes. It loads closing, verification, and external-source procedures on demand from its bundled references; `track-ledger` is not a standalone skill or command.
+[`/design grill`](skills/design/SKILL.md) owns session-ledger operations through its [track-ledger reference](skills/design/references/track-ledger.md), including ownership, resumable questions, and pending writes. It loads closing, verification, and external-source procedures on demand from its bundled references. To configure a `grill!` shortcut, point it to `/design grill`.
 
 Its interview presents the entire ready decision frontier as one numbered batch per round, with recommendations phrased for "yes" to accept. Dependent questions wait for later rounds; partial answers leave the remaining ready questions together for batched follow-up. Inline recording and user-controlled closure remain unchanged.
 
@@ -14,16 +14,16 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 
 The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
-[git-conventions](skills/git-conventions/SKILL.md) provides branch, commit, PR, and review comment formats. Review skills (`review-feat`, `review-fix`, `review-architecture`, `review-design`, `review-hitl`, `address-pr`) are bundled in WF. Worktree and hosting operations remain in their existing workflows.
+[git-conventions](skills/git-conventions/SKILL.md) provides branch, commit, PR, and review comment formats. Review skills (`review-feat`, `review-fix`, `review-architecture`, `review-hitl`, `address-pr`) are bundled in WF. Use `/design review` to review a technical design for gaps and implementation readiness.
 
 ## Skill flow
 
-1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/wayfinder`](skills/wayfinder/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/grill-design`, `/research`, or `/experiment`; `/grill-design` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/to-spec` (or `/draft-artifact design` directly).
-2. **Spec synthesis** — `/to-spec` synthesizes the spec from the resolved Wayfinder decisions or grill-design conversation, the step right after the discovery loop; a spec can feed `/to-tickets` directly or go on into design synthesis.
+1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/design wayfinder`](skills/design/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/design grill`, `/research`, or `/experiment`; `/design grill` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/design spec` (or `/draft-artifact design` directly).
+2. **Spec synthesis** — `/design spec` synthesizes the spec from the resolved Wayfinder decisions or Grill conversation, the step right after the discovery loop; a spec can feed `/design tickets` directly or go on into design synthesis.
 3. **Design synthesis** — `/draft-artifact design` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
-4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](../../skills/engineering/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/to-spec` output, or `/draft-artifact design` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row. Use `/draft-artifact story` for a standalone User story.
-5. **Story hardening** — `/grill-design` interviews and sharpens each story, run once per story.
-6. **Ticket cut** — `/to-tickets` slices each hardened story into agent-executable GitHub issues.
+4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](../../skills/engineering/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/design spec` output, or `/draft-artifact design` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row. Use `/draft-artifact story` for a standalone User story.
+5. **Story hardening** — `/design grill` interviews and sharpens each story, run once per story.
+6. **Ticket cut** — `/design tickets` proposes implementation slices from a spec and creates GitHub sub-issues after approval.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -34,14 +34,14 @@ swimlane-beta TB
 
   subgraph discovery [Discovery]
     idea([Idea])
-    resolve[1 - Resolve unknowns<br/>wayfinder or grill-design]
+    resolve[1 - Resolve unknowns<br/>/design wayfinder or /design grill]
     choosePath{2 - Choose path}
   end
 
   subgraph simple [Simple path - SMPL]
     sketchFirst{2a.1 - Sketch code first?}
     smplArchitect[2a.1a.1 - architect<br/>code sketch]
-    smplToSpec[2a.2 - to-spec]
+    smplToSpec[2a.2 - /design spec]
     smplSpec[(2a.3 - Spec)]
   end
 
@@ -50,7 +50,7 @@ swimlane-beta TB
     design[(2b.2 - Feature design)]
     toStories[2b.3 - factory-mode stories<br/>assemble design into stories]
     cmplxArchitect[2b.4 - architect<br/>for each story]
-    cmplxToSpec[2b.5 - to-spec]
+    cmplxToSpec[2b.5 - /design spec]
     cmplxSpec[(2b.6 - Spec)]
   end
 
@@ -72,20 +72,20 @@ swimlane-beta TB
 
 ### Design and story breakdown
 
-Resolves unknowns with `/wayfinder` (work too big for one session) or `/grill-design` (one session), synthesizes the feature design with `/draft-artifact design`, then breaks the design into User stories with `/factory-mode stories`.
+Resolves unknowns with `/design wayfinder` (work too big for one session) or `/design grill` (one session), synthesizes the feature design with `/draft-artifact design`, then breaks the design into User stories with `/factory-mode stories`.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: wf-design-to-stories-swimlane
 swimlane-beta TB
   accTitle: Design and story breakdown responsibility
-  accDescr: Shows unknowns resolved by wayfinder or grill-design, a feature design synthesized by draft-artifact design, and the design broken down into User stories by the factory-mode Stories playbook.
+  accDescr: Shows unknowns resolved by /design wayfinder or /design grill, a feature design synthesized by draft-artifact design, and the design broken down into User stories by the factory-mode Stories playbook.
 
   subgraph discovery [Discovery]
     idea([Idea])
     effortSize{1 - Fits one session?}
-    wayfinder[1a.1 - wayfinder<br/>chart and resolve decision tickets]
-    grillDesign[1b.1 - grill-design<br/>interview in one session]
+    wayfinder[1a.1 - /design wayfinder<br/>chart and resolve decision tickets]
+    grillDesign[1b.1 - /design grill<br/>interview in one session]
   end
 
   subgraph design [Design]
@@ -110,7 +110,7 @@ swimlane-beta TB
 
 ### Story to implementation
 
-Starts from one existing User story: `/writing-style sharpen` hardens it, `/architect` sketches the code, `/to-spec` writes the spec, and `/implement-spec` implements it.
+Starts from one existing User story: `/writing-style sharpen` hardens it, `/architect` sketches the code, `/design spec` writes the spec, and `/implement-spec` implements it.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -126,7 +126,7 @@ swimlane-beta TB
 
   subgraph design [Design]
     architect[2 - architect<br/>code sketch]
-    toSpec[3 - to-spec]
+    toSpec[3 - /design spec]
     spec[(4 - Spec)]
   end
 
@@ -193,7 +193,7 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 
 | Group | Skills |
 | --- | --- |
-| Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase` (NuGet tactic), `grill-design`, `research`, `wayfinder` |
-| Design and backlog | `architect`, `to-spec`, `to-tickets`; `factory-mode` Stories playbook (repo-level) |
+| Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase` (NuGet tactic), `research` |
+| Design and backlog | `architect`, `design` (`grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `git-conventions`, `implement-spec`, `principles`, `show-me-your-work`, `subagents`, `worktrees` |

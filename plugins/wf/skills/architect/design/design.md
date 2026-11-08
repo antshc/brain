@@ -74,7 +74,7 @@ Before each subsequent checkpoint review round, rerun `design/evidence-routing.m
 
 ## Phase D: Hand off
 
-Stop the Architect procedure and return the accepted sketch to the caller for `/to-spec`. If standalone, tell the user to run `/to-spec` with the target branch and Initiative ID; that skill turns `synthesis/` (rationale, module map, sketch) into a published spec issue. Do not draft the spec yourself.
+Stop the Architect procedure and return the accepted sketch to the caller for `/design spec`. If standalone, tell the user to run `/design spec` with the target branch and Initiative ID; that skill turns `synthesis/` (rationale, module map, sketch) into a published spec issue. Do not draft the spec yourself.
 
 ## Phase E: Implement against the sketch
 

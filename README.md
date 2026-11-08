@@ -155,13 +155,10 @@ Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tas
 
 Common everyday workflow automation skills. Expected to be useful to all developers.
 
-- [grill-design](plugins/wf/skills/grill-design/SKILL.md): relentless interview with situational tactics that sharpens a plan or design while surfacing terms, decisions, and assumptions as they crystallise.
-- [wayfinder](plugins/wf/skills/wayfinder/SKILL.md): plan work larger than one session as a shared map of decision tickets, resolved one at a time.
-- [to-spec](plugins/wf/skills/to-spec/SKILL.md): turn the current conversation into a GitHub spec issue, with explicit offline Markdown publishing when needed.
-- [factory-mode Stories playbook](skills/engineering/factory-mode/playbooks/stories.md): turn requirements, `/to-spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per row. Requires repo-level `factory-mode` installation.
+- [design](plugins/wf/skills/design/SKILL.md): `grill` for decision interviews, `spec` for GitHub or offline specs, and `tickets` for approved implementation breakdowns, `wayfinder` for decision maps, and `review` for technical design review.
+- [factory-mode Stories playbook](skills/engineering/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per row. Requires repo-level `factory-mode` installation.
 - [draft-artifact](plugins/wf/skills/draft-artifact/SKILL.md): draft a User story, bug report, feature handover (TOI), or feature design.
 - [code-sketch](plugins/wf/skills/code-sketch/SKILL.md): draft one single-pass code sketch with usage first, types and signatures with `not implemented` bodies, a module map for larger work, and a rationale.
-- [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
 - [git-conventions](plugins/wf/skills/git-conventions/SKILL.md): branch, commit, PR, and review comment formats.
 - [worktrees](plugins/wf/skills/worktrees/SKILL.md): inspect, create, reuse, or remove local Git worktrees with ownership checks. Install `wf` for Code Review and Address PR Comments worktree operations.
 - [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
@@ -180,7 +177,6 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [review-hitl](plugins/wf/skills/review-hitl/SKILL.md): interactive, human-approved PR review — draft, approve, queue, then post inline comments.
 - [review-architecture](plugins/wf/skills/review-architecture/SKILL.md): audit drift between `ARCHITECTURE.md` and the actual codebase.
 - [review-feat](plugins/wf/skills/review-feat/SKILL.md): independent bug, quality, code-smell and initiative reviewers; posts evidence-backed PR findings.
-- [review-design](plugins/wf/skills/review-design/SKILL.md): review a technical design for gaps, contradictions, risks, and readiness. Invoke as `wf:review-design`.
 - [WF installer](plugins/wf/install/install.md): one-time repo setup for GitHub issue labels and doc layout, and offers repo-level `factory-mode` install; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research and docs initialization remain local, and other skills retain their Jira workflows.
 
 ### crew
