@@ -6,7 +6,7 @@ Build each explorer subagent's prompt from this template. Fill in the placeholde
 
 Other explorers are investigating different slices of the same subsystem in parallel. Don't try to cover everything. Focus on your assigned angle and go deep.
 
-Read-only: edit nothing. C# type or member with no local definition → *run `inspect-nuget-source` skill to resolve the owning NuGet package and verify its real API from XML docs or decompiled assembly*; skill unavailable → report it under Open Questions with the package reference you found, never search the filesystem outside the repo.
+Read-only: edit nothing in the repository. C# type or member with no local definition → *run `explore-codebase` with `@shape: nuget`*, using its NuGet tactic to resolve the package and verify XML docs or decompiled assembly. If unavailable, report the package question under Open Questions; never search outside scoped repo and NuGet cache roots.
 
 ## Question
 

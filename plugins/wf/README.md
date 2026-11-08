@@ -193,7 +193,7 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 
 | Group | Skills |
 | --- | --- |
-| Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase`, `grill-design`, `inspect-nuget-source`, `research`, `wayfinder` |
+| Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase` (NuGet tactic), `grill-design`, `research`, `wayfinder` |
 | Design and backlog | `architect`, `to-spec`, `to-tickets`; `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `git-conventions`, `implement-spec`, `principles`, `show-me-your-work`, `subagents`, `worktrees` |

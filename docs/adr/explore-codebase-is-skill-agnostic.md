@@ -2,7 +2,7 @@
 
 `explore-codebase` runs inside a caller-spawned subagent and owns target resolution, contract material, tool selection, and the read-only contract, carrying no knowledge of what it is asked to run. The caller owns delegation: it reads the skill's `Request` section, forms the work (a question, a prompt instruction of its own, or a skill name), depth, target, output shape, and the one output artifact the subagent may write, decides one or parallel subagents, and spawns each with the request verbatim, instructing it to run `explore-codebase`. With the skill unavailable, the caller spawns the explore agent with the same request. `research` codebase inspection spawns `explore-codebase` subagents for its lookups; `technical-design` reaches it by running `research`.
 
-Agnosticism covers the caller's `@work` only. Tool selection includes tool skills: `explore-codebase` loads a tool skill (`graphify`, `inspect-nuget-source`) when routing picks it, so repo-local rules for that tool apply.
+Agnosticism covers the caller's `@work` only. Tool selection loads the `graphify` skill for graph queries and the local NuGet tactic for restored package inspection, so their specific rules apply without changing caller work.
 
 ## Considered Options
 
@@ -18,4 +18,4 @@ Agnosticism covers the caller's `@work` only. Tool selection includes tool skill
 - Each caller states its delegation shape (single, parallel, sequential) and consolidation; callers with several tracks (`define-concept`) hold that procedure once in their own skill.
 - The read-only contract carries one generic exception, the caller's `@outputArtifact`, plus a per-user `rg` install when missing — a tool prerequisite outside every repository.
 - The explore-agent fallback lacks the skill's routing rules; the caller accepts weaker target resolution there.
-- `explore-codebase` names tool skills it routes to; adding a delegable work skill still needs no edit here.
+- `explore-codebase` routes Graphify through its tool skill and NuGet inspection through a bundled tactic; adding a delegable work skill still needs no edit here.

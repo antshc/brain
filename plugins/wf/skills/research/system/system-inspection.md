@@ -32,7 +32,7 @@ Inspect the **as-built** state using target repositories and restored packages a
 | Isolated symbol or package call site | `symbol` | `quick` |
 | Citation line, config key, route path, table or queue name | `literal` | `quick` |
 
-For NuGet-owned claims or evidence, delegate a lookup to *run `inspect-nuget-source` skill to verify the package API or behavior from XML docs or decompiled code*. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
+For NuGet-owned claims or evidence, delegate *`explore-codebase` with `@shape: nuget`* to verify the package API or behavior from XML docs or decompiled code. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
 
 Structure and cite returned evidence. Write only the inspection document.
 
