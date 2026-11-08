@@ -22,7 +22,7 @@ failure.
 
 ## Design Guidance
 
-Three participants: a **setup skill** that scaffolds the adapter (e.g. `init-atl`), the **generated adapter
+Three participants: a **installer** that scaffolds the adapter (e.g. the [ATL installer](../../plugins/atl/install/install.md)), the **generated adapter
 skill** it writes into the repository (e.g. `pub-<issue-type>`), and the **owning user-level skill** that performs
 the actual action (e.g. `publish-work`). The extension point is the setup skill's discovery step: it enumerates
 the repository- or target-specific variants live (e.g. Jira issue types configured for this project) and offers
@@ -48,7 +48,7 @@ file read by the shared skill already carries it — see
 
 ## Examples
 
-- `init-atl`'s generated `pub-<issue-type>` skills (e.g. `pub-bug`, `pub-story`), each pre-filled with this
+- The ATL installer's generated `pub-<issue-type>` skills (e.g. `pub-bug`, `pub-story`), each pre-filled with this
   repository's required Jira fields and invoking `/publish-work` to perform the actual creation.
 
 ## Consequences

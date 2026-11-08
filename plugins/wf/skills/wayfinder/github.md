@@ -4,7 +4,7 @@
 
 Resolve `{{trackerRepository}}` using `gh repo view --json nameWithOwner --jq .nameWithOwner` from the docs/harness root or current single repository. An issue URL must belong to this tracker; resolve conflicting targets before acting. Use the explicit repository in every command.
 
-Missing workflow labels → *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode*. Missing tools, authentication, permissions, or failed writes → stop and report the operation and known remote changes. Do not claim a map/claim/resolution exists until confirmed; no Jira/local tracker fallback.
+Missing workflow labels → ask the user to follow the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) in labels-only mode. Missing tools, authentication, permissions, or failed writes → stop and report the operation and known remote changes. Do not claim a map/claim/resolution exists until confirmed; no Jira/local tracker fallback.
 
 Use `--body-file <file>` with a temporary UTF-8 file for literal multiline bodies, evidence, and comments. Remove temporary files after use. Placeholder values are arguments, not shell expressions.
 

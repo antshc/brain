@@ -42,7 +42,7 @@ def version_error(found: str | None) -> str | None:
     if supported:
         return None
     supported_range = f"{MIN_VERSION}-{MAX_VERSION}" if MAX_VERSION else f">={MIN_VERSION}"
-    return f"{LIBRARY} {supported_range} required, found {found or 'none'}; run init-atl"
+    return f"{LIBRARY} {supported_range} required, found {found or 'none'}; follow Brain's plugins/atl/install/install.md in Copilot CLI"
 
 
 def require_supported_library() -> None:

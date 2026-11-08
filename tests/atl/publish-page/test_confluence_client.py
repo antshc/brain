@@ -13,7 +13,7 @@ def test_get_confluence_exits_with_the_version_message_on_an_unsupported_library
     with pytest.raises(SystemExit) as excinfo:
         get_confluence(CREDENTIALS)
 
-    assert str(excinfo.value) == "atlassian-python-api >=5.0.5 required, found 4.0.7; run init-atl"
+    assert str(excinfo.value) == "atlassian-python-api >=5.0.5 required, found 4.0.7; follow Brain's plugins/atl/install/install.md in Copilot CLI"
 
 
 @pytest.mark.skipif(version_error(installed_version()) is not None, reason="needs the supported atlassian-python-api")

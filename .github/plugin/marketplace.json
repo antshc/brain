@@ -42,7 +42,7 @@
         {
             "name": "verify",
             "source": "./plugins/verify",
-            "description": "Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: mole CLI, receipts, web and API surface adapters, feature maps, and the init-verify setup skill."
+            "description": "Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: mole CLI, receipts, web and API surface adapters, and feature maps."
         },
         {
             "name": "skill",

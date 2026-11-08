@@ -698,12 +698,12 @@ Scenario: An unparseable settings file is reported as invalid
 
 Scenario: Setup copies the skill and the pull command, creating settings only when missing
   Given a harness root with no `.github/skills/harness/`
-  When `/init-harness` runs
+  When the Ralph installer runs
   Then `SKILL.md` and `pull-repos.py` are copied byte-identical to their sources, `.harness.json.user` is created holding `{}`, and the file (not the folder) is confirmed gitignored
 
 Scenario: Rerunning setup refreshes the skill and script but never the settings
   Given an existing `.github/skills/harness/` with a `.harness.json.user` already holding values
-  When `/init-harness` runs again
+  When the Ralph installer runs again
   Then `SKILL.md` and `pull-repos.py` are overwritten and the settings file is left untouched
 ```
 
@@ -1102,7 +1102,7 @@ Scenario: All open issue pages are returned without a spec number
 
 ## Feature: Proof Surface Selection
 
-> Script unit test (`init-verify` `scaffold.py`)
+> Script unit test (Verify installer `scaffold.py`)
 
 ```gherkin
 Scenario: Surface choice is normalised to canonical order
@@ -1346,10 +1346,10 @@ Scenario: Unresolved placeholder is an error
 ## Feature: Proof Plugin Layout
 
 ```gherkin
-Scenario: Only the two skills carry a skill md
+Scenario: Only playwright cli carries a skill md
   Given the verify plugin folder
   When SKILL.md files are listed
-  Then only init-verify and playwright-cli have one
+  Then only playwright-cli has one
 
 Scenario: Plugin manifest points at the skills folder
   Given the verify plugin manifest
@@ -1367,11 +1367,11 @@ Scenario: Template skill is renamed on scaffold
   Then each holds SKILL.md and no template-named file
 
 Scenario: One shared verify-mole template serves both languages
-  Given the init-verify templates and a typescript scaffold
+  Given the Verify installer templates and a typescript scaffold
   When the templates and the scaffolded files are listed
   Then verify-mole exists once with AGENT.md and references/component-extractor.md, no per-language verify-mole folder exists, and the typescript wording lands in proof/AGENT.md and the extractor
 
-Scenario: Every skill has name and description frontmatter
+Scenario: Playwright cli has name and description frontmatter
   Given each proof skill
   When its frontmatter is read
   Then it has the skill's name and a description
@@ -1382,7 +1382,7 @@ Scenario: Every skill has name and description frontmatter
 
 ## Feature: Proof Language Selection
 
-> Script unit test (`init-verify` `scaffold.py`, `--language`)
+> Script unit test (Verify installer `scaffold.py`, `--language`)
 
 ```gherkin
 Scenario: Language choice is normalised

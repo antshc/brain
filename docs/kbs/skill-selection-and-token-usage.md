@@ -29,7 +29,7 @@ Treat the three loads separately:
 
 `user-invocable: false` hides a skill from the slash menu **but leaves automatic invocation enabled**. It is useful for background skills the agent should still discover. With both `user-invocable: false` and `disable-model-invocation: true`, a skill has neither normal route; use a reference file instead if another workflow must read it. See the [VS Code skill options](https://code.visualstudio.com/docs/agent-customization/agent-skills).
 
-`init-crew` already uses the explicit-only setting. Keep that pattern for workflows that only run after a named command. Keep `testing-*` skills discoverable where coding agents must find the applicable test types, commands, setup, and seams.
+Crew setup lives in the [Crew installer](../../plugins/crew/install/install.md) and runs on explicit request. Keep `testing-*` skills discoverable where coding agents must find the applicable test types, commands, setup, and seams.
 
 ## Write descriptions for selection
 
@@ -118,7 +118,7 @@ Build a small prompt set from actual work:
 | “What owns this stored item and its retention?” | `inspect-system`, Data |
 | “Does this SDK operation work against the real service?” | `experiment` |
 | “Implement this repository change and verify it” | Coding agent; discover applicable `testing-*` guidance |
-| “Initialize Crew here” | Explicit `init-crew` |
+| “Initialize Crew here” | Explicit Crew installer prompt |
 
 For each prompt, record selected skills, unnecessary loads, answer quality, input tokens, tool calls, and duration. Include near misses that should **not** load a skill. Change one factor at a time: descriptions first, then explicit-only settings, then body/reference boundaries.
 
@@ -127,7 +127,7 @@ In VS Code, use **Agent Debug Logs** for discovery and token metrics, and **Chat
 ## Suggested first pass in this repository
 
 1. Audit the `wf` descriptions around `inspect-*`, `research-*`, `doc-*`, `review-*`, and `experiment` for overlapping triggers.
-2. Preserve explicit-only setup commands such as `init-crew`; evaluate other commands with the same invocation pattern.
+2. Preserve explicit invocation for installer prompts; evaluate other commands with the same invocation pattern.
 3. Measure a smaller `inspect-system` body against the three axis prompts above.
 4. Verify that coding agents still discover the applicable `testing-*` skills and run the smallest relevant checks.
 

@@ -8,6 +8,19 @@ copilot plugin marketplace add antshc/brain
 
 ## Installation
 
+### Install a plugin and configure a repository
+
+Open Copilot CLI from the target repository. Use a separate Brain checkout as the installer source.
+
+```sh
+copilot --add-dir="/path/to/brain/plugins" \
+  -i 'Follow /path/to/brain/plugins/wf/install/install.md in this repository.'
+```
+
+Replace `wf` with `atl`, `crew`, `ms`, `ralph`, or `verify`. In an open Copilot session, use `/add-dir /path/to/brain/plugins` and ask Copilot to follow the matching installer by absolute path. The MS installer sets up Azure CLI and can run outside a repository. Each installer checks the plugin version against the source checkout before setup.
+
+### Install only the plugins
+
 Pick the plugin bundles you need. Each block uninstalls any stale version first, then installs the current one.
 
 ### Workflow plugins (wf, crew, ralph, review)
@@ -86,7 +99,7 @@ gh skill install antshc/brain engineering/suggest-graphify-improvements --agent 
 gh skill install antshc/brain engineering/remove-zone-identifiers --agent github-copilot --scope user -f
 ```
 
-Repo-level (run from the target repo; `init-wf` offers it), then edit the copy to match the repo's conventions:
+Repo-level (run from the target repo; the WF installer offers it), then edit the copy to match the repo's conventions:
 
 ```sh
 gh skill install antshc/brain engineering/factory-mode --agent github-copilot --scope project
@@ -164,7 +177,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [inspect-nuget-source](plugins/wf/skills/inspect-nuget-source/SKILL.md): verify facts about a NuGet package's real API or behavior.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
 - [index-docs](plugins/wf/skills/index-docs/SKILL.md): initialize missing `ARCHITECTURE.md` and `GLOSSARY.md`, and maintain architecture indexes.
-- [init-wf](plugins/wf/skills/init-wf/SKILL.md): one-time repo setup for GitHub issue labels and doc layout, and offers repo-level `factory-mode` install; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research and docs initialization remain local, and other skills retain their Jira workflows.
+- [WF installer](plugins/wf/install/install.md): one-time repo setup for GitHub issue labels and doc layout, and offers repo-level `factory-mode` install; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research and docs initialization remain local, and other skills retain their Jira workflows.
 
 ### crew
 
@@ -175,7 +188,7 @@ Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugin
 - [to-crew](plugins/crew/skills/to-crew/SKILL.md): run the Codey subagent for an implementation task.
 - [crew-commit](plugins/crew/skills/crew-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
 - [chorey-diff](plugins/crew/skills/chorey-diff/SKILL.md) owns Chorey's commit/uncommitted review bundle, aggregate stack detection, and exact restoration mechanics; Chorey passes the manifest stacks to `/crew-chore` and owns behavior-preserving cleanup, scoped checks, the revert decision, and its status report.
-- [init-crew](plugins/crew/skills/init-crew/SKILL.md): copy stack-specific Copilot instructions and install per-stack Chorey rules.
+- [Crew installer](plugins/crew/install/install.md): copy stack-specific Copilot instructions and install per-stack Chorey rules.
 
 ### ralph
 
@@ -185,7 +198,7 @@ AFK PR review and autonomous development loop.
 - [fix](plugins/ralph/skills/fix/SKILL.md): apply suggested changes from review comments.
 - [create-worktree](plugins/ralph/skills/create-worktree/SKILL.md) / [delete-worktree](plugins/ralph/skills/delete-worktree/SKILL.md): create/reuse or remove an isolated git worktree per feature branch.
 - [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
-- [init-harness](plugins/ralph/skills/init-harness/SKILL.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
+- [Ralph installer](plugins/ralph/install/install.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
 
 ### review
 
@@ -204,8 +217,8 @@ Code and technical solution review skills with modular standards and guidance.
 
 Atlassian workflow skills.
 
-- [init-atl](plugins/atl/skills/init-atl/SKILL.md): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
-- [preflight-atlassian](plugins/atl/skills/init-atl/preflight-atlassian.SKILL.template.md): `init-atl` template generated per-repo into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
+- [ATL installer](plugins/atl/install/install.md): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
+- [preflight-atlassian](plugins/atl/install/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
 - [fetch-work](plugins/atl/skills/fetch-work/SKILL.md) / [publish-work](plugins/atl/skills/publish-work/SKILL.md): fetch or create/update a Jira work item.
 - [fetch-page](plugins/atl/skills/fetch-page/SKILL.md) / [publish-page](plugins/atl/skills/publish-page/SKILL.md): fetch or create/update a Confluence page.
 - [address-page-comments](plugins/atl/skills/address-page-comments/SKILL.md): address open Confluence page review comments; edit the page in place with twg targeted edits, reply per thread, and answer comments whose anchor text was removed in a page comment.
@@ -215,7 +228,7 @@ Atlassian workflow skills.
 
 Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills.
 
-- [init-cli](plugins/ms/skills/init-cli/SKILL.md) / [auth-principal](plugins/ms/skills/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
+- [MS installer](plugins/ms/install/install.md) / [auth-principal](plugins/ms/skills/auth-principal/SKILL.md): install/configure Azure CLI and authorize with a service principal.
 - [query-azure](plugins/ms/skills/query-azure/SKILL.md): discover, inspect, create, update, and delete Azure resources with `az`.
 - [search-ms-docs](plugins/ms/skills/search-ms-docs/SKILL.md): query official Microsoft documentation.
 - [search-ms-code-samples](plugins/ms/skills/search-ms-code-samples/SKILL.md): find working code samples and verify Microsoft SDK API signatures.
@@ -231,7 +244,7 @@ AWS documentation and SDK reference skills.
 
 Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: a `mole` CLI that drives the app in a real Chrome, receipts with a revision-bound verdict, web and API surface adapters, and feature maps.
 
-- [init-verify](plugins/verify/skills/init-verify/SKILL.md): install the TypeScript or Python kit into a repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus repository-local `verify-<app>` and `maintain-verify-<app>` skills (the latter keeps maps, adapters and proofs honest as the app changes and re-proves on a fresh build).
+- [Verify installer](plugins/verify/install/install.md): install the TypeScript or Python kit into a repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus repository-local `verify-<app>` and `maintain-verify-<app>` skills (the latter keeps maps, adapters and proofs honest as the app changes and re-proves on a fresh build).
 - [playwright-cli](plugins/verify/skills/playwright-cli/SKILL.md): browser driving helper for ad-hoc exploration and Playwright tests.
 
 ### skill
@@ -253,4 +266,4 @@ General-purpose skills not tied to a specific platform.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
-- [factory-mode](skills/engineering/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by `init-wf` and customized by its users.
+- [factory-mode](skills/engineering/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by the WF installer and customized by its users.

@@ -14,7 +14,7 @@ def test_chorey_passes_manifest_stacks_without_reinferring_them():
 
 def test_crew_chore_loads_named_stacks_or_all_stacks_for_an_empty_array():
     template = (
-        CREW_ROOT / "skills" / "init-crew" / "templates" / "chore.SKILL.template.md"
+        CREW_ROOT / "install" / "templates" / "chore.SKILL.template.md"
     ).read_text(encoding="utf-8")
 
     assert "When `STACKS` is nonempty" in template
@@ -51,9 +51,9 @@ def test_crew_reports_gotchas_without_a_memory_dependency():
         assert 'crew-memory' not in agent
         assert 'GOTCHAS UPDATED' not in agent
     assert not (CREW_ROOT / 'skills/crew-gotchas/SKILL.md').exists()
-    init = CREW_ROOT / 'skills/init-crew'
-    assert not (init / 'templates/crew-memory.SKILL.template.md').exists()
-    assert 'crew-memory' not in (init / 'SKILL.md').read_text()
+    installer = CREW_ROOT / 'install'
+    assert not (installer / 'templates/crew-memory.SKILL.template.md').exists()
+    assert 'crew-memory' not in (installer / 'install.md').read_text()
 
 
 def test_crew_codey_dotnet_uses_the_original_task_and_workspace_contract():

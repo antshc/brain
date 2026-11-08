@@ -2,7 +2,7 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
-The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-spec/SKILL.md), [to-tickets](skills/to-tickets/SKILL.md)) supports GitHub only. Each skill bundles its own GitHub reference; [init-wf](skills/init-wf/SKILL.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [index-docs](skills/index-docs/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+The backlog path ([wayfinder](skills/wayfinder/SKILL.md), [to-spec](skills/to-spec/SKILL.md), [to-tickets](skills/to-tickets/SKILL.md)) supports GitHub only. Each skill bundles its own GitHub reference; [the WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [index-docs](skills/index-docs/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
 [subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) owns How for current code behavior and Why for historical rationale alongside its existing inspection routes.
 
@@ -196,4 +196,4 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase`, `grill-design`, `inspect-nuget-source`, `research`, `wayfinder` |
 | Design and backlog | `architect`, `to-spec`, `to-stories`, `to-tickets` |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
-| Implementation and tooling | `diagnosing-bugs`, `git-conventions`, `implement-spec`, `init-wf`, `principles`, `show-me-your-work`, `subagents`, `worktrees` |
+| Implementation and tooling | `diagnosing-bugs`, `git-conventions`, `implement-spec`, `principles`, `show-me-your-work`, `subagents`, `worktrees` |

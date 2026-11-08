@@ -1,6 +1,6 @@
 {
   "name": "verify",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Agent-driven proof of app behavior: mole CLI, receipts, surface adapters and feature maps for pnpm (TypeScript) or Python repos.",
   "skills": ["./skills"]
 }

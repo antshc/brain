@@ -28,7 +28,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
    - Found → file value wins; absent keys take Default. `tokenAvailable := email and apiToken both true`.
 3. **site.** `site :=` config `cloudId` (`https://<host>`). Empty and needed → ask developer for `<organization>.atlassian.net`; never guess.
 4. **twg.** `twg := python3 <base>/scripts/twg_cred.py`, `<base>` = this skill's absolute base directory; works from any cwd. Optional leading `--config <configPath>`; default is this skill's `.atlassian.json.user`. Injects config `email`/`apiToken`/`cloudId` into the twg child only and redacts email and token from its output. Every atl skill (`twg` skill, `fetch-page`, `publish-page`, `brief-daily`) uses this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
-5. **Identity.** `accountId` and `displayName` both set → skip. Either empty → `<twg> whoami -o json --output-file whoami.json` once, then print only `data.accountId` and `data.name` with Python: success → `accountId`, `displayName`; failure → leave empty, never raise. Exception: `init-atl`'s connectivity gate always calls live, ignoring cache.
+5. **Identity.** `accountId` and `displayName` both set → skip. Either empty → `<twg> whoami -o json --output-file whoami.json` once, then print only `data.accountId` and `data.name` with Python: success → `accountId`, `displayName`; failure → leave empty, never raise. Exception: the ATL installer's connectivity gate always calls live, ignoring cache.
 6. **Report** `configPath`, `site`, `twg`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`, `displayName`, `maxResults`, `limit` before the caller's operation.
 
 **Config handoff:** `atl` scripts read the config themselves — pass `--config "<configPath>"`; never rebuild the path.
@@ -40,7 +40,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 | `apiToken` | API token; REST and twg credential | Yes | — |
 | `jiraProjectKeys` | Project keys; first = default | Yes | — |
 | `confluenceSpaceIds` | Space ids; first = default | Yes | — |
-| `accountId` | Cached by `init-atl` from `twg whoami`; never hand-entered | Yes | — |
+| `accountId` | Cached by the ATL installer from `twg whoami`; never hand-entered | Yes | — |
 | `displayName` | Same origin as `accountId`; never hand-entered | No | — |
 | `diagramRenderer` | `publish-page` mermaid rendering: `png` \| `drawio` \| `mermaid` | No | `png` |
 | `drawioExtensionKey` | Required when `diagramRenderer: drawio`; `<appId>/<envId>/static/drawio` | Yes | — |

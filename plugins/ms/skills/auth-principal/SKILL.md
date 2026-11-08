@@ -7,14 +7,13 @@ description: >-
 **Step 0 — Detect OS**
 Run `uname -s 2>/dev/null`. If it fails or returns a Windows-like environment, use the Windows steps. Otherwise use the Linux steps.
 
-**Step 1 — Load credentials**
+**Step 1 — Check credentials in the current environment**
 
 Linux:
 ```bash
-source ~/.profile
 for variable in AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID; do
   if [[ -z "${!variable}" ]]; then
-    echo "$variable is not set. Run /ms:init-cli first."
+    echo "$variable is not set. Set it locally or follow Brain's plugins/ms/install/install.md in Copilot CLI."
     exit 1
   fi
 done
@@ -25,7 +24,7 @@ Windows (PowerShell):
 $requiredVariables = 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET', 'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID'
 foreach ($variable in $requiredVariables) {
     if ([string]::IsNullOrWhiteSpace((Get-Item "Env:$variable" -ErrorAction SilentlyContinue).Value)) {
-        throw "$variable is not set. Run /ms:init-cli first."
+        throw "$variable is not set. Set it locally or follow Brain's plugins/ms/install/install.md in Copilot CLI."
     }
 }
 ```
@@ -34,12 +33,12 @@ foreach ($variable in $requiredVariables) {
 
 Linux:
 ```bash
-if ! err=$(az login --service-principal \
+if ! az login --service-principal \
   --username "$AZURE_CLIENT_ID" \
   --password "$AZURE_CLIENT_SECRET" \
   --tenant "$AZURE_TENANT_ID" \
-  --output none 2>&1); then
-  echo "az login failed: $err"
+  --output none 2>/dev/null; then
+  echo 'az login failed.'
   exit 1
 fi
 if ! err=$(az config set defaults.subscription="$AZURE_SUBSCRIPTION_ID" 2>&1); then
@@ -54,7 +53,7 @@ fi
 
 Windows (PowerShell):
 ```powershell
-az login --service-principal --username $env:AZURE_CLIENT_ID --password $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID --output none
+az login --service-principal --username $env:AZURE_CLIENT_ID --password $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID --output none 2>$null
 if ($LASTEXITCODE -ne 0) { throw 'az login failed.' }
 az config set defaults.subscription=$env:AZURE_SUBSCRIPTION_ID
 if ($LASTEXITCODE -ne 0) { throw 'az config set subscription failed.' }
