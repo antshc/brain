@@ -29,7 +29,7 @@
 | Shared | `use-github/SKILL.md`, `references/{issues,pull-requests,reviews,checks,repository}.md`, optional `scripts/github_read.py` | Qualified targets, complete pagination, exact payloads, read-back |
 | WF evidence | `explore-codebase`, `research/why`, `grill-design/references/tactics-external-source.md` | Local search, commit-pinned evidence, explicit confirmation of external edits |
 | Crew | `to-crew/SKILL.md` and install guidance | Only an explicit issue input authorizes issue handling. Agent verdict determines the operation |
-| WF backlog | `to-spec`, `to-tickets`, `wayfinder`, `init-wf`, generated instructions template | Routing labels, native versus body-based blockers, offline behavior, baseline label manifest, Wayfinder dispatch approval |
+| WF backlog | `to-spec`, `to-tickets`, `wayfinder`, WF installer, generated instructions template | Routing labels, native versus body-based blockers, offline behavior, baseline label manifest, Wayfinder dispatch approval |
 | Review | `code-review`, `hitl`, `test-gaps`, `address` and their GitHub references | Code Review markers, HITL verbatim approved body, Test Gaps read-only, Address origin and reply rules |
 | Implement Spec | `SKILL.md`, planner and publication guidance, `scripts/spec_gh.py` contract | Planner/orchestrator permissions, Codey/Chore isolation, qualified ticket routing, resumable checkpoints, draft-only PR, closure evidence |
 

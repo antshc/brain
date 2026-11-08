@@ -4,7 +4,7 @@
 
 Resolve `{{trackerRepository}}` with `gh repo view --json nameWithOwner --jq .nameWithOwner` from the docs/harness root (or current repository for single-repo work). Keep it distinct from `{{repository}}`, the source repository selected by the skill. Use the tracker explicitly for every issue and label operation.
 
-Missing baseline `spec` label → *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode* in the tracker repository, then retry.
+Missing baseline `spec` label → ask the user to follow the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) in labels-only mode in the tracker repository, then retry.
 
 ## Publish spec
 

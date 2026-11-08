@@ -24,7 +24,7 @@ Infer from context; ask only when required input missing.
 
 ## Prerequisites
 
-- `atlassian-python-api>=5.0.5` installed by `init-atl` skill; missing or other version (script exits `atlassian-python-api >=5.0.5 required, found <version>; run init-atl`), *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first.
+- Requires `atlassian-python-api>=5.0.5` and repo-local Atlassian config. If either is missing or the dependency version is unsupported, ask the user to follow the [ATL installer](https://github.com/antshc/brain/blob/main/plugins/atl/install/install.md) in Copilot CLI before retrying.
 - `cloudId`, `email`, `apiToken` in `.atlassian.json.user`; script exits non-zero naming them.
 
 ## Workflow

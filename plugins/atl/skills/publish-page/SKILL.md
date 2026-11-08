@@ -11,7 +11,7 @@ Publish local Markdown to a Confluence page via one `run` command: extract → c
 
 ## Prerequisites
 
-- `atlassian-python-api>=5.0.5` — installed by `init-atl` skill; missing or other version (script exits `atlassian-python-api >=5.0.5 required, found <version>; run init-atl`), *run `init-atl` skill for first-run setup of `.atlassian.json.user` and Atlassian dependencies* first.
+- Requires `atlassian-python-api>=5.0.5` and repo-local Atlassian config. If either is missing or the dependency version is unsupported, ask the user to follow the [ATL installer](https://github.com/antshc/brain/blob/main/plugins/atl/install/install.md) in Copilot CLI before retrying.
 - **MUST** have `cloudId`, `email`, `apiToken` in `.atlassian.json.user`; `run` exits non-zero naming any missing key before touching a page.
 - Diagram present → **MUST** have `mmdc` on PATH: `npm install -g @mermaid-js/mermaid-cli`; verify `mmdc --version`. Headless Chrome libs (Ubuntu 24.04; older releases drop `t64`): `sudo apt-get update && sudo apt-get install -y libnspr4 libnss3 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64`.
 - Diagram-free source → no `mmdc`.

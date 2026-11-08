@@ -15,4 +15,4 @@ def test_unsupported_version_exits_with_the_init_atl_message(monkeypatch, found)
     with pytest.raises(SystemExit) as excinfo:
         env.get_jira({"site": "s.example", "email": "e", "token": "t"})
 
-    assert str(excinfo.value) == f"atlassian-python-api >=5.0.5 required, found {found or 'none'}; run init-atl"
+    assert str(excinfo.value) == f"atlassian-python-api >=5.0.5 required, found {found or 'none'}; follow Brain's plugins/atl/install/install.md in Copilot CLI"

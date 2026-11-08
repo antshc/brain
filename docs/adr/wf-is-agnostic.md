@@ -2,7 +2,7 @@
 
 `wf` skills must not embed OS-specific shell syntax (bash-only or PowerShell-only) in their commands or helper scripts. A step prefers a bare, pure cross-platform CLI invocation (e.g. `gh`, `git`) written inline in the instruction; only once the logic exceeds a single pure command — branching, parsing, multi-step state — is it moved to a Python script, so the same instruction runs unmodified on Linux, macOS, and Windows, instead of asking the agent to pick and maintain a per-OS variant.
 
-GitHub-native backlog support does not change OS portability: each consuming skill bundles its own GitHub reference, and label setup uses [init-wf's Python helper](../../plugins/wf/skills/init-wf/scripts/create_labels.py). See the [Resource Access Skill exception](../concepts/structure-resource-access-skill.md) for the backend boundary.
+GitHub-native backlog support does not change OS portability: each consuming skill bundles its own GitHub reference, and label setup uses [the WF installer's Python helper](../../plugins/wf/install/scripts/create_labels.py). See the [Resource Access Skill exception](../concepts/structure-resource-access-skill.md) for the backend boundary.
 
 ## Considered Options
 

@@ -11,7 +11,7 @@ disable-model-invocation: true
 
 ## Repo instructions
 
-This skill is the repo-level engineering instruction set, installed per repo by `init-wf` and owned by the repo's users. Its Principles, Design preferences, Autonomy, and playbooks state this repo's conventions; repo edits are intentional drift and win over upstream. *Run `sync-skill` skill to merge upstream skill improvements into the local customized version, preserving intentional drift.*
+This skill is the repo-level engineering instruction set, installed per repo by the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) and owned by the repo's users. Its Principles, Design preferences, Autonomy, and playbooks state this repo's conventions; repo edits are intentional drift and win over upstream. *Run `sync-skill` skill to merge upstream skill improvements into the local customized version, preserving intentional drift.*
 
 ## Non-negotiables
 

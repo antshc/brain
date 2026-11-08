@@ -1,0 +1,54 @@
+# Install ATL
+
+Follow this file only on explicit request in Copilot CLI. Resolve the target with `git rev-parse --show-toplevel` and use it as CWD. Stop outside a Git repository. Resolve assets relative to this file's absolute path. This installer does not install TWG, edit shell profiles, set persistent environment variables, or run `twg login` or `twg setup`.
+
+## Install the Copilot plugin
+
+1. Check `copilot plugin marketplace list --json`. If `brain` is absent, run `copilot plugin marketplace add antshc/brain`. Use the existing Brain marketplace when it points to that repository or to this installer checkout for local testing. Stop on a source conflict.
+2. Check `copilot plugin list --json`. Install a missing plugin with `copilot plugin install atl@brain`. Local marketplaces can show uninstalled entries as disabled with `source: live`. For these entries, check only the matching `enabledPlugins` key in Copilot settings. An absent key permits the initial install; an explicit `false` is disabled. Recheck that `atl` is enabled from `brain` and that its version matches [plugin.json](../plugin.json). Report policy blocks, disabled installs, version mismatches, and failed commands before writing target files. Leave upgrades and enablement of existing installs to the user.
+
+## Workflow
+
+**1 — Check config and install deps.** `configPath := .github/skills/preflight-atlassian/.atlassian.json.user`. If the config path is tracked or the existing JSON is malformed, stop and report the path without reading values into the conversation. Run `python3 -m pip install -r <installer-dir>/requirements.txt` in the active Python environment. Stop on failure.
+
+**2 — Copy preflight and ignore config.** Copy the bundled [template](assets/preflight-atlassian/preflight-atlassian.SKILL.template.md) as `.github/skills/preflight-atlassian/SKILL.md` and refresh `scripts/twg_cred.py` from the same asset folder. Remove the obsolete `scripts/twg.py` there if present. If `git check-ignore -q -- "$configPath"` fails, add `.atlassian.json.user` to the target's `.gitignore` once. Verify the path is ignored and untracked before creating or editing the config. Keep the skill and its scripts trackable.
+
+**3 — Read config keys.** Inspect only top-level keys and credential presence. Use the copied skill's Configuration table as the key and default schema.
+
+**4 — Ask for missing settings.** Use the existing configuration values. Ask only for missing non-secret settings from this table.
+
+| Key | Prompt |
+|---|---|
+| `cloudId` | "Enter your Atlassian site URL (e.g. `https://<organization>.atlassian.net`):" |
+| `jiraProjectKeys` | "Enter your Jira project key(s), comma-separated, first = default:" → trimmed JSON array |
+| `confluenceSpaceIds` | "Enter your Confluence space id(s), comma-separated, first = default:" → trimmed JSON array |
+| `diagramRenderer` | "How should `/publish-page` render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |
+| `drawioExtensionKey` | "Only for `drawio` — enter the Draw.io macro's extension key, `<appId>/<envId>/static/drawio`. Find it by fetching a page that already holds a Draw.io diagram as ADF and copying the diagram node's `attrs.extensionKey`:" |
+
+`drawio`/`mermaid` need their Confluence app installed; `drawio` also needs `drawioExtensionKey` (ids differ per site). `mermaid` not yet usable — `publish-page` skill refuses it. `png` → leave both empty.
+
+**5 — Write missing keys.** Create the ignored JSON object if needed. Preserve existing values and apply the table defaults for unanswered keys. Leave missing `email` and `apiToken` fields absent. Ask the user to add them locally in the ignored config and resume this file. Keep both out of the Copilot conversation. Report credential presence only.
+
+**6 — Check TWG and cache identity.** If email or token is absent, report the missing credential and skip wrapper generation. Follow **Resolve** in the copied preflight `SKILL.md` to get the site, credentialed TWG command, and token availability, forcing the live identity check (ignore its cache-skip rule; this populates the cache). `<twg>` exit `127` → report missing "twg CLI" (user installs it), skip wrapper generation. Auth failure → report missing "valid `email`/`apiToken`", skip wrapper generation. On success, merge live `accountId` and `displayName` into missing or empty cache fields. Preserve populated fields.
+
+**7 — Offer `pub-<issue-type>` wrappers.** All lookups through Preflight's `twg`, `-o json --output-file`.
+1. `projectKey :=` Preflight `defaultProjectKey`; empty → `<twg> jira space query --limit 25`: one → use; many → ask; zero → report missing "a visible Jira project", skip wrapper generation.
+2. `<twg> jira space issue-types --id-or-key <projectKey>` → `data.issueTypes`.
+3. Per type ask: "Generate a repository-level skill for creating a `<issueType.name>` in `<projectKey>`? (yes/no)".
+4. Per accepted type:
+   - `<twg> jira workitem field create-metadata --space <projectKey> --type <issueType.name>` → keep required fields only.
+   - `skillName := pub-<issueType.name lowercased, spaces → hyphens>` (`Bug` → `pub-bug`).
+   - Folder exists → ask before overwriting.
+   - Write CWD `.github/skills/<skillName>/SKILL.md` containing:
+     - Frontmatter `name: <skillName>`, `description: Create a <issueType.name> in <projectKey> with this repository's required fields pre-filled. Use when asked to create/open/file a <issueType.name>.`
+     - Required-fields table: field key, field name.
+     - Step: gather each required field (developer or mirrored issue), then *run `publish-work` skill to create the Jira work item from a summary and Markdown description* with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additionalFields`; never create the issue directly through twg or REST.
+     - Description-fidelity step: mirror source headings verbatim, add no heading, keep `<details>` blocks; `publish-work` skill converts via `map-markdown-adf` skill and verifies the live issue.
+
+**8 — Report.** Include plugin status, refreshed preflight files, keys added without values, wrapper paths, and any missing prerequisites. Leave target changes uncommitted.
+
+## Rules
+
+- Generate repo-specific skills only under the target's `.github/skills/`. Refresh bundled preflight files. Ask before overwriting a `pub-*` wrapper.
+- Discover required Jira fields live. Use `publish-page` directly for Confluence pages.
+- Resolve both roots explicitly. Use a scratch file for live TWG identity output, extract only account ID and display name, then remove it.

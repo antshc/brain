@@ -1,6 +1,6 @@
 # Publish Page
 
-All configuration lives in `.atlassian.json.user`, beside `/preflight-atlassian`'s `SKILL.md` — located and parsed by `/preflight-atlassian` skill, whose `configPath` is passed to `run` as `--config`; created by `/init-atl`. See `SKILL.md` for the full workflow this drives.
+All configuration lives in `.atlassian.json.user`, beside `/preflight-atlassian`'s `SKILL.md` — located and parsed by `/preflight-atlassian` skill, whose `configPath` is passed to `run` as `--config`; created by the [ATL installer](../../install/install.md). See `SKILL.md` for the full workflow this drives.
 
 ## Configuration
 

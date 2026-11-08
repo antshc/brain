@@ -133,4 +133,4 @@ def test_main_prints_the_version_message_before_reading_credentials(monkeypatch)
     with pytest.raises(SystemExit) as excinfo:
         publish_work.main(["read-adf", "--config", "cfg", "--key", "ABC-1", "--out", "x.json"])
 
-    assert "required, found 4.0.7; run init-atl" in str(excinfo.value)
+    assert "required, found 4.0.7; follow Brain's plugins/atl/install/install.md in Copilot CLI" in str(excinfo.value)

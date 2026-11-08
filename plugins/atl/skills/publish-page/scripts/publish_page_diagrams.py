@@ -8,8 +8,7 @@ Usage:
     python3 publish_page_diagrams.py run --md-path design.md --page-id <id> \
         --config <configPath> --out final_adf.json
 
-Requires `atlassian-python-api` in the range `page_diagrams/confluence_client.py` names (installed once by ../../init-atl/requirements.txt via
-/init-atl), plus `mmdc` (@mermaid-js/mermaid-cli) on PATH when diagrams are present; credentials are read from
+Requires `atlassian-python-api` in the range `page_diagrams/confluence_client.py` names (installed by the ATL installer at plugins/atl/install/install.md), plus `mmdc` (@mermaid-js/mermaid-cli) on PATH when diagrams are present; credentials are read from
 `.atlassian.json.user` inside the script -- never passed as CLI args or literals.
 
 This file is a thin entrypoint; the pipeline lives in ./page_diagrams/, split along its seams

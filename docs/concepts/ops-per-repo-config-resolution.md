@@ -63,7 +63,7 @@ empty, not fatal — rather than refusing wholesale or inventing a discovery cal
 
 ## Exceptions
 
-- The harness anchor: the repository-level `harness` skill, generated into the harness by `init-harness`, derives the
+- The harness anchor: the repository-level `harness` skill, generated into the harness by the [Ralph installer](../../plugins/ralph/install/install.md), derives the
   Harness Repo Path from its own location — its folder's third ancestor (`.github/skills/harness/`) — with no
   search. It is the one path derived from a skill's location rather than read under a root, because it defines the
   root. A missing settings file beside it is an error that callers answer by using cwd; an unparseable one stops

@@ -150,7 +150,7 @@ Load [github.md](./github.md) and follow its GitHub operations for this tracker 
 - **Resolve a ticket**: **Comment on ticket** with the answer, then **Close ticket**.
 - **Read the map / a ticket**: **Read ticket**. **Read a ticket's sub-tickets**: **List sub-tickets**.
 
-**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:experiment`, `wayfinder:grilling`, `wayfinder:task`, or `wayfinder:contract-design` missing): *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode*, then retry.
+**Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:experiment`, `wayfinder:grilling`, `wayfinder:task`, or `wayfinder:contract-design` missing): ask the user to follow the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) in labels-only mode, then retry.
 
 ## Invocation
 

@@ -24,7 +24,7 @@ Loop pages until one returns fewer than 100 items. **Returns:** artifacts with `
 
 ## Labels
 
-Missing baseline `hitl`, `spec`, or `bug` → *run `init-wf` skill for wf setup and GitHub issue labels, using labels-only mode* in the tracker repository. Ensure the spec's routing label also exists:
+Missing baseline `hitl`, `spec`, or `bug` → ask the user to follow the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) in labels-only mode in the tracker repository. Ensure the spec's routing label also exists:
 
 ```
 gh label create {{repoLabel}} --repo {{trackerRepository}} --color 0e8a16 --description "Source repository for this spec's tickets" --force
