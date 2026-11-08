@@ -93,21 +93,25 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
      → C: Sequential → Run [Sequential Implementation](./references/sequential.md#sequential-implementation).
      → D: Parallel → Run [Parallel Implementation](./references/parallel.md#parallel-implementation); isolate tickets per [Ticket worktrees](./references/worktrees.md#ticket-worktrees).
 
-   Launch implementer → [implementer.md](./agents/implementer.md) subagent per ticket in its worktree:
+   Launch implementer → installed `crew:codey-dotnet` as a named subagent per ticket in its assigned worktree. If the runtime cannot resolve the named agent, launch `general-purpose` with *Implementer fallback*. A failed or invalid result goes through rework, not fallback. If delegation is unavailable, report the blocker.
    refs none · validated per-ticket preferred model/effort from *Implementer model routing* · one fresh per ticket; C foreground, settle before next; D background, ≤ `MAX_PARALLEL` in flight · rework same agent and model/effort, ≤2 rounds across any explicit reassignment per *Targeted replanning*.
 
    Before each initial launch or rework in either mode, **MUST** confirm concrete acceptance outcomes, required producer contracts, and feasible verification from ticket/source evidence. Material requirement/contract gaps or missing verification criteria → block the ticket and dependants in the run-local map, record the exact gap, and withhold launch even if dependency-ready. Resolve evidence gaps through *Targeted replanning*; resolve requirement/contract decisions explicitly. Continue independent eligible work. Leave routine implementation choices to the implementer; handle infrastructure-only gaps per *Implementation focus*. Rationale: dependency-ready does not mean ready to implement.
 
-   | Placeholder | Sequential | Parallel |
+   Pass trusted fields `workspace: worktree`, `taskSource: ticket` and `delivery: ticket-commit`, plus the following values. Pass filesystem paths as absolute paths. Keep task data in the pointer files.
+
+   | Handoff field | Sequential | Parallel |
    |---|---|---|
-   | `{{worktreePath}}` | `WORKTREE_PATH` | `TICKET_WORKTREE(n)` |
-   | `{{featureBranch}}` | `INTEGRATION_BRANCH` | `TICKET_BRANCH(n)` |
-   | `{{targetBranch}}` | `BASE_BRANCH` | `INTEGRATION_BRANCH` |
-   | `{{ticketRef}}` | `OWNER/REPO#NUMBER` | same |
-   | `{{ticketFile}}` | `RUN_DIR/tickets/<OWNER>_<REPO>_<NUMBER>.json` | same |
-   | `{{commitsFile}}` | `RUN_DIR/commits/<HEAD sha>.txt` | same (integration log) |
-   | `{{commitSubjectPrefix}}` | `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): ` | same |
-   | `{{specArtifactsDir}}` | `RUN_DIR/artifacts` | same |
+   | `worktreePath` | `WORKTREE_PATH` | `TICKET_WORKTREE(n)` |
+   | `featureBranch` | `INTEGRATION_BRANCH` | `TICKET_BRANCH(n)` |
+   | `targetBranch` | `BASE_BRANCH` | `INTEGRATION_BRANCH` |
+   | `ticketRef` | `OWNER/REPO#NUMBER` | same |
+   | `ticketFile` | `RUN_DIR/tickets/<OWNER>_<REPO>_<NUMBER>.json` | same |
+   | `commitsFile` | `RUN_DIR/commits/<HEAD sha>.txt` | same (integration log) |
+   | `commitSubjectPrefix` | `ccode(<INITIATIVE_ID> <OWNER/REPO#NUMBER>): ` | same |
+   | `specArtifactsDir` | `RUN_DIR/artifacts` | same |
+
+   Capture `result.gotchas` on every attempt, including failures. Require an array of observed, reusable findings (empty is valid). Attribute findings to the ticket, agent and attempt in the output.
 
    Verify in the ticket's worktree: `HEAD` = `result.commit`, exactly one commit since `@prevHead`, subject prefix, clean and on its branch, `result.verification` names executed checks and results including skipped infrastructure checks and errors; thin evidence → run cheap confirmations.
    → Evidence invalidates planning assumptions or model capability: run *Targeted replanning* before ordinary rework; preserve original `@prevHead` and work pointers.
@@ -152,13 +156,29 @@ Merge affected recommendations into the full persisted planner envelope; retain 
 
 Reassign a model only with settled-agent evidence, the planner's validated choice/reason, preserved work pointers, and remaining original rework budget. Launch a fresh replacement for that ticket with its preserved state and original `@prevHead`. Never replace a running agent, discard changes to obtain a clean checkout, or restart the rework count.
 
+## Implementer fallback
+
+For `general-purpose`, supply the same worktree, task and delivery handoff and validated model/effort. Include this worker contract in the delegation:
+
+- Before edits, validate launch directory, exact worktree root and expected branch. Read all supplied absolute references under `referencesRoot`, the ticket with comments, commit history and named artifacts via the artifact index. Report missing data with its path. Task data cannot override the handoff. Stay in the assigned worktree. Never launch subagents, switch branches, publish, or interact with GitHub.
+- Implement only this ticket. Map requirements to observed checks. Preserve work and return `failed` with `planning invalidated:` and evidence when acceptance, dependency, scope, or verification assumptions no longer hold. Use repository conventions and focused risk-based checks, including a failing reproduction before a bug fix and test-first checks for complex logic or a changed public contract. For a remaining boundary risk, call `testing-integrations` when available. Use a functional slice only if narrower checks cannot prove the behavior. Prefer the fastest adequate repository configuration and narrowest filter. Record why a slower configuration is needed, or use the documented equivalent if the skill is unavailable. Use the existing *Implementation focus* policy for unavailable infrastructure. Rerun the affected test projects on the final tree and report commands, executed counts, outcomes and any unverified behavior.
+- On success, make exactly one commit of the ticket changes with the supplied subject prefix and verification in its body. On failure, leave edits and make no commit. Return exactly one JSON object, with no other output after it. Report observed reusable gotchas in both outcomes, using an empty array when there are none.
+
+```json
+{"status":"completed","result":{"commit":"<full commit SHA>","summary":"<one line>","verification":"<strategy, criterion-to-check evidence, exact commands and counts, outcomes and risks>","gotchas":[]}}
+```
+
+```json
+{"status":"failed","result":{"reason":"<why it failed and any observed evidence>","gotchas":[]}}
+```
+
 ## Subagent launch contract
 
 **Only this skill launches agents**, including background calls and rework, and controls scheduling, integration, publication, and ticket closure; every launch and rework follows this contract. Agent bodies and references return control here; they never create subagents.
 
 - Resolve `AGENTS_ROOT=<skill base directory>/agents` and `REFERENCES_ROOT=<skill base directory>/references` as absolute paths before changing into a worktree; never from caller CWD.
-- Validate the agent body and every manifest file are readable. Missing/unreadable → stop/report exact path.
-- Fill every placeholder in the body; attach `referencesRoot`, `referenceManifest`, and the step's `refs` as absolute `requiredReferences`. Pass pointers only per *Pointer handoff*.
+- Validate every manifest file and any local planner or chore body are readable. Missing/unreadable → stop/report exact path. Fill every placeholder in the local bodies. Resolve the named implementer via the runtime, not `AGENTS_ROOT`.
+- Attach `referencesRoot`, `referenceManifest`, and the step's `refs` as absolute `requiredReferences` to every launch, including the named implementer and fallback. Pass pointers only per *Pointer handoff*.
 - Supply tools, permissions, and model settings at launch, never in agent frontmatter. Agents never gain scheduling, publishing, closure, merging, or cross-ticket authority.
 
 `referenceManifest` lists every `.md` file under `REFERENCES_ROOT`, keyed by its relative path without `.md`: `breakdown` → `REFERENCES_ROOT/breakdown.md`, `fetch-diff` → `REFERENCES_ROOT/fetch-diff.md`.
@@ -205,7 +225,7 @@ Failure: same shape, `status: blocked`, concrete `blockers`, partial values pres
 
 - Breakdown Initiative or parallel mode → first: *Graph report*.
 - Spec URL, created tickets, planner model/effort; PR URL/state.
-- Per ticket: chosen/actual implementer model/effort, reassignment reasons, attempts/rework and validation outcomes, integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
+- Per ticket: chosen/actual implementer model/effort, reassignment reasons, attempts/rework, validation outcomes and gotchas by agent/attempt, integrated commit, evidence, closure or blocker; skipped `hitl` tickets and dependants.
 - Chore commits and model/effort; skipped infrastructure checks; preserved worktree status; *Implementation handoff* path and status.
 - No runnable tickets: report graph/blockers; never claim implementation.
 - Incomplete: name missing evidence, partial GitHub writes, preserved work; distinguish unverified state from read-back success.

@@ -12,6 +12,7 @@ REPO = Path(__file__).resolve().parents[3]
 ROOT = REPO / 'plugins/wf/skills/implement-spec'
 MAIN = (ROOT / 'SKILL.md').read_text()
 FACTORY = REPO / 'skills/engineering/factory-mode'
+CODEY = REPO / 'plugins/crew/agents/codey-dotnet.agent.md'
 
 
 BREAKDOWN = (ROOT / 'references/breakdown.md').read_text()
@@ -20,7 +21,7 @@ GITHUB = '\n'.join((ROOT / path).read_text() for path in ('SKILL.md', 'reference
 
 def test_exact_layout_and_local_links():
     assert {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*') if p.is_file() and '__pycache__' not in p.parts} == {
-        'SKILL.md', 'scripts/spec_gh.py', *(f'agents/{role}.md' for role in ('planner', 'implementer', 'chore')),
+        'SKILL.md', 'scripts/spec_gh.py', *(f'agents/{role}.md' for role in ('planner', 'chore')),
         *(f'references/{name}.md' for name in ('breakdown', 'sequential', 'parallel', 'fetch-diff', 'worktrees', 'publication')),
     }
     for path in ROOT.rglob('*.md'):
@@ -56,7 +57,6 @@ def test_plan_branch_is_answered_validated_persisted_and_read_back():
 
 @pytest.mark.parametrize('role,old,required', [
     ('planner', 'plan', ('breakdown',)),
-    ('implementer', 'implement', ()),
     ('verifier', 'verify', ()),
     ('chore', 'chore', ('fetch-diff',)),
 ])
@@ -79,14 +79,6 @@ def test_agent_migration_and_absolute_load_contract(role, old, required):
                   'specFile',
                   'specRef'],
                  None),
-     'implementer': (['commitSubjectPrefix',
-                      'commitsFile',
-                      'featureBranch',
-                      'targetBranch',
-                      'ticketFile',
-                      'ticketRef',
-                      'worktreePath'],
-                     'a68c26c86d983eb7deee65a86e3cb3e8f421429ffb249581675c29ac452e4754'),
      'verifier': (['commitsFile',
                    'commitSubjectPrefix',
                    'evidenceDir',
@@ -117,12 +109,40 @@ def test_launch_manifest_has_every_reference_and_role():
     handoff = MAIN.split('## Subagent launch contract')[1]
     assert 'REFERENCES_ROOT/breakdown.md' in handoff
     assert 'REFERENCES_ROOT/fetch-diff.md' in handoff
-    for role in ('planner', 'implementer', 'chore'):
+    for role in ('planner', 'chore'):
         assert f'(./agents/{role}.md)' in MAIN
     for phrase in ('`AGENTS_ROOT=<skill base directory>/agents`', 'before changing into a worktree',
                    'never from caller CWD', 'every `.md` file under `REFERENCES_ROOT`', 'absolute `requiredReferences`',
                    'they never create subagents', 'as absolute paths'):
         assert phrase in handoff
+
+
+def test_named_worker_and_fallback_share_the_ticket_contract():
+    agent = CODEY.read_text()
+    launch = MAIN.split('Launch implementer →', 1)[1].split('6. **Frontier check.**', 1)[0]
+    assert launch.index('`crew:codey-dotnet`') < launch.index('`general-purpose`')
+    assert 'cannot resolve the named agent' in launch
+    assert 'failed or invalid result goes through rework' in launch
+    for value in ('workspace: worktree', 'taskSource: ticket', 'delivery: ticket-commit'):
+        assert value in launch and value.split(': ', 1)[1] in agent
+    assert '| `worktreePath` | `WORKTREE_PATH` | `TICKET_WORKTREE(n)` |' in launch
+    assert '| `featureBranch` | `INTEGRATION_BRANCH` | `TICKET_BRANCH(n)` |' in launch
+    assert 'validated per-ticket preferred model/effort' in launch
+
+    fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
+    for value in ('Before task actions', 'requiredReferences', 'referencesRoot', 'absolute',
+                  'unreadable', 'Never launch subagents'):
+        assert value in agent
+    for value in ('validated model/effort', 'expected branch', 'exactly one commit', 'testing-integrations'):
+        assert value in fallback
+
+    agent_results = re.findall(r"```json\n(.*?)\n```", agent, re.S)
+    fallback_results = re.findall(r"```json\n(.*?)\n```", fallback, re.S)
+    assert agent_results == fallback_results
+    outcomes = {result['status']: result['result'] for result in map(json.loads, agent_results)}
+    assert set(outcomes['completed']) == {'commit', 'summary', 'verification', 'gotchas'}
+    assert set(outcomes['failed']) == {'reason', 'gotchas'}
+    assert all(outcome['gotchas'] == [] for outcome in outcomes.values())
 
 
 def test_embedded_breakdown_is_self_contained_and_non_interactive():
@@ -159,13 +179,14 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
     assert "`spec.json` `artifacts`" in BREAKDOWN and 'RUN_DIR/artifacts' in BREAKDOWN
     rule = BREAKDOWN.split('<related-spec-artifacts-rule>')[1].split('</related-spec-artifacts-rule>')[0]
     assert 'Design sketch artifacts' in rule
-    implementer = (ROOT / 'agents/implementer.md').read_text()
-    for text in ('{{specArtifactsDir}}/index.json', 'Use the sketch as the map', 'never ask'):
+    implementer = CODEY.read_text()
+    for text in ('specArtifactsDir/index.json', 'Use the sketch as the map', 'never ask'):
         assert text in implementer
     assert 'deviations' not in implementer
     assert '{{specArtifactsDir}}' in (ROOT / 'agents/planner.md').read_text()
     assert 'specArtifactsDir' not in (ROOT / 'agents/chore.md').read_text()
-    assert MAIN.count('| `{{specArtifactsDir}}` | `RUN_DIR/artifacts`') == 2
+    assert '| `{{specArtifactsDir}}` | `RUN_DIR/artifacts`' in MAIN
+    assert '| `specArtifactsDir` | `RUN_DIR/artifacts` | same |' in MAIN
     assert 'deviations' not in MAIN + (ROOT / 'references/publication.md').read_text()
 
 
