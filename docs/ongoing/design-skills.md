@@ -15,7 +15,7 @@ Core separation:
 - **Design skills make technical decisions.**
 - **Diagram skills visualize the design.**
 - **`technical-design` assembles the final design artifact.**
-- **`review-design` challenges the completed design before implementation.**
+- **`/design review` challenges the completed design before implementation.**
 
 ## Workflow
 
@@ -59,7 +59,7 @@ integration-design      data-design
           technical-design
                   |
                   v
-            review-design
+          /design review
 ```
 
 The skills do not have to run as a strict sequence. The technical design skill should invoke only the design/research lanes relevant to the change.
@@ -81,7 +81,7 @@ The skills do not have to run as a strict sequence. The technical design skill s
 | `observability-design` | Define how the implementation will be operated and diagnosed. | Proposed flows/components and failure modes. | Logs, metrics, traces, correlation, alerts, health checks, dashboards and operational signals. |
 | `technical-design` | Assemble the relevant design outputs into one implementation-ready technical design and check consistency across sections. | Outputs from research and design skills. | Final technical design document. |
 | `architecture-decision` | Capture important architectural decisions independently from the feature design. | Decision context, alternatives, evidence, chosen approach. | ADR containing context, alternatives, decision and consequences. |
-| `review-design` | Challenge a completed design before implementation. | Technical design, current-system evidence, requirements. | Missing cases, contradictions, risks, unsupported assumptions, unresolved questions and implementation-readiness findings. |
+| `/design review` | Challenge a completed design before implementation. | Technical design, current-system evidence, requirements. | Missing cases, contradictions, risks, unsupported assumptions, unresolved questions and implementation-readiness findings. |
 
 ## Research Skills as Evidence Providers
 
@@ -574,7 +574,7 @@ It should primarily:
 
 Not every section is mandatory. Include only sections relevant to the change, while preserving important design drivers and risks.
 
-## review-design
+## /design review
 
 ### Responsibility
 
@@ -633,11 +633,12 @@ skills/
     ├── deployment-design/
     ├── technical-design/
     ├── architecture-decision/
-    └── review-design/
+    └── playbooks/
+        └── review.md
 ```
 
 Add `data-design`, `reliability-design`, `security-design`, and `observability-design` as separate skills when their responsibilities become large enough to justify independent orchestration.
 
 ## Design Principle
 
-> Research discovers facts. Trace reconstructs behavior. Design skills make decisions. Diagram skills visualize them. `technical-design` assembles the final artifact. `review-design` tries to break it.
+> Research discovers facts. Trace reconstructs behavior. Design skills make decisions. Diagram skills visualize them. `technical-design` assembles the final artifact. `/design review` tries to break it.

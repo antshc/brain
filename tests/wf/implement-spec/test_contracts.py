@@ -218,13 +218,13 @@ def test_worker_commits_and_caller_owns_parallel_integration():
 
 
 def test_embedded_breakdown_is_self_contained_and_non_interactive():
-    for text in ('Online-only and non-interactive', 'Never invoke, check availability of, or fall back to `/to-tickets`',
+    for text in ('Online-only and non-interactive', 'Never invoke, check availability of, or fall back to `/design tickets`',
                  'append only missing', 'including closed', 'unlinked', 'lost create response',
                  'add blocker edges only after all ticket identities exist', 'Body links never substitute for native edges',
                  'Read-back', 'preserve partial results', 'Concepts/ADRs', 'Functional Requirements', 'Business Rules',
                  'Edge Cases', 'Functional:', 'across touched layers'):
         assert text in BREAKDOWN
-    assert '/to-tickets auto' not in MAIN + BREAKDOWN
+    assert '/design tickets auto' not in MAIN + BREAKDOWN
     assert '## Breakdown ticket operations' in GITHUB
     script = (ROOT / 'scripts/spec_gh.py').read_text()
     for endpoint in ('/sub_issues', '/dependencies/blocked_by'):
@@ -263,7 +263,7 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
 
 
 def test_template_parity_except_intentional_artifact_section():
-    standalone = (REPO / 'plugins/wf/skills/to-tickets/references/issue-template.md').read_text()
+    standalone = (REPO / 'plugins/wf/skills/design/references/issue-template.md').read_text()
     embedded = BREAKDOWN[BREAKDOWN.index('<issue-template>'):]
     artifact_section = re.compile(r'^## Related Spec Artifacts\n.*?(?=^## )', re.M | re.S)
     embedded_core, embedded_sections = artifact_section.subn('', embedded)
@@ -311,9 +311,14 @@ def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
 
 
 def test_graph_only_outputs_and_scheduler_guards():
-    for skill in (ROOT, REPO / 'plugins/wf/skills/to-tickets'):
-        for path in skill.rglob('*.md'):
-            assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
+    design = REPO / 'plugins/wf/skills/design'
+    for path in (
+        *ROOT.rglob('*.md'),
+        design / 'playbooks/tickets.md',
+        design / 'references/github.md',
+        design / 'references/issue-template.md',
+    ):
+        assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
     parallel = (ROOT / 'references/parallel.md').read_text()
     for text in ('fewer than `MAX_PARALLEL`', 'blockers verified by the effective frontier',
                  'has no `file` conflict with an in-flight ticket',

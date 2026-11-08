@@ -1,12 +1,4 @@
----
-name: to-tickets
-description: >-
-  Break a Spec issue into agent-executable tasks published as GitHub sub-issues with a blocker graph, or offline Markdown.
-argument-hint: "{{specIssueNumber}} [{{implementationDetails}}, `plan.md`] | offline {{localSpecPath}}"
-disable-model-invocation: true
----
-
-# To Tickets
+# Tickets
 
 Turn one Spec into user-approved, self-contained implementation tickets linked to that Spec.
 
@@ -16,7 +8,7 @@ Turn one Spec into user-approved, self-contained implementation tickets linked t
 - `[implementationDetails]` — inline text or file path (e.g. `plan.md`, `/memories/session/plan.md`); replaces the spec body as slicing source.
 - `offline {{localSpecPath}}` — explicit offline mode; needs local spec content plus Initiative/source-repository metadata.
 
-Load [github.md](./references/github.md) before any GitHub read/write or offline save.
+Load [Ticket operations](../references/github.md#ticket-operations) before any GitHub read/write or offline save.
 
 ## Constraints
 
@@ -34,9 +26,9 @@ Reject an explicit `auto` argument as unsupported before any publication; do not
 
 Determine mode:
 
-- **Online, spec only:** resolve the tracker repository once from the docs/harness root (current repository for single-repo work) with `gh repo view --json nameWithOwner --jq .nameWithOwner` → `{{trackerRepository}}` (tracker, not the source repository). Fetch via **Read spec** in [github.md](./references/github.md); slicing source = issue title, body, and comments. Spec body has a **Design sketch** decision → also run **Read design sketch** there.
+- **Online, spec only:** resolve the tracker repository once from the docs/harness root (current repository for single-repo work) with `gh repo view --json nameWithOwner --jq .nameWithOwner` → `{{trackerRepository}}` (tracker, not the source repository). Fetch via [Read spec](../references/github.md#read-spec); slicing source = issue title, body, and comments. Spec body has a **Design sketch** decision → also run [Read design sketch](../references/github.md#read-design-sketch).
 - **Online, spec + implementation details:** resolve `{{trackerRepository}}` and read the spec as above; slicing source = implementation details (read file paths; use inline text directly).
-- **Explicit offline:** follow **Offline publishing** in [github.md](./references/github.md); use the supplied local spec and metadata; skip all GitHub lookups.
+- **Explicit offline:** follow [Offline ticket publishing](../references/github.md#offline-ticket-publishing); use the supplied local spec and metadata; skip all GitHub lookups.
 
 Set `{{repoLabel}}` to the spec's single `repo:target:<owner>/<name>` label (offline: from metadata). Missing `{{specIssueNumber}}` online, missing offline spec/metadata, or zero/several routing labels → ask the user; **MUST NOT** invent values.
 
@@ -114,20 +106,20 @@ Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 Before any write, confirm the approval guard holds for the current breakdown; otherwise return to step 4.
 
-Render each ticket body from [issue-template.md](./references/issue-template.md) verbatim — every section (Contracts Delta and Related Spec Artifacts only when they apply), each drafted per its `<...-rule>`. Copy each addressed requirement's spec text verbatim into **Requirements addressed**; numbers alone are insufficient.
+Render each ticket body from [issue-template.md](../references/issue-template.md) verbatim — every section (Contracts Delta and Related Spec Artifacts only when they apply), each drafted per its `<...-rule>`. Copy each addressed requirement's spec text verbatim into **Requirements addressed**; numbers alone are insufficient.
 
 Branch on mode:
 
-- **Offline:** save approved bodies and the symbolic blocker graph via **Offline publishing** in [github.md](./references/github.md); skip GitHub steps below.
+- **Offline:** save approved bodies and the symbolic blocker graph via [Offline ticket publishing](../references/github.md#offline-ticket-publishing); skip GitHub steps below.
 - **Online:**
-  1. Run **Reconcile reruns** in [github.md](./references/github.md); reuse matched children, create only missing ones.
+  1. Run [Reconcile reruns](../references/github.md#reconcile-reruns); reuse matched children, create only missing ones.
   2. Per missing slice, run **Create sub-ticket** with `parentIssueNumber` = `{{specIssueNumber}}` and label `hitl,{{repoLabel}}` (per **Label guard**).
   3. After every ticket exists, run **Link blocking** per slice with blockers: `issueNumber` = slice, `blockedBy` = its blockers' issue numbers; link only missing edges.
 
 **Failures:**
 
-- Label not found → follow **Labels** in [github.md](./references/github.md), then retry the failed operation once.
-- Other GitHub/tool/authentication failure → stop dependent operations, report the failed operation, and preserve known issue numbers, completed/pending links, and remaining drafts via **Offline publishing**.
+- Label not found → follow [Labels](../references/github.md#ticket-labels), then retry the failed operation once.
+- Other GitHub/tool/authentication failure → stop dependent operations, report the failed operation, and preserve known issue numbers, completed/pending links, and remaining drafts via [Offline ticket publishing](../references/github.md#offline-ticket-publishing).
 
 ## Completion criteria
 

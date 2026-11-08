@@ -23,7 +23,7 @@ Any miss → write nothing, including on an explicit request. Return the miss an
 Set `@decisionScope` before **Extend or create**: the entity the decision was made for (`narrow`, e.g. tasks) or every member of a named class (`wide`, e.g. every append-only history store).
 
 - Context states the scope explicitly → use it.
-- Unstated → ask one question phrased so yes accepts the recommendation: "Does this apply only to `{{entity}}`, or to every `{{class}}`?" Recommend `narrow` unless context names a second member of the class. Invoked by `grill-design` → return the question to the caller as a pending write; write after the answer.
+- Unstated → ask one question phrased so yes accepts the recommendation: "Does this apply only to `{{entity}}`, or to every `{{class}}`?" Recommend `narrow` unless context names a second member of the class. Invoked by `/design grill` → return the question to the caller as a pending write; write after the answer.
 - Never widen from analogy, naming similarity, or a single case. A temporary mitigation or stopgap stays `narrow`.
 - `wide` MUST name the class by a property a future reader can check (e.g. "append-only, never deleted"), not by listing entities.
 
@@ -71,7 +71,7 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 ### Rules
 
 - **Considered Options is mandatory** — at least one genuine rejected alternative with its reason. None can be stated → the trade-off criterion fails; write nothing. Never invent an option or a reason.
-- **Harvest options automatically** — collect every rejected alternative and its rejection reason from context without asking: the conversation, grill-design answers, the session ledger, linked docs, and the code. Record each as `**{{rejectedOption}}** — rejected: {{reason}}`.
+- **Harvest options automatically** — collect every rejected alternative and its rejection reason from context without asking: the conversation, Grill answers, the session ledger, linked docs, and the code. Record each as `**{{rejectedOption}}** — rejected: {{reason}}`.
 - **User-supplied options** — when the user stated options or rejections, use all of them; rephrase each into the bullet form, terse and decision-focused, preserving its meaning. Never drop or weaken one.
 - **Consequences** — only for non-obvious downstream effects; omit the heading otherwise.
 - **Link line** — only when a Concept or document holds how the decision is applied; omit otherwise.
@@ -96,6 +96,6 @@ An ADR that applies to exactly one building block is indexed in that block's `Ar
 ## Approval gate
 
 - **Explicit direct request** that passes the gate — approval is given; write immediately.
-- **Invoked by `grill-design`** — the user's answer is the approval. Write immediately; never offer, confirm, or defer, except an unsettled **Scope** question, returned to the caller. The user reviews the result in `git diff`.
+- **Invoked by `/design grill`** — the user's answer is the approval. Write immediately; never offer, confirm, or defer, except an unsettled **Scope** question, returned to the caller. The user reviews the result in `git diff`.
 
 Return the ADR path and the index row written.

@@ -1,17 +1,12 @@
----
-name: to-spec
-description: >-
-  Synthesize the current conversation into a spec and publish it as a GitHub issue or offline Markdown, with no interview. Use for 'write a spec', 'turn this into a PRD', or 'publish the spec'. Use draft-artifact for feature design, factory-mode Stories for User stories, to-tickets for implementation tasks.
-argument-hint: "What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"
----
+# Spec
 
-This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
+Synthesize the conversation and codebase context into a spec (PRD). Ask only for missing publication inputs.
 
 An **Initiative** is a coordinated product change tracked as one planning effort and may encompass multiple Capabilities and Features. A **Requirements** is a set of one Stakeholder requirement together with its Functional requirements, Business rules, Edge cases. A **Spec** packages one or more Requirements sets for planning and handoff.
 
-Load [github.md](./github.md) for GitHub repository resolution, labels, duplicate prevention, and publication.
+Load [Spec publication](../references/github.md#spec-publication) for GitHub repository resolution, labels, duplicate prevention, and publication.
 
-Explicit offline publishing or a reported GitHub/tool/authentication failure → save the spec to `docs/specs/{{initiativeIdSlug}}.md` as Markdown, following **Offline publishing** in the reference. Local output is not a published GitHub issue.
+Explicit offline publishing or a reported GitHub/tool/authentication failure → save the spec to `docs/specs/{{initiativeIdSlug}}.md` as Markdown, following [Offline spec publishing](../references/github.md#offline-spec-publishing). Local output is not a published GitHub issue.
 
 ## Process
 
@@ -25,9 +20,9 @@ Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly o
 
 3. Architect design — apply only when an architect skill run happened in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Architect design** below.
 
-4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow **Publish spec** in [github.md](./github.md) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
 
-5. Architect run → after the issue is verified, follow **Attach design artifacts** in [github.md](./github.md) with the issue number and the bundle manifest. Offline → follow its offline branch instead.
+5. Architect run → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and the bundle manifest. Offline → follow its offline branch instead.
 
 ## Architect design
 
@@ -45,10 +40,10 @@ Map the synthesized `rationale.md` into the body; fall back to the base candidat
 
 The body MUST NOT name the architect skill, candidate labels, or the run's local paths.
 
-Wrap the synthesized sketch — never a candidate's — and its module map into artifacts:
+Wrap the synthesized sketch — never a candidate's — and its module map into artifacts. Resolve the script path from the installed `design/` skill directory:
 
 ```
-python3 ./scripts/bundle_artifacts.py --sketch <synthesis/sketch path> --module-map <synthesis/module-map.md path> --out-dir <new empty temp dir outside the repository>
+python3 "<installed design directory>/scripts/bundle_artifacts.py" --sketch <synthesis/sketch path> --module-map <synthesis/module-map.md path> --out-dir <new empty temp dir outside the repository>
 ```
 
 Exit 2 → report stderr and stop before publishing; never drop a sketch file to make it pass. The printed manifest lists each artifact's `name`, `type`, and `file`; the first is the **Sketch index** mapping each file to its artifact names. Draft the **Design sketch** decision with every manifest name and `{{artifactUrl}}` placeholders that publication fills.

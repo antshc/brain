@@ -18,7 +18,7 @@ Produce one or more User stories per Functional slice. Split non-atomic work by 
 Normalize every accepted input form into the same proposed breakdown table while preserving every supplied field verbatim:
 
 - **Raw requirements** → preserve supplied Features, Functional slices, Stakeholder requirements, Functional requirements, Business rules, Edge cases, error conditions, and Acceptance criteria; derive only absent structure.
-- **`/to-spec` output** → preserve its supplied Functional requirements, Business rules, Edge cases, Implementation Decisions, Contracts Delta, and other relevant source fields; derive absent Features, deployable-local Functional slices, and Stakeholder requirements without rewriting supplied text.
+- **`/design spec` output** → preserve its supplied Functional requirements, Business rules, Edge cases, Implementation Decisions, Contracts Delta, and other relevant source fields; derive absent Features, deployable-local Functional slices, and Stakeholder requirements without rewriting supplied text.
 - **feature design output** → preserve its supplied Initiative tag, Features, Functional slices, Stakeholder requirements, Functional requirements, Business rules, Edge cases, error conditions, Acceptance criteria, Implementation Decisions, Contracts Delta, IDs, and dependencies; derive only absent fields.
 
 Keep source Business rules, Edge cases, error conditions, and Acceptance criteria attached to every proposed row they constrain so **Story** can apply them. *Done when* all three input forms yield Proposed Breakdown Format and every supplied field remains verbatim.
@@ -31,7 +31,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 - **Done when** every requirement is traced to the Functional slice or slices that implement it and every proposed User story advances exactly one Functional slice.
 
 ## Workflow
-1. **Normalize input** → apply Input Normalization to the supplied raw requirements, `/to-spec` output, or feature design output. *Done when* every source field is either preserved verbatim in a proposed row or explicitly carried as source context for that row.
+1. **Normalize input** → apply Input Normalization to the supplied raw requirements, `/design spec` output, or feature design output. *Done when* every source field is either preserved verbatim in a proposed row or explicitly carried as source context for that row.
 2. **Propose breakdown** → present Proposed Breakdown Format and wait for explicit approval; give FE and BE their own rows because they are separate Deployables. Revise and re-confirm requested merges, splits, reassignments, metadata, or dependencies. *Done when* the user explicitly approves the table; draft no story before approval.
 3. **Number and link** → assign each approved row a story number in table order, retain supplied Jira ID and Epic ID values or use `TBD`, and resolve dependencies from approved in-batch rows only. Render each dependency as `(Story {{n}}, {{jiraId|TBD}})`; use `None` when a row has no in-batch dependency. *Done when* every row has a number, both IDs, and a valid Blocked by value.
 4. **Draft each body** → *Run `draft-artifact` skill to draft one atomic User story using the Story tactic* exactly once per approved row, passing its optional Initiative tag, Deployable kind, Feature, Functional slice, verbatim Stakeholder requirement, Functional requirements addressed, and source Business rules, Edge cases, and error conditions. Also pass source Acceptance criteria, Implementation Decisions, and Contracts Delta when relevant. *Done when* every approved row has exactly one body beginning with the required `**Title:**` line and passing the **Story** tactic's Quality Check.
@@ -45,7 +45,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 
 ## Completion criteria
 
-- Raw requirements, `/to-spec` output, and feature design output all normalize into Proposed Breakdown Format.
+- Raw requirements, `/design spec` output, and feature design output all normalize into Proposed Breakdown Format.
 - Supplied fields remain verbatim; only absent fields are derived.
 - The proposed table was explicitly approved before any story body was drafted.
 - Every input requirement is traced to every Functional slice that implements it, without unexplained duplication.

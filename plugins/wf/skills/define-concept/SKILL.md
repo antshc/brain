@@ -23,7 +23,7 @@ Done when every track returned its `@outputShape` or an explicit blocker.
 
 ## Grill-design value
 
-A Concept pays off in `/grill-design` when its index row's `default` lets a decision clear that skill's **Decision states** evidence checklist, turning a question into a Feature Assumption. Rank candidates by, in order:
+A Concept pays off in `/design grill` when its index row's `default` lets a decision clear that skill's **Decision states** evidence checklist, turning a question into a Feature Assumption. Rank candidates by, in order:
 
 1. **Default-ability** — rank by independently reusable decision keys with direct choices and checkable selection conditions across the scope. Several settled variants can qualify; unknown conditions or conflicting choices remain blurry. Inspection supports a proposal, not policy; defaults require user confirmation.
 2. **Recurrence** — the number of building blocks where the concept's decision recurs.

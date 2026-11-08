@@ -75,7 +75,7 @@ Flow: /implement-spec
    → Draft vertical slices with complete issue bodies.
    → Reconcile existing children, create missing tickets without hitl labels.
    → Link native parents/blockers and verify readback.
-   → Never call /to-tickets or request breakdown approval.
+   → Never call /design tickets or request breakdown approval.
 5. Re-read and validate created tickets and dependencies.
 6. Calculate the blocker graph, ready frontier, conflicts, and critical path.
 7. Show the ticket-to-blocker graph, ready frontier, and deferred items.

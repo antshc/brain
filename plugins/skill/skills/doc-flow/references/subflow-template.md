@@ -34,7 +34,7 @@ Subflow B: <Complex Flow>
 Flow: Idea → Implementation
 
 1. Discovery
-   → /grill-design OR /wayfinder
+   → /design grill OR /design wayfinder
 
 2. Choose path
    → A: Run Simple Flow
@@ -45,7 +45,7 @@ Flow: Idea → Implementation
 
 Subflow A: Simple Flow
 
-1. /to-spec
+1. /design spec
 2. Architect Potato → Attach sketch to spec
 3. /implement-spec parallel
 4. Return
@@ -56,8 +56,8 @@ Subflow B: Complex Flow
 1. /draft-artifact design
 2. /factory-mode stories
 3. For each story:
-   → /grill-design
-4. /to-spec
+   → /design grill
+4. /design spec
 5. Architect Potato → Attach sketch to spec
 6. /implement-spec parallel
 7. Return

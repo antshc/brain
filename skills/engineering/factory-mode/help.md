@@ -20,7 +20,7 @@ PLAYBOOKS — matched from the request
   /factory-mode fix <symptom> when <trigger>
   /factory-mode <Class.Method> throws <error> on <input>
 
- design             resolve unknowns (grill-design or wayfinder) → to-spec → /draft-artifact design; no code
+ design             resolve unknowns (/design grill or /design wayfinder) → /design spec → /draft-artifact design; no code
   /factory-mode design <capability>; resolve open questions first
   /factory-mode we need <feature>, figure out the decisions
 
@@ -28,7 +28,7 @@ PLAYBOOKS — matched from the request
   /factory-mode stories from <requirements or spec>
   /factory-mode break <feature design> into User stories
 
- feature            research → architect sketch → resolve questions → to-spec → implement-spec parallel → verify app → review-feat → address-pr → finalize draft PR
+ feature            research → architect sketch → resolve questions → /design spec → implement-spec parallel → verify app → review-feat → address-pr → finalize draft PR
   /factory-mode add <behavior> to <module>
   /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
   /factory-mode add <feature> checkpoint  (pause for design approval)

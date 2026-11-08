@@ -4,7 +4,7 @@
 Flow: Idea → Implementation
 
 1. Discovery
-   → /grill-design OR /wayfinder
+   → /design grill OR /design wayfinder
 
 2. Choose path
    → A: Run Simple Flow
@@ -15,7 +15,7 @@ Flow: Idea → Implementation
 
 Subflow A: Simple Flow
 
-1. /to-spec or the /architect first + to-spec with sketch of the code
+1. /design spec or the /architect first + /design spec with sketch of the code
 3. /implement-spec parallel
 4. Return
 
@@ -26,7 +26,7 @@ Subflow B: Complex Flow
 2. /factory-mode stories
 3. For each story:
    → /architect
-4. /to-spec
+4. /design spec
 6. /implement-spec sequential/parallel
 7. Return
 ```

@@ -187,4 +187,4 @@ Superseding or retiring a Concept applies the marker to its index row via the sa
 
 - **Explicit direct request** ("record a Concept for X") — approval is already given; draft and write immediately.
 - **Invoked by `define-concept`** — its questioning confirmation settled the concept. Write immediately without a second prompt.
-- **Invoked by `grill-design`** — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.
+- **Invoked by `/design grill`** — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.

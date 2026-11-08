@@ -6,9 +6,9 @@ Status: proposal / ongoing
 
 Produce an evidence-backed, decision-complete ZDesign with four composable stages:
 
-1. `wayfinder` finds the path to the solution.
+1. `/design wayfinder` finds the path to the solution.
 2. `research-*` establishes facts and constraints.
-3. `grill-design` challenges the solution and resolves decisions.
+3. `/design grill` challenges the solution and resolves decisions.
 4. `/draft-artifact design` synthesizes the authoritative design.
 
 This replaces a mandatory chain of narrow design skills with an iterative decision workflow.
@@ -19,7 +19,7 @@ This replaces a mandatory chain of narrow design skills with an iterative decisi
 Loose feature or problem
           |
           v
-      wayfinder
+      /design wayfinder
   Find the solution path
   and unresolved decisions
           |
@@ -29,7 +29,7 @@ Loose feature or problem
   current behavior, and options
           |
           v
-    grill-design
+    /design grill
   Challenge options, resolve
   decisions, and expose gaps
           |
@@ -42,7 +42,7 @@ Loose feature or problem
 Research and grilling are iterative:
 
 ```text
-research-* -> grill-design
+research-* -> /design grill
     ^             |
     | fact gap    | new research question
     +-------------+
@@ -50,7 +50,7 @@ research-* -> grill-design
 
 If grilling exposes a prototype or manual prerequisite, Wayfinder adds the corresponding ticket before design synthesis continues.
 
-## 1. `wayfinder` — Find the Solution Path
+## 1. `/design wayfinder` — Find the Solution Path
 
 Destination: an evidence-backed, decision-complete ZDesign.
 
@@ -111,7 +111,7 @@ Reliability, security, and observability are research dimensions applied whereve
 
 Research discovers facts and constraints. It does not choose the solution.
 
-## 3. `grill-design` — Challenge and Resolve
+## 3. `/design grill` — Challenge and Resolve
 
 Consume the Wayfinder path and research evidence.
 
@@ -147,7 +147,7 @@ Run when the Wayfinder frontier is empty, or remaining questions and risks are e
 - Wayfinder map;
 - resolved Wayfinder tickets;
 - research documents;
-- confirmed grill-design outcomes;
+- confirmed /design grill outcomes;
 - existing architecture, concepts, ADRs, designs, and specifications.
 
 ### Responsibilities
@@ -196,7 +196,7 @@ The result remains a draft while `Open Questions` is non-empty.
 The previous `current-system`, `integration-design`, `runtime-design`, `cloud-design`, `deployment-design`, `reliability-design`, `security-design`, and `observability-design` responsibilities remain covered, but no longer require separate mandatory workflow stages:
 
 - research establishes the relevant facts and constraints;
-- `grill-design` makes and challenges decisions across those dimensions;
+- `/design grill` makes and challenges decisions across those dimensions;
 - `/draft-artifact design` assembles the applicable results into the final artifact.
 
 Create a dedicated skill only when a dimension requires reusable domain-specific research behavior that the existing research skills cannot express.

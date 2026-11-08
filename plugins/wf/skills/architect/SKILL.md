@@ -6,7 +6,7 @@ description: >-
 
 # Architect
 
-Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Use one runner by default or synthesize multiple model perspectives. Implement against the sketch by default; pause for review only when the user explicitly requests a **checkpoint**. A caller may request a design-only handoff to `/to-spec` instead of direct implementation.
+Sketch types, function signatures, class shapes, and module boundaries with `not implemented` bodies and pseudocode. Use one runner by default or synthesize multiple model perspectives. Implement against the sketch by default; pause for review only when the user explicitly requests a **checkpoint**. A caller may request a design-only handoff to `/design spec` instead of direct implementation.
 
 ## Options
 
