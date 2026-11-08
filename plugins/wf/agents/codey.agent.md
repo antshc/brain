@@ -56,9 +56,12 @@ Applies when the task quotes design sketch excerpts, including a ticket's **Rela
 
 ### Integration boundary
 
-- Identify the changed behavior at the boundary, the public entry point and the risk that narrower checks leave open (for example, serialization, persistence, or message delivery). If there is no material gap, skip the skill and functional slice and record why.
-- When a material gap remains, call `testing-integrations` with the behavior, entry point and gap. Use the lowest test seam that proves the behavior. Use a functional slice when narrower checks cannot prove it. Preserve test-first ordering when applicable.
-- For a functional slice, use the narrowest filter and fastest repository-supported configuration that exposes the risk. Start with mock or fake configuration. Use the real SDK or real environment only when evidence shows that faster configurations hide the behavior under test. Use the skill's documented setup and safety gates. If the skill is unavailable, use the repository's documented equivalent when available and apply **Failure handling** to any remaining gap.
+- Identify the changed behavior at the boundary, the public entry point and the risk that narrower checks leave open (for example, serialization, persistence, or message delivery). If there is no material integration gap, skip the skill and record why.
+- When a material integration gap remains, call `testing-integrations` with the changed behavior, boundary and gap. Run the smallest test that proves the behavior. Preserve test-first ordering when applicable.
+  - **Database risk**: Run a focused database component test through the affected repository or accessor.
+  - **Cloud risk**: Run a focused cloud component test through the affected SDK client, adapter or proxy.
+  - **Cross-component risk**: Run a functional slice through the public entry point when narrower checks cannot prove the behavior.
+- For any integration test, use the narrowest filter and fastest repository-supported configuration that exposes the risk. For a functional slice, start with mock or fake configuration. Use the real SDK or real environment only when evidence shows that faster configurations hide the behavior under test. Use the skill's documented setup and safety gates. If the skill is unavailable, use the repository's documented equivalent when available and apply **Failure handling** to any remaining gap.
 - Record the environment, filter, command, actual test counts and behavior proved. Run tests from the launch directory.
 
 ### Failure handling

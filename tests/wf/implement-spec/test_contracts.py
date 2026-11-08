@@ -125,14 +125,17 @@ def test_wf_codey_is_registered_for_implementation_tasks():
     assert 'Use for implementation tasks' in frontmatter
 
 
-def test_codey_gates_functional_slice_and_prefers_the_fastest_adequate_config():
+def test_codey_selects_focused_integration_tests_by_risk():
     agent = CODEY.read_text()
     boundary = agent.split('### Integration boundary', 1)[1].split('### Failure handling', 1)[0]
-    assert 'If there is no material gap, skip the skill and functional slice' in boundary
-    assert 'When a material gap remains, call `testing-integrations`' in boundary
-    assert 'Use a functional slice when narrower checks cannot prove it' in boundary
+    assert 'If there is no material integration gap, skip the skill' in boundary
+    assert 'When a material integration gap remains, call `testing-integrations`' in boundary
+    assert 'functional slice through the public entry point when narrower checks cannot prove the behavior' in boundary
+    fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
+    for test_kind in ('focused database component test', 'focused cloud component test'):
+        assert test_kind in boundary and test_kind in fallback
     assert 'narrowest filter' in boundary
-    assert boundary.index('Start with mock or fake') < boundary.index('Use the real SDK')
+    assert boundary.index('start with mock or fake') < boundary.index('Use the real SDK')
     assert 'only when evidence shows' in boundary
 
 
