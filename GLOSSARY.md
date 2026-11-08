@@ -105,7 +105,7 @@ _Plugins_set_: ralph, crew, wf
 ### Language
 
 **Codey**:
-The implementation agent. Implements one task in its invocation directory and returns the five-field report that alone governs `ralph:dev`'s distill, commit, and issue-handling steps.
+The implementation agent. Crew agents run one task in their invocation directory and return the five-field report. The WF agent `wf:codey` also handles `implement-spec` tickets in assigned worktrees and returns edits and verification evidence. The caller owns worktree selection and commits.
 _Avoid_: droid, implementer, coder
 
 **Chorey**:
@@ -113,7 +113,7 @@ The maintainability-review agent. Reviews the staged change set in cwd for behav
 _Avoid_: reviewer, refactorer, cleanup agent
 
 **Stack**:
-A technology family a repo's code belongs to — `py`, `dotnet`, `ai` — named by the `codey-<stack>` agent that ships for it and used for `CHORE-<stack>.md` and Copilot instruction templates. The vocabulary is closed: a stack exists only where an agent ships for it. One repo can carry several.
+A family of repository conventions with Copilot instruction and Chore rule templates. Crew ships `py`, `dotnet`, and `ai` templates. One repository can use several stacks.
 _Avoid_: language, platform, toolchain, tech
 
 **Stack agent**:
@@ -121,15 +121,15 @@ A self-contained implementation agent for one Stack, with declared scope, implem
 _Avoid_: language agent, specialised codey, subclass agent
 
 **Agent flow**:
-Chorey's agent holds its review, verification, revert decision, and verdict while `chorey-diff` owns change capture and restoration mechanics. Implementation agents carry their own flows and invoke `crew-gotchas` for shared gotchas handling.
+Chorey owns review, verification and its verdict. `chorey-diff` owns change capture and restoration mechanics. Implementation agents own their implementation and verification flows and report observed gotchas.
 _Avoid_: base agent, parent agent, agent template
 
 **Convention skills**:
-Repository-specific Chore rules and Crew memory are installed as `.github/skills/chore-<stack>/` and `.github/skills/crew-memory/`. Copilot instructions reside in the codebase's `.github/instructions/`; old `.crew/`, `CODE*.md`, and `VERIFY*.md` conventions are unused.
+Repository-specific Chore rules are installed in `.github/skills/crew-chore/`. Copilot instructions reside in the codebase's `.github/instructions/`.
 _Avoid_: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
-Reusable directives exposed by the repository's `/crew-memory` skill, which loads and persists its own `## Gotchas` section while `crew-gotchas` applies the supplied rules and distills reusable session friction into rule updates. Agents apply the directives before work and persist new or extended directives afterward; an unavailable memory skill is a no-op.
+Reusable findings observed during a run, such as a required test setting or a misleading fixture. Agents return them in their result.
 _Avoid_: decisions, durable decisions, problem log
 
 **Module**:
@@ -319,5 +319,5 @@ _Avoid_: checklist.md, agent instructions
 
 # Relationships
 
-- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` once via the `harness` skill, derives the `Codebase Repo Path` from the target repository, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Codey discovers `/crew-memory` directly rather than receiving a harness path. `Chorey` follows only on a Codey `STATUS: complete`, stages Codey's changes first and reviews that staged diff with no trusted input beyond cwd, and discovers its available rules and memory skills directly.
-- **crew ↔ Shared**: crew agents read skill-owned implementation, verification, and review guidance before changing code, then write distilled `Gotchas` through `/crew-memory` after feedback loops pass.
+- **ralph → crew**: Consumers install `ralph` in the `Harness Repo Path` to use its development workflow. Ralph resolves the `Harness Repo Path` once via the `harness` skill, derives the `Codebase Repo Path` from the target repository, creates the `Worktree Path`, and launches `Codey` from that directory — falling back to a general-purpose agent when Codey is unavailable. Ralph owns the commit and surfaces Codey's gotchas with ticket attribution.
+- **wf implementer**: `implement-spec` delegates to `wf:codey` from a caller-selected workspace. `implement-spec` verifies and commits the edits. It uses `general-purpose` when Codey is unavailable.
