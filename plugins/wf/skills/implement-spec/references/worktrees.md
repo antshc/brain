@@ -6,14 +6,14 @@ Orchestrator-only worktree procedures. Implementation workers run in the launch 
 
 - `HARNESS_ROOT` = `preflight`'s `harness_root`: `git rev-parse --show-toplevel` run from the agent session's launch folder, not the current CWD. **MUST NOT** re-resolve it from a git worktree or nested repo (e.g. code repo under `workspace/`) after a `cd`.
 - `WORKTREES_ROOT` = `HARNESS_ROOT/.worktrees/<REPO>`, `<REPO>` = source repository name from `OWNER/REPO`. Same root for both layouts: harness repo only (`SOURCE_ROOT` = `HARNESS_ROOT`) and harness with sub-repositories (`SOURCE_ROOT` = `HARNESS_ROOT/workspace/<REPO>`). Never derive a root from the current worktree or `SOURCE_ROOT`.
-- `INTEGRATION_BRANCH` = `preflight`'s `integration_branch` (`feat/<INITIATIVE_ID>`); never invent another name. Unique run suffix (*Integration setup* step 1) → append `-<suffix>` to both branch and `WORKTREE_PATH`.
-- `WORKTREE_PATH` = `WORKTREES_ROOT/INITIATIVE_ID` (integration worktree on `INTEGRATION_BRANCH`).
-- Parallel only: use the effective graph ticket’s `key` (derived from its full qualified ref) for `TICKET_BRANCH(key)` = `INTEGRATION_BRANCH-<key>` and `TICKET_WORKTREE(key)` = `WORKTREES_ROOT/<integration worktree leaf>-<key>`. The leaf includes any run suffix. Reject paths or refs already owned by another ticket.
+- `INTEGRATION_BRANCH` = the new branch validated by preflight or the exact branch from a verified resume checkpoint.
+- For a new run, use the integration branch slug as the single-segment worktree leaf under `WORKTREES_ROOT`. On resume use the recorded path.
+- Parallel only: assign unused stable worker ordinals, one per qualified ticket. *Run `git-conventions` tactic **Name branch*** for the worker suffix and use the resulting branch slug as its worktree leaf. Record the exact branch and path by ticket key in the publication checkpoint before creating the worktree. Reuse that mapping for retries and resume. Recover a legacy mapping from its verified worktree record before reuse.
 - Confirm every resolved path stays under `WORKTREES_ROOT`; reuse existing paths or branches only after explicit resume verifies their recorded ownership.
 
 ## Integration setup
 
-Verify the preflight-pinned `BASE_COMMIT` exists locally. Use that SHA without fetching or re-resolving the branch. Existing path or proposed branch → stop for verified resume or choose a unique run suffix before creation.
+Verify the preflight-pinned `BASE_COMMIT` exists locally. Use that SHA without fetching or re-resolving the branch. Check the path and local and remote refs. Collision → stop for verified resume or select a unique run suffix through the naming tactic and revalidate the ref before creation. Persist the final branch and path before launch.
 
 *Run `worktrees` skill to create an isolated worktree* at `WORKTREE_PATH` on `INTEGRATION_BRANCH` from `BASE_COMMIT`. Generate the stable run ID before creation. Supply it with `HARNESS_ROOT`, `SOURCE_ROOT`, and repository name. Persist the returned record at `RUN_DIR/worktrees/integration.json` before any worker launch. Verify the path and branch match preflight and use the shared skill's blocker if creation fails.
 
