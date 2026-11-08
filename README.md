@@ -136,6 +136,8 @@ Plugins bundle related skills (and, for `crew`, agents). Follow a link to read a
 
 ### wf
 
+Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tasks. `implement-spec` delegates tickets to `wf:codey`, with a `general-purpose` fallback.
+
 - [diagnosing-bugs](plugins/wf/skills/diagnosing-bugs/SKILL.md): diagnose hard bugs or performance regressions, and fix them when explicitly requested.
 
 Common everyday workflow automation skills. Expected to be useful to all developers.
@@ -166,13 +168,12 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 
 Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.
 
-Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [codey-ai](plugins/crew/agents/codey-ai.agent.md), [chorey](plugins/crew/agents/chorey.agent.md).
+Agents: [codey-py](plugins/crew/agents/codey-py.agent.md), [codey-dotnet](plugins/crew/agents/codey-dotnet.agent.md), [chorey](plugins/crew/agents/chorey.agent.md). Crew agents return gotchas in their reports.
 
 - [to-crew](plugins/crew/skills/to-crew/SKILL.md): run the Codey subagent for an implementation task.
 - [crew-commit](plugins/crew/skills/crew-commit/SKILL.md): commit staged/unstaged changes using the agent's status report.
 - [chorey-diff](plugins/crew/skills/chorey-diff/SKILL.md) owns Chorey's commit/uncommitted review bundle, aggregate stack detection, and exact restoration mechanics; Chorey passes the manifest stacks to `/crew-chore` and owns behavior-preserving cleanup, scoped checks, the revert decision, and its status report.
-- [crew-gotchas](plugins/crew/skills/crew-gotchas/SKILL.md): shared read/write procedure for repository-local gotchas memory.
-- [init-crew](plugins/crew/skills/init-crew/SKILL.md): copy stack-specific Copilot instructions and install per-stack Chorey rules skills plus shared gotchas memory.
+- [init-crew](plugins/crew/skills/init-crew/SKILL.md): copy stack-specific Copilot instructions and install per-stack Chorey rules.
 
 ### ralph
 

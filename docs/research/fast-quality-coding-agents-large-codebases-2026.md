@@ -68,7 +68,7 @@ There is **no measured evidence in the sources below** that replacing TDD univer
 
 ## Specific implications for antshc/brain
 
-The current [implementer agent](https://github.com/antshc/brain/blob/main/plugins/wf/skills/implement-spec/agents/implementer.md) already:
+The [implementer agent reviewed here](https://github.com/antshc/brain/blob/b7e1c7c5ca413b742003b5814fb957798f210d8d/plugins/wf/skills/implement-spec/agents/implementer.md) already:
 
 - Uses red–green–refactor **where applicable**, not unconditionally.
 - Discovers the affected build/test boundary and actual test counterparts.

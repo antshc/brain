@@ -1,6 +1,6 @@
 # Worktrees
 
-Orchestrator-only worktree procedures; agents only receive worktree paths. Never overwrite, reset, force, or discard existing work.
+Orchestrator-only worktree procedures. Implementation workers run in the launch directory the orchestrator sets. Never overwrite, reset, force, or discard existing work.
 
 ## Paths
 
@@ -33,7 +33,7 @@ Done when the git check passes and existing editor configs exclude `.worktrees`.
 - `WORKTREE_PATH` is the sole location for integrated ticket commits, publishing, and chore; preserve it for the caller’s post-implementation checks.
 - One writer at a time: start a writer only after the previous result is verified. No merger subagents.
 - Sequential: each verified ticket commit lands directly on `INTEGRATION_BRANCH`.
-- Parallel: implementers write only in their ticket worktrees; verified ticket commits are cherry-picked here one at a time; tickets with a `file` conflict never run concurrently. `soft` conflicts may run concurrently; a textual conflict at cherry-pick goes to the rebase rework round, a contract break to the post-merge check.
+- Parallel: implementers write only in their ticket worktrees; the orchestrator applies verified ticket commits here one at a time and commits after the integration check. Tickets with a `file` conflict never run concurrently. `soft` conflicts may run concurrently. Follow the parallel reference for integration rework.
 - Failed or incomplete changes: preserve them and stop advancement.
 
 ## Ticket worktrees

@@ -42,3 +42,25 @@ def test_chorey_uses_testing_integrations_skill_and_minimal_existing_boundary_te
     assert "*run `testing-integrations` skill" in agent
     assert "source of truth" in agent
     assert "smallest matching existing boundary-test subset" in agent
+
+
+def test_crew_reports_gotchas_without_a_memory_dependency():
+    for path in (CREW_ROOT / 'agents').glob('*.agent.md'):
+        agent = path.read_text()
+        assert 'GOTCHAS' in agent
+        assert 'crew-memory' not in agent
+        assert 'GOTCHAS UPDATED' not in agent
+    assert not (CREW_ROOT / 'skills/crew-gotchas/SKILL.md').exists()
+    init = CREW_ROOT / 'skills/init-crew'
+    assert not (init / 'templates/crew-memory.SKILL.template.md').exists()
+    assert 'crew-memory' not in (init / 'SKILL.md').read_text()
+
+
+def test_crew_codey_dotnet_uses_the_original_task_and_workspace_contract():
+    agent = (CREW_ROOT / 'agents/codey-dotnet.agent.md').read_text()
+    assert 'name: codey-dotnet' in agent
+    assert '`## TASK`' in agent
+    assert '`/memories/session/plan.md`' in agent
+    assert 'Work in cwd' in agent
+    assert 'leave changes uncommitted for the caller' in agent
+    assert 'ticket-commit' not in agent
