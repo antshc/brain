@@ -149,6 +149,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [draft-story](plugins/wf/skills/draft-story/SKILL.md): draft one standalone story body with its formatted title, requirements, acceptance criteria, and optional technical notes.
 - [code-sketch](plugins/wf/skills/code-sketch/SKILL.md): draft one single-pass code sketch with usage first, types and signatures with `not implemented` bodies, a module map for larger work, and a rationale.
 - [to-tickets](plugins/wf/skills/to-tickets/SKILL.md): break a plan or spec into tracer-bullet tickets.
+- [worktrees](plugins/wf/skills/worktrees/SKILL.md): inspect, create, reuse, or remove local Git worktrees with ownership checks. Install `wf` for Code Review and Address worktree operations.
 - [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [to-zdesign](plugins/wf/skills/to-zdesign/SKILL.md): synthesize or extend an authoritative feature design from specs and decisions.
 - [doc-architecture-diagram](plugins/wf/skills/doc-architecture-diagram/SKILL.md), [doc-behavior-diagram](plugins/wf/skills/doc-behavior-diagram/SKILL.md), [doc-code-diagram](plugins/wf/skills/doc-code-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
