@@ -142,26 +142,38 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert launch.index('`wf:codey`') < launch.index('`general-purpose`')
     assert 'cannot resolve the named agent' in launch
     assert 'failed or invalid result goes through rework' in launch
-    for value in ('workspace: worktree', 'taskSource: ticket', 'delivery: ticket-commit'):
-        assert value in launch and value.split(': ', 1)[1] in agent
-    assert '| `worktreePath` | `WORKTREE_PATH` | `TICKET_WORKTREE(n)` |' in launch
-    assert '| `featureBranch` | `INTEGRATION_BRANCH` | `TICKET_BRANCH(n)` |' in launch
+    assert 'taskSource: ticket' in launch
+    assert 'taskSource: ticket' in agent
+    assert 'as its working directory' in launch
+    for field in ('worktreePath', 'featureBranch', 'commitSubjectPrefix', 'ticket-commit'):
+        assert field not in agent
+    assert 'Leave edits unstaged and uncommitted' in agent
+    assert launch.index('Inspect the diff') < launch.index('the orchestrator stages')
+    assert 'exactly one ticket commit' in launch
     assert 'validated per-ticket preferred model/effort' in launch
 
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
     for value in ('Before task actions', 'requiredReferences', 'referencesRoot', 'absolute',
                   'unreadable', 'Never launch subagents'):
         assert value in agent
-    for value in ('validated model/effort', 'expected branch', 'exactly one commit', 'testing-integrations'):
+    for value in ('validated model/effort', 'launch directory', 'unstaged and uncommitted', 'testing-integrations'):
         assert value in fallback
 
     agent_results = re.findall(r"```json\n(.*?)\n```", agent, re.S)
     fallback_results = re.findall(r"```json\n(.*?)\n```", fallback, re.S)
     assert agent_results == fallback_results
     outcomes = {result['status']: result['result'] for result in map(json.loads, agent_results)}
-    assert set(outcomes['completed']) == {'commit', 'summary', 'verification', 'gotchas'}
+    assert set(outcomes['completed']) == {'summary', 'files', 'verification', 'gotchas'}
     assert set(outcomes['failed']) == {'reason', 'gotchas'}
     assert all(outcome['gotchas'] == [] for outcome in outcomes.values())
+
+
+def test_parallel_caller_commits_after_integration_checks_and_owns_rework():
+    parallel = (ROOT / 'references/parallel.md').read_text()
+    assert 'orchestrator applies `git cherry-pick --no-commit' in parallel
+    assert parallel.index('build/test on the tentative application') < parallel.index('uses `git commit -C')
+    assert 'orchestrator stages the resolution and continues the rebase' in parallel
+    assert 'unpublished ticket commit with `git commit --amend`' in parallel
 
 
 def test_embedded_breakdown_is_self_contained_and_non_interactive():
@@ -226,7 +238,7 @@ def test_implementation_stops_at_handoff_and_factory_owns_completion():
     publication = (ROOT / 'references/publication.md').read_text()
     assert '## Verification evidence' not in publication
     assert '## Closure gates' not in publication
-    for text in ('exactly one commit', 'at most two rounds', 'PR stays draft', 'one quick confirmation'):
+    for text in ('exactly one ticket commit', 'at most two rounds', 'PR stays draft', 'one quick confirmation'):
         assert text in MAIN
     parallel = (ROOT / 'references/parallel.md').read_text()
     assert 'no `conflicts`, paths `-`' not in parallel
