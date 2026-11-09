@@ -1,6 +1,0 @@
-{
-  "name": "skill",
-  "version": "2.0.0",
-  "description": "Skill authoring: one skill-author skill that grills a skill idea into a brief, writes and shrinks an agent skill, or writes a custom coding agent, from bundled best practices.",
-  "skills": ["./skills"]
-}
