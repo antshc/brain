@@ -1,15 +1,14 @@
 """Marker routing and safe reconciliation of Address review threads."""
-import importlib.util
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-SPEC = importlib.util.spec_from_file_location(
-    "address_discussion_state", Path(__file__).parents[1] / "scripts/pr_discussion_state.py"
-)
-state = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(state)
+SCRIPTS = Path(__file__).resolve().parents[2] / "github/scripts"
+sys.path.insert(0, str(SCRIPTS))
+
+from github_cli import reviews as state
 
 
 def comment(body, ident="c1", author="shared", review="COMMENTED"):

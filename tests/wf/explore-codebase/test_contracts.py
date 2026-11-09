@@ -42,14 +42,14 @@ def test_body_under_300_lines():
 
 def test_request_lists_shape_enum():
     line = next(l for l in section('Request').splitlines() if l.startswith('- `[@shape]`'))
-    assert re.search(r'`([^`]+)`;', line).group(1) == 'literal | symbol | relationship'
+    assert re.search(r'`([^`]+)`;', line).group(1) == 'literal | symbol | relationship | nuget'
 
 
 def test_route_the_lookup_precedes_tool_selection():
     assert BODY.index('### Route the lookup') < BODY.index('### Select tools by question shape')
     route = section('Route the lookup')
     assert 'route: rg | lsp | graphify | github' in route
-    assert {re.match(r'`(\w+)`', row[-1]).group(1) for row in table_rows(route)} == ROUTES
+    assert {re.match(r'`(\w+)`', row[-1]).group(1) for row in table_rows(route)} == ROUTES | {'nuget'}
 
 
 def test_rg_rules():

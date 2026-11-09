@@ -1,0 +1,47 @@
+[
+  {
+    "name": "hitl",
+    "color": "fbca04",
+    "description": "Requires human implementation"
+  },
+  {
+    "name": "spec",
+    "color": "5319e7",
+    "description": "Spec task with implementation context"
+  },
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "Failure requiring investigation"
+  },
+  {
+    "name": "wayfinder:map",
+    "color": "0e8a16",
+    "description": "Marks the map issue itself"
+  },
+  {
+    "name": "wayfinder:research",
+    "color": "1d76db",
+    "description": "Research-type decision ticket"
+  },
+  {
+    "name": "wayfinder:experiment",
+    "color": "5319e7",
+    "description": "Experiment-type decision ticket"
+  },
+  {
+    "name": "wayfinder:grilling",
+    "color": "fbca04",
+    "description": "Grilling-type decision ticket"
+  },
+  {
+    "name": "wayfinder:task",
+    "color": "d93f0b",
+    "description": "Manual-work decision ticket"
+  },
+  {
+    "name": "wayfinder:contract-design",
+    "color": "c5def5",
+    "description": "Contract-design decision ticket"
+  }
+]

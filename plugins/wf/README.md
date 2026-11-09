@@ -14,7 +14,7 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 
 The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
-[git-conventions](skills/git-conventions/SKILL.md) provides branch, commit, PR, and review comment formats. [Review](skills/review/SKILL.md) routes PR code review, comment follow-up, blast radius, test gaps, architecture drift, and human-led review through one skill. Use `/design review` to review a technical design for gaps and implementation readiness.
+[github](skills/github/SKILL.md) provides Git conventions and one CLI for Git and GitHub operations. [Review](skills/review/SKILL.md) routes PR code review, comment follow-up, blast radius, test gaps, architecture drift, and human-led review through one skill. Use `/design review` to review a technical design for gaps and implementation readiness.
 
 ## Skill flow
 
@@ -196,4 +196,4 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase` (NuGet tactic), `research` |
 | Design and backlog | `architect`, `design` (`grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
-| Implementation and tooling | `diagnosing-bugs`, `git-conventions`, `implement-spec`, `principles`, `show-me-your-work`, `subagents`, `worktrees` |
+| Implementation and tooling | `diagnosing-bugs`, `github`, `implement-spec`, `principles`, `show-me-your-work`, `subagents` |

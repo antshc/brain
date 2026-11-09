@@ -21,7 +21,7 @@ GITHUB = '\n'.join((ROOT / path).read_text() for path in ('SKILL.md', 'reference
 
 def test_exact_layout_and_local_links():
     assert {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*') if p.is_file() and '__pycache__' not in p.parts} == {
-        'SKILL.md', 'scripts/spec_gh.py', *(f'agents/{role}.md' for role in ('planner', 'chore')),
+        'SKILL.md', *(f'agents/{role}.md' for role in ('planner', 'chore')),
         *(f'references/{name}.md' for name in ('breakdown', 'sequential', 'parallel', 'fetch-diff', 'worktrees', 'publication')),
     }
     for path in ROOT.rglob('*.md'):
@@ -123,8 +123,8 @@ def test_wf_codey_is_registered_for_implementation_tasks():
     assert plugin['agents'] == ['./agents']
     frontmatter = CODEY.read_text().split('---', 2)[1]
     assert 'name: codey' in frontmatter
-    assert 'Implement and verify one requested change' in frontmatter
-    assert 'Route design, planning, and review to their own workflows' in frontmatter
+    assert 'Implement and verify code in any programming language' in frontmatter
+    assert 'implement features, tickets, or plans' in frontmatter
 
 
 def test_codey_infers_task_context_and_keeps_the_session_plan_fallback():
@@ -198,7 +198,7 @@ def test_worker_reads_pinned_ccode_history_locally_without_snapshot():
     assert '| `historyTip` | captured integration HEAD | same |' in MAIN
     assert '`{{baseCommit}}..{{historyTip}}`' in chore
     for body in (agent, chore, MAIN.split('## Implementer fallback', 1)[1]):
-        for value in ('`git log`', '`ccode(...):`', 'subjects', 'oldest first'):
+        for value in ('Commits tactic', '`ccode(...):`', 'subjects', 'oldest first'):
             assert value in body
     assert 'commitsFile' not in agent + MAIN + chore
     post = (FACTORY / 'references/post-implementation.md').read_text()
@@ -226,7 +226,7 @@ def test_embedded_breakdown_is_self_contained_and_non_interactive():
         assert text in BREAKDOWN
     assert '/design tickets auto' not in MAIN + BREAKDOWN
     assert '## Breakdown ticket operations' in GITHUB
-    script = (ROOT / 'scripts/spec_gh.py').read_text()
+    script = (ROOT.parent / 'github/scripts/github_cli/implement_spec.py').read_text()
     for endpoint in ('/sub_issues', '/dependencies/blocked_by'):
         assert endpoint in script
 
@@ -418,7 +418,7 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert 'Review never fixes code' in review
     finalize = post.split('## Finalize\n')[1].split('\n## ')[0]
     assert 'posting failure' in post.lower()
-    for text in ('stale', 'pending', 'failed', '`worktrees` skill', 'RUN_DIR/worktrees/integration.json'):
+    for text in ('stale', 'pending', 'failed', '`github` Worktrees tactic', 'RUN_DIR/worktrees/integration.json'):
         assert text in finalize
     assert 'do not restart Address' in finalize
     assert 'Diagnose' not in finalize
