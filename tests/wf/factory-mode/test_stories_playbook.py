@@ -33,7 +33,7 @@ def test_current_guidance_has_no_standalone_stories_invocation():
         "plugins/wf/README.md",
         "plugins/wf/skills/design/SKILL.md",
         "plugins/wf/skills/design/playbooks/spec.md",
-        "plugins/skill/skills/doc-flow/references/subflow-template.md",
+        "skills/productivity/doc-flow/references/subflow-template.md",
         "docs/plans/idea-to-implementation-flow.md",
     ):
         text = (REPO / relative).read_text()

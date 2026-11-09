@@ -30,8 +30,6 @@ Pick the plugin bundles you need. Each block uninstalls any stale version first,
 copilot plugin install wf@brain && \
 (copilot plugin uninstall crew@brain >/dev/null 2>&1 || true) && \
 copilot plugin install crew@brain && \
-(copilot plugin uninstall skill@brain >/dev/null 2>&1 || true) && \
-copilot plugin install skill@brain && \
 (copilot plugin uninstall ralph@brain >/dev/null 2>&1 || true) && \
 copilot plugin install ralph@brain
 ```
@@ -45,7 +43,8 @@ copilot plugin install ralph@brain
 (copilot plugin uninstall solution@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall learn-aws@brain >/dev/null 2>&1 || true) && \
 (copilot plugin uninstall aws-platform@brain >/dev/null 2>&1 || true) && \
-(copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true)
+(copilot plugin uninstall azure-platform@brain >/dev/null 2>&1 || true) && \
+(copilot plugin uninstall skill@brain >/dev/null 2>&1 || true)
 ```
 
 </details>
@@ -72,14 +71,6 @@ copilot plugin install aws@brain
 copilot plugin install verify@brain
 ```
 
-### Skill authoring plugin (skill)
-
-```sh
-(copilot plugin uninstall skill@brain >/dev/null 2>&1 || true) && \
-copilot plugin install skill@brain
-```
-
-
 ### Brain engineering skills
 
 ```sh
@@ -95,6 +86,13 @@ Repo-level (run from the target repo; the WF installer offers it), then edit the
 
 ```sh
 gh skill install antshc/brain engineering/factory-mode --agent github-copilot --scope project
+```
+
+### Brain productivity skills
+
+```sh
+gh skill install antshc/brain productivity/skill-author --agent github-copilot --scope user -f
+gh skill install antshc/brain productivity/doc-flow --agent github-copilot --scope user -f
 ```
 
 ### dotnet skill (external)
@@ -223,11 +221,10 @@ Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: a `mol
 - [Verify installer](plugins/verify/install/install.md): install the TypeScript or Python kit into a repo, research the codebase, ask which surfaces to prove (web, api, both), and generate starter cases plus repository-local `verify-<app>` and `maintain-verify-<app>` skills (the latter keeps maps, adapters and proofs honest as the app changes and re-proves on a fresh build).
 - [playwright-cli](plugins/verify/skills/playwright-cli/SKILL.md): browser driving helper for ad-hoc exploration and Playwright tests.
 
-### skill
+### productivity
 
-Skill authoring from bundled best practices (repo rules, mattpocock writing-for-agents, Agent Skills KBs).
-
-- [skill-author](plugins/skill/skills/skill-author/SKILL.md): routes each request to a mode playbook. Grill interviews one question at a time to define purpose, triggers, contract, body blocks, and constraints, then hands the confirmed skill brief to write mode. Write drafts the skill (template with composable Workflow, Loop, Tactics, and Reference blocks) then shrinks it, each in a fresh subagent. Shrink only tightens existing skill, agent, or instructions files while preserving behavior. Agent writes or rewrites a custom coding agent, including planner agents. Manual-only.
+- [skill-author](skills/productivity/skill-author/SKILL.md): routes each request to a mode playbook. Grill interviews one question at a time to define purpose, triggers, contract, body blocks, and constraints, then hands the confirmed skill brief to write mode. Write drafts the skill (template with composable Workflow, Loop, Tactics, and Reference blocks) then shrinks it, each in a fresh subagent. Shrink only tightens existing skill, agent, or instructions files while preserving behavior. Agent writes or rewrites a custom coding agent, including planner agents. Manual-only.
+- [doc-flow](skills/productivity/doc-flow/SKILL.md): draft or revise a workflow as compact numbered pseudocode with named subflows.
 
 ### engineering
 
