@@ -15,7 +15,7 @@ Inspect the **as-built** state using target repositories and restored packages a
 
 ## Codebase lookups
 
-**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one read-only subagent per independent lookup. Sequence dependent lookups. Instruct each to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, literal, or config evidence*. If Research is unavailable, spawn the explore agent with the same Request and read-only contract. Pass each Explore request:
+**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one `hunter` subagent per independent lookup (`hunter` unavailable → `explore` agent with the read-only contract; it lacks the `skill` tool, so require `graphify` from the shell). Sequence dependent lookups. Instruct each to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, literal, or config evidence*. Research missing from the plugin → same agent type with the same Request and read-only contract. Pass each Explore request:
 
 - `@work`: question, prefixed `Exact literal \`X\`:`, `Symbol \`Type.Member\`:`, or `Names unknown:`.
 - `@shape` and `@depth`: from the table below.

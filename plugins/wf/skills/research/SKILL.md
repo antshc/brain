@@ -18,7 +18,7 @@ Single entry point for search and investigation: saved cited documents (How, Why
 
 ## Explore request
 
-Inline lookup contract. Caller forms it before spawning a read-only subagent; the subagent receives it verbatim and runs the **Explore** route:
+Inline lookup contract. Caller forms it before spawning a read-only subagent; the subagent receives it verbatim and runs the **Explore** route. Caller **MUST** spawn the `hunter` agent (read-only, loads skills). `hunter` unavailable → `explore` agent; it has no `skill` tool, so pass the request plus the read-only contract and require `graphify query | path | explain` from the shell in place of the `graphify` skill. Research missing from the plugin → same agent type with the same request plus the read-only contract.
 
 - `@work` — one of: question | prompt instruction | skill name to run. Instruction and skill name pass **verbatim**, never paraphrased.
 - `@depth` — `quick | medium | thorough`.
@@ -28,15 +28,16 @@ Inline lookup contract. Caller forms it before spawning a read-only subagent; th
 - `[@outputArtifact]` — the one file the run may write.
 - `[@inputs]` — caller-supplied inputs `@work` needs.
 
-Direct `/research` with a lookup question (`where is`, `what calls`, one symbol, literal, or package API) and no saved document wanted → form this request and spawn one read-only subagent with it; return its verdict and save nothing.
+Direct `/research` with a lookup question (`where is`, `what calls`, one symbol, literal, or package API) and no saved document wanted → form this request and spawn one `hunter` subagent with it; return its verdict and save nothing.
 
 ## Constraints
 
 - **MUST** delegate source reading. Parent routes, briefs, and verifies to keep raw evidence in subagent context. If delegation is unavailable, report the blocker. Exception: the **Explore** route is the delegated worker; it reads sources itself and never spawns.
+- **MUST** spawn every How worker and every Explore lookup as the `hunter` agent, and every other evidence worker as a `general-purpose` agent with edits forbidden except its output artifact, so the `skill` tool can load `graphify`, this skill's Explore route, and other named skills. `hunter` unavailable → `explore` agent per the Explore request fallback; never `explore` for other evidence workers. Pass this rule verbatim into each brief that may delegate further.
 - **MUST** pass `@outputShape` verbatim to every subagent. It takes precedence over report defaults.
 - **MUST** check each codebase target root for `graphify-out/`. Present → paste this **Graphify line** verbatim into the subagent prompt body of every codebase-reading brief (How explorer and explainer, System inspection, Why code anchor), with `<root>` filled:
 
-  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Read-only overrides its write steps. Cite source files, not graph nodes; a missing node is never absence evidence.
+  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Read-only overrides its write steps. No `skill` tool → run `graphify query | path | explain` from the shell instead. Cite source files, not graph nodes; a missing node is never absence evidence.
 
   A brief without the Graphify line, or paraphrasing it (e.g. "graphify-out/ exists for orientation"), is a defect; fix before dispatch.
 
@@ -97,3 +98,4 @@ Use a general-purpose subagent with web access. Cite each claim in place from it
 - Every part has an artifact or a named blocker. Artifacts match route and requested paths, count, diagrams, and framing.
 - Every factual claim has an in-place primary-source citation. Mark assumptions and unknowns. Use the inspection contract's citation format where applicable.
 - Every Mermaid block renders. Remove template placeholders, Rules blocks, and unfilled sections.
+- Every part whose codebase target has `graphify-out/` reports the graph queries run, or why the graph was skipped; otherwise redispatch.
