@@ -33,11 +33,6 @@
             "name": "verify",
             "source": "./plugins/verify",
             "description": "Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: mole CLI, receipts, web and API surface adapters, and feature maps."
-        },
-        {
-            "name": "skill",
-            "source": "./plugins/skill",
-            "description": "Skill authoring: one skill-author skill that grills a skill idea into a brief, writes and shrinks an agent skill, or writes a custom coding agent, from bundled best practices."
         }
     ]
 }
