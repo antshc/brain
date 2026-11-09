@@ -12,6 +12,7 @@ REPO = Path(__file__).resolve().parents[3]
 SKILL = (REPO / 'plugins/wf/skills/research/SKILL.md').read_text()
 FRONTMATTER, SKILL_BODY = re.match(r'^---\n(.*?)\n---\n(.*)$', SKILL, re.S).groups()
 BODY = (REPO / 'plugins/wf/skills/research/explore/explore.md').read_text()
+HUNTER = (REPO / 'plugins/wf/agents/hunter.agent.md').read_text()
 EVALS = Path(__file__).parent / 'evals'
 ROUTES = {'rg', 'lsp', 'graphify', 'github'}
 
@@ -61,7 +62,7 @@ def test_route_the_lookup_precedes_tool_selection():
 
 
 def test_rg_rules():
-    tools = section('Select tools by question shape')
+    tools = section('Tools', HUNTER)
     for text in ('exit codes', '`1` no match', 'Only `command -v rg` decides presence',
                  '**MUST NOT** run recursive `grep`', 'rg … || grep …'):
         assert text in tools, text
@@ -73,13 +74,14 @@ def test_rg_rules():
     ('`graphify-out/cache/`', 'allowed'),
 ])
 def test_graphify_read_only_overrides(step, verdict):
-    row = next(r for r in table_rows(section('Select tools by question shape')) if step in r[0])
+    row = next(r for r in table_rows(section('Graphify', HUNTER)) if step in r[0])
     assert verdict in row[-1]
 
 
 def test_graphify_cli_first_cache_exception_and_not_found():
-    assert '`graphify` on `PATH` → query through `graphify query | path | explain`; inline `graph.json` traversal only when the CLI is missing' in BODY
-    assert '`graphify query`/`path`/`explain` updating `graphify-out/cache/`' in section('Read-only contract')
+    assert 'inline `graph.json` traversal only when the CLI is missing' in section('Graphify', HUNTER)
+    assert '`graphify query | path | explain` updating `graphify-out/cache/`' in section('Read-only contract', HUNTER)
+    assert "`hunter`'s read-only contract applies" in section('Read-only contract')
     verdict = section('Return the verdict')
     assert 'repeats the `route:` line' in verdict
     assert 'exactly `NOT FOUND`' in verdict
