@@ -31,7 +31,7 @@ Omit process detail (`using bundled best practices`, `from a brief`) unless it s
 
 | Character | Why |
 |---|---|
-| `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`publish-page`) allowed |
+| `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`address-page-comments`) allowed |
 | `<` `>` | Rejected by skill validators (XML/HTML injection guard) |
 | `: ` (colon + space) | YAML reads it as a nested mapping key |
 | ` #` (space + hash) | YAML starts a comment; rest of description dropped |
@@ -62,11 +62,11 @@ Pick one mode:
 
 ## Skill invocation syntax
 
-Reference the exact plain `skill-name` without leading `/`, immediately followed by the word `skill` (e.g. `` `fetch-page` skill ``). Verb may vary (run, follow, use, load).
+Reference the exact plain `skill-name` without leading `/`, immediately followed by the word `skill` (e.g. `` `atlassian` skill ``). Verb may vary (run, follow, use, load).
 
 Every skill invocation **MUST** include 3–6 distinctive keywords from the invoked skill's description. Do not copy the full description.
 
-Wrap the whole invocation phrase in *italics*. Example: *Run `fetch-page` skill to fetch the Confluence page as Markdown.*
+Wrap the whole invocation phrase in *italics*. Example: *Run `atlassian` skill to fetch the Confluence page as Markdown.*
 
 ## Information hierarchy
 
@@ -205,7 +205,7 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 | Syntax | Meaning | Example |
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
-| *italic* | Skill invocation phrase | *Run `fetch-page` skill to fetch the Confluence page as Markdown.* |
+| *italic* | Skill invocation phrase | *Run `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |

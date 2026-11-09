@@ -12,7 +12,7 @@ import pytest
 
 ATL_DIR = Path(__file__).resolve().parents[3] / "plugins" / "atl"
 SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
-CONVERTER = ATL_DIR / "skills" / "map-markdown-adf" / "scripts" / "map_markdown_adf.py"
+ATL_PY = ATL_DIR / "skills" / "atlassian" / "scripts" / "atl.py"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
@@ -24,7 +24,7 @@ _IGNORED_RE = re.compile(r"<!-- adf:ignore:start -->.*?<!-- adf:ignore:end -->\n
 
 def _convert(command: str, text: str) -> str:
     return subprocess.run(
-        [sys.executable, str(CONVERTER), command], input=text, capture_output=True, text=True, check=True
+        [sys.executable, str(ATL_PY), "map-markdown", command], input=text, capture_output=True, text=True, check=True
     ).stdout
 
 

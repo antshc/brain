@@ -203,10 +203,10 @@ Atlassian workflow skills.
 
 - [ATL installer](plugins/atl/install/install.md): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
 - [preflight-atlassian](plugins/atl/install/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
-- [fetch-work](plugins/atl/skills/fetch-work/SKILL.md) / [publish-work](plugins/atl/skills/publish-work/SKILL.md): fetch or create/update a Jira work item.
-- [fetch-page](plugins/atl/skills/fetch-page/SKILL.md) / [publish-page](plugins/atl/skills/publish-page/SKILL.md): fetch or create/update a Confluence page.
+- [atlassian](plugins/atl/skills/atlassian/SKILL.md): one entry point for Jira and Confluence: fetch or publish a work item or page, convert Markdown to/from ADF, and search or operate through twg. Its `scripts/atl.py` CLI (`fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown`) runs from any working directory.
 - [address-page-comments](plugins/atl/skills/address-page-comments/SKILL.md): address open Confluence page review comments; edit the page in place with twg targeted edits, reply per thread, and answer comments whose anchor text was removed in a page comment.
-- [map-markdown-adf](plugins/atl/skills/map-markdown-adf/SKILL.md): convert Markdown to/from Atlassian Document Format, and detect the constructs only ADF can express.
+
+**Migrating from atl 1.x:** `fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown-adf`, and `twg` are now tactics of the `atlassian` skill; old slash commands become requests to `/atlassian` (e.g. `/atlassian fetch PROJ-123`). `fix-confluence-comments` is retired: ordinary page edits use the `atlassian` Publish page tactic, replies stay with `address-page-comments`. `brief-daily` moved to the engineering skill [daily-briefing](skills/engineering/daily-briefing/SKILL.md). Scripts that called `plugins/atl/skills/<old-skill>/scripts/*.py` call `python3 plugins/atl/skills/atlassian/scripts/atl.py <command>` instead. Re-run the [ATL installer](plugins/atl/install/install.md) to refresh `preflight-atlassian` and migrate generated `pub-*` wrappers.
 
 ### ms
 
@@ -250,4 +250,5 @@ General-purpose skills not tied to a specific platform.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
+- [daily-briefing](skills/engineering/daily-briefing/SKILL.md): report your blocked Jira items and unanswered or answered @mentions; read-only. Requires the ATL plugin and its installer-generated `preflight-atlassian` skill.
 - [factory-mode](skills/engineering/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by the WF installer and customized by its users.

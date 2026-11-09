@@ -24,7 +24,7 @@ failure.
 
 Three participants: a **installer** that scaffolds the adapter (e.g. the [ATL installer](../../plugins/atl/install/install.md)), the **generated adapter
 skill** it writes into the repository (e.g. `pub-<issue-type>`), and the **owning user-level skill** that performs
-the actual action (e.g. `publish-work`). The extension point is the setup skill's discovery step: it enumerates
+the actual action (e.g. the `atlassian` skill's Publish work tactic). The extension point is the setup skill's discovery step: it enumerates
 the repository- or target-specific variants live (e.g. Jira issue types configured for this project) and offers
 to generate one adapter per variant, rather than shipping a fixed set.
 
@@ -49,7 +49,7 @@ file read by the shared skill already carries it — see
 ## Examples
 
 - The ATL installer's generated `pub-<issue-type>` skills (e.g. `pub-bug`, `pub-story`), each pre-filled with this
-  repository's required Jira fields and invoking `/publish-work` to perform the actual creation.
+  repository's required Jira fields and invoking the `atlassian` skill's Publish work tactic to perform the actual creation.
 
 ## Consequences
 

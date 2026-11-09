@@ -22,10 +22,10 @@ Follow this file only on explicit request in Copilot CLI. Resolve the target wit
 | `cloudId` | "Enter your Atlassian site URL (e.g. `https://<organization>.atlassian.net`):" |
 | `jiraProjectKeys` | "Enter your Jira project key(s), comma-separated, first = default:" → trimmed JSON array |
 | `confluenceSpaceIds` | "Enter your Confluence space id(s), comma-separated, first = default:" → trimmed JSON array |
-| `diagramRenderer` | "How should `/publish-page` render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |
+| `diagramRenderer` | "How should Confluence publishing render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |
 | `drawioExtensionKey` | "Only for `drawio` — enter the Draw.io macro's extension key, `<appId>/<envId>/static/drawio`. Find it by fetching a page that already holds a Draw.io diagram as ADF and copying the diagram node's `attrs.extensionKey`:" |
 
-`drawio`/`mermaid` need their Confluence app installed; `drawio` also needs `drawioExtensionKey` (ids differ per site). `mermaid` not yet usable — `publish-page` skill refuses it. `png` → leave both empty.
+`drawio`/`mermaid` need their Confluence app installed; `drawio` also needs `drawioExtensionKey` (ids differ per site). `mermaid` not yet usable; the `atlassian` skill's Publish page tactic refuses it. `png` → leave both empty.
 
 **5 — Write missing keys.** Create the ignored JSON object if needed. Preserve existing values and apply the table defaults for unanswered keys. Leave missing `email` and `apiToken` fields absent. Ask the user to add them locally in the ignored config and resume this file. Keep both out of the Copilot conversation. Report credential presence only.
 
@@ -42,13 +42,15 @@ Follow this file only on explicit request in Copilot CLI. Resolve the target wit
    - Write CWD `.github/skills/<skillName>/SKILL.md` containing:
      - Frontmatter `name: <skillName>`, `description: Create a <issueType.name> in <projectKey> with this repository's required fields pre-filled. Use when asked to create/open/file a <issueType.name>.`
      - Required-fields table: field key, field name.
-     - Step: gather each required field (developer or mirrored issue), then *run `publish-work` skill to create the Jira work item from a summary and Markdown description* with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additionalFields`; never create the issue directly through twg or REST.
-     - Description-fidelity step: mirror source headings verbatim, add no heading, keep `<details>` blocks; `publish-work` skill converts via `map-markdown-adf` skill and verifies the live issue.
+     - Step: gather each required field (developer or mirrored issue), then *run `atlassian` skill's Publish work tactic to create the Jira work item from a summary and Markdown description* with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additionalFields`; never create the issue directly through twg or REST.
+     - Description-fidelity step: mirror source headings verbatim, add no heading, keep `<details>` blocks; the Publish work tactic converts Markdown to ADF and verifies the live issue.
 
-**8 — Report.** Include plugin status, refreshed preflight files, keys added without values, wrapper paths, and any missing prerequisites. Leave target changes uncommitted.
+**8 — Migrate existing wrappers.** For each existing `.github/skills/pub-*/SKILL.md` that invokes the retired `publish-work` skill: show the planned change and ask before editing. Replace only that invocation with the Step 7 Publish work invocation; keep the frontmatter, Required-fields table, field values, and every local edit. Wrappers already on the `atlassian` skill → no change.
+
+**9 — Report.** Include plugin status, refreshed preflight files, keys added without values, wrapper paths (generated, migrated, skipped), and any missing prerequisites. Leave target changes uncommitted.
 
 ## Rules
 
-- Generate repo-specific skills only under the target's `.github/skills/`. Refresh bundled preflight files. Ask before overwriting a `pub-*` wrapper.
-- Discover required Jira fields live. Use `publish-page` directly for Confluence pages.
+- Generate repo-specific skills only under the target's `.github/skills/`. Refresh bundled preflight files without changing `.atlassian.json.user` values. Ask before overwriting or migrating a `pub-*` wrapper.
+- Discover required Jira fields live. Confluence pages need no wrapper; use the `atlassian` skill's Publish page tactic.
 - Resolve both roots explicitly. Use a scratch file for live TWG identity output, extract only account ID and display name, then remove it.

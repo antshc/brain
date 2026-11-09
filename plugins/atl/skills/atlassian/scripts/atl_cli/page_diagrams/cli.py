@@ -1,0 +1,285 @@
+"""CLI orchestration: argument parsing, action dispatch, and error framing for every
+publish-page subcommand. `run` (see pipeline.py) chains the full pipeline — extract,
+Markdown<->ADF conversion, attachment upload, marker substitution, and publish; the
+older per-step subcommands (`extract`/`render-attach`/`substitute-media`/`publish-adf`)
+remain for ad-hoc use; see the `atlassian` skill's references/publish-page.md. Every publish goes over REST.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+from .adf import replace_markers, substitute_media
+from ..confluence_client import get_confluence
+from .env import load_credentials, load_renderer
+from .mermaid import extract_mermaid, render_diagrams
+from .attachments import upload_diagrams
+from .patterns import strip_ignored_sections
+from .pipeline import CreatedPageError, publish
+from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
+from . import renderers
+
+def build_arg_parser(prog: str | None = None) -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog=prog,
+        description="Publish Markdown to a Confluence page and its step utilities.",
+        epilog="Also: `verify` (read-back check) and `check-anchors` (offline anchor comparison); run each with --help.",
+    )
+    sub = parser.add_subparsers(dest="action", required=True)
+
+    sub.add_parser("extract", help="Extract mermaid fences from Markdown (stdin) into markers. Pure, offline.")
+
+    render = sub.add_parser(
+        "render-attach",
+        help="Render each diagram (stdin: {\"diagrams\": [...]} from `extract`) to PNG and upload it as a "
+        "Confluence attachment. Requires `mmdc` on PATH and a configured Atlassian API token "
+        "(see `/preflight-atlassian` skill).",
+    )
+    render.add_argument("--assets-dir", required=True, help="Directory to write rendered .mmd/.png files into")
+    render.add_argument("--page-id", required=True, help="Confluence pageId to attach the rendered images to")
+    render.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
+    render.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
+    render.add_argument(
+        "--out",
+        help="Write {\"mediaIdsByIndex\": ...} to this file instead of stdout, keeping stdout "
+        "clean of any subprocess logging leakage. Omit to keep the current stdout-print behavior.",
+    )
+
+    replace = sub.add_parser(
+        "replace-markers",
+        help="Replace \\x00MEDIA:<index>\\x00 marker paragraphs in an ADF document (stdin: "
+        "{\"adf\": ..., \"mediaIdsByIndex\": {...}}) with their uploaded media nodes. Top-level "
+        "only — legacy/back-compat. Pure, offline.",
+    )
+    replace.add_argument("--page-id", required=True, help="Confluence pageId the media belongs to")
+
+    substitute = sub.add_parser(
+        "substitute-media",
+        help="Replace \\x00MEDIA:<index>\\x00 marker paragraphs anywhere in an ADF document, at "
+        "any nesting depth (stdin: {\"adf\": ..., \"mediaIdsByIndex\": {...}}), then verify no "
+        "marker remains. Pure, offline.",
+    )
+    substitute.add_argument("--page-id", required=True, help="Confluence pageId the media belongs to")
+
+    publish_adf = sub.add_parser(
+        "publish-adf",
+        help="Publish an ADF body (stdin: {\"adf\": ...}) via Confluence REST v2.",
+    )
+    publish_adf.add_argument("--page-id", help="Confluence pageId to update (update path)")
+    publish_adf.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
+    publish_adf.add_argument("--title", help="Page title (create path, or update path when the title changed)")
+    publish_adf.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
+
+    run = sub.add_parser(
+        "run",
+        help="Full pipeline in one call: extract -> md-to-adf -> create/attach -> substitute -> "
+        "publish, over Confluence REST.",
+    )
+    run.add_argument("--md-path", required=True, help="Path to the local Markdown file to publish")
+    target = run.add_mutually_exclusive_group(required=True)
+    target.add_argument("--page-id", help="Confluence pageId to update (update path)")
+    target.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
+    run.add_argument("--title", help="Page title (default: the Markdown's first '#' heading)")
+    run.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
+    run.add_argument(
+        "--assets-dir",
+        help="Directory to write rendered .mmd/.png files into (default: <md path>.tmp)",
+    )
+    run.add_argument("--out", help="Path to write the final ADF to (default: <assets dir>/final-adf.json)")
+    run.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
+
+    combine = sub.add_parser(
+        "combine",
+        help='Combine an ADF file with an optional mediaIdsByIndex file into the {"adf":..., '
+        '"mediaIdsByIndex":...} shape substitute-media/publish-adf expect on stdin. Pure, offline.',
+    )
+    combine.add_argument("--adf", required=True, help="Path to a JSON file holding the ADF document")
+    combine.add_argument(
+        "--media-ids",
+        help='Path to a JSON file holding {"mediaIdsByIndex": ...} (e.g. render-attach\'s --out), optional',
+    )
+    combine.add_argument("--out", required=True, help="Path to write the combined JSON to")
+
+    return parser
+
+
+def _run_extract() -> None:
+    md_text = sys.stdin.read()
+    try:
+        processed, diagrams = extract_mermaid(strip_ignored_sections(md_text))
+    except ValueError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1)
+    json.dump({"processedMarkdown": processed, "diagrams": diagrams}, sys.stdout)
+    sys.stdout.write("\n")
+
+
+def _write_media_ids_by_index(result: dict, out_path: str | None) -> None:
+    if out_path:
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(result, f)
+            f.write("\n")
+    else:
+        json.dump(result, sys.stdout)
+        sys.stdout.write("\n")
+
+
+def _run_render_attach(args: argparse.Namespace) -> None:
+    payload = json.loads(sys.stdin.read())
+    diagrams = payload["diagrams"]
+
+    if not diagrams:
+        _write_media_ids_by_index({"mediaIdsByIndex": {}}, args.out)
+        return
+
+    renderer = load_renderer(args.config)
+    if renderer != renderers.PNG:
+        # This step ends in a mediaIdsByIndex map, which only the png renderer's one-image-per-
+        # diagram output fits; the macro renderers need the custom content `run` creates.
+        print(
+            f"error: render-attach supports diagramRenderer=png only; {renderer!r} "
+            "publishes a macro, so use the `run` subcommand instead",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+
+    try:
+        render_diagrams(diagrams, args.assets_dir, background=args.mermaid_bg, renderer=renderer)
+    except FileNotFoundError:
+        print(
+            "error: mmdc not found on PATH — install @mermaid-js/mermaid-cli "
+            "(npm install -g @mermaid-js/mermaid-cli)",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+
+    credentials = load_credentials(args.config)
+    confluence = get_confluence(credentials)
+    filename_to_file_id = upload_diagrams(confluence, args.page_id, diagrams)
+
+    media_ids_by_index = {str(d["index"]): filename_to_file_id[d["filename"]] for d in diagrams}
+    _write_media_ids_by_index({"mediaIdsByIndex": media_ids_by_index}, args.out)
+
+
+def _run_replace_markers(args: argparse.Namespace) -> None:
+    payload = json.loads(sys.stdin.read())
+    adf, replaced = replace_markers(payload["adf"], payload["mediaIdsByIndex"], args.page_id)
+    json.dump({"adf": adf, "replaced": replaced}, sys.stdout)
+    sys.stdout.write("\n")
+
+
+def _run_substitute_media(args: argparse.Namespace) -> None:
+    payload = json.loads(sys.stdin.read())
+    try:
+        adf, replaced = substitute_media(payload["adf"], payload["mediaIdsByIndex"], args.page_id)
+    except RuntimeError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1)
+    json.dump({"adf": adf, "replaced": replaced}, sys.stdout)
+    sys.stdout.write("\n")
+
+
+def _run_publish_adf(args: argparse.Namespace) -> None:
+    payload = json.loads(sys.stdin.read())
+    adf = payload["adf"]
+    size_bytes = adf_body_size(adf)
+    credentials = load_credentials(args.config)
+    confluence = get_confluence(credentials)
+
+    if args.page_id:
+        version = get_page_version(confluence, args.page_id)
+        update_page_adf(confluence, args.page_id, args.title, adf, version)
+        page_id = args.page_id
+    else:
+        if not args.space_id or not args.title:
+            print("error: --space-id and --title are required to create a page", file=sys.stderr)
+            raise SystemExit(1)
+        result = create_page_adf(confluence, args.space_id, args.title, adf)
+        page_id = result["id"]
+
+    json.dump({"method": "rest", "pageId": page_id, "sizeBytes": size_bytes}, sys.stdout)
+    sys.stdout.write("\n")
+
+
+def _warn_partial_removals(result: dict) -> None:
+    for removal in result.get("partialCommentRemovals", []):
+        print(
+            f"warning: comment anchor {removal['id']} spanned {removal['before']} blocks, now "
+            f"{removal['after']}; edit or remove all spans together",
+            file=sys.stderr,
+        )
+
+
+def _run_run(args: argparse.Namespace) -> None:
+    md_path = Path(args.md_path)
+    # Artifacts sit beside the source as `<md filename>.tmp`, suffix included, so the folder
+    # stays adjacent to the document it came from and is obvious to gitignore.
+    assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.name}.tmp")
+    Path(assets_dir).mkdir(parents=True, exist_ok=True)
+    out_path = args.out or str(Path(assets_dir) / "final-adf.json")
+
+    try:
+        result = publish(
+            md_path=str(md_path),
+            config_path=args.config,
+            page_id=args.page_id,
+            space_id=args.space_id,
+            title=args.title,
+            assets_dir=assets_dir,
+            out_path=out_path,
+            mermaid_bg=args.mermaid_bg,
+        )
+    except CreatedPageError as e:
+        json.dump({"method": "rest", "pageId": e.page_id, "published": False}, sys.stdout)
+        sys.stdout.write("\n")
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1)
+    except FileNotFoundError:
+        print(
+            "error: mmdc not found on PATH — install @mermaid-js/mermaid-cli "
+            "(npm install -g @mermaid-js/mermaid-cli)",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+    except (ValueError, RuntimeError) as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1)
+
+    _warn_partial_removals(result)
+    json.dump(result, sys.stdout)
+    sys.stdout.write("\n")
+
+
+def _run_combine(args: argparse.Namespace) -> None:
+    with open(args.adf, encoding="utf-8") as f:
+        adf = json.load(f)
+    payload: dict = {"adf": adf}
+    if args.media_ids:
+        with open(args.media_ids, encoding="utf-8") as f:
+            media_payload = json.load(f)
+        payload["mediaIdsByIndex"] = media_payload["mediaIdsByIndex"]
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(payload, f)
+        f.write("\n")
+
+
+def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
+    parser = build_arg_parser(prog)
+    args = parser.parse_args(argv)
+
+    if args.action == "extract":
+        _run_extract()
+    elif args.action == "render-attach":
+        _run_render_attach(args)
+    elif args.action == "substitute-media":
+        _run_substitute_media(args)
+    elif args.action == "publish-adf":
+        _run_publish_adf(args)
+    elif args.action == "run":
+        _run_run(args)
+    elif args.action == "combine":
+        _run_combine(args)
+    else:
+        _run_replace_markers(args)

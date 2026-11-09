@@ -123,11 +123,11 @@ def test_fixture_exercises_every_adf_only_construct():
     import subprocess
     import sys
 
-    from conftest import CONVERTER
+    from conftest import ATL_PY
 
     report = json.loads(
         subprocess.run(
-            [sys.executable, str(CONVERTER), "detect-adf-only"],
+            [sys.executable, str(ATL_PY), "map-markdown", "detect-adf-only"],
             input=FIXTURE.read_text(encoding="utf-8"),
             capture_output=True,
             text=True,

@@ -211,7 +211,7 @@ CASES: tuple[Case, ...] = (
     Case("R2", "Orphaned thread answered in a page comment linking it", ("replies", "seed"), _page_answer),
     Case("G3", "Rerun gate detects every answer and skips", ("gate-3",), _gate_3),
     Case("R3", "No seeded comment resolved", ("final-comments", "seed"), _still_open),
-    Case("P1", "Page carries diagrams, media, tables, lists, panels, and other map-markdown-adf constructs", ("before",), _rich_present),
+    Case("P1", "Page carries diagrams, media, tables, lists, panels, and other ADF-only constructs", ("before",), _rich_present),
     Case("P2", "Everything outside the edited nodes is byte-identical after edits and replies", ("before", "final", "seed"), _rich_preserved),
     Case("P3", "Attachments (image, file, draw.io) unchanged after edits and replies", ("attachments-before", "attachments-after"), _attachments_kept),
 )
