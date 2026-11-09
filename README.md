@@ -76,7 +76,7 @@ copilot plugin install verify@brain
 ```sh
 gh skill install antshc/brain engineering/be-terse --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/suggest --agent github-copilot --scope user -f
-gh skill install antshc/brain engineering/testing-integrations --agent github-copilot --scope user -f
+gh skill install antshc/brain plugins/wf/install/assets/testing-integrations/SKILL.md --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/render-mermaid-png --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/suggest-graphify-improvements --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/remove-zone-identifiers --agent github-copilot --scope user -f
@@ -228,7 +228,7 @@ General-purpose skills not tied to a specific platform.
 
 - [be-terse](skills/engineering/be-terse/SKILL.md): rephrase or tighten a selection into terse, agent-optimized text.
 - [suggest](skills/engineering/suggest/SKILL.md): analyze provided information and propose improvements with reasoning.
-- [testing-integrations](skills/engineering/testing-integrations/SKILL.md): select and run focused integration, functional-slice, and regression tests with evidence.
+- [testing-integrations](plugins/wf/install/assets/testing-integrations/SKILL.md): select and run focused integration, functional-slice, and regression tests with evidence.
 - [render-mermaid-png](skills/engineering/render-mermaid-png/SKILL.md): render Mermaid diagrams as high-resolution PNGs.
 - [suggest-graphify-improvements](skills/engineering/suggest-graphify-improvements/SKILL.md): audit a Graphify knowledge graph and suggest evidence-backed improvements.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
