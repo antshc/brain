@@ -10,11 +10,13 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import subprocess
-import sys
-from typing import Any
+from pathlib import Path
+from typing import Any, Callable
 
-PR_URL_RE = re.compile(r"^https?://[^/]+/(?P<owner>[^/]+)/(?P<repo>[^/]+)/pull/(?P<number>\d+)")
+from .gh import Gh, GhError, Ref, UsageError, graphql, parse_ref, read_body, request
+from .pulls import require_snapshot
+
+PR_URL_RE = re.compile(r"^https://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/]+)/pull/(?P<number>[1-9]\d*)/?$")
 PR_SHORT_RE = re.compile(r"^(?P<owner>[^/\s]+)/(?P<repo>[^/#\s]+)#(?P<number>\d+)$")
 MARKER_OPENERS = {"<!-- agent:comment": "comment", "<!-- agent:reply": "reply"}
 FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
@@ -48,24 +50,20 @@ query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
 """
 
 
-class GhError(RuntimeError):
-    pass
-
 
 def run_gh(args: list[str]) -> str:
-    proc = subprocess.run(["gh", *args], capture_output=True, text=True)
-    if proc.returncode != 0:
-        raise GhError(f"gh {' '.join(args)} failed ({proc.returncode}): {proc.stderr.strip()}")
-    return proc.stdout
+    return Gh().text(*args)
 
 
 def parse_pr_ref(raw: str) -> tuple[str, str, int]:
     match = PR_URL_RE.match(raw.strip()) or PR_SHORT_RE.match(raw.strip())
     if not match:
         raise ValueError(
-            f"cannot parse {raw!r} — expected https://host/owner/repo/pull/N or owner/repo#N"
+            f"cannot parse {raw!r} — expected https://github.com/owner/repo/pull/N or owner/repo#N"
         )
-    return match["owner"], match["repo"], int(match["number"])
+    ref = parse_ref(raw, kind="pull")
+    owner, repo = ref.repo.split("/")
+    return owner, repo, ref.number
 
 
 def pr_metadata(owner: str, repo: str, number: int) -> dict[str, Any]:
@@ -77,7 +75,9 @@ def pr_metadata(owner: str, repo: str, number: int) -> dict[str, Any]:
     return json.loads(out)
 
 
-def fetch_threads(owner: str, repo: str, number: int) -> list[dict[str, Any]]:
+def fetch_threads(
+    owner: str, repo: str, number: int, *, read: Callable[..., str] | None = None
+) -> list[dict[str, Any]]:
     threads: list[dict[str, Any]] = []
     cursor: str | None = None
     seen_cursors: set[str] = set()
@@ -91,7 +91,7 @@ def fetch_threads(owner: str, repo: str, number: int) -> list[dict[str, Any]]:
         ]
         if cursor:
             args += ["-f", f"cursor={cursor}"]
-        page = json.loads(run_gh(args))
+        page = json.loads(read(*args) if read else run_gh(args))
         if page.get("errors"):
             raise GhError(f"GraphQL errors: {json.dumps(page['errors'])}")
         connection = page["data"]["repository"]["pullRequest"]["reviewThreads"]
@@ -293,17 +293,19 @@ def build_state(pr_ref: str) -> tuple[dict[str, Any], int]:
     return state, 0
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+def register(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("pr", help="PR URL (https://github.com/owner/repo/pull/N) or owner/repo#N")
     parser.add_argument("--json-out", help="also write the JSON state to this path")
     parser.add_argument("--pretty", action="store_true", help="indent the JSON")
-    args = parser.parse_args()
+    parser.set_defaults(entry=discussion)
+
+
+def discussion(args: argparse.Namespace) -> int:
 
     try:
         state, exit_code = build_state(args.pr)
-    except (GhError, ValueError, KeyError, json.JSONDecodeError) as error:
-        print(json.dumps({"action": "stop", "reason": str(error)}))
+    except (GhError, UsageError, ValueError, KeyError) as exception:
+        print(json.dumps({"action": "stop", "reason": str(exception)}))
         return 1
 
     payload = json.dumps(state, indent=2 if args.pretty else None)
@@ -314,5 +316,83 @@ def main() -> int:
     return exit_code
 
 
-if __name__ == "__main__":
-    sys.exit(main())
+def post_inline(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
+    ref = parse_ref(args.ref, kind="pull")
+    body = read_body(args.body_file)
+    path = f"repos/{ref.repo}/pulls/{ref.number}/comments"
+    require_snapshot(gh, ref, args.expected, args.base)
+    matches = [
+        row for row in gh.pages(f"{path}?per_page=100")
+        if row.get("commit_id") == args.expected and row["path"] == args.path
+        and row.get("line") == args.line and row.get("side") == "RIGHT" and row["body"] == body
+    ]
+    if len(matches) > 1:
+        raise UsageError("multiple matching findings; reconcile before writing")
+    if matches:
+        return matches[0]
+    require_snapshot(gh, ref, args.expected, args.base)
+    posted = request(gh, path, "POST", {
+        "body": body, "commit_id": args.expected, "path": args.path, "line": args.line, "side": "RIGHT",
+    })
+    observed = gh.json("api", f"repos/{ref.repo}/pulls/comments/{posted['id']}")
+    if observed.get("body") != body or observed.get("path") != args.path or observed.get("commit_id") != args.expected:
+        raise GhError(f"inline comment {posted['id']} could not be verified")
+    return observed
+
+
+def thread_state(gh: Gh, ref: Ref, thread_id: str) -> dict[str, Any]:
+    owner, repo = ref.repo.split("/")
+    threads = fetch_threads(owner, repo, ref.number, read=gh.text)
+    target = next((item for item in threads if item["id"] == thread_id), None)
+    if target is None:
+        raise UsageError("thread is absent from the qualified PR")
+    comments = target["comments"]
+    if comments["pageInfo"]["hasNextPage"] or comments["totalCount"] > len(comments["nodes"]):
+        raise GhError("truncated thread comments; full context required")
+    return target
+
+
+def change_thread(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
+    ref = parse_ref(args.ref, kind="pull")
+    expected = json.loads(Path(args.snapshot).read_text(encoding="utf-8"))
+    require_snapshot(gh, ref, args.expected)
+    thread = thread_state(gh, ref, args.thread)
+    comments = flatten_comments(thread)
+    if args.action == "reply":
+        body = read_body(args.body_file)
+        if terminal_marker(body) != "reply":
+            raise UsageError("review reply must carry the terminal agent:reply marker")
+        if comments and comments[:-1] == expected and comments[-1]["body"] == body:
+            return comments[-1]
+        if thread["isResolved"] or comments != expected:
+            raise UsageError("review thread changed; reassess before replying")
+        require_snapshot(gh, ref, args.expected)
+        result = graphql(gh, """
+            mutation($id: ID!, $body: String!) {
+              addPullRequestReviewThreadReply(input: {pullRequestReviewThreadId: $id, body: $body}) {
+                comment { id body updatedAt }
+              }
+            }
+        """, id=args.thread, body=body)
+        reply = result.get("addPullRequestReviewThreadReply", {}).get("comment")
+        observed = flatten_comments(thread_state(gh, ref, args.thread))
+        if not reply or observed[:-1] != expected or not observed or observed[-1]["id"] != reply["id"] or observed[-1]["body"] != body:
+            raise GhError("review reply could not be verified; reconcile before retrying")
+        return observed[-1]
+    if comments != expected:
+        raise UsageError("review thread changed; reassess before resolving")
+    if thread["isResolved"]:
+        return {"id": args.thread, "isResolved": True}
+    if not comments or terminal_marker(comments[0]["body"]) != "comment" or terminal_marker(comments[-1]["body"]) != "reply":
+        raise UsageError("only an answered agent-owned thread can be resolved")
+    require_snapshot(gh, ref, args.expected)
+    result = graphql(gh, """
+        mutation($id: ID!) {
+          resolveReviewThread(input: {threadId: $id}) { thread { id isResolved } }
+        }
+    """, id=args.thread)
+    resolved = result.get("resolveReviewThread", {}).get("thread")
+    observed = thread_state(gh, ref, args.thread)
+    if not resolved or resolved.get("id") != args.thread or not resolved.get("isResolved") or not observed["isResolved"]:
+        raise GhError("review thread resolution could not be verified")
+    return resolved

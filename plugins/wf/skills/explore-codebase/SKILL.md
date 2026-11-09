@@ -90,9 +90,7 @@ Before the first search, print one line: `route: rg | lsp | graphify | github | 
 
 **No local checkout**
 
-- Load the deferred GitHub tools before use.
-- Use `github_repo` for behavior or architecture in one known repository.
-- Use `github_text_search` for exact symbols, package IDs, image names, or organization-wide ownership discovery.
+- Use the read-only `github` Repository tactic. Scope searches to the supplied repository or use the integration for authorized organization-wide discovery. Verify decisive source at a pinned commit.
 - GitHub search reflects indexed branches and can be stale; carry that branch uncertainty into the verdict.
 
 **Graphify** — local checkouts only: the target checkout itself, plus any other deployable or supporting repository that is checked out locally. A target with no local checkout stays on the GitHub tools.

@@ -18,7 +18,7 @@ Ask the user:
 1. Check `copilot plugin marketplace list --json`. If `brain` is absent, run `copilot plugin marketplace add antshc/brain`. Use the existing Brain marketplace when it points to that repository or to this installer checkout for local testing. Stop on a source conflict.
 2. Check `copilot plugin list --json`. Install a missing plugin with `copilot plugin install wf@brain`. Local marketplaces can show uninstalled entries as disabled with `source: live`. For these entries, check only the matching `enabledPlugins` key in Copilot settings. An absent key permits the initial install; an explicit `false` is disabled. Recheck that `wf` is enabled from `brain` and that its version matches [plugin.json](../plugin.json). Report policy blocks, disabled installs, version mismatches, and failed commands before writing target files. Leave upgrades and enablement of existing installs to the user.
 
-Check that `index-docs` is loaded before writing target files. If it is missing after installation, ask the user to run `/restart` and say “Resume the WF installer for <target> in <topology> mode.”
+Check that `index-docs` and `github` are loaded before writing target files. If it is missing after installation, ask the user to run `/restart` and say “Resume the WF installer for <target> in <topology> mode.”
 
 ## Configure the selected topology
 

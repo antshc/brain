@@ -1,6 +1,6 @@
 # Address PR comments conversation flows
 
-[Address PR comments](../playbooks/comments.md) investigates PR review discussions, fixes verified concerns, and replies using [Git Conventions](../../git-conventions/SKILL.md).
+[Address PR comments](../playbooks/comments.md) investigates PR review discussions, fixes verified concerns, and replies using [GitHub](../../github/SKILL.md).
 
 These flows describe PR #172 behavior. The gaps below are limitations and proposed follow-ups, not implemented guarantees.
 
@@ -74,7 +74,7 @@ Each continuation requires another invocation. Address handles each thread indep
 - Before resolution, refetch complete comments and current head; changed context requires reassessment. Confirm resolution through API read-back.
 - Human-origin threads remain open after fixes, disagreement, clarification, and acceptance until a human closes them.
 
-See [the gate](../scripts/pr_discussion_state.py) and [GitHub API reference](github-api.md).
+See [the GitHub Reviews tactic](../../github/tactics/reviews.md).
 
 ## Deferred concerns
 

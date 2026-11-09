@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[3] / "plugins/wf/skills/worktrees/scripts/worktrees.py"
+SCRIPT = Path(__file__).resolve().parents[3] / "plugins/wf/skills/github/scripts/github.py"
 
 
 def git(path: Path, *args: str) -> str:
@@ -31,7 +31,7 @@ def repository(tmp_path: Path) -> Path:
 
 def run(source: Path, action: str, *args: str, harness: Path | None = None) -> dict:
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), action, "--harness", str(harness or source),
+        [sys.executable, str(SCRIPT), 'worktree', action, "--harness", str(harness or source),
          "--source", str(source), *args], capture_output=True, text=True,
     )
     payload = json.loads(result.stdout)

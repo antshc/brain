@@ -9,3 +9,5 @@ When a statement, decision, or resolved term contradicts it, cite the source and
 An external-source edit is the only exception to the parent's local writable-surface list. Require user confirmation of the exact target and wording before writing. A missing write-capable tool leaves the source stale; report it. A failed authorized write follows the parent's bounded-retry protocol and stays pending in the ledger.
 
 Confirm the update result before marking it synchronized. Persist the resolved wording, source status, and any pending correction so the next turn or handoff can continue without repeating approval.
+
+For GitHub sources use the `github` Repository or Issues tactic. Pass qualified refs and the confirmed text for an authorized edit.
