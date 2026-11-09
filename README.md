@@ -85,7 +85,7 @@ gh skill install antshc/brain engineering/remove-zone-identifiers --agent github
 Repo-level (run from the target repo; the WF installer offers it), then edit the copy to match the repo's conventions:
 
 ```sh
-gh skill install antshc/brain engineering/factory-mode --agent github-copilot --scope project
+gh skill install antshc/brain plugins/wf/install/assets/factory-mode/SKILL.md --agent github-copilot --scope project
 ```
 
 ### Brain productivity skills
@@ -146,10 +146,9 @@ Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tas
 
 Common everyday workflow automation skills. Expected to be useful to all developers.
 
-- [design](plugins/wf/skills/design/SKILL.md): `grill` for decision interviews, `spec` for GitHub or offline specs, and `tickets` for approved implementation breakdowns, `wayfinder` for decision maps, and `review` for technical design review.
-- [factory-mode Stories playbook](skills/engineering/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per row. Requires repo-level `factory-mode` installation.
+- [design](plugins/wf/skills/design/SKILL.md): `grill` for decision interviews, `sketch` for a single-pass usage-first code sketch, `spec` for GitHub or offline specs, and `tickets` for approved implementation breakdowns, `wayfinder` for decision maps, and `review` for technical design review.
+- [factory-mode Stories playbook](plugins/wf/install/assets/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per row. Requires repo-level `factory-mode` installation.
 - [draft-artifact](plugins/wf/skills/draft-artifact/SKILL.md): draft a User story, bug report, feature handover (TOI), or feature design.
-- [code-sketch](plugins/wf/skills/code-sketch/SKILL.md): draft one single-pass code sketch with usage first, types and signatures with `not implemented` bodies, a module map for larger work, and a rationale.
 - [github](plugins/wf/skills/github/SKILL.md): route Git conventions, branches, commits, owned worktrees, specs, issues, PRs, review discussions, and checks through one skill and CLI. Install WF for Factory Mode's GitHub routes.
 - [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
@@ -238,4 +237,4 @@ General-purpose skills not tied to a specific platform.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
 - [daily-briefing](skills/engineering/daily-briefing/SKILL.md): report your blocked Jira items and unanswered or answered @mentions; read-only. Requires the `atlassian` skill and its installer-generated `preflight-atlassian` skill.
-- [factory-mode](skills/engineering/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by the WF installer and customized by its users.
+- [factory-mode](plugins/wf/install/assets/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by the WF installer and customized by its users.

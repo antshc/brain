@@ -52,7 +52,7 @@ Follow [github.md](./github.md) **Setup labels**. Done when all nine baseline la
 Ask the user whether to install the `factory-mode` skill at repo level; it holds the repo-level engineering instructions (principles, design preferences, playbooks). Yes → run from the reporoot:
 
 ```bash
-gh skill install antshc/brain engineering/factory-mode --agent github-copilot --scope project
+gh skill install antshc/brain plugins/wf/install/assets/factory-mode/SKILL.md --agent github-copilot --scope project
 ```
 
 Already installed → skip; never overwrite (no `-f`), the repo copy carries user edits. Then tell the user to edit the installed `SKILL.md` and playbooks to align with the repo's conventions (layering, patterns, build/verify commands), and to use the `sync-skill` skill to pull upstream improvements later.

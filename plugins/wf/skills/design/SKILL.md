@@ -1,7 +1,7 @@
 ---
 name: design
 description: >-
-  Stress-test a plan or design through a decision interview, or write and publish a spec or PRD from resolved context. On explicit request, break a spec into implementation tickets, chart or resume a Wayfinder decision map, or review a technical design for gaps and readiness.
+  Stress-test a design through a decision interview, sketch code shape usage first, or publish a spec or PRD. Use for grill this, sketch this, type sketch, write a spec. On explicit request, break a spec into tickets, chart a Wayfinder map, or review a technical design.
 ---
 
 # Design
@@ -9,6 +9,7 @@ description: >-
 | Mode | Select for | Playbook |
 | --- | --- | --- |
 | `grill` | Challenge a plan, interview for domain decisions, or resolve a Wayfinder grilling ticket. | [Grill](playbooks/grill.md) |
+| `sketch` | Draft one usage-first code sketch: types, signatures with `not implemented` bodies, module map, rationale. Use for sketch this, type sketch, signatures, module map, or a single-pass design without architect's phases. | [Sketch](playbooks/sketch.md) |
 | `spec` | Synthesize a spec or PRD from the conversation, resolved decisions, or an accepted sketch. | [Spec](playbooks/spec.md) |
 | `tickets` | An explicit user request to break a spec into implementation tickets. | [Tickets](playbooks/tickets.md) |
 | `wayfinder` | An explicit request to chart or resume a Wayfinder decision map. | [Wayfinder](playbooks/wayfinder.md) |
@@ -18,4 +19,4 @@ description: >-
 2. Select `tickets`, `wayfinder`, or `review` only on an explicit user request, including clear natural language or a caller relaying that request. Tickets publication requires separate approval of the current breakdown. Wayfinder automatic runs require their own confirmation.
 3. Read only the selected playbook and the references it calls for. Wayfinder loads Grill when its playbook calls for an interview, then resumes the map. Continue from Grill to Spec only for a requested handoff after the closing sweep.
 
-Use `draft-artifact` in `design` mode for authoritative feature-design documents, `architect` for code sketches, and `factory-mode` in `stories` mode for User story breakdown.
+Use `draft-artifact` in `design` mode for authoritative feature-design documents, `architect` for multi-phase or competing-candidate code designs, and `factory-mode` in `stories` mode for User story breakdown.
