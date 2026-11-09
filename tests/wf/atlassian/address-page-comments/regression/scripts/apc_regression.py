@@ -24,7 +24,7 @@ from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = _SCRIPT_DIR.parents[5]
-STATE_SCRIPTS = REPO_ROOT / "skills" / "engineering" / "atlassian" / "scripts"
+STATE_SCRIPTS = REPO_ROOT / "plugins" / "wf" / "skills" / "atlassian" / "scripts"
 for _path in (_SCRIPT_DIR, STATE_SCRIPTS):
     if str(_path) not in sys.path:
         sys.path.insert(0, str(_path))
@@ -34,7 +34,7 @@ from cases import APPENDED_TEXT, CASES, EDIT_NEW, EDIT_OLD, REVIEWER_ID, evaluat
 
 DEFAULT_RUNS_DIR = _SCRIPT_DIR.parent / "runs"
 FIXTURE_DIR = _SCRIPT_DIR.parent / "fixtures"
-ATL_PY = REPO_ROOT / "skills" / "engineering" / "atlassian" / "scripts" / "atl.py"
+ATL_PY = REPO_ROOT / "plugins" / "wf" / "skills" / "atlassian" / "scripts" / "atl.py"
 SEEDS = {
     "edit": ("inline", "retry limit", "Should be five attempts, not three."),
     "delete": ("inline", "Legacy export", "Legacy export is gone; remove this line."),

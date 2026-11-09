@@ -275,7 +275,7 @@ _Avoid_: comment, finding, issue
 
 ## atlassian
 
-Location: skills/engineering/atlassian/ (former `atl` plugin)
+Location: plugins/wf/skills/atlassian/ (WF plugin)
 
 ### Language
 

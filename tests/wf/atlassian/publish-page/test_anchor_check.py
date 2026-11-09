@@ -7,7 +7,7 @@ from atl_cli.page_diagrams import anchor_check
 
 FETCHED = Path(__file__).resolve().parents[1] / "fetch-page" / "fixtures" / "shared-anchor.md"
 FIXTURES = Path(__file__).parent / "fixtures"
-ATL_PY = Path(__file__).resolve().parents[4] / "skills" / "engineering" / "atlassian" / "scripts" / "atl.py"
+ATL_PY = Path(__file__).resolve().parents[4] / "plugins" / "wf" / "skills" / "atlassian" / "scripts" / "atl.py"
 SHARED_ID = "1e1cb525-8cdd-4497-8fce-7213342df598"
 SINGLE_ID = "7f3a0c2e-1111-4222-8333-944455556666"
 

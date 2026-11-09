@@ -17,7 +17,7 @@ copilot --add-dir="/path/to/brain/plugins" \
   -i 'Follow /path/to/brain/plugins/wf/install/install.md in this repository.'
 ```
 
-Replace `wf` with `crew`, `ms`, `ralph`, or `verify`. Atlassian is a standalone skill: `gh skill install antshc/brain engineering/atlassian`, then follow `/path/to/brain/skills/engineering/atlassian/references/install.md` (or run `/atlassian install`). In an open Copilot session, use `/add-dir /path/to/brain/plugins` and ask Copilot to follow the matching installer by absolute path. The MS installer sets up Azure CLI and can run outside a repository. Each installer checks the plugin version against the source checkout before setup.
+Replace `wf` with `crew`, `ms`, `ralph`, or `verify`. For Jira or Confluence setup, run `/atlassian install` after installing `wf@brain`. In an open Copilot session, use `/add-dir /path/to/brain/plugins` and ask Copilot to follow the matching installer by absolute path. The MS installer sets up Azure CLI and can run outside a repository. Each installer checks the plugin version against the source checkout before setup.
 
 ### Install only the plugins
 
@@ -164,6 +164,14 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [review](plugins/wf/skills/review/SKILL.md): use `code` for PR findings, `comments` for existing threads, `blast-radius` for downstream risk, `tests-gap` for regression coverage, `architecture` for drift, or `hitl` for human-led PR review.
 - [WF installer](plugins/wf/install/install.md): one-time repo setup for GitHub issue labels and doc layout, and offers repo-level `factory-mode` install; labels-only mode repairs missing labels. Backlog skills bundle their own GitHub guidance; research and docs initialization remain local, and other skills retain their Jira workflows.
 
+#### Atlassian
+
+- [ATL installer](plugins/wf/skills/atlassian/references/install.md) (`/atlassian install`): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
+- [preflight-atlassian](plugins/wf/skills/atlassian/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
+- [atlassian](plugins/wf/skills/atlassian/SKILL.md): one entry point for Jira and Confluence: fetch or publish a work item or page, address page review comments (targeted in-place edits plus a reply per thread), convert Markdown to/from ADF, and search or operate through twg. `/atlassian help` lists every tactic and command. Its `scripts/atl.py` CLI (`fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown`) runs from any working directory.
+
+**Migration:** install or update `wf@brain` and remove any standalone `atlassian` copy. If you still use the retired plugin, run `copilot plugin uninstall atl@brain`. `fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown-adf`, `address-page-comments`, and `twg` are now tactics of the `atlassian` skill; old slash commands become requests to `/atlassian` (e.g. `/atlassian fetch PROJ-123`). `fix-confluence-comments` is retired: ordinary page edits use the Publish page tactic, review-thread replies the Address page comments tactic. `brief-daily` moved to the engineering skill [daily-briefing](skills/engineering/daily-briefing/SKILL.md). Scripts that called `plugins/atl/skills/<old-skill>/scripts/*.py` call `python3 plugins/wf/skills/atlassian/scripts/atl.py <command>` instead. Re-run `/atlassian install` to refresh `preflight-atlassian` and migrate generated `pub-*` wrappers.
+
 ### crew
 
 Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions.
@@ -185,16 +193,6 @@ AFK PR review and autonomous development loop.
 - [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
 - [Ralph installer](plugins/ralph/install/install.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
 
-
-### Atlassian (engineering skill)
-
-Standalone skill under `skills/engineering/atlassian/`; the former `atl` plugin is retired (`copilot plugin uninstall atl@brain`).
-
-- [ATL installer](skills/engineering/atlassian/references/install.md) (`/atlassian install`): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
-- [preflight-atlassian](skills/engineering/atlassian/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
-- [atlassian](skills/engineering/atlassian/SKILL.md): one entry point for Jira and Confluence: fetch or publish a work item or page, address page review comments (targeted in-place edits plus a reply per thread), convert Markdown to/from ADF, and search or operate through twg. `/atlassian help` lists every tactic and command. Its `scripts/atl.py` CLI (`fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown`) runs from any working directory.
-
-**Migrating from the atl plugin:** uninstall `atl@brain`, then `gh skill install antshc/brain engineering/atlassian`. `fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown-adf`, `address-page-comments`, and `twg` are now tactics of the `atlassian` skill; old slash commands become requests to `/atlassian` (e.g. `/atlassian fetch PROJ-123`). `fix-confluence-comments` is retired: ordinary page edits use the Publish page tactic, review-thread replies the Address page comments tactic. `brief-daily` moved to the engineering skill [daily-briefing](skills/engineering/daily-briefing/SKILL.md). Scripts that called `plugins/atl/skills/<old-skill>/scripts/*.py` call `python3 skills/engineering/atlassian/scripts/atl.py <command>` instead. Re-run `/atlassian install` to refresh `preflight-atlassian` and migrate generated `pub-*` wrappers.
 
 ### ms
 
