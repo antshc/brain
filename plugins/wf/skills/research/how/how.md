@@ -19,7 +19,7 @@ When in doubt, take the simple path.
 
 ## 2. Explore (complex only)
 
-Decompose the question into 2 to 4 angles, each a distinct slice of the subsystem. Spawn all explorers in a single message, each with `how/explorer-prompt.md` and its angle filled in.
+Decompose the question into 2 to 4 angles, each a distinct slice of the subsystem. Spawn all explorers in a single message, each with `how/explorer-prompt.md` and its angle filled in. Fill placeholders only; keep the Read-only paragraph verbatim. Target has `graphify-out/` → paste the research skill's Graphify line verbatim into each explorer prompt body.
 
 ## 3. Synthesize (complex only)
 

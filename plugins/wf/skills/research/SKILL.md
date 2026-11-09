@@ -18,6 +18,11 @@ description: >-
 
 - **MUST** delegate source reading. Parent routes, briefs, and verifies to keep raw evidence in subagent context. If delegation is unavailable, report the blocker.
 - **MUST** pass `@outputShape` verbatim to every subagent. It takes precedence over report defaults.
+- **MUST** check each codebase target root for `graphify-out/`. Present → paste this **Graphify line** verbatim into the subagent prompt body of every codebase-reading brief (How explorer and explainer, System inspection, Why code anchor), with `<root>` filled:
+
+  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Read-only overrides its write steps. Cite source files, not graph nodes; a missing node is never absence evidence.
+
+  A brief without the Graphify line, or paraphrasing it (e.g. "graphify-out/ exists for orientation"), is a defect; fix before dispatch.
 
 ## Entry routes
 
@@ -31,6 +36,8 @@ description: >-
 
 For full Why, load only the relevant source playbooks in full: [code archaeology](why/sources/code-archaeology.md), [Atlassian](why/sources/atlassian.md), [Linear](why/sources/linear.md), [Notion](why/sources/notion.md), [Slack](why/sources/slack.md), [Datadog](why/sources/datadog.md), [Sentry](why/sources/sentry.md), [Databricks](why/sources/databricks.md), and [incident postmortems](why/sources/incident-postmortem.md) for defensive code.
 
+For How, copy the explorer and explainer templates' read-only paragraphs verbatim and add the Graphify line to each prompt body.
+
 For How or Why, pass the original question, named targets or refs, and `@outputShape` to each brief. Keep evidence workers read-only. The Research coordinator verifies citations, saves the Markdown output to the requested path or `docs/research/<slug>.md`, and returns its path and any gaps. A caller may request the Why code anchor inline. If evidence is missing, report the gap with any verified results.
 
 ## Workflow
@@ -41,7 +48,7 @@ For How or Why, pass the original question, named targets or refs, and `@outputS
 
 ## System inspection
 
-Read [system-inspection.md](system/system-inspection.md) to brief. Use the supplied axis when present (`focused` requests a focused report). Otherwise select one axis below or request a focused report for an isolated lookup or package API question. Include named deployables or repositories and planned lookups with `@shape` and `@depth` from Codebase lookups. Quote literals and symbols exactly. Subagent reads the contract and any selected axis reference and template in full, applies Codebase lookups, and inspects as built.
+Read [system-inspection.md](system/system-inspection.md) to brief. Use the supplied axis when present (`focused` requests a focused report). Otherwise select one axis below or request a focused report for an isolated lookup or package API question. Include named deployables or repositories and planned lookups with `@shape` and `@depth` from Codebase lookups. Quote literals and symbols exactly. Add the Graphify line to the subagent prompt body. Subagent reads the contract and any selected axis reference and template in full, applies Codebase lookups, and inspects as built.
 
 | Axis | Select for | Reference | Template |
 |---|---|---|---|
