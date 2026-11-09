@@ -17,7 +17,7 @@ copilot --add-dir="/path/to/brain/plugins" \
   -i 'Follow /path/to/brain/plugins/wf/install/install.md in this repository.'
 ```
 
-Replace `wf` with `crew`, `ms`, `ralph`, or `verify`. For `atl`, follow `/path/to/brain/plugins/atl/skills/atlassian/references/install.md`, or run `/atlassian install` once the plugin is installed. In an open Copilot session, use `/add-dir /path/to/brain/plugins` and ask Copilot to follow the matching installer by absolute path. The MS installer sets up Azure CLI and can run outside a repository. Each installer checks the plugin version against the source checkout before setup.
+Replace `wf` with `crew`, `ms`, `ralph`, or `verify`. Atlassian is a standalone skill: `gh skill install antshc/brain engineering/atlassian`, then follow `/path/to/brain/skills/engineering/atlassian/references/install.md` (or run `/atlassian install`). In an open Copilot session, use `/add-dir /path/to/brain/plugins` and ask Copilot to follow the matching installer by absolute path. The MS installer sets up Azure CLI and can run outside a repository. Each installer checks the plugin version against the source checkout before setup.
 
 ### Install only the plugins
 
@@ -49,13 +49,6 @@ copilot plugin install ralph@brain
 ```
 
 </details>
-
-### Atlassian plugin (atl)
-
-```sh
-(copilot plugin uninstall atl@brain >/dev/null 2>&1 || true) && \
-copilot plugin install atl@brain
-```
 
 ### Microsoft platform plugin (ms)
 
@@ -197,15 +190,15 @@ AFK PR review and autonomous development loop.
 - [Ralph installer](plugins/ralph/install/install.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
 
 
-### atl
+### Atlassian (engineering skill)
 
-Atlassian workflow skills.
+Standalone skill under `skills/engineering/atlassian/`; the former `atl` plugin is retired (`copilot plugin uninstall atl@brain`).
 
-- [ATL installer](plugins/atl/skills/atlassian/references/install.md) (`/atlassian install`): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
-- [preflight-atlassian](plugins/atl/skills/atlassian/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
-- [atlassian](plugins/atl/skills/atlassian/SKILL.md): one entry point for Jira and Confluence: fetch or publish a work item or page, address page review comments (targeted in-place edits plus a reply per thread), convert Markdown to/from ADF, and search or operate through twg. `/atlassian help` lists every tactic and command. Its `scripts/atl.py` CLI (`fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown`) runs from any working directory.
+- [ATL installer](skills/engineering/atlassian/references/install.md) (`/atlassian install`): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
+- [preflight-atlassian](skills/engineering/atlassian/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
+- [atlassian](skills/engineering/atlassian/SKILL.md): one entry point for Jira and Confluence: fetch or publish a work item or page, address page review comments (targeted in-place edits plus a reply per thread), convert Markdown to/from ADF, and search or operate through twg. `/atlassian help` lists every tactic and command. Its `scripts/atl.py` CLI (`fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown`) runs from any working directory.
 
-**Migrating from atl 1.x:** `fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown-adf`, `address-page-comments`, and `twg` are now tactics of the `atlassian` skill; old slash commands become requests to `/atlassian` (e.g. `/atlassian fetch PROJ-123`). `fix-confluence-comments` is retired: ordinary page edits use the Publish page tactic, review-thread replies the Address page comments tactic. `brief-daily` moved to the engineering skill [daily-briefing](skills/engineering/daily-briefing/SKILL.md). Scripts that called `plugins/atl/skills/<old-skill>/scripts/*.py` call `python3 plugins/atl/skills/atlassian/scripts/atl.py <command>` instead. Re-run `/atlassian install` to refresh `preflight-atlassian` and migrate generated `pub-*` wrappers.
+**Migrating from the atl plugin:** uninstall `atl@brain`, then `gh skill install antshc/brain engineering/atlassian`. `fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown-adf`, `address-page-comments`, and `twg` are now tactics of the `atlassian` skill; old slash commands become requests to `/atlassian` (e.g. `/atlassian fetch PROJ-123`). `fix-confluence-comments` is retired: ordinary page edits use the Publish page tactic, review-thread replies the Address page comments tactic. `brief-daily` moved to the engineering skill [daily-briefing](skills/engineering/daily-briefing/SKILL.md). Scripts that called `plugins/atl/skills/<old-skill>/scripts/*.py` call `python3 skills/engineering/atlassian/scripts/atl.py <command>` instead. Re-run `/atlassian install` to refresh `preflight-atlassian` and migrate generated `pub-*` wrappers.
 
 ### ms
 
@@ -249,5 +242,5 @@ General-purpose skills not tied to a specific platform.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
-- [daily-briefing](skills/engineering/daily-briefing/SKILL.md): report your blocked Jira items and unanswered or answered @mentions; read-only. Requires the ATL plugin and its installer-generated `preflight-atlassian` skill.
+- [daily-briefing](skills/engineering/daily-briefing/SKILL.md): report your blocked Jira items and unanswered or answered @mentions; read-only. Requires the `atlassian` skill and its installer-generated `preflight-atlassian` skill.
 - [factory-mode](skills/engineering/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by the WF installer and customized by its users.

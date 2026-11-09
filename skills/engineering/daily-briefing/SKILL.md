@@ -11,9 +11,9 @@ Two read-only Jira reports for the current user: blocked items assigned to them,
 
 ## Prerequisites
 
-- **ATL plugin** installed and enabled, providing the `atlassian` skill's twg routing.
+- **`atlassian`** engineering skill installed, providing twg routing.
 - **`preflight-atlassian`** skill generated in this repo by the `atlassian` skill's Install tactic, with `email`/`apiToken` in its `.atlassian.json.user`.
-- Either missing → stop and report that daily-briefing needs the ATL plugin and its preflight-atlassian skill, and ask the user to run `/atlassian install` in Copilot CLI. Never authenticate or install anything yourself.
+- Either missing → stop and report that daily-briefing needs the `atlassian` skill and its preflight-atlassian skill, and ask the user to run `/atlassian install` in Copilot CLI. Never authenticate or install anything yourself.
 
 ## Contract
 
