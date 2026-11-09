@@ -1,6 +1,6 @@
-# explore-codebase evaluations
+# research Explore route evaluations
 
-Live routing eval for the `explore-codebase` skill. `scenarios.json` holds each case's Request, `excludedTools`, expected route, and checks; `results.json` holds the baseline scoreboard and post-fix runs. `test_contracts.py` guards the scenario file shape offline; it does not run models.
+Live routing eval for the `research` skill's Explore route. `scenarios.json` holds each case's Request, `excludedTools`, expected route, and checks; `results.json` holds the baseline scoreboard and post-fix runs. `test_explore_contracts.py` guards the scenario file shape offline; it does not run models.
 
 ## Live runner
 

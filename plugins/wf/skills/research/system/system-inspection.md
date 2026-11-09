@@ -15,7 +15,7 @@ Inspect the **as-built** state using target repositories and restored packages a
 
 ## Codebase lookups
 
-**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one read-only subagent per independent lookup. Sequence dependent lookups. Instruct each to *run `explore-codebase` skill for symbol, callers, flow, literal, or config evidence*. If the skill is unavailable, spawn the explore agent with the same Request and read-only contract. Pass each Request:
+**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one read-only subagent per independent lookup. Sequence dependent lookups. Instruct each to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, literal, or config evidence*. If Research is unavailable, spawn the explore agent with the same Request and read-only contract. Pass each Explore request:
 
 - `@work`: question, prefixed `Exact literal \`X\`:`, `Symbol \`Type.Member\`:`, or `Names unknown:`.
 - `@shape` and `@depth`: from the table below.
@@ -34,7 +34,7 @@ Inspect the **as-built** state using target repositories and restored packages a
 
 Target has `graphify-out/` → for `relationship` lookups, instruct the subagent to *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* before `rg`/LSP; read-only contract overrides its write steps. Graph orients, source proves; a missing node is never absence evidence.
 
-For NuGet-owned claims or evidence, delegate *`explore-codebase` with `@shape: nuget`* to verify the package API or behavior from XML docs or decompiled code. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
+For NuGet-owned claims or evidence, delegate *`research` skill Explore route with `@shape: nuget` to verify this NuGet API inline, read-only*, checking the package API or behavior from XML docs or decompiled code. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
 
 Structure and cite returned evidence. Write only the inspection document.
 

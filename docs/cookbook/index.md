@@ -33,7 +33,7 @@ Tracks reusable AI-agent practices found in this repository and explicitly scann
 
 - [ ] **Skill composition and single ownership** — [source](../concepts/structure-skill-composition.md)
 - [ ] **Cross-scope specialist discovery** — [source](../concepts/structure-cross-scope-skill-family.md)
-- [ ] **Delegation engine isolation** — [source](../adr/explore-codebase-is-skill-agnostic.md)
+- [ ] **Delegation engine isolation** — [source](../adr/research-explore-is-skill-agnostic.md)
 - [ ] **Agent-agnostic handoff contracts** — [source](../adr/ralph-is-agent-agnostic.md)
 - [ ] **Session ledger** — [source](../concepts/structure-ledger.md)
 - [ ] **Trigger indexing** — [source](../concepts/structure-trigger-indexer.md)

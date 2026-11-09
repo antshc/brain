@@ -6,7 +6,7 @@ Build each explorer subagent's prompt from this template. Fill in the placeholde
 
 Other explorers are investigating different slices of the same subsystem in parallel. Don't try to cover everything. Focus on your assigned angle and go deep.
 
-Read-only: edit nothing in the repository. Target has `graphify-out/` → *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* first to orient; cite source files, not graph nodes. C# type or member with no local definition → *run `explore-codebase` with `@shape: nuget`*, using its NuGet tactic to resolve the package and verify XML docs or decompiled assembly. If unavailable, report the package question under Open Questions; never search outside scoped repo and NuGet cache roots.
+Read-only: edit nothing in the repository. Target has `graphify-out/` → *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* first to orient; cite source files, not graph nodes. C# type or member with no local definition → *run `research` skill Explore route with `@shape: nuget` to verify this NuGet API inline, read-only*, using its NuGet tactic to resolve the package and verify XML docs or decompiled assembly. If unavailable, report the package question under Open Questions; never search outside scoped repo and NuGet cache roots.
 
 ## Question
 

@@ -18,7 +18,7 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 ## Research
 
-*Run `research` skill to investigate primary sources (codebase, NuGet packages, cloud docs, web) via discovered specialists or subagents.* Research routes codebase and NuGet parts through `explore-codebase`, including its NuGet tactic for restored package types; **MUST NOT** invoke it directly. Pass:
+*Run `research` skill to investigate primary sources (codebase, NuGet packages, cloud docs, web) via discovered specialists or subagents.* Research routes codebase and NuGet parts through its Explore route, including the NuGet tactic for restored package types; **MUST NOT** run the Explore route directly. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
 - `@outputShape`: Markdown; one result per topic/source part; location `<repo-root>/tmp/architect-<slug>/research/`; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.

@@ -6,7 +6,7 @@ Explore the codebase to answer "how does X work?" questions. Produce architectur
 
 For each stage, *run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch**. Explorers use `how explorer` and explainers use `how explainer`. Require read-only access: use `explore`, or `general-purpose` with edits forbidden if MCP is needed. Use the role fallback on rejection, then the closest valid model of the same family.
 
-**Spawn as `explore-codebase` request.** Read `explore-codebase` skill's **Request**; form per spawn: `@work` = the filled prompt template as prompt instruction (verbatim); `@depth` = `thorough` for explorers, `medium` for the simple-path explainer, `quick` for the synthesizing explainer; `[@target]` = repositories or services the question names; `@outputShape` = the template's Output section. Spawn each subagent with its request verbatim, instructing it to *run `explore-codebase` skill for the read-only lookup — resolve target, locate symbols, callers, flow, config evidence*. Skill unavailable → spawn with the filled prompt template alone, as below.
+**Spawn as Explore request.** Read this skill's **Explore request**; form per spawn: `@work` = the filled prompt template as prompt instruction (verbatim); `@depth` = `thorough` for explorers, `medium` for the simple-path explainer, `quick` for the synthesizing explainer; `[@target]` = repositories or services the question names; `@outputShape` = the template's Output section. Spawn each subagent with its request verbatim, instructing it to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, config evidence*. Research unavailable → spawn with the filled prompt template alone, as below.
 
 ## 1. Assess complexity
 
