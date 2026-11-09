@@ -20,11 +20,11 @@ Run once per session, before Review loop. Steps 1 to 3 complete before step 4.
 
 If `git status --porcelain` is non-empty, stop and ask the user before checkout.
 
-Follow [Fetch PR diff](../references/fetch-diff.md#hitl), using the HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
+Follow [Fetch PR diff](../../github/references/fetch-diff.md#hitl), using the HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
 
 **2. Load existing review comments**
 
-Run `gh api --paginate repos/<OWNER>/<REPO>/pulls/<PR_NUMBER>/comments --jq '.[] | "File: \(.path)  Line: \(.line) OrigLine: \(.original_line)\nUser: \(.user.login)\nBody: \(.body)\n---"'`. Use results as dedup context only; report only new issues backed by fresh evidence.
+Use `GH_TOOL pr snapshot OWNER/REPO#PR_NUMBER --inline` for paginated dedup context. Report only new findings.
 
 **3. Load architecture documentation**
 
@@ -36,7 +36,7 @@ Locate existing architecture docs — overview, Crosscutting Concepts, ADRs — 
 
 Runs on the user's behalf despite the on-initiative restriction; the human reads the output, the assistant does not summarize it.
 
-Set `@diffSize` to `additions + deletions` from `gh pr view <PR_NUMBER> --repo <OWNER>/<REPO> --json additions,deletions`. Set `@agentSize` from `@diffSize`:
+Set `@diffSize` to `additions + deletions` from `GH_TOOL pr snapshot OWNER/REPO#PR_NUMBER`. Set `@agentSize` from `@diffSize`:
 
 | `@diffSize` | `@agentSize` |
 |---|---|
@@ -93,7 +93,7 @@ Drafts, approves, and posts one review comment.
 
 2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability, etc.).
 
-2.2 `IMPROVEMENT` — concrete fix or direction. *Run `git-conventions` tactic **Draft or finalize review comment*** with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `git-conventions` install before drafting. Stop and report missing access if neither is available.
+2.2 `IMPROVEMENT` — concrete fix or direction. *Run `github` tactic **Draft or finalize review comment*** with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `github` install before drafting. Stop and report missing access if neither is available.
 
 2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 

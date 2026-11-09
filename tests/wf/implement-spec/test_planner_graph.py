@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-import spec_gh
+from github_cli import cli, implement_spec as spec_gh
 
 
 SPEC = "acme/specs#1"
@@ -44,7 +44,7 @@ def test_inferred_dependencies_survive_tracker_refresh_and_incremental_completio
     for done, expected in (([], [A]), ([A], [B]), ([A, B], [C])):
         # A tracker refresh has no knowledge of run-local inferred edges.
         (tmp_path / "graph.json").write_bytes(original)
-        assert spec_gh.main(args + (["--done", *done] if done else [])) == 0
+        assert cli.main(args + (["--done", *done] if done else [])) == 0
         assert json.loads(capsys.readouterr().out)["ready"] == expected
         saved = json.loads((tmp_path / "effective-graph.json").read_text())
         assert saved["frontier"]["ready"] == expected
@@ -76,7 +76,7 @@ def test_new_dependency_cycle_rejected_before_effective_graph_is_replaced(tmp_pa
     args = paths(tmp_path, native, planner)
     output = tmp_path / "effective-graph.json"
     output.write_text("previous valid graph")
-    assert spec_gh.main(args) == 2
+    assert cli.main(args) == 2
     assert "cycle" in capsys.readouterr().err.lower()
     assert output.read_text() == "previous valid graph"
 
@@ -97,7 +97,7 @@ def test_invalid_or_stale_planner_result_stops_before_writing(tmp_path, capsys, 
     planner = plan()
     mutation(planner)
     args = paths(tmp_path, graph(), planner)
-    assert spec_gh.main(args) == 2
+    assert cli.main(args) == 2
     assert capsys.readouterr().err
     assert not (tmp_path / "effective-graph.json").exists()
 
@@ -117,7 +117,7 @@ def test_output_cannot_overwrite_native_graph_or_planner(tmp_path, capsys, targe
     args = paths(tmp_path, graph(), plan())
     before = (tmp_path / target).read_bytes()
     args[-1] = str(tmp_path / target)
-    assert spec_gh.main(args) == 2
+    assert cli.main(args) == 2
     assert "overwrite" in capsys.readouterr().err
     assert (tmp_path / target).read_bytes() == before
 

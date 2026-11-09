@@ -1,45 +1,18 @@
-#!/usr/bin/env python3
-"""GitHub operations for the implement-spec skill: one command per intent, JSON on stdout.
-
-Self-contained: stdlib only, shells out to `gh` and `git`. Errors go to stderr.
-Exit codes: 0 ok, 1 GitHub/tool failure, 2 invalid input or unresolved routing,
-3 completed but read-back verification reported `problems`.
-
-    preflight   (--spec REF | --source-repository R --base-branch B --initiative-id I)
-                [--harness-root P] [--mode MODE] [--max-parallel N] [--integration-branch H] [--pin-base]
-    run checkpoint --run-dir DIR --input FILE
-    spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N
-    graph read  --spec REF --out RUN_DIR      (also saves spec issue artifacts under RUN_DIR/artifacts, indexed by name in index.json)
-    graph frontier --graph FILE [--planner FILE --out EFFECTIVE_FILE] [--done REF ...]
-    ticket create --spec REF --title T --body-file F
-    issue block REF --by REF [--by REF ...]
-    issue edit-body REF --body-file F
-    issue comment REF --body-file F [--run-id ID]
-    issue close REF (--run-id ID --evidence-comment N | --commit SHA --branch B [--pr URL] | --comment TEXT)
-    pr publish  --source-repository R --base B --head H --title T --initiative-id I
-                --rationale-file F --changes-file F --evidence-file F [--refs REF ...]
-    pr read     --source-repository R (--number N | --head H) [--initiative-id I] [--expect-refs REF ...]
-    pr diff-split --pr URL_OR_NUMBER [--source-repository R]
-
-REF is `OWNER/REPO#NUMBER` or an issue URL.
-"""
 from __future__ import annotations
 
 import argparse
 import copy
-import hashlib
 import json
 import re
 import shutil
-import subprocess
-import sys
 import tempfile
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import quote
 
-REPO_PATTERN = r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
+from .gh import REPO_PATTERN, Gh, GhError, Ref, UsageError, parse_ref, read_body
+from .issues import labels_of, read_comments, read_issue
+
 BLOCK_BEGIN = "<!-- implement-spec:begin -->"
 BLOCK_END = "<!-- implement-spec:end -->"
 TARGET_PREFIX = "repo:target:"
@@ -48,88 +21,11 @@ ARTIFACTS_API_VERSION = "2026-03-10"
 ARTIFACTS_PAGE_SIZE = 100
 ARTIFACTS_INDEX = "index.json"
 RUN_ID_PATTERN = r"[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*"
-Runner = Callable[[list[str]], tuple[int, str, str]]
-
-
-class UsageError(Exception):
-    exit_code = 2
-
-
-class GhError(Exception):
-    exit_code = 1
-
-
-@dataclass(frozen=True)
-class Ref:
-    repo: str
-    number: int
-
-    def __str__(self) -> str:
-        return f"{self.repo}#{self.number}"
-
-    @property
-    def key(self) -> str:
-        digest = hashlib.sha256(str(self).lower().encode("ascii")).hexdigest()[:24]
-        return f"t{self.number}-{digest}"
-
-
-def parse_ref(text: str, default_repo: str | None = None) -> Ref:
-    text = text.strip()
-    match = re.fullmatch(rf"https://github\.com/({REPO_PATTERN})/(?:issues|pull)/(\d+)/?", text)
-    match = match or re.fullmatch(rf"({REPO_PATTERN})#(\d+)", text)
-    if match:
-        return Ref(match.group(1), int(match.group(2)))
-    bare = re.fullmatch(r"#?(\d+)", text)
-    if bare and default_repo:
-        return Ref(default_repo, int(bare.group(1)))
-    raise UsageError(f"cannot parse issue reference: {text!r}")
-
-
-def run_cmd(args: list[str]) -> tuple[int, str, str]:
-    try:
-        done = subprocess.run(args, check=False, capture_output=True, text=True)
-    except FileNotFoundError as exception:
-        raise GhError(f"{args[0]} is not installed") from exception
-    return done.returncode, done.stdout, done.stderr
-
-
-class Gh:
-    def __init__(self, runner: Runner = run_cmd) -> None:
-        self._runner = runner
-
-    def raw(self, *args: str) -> tuple[int, str, str]:
-        return self._runner(["gh", *args])
-
-    def text(self, *args: str) -> str:
-        code, out, err = self.raw(*args)
-        if code:
-            raise GhError(f"gh {' '.join(args[:3])} failed ({code}): {(err or out).strip()}")
-        return out
-
-    def json(self, *args: str) -> Any:
-        return json.loads(self.text(*args) or "null")
-
-    def pages(self, endpoint: str) -> list[dict[str, Any]]:
-        return [item for page in self.json("api", "--paginate", "--slurp", endpoint) for item in page]
-
-    def git(self, *args: str) -> str:
-        code, out, err = self._runner(["git", *args])
-        if code:
-            raise GhError(f"git {' '.join(args[:3])} failed ({code}): {(err or out).strip()}")
-        return out
 
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
-
-
-def read_issue(gh: Gh, ref: Ref) -> dict[str, Any]:
-    return gh.json("api", f"repos/{ref.repo}/issues/{ref.number}")
-
-
-def read_comments(gh: Gh, ref: Ref) -> list[dict[str, Any]]:
-    return gh.pages(f"repos/{ref.repo}/issues/{ref.number}/comments")
 
 
 def read_artifacts(gh: Gh, ref: Ref) -> tuple[list[dict[str, Any]], str | None]:
@@ -169,10 +65,6 @@ def save_artifacts(artifacts: list[dict[str, Any]], directory: Path) -> list[dic
     directory.mkdir(parents=True, exist_ok=True)
     (directory / ARTIFACTS_INDEX).write_text(json.dumps(records, indent=2), encoding="utf-8")
     return records
-
-
-def labels_of(issue: dict[str, Any]) -> list[str]:
-    return [label["name"] if isinstance(label, dict) else label for label in issue.get("labels", [])]
 
 
 def ref_of_api(issue: dict[str, Any]) -> Ref:
@@ -649,8 +541,8 @@ def cmd_issue_block(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
 def cmd_issue_edit_body(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     ref = parse_ref(args.ref)
     gh.text("issue", "edit", str(ref.number), "--repo", ref.repo, "--body-file", args.body_file)
-    expected = Path(args.body_file).read_text(encoding="utf-8").strip()
-    problems = [] if (read_issue(gh, ref).get("body") or "").strip() == expected else ["body differs after edit"]
+    expected = read_body(args.body_file)
+    problems = [] if (read_issue(gh, ref).get("body") or "") == expected else ["body differs after edit"]
     return {"ref": str(ref), "problems": problems}
 
 
@@ -914,103 +806,3 @@ def cmd_pr_diff_split(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
         manifest.append(f"{path}\t{name}")
     (diff_dir / "_manifest.tsv").write_text("\n".join(manifest) + "\n", encoding="utf-8")
     return {"diff_dir": str(diff_dir), "manifest": str(diff_dir / "_manifest.tsv"), "files": len(files)}
-
-
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="implement-spec GitHub operations")
-    groups = parser.add_subparsers(dest="group", required=True)
-    nested = {
-        group: groups.add_parser(group).add_subparsers(dest="action", required=True)
-        for group in ("spec", "graph", "ticket", "issue", "pr", "run")
-    }
-
-    def command(group: str | None, name: str, handler: Callable[..., dict[str, Any]]) -> argparse.ArgumentParser:
-        sub = (groups if group is None else nested[group]).add_parser(name)
-        sub.set_defaults(handler=handler)
-        return sub
-
-    p = command(None, "preflight", cmd_preflight)
-    p.add_argument("--spec")
-    p.add_argument("--harness-root")
-    p.add_argument("--source-repository")
-    p.add_argument("--base-branch")
-    p.add_argument("--initiative-id")
-    p.add_argument("--mode", choices=("sequential", "parallel"), default="sequential")
-    p.add_argument("--max-parallel", type=int)
-    p.add_argument("--pin-base", action="store_true")
-    p.add_argument("--integration-branch")
-
-    p = command("run", "checkpoint", cmd_run_checkpoint)
-    p.add_argument("--run-dir", required=True)
-    p.add_argument("--input", required=True)
-
-    p = command("spec", "create", cmd_spec_create)
-    for flag in ("source-repository", "base-branch", "initiative-id", "summary", "body-file", "source-note"):
-        p.add_argument(f"--{flag}", required=True)
-    p.add_argument("--tracker-repository")
-
-    p = command("graph", "read", cmd_graph_read)
-    p.add_argument("--spec", required=True)
-    p.add_argument("--out", required=True)
-
-    p = command("graph", "frontier", cmd_graph_frontier)
-    p.add_argument("--graph", required=True)
-    p.add_argument("--planner")
-    p.add_argument("--out")
-    p.add_argument("--done", action="extend", nargs="+", default=[])
-
-    p = command("ticket", "create", cmd_ticket_create)
-    for flag in ("spec", "title", "body-file"):
-        p.add_argument(f"--{flag}", required=True)
-
-    p = command("issue", "block", cmd_issue_block)
-    p.add_argument("ref")
-    p.add_argument("--by", action="extend", nargs="+", required=True)
-
-    for name, handler in (("edit-body", cmd_issue_edit_body), ("comment", cmd_issue_comment)):
-        p = command("issue", name, handler)
-        p.add_argument("ref")
-        p.add_argument("--body-file", required=True)
-        if name == "comment":
-            p.add_argument("--run-id")
-
-    p = command("issue", "close", cmd_issue_close)
-    p.add_argument("ref")
-    for flag in ("commit", "branch", "pr", "comment", "run-id"):
-        p.add_argument(f"--{flag}")
-    p.add_argument("--evidence-comment", type=int)
-
-    p = command("pr", "publish", cmd_pr_publish)
-    for flag in ("source-repository", "base", "head", "title", "initiative-id", "rationale-file", "changes-file", "evidence-file"):
-        p.add_argument(f"--{flag}", required=True)
-    p.add_argument("--refs", action="extend", nargs="+", default=[])
-
-    p = command("pr", "diff-split", cmd_pr_diff_split)
-    p.add_argument("--pr", required=True)
-    p.add_argument("--source-repository")
-
-    p = command("pr", "read", cmd_pr_read)
-    p.add_argument("--source-repository", required=True)
-    p.add_argument("--number", type=int)
-    p.add_argument("--head")
-    p.add_argument("--initiative-id")
-    p.add_argument("--expect-refs", action="extend", nargs="+", default=[])
-    return parser
-
-
-def main(argv: list[str] | None = None, *, gh: Gh | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    try:
-        result = args.handler(gh or Gh(), args)
-    except (UsageError, GhError) as exception:
-        print(f"error: {exception}", file=sys.stderr)
-        return exception.exit_code
-    except (OSError, json.JSONDecodeError) as exception:
-        print(f"error: {exception}", file=sys.stderr)
-        return UsageError.exit_code
-    print(json.dumps(result, indent=2))
-    return 3 if result.get("problems") else 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

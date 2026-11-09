@@ -213,9 +213,7 @@ def remove(
     result["status"] = "removed"
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Create or remove an owned Git worktree.")
-    actions = parser.add_subparsers(dest="action", required=True)
+def register(actions: Any) -> None:
     create_parser = actions.add_parser("create")
     remove_parser = actions.add_parser("remove")
     for action_parser in (create_parser, remove_parser):
@@ -229,15 +227,32 @@ def main() -> int:
     remove_parser.add_argument("--record", type=Path, required=True)
     remove_parser.add_argument("--expect-head", required=True)
     remove_parser.add_argument("--recoverable", action="store_true")
-    args = parser.parse_args()
+    for action_parser in (create_parser, remove_parser):
+        action_parser.set_defaults(entry=run)
+    for name in ("inspect", "reconcile", "reuse"):
+        action_parser = actions.add_parser(name)
+        action_parser.add_argument("--harness", type=Path, required=True)
+        action_parser.add_argument("--source", type=Path, required=True)
+        action_parser.add_argument("--record", type=Path)
+        action_parser.add_argument("--repo-name")
+        action_parser.add_argument("--name")
+        action_parser.add_argument("--expect-head")
+        action_parser.set_defaults(entry=run)
+
+
+def run(args: argparse.Namespace) -> int:
 
     result: dict[str, Any] = {"changedExcludeFiles": []} if args.action == "create" else {}
     try:
         harness = checkout(args.harness)
         source = checkout(args.source)
         common = git_path(source, "--git-common-dir")
-        action = create if args.action == "create" else remove
-        action(args, harness, source, common, result)
+        if args.action == "create":
+            create(args, harness, source, common, result)
+        elif args.action == "remove":
+            remove(args, harness, source, common, result)
+        else:
+            inspect(args, harness, source, common, result)
     except (WorktreeError, OSError, ValueError, RuntimeError) as exception:
         result.update(status="blocked", reason=str(exception))
         print(str(exception), file=sys.stderr)
@@ -245,5 +260,57 @@ def main() -> int:
     return 1 if result["status"] == "blocked" else 0
 
 
-if __name__ == "__main__":
-    sys.exit(main())
+def inspect(
+    args: argparse.Namespace, harness: Path, source: Path, common: Path, result: dict[str, Any]
+) -> None:
+    record = json.loads(args.record.read_text(encoding="utf-8")) if args.record else None
+    if record is not None:
+        if not isinstance(record, dict) or not isinstance(record.get("path"), str):
+            raise WorktreeError("Invalid ownership record")
+        path = Path(record["path"])
+        if not path.is_relative_to(harness / ".worktrees"):
+            raise WorktreeError("Ownership record belongs to another harness")
+        parts = path.relative_to(harness / ".worktrees").parts
+        if len(parts) != 2 or managed_path(harness, *parts) != path:
+            raise WorktreeError("Invalid managed worktree path")
+    elif args.repo_name and args.name and args.action != "reuse":
+        path = managed_path(harness, args.repo_name, args.name)
+    else:
+        raise WorktreeError("Supply an ownership record or the managed repo name and leaf")
+
+    result["path"] = str(path)
+    fields = registrations(source).get(path)
+    if fields is None and not path.exists():
+        if args.action == "reuse":
+            raise WorktreeError(f"Worktree is absent: {path}")
+        result["status"] = "absent"
+        return
+    if fields is None or not path.is_dir():
+        raise WorktreeError(f"Worktree path and registration disagree: {path}")
+    head = fields.get("HEAD")
+    branch = fields.get("branch", "").removeprefix("refs/heads/") or None
+    if not head:
+        raise WorktreeError(f"Registration has no HEAD: {path}")
+    result.update(head=head, branch=branch, locked="locked" in fields, registered=True)
+    if args.action == "inspect":
+        if git_path(path, "--git-common-dir") != common:
+            raise WorktreeError(f"Worktree belongs to another repository: {path}")
+        admin = git_path(path, "--git-dir")
+        try:
+            check_clean(path, admin)
+        except WorktreeError as exception:
+            result.update(clean=False, reason=str(exception))
+        else:
+            result["clean"] = True
+        result.update(status="present", gitDir=str(admin), commonDir=str(common))
+        return
+    if not record or not args.expect_head:
+        raise WorktreeError("Verify ownership and expected HEAD before reuse or reconciliation")
+    admin = check_state(path, fields, common, record.get("branch"), args.expect_head)
+    marker = admin / OWNER_FILE
+    if (not record.get("owner") or not record.get("token") or record.get("commonDir") != str(common)
+            or record.get("gitDir") != str(admin) or marker.is_symlink() or not marker.is_file()
+            or json.loads(marker.read_text(encoding="utf-8")) != record):
+        raise WorktreeError(f"Worktree ownership could not be verified: {path}")
+    check_clean(path, admin)
+    result.update(status="reused" if args.action == "reuse" else "verified", record=record)

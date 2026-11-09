@@ -1,4 +1,4 @@
-"""Integration: spec_gh.py runs as a real subprocess against a stateful fake `gh` and a real git checkout."""
+"""Integration: github.py runs as a real subprocess against a stateful fake `gh` and a real git checkout."""
 from __future__ import annotations
 
 import json
@@ -11,7 +11,7 @@ import pytest
 
 HERE = Path(__file__).resolve().parent
 FAKE_GH = HERE / "fake_gh.py"
-TOOL = HERE.parents[2] / "plugins" / "wf" / "skills" / "implement-spec" / "scripts" / "spec_gh.py"
+TOOL = HERE.parents[2] / "plugins" / "wf" / "skills" / "github" / "scripts" / "github.py"
 
 pytestmark = pytest.mark.integration
 

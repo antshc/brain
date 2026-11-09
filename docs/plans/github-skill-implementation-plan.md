@@ -1,91 +1,95 @@
-# Consolidate GitHub, Git conventions, and worktrees into git-toolkit
+# Consolidate Git and GitHub into the `github` skill
 
-**Goal.** Replace the proposed `use-github` skill and the existing `git-conventions` and `worktrees` skills with one model-invoked, tactic-based skill. Callers select only the needed tactic; the skill does not orchestrate feature delivery or assume authority to publish, commit, or delete.
+Replace WF's `git-conventions` and `worktrees` with one discoverable `github` skill and one Python CLI. Migrate active WF and Factory Mode GitHub recipes. Replace the earlier `git-toolkit` proposal and its optional read-only CLI. Net change **−1 discoverable skill**.
 
-**Baseline.** The earlier [Brain snapshot at dff4393](https://github.com/antshc/brain/tree/dff4393bfe089ed44f4547d603478d811cd60fa0) and [GitHub skill proposal](https://chatgpt.com/library?file_id=libfile_989d274a269c8191b37699402923a3e0&account_id=personal) describe the original GitHub-only migration. Recheck the current `main` before implementation: `git-conventions` and `worktrees` now exist and have live WF, Review, and factory callers.
+Baseline [Brain main at `11773dd`](https://github.com/antshc/brain/tree/11773dd6e8c0da474c845c9e889b068da7d353de). Keep the existing Crew and Ralph exclusions. Inventory their copies and the legacy AFK module separately.
 
-## Name
-
-**Selected: `git-toolkit`.** One model-invoked tactic router, not an end-to-end workflow. Do not keep compatibility aliases: they would retain extra autodiscoverable skills.
-
-## Constraints
-
-- **MUST** use one discoverable `SKILL.md` with a small tactic router and on-demand references. GitHub access, Git conventions and local worktrees are independent tactic groups, not sequential workflow steps.
-- **MUST** keep caller ownership of repository/tracker routing, branch choice, integration, commit/push authorization, publication gates, review ownership, thread closure, worktree lifecycle policy and branch deletion. A formatting tactic returns text; it never executes a Git or GitHub write.
-- **MUST** qualify GitHub operations by repository and object. Keep tracker and source routing distinct. Honor the caller's expected state, transport and approval gates. Prefer the GitHub integration for supported, permitted operations, including ChatGPT publication; use authenticated `gh` only where supported and allowed. Missing capabilities stop dependent operations.
-- **MUST** read back remote writes and reconcile unknown outcomes before retries. Distinguish confirmed empty, incomplete, failed and partial results.
-- **MUST** preserve the existing `worktrees` ownership record and `scripts/worktrees.py` behavior: absolute harness/source separation, pinned commit, clean/unlocked reuse, recoverability, verified removal, no force/reset/prune/recursive deletion and no touching unowned or dirty worktrees.
-- **MUST** preserve `git-conventions` contracts: `feat/` or `fix/` branch names without ticket IDs; ordinary conventional commits and WF `ccode(...)` commits; leading initiative marker in PR title/body; concise review prose and terminal hidden agent markers. Keep the `writing-style` dependency only for convention prose that already uses it.
-- **MUST** retain caller-specific adapters and policies: Implement Spec's required `GH_TOOL` and checkpoint semantics, Address discussion gates, HITL verbatim approval, Wayfinder body blockers, To Tickets native edges, offline publication and Ralph as a separate migration.
-- **MUST NOT** turn this skill into a Git workflow orchestrator, duplicate full command recipes in callers, broaden mutation permissions, or make GitHub publication a side effect of naming/inspection.
-- **MUST NOT** refactor the Crew plugin (`plugins/crew/**`), its skills, agents, manifests, documentation, or installer. Leave its existing GitHub operations and skill dependencies unchanged. Crew migration may be proposed separately.
-
-## Proposed structure
+## Skill structure
 
 ```text
-plugins/wf/skills/git-toolkit/
-  SKILL.md                          # Tactic router; guards, inputs, outputs
-  references/
-    github/
-      issues.md
-      pull-requests.md
-      reviews.md
-      checks.md
-      repository.md
-    conventions/
-      branches.md
-      commits.md
-      pull-requests.md
-      review-comments.md
-    worktrees.md                    # Inspect/create/reuse/remove/reconcile + helper contract
-  scripts/
-    worktrees.py                    # Move existing tested helper without behavioral change
-    github_read.py                  # Optional pilot only if justified by callers
+plugins/wf/skills/github/
+├── SKILL.md
+├── tactics/
+│   ├── repository.md
+│   ├── branches.md
+│   ├── commits.md
+│   ├── worktrees.md
+│   ├── issues.md
+│   ├── specs-and-tickets.md
+│   ├── pull-requests.md
+│   ├── reviews.md
+│   └── checks.md
+├── references/
+│   ├── cli-contract.md
+│   ├── transports.md
+│   ├── pr-format.md
+│   ├── review-comments.md
+│   ├── fetch-diff.md
+│   └── issue-artifacts.md
+└── scripts/
+    ├── github.py
+    └── github_cli/
+        ├── __init__.py
+        ├── cli.py
+        ├── git.py
+        ├── gh.py
+        ├── worktrees.py
+        ├── issues.py
+        ├── specs.py
+        ├── pulls.py
+        ├── reviews.py
+        └── implement_spec.py
 ```
 
-| Tactic group | Operations | Effect |
-| --- | --- | --- |
-| **GitHub** | Repository lookup, issues/edges, PRs, review threads/replies, checks | Explicit remote reads/writes, only as authorized by caller |
-| **Conventions** | Name branch, draft commit, draft/read PR, draft/finalize review comment | Pure text or metadata; no Git/GitHub writes |
-| **Worktrees** | Inspect, create, reuse, remove, reconcile | Local state; mutations only for authorized run-owned worktrees |
+Resolve `python3 <installed github skill>/scripts/github.py` before changing directory. Use the standard library and existing `git` and `gh` subprocess patterns. `github.py` is the only supported CLI entry point. Put route-specific flags in the tactic and CLI help. Keep shared result and transport contracts in references.
 
-The router selects one operation and loads its exact reference. Each tactic reports verified result and relevant completeness/blockers. Keep `github/pull-requests.md` (remote transport) separate from `conventions/pull-requests.md` (format). Merge the old `worktrees/SKILL.md` and `references/helper.md` into the one `references/worktrees.md`; preserve its Python helper. Move the four conventions references verbatim initially, then change paths and check for semantic overlap.
+## Progressive disclosure
 
-**Skill count.** Relative to the original three-skill target (`use-github`, `git-conventions`, `worktrees`), one discoverable skill replaces three: **net −2**. Relative to today's existing two skills, the migration produces one: **net −1**. Reference and helper files are not discoverable skills.
+`SKILL.md` maps requested intent to one tactic. Load a reference only when the selected operation requires it. For example, branch naming loads `branches.md` and returns text. An explicit branch creation request uses the same tactic and runs the CLI. Opening a PR loads `pull-requests.md` and `pr-format.md` only if the caller needs formatted metadata. A task spanning several operations reselects the tactic at each step.
+
+| Tactic | CLI command groups and behavior |
+| --- | --- |
+| Repository | `repo resolve / read / search` and pinned remote file or commit reads. Identify the source, tracker, checkout and remote explicitly. |
+| Branches | `branch inspect / create / fetch / push / delete`. Keep `feat/` and `fix/` names free of ticket IDs, retain worker ordinals, and resume with exact recorded refs. Validate the expected SHA and the destination before writes. |
+| Commits | `commit history / create`. Keep conventional subjects and WF `ccode(...)` subjects. Scope history to the caller's pinned range and commits to caller-authorized paths. |
+| Worktrees | `worktree inspect / create / reuse / remove / reconcile`. Port the existing helper and ownership record. Require verified checkout identity, a pinned SHA, recoverability and clean, unlocked state where required. |
+| Issues | `issue read / list / create / edit-body / assign / unassign / comment / close`, `issue children / link-child / blockers / block`, and `label ensure / verify`. Qualify the issue and retain both API IDs and issue numbers. |
+| Specs and tickets | `spec preflight / create`, `ticket create`, `graph read`, `artifact list / get / put`. Reuse issue, label and relationship operations. Load artifact requirements only for artifact work. |
+| Pull requests | `pr read / find / publish / diff / diff-split / checkout / comment / upsert-comment`. Preserve draft policy, manual PR text, legacy initiative parsing and plain coverage references. Diff routes retain exact head/base, manifests and output ownership. |
+| Reviews | `review discussion / inline / reply / resolve`. Separate inline findings, thread replies and top-level comments. Use one marker reference for visible wording, terminal HTML rules and recognition. |
+| Checks | `checks read`. Bind results to the verified PR head and distinguish absent, pending, failed and passed. |
+
+Formatting remains a skill tactic. Apply `writing-style` to the existing commit, PR and review-draft routes. Final comment posting uses the approved body verbatim. The caller decides when to create branches, stage or integrate commits, publish, resolve threads, close issues and clean up. Preserve caller-owned merge, cherry-pick, conflict and approval logic.
+
+## Migration inventory
+
+Paths under `plugins/wf/` are relative to that directory.
+
+| Current source | Move or update |
+| --- | --- |
+| `skills/git-conventions/SKILL.md` and its four references | Move naming and commit rules to their tactics. Move PR and review formats to their references. Retire the old skill. |
+| `skills/worktrees/{SKILL.md,references/helper.md,scripts/worktrees.py}` | Move rules and tested behavior into `worktrees.md` and the CLI. Migrate callers before retiring the skill. Preserve `brain-worktree.json`, the ownership token and changed exclude-file reporting. |
+| `skills/implement-spec/scripts/spec_gh.py` | Port preflight, issue/spec/ticket operations, artifacts, graph read, draft PR publication, checks and diff split. Keep `graph frontier` and `run checkpoint` under the same CLI in private `implement_spec.py`. Those commands remain local and Implement Spec-owned. Rebind `GH_TOOL` to the new absolute entry point. Update `SKILL.md`, planner/Chore, breakdown, publication, worktrees, fetch-diff and sequential/parallel references. |
+| `skills/design/references/github.md` and Spec, Tickets and Wayfinder playbooks | Replace remote recipes with tactic calls. Keep approved content, publication profiles, label selection and offline output in Design. Keep native blockers for Tickets and body blockers for Wayfinder. Keep `bundle_artifacts.py` in Design for local packaging. Move issue artifact upload, read-back and URL mapping into the shared CLI. |
+| `skills/review/scripts/pr_discussion_state.py`, `references/{github-api,posting,fetch-diff,conversation-flows}.md`, and Code, Comments and HITL playbooks | Move snapshot acquisition, parsing, posting and diff mechanisms. Keep Review's approval, anchoring, freshness, thread ownership and resolution decisions in the playbooks. Preserve Code's detached worktree, HITL's authorized interactive checkout and Chore's read-only snapshot handoff as distinct acquisition profiles. |
+| `install/{install.md,github.md,copilot-instructions.template.md,scripts/create_labels.py}` | Route baseline label setup through the CLI. Keep the baseline manifest and labels-only entry in the installer. Preserve existing labels and the generated source/tracker remote guard. |
+| `agents/codey.agent.md`, `skills/research/why/`, `skills/design/references/tactics-external-source.md` | Update Codey's authorized history/commit usage and route remote evidence lookup or authorized source corrections through `github`. Check Explore Codebase, Architect and other WF callers for GitHub/worktree links. Keep local code search and isolated subagent policy with their owners. |
+| `skills/engineering/factory-mode/`, `.chatgpt/{dev,feat}.scut.md`, `brain.md`, READMEs and architecture | Migrate direct branch, push, PR, graph, checks, issue closure and comment recipes. Preserve the Factory decision-report marker and verifier verdict comment identity. Document WF as the provider. Keep the GitHub integration as the ChatGPT publication transport. |
+
+**Adjacent inventory.** `tools/src/modules/github/` owns legacy AFK `fetch_issues.py`, `fetch_threads.py`, `pr_discussion_state.py` and transport/domain code. Its 17 nonempty Python files have byte-identical copies in both Ralph `dev/github/` and `fix/github/`. The current WF discussion helper has a different marker-based contract. Keep legacy AFK and Ralph on their existing runtime. Crew's `to-crew` issue instructions and `chorey_diff.py` remain in Crew. Separate GitHub Actions runner definitions and unrelated install downloads from agent-facing repository operations.
 
 ## Implementation order
 
-1. **Verify discovery.** Confirm WF and Review + WF install paths can discover `git-toolkit`. Review has a separate manifest without a declared WF dependency; document or enforce the prerequisite. Exercise Review-only behavior explicitly. Missing shared capability must surface before remote or local mutation. Do not touch Crew install paths.
-2. **Capture behavior and tests.** Recheck current `main`, existing tests, the GitHub migration proposal, `git-conventions` references, `worktrees` Python helper, and all current caller contracts. Record any path-dependent test fixture or script invocation before moving files.
-3. **Create the shared tactic router.** Add `git-toolkit/SKILL.md`, five GitHub references, four convention references and `worktrees.md` as above. Standardize target, intent, expected state, authorization, result, and completeness fields without forcing every tactic into a single rigid schema. Keep review reply, inline finding, and PR conversation operations distinct. Worktree operations use separate absolute harness and source paths.
-4. **Migrate existing conventions/worktrees callers first.** Redirect branch, commit, PR, review-comment, and worktree references to the new skill; move `scripts/worktrees.py` without changing its JSON/exit/ownership contracts. Keep caller-side fetch, branch setup, integration, publication, run records and editor exclusions. Keep `writing-style` invocation inside conventions tactics. Update Review Address, Code Review, HITL, Implement Spec, factory post-implementation, install guidance and relevant tests.
-5. **Migrate straightforward GitHub callers in WF and Review only.** Replace embedded access recipes for repository search, PR context and external sources. Keep local evidence paths and mutation boundaries. Crew retains its current implementation.
-6. **Migrate WF backlog callers.** Move reusable issue, artifact, label and relationship transport to GitHub tactics. Keep each caller's record identities and reconciliation keys. Wayfinder retains body blockers; To Tickets retains native dependencies. Offline paths remain local. Run the Init WF label fixture before altering the manifest.
-7. **Migrate Review and Implement Spec GitHub transport.** Route remote operations through shared tactics or documented required adapters; preserve local diff/worktree acquisition and existing command/JSON/exit contracts. Address keeps discussion gates, HITL human approval, Code Review marker policy and Implement Spec `GH_TOOL`/draft-only/checkpoints. Do not create duplicate remote writers for one action.
-8. **Pilot optional Python GitHub reads.** Only if needed, add read-only thread snapshots and native issue-graph lookup wrapping authenticated `gh`, resolved from the shared skill base. Require explicit repository and object, emit raw IDs/head/edges and completeness as JSON, and wire each shipped command to a real caller. Otherwise defer scripts and keep connector-only runs viable.
-9. **Update docs and remove old skills.** Update `ARCHITECTURE.md`, `docs/concepts/structure-resource-access-skill.md`, `README.md`, `plugins/wf/README.md`, installers/manifests, test expectations and relative/absolute skill links. Remove `plugins/wf/skills/git-conventions/` and `plugins/wf/skills/worktrees/` only after migration and validation. Sweep current plugin sources for old names and direct GitHub recipes; classify remaining adapters, installer, caller policy, Ralph follow-up or omissions.
+1. **Lock the current contracts.** Capture command arguments, JSON/exit behavior, graph and checkpoint schemas, ownership files, baseline labels and fixture paths. Document differences before sharing code. Design checks duplicate specs and publishes the supplied body. Implement Spec appends its source note and has different existing label setup. Use explicit caller profiles over shared primitives. Preserve exact payloads on read-back.
+2. **Build the router and local commands.** Port worktree code first. Share narrow Git primitives for ref verification, history and authorized mutations. Keep the existing branch/commit formats, old recorded refs and owner-token checks. Use explicit checkout and expected SHA for mutations. Avoid force pushes and refuse unsafe worktree cleanup.
+3. **Consolidate remote operations.** Reuse one `gh` adapter for REST/GraphQL, paging, verbatim body files and errors. Keep Implement Spec's required CLI backend. For connector-only ChatGPT runs, execute the same tactic through the GitHub integration when it supports the entire operation. The Python CLI does not call the connector. Missing capability blocks dependent work. Record verified IDs and partial progress, reconcile uncertain responses before retrying, and report incomplete reads separately from empty results. Preserve installer label defaults and check issue-artifact capability only on that route.
+4. **Switch callers and retire entry points.** Migrate Install/Design, Implement Spec, Review, then Factory/shortcuts. Keep the existing Implement Spec and Review result schemas through cutover, including Review's `stop / skip / proceed` gate. Remove the four old script entry points and two old skills after caller and fixture checks pass. Verify WF discovery and standalone Factory's WF prerequisite before any affected mutation.
+5. **Sweep current sources.** Search active tracked instructions and scripts for old skill names, script paths, GitHub API/CLI/MCP recipes and local Git lifecycle recipes. Classify remaining matches as CLI adapter, caller-owned workflow logic, CI/bootstrap, historical documentation or existing scope exclusion. Update the published implementation plan when applying the migration.
 
-## Affected surfaces
+## Acceptance checks
 
-| Area | Files or skills | Preserve |
-| --- | --- | --- |
-| Shared | `git-toolkit/SKILL.md`, `references/{github,conventions}/*`, `references/worktrees.md`, `scripts/worktrees.py`, optional `scripts/github_read.py` | Tactic boundaries, qualified targets, exact payloads, ownership, recoverability, read-back |
-| Existing shared skills | Remove `git-conventions` and `worktrees` after replacing references | No discoverable aliases; full behavior and tests migrate |
-| WF evidence | `explore-codebase`, `research/why`, `design/references/tactics-external-source.md` | Local search, pinned evidence, confirmation of external edits |
-| WF backlog | `design/references/github.md` (Spec, Tickets, and Wayfinder), installer, generated template | Routing labels, blocker semantics, offline mode, label manifest, dispatch approval |
-| WF reviews | `review-feat`, `review-hitl`, `review-fix`, `address-pr`, review references and docs | Comment text/markers, approval gates, discussion and thread ownership |
-| Implement Spec | `SKILL.md`, `references/worktrees.md`, planner/publication/sequential/parallel guidance, `scripts/spec_gh.py` | Worktree/commit callers, Codey/Chore isolation, `GH_TOOL`, checkpoints, draft PR and closure evidence |
-| Factory/other | `factory-mode/references/post-implementation.md` and other convention/worktree call sites | Commit format and existing workflow authority |
-| Docs/install/tests | `ARCHITECTURE.md`, concept, READMEs, plugin prerequisites, skill paths, Python/contract tests | Accurate discovery, counts, paths and behavior |
-
-## Verification
-
-- **Discovery.** Exercise WF-only, Review + WF and Review-only installed setups; simulate an unavailable shared skill. Fail before a mutation when required tactics cannot load. Check old skills are absent from autodiscovery after migration.
-- **Convention regression.** Verify `feat/` vs `fix/` slug and omission of IDs; ordinary and `ccode(...)` commit subjects/history filters; PR initiative marker consistency; exact final visible review body, agent marker count and recognition; writing-style selection.
-- **Worktree safety.** Run the existing Python helper tests in the new path. Exercise clean create/reuse/remove; dirty, ignored/untracked, locked, unowned, misrouted, stale-HEAD and interrupted cases. Verify no force/delete/reset and no regression in ownership JSON and exit codes. Test working directory changes do not break script resolution.
-- **GitHub reads.** Exercise cross-repo targets, pinned search, truncated diffs, paginated issue edges and threads, stale head and denied reads. Missing data must report incompleteness.
-- **Remote write recovery.** Simulate lost create/reply results and issue creation with failed parent link; reruns reconcile records and do missing work only. Confirm head changes block stale review writes.
-- **Policy regressions.** Offline makes zero GitHub calls; Wayfinder keeps text blockers; To Tickets native edges; HITL approved text unchanged; Address markers/discussion unchanged; Implement Spec `GH_TOOL`, checkpoints and draft PR unchanged. Worktree tactics never auto-commit or auto-push.
-- **Repository checks.** Run `python3 .github/scripts/run-python-tests.py --unit-only` after staging tests for Git-based discovery; focused Implement Spec, Init WF, Address, worktrees and conventions suites. Validate skill frontmatter, reference paths, scripts, manifests and discovery. Sweep references to both retired skill names.
-
-**Done when** all in-scope WF, Review and factory GitHub, convention and worktree calls use `git-toolkit` or an explicit required caller adapter; there are no dangling references or duplicate discoverable skills; safety, formatting and publication contracts pass. Crew and Ralph remain unchanged.
+- **Discovery and routing.** Installed WF discovers one `github` skill. Each intent loads its selected tactic and runs from an unrelated CWD. Missing capability fails before dependent mutations. Connector-only publication and offline Design still follow their respective routes.
+- **Local Git.** Exercise branch collisions, stale refs, normal pushes and pinned `ccode` history. Exercise worktree interruption, wrong repository/token, dirty and locked paths, legacy records and verified removal. Confirm only authorized paths and refs change.
+- **Issue and PR writes.** Exercise cross-repo tracker/source routing, duplicate spec detection, paginated graphs, artifact round trips, lost create responses, failed parent links, and idempotent comment upserts. Verify draft PR text and manual edits survive retries. Verify baseline labels are preserved, Wayfinder keeps body blockers, and offline runs make zero remote calls.
+- **Review and evidence.** Exercise fork PRs, changed head/base, incomplete comments, exact approved HITL text, marker ownership and resolved-thread read-back. Preserve the current stop on truncated nested comments until complete paging is proven. Verify closure/checkpoint order and that check absence never counts as a pass.
+- **Repository checks.** Migrate focused worktree, Implement Spec, Review discussion, Design and installer tests. Add regressions for missing shared behaviors, especially partial writes and the installed entry point. Stage new tests before running `python3 .github/scripts/run-python-tests.py --unit-only`, which uses Git discovery.

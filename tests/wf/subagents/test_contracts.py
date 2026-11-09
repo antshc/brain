@@ -62,13 +62,13 @@ def test_pr_review_routes_share_diff_acquisition_and_preserve_posting_contracts(
     root = SKILLS / "review"
     for route in ("code", "hitl"):
         playbook = (root / f"playbooks/{route}.md").read_text()
-        assert f"](../references/fetch-diff.md#{route})" in playbook
+        assert f"](../../github/references/fetch-diff.md#{route})" in playbook
         assert f"](../references/posting.md#{route})" in playbook
 
-    diff = (root / "references/fetch-diff.md").read_text()
+    diff = (SKILLS / "github/references/fetch-diff.md").read_text()
     assert diff.count("## Build the per-file diff") == 1
     assert "fresh detached review worktree" in diff
-    assert "gh pr checkout" in diff
+    assert "GH_TOOL pr checkout" in diff
     assert "_manifest.tsv" in diff
     hitl = (root / "playbooks/hitl.md").read_text()
     assert hitl.index("**3. Human approval**") < hitl.index("On approval (1 or 2): follow [Posting]")
@@ -76,6 +76,6 @@ def test_pr_review_routes_share_diff_acquisition_and_preserve_posting_contracts(
     assert "Require explicit human approval" in posting
     assert "current PR head and base" in posting
     comments = (root / "playbooks/comments.md").read_text()
-    assert "references/github-api.md" in comments
-    assert (root / "references/github-api.md").is_file()
+    assert 'GH_TOOL review discussion' in comments
+    assert (SKILLS / "github/tactics/reviews.md").is_file()
     assert all(path.is_file() for path in (root / "references").iterdir())
