@@ -33,7 +33,7 @@ The skill calls shared preflight/TWG and may use `atlassian` fetch operations wh
 
 ### 1.3 Move `brief-daily` to `daily-briefing` in engineering
 
-Move `plugins/atl/skills/brief-daily/` to `skills/engineering/daily-briefing/`, including its existing post-processors. Keep it an independently discoverable skill, not a `factory-mode` playbook or an `atlassian` tactic. Follow the factory-mode separation principle only where useful: concise trigger/contract in `SKILL.md`, detailed workflow and output contract in a referenced file. No extra dispatcher for a single workflow.
+reanme `plugins/atl/skills/brief-daily/` to `daily-briefing/`. Keep it an independently discoverable skill, not a `factory-mode` playbook or an `atlassian` tactic. Follow the factory-mode separation principle only where useful: concise trigger/contract in `SKILL.md`, detailed workflow and output contract in a referenced file. No extra dispatcher for a single workflow.
 
 **Approved name:** `daily-briefing`. Rename `brief-daily` during relocation; preserve trigger coverage for daily briefing, standup, blockers, and unanswered mentions.
 
