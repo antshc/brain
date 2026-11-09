@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[3]
-FACTORY = REPO / "skills/engineering/factory-mode"
+FACTORY = REPO / "plugins/wf/install/assets/factory-mode"
 
 
 def test_stories_is_factory_playbook_not_standalone_skill():
