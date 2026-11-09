@@ -15,11 +15,6 @@
             "description": "ralph AFK PR review automation skills."
         },
         {
-            "name": "atl",
-            "source": "./plugins/atl",
-            "description": "Atlassian workflow skills."
-        },
-        {
             "name": "crew",
             "source": "./plugins/crew",
             "description": "Technology-agnostic autonomous coding crew (Codey, Chorey) and conventions."
