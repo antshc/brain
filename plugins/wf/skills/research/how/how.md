@@ -4,7 +4,7 @@ Grounding procedure of the Research skill. Paths resolve from the skill base dir
 
 Explore the codebase to answer "how does X work?" questions. Produce architectural explanations at the level of a senior engineer onboarding onto a subsystem, enough to build a working mental model, not so much that it reads like annotated source code.
 
-For each stage, *run `subagents` skill to dispatch independent workers* using **Dispatch**. Spawn every explorer and explainer as the `hunter` agent with its own model; pass no model override. `hunter` unavailable → `explore` agent; it lacks the `skill` tool, so the prompt requires `graphify` from the shell.
+For each stage, *run `subagents` skill to dispatch independent workers* using **Dispatch**. Spawn every explorer and explainer as the `hunter` agent with its own model; pass no model override. `hunter` unavailable → `explore` agent per the Explore request fallback.
 
 **Spawn as Explore request.** Read this skill's **Explore request**; form per spawn: `@work` = the filled prompt template as prompt instruction (verbatim); `@depth` = `thorough` for explorers, `medium` for the simple-path explainer, `quick` for the synthesizing explainer; `[@target]` = repositories or services the question names; `@outputShape` = the template's Output section. Spawn each subagent with its request verbatim, instructing it to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, config evidence*. Research missing from the plugin → spawn the same agent with the filled prompt template alone, as below.
 
@@ -19,7 +19,7 @@ When in doubt, take the simple path.
 
 ## 2. Explore (complex only)
 
-Decompose the question into 2 to 4 angles, each a distinct slice of the subsystem. Spawn all explorers in a single message, each with `how/explorer-prompt.md` and its angle filled in. Fill placeholders only; keep the Read-only paragraph verbatim. Target has `graphify-out/` → paste the research skill's Graphify line verbatim into each explorer prompt body.
+Decompose the question into 2 to 4 angles, each a distinct slice of the subsystem. Spawn all explorers in a single message, each with `how/explorer-prompt.md` and its angle filled in. Fill placeholders only; keep the Read-only paragraph verbatim.
 
 ## 3. Synthesize (complex only)
 

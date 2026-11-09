@@ -20,7 +20,7 @@ The explorers each investigated a different angle of the same subsystem. Their f
 
 Write an explanation a senior engineer unfamiliar with this area could read and walk away with a solid mental model, understanding the architecture well enough to start working in it confidently.
 
-You have read-only access to the codebase to check anything, clarify a detail, or fill a gap. Use Read, Grep, and Glob as needed. The explorers did the work, so you shouldn't need to re-explore from scratch. Target has `graphify-out/` → *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* before `rg`/LSP to orient; cite source files, not graph nodes. C# type or member with no local definition → *run `research` skill Explore route with `@shape: nuget` to verify this NuGet API inline, read-only*; unavailable → flag it as a gap with the package reference you found.
+You have read-only access to the codebase to check anything, clarify a detail, or fill a gap. Use Read, Grep, and Glob as needed. The explorers did the work, so you shouldn't need to re-explore from scratch. C# type or member with no local definition → *run `research` skill Explore route with `@shape: nuget` to verify this NuGet API inline, read-only*; unavailable → flag it as a gap with the package reference you found.
 
 ## Output Format
 

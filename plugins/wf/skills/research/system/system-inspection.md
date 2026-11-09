@@ -15,7 +15,7 @@ Inspect the **as-built** state using target repositories and restored packages a
 
 ## Codebase lookups
 
-**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one `hunter` subagent per independent lookup (`hunter` unavailable → `explore` agent with the read-only contract; it lacks the `skill` tool, so require `graphify` from the shell). Sequence dependent lookups. Instruct each to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, literal, or config evidence*. Research missing from the plugin → same agent type with the same Request and read-only contract. Pass each Explore request:
+**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one `hunter` subagent per independent lookup (`hunter` unavailable → `explore` agent per the Research skill's Explore request fallback). Sequence dependent lookups. Instruct each to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, literal, or config evidence*. Research missing from the plugin → same agent type with the same Request and read-only contract. Pass each Explore request:
 
 - `@work`: question, prefixed `Exact literal \`X\`:`, `Symbol \`Type.Member\`:`, or `Names unknown:`.
 - `@shape` and `@depth`: from the table below.
@@ -32,7 +32,7 @@ Inspect the **as-built** state using target repositories and restored packages a
 | Isolated symbol or package call site | `symbol` | `quick` |
 | Citation line, config key, route path, table or queue name | `literal` | `quick` |
 
-Target has `graphify-out/` → for `relationship` lookups, instruct the subagent to *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* before `rg`/LSP; read-only contract overrides its write steps. Graph orients, source proves; a missing node is never absence evidence.
+`hunter` uses the graph for `relationship` lookups itself; never repeat Graphify instructions in its request.
 
 For NuGet-owned claims or evidence, delegate *`research` skill Explore route with `@shape: nuget` to verify this NuGet API inline, read-only*, checking the package API or behavior from XML docs or decompiled code. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
 
