@@ -26,7 +26,7 @@ Reject an explicit `auto` argument as unsupported before any publication; do not
 
 Determine mode:
 
-- **Online, spec only:** resolve the tracker repository once from the docs/harness root (current repository for single-repo work) with `gh repo view --json nameWithOwner --jq .nameWithOwner` → `{{trackerRepository}}` (tracker, not the source repository). Fetch via [Read spec](../references/github.md#read-spec); slicing source = issue title, body, and comments. Spec body has a **Design sketch** decision → also run [Read design sketch](../references/github.md#read-design-sketch).
+- **Online, spec only:** resolve the tracker repository once from the docs/harness root (current repository for single-repo work) with the `github` Repository tactic → `{{trackerRepository}}` (tracker, not the source repository). Fetch via [Read spec](../references/github.md#read-spec); slicing source = issue title, body, and comments. Spec body has a **Design sketch** decision → also run [Read design sketch](../references/github.md#read-design-sketch).
 - **Online, spec + implementation details:** resolve `{{trackerRepository}}` and read the spec as above; slicing source = implementation details (read file paths; use inline text directly).
 - **Explicit offline:** follow [Offline ticket publishing](../references/github.md#offline-ticket-publishing); use the supplied local spec and metadata; skip all GitHub lookups.
 

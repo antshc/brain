@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-import spec_gh
-from spec_gh import Gh, GhError, UsageError
+from github_cli import cli, implement_spec as spec_gh
+from github_cli.gh import Gh, GhError, UsageError
 
 
 class FakeRunner:
@@ -97,7 +97,7 @@ class TestFrontier:
 class TestPreflight:
     def args(self, tmp_path, **extra):
         values = {"spec": "acme/specs#1", "harness_root": str(tmp_path), "source_repository": None, "base_branch": None}
-        return spec_gh.build_parser().parse_args(["preflight", "--spec", values["spec"], "--harness-root", values["harness_root"]]), extra
+        return cli.build_parser().parse_args(["preflight", "--spec", values["spec"], "--harness-root", values["harness_root"]]), extra
 
     def runner(self, tmp_path, labels):
         (tmp_path / "workspace" / "shop" / ".git").mkdir(parents=True)
@@ -177,7 +177,7 @@ class TestGraphRead:
             "issues/5/comments": "[[]]", "issues/5/dependencies/blocked_by": json.dumps([[blocker]]),
             "api repos/acme/specs/issues/1": json.dumps(spec),
         })
-        args = spec_gh.build_parser().parse_args(["graph", "read", "--spec", "acme/specs#1", "--out", str(tmp_path / "run")])
+        args = cli.build_parser().parse_args(["graph", "read", "--spec", "acme/specs#1", "--out", str(tmp_path / "run")])
         graph = spec_gh.cmd_graph_read(Gh(runner), args)
         assert (tmp_path / "run" / "spec.json").exists()
         assert Path(graph["tickets"][0]["file"]).is_file()
@@ -201,7 +201,7 @@ class TestSpecArtifacts:
             "issues/1/comments": "[[]]", "issues/1/sub_issues": "[[]]",
             "api repos/acme/specs/issues/1": json.dumps(spec),
         })
-        args = spec_gh.build_parser().parse_args(["graph", "read", "--spec", "acme/specs#1", "--out", str(tmp_path / "run")])
+        args = cli.build_parser().parse_args(["graph", "read", "--spec", "acme/specs#1", "--out", str(tmp_path / "run")])
         return spec_gh.cmd_graph_read(Gh(runner), args), runner
 
     def test_artifacts_saved_and_listed_in_spec_and_graph(self, tmp_path):
@@ -249,7 +249,7 @@ class TestSpecArtifacts:
 class TestIssueOps:
     def test_close_refuses_hitl(self):
         runner = FakeRunner({"api repos/acme/shop/issues/3": json.dumps(issue(3, "t", labels=["hitl"]))})
-        args = spec_gh.build_parser().parse_args(["issue", "close", "acme/shop#3", "--commit", "abc", "--branch", "b"])
+        args = cli.build_parser().parse_args(["issue", "close", "acme/shop#3", "--commit", "abc", "--branch", "b"])
         with pytest.raises(UsageError, match="hitl"):
             spec_gh.cmd_issue_close(Gh(runner), args)
         assert not any("issue close" in call for call in runner.calls)
@@ -258,14 +258,14 @@ class TestIssueOps:
         runner = FakeRunner({
             "issue close": "", "api repos/acme/shop/issues/3": json.dumps(issue(3, "t", state="open")),
         })
-        args = spec_gh.build_parser().parse_args(["issue", "close", "acme/shop#3", "--comment", "done"])
+        args = cli.build_parser().parse_args(["issue", "close", "acme/shop#3", "--comment", "done"])
         with pytest.raises(GhError, match="not closed"):
             spec_gh.cmd_issue_close(Gh(runner), args)
 
     def test_close_default_comment(self):
         closed = json.dumps(issue(3, "t", state="closed", reason="completed"))
         runner = FakeRunner({"issue close": "", "api repos/acme/shop/issues/3": closed})
-        args = spec_gh.build_parser().parse_args(
+        args = cli.build_parser().parse_args(
             ["issue", "close", "acme/shop#3", "--commit", "abc", "--branch", "feat", "--pr", "http://pr"])
         spec_gh.cmd_issue_close(Gh(runner), args)
         assert "--comment Implemented in abc on feat (http://pr)." in next(c for c in runner.calls if "issue close" in c)
@@ -277,13 +277,13 @@ class TestIssueOps:
             "issue comment": "https://github.com/acme/shop/issues/3#issuecomment-99",
             "issues/comments/99": json.dumps({"body": "hello"}),
         })
-        args = spec_gh.build_parser().parse_args(["issue", "comment", "acme/shop#3", "--body-file", str(body)])
+        args = cli.build_parser().parse_args(["issue", "comment", "acme/shop#3", "--body-file", str(body)])
         result = spec_gh.cmd_issue_comment(Gh(runner), args)
         assert result["id"] == 99 and result["problems"] == []
 
     def test_block_is_idempotent(self):
         runner = FakeRunner({"dependencies/blocked_by": json.dumps([[issue(4, "dep")]])})
-        args = spec_gh.build_parser().parse_args(["issue", "block", "acme/shop#5", "--by", "acme/shop#4"])
+        args = cli.build_parser().parse_args(["issue", "block", "acme/shop#5", "--by", "acme/shop#4"])
         result = spec_gh.cmd_issue_block(Gh(runner), args)
         assert result["added"] == [] and not any("POST" in call for call in runner.calls)
 
@@ -298,7 +298,7 @@ class TestTicketCreate:
             "issues/1/sub_issues": json.dumps([[issue(8, "slice one")]]),
             "api repos/acme/shop/issues/1": json.dumps(spec),
         })
-        args = spec_gh.build_parser().parse_args(
+        args = cli.build_parser().parse_args(
             ["ticket", "create", "--spec", "acme/shop#1", "--title", "slice one", "--body-file", str(body)])
         assert spec_gh.cmd_ticket_create(Gh(runner), args) == {"ref": "acme/shop#8", "created": False, "linked": True}
         assert not any("issue create" in call for call in runner.calls)
@@ -339,7 +339,7 @@ class TestPrPublish:
         changes.write_text("Cap retries.\n")
         evidence = tmp_path / "evidence.md"
         evidence.write_text("Regression test passed.\n")
-        return spec_gh.build_parser().parse_args([
+        return cli.build_parser().parse_args([
             "pr", "publish", "--source-repository", "acme/shop", "--base", "main", "--head", "feat",
              "--title", "[PAY-12] fix: cap retries", "--initiative-id", "PAY-12", "--rationale-file", str(rationale),
             "--changes-file", str(changes), "--evidence-file", str(evidence), *extra])
@@ -392,10 +392,10 @@ class TestPrPublish:
 class TestMain:
     def test_exit_codes(self, capsys):
         runner = FakeRunner({"api repos/acme/shop/issues/3": json.dumps(issue(3, "t", labels=["hitl"]))})
-        code = spec_gh.main(["issue", "close", "acme/shop#3", "--comment", "x"], gh=Gh(runner))
+        code = cli.main(["issue", "close", "acme/shop#3", "--comment", "x"], gh=Gh(runner))
         assert code == 2 and "hitl" in capsys.readouterr().err
         failing = FakeRunner({"api": (1, "", "HTTP 404")})
-        assert spec_gh.main(["issue", "close", "acme/shop#3", "--comment", "x"], gh=Gh(failing)) == 1
+        assert cli.main(["issue", "close", "acme/shop#3", "--comment", "x"], gh=Gh(failing)) == 1
 
 
 class TestWrites:
@@ -408,7 +408,7 @@ class TestWrites:
             "branches/main": "{}", "label list": "[]", "label create": "",
             "issue create": "https://github.com/acme/specs/issues/7", "api repos/acme/specs/issues/7": json.dumps(created),
         })
-        args = spec_gh.build_parser().parse_args([
+        args = cli.build_parser().parse_args([
             "spec", "create", "--source-repository", "acme/shop", "--base-branch", "main", "--initiative-id", "PAY-12",
             "--summary", "Refunds  plan", "--body-file", str(body), "--source-note", "plan.md", "--tracker-repository", "acme/specs"])
         result = spec_gh.cmd_spec_create(Gh(runner), args)
@@ -435,7 +435,7 @@ class TestWrites:
             "issue create": "https://github.com/acme/shop/issues/8", "POST": "{}",
             "api repos/acme/shop/issues/1": json.dumps(spec), "api repos/acme/shop/issues/8": "80",
         })
-        args = spec_gh.build_parser().parse_args(["ticket", "create", "--spec", "acme/shop#1", "--title", "slice", "--body-file", str(body)])
+        args = cli.build_parser().parse_args(["ticket", "create", "--spec", "acme/shop#1", "--title", "slice", "--body-file", str(body)])
         assert spec_gh.cmd_ticket_create(Gh(runner), args) == {"ref": "acme/shop#8", "created": True, "linked": True}
         assert any("sub_issue_id=80" in call for call in runner.calls)
 
@@ -446,7 +446,7 @@ class TestWrites:
             "issues/1/sub_issues": json.dumps([[issue(2, "dup"), issue(3, "dup")]]),
             "api repos/acme/shop/issues/1": json.dumps(spec),
         })
-        args = spec_gh.build_parser().parse_args(["ticket", "create", "--spec", "acme/shop#1", "--title", "dup", "--body-file", "-"])
+        args = cli.build_parser().parse_args(["ticket", "create", "--spec", "acme/shop#1", "--title", "dup", "--body-file", "-"])
         with pytest.raises(UsageError, match="already titled"):
             spec_gh.cmd_ticket_create(Gh(runner), args)
 
@@ -462,12 +462,12 @@ class TestWrites:
                 return super().__call__(args)
 
         runner = Runner({"api repos/acme/shop/issues/4": "44", "POST": "{}"})
-        args = spec_gh.build_parser().parse_args(["issue", "block", "acme/shop#5", "--by", "acme/shop#4"])
+        args = cli.build_parser().parse_args(["issue", "block", "acme/shop#5", "--by", "acme/shop#4"])
         assert spec_gh.cmd_issue_block(Gh(runner), args)["added"] == ["acme/shop#4"]
 
     def test_block_fails_when_edge_missing_after_link(self):
         runner = FakeRunner({"dependencies/blocked_by": json.dumps([[]]), "api repos/acme/shop/issues/4": "44"})
-        args = spec_gh.build_parser().parse_args(["issue", "block", "acme/shop#5", "--by", "acme/shop#4"])
+        args = cli.build_parser().parse_args(["issue", "block", "acme/shop#5", "--by", "acme/shop#4"])
         with pytest.raises(GhError, match="missing after link"):
             spec_gh.cmd_issue_block(Gh(runner), args)
 
@@ -475,7 +475,7 @@ class TestWrites:
         body = tmp_path / "b.md"
         body.write_text("new")
         runner = FakeRunner({"issue edit": "", "api repos/acme/shop/issues/3": json.dumps(issue(3, "t", body="old"))})
-        args = spec_gh.build_parser().parse_args(["issue", "edit-body", "acme/shop#3", "--body-file", str(body)])
+        args = cli.build_parser().parse_args(["issue", "edit-body", "acme/shop#3", "--body-file", str(body)])
         assert spec_gh.cmd_issue_edit_body(Gh(runner), args)["problems"] == ["body differs after edit"]
 
 
@@ -498,9 +498,9 @@ class TestChecks:
 def test_graph_frontier_command_reads_saved_graph(tmp_path, capsys):
     path = tmp_path / "graph.json"
     path.write_text(json.dumps({"tickets": [ticket("a/b#1"), ticket("a/b#2", blockers=["a/b#1"])]}))
-    assert spec_gh.main(["graph", "frontier", "--graph", str(path), "--done", "a/b#1"], gh=Gh(FakeRunner({}))) == 0
+    assert cli.main(["graph", "frontier", "--graph", str(path), "--done", "a/b#1"], gh=Gh(FakeRunner({}))) == 0
     assert json.loads(capsys.readouterr().out)["ready"] == ["a/b#2"]
-    assert spec_gh.main(["graph", "frontier", "--graph", str(tmp_path / "missing.json")], gh=Gh(FakeRunner({}))) == 2
+    assert cli.main(["graph", "frontier", "--graph", str(tmp_path / "missing.json")], gh=Gh(FakeRunner({}))) == 2
 
 
 @pytest.mark.parametrize("argv", [
@@ -508,11 +508,11 @@ def test_graph_frontier_command_reads_saved_graph(tmp_path, capsys):
     ["graph", "frontier", "--graph", "g.json", "--done", "a/b#1", "--done", "a/b#2"],
 ])
 def test_multi_value_flags_accept_space_separated_and_repeated(argv):
-    assert spec_gh.build_parser().parse_args(argv).done == ["a/b#1", "a/b#2"]
+    assert cli.build_parser().parse_args(argv).done == ["a/b#1", "a/b#2"]
 
 
 def test_pr_and_block_flags_accept_space_separated_refs():
-    parser = spec_gh.build_parser()
+    parser = cli.build_parser()
     publish = parser.parse_args(["pr", "publish", "--source-repository", "a/b", "--base", "main", "--head", "h", "--title", "t",
                                  "--initiative-id", "I", "--rationale-file", "r", "--changes-file", "c", "--evidence-file", "e", "--refs", "a/b#1", "a/b#2", "--refs", "a/b#3"])
     assert publish.refs == ["a/b#1", "a/b#2", "a/b#3"]
@@ -528,14 +528,15 @@ class TestInstructionsUseRealCommands:
 
         found = []
         for path in self.ROOT.rglob("*.md"):
-            for match in re.finditer(r"(?:`GH_TOOL|\{\{ghTool\}\}) ((?:preflight|spec|graph|ticket|issue|pr|run)\b(?: (?:create|read|frontier|block|edit-body|comment|close|publish|diff-split|checkpoint)\b)?)", path.read_text()):
+            pattern = r"(?:`GH_TOOL|\{\{ghTool\}\}) (preflight|(?:spec|graph|ticket|issue|pr|run|repo|branch) [a-z-]+)"
+            for match in re.finditer(pattern, path.read_text()):
                 found.append(tuple(match.group(1).split()))
         return found
 
     def test_every_documented_command_parses(self):
         commands = self.commands()
         assert len(commands) >= 10
-        parser = spec_gh.build_parser()
+        parser = cli.build_parser()
         groups = {action.dest: action for action in parser._subparsers._group_actions}
         for command in commands:
             assert command[0] in groups["group"].choices, command
@@ -566,7 +567,7 @@ class TestDiffSplit:
         assert spec_gh.split_diff("noise\n") == []
 
     def test_writes_files_manifest_and_dedupes_sanitized_names(self):
-        result = spec_gh.cmd_pr_diff_split(Gh(FakeRunner({"pr diff": DIFF})), spec_gh.build_parser().parse_args(
+        result = spec_gh.cmd_pr_diff_split(Gh(FakeRunner({"pr diff": DIFF})), cli.build_parser().parse_args(
             ["pr", "diff-split", "--pr", "https://github.com/acme/shop/pull/9"]))
         out = Path(result["diff_dir"])
         rows = [line.split("\t") for line in (out / "_manifest.tsv").read_text().splitlines()]
@@ -574,6 +575,6 @@ class TestDiffSplit:
         assert (out / "src_a.py").read_text().count("+y") == 1 and (out / "src_a.py_").read_text().count("+2") == 1
 
     def test_empty_diff_is_an_error(self):
-        args = spec_gh.build_parser().parse_args(["pr", "diff-split", "--pr", "9", "--source-repository", "acme/shop"])
+        args = cli.build_parser().parse_args(["pr", "diff-split", "--pr", "9", "--source-repository", "acme/shop"])
         with pytest.raises(GhError, match="never run the subagent"):
             spec_gh.cmd_pr_diff_split(Gh(FakeRunner({"pr diff": ""})), args)

@@ -4,24 +4,6 @@
 
 Run from the tracker repository: the current repository for a single repo, the docs/harness root for a wrapping repo. GitHub issues are the only backlog backend for this workflow; local documents are not a tracker.
 
-1. Confirm CLI authentication with `gh auth status`; resolve the tracker with `gh repo view --json nameWithOwner --jq .nameWithOwner`. Stop and report failures.
-2. Resolve `./scripts/create_labels.py` from the installer directory, not the caller CWD. Run `python3 <resolved-script-path>` with the tracker repository as CWD. The helper creates missing labels and preserves existing ones.
-3. Check `gh api --paginate repos/{{trackerRepository}}/labels?per_page=100 --jq .[].name` for every baseline label below. If a label is absent, report incomplete setup rather than success.
-
-| Label | Color | Purpose |
-|---|---|---|
-| `hitl` | `fbca04` | Requires human implementation/review |
-| `spec` | `5319e7` | Spec with implementation context |
-| `bug` | `d73a4a` | Failure requiring investigation |
-| `wayfinder:map` | `0e8a16` | Map issue |
-| `wayfinder:research` | `1d76db` | Research decision |
-| `wayfinder:experiment` | `5319e7` | Experiment decision |
-| `wayfinder:grilling` | `fbca04` | Grilling decision |
-| `wayfinder:task` | `d93f0b` | Manual-work decision |
-| `wayfinder:contract-design` | `c5def5` | Contract-design decision |
-
-**Returns:** the resolved tracker repository and confirmed label names.
-
-## Gotchas
-
-GitHub authentication, repository permissions, or missing `gh` must surface as setup errors. Do not claim setup succeeded or substitute a Jira/local tracker. Existing labels are intentionally not recolored or rewritten.
+1. Resolve the sibling `../skills/github/scripts/github.py` from this installer's absolute directory as `GH_TOOL`. Use the `github` Repository tactic to resolve the tracker checkout. Labels-only mode can run from the WF source tree. Stop on missing tooling or ambiguous routing.
+2. Resolve `github-labels.json` from this installer directory. Run `GH_TOOL label ensure --repo TRACKER --manifest FILE` using the Issues tactic.
+3. Require verified presence of all manifest labels. Preserve existing label colors and descriptions. Report incomplete setup with confirmed labels and blockers.
