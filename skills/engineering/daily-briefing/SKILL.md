@@ -11,9 +11,9 @@ Two read-only Jira reports for the current user: blocked items assigned to them,
 
 ## Prerequisites
 
-- **`atlassian`** engineering skill installed, providing twg routing.
+- **`atlassian`** skill from `wf@brain`, providing twg routing.
 - **`preflight-atlassian`** skill generated in this repo by the `atlassian` skill's Install tactic, with `email`/`apiToken` in its `.atlassian.json.user`.
-- Either missing → stop and report that daily-briefing needs the `atlassian` skill and its preflight-atlassian skill, and ask the user to run `/atlassian install` in Copilot CLI. Never authenticate or install anything yourself.
+- Missing `atlassian` → ask the user to install or update `wf@brain` and stop. Missing preflight → ask the user to run `/atlassian install` in Copilot CLI and stop. Never authenticate or install anything yourself.
 
 ## Contract
 

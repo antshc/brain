@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-SKILL_DIR = Path(__file__).resolve().parents[4] / "skills" / "engineering" / "atlassian"
+SKILL_DIR = Path(__file__).resolve().parents[4] / "plugins" / "wf" / "skills" / "atlassian"
 SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
 ATL_PY = SKILL_DIR / "scripts" / "atl.py"
 if str(SCRIPTS_DIR) not in sys.path:

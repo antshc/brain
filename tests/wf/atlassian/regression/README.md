@@ -33,5 +33,5 @@ Not covered from Markdown: Confluence smart links (`inlineCard`) and Draw.io mac
 
 ## Tests
 
-- Offline (CI): `python3 -m pytest tests/engineering/atlassian/regression` — runs the fixture through the real converter, simulates fetch-page's substitutions, and proves every check passes on a healthy round trip and fails on a lost construct.
-- Live: `ATL_REGRESSION_RUN=tests/engineering/atlassian/regression/runs/<runId> python3 -m pytest tests/engineering/atlassian/regression -k integration` — one test per capability against a real run; skipped when the variable is unset.
+- Offline (CI): `python3 -m pytest tests/wf/atlassian/regression` — runs the fixture through the real converter, simulates fetch-page's substitutions, and proves every check passes on a healthy round trip and fails on a lost construct.
+- Live: `ATL_REGRESSION_RUN=tests/wf/atlassian/regression/runs/<runId> python3 -m pytest tests/wf/atlassian/regression -k integration` — one test per capability against a real run; skipped when the variable is unset.

@@ -22,7 +22,7 @@ failure.
 
 ## Design Guidance
 
-Three participants: a **installer** that scaffolds the adapter (e.g. the [ATL installer](../../skills/engineering/atlassian/references/install.md)), the **generated adapter
+Three participants: a **installer** that scaffolds the adapter (e.g. the [ATL installer](../../plugins/wf/skills/atlassian/references/install.md)), the **generated adapter
 skill** it writes into the repository (e.g. `pub-<issue-type>`), and the **owning user-level skill** that performs
 the actual action (e.g. the `atlassian` skill's Publish work tactic). The extension point is the setup skill's discovery step: it enumerates
 the repository- or target-specific variants live (e.g. Jira issue types configured for this project) and offers
