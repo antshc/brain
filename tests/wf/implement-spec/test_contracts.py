@@ -11,7 +11,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 ROOT = REPO / 'plugins/wf/skills/implement-spec'
 MAIN = (ROOT / 'SKILL.md').read_text()
-FACTORY = REPO / 'skills/engineering/factory-mode'
+FACTORY = REPO / 'plugins/wf/install/assets/factory-mode'
 CODEY = REPO / 'plugins/wf/agents/codey.agent.md'
 
 

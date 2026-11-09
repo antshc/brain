@@ -122,4 +122,4 @@ Call `python3 <atlassian-skill-dir>/scripts/atl.py` from any working directory. 
 ## Sources
 
 - [ATL plugin](https://github.com/antshc/brain/tree/main/plugins/atl) and [transport ADR](https://github.com/antshc/brain/blob/main/docs/adr/atl-is-twg-first-with-rest-adf-content.md)
-- [Skill-owned code convention](https://github.com/antshc/brain/blob/main/docs/concepts/structure-skill-owned-code.md), [factory-mode layout](https://github.com/antshc/brain/tree/main/skills/engineering/factory-mode), and [ATL regression suite](https://github.com/antshc/brain/tree/main/tests/atl)
+- [Skill-owned code convention](https://github.com/antshc/brain/blob/main/docs/concepts/structure-skill-owned-code.md), [factory-mode layout](https://github.com/antshc/brain/tree/main/plugins/wf/install/assets/factory-mode), and [ATL regression suite](https://github.com/antshc/brain/tree/main/tests/atl)
