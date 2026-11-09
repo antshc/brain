@@ -187,6 +187,7 @@ swimlane-beta TB
 | Architecture, behavior, or code diagrams | `/doc-diagram <diagram type>` with optional current or delta mode |
 | Initialize docs | `/index-docs Initialize missing docs` |
 | Story, bug report, feature handover, or feature design | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi`, `/draft-artifact design` |
+| Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
 | Deepen a task prompt or restate intent | `/writing-style sharpen` |
 
 Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [behavior](skills/doc-diagram/examples/behavior.md), and [code](skills/doc-diagram/examples/code.md).

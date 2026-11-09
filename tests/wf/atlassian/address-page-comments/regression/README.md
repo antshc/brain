@@ -50,5 +50,5 @@ Diagrams render with the configured `diagramRenderer`; `drawio` needs the `drawi
 
 ## Tests
 
-- Offline (CI): `python3 -m pytest tests/engineering/atlassian/address-page-comments` — every case passes on healthy artifacts, fails on a broken one, skips on a missing one.
+- Offline (CI): `python3 -m pytest tests/wf/atlassian/address-page-comments` — every case passes on healthy artifacts, fails on a broken one, skips on a missing one.
 - Live: see [run-regression.prompt.md](./run-regression.prompt.md).

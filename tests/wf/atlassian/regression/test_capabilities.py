@@ -123,7 +123,7 @@ def test_fixture_exercises_every_adf_only_construct():
     import subprocess
     import sys
 
-    ATL_PY = Path(__file__).resolve().parents[4] / "skills" / "engineering" / "atlassian" / "scripts" / "atl.py"
+    ATL_PY = Path(__file__).resolve().parents[4] / "plugins" / "wf" / "skills" / "atlassian" / "scripts" / "atl.py"
 
     report = json.loads(
         subprocess.run(

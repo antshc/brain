@@ -4,7 +4,7 @@ The **Install** tactic. Follow only on explicit request in Copilot CLI; it needs
 
 ## Skill install
 
-The `atlassian` skill ships as a standalone engineering skill, not a Copilot plugin. Running this file from a Brain checkout needs no install. To make `/atlassian` available in the target repo or user profile, the user runs `gh skill install antshc/brain engineering/atlassian` (and `engineering/daily-briefing` for briefings); update with `gh skill update --all`. Never run these yourself; report when `/atlassian` is not discoverable. A leftover `atl` plugin from atl 1.x/2.0 is obsolete: tell the user to run `copilot plugin uninstall atl@brain`.
+The `atlassian` skill ships with `wf@brain`. You can also follow this file directly from a Brain checkout. If `/atlassian` is unavailable, ask the user to run `copilot plugin install wf@brain` or update their existing WF plugin. Users migrating from an earlier release should remove any standalone copy of the skill and uninstall the retired plugin with `copilot plugin uninstall atl@brain` if present. Report plugin status and leave plugin changes to the user.
 
 ## Workflow
 

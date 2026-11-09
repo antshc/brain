@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-_SCRIPT = Path(__file__).resolve().parents[4] / "skills" / "engineering" / "atlassian" / "scripts" / "atl.py"
+_SCRIPT = Path(__file__).resolve().parents[4] / "plugins" / "wf" / "skills" / "atlassian" / "scripts" / "atl.py"
 
 
 def _run(direction: str, input_text: str) -> subprocess.CompletedProcess:

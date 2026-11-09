@@ -19,4 +19,4 @@
 - Exception: the `atlassian` skill's Address page comments tactic edits a commented page in place with twg targeted edits (`content update --edits-file`, HTML node values against a `--draft --format html` read). twg preserves untouched nodes exactly, so inline-comment anchors, macros, and diagrams survive; full-body replacement through twg stays forbidden.
 - Publish page keeps `mmdc` and `atlassian-python-api>=5.0.5`; `atl.py` builds one shared `ConfluenceCloud` client on `<site>/wiki` and uploads attachments over REST, since 5.x dropped the implicit `/wiki` and `Confluence.attach_file()`.
 - Body operations, the converter, and twg routing live in one `atlassian` skill with one `atl.py` CLI; review-thread replies are its Address page comments tactic, and the daily briefing is the engineering `daily-briefing` skill, both on the same Preflight launcher.
-- The `atl` plugin is retired; the `atlassian` skill, including its installer, ships as a standalone engineering skill under `skills/engineering/atlassian/`.
+- The `atl` plugin is retired; the `atlassian` skill, including its installer, ships with the WF plugin under `plugins/wf/skills/atlassian/`.
