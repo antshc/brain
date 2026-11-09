@@ -47,7 +47,7 @@ Subflow A: Simple Flow
 
 1. /design spec
 2. Architect Potato → Attach sketch to spec
-3. /implement-spec parallel
+3. /implement parallel
 4. Return
 
 
@@ -59,6 +59,6 @@ Subflow B: Complex Flow
    → /design grill
 4. /design spec
 5. Architect Potato → Attach sketch to spec
-6. /implement-spec parallel
+6. /implement parallel
 7. Return
 ```

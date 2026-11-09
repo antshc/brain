@@ -15,7 +15,7 @@ Load [Ticket operations](../references/github.md#ticket-operations) before any G
 - **Approval guard:** **MUST NOT** create, label, link, or save tickets (GitHub issues or `docs/tickets/` files) until the user explicitly approves the current breakdown in step 4. Silence, partial feedback, corrections, and ambiguous replies are not approval. Any slice change after approval needs re-presentation and re-approval. Before approval, only read and draft. Rationale: published tickets create tracker state the user must clean up.
 - **MUST NOT** close or modify the parent Spec issue.
 - **Source precedence:** spec (or supplied implementation details) is authoritative for behavior and requirements; matched Concepts/ADRs for implementation patterns and policies; code for current state. On conflict, surface it in step 4; do not silently pick a side.
-- **Label guard:** every created ticket **MUST** carry `hitl`, whatever its HITL/AFK type. **MUST NOT** create or apply an `afk` label or any label encoding HITL/AFK type. Rationale: `implement-spec` skips `hitl` tickets; the user removes `hitl` to release a reviewed ticket for execution.
+- **Label guard:** every created ticket **MUST** carry `hitl`, whatever its HITL/AFK type. **MUST NOT** create or apply an `afk` label or any label encoding HITL/AFK type. Rationale: `implement` skips `hitl` tickets; the user removes `hitl` to release a reviewed ticket for execution.
 - Use offline publishing only when explicitly requested or after a reported GitHub/tool/authentication failure. **MUST NOT** report offline or partial output as GitHub success.
 
 ## Workflow
@@ -62,7 +62,7 @@ Choose task boundaries using the plan/spec and the inspected codebase:
 
 </task-decomposition-rules>
 
-The `implement-spec` planner selects implementer models after reading the ticket graph; do not encode model preferences in ticket bodies.
+The `implement` planner selects implementer models after reading the ticket graph; do not encode model preferences in ticket bodies.
 
 Build an acyclic **blocker graph**: nodes are all tasks; each directed edge runs from blocker to dependent. Use stable slice IDs before publication, then map them to issue identities. Reject cycles and missing blocker nodes; include roots with no blockers. Identify the initial ready frontier separately; do not assign execution batches.
 

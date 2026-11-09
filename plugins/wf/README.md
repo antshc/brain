@@ -30,7 +30,7 @@ The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decisi
 %% diagram-id: wf-idea-to-implementation-swimlane
 swimlane-beta TB
   accTitle: Idea to implementation responsibility
-  accDescr: Shows discovery choosing a simple or complex path, each producing a spec that implement-spec turns into an implementation.
+  accDescr: Shows discovery choosing a simple or complex path, each producing a spec that implement turns into an implementation.
 
   subgraph discovery [Discovery]
     idea([Idea])
@@ -55,7 +55,7 @@ swimlane-beta TB
   end
 
   subgraph implementation [Implementation]
-    implementSpec[3 - implement-spec<br/>sequential or parallel]
+    implementSpec[3 - implement<br/>sequential or parallel]
     done([Implementation])
   end
 
@@ -110,14 +110,14 @@ swimlane-beta TB
 
 ### Story to implementation
 
-Starts from one existing User story: `/writing-style sharpen` hardens it, `/architect` sketches the code, `/design spec` writes the spec, and `/implement-spec` implements it.
+Starts from one existing User story: `/writing-style sharpen` hardens it, `/architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: wf-story-to-implementation-swimlane
 swimlane-beta TB
   accTitle: Story to implementation responsibility
-  accDescr: Shows one User story sharpened, sketched by architect, turned into a spec, and implemented by implement-spec.
+  accDescr: Shows one User story sharpened, sketched by architect, turned into a spec, and implemented by implement.
 
   subgraph story [Story hardening]
     userStory([User story])
@@ -131,7 +131,7 @@ swimlane-beta TB
   end
 
   subgraph implementation [Implementation]
-    implementSpec[5 - implement-spec]
+    implementSpec[5 - implement]
     done([Implementation])
   end
 
@@ -196,4 +196,4 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | Discovery and research | `define-concept`, `define-research`, `experiment`, `explore-codebase` (NuGet tactic), `research` |
 | Design and backlog | `architect`, `design` (`grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
-| Implementation and tooling | `diagnosing-bugs`, `github`, `implement-spec`, `principles`, `show-me-your-work`, `subagents` |
+| Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

@@ -521,7 +521,7 @@ def test_pr_and_block_flags_accept_space_separated_refs():
 
 
 class TestInstructionsUseRealCommands:
-    ROOT = Path(__file__).resolve().parents[3] / "plugins" / "wf" / "skills" / "implement-spec"
+    ROOT = Path(__file__).resolve().parents[3] / "plugins" / "wf" / "skills" / "implement"
 
     def commands(self) -> list[tuple[str, ...]]:
         import re

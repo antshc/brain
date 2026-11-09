@@ -1,5 +1,5 @@
 ---
-name: implement-spec
+name: implement
 description: >-
   Implement a GitHub spec or plan through a routed ticket graph, delivering tickets sequentially or in parallel into one draft PR with chore cleanup and a handoff. Use for 'implement this spec', 'build plan.md', or delivering a spec's sub-issues end to end.
 ---

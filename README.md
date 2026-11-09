@@ -140,7 +140,7 @@ Plugins bundle related skills (and, for `crew`, agents). Follow a link to read a
 
 ### wf
 
-Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tasks. `implement-spec` delegates tickets to `wf:codey`, with a `general-purpose` fallback.
+Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tasks. `implement` delegates tickets to `wf:codey`, with a `general-purpose` fallback.
 
 - [diagnosing-bugs](plugins/wf/skills/diagnosing-bugs/SKILL.md): diagnose hard bugs or performance regressions, and fix them when explicitly requested.
 
@@ -150,7 +150,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [factory-mode Stories playbook](plugins/wf/install/assets/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per row. Requires repo-level `factory-mode` installation.
 - [draft-artifact](plugins/wf/skills/draft-artifact/SKILL.md): draft a User story, bug report, feature handover (TOI), or feature design.
 - [github](plugins/wf/skills/github/SKILL.md): route Git conventions, branches, commits, owned worktrees, specs, issues, PRs, review discussions, and checks through one skill and CLI. Install WF for Factory Mode's GitHub routes.
-- [implement-spec](plugins/wf/skills/implement-spec/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
+- [implement](plugins/wf/skills/implement/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
 - [writing-style](plugins/wf/skills/writing-style/SKILL.md): write, review, or unslop prose; normalize requirement or story text by stripping implementation artifacts.
