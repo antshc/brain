@@ -1,13 +1,6 @@
----
-name: grill-skill
-description: >-
-  Interview the user to define a new agent skill and produce a confirmed skill brief for /write-skill.
-disable-model-invocation: true
----
+# Grill mode
 
-# Grill Skill
-
-Own the interview and the **skill brief**. Writing belongs to `/write-skill`, which the user runs. Writable surface: none until handoff.
+Own the interview and the **skill brief**. Writing belongs to the Draft phase. Writable surface: none until handoff.
 
 ## Interview
 
@@ -80,8 +73,8 @@ Default to Workflow; combine others only when needed.
 
 1. Print the filled brief. *Done when* every field holds a value, `none`, or a listed assumption.
 2. Ask the user to confirm or edit. Only the user ends the interview. *Done when* the user confirms.
-3. Save the confirmed brief to the session workspace (or print it when no workspace exists) and tell the user to run `/write-skill` with that brief. `write-skill` is user-invoked, so the agent cannot invoke it. *Done when* the brief path or full brief and the `/write-skill` instruction are shown.
+3. Save the confirmed brief to the session workspace (or print it when no workspace exists) and return control to the orchestrator for *Draft phase* with that brief. *Done when* the brief path or full brief is shown.
 
 ## Completion criteria
 
-- Confirmed brief saved or printed in full, with the `/write-skill` handoff instruction, or the user ended the interview with the brief printed.
+- Confirmed brief saved or printed in full and handed to the Draft phase, or the user ended the interview with the brief printed.

@@ -1,6 +1,6 @@
 # Draft phase
 
-Write or rewrite one skill from a brief or request. Apply every rule in [best-practices.md](best-practices.md) and [wording.md](wording.md); fill [SKILL.template.md](../templates/SKILL.template.md). Ground every fact in the input or the environment; record each gap as an assumption instead of guessing.
+Write or rewrite one skill from a brief or request. Apply every rule in [best-practices.md](../references/best-practices.md) and [wording.md](../references/wording.md); fill [SKILL.template.md](../templates/SKILL.template.md). Ground every fact in the input or the environment; record each gap as an assumption instead of guessing.
 
 ## Inputs
 

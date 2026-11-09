@@ -3,7 +3,7 @@ name: {{agentName|planner role noun, e.g. planner}}
 description: {{description|Decompose a spec into a dependency graph of independently verifiable tasks. Use when a feature needs a plan before implementers start. Do not use when implementing, reviewing, or scheduling.}}
 tools: {{tools|read and search only; no edit}}
 ---
-<!-- @: Use for planner/decomposer agents. Render in the platform's format and fields from references/platforms.md. -->
+<!-- @: Use for planner/decomposer agents. Render in the platform's format and fields from references/agent-platforms.md. -->
 <!-- @: Keep the Constraints from Planner agents in references/agent-best-practices.md; adapt wording, do not drop. -->
 
 # Role

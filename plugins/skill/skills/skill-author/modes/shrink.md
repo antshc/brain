@@ -1,6 +1,6 @@
 # Shrink phase
 
-Make agent-facing files shorter and more consistent while preserving every behavior. Apply [wording.md](wording.md); keep frontmatter valid per Frontmatter and description in [best-practices.md](best-practices.md).
+Make agent-facing files shorter and more consistent while preserving every behavior. Apply [wording.md](../references/wording.md); keep frontmatter valid per Frontmatter and description in [best-practices.md](../references/best-practices.md).
 
 ## Inputs
 

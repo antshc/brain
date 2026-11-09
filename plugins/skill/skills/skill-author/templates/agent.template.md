@@ -3,7 +3,7 @@ name: {{agentName}}
 description: {{description|Capability. Use when trigger. Do not use when exclusion.}}
 tools: {{tools}}
 ---
-<!-- @: Render in the platform's format and fields from references/platforms.md. -->
+<!-- @: Render in the platform's format and fields from references/agent-platforms.md. -->
 <!-- @: Section names may vary. Very small agent: merge Invocation into Role and Verification into Workflow; keep Constraints and Output. -->
 
 # Role
