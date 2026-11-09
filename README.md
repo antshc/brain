@@ -17,7 +17,7 @@ copilot --add-dir="/path/to/brain/plugins" \
   -i 'Follow /path/to/brain/plugins/wf/install/install.md in this repository.'
 ```
 
-Replace `wf` with `atl`, `crew`, `ms`, `ralph`, or `verify`. In an open Copilot session, use `/add-dir /path/to/brain/plugins` and ask Copilot to follow the matching installer by absolute path. The MS installer sets up Azure CLI and can run outside a repository. Each installer checks the plugin version against the source checkout before setup.
+Replace `wf` with `crew`, `ms`, `ralph`, or `verify`. For `atl`, follow `/path/to/brain/plugins/atl/skills/atlassian/references/install.md`, or run `/atlassian install` once the plugin is installed. In an open Copilot session, use `/add-dir /path/to/brain/plugins` and ask Copilot to follow the matching installer by absolute path. The MS installer sets up Azure CLI and can run outside a repository. Each installer checks the plugin version against the source checkout before setup.
 
 ### Install only the plugins
 
@@ -201,12 +201,11 @@ AFK PR review and autonomous development loop.
 
 Atlassian workflow skills.
 
-- [ATL installer](plugins/atl/install/install.md): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
-- [preflight-atlassian](plugins/atl/install/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
-- [atlassian](plugins/atl/skills/atlassian/SKILL.md): one entry point for Jira and Confluence: fetch or publish a work item or page, convert Markdown to/from ADF, and search or operate through twg. Its `scripts/atl.py` CLI (`fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown`) runs from any working directory.
-- [address-page-comments](plugins/atl/skills/address-page-comments/SKILL.md): address open Confluence page review comments; edit the page in place with twg targeted edits, reply per thread, and answer comments whose anchor text was removed in a page comment.
+- [ATL installer](plugins/atl/skills/atlassian/references/install.md) (`/atlassian install`): first-run setup for a repo's Atlassian config, optionally generating `pub-<issue-type>` skills.
+- [preflight-atlassian](plugins/atl/skills/atlassian/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md): template copied by the ATL installer into `.github/skills/preflight-atlassian/`; resolves Atlassian connection facts before any Jira/Confluence operation, and owns locating/parsing the repo's Atlassian config file.
+- [atlassian](plugins/atl/skills/atlassian/SKILL.md): one entry point for Jira and Confluence: fetch or publish a work item or page, address page review comments (targeted in-place edits plus a reply per thread), convert Markdown to/from ADF, and search or operate through twg. `/atlassian help` lists every tactic and command. Its `scripts/atl.py` CLI (`fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown`) runs from any working directory.
 
-**Migrating from atl 1.x:** `fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown-adf`, and `twg` are now tactics of the `atlassian` skill; old slash commands become requests to `/atlassian` (e.g. `/atlassian fetch PROJ-123`). `fix-confluence-comments` is retired: ordinary page edits use the `atlassian` Publish page tactic, replies stay with `address-page-comments`. `brief-daily` moved to the engineering skill [daily-briefing](skills/engineering/daily-briefing/SKILL.md). Scripts that called `plugins/atl/skills/<old-skill>/scripts/*.py` call `python3 plugins/atl/skills/atlassian/scripts/atl.py <command>` instead. Re-run the [ATL installer](plugins/atl/install/install.md) to refresh `preflight-atlassian` and migrate generated `pub-*` wrappers.
+**Migrating from atl 1.x:** `fetch-work`, `publish-work`, `fetch-page`, `publish-page`, `map-markdown-adf`, `address-page-comments`, and `twg` are now tactics of the `atlassian` skill; old slash commands become requests to `/atlassian` (e.g. `/atlassian fetch PROJ-123`). `fix-confluence-comments` is retired: ordinary page edits use the Publish page tactic, review-thread replies the Address page comments tactic. `brief-daily` moved to the engineering skill [daily-briefing](skills/engineering/daily-briefing/SKILL.md). Scripts that called `plugins/atl/skills/<old-skill>/scripts/*.py` call `python3 plugins/atl/skills/atlassian/scripts/atl.py <command>` instead. Re-run `/atlassian install` to refresh `preflight-atlassian` and migrate generated `pub-*` wrappers.
 
 ### ms
 

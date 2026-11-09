@@ -300,7 +300,7 @@ _Avoid_: .atlmcp, .env, credentials file, convention folder
 _Plugins_set_: atl
 
 **Preflight**:
-The single resolution gate the `atlassian`, `address-page-comments`, and `daily-briefing` skills run first, returning `site`, `twg` (the credentialed twg command), `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, and the cached identity. It never fails on missing **Atlassian config** — an unresolved field comes back empty and the caller names the missing prerequisite.
+The single resolution gate the `atlassian` and `daily-briefing` skills run first, returning `site`, `twg` (the credentialed twg command), `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, and the cached identity. It never fails on missing **Atlassian config** — an unresolved field comes back empty and the caller names the missing prerequisite.
 _Avoid_: auth, init, bootstrap, config check
 _Plugins_set_: atl
 

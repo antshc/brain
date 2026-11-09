@@ -40,7 +40,7 @@ def test_version_error_accepts_the_supported_range(found):
 def test_version_error_names_range_found_version_and_init_atl(found):
     message = version_error(found)
 
-    assert message == f"atlassian-python-api >=5.0.5 required, found {found or 'none'}; follow Brain's plugins/atl/install/install.md in Copilot CLI"
+    assert message == f"atlassian-python-api >=5.0.5 required, found {found or 'none'}; run `/atlassian install` (atlassian skill's Install tactic) in Copilot CLI"
 
 
 def test_get_confluence_exits_with_the_version_message_on_an_unsupported_library(monkeypatch):
@@ -49,7 +49,7 @@ def test_get_confluence_exits_with_the_version_message_on_an_unsupported_library
     with pytest.raises(SystemExit) as excinfo:
         get_confluence(CREDENTIALS)
 
-    assert str(excinfo.value) == "atlassian-python-api >=5.0.5 required, found 4.0.7; follow Brain's plugins/atl/install/install.md in Copilot CLI"
+    assert str(excinfo.value) == "atlassian-python-api >=5.0.5 required, found 4.0.7; run `/atlassian install` (atlassian skill's Install tactic) in Copilot CLI"
 
 
 @pytest.mark.skipif(version_error(installed_version()) is not None, reason="needs the supported atlassian-python-api")

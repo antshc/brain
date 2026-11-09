@@ -1,4 +1,4 @@
-"""Classify a Confluence page's open comment threads for address-page-comments."""
+"""Classify a Confluence page's open comment threads for the atlassian Address page comments tactic."""
 from __future__ import annotations
 
 import argparse

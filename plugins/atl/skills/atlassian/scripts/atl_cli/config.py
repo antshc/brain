@@ -44,7 +44,7 @@ def version_error(found: str | None) -> str | None:
         supported = _version_tuple(found) < _version_tuple(MAX_VERSION)
     if supported:
         return None
-    return f"{LIBRARY} {supported_range()} required, found {found or 'none'}; follow Brain's plugins/atl/install/install.md in Copilot CLI"
+    return f"{LIBRARY} {supported_range()} required, found {found or 'none'}; run `/atlassian install` (atlassian skill's Install tactic) in Copilot CLI"
 
 
 def require_supported_library() -> None:
