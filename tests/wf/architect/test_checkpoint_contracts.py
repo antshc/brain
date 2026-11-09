@@ -3,7 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3] / "plugins/wf/skills"
 ARCHITECT = ROOT / "architect"
-FACTORY = Path(__file__).resolve().parents[3] / "skills/engineering/factory-mode"
+FACTORY = Path(__file__).resolve().parents[3] / "plugins/wf/install/assets/factory-mode"
 
 
 def test_architect_checkpoint_is_opt_in_and_implementation_is_default():
