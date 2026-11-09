@@ -1,13 +1,13 @@
 ---
 name: preflight-atlassian
 description: >-
-  Resolve Atlassian connection facts (site, default project key, default space id, token availability, credentialed twg command) from this repo's `.atlassian.json.user` config. Internal gate invoked by atlassian, address-page-comments, and daily-briefing, not a user entry point. Use atlassian for the operation itself.
+  Resolve Atlassian connection facts (site, default project key, default space id, token availability, credentialed twg command) from this repo's `.atlassian.json.user` config. Internal gate invoked by atlassian and daily-briefing, not a user entry point. Use atlassian for the operation itself.
 compatibility: Requires the `twg` CLI and an Atlassian API token (`email` + `apiToken`); twg and the REST scripts share those credentials.
 ---
 
 # Preflight
 
-Resolution gate the `atlassian`, `address-page-comments`, and `daily-briefing` skills run first. Never fails — unresolved facts return empty; caller names the missing prerequisite. Sole owner of locating and parsing `.atlassian.json.user` (gitignored, sibling of this `SKILL.md`); other skills MUST NOT re-implement it.
+Resolution gate the `atlassian` and `daily-briefing` skills run first. Never fails — unresolved facts return empty; caller names the missing prerequisite. Sole owner of locating and parsing `.atlassian.json.user` (gitignored, sibling of this `SKILL.md`); other skills MUST NOT re-implement it.
 
 **MUST NOT echo** config `email`/`apiToken` or identity-response `email` — not in output, logs, errors, or command lines.
 
@@ -15,8 +15,7 @@ Resolution gate the `atlassian`, `address-page-comments`, and `daily-briefing` s
 
 Preflight resolves facts only; never creates/updates content. Request is the operation itself → hand off to the owning skill, which runs Preflight first:
 
-- Fetch, publish, convert, search, or operate on Jira or Confluence content → *run `atlassian` skill to fetch, publish, convert, and query Jira and Confluence content (Fetch work, Publish work, Fetch page, Publish page, Map Markdown, TWG)*.
-- Settle and reply to Confluence page review comments → *run `address-page-comments` skill to edit a Confluence page in place and reply to each review thread*.
+- Fetch, publish, convert, search, or operate on Jira or Confluence content, or address page review comments → *run `atlassian` skill to fetch, publish, convert, and query Jira and Confluence content and address page comments (Fetch work, Publish work, Fetch page, Publish page, Address page comments, Map Markdown, TWG)*.
 - Daily blocked items and @mentions → *run `daily-briefing` skill for the daily briefing, standup update, and unanswered mentions*.
 
 ## Resolve
@@ -26,7 +25,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
    - Not found → keys take table Default; keys without Default resolve empty (`site` → step 3, identity → step 5, project key/space id → ask per caller).
    - Found → file value wins; absent keys take Default. `tokenAvailable := email and apiToken both true`.
 3. **site.** `site :=` config `cloudId` (`https://<host>`). Empty and needed → ask developer for `<organization>.atlassian.net`; never guess.
-4. **twg.** `twg := python3 <base>/scripts/twg_cred.py`, `<base>` = this skill's absolute base directory; works from any cwd. Optional leading `--config <configPath>`; default is this skill's `.atlassian.json.user`. Injects config `email`/`apiToken`/`cloudId` into the twg child only and redacts email and token from its output. `atlassian`, `address-page-comments`, and `daily-briefing` use this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
+4. **twg.** `twg := python3 <base>/scripts/twg_cred.py`, `<base>` = this skill's absolute base directory; works from any cwd. Optional leading `--config <configPath>`; default is this skill's `.atlassian.json.user`. Injects config `email`/`apiToken`/`cloudId` into the twg child only and redacts email and token from its output. `atlassian` and `daily-briefing` use this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
 5. **Identity.** `accountId` and `displayName` both set → skip. Either empty → `<twg> whoami -o json --output-file whoami.json` once, then print only `data.accountId` and `data.name` with Python: success → `accountId`, `displayName`; failure → leave empty, never raise. Exception: the ATL installer's connectivity gate always calls live, ignoring cache.
 6. **Report** `configPath`, `site`, `twg`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`, `displayName`, `maxResults`, `limit` before the caller's operation.
 
@@ -53,7 +52,7 @@ Apply in every skill that runs Preflight:
 
 - **twg first.** Search and every non-body Jira/Confluence operation → *follow `atlassian` skill's TWG tactic for Jira workitems, JQL, Confluence pages, CQL, spaces, and people*, running Preflight's `twg` in place of bare `twg`. Never call the Atlassian MCP.
 - **REST + ADF for bodies.** Full Jira descriptions and Confluence page bodies (`<details>`, panels, status, TOC, wide tables, inline-comment anchors, diagrams, attachments) move only through the `atlassian` skill's Fetch work, Publish work, Fetch page, and Publish page tactics (`atl.py` over REST). Never read or write those bodies through twg, except each tactic's documented lossy fallback.
-- **Markdown, not HTML.** twg fallback reads use `--format md` and warn they are lossy; twg writes use markdown body formats. Never request or send `html`, except `address-page-comments` targeted edits.
+- **Markdown, not HTML.** twg fallback reads use `--format md` and warn they are lossy; twg writes use markdown body formats. Never request or send `html`, except the `atlassian` Address page comments tactic's targeted edits.
 - JQL/CQL searches use resolved `maxResults`/`limit` as `--limit`, unless the caller bundles its own extraction script and declares a higher cap.
 - Large twg result → `-o json --output-file <file>.json`, `cd` there, extract with Python (`read_file` silently truncates lines at ~2000 chars). Unknown shape → `print(json.dumps(d, indent=2)[:2000])`.
 - `<twg>` exits `127` → report missing "twg CLI". Auth error → report `email`/`apiToken` in `.atlassian.json.user` as the prerequisite. **MUST NOT** run `twg login`, `setup`, or any interactive command.

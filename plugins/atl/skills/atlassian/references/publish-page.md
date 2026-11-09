@@ -63,7 +63,7 @@ python3 <skillDir>/scripts/atl.py publish-page verify --page-id <pageId> --confi
 
 ## Edit a fetched page
 
-Ordinary edits of an existing page without thread replies. Review-thread replies belong to the `address-page-comments` skill; never trigger it from here.
+Ordinary edits of an existing page without thread replies. Review-thread replies belong to the Address page comments tactic; never switch to it from here.
 
 1. Fetch with the **Fetch page** tactic into `tmp/<pageId>/page.md`; copy it to `tmp/<pageId>/original.md`. Done when both exist.
 2. Edit `page.md`. Text kept → keep its `adf:comment` span and id unchanged; the span moves with the text. Text removed on purpose → delete the span with it. Ambiguous intent → ask once, batched, before editing.

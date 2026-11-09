@@ -19,7 +19,7 @@ Choose subprocess capture when the consumer must reliably detect and handle the 
 The producer contract is what makes both variants interchangeable: stdout carries only the JSON payload, so a consumer can treat it as a pure data channel regardless of which composition mechanism wraps it.
 
 ## Examples
-- `/preflight-atlassian`'s **Read** command (plugins/atl/install/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md, Resolve step 2) emits only config JSON, with credential values replaced by presence booleans.
+- `/preflight-atlassian`'s **Read** command (plugins/atl/skills/atlassian/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md, Resolve step 2) emits only config JSON, with credential values replaced by presence booleans.
 - `/preflight-atlassian`'s **Locate** command prints `configPath`; `atl.py fetch-page`, `fetch-work`, `publish-work`, and `publish-page` take it as `--config "<configPath>"` and read the JSON themselves, because their stdin already carries the page or issue content.
 
 ## Considered options

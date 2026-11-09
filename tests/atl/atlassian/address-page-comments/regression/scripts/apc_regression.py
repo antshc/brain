@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Live regression for the address-page-comments skill.
+"""Live regression for the atlassian skill's Address page comments tactic.
 
     run     create a test page in a user-supplied space, seed review comments, then follow the
             skill's gate, edit, and reply steps with the real twg and `comment_state.py`,
@@ -23,8 +23,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = _SCRIPT_DIR.parents[4]
-STATE_SCRIPTS = REPO_ROOT / "plugins" / "atl" / "skills" / "address-page-comments" / "scripts"
+REPO_ROOT = _SCRIPT_DIR.parents[5]
+STATE_SCRIPTS = REPO_ROOT / "plugins" / "atl" / "skills" / "atlassian" / "scripts"
 for _path in (_SCRIPT_DIR, STATE_SCRIPTS):
     if str(_path) not in sys.path:
         sys.path.insert(0, str(_path))

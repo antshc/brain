@@ -1,17 +1,17 @@
-# Install ATL
+# Install
 
-Follow this file only on explicit request in Copilot CLI. Resolve the target with `git rev-parse --show-toplevel` and use it as CWD. Stop outside a Git repository. Resolve assets relative to this file's absolute path. This installer does not install TWG, edit shell profiles, set persistent environment variables, or run `twg login` or `twg setup`.
+The **Install** tactic. Follow only on explicit request in Copilot CLI; it needs no Preflight (it creates it). Resolve the target with `git rev-parse --show-toplevel` and use it as CWD. Stop outside a Git repository. Resolve `assets/` and `scripts/` from the `atlassian` skill's base directory (`<skillDir>`, the parent of this file's `references/` folder). This installer does not install TWG, edit shell profiles, set persistent environment variables, or run `twg login` or `twg setup`.
 
 ## Install the Copilot plugin
 
 1. Check `copilot plugin marketplace list --json`. If `brain` is absent, run `copilot plugin marketplace add antshc/brain`. Use the existing Brain marketplace when it points to that repository or to this installer checkout for local testing. Stop on a source conflict.
-2. Check `copilot plugin list --json`. Install a missing plugin with `copilot plugin install atl@brain`. Local marketplaces can show uninstalled entries as disabled with `source: live`. For these entries, check only the matching `enabledPlugins` key in Copilot settings. An absent key permits the initial install; an explicit `false` is disabled. Recheck that `atl` is enabled from `brain` and that its version matches [plugin.json](../plugin.json). Report policy blocks, disabled installs, version mismatches, and failed commands before writing target files. Leave upgrades and enablement of existing installs to the user.
+2. Check `copilot plugin list --json`. Install a missing plugin with `copilot plugin install atl@brain`. Local marketplaces can show uninstalled entries as disabled with `source: live`. For these entries, check only the matching `enabledPlugins` key in Copilot settings. An absent key permits the initial install; an explicit `false` is disabled. Recheck that `atl` is enabled from `brain` and that its version matches `<skillDir>/../../plugin.json`. Report policy blocks, disabled installs, version mismatches, and failed commands before writing target files. Leave upgrades and enablement of existing installs to the user.
 
 ## Workflow
 
-**1 — Check config and install deps.** `configPath := .github/skills/preflight-atlassian/.atlassian.json.user`. If the config path is tracked or the existing JSON is malformed, stop and report the path without reading values into the conversation. Run `python3 -m pip install -r <installer-dir>/requirements.txt` in the active Python environment. Stop on failure.
+**1 — Check config and install deps.** `configPath := .github/skills/preflight-atlassian/.atlassian.json.user`. If the config path is tracked or the existing JSON is malformed, stop and report the path without reading values into the conversation. Run `python3 -m pip install -r <skillDir>/scripts/requirements.txt` in the active Python environment. Stop on failure.
 
-**2 — Copy preflight and ignore config.** Copy the bundled [template](assets/preflight-atlassian/preflight-atlassian.SKILL.template.md) as `.github/skills/preflight-atlassian/SKILL.md` and refresh `scripts/twg_cred.py` from the same asset folder. Remove the obsolete `scripts/twg.py` there if present. If `git check-ignore -q -- "$configPath"` fails, add `.atlassian.json.user` to the target's `.gitignore` once. Verify the path is ignored and untracked before creating or editing the config. Keep the skill and its scripts trackable.
+**2 — Copy preflight and ignore config.** Copy `<skillDir>/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md` as `.github/skills/preflight-atlassian/SKILL.md` and refresh `scripts/twg_cred.py` from `<skillDir>/assets/preflight-atlassian/scripts/`. Remove the obsolete `scripts/twg.py` there if present. If `git check-ignore -q -- "$configPath"` fails, add `.atlassian.json.user` to the target's `.gitignore` once. Verify the path is ignored and untracked before creating or editing the config. Keep the skill and its scripts trackable.
 
 **3 — Read config keys.** Inspect only top-level keys and credential presence. Use the copied skill's Configuration table as the key and default schema.
 

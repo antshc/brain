@@ -1,6 +1,6 @@
-# address-page-comments live regression
+# Address page comments live regression
 
-Proves the twg mechanics `address-page-comments` relies on, against a real Confluence space: targeted edits keep untouched nodes, inline-comment highlights, draw.io diagrams, media, attachments, and every other ADF-only construct, a removed highlight turns its thread orphaned, replies land in the right place, and the rerun gate sees every answer. Run it with [run-regression.prompt.md](./run-regression.prompt.md); the user supplies the test space.
+Proves the twg mechanics the `atlassian` skill's Address page comments tactic relies on, against a real Confluence space: targeted edits keep untouched nodes, inline-comment highlights, draw.io diagrams, media, attachments, and every other ADF-only construct, a removed highlight turns its thread orphaned, replies land in the right place, and the rerun gate sees every answer. Run it with [run-regression.prompt.md](./run-regression.prompt.md); the user supplies the test space.
 
 Scripted, not agent-driven: [scripts/apc_regression.py](./scripts/apc_regression.py) follows the skill's steps with fixed edits and replies, so a failure points at twg or `comment_state.py`, never at agent judgment.
 
@@ -50,5 +50,5 @@ Diagrams render with the configured `diagramRenderer`; `drawio` needs the `drawi
 
 ## Tests
 
-- Offline (CI): `python3 -m pytest tests/atl/address-page-comments` — every case passes on healthy artifacts, fails on a broken one, skips on a missing one.
+- Offline (CI): `python3 -m pytest tests/atl/atlassian/address-page-comments` — every case passes on healthy artifacts, fails on a broken one, skips on a missing one.
 - Live: see [run-regression.prompt.md](./run-regression.prompt.md).

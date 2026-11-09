@@ -1,10 +1,10 @@
 ---
 mode: agent
-description: Run the address-page-comments live regression (twg targeted edits, orphaned comments, replies, rerun gate) against a user-supplied test space and report the case checklist.
+description: Run the atlassian Address page comments live regression (twg targeted edits, orphaned comments, replies, rerun gate) against a user-supplied test space and report the case checklist.
 argument-hint: <Confluence test space key or numeric id>
 ---
 
-# Run address-page-comments regression
+# Run Address page comments regression
 
 Run [README.md](./README.md)'s scenario. Paths are relative to the repository root.
 
@@ -17,7 +17,7 @@ Run [README.md](./README.md)'s scenario. Paths are relative to the repository ro
 1. *Run `preflight-atlassian` skill to resolve site, credentialed twg command, and token availability from `.atlassian.json.user` config* **Action: Resolve**; keep `configPath`, `twg`, `site`, `accountId`. `tokenAvailable` false or empty `accountId` → stop and report.
 2. From the repository root, with the repo environment active (`source .envrc`):
    ```bash
-   python tests/atl/address-page-comments/regression/scripts/apc_regression.py run --space "<space>" --twg "<twg>" --account-id <accountId> --site <site> --config "<configPath>"
+   python tests/atl/atlassian/address-page-comments/regression/scripts/apc_regression.py run --space "<space>" --twg "<twg>" --account-id <accountId> --site <site> --config "<configPath>"
    ```
    Prints `runDir`, `checklist`, and `pass`/`fail`/`skipped` case ids; exit 1 unless all pass.
 

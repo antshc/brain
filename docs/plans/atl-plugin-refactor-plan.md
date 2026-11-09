@@ -1,6 +1,6 @@
 # Refactor the ATL plugin
 
-**Status** — Implemented (atl 2.0.0); engineering skill name approved: `daily-briefing`. Reviewed `antshc/brain` main. Scope is skill routing, Python consolidation, and caller migration.
+**Status** — Implemented (atl 2.0.0); follow-up: `address-page-comments` folded into `atlassian` as the Address page comments tactic, superseding 1.2; engineering skill name approved: `daily-briefing`. Reviewed `antshc/brain` main. Scope is skill routing, Python consolidation, and caller migration.
 
 ## Findings
 
