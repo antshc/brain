@@ -9,7 +9,7 @@ import pytest
 
 
 REPO = Path(__file__).resolve().parents[3]
-ROOT = REPO / 'plugins/wf/skills/implement-spec'
+ROOT = REPO / 'plugins/wf/skills/implement'
 MAIN = (ROOT / 'SKILL.md').read_text()
 FACTORY = REPO / 'plugins/wf/install/assets/factory-mode'
 CODEY = REPO / 'plugins/wf/agents/codey.agent.md'
@@ -398,7 +398,7 @@ def test_factory_owns_verifier_resources_and_local_links():
             assert resolved.is_relative_to(FACTORY.resolve()), (path, target)
             assert resolved.exists(), (path, target)
     post = (FACTORY / 'references/post-implementation.md').read_text()
-    assert 'implement-spec/scripts' not in post
+    assert 'implement/scripts' not in post
     assert 'GH_TOOL' not in post
     publication = post.split('## Publication verification\n')[1].split('\n## ')[0]
     assert 'clean' in publication and 'HEAD' in publication
@@ -409,7 +409,7 @@ def test_factory_owns_verifier_resources_and_local_links():
 def test_feature_workflow_verifies_and_reviews_after_implementation():
     playbook = (FACTORY / 'playbooks/feature.md').read_text()
     workflow = playbook.split('## Workflow\n')[1]
-    assert workflow.index('`implement-spec` skill') < workflow.index('*App verification*') < workflow.index('*Code review*') < workflow.index('*Finalize*')
+    assert workflow.index('`implement` skill') < workflow.index('*App verification*') < workflow.index('*Code review*') < workflow.index('*Finalize*')
     assert '`ready`' in workflow and 'blocked/incomplete' in workflow
     post = (FACTORY / 'references/post-implementation.md').read_text()
     review = post.split('## Code review\n')[1].split('\n## ')[0]

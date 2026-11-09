@@ -121,7 +121,7 @@ Before editing for Bug Fix or Refactoring, *run `github` tactic **Name branch***
 
 ## Opening a PR
 
-For direct code-shipping playbooks. Feature uses the draft from `implement-spec`.
+For direct code-shipping playbooks. Feature uses the draft from `implement`.
 
 - *Run `github` tactic **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
 - *Run `github` tactic **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
