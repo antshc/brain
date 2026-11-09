@@ -43,5 +43,8 @@ jobs:
           )
           python -m pip install -e ".[dev]"
 
+      - name: Lint skill descriptions
+        run: python .github/scripts/lint_skill_descriptions.py
+
       - name: Run Python unit tests
         run: python .github/scripts/run-python-tests.py --unit-only

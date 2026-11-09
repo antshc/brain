@@ -1,7 +1,7 @@
 ---
 name: explore-codebase
 description: >-
-  Explore codebase symbols, callers, flows, literals, and restored NuGet package APIs or behavior, read-only in a caller-spawned subagent. Use for 'where is', 'what calls', 'how does this work', an unknown C# type, package API verification, or a Request with @work and @depth.
+  Look up codebase symbols, callers, flows, literals, and restored NuGet package APIs inline, read-only in a caller-spawned subagent. Use for 'where is', 'what calls', an unknown C# type, or a Request with @work and @depth. Not for saved cited documents → `research`.
 ---
 
 # Explore Codebase

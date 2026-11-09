@@ -1,7 +1,7 @@
 ---
 name: design
 description: >-
-  Stress-test a design through a decision interview, sketch code shape usage first, or publish a spec or PRD. Use for grill this, sketch this, type sketch, write a spec. On explicit request, break a spec into tickets, chart a Wayfinder map, or review a technical design.
+  Stress-test a plan through a decision interview, or publish a spec or PRD. Use for 'grill this', 'write a spec'; on request, break a spec into tickets, chart a Wayfinder map, or review a design. Not for code shape → `architect`; stories, bugs, TOIs, feature designs → `draft-artifact`.
 ---
 
 # Design
@@ -9,7 +9,7 @@ description: >-
 | Mode | Select for | Playbook |
 | --- | --- | --- |
 | `grill` | Challenge a plan, interview for domain decisions, or resolve a Wayfinder grilling ticket. | [Grill](playbooks/grill.md) |
-| `sketch` | Draft one usage-first code sketch: types, signatures with `not implemented` bodies, module map, rationale. Use for sketch this, type sketch, signatures, module map, or a single-pass design without architect's phases. | [Sketch](playbooks/sketch.md) |
+| `sketch` | Draft one usage-first code sketch: types, signatures with `not implemented` bodies, module map, rationale. Select only on explicit `sketch`; `architect` owns code shape otherwise. | [Sketch](playbooks/sketch.md) |
 | `spec` | Synthesize a spec or PRD from the conversation, resolved decisions, or an accepted sketch. | [Spec](playbooks/spec.md) |
 | `tickets` | An explicit user request to break a spec into implementation tickets. | [Tickets](playbooks/tickets.md) |
 | `wayfinder` | An explicit request to chart or resume a Wayfinder decision map. | [Wayfinder](playbooks/wayfinder.md) |

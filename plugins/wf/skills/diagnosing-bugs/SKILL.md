@@ -1,6 +1,7 @@
 ---
 name: diagnosing-bugs
-description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow. Also use for explicit bug-fix requests.
+description: >-
+  Run a diagnosis loop for hard bugs and performance regressions. Use for 'diagnose this', 'debug this', or reports of broken, throwing, failing, or slow behavior; also explicit bug-fix requests. Not for one-off behavior questions → `experiment`.
 ---
 
 # Diagnosing Bugs

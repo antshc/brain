@@ -1,7 +1,7 @@
 ---
 name: preflight-atlassian
 description: >-
-  Resolve Atlassian connection facts (site, default project key, default space id, token availability, credentialed twg command) from this repo's `.atlassian.json.user` config. Internal gate invoked by atlassian and daily-briefing, not a user entry point. Use atlassian for the operation itself.
+  Resolve Atlassian connection facts (site, default project key, default space id, token availability, credentialed twg command) from this repo's `.atlassian.json.user` config. Internal gate for `atlassian`, not a user entry point. Not for Jira or Confluence operations → `atlassian`.
 compatibility: Requires the `twg` CLI and an Atlassian API token (`email` + `apiToken`); twg and the REST scripts share those credentials.
 ---
 

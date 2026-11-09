@@ -1,7 +1,7 @@
 ---
 name: github
 description: >-
-  Manage Git branches, commits, worktrees, and GitHub repositories, specs, tickets, issues, pull requests, reviews, and checks. Use to name a branch, publish a spec, fetch a PR, reply to a review, or inspect checks.
+  Run Git and GitHub mechanics for branches, commits, worktrees, specs, tickets, issues, pull requests, review threads, and checks. Use for 'name a branch', 'publish a spec', 'fetch a PR', 'post a reply', 'inspect checks'. Not for judging what a review comment needs → `review`.
 ---
 
 # GitHub
@@ -19,5 +19,7 @@ Select one operation below. Load its tactic only, then follow any reference it s
 | Draft or read PR metadata, publish, get a diff, or post a conversation comment | [Pull requests](tactics/pull-requests.md) |
 | Draft or finalize a review comment, inspect discussion, post, reply, or resolve | [Reviews](tactics/reviews.md) |
 | Verify checks at a pinned head | [Checks](tactics/checks.md) |
+
+`github` owns mechanics only. *Run `review` skill for PR findings, existing PR comments, and blast radius judgment*; long-running review and CI monitoring is the caller's loop.
 
 For CLI operations, resolve `GH_TOOL` as `python3 <installed github skill directory>/scripts/github.py` before changing CWD. Use subcommand `--help` for flags and [CLI contract](references/cli-contract.md) when interpreting errors or adapting outputs. For remote operations, follow [Transports](references/transports.md). Explicit offline mode skips remote calls.

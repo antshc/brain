@@ -1,7 +1,7 @@
 ---
 name: draft-artifact
 description: >-
-  Draft a User story, reproducible bug report, feature Transfer of Information (TOI), or feature design. Use for 'write a User story', 'draft a bug report', 'write a TOI', feature handover, or an explicit request to create or update a feature design.
+  Draft a User story, bug report, feature Transfer of Information (TOI), or feature design document from a template. Use for 'write a User story', 'draft a bug report', 'write a TOI', 'write a feature design'. Not for specs or PRDs → `design`; settled ADRs, Concepts, terms → `record-architecture`.
 argument-hint: "story | bug | toi | design"
 ---
 

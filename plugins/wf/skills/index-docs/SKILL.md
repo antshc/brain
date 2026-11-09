@@ -1,12 +1,14 @@
 ---
 name: index-docs
 description: >-
-  Initialize missing ARCHITECTURE.md and GLOSSARY.md files. Maintain ARCHITECTURE.md sections and Trigger condition tables. Use to load an index, generate triggers, scan and match rows, or sync a Deployables, ADR, Concept, or custom row.
+  Initialize missing ARCHITECTURE.md and GLOSSARY.md, and sync ARCHITECTURE.md index rows and Trigger condition tables. Use for 'load an index', 'generate triggers', 'sync an index row'. Not for authoring ADR or Concept content → `record-architecture`; Concept interviews → `define-concept`.
 ---
 
 # Index Docs
 
 Own `ARCHITECTURE.md`'s structural prose and its three indexes (`Deployables`, `Architecture Decision Records`, `Crosscutting Concepts`). Template: [ARCHITECTURE-FORMAT.md](./ARCHITECTURE-FORMAT.md).
+
+Handoffs: `define-concept` interviews, `record-architecture` writes ADR, Concept, and Deployable content, `index-docs` syncs the index rows. Row content comes from the caller.
 
 ## Initialize missing docs
 

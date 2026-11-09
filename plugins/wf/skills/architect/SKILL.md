@@ -1,7 +1,7 @@
 ---
 name: architect
 description: >-
-  Sketch types, signatures, and module boundaries before code, then implement or hand off the sketch. Use for /architect, 'design this', '/architect sketch', '/architect interrogate' to attack a change, deep module or seam design, or non-trivial work needing shape first.
+  Sketch types, signatures, and module boundaries in code before implementing, then implement or hand off the sketch. Use for /architect, 'architect this', '/architect interrogate', deep module or seam design. Not for decision interviews or specs → `design`; settled ADRs → `record-architecture`.
 ---
 
 # Architect

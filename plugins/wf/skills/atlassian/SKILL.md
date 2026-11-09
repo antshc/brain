@@ -1,7 +1,7 @@
 ---
 name: atlassian
 description: >-
-  Fetch, publish, convert, and query Jira and Confluence content, and address page review comments. Use for 'fetch PROJ-123', 'read this Confluence page', 'publish Markdown to Confluence', 'create a Jira story', 'address page comments', JQL or CQL search, or Markdown and ADF conversion. Use 'help' to list commands.
+  Fetch, publish, convert, and query Jira and Confluence content, and address page comments. Use for 'fetch PROJ-123', 'read this Confluence page', 'publish Markdown to Confluence', 'create a Jira story', JQL or CQL search. Not for connection facts → `preflight-atlassian`.
 ---
 
 # Atlassian

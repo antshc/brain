@@ -1,7 +1,7 @@
 ---
 name: experiment
 description: >-
-  Run a minimal throwaway experiment that answers one uncertain technical question by observing actual behavior. Use when asked to test, verify, prove, or see how something actually behaves in code, UI, SDK/API, cloud, message brokers, or databases before committing production code.
+  Run a minimal throwaway experiment that answers one uncertain technical question by observing actual behavior. Use for 'run an experiment', 'try it and see', 'how does X actually behave'. Not for broken, failing, or slow code → `diagnosing-bugs`.
 ---
 
 # Experiment
