@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-ATL_PY = Path(__file__).resolve().parents[4] / "skills" / "engineering" / "atlassian" / "scripts" / "atl.py"
+ATL_PY = Path(__file__).resolve().parents[4] / "plugins" / "wf" / "skills" / "atlassian" / "scripts" / "atl.py"
 COMMANDS = ("fetch-work", "publish-work", "fetch-page", "publish-page", "map-markdown")
 
 
