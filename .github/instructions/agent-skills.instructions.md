@@ -82,6 +82,8 @@ Wrap the whole invocation phrase in *italics* to mark it visibly. Example: *Run 
 
 Run subagents through prose instructions describing the task, scope, inputs, constraints, and expected output. Do not instruct agents to call `runSubagent` directly.
 
+A brief that tells the subagent to run a skill **MUST** name a skill-capable agent type: wf `hunter` for read-only codebase lookups, else `general-purpose` with edits forbidden when read-only. Use the built-in `explore` agent for it only as the `hunter` fallback, with skill steps replaced by their CLI equivalents: `explore` has no `skill` tool, so it silently skips skill steps. Plain grep/LSP checks that name no skill may still use `explore`.
+
 ## Content and resources
 
 Order content by need: **steps → inline reference → disclosed reference**. Inline always-needed material; disclose conditional or bulky material.

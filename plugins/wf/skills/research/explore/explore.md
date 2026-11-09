@@ -1,6 +1,6 @@
 # Explore
 
-Explore procedure of the Research skill. Runs inside a caller-spawned subagent; never spawns subagents. Owns target resolution, contract material, tool selection, and the read-only contract. The caller owns delegation: it reads the Research skill's Explore request, forms the request, decides one or parallel subagents, and spawns them. Research unavailable → caller spawns the explore agent with the same request plus the read-only contract.
+Explore procedure of the Research skill. Runs inside a caller-spawned subagent; never spawns subagents. Owns target resolution, contract material, tool selection, and the read-only contract. The caller owns delegation: it reads the Research skill's Explore request, forms the request, decides one or parallel subagents, and spawns them as the `hunter` agent (`hunter` unavailable → `explore` agent with the request plus the read-only contract; it has no `skill` tool, so use `graphify` from the shell). Research missing from the plugin → same agent type with the same request plus the read-only contract.
 
 ## Contents
 

@@ -50,7 +50,7 @@ If `feature` is missing or matches more than one feature, ask the user with the 
    - Locate these by searching the workspace; skip any that do not exist and record the gap.
    - Keep the evidence map (section → fact → source) outside the TOI.
 
-4. **Explore the codebase (legwork).** Find hard facts in source; docs and Jira are leads, not proof. Spawn read-only subagents; in each, *run `research` skill Explore route for the inline read-only lookup — where is, what calls, how a flow works, which file holds a literal or config, in the current repo or a named external codebase*. Rationale: preserve parent context for drafting. Spawn one subagent per target below, in parallel. Pass each request verbatim:
+4. **Explore the codebase (legwork).** Find hard facts in source; docs and Jira are leads, not proof. Spawn `hunter` subagents; in each, *run `research` skill Explore route for the inline read-only lookup — where is, what calls, how a flow works, which file holds a literal or config, in the current repo or a named external codebase*. Rationale: preserve parent context for drafting. Spawn one subagent per target below, in parallel. Pass each request verbatim:
    - `@work` := question: "For feature `{{feature}}` (keywords: {{keywords}}), answer the Exploration checklist rows marked for this target."
    - `@depth` := `thorough`.
    - `@target` := one of: current repository; GUI repository; pipeline definitions; other system components the feature touches (for example Payment gateway, Identity provider); third-party packages owning symbols absent from local source.

@@ -4,9 +4,9 @@ Grounding procedure of the Research skill. Paths resolve from the skill base dir
 
 Explore the codebase to answer "how does X work?" questions. Produce architectural explanations at the level of a senior engineer onboarding onto a subsystem, enough to build a working mental model, not so much that it reads like annotated source code.
 
-For each stage, *run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch**. Explorers use `how explorer` and explainers use `how explainer`. Require read-only access: use `explore`, or `general-purpose` with edits forbidden if MCP is needed. Use the role fallback on rejection, then the closest valid model of the same family.
+For each stage, *run `subagents` skill to dispatch independent workers* using **Dispatch**. Spawn every explorer and explainer as the `hunter` agent with its own model; pass no model override. `hunter` unavailable → `explore` agent; it lacks the `skill` tool, so the prompt requires `graphify` from the shell.
 
-**Spawn as Explore request.** Read this skill's **Explore request**; form per spawn: `@work` = the filled prompt template as prompt instruction (verbatim); `@depth` = `thorough` for explorers, `medium` for the simple-path explainer, `quick` for the synthesizing explainer; `[@target]` = repositories or services the question names; `@outputShape` = the template's Output section. Spawn each subagent with its request verbatim, instructing it to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, config evidence*. Research unavailable → spawn with the filled prompt template alone, as below.
+**Spawn as Explore request.** Read this skill's **Explore request**; form per spawn: `@work` = the filled prompt template as prompt instruction (verbatim); `@depth` = `thorough` for explorers, `medium` for the simple-path explainer, `quick` for the synthesizing explainer; `[@target]` = repositories or services the question names; `@outputShape` = the template's Output section. Spawn each subagent with its request verbatim, instructing it to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, config evidence*. Research missing from the plugin → spawn the same agent with the filled prompt template alone, as below.
 
 ## 1. Assess complexity
 
