@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-SCRIPTS = Path(__file__).resolve().parents[2] / "github/scripts"
+SCRIPTS = Path(__file__).resolve().parents[3] / "plugins/wf/skills/github/scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from github_cli import reviews as state
