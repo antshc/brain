@@ -280,17 +280,17 @@ Location: plugins/atl/ (config) + plugins/atl/skills/ (skills)
 ### Language
 
 **Work item**:
-The Jira unit of work an `atl` skill reads or publishes — Story, Task, Bug, Epic, or a child of one. Names the Jira half of the `fetch-work`/`publish-work` axis, opposite **Page**.
+The Jira unit of work an `atl` skill reads or publishes — Story, Task, Bug, Epic, or a child of one. Names the Jira half of the Fetch work/Publish work axis of the `atlassian` skill, opposite **Page**.
 _Avoid_: issue, ticket, card
 _Plugins_set_: atl
 
 **Page**:
-The Confluence page an `atl` skill reads or publishes. Names the Confluence half of the `fetch-page`/`publish-page` axis, opposite **Work item**.
+The Confluence page an `atl` skill reads or publishes. Names the Confluence half of the Fetch page/Publish page axis of the `atlassian` skill, opposite **Work item**.
 _Avoid_: document, article, wiki page
 _Plugins_set_: atl
 
 **ADF**:
-Atlassian Document Format — the structured JSON body Jira and Confluence store content in. Markdown is what the user and the agent read, and `map-markdown-adf` is the single boundary between the two, in both directions; it also decides which representation goes over the wire, since Jira accepts plain Markdown but only ADF carries panels, expands, status lozenges, and Confluence macros.
+Atlassian Document Format — the structured JSON body Jira and Confluence store content in. Markdown is what the user and the agent read, and the `atlassian` skill's converter (`atl.py map-markdown`) is the single boundary between the two, in both directions; it also decides which representation goes over the wire, since Jira accepts plain Markdown but only ADF carries panels, expands, status lozenges, and Confluence macros.
 _Avoid_: rich text, Atlassian JSON, doc format
 _Plugins_set_: atl
 
@@ -300,7 +300,7 @@ _Avoid_: .atlmcp, .env, credentials file, convention folder
 _Plugins_set_: atl
 
 **Preflight**:
-The single resolution gate every other `atl` skill runs first, returning `site`, `twg` (the credentialed twg command), `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, and the cached identity. It never fails on missing **Atlassian config** — an unresolved field comes back empty and the caller names the missing prerequisite.
+The single resolution gate the `atlassian`, `address-page-comments`, and `daily-briefing` skills run first, returning `site`, `twg` (the credentialed twg command), `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, and the cached identity. It never fails on missing **Atlassian config** — an unresolved field comes back empty and the caller names the missing prerequisite.
 _Avoid_: auth, init, bootstrap, config check
 _Plugins_set_: atl
 

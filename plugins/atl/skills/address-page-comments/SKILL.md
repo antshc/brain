@@ -1,7 +1,7 @@
 ---
 name: address-page-comments
 description: >-
-  Edit a Confluence page in place to settle open review comments and reply to each thread; removed-anchor comments get a page comment. Use for a Confluence page URL or ID with 'address page comments' or 'reply to review comments'. Use fix-confluence-comments to edit without replying.
+  Edit a Confluence page in place to settle open review comments and reply to each thread; removed-anchor comments get a page comment. Use for a Confluence page URL or ID with 'address page comments' or 'reply to review comments'. Use atlassian to edit a page without replying.
 argument-hint: '<page_id_or_url> (e.g. "123456789" or "https://<site>.atlassian.net/wiki/spaces/<space>/pages/123456789/<title>")'
 ---
 
@@ -66,7 +66,7 @@ Classify each issue:
 | `answer` | A question, or a change the evidence shows is wrong or unneeded | Reply only |
 | `unclear` | Ambiguous intent, or facts you cannot verify | Ask one focused question |
 
-Verify factual claims before acting: the page itself, Jira/Confluence via `<twg>` search, and the codebase when the page documents code in this workspace. Missing evidence → `unclear`; never invent keys, versions, URLs, or behavior.
+Verify factual claims before acting: the page itself, Jira/Confluence via `<twg>` search (full bodies: *use `atlassian` skill's Fetch work or Fetch page tactic to fetch a Jira work item or Confluence page as Markdown*, read-only), and the codebase when the page documents code in this workspace. Missing evidence → `unclear`; never invent keys, versions, URLs, or behavior.
 
 Done when each pending thread belongs to one issue with a class, target `localId`s for every `edit`, and cited evidence for every verdict.
 
@@ -155,7 +155,7 @@ No praise, apologies, headings, canned wording, or labels (`Bug:`, `Nit:`, `Note
 
 ## Gotchas
 
-- **Targeted twg edits are the only body write here.** This overrides Preflight's Markdown-only and REST-only body rules: `--edits-file` preserves untouched nodes exactly (macros, diagrams, annotations), while `publish-page` full republish or `--body-file` replacement can drop or rewrite inline-comment anchors. **MUST NOT** use `--body`/`--body-file`.
+- **Targeted twg edits are the only body write here.** This is the `atlassian` skill's only HTML exception and overrides its REST-only body rule: `--edits-file` preserves untouched nodes exactly (macros, diagrams, annotations), while an `atl.py publish-page` full republish or `--body-file` replacement can drop or rewrite inline-comment anchors. **MUST NOT** use `--body`/`--body-file`.
 - `localId`s come from the latest `content get --detail full`; `data.metadata.localIdsDurable: false` → refetch immediately before `update`.
 - Classic pages (`type=page`) need the `--draft` read's `snapshotToken`; never retry with `data.currentSnapshot.token` from an error.
 - `--resolution-status open` includes inline comments whose highlighted text an edit removed; `comment_state.py` marks them `orphaned` by checking `data-annotation-id` in the body.

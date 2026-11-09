@@ -34,7 +34,7 @@ from cases import APPENDED_TEXT, CASES, EDIT_NEW, EDIT_OLD, REVIEWER_ID, evaluat
 
 DEFAULT_RUNS_DIR = _SCRIPT_DIR.parent / "runs"
 FIXTURE_DIR = _SCRIPT_DIR.parent / "fixtures"
-PUBLISH_SCRIPT = REPO_ROOT / "plugins" / "atl" / "skills" / "publish-page" / "scripts" / "publish_page_diagrams.py"
+ATL_PY = REPO_ROOT / "plugins" / "atl" / "skills" / "atlassian" / "scripts" / "atl.py"
 SEEDS = {
     "edit": ("inline", "retry limit", "Should be five attempts, not three."),
     "delete": ("inline", "Legacy export", "Legacy export is gone; remove this line."),
@@ -150,9 +150,9 @@ def _publish(twg: Twg, space: str, title: str, config: Path) -> str:
     if not space.isdigit():
         space_id = str(twg("space", "confluence", "space", "list", "--keys", space)["data"][0]["id"])
     result = subprocess.run(
-        [sys.executable, str(PUBLISH_SCRIPT), "run", "--md-path", str(twg.run_dir / "page.md"), "--space-id", space_id,
+        [sys.executable, str(ATL_PY), "publish-page", "run", "--md-path", str(twg.run_dir / "page.md"), "--space-id", space_id,
          "--title", title, "--config", str(config)],
-        cwd=PUBLISH_SCRIPT.parent, capture_output=True, text=True, check=False)
+        cwd=twg.run_dir, capture_output=True, text=True, check=False)
     (twg.run_dir / "publish.json").write_text(result.stdout, encoding="utf-8")
     if result.returncode:
         raise StepError(f"publish-page exit {result.returncode}: {result.stderr[-1500:]}")

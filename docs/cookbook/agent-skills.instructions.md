@@ -35,11 +35,11 @@ Register every new plugin in [marketplace.json](../plugin/marketplace.json) in t
 
 ## Skill invocation
 
-Reference the exact plain `skill-name` without a leading `/`, immediately followed by the word `skill` (e.g. `` `fetch-page` skill ``). Wording may use run, follow, use, load, or equivalent prose; do not enforce one verb.
+Reference the exact plain `skill-name` without a leading `/`, immediately followed by the word `skill` (e.g. `` `atlassian` skill ``). Wording may use run, follow, use, load, or equivalent prose; do not enforce one verb.
 
 Every skill invocation **MUST** include 3–6 distinctive keywords from the invoked skill's description to strengthen triggering. Do not copy the full description.
 
-Wrap the whole invocation phrase in *italics* to mark it visibly. Example: *Run `fetch-page` skill to fetch the Confluence page as Markdown.*
+Wrap the whole invocation phrase in *italics* to mark it visibly. Example: *Run `atlassian` skill to fetch the Confluence page as Markdown.*
 
 ## Subagents
 
@@ -77,7 +77,7 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 | Syntax | Meaning | Example |
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
-| *italic* | Skill invocation phrase | *Run `fetch-page` skill to fetch the Confluence page as Markdown.* |
+| *italic* | Skill invocation phrase | *Run `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |

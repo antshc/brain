@@ -1,6 +1,6 @@
 # address-page-comments live regression
 
-Proves the twg mechanics `address-page-comments` relies on, against a real Confluence space: targeted edits keep untouched nodes, inline-comment highlights, draw.io diagrams, media, attachments, and every other `map-markdown-adf` construct, a removed highlight turns its thread orphaned, replies land in the right place, and the rerun gate sees every answer. Run it with [run-regression.prompt.md](./run-regression.prompt.md); the user supplies the test space.
+Proves the twg mechanics `address-page-comments` relies on, against a real Confluence space: targeted edits keep untouched nodes, inline-comment highlights, draw.io diagrams, media, attachments, and every other ADF-only construct, a removed highlight turns its thread orphaned, replies land in the right place, and the rerun gate sees every answer. Run it with [run-regression.prompt.md](./run-regression.prompt.md); the user supplies the test space.
 
 Scripted, not agent-driven: [scripts/apc_regression.py](./scripts/apc_regression.py) follows the skill's steps with fixed edits and replies, so a failure points at twg or `comment_state.py`, never at agent judgment.
 
@@ -8,7 +8,7 @@ Scripted, not agent-driven: [scripts/apc_regression.py](./scripts/apc_regression
 
 | Step | Real call | Artifact in the run directory |
 |---|---|---|
-| 1. Publish | `publish-page` script on [fixtures/page.md](./fixtures/page.md): three comment-target paragraphs plus every construct from the round-trip fixture (TOC, marks, status, headings, lists, panels, code, breakouts, tables, expands, two draw.io diagrams, image, file) | `page.md`, `publish.json`, `run.json` |
+| 1. Publish | `atl.py publish-page run` on [fixtures/page.md](./fixtures/page.md): three comment-target paragraphs plus every construct from the round-trip fixture (TOC, marks, status, headings, lists, panels, code, breakouts, tables, expands, two draw.io diagrams, image, file) | `page.md`, `publish.json`, `run.json` |
 | 2. Seed | twg inline comments on `retry limit`, `Legacy export`, `rotate daily`; one footer comment | `seed.json` |
 | 3. Gate 1 | twg `attachments list`, `comments list`, `content get --draft --format html` + `comment_state.py` | `attachments-before.json`, `before.html`, `gate-1.json` |
 | 4. Edit | twg `content update --edits-file`: `replaceNode` (three → five), `deleteNode` (legacy export), `appendNodeToEnd` (owner) | `edits.json`, `update.json`, `after.html` |
@@ -38,11 +38,11 @@ A failed step writes `<step>.err` and stops; verify still runs, marking every ca
 | R2 | Orphaned thread answered in a page comment linking it |
 | G3 | Rerun gate detects every answer and skips |
 | R3 | No seeded comment resolved |
-| P1 | Page carries diagrams, media, tables, lists, panels, and other `map-markdown-adf` constructs |
+| P1 | Page carries diagrams, media, tables, lists, panels, and other ADF-only constructs |
 | P2 | Everything outside the edited nodes is byte-identical after edits and replies |
 | P3 | Attachments (image, file, draw.io) unchanged after edits and replies |
 
-Diagrams render with the configured `diagramRenderer`; `drawio` needs the `drawio` CLI and `drawioExtensionKey` (see `publish-page`), `mmdc` always.
+Diagrams render with the configured `diagramRenderer`; `drawio` needs the `drawio` CLI and `drawioExtensionKey` (see the `atlassian` skill's Publish page reference), `mmdc` always.
 
 ## Runs
 
