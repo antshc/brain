@@ -19,7 +19,7 @@ Azure SDK (`Azure.*`, `Microsoft.Azure.*`):
 
 1. Resolve the version from the workspace — `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `*.csproj`; absent → `obj/project.assets.json`. Never reuse a version from an earlier session.
 2. Search official Microsoft code samples and API reference for the package, version, namespace, type, and member — use the Microsoft Learn MCP code sample search when installed.
-3. Not settled, or Learn unavailable → *run `explore-codebase` with `@shape: nuget` to verify the package type, member, signature, and behavior from the restored NuGet package's XML docs or decompiled assembly.*
+3. Not settled, or Learn unavailable → *run `research` skill Explore route with `@shape: nuget` for an inline read-only lookup to verify the package type, member, signature, and behavior from the restored NuGet package's XML docs or decompiled assembly.*
 
 Other SDKs: resolve the version from the dependency manifest and lockfile, then use Docs.
 

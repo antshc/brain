@@ -7,7 +7,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 SKILLS = REPO / 'plugins/wf/skills'
 RESEARCH = (SKILLS / 'research/system/system-inspection.md').read_text()
-EXPLORE = (SKILLS / 'explore-codebase/SKILL.md').read_text()
+EXPLORE = (SKILLS / 'research/SKILL.md').read_text().split('## Explore request')[1].split('\n## ')[0]
 
 
 def lookup_rows() -> list[list[str]]:
@@ -32,6 +32,6 @@ def test_lookup_depths_match_explore_enum():
 
 
 def test_request_lists_required_fields():
-    request = RESEARCH.split('Pass each Request:')[1].split('| Lookup |')[0]
+    request = RESEARCH.split('Pass each Explore request:')[1].split('| Lookup |')[0]
     for field in ('@work', '@shape', '@depth', '@target', '@outputShape'):
         assert f'`{field}`' in request, field

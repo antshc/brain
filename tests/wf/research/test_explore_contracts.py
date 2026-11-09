@@ -9,16 +9,17 @@ import yaml
 
 
 REPO = Path(__file__).resolve().parents[3]
-SKILL = (REPO / 'plugins/wf/skills/explore-codebase/SKILL.md').read_text()
-FRONTMATTER, BODY = re.match(r'^---\n(.*?)\n---\n(.*)$', SKILL, re.S).groups()
+SKILL = (REPO / 'plugins/wf/skills/research/SKILL.md').read_text()
+FRONTMATTER, SKILL_BODY = re.match(r'^---\n(.*?)\n---\n(.*)$', SKILL, re.S).groups()
+BODY = (REPO / 'plugins/wf/skills/research/explore/explore.md').read_text()
 EVALS = Path(__file__).parent / 'evals'
 ROUTES = {'rg', 'lsp', 'graphify', 'github'}
 
 
-def section(title: str) -> str:
-    start = re.search(rf'^#{{2,3}} {re.escape(title)}\n', BODY, re.M).end()
-    end = re.compile(r'^#{2,3} ', re.M).search(BODY, start)
-    return BODY[start:end.start() if end else None]
+def section(title: str, text: str = BODY) -> str:
+    start = re.search(rf'^#{{2,3}} {re.escape(title)}\n', text, re.M).end()
+    end = re.compile(r'^#{2,3} ', re.M).search(text, start)
+    return text[start:end.start() if end else None]
 
 
 def table_rows(text: str) -> list[list[str]]:
@@ -29,7 +30,7 @@ def table_rows(text: str) -> list[list[str]]:
 def test_frontmatter_parses_and_description_is_safe():
     meta = yaml.safe_load(FRONTMATTER)
     description = meta['description']
-    assert meta['name'] == 'explore-codebase'
+    assert meta['name'] == 'research'
     assert len(description) <= 1024
     assert '@work' in description
     for char in ('—', '–', ': ', ' #', '<', '>'):
@@ -37,11 +38,18 @@ def test_frontmatter_parses_and_description_is_safe():
 
 
 def test_body_under_300_lines():
-    assert len(BODY.splitlines()) < 300
+    assert len(SKILL_BODY.splitlines()) < 300
+
+
+def test_explore_route_links_engine_and_nuget_tactic():
+    routes = section('Entry routes', SKILL_BODY)
+    assert '(explore/explore.md)' in routes
+    assert '(explore/nuget.md)' in routes
+    assert '](' not in BODY.split('## Contents')[0] + section('Routing rules')
 
 
 def test_request_lists_shape_enum():
-    line = next(l for l in section('Request').splitlines() if l.startswith('- `[@shape]`'))
+    line = next(l for l in section('Explore request', SKILL_BODY).splitlines() if l.startswith('- `[@shape]`'))
     assert re.search(r'`([^`]+)`;', line).group(1) == 'literal | symbol | relationship | nuget'
 
 

@@ -9,7 +9,7 @@
     "{{remoteOnlyRepo}}": "repository with an origin URL but no local checkout"
   },
   "commonChecks": [
-    "loads explore-codebase skill",
+    "loads research skill and its Explore route",
     "verdict first line matches routeLinePattern and equals expectedRoute",
     "no recursive grep (-r, -R, find -exec grep, xargs grep, rg ... || grep ...)",
     "no rg install while command -v rg resolves",

@@ -1,10 +1,12 @@
 ---
 name: research
 description: >-
-  Investigate primary sources and save a cited Markdown document. Use for 'research X', 'investigate X', 'why was this built this way', 'verify this NuGet API', 'check this cloud limit'. Not for inline lookups → `explore-codebase`.
+  Investigate primary sources; save a cited Markdown document or return an inline read-only lookup. Use for 'research X', 'investigate X', 'where is', 'what calls', 'why was this built this way', 'verify this NuGet API', 'check this cloud limit', or an Explore request with @work and @depth.
 ---
 
 # Research
+
+Single entry point for search and investigation: saved cited documents (How, Why, system, cloud, web) and inline read-only codebase or NuGet lookups (Explore).
 
 ## Inputs
 
@@ -14,9 +16,23 @@ description: >-
 - `@researchScope` [optional] — one entry per research part with route (`system`, `cloud`, or `web`), target when known, system axis when applicable (`Behavior`, `Flow`, `Data`, or `focused`), and a part question for multi-part requests. Cloud entries include provider, service, and whether live values matter.
 - `@outputShape` [optional] — requested file count, paths, diagrams, or framing.
 
+## Explore request
+
+Inline lookup contract. Caller forms it before spawning a read-only subagent; the subagent receives it verbatim and runs the **Explore** route:
+
+- `@work` — one of: question | prompt instruction | skill name to run. Instruction and skill name pass **verbatim**, never paraphrased.
+- `@depth` — `quick | medium | thorough`.
+- `[@shape]` — `literal | symbol | relationship | nuget`; routing hint. Omitted → classify in Route the lookup.
+- `[@target]` — repository or service names as stated; omitted → current repository.
+- `@outputShape` — caller's return shape; omitted → Return the verdict.
+- `[@outputArtifact]` — the one file the run may write.
+- `[@inputs]` — caller-supplied inputs `@work` needs.
+
+Direct `/research` with a lookup question (`where is`, `what calls`, one symbol, literal, or package API) and no saved document wanted → form this request and spawn one read-only subagent with it; return its verdict and save nothing.
+
 ## Constraints
 
-- **MUST** delegate source reading. Parent routes, briefs, and verifies to keep raw evidence in subagent context. If delegation is unavailable, report the blocker.
+- **MUST** delegate source reading. Parent routes, briefs, and verifies to keep raw evidence in subagent context. If delegation is unavailable, report the blocker. Exception: the **Explore** route is the delegated worker; it reads sources itself and never spawns.
 - **MUST** pass `@outputShape` verbatim to every subagent. It takes precedence over report defaults.
 - **MUST** check each codebase target root for `graphify-out/`. Present → paste this **Graphify line** verbatim into the subagent prompt body of every codebase-reading brief (How explorer and explainer, System inspection, Why code anchor), with `<root>` filled:
 
@@ -30,6 +46,7 @@ description: >-
 
 | Action | Load in full | Return |
 | --- | --- | --- |
+| **Explore** (running inside a subagent with an Explore request) | [Explore](explore/explore.md); [NuGet tactic](explore/nuget.md) when the route is `nuget` | `@outputShape`, else the verdict; no saved document unless `@outputArtifact`. |
 | **How** | [How](how/how.md), [explainer prompt](how/explainer-prompt.md), [explorer prompt](how/explorer-prompt.md) on the complex path | Cited explanation of current behavior. |
 | **Why code anchor** (`@mode=why`, `@whyDepth=anchor`) | [Why](why/why.md). Execute through Establish the Code Anchor. | Cited symbols, commits, PRs, linked tickets and gaps. Stop after the anchor. |
 | **Why** (`@mode=why`) | [Why](why/why.md), [epistemics](why/epistemics.md), [investigator prompt](why/investigator-prompt.md), [synthesizer prompt](why/synthesizer-prompt.md), [source playbook](why/source-playbook.md) | Cited rationale, source coverage and confidence. |
