@@ -32,6 +32,8 @@ Inspect the **as-built** state using target repositories and restored packages a
 | Isolated symbol or package call site | `symbol` | `quick` |
 | Citation line, config key, route path, table or queue name | `literal` | `quick` |
 
+Target has `graphify-out/` → for `relationship` lookups, instruct the subagent to *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* before `rg`/LSP; read-only contract overrides its write steps. Graph orients, source proves; a missing node is never absence evidence.
+
 For NuGet-owned claims or evidence, delegate *`explore-codebase` with `@shape: nuget`* to verify the package API or behavior from XML docs or decompiled code. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
 
 Structure and cite returned evidence. Write only the inspection document.
