@@ -227,8 +227,7 @@ Agent-driven proof of app behavior for TypeScript (pnpm) or Python repos: a `mol
 
 Skill authoring from bundled best practices (repo rules, mattpocock writing-for-agents, Agent Skills KBs).
 
-- [grill-skill](plugins/skill/skills/grill-skill/SKILL.md): interview one question at a time to define purpose, triggers, contract, body blocks, and constraints; outputs a confirmed skill brief for you to pass to `/write-skill`. Manual-only.
-- [write-skill](plugins/skill/skills/write-skill/SKILL.md): write mode drafts the skill (template with composable Workflow, Loop, Tactics, and Reference blocks) then shrinks it, each in a fresh subagent; shrink mode only tightens existing skill, agent, or instructions files while preserving behavior. Manual-only.
+- [skill-author](plugins/skill/skills/skill-author/SKILL.md): routes each request to a mode playbook. Grill interviews one question at a time to define purpose, triggers, contract, body blocks, and constraints, then hands the confirmed skill brief to write mode. Write drafts the skill (template with composable Workflow, Loop, Tactics, and Reference blocks) then shrinks it, each in a fresh subagent. Shrink only tightens existing skill, agent, or instructions files while preserving behavior. Agent writes or rewrites a custom coding agent, including planner agents. Manual-only.
 
 ### engineering
 
