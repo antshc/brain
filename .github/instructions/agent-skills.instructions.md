@@ -38,6 +38,16 @@ Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, 
 
 Omit process detail (`using bundled best practices`, `from a brief`) unless it sets the skill apart. User-invoked skills: the What sentence only.
 
+**Overlap rules:**
+
+- Put the strongest trigger phrases first; long descriptions get truncated in listings.
+- Keep each description to 300 chars or fewer.
+- Every quoted trigger phrase is unique across all skills; near-duplicates (`'how does this work'` vs `'how does this code work'`) count as duplicates.
+- Where skills overlap, end with ``Not for X → `skill`.``, one `→ skill` redirect per neighbor, each naming an existing skill other than itself.
+- Assign one role per skill; name the owner of each neighboring role in `Not for`.
+
+CI runs [lint_skill_descriptions.py](../scripts/lint_skill_descriptions.py) over `plugins/wf/`: length, duplicate or near-duplicate quoted triggers, and `Not for` targets that do not exist.
+
 | Invocation | Example |
 |---|---|
 | Model-invoked | `Investigate a question against primary sources and save cited findings as Markdown. Use for /research, 'research X', 'gather docs on Y', or delegating reading legwork. Use why for design rationale.` |

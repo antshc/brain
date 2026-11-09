@@ -1,7 +1,7 @@
 ---
 name: review
 description: >-
-  Review pull requests for code findings, address existing PR comments, assess blast radius, or identify regression test gaps. On explicit request, audit architecture drift or assist with a human-led PR review.
+  Review pull requests for findings, judge and fix existing PR comments, assess blast radius, or find regression test gaps. Use for 'review this PR', 'address PR comments', 'blast radius'. Not for posting or thread mechanics → `github`; technical design review → `design`.
 argument-hint: '<code|comments|blast-radius|tests-gap|architecture|hitl> [target] [options]'
 ---
 
@@ -20,4 +20,4 @@ argument-hint: '<code|comments|blast-radius|tests-gap|architecture|hitl> [target
 2. For a PR URL alone, a generic fix review, or any other ambiguous request, ask which outcome the user wants and wait before loading a playbook or acting. A PR URL with a review level selects `code`. If the user explicitly asks for both impact and test coverage, run `blast-radius` first and pass its risks to `tests-gap`.
 3. Read only the selected playbook in full, then open its references as directed. Resolve skill-relative paths from this `SKILL.md` directory, including absolute paths handed to subagents.
 
-For technical design review, use `/design review`.
+`review` owns judgment; *run `github` skill for review thread, post, reply, and resolve mechanics*. Long-running review and CI monitoring is the caller's loop, not this skill. For technical design review, use `/design review`.

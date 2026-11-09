@@ -1,7 +1,7 @@
 ---
 name: research
 description: >-
-  Investigate primary sources and save cited findings as Markdown. Use for 'research X', 'how does this code work', 'why was this built this way', 'verify this NuGet API', or 'check this cloud limit'.
+  Investigate primary sources and save a cited Markdown document. Use for 'research X', 'investigate X', 'why was this built this way', 'verify this NuGet API', 'check this cloud limit'. Not for inline lookups → `explore-codebase`.
 ---
 
 # Research

@@ -1,6 +1,7 @@
 ---
 name: 'suggest'
-description: 'Analyzes provided information and proposes improvements, options, or ideas, each with supporting reasoning. Use when asked to suggest, improve, brainstorm, list options or alternatives, or propose ideas.'
+description: 'Propose improvements, options, or ideas with supporting reasoning for provided information.'
+disable-model-invocation: true
 ---
 Analyze the provided information, then propose what fits the request:
 

@@ -1,7 +1,7 @@
 ---
 name: define-concept
 description: >-
-  Define or extend an arc42 Crosscutting Concept through questioning and read-only codebase inspection, then record it. Use when asked to define, add, or improve a Concept, check one against recorded Concepts, find which Concept to write next, or turn a recurring practice into one.
+  Interview for an arc42 Crosscutting Concept through questioning and read-only codebase inspection, then hand it to `record-architecture`. Use for 'define a Concept', 'improve a Concept', 'which Concept next'. Not for writing records → `record-architecture`; index rows → `index-docs`.
 ---
 
 # Define Concept
