@@ -2,9 +2,9 @@
 
 Structure and content rules for agent-facing documents: `SKILL.md`, bundled references and templates, `*.agent.md`, instructions files. Wording rules live in [wording.md](wording.md). Repository-local rules (e.g. `.github/instructions/*.instructions.md`) override this file on conflict.
 
-**Root virtue: predictability.** The agent takes the same _process_ every run, not the same output. Every rule below serves it.
+**Predictability:** repeat the process, not the output.
 
-**Guiding principle:** constrain what must remain true, prescribe how only when necessary, explain why when non-obvious, define what happens when execution cannot proceed.
+Constrain invariants; prescribe mechanisms only when needed; explain non-obvious reasons; define blocked behavior.
 
 ## Contents
 
@@ -58,9 +58,9 @@ Omit process detail (`using bundled best practices`, `from a brief`) unless it s
 | Leading `-` `?` `:` `[` `]` `{` `}` `,` `&` `*` `!` `\|` `>` `'` `"` `%` `@` `` ` `` | YAML indicator; plain scalar cannot start with it |
 | Tabs, line breaks in a plain scalar, leading/trailing whitespace | Multiline/indent parse errors |
 
-**YAML safety:** frontmatter MUST parse as YAML; a plain scalar containing `: ` or ` #` breaks parsing and the skill silently disappears. Write `description` (and any value with `: `, quotes, backticks, `#`, or a leading `[`, `{`, `*`, `&`, `!`, `%`, `@`) as a folded block scalar: `description: >-` then the text indented two spaces on the next line. Never use `: ` inside a plain scalar.
+**YAML safety:** frontmatter MUST parse. Use a folded block scalar (`description: >-`, text indented two spaces) for `description` and values containing `: `, quotes, backticks, `#`, or leading `[`, `{`, `*`, `&`, `!`, `%`, `@`. Never use `: ` inside a plain scalar.
 
-**Description as context pointer.** A description is a **context pointer**: always-loaded text naming out-of-context material plus the condition for reaching it. Its _wording_, not its target, decides when and how reliably the agent reaches the skill. It does two jobs: state what the skill is, list the **branches** that trigger it. Every word costs on every turn, so prune it harder than the body:
+**Description as context pointer:** name the skill and its triggering branches. Pointer wording controls discovery; prune always-loaded descriptions harder than bodies:
 
 - Front-load the skill's **leading word**.
 - One trigger per branch. Synonyms renaming one branch are duplication; collapse them.
@@ -69,10 +69,7 @@ Omit process detail (`using bundled best practices`, `from a brief`) unless it s
 
 ## Invocation choice
 
-Two loads, each spent by every document and pointer:
-
-- **Context load** — always-loaded material (descriptions, `AGENTS.md` lines) spending tokens and attention every turn.
-- **Cognitive load** — the human as index, remembering which skills exist. Spend it where human judgement matters.
+Balance **context load** (always-loaded descriptions and `AGENTS.md`) against **cognitive load** (humans remembering skills). Spend human attention where judgement matters.
 
 Pick one mode:
 
@@ -90,19 +87,13 @@ Wrap the whole invocation phrase in *italics*. Example: *Run `atlassian` skill t
 
 ## Information hierarchy
 
-Two content types mix freely: **steps** (ordered actions) and **reference** (definitions, rules, facts consulted on demand). A skill may be all steps, all reference, or both. Place each piece on the ladder by how immediately the agent needs it:
+Order by need: **steps** (ordered actions) → **inline reference** (rules, definitions, facts) → **disclosed reference** (separate files loaded by condition). Use any combination, including reference-only skills and flat rule sets.
 
-1. **In-file step** — primary tier: what the agent does, in order.
-2. **In-file reference** — consulted on demand. A flat peer-set (every rule of a review on one rung) is fine.
-3. **Disclosed reference** — separate file reached by a context pointer, loaded only when the pointer fires.
-
-Order content by need: **steps → inline reference → disclosed reference**. Push too little down and the top bloats; push too much and you hide material the agent needs.
-
-- **Progressive disclosure** — move material down the ladder behind a pointer so the top stays legible. Branching test: inline what every branch needs; disclose what only some branches reach. Undisclosed reference buries steps and makes attending to them a coin-flip.
-- **Pointer wording decides reach.** A must-have target behind a weak pointer is a variance bug: sharpen wording first; inline only if sharpening fails. Name the condition: "Read `references/aws.md` when targeting AWS", not "Read documentation".
+- **Progressive disclosure:** inline shared material; disclose branch-only material behind conditional pointers.
+- **Pointers:** name the loading condition: "Read `references/aws.md` when targeting AWS". Sharpen weak pointers before inlining their targets.
 - Load references conditionally; never load every reference unconditionally.
-- **Co-location** — keep a concept's definition, rules, and caveats under one heading. The document should read like documentation written for the agent.
-- **Sprawl** — too long even when every line is live. Cure: disclose reference, split by branch or sequence.
+- **Co-location:** keep a concept's definition, rules, and caveats under one heading.
+- **Sprawl:** split lengthy live content by branch or sequence, or disclose reference.
 - Keep `SKILL.md` body under 300 lines; 100–250 is a useful stricter target. Include only sections that materially help execution.
 
 ## Route composition
@@ -134,11 +125,7 @@ Link every conditional playbook, tactic, and reference directly from `SKILL.md` 
 
 ## Steps and completion criteria
 
-Every step ends on a **completion criterion**: the condition that tells the agent the work is done. Use numbered steps only when order matters; otherwise state decision criteria.
-
-- **Clarity** — can the agent tell done from not-done? A vague bound ("understanding reached") invites **premature completion**: ending a step early because attention slips to _being done_, pulled by visible **post-completion steps**.
-- **Demand** — how much it requires. "Every modified model accounted for" forces **legwork** where "produce a change list" does not. Demand also binds flat reference ("every rule applied").
-- Strongest criteria are both checkable and exhaustive.
+End every step with a checkable completion condition, exhaustive where omissions matter ("every modified model accounted for", not "produce a change list"). Apply the same demand to reference rules. Number steps only when order matters; otherwise state decision criteria.
 
 **Body blocks** — compose; default to Workflow, add others only when needed:
 
@@ -149,7 +136,7 @@ Every step ends on a **completion criterion**: the condition that tells the agen
 - **Examples** — input → output pairs when output style or quality matters; examples outperform descriptions of style.
 - Defend premature completion in order: sharpen the bound first; only if irreducibly fuzzy _and_ the rush is observed, split the sequence. Hiding later steps works only across a real context boundary (hand-off or subagent); an inline call clears nothing.
 
-**`## Completion criteria` section** — add when the result is not self-evident. List observable, checkable conditions on the produced result (files, output, state), not effort. Without them the agent stops at "steps ran" and claims success on a wrong or empty result.
+**`## Completion criteria` section:** when results are not self-evident, define observable conditions on files, output, or state, not effort.
 
 - Name it **Completion criteria**; not `Verification`, `Validation`, `Testing`, or `Acceptance criteria`.
 - State the result to observe, not how to run tests. A skill's own test suite is repository tooling: **MUST NOT** appear in a skill (no test commands, test paths, test-only dependencies).
@@ -174,15 +161,13 @@ Define what the agent must produce: artifacts, format, ordering, location. Inclu
 
 ## When to split
 
-Give each skill one purpose nameable in one phrase. Each cut spends a load, so split only when it earns it:
+Give each skill one phrase of purpose. Split only when justified:
 
 - **By invocation** — split off a model-invoked skill when a distinct leading word should trigger it alone, or another skill must reach it.
 - **By sequence** — split a run of steps when post-completion steps tempt the agent to rush the current one. Merging sequences has the reverse effect.
 - **Compose by invoking the owner.** Behaviour needed by one skill stays inline; behaviour needed by several gets one owning skill that others invoke. Never restate another skill's procedure.
 
 ## Instruction precision
-
-Make behavior predictable without restricting valid implementation choices.
 
 **Constraint → mechanism → rationale → failure behavior** — use for critical requirements:
 
@@ -193,7 +178,7 @@ Make behavior predictable without restricting valid implementation choices.
 
 > MUST delegate codebase exploration to a subagent. The subagent returns relevant file paths and evidence. MUST NOT substitute direct exploration, even if faster. Rationale: preserve parent context. If delegation is unavailable, report the blocker rather than silently substituting another mechanism.
 
-A rationale helps interpretation but does not guarantee compliance; verify critical constraints through observable actions or external checks. Prohibit plausible substitutions explicitly when an agent might silently swap mechanisms.
+Verify critical constraints through observable actions or external checks; rationale alone cannot enforce them. Explicitly prohibit plausible substitutions.
 
 **Degrees of freedom** — match prescription to task risk:
 
@@ -206,7 +191,6 @@ A rationale helps interpretation but does not guarantee compliance; verify criti
 | Migration | Low | Specify ordering, mechanism, recovery |
 | Destructive operations | Very low | Require authorization and explicit safeguards |
 
-Constrain what must remain true; prescribe how only when necessary. Example: "MUST preserve public API behavior. Choose internal implementation details independently."
 
 **Failure policies** — pick one per critical step:
 
@@ -236,9 +220,9 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 - Keep up to two category files at skill root; otherwise use the matching resource folder. Name linked files for what they hold.
 - **Bundled paths** resolve from the skill base directory, never caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
 - **Skill-local resources:** each skill **MUST** bundle required resource files inside its own folder; **MUST NOT** read, link, or execute resource files from another skill's folder. Copy required resources in. Invoking another skill remains allowed.
-- **Keep references one level deep:** `SKILL.md` links every reference file directly; a reference **MUST NOT** send the agent on to another file. Citing a section of a file `SKILL.md` already loads, by its exact heading, is allowed. Rationale: agents may only partly read (`head -100`) files reached through a reference chain. Sources: [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) ("Avoid deeply nested references"); [Agent Skills spec](https://agentskills.io/specification) ("File references").
+- **Keep references one level deep:** `SKILL.md` links every reference directly; references **MUST NOT** load another file. Cite exact headings in already-loaded files instead. Loading chains risk partial reads. See sources below.
 - **Hand-back by action:** a reference returns control by naming the action and the target section's exact heading, never the file name or a step number. Example: "Return control to the orchestrator for *Frontier check*."
-- **Long references:** a reference file over 100 lines starts with a `## Contents` list naming every section by its exact heading. Rationale: a partial preview still shows the full scope. Source: [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) ("Structure longer reference files with a table of contents").
+- **Long references:** over 100 lines, start with `## Contents` listing every section by exact heading so previews expose the full scope.
 - **Read references fully:** every pointer to a reference requires reading the whole file; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
 - Use scripts for repetitive or fragile operations. Prefer Python over shell-specific scripts; use the repository-supported Python command.
 - New plugin → register it in the repository's plugin marketplace/manifest in the same change.
@@ -270,9 +254,9 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 
 ## Pruning
 
-- **Single source of truth** — one meaning, one place within a skill; a behaviour change is a one-place edit. **Duplication** costs maintenance and tokens and inflates a meaning's prominence. Duplicate across skills only to keep resources skill-local.
-- **Environment is a source of truth** — `package.json` scripts, config, directory layout, `--help` output. Restating it is a **cache**; cache only what the agent cannot find by looking (unwritten conventions, reasons, gotchas).
-- **Relevance** — every line bears on what the skill does. Lines lose relevance by never bearing on the task or by going stale. Without pruning the default fate is **sediment**.
+- **Single source of truth:** one meaning, one place within a skill. Duplicate across skills only to preserve skill-local resources.
+- **Environment:** use `package.json`, config, layout, `--help`; record only undiscoverable conventions, reasons, gotchas.
+- **Relevance:** delete unrelated or stale lines.
 - **No-ops** — apply the No-op test in [wording.md](wording.md).
 
 ## Evaluation

@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Skill Author
 
-Own agent-facing authoring end to end: route each request to one selected playbook in `playbooks/`, run it, then run the final check. Writable surface: the target skill folder, the target agent file, or the files given for shrink.
+Select one playbook, execute, then check results. Writable surface: target skill folder, target agent file, or files given for shrink.
 
 ## Routing
 
@@ -22,22 +22,22 @@ Pick the first matching row. Resolve every path from this skill's base directory
 
 ## Composition resources
 
-For skill composition, read Route composition in [best-practices.md](references/best-practices.md). Pass Draft absolute paths of [playbook.template.md](templates/playbook.template.md) and [tactic.template.md](templates/tactic.template.md); it reads and fills the former for extracted procedures, the latter for extracted techniques, only when the composition requires them.
+For skill composition, read Route composition in [best-practices.md](references/best-practices.md). Pass Draft absolute paths of [playbook.template.md](templates/playbook.template.md) and [tactic.template.md](templates/tactic.template.md); read and fill only for extracted procedures or techniques, respectively.
 
 ## Constraints
 
-- **MUST** run the Draft phase and the Shrink phase each in a separate fresh subagent; the parent never drafts or shrinks a skill inline. Rationale: isolated context keeps the shrink pass independent and stops the draft rushing toward later phases. If subagents are unavailable, stop and report the blocker.
+- **MUST** run Draft and Shrink in separate fresh subagents; never inline. Isolation keeps Shrink independent and Draft focused. If subagents are unavailable, stop and report the blocker.
 - Pass the user input verbatim; restate nothing from the playbooks in prompts.
 - Pass absolute paths of the phase playbook and every file in its Loads cell.
 
 ## Workflow
 
-1. **Route.** Select the mode per Routing. Take the brief or request verbatim and any target path; shrink mode: collect the file paths. *Done when* mode and inputs are known; ask only when no target can be derived from input or repository layout.
-2. **Grill** (grill mode). Read and follow `playbooks/grill.md` in this session. *Done when* the user confirms the brief → run Draft phase with the confirmed brief as input; or the user ends the interview → Report.
-3. **Agent** (agent mode). Read and follow `playbooks/agent.md` in this session, reading every file in its Loads cell in full. *Done when* its Output is produced → Final check.
-4. **Draft phase** (write mode). Launch a fresh subagent instructed to read and follow `playbooks/draft.md`, given the input verbatim, the target path, and absolute paths of `playbooks/draft.md` and its Loads files. It returns per draft.md Return. *Done when* every returned path exists on disk.
-5. **Shrink phase** (write and shrink modes). Launch a new fresh subagent instructed to read and follow `playbooks/shrink.md` on the drafted paths (write mode) or given paths (shrink mode), given absolute paths of `playbooks/shrink.md` and its Loads files. It returns per shrink.md Return. *Done when* the report lists every file with before → after counts.
-6. **Final check.** Read the result files. Confirm Completion criteria, plus the playbook's Completion criteria in agent mode; fix a failing item by re-running the owning phase or mode with the defect named. *Done when* all criteria hold or a remaining defect is reported.
+1. **Route.** Select per Routing; collect verbatim input and target paths. Ask only if input and repository layout cannot supply a target. *Done when* mode and inputs are known.
+2. **Grill** (grill mode). Follow the selected playbook interactively. User confirms brief → Draft phase with that brief; user ends interview → Report.
+3. **Agent** (agent mode). Follow the selected playbook here; read every Loads file fully. Its Output produced → Final check.
+4. **Draft phase** (write mode). Delegate reading and following `playbooks/draft.md` with input and paths per Constraints; require its Return. *Done when* every returned path exists.
+5. **Shrink phase** (write and shrink modes). Delegate reading and following `playbooks/shrink.md` on drafted or given paths, per Constraints; require its Return. *Done when* every file has before → after counts.
+6. **Final check.** Read results against Completion criteria and, for Agent, its playbook criteria. Re-run the owning phase or mode with named defects. *Done when* criteria pass or remaining defects are reported.
 7. **Report.** Return mode and paths, then per mode: write → blocks, invocation mode, assumptions, shrink deltas, flagged items; shrink → shrink deltas, flagged items; agent → agent.md Output; grill ended early → the brief. *Done when* the report is shown.
 
 ## Completion criteria
