@@ -1,7 +1,7 @@
 ---
 name: design
 description: >-
-  Design and validate code architecture, sketch types and module interfaces, interrogate or prove technical claims, interview decisions, and publish specs or tickets. Use for 'architect this', 'sketch the code', 'deep module', 'grill this', 'write a spec', Wayfinder, or design review. Stories, bugs, TOIs and authoritative feature-design documents use `draft-artifact`; settled ADRs use `record-architecture`.
+  Design architecture via Architect, Sketch, Deep Module, Interrogate and Prove. Grill decisions, publish specs/tickets, guide Wayfinder, review designs. Triggers: 'architect this', 'sketch code', 'grill this', 'write a spec'. Feature docs: `draft-artifact`; ADRs: `record-architecture`.
 ---
 
 # Design
