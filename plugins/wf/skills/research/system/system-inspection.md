@@ -23,6 +23,12 @@ Explicit inspection or verification sets the minimum depth. Escalate when extra 
 
 Load only the references that help answer the question. A lane's internal decision, persistence semantics, or cloud behavior that determines the outcome belongs in the same answer. Follow the relevant lens or verify provider evidence for that detail. Treat a separately scoped question as independent work for a later request.
 
+## Handoff by role
+
+- **Research** selects depth and lenses, bounds the question, and checks evidence coverage and runtime claims.
+- **Hunter** owns repository navigation, source lookup, and tool choice. The Explorer prompt carries the proof checks for its assigned angle. For bounded follow-up lookups, send the specific check directly.
+- **Explainer** receives the applicable report guidance from these rules and the selected lenses. Include the scope and coverage that matter, the confirmed evidence and unresolved gaps, and any diagram guidance. For example, a Flow brief calls for explaining handoffs and identifying terminal boundaries, with a swimlane when it clarifies the chain.
+
 ## Codebase lookups
 
 Send each Explore request directly to `hunter`. If Hunter is unavailable, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for a system evidence pass, and use bounded requests to fill evidence gaps. Pass each Explore request:

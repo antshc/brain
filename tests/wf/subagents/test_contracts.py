@@ -17,7 +17,8 @@ def test_subagents_owns_arena_swarm_and_model_roles():
 
 def test_research_preserves_why_and_routes_system_evidence_to_hunter():
     skill = (SKILLS / "research/SKILL.md").read_text()
-    for reference in ("how/how.md", "how/explorer-prompt.md", "why/why.md", "why/sources/atlassian.md"):
+    for reference in ("how/how.md", "how/explorer-prompt.md", "how/explainer-prompt.md",
+                      "why/why.md", "why/sources/atlassian.md"):
         assert f"]({reference})" in skill
         assert (SKILLS / "research" / reference).is_file()
     assert "`@whyDepth`" in skill
@@ -25,7 +26,9 @@ def test_research_preserves_why_and_routes_system_evidence_to_hunter():
     assert skill.index("## Entry routes") < skill.index("## Workflow")
     system = skill.split("## System research")[1].split("\n## ")[0]
     assert "as `@work` directly to Hunter" in system
-    assert "save one cited Markdown document using How" in system
+    assert system.index("**Explore.**") < system.index("**Explain.**") < system.index("**Save.**")
+    assert "relevant System Inspection guidance for the report" in system
+    assert "Save one cited Markdown document" in system
     dispatch = (SKILLS / "subagents/SKILL.md").read_text()
     assert "Send Explore requests verbatim to `hunter`" in dispatch
     assert "report the blocked evidence request and continue independent work" in dispatch
