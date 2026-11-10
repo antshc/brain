@@ -117,13 +117,13 @@ Keep a comment only for a non-obvious *why* the code cannot show. No phase-narra
 
 Require the WF plugin's `github` skill before Git or GitHub mutations.
 
-Before editing for Bug Fix or Refactoring, *run `github` tactic **Name branch*** with the change intent and summary. Use its Branches tactic to verify the target and local/remote ref availability. Create the branch from the pinned target or use a fresh worktree if unrelated changes are present. Reuse the exact recorded branch when continuing an existing PR.
+Before editing for Bug Fix or Refactoring, *run `git` tactic **Name branch*** with the change intent and summary. Use its Branches tactic to verify the target and local/remote ref availability. Create the branch from the pinned target or use a fresh worktree if unrelated changes are present. Reuse the exact recorded branch when continuing an existing PR.
 
 ## Opening a PR
 
 For direct code-shipping playbooks. Feature uses the draft from `implement`.
 
-- *Run `github` tactic **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
+- *Run `git` tactic **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
 - *Run `github` tactic **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
 - Use the `github` Pull requests tactic to open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. Run the `review` skill's `code` route when requested.
 - Post the URL and continue. Monitor checks when the caller requests it.
