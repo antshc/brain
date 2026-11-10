@@ -1,5 +1,5 @@
 ---
-name: 'suggest'
+name: suggest
 description: 'Propose improvements, options, or ideas with supporting reasoning for provided information.'
 disable-model-invocation: true
 ---
