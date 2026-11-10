@@ -128,15 +128,18 @@ On approval (1 or 2): follow [Posting](../references/posting.md#hitl), with `FIL
 
 Answers a code question; never drafts or posts.
 
-1. **Explore:** delegate to a read-only `Explore` subagent. Pass the question, `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed. Thoroughness by question complexity:
-   - `quick` — single symbol/file lookup (where is X, what does Y return).
-   - `medium` — one flow or caller chain within one component.
-   - `thorough` — cross-component flow, multiple call paths, or design/why questions.
+1. **Research:** check `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` first; answer from matching facts. Otherwise *run `research` skill to investigate primary sources and return cited findings* on the checked-out PR head. Pass the question as `@question`, plus `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed. Route by question:
+   - **Lookup** — where is X, who calls Y, what does Z return: pure lookup; no document; research returns Hunter's verdict inline.
+   - **How** — flow, mechanism, or behavior across files or components: default Research; set `@outputShape` to `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/inspect/{{slug}}.md`.
+   - **Why** — design rationale or what led to the change: **Why code anchor** (`@mode=why`, `@whyDepth=anchor`), returned inline; use full Why only when the user asks for rationale beyond code, commits, and PRs.
+
+   Done when research returns cited facts, a saved path, or a named blocker.
 2. **Record:** append to `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` (create if missing):
 ```
 ## <question>
 - <fact> — <path>:<line>
+Report: <saved path>  (omit when none)
 Unconfirmed: <item>  (omit when none)
 ```
-3. **Present:** show the question and facts with evidence; return to Get the input.
+3. **Present:** show the question and facts with evidence; for a saved report, add one Markdown link to it (absolute path, `/` separators). Return to Get the input.
 4. **Escalate:** user asks to turn a finding into a comment → go to Review branch Analyse with the finding as input; use recorded facts as evidence.
