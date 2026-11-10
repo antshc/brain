@@ -1,22 +1,62 @@
 ---
 name: design
 description: >-
-  Stress-test a plan through a decision interview, or publish a spec or PRD. Use for 'grill this', 'write a spec'; on request, break a spec into tickets, chart a Wayfinder map, or review a design. Not for code shape → `architect`; stories, bugs, TOIs, feature designs → `draft-artifact`.
+  Design and validate code architecture, sketch types and module interfaces, interrogate or prove technical claims, interview decisions, and publish specs or tickets. Use for 'architect this', 'sketch the code', 'deep module', 'grill this', 'write a spec', Wayfinder, or design review. Stories, bugs, TOIs and authoritative feature-design documents use `draft-artifact`; settled ADRs use `record-architecture`.
 ---
 
 # Design
 
-| Mode | Select for | Playbook |
+One entry point; route to one playbook. Do not load unrelated routes.
+
+| Route | Select for | Playbook |
 | --- | --- | --- |
-| `grill` | Challenge a plan, interview for domain decisions, or resolve a Wayfinder grilling ticket. | [Grill](playbooks/grill.md) |
-| `sketch` | Draft one usage-first code sketch: types, signatures with `not implemented` bodies, module map, rationale. Select only on explicit `sketch`; `architect` owns code shape otherwise. | [Sketch](playbooks/sketch.md) |
-| `spec` | Synthesize a spec or PRD from the conversation, resolved decisions, or an accepted sketch. | [Spec](playbooks/spec.md) |
-| `tickets` | An explicit user request to break a spec into implementation tickets. | [Tickets](playbooks/tickets.md) |
-| `wayfinder` | An explicit request to chart or resume a Wayfinder decision map. | [Wayfinder](playbooks/wayfinder.md) |
-| `review` | An explicit request to review a technical design for gaps, risks, or implementation readiness. | [Review](playbooks/review.md) |
+| `architect` | Design code shape across modules, compare candidates, then implement or hand off an accepted sketch. | [Architect](playbooks/architect.md) |
+| `sketch` | Explicit request for a usage-first code sketch only, without Arena or implementation. | [Sketch](playbooks/sketch.md) |
+| `deep-module` | Deepen an interface, place a seam, or compare module shapes. | [Deep module](playbooks/deep-module.md) |
+| `interrogate` | Adversarially attack a design or change and verify findings with runnable evidence. | [Interrogate](playbooks/interrogate.md) |
+| `prove` | Prove or refute one technical assumption with reproducible evidence. | [Prove](playbooks/prove.md) |
+| `grill` | Challenge a plan, interview domain decisions, or resolve a Wayfinder grilling ticket. | [Grill](playbooks/grill.md) |
+| `spec` | Synthesize a spec or PRD from decisions or an accepted sketch. | [Spec](playbooks/spec.md) |
+| `tickets` | Break a spec into implementation tickets on explicit request. | [Tickets](playbooks/tickets.md) |
+| `wayfinder` | Chart or resume a Wayfinder decision map on explicit request. | [Wayfinder](playbooks/wayfinder.md) |
+| `review` | Assess a technical design's gaps, risks, and implementation readiness on explicit request. | [Review](playbooks/review.md) |
 
-1. Honor an explicit mode from the user or caller. For a reply to a pending question, review, or confirmation, continue the active route unless the user requests a different mode. Otherwise infer the mode from clear intent. If the request is ambiguous, ask which outcome the user wants and wait.
-2. Select `tickets`, `wayfinder`, or `review` only on an explicit user request, including clear natural language or a caller relaying that request. Tickets publication requires separate approval of the current breakdown. Wayfinder automatic runs require their own confirmation.
-3. Read only the selected playbook and the references it calls for. Wayfinder loads Grill when its playbook calls for an interview, then resumes the map. Continue from Grill to Spec only for a requested handoff after the closing sweep.
+1. Honor an explicit route from the user or caller. On replies to pending questions or checkpoints, continue the active route. Otherwise infer from clear intent. Ambiguous requests → ask which outcome the user wants and wait.
+2. Select `tickets`, `wayfinder`, or `review` only on an explicit user request, including clear natural language relayed by a caller. Ticket publication requires separate approval of the breakdown; automatic Wayfinder runs have their own confirmation.
+3. Select `sketch` only when the user explicitly requests a sketch without implementation. General code-shape or multi-candidate work selects `architect`. `interrogate`, `prove`, and `deep-module` are standalone routes when explicitly requested and can also be called internally by Architect.
+4. Read only the selected playbook and references it calls for. Wayfinder loads Grill for interviews and then resumes the map. Continue Grill to Spec only after a requested handoff and closing sweep.
 
-Use `draft-artifact` in `design` mode for authoritative feature-design documents, `architect` for multi-phase or competing-candidate code designs, and `factory-mode` in `stories` mode for User story breakdown.
+## Architect options and behavior
+
+- Accept `arena-agents=1|2|3`, default `1`; reject other values before Arena. Retain the count across correction re-runs.
+- Accept `adversaries=1|2|3`, default `1`, independently for Interrogate.
+- `checkpoint` is opt-in, only when explicitly requested; preserve it through caller handoffs. Otherwise Architect implements after review by default. An explicit **design-only handoff** returns the sketch for `design spec` without implementing.
+- `architect sketch` routes to `sketch` only, `architect interrogate` to `interrogate`, and `architect deep-module` to `deep-module`, for intent compatibility. Prefer the direct `design <route>` spelling.
+
+## Artifact and repository contract
+
+For Architect, Sketch, Deep-module, Prove, and Interrogate, use `<repo-root>/tmp/design-<slug>/`, with a kebab-case task slug; never system `/tmp` or a session folder. Grounding, experiments, Arena outputs, findings, and review logs stay under this root; Research specialists may impose stronger locations but their outputs must be indexed here. Production code, when authorized, goes in the working tree.
+
+```
+<artifact-root>/
+  task.md
+  grounding-*.md
+  candidate-<n>/                 # Arena candidates
+    rationale.md
+    module-map.md
+    sketch/                      # real source files
+  synthesis/                     # selected package; also standalone Sketch output
+    rationale.md
+    module-map.md
+    sketch/
+    synthesis-note.md           # Arena only
+  arena-r<k>/                   # optional correction re-runs
+  deep-modules/                 # interface options and comparison
+  interrogate.md
+  prove/                        # reports and optional patches
+  review-log.md
+```
+
+- `sketch/` contains language-native source files with `not implemented` bodies, not Markdown with embedded code; `module-map.md` maps them to repo-relative targets. `rationale.md` contains usage, decisions, alternatives, and open questions. The complete `synthesis/` package is the only accepted design handed to Spec; never publish raw candidates.
+- Before grounding, read present repository architecture, relevant ADRs, Concepts, and glossary. Preserve their terms and boundaries; document conflicts as open questions and raise them during review. Pass source paths to delegated runners.
+- `draft-artifact design` owns authoritative feature-design documents; `factory-mode stories` owns story breakdown.

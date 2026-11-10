@@ -40,7 +40,7 @@ swimlane-beta TB
 
   subgraph simple [Simple path - SMPL]
     sketchFirst{2a.1 - Sketch code first?}
-    smplArchitect[2a.1a.1 - architect<br/>code sketch]
+    smplArchitect[2a.1a.1 - design architect<br/>code sketch]
     smplToSpec[2a.2 - /design spec]
     smplSpec[(2a.3 - Spec)]
   end
@@ -49,7 +49,7 @@ swimlane-beta TB
     toZdesign[2b.1 - draft-artifact design<br/>synthesize or merge feature design]
     design[(2b.2 - Feature design)]
     toStories[2b.3 - factory-mode stories<br/>assemble design into stories]
-    cmplxArchitect[2b.4 - architect<br/>for each story]
+    cmplxArchitect[2b.4 - design architect<br/>for each story]
     cmplxToSpec[2b.5 - /design spec]
     cmplxSpec[(2b.6 - Spec)]
   end
@@ -110,7 +110,7 @@ swimlane-beta TB
 
 ### Story to implementation
 
-Starts from one existing User story: `/writing-style sharpen` hardens it, `/architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
+Starts from one existing User story: `/writing-style sharpen` hardens it, `/design architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -125,7 +125,7 @@ swimlane-beta TB
   end
 
   subgraph design [Design]
-    architect[2 - architect<br/>code sketch]
+    architect[2 - design architect<br/>code sketch]
     toSpec[3 - /design spec]
     spec[(4 - Spec)]
   end
@@ -142,7 +142,7 @@ swimlane-beta TB
 
 ### Story to direct implementation
 
-Starts from one existing User story with no spec: `/writing-style sharpen` hardens it, `/architect` sketches the code, and the **implement** reply makes `/architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
+Starts from one existing User story with no spec: `/writing-style sharpen` hardens it, `/design architect` sketches the code, and the **implement** reply makes `/design architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -157,13 +157,13 @@ swimlane-beta TB
   end
 
   subgraph design [Design]
-    sketch[2 - architect<br/>ground and sketch]
-    review{3 - architect review<br/>reply?}
+    sketch[2 - design architect<br/>ground and sketch]
+    review{3 - architect checkpoint<br/>reply?}
     specFlow([Story to implementation flow])
   end
 
   subgraph implementation [Implementation]
-    scaffold[4 - architect implement<br/>scaffold commit]
+    scaffold[4 - design architect implement<br/>scaffold commit]
     fillIn[5 - Fill in code against sketch<br/>surface deviations]
     friction{6 - Repeated friction?}
     done([Implementation])
@@ -195,6 +195,6 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | Group | Skills |
 | --- | --- |
 | Discovery and research | `define-concept`, `define-research`, `experiment`, `research`, Hunter (Explore and NuGet evidence) |
-| Design and backlog | `architect`, `design` (`grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
+| Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `interrogate`, `prove`, `grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

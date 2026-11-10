@@ -15,6 +15,8 @@
 
 {{shape|The recommended architecture. Data structures first, then how data flows through the signatures. State which invariants are encoded in types, where validation lives, and what the system deliberately does not do. Judge interface depth: what complexity the public surface hides, what stays exposed to callers, and why the interface is no larger than needed.}}
 
+<!-- @: Architect Arena synthesis only: insert "## Synthesis decision" here with base candidate, adopted grafts, rejected ideas and run details. Omit in standalone Sketch and Arena candidate rationale. -->
+
 ## Tradeoffs accepted
 
 - {{tradeoff|"we accept X in exchange for Y." Name anything a future reader might mistake for an oversight, including apparent premature optimization or premature simplification.}}
