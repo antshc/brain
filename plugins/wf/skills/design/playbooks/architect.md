@@ -1,6 +1,6 @@
 # Design
 
-Design procedure of the `architect` skill. Paths resolve from the skill base directory. Sections Artifact location, Repo docs, and Options refer to `SKILL.md`.
+Full architecture procedure of the `design` skill's `architect` route. Paths resolve from `plugins/wf/skills/design/`. Route options, artifact location, and repo-doc rules are in `SKILL.md`.
 
 ## Contents
 
@@ -28,15 +28,15 @@ Add a Scrap entry when Phase F triggers.
 
 Build a mental model of touched subsystems from Repo docs and code. *Run `research` skill to investigate primary sources and save cited findings* using default Research for current behavior. Pass the relevant subsystems, repo docs and `@outputShape` for `<artifact-root>/grounding-how.md`. When ownership or layering changes, call **Why** with the existing boundary and `@outputShape` for `<artifact-root>/grounding-why.md`. Treat supported rationale as a constraint.
 
-Skip subsystem grounding only when the work is genuinely greenfield with no surrounding system to integrate. Before Phase B, resolve technical questions through `design/evidence-routing.md`, including greenfield work.
+Skip subsystem grounding only when the work is genuinely greenfield with no surrounding system to integrate. Before Phase B, resolve technical questions through [Evidence routing](../references/evidence-routing.md), including greenfield work.
 
 ## Phase B: Sketch
 
-*Run `subagents` skill to compare independent candidates and synthesize findings* using **Arena**. Pass the design task, Phase A grounding, `architect runners` role, resolved `arena-agents` count, rubric inputs, screening rules below, and Artifact layout from Architect. Use the artifact root for Arena outputs. Pass `arena/runner-prompt.md` and the absolute paths to Architect's `SKILL.md`, this procedure and the rationale template as runner inputs. Require the candidate and synthesis directories to contain `rationale.md`, `module-map.md`, and `sketch/`. Verify consistency against Artifact layout, Repo docs, and the caller's design criteria.
+*Run `subagents` skill to compare independent candidates and synthesize findings* using **Arena**. Pass the design task, Phase A grounding, `architect runners` role, resolved `arena-agents` count, rubric inputs, screening rules below, and artifact layout from `design/SKILL.md`. Use that artifact root for Arena outputs. Pass [Runner prompt](../references/runner-prompt.md), the absolute paths to `design/SKILL.md`, [Sketch](sketch.md), its [shared sketch contract](../references/sketch-contract.md), and [Rationale template](../references/rationale.template.md). Each runner follows Sketch's **Candidate** context; do not create a second sketch implementation. Require each candidate and the synthesized result to contain `rationale.md`, `module-map.md`, and `sketch/`. Arena fills the synthesized rationale's synthesis decision. Verify these against the artifact contract, repo docs, and design criteria.
 
 With multiple runners, require structurally distinct candidates before synthesis, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Exhaust the design space` principle*. Whole-shape alternatives, not point fixes inside one shape.
 
-Screen every candidate against `design/design-red-flags.md` and the Repo docs rules before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
+Screen every candidate with [shared design red flags](../references/red-flags.md) and the Repo docs rules before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
 
 Compare viable candidates on interface depth. Prefer the design that hides more complexity behind a smaller, simpler public surface. A rich interface can keep call chains short by concentrating capability instead of scattering it across layers.
 
@@ -44,7 +44,7 @@ Arena returns one synthesized design package. Its synthesis decision fills the r
 
 ## Phase C: Review (optional checkpoint)
 
-Before continuing, run `design/evidence-routing.md` on open questions and material claims. When the caller requests one overall Interrogate, run it before the checkpoint or handoff, reusing existing coverage. Without checkpoint, apply supported corrections; with checkpoint, present proposals for approval. Record decisions in the sketch, rationale, and `review-log.md`. Never write production code during this phase; proof code remains disposable evidence in a worktree.
+Before continuing, run [Evidence routing](../references/evidence-routing.md) on open questions and material claims. When the caller requests one overall [Interrogate](interrogate.md), run it before the checkpoint or handoff, reusing existing coverage. Without checkpoint, apply supported corrections; with checkpoint, present proposals for approval. Record decisions in the sketch, rationale, and `review-log.md`. Never write production code during this phase; proof code remains disposable evidence in a worktree.
 
 **Default: no checkpoint.** Continue to Phase E automatically. When the caller explicitly requests a **design-only handoff** (as Factory Mode does), continue to Phase D instead. Do not wait for an `accept` or `implement` reply.
 
@@ -62,15 +62,15 @@ Before continuing, run `design/evidence-routing.md` on open questions and materi
    - **implement**: build against the sketch in this working tree (overrides a design-only handoff)
    ```
 3. Act on the reply:
-   - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place, then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite against `design/design-red-flags.md` and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
+   - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place under the [shared sketch contract](../references/sketch-contract.md), then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite with [red flags](../references/red-flags.md) and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Corrections with `arena`** → apply as above, then *run `subagents` skill to compare independent candidates and synthesize findings* using **Arena** with the corrected incumbent, next revision number, same Phase B contract, and corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
-   - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Resolve verified contract findings through Deep-module design in `SKILL.md`. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
-   - **Prove** → run the `prove/prove.md` procedure on the question in the reply; run its Attack step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
+   - **Interrogate** → run [Interrogate](interrogate.md) on the current sketch. Resolve verified contract findings through [Deep module](deep-module.md). Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
+   - **Prove** → run [Prove](prove.md) on the question in the reply; run its Attack step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, using Phase A’s default Research or **Why** call when needed, with a distinct grounding output for the new question; present the answer, then start the next round.
    - **Accept** → go to Phase D for a design-only handoff; otherwise Phase E.
    - **Implement** → go to Phase E.
 
-Before each subsequent checkpoint review round, rerun `design/evidence-routing.md` only for changed questions or claims. Ambiguous reply → ask which of the six it is; never treat it as acceptance or implement.
+Before each subsequent checkpoint review round, rerun [Evidence routing](../references/evidence-routing.md) only for changed questions or claims. Ambiguous reply → ask which of the six it is; never treat it as acceptance or implement.
 
 ## Phase D: Hand off
 
@@ -110,5 +110,5 @@ When you scrap:
 
 ## Outputs
 
-The caller's usage is written first and the type sketch derived from it. Files follow *Artifact layout* in `SKILL.md`: `synthesis/sketch/` source files (one file for small changes), `synthesis/module-map.md`, and `synthesis/rationale.md` shaped per `design/rationale-template.md`, including the usage sketch and the synthesis decision. Sketch, synthesized design, and rationale reflect every correction and Phase E deviation; `review-log.md` records each decision. Phase E produces a scaffold commit, then working code filling it in the current branch.
+The caller's usage is written first and the type sketch derived from it. Files follow the artifact contract in `design/SKILL.md`: `synthesis/sketch/` source files (one file for small changes), `synthesis/module-map.md`, and `synthesis/rationale.md` shaped by the [shared template](../references/rationale.template.md), including usage and the synthesis decision. Sketch, synthesized design, and rationale reflect every correction and Phase E deviation; `review-log.md` records each decision. Phase E produces a scaffold commit, then working code filling it in the current branch.
 

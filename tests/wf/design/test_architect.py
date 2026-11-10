@@ -2,13 +2,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[3] / "plugins/wf/skills"
-ARCHITECT = ROOT / "architect"
+DESIGN = ROOT / "design"
 FACTORY = Path(__file__).resolve().parents[3] / "plugins/wf/install/assets/factory-mode"
 
 
 def test_architect_checkpoint_is_opt_in_and_implementation_is_default():
-    skill = (ARCHITECT / "SKILL.md").read_text()
-    design = (ARCHITECT / "design/design.md").read_text()
+    skill = (DESIGN / "SKILL.md").read_text()
+    design = (DESIGN / "playbooks/architect.md").read_text()
 
     assert "checkpoint" in skill
     assert "**Default: no checkpoint.** Continue to Phase E automatically" in design
@@ -19,7 +19,7 @@ def test_architect_checkpoint_is_opt_in_and_implementation_is_default():
 
 
 def test_evidence_corrections_do_not_require_approval_without_checkpoint():
-    evidence = (ARCHITECT / "design/evidence-routing.md").read_text()
+    evidence = (DESIGN / "references/evidence-routing.md").read_text()
 
     assert "without checkpoint" in evidence.lower()
     assert "with checkpoint" in evidence.lower()
@@ -35,7 +35,7 @@ def test_factory_uses_one_autonomous_feature_flow_and_optional_checkpoint():
     assert "## Auto" not in playbook
     assert "Select mode" not in playbook
     assert "arena-agents=1" in playbook
-    assert "`interrogate` with `adversaries=3`" in playbook
+    assert "`design interrogate` with `adversaries=3`" in playbook
     assert "design-only handoff" in playbook
     assert "forward `checkpoint` only when the user explicitly asks" in playbook
     assert playbook.index('`design` skill in `spec` mode') < playbook.index('`implement` skill')

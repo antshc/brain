@@ -1,8 +1,10 @@
 # Prove
 
-Evidence procedure of the `architect` skill. Paths resolve from the skill base directory.
+Evidence procedure of `design prove`. Paths resolve from the `design` skill directory.
 
-Prove or refute one uncertain part of the sketch with real evidence: actual output from a run against the real boundary. Experiment selects the cheapest sufficient method: command, CLI/API call, existing test, script, simulation, or throwaway prototype; a prototype is one method, used only when nothing smaller settles it. Attack the evidence with `interrogate/interrogate.md` only when the user's prove reply includes `interrogate`. Evidence is not design: it never replaces or enters the sketch. Report the evidence. Do not promote proof code.
+Prove or refute one uncertain part of the sketch with real evidence: actual output from a run against the real boundary. Experiment selects the cheapest sufficient method: command, CLI/API call, existing test, script, simulation, or throwaway prototype; a prototype is one method, used only when nothing smaller settles it. Attack the evidence with [Interrogate](interrogate.md) only when the user's prove reply includes `interrogate`. Evidence is not design: it never replaces or enters the sketch. Report the evidence. Do not promote proof code.
+
+Standalone `design prove` may use a user-supplied falsifiable claim without an existing sketch; use the claim and repository facts as the Frame. Do not invent a sketch.
 
 ## Frame
 
@@ -20,14 +22,14 @@ Rerun the report's command in the worktree. Treat an unreproducible observation 
 
 ## Attack
 
-Run only when the user's prove reply includes `interrogate`; otherwise skip to Output. Run `interrogate/interrogate.md` with the prover worktree's diff as the scope, the Frame's intent, and the same runnable target. For CLI-only runs, use the report's command, assumption, and observation as scope instead of a diff. Adversaries try to break the proof. Reuse coverage for the same scope/revision. A verified finding means the sketch's shape fails under that run.
+Run only when the user's prove reply includes `interrogate`; otherwise skip to Output. Run [Interrogate](interrogate.md) with the prover worktree's diff as the scope, the Frame's intent, and the same runnable target. For CLI-only runs, use the report's command, assumption, and observation as scope instead of a diff. Adversaries try to break the proof. Reuse coverage for the same scope/revision. A verified finding means the sketch's shape fails under that run.
 
 ## Output
 
 - **Question**: the Frame.
 - **Method**: what Experiment selected and why.
 - **Observation**: the rerun command, its output, and the conclusion.
-- **Interrogate**: when Attack ran, the verified findings and dropped counts per `interrogate/interrogate.md`; otherwise "not requested".
+- **Interrogate**: when Attack ran, the verified findings and dropped counts per [Interrogate](interrogate.md); otherwise "not requested".
 - **Proposed corrections**: sketch changes the evidence supports, each citing its command. The sketch keeps `not implemented` bodies; proof code stays out of it.
 - **Artifacts**: absolute path of `report.md` and, when code was created, `proof.patch`.
 

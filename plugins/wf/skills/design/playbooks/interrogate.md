@@ -1,8 +1,10 @@
 # Interrogate
 
-Adversarial review procedure of the `architect` skill. Paths resolve from the skill base directory.
+Adversarial review procedure of `design interrogate`. Paths resolve from the `design` skill directory.
 
 Adversaries try to break a change or a design. A finding survives only when a run proves it. Report the findings. Do not apply fixes.
+
+Standalone `design interrogate` reads the repository's architecture, relevant ADRs/Concepts and glossary, then derives intent, scope, and a safe runnable target. Write verified findings to `<artifact-root>/interrogate.md`; for verified contract findings, run [Deep module](deep-module.md) and append recommended interfaces as **proposed** corrections. Present the report and stop. Apply nothing. When Architect calls this route, return findings and proposals to the caller instead.
 
 ## Frame
 
