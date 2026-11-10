@@ -1,6 +1,6 @@
 # Explorer prompt
 
-Fill the placeholders and pass the resulting brief verbatim to Hunter as `@work` in an Explore request. Set `@target` and the lookup `@shape` and `@depth` as applicable. Pass the Evidence return as the worker's inline `@outputShape` and include any caller-supplied framing. The Research coordinator owns the final document.
+Fill the placeholders and pass the resulting brief verbatim to Hunter as `@work` in an Explore request. Set `@target` and the lookup `@shape` and `@depth` as applicable. Pass the Evidence return as the worker's inline `@outputShape` and include any caller-supplied framing. Research passes the evidence to the Explainer.
 
 ---
 
@@ -16,9 +16,9 @@ Fill the placeholders and pass the resulting brief verbatim to Hunter as `@work`
 - Research depth — {DEPTH}
 - Applicable lens and proof checks — {LENS_AND_CHECKS}
 
-Resolve the named targets and read contracts first using Hunter's Explore procedure. Focus on the assigned angle. Cite decisive source lines and distinguish executing source from documented intent and runtime observations. For Behavior, trace the trigger, real provider, fallbacks, and observable outcomes. For Flow, prove sender, receiver, and binding. For Data, trace the actual writers, readers, keys, and storage rules. Apply the supplied checks to the part of the question in scope.
+Resolve the named targets and read contracts first using Hunter's Explore procedure. Focus on the assigned angle. Cite decisive source lines and distinguish executing source from documented intent and runtime observations. Apply only the supplied proof checks for the assigned angle.
 
-Stay read-only under Hunter's rules. Resolve C# dependencies through Hunter's NuGet tactic when needed. Keep search roots bounded to the resolved targets and package cache. Return evidence inline and leave report writing to Research.
+Stay read-only under Hunter's rules. Resolve C# dependencies through Hunter's NuGet tactic when needed. Keep search roots bounded to the resolved targets and package cache. Return evidence inline using Evidence return.
 
 If static evidence leaves a material claim open, run a read-only check only with authorized access and a safe target. Record the command or query, environment, and result. If the check needs mutation, unavailable access, or an unsafe target, report the claim, blocker, and exact next check.
 

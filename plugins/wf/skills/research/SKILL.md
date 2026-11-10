@@ -32,7 +32,7 @@ A pure lookup (one literal, symbol, caller lookup, or package API) with no reque
 
 ## Constraints
 
-- **MUST** delegate source reading. The coordinator routes, briefs, verifies citations, and writes the system report. If delegation is unavailable, report the blocker.
+- **MUST** delegate source reading. The coordinator routes, briefs, verifies citations, and saves the system report. If delegation is unavailable, report the blocker.
 - Send every Explore request and current-system evidence brief to `hunter`. Use read-only `general-purpose` workers for independent Cloud, Web, and Why evidence, allowing only a designated output artifact. Preserve the Why worker roles.
 - For Why, Cloud, and Web, pass caller-provided `@outputShape` verbatim. In a system evidence brief, pass it as report context and set the worker's inline `@outputShape` to the explorer prompt's Evidence return. Only the coordinator applies the requested report path.
 - **MUST** check codebase target roots for `graphify-out/`. When present, paste the **Graphify line** verbatim, with `<root>` filled, into codebase-reading briefs sent to agents other than Hunter. Hunter handles Graphify itself.
@@ -60,9 +60,11 @@ Pass the original question, named targets or refs, and `@outputShape` to Why wor
 
 ## System research
 
-1. Load [System inspection](system/system-inspection.md) and [How](how/how.md) for every saved current-system answer. Use the inspection rules to select depth and the relevant lenses. Read only the selected lens references.
-2. Load the [Explorer prompt](how/explorer-prompt.md). Fill it per evidence pass with the original question, assigned angle, named targets or refs, depth, and applicable lens checks. Send the filled prompt verbatim as `@work` directly to Hunter in an Explore request. Use one focused pass for a narrow question and split complex evidence only where useful. Workers return cited evidence and gaps inline.
-3. Apply the evidence and runtime checks. If provider semantics or live values determine the answer, use the applicable Cloud inspection checks to request inline evidence without a separate report. Resolve material conflicts or name the unresolved claim and exact next check. Integrate the findings and save one cited Markdown document using How.
+1. **Scope.** Load [System inspection](system/system-inspection.md) and [How](how/how.md) for every saved current-system answer. Select depth and load only the relevant lens references. Use their proof checks to brief evidence collection and their presentation guidance to brief the Explainer.
+2. **Explore.** Fill the [Explorer prompt](how/explorer-prompt.md) with the original question, assigned angle, named targets or refs, depth, and the proof checks that apply to that angle. Send it verbatim as `@work` directly to Hunter in an Explore request. Use one focused pass for a narrow question and split complex evidence only where useful. Hunter returns cited evidence and gaps inline.
+3. **Verify evidence.** Apply the inspection and runtime checks. If provider semantics or live values determine the answer, request inline evidence using the applicable Cloud inspection checks. Send material source gaps back to Hunter as bounded lookups. When a claim stays unresolved, carry its blocker and exact next check into synthesis.
+4. **Explain.** Fill the [Explainer prompt](how/explainer-prompt.md) with the question, scope and depth, cited findings, relevant System Inspection guidance for the report, and caller framing. For a concise answer, apply the prompt in the coordinator. For a detailed or full answer, dispatch a read-only `general-purpose` Explainer using the `subagents` Dispatch action. Pass the absolute path to `how/how.md` with the filled prompt. The Explainer returns a single How draft with any applicable diagrams and names remaining evidence gaps. If synthesis delegation is unavailable, apply the prompt in the coordinator using the evidence already collected.
+5. **Save.** Verify the draft against How, resolve material evidence gaps with bounded lookups as needed, and render every included Mermaid block. Save one cited Markdown document at the requested path or the How default.
 
 ## Cloud inspection
 

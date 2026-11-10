@@ -10,6 +10,7 @@ ROOT = SKILLS / 'research'
 RESEARCH = (ROOT / 'system/system-inspection.md').read_text()
 HOW = (ROOT / 'how/how.md').read_text()
 PROMPT = (ROOT / 'how/explorer-prompt.md').read_text()
+EXPLAINER = (ROOT / 'how/explainer-prompt.md').read_text()
 EXPLORE = (SKILLS / 'research/SKILL.md').read_text().split('## Explore request')[1].split('\n## ')[0]
 
 
@@ -55,7 +56,7 @@ def test_saved_system_reports_use_one_template():
     assert HOW.index('## Answer') < HOW.index('## How it works')
     for path in ('<slug>.md', '<slug>-chain.md', '<slug>-data.md'):
         assert f'docs/research/{path}' in HOW
-    assert not (ROOT / 'how/explainer-prompt.md').exists()
+    assert '[How](how.md) as the report contract' in EXPLAINER
     assert not list((ROOT / 'system').glob('*-template.md'))
 
 
@@ -65,3 +66,11 @@ def test_system_evidence_is_inline_and_names_blocked_runtime_checks():
         assert f'{{{field}}}' in PROMPT
     assert 'Return evidence inline' in PROMPT
     assert 'claim, blocker, and exact next check' in PROMPT
+
+
+def test_explainer_receives_findings_and_selected_inspection_guidance():
+    assert '{EXPLORER_FINDINGS}' in EXPLAINER
+    assert '{INSPECTION_GUIDANCE}' in EXPLAINER
+    assert 'applicable lens guidance to choose a diagram' in EXPLAINER
+    assert 'Return one Markdown draft inline' in EXPLAINER
+    assert 'Apply only the supplied proof checks' in PROMPT
