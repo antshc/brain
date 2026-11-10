@@ -6,6 +6,26 @@ Structure and content rules for agent-facing documents: `SKILL.md`, bundled refe
 
 **Guiding principle:** constrain what must remain true, prescribe how only when necessary, explain why when non-obvious, define what happens when execution cannot proceed.
 
+## Contents
+
+- Frontmatter and description
+- Invocation choice
+- Skill invocation syntax
+- Information hierarchy
+- Route composition
+- Steps and completion criteria
+- Output contract
+- When to split
+- Instruction precision
+- Gotchas
+- Subagents
+- Resources
+- Template ownership
+- Syntax legend
+- Pruning
+- Evaluation
+- Before finishing
+
 ## Frontmatter and description
 
 | Key | Required | Rule |
@@ -85,6 +105,33 @@ Order content by need: **steps → inline reference → disclosed reference**. P
 - **Sprawl** — too long even when every line is live. Cure: disclose reference, split by branch or sequence.
 - Keep `SKILL.md` body under 300 lines; 100–250 is a useful stricter target. Include only sections that materially help execution.
 
+## Route composition
+
+Use these repository conventions; they are not Agent Skills specification fields.
+
+| Term | Responsibility |
+|---|---|
+| Router | Select outcomes or execution variants inside an activated `SKILL.md`. |
+| Route | One selectable path with a trigger and output contract; represented in the router, not a folder. |
+| Playbook | Own one route's end-to-end procedure: inputs, decisions, steps, failures, output, completion. |
+| Tactic | Solve a conditional subproblem: observable trigger, technique, result/evidence; reusable across routes. |
+| Reference | Supply knowledge, schemas, examples, or conventions without owning a task. |
+
+| Need | Structure |
+|---|---|
+| One short procedure | Inline Workflow; no router needed |
+| Related outcomes with distinct substantial procedures | Routing in `SKILL.md`; `playbooks/<route>.md` |
+| One or two short methods | Inline Tactics |
+| Bulky, conditional, or multi-playbook technique | `tactics/<name>.md` |
+| Supporting knowledge | `references/` |
+| Fillable output | `templates/` |
+| Repeated or error-prone deterministic work | `scripts/` |
+| Independent discovery or authority boundary | Separate skill |
+
+Generate only justified files and directories. Keep shared invariants and selection in `SKILL.md`; the selected playbook owns execution. For each route define an unambiguous trigger, playbook, and output contract; specify ambiguity handling, continuation, and combined-request order. Read only the selected playbook, then select again only per the continuation policy.
+
+Link every conditional playbook, tactic, and reference directly from `SKILL.md` with its loading condition; read triggered files fully. A playbook may name a registered tactic or reference and its trigger in prose, but must not introduce a loading chain or second router. Resolve bundled paths from the target skill base directory. Keep one authoritative tactic definition for all consuming routes.
+
 ## Steps and completion criteria
 
 Every step ends on a **completion criterion**: the condition that tells the agent the work is done. Use numbered steps only when order matters; otherwise state decision criteria.
@@ -95,6 +142,7 @@ Every step ends on a **completion criterion**: the condition that tells the agen
 
 **Body blocks** — compose; default to Workflow, add others only when needed:
 
+- **Routing** — select related task outcomes; use Route composition to separate selection from playbook execution.
 - **Workflow** — ordered steps. When cases need different steps, make step 1 a branch: "**New file?** → Creation steps; **Existing file?** → Editing steps".
 - **Loop** — repeat-until work (interview, review, validate → fix → repeat). State the exit condition and the steps every pass runs; a step that always runs belongs in the loop, not in Tactics.
 - **Tactics** — unordered techniques, each with an observable trigger, an action, and a result; state when triggers are re-checked. Use bold-lead lines, not tables, so a tactic can carry bullets and pointers.
@@ -178,6 +226,8 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 
 | Folder | Holds |
 |---|---|
+| `playbooks/` | substantial route procedures; create only when needed |
+| `tactics/` | substantial conditional techniques shared or used by routes; create only when needed |
 | `scripts/` | executable automation |
 | `references/` | decision/reference material |
 | `assets/` | files used unchanged |

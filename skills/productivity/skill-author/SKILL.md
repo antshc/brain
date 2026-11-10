@@ -20,6 +20,10 @@ Pick the first matching row. Resolve every path from this skill's base directory
 | Shrink | Request is to shrink, tighten, compress, or condense existing skill, agent, or instructions files | [shrink.md](playbooks/shrink.md) | [wording.md](references/wording.md), [best-practices.md](references/best-practices.md) | fresh subagent |
 | Write | Everything else: skill brief, free-text skill request, rewrite of an existing skill | [draft.md](playbooks/draft.md), then [shrink.md](playbooks/shrink.md) | [best-practices.md](references/best-practices.md), [wording.md](references/wording.md), [SKILL.template.md](templates/SKILL.template.md) | fresh subagent per phase |
 
+## Composition resources
+
+For skill composition, read Route composition in [best-practices.md](references/best-practices.md). Pass Draft absolute paths of [playbook.template.md](templates/playbook.template.md) and [tactic.template.md](templates/tactic.template.md); it reads and fills the former for extracted procedures, the latter for extracted techniques, only when the composition requires them.
+
 ## Constraints
 
 - **MUST** run the Draft phase and the Shrink phase each in a separate fresh subagent; the parent never drafts or shrinks a skill inline. Rationale: isolated context keeps the shrink pass independent and stops the draft rushing toward later phases. If subagents are unavailable, stop and report the blocker.
@@ -40,6 +44,7 @@ Pick the first matching row. Resolve every path from this skill's base directory
 
 - Every target `SKILL.md` has valid frontmatter: `name` matches folder; description passes the forbidden description character table in best-practices.md.
 - `SKILL.md` body under 300 lines; no template placeholder or `<!-- @: -->` directive left in a produced skill or agent.
-- Every relative link resolves inside its own skill folder.
+- Every relative link resolves inside its own skill folder; every conditional playbook, tactic, and reference has a direct body link and loading condition, without loading chains.
+- Every route has an unambiguous trigger, playbook, output contract, and selection/ambiguity/continuation/combined-request policy; every tactic has a trigger, consumer, and result. Simple skills retain only justified blocks/files.
 - Shrink report shows no unflagged lost behavior item.
 - New plugin, when created, is registered alongside its siblings.
