@@ -29,12 +29,12 @@ Record each answer into the brief; rebuild later questions when an answer change
 | 4 | **Triggers** | Distinct branches, 3–6 keywords users type | One trigger per branch; collapse synonyms |
 | 5 | **Inputs** | Each input, source, required or optional, resolution when missing | Derive from environment over asking at runtime |
 | 6 | **Output contract** | Artifacts, format, location, no-result and incomplete outcomes | Explicit outcome for each edge case |
-| 7 | **Blocks** | Workflow, Loop, Tactics, Reference, or free-form | See Blocks |
-| 8 | **Steps and tactics** | Outline with a checkable completion condition or trigger each | Demanding, exhaustive criteria where it matters |
+| 7 | **Composition** | Workflow or Routing, plus Loop, Tactics, Reference, or free-form; routes with names, intent, triggers, owned output, playbook, ambiguity and combined-request policy | Inline short procedures; extract distinct substantial outcomes |
+| 8 | **Steps and tactics** | Steps with completion conditions; each tactic with trigger, consumer routes, technique, result, inline or extracted placement | Reuse one method across consumers; extract only when justified |
 | 9 | **Degrees of freedom** | What must stay true vs agent's choice | Exploration high; migration and destructive ops low |
 | 10 | **Hard constraints** | MUST/MUST NOT rules, mechanism, failure policy each | Fail closed for mandatory mechanisms; fallback or degradation otherwise |
 | 11 | **Gotchas** | External tools, APIs, platform quirks | Only knowledge not findable by looking |
-| 12 | **Resources** | scripts, references, templates, assets | Scripts for fragile repeated operations; disclose branch-only reference |
+| 12 | **Resources** | playbooks, tactics, scripts, references, templates, assets; chosen paths and loading conditions | Only needed files; direct links from SKILL.md; no loading chains |
 | 13 | **Completion** | Result conditions; completeness sweep needed? | Sweep only for multi-part work |
 | 14 | **Placement** | Plugin or folder, name in verb-prefix family | Existing plugin and family first |
 
@@ -42,7 +42,8 @@ Record each answer into the brief; rebuild later questions when an answer change
 
 Default to Workflow; combine others only when needed.
 
-- **Workflow** — steps run in a fixed order; optional first branch step routes cases to different steps.
+- **Routing** — select distinct outcomes; playbooks own their substantial procedures. Use Route composition in best-practices.md.
+- **Workflow** — steps run in a fixed order; inline short case branches.
 - **Loop** — repeat-until work: interview, review, validate then fix.
 - **Tactics** — unordered techniques, each applied when its trigger holds.
 - **Reference** — definitions or rules consulted on demand.
@@ -59,12 +60,15 @@ Default to Workflow; combine others only when needed.
 - Triggers: {{branches and keywords}}
 - Inputs: {{name, source, required|optional, missing handling}}
 - Output: {{artifacts, format, location}}; no result: {{outcome}}; incomplete: {{outcome}}
-- Blocks: {{Workflow|Loop|Tactics|Reference|free-form, one or more}}; reason: {{reason per block}}
-- Steps and tactics: {{outline with completion conditions or triggers}}
+- Blocks: {{Workflow|Routing|Loop|Tactics|Reference|free-form, one or more}}; reason: {{reason per block}}
+- Routes: {{name, intent, trigger, owned output, playbook path or inline; none for single procedure}}
+- Routing policy: {{selection, ambiguity, continuation, combined-request order; none when unrouted}}
+- Steps: {{outline with completion conditions}}
+- Tactics: {{trigger, consumer routes, technique, result, inline or path; or none}}
 - Degrees of freedom: {{fixed vs free}}
 - Constraints: {{MUST/MUST NOT, mechanism, failure policy}}
 - Gotchas: {{items or none}}
-- Resources: {{scripts, references, templates, assets or none}}
+- Resources: {{selected playbooks, tactics, scripts, references, templates, assets with paths and loading conditions; or none}}
 - Completion criteria: {{conditions}}; completeness sweep: {{yes|no}}
 - Assumptions and open items: {{items or none}}
 ```

@@ -51,6 +51,10 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 A selection block in an activated `SKILL.md` that maps task intent or observed conditions to one route and its supporting files. It selects instructions within a skill; unlike a router skill, it does not independently invoke another installed skill.
 _Avoid_: automatic import, playbook, orchestrator
 
+**Route**:
+One selectable outcome or execution path within an activated skill, with a trigger and output contract. Represent it in the router, not a folder or independently discoverable skill.
+_Avoid_: playbook, tactic, mode folder
+
 **Playbook**:
 The task-level procedure for one route, including decisions, ordered actions, verification, and completion criteria. A router selects the playbook; the playbook owns the end-to-end outcome.
 _Avoid_: tactic, reference, checklist

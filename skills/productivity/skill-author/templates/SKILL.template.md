@@ -18,7 +18,16 @@ description: {{description|imperative What sentence with concrete result, then U
 
 - **MUST** {{constraint}}. {{mechanism}}. Rationale: {{rationale}}. If {{blocker}}, {{failurePolicy|fail closed, controlled fallback, or graceful degradation}}.
 
-<!-- @: Block selection: Workflow by default; add Loop, Tactics, Reference only when the task needs them; free-form sections only when the output itself dictates structure. -->
+<!-- @: Block selection: inline Workflow for a short procedure; Routing plus playbooks for distinct substantial outcomes; add Loop, Tactics, Reference only as needed; free-form when output dictates structure. -->
+<!-- @: BLOCK Routing: omit for a single short procedure; repeat rows per route and keep shared invariants here. -->
+## Routing
+
+| Route | Select when | Playbook |
+|---|---|---|
+| {{routeName}} | {{trigger|Unambiguous intent or observable condition}} | [{{routeTitle}}](playbooks/{{routeName}}.md) |
+
+Select {{selectionPolicy|Explicit precedence or mutually exclusive conditions}}. Read only the selected playbook in full. If the requested outcome remains ambiguous, {{ambiguityPolicy|Ask the smallest clarifying question}}. For combined requests, {{combinedPolicy|Route order and dependency handling}}. After its output, {{continuationPolicy|Stop or select the next requested route}}.
+
 <!-- @: BLOCK Workflow: ordered steps; add the branch step only when cases need different steps. -->
 ## Workflow
 
@@ -37,7 +46,10 @@ Repeat until {{exitCondition|observable stop, e.g. user confirms or validator pa
 
 Re-check triggers {{cadence|once at start, after every answer, or after every new fact}}.
 
+<!-- @: Keep short techniques inline; for extracted techniques use the linked form below, repeat per tactic, delete unused form. -->
 **{{tacticName|leading word}}** — when {{trigger|observable condition}}, {{action}}. Yields {{result|evidence or artifact}}.
+
+**{{externalTacticName|leading word}}** — when {{externalTrigger|observable condition}}, read [{{externalTacticTitle}}](tactics/{{tacticSlug}}.md) in full. Used by {{consumingRoutes}}; yields {{externalResult|evidence or artifact}}.
 
 <!-- @: BLOCK Reference: definitions or rules consulted on demand; name the section for its content; disclose branch-only material. -->
 ## {{referenceName|Section named for its content}}

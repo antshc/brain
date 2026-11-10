@@ -92,6 +92,8 @@ Keep `SKILL.md` body under 300 lines.
 
 | Folder | Holds |
 |---|---|
+| `playbooks/` | substantial route procedures; create only when needed |
+| `tactics/` | substantial conditional techniques shared or used by routes; create only when needed |
 | `scripts/` | executable automation |
 | `references/` | decision/reference material |
 | `assets/` | files used unchanged |
@@ -99,9 +101,11 @@ Keep `SKILL.md` body under 300 lines.
 
 Keep up to two category files at skill root; otherwise use the matching resource folder.
 
+**Composition:** keep shared invariants and route selection in `SKILL.md`; playbooks own route outcomes, tactics solve conditional subproblems, references supply knowledge. Use inline Workflow for short procedures; extract only substantial routes or techniques into required files and folders. Link every playbook and tactic directly from `SKILL.md`, with its loading condition; read only selected playbooks and triggered tactics. Apply one-level-deep rules to these folders too; no playbook → tactic → reference loading chains.
+
 **Kind folders:** a skill that routes to several same-kind playbooks MAY group them in a folder named by that kind (plural, lowercase, e.g. `kinds/`, `strategies/`, `modes/`) instead of `references/`. `SKILL.md` links each file directly from a routing table; bundled-path, skill-local, and one-level-deep rules apply unchanged. Name sibling playbooks in prose (`component` kind), never link between them.
 
-**Bundled paths:** resolve `scripts/`, `references/`, `assets/`, `templates/`, and kind folders from the skill base directory, never the caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
+**Bundled paths:** resolve `playbooks/`, `tactics/`, `scripts/`, `references/`, `assets/`, `templates/`, and kind folders from the skill base directory, never the caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
 
 **Skill-local resources:** each skill **MUST** bundle required resource files inside its own folder; **MUST NOT** read, link, or execute resource files from another skill's folder. Copy required resources into the consuming skill and update its paths. Invoking another skill remains allowed; accessing its internal files does not.
 
