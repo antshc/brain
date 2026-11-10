@@ -1,7 +1,7 @@
 ---
 name: index-docs
 description: >-
-  Initialize missing ARCHITECTURE.md and GLOSSARY.md, and sync ARCHITECTURE.md index rows and Trigger condition tables. Use for 'load an index', 'generate triggers', 'sync an index row'. Not for authoring ADR or Concept content → `record-architecture`; Concept interviews → `define concept`.
+  Initialize missing ARCHITECTURE.md and GLOSSARY.md, and sync ARCHITECTURE.md index rows and Trigger condition tables. Use for 'load an index', 'generate triggers', 'sync an index row'. Not for authoring ADR or Concept content → `record-architecture`; Concept interviews → `define`.
 ---
 
 # Index Docs
