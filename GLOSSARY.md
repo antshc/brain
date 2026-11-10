@@ -46,6 +46,21 @@ Location: plugins/
 Terms used across more than one plugin — not owned by a single plugin's context.
 
 ### Language
+
+**Router**:
+A selection block in an activated `SKILL.md` that maps task intent or observed conditions to one route and its supporting files. It selects instructions within a skill; unlike a router skill, it does not independently invoke another installed skill.
+_Avoid_: automatic import, playbook, orchestrator
+
+**Playbook**:
+The task-level procedure for one route, including decisions, ordered actions, verification, and completion criteria. A router selects the playbook; the playbook owns the end-to-end outcome.
+_Avoid_: tactic, reference, checklist
+
+**Tactic**:
+A focused, reusable method applied conditionally within a route or playbook, such as external-source checking or runtime verification. It solves one subproblem rather than owning the complete task outcome.
+_Avoid_: playbook, route, skill
+
+See [Skill routing research](docs/research/agent-skill-routing-and-progressive-disclosure.md) for standards, examples, and pattern selection.
+
 **Harness environment**:
 The repository that owns the specs and issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
 **Harness Repo Path**:
