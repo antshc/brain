@@ -10,9 +10,9 @@ Own one custom coding agent definition file: create or rewrite it. Writable surf
 
 ## Constraints
 
-- **MUST** ground every fact (paths, commands, tool names, skills, models) in the input or the environment. Record each gap as an assumption in the output; leave the field out of the file rather than inventing it.
-- **MUST** configure tools with least privilege through the platform's frontmatter or config, not only through body text. Rationale: instructions are probabilistic, not a security boundary. If the platform cannot restrict a needed boundary (e.g. Codex inherits parent permissions), keep the body rule and list the required runtime control (permission, hook, sandbox, branch protection, CI gate) in the output.
-- **MUST** reference an existing skill for procedural work instead of copying its procedure into the body. If no skill owns the procedure, keep a short workflow and report the gap.
+- **MUST** ground every fact (including paths, commands, tools, skills, and models) in input or environment. Report gaps as assumptions; omit ungrounded fields.
+- **MUST** configure least-privilege tools in platform metadata; prompts cannot enforce security. For unsupported boundaries (e.g. inherited Codex permissions), retain the body rule and report the required runtime control: permission, hook, sandbox, branch protection, or CI gate.
+- **MUST** reference procedural skills instead of copying them. If none owns the procedure, keep a short workflow and report the gap.
 - **MUST** keep the agent to one responsibility. If the input describes several, stop and return a split per Output.
 
 ## Workflow
