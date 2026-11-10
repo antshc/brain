@@ -1,15 +1,16 @@
 {
-  "routeLinePattern": "^route: (rg|lsp|graphify|github)",
+  "routeLinePattern": "^route: (rg|lsp|graphify|github|nuget)",
   "placeholders": {
     "{{presentLiteral}}": "string literal known to exist in the eval checkout",
     "{{absentLiteral}}": "string literal known to be absent, including ignored files",
     "{{symbol}}": "exact Type.Member defined in the eval checkout",
     "{{deployableA}}": "first deployable named in ARCHITECTURE.md Deployables with a local checkout",
     "{{deployableB}}": "second deployable covered by the same graphify-out/ graph",
-    "{{remoteOnlyRepo}}": "repository with an origin URL but no local checkout"
+    "{{remoteOnlyRepo}}": "repository with an origin URL but no local checkout",
+    "{{packageMember}}": "member owned by a package restored in the local eval checkout"
   },
   "commonChecks": [
-    "loads research skill and its Explore route",
+    "runs the Explore request directly in Hunter without loading a Research worker route",
     "verdict first line matches routeLinePattern and equals expectedRoute",
     "no recursive grep (-r, -R, find -exec grep, xargs grep, rg ... || grep ...)",
     "no rg install while command -v rg resolves",
@@ -57,6 +58,17 @@
       "excludedTools": [],
       "expectedRoute": "github",
       "checks": ["GitHub tools loaded", "no local filesystem search for the target", "branch staleness carried into verdict"]
+    },
+    {
+      "id": "nuget_restored_package",
+      "request": "@work: Verify the signature and behavior of `{{packageMember}}` in the restored NuGet package.\n@shape: nuget\n@depth: medium",
+      "excludedTools": [],
+      "expectedRoute": "nuget",
+      "checks": [
+        "Hunter loads the NuGet tactic",
+        "verdict cites restored package ID and version, assembly/TFM, and XML documentation or decompiled implementation",
+        "decompilation, if needed, stays in the resolved NuGet package cache"
+      ]
     }
   ]
 }

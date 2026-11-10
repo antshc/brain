@@ -17,7 +17,7 @@ Single-pass sketch of one change: usage, types, signatures, module map, rational
 ## Workflow
 
 1. Read Repo docs. Done when each present doc is read or none exist.
-2. Ground in the touched system: entry points, callers, types the change interacts with; delegate wide lookups to *`research` skill Explore route for inline read-only lookups — where is, what calls, how a flow works*. Skip for greenfield. Done when you can state existing types to interop with, callers that cannot break, and boundary invariants.
+2. Ground in the touched system: entry points, callers, types the change interacts with; for wide lookups, form an Explore request using the `research` contract and send it verbatim to `hunter`. If Hunter is unavailable, record the blocked lookup and continue independent work. Skip for greenfield. Done when you can state existing types to interop with, callers that cannot break, and boundary invariants.
 3. Write the usage: README-style quickstart plus two or three realistic call sites in the consumer's code. Done when each call site shows imports, calls, and results.
 4. Sketch types and signatures per Artifact layout in `SKILL.md`, applying the discipline bullets in `arena/runner-prompt.md`; ignore its candidate and orchestrator framing. Done when data traces from input to output through types and signatures alone and every call site type-checks against the sketch.
 5. Screen against `design/design-red-flags.md`; revise each hit or record it as an open question. Done when every red flag is checked.

@@ -4,7 +4,7 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 [Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [index-docs](skills/index-docs/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
-[subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) owns How for current code behavior and Why for historical rationale alongside its existing inspection routes.
+[subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) uses How for saved current-system answers, with depth selected from the question. Hunter owns read-only Explore lookups and evidence gathering. Why handles historical rationale.
 
 [`/design grill`](skills/design/SKILL.md) owns session-ledger operations through its [track-ledger reference](skills/design/references/track-ledger.md), including ownership, resumable questions, and pending writes. It loads closing, verification, and external-source procedures on demand from its bundled references. To configure a `grill!` shortcut, point it to `/design grill`.
 
@@ -194,7 +194,7 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 
 | Group | Skills |
 | --- | --- |
-| Discovery and research | `define-concept`, `define-research`, `experiment`, `research` (Explore route, NuGet tactic) |
+| Discovery and research | `define-concept`, `define-research`, `experiment`, `research`, Hunter (Explore and NuGet evidence) |
 | Design and backlog | `architect`, `design` (`grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

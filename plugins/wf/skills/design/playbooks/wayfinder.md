@@ -104,7 +104,7 @@ When mapping the frontier or discovering new evidence gaps, consider all four op
 | Current system | `system` | Repository or deployable being mapped and inspection axis |
 | External system | `system` | Named external repository or deployable and inspection axis. If only public docs are available, offer Web. |
 
-For system inspection, choose `Behavior` for one deployable's behavior, `Flow` for handoffs across deployables, `Data` for a data boundary, or `focused` for an isolated lookup or package API.
+For a system question, choose `Behavior` for one deployable, `Flow` for handoffs across deployables, `Data` for a data boundary, or `focused` for an isolated call or package API. This axis sets the primary lens. The question sets the depth, with an explicit inspection requesting full coverage.
 
 Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for System), and the part's question when the ticket spans multiple parts. For Cloud, include the provider, service, and need for live values.
 
