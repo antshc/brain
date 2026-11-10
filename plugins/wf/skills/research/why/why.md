@@ -2,7 +2,7 @@
 
 Rationale procedure of the Research skill. Paths resolve from the skill base directory.
 
-Investigate the motivation and intent behind code. The companion `how/how.md` procedure answers what the code does and how it works. `why` answers what forces led to its shape.
+Investigate the motivation and intent behind code. Default Research explains current behavior in the How output template. `why` answers what forces led to its shape.
 
 At each dispatch, *run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch**. Use `general-purpose` with read-only instructions for MCP access and citation spot-checks. Use the role fallback on rejection, then the closest valid model of the same family.
 

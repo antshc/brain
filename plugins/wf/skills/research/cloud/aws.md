@@ -18,7 +18,7 @@ Search and read official AWS documentation — service guides, API references, S
 AWS SDK for .NET (`AWSSDK.*`, `AWS.Logger.*`):
 
 1. Resolve the version from the workspace — `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `*.csproj`; absent → `obj/project.assets.json`. Never reuse a version from an earlier session.
-2. *Run `research` skill Explore route with `@shape: nuget` for an inline read-only lookup to verify the package type, member, signature, and behavior from the restored NuGet package's XML docs or decompiled assembly.*
+2. Send an Explore request directly to `hunter` with `@shape: nuget` to verify the type, member, signature, and behavior using the restored package’s XML docs or decompiled assembly. If Hunter is unavailable, report the blocked lookup and continue independent evidence work.
 3. Version-specific behavior, release notes, or retry/config defaults not visible in the package → official AWS SDK docs per Docs.
 
 Other SDKs: resolve the version from the dependency manifest and lockfile, then use Docs.
