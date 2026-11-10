@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from conftest import SCRIPT, FakeGitHub, git
+from conftest import SCRIPT, GIT_SCRIPT, FakeGitHub, git
 
 SHA = "a" * 40
 
@@ -85,7 +85,7 @@ def test_a_missing_gh_binary_is_reported_not_raised(run, monkeypatch):
     assert result.code == 1 and "gh is not installed" in result.err
 
 
-@pytest.mark.parametrize("argv", [[], ["unknown"], ["issue"], ["issue", "nope"], ["branch", "create"], ["pr", "open"]])
+@pytest.mark.parametrize("argv", [[], ["unknown"], ["issue"], ["issue", "nope"], ["pr", "open"]])
 def test_argument_errors_exit_2_without_touching_github(argv):
     done = subprocess.run([sys.executable, str(SCRIPT), *argv], capture_output=True, text=True)
     assert done.returncode == 2 and "usage:" in done.stderr
@@ -93,9 +93,14 @@ def test_argument_errors_exit_2_without_touching_github(argv):
 
 def test_every_documented_command_is_registered():
     done = subprocess.run([sys.executable, str(SCRIPT), "--help"], capture_output=True, text=True)
-    for group in ("repo", "branch", "commit", "worktree", "spec", "graph", "ticket", "issue", "label", "artifact",
+    for group in ("repo", "spec", "graph", "ticket", "issue", "label", "artifact",
                   "pr", "review", "checks", "run", "preflight"):
         assert group in done.stdout
+    assert "branch" not in done.stdout and "worktree" not in done.stdout
+    git_help = subprocess.run([sys.executable, str(GIT_SCRIPT), "--help"], capture_output=True, text=True)
+    assert git_help.returncode == 0
+    for group in ("repo", "branch", "commit", "worktree"):
+        assert group in git_help.stdout
 
 
 def test_errors_go_to_stderr_and_stdout_stays_empty():

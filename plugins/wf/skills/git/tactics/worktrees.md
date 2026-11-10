@@ -23,7 +23,7 @@ Recheck tactics when the caller's goal or observed Git state changes.
 Pass repository name, single-segment worktree name, pinned local commit and `--new-branch BRANCH` or `--detach`. The helper verifies commit, managed path and unused destination, configures the harness's local Git exclude if needed and reads back registration, branch or detached state, HEAD and cleanliness.
 
 ```text
-GH_TOOL worktree create --harness ROOT --source CHECKOUT --repo-name NAME --name LEAF --commit SHA --owner RUN_ID --new-branch BRANCH
+GIT_TOOL worktree create --harness ROOT --source CHECKOUT --repo-name NAME --name LEAF --commit SHA --owner RUN_ID --new-branch BRANCH
 ```
 
 Persist `record` as standalone JSON outside the worktree. The linked Git directory records the same ownership token.
@@ -33,7 +33,7 @@ Persist `record` as standalone JSON outside the worktree. The linked Git directo
 Supply `--recoverable` only after verifying the caller's completion policy. Run outside the target. If source is target, use another checkout of the same repository. Pass expected current HEAD, which can differ from creation SHA. The helper verifies ownership, registration and identity, preserves locked or dirty worktrees including ignored and untracked files, blocks if index flags can hide edits, and removes without force.
 
 ```text
-GH_TOOL worktree remove --harness ROOT --source CHECKOUT --record FILE --expect-head SHA --recoverable
+GIT_TOOL worktree remove --harness ROOT --source CHECKOUT --record FILE --expect-head SHA --recoverable
 ```
 
 ## Results

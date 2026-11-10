@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from pathlib import PurePosixPath
 from typing import Any, Callable
 from urllib.parse import quote
 
-from . import git, implement_spec, issues, pulls, reviews, specs, worktrees
+from . import implement_spec, issues, pulls, reviews, specs
 
 from .gh import Gh, GhError, UsageError, repository
+from .pr_git import sha
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -18,7 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
     groups = parser.add_subparsers(dest="group", required=True)
     nested = {
         group: groups.add_parser(group).add_subparsers(dest="action", required=True)
-        for group in ("repo", "branch", "commit", "worktree", "spec", "graph", "ticket", "issue", "label", "artifact", "pr", "review", "checks", "run")
+        for group in ("repo", "spec", "graph", "ticket", "issue", "label", "artifact", "pr", "review", "checks", "run")
     }
 
     def command(group: str | None, name: str, handler: Callable[..., dict[str, Any]]) -> argparse.ArgumentParser:
@@ -120,19 +120,6 @@ def main(argv: list[str] | None = None, *, gh: Gh | None = None) -> int:
     return 3 if result.get("problems") else 0
 
 
-def repo_resolve(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
-    root = git.checkout(gh, args)
-    url = gh.git("-C", root, "remote", "get-url", args.remote).strip()
-    name = args.repo
-    if not name:
-        match = re.fullmatch(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)(.+?)(?:\.git)?/?", url)
-        if not match:
-            raise UsageError("remote is not a GitHub repository")
-        name = match[1]
-    git.verify_remote(gh, root, args.remote, repository(name))
-    return {"repo": name, "checkout": root, "remote": args.remote}
-
-
 def repo_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
     endpoint = f"repos/{repository(args.repo)}"
     if args.path:
@@ -141,9 +128,9 @@ def repo_read(gh: Gh, args: argparse.Namespace) -> dict[str, Any]:
             raise UsageError("expected a repository-relative file path")
         if not args.ref:
             raise UsageError("file reads require a pinned commit SHA")
-        endpoint += f"/contents/{quote(args.path, safe='/')}?ref={git.sha(args.ref)}"
+        endpoint += f"/contents/{quote(args.path, safe='/')}?ref={sha(args.ref)}"
     elif args.ref:
-        endpoint += f"/commits/{git.sha(args.ref)}"
+        endpoint += f"/commits/{sha(args.ref)}"
     return gh.json("api", endpoint)
 
 
@@ -157,10 +144,6 @@ def register_commands(command: Callable[..., argparse.ArgumentParser], nested: d
         for name in names:
             parser.add_argument(f"--{name}", required=True)
 
-    p = command("repo", "resolve", repo_resolve)
-    flags(p, "checkout")
-    p.add_argument("--repo")
-    p.add_argument("--remote", default="origin")
     p = command("repo", "read", repo_read)
     flags(p, "repo")
     p.add_argument("--ref")
@@ -168,31 +151,6 @@ def register_commands(command: Callable[..., argparse.ArgumentParser], nested: d
     p = command("repo", "search", repo_search)
     flags(p, "repo")
     p.add_argument("query")
-
-    for action, handler, required in (
-        ("inspect", git.branch_inspect, ("name",)),
-        ("create", git.branch_create, ("name", "start")),
-        ("fetch", git.branch_fetch, ("repo", "remote", "expected")),
-        ("push", git.branch_push, ("repo", "remote", "name", "expected", "previous")),
-        ("delete", git.branch_delete, ("name", "expected", "integrated-into")),
-    ):
-        p = command("branch", action, handler)
-        flags(p, "checkout", *required)
-        if action == "inspect":
-            p.add_argument("--repo")
-            p.add_argument("--remote")
-        if action == "push":
-            p.add_argument("--set-upstream", action="store_true")
-
-    p = command("commit", "history", git.commit_history)
-    flags(p, "checkout")
-    p.add_argument("--base")
-    p.add_argument("--tip")
-    p.add_argument("--ccode", action="store_true")
-    p = command("commit", "create", git.commit_create)
-    flags(p, "checkout", "expected", "message-file")
-    p.add_argument("paths", nargs="+")
-    worktrees.register(nested["worktree"])
 
     p = command("issue", "read", issues.issue_read)
     p.add_argument("ref")

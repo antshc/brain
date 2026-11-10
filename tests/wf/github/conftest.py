@@ -18,10 +18,14 @@ import pytest
 
 SKILL = Path(__file__).resolve().parents[3] / "plugins/wf/skills/github"
 SCRIPT = SKILL / "scripts/github.py"
+GIT_SCRIPT = SKILL.parent / "git/scripts/git.py"
 sys.path.insert(0, str(SCRIPT.parent))
+sys.path.insert(0, str(GIT_SCRIPT.parent))
 
 from github_cli.cli import main
 from github_cli.gh import Gh, run_cmd
+from git_cli.cli import main as git_main
+from git_cli.core import Git
 
 LIVE_REPO = "antshc/brain"
 LIVE_ENV = "BRAIN_GH_LIVE"
@@ -54,8 +58,13 @@ class Result:
 @pytest.fixture
 def run(capsys: pytest.CaptureFixture[str]) -> Callable[..., Result]:
     def invoke(*argv: object, gh: Gh | Callable | None = None) -> Result:
-        runner = gh if isinstance(gh, Gh) else Gh(gh) if gh else None
-        code = main([str(arg) for arg in argv], gh=runner)
+        is_git = argv[0] in ("branch", "commit", "worktree") or argv[:2] == ("repo", "resolve")
+        if is_git:
+            client = Git(gh._runner if isinstance(gh, Gh) else gh) if gh else None
+            code = git_main([str(arg) for arg in argv], git_client=client)
+        else:
+            runner = gh if isinstance(gh, Gh) else Gh(gh) if gh else None
+            code = main([str(arg) for arg in argv], gh=runner)
         out, err = capsys.readouterr()
         return Result(code, json.loads(out) if out.strip() else None, err)
     return invoke
@@ -370,7 +379,8 @@ def live(live_ready: None, cleanup: Callable, run_id: str) -> Callable[..., Resu
     cleanup(sweep)
 
     def invoke(*argv: object, cwd: Path | None = None, code: int | None = 0) -> Result:
-        done = subprocess.run([sys.executable, str(SCRIPT), *map(str, argv)], cwd=cwd, text=True, capture_output=True,
+        script = GIT_SCRIPT if argv[0] in ("branch", "commit", "worktree") or argv[:2] == ("repo", "resolve") else SCRIPT
+        done = subprocess.run([sys.executable, str(script), *map(str, argv)], cwd=cwd, text=True, capture_output=True,
                               env={**os.environ, **LIVE_GIT_ENV})
         result = Result(done.returncode, json.loads(done.stdout) if done.stdout.strip().startswith(("{", "[")) else done.stdout, done.stderr)
         if code is not None:

@@ -1,20 +1,20 @@
 # GitHub skill tests
 
-Tests for `plugins/wf/skills/github/scripts/` (`github.py`, package `github_cli`). Read before adding, changing or running them.
+Tests for `plugins/wf/skills/github/scripts/` (`github.py`, `github_cli`) and the split `plugins/wf/skills/git/scripts/` (`git.py`, `git_cli`). Read before adding, changing or running them.
 
 ## Layout
 
 | File | Covers | Runs |
 |---|---|---|
 | `test_gh.py` | refs, `Gh` wrapper, pagination, GraphQL, `run_cmd` | in-process |
-| `test_git.py` | branch, commit, push, fetch, remote identity (real git, bare remote) | in-process |
+| `test_git.py` | separate Git CLI: branch, commit, push, fetch, remote identity (real git, bare remote) | in-process |
 | `test_issues.py` | issue, label, comment, assignment, sub-issue (fake `gh`) | in-process |
 | `test_pulls.py` | PR open, snapshot, diff, fetch, checkout, checks, comments | in-process |
 | `test_specs.py` | design spec, issue artifacts | in-process |
 | `test_reviews.py` | inline findings, reply, resolve, discussion gate | in-process |
-| `test_worktrees.py` | worktree lifecycle and ownership (real git) | in-process |
+| `test_worktrees.py` | separate Git CLI: worktree lifecycle and ownership (real git) | in-process |
 | `test_implement_spec_units.py` | validation, PR body, checkout resolution, close, evidence, checkpoint, planner graph | in-process |
-| `test_cli_routing.py`, `test_cli.py` | argument parsing, exit codes, repo read/search | in-process |
+| `test_cli_routing.py`, `test_cli.py` | two entry points, routing, exit codes, repo read/search | in-process |
 | `test_*_integration.py` | the same commands against the real `antshc/brain` | live, gated |
 
 `tests/wf/implement/` (spec flow) and `tests/wf/review/` (discussion marker routing) also cover this code; do not duplicate them.
@@ -48,8 +48,9 @@ Run the in-process suite first. Go live only for a risk the fake cannot prove, t
 | GraphQL text in `reviews.py` | schema, thread fields, mutation names | `pulls` |
 | `gh` flags or output parsing (`pr diff`, `pr checks`, `issue artifact`, `label`, `search code`) | CLI version drift | `pulls`, `issues`, `specs`, `repo` |
 | idempotent create or reconcile logic | read-after-write lag (label-filtered lists lag 2-4 s) | `issues`, `specs` |
-| push, fetch, remote URL checks, credentials in `git.py` | real transport and auth | `pulls`, `repo` |
-| `gh.py`, `cli.py` shared helpers | everything | `all` |
+| push, fetch, remote URL checks, credentials in `git_cli/branches.py` | real transport and auth | `pulls`, `repo` |
+| `github_cli/gh.py`, `github_cli/cli.py` GitHub helpers | GitHub surface | `all` |
+| `git_cli/core.py`, `git_cli/cli.py` Git helpers | Git operations | local Git tests first; `repo`/`pulls` live only for auth or transport changes |
 | docs, tests only, pure validation in `implement_spec.py`, `worktrees.py` | none | skip live |
 
 Areas: `repo` (read-only), `issues`, `specs`, `pulls`. Report which area ran and why; report a skipped live run as not run.

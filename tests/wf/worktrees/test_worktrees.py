@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[3] / "plugins/wf/skills/github/scripts/github.py"
+SCRIPT = Path(__file__).resolve().parents[3] / "plugins/wf/skills/git/scripts/git.py"
 
 
 def git(path: Path, *args: str) -> str:

@@ -9,6 +9,7 @@ import pytest
 
 SKILL = Path(__file__).resolve().parents[3] / "plugins/wf/skills/github"
 SCRIPT = SKILL / "scripts/github.py"
+GIT_SCRIPT = SKILL.parent / "git/scripts/git.py"
 sys.path.insert(0, str(SCRIPT.parent))
 
 from github_cli.cli import main
@@ -27,7 +28,7 @@ def test_local_entry_point_creates_branch_and_commits_exact_paths(tmp_path):
         return subprocess.check_output(["git", "-C", str(checkout), *args], text=True).strip()
 
     def cli(*args, code=0):
-        result = subprocess.run([sys.executable, str(SCRIPT), *args, "--checkout", str(checkout)],
+        result = subprocess.run([sys.executable, str(GIT_SCRIPT), *args, "--checkout", str(checkout)],
                                 cwd=tmp_path, text=True, capture_output=True)
         assert result.returncode == code, result.stderr
         return json.loads(result.stdout) if code == 0 else result.stderr
@@ -99,12 +100,18 @@ def test_review_write_rejects_wrong_resource_url(target, capsys):
     assert "qualified GitHub reference" in capsys.readouterr().err
 
 
-def test_one_discoverable_skill_routes_to_bundled_tactics():
+def test_two_discoverable_skills_route_to_bundled_tactics():
     router = (SKILL / "SKILL.md").read_text()
+    git_skill = SKILL.parent / "git"
+    git_router = (git_skill / "SKILL.md").read_text()
     assert router.startswith("---\nname: github\n")
+    assert git_router.startswith("---\nname: git\n")
     assert "disable-model-invocation" not in router
+    assert "disable-model-invocation" not in git_router
     assert list(SKILL.rglob("SKILL.md")) == [SKILL / "SKILL.md"]
+    assert list(git_skill.rglob("SKILL.md")) == [git_skill / "SKILL.md"]
     assert not (SKILL.parent / "git-conventions/SKILL.md").exists()
     assert not (SKILL.parent / "worktrees/SKILL.md").exists()
-    for path in (SKILL / "tactics").glob("*.md"):
-        assert f"](tactics/{path.name})" in router
+    for skill, text in ((SKILL, router), (git_skill, git_router)):
+        for path in (skill / "tactics").glob("*.md"):
+            assert f"](tactics/{path.name})" in text
