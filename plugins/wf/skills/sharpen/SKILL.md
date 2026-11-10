@@ -1,7 +1,7 @@
 ---
 name: sharpen
 description: >-
-  Deepen a task prompt without expanding its scope, or restate the user's intent. Use for 'sharpen', 'deepen this task', 'rewrite this prompt', or 'in your own words'.
+  Make a task deeper, not bigger, then rewrite the prompt. Use for /sharpen.
 ---
 
 # Sharpen
