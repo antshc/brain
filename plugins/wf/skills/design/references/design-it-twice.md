@@ -1,6 +1,6 @@
 # Design It Twice
 
-Parallel interface-design procedure for the Deep-module design route in `SKILL.md`. First idea is rarely the best (Ousterhout). Use the vocabulary in `design/deep-modules.md`. Adapted from mattpocock/skills `codebase-design` (MIT).
+Parallel interface-design procedure for the `design deep-module` route. First idea is rarely the best (Ousterhout). Use the vocabulary in `references/deep-modules.md`. Adapted from mattpocock/skills `codebase-design` (MIT).
 
 Write every output under `<artifact-root>/deep-modules/`.
 
@@ -20,7 +20,7 @@ Standalone → show `problem.md` to the user, then continue immediately without 
 
 *Run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch** with 3+ designer briefs and the ordered `architect runners` pool. Each MUST produce a **radically different** interface.
 
-Give each a separate technical brief: file paths, coupling details, dependency categories, what sits behind the seam, absolute paths of `design/deep-modules.md` and the repo glossary, and its output path `option-<n>.md`. Assign one constraint per designer:
+Give each a separate technical brief: file paths, coupling details, dependency categories, what sits behind the seam, absolute paths of `design/references/deep-modules.md` and the repo glossary, and its output path `option-<n>.md`. Assign one constraint per designer:
 
 1. Minimize the interface: 1–3 entry points; maximize leverage per entry point.
 2. Maximize flexibility: support many use cases and extension.

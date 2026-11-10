@@ -18,29 +18,29 @@ Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.
 
 Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
-3. Architect design — apply only when an architect skill run happened in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Architect design** below.
+3. Design sketch — apply only when `design architect` or `design sketch` produced a completed, accepted `synthesis/` package in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Design sketch handoff** below.
 
 4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
 
-5. Architect run → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and the bundle manifest. Offline → follow its offline branch instead.
+5. Completed design package → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and bundle manifest. Offline → follow its offline branch instead.
 
-## Architect design
+## Design sketch handoff
 
-Classify the run's outputs by role, never by file name. The run's artifact root holds `task.md`, `grounding-*.md`, `candidate-<n>/`, and `synthesis/`; each of `candidate-<n>/` and `synthesis/` holds `rationale.md`, `module-map.md`, and `sketch/`.
+Classify the run's outputs by role, never by file name. Both `design architect` and standalone `design sketch` use `<repo-root>/tmp/design-<slug>/synthesis/` with `rationale.md`, `module-map.md`, and `sketch/`. Architect additionally has `task.md`, `grounding-*.md`, and `candidate-<n>/`.
 
-- **Synthesized design** — `synthesis/`: its `rationale.md`, `module-map.md`, and `sketch/` are the final design package; its synthesis decision names the base candidate. Correction re-runs: the `arena-r<k>/synthesis/` the user picked.
-- **Excluded** — every `candidate-<n>/` (including the base candidate), `synthesis-note.md`, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
+- **Selected design** — `synthesis/`: its `rationale.md`, `module-map.md`, and `sketch/` are the final package. For Architect Arena, the synthesis decision names the base candidate. Correction re-runs: the `arena-r<k>/synthesis/` the user picked.
+- **Excluded** — every Arena `candidate-<n>/` (including the base candidate), `synthesis-note.md`, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
 
-Map the synthesized `rationale.md` into the body; fall back to the base candidate's `rationale.md` only for sections the synthesis leaves empty:
+Map the selected `rationale.md` into the body; for an Architect Arena package, fall back to the base candidate's `rationale.md` only for sections the synthesis leaves empty:
 
 - Problem and caller usage → **Problem Statement** and **Solution**, user-facing.
 - Behavior the design commits to → **Requirements**, solution agnostic.
-- Module shape, types, invariants, tradeoffs, rejected alternatives, synthesis decision → **Implementation Decisions** as prose, after the **Design sketch** decision.
+- Module shape, types, invariants, tradeoffs, rejected alternatives, and synthesis decision when present → **Implementation Decisions** as prose, after the **Design sketch** decision.
 - Open questions and risks → **Further Notes**.
 
-The body MUST NOT name the architect skill, candidate labels, or the run's local paths.
+The body MUST NOT name design routes, candidate labels, or the run's local paths.
 
-Wrap the synthesized sketch — never a candidate's — and its module map into artifacts. Resolve the script path from the installed `design/` skill directory:
+Wrap the selected `synthesis/` sketch — never an Arena candidate's — and its module map into artifacts. Resolve the script path from the installed `design/` skill directory:
 
 ```
 python3 "<installed design directory>/scripts/bundle_artifacts.py" --sketch <synthesis/sketch path> --module-map <synthesis/module-map.md path> --out-dir <new empty temp dir outside the repository>
@@ -108,7 +108,7 @@ Boundary conditions and their expected handling. Each edge case should be in the
 
 ## Implementation Decisions
 
-<!-- Omit the Design sketch decision when no architect run happened. -->
+<!-- Omit the Design sketch decision when no accepted design package exists. -->
 
 - **Design sketch (binding):** the selected design sketch is attached to this issue as artifacts. Use it as the map for where logic goes and how code is structured: its types, signatures, module boundaries, and file locations. Start from the **Sketch index**; the module map, when attached, maps sketch files to target locations. When the sketch conflicts with the Requirements or the codebase, the Requirements win; choose the option that best fits them.
   - [{{artifactName}}]({{artifactUrl}}) — one entry per artifact, Sketch index first.

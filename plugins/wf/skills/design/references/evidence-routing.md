@@ -1,6 +1,6 @@
 # Evidence routing
 
-Resolve technical questions during Ground and before each Review round, including greenfield. Use existing procedures; **MUST NOT** duplicate their internals, even if simpler. Gather evidence separately from design acceptance.
+Resolve technical questions during Architect Ground and before each Review round, including greenfield. Use existing procedures; **MUST NOT** duplicate their internals, even if simpler. Gather evidence separately from design acceptance.
 
 ## Route
 
@@ -21,7 +21,7 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 *Run `research` skill to investigate primary sources (codebase, NuGet packages, cloud docs, web) via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
-- `@outputShape`: Markdown; one result per topic/source part; location `<repo-root>/tmp/architect-<slug>/research/`; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
+- `@outputShape`: Markdown; one result per topic/source part; location `<repo-root>/tmp/design-<slug>/research/`; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
 
 Pass `@outputShape` verbatim; Research propagates it to every specialist and owns discovery, classification, and fan-out. **MUST NOT** dispatch separate research agents. Honor stronger specialist artifact-location contracts; index returned paths in the artifact root.
 
@@ -49,7 +49,7 @@ Record question/claim, sketch revision, environment/version, evidence paths, out
 |---|---|
 | Confirmed and compatible | Close factual question; cite evidence in rationale |
 | Refuted or verified finding | Without checkpoint: apply supported correction and log rationale; with checkpoint: present proposed correction for acceptance |
-| Verified Interrogate finding on a contract (interface, invariant, ordering, error mode, configuration, seam, adapter) | Derive the correction through Deep-module design in `SKILL.md`, then act as for a verified finding |
+| Verified Interrogate finding on a contract (interface, invariant, ordering, error mode, configuration, seam, adapter) | Derive the correction through [Deep module](../playbooks/deep-module.md), then act as for a verified finding |
 | Inconclusive | Preserve unknown, missing evidence, and impact |
 | Tool, permission, or sandbox unavailable | Record blocker; invent no result |
 | Material change | Recheck only invalidated assumptions |
