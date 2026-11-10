@@ -154,10 +154,11 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
 - [writing-style](plugins/wf/skills/writing-style/SKILL.md): write, review, or unslop prose; normalize requirement or story text by stripping implementation artifacts.
+- [sharpen](plugins/wf/skills/sharpen/SKILL.md): deepen task rigor without expanding scope, or restate the user's intent.
 - [experiment](plugins/wf/skills/experiment/SKILL.md): run a throwaway experiment to answer a design question.
 - [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template. Uses How for saved current-system answers and Why for historical rationale. Hunter owns Explore for inline read-only codebase and restored NuGet package lookups.
 - [subagents](plugins/wf/skills/subagents/SKILL.md): dispatch independent workers, select model roles, compare Arena candidates, and run Swarm partitions or races.
-- [define-concept](plugins/wf/skills/define-concept/SKILL.md): suggest which Concept to add or extend (or check a described one against recorded Concepts), question it against cited codebase evidence, and record the result.
+- [define](plugins/wf/skills/define/SKILL.md): `research` charts or resumes a research map; `concept` suggests, questions, and records an arc42 Crosscutting Concept against cited codebase evidence.
 - [record-architecture](plugins/wf/skills/record-architecture/SKILL.md): record settled ADRs, Concepts, Deployables, deployment topology, or glossary terms; render concept bodies and compact decision bullets without saving. Select a mode explicitly or describe the artifact.
 - [index-docs](plugins/wf/skills/index-docs/SKILL.md): initialize missing `ARCHITECTURE.md` and `GLOSSARY.md`, and maintain architecture indexes.
 - [review](plugins/wf/skills/review/SKILL.md): use `code` for PR findings, `comments` for existing threads, `blast-radius` for downstream risk, `tests-gap` for regression coverage, `architecture` for drift, or `hitl` for human-led PR review.

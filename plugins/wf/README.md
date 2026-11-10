@@ -10,7 +10,7 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 Its interview presents the entire ready decision frontier as one numbered batch per round, with recommendations phrased for "yes" to accept. Dependent questions wait for later rounds; partial answers leave the remaining ready questions together for batched follow-up. Inline recording and user-controlled closure remain unchanged.
 
-[record-architecture](skills/record-architecture/SKILL.md) replaces the seven standalone architecture record/render commands. Its modes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, and `decision-bullet`; the two render-only modes never save files or update indexes. Explicit modes take precedence, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [define-concept](skills/define-concept/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview.
+[record-architecture](skills/record-architecture/SKILL.md) replaces the seven standalone architecture record/render commands. Its modes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, and `decision-bullet`; the two render-only modes never save files or update indexes. Explicit modes take precedence, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [`/define concept`](skills/define/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview. `/define research` charts research and hypothesis topics.
 
 The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
@@ -110,7 +110,7 @@ swimlane-beta TB
 
 ### Story to implementation
 
-Starts from one existing User story: `/writing-style sharpen` hardens it, `/design architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
+Starts from one existing User story: `/sharpen` hardens it, `/design architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -121,7 +121,7 @@ swimlane-beta TB
 
   subgraph story [Story hardening]
     userStory([User story])
-    sharpen[1 - writing-style sharpen]
+    sharpen[1 - sharpen]
   end
 
   subgraph design [Design]
@@ -142,7 +142,7 @@ swimlane-beta TB
 
 ### Story to direct implementation
 
-Starts from one existing User story with no spec: `/writing-style sharpen` hardens it, `/design architect` sketches the code, and the **implement** reply makes `/design architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
+Starts from one existing User story with no spec: `/sharpen` hardens it, `/design architect` sketches the code, and the **implement** reply makes `/design architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -153,7 +153,7 @@ swimlane-beta TB
 
   subgraph story [Story hardening]
     userStory([User story])
-    sharpen[1 - writing-style sharpen]
+    sharpen[1 - sharpen]
   end
 
   subgraph design [Design]
@@ -188,13 +188,13 @@ swimlane-beta TB
 | Initialize docs | `/index-docs Initialize missing docs` |
 | Story, bug report, feature handover, or feature design | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi`, `/draft-artifact design` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
-| Deepen a task prompt or restate intent | `/writing-style sharpen` |
+| Deepen a task prompt or restate intent | `/sharpen` |
 
 Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [behavior](skills/doc-diagram/examples/behavior.md), and [code](skills/doc-diagram/examples/code.md).
 
 | Group | Skills |
 | --- | --- |
-| Discovery and research | `define-concept`, `define-research`, `experiment`, `research`, Hunter (Explore and NuGet evidence) |
+| Discovery and research | `define` (`concept`, `research`), `experiment`, `research`, Hunter (Explore and NuGet evidence) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `interrogate`, `prove`, `grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
-| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `writing-style` |
+| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `sharpen`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

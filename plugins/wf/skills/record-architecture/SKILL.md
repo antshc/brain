@@ -1,7 +1,7 @@
 ---
 name: record-architecture
 description: >-
-  Persist a settled ADR, Concept, Deployable, deployment topology, or glossary term, or render one without saving. Use for 'record an ADR', 'add a glossary term', 'document this Deployable'. Not for open decisions → `design`; Concept interviews → `define-concept`; index rows → `index-docs`.
+  Persist a settled ADR, Concept, Deployable, deployment topology, or glossary term, or render one without saving. Use for 'record an ADR', 'add a glossary term', 'document this Deployable'. Not for open decisions → `design`; Concept interviews → `define concept`; index rows → `index-docs`.
 argument-hint: "mode: adr | building-block | deployment-view | term | concept-body | concept-record | decision-bullet"
 ---
 
