@@ -177,7 +177,7 @@ The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skil
 
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
 2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
-3. Load [defaults.md](./defaults.md) and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `define-concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
+3. Load [defaults.md](./defaults.md) and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `/define concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
 4. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.
 5. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
 
@@ -186,5 +186,5 @@ Superseding or retiring a Concept applies the marker to its index row via the sa
 ## Approval gate
 
 - **Explicit direct request** ("record a Concept for X") — approval is already given; draft and write immediately.
-- **Invoked by `define-concept`** — its questioning confirmation settled the concept. Write immediately without a second prompt.
+- **Invoked by `/define concept`** — its questioning confirmation settled the concept. Write immediately without a second prompt.
 - **Invoked by `/design grill`** — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.

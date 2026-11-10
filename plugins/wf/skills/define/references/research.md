@@ -1,11 +1,3 @@
----
-name: define-research
-description: >-
-  Chart or resume a research map of research and hypothesis topics under docs/ongoing/, resolved via research or experiment.
-argument-hint: "{{researchPromptOrContext}} | {{researchMapPath}}"
-disable-model-invocation: true
----
-
 # Define Research
 
 A research prompt or context has arrived, and it may hide several questions. This skill charts it as a **research map**: a destination, the topics that must be resolved to reach it, and the fog beyond them. It then works the frontier — `/research` topics in parallel, experiments one at a time with the user — until nothing left open can change the destination.

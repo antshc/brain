@@ -1,9 +1,3 @@
----
-name: define-concept
-description: >-
-  Interview for an arc42 Crosscutting Concept through questioning and read-only codebase inspection, then hand it to `record-architecture`. Use for 'define a Concept', 'improve a Concept', 'which Concept next'. Not for writing records → `record-architecture`; index rows → `index-docs`.
----
-
 # Define Concept
 
 Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `hunter` owns read-only Explore lookups (where is, what calls, how a flow works); `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
