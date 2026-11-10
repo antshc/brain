@@ -6,7 +6,7 @@ description: >-
 
 # Define Concept
 
-Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and the `research` skill Explore route owns in-subagent read-only lookup (where is, what calls, how a flow works); `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
+Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `hunter` owns read-only Explore lookups (where is, what calls, how a flow works); `/index-docs` owns scan and match. *Use `record-architecture` skill for settled architecture Concepts and concept bodies: `concept-body` mode renders, `concept-record` mode persists and indexes.* Do not reimplement their rules.
 
 ## Evidence
 
@@ -16,7 +16,7 @@ Every fact in a suggestion, a question, or the recorded Concept is either a cite
 
 1. Read `research` skill's **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
 2. Pick shape: one focused path → one subagent; distinct non-overlapping tracks (separate deployables, workflow boundaries, configuration versus tests, categories) → parallel subagents, each a bounded subquestion; a track needing another's answer → sequential. No duplicate lookups for areas already in flight.
-3. Spawn each lookup as a `hunter` subagent with its request verbatim, instructing it to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, config evidence*. `hunter` unavailable → `explore` agent with the same request plus the read-only contract.
+3. Spawn each lookup as a `hunter` subagent with its Explore request verbatim. If Hunter is unavailable, record the blocked evidence request and continue independent tracks.
 4. Consolidate results: resolve conflicts with targeted evidence; state remaining uncertainty.
 
 Done when every track returned its `@outputShape` or an explicit blocker.

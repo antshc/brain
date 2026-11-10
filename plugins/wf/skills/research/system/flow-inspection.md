@@ -1,10 +1,10 @@
 # Flow axis — cross-deployable slice chain
 
-Breadth first, depth later. One deployable and its functional slice are one lane; the chain connects related slices through every outcome-relevant system whose executing source you can open, and ends at the systems whose source you cannot. **One chain run produces one document.** Depth inside a lane belongs to the **Behavior** axis, offered as a follow-up once the chain is complete.
+Start with boundaries. One deployable and its functional slice form one lane. Trace each outcome-relevant handoff through the systems whose source is available. Apply Behavior checks within a lane when its internal decision changes the answer.
 
 Map each handoff to a row, then verify sender, wire contract, receiver, and deployment or configuration binding. Stop at a terminal infrastructure boundary only after recording the operation, protocol, authentication, errors, and relevant configuration.
 
-**Output:** exactly one file, `docs/research/{{slug}}-chain.md`. A chain run writes no other document.
+Add findings to the How report. The default single-axis Flow path is `docs/research/{{slug}}-chain.md`.
 
 ## Contents
 
@@ -16,16 +16,15 @@ Map each handoff to a row, then verify sender, wire contract, receiver, and depl
 - Integration contract
 - Handoff evidence
 - Chain check
-- Behavior follow-up gate
 - Gotchas
 
 ## Diagram
 
-Draw a mandatory **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. *Follow `doc-diagram` skill's **Swimlane Diagram** for lane ownership, handoffs, and responsibility changes* and open its swimlane template before drafting.
+When a chain diagram adds clarity, draw a **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. *Follow `doc-diagram` skill's **Swimlane Diagram** for lane ownership, handoffs, and responsibility changes* and open its swimlane template before drafting.
 
 Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
 
-Keep file references in the tables and numbered Facts; Summary, diagram, Flow, boundary contracts, and Conclusion trace to those Facts. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; *run `doc-diagram` skill for the Mermaid C4 container diagram's deployables and relationships*.
+Back every node and crossing with the cited mechanism or handoff table. Group terminal nodes at the edges in a lane titled Terminal boundaries when useful. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; *run `doc-diagram` skill for the Mermaid C4 container diagram's deployables and relationships*.
 
 ## Tiers
 
@@ -48,14 +47,13 @@ Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm c
 
 1. **Frame the chain** — name the outcome traced, not the service. "Where does a placed order become reserved stock?" beats "how does ordering work?".
 2. **Find the chain entries** — what originates the flow from outside the whole system: user action, schedule, webhook, upstream system, batch drop. An inbound call from a deployable already in the chain is a handoff, not an entry.
-3. **Walk lane by lane** — per deployable record what it receives, 1–5 ordered major steps, and what it emits. A major step is a boundary-relevant responsibility needed to explain how the inbound contract becomes the outbound contract; collapse implementation details that do not change that explanation. Read only enough client call sites, routes, publish/subscribe calls, SDK use, auth configuration, error handling, and IaC bindings to prove the steps and next crossing; leave deeper internal mechanism for a Behavior-axis run.
+3. **Walk lane by lane** — per deployable record what it receives, 1–5 ordered major steps, and what it emits. A major step is a boundary-relevant responsibility needed to explain how the inbound contract becomes the outbound contract; collapse implementation details that do not change that explanation. Read only enough client call sites, routes, publish/subscribe calls, SDK use, auth configuration, error handling, and IaC bindings to prove the steps and next crossing; apply the Behavior lens in the same report when an internal decision affects the outcome.
 4. **Classify every edge** — continuable or terminal (see Boundary). Continue when the next deployable's executing source opens and its behavior can change the framed outcome. Otherwise close a confirmed crossing as terminal with `no source access` or `out of framed scope — {{reason}}`; keep an unconfirmed crossing in Gaps.
-5. **Complete the chain** — reach a terminal for every in-scope branch before examining any lane internally. Record outcome-irrelevant siblings as terminal by scope and cycles as handoffs back to an existing lane.
-6. **Check the chain at runtime** (see Chain check) — one real correlation id beats any amount of static reading for proving the lanes actually connect. Record the command, correlation id, and confirmed handoffs as Facts; when no runtime check runs and runtime confirmation matters, record the exact check in Unknowns.
-7. **Draw and render the chain** — the swimlane is part of the deliverable, not an illustration added afterwards. Draw each deployable once as one lane containing 1–5 ordered major-step nodes; arrows between lanes carry boundary contracts.
-8. **Offer Behavior follow-ups** — after the chain is complete, apply the Behavior follow-up gate. Run the **Behavior** axis only when the user asks for a listed follow-up; pass its question verbatim, its inbound contract as the entry point, and its expected outbound contracts as the observable-outcome boundary.
+5. **Complete the chain** — reach a terminal for every in-scope branch. Trace deciding lane behavior and storage or provider semantics as needed to settle the question. Record outcome-irrelevant siblings as terminal by scope and cycles as handoffs back to an existing lane.
+6. **Check the chain at runtime** when runtime confirmation matters. Follow Chain check and the System inspection runtime rules.
+7. **Explain the chain** — use the How mechanism. If a table clarifies the trace, give each deployable one row in chain order, with the inbound contract, ordered major steps, outbound contract, and evidence. Render any included diagram.
 
-**Done when** the chain document is the only file written; every entry reaches a lane; every deployable appears exactly once as one lane with 1–5 major-step nodes; every artifact sits inside its executing lane; every in-scope branch reaches a terminal; the swimlane renders and every terminal sits at a diagram edge; every boundary records its API or event, SDK, protocol, auth, errors, and binding; every internal handoff has emit-, receive-, and binding citations; every terminal says why research stops; every diagram and conclusion claim is backed by a numbered Fact; and every deferred internal question has a complete Behavior follow-up.
+**Done when** each entry reaches a lane, each in-scope branch reaches a terminal or a recorded gap, and each internal handoff has emit, receive, and binding citations. Record why each terminal ends the trace. Back the mechanism and any diagram with confirmed evidence.
 
 ## Boundary
 
@@ -92,21 +90,7 @@ Guessed topology is the default failure of cross-service tracing, and this rule 
 
 ## Chain check
 
-Issue one real request carrying a correlation id, then collect that id across every deployable's logs or distributed trace. Every handoff the id lights up becomes a Fact in one action, and lanes the static read missed surface here. Record the correlation id and the command issued so the trace is re-runnable; handoffs the check never lit stay assumptions.
-
-## Behavior follow-up gate
-
-Add a follow-up only when the framed outcome depends on a deployable's internal decision and its boundary contracts do not explain that decision. Curiosity, complexity, and unfamiliar code do not qualify. Finish the chain first, then record each qualifying lane with:
-
-| Field | Content |
-|---|---|
-| Lane | lane number and deployable |
-| Rationale | why its internal mechanism can change the framed outcome |
-| Behavior question | the exact domain-facing question for the Behavior-axis run |
-| Inbound contract | the proved contract that becomes the Behavior trace's entry point |
-| Expected outbound contracts | the proved emissions that bound its observable outcomes |
-
-The follow-up is deferred scope, not missing evidence. A one-sided handoff or unresolved terminal belongs in Gaps instead. When the user requests a follow-up, the Behavior document links back to this chain and uses the lane number, question, inbound contract, and expected outbound contracts without reframing them.
+Correlate an existing request across logs or distributed traces, or issue a request with a correlation ID when authorized on a safe target. Record the command or query, environment, correlation ID, and observed handoffs. If confirmation is blocked, name the claim and exact next check. Keep unobserved handoffs separate from runtime-confirmed facts.
 
 ## Gotchas
 

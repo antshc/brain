@@ -4,7 +4,7 @@ The unit is one data boundary: the governed item type, its authoritative writer,
 
 Identify the item and store first, then route every writer and reader through lookups. Verify keys, ownership, consistency, migration, concurrency, and retention in executing source.
 
-**Output:** `docs/research/{{slug}}-data.md`
+Add findings to the How report. The default single-axis Data path is `docs/research/{{slug}}-data.md`.
 
 **Diagram:** none by default; the store, key, and shape tables carry the answer. When the brief asks for one, select the view from the question and *run `doc-diagram` skill for the Mermaid view*: behavior for access order or branching, architecture for ownership or deployment boundaries, or class for item types and their relationships. Keep evidence in the tables.
 
@@ -12,11 +12,11 @@ Identify the item and store first, then route every writer and reader through lo
 
 1. **Frame** — name the decision the data has to support. "Can two checkouts reserve the same seat?" beats "how is the booking table modeled?".
 2. **Inventory the stores** — read the table/collection/schema definitions out of IaC, migrations, and config: keys, indexes, streams, expiry settings, and the binding naming the real resource, account, and region.
-3. **Collect access patterns before judging keys** — enumerate every read and every write from their call sites, each with its filter, sort, and expected result count. Keys are judged against this list; a key justified by nothing on it is dead weight, and a pattern served by no key is served by a scan.
+3. **Collect access patterns before judging keys** — enumerate every read and every write from their call sites, each with its filter, sort, and expected result count, pagination, and serving key or index. Keys are judged against this list; a key justified by nothing on it is dead weight, and a pattern served by no key is served by a scan.
 4. **Attribute every write to its writer** — find-references on the store binding and the grant that permits the write, across every repo that could hold one.
 5. **Read the shape off the write path** — the persisted attribute set is whatever the serializer emits, which drifts from what the model class declares: ignored members, custom converters, nulls dropped on write, and older items written by older code.
 6. **Settle each dimension** — Schemas, Ownership, Consistency, Migrations, Concurrency, Retention. Each section below names what to establish and the failure it catches.
-7. **Run a runtime check when static reading can't settle it** — read one real item and diff its attributes against the model, run the query and check whether it scanned, write twice concurrently and see which guard fires.
+7. **Run a runtime check when static reading leaves a material claim open** — use System inspection’s runtime rules. Read a real item or inspect a query plan when authorized. Use a safe test target for concurrent writes.
 
 **Done when** every access pattern names the key or index that serves it and every key and index names a pattern that needs it; every item type names its sole writer and its readers; every read states its consistency and its lag sources; every in-flight attribute change states its backfill and completion signal; every racing write states its guard; every item type states its retention; and the remaining unknowns can't change the answer.
 
@@ -24,7 +24,7 @@ Identify the item and store first, then route every writer and reader through lo
 
 Establish, per store: the **partition key** and its cardinality, the sort key and its composite structure, and every secondary index with its keys, its projection, and whether it shares the base partition key or spans the table.
 
-Establish, per item type: attribute names, types, optionality, nested shape, enumerated values, and the size of the largest realistic item.
+Establish, per item type: attribute names, types, optionality, nested shape, enumerated values, and the size of the largest realistic item. Cite the serializer or mapper and record runtime attributes absent from the model.
 
 Establish, per store: **single-table** (several item types in one store, told apart by a discriminator attribute and key prefixes) or table-per-type. Record the discriminator and the prefix grammar — in a single-table design the key *encoding* is the schema, and an undocumented prefix is unreadable to everyone but its author.
 
@@ -38,11 +38,13 @@ Establish, per item type: the **sole writer** — the one deployable that create
 
 Where the store has no cross-table foreign keys, ownership is a convention, not a constraint, so prove it rather than infer it from the name: cite the write call sites *and* the grant (IAM policy, role, database user, connection string) that permits the write. **Two deployables holding write grants to one item type is a finding even when only one writes today** — the grant is what makes the second writer possible.
 
+If a table helps, pair each access pattern with its serving key or index and cite its call site. Pair each key and index with the patterns it serves, or mark it unused.
+
 Record readers as an implicit contract: a reader coupling to an attribute the writer owns means the writer cannot rename or retype it unilaterally, and that coupling is invisible from the writer's repo.
 
 ## Consistency
 
-Establish, per read: eventually or strongly consistent, and what the caller does with a stale answer.
+Establish, per read: eventually or strongly consistent, and the lag source, and what the caller does with a stale answer. Verify consistency against the actual engine, configuration, and read path.
 
 - **Default is usually eventual**, with strong consistency a per-call option that costs more and is unavailable on some read paths.
 - **Secondary indexes lag the base store** — an item written and then queried through a global/cross-partition index in the same request can come back missing or stale. Indexes sharing the base partition key usually don't lag.
@@ -84,5 +86,5 @@ Establish, per item type: how long it lives, what removes it, and what sees the 
 
 ## Gotchas
 
-- **An entity class is a claim about shape, and stored items are the evidence** — items written by earlier code, by a different service, or by a console operator carry attributes no current class declares. Read a real item before describing the shape.
+- **An entity class is a claim about shape, and stored items are the evidence** — items written by earlier code, by a different service, or by a console operator carry attributes no current class declares. When old or external writers could change the answer, verify a real item on an authorized target or record the gap.
 - **An index name in IaC proves the index exists, not that anything queries it** — pair every index with the access-pattern row that needs it, or record it as unused.

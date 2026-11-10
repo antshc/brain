@@ -15,13 +15,23 @@ def test_subagents_owns_arena_swarm_and_model_roles():
         assert not (SKILLS / "architect" / old_path).exists()
 
 
-def test_research_routes_how_and_why_before_standard_inspection():
+def test_research_preserves_why_and_routes_system_evidence_to_hunter():
     skill = (SKILLS / "research/SKILL.md").read_text()
-    for reference in ("how/how.md", "why/why.md", "why/sources/atlassian.md"):
+    for reference in ("how/how.md", "how/explorer-prompt.md", "how/explainer-prompt.md",
+                      "why/why.md", "why/sources/atlassian.md"):
         assert f"]({reference})" in skill
         assert (SKILLS / "research" / reference).is_file()
     assert "`@whyDepth`" in skill
+    assert "Why code anchor" in skill
     assert skill.index("## Entry routes") < skill.index("## Workflow")
+    system = skill.split("## System research")[1].split("\n## ")[0]
+    assert "as `@work` directly to Hunter" in system
+    assert system.index("**Explore.**") < system.index("**Explain.**") < system.index("**Save.**")
+    assert "relevant System Inspection guidance for the report" in system
+    assert "Save one cited Markdown document" in system
+    dispatch = (SKILLS / "subagents/SKILL.md").read_text()
+    assert "Send Explore requests verbatim to `hunter`" in dispatch
+    assert "report the blocked evidence request and continue independent work" in dispatch
 
 
 def test_review_loads_playbooks_by_route():
@@ -50,7 +60,7 @@ def test_review_impact_and_tests_keep_their_analysis_contracts():
     assert re.findall(r"\*run `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
         "research", "research", "subagents", "writing-style",
     ]
-    for action in ("Why code anchor", "**How**", "**Arena**", "**Unslop only**"):
+    for action in ("Why code anchor", "**default Research**", "**Arena**", "**Unslop only**"):
         assert action in impact
     assert "Write a script or test that runs the real code, run it" in impact
     assert "MUST NOT" in assessment and "edit production code or tests" in assessment

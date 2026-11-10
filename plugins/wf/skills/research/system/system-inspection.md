@@ -1,27 +1,42 @@
 # System inspection
 
-Inspect the **as-built** state using target repositories and restored packages as primary sources. Write one Markdown file with cited claims. Use File references for repository citations.
+Use these depth and evidence rules to answer a question about the as-built system. [How](../how/how.md) owns the report structure and path.
 
-## Contents
+## Select depth
 
-- Codebase lookups
-- Axes
-- Crossing axes
-- Evidence ladder
-- Claim types
-- File references
-- Runtime checks
-- Gotchas
+| Question | Depth | Evidence |
+|---|---|---|
+| Narrow system question | Concise | One focused Explore pass. Confirm the deciding behavior and cite the primary source. |
+| Complex system question | Detailed | Apply relevant lenses. Trace outcome-relevant boundaries, failure paths, and edge cases. Split only independent evidence work that benefits from parallel lookup. |
+| Explicit inspection or verification | Full | Apply the relevant lens checks throughout the requested scope. Verify material runtime-dependent claims or identify the claim, blocker, and exact next check. |
+
+Explicit inspection or verification sets the minimum depth. Escalate when extra boundaries, consequential failure paths, or conflicting evidence leave the question open. A supplied axis selects the primary lens. Infer it from the question when omitted.
+
+## Select lenses
+
+| Lens | Use for | Reference |
+|---|---|---|
+| Behavior | One deployable's triggers, execution, and outcomes | [Behavior](behavior-inspection.md) |
+| Flow | Handoffs and contracts across deployables | [Flow](flow-inspection.md) |
+| Data | A data boundary, including keys, ownership, consistency, migration, concurrency, retention, or deletion | [Data](data-inspection.md) |
+| Focused | An isolated call, symbol, or package API in a saved answer | Use the relevant checks below. |
+
+Load only the references that help answer the question. A lane's internal decision, persistence semantics, or cloud behavior that determines the outcome belongs in the same answer. Follow the relevant lens or verify provider evidence for that detail. Treat a separately scoped question as independent work for a later request.
+
+## Handoff by role
+
+- **Research** selects depth and lenses, bounds the question, and checks evidence coverage and runtime claims.
+- **Hunter** owns repository navigation, source lookup, and tool choice. The Explorer prompt carries the proof checks for its assigned angle. For bounded follow-up lookups, send the specific check directly.
+- **Explainer** receives the applicable report guidance from these rules and the selected lenses. Include the scope and coverage that matter, the confirmed evidence and unresolved gaps, and any diagram guidance. For example, a Flow brief calls for explaining handoffs and identifying terminal boundaries, with a swimlane when it clarifies the chain.
 
 ## Codebase lookups
 
-**MUST** delegate repository lookups. Extend the brief with missing lookups. Spawn one `hunter` subagent per independent lookup (`hunter` unavailable → `explore` agent per the Research skill's Explore request fallback). Sequence dependent lookups. Instruct each to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, literal, or config evidence*. Research missing from the plugin → same agent type with the same Request and read-only contract. Pass each Explore request:
+Send each Explore request directly to `hunter`. If Hunter is unavailable, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for a system evidence pass, and use bounded requests to fill evidence gaps. Pass each Explore request:
 
-- `@work`: question, prefixed `Exact literal \`X\`:`, `Symbol \`Type.Member\`:`, or `Names unknown:`.
-- `@shape` and `@depth`: from the table below.
-- `@target`: deployable or repository names as stated.
-- `@outputShape`: `file:line — claim` rows, so citations need no re-search.
-- `[@inputs]`: the graph health line returned by the first lookup.
+- `@work` — the filled explorer prompt or a bounded question. For a bounded question use a prefix such as `Exact literal X`, `Symbol Type.Member`, or `Names unknown` when applicable. Preserve literal and symbol spelling.
+- `@shape` and `@depth` — from the lookup table for the assigned angle.
+- `@target` — deployable or repository names as stated.
+- `@outputShape` — the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up.
 
 | Lookup | `@shape` | `@depth` |
 |---|---|---|
@@ -32,52 +47,16 @@ Inspect the **as-built** state using target repositories and restored packages a
 | Isolated symbol or package call site | `symbol` | `quick` |
 | Citation line, config key, route path, table or queue name | `literal` | `quick` |
 
-`hunter` uses the graph for `relationship` lookups itself; never repeat Graphify instructions in its request.
+Hunter handles Graphify. For restored package evidence, send a request with `@shape: nuget`. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
 
-For NuGet-owned claims or evidence, delegate *`research` skill Explore route with `@shape: nuget` to verify this NuGet API inline, read-only*, checking the package API or behavior from XML docs or decompiled code. Cite the resolved package ID, version, type or member, and evidence source. Missing package evidence → mark unknown.
+## Evidence checks
 
-Structure and cite returned evidence. Write only the inspection document.
-
-## Axes
-
-A capability is a stable product ability realized by features and functional slices. Each slice belongs to one deployable. Behavior inspects one slice. Flow traces contracts across slices in different deployables. Data inspects one data boundary. Load only the selected axis reference and template. For isolated lookups or package API questions, write a focused Markdown report with cited findings and unknowns in `docs/research/<slug>.md` unless `@outputShape` sets the path.
-
-Write one file at the axis reference's output path directly in `docs/research/` unless `@outputShape` names a location. Fill the axis template, obey its `**Rules**` blocks, and remove them from the result.
-
-Run the diagram’s owning skill for syntax and style before drafting. Render every Mermaid block before completion.
-
-## Crossing axes
-
-- End Flow at the chain document. Add a Behavior follow-up only when a lane's internal decision determines the framed outcome and boundary contracts leave it unexplained. Record the lane, rationale, exact question, inbound contract, and expected outbound contracts.
-- Run the Behavior axis only after the user requests a listed follow-up. Write `docs/research/{{chainSlug}}-chain-{{n}}-{{deployable}}.md` beside the chain file; pass the question verbatim, start at its inbound contract, bound outcomes by expected outbound contracts, and link the result from the follow-up row.
-- In Flow or Behavior, report a Data follow-up to the orchestrator when a persistence question depends on ownership, keys, consistency, migration, concurrency, retention, or deletion.
-- Report managed-service semantics, quotas, and API parameters to the orchestrator as cloud follow-ups.
-
-## Evidence ladder
-
-Executing source > passing test exercising this exact path > repo docs (ADR, Concept, README, ARCHITECTURE.md) > config/schema defaults > commit or PR description > code comment > inference.
-
-Tests, comments, and docs state *intent*. Executing code proves *behavior*. Record mismatches as findings.
-
-IaC and migration files are executing code. Entity classes *declare* shape. Serializers determine write *behavior*.
-
-## Claim types
-
-- **FACT** — confirmed against code, a test, or a runtime check; carries a citation.
-- **ASSUMPTION** — plausible, unconfirmed; state why, and what would verify it.
-- **UNKNOWN** — a named gap, stated as a concrete next check.
-- **CONCLUSION** — the explanation the facts support.
-
-## File references
-
-Use filename-only links with visible line numbers for every repository file mention: `[{{filename}}]({{path relative to the research document}}#L{{line}}):L{{line}}` for one line or `[{{filename}}]({{path relative to the research document}}#L{{start}}):L{{start}}-{{end}}` for a range. Put the relative path and start-line anchor in the target. Keep the full line location outside it. Example: `[orders.py](../../src/orders.py#L42):L42-54`. Apply in prose, tables, Facts, Gaps, runtime checks, and Evidence fields. Place each citation immediately after its claim. Quote a short deciding line when it settles the claim. A bare path, symbol, table, or service name is not a citation.
+- Trace the executing path and its selected provider or binding. A test exercising that path supports its own setup and outcome. Repo docs, comments, and PR descriptions establish intent. Record mismatches. Inspect IaC and migrations for deployed bindings and storage behavior. Use serializers and mappers to establish the written shape.
+- Distinguish **facts** with decisive citations, **assumptions** with a way to verify them, and **unknowns** with exact next checks. Derive the answer from confirmed facts and state what unresolved evidence could change it.
+- Trace the real implementation when a flag, profile, or environment substitutes a mock, stub, emulator, or recorded response. Identify the actual environment before making consistency, lag, or expiry claims.
 
 ## Runtime checks
 
-Static reading proves possible behavior. Verify actual behavior with a runtime check when reading leaves a claim open: run the test, add a temporary log, call the endpoint, read stored data, or correlate logs by ID. Discard the check and keep the result.
+Static source establishes possible behavior. When runtime selection, ordering, binding, or a live value could change the answer, use authorized access and a safe target to check the actual outcome. Prefer existing test results, read-only queries, or correlated traces. Stay within Hunter's read-only contract for delegated evidence. If a check needs an instrumented or state-changing probe, keep it outside Hunter and run it only when the request authorizes that probe on a safe target. Otherwise record the claim, blocker, and exact next check.
 
-## Gotchas
-
-- **A `block` mermaid diagram rejects rhombus/diamond node shapes (`{"label"}`)**. Use `flowchart` for decision shapes.
-- **A trace that ends in a double proves the wiring, not the behavior** — an environment, profile, or flag may substitute a mock, stub, in-memory fake, or recorded response. Record the double as its own Fact and follow the real implementation for behavior claims.
-- **Use production configuration for consistency, lag, and expiry claims.** An emulator, in-memory fake, or single-node instance can behave differently.
+Record the command or query, environment, and observation. For a distributed trace, record the correlation ID and observed handoffs. Keep runtime results separate from code-derived possibilities in the report.
