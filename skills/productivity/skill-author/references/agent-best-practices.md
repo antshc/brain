@@ -18,7 +18,7 @@ Cross-vendor synthesis (Claude Code, GitHub Copilot, OpenAI Codex, Grok Build, G
 
 ## Layer test
 
-Each layer owns one thing. An agent defines **who**; put other content in its owning layer.
+An agent defines **who**; place other content in its owning layer.
 
 | Layer | Owns | Examples |
 |---|---|---|
@@ -35,7 +35,7 @@ Each layer owns one thing. An agent defines **who**; put other content in its ow
 
 ## Description
 
-The description is a **routing interface**: it drives automatic selection (Claude Code, Gemini CLI, Copilot). Keep it short, concrete, exclusive.
+Treat the description as the automatic **routing interface**: short, concrete, exclusive.
 
 - Pattern: `[Capability]. Use when [trigger]. Do not use when [exclusion].` or `… Use [sibling] for [territory].`
 - Capability: imperative verb first, one observable outcome; triggers in words users type.
@@ -68,12 +68,12 @@ Normative words carry clarity, not keyword semantics:
 - Use `MUST` sparingly, for actual invariants.
 - Add a terse rationale to consequential constraints (`Rationale: Existing clients depend on it.`).
 - Prohibit plausible substitutions explicitly ("MUST NOT replace the required SQLite persistence, even if faster").
-- Write plain, testable constraints. For a repeatedly missed rule, shorten the file or enforce with a hook or deny rule instead of `IMPORTANT`, `CRITICAL`, ALL CAPS, or repeated `ALWAYS!!!`.
+- Write testable constraints. For repeatedly missed rules, shorten the file or use hooks/deny rules instead of emphasis.
 
 ## Tools and permissions
 
 - Explorers and auditors get read and search only.
-- Reviewers and verifiers get read, search, and execute; no edit. Rationale: reviewers that navigate and run repository code catch more critical issues with fewer false positives than diff-only review. Where execute permits writes (shell), list a sandbox or deny rule as runtime control.
+- Reviewers/verifiers: read, search, execute; no edit. Repository execution improves evidence beyond diffs. Where execution permits writes, report a sandbox or deny rule as runtime control.
 - Keep model and tool metadata separate from behavioral text; no credentials or provider-specific tool names in portable instructions.
 - Model specialization (different model or effort for exploration, implementation, review) is optional; benchmark first.
 
@@ -86,9 +86,9 @@ Normative words carry clarity, not keyword semantics:
 
 ## Coding agents
 
-Apply to agents that edit code (implementer, fixer, refactorer, tester). Risk-based synthesis for large codebases, not a standard; validate a changed policy on comparable tickets (end-to-end time, rework, verifier pass rate, escaped regressions) before adopting it.
+For code-editing agents. Risk-based guidance, not a standard: validate policy changes on comparable tickets using elapsed time, rework, verifier pass rate, and escaped regressions.
 
-- **Context:** short body; link authoritative architecture, plan, and build/test docs conditionally. Point to repository build/test instructions and a prepared environment instead of command discovery by trial.
+- **Context:** short body; conditionally link authoritative architecture, plan, build/test instructions, and prepared environment; avoid command discovery by trial.
 - **Scope:** one ticket or plan slice per run. Large change → plan first, or split planner and worker agents.
 - **Exploration stop:** find affected symbols, callers, external boundaries, nearby conventions, actual test counterparts, smallest build boundary; stop when context suffices.
 - **Implementation:** thin coherent slice; reuse existing models, utilities, test fakes, layering, naming; no speculative abstractions or unrelated cleanup.
@@ -125,7 +125,7 @@ Constraints every coding agent carries:
 
 ## Planner agents
 
-Apply to agents that decompose a feature, spec, or plan into tasks for independent implementers (parallel workers, worktrees). Synthesis of Cursor, OpenAI Symphony, Copilot, Anthropic agent-teams practice, October 2026; benchmark on representative features before imposing thresholds.
+For feature/spec/plan decomposition into independent implementer tasks. Cross-vendor synthesis, October 2026; benchmark representative features before imposing thresholds.
 
 - **Goal:** accepted, integrated behavior per elapsed hour; not task count, agent count, or commits. A sequential graph is a valid result.
 - **Role split:** planner owns requirement coverage, exploration, task contracts, blocker graph, conflict prediction, critical path. Scheduler owns DAG validation, slots, worktrees, dispatch, retries. Implementer owns one task. Integrator owns serialized merges and post-merge checks. Verifier owns integrated acceptance. Planner tools: read, search; no edit, no execute beyond read-only inspection. Rationale: workers cannot repair a planner's invented facts or scope creep.
@@ -149,7 +149,7 @@ Decomposition:
 | Horizontal split | Only for independent module migrations, mechanical repo-wide edits, stable interface implementations |
 
 - Size by coupling, context load, time to feedback, integration risk; never by fixed files, lines, or tasks per worker.
-- **Model-aware task size:** Keep cohesive, even multi-hour, behavior with one capable implementer. Merge trivial work when coordination dominates; split only at independently verifiable, stable-contract, disjoint-write seams. Never split just to shorten runtime or increase worker count. Prefer stronger models for complex work; benchmark cheaper models on bounded tasks using total verified cost and time. Model selection belongs to the workflow.
+- **Model-aware task size:** keep cohesive, even multi-hour, work with one capable implementer; merge trivial work when coordination dominates. Split only at independently verifiable, stable-contract, disjoint-write seams, never for shorter runtime or more workers. Workflow selects models: prefer stronger for complexity; benchmark cheaper on bounded tasks by total verified cost/time.
 - Tests ship with each behavior slice; no standalone "write tests" task per coding task. Independent black-box verification may be a downstream task.
 - **Readiness:** a worker identifies behavior, permitted scope, real source context, contracts, executable checks, handoff format without asking another worker.
 
