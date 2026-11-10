@@ -7,7 +7,7 @@ from typing import Any
 from urllib.parse import quote, urlencode
 
 from .gh import Gh, GhError, Ref, UsageError, parse_ref, read_body, repository, request
-from .git import checkout, sha, verify_remote
+from .pr_git import checkout, sha, verify_remote
 from .implement_spec import cmd_pr_diff_split, find_pr, pr_checks
 from .issues import read_comments
 

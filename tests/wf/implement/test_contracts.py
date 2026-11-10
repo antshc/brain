@@ -418,7 +418,7 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert 'Review never fixes code' in review
     finalize = post.split('## Finalize\n')[1].split('\n## ')[0]
     assert 'posting failure' in post.lower()
-    for text in ('stale', 'pending', 'failed', '`github` Worktrees tactic', 'RUN_DIR/worktrees/integration.json'):
+    for text in ('stale', 'pending', 'failed', '`git` Worktrees tactic', 'RUN_DIR/worktrees/integration.json'):
         assert text in finalize
     assert 'do not restart Address' in finalize
     assert 'Diagnose' not in finalize

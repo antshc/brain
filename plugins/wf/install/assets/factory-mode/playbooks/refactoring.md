@@ -11,6 +11,6 @@ Cleanup reveals a missing feature or real bug → report it separately; ship the
 5. Move in small behavior-preserving steps, each keeping the pin green. API reshape → migrate every caller and delete the old API in the same wave; no shims (**Migrate callers, then delete**). Spot-check renames against strings, docs, and back-references. C# → *run `csharp-refactoring` skill to safely rename, move, extract, or inline C# code without changing behavior.* Delegate mechanical edits with a specific scope: files, names moved, behavior to hold.
 6. Prove behavior unchanged on the real artifact (**Prove it works**). Larger reshapes → equivalence check: diff old vs new outputs, replay a recorded baseline, or smoke-run the matching surface.
 7. Confirm it earns its place. Success measure is reduced reader load (**Minimize reader load**); no reduction → revert.
-8. Use the `github` **Draft commit** tactic. Rebase into ordered commits: subtraction, reshape, follow-on cleanup; each green (**Verifiable units**). Run Opening a PR.
+8. Use the `git` **Draft commit** tactic. Rebase into ordered commits: subtraction, reshape, follow-on cleanup; each green (**Verifiable units**). Run Opening a PR.
 
 **Reply:** the structure that changed, the pin, the equivalence proof, the reader-load delta, what shipped and what got reverted. No new behavior.

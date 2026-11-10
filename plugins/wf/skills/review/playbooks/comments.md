@@ -28,10 +28,10 @@ Done when actionable reply/reconciliation work is in hand, or waiting/incomplete
 
 ## 1. Setup
 
-Use the `github` Repository, Branches and Worktrees tactics for setup.
+Use `git` Repository, Branches and Worktrees for checkout setup; `github` PR and Reviews tactics for remote discussion.
 
 1. Derive `CODEBASE_REPO_PATH` for `{{owner}}/{{repo}}` (the PR's repository, from §0): the Git repository of the current directory (`git rev-parse --show-toplevel`) whose `origin` remote (`git remote get-url origin`) normalizes to `{{owner}}/{{repo}}`. Missing, or a clone of another repository → **stop** before touching any review thread, post no replies, and report why.
-2. Capture `HARNESS_ROOT` from the launch context before changing directories. Fetch the PR head and base from verified `origin`; verify the local head ref equals the captured `headOid`. *Run `github` Worktrees tactic to create an isolated worktree* on `$headRef` from that SHA, with `CODEBASE_REPO_PATH` as source, leaf `pr-{{number}}` and a unique run ID. Save its ownership record in a run-owned temp directory outside all checkouts. Set the branch upstream to `origin/$headRef`, then enter the returned `WORKTREE_PATH`. Collision or mismatch → stop and report.
+2. Capture `HARNESS_ROOT` from the launch context before changing directories. Fetch the PR head and base from verified `origin`; verify the local head ref equals the captured `headOid`. *Run `git` Worktrees tactic to create an isolated worktree* on `$headRef` from that SHA, with `CODEBASE_REPO_PATH` as source, leaf `pr-{{number}}` and a unique run ID. Save its ownership record in a run-owned temp directory outside all checkouts. Set the branch upstream to `origin/$headRef`, then enter the returned `WORKTREE_PATH`. Collision or mismatch → stop and report.
 
 Done when `git rev-parse --abbrev-ref HEAD` prints `$headRef` and `HEAD` equals `origin/$headRef`.
 
@@ -84,7 +84,7 @@ Take the issues one at a time. Per `issue`:
 
 1. `chore`, or `verdict: fix-needed` → apply the change, scoped to that `issue` alone.
 2. Run `$buildCommand`, then `$testCommand` over the changed files. A failure this `issue` caused → `git checkout -- {{paths}}` and carry the `issue` forward as `unclear`.
-3. *Run `github` tactic **Draft commit*** for the verified fix. Commit on the existing PR head and name the `issue` and threads it answers in the body.
+3. *Run `git` tactic **Draft commit*** for the verified fix. Commit on the existing PR head and name the `issue` and threads it answers in the body.
 
 An `issue` whose `verdict` is `no-change-needed` or `unclear` produces no commit.
 
@@ -124,7 +124,7 @@ Done when each actionable thread has a confirmed answer and independent closure 
 
 ## 9. Cleanup
 
-If setup created a worktree, leave `WORKTREE_PATH` and verify the remote PR head equals the verified local HEAD. *Run `github` Worktrees tactic to remove the finished worktree* with the saved record and verified HEAD. After verified removal, delete the local branch through the `github` Branches tactic using the verified published head. Preserve and report blocked cleanup and any remaining path or branch.
+If setup created a worktree, leave `WORKTREE_PATH` and verify the remote PR head equals the verified local HEAD. *Run `git` Worktrees tactic to remove the finished worktree* with the saved record and verified HEAD. After verified removal, delete the local branch through the `git` Branches tactic using the verified published head. Preserve and report blocked cleanup and any remaining path or branch.
 
 Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is gone; the remote branch and the PR are untouched.
 
@@ -140,7 +140,7 @@ Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is go
 
 ## Rules
 
-- Push to `$headRef` through the `github` Branches tactic using the originally observed remote SHA. `--force`, `--force-with-lease`, `--amend`, and rebasing a pushed commit stay off the table — the reviewer is reading these commits as you write them.
+- Push to `$headRef` through the `git` Branches tactic using the originally observed remote SHA. `--force`, `--force-with-lease`, `--amend`, and rebasing a pushed commit stay off the table — the reviewer is reading these commits as you write them.
 - One `issue`, one commit. One run, one push.
 - Ask the reviewer outright the moment the `evidence` runs out. A question costs the reviewer less than a wrong guess.
 - Reply to new work; reconcile unresolved agent threads without duplicate replies. An unanswered question remains open until clarification; a posted answer alone is not completion.

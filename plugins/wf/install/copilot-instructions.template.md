@@ -120,4 +120,4 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 - **AWS Documentation MCP Server** (`aws-knowledge-mcp-server`) — read-only official AWS docs lookup; see the `search-aws-docs` skill.
 - **`mmdc` (`@mermaid-js/mermaid-cli`)** — renders Mermaid diagrams (e.g. from docs) to images/SVG/PDF; installed globally via `npm install -g @mermaid-js/mermaid-cli`. Verify with `mmdc --version`.
 
-Use the installed WF `github` skill for branch, commit, worktree, PR, issue and label operations. Apply the source/tracker guard above before routing.
+Use WF `git` for branches, commits, worktrees and their conventions; `github` for PRs, issues, labels and GitHub evidence. Apply the source/tracker guard before routing.

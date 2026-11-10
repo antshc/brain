@@ -1,7 +1,7 @@
 ---
 name: github
 description: >-
-  Run Git and GitHub mechanics for branches, commits, worktrees, specs, tickets, issues, pull requests, review threads, and checks. Use for 'name a branch', 'publish a spec', 'fetch a PR', 'post a reply', 'inspect checks'. Not for judging what a review comment needs → `review`.
+  Run GitHub platform mechanics for repositories, specs, tickets, issues, pull requests, review threads, and checks. Use for 'publish a spec', 'fetch a PR', 'post a reply', or 'inspect checks'. Branches, commits and worktrees belong to `git`; review judgment belongs to `review`.
 ---
 
 # GitHub
@@ -10,10 +10,7 @@ Select one operation below. Load its tactic only, then follow any reference it s
 
 | Intent | Tactic |
 | --- | --- |
-| Resolve a repository or read/search remote evidence | [Repository](tactics/repository.md) |
-| Name, inspect, create, fetch, push, or delete a branch | [Branches](tactics/branches.md) |
-| Draft a commit, read history, or commit authorized files | [Commits](tactics/commits.md) |
-| Inspect, create, reuse, remove, or reconcile a worktree | [Worktrees](tactics/worktrees.md) |
+| Read/search GitHub repository metadata or pinned evidence | [Repository](tactics/repository.md) |
 | Read or change issues, labels, assignees, or relationships | [Issues](tactics/issues.md) |
 | Publish a spec or ticket, read a graph, or handle issue artifacts | [Specs and tickets](tactics/specs-and-tickets.md) |
 | Draft or read PR metadata, publish, get a diff, or post a conversation comment | [Pull requests](tactics/pull-requests.md) |
