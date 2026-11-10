@@ -26,6 +26,20 @@ def test_evidence_corrections_do_not_require_approval_without_checkpoint():
     assert "review-log.md" in evidence
 
 
+def test_architect_uses_fixed_three_runner_arena_with_cross_judge():
+    skill = (DESIGN / "SKILL.md").read_text()
+    architect = (DESIGN / "playbooks/architect.md").read_text()
+    interrogate = (DESIGN / "playbooks/interrogate.md").read_text()
+    readme = (DESIGN / "README.md").read_text()
+    factory = (FACTORY / "playbooks/feature.md").read_text()
+
+    assert "arena-agents" not in "\n".join((skill, architect, interrogate, readme, factory))
+    assert "three independent runners" in architect
+    assert "cross-judge" in architect
+    assert "three runners and cross-judging" in readme
+    assert "three-runner Arena" in factory
+
+
 def test_factory_uses_one_autonomous_feature_flow_and_optional_checkpoint():
     playbook = (FACTORY / "playbooks/feature.md").read_text()
     skill = (FACTORY / "SKILL.md").read_text()
@@ -34,7 +48,7 @@ def test_factory_uses_one_autonomous_feature_flow_and_optional_checkpoint():
     assert "## Interactive" not in playbook
     assert "## Auto" not in playbook
     assert "Select mode" not in playbook
-    assert "arena-agents=1" in playbook
+    assert "three-runner Arena" in playbook
     assert "`design interrogate` with `adversaries=3`" in playbook
     assert "design-only handoff" in playbook
     assert "forward `checkpoint` only when the user explicitly asks" in playbook

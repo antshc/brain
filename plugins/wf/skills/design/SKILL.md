@@ -28,8 +28,8 @@ One entry point; route to one playbook. Do not load unrelated routes.
 
 ## Architect options and behavior
 
-- Accept `arena-agents=1|2|3`, default `1`; reject other values before Arena. Retain the count across correction re-runs.
-- Accept `adversaries=1|2|3`, default `1`, independently for Interrogate.
+- Architect always runs Arena with three independent runners and cross-judging enabled, including correction re-runs. Use the shared `subagents` Arena rules for unavailable runners or judges.
+- Accept `adversaries=1|2|3`, default `1`, for Interrogate.
 - `checkpoint` is opt-in, only when explicitly requested; preserve it through caller handoffs. Otherwise Architect implements after review by default. An explicit **design-only handoff** returns the sketch for `design spec` without implementing.
 - `architect sketch` routes to `sketch` only, `architect interrogate` to `interrogate`, and `architect deep-module` to `deep-module`, for intent compatibility. Prefer the direct `design <route>` spelling.
 

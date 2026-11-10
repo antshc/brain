@@ -14,7 +14,7 @@ The scope is what the user names. Otherwise it is the branch diff from its merge
 
 ## Fan out
 
-*Run `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Use the ordered `interrogate reviewers` pool and the caller's `adversaries` count (1–3, default 1, independent of `arena-agents`). Give each general-purpose reviewer an isolated worktree with the scope's uncommitted changes, the scope and intent, and this brief:
+*Run `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Use the ordered `interrogate reviewers` pool and the caller's `adversaries` count (1–3, default 1, independent of Architect's fixed Arena runner count). Give each general-purpose reviewer an isolated worktree with the scope's uncommitted changes, the scope and intent, and this brief:
 
 > Read `experiment` skill's Inputs and Workflow before starting, then *run `experiment` skill to test uncertain technical behavior through observation*, filling `@question` = the claim, `@criteria` = success/refutation criteria, `@repoFacts` = intent, scope, runnable target, and prior evidence, `@limits` = safety limits and your worktree. Invoke it directly, without the Prove wrapper or nested Interrogate; reuse valid reproductions and preserve them until coordinator verification. Keep state local or in authorized sandboxes; never use destructive production targets or expand credentials/permissions.
 
