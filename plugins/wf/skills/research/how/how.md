@@ -1,34 +1,24 @@
 # How
 
-Grounding procedure of the Research skill. Paths resolve from the skill base directory.
+Use this template for every saved answer about current system behavior. Write one Markdown document per system question. Give a senior engineer enough context to trace the mechanism and find the source.
 
-Explore the codebase to answer "how does X work?" questions. Produce architectural explanations at the level of a senior engineer onboarding onto a subsystem, enough to build a working mental model, not so much that it reads like annotated source code.
+## Answer
 
-For each stage, *run `subagents` skill to dispatch independent workers* using **Dispatch**. Spawn every explorer and explainer as the `hunter` agent with its own model; pass no model override. `hunter` unavailable → `explore` agent per the Explore request fallback.
+Lead with the direct answer in one or two short paragraphs. Name the outcome and the condition or boundary that determines it. Frame the answer and scope in domain terms before introducing implementation details.
 
-**Spawn as Explore request.** Read this skill's **Explore request**; form per spawn: `@work` = the filled prompt template as prompt instruction (verbatim); `@depth` = `thorough` for explorers, `medium` for the simple-path explainer, `quick` for the synthesizing explainer; `[@target]` = repositories or services the question names; `@outputShape` = the template's Output section. Spawn each subagent with its request verbatim, instructing it to *run `research` skill Explore route for the inline read-only lookup — where is, what calls, flow, config evidence*. Research missing from the plugin → spawn the same agent with the filled prompt template alone, as below.
+## How it works
 
-## 1. Assess complexity
+Explain the mechanism from trigger to outcome. Define key concepts when they first matter. Name concrete services, calls, decisions, and data where they help the reader follow the trace. Keep a narrow answer short.
 
-If the scope is ambiguous, state your interpretation and explore. The user can redirect.
+Integrate relevant Behavior, Flow, and Data findings into this explanation. Include the lane decision, storage detail, or provider rule that changes the answer at the point where it matters. Explain each step once. Add a diagram or table when it clarifies relationships or comparisons. Follow the applicable lens and diagram guidance and render every included Mermaid block.
 
-- **Simple** (a single module, a small utility, a narrow question such as "how does function X work"): no explorers. Spawn one explainer that explores and explains in one pass, built from `how/explainer-prompt.md` without the explorer-findings section. Go to step 4.
-- **Complex** (a subsystem spanning multiple files or services, a cross-cutting feature, a full architectural overview): go to step 2.
+## Additional sections
 
-When in doubt, take the simple path.
+Include only sections the question needs, such as **Where things live**, **Failures and edge cases**, **Runtime observations**, or **Assumptions and unknowns**. Report observed results with the environment and check used. For an unresolved claim, name the blocker and the exact next check. Explain non-obvious behavior where it changes the answer.
 
-## 2. Explore (complex only)
+## Report checks
 
-Decompose the question into 2 to 4 angles, each a distinct slice of the subsystem. Spawn all explorers in a single message, each with `how/explorer-prompt.md` and its angle filled in. Fill placeholders only; keep the Read-only paragraph verbatim.
-
-## 3. Synthesize (complex only)
-
-Once all explorers have returned, spawn one explainer with `how/explainer-prompt.md` and every explorer's findings filled in.
-
-## 4. Present
-
-Return the explainer's output to Research. Require `file:line` evidence for code claims, and mark gaps. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.
-
-## Output format
-
-The explanation uses the sections defined in `how/explainer-prompt.md`, dropping any that do not apply: Overview, Key Concepts, How It Works, Where Things Live, Gotchas.
+- Cite each material claim in place. Use repository links such as `[orders.py](../../src/orders.py#L42):L42-54`. Use the filename as the label and show the line or range outside the link. For remote source, pin the commit and line. Quote the deciding line when it helps.
+- Reconcile conflicting evidence before writing. Distinguish executing source, documented intent, and observations from a specific runtime. Label assumptions and unknowns.
+- Honor the requested `@outputShape` path and framing in one document. Use `docs/research/<slug>-chain.md` for single-axis Flow and `docs/research/<slug>-data.md` for single-axis Data. Use `docs/research/<slug>.md` for focused, Behavior, and combined work.
+- Remove placeholders and unused sections. Report the saved path and material gaps.

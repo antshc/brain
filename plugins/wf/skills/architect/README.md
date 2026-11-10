@@ -23,7 +23,7 @@ Trigger: `/architect`, "architect this", "design this". Use for non-trivial work
 
 | Phase | What happens | Output |
 |---|---|---|
-| A Ground | Research How explains the touched subsystems; Research Why adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
+| A Ground | Default Research explains the touched subsystems; Research Why adds history and rationale when the design redefines ownership or layering; technical unknowns automatically route to Research or Experiment | grounding notes and evidence |
 | B Sketch | `arena`: one runner by default; with 2–3, compare candidates and graft good ideas | usage sketch, module map, types, rationale |
 | C Review | resolve technical questions and challenge material claims automatically; pause only for an explicit checkpoint, then support **accept**, **implement**, **corrections**, **interrogate**, **prove**, or **ask** | `review-log.md` |
 | D Hand off | when the caller requests a design-only handoff, return the sketch for `/design spec` | design artifacts |
@@ -51,7 +51,7 @@ Checkpoint replies use plain chat. An ambiguous reply is never treated as accept
 
 ## Open questions and risks
 
-Architect resolves source facts (codebase, NuGet packages, cloud, web) through Research, which routes codebase and NuGet parts through its Explore route and NuGet tactic, and runtime uncertainty through Experiment before review. Material falsifiable claims automatically trigger Interrogate when a safe runnable target exists. Examples: SDK-version contracts need research; CLI capabilities or concurrency need execution; retry duplication needs an adversarial probe. Research owns its specialist fan-out.
+Architect resolves source facts (codebase, NuGet packages, cloud, web) through Research, which delegates codebase and NuGet evidence to Hunter, and runtime uncertainty through Experiment before review. Material falsifiable claims automatically trigger Interrogate when a safe runnable target exists. Examples: SDK-version contracts need research; CLI capabilities or concurrency need execution; retry duplication needs an adversarial probe. Research owns its specialist fan-out.
 
 Open questions and risks remain phrased as questions; without checkpoint, apply evidence-backed corrections and document reasonable defaults. With checkpoint, design corrections wait for your reply. Unanswered ones carry into the spec. Unchanged evidence and existing Interrogate coverage are reused; changes recheck only affected assumptions. Review includes evidence, limitations, and proposed corrections.
 

@@ -1,6 +1,6 @@
-# Research System
+# Current-system research
 
-Prompt examples and recommendations for getting precise, evidence-backed results from the `research` skill when it inspects a codebase (Behavior, Flow, or Data axis).
+Use `research` for both a narrow “how does this work?” question and an explicit inspection. A saved answer uses [How](../how/how.md) with cited findings. Hunter supplies the evidence.
 
 ## Write a strong instruction
 
@@ -22,7 +22,7 @@ Include the details that materially change the investigation:
 - Provide an output path only when the default location under `docs/research/` is unsuitable.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
-The skill selects the inspection axis and appropriate diagram from the question. Describe what you need to understand rather than prescribing a diagram type.
+Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document can return Hunter’s verdict inline. Keep outcome-relevant lens findings in the same answer.
 
 ## Behavior instruction examples
 

@@ -26,7 +26,7 @@ Add a Scrap entry when Phase F triggers.
 
 ## Phase A: Ground the problem
 
-Build a mental model of touched subsystems from Repo docs and code. *Run `research` skill to investigate primary sources and save cited findings* using **How**. Pass the relevant subsystems, repo docs and `@outputShape` for `<artifact-root>/grounding-how.md`. When ownership or layering changes, call **Why** with the existing boundary and `@outputShape` for `<artifact-root>/grounding-why.md`. Treat supported rationale as a constraint.
+Build a mental model of touched subsystems from Repo docs and code. *Run `research` skill to investigate primary sources and save cited findings* using default Research for current behavior. Pass the relevant subsystems, repo docs and `@outputShape` for `<artifact-root>/grounding-how.md`. When ownership or layering changes, call **Why** with the existing boundary and `@outputShape` for `<artifact-root>/grounding-why.md`. Treat supported rationale as a constraint.
 
 Skip subsystem grounding only when the work is genuinely greenfield with no surrounding system to integrate. Before Phase B, resolve technical questions through `design/evidence-routing.md`, including greenfield work.
 
@@ -66,7 +66,7 @@ Before continuing, run `design/evidence-routing.md` on open questions and materi
    - **Corrections with `arena`** → apply as above, then *run `subagents` skill to compare independent candidates and synthesize findings* using **Arena** with the corrected incumbent, next revision number, same Phase B contract, and corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
    - **Interrogate** → run the `interrogate/interrogate.md` procedure on the current sketch. Resolve verified contract findings through Deep-module design in `SKILL.md`. Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
    - **Prove** → run the `prove/prove.md` procedure on the question in the reply; run its Attack step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
-   - **Ask** → answer from Phase A grounding, using Phase A's Research call in **How** or **Why** mode when needed, with a distinct grounding output for the new question; present the answer, then start the next round.
+   - **Ask** → answer from Phase A grounding, using Phase A’s default Research or **Why** call when needed, with a distinct grounding output for the new question; present the answer, then start the next round.
    - **Accept** → go to Phase D for a design-only handoff; otherwise Phase E.
    - **Implement** → go to Phase E.
 
@@ -103,7 +103,7 @@ Use judgment. A few edge cases don't condemn an architecture. Complexity in the 
 When you scrap:
 
 1. Tell the user which tells fired, with file evidence; append to `review-log.md`.
-2. Use Phase A's Research **How** call over what was built. Save revised grounding beside the original and pass it into the new Phase B.
+2. Use Phase A’s default Research call over what was built. Save revised grounding beside the original and pass it into the new Phase B.
 3. Redesign as if the new constraints had been day-one assumptions, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Redesign from first principles` principle*.
 4. Subtract before adding, per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `Subtract before you add` principle*. The new sketch is smaller than the old one before it grows.
 5. Return to Phase B and re-run arena, then Phase C review.

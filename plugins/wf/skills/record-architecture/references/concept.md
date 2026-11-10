@@ -63,7 +63,7 @@ Runs before Body. Give every rule a source and check it by that source:
 
 | Rule source | Check | Record shows it as |
 |---|---|---|
-| **Implemented** — target code exists | Read `research` skill's **Explore request**; form the rule's lookup and output shape; spawn a `hunter` subagent (unavailable → `explore`) with it verbatim, instructing it to *run `research` skill Explore route for the inline read-only lookup — where is the rule implemented, what calls it, flow*. Code contradicts the rule → stop; ask the user which wins. | `Implementation Map` row |
+| **Implemented** — target code exists | Read `research` skill's **Explore request**; form the rule's lookup and output shape; send it verbatim to a `hunter` subagent. If Hunter is unavailable, record the blocked lookup and continue independent rules. Code contradicts the rule → stop; ask the user which wins. | `Implementation Map` row |
 | **Decided** — target code does not exist yet | Decision comes from the user, the caller, or an ADR. Do not search for an implementation; do not mark it `not verified`. | Rule only, no map row; add the row once code exists |
 | **Ported** — rule comes from another project | Restate it in the target's stack and conventions; it then counts as Implemented or Decided. | Per the resulting source |
 
