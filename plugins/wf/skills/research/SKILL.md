@@ -90,7 +90,7 @@ Read triggered resources in full from this skill base, not caller CWD. These dir
 
 ## Dispatch and delivery
 
-For independent non-How workers, *run `subagents` skill using Dispatch for independent workers and role-based models*. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
+For independent non-How workers, *run `subagents` skill to dispatch independent workers with role-based models* using Dispatch. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
 
 Cloud briefs include provider, mode (`question` or `implementation`), services, operations, region, account/subscription, relevant dimensions, and need for live values. Pass the loaded contract, template, and selected provider; request the filled report inline.
 

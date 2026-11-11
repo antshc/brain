@@ -4,7 +4,7 @@ One subagent per substantive `issue`, each returning a `verdict` backed by `evid
 
 ## Discover the investigation skills
 
-Investigation skills are named `search-*`, `inspect-*`, and `explore-*`. The skills available to you are already enumerated in your system context. Filter that list to names matching those prefixes.
+Investigation skills are named `search-*`, `inspect-*`, and `explore-*`. The skills available to you are already enumerated in your system context. Filter that list to names matching those prefixes. Render each applicable call as *Run `skill-name` skill to <3–6 distinctive keywords from its description>*, using its exact plain name; never send the placeholder literally.
 
 Prioritize these matched skills over generic search/read tools for any issue within their stated scope.
 
