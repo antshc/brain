@@ -1,7 +1,7 @@
 ---
 name: prove
 description: >-
-  Confirm or refute one technical claim with reproducible evidence. Use for /prove, 'run an experiment', 'try it and see'. Not for adversarial change review → `interrogate`; broken or slow behavior → `diagnosing-bugs`.
+  Confirm or refute one technical claim with reproducible evidence. Use for /prove, 'run an experiment', 'try it and see'. Not for adversarial change review → `challenge-this`; broken or slow behavior → `diagnosing-bugs`.
 ---
 
 # Prove

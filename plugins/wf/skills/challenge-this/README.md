@@ -1,6 +1,6 @@
-# Interrogate examples
+# Challenge this examples
 
-- `/interrogate this PR; intent: preserve acknowledged writes; target: local stack`
+- `/challenge-this this PR; intent: preserve acknowledged writes; target: local stack`
 - `Challenge this cache change for concurrent readers.`
 - `Stress test this code against its retry contract; adversaries=3.`
 - `Find blind spots in this design using the existing integration environment.`

@@ -1,10 +1,10 @@
 ---
-name: interrogate
+name: challenge-this
 description: >-
-  Find failures in a change or design with reproduced counterexamples. Use for 'interrogate', 'adversarial review', 'multi-model review', 'challenge this', 'stress test this code', 'find blind spots', 'tear this apart'. Not for one claim → `prove`; bug fixes → `diagnosing-bugs`.
+  Find problems in a change or design and show them with a run. Use for 'challenge this', 'stress test this code', 'find blind spots', 'tear this apart'. Not for one claim → `prove`; bug fixes → `diagnosing-bugs`.
 ---
 
-# Interrogate
+# Challenge this
 
 Adversaries try to break a change or design. Only findings proven by a run survive. Report findings; do not apply fixes. No verified findings means no counterexample found within the reported coverage, not proof of correctness.
 
@@ -26,7 +26,7 @@ Reject an adversary count outside the documented values before dispatch. Resolve
 
 ## Fan out
 
-Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. *Run `subagents` skill to dispatch independent workers with isolated outputs* using Dispatch and the ordered `interrogate reviewers` pool, with the resolved adversary count. Use skill-capable general-purpose reviewers; request one isolated owned worktree each, copying only scoped uncommitted changes, unless supplied verified checkouts already satisfy isolation. Pass Frame, facts, prior reproductions, limits, exact output destinations and the completed prompt. Keep ownership records and evidence outside worktrees. No safe target/isolation → report blocked scope; continue independent checks only. Done when every assignment has a terminal report or named blocker.
+Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. *Run `subagents` skill to dispatch independent workers with isolated outputs* using Dispatch and the ordered `challenge-this reviewers` pool, with the resolved adversary count. Use skill-capable general-purpose reviewers; request one isolated owned worktree each, copying only scoped uncommitted changes, unless supplied verified checkouts already satisfy isolation. Pass Frame, facts, prior reproductions, limits, exact output destinations and the completed prompt. Keep ownership records and evidence outside worktrees. No safe target/isolation → report blocked scope; continue independent checks only. Done when every assignment has a terminal report or named blocker.
 
 ## Verify
 
@@ -38,7 +38,7 @@ Independently rerun each finding's exact command in the reviewer's recorded envi
 - **Scope** — target/baseline, dirty inputs, environment, tested/excluded areas and blockers, including missing workers.
 - **Findings** — each verified failure: title, root cause/location, exact command/working directory, expected/actual output, violated intent, evidence/patch paths and adversaries. Say `no verified findings` when empty; report incomplete coverage separately.
 - **Dropped** — each adversary's dropped count and reasons.
-- **Handoff** — retained evidence, resource/worktree ownership and cleanup outcome. Contract findings return to Design for proposed Deep Module corrections; Interrogate supplies no interface redesign or fixes.
+- **Handoff** — retained evidence, resource/worktree ownership and cleanup outcome. Contract findings return to Design for proposed Deep Module corrections; Challenge this supplies no interface redesign or fixes.
 
 Preserve reports, patches and rerun prerequisites until verification and requested follow-up finish. Remove only run-owned resources, using *`git` skill for verified worktree lifecycle* with Worktrees; preserve caller-owned worktrees and report leftovers. Done when every resource is removed or explicitly handed back.
 

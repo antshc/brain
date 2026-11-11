@@ -21,7 +21,7 @@ def bundled_links(path: Path) -> Iterator[Path]:
             yield (path.parent / unquote(parts.path)).resolve()
 
 
-@pytest.mark.parametrize('name', ['prove', 'interrogate'])
+@pytest.mark.parametrize('name', ['prove', 'challenge-this'])
 def test_standalone_skill_resources_are_discoverable_and_local(name: str) -> None:
     root = SKILLS / name
     entry = root / 'SKILL.md'
@@ -39,8 +39,10 @@ def test_standalone_skill_resources_are_discoverable_and_local(name: str) -> Non
 
 def test_removed_entry_points_and_testing_kind_have_no_live_consumers() -> None:
     obsolete = ['experiment/SKILL.md', 'playbooks/prove.md',
-                'playbooks/interrogate.md', 'kinds/experiment.md']
+                'playbooks/interrogate.md', 'playbooks/challenge-this.md',
+                'interrogate/SKILL.md', 'kinds/experiment.md']
     assert not (SKILLS / 'experiment').exists()
+    assert not (SKILLS / 'interrogate').exists()
     assert not (TESTING / 'kinds/experiment.md').exists()
     for path in list(SKILLS.rglob('*.md')) + list(TESTING.rglob('*.md')):
         content = path.read_text()
@@ -50,13 +52,13 @@ def test_removed_entry_points_and_testing_kind_have_no_live_consumers() -> None:
 
 def test_execution_calls_are_one_way() -> None:
     integration = (SKILLS / 'prove/tactics/integration.md').read_text()
-    adversary = (SKILLS / 'interrogate/references/adversary-prompt.md').read_text()
+    adversary = (SKILLS / 'challenge-this/references/adversary-prompt.md').read_text()
     assert re.search(r'`testing-integrations` skill.*\*\*Select\*\*', integration)
     assert re.search(r'`testing-integrations` skill.*\*\*Run selected\*\*', integration)
     assert re.search(r'`prove` skill.*\*\*Execute\*\*', adversary)
     for resource in TESTING.rglob('*.md'):
         assert not re.search(r'\b(?:run|invoke|load|use)\s+`prove`\s+skill', resource.read_text(), re.I), resource
-    assert not re.search(r'\b(?:run|invoke|load|use)\s+`interrogate`\s+skill', (SKILLS / 'prove/SKILL.md').read_text(), re.I)
+    assert not re.search(r'\b(?:run|invoke|load|use)\s+`challenge-this`\s+skill', (SKILLS / 'prove/SKILL.md').read_text(), re.I)
 
 
 def test_testing_selection_and_execution_are_distinct_public_actions() -> None:

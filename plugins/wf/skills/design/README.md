@@ -12,10 +12,10 @@ One discoverable entry point for code architecture, standalone code sketches, de
 | `/design grill` / `/design spec` / `/design tickets` | Corresponding route | Decisions, spec or approved ticket breakdown |
 | `/design wayfinder` / `/design review` | Corresponding route | Decision map or design-gap assessment |
 
-Architect accepts `arena-agents=1|2|3` (default 1); Interrogate accepts `adversaries=1|2|3` (default 1). `checkpoint` requires explicit request. Explicit design-only handoff stops before implementation and returns the accepted `synthesis/` package to `design spec`.
+Architect accepts `arena-agents=1|2|3` (default 1); Challenge this accepts `adversaries=1|2|3` (default 1). `checkpoint` requires explicit request. Explicit design-only handoff stops before implementation and returns the accepted `synthesis/` package to `design spec`.
 
 Both `sketch` and `architect` use [one code-sketch contract](references/sketch-contract.md). The former makes one package; the latter uses that procedure for Arena candidates and synthesizes the selected package. Artifacts live under `<repo-root>/tmp/design-<slug>/` and the accepted package is always `synthesis/{sketch/,module-map.md,rationale.md}`.
 
 See [Skill router](SKILL.md) and [Architect playbook](playbooks/architect.md). `draft-artifact design` remains the owner of authoritative feature-design documents.
 
-Use `/prove <claim>` for empirical evidence and `/interrogate <scope>` for reproduced adversarial findings. Architect invokes these standalone skills as needed.
+Use `/prove <claim>` for empirical evidence and `/challenge-this <scope>` for reproduced adversarial findings. Architect invokes these standalone skills as needed.

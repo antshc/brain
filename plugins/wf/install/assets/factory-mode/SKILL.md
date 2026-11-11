@@ -83,7 +83,7 @@ Apply when the trigger matches; cite by bold name.
 
 - Run the playbook in this chat; delegate steps, never the playbook itself.
 - *Run `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Brief with file paths, the restated goal, scope, named data shape, constraints, and success criteria.
-- Use harness model and effort defaults unless the user names them. For Interrogate, pass the adversary count directly to that skill; it owns the configured `interrogate reviewers` role.
+- Use harness model and effort defaults unless the user names them. For Challenge this, pass the adversary count directly to that skill; it owns the configured `challenge-this reviewers` role.
 - Review worker diffs and own the summary.
 
 ## Throughput checkpoint
