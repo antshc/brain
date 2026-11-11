@@ -4,9 +4,9 @@ The unit is one data boundary: the governed item type, its authoritative writer,
 
 Identify the item and store first, then route every writer and reader through lookups. Verify keys, ownership, consistency, migration, concurrency, and retention in executing source.
 
-Add findings to the How report. The default single-axis Data path is `docs/research/{{slug}}-data.md`.
+Add findings to the How explanation; the caller owns any save destination.
 
-**Diagram:** none by default; the store, key, and shape tables carry the answer. When the brief asks for one, select the view from the question and *run `doc-diagram` skill for the Mermaid view*: behavior for access order or branching, architecture for ownership or deployment boundaries, or class for item types and their relationships. Keep evidence in the tables.
+The Explainer chooses visuals under Visualize. Supply access-order, ownership, shape, and key evidence; tables often explain data rules most directly.
 
 ## Workflow
 
@@ -16,9 +16,9 @@ Add findings to the How report. The default single-axis Data path is `docs/resea
 4. **Attribute every write to its writer** — find-references on the store binding and the grant that permits the write, across every repo that could hold one.
 5. **Read the shape off the write path** — the persisted attribute set is whatever the serializer emits, which drifts from what the model class declares: ignored members, custom converters, nulls dropped on write, and older items written by older code.
 6. **Settle each dimension** — Schemas, Ownership, Consistency, Migrations, Concurrency, Retention. Each section below names what to establish and the failure it catches.
-7. **Run a runtime check when static reading leaves a material claim open** — use System inspection’s runtime rules. Read a real item or inspect a query plan when authorized. Use a safe test target for concurrent writes.
+7. **Run a runtime check when static reading leaves a material claim open** — use Inspection evidence runtime rules. Read a real item or inspect a query plan when authorized. Use a safe test target for concurrent writes.
 
-**Done when** every access pattern names the key or index that serves it and every key and index names a pattern that needs it; every item type names its sole writer and its readers; every read states its consistency and its lag sources; every in-flight attribute change states its backfill and completion signal; every racing write states its guard; every item type states its retention; and the remaining unknowns can't change the answer.
+**Done when** every access pattern names the key or index that serves it and every key and index names a pattern that needs it; every item type names its writers, ownership model, and readers; every read states its consistency and its lag sources; every in-flight attribute change states its backfill and completion signal; every racing write states its guard; every item type states its retention; and any remaining unknown states its consequence for the answer.
 
 ## Schemas
 
@@ -34,9 +34,9 @@ A key design is only ever right relative to the access patterns, so record the p
 
 ## Ownership
 
-Establish, per item type: the **sole writer** — the one deployable that creates and updates it — plus every reader.
+Establish, per item type: the authoritative ownership model, every deployable that creates or updates it, and every reader. Prove sole-writer ownership only when the evidence establishes it; report multiple writers and coordination.
 
-Where the store has no cross-table foreign keys, ownership is a convention, not a constraint, so prove it rather than infer it from the name: cite the write call sites *and* the grant (IAM policy, role, database user, connection string) that permits the write. **Two deployables holding write grants to one item type is a finding even when only one writes today** — the grant is what makes the second writer possible.
+Where the store has no cross-table foreign keys, ownership is a convention, not a constraint, so prove it rather than infer it from the name: cite the write call sites *and* the grant (IAM policy, role, database user, connection string) that permits the write. **Multiple write grants are distinct from observed writers** — report both; the grant shows capability, not that the path executes.
 
 If a table helps, pair each access pattern with its serving key or index and cite its call site. Pair each key and index with the patterns it serves, or mark it unused.
 
@@ -46,8 +46,8 @@ Record readers as an implicit contract: a reader coupling to an attribute the wr
 
 Establish, per read: eventually or strongly consistent, and the lag source, and what the caller does with a stale answer. Verify consistency against the actual engine, configuration, and read path.
 
-- **Default is usually eventual**, with strong consistency a per-call option that costs more and is unavailable on some read paths.
-- **Secondary indexes lag the base store** — an item written and then queried through a global/cross-partition index in the same request can come back missing or stale. Indexes sharing the base partition key usually don't lag.
+- **Read guarantees** — establish the actual engine, isolation/consistency setting, API option, and applicable cost/availability constraints; do not assume an eventual or strong default.
+- **Indexes** — verify whether updates are synchronous or asynchronous for the actual engine/index type. Prove read-after-write behavior from its guarantees and the selected access path.
 - **Transactional scope** — what commits atomically together, and what is two writes that can half-fail. Name the intermediate state a half-failure leaves behind.
 - **Replicas** — cross-region replication, read replicas, and caches each add their own lag between the write and the read.
 
@@ -59,7 +59,7 @@ Where the store validates no shape on write, **migration means attribute-shape e
 
 Establish, per change: the attribute added, renamed, retyped, or dropped; the dual-read window and which code reads both shapes; the **backfill** mechanism (change-stream-triggered rewrite, scan-and-update job, or lazy-on-next-write); the signal that proves the backfill finished; and the rollback while it is in flight.
 
-**A rename is an add, a backfill, a read switch, and a drop** — four deploys, not one edit. A lazy backfill never completes for cold items, so it needs a floor date or a sweep.
+**Rolling compatibility** — identify any add, backfill, read-switch, and drop phases a rename needs; verify their deployment order for this engine and rollout. A lazy backfill leaves cold items unchanged unless another mechanism completes it.
 
 Where the store does validate shape, establish instead: the migration files and their order, whether the change is expand-then-contract or a breaking single step, and what it locks while it runs.
 
@@ -79,7 +79,7 @@ The failure this catches: one path guarded and another path writing the same ite
 Establish, per item type: how long it lives, what removes it, and what sees the removal.
 
 - **Expiry attribute** — which attribute drives it, its unit (epoch seconds versus milliseconds — the wrong unit deletes immediately or never), who sets it and on which writes, and whether updates refresh it.
-- **Delete latency** — expiry is typically best-effort and can trail the deadline by hours, so readers filter expired items themselves rather than trusting the store to have removed them.
+- **Delete latency** — establish the actual engine's expiry/removal guarantees and timing. Verify whether readers must filter logically expired items before physical deletion.
 - **Archive** — whether a change stream feeds an archive before deletion, and whether the archive write is confirmed before the item is unrecoverable.
 - **Soft versus hard delete** — a tombstone attribute leaves the item visible to every query that forgets to filter it, and to every index that projects it.
 - **Floors and ceilings** — a compliance minimum and a privacy maximum both constrain the number, and they are set outside the code.

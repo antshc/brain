@@ -1,0 +1,38 @@
+{
+  "runs": [
+    {
+      "date": "2026-11-11",
+      "baseRevision": "429e5c2f4fcc3f0806b5ae093bae429160f94929",
+      "revisionContext": "working tree implementing How orchestration; Draft followed by behavior-preserving Shrink",
+      "method": "fresh agent prompt checks with supplied evidence; no live service, Hunter runtime, Graphify, or package-cache evaluation",
+      "cases": [
+        {
+          "id": "explainer_captured_order_flow",
+          "request": "Explain how an accepted order reaches fulfillment and whether fulfillment is guaranteed; use Explainer prompt and report contract, return inline.",
+          "inputs": "Captured fictional source findings: Pending order commit precedes event publication with no outbox/shared transaction; event client retries twice then throws; worker consumes the logical event and marks Complete after accepted HTTP 202; deployment binding and downstream source unavailable; no runtime traces or rendering tools.",
+          "outcome": "passed",
+          "observed": [
+            "identified commit-before-publish failure and returned an inline explanation with a step table",
+            "kept event resource binding unverified despite matching logical topic names",
+            "distinguished HTTP acceptance from proven downstream completion",
+            "labeled findings as supplied source evidence rather than runtime observation",
+            "no diagram or artifact written"
+          ]
+        },
+        {
+          "id": "destination_conflict_and_missing_package_evidence",
+          "request": "Identify the package owning Type.Member, with conflicting explicit outputPath and legacy outputShape destinations.",
+          "inputs": "Namespace Vendor.Client only; no restored assets/assembly, Hunter, or source access.",
+          "outcome": "passed",
+          "observed": [
+            "reported package owner UNKNOWN instead of inferring from namespace",
+            "named restored assets, assembly, resolved version, XML/IL as next checks",
+            "reported both conflicting destinations and blocked saving",
+            "returned findings inline; no files written"
+          ]
+        }
+      ],
+      "limitations": "Other cases in how-scenarios.json are specified for future live evaluation, not reported as executed. These checks validate prompt behavior on supplied context, not production system behavior."
+    }
+  ]
+}

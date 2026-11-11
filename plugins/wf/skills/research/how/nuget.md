@@ -49,7 +49,7 @@ XML docs establish documented contracts, not executable behavior. For a signatur
 
 3. Search the decompiled folder with `rg`, read the relevant method, and distinguish actual implementation from the reference assembly.
 
-If the package is not restored, the symbol is not NuGet-owned, or tools are unavailable, report the precise unresolved step rather than claiming an API or implementation.
+If the package is not restored, the symbol is not NuGet-owned, or tools are unavailable, report the precise unresolved step rather than claiming an API or implementation. Do not restore or build solely to obtain evidence under Hunter's read-only contract.
 
 ## 4. Return evidence
 

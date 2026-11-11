@@ -24,3 +24,9 @@ Append one entry to `results.json` `runs` per eval run: label, agent revision, r
 - `claude-haiku-5.5` ≥ 11/12 with `@shape` sent.
 - `claude-sonnet-5` loads the skill on every case.
 - No run writes `graphify-out/` outside `cache/`; no `rg` install while `rg` is on `PATH`.
+
+## How orchestration evaluations
+
+`how-scenarios.json` covers discovery, cross-repository evidence, package implementation, terminal/access gaps, provider/data uncertainty, and caller-owned destinations. These complement Hunter routing cases; offline contract tests validate structure, not model behavior.
+
+Run each request in a fresh session with the Research skill and the caller context named in the case. Supply a representative read-only checkout or captured evidence when needed. Apply `commonChecks` plus each case’s checks to the transcript, requested writes, and produced explanation. Record the tested revision, supplied context, outcome, and evidence limits; do not report an unexecuted case as passed. For an Explainer-only check, supply the findings directly and use the bundled Explainer prompt and report contract.

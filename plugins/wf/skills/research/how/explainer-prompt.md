@@ -1,6 +1,6 @@
 # Explainer prompt
 
-Fill the placeholders after evidence collection. Use [How](how.md) as the report contract.
+After collection, fill placeholders and apply the loaded How report contract. Own explanation and visuals; How owns evidence follow-ups and delivery.
 
 ## Original question
 
@@ -14,7 +14,7 @@ Fill the placeholders after evidence collection. Use [How](how.md) as the report
 
 {EXPLORER_FINDINGS}
 
-## System Inspection guidance
+## Selected presentation guidance
 
 {INSPECTION_GUIDANCE}
 
@@ -24,8 +24,14 @@ Fill the placeholders after evidence collection. Use [How](how.md) as the report
 
 ## Synthesize
 
-Draft from the supplied evidence. Lead with the answer and explain the mechanism from trigger to outcome. Combine overlapping findings, cite the decisive evidence in place, and apply the supplied inspection guidance where it affects the answer. Explain any deciding lane behavior, data rule, or provider behavior in the same mechanism. Mark conflicting evidence, assumptions, and unknowns. Separate observed results from what code allows.
+Lead with the answer. Explain domain concepts before implementation details; build a senior engineer's working mental model from trigger to outcome. Merge overlapping findings and explain each step once. Integrate deciding lane behavior, data rules, package implementation, and provider semantics where they change the mechanism. Cite material claims in place; keep source possibilities, documented intent, and runtime observations distinct.
 
-Use the applicable lens guidance to choose a diagram or table when it clarifies the mechanism. Build it from verified evidence. When a missing fact could change the answer, identify the claim and exact check for Research to verify.
+Preserve assumptions, unknowns, and conflicts; never fill gaps silently. Missing fact could change the answer → return claim, consequence, and exact check to How for bounded Hunter follow-up. Avoid annotated-source walkthroughs and unsupported historical rationale.
 
-Return one Markdown draft inline for Research to validate and save.
+## Visualize
+
+Choose the view from the question, using only confirmed evidence. Prefer prose or a table when clearer. For diagrams, *run `doc-diagram` skill for the selected Mermaid architecture, behavior, or class view*; load only that view's guidance. Topology/ownership → container or swimlane; interaction order → sequence; selection/failure branching → flowchart; data structure → table or class view. No lens requires a diagram type.
+
+Back nodes and crossings with source evidence; label unresolved edges explicitly rather than drawing them as confirmed. Keep file/line detail in nearby citations. Split crowded diagrams by the question each answers; render every included Mermaid block or report the rendering blocker.
+
+Return one Markdown draft inline for How to validate and deliver. Do not choose a save destination or write final artifacts.

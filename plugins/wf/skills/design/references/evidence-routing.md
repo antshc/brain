@@ -21,9 +21,11 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 *Run `research` skill to investigate primary sources (codebase, NuGet packages, cloud docs, web) via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
-- `@outputShape`: Markdown; one result per topic/source part; location `<repo-root>/tmp/design-<slug>/research/`; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
+- `@outputPath`: exact file `<artifact-root>/research/<question-slug>.md` selected by Design; use distinct slugs for separate calls. For several independent reports, Design supplies a question-to-file mapping before dispatch; never pass only a directory.
+- `@outputBase`: absolute repository root.
+- `@outputShape`: Markdown; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
 
-Pass `@outputShape` verbatim; Research propagates it to every specialist and owns discovery, classification, and fan-out. **MUST NOT** dispatch separate research agents. Honor stronger specialist artifact-location contracts; index returned paths in the artifact root.
+Pass framing verbatim and destinations separately; Research owns discovery, classification, and fan-out and returns worker findings inline. **MUST NOT** dispatch separate research agents. Index the caller-selected report paths in the artifact root; no specialist may override them.
 
 Read final artifacts; check cited conclusions and applicable versions. Add findings to grounding/rationale before Arena or review; route empirical unknowns to Experiment.
 

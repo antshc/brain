@@ -2,7 +2,7 @@
 
 Hunter runs Explore for caller-supplied questions, prompt instructions, and named skills. It resolves targets, reads contracts, selects tools, enforces read-only rules, and returns evidence. The caller reads the Research skill's Explore request contract, forms the work and return shape, and dispatches Hunter with that request verbatim. If Hunter is unavailable, the caller reports the blocked evidence request and continues independent work.
 
-Research routes system questions, collects Hunter's evidence, and writes one cited answer using How. It returns pure lookup verdicts inline. Hunter uses Graphify for relationships where a graph covers the target and loads the NuGet tactic for package evidence. A caller may name the one output artifact Hunter is allowed to write.
+Research routes current-system questions to How. How owns discovery, depth, evidence dispatch and reconciliation, explanation, and delivery; Hunter executes the Explorer prompt. The Explainer synthesizes verified findings and selects useful diagrams. Callers own artifact destinations and supply exact `@outputPath` values and `@outputBase` for relative paths; all Research routes return inline findings when no save is requested. Research has no default report directory, filename, or lens suffix. It returns pure lookup verdicts inline. Hunter uses Graphify for relationships where a graph covers the target and loads the NuGet tactic for package evidence. A caller may name the one output artifact Hunter is allowed to write.
 
 ## Alternatives considered
 

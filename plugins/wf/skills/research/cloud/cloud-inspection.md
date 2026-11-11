@@ -1,8 +1,8 @@
 # Cloud inspection
 
-Inspector contract for a cloud part. Source of truth is the provider: official docs, API/SDK references, and the live account or subscription. Output: one Markdown file per provider, every claim cited in place.
+Inspector contract for a cloud part. Source of truth is the provider: official docs, API/SDK references, and the live account or subscription. Output: one Markdown draft per provider/question, every claim cited in place; coordinator owns delivery.
 
-Load only the brief's provider reference ([aws.md](aws.md) or [azure.md](azure.md)); leave the other unread. Fill [cloud-inspection-template.md](cloud-inspection-template.md).
+Use the brief's loaded provider reference; leave the other unread. Fill the loaded Cloud template.
 
 ## Contents
 
@@ -71,7 +71,7 @@ Never pool citations under a generic Sources section — it hides which claim is
 
 ## Output
 
-Write `docs/research/<slug>-<provider>.md` (`aws` | `azure`) unless `@outputShape` names a location. Flat path, no subfolder. Fill the template, obeying its `**Rules**` blocks and deleting every one of them from the result.
+Return the filled template inline for coordinator verification. Apply Caller-owned destinations from Research: saving requires an exact caller-supplied destination; define no default directory, filename, or provider suffix. Obey the template's `**Rules**` blocks and delete every one from the result.
 
 ## Done
 

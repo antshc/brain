@@ -2,13 +2,13 @@
 
 Rationale procedure of the Research skill. Paths resolve from the skill base directory.
 
-Investigate the motivation and intent behind code. Default Research explains current behavior in the How output template. `why` answers what forces led to its shape.
+Investigate the motivation and intent behind code. How explains current behavior. `why` answers what forces led to its shape.
 
 At each dispatch, *run `subagents` skill to dispatch independent workers with role-based models* using **Dispatch**. Use `general-purpose` with read-only instructions for MCP access and citation spot-checks. Use the role fallback on rejection, then the closest valid model of the same family.
 
 ## Operating Posture
 
-Operate as a **careful, cautious, and precise investigator**. Be honest about what you know vs what you're inferring. Read `why/epistemics.md` for the full confidence framework and phrasing guide. The synthesizer must follow it.
+Operate as a **careful, cautious, and precise investigator**. Be honest about what you know vs what you're inferring. Apply the loaded Epistemics confidence framework and phrasing guide. The synthesizer must follow it.
 
 ## Step 1. Understand the Target and the Question
 
@@ -83,7 +83,7 @@ Spawn one synthesizer. `model`: the `why synthesizer` role. It gets:
 
 ## Step 5. Present
 
-Return the synthesizer's output to Research for the requested report. You may lightly edit for clarity or add context from the conversation, but **do not rewrite the confidence language**.
+Return the synthesizer's output inline to Research for coordinator delivery under Caller-owned destinations. You may lightly edit for clarity or add context from the conversation, but **do not rewrite the confidence language**.
 
 ## Output Format
 
