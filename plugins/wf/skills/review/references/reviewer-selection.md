@@ -4,8 +4,8 @@ Resolve before spawning. Use a fresh, general-purpose read-only review subagent 
 
 ## Model routing
 
-Take the review level (`low`, `medium`, `high`) from the user's invocation or caller configuration; default `medium`. An unrecognized level fails before delegation; ask the user instead of guessing.
+For each eligible axis, choose uniformly at random between GPT Sol and Claude Opus, independently per axis; use `reasoning_effort: high`. Resolve each family to its latest version explicitly advertised by the runtime that supports High. Known IDs: `gpt-6.1-sol`, `claude-opus-5.5`; prefer newer supported versions when advertised. Use exact runtime IDs; never infer version names or substitute another family.
 
-Look up the level's model pool in the *Model selection* table. For each eligible axis, pick one pool entry uniformly at random, independently per axis. If the runtime rejects the picked entry, pick randomly among the remaining entries of the same pool; when the pool is exhausted, inherit the current model and disclose the limitation. Do not invent IDs absent from the table or caller configuration. If model selection is unsupported, inherit and record `model selection unsupported`. Model choice never reduces coverage/evidence requirements.
+If model discovery is unavailable, try the known IDs. If the selected model rejects High or is unavailable, try the latest advertised version in that family supporting High, then the other eligible family. Skip rejected entries. If neither family supports High, report a delegation blocker. If model selection is unsupported, inherit the current model and disclose `model selection unsupported`; do not claim the requested model or effort took effect. Model choice never reduces coverage/evidence requirements.
 
-Before delegation, record: reviewed SHA, review level, and per axis the requested model and effort plus any rejection/fallback. Record actual model when exposed; never claim an unobservable selection took effect.
+Before delegation, record the reviewed SHA and per-axis requested model and effort, including rejections/fallbacks. Record actual model when exposed; never claim an unobservable selection took effect.
