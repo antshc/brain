@@ -6,25 +6,9 @@ Route to one owning deployable and stop at effects leaving it. For an API, start
 
 Add findings to the How report. If the question refers to an existing chain, cite the chain and lane and use the confirmed inbound contract to bound the trace.
 
-## Diagram
+## Presentation
 
-Pick the diagram from what the question asks, then run its owning skill.
-
-| Inspection topic | Draw | Skill |
-|---|---|---|
-| the call chain end to end — interaction order, cross-boundary calls, returns, failure branching | a **sequence diagram** | `doc-diagram` |
-| which branch fires — config or feature-flag branching, provider selection and fallback, error and edge paths | a **flowchart** | `doc-diagram` |
-| who owns each step and where responsibility changes — handoffs across layer, modules, or teams | a **swimlane diagram** | `doc-diagram` |
-| which deployable-local functional slices and external systems a flow connects | a **container diagram** | `doc-diagram` |
-| scope and integration boundary — the actors and external systems around it | a **system context diagram** | `doc-diagram` |
-| where it runs — hosting, runtime, infrastructure placement | a **deployment view** | `doc-diagram` |
-| which types implement the interface behind it — inheritance, composition, dependencies | a **class diagram** | `doc-diagram` |
-
-When a diagram clarifies a traced behavior, default to the **sequence diagram**; *run `doc-diagram` skill for the sequence diagram's interaction order, call chain, and failure branching* before drafting it.
-
-Label nodes with the role or step plus one greppable trace keyword — a route path, config key, event or queue name, table name, or interface name. Keep file references in the tables; use class, method, or file names with exact lines in the diagram only when the brief asks for them.
-
-Default to one: triggers enter as parallel participants meeting at the convergence point, observable outcomes leave from it. Split only when triggers diverge, selection needs a flowchart, outcomes fire out of band, or the diagram passes roughly 12 participants or 25 messages. Each split carries a heading naming the question it answers and repeats no node.
+The Explainer chooses visuals from the question under Visualize. Supply confirmed convergence points, provider/fallback edges, and trace keywords; keep source references in evidence. A deployment, ownership, interaction, or branch question may need a different view.
 
 ## Workflow
 
@@ -38,7 +22,7 @@ Default to one: triggers enter as parallel participants meeting at the convergen
 8. **Run a runtime check** when static reading can't settle a claim — which branch fires, runtime-computed config, async ordering.
 9. **Record on confirmation** — write each Fact with its citation immediately, and prune the branches it rules out.
 
-**Done when** every in-scope trigger reaches a cited convergence point, every step from there to an observable outcome carries a citation, every outcome and selectable provider with its fallback edge is accounted for, every call leaving the deployable is recorded as an outcome carrying its contract, any diagram depicts the confirmed mechanism, and the remaining unknowns can't change the answer.
+**Done when** every in-scope trigger reaches a cited convergence point, every step from there to an observable outcome carries a citation, every outcome and selectable provider with its fallback edge is accounted for, every call leaving the deployable is recorded as an outcome carrying its contract, any diagram depicts the confirmed mechanism, and any remaining unknown states its consequence for the answer.
 
 ## Surface map
 
@@ -46,7 +30,7 @@ A behavior can have many triggers and observable outcomes; tracing one of each a
 
 - **Triggers** — REST/RPC route, GUI action, client library, CLI, scheduled job, queue or event consumer, webhook. Several usually converge on one core; each can apply its own auth, validation, defaults, and deserialization first. Cite each trigger and its **convergence point**, then trace once below it. Record the initiator and any auth, validation, default, or deserialization difference that affects the result.
 - **Observable outcomes** — independently observable persisted writes, published events, outbound calls, files, cache invalidations, notifications, response payloads, and logs or metrics another system consumes. Reads, validations, branch decisions, internal calls, and calculations stay in the mechanism explanation unless they themselves create an observable result. Separate outcomes with different timing or transactionality. For each, identify the condition and what commits or rolls back with it.
-- **Boundary** — an outcome that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a lane of its own, reached by the **Flow** axis.
+- **Boundary** — an outcome that leaves the deployable ends this trace: record the contract it carries — operation or schema, parameters, error surface — and stop. What the receiving system does with it is a Flow check in the same investigation when outcome-relevant.
 
 ## Providers and fallback
 

@@ -1,6 +1,6 @@
 # Azure
 
-Provider reference for an Azure cloud part. Contract: [cloud-inspection.md](cloud-inspection.md).
+Provider reference for an Azure cloud part. Apply the loaded Cloud inspection contract.
 
 ## Contents
 

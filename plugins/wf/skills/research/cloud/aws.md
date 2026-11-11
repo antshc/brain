@@ -1,6 +1,6 @@
 # AWS
 
-Provider reference for an AWS cloud part. Contract: [cloud-inspection.md](cloud-inspection.md).
+Provider reference for an AWS cloud part. Apply the loaded Cloud inspection contract.
 
 ## Contents
 

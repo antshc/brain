@@ -4,12 +4,11 @@ Start with boundaries. One deployable and its functional slice form one lane. Tr
 
 Map each handoff to a row, then verify sender, wire contract, receiver, and deployment or configuration binding. Stop at a terminal infrastructure boundary only after recording the operation, protocol, authentication, errors, and relevant configuration.
 
-Add findings to the How report. The default single-axis Flow path is `docs/research/{{slug}}-chain.md`.
+Add findings to the How explanation; the caller owns any save destination.
 
 ## Contents
 
-- Diagram
-- Tiers
+- Presentation
 - Deployable eligibility
 - Workflow
 - Boundary
@@ -18,22 +17,9 @@ Add findings to the How report. The default single-axis Flow path is `docs/resea
 - Chain check
 - Gotchas
 
-## Diagram
+## Presentation
 
-When a chain diagram adds clarity, draw a **swimlane** with one lane per deployable, 1–5 ordered major-step nodes in each lane, terminal systems as edge lanes, and every cross-lane arrow labelled with its contract. *Follow `doc-diagram` skill's **Swimlane Diagram** for lane ownership, handoffs, and responsibility changes* and open its swimlane template before drafting.
-
-Use Mermaid `swimlane-beta`. When the renderer lacks swimlane support, fall back to a `flowchart` with one `subgraph` per lane. A `sequenceDiagram` is not a chain view because it loses the lane ownership this axis exists to show.
-
-Back every node and crossing with the cited mechanism or handoff table. Group terminal nodes at the edges in a lane titled Terminal boundaries when useful. Add a **container diagram** above the swimlane only when the lane count passes roughly eight and the reader needs the shape first; *run `doc-diagram` skill for the Mermaid C4 container diagram's deployables and relationships*.
-
-## Tiers
-
-| | This axis — chain | Behavior axis — lane |
-|---|---|---|
-| Unit | one deployable = one lane | one symbol = one participant |
-| Diagram | swimlane | sequence |
-| Evidence | the wire: emit site + receive site + the binding naming the real resource | file references along the call chain |
-| Stops at | terminal external systems | that lane's inbound entry and outbound effects |
+The Explainer chooses the view under Visualize: ownership/responsibility → swimlane or container; interaction order → sequence. If lanes help, use one per deployable and 1–5 boundary-relevant steps per lane; label crossings with contracts. Back every node/crossing with evidence. Do not require a diagram when prose or a table answers the question.
 
 ## Deployable eligibility
 
@@ -41,16 +27,16 @@ A lane is a **deployable**: a unit independently runnable or deployed in product
 
 **Eligibility test** — does production start this unit independently? Yes → it earns a lane. No → it is an artifact, and it belongs inside the lane of whatever executes it.
 
-Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm charts, Terraform modules, SQL migrations, and libraries are **artifacts**. Name the executing deployable as the lane and record the artifact as what that lane *does*. A bundle executed by a privileged host agent is one lane — the agent — not two.
+Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm charts, Terraform modules, SQL migrations, and libraries are **artifacts** unless independently started/deployed; verify the executing unit. Name the executing deployable as the lane and record the artifact as what that lane *does*. A bundle executed by a privileged host agent is one lane — the agent — not two.
 
 ## Workflow
 
 1. **Frame the chain** — name the outcome traced, not the service. "Where does a placed order become reserved stock?" beats "how does ordering work?".
 2. **Find the chain entries** — what originates the flow from outside the whole system: user action, schedule, webhook, upstream system, batch drop. An inbound call from a deployable already in the chain is a handoff, not an entry.
 3. **Walk lane by lane** — per deployable record what it receives, 1–5 ordered major steps, and what it emits. A major step is a boundary-relevant responsibility needed to explain how the inbound contract becomes the outbound contract; collapse implementation details that do not change that explanation. Read only enough client call sites, routes, publish/subscribe calls, SDK use, auth configuration, error handling, and IaC bindings to prove the steps and next crossing; apply the Behavior lens in the same report when an internal decision affects the outcome.
-4. **Classify every edge** — continuable or terminal (see Boundary). Continue when the next deployable's executing source opens and its behavior can change the framed outcome. Otherwise close a confirmed crossing as terminal with `no source access` or `out of framed scope — {{reason}}`; keep an unconfirmed crossing in Gaps.
-5. **Complete the chain** — reach a terminal for every in-scope branch. Trace deciding lane behavior and storage or provider semantics as needed to settle the question. Record outcome-irrelevant siblings as terminal by scope and cycles as handoffs back to an existing lane.
-6. **Check the chain at runtime** when runtime confirmation matters. Follow Chain check and the System inspection runtime rules.
+4. **Classify every edge** — continuable or terminal (see Boundary). Continue when the next deployable's executing source opens and its behavior can change the framed outcome. Otherwise record a proven external terminal, explicit scope stop, or inaccessible-source stop with its reason and coverage consequence; keep an unconfirmed crossing in Gaps.
+5. **Complete the chain** — reach a terminal for every in-scope branch. Trace deciding lane behavior and storage or provider semantics as needed to settle the question. Record outcome-irrelevant siblings as scope stops and cycles as handoffs back to an existing lane.
+6. **Check the chain at runtime** when runtime confirmation matters. Follow Chain check and Inspection evidence runtime rules.
 7. **Explain the chain** — use the How mechanism. If a table clarifies the trace, give each deployable one row in chain order, with the inbound contract, ordered major steps, outbound contract, and evidence. Render any included diagram.
 
 **Done when** each entry reaches a lane, each in-scope branch reaches a terminal or a recorded gap, and each internal handoff has emit, receive, and binding citations. Record why each terminal ends the trace. Back the mechanism and any diagram with confirmed evidence.
@@ -65,9 +51,9 @@ Two kinds of crossing, with different stop semantics.
 | Record | the integration contract and the IaC/config naming the real resource, region, and account | the integration contract plus emit site, receive site, and binding |
 | Becomes | a terminal Boundary contract | the next Flow row plus an internal Boundary contract |
 
-**Continue test** — keep following a hop while its executing source opens **and** the framed outcome depends on what happens there. Either answer turns no → terminal, write the contract, stop. Unfamiliarity, repository distance, and lane count are not stop conditions.
+**Continue test** — keep following a hop while its executing source opens **and** the framed outcome depends on what happens there. Either answer turns no → classify the stop and record its contract, reason, and coverage consequence. Inaccessible source does not establish downstream behavior. Unfamiliarity, repository distance, and lane count are not stop conditions.
 
-A deployable often emits to several downstreams. Expand only the ones on the path to the framed outcome; record the siblings as terminal by scope with a one-line reason. This is what keeps a mesh from swallowing the research.
+A deployable often emits to several downstreams. Expand only the ones on the path to the framed outcome; record the siblings as scope stops with a one-line reason. This is what keeps a mesh from swallowing the research.
 
 ## Integration contract
 

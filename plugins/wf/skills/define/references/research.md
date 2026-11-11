@@ -6,7 +6,7 @@ The destination is the decision, explanation, design, or action the findings mus
 
 ## Research, don't decide
 
-Each topic surfaces a fact or tests a claim; the map is done when the findings support the destination. The decision itself and any implementation belong to the caller after the map is done. `/research` and its specialists own sources, evidence strategy, citations, and findings files — a topic carries only the question.
+Each topic surfaces a fact or tests a claim; the map is done when the findings support the destination. The decision itself and any implementation belong to the caller after the map is done. `research` owns sources, evidence strategy, and citations. Define Research owns findings destinations and passes them explicitly; a topic carries the question, not a source strategy.
 
 ## Refer by name
 
@@ -120,7 +120,7 @@ Ask whether to resolve the frontier now. On decline, stop — the map file holds
 
 On acceptance:
 
-- Run `/research` skill in parallel to investigate each question against primary sources and save cited findings, one subagent per frontier topic resolved via research. Pass the topic's Question or Claim with its confirm/refute conditions, the Destination, and the Notes verbatim.
+- Run `/research` skill in parallel to investigate each question against primary sources and save cited findings, one subagent per frontier topic resolved via research. Pass the topic's Question or Claim with its confirm/refute conditions, the Destination, and the Notes verbatim. Define Research selects `@outputPath=docs/research/{{destinationSlug}}-{{topicSlug}}.md` and `@outputBase` = the absolute map repository root before dispatch; preserve an explicit caller destination instead. For separate reports within a topic, supply an exact question-to-file mapping. Use distinct topic slugs; Research must not derive report paths.
 - Offer each frontier experiment to the user one at a time; on acceptance, read `experiment` skill's Inputs and Workflow, then Run `/experiment` skill to run a minimal throwaway experiment observing actual behavior, filling `@question` = the Claim, `@criteria` = its confirm/refute conditions, `@repoFacts` = the Notes verbatim plus findings from resolved research topics.
 
 **Done when:** every frontier topic has either returned a result or been declined by the user.

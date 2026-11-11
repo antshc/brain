@@ -23,12 +23,11 @@ def test_research_preserves_why_and_routes_system_evidence_to_hunter():
         assert (SKILLS / "research" / reference).is_file()
     assert "`@whyDepth`" in skill
     assert "Why code anchor" in skill
-    assert skill.index("## Entry routes") < skill.index("## Workflow")
-    system = skill.split("## System research")[1].split("\n## ")[0]
-    assert "as `@work` directly to Hunter" in system
-    assert system.index("**Explore.**") < system.index("**Explain.**") < system.index("**Save.**")
-    assert "relevant System Inspection guidance for the report" in system
-    assert "Save one cited Markdown document" in system
+    assert "## Routing" in skill
+    how = (SKILLS / "research/how/how.md").read_text()
+    assert "system/system-inspection.md" not in skill
+    assert "Hunter" in how and "Explainer" in how
+    assert "@outputPath" in skill and "@outputBase" in skill
     dispatch = (SKILLS / "subagents/SKILL.md").read_text()
     assert "Send Explore requests verbatim to `hunter`" in dispatch
     assert "report the blocked evidence request and continue independent work" in dispatch

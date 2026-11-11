@@ -47,7 +47,7 @@ def test_hunter_owns_explore_and_loads_the_nuget_tactic():
     request = section('Explore request', SKILL_BODY)
     assert 'verbatim directly to a `hunter` subagent' in request
     assert 'If Hunter is unavailable, report the blocked evidence request' in request
-    assert '(../skills/research/explore/nuget.md)' in section('Route the lookup')
+    assert '(../skills/research/how/nuget.md)' in section('Route the lookup')
     assert 'Hunter never spawns subagents' in HUNTER
 
 

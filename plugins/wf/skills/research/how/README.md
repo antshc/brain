@@ -1,6 +1,6 @@
 # Current-system research
 
-Use `research` for both a narrow “how does this work?” question and an explicit inspection. A saved answer uses [How](../how/how.md) with cited findings. Hunter supplies the evidence.
+Use `research` for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. Hunter supplies the evidence.
 
 ## Write a strong instruction
 
@@ -8,7 +8,7 @@ A useful instruction names the **unit to inspect**, the **question to settle**, 
 
 Use this shape:
 
-> Inspect **{{unit}}** to determine **{{question}}**. Start at **{{entry point}}** and stop at **{{observable outcome or terminal system}}**. Cover **{{important branches or concerns}}**. Write the result to **{{optional output path}}**.
+> Inspect **{{unit}}** to determine **{{question}}**. Start at **{{entry point}}** and stop at **{{observable outcome or terminal system}}**. Cover **{{important branches or concerns}}**. Return inline, or save to **{{caller-selected exact output path}}**.
 
 Include the details that materially change the investigation:
 
@@ -19,7 +19,7 @@ Include the details that materially change the investigation:
 - Ask for current **as-built** behavior. Use a design or review skill when the goal is a proposed change or a before-and-after delta.
 - Mention suspected mocks, emulators, or development-only stores so the inspection can distinguish wiring from production behavior.
 - Request a runtime check when static code cannot settle a runtime claim, and say which commands or environments are safe to use.
-- Provide an output path only when the default location under `docs/research/` is unsuitable.
+- To save output, provide an exact `@outputPath`; for relative paths include the absolute caller root as `@outputBase`. No save request → inline. Research defines no default output directory or filename.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
 Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document can return Hunter’s verdict inline. Keep outcome-relevant lens findings in the same answer.

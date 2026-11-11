@@ -35,7 +35,7 @@ One entry point; route to one playbook. Do not load unrelated routes.
 
 ## Artifact and repository contract
 
-For Architect, Sketch, Deep-module, Prove, and Interrogate, use `<repo-root>/tmp/design-<slug>/`, with a kebab-case task slug; never system `/tmp` or a session folder. Grounding, experiments, Arena outputs, findings, and review logs stay under this root; Research specialists may impose stronger locations but their outputs must be indexed here. Production code, when authorized, goes in the working tree.
+For Architect, Sketch, Deep-module, Prove, and Interrogate, use `<repo-root>/tmp/design-<slug>/`, with a kebab-case task slug; never system `/tmp` or a session folder. Grounding, experiments, Arena outputs, findings, and review logs stay under this root; Design selects exact Research destinations under this root and supplies `@outputPath` and `@outputBase`; Research returns inline findings when no save is requested. Production code, when authorized, goes in the working tree.
 
 ```
 <artifact-root>/

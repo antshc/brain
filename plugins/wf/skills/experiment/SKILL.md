@@ -17,11 +17,12 @@ Callers read this section and Workflow before invoking, then fill these from wha
 - `[@option]` — `logic | runtime | integration-local | integration-cloud | ui`; omitted → step 5 picks.
 - `[@repoFacts]` — facts the caller already discovered: stack, test infra, suites and run commands, cloud account and region, runnable target, prior evidence. Reuse verbatim; never re-discover them.
 - `[@limits]` — safety limits, out-of-scope behavior, writable paths.
+- `[@outputPath]`, `[@outputBase]` — explicit report destination and its absolute base for a Research fallback; keep content framing in `@outputShape`.
 
 ## Workflow
 
 1. State the question, assumption, success/observation criteria, and out-of-scope behavior from Inputs; fill only what they omit.
-2. Docs or code reading can settle it → no experiment. Load `research` skill's Inputs and *run `research` skill to investigate primary sources, codebase, cloud docs, or the web and save cited findings*, passing `@question` verbatim; stop. Experiment only on what observation must settle.
+2. Docs or code reading can settle it → no experiment. Load `research` skill's Inputs and *run `research` skill to investigate primary sources, codebase, cloud docs, or the web and save cited findings*, passing `@question` verbatim. Forward an explicit `@outputPath` and `@outputBase` when supplied; otherwise request findings inline. If the enclosing workflow requires a saved fallback, it supplies the destination before dispatch. Stop. Experiment only on what observation must settle.
 3. Inspect the repository for facts the experiment needs and `@repoFacts` lacks:
 
    | Fact | `@work` | `@shape` | `@depth` |

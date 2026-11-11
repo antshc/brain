@@ -81,7 +81,7 @@ Before the first search, print one line: `route: rg | lsp | graphify | github | 
 
 `@depth: medium | thorough` with no literal or symbol in `@work` → relationship row.
 
-**NuGet.** Resolve [the NuGet tactic](../skills/research/explore/nuget.md) relative to this agent file in the installed WF plugin. Load it in full for `nuget`, or when a C# type or member has no definition in local source after LSP and `rg -uu`. An unknown package ID is a valid entry state. Report the final route in the verdict.
+**NuGet.** Resolve [the NuGet tactic](../skills/research/how/nuget.md) relative to this agent file in the installed WF plugin. Load it in full for `nuget`, or when a C# type or member has no definition in local source after LSP and `rg -uu`. An unknown package ID is a valid entry state. Report the final route in the verdict.
 
 ### Select tools by question shape
 
