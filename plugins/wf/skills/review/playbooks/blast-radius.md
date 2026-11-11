@@ -35,9 +35,7 @@ Apply this ladder to every risk, cleared risk, and safety claim. Attempt executa
 
 Keep verdict (`confirmed | cleared | unresolved`) separate from evidence level. Execution can confirm a defect or clear it for the exercised conditions. Levels 1–2 alone cannot establish safety. A missing caller in search results is a search observation, not proof of unreachability. Scope every clearance to its evidence; never generalize one passing case to all inputs.
 
-For each claim, record a stable ID, failure mechanism, `file:line`, likelihood, impact, verdict, ladder level, proof method, and evidence. For execution, include target SHA or local-state identity, environment, exact command, test names, observed output, and artifact paths. Without executable proof, write **unproven**, why it could not run or establish the claim, and the next verification step; retain any supported source-level conclusion.
-
-Associate each execution with the hashes of its applied patches. Never weaken valid assertions or skip failing tests to obtain proof. For production instrumentation, rerun without it or explain why it preserves the behavior being claimed. To attribute a defect to this change, compare the same proof on the pinned baseline and target; otherwise mark regression attribution unproven with the reason.
+Resolve this playbook's relative links from its own directory. Use the [worker prompt](../references/blast-radius-worker-prompt.md) for the per-claim evidence contract. Read it and the [final report contract](../references/blast-radius-report.md) in full before dispatch and fill every worker placeholder; pass absolute resource paths to workers.
 
 ## Steps
 
@@ -45,9 +43,19 @@ Associate each execution with the hashes of its applied patches. Never weaken va
 2. Find the one fact it's safe because of. Most changes that look risky are safe because of a single fact, like "this call only drops already-dead cache entries and does nothing else". Find that fact. If it holds, most risky cases are cleared at once. Spend your time here, not on a long list of maybes.
 3. Look where grep stops. *Run `research` skill to investigate primary sources and return cited findings* using **default Research** for current and downstream behavior around the changed boundary. Pass the changed symbols and safety question. Pass `@outputPath=grounding-how.md` and the absolute run directory as `@outputBase`; identify the code checkout separately. Read the source of the library you call, and check its pinned version and any local patch. Work out when things run: microtasks, unmount and teardown, Solid versus React. Follow what a symbol search misses: the JSON an API returns, a DB column, a wire format, another language reading the same bytes, a feature flag, code three hops downstream.
 4. Inventory affected behaviors, boundaries, and downstream consumers. Assign IDs to concrete risks and safety claims, including the central safety fact. Give each risk a real likelihood and cost. Keep confirmed, cleared, and unresolved claims; distinguish evidence from inference and never invent a caller or API.
-5. *Run `testing-integrations` skill to discover suites and select the smallest test seam that exercises each claim's failure mechanism.* Pass the pinned target, original launch/harness root, explicit code checkout, behavior inventory, and claim IDs. Map each claim to an existing test and inspect its fixtures and assertions; mocks that remove the suspect boundary cannot prove it. Use documented commands and narrow filters. Add or adapt a test in an owned proof worktree when coverage is missing; use the skill's experiment route for an uncertain question. Report unavailable suites, skipped tests, and prerequisites instead of inventing commands.
-6. Prove every claim. Dispatch independent claim groups to parallel workers; use `git` worktrees at the same pinned target whenever workers modify files. For dirty local targets, reproduce and record the same tracked and untracked input state in each proof worktree without altering the original. Give each worker claim IDs, target identity, test seam, permitted edits, resource ownership, and the evidence contract above. Share read-only discovery; serialize runs sharing mutable databases, cloud resources, ports, or fixtures unless isolated. Keep the original launch root and explicit checkout separate when invoking `testing-integrations`. Require real assertions and confirm intended tests executed; exit code alone or zero collected tests proves nothing. If parallel execution is unavailable, run the same groups sequentially and report the limitation. Reconcile every worker result, including failures and blockers, into its claim record. Preserve regression patches and instrumentation diffs; report their effect on proof validity.
-7. For a big or wide change, *run `subagents` skill to compare independent candidates and synthesize findings* using **Arena** with two or three distinct model perspectives. Pass the same diff, safety question, grounding, and report contract to each reviewer, with isolated outputs under the absolute run directory. Have reviewers return evidence without starting another Arena. Screen for reproducible proof and cited risks. Merge every distinct supported risk into the report, including findings outside the chosen base. Send newly discovered claims through steps 5–6.
+5. *Run `testing-integrations` skill to discover suites and select the smallest test seam that exercises each claim's failure mechanism.* Pass target identity, original launch/harness root, explicit checkout, behavior inventory, and claim IDs. Retain cited suite commands and prerequisites for worker briefs; discovery does not establish proof.
+6. Prove every claim. *Run `subagents` skill using **Dispatch** for independent claim groups*, supplying the filled worker prompt, evidence contract, exact artifact destinations, and worktree requirements. Require the same pinned target and, for dirty targets, the same recorded tracked/untracked inputs. Require separate owned `git` worktrees for writers; share discovery and serialize groups using shared mutable resources unless isolated. Let Dispatch own launch, parallel execution, collection, and worktree creation. If parallel execution is unavailable, use the same briefs sequentially and report the limitation; unavailable required isolation blocks that proof.
+7. For a big or wide change, *run `subagents` skill using **Arena** to compare independent candidates and synthesize findings* with two or three distinct model perspectives. Pass the same diff, safety question, grounding, and loaded report contract to each reviewer, with isolated outputs under the absolute run directory. Request an evidence union of every distinct supported finding from all candidates, with claim IDs, candidate provenance, and dropouts; do not retain only the winning report. Require evidence and no recursive Arena. Treat Arena synthesis and candidate evidence as input to aggregation, not the final verdict.
+
+## Aggregate and deliver
+
+The coordinator owns risk judgment and the final result; no separate synthesizer is required.
+
+1. Reconcile every assignment and claim ID with a terminal result or named blocker. Verify target/patch identity, decisive citations, assertions, executed test names, observed results, and evidence paths. Missing workers or invalid evidence leave claims unresolved.
+2. Merge findings describing the same failure mechanism; preserve original IDs, worker provenance, and distinct affected behaviors. Keep supported findings outside the original groups and label their scope.
+3. Resolve conflicting verdicts with focused evidence checks, never majority vote or a higher ladder number alone. Send newly discovered risks and material gaps through steps 5–6. Bound each follow-up to the missing fact; if unavailable or inconclusive, retain the conflict, consequence, and exact next check.
+4. Run completeness verification below. Inspect returned diffs, preserve reusable patches and evidence outside worktrees, then use `git` for owned worktree cleanup; report retained worktrees and external resources.
+5. Recheck the pinned head when remote state may have changed. If it changed, label evidence with the reviewed revision; reverify affected claims before asserting coverage of the new head. Fill the [final report](../references/blast-radius-report.md) in full and return one aggregated result.
 
 ## Completeness verification
 
@@ -61,21 +69,8 @@ Before reporting, reconcile the diff and behavior inventory with the evidence re
 
 Report **coverage complete | incomplete** with omitted or inaccessible scope, separately from **risks resolved | unresolved**. Coverage complete means the inventory was reconciled, not that every claim was proved or the change is safe. Any unresolved claim makes risks unresolved; confirmed defects remain visible even when verification is complete.
 
-## What to hand back
-
-Recheck the pinned head before reporting when remote state may have changed. State scope and baseline, and give every inspected behavior a supported risk verdict or named uncertainty.
-
-- **What it does.** What changed, including the part that isn't obvious.
-- **The one fact it's safe because of.** State it, say which step you got it to, and show the proof. If you couldn't prove it, write unproven.
-- **Risks and cleared claims.** Include every claim in the table below; link shared evidence by claim ID without dropping individual verdicts. Keep unresolved risks visible.
-
-  | ID / risk or safety claim | Failure mechanism, location, likelihood / impact | Verdict | Ladder level | Proof method and evidence | Unproven reason / next step |
-  | --- | --- | --- | --- | --- | --- |
-  | Stable ID and claim | Concrete mechanism and `file:line` | confirmed / cleared / unresolved | 1–5 | Source trace or exact command, test, environment, observed result, artifacts | Reason and next check, or none |
-
-- **Completeness.** Coverage and risk-resolution statuses, behavior-to-claim mapping, omitted scope, conflicts, and blockers.
-- **Before you merge.** The cheapest test or repro that catches the real bug, reusable regression patches, remaining checks, and cleanup/retention outcomes.
+## Final prose check
 
 *Run `writing-style` skill to review prose and remove AI tells* using **Unslop only** on the assembled report. Edit prose only. Preserve citations, commands, observed output, proof status, and risk judgments. Strip private details before sharing publicly.
 
-**Reply:** the writeup above, with every claim's proof level and method, explicit reasons for unproven claims, and both completeness statuses.
+**Reply:** one final report following the loaded report contract, not concatenated worker reports.
