@@ -59,7 +59,7 @@ def test_review_impact_and_tests_keep_their_analysis_contracts():
     impact = (root / "blast-radius.md").read_text()
     assessment = (root / "tests-gap.md").read_text()
     assert re.findall(r"\*run `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
-        "research", "research", "testing-integrations", "subagents", "subagents", "writing-style",
+        "principles", "research", "research", "testing-integrations", "subagents", "subagents", "writing-style",
     ]
     for action in ("Why code anchor", "**default Research**", "**Dispatch**", "**Arena**", "**Unslop only**"):
         assert action in impact

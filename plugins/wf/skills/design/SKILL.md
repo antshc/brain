@@ -24,6 +24,10 @@ One entry point; route to one playbook. Do not load unrelated routes.
 3. Select `sketch` only when the user explicitly requests a sketch without implementation. General code-shape or multi-candidate work selects `architect`. `deep-module` is standalone when explicitly requested and can also be called by Architect. Empirical checks and adversarial review belong to the standalone Prove and Challenge this skills.
 4. Read only the selected playbook and references it calls for. Wayfinder loads Grill for interviews and then resumes the map. Continue Grill to Spec only after a requested handoff and closing sweep.
 
+## Principles
+
+*Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Pass task, selected route, phase and explicitly named principles; select `In your own words` for intent. Let the Index select for consumer experience, domain/type shape, seams, boundaries, concurrency and alternatives. Apply before the selected playbook; re-evaluate at phase changes. Fresh candidate workers apply this rule in their own context.
+
 ## Architect options and behavior
 
 - Accept `arena-agents=1|2|3`, default `1`; reject other values before Arena. Retain the count across correction re-runs.

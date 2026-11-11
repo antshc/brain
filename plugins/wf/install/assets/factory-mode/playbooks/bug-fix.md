@@ -8,7 +8,7 @@ Be scientific. Every shipped line traces to runtime evidence. "Might help" is a 
 2. Binary-search the cause. List candidate hypotheses; each pass take the split that cuts the most remaining space, get runtime evidence, eliminate. Seed with research through Non-negotiables: affected subsystem behavior and regression history from `git log -p` / `git blame`. Unclear state → add logging or instrumentation and read it as the code runs. Confirm the surviving *mechanism* with runtime evidence before step 3 (**Fix root causes**, **Attack the premise**).
 3. Run **Prepare a direct branch** before implementation. Plan the fix. Crosses a function boundary → `design architect` first. Delegate implementation with a specific scope: files, data shape, the repro to turn green.
 4. Verify on the same surface. The original repro now passes. "Inconclusive" or wrong-surface is not a pass; flag it. Unit tests show branch behavior, not bug absence (**Prove it works**).
-5. Use the `git` **Draft commit** tactic. Stage commits so the failing repro lands before the fix (**Verifiable units**). Skip the separate failing-test commit when that test would be expensive or integration-heavy; say so.
+5. Use the `git` **Draft commit** tactic. Stage commits so the failing repro lands before the fix (**Sequence verifiable units**). Skip the separate failing-test commit when that test would be expensive or integration-heavy; say so.
 6. Not fixing now, or the user wants a report → *run `draft-artifact` skill to draft a reproducible bug report from observed behavior using **Bug report**.*
 7. Run Opening a PR.
 
