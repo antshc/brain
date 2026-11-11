@@ -6,7 +6,7 @@ description: >-
 
 # Principles
 
-Indexed engineering principles. Bodies are verbatim from [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack/skills) `principle-*` skills; cross-links became bold names. The seven additions (Build the lever, Experience first, Guard the context window, Migrate callers, then delete legacy APIs, Model the domain, Never block on the human, Type system discipline) use [pinned source 5866df5](https://github.com/cursor/plugins/tree/5866df557357d005b3c0c9d3da0d9e739b4bdde3/pstack/skills); only frontmatter removal and principle-link/name normalization were applied.
+Indexed engineering principles. Bodies are verbatim from [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack/skills) `principle-*` skills; cross-links became bold names and skill-call wording follows the repository invocation contract. The seven additions (Build the lever, Experience first, Guard the context window, Migrate callers, then delete legacy APIs, Model the domain, Never block on the human, Type system discipline) use [pinned source 5866df5](https://github.com/cursor/plugins/tree/5866df557357d005b3c0c9d3da0d9e739b4bdde3/pstack/skills); only frontmatter removal and principle-link/name normalization were applied.
 
 ## Load
 

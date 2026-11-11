@@ -20,13 +20,13 @@ For example requests, read [Examples](README.md) in full.
 
 ## Frame
 
-Read relevant repository architecture, ADRs/Concepts and glossary. Derive intent from the user, commits and PR description. *Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Select `In your own words`. Ask when intent is unclear. Pin committed refs and record dirty inputs; for CLI-only evidence scope the claim, command and observation instead of requiring a diff. Done when intent, scope/revision, safe target and limits are explicit.
+Read relevant repository architecture, ADRs/Concepts and glossary. Derive intent from the user, commits and PR description. *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `In your own words`. Ask when intent is unclear. Pin committed refs and record dirty inputs; for CLI-only evidence scope the claim, command and observation instead of requiring a diff. Done when intent, scope/revision, safe target and limits are explicit.
 
 Reject an adversary count outside the documented values before dispatch. Resolve relative report paths only against the supplied absolute base; an absent/ambiguous base blocks saving, not independent investigation.
 
 ## Fan out
 
-Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. *Run `subagents` skill to dispatch independent workers with isolated outputs* using Dispatch and the ordered `challenge-this reviewers` pool, with the resolved adversary count. Use skill-capable general-purpose reviewers; request one isolated owned worktree each, copying only scoped uncommitted changes, unless supplied verified checkouts already satisfy isolation. Pass Frame, facts, prior reproductions, limits, exact output destinations and the completed prompt. Keep ownership records and evidence outside worktrees. No safe target/isolation → report blocked scope; continue independent checks only. Done when every assignment has a terminal report or named blocker.
+Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. *Load and follow the `subagents` skill to dispatch independent workers with isolated outputs* using Dispatch and the ordered `challenge-this reviewers` pool, with the resolved adversary count. Use skill-capable general-purpose reviewers; request one isolated owned worktree each, copying only scoped uncommitted changes, unless supplied verified checkouts already satisfy isolation. Pass Frame, facts, prior reproductions, limits, exact output destinations and the completed prompt. Keep ownership records and evidence outside worktrees. No safe target/isolation → report blocked scope; continue independent checks only. Done when every assignment has a terminal report or named blocker.
 
 ## Verify
 
@@ -40,7 +40,7 @@ Independently rerun each finding's exact command in the reviewer's recorded envi
 - **Dropped** — each adversary's dropped count and reasons.
 - **Handoff** — retained evidence, resource/worktree ownership and cleanup outcome. Contract findings return to Design for proposed Deep Module corrections; Challenge this supplies no interface redesign or fixes.
 
-Preserve reports, patches and rerun prerequisites until verification and requested follow-up finish. Remove only run-owned resources, using *`git` skill for verified worktree lifecycle* with Worktrees; preserve caller-owned worktrees and report leftovers. Done when every resource is removed or explicitly handed back.
+Preserve reports, patches and rerun prerequisites until verification and requested follow-up finish. Remove only run-owned resources, using *Load and follow the `git` skill to run verified worktree lifecycle* with Worktrees; preserve caller-owned worktrees and report leftovers. Done when every resource is removed or explicitly handed back.
 
 ## Completion criteria
 

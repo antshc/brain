@@ -16,4 +16,4 @@ Route the request to exactly one procedure. Read that route and every reference 
 
 Explicit `research` or `concept` arguments win. Otherwise infer from the requested artifact: a research map under `docs/ongoing/` selects Research; a Crosscutting Concept or architecture default selects Concept. Ask when neither is clear.
 
-Both routes use [Questioning](references/questioning.md). Research maps only evidence work and hands off decisions; Concept confirms decisions; *run `doc-architecture` skill to record settled architecture* with route `concept-record`.
+Both routes use [Questioning](references/questioning.md). Research maps only evidence work and hands off decisions; Concept confirms decisions; *Load and follow the `doc-architecture` skill to record settled architecture* with route `concept-record`.

@@ -36,17 +36,17 @@ With at least two viable candidates, after all Phase B candidates complete, choo
 
 Read every candidate end to end before picking. Score each against the rubric criterion by criterion, not on holistic feel, and compare with the cross-judge when Phase C ran one. Agreement on the base confirms the pick. Disagreement means one of you is biased or the rubric was ambiguous. Read both rationales before deciding.
 
-Pick the base a future maintainer can extend most easily without breaking invariants. For a design, break ties in favor of the cleaner boundary or smaller API. *Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Select `Laziness protocol`.
+Pick the base a future maintainer can extend most easily without breaking invariants. For a design, break ties in favor of the cleaner boundary or smaller API. *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `Laziness protocol`.
 
 ## Phase E: Graft
 
-Walk each losing candidate once more for what is worth porting into the base, usually one or two things per candidate. If the caller requests an evidence union, include every distinct verified finding. Fold each graft in by hand so the result stays coherent under one mental model. *Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Select `Redesign from first principles`. Don't paste mechanically.
+Walk each losing candidate once more for what is worth porting into the base, usually one or two things per candidate. If the caller requests an evidence union, include every distinct verified finding. Fold each graft in by hand so the result stays coherent under one mental model. *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `Redesign from first principles`. Don't paste mechanically.
 
 For design candidates, if they converge on one shape, that is strong agreement. Note it and ship the consensus shape. No graft is needed. If design candidates wildly diverge, Phase A was under-specified. Reframe and re-run rather than averaging the divergence.
 
 ## Phase F: Verify
 
-Verify the synthesized artifact against the caller's criteria. *Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Select `Prove it works`. If verification finds a problem the arena missed, either Phase A was wrong (re-frame and re-run) or a candidate caught it and you missed the graft (go back to Phase E). Don't paper over it.
+Verify the synthesized artifact against the caller's criteria. *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `Prove it works`. If verification finds a problem the arena missed, either Phase A was wrong (re-frame and re-run) or a candidate caught it and you missed the graft (go back to Phase E). Don't paper over it.
 
 ## Re-run for corrections
 

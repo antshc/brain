@@ -12,7 +12,7 @@ Explicit offline publishing or a reported GitHub/tool/authentication failure →
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any Concepts and ADRs in the area you're touching.
 
-2. Draft the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, *Run `doc-contracts` skill to write an API, database, or resource contract delta* once per touched contract kind and inline its substantive contract content under **Contracts Delta**, preserving contract facts while removing skill references and authoring directives.
+2. Draft the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, *Load and follow the `doc-contracts` skill to write an API, database, or resource contract delta* once per touched contract kind and inline its substantive contract content under **Contracts Delta**, preserving contract facts while removing skill references and authoring directives.
 
 Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
