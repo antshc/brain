@@ -1,6 +1,6 @@
 # Current-system research
 
-Use `research` for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. Hunter supplies the evidence.
+*Use `research` skill to investigate primary sources and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. Hunter supplies the evidence.
 
 ## Write a strong instruction
 

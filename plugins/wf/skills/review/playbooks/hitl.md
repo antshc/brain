@@ -20,7 +20,7 @@ Run once per session, before Review loop. Steps 1 to 3 complete before step 4.
 
 If `git status --porcelain` is non-empty, stop and ask the user before checkout.
 
-Follow [Fetch PR diff](../../github/references/fetch-diff.md#hitl), using the HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
+*Follow `github` skill for pull requests and review evidence* using Pull requests, Diff, HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
 
 **2. Load existing review comments**
 
@@ -93,7 +93,7 @@ Drafts, approves, and posts one review comment.
 
 2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability, etc.).
 
-2.2 `IMPROVEMENT` — concrete fix or direction. *Run `github` tactic **Draft or finalize review comment*** with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `github` install before drafting. Stop and report missing access if neither is available.
+2.2 `IMPROVEMENT` — concrete fix or direction. *Run `github` skill to draft review threads and pull request comments using Reviews* with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `github` install before drafting. Stop and report missing access if neither is available.
 
 2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 

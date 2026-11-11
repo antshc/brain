@@ -8,7 +8,7 @@ Standalone `design prove` may use a user-supplied falsifiable claim without an e
 
 ## Frame
 
-State the question, the assumption, the success criteria, and the intent per *run `principles` skill; read its body in full, then load in full the file its Index maps to the `In your own words` principle*, from the user's reply and the current sketch. For automatic runs, use the routing handoff in place of the reply. One question per proof. Ask the user when the question is unclear. Stop and say so when code inspection, docs, or reasoning answer it confidently.
+State the question, the assumption, the success criteria, and the intent per *run `principles` skill to load indexed engineering principles by name; read its body in full, then load in full the file its Index maps to the `In your own words` principle*, from the user's reply and the current sketch. For automatic runs, use the routing handoff in place of the reply. One question per proof. Ask the user when the question is unclear. Stop and say so when code inspection, docs, or reasoning answer it confidently.
 
 ## Build
 

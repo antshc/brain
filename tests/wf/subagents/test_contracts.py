@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 from pathlib import Path
 
@@ -74,10 +76,15 @@ def test_pr_review_routes_share_diff_acquisition_and_preserve_posting_contracts(
     root = SKILLS / "review"
     for route in ("code", "hitl"):
         playbook = (root / f"playbooks/{route}.md").read_text()
-        assert f"](../../github/references/fetch-diff.md#{route})" in playbook
+        assert "*Follow `github` skill for pull requests and review evidence*" in playbook
+        assert f"using Pull requests, Diff, {route.upper() if route == 'hitl' else route.title()} setup" in playbook
+        assert "../../github/" not in playbook
         assert f"](../references/posting.md#{route})" in playbook
 
-    diff = (SKILLS / "github/references/fetch-diff.md").read_text()
+    github = SKILLS / "github"
+    assert "](tactics/pull-requests.md)" in (github / "SKILL.md").read_text()
+    assert "](../references/fetch-diff.md)" in (github / "tactics/pull-requests.md").read_text()
+    diff = (github / "references/fetch-diff.md").read_text()
     assert diff.count("## Build the per-file diff") == 1
     assert "fresh detached review worktree" in diff
     assert "GH_TOOL pr checkout" in diff

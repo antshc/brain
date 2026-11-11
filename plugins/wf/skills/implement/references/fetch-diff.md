@@ -1,6 +1,6 @@
 # Fetch PR Diff
 
-Follow the `github` Pull requests tactic's Chore acquisition. Split the current pull request diff into per-file diffs for the chore subagent. Run fresh before each subagent; the diff changes after every push.
+*Follow `github` skill for pull requests and review evidence* using Pull requests, Chore acquisition. Split the current pull request diff into per-file diffs for the chore subagent. Run fresh before each subagent; the diff changes after every push.
 
 ## Fetch the diff per file
 

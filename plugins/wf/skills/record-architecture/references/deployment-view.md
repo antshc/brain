@@ -34,7 +34,7 @@ Fill `Observability` by following each signal from the process that emits it to 
 
 ## Keep ARCHITECTURE.md pointing here
 
-*Run `index-docs` skill for structural prose, trigger-generation, and row-sync; use **Sync Deployment View reference***, passing `{{skeletonContent}}` = the link to `DEPLOYMENT.md` plus 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies — enough for an agent to decide whether to load the full document. Never edit `ARCHITECTURE.md` directly.
+*Run `index-docs` skill to sync index rows and Trigger condition tables; use **Sync Deployment View reference***, passing `{{skeletonContent}}` = the link to `DEPLOYMENT.md` plus 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies — enough for an agent to decide whether to load the full document. Never edit `ARCHITECTURE.md` directly.
 
 Re-run it whenever the hosting model or node set changes, so the stub's keywords still match the topology.
 

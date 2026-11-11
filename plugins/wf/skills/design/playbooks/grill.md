@@ -26,9 +26,9 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 | Operation | Invocation and inputs | Required result |
 |---|---|---|
-| Code/test lookup | Read `research` skill's **Explore request**; form the bounded question, target, depth, and output shape. Send the request verbatim to one `hunter` per independent track. Sequence dependent tracks. If Hunter is unavailable, record the blocked lookup and continue independent tracks. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
+| Code/test lookup | *Load `research` skill to investigate primary sources and return cited findings*; use **Explore request**; form the bounded question, target, depth, and output shape. Send the request verbatim to one `hunter` per independent track. Sequence dependent tracks. If Hunter is unavailable, record the blocked lookup and continue independent tracks. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
 | Index load/scan/sync | *Run `index-docs` skill for full index load, scan/match, and row-sync of Markdown Trigger condition tables.* Supply the operation and its required metadata. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
-| Record | *Run `record-architecture` skill for settled architecture ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
+| Record | *Run `record-architecture` skill to persist settled ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
 
 Integrate lookup evidence into the frontier and touched surface; integrate record/index results into the ledger. Mark a record written only after the returned result confirms its persistence and required sync.
 
@@ -155,7 +155,7 @@ Re-check each tactic's trigger after every user answer or new fact. A later answ
 
 When the user asks to close, confirms closure, or requests implementation, load [closing-sweep.md](../references/closing-sweep.md). Complete its reconciliation, repairs, and trigger refinement before handoff. If the user resumes questioning, persist outstanding work and return to the interview.
 
-After the sweep, pass the saved context to the [Spec playbook](./spec.md) for a requested spec handoff. For a requested authoritative feature design, *run `draft-artifact` skill in `design` mode* with the saved context. If a handoff was requested and its output is unclear, return the saved context and ask which output the user wants.
+After the sweep, pass the saved context to the [Spec playbook](./spec.md) for a requested spec handoff. For a requested authoritative feature design, *run `draft-artifact` skill to draft a feature design document* in `design` mode with the saved context. If a handoff was requested and its output is unclear, return the saved context and ask which output the user wants.
 
 ## Completion criteria
 
