@@ -1,10 +1,22 @@
 # Record ADR
 
-Record **one point-in-time, localized architectural decision** into `docs/adr/` — what was decided, why, and which options were rejected. For a compact decision inside a design or decision list, load [decision-bullet.md](./decision-bullet.md) instead.
+## Contents
+
+- Where it belongs
+- ADR gate
+- Scope
+- Extend or create
+- Lazy creation
+- Record name
+- Body
+- Authoring the index row
+- Approval gate
+
+Record **one point-in-time, localized architectural decision** into `docs/adr/` — what was decided, why, and which options were rejected. For a compact decision inside a design or decision list, return control to the router for **Decision bullet** instead.
 
 ## Where it belongs
 
-An ADR answers **which option was chosen and why the others were not**. How the decision is applied or implemented belongs elsewhere — a [Concept](./concept.md), a design doc, or the code — and the ADR links to it rather than restating it. Contested terminology → load [term.md](./term.md).
+An ADR answers **which option was chosen and why the others were not**. How the decision is applied or implemented belongs elsewhere — a Concept, a design doc, or the code — and the ADR links to it rather than restating it. Contested terminology → return control to the router for **Record term**.
 
 ## ADR gate
 
@@ -16,7 +28,7 @@ Record only when all three are true:
 
 Qualifies: architectural shape; integration patterns between contexts; technology choices carrying lock-in (not every library); boundary and ownership decisions, where the explicit no-s matter as much as the yes-s; deliberate deviations from the obvious path; constraints invisible in the code (compliance, latency contracts); rejected alternatives whose rejection is non-obvious.
 
-Any miss → write nothing, including on an explicit request. Return the miss and the narrower home: feature decision in the session ledger, a design doc, [Concept](./concept.md), or [term](./term.md).
+Any miss → write nothing, including on an explicit request. Return the miss and the narrower home: feature decision in the session ledger, a design doc, Concept, or the term route.
 
 ## Scope
 
@@ -31,7 +43,7 @@ Set `@decisionScope` before **Extend or create**: the entity the decision was ma
 
 Runs before any write. A near-duplicate ADR splits authority over one decision area.
 
-1. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Scan and match*** over the `Architecture Decision Records` table in `ARCHITECTURE.md` and every matched building block's `Architecture Decision Records` table with this decision's surface — its terms and the paths it governs; for `wide`, also the class terms.
+1. Apply **Scan and match** over the `Architecture Decision Records` table in `ARCHITECTURE.md` and every matched building block's `Architecture Decision Records` table with this decision's surface — its terms and the paths it governs; for `wide`, also the class terms.
 2. A matched ADR already owns this decision area and the decision still stands → **extend it**: amend the body and resync its row via **Sync index row**. Scope changed (e.g. `narrow` → `wide`) → rewrite the scope sentence and regenerate the Trigger condition and Default. Stop here.
 3. A matched ADR owns the area but this decision reverses it → **rewrite it in place**; never create a second ADR:
    - Rename the file to `docs/adr/{{newSlug}}.md` and update every inbound link to the old path.
@@ -88,10 +100,10 @@ See [{{conceptOrDocTitle}}]({{relativePath}}) for how it is applied.
 An ADR that applies to exactly one building block is indexed in that block's `Architecture Decision Records` table inside `docs/building-blocks/{{slug}}.md` (or its repository's own ADR index when that repository documents itself). Every other ADR is indexed in `ARCHITECTURE.md`'s `Architecture Decision Records` table. Never both.
 
 1. Row shape: `| [{{decisionTitle}}]({{pathToAdr}}) | {{summary}} | **Trigger:** {{triggerCondition}}. **Default:** {{default}} |` — `{{decisionTitle}}` identical to the ADR heading; `{{pathToAdr}}` relative to the indexing file.
-2. Load [defaults.md](./defaults.md) and author `default` under its contract, bounded by `@decisionScope` (`narrow` names the entity). Never restate a rejected option as the default. Several clauses cover only this ADR's localized decision, not unrelated choices.
-3. Derive the Trigger condition: *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Generate trigger condition***, passing the written ADR as `{{recordContent}}` and the authored default as `{{rowValues}}`. `narrow` → trigger phrases name the entity; `wide` → name the class property and its domain synonyms, never one member alone. Confirm every clause's applicability is discoverable.
+2. Use the already-loaded index defaults contract and author `default` under its contract, bounded by `@decisionScope` (`narrow` names the entity). Never restate a rejected option as the default. Several clauses cover only this ADR's localized decision, not unrelated choices.
+3. Derive the Trigger condition: Apply **Generate trigger condition**, passing the written ADR as `{{recordContent}}` and the authored default as `{{rowValues}}`. `narrow` → trigger phrases name the entity; `wide` → name the class property and its domain synonyms, never one member alone. Confirm every clause's applicability is discoverable.
 4. Author the Summary yourself — 1-2 agent-optimized sentences stating the decision.
-5. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Ensure section exists*** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = `pathToAdr` (the previous path when renamed), `decisionTitle`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table directly.
+5. Apply **Ensure section exists** for `Architecture Decision Records`, then its **Sync index row** with `{{rowMetadata}}` = `pathToAdr` (the previous path when renamed), `decisionTitle`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table directly.
 
 ## Approval gate
 

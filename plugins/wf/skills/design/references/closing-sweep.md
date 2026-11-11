@@ -13,16 +13,16 @@ Reconcile before repairing: enumerate all saved questions and available conversa
 Inspect each gap, including previously resolved gaps invalidated by later answers:
 
 * **Gate miss** — confirmed ADR write → resolve with its path. Reusable answer with an existing Concept owner → repair that decision key's missing default through `concept-record`, preserving unrelated clauses, conditions, exceptions, and source anchors. Several owners → repair only an explicitly established owner; unresolved ownership stays open. No existing owner → resolve as ledger-only without creating a Concept. Feature-scoped answer → resolve as Feature Decision. Pending answer, classification, or write → keep open.
-* **Correction** — user corrected an assumption based on a Concept default → repair that key. For ADR corrections, surface the conflict and use the user's resolution in `adr` mode; do not autonomously rewrite its decision.
+* **Correction** — user corrected an assumption based on a Concept default → repair that key. For ADR corrections, surface the conflict and use the user's resolution in `adr` route; do not autonomously rewrite its decision.
 * **Drift** — inspect both the record anchor and code evidence. Missing proof stays unverified/open. For a confirmed Concept discrepancy, correct the key or mark the anchor "verify — may drift"; that marker records uncertainty, not a completed repair. An ADR discrepancy needs the user's decision before rewrite.
 
-A Concept repair covered by a user answer needs no second approval. A key change no answer covers remains the model's call: write it, log its evidence, and report it in the closing `[assumed]` list. *Run `record-architecture` skill to persist a settled Concept body* in `concept-record` mode; let it sync the index. Append `repaired:` only after both results are confirmed.
+A Concept repair covered by a user answer needs no second approval. A key change no answer covers remains the model's call: write it, log its evidence, and report it in the closing `[assumed]` list. *Run `doc-architecture` skill to record settled architecture* with route `concept-record`; let it sync the index. Append `repaired:` only after both results are confirmed.
 
-If the user corrects an answer after an ADR was written, reopen the linked question/gap and route the reversal through `adr` mode. Preserve the prior ADR choice as rejected; do not treat an earlier successful write as proof of the new decision.
+If the user corrects an answer after an ADR was written, reopen the linked question/gap and route the reversal through `adr` route. Preserve the prior ADR choice as rejected; do not treat an earlier successful write as proof of the new decision.
 
 ## 3. Trigger-condition refinement
 
-Run after repairs so newly synced rows are included. Check each relevant row for a missed clause or blank Trigger condition exposed this session, including discoverability of every repaired default's scope, branch conditions, and exceptions. Do not broaden policy to broaden matching. Supply an evidenced refinement through *Run `index-docs` skill to sync Markdown index rows and Trigger condition tables*, using **Sync index row**. Preserve unaffected cells; pending sync remains open.
+Run after repairs so newly synced rows are included. Check each relevant row for a missed clause or blank Trigger condition exposed this session, including discoverability of every repaired default's scope, branch conditions, and exceptions. Do not broaden policy to broaden matching. Supply an evidenced refinement through *Run `doc-architecture` skill to maintain architecture indexes*, route `index`, action `sync-row`. Preserve unaffected cells; pending sync remains open.
 
 ## Final reconciliation and handoff
 

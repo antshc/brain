@@ -8,7 +8,7 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[3] / "plugins/wf/skills/index-docs/scripts/load_index.py"
+SCRIPT = Path(__file__).resolve().parents[3] / "plugins/wf/skills/doc-architecture/scripts/load_index.py"
 
 INDEX = """# System Overview
 
