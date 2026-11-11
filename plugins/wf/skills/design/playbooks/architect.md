@@ -1,6 +1,6 @@
 # Design
 
-Full architecture procedure of the `design` skill's `architect` route. Paths resolve from `plugins/wf/skills/design/`. Route options, artifact location, and repo-doc rules are in `SKILL.md`.
+Full architecture procedure of the `design` skill's `architect` route. Paths resolve from `plugins/wf/skills/design/`. Route options, artifact location, and repo-doc rules are in `SKILL.md`. Before each phase, apply its shared Principles rule, selecting names cited in that phase.
 
 ## Contents
 
@@ -34,7 +34,7 @@ Skip subsystem grounding only when the work is genuinely greenfield with no surr
 
 *Run `subagents` skill to compare independent candidates and synthesize findings* using **Arena**. Pass the design task, Phase A grounding, `architect runners` role, resolved `arena-agents` count, rubric inputs, screening rules below, and artifact layout from `design/SKILL.md`. Use that artifact root for Arena outputs. Pass [Runner prompt](../references/runner-prompt.md), the absolute paths to `design/SKILL.md`, [Sketch](sketch.md), its [shared sketch contract](../references/sketch-contract.md), and [Rationale template](../references/rationale.template.md). Each runner follows Sketch's **Candidate** context; do not create a second sketch implementation. Require each candidate and the synthesized result to contain `rationale.md`, `module-map.md`, and `sketch/`. Arena fills the synthesized rationale's synthesis decision. Verify these against the artifact contract, repo docs, and design criteria.
 
-With multiple runners, require structurally distinct candidates before synthesis, per *run `principles` skill to load indexed engineering principles by name; read its body in full, then load in full the file its Index maps to the `Exhaust the design space` principle*. Whole-shape alternatives, not point fixes inside one shape.
+With multiple runners, require structurally distinct candidates before synthesis, per `Exhaust the design space`. Whole-shape alternatives, not point fixes inside one shape.
 
 Screen every candidate with [shared design red flags](../references/red-flags.md) and the Repo docs rules before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
 
@@ -80,14 +80,14 @@ Stop the Architect procedure and return the accepted sketch to the caller for `/
 
 Work in the current working tree and branch. The synthesized sketch is the contract.
 
-1. Scaffold: write the accepted sketch's types, signatures, and `not implemented` bodies into their target modules; commit as its own commit, per *run `principles` skill to load indexed engineering principles by name; read its body in full, then load in full the file its Index maps to the `Foundational thinking` principle*. Done when the scaffold commit exists.
-2. Fill in: replace `not implemented` bodies with code and pseudocode with logic. Planned, scoped breakage during fill-in is fine, per *run `principles` skill to load indexed engineering principles by name; read its body in full, then load in full the file its Index maps to the `Outcome-oriented execution` principle*. Done when no `not implemented` body from the sketch remains and the repo's build and tests pass.
+1. Scaffold: write the accepted sketch's types, signatures, and `not implemented` bodies into their target modules; commit as its own commit, per `Foundational thinking`. Done when the scaffold commit exists.
+2. Fill in: replace `not implemented` bodies with code and pseudocode with logic. Planned, scoped breakage during fill-in is fine, per `Outcome-oriented execution`. Done when no `not implemented` body from the sketch remains and the repo's build and tests pass.
 3. Deviations: when code needs something the sketch didn't anticipate (new parameter, type, dependency, module), classify it: sketch wrong, requirement missed, or implementation overreaching. Make evidence-backed corrections, update the sketch, synthesized design, and rationale, and append to `review-log.md`; with checkpoint, surface material changes for approval. Do not silently change user requirements or exceed authorized scope.
 4. Watch for Phase F tells throughout; on a pattern, go to Phase F.
 
 ## Phase F: Scrap when the architecture is wrong
 
-If implementation keeps producing friction the sketch can't absorb, throw the sketch out. Don't bolt fixes onto a wrong design, per *run `principles` skill to load indexed engineering principles by name; read its body in full, then load in full the files its Index maps to the `Redesign from first principles` and `Fix root causes` principles*.
+If implementation keeps producing friction the sketch can't absorb, throw the sketch out. Don't bolt fixes onto a wrong design, per `Redesign from first principles` and `Fix root causes`.
 
 The signal is a pattern, not single instances. Tells:
 
@@ -104,8 +104,8 @@ When you scrap:
 
 1. Tell the user which tells fired, with file evidence; append to `review-log.md`.
 2. Use Phase A’s default Research call over what was built. Save revised grounding beside the original and pass it into the new Phase B.
-3. Redesign as if the new constraints had been day-one assumptions, per *run `principles` skill to load indexed engineering principles by name; read its body in full, then load in full the file its Index maps to the `Redesign from first principles` principle*.
-4. Subtract before adding, per *run `principles` skill to load indexed engineering principles by name; read its body in full, then load in full the file its Index maps to the `Subtract before you add` principle*. The new sketch is smaller than the old one before it grows.
+3. Redesign as if the new constraints had been day-one assumptions, per `Redesign from first principles`.
+4. Subtract before adding, per `Subtract before you add`. The new sketch is smaller than the old one before it grows.
 5. Return to Phase B and re-run arena, then Phase C review.
 
 ## Outputs

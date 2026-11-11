@@ -13,16 +13,10 @@ Canonical code-shape instructions for both `design sketch` and every `design arc
 
 ## Discipline
 
-Run `principles` and read its indexed principle files named below fully before sketching. Apply them rather than copying their bodies here.
+Apply the shared Principles rule from Design before shaping code. Reject at least one concrete whole-shape alternative, judged by interface depth.
 
-- **Foundational thinking:** choose data structures first; trace dominant access patterns and do not defer essential indexes/maps to 'later'.
-- **Deep modules:** expose a small, capable interface and hide complexity in the callee. Keep transport/wire types private per **Boundary discipline**.
-- **Separate before serializing shared state:** consider per-actor state merged at the read boundary when multiple actors write.
-- **Encode lessons in structure:** prefer hard-to-misuse types over runtime checks, over comments.
-- **Boundary discipline:** validate at entry points, use trusted domain types inside, pure business logic, thin shell.
-- **Make operations idempotent:** account for repeat execution and crashes partway through state transitions.
-- **Laziness protocol** and **Minimize reader load:** avoid long call chains; flatten when tracing a flow needs more than three files.
-- **Exhaust the design space:** reject at least one concrete whole-shape alternative, judged by interface depth, not a variation of the same shape.
+Local sketch checks (not indexed principles):
+
 - **One source of truth:** derive rather than synchronize duplicated state or lists.
 - **Agent reader:** a future agent reads few files and copies the nearest example. Make the locally obvious change safe for the whole repository; hide internals and provide one supported operation path.
 

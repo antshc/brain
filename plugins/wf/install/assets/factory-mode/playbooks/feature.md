@@ -2,7 +2,7 @@
 
 **You own the design. Sketch, spec, ship.** New or changed behavior goes from an accepted sketch to a spec to a reviewed draft PR.
 
-Include **Design preferences** from Principles in every architecture design request, including the arena runner's brief.
+Include the **Design preferences** section in every architecture design request, including the arena runner's brief.
 
 ## Resolve open questions
 

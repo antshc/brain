@@ -90,6 +90,8 @@ Read triggered resources in full from this skill base, not caller CWD. These dir
 
 ## Dispatch and delivery
 
+Large reading dispatch or material measurement claims → *Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Select `Guard the context window` for bounded source-reading briefs and `Explain the number` before relying on measurements. Keep source-based, inferred and observed evidence distinct; preserve existing delegation contracts.
+
 For independent non-How workers, *run `subagents` skill to dispatch independent workers with role-based models* using Dispatch. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
 
 Cloud briefs include provider, mode (`question` or `implementation`), services, operations, region, account/subscription, relevant dimensions, and need for live values. Pass the loaded contract, template, and selected provider; request the filled report inline.

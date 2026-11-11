@@ -22,6 +22,8 @@ Never launch subagents, switch branches, manage worktrees, run a rebase, publish
 
 ## Implementation
 
+*Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Pass task, phase, scope and constraints; let the Index select for data/type shape, abstractions, nontrivial mechanical work, eligible internal migration and tests. Apply `Foundational thinking` and `Model the domain` before logic, `Test behavior, not implementation` for assertions and `Prove it works` before completion; re-evaluate when the phase changes. Existing scope, no-subagent and commit limits still apply.
+
 Implement the task using the smallest change that satisfies its requirements.
 If observed evidence proves the task is already satisfied, return the verified no-change result.
 
