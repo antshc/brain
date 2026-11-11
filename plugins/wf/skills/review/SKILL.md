@@ -20,4 +20,4 @@ argument-hint: '<code|comments|blast-radius|tests-gap|architecture|hitl> [target
 2. For a PR URL alone, a generic fix review, or any other ambiguous request, ask which outcome the user wants and wait before loading a playbook or acting. If the user explicitly asks for both impact and test coverage, run `blast-radius` first and pass its risks to `tests-gap`.
 3. Read only the selected playbook in full, then open its references as directed. Resolve skill-relative paths from this `SKILL.md` directory, including absolute paths handed to subagents.
 
-`review` owns judgment; *run `github` skill for review thread, post, reply, and resolve mechanics*. Long-running review and CI monitoring is the caller's loop, not this skill. For technical design review, *use `design` skill to review technical design architecture* using `review`.
+`review` owns judgment; *Load and follow the `github` skill to manage review threads, posts, replies, and resolution mechanics*. Long-running review and CI monitoring is the caller's loop, not this skill. For technical design review, *Load and follow the `design` skill to review technical design architecture* using `review`.

@@ -11,6 +11,14 @@ from modules.repo_consistency.frontmatter import parse_frontmatter
 SCAN_ROOTS = ("plugins", "skills")
 
 
+def is_excluded(path: Path) -> bool:
+    """Excluded trees neither provide skills nor contain executable callers."""
+    return bool({"_backup", "_in-progress"} & set(path.parts)) or any(
+        parent.name == "kbs" and parent.parent.name == "docs"
+        for parent in (path, *path.parents)
+    )
+
+
 def find_skill_and_agent_files(repo_root: Path) -> list[Path]:
     """Every SKILL.md and *.agent.md file under the repo's plugin/skill trees."""
     files: list[Path] = []
@@ -20,7 +28,7 @@ def find_skill_and_agent_files(repo_root: Path) -> list[Path]:
             continue
         files.extend(root.rglob("SKILL.md"))
         files.extend(root.rglob("*.agent.md"))
-    return sorted(files)
+    return sorted(path for path in files if not is_excluded(path.relative_to(repo_root)))
 
 
 def find_skill_names(repo_root: Path) -> set[str]:
@@ -31,9 +39,11 @@ def find_skill_names(repo_root: Path) -> set[str]:
         if not root.is_dir():
             continue
         for skill_md in root.rglob("SKILL.md"):
+            if is_excluded(skill_md.relative_to(repo_root)):
+                continue
             names.add(skill_md.parent.name)
         for template in root.rglob("*.SKILL.template.md"):
-            if any(part in {"_backup", "_in-progress"} for part in template.relative_to(root).parts):
+            if is_excluded(template.relative_to(repo_root)):
                 continue
             fields = parse_frontmatter(template.read_text(encoding="utf-8"))
             name = (fields or {}).get("name", "")

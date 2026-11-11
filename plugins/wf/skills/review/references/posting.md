@@ -12,4 +12,4 @@ Require explicit human approval of the exact human-owned body. Preserve the appr
 
 Resolve `OWNER`, `REPO`, `PR_NUMBER`, the exact manifest `FILE_PATH`, and a commentable right-side `LINE_NUMBER`. Retain unanchored findings as unposted with the reason. Run the selected route's freshness check immediately before the API call.
 
-*Run `github` skill to post pull request review threads* using Reviews, **Inline**, with the qualified PR, `COMMIT_ID`, exact path, line, and body file. Code also supplies `REVIEW_BASE`. Retain the confirmed comment ID. On mismatch or uncertain response, report the finding and reconcile before retrying. Leave review submission to the caller.
+*Load and follow the `github` skill to post pull request review threads* using Reviews, **Inline**, with the qualified PR, `COMMIT_ID`, exact path, line, and body file. Code also supplies `REVIEW_BASE`. Retain the confirmed comment ID. On mismatch or uncertain response, report the finding and reconcile before retrying. Leave review submission to the caller.

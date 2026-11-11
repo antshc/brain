@@ -20,7 +20,7 @@ Run once per session, before Review loop. Steps 1 to 3 complete before step 4.
 
 If `git status --porcelain` is non-empty, stop and ask the user before checkout.
 
-*Follow `github` skill for pull requests and review evidence* using Pull requests, Diff, HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
+*Load and follow the `github` skill to read pull requests and review evidence* using Pull requests, Diff, HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
 
 **2. Load existing review comments**
 
@@ -93,7 +93,7 @@ Drafts, approves, and posts one review comment.
 
 2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability, etc.).
 
-2.2 `IMPROVEMENT` — concrete fix or direction. *Run `github` skill to draft review threads and pull request comments using Reviews* with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `github` install before drafting. Stop and report missing access if neither is available.
+2.2 `IMPROVEMENT` — concrete fix or direction. *Load and follow the `github` skill to draft review threads and pull request comments using Reviews* with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `github` install before drafting. Stop and report missing access if neither is available.
 
 2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 
@@ -128,7 +128,7 @@ On approval (1 or 2): follow [Posting](../references/posting.md#hitl), with `FIL
 
 Answers a code question; never drafts or posts.
 
-1. **Research:** check `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` first; answer from matching facts. Otherwise *run `research` skill to investigate primary sources and return cited findings* on the checked-out PR head. Pass the question as `@question`, plus `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed. Route by question:
+1. **Research:** check `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` first; answer from matching facts. Otherwise *Load and follow the `research` skill to investigate primary sources and return cited findings* on the checked-out PR head. Pass the question as `@question`, plus `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed. Route by question:
    - **Lookup** — where is X, who calls Y, what does Z return: pure lookup; no document; research returns Hunter's verdict inline.
    - **How** — flow, mechanism, or behavior across files or components: default Research; set `@outputPath` to `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/inspect/{{slug}}.md` and `@outputBase` to the checked-out repository root. Keep content framing in `@outputShape`.
    - **Why** — design rationale or what led to the change: **Why code anchor** (`@mode=why`, `@whyDepth=anchor`), returned inline; use full Why only when the user asks for rationale beyond code, commits, and PRs.

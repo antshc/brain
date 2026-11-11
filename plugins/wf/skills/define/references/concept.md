@@ -1,14 +1,14 @@
 # Define Concept
 
-Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `hunter` owns read-only Explore lookups (where is, what calls, how a flow works); The architecture index route owns scan and match. *Use `doc-architecture` skill to record settled architecture*; `concept-body` renders, `concept-record` persists and indexes. Do not reimplement their rules.
+Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `hunter` owns read-only Explore lookups (where is, what calls, how a flow works); The architecture index route owns scan and match. *Load and follow the `doc-architecture` skill to record settled architecture*; `concept-body` renders, `concept-record` persists and indexes. Do not reimplement their rules.
 
 ## Evidence
 
-Every fact in a suggestion, a question, or the recorded Concept is either a cited inspection result or a user answer from this session. A fact inspection cannot settle becomes a question to the user, carrying the evidence that left it open. A recommended answer cites its evidence or is labelled `proposal`. *Load `doc-architecture` skill to record settled architecture* with route `concept-body` and follow the selected procedure's **Evidence** and **Terminology** for what the body may claim.
+Every fact in a suggestion, a question, or the recorded Concept is either a cited inspection result or a user answer from this session. A fact inspection cannot settle becomes a question to the user, carrying the evidence that left it open. A recommended answer cites its evidence or is labelled `proposal`. *Load and follow the `doc-architecture` skill to record settled architecture* with route `concept-body` and follow the selected procedure's **Evidence** and **Terminology** for what the body may claim.
 
 ## Inspection
 
-1. *Load `research` skill to investigate primary sources and return cited findings*; use **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
+1. *Load and follow the `research` skill to investigate primary sources and return cited findings*; use **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
 2. Pick shape: one focused path → one subagent; distinct non-overlapping tracks (separate deployables, workflow boundaries, configuration versus tests, categories) → parallel subagents, each a bounded subquestion; a track needing another's answer → sequential. No duplicate lookups for areas already in flight.
 3. Spawn each lookup as a `hunter` subagent with its Explore request verbatim. If Hunter is unavailable, record the blocked evidence request and continue independent tracks.
 4. Consolidate results: resolve conflicts with targeted evidence; state remaining uncertainty.
@@ -47,7 +47,7 @@ Read `ARCHITECTURE.md`'s `Crosscutting Concepts` table in full; an absent file o
 
 **2. Match the described candidate, or sweep for candidates**
 
-- **Described** — the user described the concept to add. *Run `doc-architecture` skill to maintain architecture indexes*, route `index`, action `scan` over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run Inspection over the described concern and each matched record for drift. A rule that is not crosscutting → *load `doc-architecture` skill to record settled architecture* with route `concept-record` and route per the selected procedure's **Where the rule belongs**; report its home and stop.
+- **Described** — the user described the concept to add. *Load and follow the `doc-architecture` skill to maintain architecture indexes*, route `index`, action `scan` over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run Inspection over the described concern and each matched record for drift. A rule that is not crosscutting → *Load and follow the `doc-architecture` skill to record settled architecture* with route `concept-record` and route per the selected procedure's **Where the rule belongs**; report its home and stop.
 - **Not described** — sweep. Run Inspection at `thorough`, with one parallel track per category group of the arc42 list plus one drift track over the recorded Concepts. Give each track its group's categories and the item 1 mapping as `@inputs`, and this `@work` instruction verbatim:
 
   > For each category, report: present in the codebase, with file-and-line citations, or `no evidence found in inspected scope`; the building blocks where its decision recurs; whether the code makes one consistent choice (quote it) or several (list each with citations); the recorded Concept covering it, if any. For the drift track, report per recorded Concept every rule or `default` the code contradicts, with citations. Report only what you cite.
@@ -79,7 +79,7 @@ List every planned `Rules` bullet, scenario, and `Implementation Map` row, plus 
 
 **8. Document and record**
 
-Select the `dom`, `str`, or `ops` kind and *run `doc-architecture` skill to record settled architecture* with route `concept-body` from the resolved concept and cited evidence. Then *run `doc-architecture` skill to record settled architecture* with route `concept-record`, passing the body and the user-confirmed `default` to apply its gate and extend or create the record. An explicit request to define the concept authorizes this write after the questioning confirmation; no second permission prompt. If the gate fails, report the appropriate home and do not create a Concept.
+Select the `dom`, `str`, or `ops` kind and *Load and follow the `doc-architecture` skill to record settled architecture* with route `concept-body` from the resolved concept and cited evidence. Then *Load and follow the `doc-architecture` skill to record settled architecture* with route `concept-record`, passing the body and the user-confirmed `default` to apply its gate and extend or create the record. An explicit request to define the concept authorizes this write after the questioning confirmation; no second permission prompt. If the gate fails, report the appropriate home and do not create a Concept.
 
 **9. Report**
 

@@ -26,7 +26,7 @@ One entry point; route to one playbook. Do not load unrelated routes.
 
 ## Principles
 
-*Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Pass task, selected route, phase and explicitly named principles; select `In your own words` for intent. Let the Index select for consumer experience, domain/type shape, seams, boundaries, concurrency and alternatives. Apply before the selected playbook; re-evaluate at phase changes. Fresh candidate workers apply this rule in their own context.
+*Load and follow the `principles` skill to load indexed engineering principles by name*. Pass task, selected route, phase and explicitly named principles; select `In your own words` for intent. Let the Index select for consumer experience, domain/type shape, seams, boundaries, concurrency and alternatives. Apply before the selected playbook; re-evaluate at phase changes. Fresh candidate workers apply this rule in their own context.
 
 ## Architect options and behavior
 

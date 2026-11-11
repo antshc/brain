@@ -143,7 +143,7 @@ def test_codey_selects_focused_integration_tests_by_risk():
     assert 'If there is no material integration gap, skip the skill' in boundary
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
     for body in (boundary, fallback):
-        assert '*run `testing-integrations` skill to pick the minimal seam for a DB or cloud component test or a functional slice*' in body
+        assert '*Load and follow the `testing-integrations` skill to pick the minimal seam for a DB or cloud component test or a functional slice*' in body
         assert 'fastest adequate configuration, narrowest filter, documented test directory within the workspace, and safety gates' in body
         assert "repository's documented equivalent and safety rules" in body
 
@@ -418,7 +418,7 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert 'Review never fixes code' in review
     finalize = post.split('## Finalize\n')[1].split('\n## ')[0]
     assert 'posting failure' in post.lower()
-    for text in ('stale', 'pending', 'failed', '`git` Worktrees tactic', 'RUN_DIR/worktrees/integration.json'):
+    for text in ('stale', 'pending', 'failed', '`git` skill', 'Worktrees', 'RUN_DIR/worktrees/integration.json'):
         assert text in finalize
     assert 'do not restart Address' in finalize
     assert 'Diagnose' not in finalize

@@ -10,7 +10,7 @@ Verify the running app on branch `{{featureBranch}}` (pull request {{pullRequest
 
 # CONTEXT
 
-These repository skills launch and drive the app and capture evidence. Read each `SKILL.md` fully and follow its launch, readiness check, drive, evidence, and cleanup instructions exactly; also use the feature map beside each when present:
+These repository skills launch and drive the app and capture evidence. Resolve each exact skill name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. Read its full body, selected route and required resources, then follow launch, readiness, drive, evidence and cleanup; use the feature map when present:
 
 <verification_skills>
 {{verificationSkills}}

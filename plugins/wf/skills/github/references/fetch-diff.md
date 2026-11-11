@@ -12,7 +12,7 @@ Resolve and fetch the PR, follow the requested route's setup, then [build the pe
 
 Use a fresh detached review worktree in the existing repository. **MUST NOT** clone, copy the repository, reuse the implementation worktree, or switch or reset the caller checkout. Capture `HARNESS_ROOT` before changing directories, choose the leaf `review-pr-PR_NUMBER-RUN_ID`, and create a unique run-owned `DIFF_DIR` outside the repository and all worktrees.
 
-*Run `git` skill for worktree lifecycle and creation using Worktrees* with `HARNESS_ROOT`, `SOURCE_ROOT`, repository name, run ID, selected leaf and detached `REVIEW_HEAD`. Use the returned path as `REVIEW_REPO` and save the ownership record in `DIFF_DIR`. On a partial creation, preserve the temporary refs and report the path until Reconcile confirms its state. Use this new worktree for source inspection; no implementation branch checkout, clone or new branch. Done when the fresh review worktree is verified.
+*Load and follow the `git` skill to run worktree lifecycle and creation using Worktrees* with `HARNESS_ROOT`, `SOURCE_ROOT`, repository name, run ID, selected leaf and detached `REVIEW_HEAD`. Use the returned path as `REVIEW_REPO` and save the ownership record in `DIFF_DIR`. On a partial creation, preserve the temporary refs and report the path until Reconcile confirms its state. Use this new worktree for source inspection; no implementation branch checkout, clone or new branch. Done when the fresh review worktree is verified.
 
 After building the diff, re-read the PR head and base. On change, follow Cleanup, then reacquire. After two changed-snapshot retries, report a stale review. Return `SOURCE_ROOT`, `REVIEW_REPO`, `DIFF_DIR`, `MANIFEST`, head/base/merge-base, metadata, and cleanup ownership.
 
@@ -32,7 +32,7 @@ Use `DIFF_DIR/_manifest.tsv` as `MANIFEST`. Anchor inline comments to exact mani
 
 ## Cleanup
 
-After retaining findings and evidence, leave `REVIEW_REPO` and *run `git` skill for verified worktree lifecycle and removal using Worktrees* with its saved ownership record and pinned `REVIEW_HEAD`. Retain the temporary refs until removal is verified so the pinned snapshot remains recoverable. Preserve/report dirty worktrees or failed removal; never recursively delete a registered worktree. After successful removal (or if creation never occurred), delete only this run's temporary refs using `git update-ref -d REF EXPECTED_SHA`, then remove its diff/temp directory. Preserve caller worktrees, branch refs, HEAD and files; report any unexpected change. Keep fetched Git objects in the shared database; no pruning/GC.
+After retaining findings and evidence, leave `REVIEW_REPO` and *Load and follow the `git` skill to run verified worktree lifecycle and removal using Worktrees* with its saved ownership record and pinned `REVIEW_HEAD`. Retain the temporary refs until removal is verified so the pinned snapshot remains recoverable. Preserve/report dirty worktrees or failed removal; never recursively delete a registered worktree. After successful removal (or if creation never occurred), delete only this run's temporary refs using `git update-ref -d REF EXPECTED_SHA`, then remove its diff/temp directory. Preserve caller worktrees, branch refs, HEAD and files; report any unexpected change. Keep fetched Git objects in the shared database; no pruning/GC.
 
 ## Chore
 

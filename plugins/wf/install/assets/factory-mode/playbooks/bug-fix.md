@@ -4,12 +4,12 @@
 
 Be scientific. Every shipped line traces to runtime evidence. "Might help" is a hypothesis, not a fix; it does not ship. When evidence refutes a hypothesis, revert what it motivated.
 
-1. Reproduce it yourself on the matching surface. *Run `testing-integrations` skill to pick the minimal seam and reproduce strategy (component test, functional slice, real cloud, local app via REST or GUI).* Cloud-only symptom → *run `prototype-cloud-scenario` skill to reproduce the bug as a throwaway cloud scenario on isolated test resources.* Ask the user only with a specific reason the surface is unreachable, after driving it as far as it goes. Done when the symptom fires on demand.
+1. Reproduce it yourself on the matching surface. *Load and follow the `testing-integrations` skill to pick the minimal seam and reproduce strategy (component test, functional slice, real cloud, local app via REST or GUI).* Cloud-only symptom → *Load and follow the `prototype-cloud-scenario` skill to reproduce the bug as a throwaway cloud scenario on isolated test resources.* Ask the user only with a specific reason the surface is unreachable, after driving it as far as it goes. Done when the symptom fires on demand.
 2. Binary-search the cause. List candidate hypotheses; each pass take the split that cuts the most remaining space, get runtime evidence, eliminate. Seed with research through Non-negotiables: affected subsystem behavior and regression history from `git log -p` / `git blame`. Unclear state → add logging or instrumentation and read it as the code runs. Confirm the surviving *mechanism* with runtime evidence before step 3 (**Fix root causes**, **Attack the premise**).
-3. Run **Prepare a direct branch** before implementation. Plan the fix. Crosses a function boundary → `design architect` first. Delegate implementation with a specific scope: files, data shape, the repro to turn green.
+3. Run **Prepare a direct branch** before implementation. Plan the fix. Crosses a function boundary → *Load and follow the `design` skill to design architecture and sketch code*, selecting `architect` first. Delegate implementation with a specific scope: files, data shape, the repro to turn green.
 4. Verify on the same surface. The original repro now passes. "Inconclusive" or wrong-surface is not a pass; flag it. Unit tests show branch behavior, not bug absence (**Prove it works**).
-5. Use the `git` **Draft commit** tactic. Stage commits so the failing repro lands before the fix (**Sequence verifiable units**). Skip the separate failing-test commit when that test would be expensive or integration-heavy; say so.
-6. Not fixing now, or the user wants a report → *run `draft-artifact` skill to draft a reproducible bug report from observed behavior using **Bug report**.*
+5. *Load and follow the `git` skill to run verified Git mechanics using **Draft commit***. Stage commits so the failing repro lands before the fix (**Sequence verifiable units**). Skip the separate failing-test commit when that test would be expensive or integration-heavy; say so.
+6. Not fixing now, or the user wants a report → *Load and follow the `draft-artifact` skill to draft a reproducible bug report from observed behavior using **Bug report**.*
 7. Run Opening a PR.
 
 **Reply:** what was broken, root cause, fix, how you verified. Paste failing-then-passing repro output verbatim.

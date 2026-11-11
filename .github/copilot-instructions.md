@@ -1,3 +1,7 @@
+## Skill execution
+
+When invoking a skill, load and follow its complete `SKILL.md`; read the selected route procedure fully before acting, then required or conditionally triggered resources fully before their dependent steps. Resolve paths from that skill's base directory. Continue truncated reads to EOF; descriptions, summaries and partial reads do not count as loaded. Reuse complete content already available for the same revision; reload after context loss or changes. Apply this to skill-capable workers. Missing content blocks dependent work; report it and continue independent work. Resolve external/generated skills and their current descriptions from the installed roster before rendering a call; never invent missing instructions.
+
 # Excluded Folders
 
 **Never scan, read, or edit `_backup/`, `docs/kbs`, `_in-progress/`.** Treat them as out of scope for all tasks.

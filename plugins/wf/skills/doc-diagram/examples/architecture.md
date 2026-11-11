@@ -102,7 +102,7 @@ C4Container
 
 ## Component Diagram Example
 
-*Run `doc-diagram` skill to show system structure in a Mermaid C4 component diagram* when one selected deployable needs internal architecture detail. The result is one evidence-grounded `C4Component` view of architecturally relevant components and dependencies inside that deployable; classes such as Managers, Engines, or Accessors appear only when they carry architectural responsibility.
+*Load and follow the `doc-diagram` skill to show system structure in a Mermaid C4 component diagram* when one selected deployable needs internal architecture detail. The result is one evidence-grounded `C4Component` view of architecturally relevant components and dependencies inside that deployable; classes such as Managers, Engines, or Accessors appear only when they carry architectural responsibility.
 
 <details>
 <summary>Component Diagram — Order Service</summary>

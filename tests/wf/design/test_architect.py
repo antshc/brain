@@ -38,7 +38,7 @@ def test_factory_uses_one_autonomous_feature_flow_and_optional_checkpoint():
     assert "`challenge-this` with `adversaries=3`" in playbook
     assert "design-only handoff" in playbook
     assert "forward `checkpoint` only when the user explicitly asks" in playbook
-    assert playbook.index('`design` skill in `spec` mode') < playbook.index('`implement` skill')
+    assert playbook.index('use `spec` mode') < playbook.index('`implement` skill')
     assert "Auto adds" not in skill
     assert "architect auto" not in help_text
     assert "architect` vs `architect auto" not in help_text

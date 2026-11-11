@@ -25,11 +25,11 @@ Operations and tactics for Jira and Confluence. Pick the tactic by trigger, load
 
 Address page comments runs only on an explicit review-thread request; an ordinary edit never triggers it.
 
-Out of scope here: daily blocked items and @mentions → *run `daily-briefing` skill for the daily briefing, standup update, blocked work items, and unanswered mentions*.
+Out of scope here: daily blocked items and @mentions → *Load and follow the `daily-briefing` skill to produce the daily briefing, standup update, blocked work items, and unanswered mentions*.
 
 ## Shared constraints
 
-1. **Preflight once per site.** Before the first operation: *run `preflight-atlassian` skill to resolve site, default project key, default space id, credentialed twg command, and token availability from `.atlassian.json.user` config* **Action: Resolve**. Keep `configPath`, `site`, `twg`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`. Later operations in the same request on the same site reuse them; a different site, or a missing fact a tactic needs, re-runs it. Map Markdown and Install need no Preflight.
+1. **Preflight once per site.** Before the first operation: *Load and follow the `preflight-atlassian` skill to resolve site, default project key, default space id, credentialed twg command, and token availability from `.atlassian.json.user` config* **Action: Resolve**. Keep `configPath`, `site`, `twg`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`. Later operations in the same request on the same site reuse them; a different site, or a missing fact a tactic needs, re-runs it. Map Markdown and Install need no Preflight.
 2. **CLI.** `<skillDir>` = the parent of this `SKILL.md`. Body operations run `python3 <skillDir>/scripts/atl.py <command> ...` from any working directory; pass `--config "<configPath>"`, never credentials.
 3. **Body transport.** Full Jira descriptions and Confluence page bodies move over REST + ADF through `atl.py` only. Search, discovery, metadata, Jira comments, transitions, and every other non-body operation use Preflight's `<twg>`. Never use the Atlassian MCP. Request Markdown, never HTML, from twg; the only HTML exception is the Address page comments tactic's targeted edits.
 4. **Fallbacks.** Each fetch reference names its lossy twg fallback and warning; use it only when `atl.py` is unavailable or fails for a non-auth reason. Auth failure or policy denial → stop and report; no fallback.

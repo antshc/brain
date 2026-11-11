@@ -58,8 +58,8 @@ def test_review_impact_and_tests_keep_their_analysis_contracts():
     root = SKILLS / "review/playbooks"
     impact = (root / "blast-radius.md").read_text()
     assessment = (root / "tests-gap.md").read_text()
-    assert re.findall(r"\*run `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
-        "principles", "research", "research", "testing-integrations", "subagents", "subagents", "writing-style",
+    assert re.findall(r"\*Load and follow the `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
+        "git", "principles", "research", "research", "testing-integrations", "subagents", "subagents", "git", "writing-style",
     ]
     for action in ("Why code anchor", "**default Research**", "**Dispatch**", "**Arena**", "**Unslop only**"):
         assert action in impact
@@ -76,7 +76,7 @@ def test_pr_review_routes_share_diff_acquisition_and_preserve_posting_contracts(
     root = SKILLS / "review"
     for route in ("code", "hitl"):
         playbook = (root / f"playbooks/{route}.md").read_text()
-        assert "*Follow `github` skill for pull requests and review evidence*" in playbook
+        assert "*Load and follow the `github` skill to read pull requests and review evidence*" in playbook
         assert f"using Pull requests, Diff, {route.upper() if route == 'hitl' else route.title()} setup" in playbook
         assert "../../github/" not in playbook
         assert f"](../references/posting.md#{route})" in playbook

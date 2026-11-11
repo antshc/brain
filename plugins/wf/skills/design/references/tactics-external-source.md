@@ -10,4 +10,4 @@ An external-source edit is the only exception to the parent's local writable-sur
 
 Confirm the update result before marking it synchronized. Persist the resolved wording, source status, and any pending correction so the next turn or handoff can continue without repeating approval.
 
-For GitHub sources *use `github` skill for platform repositories and issues* using Repository or Issues. Pass qualified refs and the confirmed text for an authorized edit.
+For GitHub sources *Load and follow the `github` skill to run GitHub platform mechanics for repositories and issues* using Repository or Issues. Pass qualified refs and the confirmed text for an authorized edit.
