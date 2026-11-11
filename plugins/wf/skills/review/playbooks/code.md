@@ -2,7 +2,7 @@
 
 ## Inputs
 
-- User invocation: PR URL, with an existing local checkout of the PR repository available. For explicit code review with a legacy `low`, `medium`, or `high` level, disclose that levels are retired and use Subagents role selection.
+- User invocation: PR URL, with an existing local checkout of the PR repository available.
 - Resolve a matching existing repository from explicit `SOURCE_ROOT`, caller checkout, or the harness workspace; ask for its path if absent/ambiguous. **MUST NOT** clone as a fallback.
 
 ## Workflow

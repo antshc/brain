@@ -60,14 +60,13 @@ def test_code_review_delegates_axes_without_owning_model_policy():
     assert re.search(r"^\| swarm workers \|", models, flags=re.MULTILINE)
 
 
-def test_review_retires_levels_without_changing_ambiguous_route_handling():
+def test_review_accepts_pr_url_without_level_options():
     router = (SKILLS / "review/SKILL.md").read_text()
     code_row = next(line for line in router.splitlines() if line.startswith("| `code` |"))
     assert "level" not in code_row
-    assert "review level selects `code`" not in router
-    assert "retired review level remains ambiguous" in router
+    assert "ask which outcome" in router
     code = (SKILLS / "review/playbooks/code.md").read_text()
-    assert "disclose that levels are retired" in code
+    assert not re.search(r"`(?:low|medium|high)`|\blegacy\b|\bretired\b", router + code)
 
 
 def test_research_preserves_why_and_routes_system_evidence_to_hunter():
