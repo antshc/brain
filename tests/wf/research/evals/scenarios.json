@@ -1,12 +1,12 @@
 {
-  "routeLinePattern": "^route: (rg|lsp|graphify|github|nuget)",
+  "routeLinePattern": "^route: (rg|lsp|graphify|nuget|unresolved)",
   "placeholders": {
     "{{presentLiteral}}": "string literal known to exist in the eval checkout",
     "{{absentLiteral}}": "string literal known to be absent, including ignored files",
     "{{symbol}}": "exact Type.Member defined in the eval checkout",
     "{{deployableA}}": "first deployable named in ARCHITECTURE.md Deployables with a local checkout",
     "{{deployableB}}": "second deployable covered by the same graphify-out/ graph",
-    "{{remoteOnlyRepo}}": "repository with an origin URL but no local checkout",
+    "{{missingLocalRepo}}": "repository with an origin URL but no local checkout",
     "{{packageMember}}": "member owned by a package restored in the local eval checkout"
   },
   "commonChecks": [
@@ -53,11 +53,11 @@
       "checks": ["no graphify skill or CLI", "LSP references or call hierarchy used before rg"]
     },
     {
-      "id": "github_no_checkout",
-      "request": "@work: Names unknown: where does {{remoteOnlyRepo}} define its public API?\n@shape: relationship\n@depth: medium\n@target: {{remoteOnlyRepo}}",
+      "id": "missing_local_checkout",
+      "request": "@work: Names unknown: where does {{missingLocalRepo}} define its public API?\n@shape: relationship\n@depth: medium\n@target: {{missingLocalRepo}}",
       "excludedTools": [],
-      "expectedRoute": "github",
-      "checks": ["GitHub tools loaded", "no local filesystem search for the target", "branch staleness carried into verdict"]
+      "expectedRoute": "unresolved",
+      "checks": ["reports missing local checkout as a blocker", "no remote repository tools, clone, or fetch", "no guessed neighboring checkout or package-cache evidence"]
     },
     {
       "id": "nuget_restored_package",

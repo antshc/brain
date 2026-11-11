@@ -13,7 +13,7 @@ SKILL = (REPO / 'plugins/wf/skills/research/SKILL.md').read_text()
 FRONTMATTER, SKILL_BODY = re.match(r'^---\n(.*?)\n---\n(.*)$', SKILL, re.S).groups()
 HUNTER = (REPO / 'plugins/wf/agents/hunter.agent.md').read_text()
 EVALS = Path(__file__).parent / 'evals'
-ROUTES = {'rg', 'lsp', 'graphify', 'github', 'nuget'}
+ROUTES = {'rg', 'lsp', 'graphify', 'nuget', 'unresolved'}
 
 
 def section(title: str, text: str = HUNTER) -> str:
@@ -59,7 +59,7 @@ def test_request_lists_shape_enum():
 def test_route_the_lookup_precedes_tool_selection():
     assert HUNTER.index('### Route the lookup') < HUNTER.index('### Select tools by question shape')
     route = section('Route the lookup')
-    assert 'route: rg | lsp | graphify | github' in route
+    assert 'route: rg | lsp | graphify | nuget | unresolved' in route
     assert {re.match(r'`(\w+)`', row[-1]).group(1) for row in table_rows(route)} == ROUTES
 
 
@@ -95,9 +95,21 @@ def test_eval_scenarios_cover_every_route():
     scenarios = json.loads((EVALS / 'scenarios.json').read_text())
     cases = scenarios['cases']
     assert {'rg_shell_literal', 'rg_shell_absent_literal', 'rg_backend_literal', 'graphify_relationship',
-            'lsp_symbol', 'github_no_checkout', 'nuget_restored_package'} <= {c['id'] for c in cases}
+            'lsp_symbol', 'missing_local_checkout', 'nuget_restored_package'} <= {c['id'] for c in cases}
     assert {c['expectedRoute'] for c in cases} == ROUTES
     pattern = re.compile(scenarios['routeLinePattern'])
     for case in cases:
         assert re.search(r'@shape: (literal|symbol|relationship|nuget)', case['request']), case['id']
         assert pattern.match(f"route: {case['expectedRoute']} — reason"), case['id']
+
+
+def test_missing_checkout_blocks_lookup_without_remote_fallback():
+    target = section('Resolve the target')
+    assert 'local checkout' in target and 'unresolved' in target
+    route = section('Route the lookup')
+    row = next(row for row in table_rows(route) if 'no local checkout' in row[0])
+    assert row[-1].startswith('`unresolved`')
+    assert 'github' not in route.lower()
+    tools = section('Select tools by question shape')
+    assert 'clone' in tools and 'fetch' in tools
+    assert 'GitHub Repository tactic' not in HUNTER

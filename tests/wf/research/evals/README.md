@@ -9,7 +9,7 @@ Needs a workspace with:
 - `ARCHITECTURE.md` with a `Deployables` table;
 - at least one local checkout under `workspace/`;
 - a built `graphify-out/` covering two deployables, and `graphify` on `PATH`;
-- one Deployables row whose repository has no local checkout (`github_no_checkout`);
+- one Deployables row whose repository has no local checkout (`missing_local_checkout`);
 - a restored NuGet dependency with a known member (`nuget_restored_package`).
 
 The runner reads `EXPLORE_EVAL_REPO` (workspace root) and skips when unset. Fill the `scenarios.json` placeholders from that workspace, send each Request verbatim to a fresh Hunter agent with the case's `excludedTools` removed, and classify the transcript with the trace classifier. Copy the classifier from `zic-board/tools/shared/utils/copilot_trace.py` into this folder rather than importing across repositories.

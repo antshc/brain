@@ -15,7 +15,7 @@ Orchestrate current-system research: frame → discover → trace → verify →
 
 ## Dispatch
 
-Use Research’s Explore request contract. Hunter owns target resolution, Graphify, GitHub, NuGet, and read-only enforcement; do not duplicate them. If Hunter is unavailable, report the blocked evidence request and continue independent work. For a bounded follow-up, send the exact question/check without rebuilding the whole Explorer prompt.
+Use Research’s Explore request contract. Hunter owns local target resolution, Graphify, NuGet, and read-only enforcement; do not duplicate them. Repository evidence comes only from local checkouts; report missing checkouts/refs as blockers, without remote lookup, clone, or fetch. If Hunter is unavailable, report the blocked evidence request and continue independent work. For a bounded follow-up, send the exact question/check without rebuilding the whole Explorer prompt.
 
 The coordinator owns splitting and dispatch; require neither multiple explorers nor fixed models. Stop when the framed question is answered; leave unrelated branches unexplored.
 
