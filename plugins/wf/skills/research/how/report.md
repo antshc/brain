@@ -18,7 +18,7 @@ Include only needed sections, e.g. **Where things live**, **Failures and edge ca
 
 ## Report checks
 
-- Cite each material claim in place. Use repository links such as `[orders.py](../../src/orders.py#L42):L42-54`. Resolve relative source links from the actual caller-selected report location; for inline answers use source links the caller can open. Use the filename as the label and show the line or range outside the link. For remote source, pin the commit and line. Quote the deciding line when it helps.
+- Cite each material claim in place. Use repository links such as `[orders.py](../../src/orders.py#L42):L42-54`. Resolve relative source links from the actual caller-selected report location; for inline answers use source links the caller can open. Use the filename as the label and show the line or range outside the link. For repository permalinks to locally inspected source, pin the inspected commit and line. Quote the deciding line when it helps.
 - Reconcile conflicting evidence before writing. Distinguish executing source, documented intent, and observations from a specific runtime. Label assumptions and unknowns.
 - Honor `@outputShape` framing. Research owns delivery under Caller-owned destinations; use only its resolved caller-supplied `@outputPath` when saving. Define no output directory, filename, or lens suffix here.
 - Remove placeholders and unused sections. Report the saved path when saved, otherwise the inline answer; include material gaps.

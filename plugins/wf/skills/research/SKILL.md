@@ -31,7 +31,7 @@ Apply to How, Why, Cloud, Web, prompts, and templates. **MUST NOT** define defau
 
 ## Explore request
 
-The caller sends this request verbatim directly to a `hunter` subagent. Hunter owns target resolution, tool routing, read-only constraints, and evidence return. If Hunter is unavailable, report the blocked evidence request and continue independent work.
+The caller sends this request verbatim directly to a `hunter` subagent. Hunter owns local target resolution, tool routing, read-only constraints, and evidence return. Repository evidence uses local checkouts only; missing checkouts/refs are blockers, not remote lookup requests. If Hunter is unavailable, report the blocked evidence request and continue independent work.
 
 - `@work` — question | prompt instruction | skill name to run. Pass instructions and skill names verbatim.
 - `@depth` — `quick | medium | thorough`.

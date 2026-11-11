@@ -45,21 +45,21 @@ Every harness-side search is bounded to `@repoRoot`, never above it. A supportin
 
 ## Resolve the target
 
-Preserve the repository or service names in `@target` and the question. Use the assigned angle to bound the search. If no target is named, use the current repository. Honor an explicit ref and identify the revision used.
+Preserve the repository or service names in `@target` and the question. Use the assigned angle to bound the search. If no target is named, use the current repository. Honor an explicit ref using locally available source and identify the revision used. An unavailable checkout or ref is unresolved; report the missing local prerequisite.
 
-**Building-block index** — MUST use for the navigation, and the source of supporting repository locations. Read `@repoRoot/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved; a matching row's `Location` cell maps a Deployable name — or its Trigger condition — to a local path (`workspace/<repo>[/subpath]` or absolute) and an `origin` URL. Consult the `Shared dependency ownership` table the same way for a dependency more than one Deployable uses, and the `Terminal infrastructure boundaries` table for where tracing stops. Use these tables from the launch root. A path a row names but the disk lacks is unresolved, not a licence to guess a neighbouring one.
+**Building-block index** — MUST use for the navigation, and the source of supporting repository locations. Read `@repoRoot/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved; a matching row's `Location` cell maps a Deployable name — or its Trigger condition — to a local path (`workspace/<repo>[/subpath]` or absolute) and optional `origin` metadata; source lookup uses only the local path. Consult the `Shared dependency ownership` table the same way for a dependency more than one Deployable uses, and the `Terminal infrastructure boundaries` table for where tracing stops. Use these tables from the launch root. A path a row names but the disk lacks is unresolved, not a licence to guess a neighbouring one.
 
-**Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `@repoRoot` itself for harness documents and its own source, the main codebase repository under `@repoRoot/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk. A name the list has no path for routes to the GitHub tools.
+**Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `@repoRoot` itself for harness documents and its own source, the main codebase repository under `@repoRoot/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk. A name with no existing local checkout is unresolved; report the missing checkout and continue independent local targets.
 
 **Graph coverage** — read `graphify-out/manifest.json` under each enumerated checkout, where present. Select the widest graph whose manifest covers the target path relative to the graph root. For a multi-target lookup, use a graph that covers the relationship being traced. If no manifest covers it, continue from source.
 
-Report a name that resolves to neither a local checkout nor a GitHub repository as unresolved.
+Use only resolved local checkouts for repository evidence, plus their resolved NuGet package caches for package inspection. Origin metadata does not authorize remote source lookup.
 
 ## Routing rules
 
 ### Contracts first
 
-Before searching source, read the contract material for the resolved target, nearest owner first. For remote targets, read the available contracts through the GitHub Repository tactic. `GLOSSARY.md` carries terminology; `ARCHITECTURE.md`, `DEPLOYMENT.md`, and `README.md` carry ownership and runtime boundaries; `*.swagger.json` carries REST contracts; `*.configuration-tweaks.md` carries configuration surfaces.
+Before searching source, read the contract material for the resolved target, nearest owner first. `GLOSSARY.md` carries terminology; `ARCHITECTURE.md`, `DEPLOYMENT.md`, and `README.md` carry ownership and runtime boundaries; `*.swagger.json` carries REST contracts; `*.configuration-tweaks.md` carries configuration surfaces.
 
 1. The target checkout's own copies of those files.
 2. The `@repoRoot` document whose folder or filename names that target — a `@repoRoot/**/` glob returns one set per documented service, so match on the name rather than reading them all.
@@ -69,11 +69,11 @@ Prefer the nearest contract for documented intent. Verify as-built behavior agai
 
 ### Route the lookup
 
-Before the first search, print one line: `route: rg | lsp | graphify | github | nuget — {{reason}}`. A target without a local checkout uses GitHub. For a local target, honor `@shape` when provided. Otherwise choose the first matching row.
+Before the first search, print one line: `route: rg | lsp | graphify | nuget | unresolved — {{reason}}`. A target without a local checkout returns `unresolved` with the missing prerequisite. For a resolved local target, honor `@shape` when provided. Otherwise choose the first matching row.
 
 | Signal in `@work` | Route |
 |---|---|
-| target has no local checkout | `github`; package cache cannot be inferred from remote source |
+| target has no local checkout or lacks the requested ref locally | `unresolved`; report the missing local prerequisite |
 | `@shape: nuget`; restored NuGet package, its API, or behavior | `nuget` — NuGet tactic |
 | `@shape: literal`; quoted literal, config key, error text, route path, test name, file glob | `rg` |
 | `@shape: symbol`; exact type or member name, asking definition, references, implementations, callers | `lsp`, then `rg` |
@@ -89,8 +89,7 @@ Before the first search, print one line: `route: rg | lsp | graphify | github | 
 
 **No local checkout**
 
-- Use the read-only `github` Repository tactic. Scope searches to the supplied repository or use the integration for authorized organization-wide discovery. Verify decisive source at a pinned commit.
-- GitHub search reflects indexed branches and can be stale; carry that branch uncertainty into the verdict.
+Return `route: unresolved` with the target and missing local checkout/ref; continue independent resolved targets. **MUST NOT** use remote repository tools, clone, or fetch to fill the gap. Do not substitute a neighboring checkout or infer a package cache for an unavailable target.
 
 ## Tools
 
