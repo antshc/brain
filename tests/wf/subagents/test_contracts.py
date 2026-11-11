@@ -57,11 +57,11 @@ def test_review_impact_and_tests_keep_their_analysis_contracts():
     impact = (root / "blast-radius.md").read_text()
     assessment = (root / "tests-gap.md").read_text()
     assert re.findall(r"\*run `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
-        "research", "research", "subagents", "writing-style",
+        "research", "research", "testing-integrations", "subagents", "writing-style",
     ]
     for action in ("Why code anchor", "**default Research**", "**Arena**", "**Unslop only**"):
         assert action in impact
-    assert "Write a script or test that runs the real code, run it" in impact
+    assert "Prove every claim" in impact
     assert "MUST NOT" in assessment and "edit production code or tests" in assessment
     assert "Seam / assertion quality" in assessment
     assert "Every gap names input/setup, expected observable result, test level, and priority" in assessment
