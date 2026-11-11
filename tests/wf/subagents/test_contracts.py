@@ -15,6 +15,59 @@ def test_subagents_owns_arena_swarm_and_model_roles():
         assert not (SKILLS / "architect" / old_path).exists()
 
 
+def test_swarm_preserves_caller_payloads_and_accounts_for_required_slices():
+    swarm = (SKILLS / "subagents/swarm.md").read_text()
+    for contract in (
+        "share the complete input", "responsibility or evaluation dimension",
+        "caller output contracts", "without dropping required slices",
+        "original reports and corrections", "missing results as gaps",
+        "actual model only when observable", "separate from caller-defined worker payloads",
+    ):
+        assert contract in swarm
+    # Generic defaults and measurement/race contracts survive custom payloads.
+    for default in (
+        "`PASS`, `ISSUES` or `BLOCKED`", "retry malformed or incomplete reports once",
+        "**first pass**", "**rank all**", "**best-of**",
+        "method, sample count, unit and order", "each writer an isolated output",
+        "A gap cannot count as a pass",
+    ):
+        assert default in swarm
+    assert not re.search(r"\b(PR|initiative|bugs|quality-attributes|code-smells|REVIEW_COMMENT)\b", swarm)
+
+
+def test_code_review_delegates_axes_without_owning_model_policy():
+    root = SKILLS / "review"
+    code = (root / "playbooks/code.md").read_text()
+    assert re.findall(r"\*run `(subagents)` skill\b", code, flags=re.IGNORECASE) == ["subagents"]
+    for contract in (
+        "**Swarm**", "partition shape", "`swarm workers`",
+        "fresh general-purpose skill-capable read-only worker",
+        "complete change for its axis", "JSON unchanged",
+        "initiative-description gate passed", "never as empty success",
+        "substitute parent review when delegation is unavailable",
+    ):
+        assert contract in code
+    assert re.findall(r"^   \| `([^`]+)` \|", code, flags=re.MULTILINE) == [
+        "bugs", "quality-attributes", "code-smells", "initiative",
+    ]
+    assert "## Model selection" not in code
+    assert not re.search(r"\b(claude-|gpt-|grok-|gemini-|random)", code)
+    assert "reviewer-selection.md" not in code
+    assert not (root / "references/reviewer-selection.md").exists()
+    models = (SKILLS / "subagents/models.md").read_text()
+    assert re.search(r"^\| swarm workers \|", models, flags=re.MULTILINE)
+
+
+def test_review_retires_levels_without_changing_ambiguous_route_handling():
+    router = (SKILLS / "review/SKILL.md").read_text()
+    code_row = next(line for line in router.splitlines() if line.startswith("| `code` |"))
+    assert "level" not in code_row
+    assert "review level selects `code`" not in router
+    assert "retired review level remains ambiguous" in router
+    code = (SKILLS / "review/playbooks/code.md").read_text()
+    assert "disclose that levels are retired" in code
+
+
 def test_research_preserves_why_and_routes_system_evidence_to_hunter():
     skill = (SKILLS / "research/SKILL.md").read_text()
     for reference in ("how/how.md", "how/explorer-prompt.md", "how/explainer-prompt.md",

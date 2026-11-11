@@ -12,7 +12,7 @@ description: >-
 | --- | --- | --- |
 | **Dispatch** | Worker briefs with scope, tools, constraints, evidence and expected output. Optional role or ordered role pool, explicit model, worktree requirements, and model fallback. | Reports or blockers per brief, model choices and worktree paths. |
 | **Arena** | Same task for all runners, output root, artifact contract, grounding, runner role/count, rubric inputs, screening and verification rules, and optional incumbent and correction context. | Synthesis path, candidate paths, judge or skip reason, and verified findings or blockers. |
-| **Swarm** | Task, worker count, partition/race/mixed shape, done condition and required evidence. | One report covering results, issues and gaps. |
+| **Swarm** | Task, worker count or named slice briefs, partition/race/mixed shape, done condition and required evidence. Optional shared scope, role, caller output contract, validation and retry rules. | Consolidated report plus original per-slice results, model choices, blockers and gaps. |
 
 - **Dispatch** → apply Dispatch and Model selection below.
 - **Arena** → read [arena.md](arena.md) in full. Use its dispatch rules within the same run.
