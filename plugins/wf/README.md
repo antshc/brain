@@ -2,7 +2,7 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
-[Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [index-docs](skills/index-docs/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+[Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [doc-architecture](skills/doc-architecture/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
 [subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) routes current-system questions through How for discovery, tracing, verification, and explanation. Callers supply saved-report destinations; no save request returns inline. Hunter owns read-only Explore lookups and evidence gathering. Why handles historical rationale.
 
@@ -10,7 +10,7 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 Its interview presents the entire ready decision frontier as one numbered batch per round, with recommendations phrased for "yes" to accept. Dependent questions wait for later rounds; partial answers leave the remaining ready questions together for batched follow-up. Inline recording and user-controlled closure remain unchanged.
 
-[record-architecture](skills/record-architecture/SKILL.md) replaces the seven standalone architecture record/render commands. Its modes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, and `decision-bullet`; the two render-only modes never save files or update indexes. Explicit modes take precedence, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [`/define concept`](skills/define/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview. `/define research` charts research and hypothesis topics.
+[doc-architecture](skills/doc-architecture/SKILL.md) owns architecture records, rendering, initialization, and index mechanics. Routes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, `decision-bullet`, `initialize`, and `index`. The index route takes `load`, `scan`, `trigger`, `ensure-section`, `sync-row`, or `sync-deployment`; row mutations use `rowAction`. The two render-only routes never save files or update indexes. Explicit routes take precedence; existing record mode inputs remain aliases, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [`/define concept`](skills/define/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview. `/define research` charts research and hypothesis topics.
 
 The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
@@ -185,7 +185,7 @@ swimlane-beta TB
 | Task | Entry |
 | --- | --- |
 | Architecture, behavior, or code diagrams | `/doc-diagram <diagram type>` with optional current or delta mode |
-| Initialize docs | `/index-docs Initialize missing docs` |
+| Initialize docs | `/doc-architecture route: initialize` |
 | Story, bug report, feature handover, or feature design | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi`, `/draft-artifact design` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
 | Deepen a task prompt or restate intent | `/sharpen` |
@@ -196,5 +196,5 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | --- | --- |
 | Discovery and research | `define` (`concept`, `research`), `prove`, `challenge-this`, `research`, Hunter (Explore and NuGet evidence) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
-| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `index-docs`, `record-architecture`, `sharpen`, `suggest`, `writing-style` |
+| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `doc-architecture`, `sharpen`, `suggest`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

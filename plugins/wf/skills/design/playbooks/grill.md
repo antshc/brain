@@ -8,7 +8,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 **Concepts are consumed, not discovered.** Match, open, and apply existing Concepts; repair wrong defaults, drifted keys, and missing trigger clauses during closing. MUST NOT author or offer new Concepts, or count rule occurrences to discover them. Rules with no existing owner stay in the ledger.
 
-**ADRs are recorded, not offered.** An explicit user answer passing the loaded `adr` mode's gate authorizes its same-turn write. A user reversal rewrites that ADR in place through the same mode, preserving the previous decision as a rejected option.
+**ADRs are recorded, not offered.** An explicit user answer passing the loaded `adr` route's gate authorizes its same-turn write. A user reversal rewrites that ADR in place through the same route, preserving the previous decision as a rejected option.
 
 **Only the user ends the grill.** The grill MUST end only on a user request or confirmation, not a finished record, empty frontier, or clean sweep. When the tree appears resolved, report it, ask to close, and wait.
 
@@ -17,8 +17,8 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 ## Session start
 
 1. **Claim state** — load [track-ledger.md](../references/track-ledger.md) before ledger access. Resolve session storage and ownership using its protocol; restore the frontier, answers, pending writes, and blockers. An unknown owner starts fresh without overwriting the old ledger.
-2. **Check docs** — existence-check `ARCHITECTURE.md` and `GLOSSARY.md`. If either is missing, *Run `index-docs` skill to initialize missing ARCHITECTURE.md and GLOSSARY.md files using **Initialize missing docs** at the same docs root*. Proceed only when both exist; otherwise apply *Gotchas*.
-3. **Load the index** — *Run `index-docs` skill to load the full ARCHITECTURE.md index of Trigger condition tables*, using **Load index** on `ARCHITECTURE.md` with `Summary` omitted; this covers every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. MUST use that operation's Python loader and consume every returned row; MUST NOT substitute manual reads, search, or counts-only output, even if simpler. Rationale: script counts and validation make completeness observable. Log per-table total/loaded counts and source in the ledger's `Index loaded` header. MUST NOT scan/match until every row is loaded; script unavailable or incomplete output → Index failure. Missing sections are optional, not gaps.
+2. **Check docs** — existence-check `ARCHITECTURE.md` and `GLOSSARY.md`. If either is missing, *Run `doc-architecture` skill to initialize missing docs* with route `initialize` at the same docs root. Proceed only when both exist; otherwise apply *Gotchas*.
+3. **Load the index** — *Run `doc-architecture` skill to maintain architecture indexes*, route `index`, action `load` on `ARCHITECTURE.md` with `Summary` omitted; this covers every row of `Deployables`, `Architecture Decision Records`, and `Crosscutting Concepts`. MUST use that operation's Python loader and consume every returned row; MUST NOT substitute manual reads, search, or counts-only output, even if simpler. Rationale: script counts and validation make completeness observable. Log per-table total/loaded counts and source in the ledger's `Index loaded` header. MUST NOT scan/match until every row is loaded; script unavailable or incomplete output → Index failure. Missing sections are optional, not gaps.
 4. **Seed the surface** — extract terms and concrete file/folder paths from the initial request; run *Scan and match*. On resume, apply only newly surfaced inputs; retain same-session match history, reloading needed evidence absent from context.
 5. **Interview** — restore or construct the dependency tree and its ready questions; apply *Decision states*, persist the ledger, and use the pre-question status below.
 
@@ -27,8 +27,8 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 | Operation | Invocation and inputs | Required result |
 |---|---|---|
 | Code/test lookup | *Load `research` skill to investigate primary sources and return cited findings*; use **Explore request**; form the bounded question, target, depth, and output shape. Send the request verbatim to one `hunter` per independent track. Sequence dependent tracks. If Hunter is unavailable, record the blocked lookup and continue independent tracks. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
-| Index load/scan/sync | *Run `index-docs` skill for full index load, scan/match, and row-sync of Markdown Trigger condition tables.* Supply the operation and its required metadata. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
-| Record | *Run `record-architecture` skill to persist settled ADRs, Concepts, and glossary terms.* Select `term`, `adr`, or `concept-record`; load the mode before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
+| Index load/scan/sync | *Run `doc-architecture` skill to maintain architecture indexes.* Use route `index`, action `load`, `scan`, or `sync-row`, and required metadata; row mutations use `rowAction`. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
+| Record | *Run `doc-architecture` skill to record settled architecture.* Select route `term`, `adr`, or `concept-record`; load the procedure before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
 
 Integrate lookup evidence into the frontier and touched surface; integrate record/index results into the ledger. Mark a record written only after the returned result confirms its persistence and required sync.
 
@@ -86,7 +86,7 @@ Every decision question **MUST** get a gate-miss line per unresolved key that tu
 | ADR decision | Gate miss + recorded path, or pending write until persistence succeeds. |
 | Feature Assumption | Assumed with key, applied condition, and governing source anchors; no gate miss. |
 
-Log state changes that turn. When the user corrects an assumption, replace it with a correction line if based on a Concept default; otherwise remove the stale assumption, retaining the correction and new answer in the frontier history. Surface ADR corrections for explicit user resolution through `adr` mode.
+Log state changes that turn. When the user corrects an assumption, replace it with a correction line if based on a Concept default; otherwise remove the stale assumption, retaining the correction and new answer in the frontier history. Surface ADR corrections for explicit user resolution through `adr` route.
 
 Unknown applicability alone creates a fact-gap prerequisite, not a policy decision or gate-miss line; re-evaluate its decision key after the fact is established. Fact-gap questions, term clarifications, and close/authorization requests are not failed decision-checklist gates; record their kind and answer in the frontier instead. Documentation wording, synonyms, and section placement are authoring choices, not decisions.
 
@@ -119,8 +119,8 @@ Extract mandates, prohibitions, open choices, and default clauses from the body 
 * Out of scope → explain why the record does not apply.
 
 **Record inline** — resolve terms and architectural decisions in the turn answered, before the next question:
-* Explicitly resolved term → use the record contract's `term` mode.
-* Explicitly resolved decision → load `adr` mode and check its gate; pass → write; miss → Feature Decision in the ledger.
+* Explicitly resolved term → use the record contract's `term` route.
+* Explicitly resolved decision → load `adr` route and check its gate; pass → write; miss → Feature Decision in the ledger.
 * Model resolution → Feature Assumption in the ledger, not an ADR.
 
 Existing Concept repairs belong to closing; other reusable rules remain ledger-only. Apply *Gotchas* when a write is blocked. Question sequencing does not delay authorized inline writes.
@@ -148,7 +148,7 @@ Re-check each tactic's trigger after every user answer or new fact. A later answ
 - Lookup failure/inconclusive result → ask for the missing fact, labelled **fact gap**. Record user-supplied evidence as such; conflicting or unverified facts remain blocked. An unknown fact is not a design decision.
 - Incomplete index load (Python loader unavailable/not run, **Load index** errors, truncated output, unread rows, or missing total/loaded counts) → Index failure; recover through **Load index** before matching. Manual reads and counts-only output cannot clear the blocker.
 - Index failure → treat matching/sync as incomplete, not "no matches". Block affected assumptions; preserve partial writes as pending sync.
-- Record failure/unavailable → persist the answer, intended mode/target, and blocker as `pending write`. If the ADR gate was unavailable, mark classification pending rather than assuming a Feature Decision. Resume the owning procedure after recovery; check existing state first to avoid duplicate records.
+- Record failure/unavailable → persist the answer, intended route/target, and blocker as `pending write`. If the ADR gate was unavailable, mark classification pending rather than assuming a Feature Decision. Resume the owning procedure after recovery; check existing state first to avoid duplicate records.
 - Missing session storage → apply the ledger's storage failure protocol; do not substitute an arbitrary repository file.
 
 ## Closing sweep

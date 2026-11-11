@@ -1,6 +1,6 @@
 # Record Deployment View
 
-Record **where the building blocks actually run** — nodes, containers, host paths, and the connections between them — into `DEPLOYMENT.md` at the repo root. Template: [DEPLOYMENT-VIEW-FORMAT.md](../templates/DEPLOYMENT-VIEW-FORMAT.md).
+Record **where the building blocks actually run** — nodes, containers, host paths, and the connections between them — into `DEPLOYMENT.md` at the repo root. Use the deployment format already loaded by the router.
 
 Inputs: `{{systemName}}`, `{{deploymentNodes}}`, `{{hostingModel}}`, `{{grillingContext}}`, `{{domainGlossary}}`.
 
@@ -8,11 +8,11 @@ No approval gate — record the topology as soon as it's identified.
 
 ## Lazy creation
 
-Create `DEPLOYMENT.md` from [DEPLOYMENT-VIEW-FORMAT.md](../templates/DEPLOYMENT-VIEW-FORMAT.md) on the first run; update it in place if it exists. Deployment view owns creation of this file. The **Initialize missing docs** action covers `ARCHITECTURE.md` and `GLOSSARY.md`.
+Create `DEPLOYMENT.md` from `DEPLOYMENT-VIEW-FORMAT.md` already selected and loaded by the router on the first run; update it in place if it exists. Deployment view owns creation of this file. The **Initialize missing docs** action covers `ARCHITECTURE.md` and `GLOSSARY.md`.
 
 ## Reuse the building blocks
 
-Every `Container`/`ContainerDb`/`ContainerQueue` alias in the diagram is an existing `Deployables` row in `ARCHITECTURE.md` — same `{{mermaidComponentName}}`, so the two diagrams line up. An alias with no row is a gap: load [building-block.md](./building-block.md) and record it first, then place it here.
+Every `Container`/`ContainerDb`/`ContainerQueue` alias in the diagram is an existing `Deployables` row in `ARCHITECTURE.md` — same `{{mermaidComponentName}}`, so the two diagrams line up. An alias with no row is a gap: return control to the router for **Select and load** with route `building-block`; record it first, then place it here.
 
 Name every external dependency explicitly — a registry, reverse proxy, managed service, or SaaS the deployment relies on — rather than folding it into a generic "external" node; the deployment view is where a reader learns what actually sits between the building blocks and the outside world.
 
@@ -34,7 +34,7 @@ Fill `Observability` by following each signal from the process that emits it to 
 
 ## Keep ARCHITECTURE.md pointing here
 
-*Run `index-docs` skill to sync index rows and Trigger condition tables; use **Sync Deployment View reference***, passing `{{skeletonContent}}` = the link to `DEPLOYMENT.md` plus 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies — enough for an agent to decide whether to load the full document. Never edit `ARCHITECTURE.md` directly.
+Apply **Sync Deployment View reference**, passing `{{skeletonContent}}` = the link to `DEPLOYMENT.md` plus 1-3 keyword-dense sentences naming the hosting model, node kinds, and runtime technologies — enough for an agent to decide whether to load the full document. Never edit `ARCHITECTURE.md` directly.
 
 Re-run it whenever the hosting model or node set changes, so the stub's keywords still match the topology.
 

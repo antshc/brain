@@ -1,8 +1,29 @@
 # Concept
 
-Render or record **one shared approach** governing multiple building blocks. Use the selected mode:
+## Contents
 
-- `concept-body`: follow **Body** through **Quality gate**, then return the body and kind. MUST NOT write files, name records, sync indexes, invoke a recording skill, or switch modes.
+- Where the rule belongs
+- When to write a Concept
+- Extend or create
+- Lazy creation
+- Record identity
+- Grounding
+- Body
+- Record the house variant
+- Decisions, not parameters
+- Variants
+- Example
+- Naming
+- Terminology
+- Evidence
+- Implementation Map
+- Quality gate
+- Authoring the index row
+- Approval gate
+
+Render or record **one shared approach** governing multiple building blocks. Use the selected route:
+
+- `concept-body`: follow **Body** through **Quality gate**, then return the body and kind. MUST NOT write files, name records, sync indexes, invoke a recording skill, or switch routes.
 - `concept-record`: follow the recording sections below; apply **Body** through **Quality gate** when rendering or revising. Reuse a compliant body supplied by the caller without rendering or interviewing again. Write the record and its index row in the same change.
 
 All sections outside **Body** through **Quality gate** apply only to `concept-record`.
@@ -17,9 +38,9 @@ Split on **when the rule is needed**:
 |---|---|---|
 | how a shared business process, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
 | which approach was chosen and its structural decisions | Concept, `docs/concepts/` | this skill — continue below |
-| why it was chosen, and the rejected alternatives | standalone ADR linking to the Concept, or feature design when it fails the ADR gate | load [adr.md](./adr.md); otherwise session ledger / feature design |
+| why it was chosen, and the rejected alternatives | standalone ADR linking to the Concept, or feature design when it fails the ADR gate | return control to the router for **Select and load** with route `adr`; otherwise session ledger / feature design |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
-| what a contested term means | glossary, `GLOSSARY.md` | load [term.md](./term.md) |
+| what a contested term means | glossary, `GLOSSARY.md` | return control to the router for **Record term** |
 | which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
 
 Two tests settle most cases:
@@ -43,7 +64,7 @@ If any of the three is missing, skip the Concept — route it by *Where the rule
 
 Runs before any write. A near-duplicate record is worse than a longer one: it splits a decision area across two files instead of sharpening one.
 
-1. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Scan and match*** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
+1. Apply **Scan and match** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
 2. A matched record's scope already covers this decision area → **extend it**: apply **Grounding** and **Body** through **Quality gate** for a body change and sharpen its `default` or `trigger` when needed. Resync its row via **Sync index row**. Stop here.
 3. No match covers the area → **create** a new Concept.
 
@@ -77,13 +98,13 @@ For ported content:
 
 ## Body
 
-Choose by the shared concern, not the component where it was found; read only the selected template. Return the chosen row's **kind** with the body.
+Choose by the shared concern, not the component where it was found; return control to the router for **Resource map** to load only the selected template. Return the chosen row's **kind** with the body.
 
 | Concern | Kind | Template |
 |---|---|---|
-| Business capabilities — the processes that deliver them, and the scenarios each process handles | `dom` | [domain-business-process.md](../templates/domain-business-process.md) |
-| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `str` | [structure-implementation.md](../templates/structure-implementation.md) |
-| Security, error handling, testing, configuration, migration, installation, logging, disaster recovery, domain safety, runtime safety or batch operations | `ops` | [ops-policy.md](../templates/ops-policy.md) |
+| Business capabilities — the processes that deliver them, and the scenarios each process handles | `dom` | `domain-business-process.md` already selected and loaded by the router |
+| Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `str` | `structure-implementation.md` already selected and loaded by the router |
+| Security, error handling, testing, configuration, migration, installation, logging, disaster recovery, domain safety, runtime safety or batch operations | `ops` | `ops-policy.md` already selected and loaded by the router |
 
 Keep one concept per page and aim for one page. Describe a shared approach that governs multiple building blocks; name the affected scope and the conditions under which it applies. If the subject crosses categories, select the template that explains its governing rule best; link related concepts instead of duplicating obligations. Show **how** it works with one representative scenario, code or test anchor where useful. Omit optional sections and inapplicable template prompts.
 
@@ -177,9 +198,9 @@ The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skil
 
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
 2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
-3. Load [defaults.md](./defaults.md) and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `/define concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
-4. Derive the Trigger condition: *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Generate trigger condition***, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.
-5. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Ensure section exists*** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
+3. Use the already-loaded index defaults contract and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `/define concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
+4. Derive the Trigger condition: Apply **Generate trigger condition**, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.
+5. Apply **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
 
 Superseding or retiring a Concept applies the marker to its index row via the same **Sync index row** call; the record itself carries no status field.
 
