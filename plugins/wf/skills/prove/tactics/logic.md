@@ -21,6 +21,6 @@ Use for pure business logic, state transitions, state machines, reducers, data s
 ## Constraints
 
 - Keep state in memory unless persistence is being evaluated.
-- Do not call real SDKs, APIs, brokers, or databases; use [INTEGRATION.md](INTEGRATION.md).
+- Do not call real SDKs, APIs, brokers, or databases; use the integration tactic selected by Methods.
 - Do not add unrelated tests or abstractions.
 - Keep the validated logic portable; treat the driver as throwaway.

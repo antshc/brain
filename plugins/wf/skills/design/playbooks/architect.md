@@ -44,7 +44,7 @@ Arena returns one synthesized design package. Its synthesis decision fills the r
 
 ## Phase C: Review (optional checkpoint)
 
-Before continuing, run [Evidence routing](../references/evidence-routing.md) on open questions and material claims. When the caller requests one overall [Interrogate](interrogate.md), run it before the checkpoint or handoff, reusing existing coverage. Without checkpoint, apply supported corrections; with checkpoint, present proposals for approval. Record decisions in the sketch, rationale, and `review-log.md`. Never write production code during this phase; proof code remains disposable evidence in a worktree.
+Before continuing, run [Evidence routing](../references/evidence-routing.md) on open questions and material claims. When the caller requests one overall adversarial review, *run `challenge-this` skill to find problems in a change or design* before checkpoint/handoff, passing current intent/scope, safe target, facts, limits, `adversaries`, `@outputPath=<artifact-root>/challenge-this.md` and repository root as `@outputBase`; reuse existing coverage. Resolve contract findings through Deep module in Design. Without checkpoint, apply supported corrections; with checkpoint, present proposals for approval. Record decisions in the sketch, rationale, and `review-log.md`. Never write production code during this phase; proof code remains disposable evidence in a worktree.
 
 **Default: no checkpoint.** Continue to Phase E automatically. When the caller explicitly requests a **design-only handoff** (as Factory Mode does), continue to Phase D instead. Do not wait for an `accept` or `implement` reply.
 
@@ -55,8 +55,8 @@ Before continuing, run [Evidence routing](../references/evidence-routing.md) on 
    ```
    Reply with one:
    - **corrections**: `Q2 → keep per-tenant tables` (edits sketch, design, rationale; add `; arena` to also run a new arena that creates a new candidate)
-   - **interrogate**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
-   - **prove**: `GSI backfill; target: DynamoDB Local` (real evidence via the smallest run: command, test, script, or throwaway prototype in a worktree; add `; interrogate` to also have adversaries attack it)
+   - **challenge-this**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
+   - **prove**: `GSI backfill; target: DynamoDB Local` (real evidence via the smallest run: command, test, script, or throwaway prototype in a worktree; add `; challenge-this` to also have adversaries attack it)
    - **ask**: `why does X own Y?` (grounds the answer, then corrections)
    - **accept**: continue implementation (or the caller's design-only handoff)
    - **implement**: build against the sketch in this working tree (overrides a design-only handoff)
@@ -64,8 +64,8 @@ Before continuing, run [Evidence routing](../references/evidence-routing.md) on 
 3. Act on the reply:
    - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place under the [shared sketch contract](../references/sketch-contract.md), then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite with [red flags](../references/red-flags.md) and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Corrections with `arena`** → apply as above, then *run `subagents` skill to compare independent candidates and synthesize findings* using **Arena** with the corrected incumbent, next revision number, same Phase B contract, and corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
-   - **Interrogate** → run [Interrogate](interrogate.md) on the current sketch. Resolve verified contract findings through [Deep module](deep-module.md). Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
-   - **Prove** → run [Prove](prove.md) on the question in the reply; run its Attack step only when the reply includes `interrogate`. Present its output; apply only the proposed corrections the user accepts, as above, citing the evidence in the rationale. Start the next round.
+   - **Challenge this** → *run `challenge-this` skill to find problems in a change or design* on the current sketch, using the Phase C handoff. Resolve verified contract findings through [Deep module](deep-module.md). Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
+   - **Prove** → *run `prove` skill to confirm or refute one technical claim with reproducible evidence* on the question, passing sketch/grounding, limits and an exact report destination under `<artifact-root>/prove/`. For `; challenge-this`, request retained runnable state, then Design invokes Challenge this with that evidence before releasing owned resources. Present evidence-backed proposed corrections; apply only those the user accepts, citing evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, using Phase A’s default Research or **Why** call when needed, with a distinct grounding output for the new question; present the answer, then start the next round.
    - **Accept** → go to Phase D for a design-only handoff; otherwise Phase E.
    - **Implement** → go to Phase E.

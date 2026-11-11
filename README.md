@@ -155,7 +155,8 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [writing-style](plugins/wf/skills/writing-style/SKILL.md): write, review, or unslop prose; normalize requirement or story text by stripping implementation artifacts.
 - [suggest](plugins/wf/skills/suggest/SKILL.md): propose improvements, options, or ideas with reasoning; never apply without approval.
 - [sharpen](plugins/wf/skills/sharpen/SKILL.md): deepen task rigor without expanding scope, or restate the user's intent.
-- [experiment](plugins/wf/skills/experiment/SKILL.md): run a throwaway experiment to answer a design question.
+- [prove](plugins/wf/skills/prove/SKILL.md): confirm or refute one technical claim with reproducible evidence.
+- [challenge-this](plugins/wf/skills/challenge-this/SKILL.md): try to break a change or design; report problems shown by a run.
 - [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and capture findings in the repo; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template. How orchestrates current-system discovery, tracing, verification, and explanation; callers supply saved-report destinations. Why handles historical rationale. Hunter owns Explore for inline read-only codebase and restored NuGet package lookups.
 - [subagents](plugins/wf/skills/subagents/SKILL.md): dispatch independent workers, select model roles, compare Arena candidates, and run Swarm partitions or races.
 - [define](plugins/wf/skills/define/SKILL.md): `research` charts or resumes a research map; `concept` suggests, questions, and records an arc42 Crosscutting Concept against cited codebase evidence.

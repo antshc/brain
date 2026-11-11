@@ -6,7 +6,7 @@ Typical questions include ASP.NET Core middleware exception handling, DI scope/d
 
 ## Build
 
-1. Reuse the runtime, framework, packages, hosting model, scripts, and container setup from the Inspect step's facts; look up only gaps there, never re-search here.
+1. Reuse the runtime, framework, packages, hosting model, scripts, and container setup from the supplied/discovered facts; look up only gaps there, never re-search here.
 2. Isolate the mechanism under test.
 3. Choose the smallest runnable artifact:
    - console/CLI app
@@ -16,10 +16,10 @@ Typical questions include ASP.NET Core middleware exception handling, DI scope/d
    - container/Compose setup
    - minimal set of cooperating processes
 4. Use the real framework/runtime mechanism being evaluated.
-5. Stub irrelevant external systems. When the experiment also crosses a real external boundary, apply [INTEGRATION.md](INTEGRATION.md) in addition.
+5. Stub irrelevant external systems. When the experiment also crosses a real external boundary, apply the integration tactic selected by Methods in addition.
 6. Expose relevant inputs, state transitions, timing, output, exit codes, logs, or failures.
 7. Run the smallest cases that prove or disprove the assumption.
-8. Capture the observed behavior and discard the experiment shell.
+8. Capture observed behavior; retain the experiment shell until coordinator verification and requested follow-up finish.
 
 ## Constraints
 
