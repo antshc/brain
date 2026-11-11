@@ -4,11 +4,11 @@ Own candidate selection, the concept's scope, and its decisions. [questioning.md
 
 ## Evidence
 
-Every fact in a suggestion, a question, or the recorded Concept is either a cited inspection result or a user answer from this session. A fact inspection cannot settle becomes a question to the user, carrying the evidence that left it open. A recommended answer cites its evidence or is labelled `proposal`. *Load `record-architecture` skill in `concept-body` mode for settled architecture concept bodies* and follow the selected procedure's **Evidence** and **Terminology** for what the body may claim.
+Every fact in a suggestion, a question, or the recorded Concept is either a cited inspection result or a user answer from this session. A fact inspection cannot settle becomes a question to the user, carrying the evidence that left it open. A recommended answer cites its evidence or is labelled `proposal`. *Load `record-architecture` skill to render a settled Concept in `concept-body` mode* and follow the selected procedure's **Evidence** and **Terminology** for what the body may claim.
 
 ## Inspection
 
-1. Read `research` skill's **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
+1. *Load `research` skill to investigate primary sources and return cited findings*; use **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
 2. Pick shape: one focused path → one subagent; distinct non-overlapping tracks (separate deployables, workflow boundaries, configuration versus tests, categories) → parallel subagents, each a bounded subquestion; a track needing another's answer → sequential. No duplicate lookups for areas already in flight.
 3. Spawn each lookup as a `hunter` subagent with its Explore request verbatim. If Hunter is unavailable, record the blocked evidence request and continue independent tracks.
 4. Consolidate results: resolve conflicts with targeted evidence; state remaining uncertainty.
@@ -47,7 +47,7 @@ Read `ARCHITECTURE.md`'s `Crosscutting Concepts` table in full; an absent file o
 
 **2. Match the described candidate, or sweep for candidates**
 
-- **Described** — the user described the concept to add. Run `/index-docs`' skill **Scan and match** over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run Inspection over the described concern and each matched record for drift. A rule that is not crosscutting → *load `record-architecture` skill in `concept-record` mode for settled architecture Concepts* and route per the selected procedure's **Where the rule belongs**; report its home and stop.
+- **Described** — the user described the concept to add. *Run `index-docs` skill to scan and match Markdown Trigger condition tables* using **Scan and match** over the `Crosscutting Concepts` table with the description's terms and paths, and open each matched record's body. Run Inspection over the described concern and each matched record for drift. A rule that is not crosscutting → *load `record-architecture` skill to persist a settled Concept in `concept-record` mode* and route per the selected procedure's **Where the rule belongs**; report its home and stop.
 - **Not described** — sweep. Run Inspection at `thorough`, with one parallel track per category group of the arc42 list plus one drift track over the recorded Concepts. Give each track its group's categories and the item 1 mapping as `@inputs`, and this `@work` instruction verbatim:
 
   > For each category, report: present in the codebase, with file-and-line citations, or `no evidence found in inspected scope`; the building blocks where its decision recurs; whether the code makes one consistent choice (quote it) or several (list each with citations); the recorded Concept covering it, if any. For the drift track, report per recorded Concept every rule or `default` the code contradicts, with citations. Report only what you cite.
@@ -79,7 +79,7 @@ List every planned `Rules` bullet, scenario, and `Implementation Map` row, plus 
 
 **8. Document and record**
 
-Select the `dom`, `str`, or `ops` kind and *run `record-architecture` skill in `concept-body` mode to render settled architecture concept bodies* from the resolved concept and cited evidence. Then *run `record-architecture` skill in `concept-record` mode to record settled architecture Concepts*, passing the body and the user-confirmed `default` to apply its gate and extend or create the record. An explicit request to define the concept authorizes this write after the questioning confirmation; no second permission prompt. If the gate fails, report the appropriate home and do not create a Concept.
+Select the `dom`, `str`, or `ops` kind and *run `record-architecture` skill to render a settled Concept in `concept-body` mode* from the resolved concept and cited evidence. Then *run `record-architecture` skill to persist a settled Concept in `concept-record` mode*, passing the body and the user-confirmed `default` to apply its gate and extend or create the record. An explicit request to define the concept authorizes this write after the questioning confirmation; no second permission prompt. If the gate fails, report the appropriate home and do not create a Concept.
 
 **9. Report**
 

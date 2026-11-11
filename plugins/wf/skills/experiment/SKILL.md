@@ -34,7 +34,7 @@ Callers read this section and Workflow before invoking, then fill these from wha
    | code under test named in `@question` | `Symbol` `Type.Member` | `symbol` | `medium` |
    | mechanism with unknown names: which module owns it, how a call reaches it | `Names unknown:` | `relationship` | `medium` |
 
-   Load `research` skill's **Explore request** and form one request per row needed, `@target` = repository as named. Spawn one `hunter` subagent per independent request, in parallel, passing the Explore request verbatim. If Hunter is unavailable, record the blocked evidence and continue independent checks. Read returned files directly. Rationale: a shaped request routes each lookup straight to rg, LSP, or graphify, and caller facts skip re-discovery entirely. Done when each needed fact has a file:line or `unknown`.
+   *Load `research` skill to investigate primary sources and return cited findings*; use **Explore request** and form one request per row needed, `@target` = repository as named. Spawn one `hunter` subagent per independent request, in parallel, passing the Explore request verbatim. If Hunter is unavailable, record the blocked evidence and continue independent checks. Read returned files directly. Rationale: a shaped request routes each lookup straight to rg, LSP, or graphify, and caller facts skip re-discovery entirely. Done when each needed fact has a file:line or `unknown`.
 4. Reuse the repository's stack, dependencies, clients, test infrastructure, scripts, and conventions unless the experiment evaluates an alternative.
 5. Apply guidance by `@option`, else by uncertainty; combine when needed:
    - `logic`: pure logic, state, transitions, data shape -> [LOGIC.md](LOGIC.md)

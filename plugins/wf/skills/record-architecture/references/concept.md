@@ -43,7 +43,7 @@ If any of the three is missing, skip the Concept — route it by *Where the rule
 
 Runs before any write. A near-duplicate record is worse than a longer one: it splits a decision area across two files instead of sharpening one.
 
-1. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Scan and match*** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
+1. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Scan and match*** over the `Crosscutting Concepts` table with this rule's surface — its terms and the paths it governs.
 2. A matched record's scope already covers this decision area → **extend it**: apply **Grounding** and **Body** through **Quality gate** for a body change and sharpen its `default` or `trigger` when needed. Resync its row via **Sync index row**. Stop here.
 3. No match covers the area → **create** a new Concept.
 
@@ -63,7 +63,7 @@ Runs before Body. Give every rule a source and check it by that source:
 
 | Rule source | Check | Record shows it as |
 |---|---|---|
-| **Implemented** — target code exists | Read `research` skill's **Explore request**; form the rule's lookup and output shape; send it verbatim to a `hunter` subagent. If Hunter is unavailable, record the blocked lookup and continue independent rules. Code contradicts the rule → stop; ask the user which wins. | `Implementation Map` row |
+| **Implemented** — target code exists | *Load `research` skill to investigate primary sources and return cited findings*; use **Explore request**; form the rule's lookup and output shape; send it verbatim to a `hunter` subagent. If Hunter is unavailable, record the blocked lookup and continue independent rules. Code contradicts the rule → stop; ask the user which wins. | `Implementation Map` row |
 | **Decided** — target code does not exist yet | Decision comes from the user, the caller, or an ADR. Do not search for an implementation; do not mark it `not verified`. | Rule only, no map row; add the row once code exists |
 | **Ported** — rule comes from another project | Restate it in the target's stack and conventions; it then counts as Implemented or Decided. | Per the resulting source |
 
@@ -178,8 +178,8 @@ The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skil
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
 2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
 3. Load [defaults.md](./defaults.md) and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `/define concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
-4. Derive the Trigger condition: *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition***, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.
-5. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
+4. Derive the Trigger condition: *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Generate trigger condition***, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.
+5. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Ensure section exists*** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
 
 Superseding or retiring a Concept applies the marker to its index row via the same **Sync index row** call; the record itself carries no status field.
 
