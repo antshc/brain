@@ -30,7 +30,7 @@ Preserve assumptions, unknowns, and conflicts; never fill gaps silently. Missing
 
 ## Visualize
 
-Choose the view from the question, using only confirmed evidence. Prefer prose or a table when clearer. For diagrams, *run `doc-diagram` skill for the selected Mermaid architecture, behavior, or class view*; load only that view's guidance. Topology/ownership → container or swimlane; interaction order → sequence; selection/failure branching → flowchart; data structure → table or class view. No lens requires a diagram type.
+Choose the view from the question, using only confirmed evidence. Prefer prose or a table when clearer. For diagrams, *run `doc-diagram` skill to create the selected Mermaid architecture, process flow, or class diagram*; load only that view's guidance. Topology/ownership → container or swimlane; interaction order → sequence; selection/failure branching → flowchart; data structure → table or class view. No lens requires a diagram type.
 
 Back nodes and crossings with source evidence; label unresolved edges explicitly rather than drawing them as confirmed. Keep file/line detail in nearby citations. Split crowded diagrams by the question each answers; render every included Mermaid block or report the rendering blocker.
 

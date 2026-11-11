@@ -1,7 +1,7 @@
 ---
 name: doc-diagram
 description: >-
-  Document software as a Mermaid architecture, behavior, or class diagram. Use for C4 system context, container, component, or deployment views, flowcharts, swimlanes, sequence diagrams, class diagrams, and current-state or delta views.
+  Create Mermaid architecture, flowchart, swimlane, sequence, and class diagrams. Use whenever a task needs a Mermaid diagram to show system structure, process flow, responsibility handoffs, call order, type relationships, or proposed changes.
 argument-hint: "[diagram type] [current | delta] [scope]"
 ---
 
