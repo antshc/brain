@@ -18,7 +18,7 @@ This skill is the repo-level engineering instruction set, installed per repo by 
 Name each principle (Principles) that shaped a decision and the choice it changed in the reply.
 
 - **First message on a task** → restate the goal, the problem, and, if the task ships a change, the smallest change expected to meet it. Do not wait for confirmation. Evidence rules out the requested change → show it and stop. Restate the goal in every subagent brief, PR `## Why`, and final reply (skip for a fully specified one-line edit). *Run `sharpen` skill to restate goals in your own words when the ask is vague or layered.*
-- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → run the `experiment` skill for a minimal throwaway experiment and let observed behavior decide. Compare competing design alternatives with the `prototype` playbook when needed. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
+- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → *run `prove` skill to confirm or refute one technical claim with reproducible evidence* and let observed behavior decide. Compare competing design alternatives with the `prototype` playbook when needed. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
 - **Any code** → name the data shape and its organizing structure first (**Model the domain**).
 - **Code crossing a function boundary** → *run `design` skill's `architect` route to sketch types, signatures, and module structure before code.*
 - **Module interface, seam, or testability question** → *run `design` skill's `deep-module` route for deep-module vocabulary, seam placement, deepening opportunities, and Design It Twice interface options.*
@@ -83,7 +83,7 @@ Apply when the trigger matches; cite by bold name.
 
 - Run the playbook in this chat; delegate steps, never the playbook itself.
 - *Run `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Brief with file paths, the restated goal, scope, named data shape, constraints, and success criteria.
-- Use harness model and effort defaults unless the user names them. For Interrogate, pass the adversary count to Architect so it uses the configured `interrogate reviewers` role.
+- Use harness model and effort defaults unless the user names them. For Interrogate, pass the adversary count directly to that skill; it owns the configured `interrogate reviewers` role.
 - Review worker diffs and own the summary.
 
 ## Throughput checkpoint

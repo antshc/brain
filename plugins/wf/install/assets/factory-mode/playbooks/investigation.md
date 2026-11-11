@@ -4,10 +4,10 @@
 
 1. Ground the question. Keep the original request, including how/why framing; identify the known target, context, exact unknown, and evidence needed. Done when the research brief preserves the request and states an answerable question.
 2. Research through Non-negotiables. Locate relevant code, trace behavior across deployables and data ownership, inspect dependency APIs, and consult external primary sources as the question requires. Done when claims cite file/line or external sources; unsupported explanations and inferred intent are labeled assumptions or unknowns.
-3. Uncertain behavior that reading cannot settle → read `experiment` skill's Inputs and Workflow, then *run `experiment` skill to answer one technical question by observing actual behavior*, filling `@question` and `@criteria` from step 1 and `@repoFacts` = step 2's cited findings (file:line, sources), so it skips re-discovery.
+3. Uncertain behavior that reading cannot settle → *run `prove` skill to confirm or refute one technical claim with reproducible evidence*, filling `@question` and `@criteria` from step 1 and `@repoFacts` = step 2's cited findings (file:line, sources), so it skips re-discovery.
 4. Throughput checkpoint is one line: `throughput checkpoint: n/a, read-only investigation`.
 5. Shape the output: Overview, Key concepts, How it works, Where things live, Gotchas. A decision between alternatives → recommendation plus tradeoffs table. *Run `writing-style` skill to write a bottom line: the decision-oriented key finding and recommended action* when the reader must act.
 
-No PR or code changes. Return findings without automatically starting another playbook.
+No PR or production checkout changes. Prove may create disposable probes in an owned isolated worktree; retain only requested evidence. Return findings without automatically starting another playbook.
 
 **Reply:** the investigation output. For "are we sure?" give real judgment with reasons; push back when the premise is wrong (Autonomy).

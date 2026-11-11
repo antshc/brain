@@ -10,7 +10,7 @@ Take the first applicable route per question; reevaluate after each result.
 |---|---|
 | Reliable evidence answers it for the same sketch revision and environment/version | Reuse; record the answer |
 | Needs facts from the codebase, installed NuGet packages, cloud/API, or web documentation | Research |
-| Needs observed behavior, including a CLI/API command | Experiment |
+| Needs observed behavior, including a CLI/API command | Prove |
 | Material falsifiable design claim has a safe runnable target | Interrogate |
 | Needs user intent, policy, tradeoff, or unavailable authority | Recommend and document a reversible choice; ask only when authority is required or a checkpoint was requested |
 
@@ -27,21 +27,19 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 Pass framing verbatim and destinations separately; Research owns discovery, classification, and fan-out and returns worker findings inline. **MUST NOT** dispatch separate research agents. Index the caller-selected report paths in the artifact root; no specialist may override them.
 
-Read final artifacts; check cited conclusions and applicable versions. Add findings to grounding/rationale before Arena or review; route empirical unknowns to Experiment.
+Read final artifacts; check cited conclusions and applicable versions. Add findings to grounding/rationale before Arena or review; route empirical unknowns to Prove.
 
-## Experiment
+## Prove
 
-Read `experiment` skill's Inputs and Workflow first, then *run `experiment` skill to test one uncertain technical question by observing actual behavior*, filling: `@question`; `@criteria` = falsifiable assumption plus observable success/refutation criteria; `@repoFacts` = repo, current sketch, grounding and Research artifact paths, prior evidence; `@limits` = runtime/environment constraints, safety limits, out-of-scope behavior, disposable worktree.
+*Run `prove` skill to confirm or refute one technical claim with reproducible evidence*. Pass `@question`, `@criteria` (assumption and confirm/refute observations), `@repoFacts` (launch/harness root, explicit checkout, revision, sketch/grounding/research paths, prior suites/evidence), and `@limits` (runtime/safety, exclusions, writable paths). Design chooses a fresh exact `@outputPath=<artifact-root>/prove/<question-id>-<revision>-<attempt>/report.md`, repository root as `@outputBase`, and distinct worker evidence/patch destinations in that run directory. Request method, observed output, independent rerun, conclusion, limitations and cleanup in `@outputShape`.
 
-Experiment's Workflow selects the method and artifact; **MUST NOT** prescribe one, and **MUST NOT** require an app or code patch for a CLI-only result. Keep code isolated in disposable worktrees and state local or in authorized sandboxes; **MUST NOT** use destructive production targets or expand credentials/permissions.
-
-Require a report with question, method, exact reproducible command, actual output, conclusion (`confirmed`, `refuted`, or `inconclusive`), evidence paths, architectural implication, and cleanup. Require a patch only when code was created.
-
-Use loaded Prove for prover isolation, rerun, and cleanup; automatic runs skip its Attack step. Material claims still route to Interrogate below; reuse Attack coverage for the same scope/revision when it ran.
+Prove owns method selection, integration-test discovery through Testing Integrations, isolation, rerun and cleanup. CLI-only requires no app/patch; require a patch only when code changed. When a following adversarial review needs runnable evidence, pass deferred cleanup and reuse its environment; Design releases owned resources after both runs. Material claims still receive Interrogate coverage below.
 
 ## Interrogate
 
-Run loaded Interrogate with intent, scope, material claim, runnable target, and prior reproductions. Reviewers use Experiment for probes; coordinator independently reruns findings. Reuse valid reproductions. No verified findings is valid.
+*Run `interrogate` skill to find failures with reproduced counterexamples*. Pass intent, scope/material claim, pinned revision, runnable target, prior reproductions, known suites, original launch/harness root, explicit checkout, safety limits, `adversaries` when supplied, exact `@outputPath=<artifact-root>/interrogate.md` and repository root as `@outputBase`. For per-claim runs, select distinct report/worker destinations before dispatch and aggregate coverage in the review log. Interrogate owns its adversaries and independent reruns; no duplicated procedure or internal resource access.
+
+Design interprets returned findings. Resolve verified contract findings through its Deep module route. No verified findings is valid; blocked coverage remains explicit.
 
 ## Outcomes and reuse
 
@@ -57,6 +55,6 @@ Record question/claim, sketch revision, environment/version, evidence paths, out
 | Material change | Recheck only invalidated assumptions |
 | Unchanged question, dependencies, and sketch | Reuse evidence and prior Interrogate coverage |
 
-Retry once per question/revision only when new evidence or setup addresses the failure; otherwise record blocker/unknown. Without checkpoint, apply evidence-backed Experiment or Interrogate corrections to the sketch; with checkpoint, require approval for proposed corrections. Neither path permits production code before Phase E.
+Retry once per question/revision only when new evidence or setup addresses the failure; otherwise record blocker/unknown. Without checkpoint, apply evidence-backed Prove or Interrogate corrections to the sketch; with checkpoint, require approval for proposed corrections. Neither path permits production code before Phase E.
 
 Return control to the orchestrator for **Phase B: Sketch** after Ground, or **Phase C: Review** before continuing.
