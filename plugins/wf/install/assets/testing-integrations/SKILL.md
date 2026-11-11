@@ -12,7 +12,7 @@ Integration-test orchestrator. Discover repo facts, pick a **kind** (what runs) 
 
 ## Actions
 
-*Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Pass action, claim, boundary and available runtime facts. Select `Test behavior, not implementation` for assertions, `Prove it works` for execution/reporting and `Explain the number` for speed claims. Select remains read-only; estimated costs stay labelled estimated, and existing commands remain preferred.
+*Load and follow the `principles` skill to load indexed engineering principles by name*. Pass action, claim, boundary and available runtime facts. Select `Test behavior, not implementation` for assertions, `Prove it works` for execution/reporting and `Explain the number` for speed claims. Select remains read-only; estimated costs stay labelled estimated, and existing commands remain preferred.
 
 Default → Discover, Choose the kind — ladder, Route, execute and Report. Explicit `select <claim>` or **Select** → read-only selection below; **Run selected** → execute the supplied selection after checking applicability. Neither action invokes Prove or builds throwaway probes; unknown behavior returns to the caller.
 

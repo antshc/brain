@@ -11,27 +11,27 @@ disable-model-invocation: true
 
 ## Repo instructions
 
-This skill is the repo-level engineering instruction set, installed per repo by the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) and owned by the repo's users. Its Principles section invokes shared engineering guidance; Design preferences, Autonomy and playbooks retain this repo's conventions; repo edits are intentional drift and win over upstream. *Run `sync-skill` skill to merge upstream skill improvements into the local customized version, preserving intentional drift.*
+This skill is the repo-level engineering instruction set, installed per repo by the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) and owned by the repo's users. Its Principles section invokes shared engineering guidance; Design preferences, Autonomy and playbooks retain this repo's conventions; repo edits are intentional drift and win over upstream. *Load and follow the `sync-skill` skill to merge upstream skill improvements into the local customized version, preserving intentional drift.*
 
 ## Non-negotiables
 
 Before any playbook or no-playbook fallback executes, apply Principles below. Name each principle that shaped a decision and the choice it changed in the reply.
 
-- **First message on a task** → restate the goal, the problem, and, if the task ships a change, the smallest change expected to meet it. Do not wait for confirmation. Evidence rules out the requested change → show it and stop. Restate the goal in every subagent brief, PR `## Why`, and final reply (skip for a fully specified one-line edit). *Run `sharpen` skill to restate goals in your own words when the ask is vague or layered.*
-- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → *run `prove` skill to confirm or refute one technical claim with reproducible evidence* and let observed behavior decide. Compare competing design alternatives with the `prototype` playbook when needed. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
+- **First message on a task** → restate the goal, the problem, and, if the task ships a change, the smallest change expected to meet it. Do not wait for confirmation. Evidence rules out the requested change → show it and stop. Restate the goal in every subagent brief, PR `## Why`, and final reply (skip for a fully specified one-line edit). *Load and follow the `sharpen` skill to make the task deeper and rewrite the prompt when the ask is vague or layered.*
+- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* and let observed behavior decide. Compare competing design alternatives with the `prototype` playbook when needed. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
 - **Any code** → name the data shape and its organizing structure first (**Model the domain**).
-- **Code crossing a function boundary** → *run `design` skill's `architect` route to sketch types, signatures, and module structure before code.*
-- **Module interface, seam, or testability question** → *run `design` skill's `deep-module` route for deep-module vocabulary, seam placement, deepening opportunities, and Design It Twice interface options.*
+- **Code crossing a function boundary** → *Load and follow the `design` skill to use its `architect` route to sketch types, signatures, and module structure before code.*
+- **Module interface, seam, or testability question** → *Load and follow the `design` skill to deepen modules and design interfaces; use its `deep-module` route for deep-module vocabulary, seam placement, deepening opportunities, and Design It Twice interface options.*
 - **Contested or unresolved design** → run the `design` playbook.
-- **Reading legwork, including locating code and answering how/why questions** → **MUST** *run `research` skill to investigate the question against primary sources and save cited findings*, even if direct exploration seems faster or simpler. Pass the original research request verbatim; add a separate grounded question with the known repository/subsystem/symbol or external target, context, exact unknown, and expected evidence. Factory Mode chooses the exact report destination before dispatch: preserve an explicit user path; otherwise use `<repo-root>/tmp/factory-mode-<task-slug>/research/<question-slug>.md`. Pass `@outputPath` plus the absolute repository root as `@outputBase`; keep framing in `@outputShape`. For multiple saved reports, supply an explicit question-to-file mapping. Use **How** for current code behavior, **Why** for historical rationale, or standard inspection for external sources and structured scope. Preserve requested output constraints. Let research own source selection, specialists, and delegation. Rationale: one entry point owns routing and evidence; grounding must preserve user intent.
+- **Reading legwork, including locating code and answering how/why questions** → **MUST** *Load and follow the `research` skill to investigate the question against primary sources and save cited findings*, even if direct exploration seems faster or simpler. Pass the original research request verbatim; add a separate grounded question with the known repository/subsystem/symbol or external target, context, exact unknown, and expected evidence. Factory Mode chooses the exact report destination before dispatch: preserve an explicit user path; otherwise use `<repo-root>/tmp/factory-mode-<task-slug>/research/<question-slug>.md`. Pass `@outputPath` plus the absolute repository root as `@outputBase`; keep framing in `@outputShape`. For multiple saved reports, supply an explicit question-to-file mapping. Use **How** for current code behavior, **Why** for historical rationale, or standard inspection for external sources and structured scope. Preserve requested output constraints. Let research own source selection, specialists, and delegation. Rationale: one entry point owns routing and evidence; grounding must preserve user intent.
 - **Nontrivial multi-step** → write the throughput checkpoint (Throughput checkpoint).
-- **Before commit** → *run `crew-commit` skill to commit current work with a message derived from the diff.*
+- **Before commit** → *Load and follow the `crew-commit` skill to commit current work with a message derived from the diff.*
 - **Before review** → strip comments that narrate code (Comments).
 - **Broken skill mid-task** → fix it in a separate change. Do not block; do not silently work around it.
 
 ## Principles
 
-*Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Pass the task and canonical names cited by the selected playbook. Apply at matching decision points; re-evaluate at phase changes. Fresh workers load applicable principles themselves. Missing dependency → report it and block dependent decisions; downstream calls do not replace this invocation. Help-only requests keep their early exit.
+*Load and follow the `principles` skill to load indexed engineering principles by name*. Pass the task and canonical names cited by the selected playbook. Apply at matching decision points; re-evaluate at phase changes. Fresh workers load applicable principles themselves. Missing dependency → report it and block dependent decisions; downstream calls do not replace this invocation. Help-only requests keep their early exit.
 
 Repository policy and explicit task, scope, approval and product-decision gates govern permitted actions; shared principles do not override them.
 
@@ -52,7 +52,7 @@ Prefer the smallest change that satisfies the requirements. Apply YAGNI; avoid s
 ## Subagents
 
 - Run the playbook in this chat; delegate steps, never the playbook itself.
-- *Run `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Brief with file paths, the restated goal, scope, named data shape, constraints, and success criteria.
+- *Load and follow the `subagents` skill to dispatch independent workers with role-based models and isolated outputs* using **Dispatch**. Brief with file paths, the restated goal, scope, named data shape, constraints, and success criteria.
 - Use harness model and effort defaults unless the user names them. For Challenge this, pass the adversary count directly to that skill; it owns the configured `challenge-this reviewers` role.
 - Review worker diffs and own the summary.
 
@@ -85,17 +85,17 @@ Keep a comment only for a non-obvious *why* the code cannot show. No phase-narra
 
 ## Prepare a direct branch
 
-Require the WF plugin's `github` skill before Git or GitHub mutations.
+*Load and follow the `github` skill to prepare GitHub platform mechanics before mutations*; select the owning action below.
 
-Before editing for Bug Fix or Refactoring, *run `git` tactic **Name branch*** with the change intent and summary. Use its Branches tactic to verify the target and local/remote ref availability. Create the branch from the pinned target or use a fresh worktree if unrelated changes are present. Reuse the exact recorded branch when continuing an existing PR.
+Before editing for Bug Fix or Refactoring, *Load and follow the `git` skill to run verified Git mechanics using **Name branch*** with the change intent and summary. Use its Branches tactic to verify the target and local/remote ref availability. Create the branch from the pinned target or use a fresh worktree if unrelated changes are present. Reuse the exact recorded branch when continuing an existing PR.
 
 ## Opening a PR
 
 For direct code-shipping playbooks. Feature uses the draft from `implement`.
 
-- *Run `git` tactic **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
-- *Run `github` tactic **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
-- Use the `github` Pull requests tactic to open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. Run the `review` skill's `code` route when requested.
+- *Load and follow the `git` skill to run verified Git mechanics using **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
+- *Load and follow the `github` skill to run GitHub platform mechanics using **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
+- *Load and follow the `github` skill to run GitHub platform mechanics using Pull requests* to open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. When requested, *Load and follow the `review` skill to review pull requests for findings*, selecting route `code`.
 - Post the URL and continue. Monitor checks when the caller requests it.
 
 ## Playbooks

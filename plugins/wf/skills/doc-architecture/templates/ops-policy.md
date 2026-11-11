@@ -26,7 +26,7 @@
 ## Optional: Operational Flow
 <Describe the normal operational flow or lifecycle.>
 
-<*Run `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams*, using Swimlane Diagram with one lane per responsible role or component.>
+<*Load and follow the `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams*, using Swimlane Diagram with one lane per responsible role or component.>
 
 ## Optional: Failure Handling
 <Describe what happens when the mechanism fails — detection, retry, fallback, escalation, recovery, manual intervention.>

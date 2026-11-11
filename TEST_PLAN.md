@@ -1631,3 +1631,70 @@ Scenario: A scenario fails before the fix passes after it and goes stale on the 
 ```
 
 **Coverage:** Integration test
+
+
+## Feature: WF Skill Invocation Loading
+
+> Unit: `modules.repo_consistency.skill_invocations.find_dangling_skill_invocations()`
+
+```gherkin
+Scenario: Canonical calls resolve in every wf document
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+Scenario: Noncanonical wf calls are reported
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+Scenario: Each call on one line is checked
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+Scenario: Declared external skills are resolved
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+Scenario: Dynamic calls require resolution instructions
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+Scenario: Human commands guards and filesystem paths are ignored
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+Scenario: Excluded folders do not supply or require skills
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+Scenario: Non wf legacy callers keep their existing policy
+  Given the scoped WF Markdown caller fixture for this scenario
+  When skill invocations are checked
+  Then syntax, identity, exclusions and preserved non-WF behavior match the scenario
+
+```
+
+**Coverage:** Unit test
+
+```gherkin
+Scenario: Canonical calls resolve generated skill names
+  Given a canonical WF call to a skill declared in generated-template frontmatter
+  When skill invocations are checked
+  Then the target resolves without violations
+
+Scenario: Dynamic resolution does not excuse legacy wording
+  Given resolution instructions and a legacy dynamic invocation
+  When skill invocations are checked
+  Then the invocation shape is reported
+
+Scenario: Next call does not close an unterminated invocation
+  Given an unterminated canonical call followed by a complete call
+  When skill invocations are checked
+  Then only the unterminated call is reported
+```

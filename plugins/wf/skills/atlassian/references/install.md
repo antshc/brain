@@ -41,7 +41,7 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
    - Write CWD `.github/skills/<skillName>/SKILL.md` containing:
      - Frontmatter `name: <skillName>`, `description: Create a <issueType.name> in <projectKey> with this repository's required fields pre-filled. Use when asked to create/open/file a <issueType.name>.`
      - Required-fields table: field key, field name.
-     - Step: gather each required field (developer or mirrored issue), then *run `atlassian` skill's Publish work tactic to create the Jira work item from a summary and Markdown description* with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additionalFields`; never create the issue directly through twg or REST.
+     - Step: gather each required field (developer or mirrored issue), then *Load and follow the `atlassian` skill to use its Publish work tactic to create the Jira work item from a summary and Markdown description* with `summary`, `issueType: <issueType.name>`, `description`, `projectKey: <projectKey>`, `additionalFields`; never create the issue directly through twg or REST.
      - Description-fidelity step: mirror source headings verbatim, add no heading, keep `<details>` blocks; the Publish work tactic converts Markdown to ADF and verifies the live issue.
 
 **8 — Migrate existing wrappers.** For each existing `.github/skills/pub-*/SKILL.md` that invokes the retired `publish-work` skill: show the planned change and ask before editing. Replace only that invocation with the Step 7 Publish work invocation; keep the frontmatter, Required-fields table, field values, and every local edit. Wrappers already on the `atlassian` skill → no change.
@@ -51,5 +51,5 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 ## Rules
 
 - Generate repo-specific skills only under the target's `.github/skills/`. Refresh bundled preflight files without changing `.atlassian.json.user` values. Ask before overwriting or migrating a `pub-*` wrapper.
-- Discover required Jira fields live. Confluence pages need no wrapper; *use `atlassian` skill to publish Confluence content* using Publish page.
+- Discover required Jira fields live. Confluence pages need no wrapper; *Load and follow the `atlassian` skill to publish Confluence content* using Publish page.
 - Resolve both roots explicitly. Use a scratch file for live TWG identity output, extract only account ID and display name, then remove it.

@@ -2,7 +2,7 @@
 
 **You own the breakdown.** Turn conversation, raw requirements, spec or design into an approved ordered list of atomic, testable **User stories**, broken down by **Functional slice**. This playbook produces stories, not code or implementation tickets.
 
-This playbook owns source normalization, the proposed breakdown and approval gate, story order and numbers, dependencies, numbered headings, Jira-sync metadata, and final list assembly. *Run `draft-artifact` skill to draft one atomic User story using the Story tactic* exactly once per approved row for its formatted Title and body.
+This playbook owns source normalization, the proposed breakdown and approval gate, story order and numbers, dependencies, numbered headings, Jira-sync metadata, and final list assembly. *Load and follow the `draft-artifact` skill to draft one atomic User story using the Story tactic* exactly once per approved row for its formatted Title and body.
 
 ## Vocabulary
 
@@ -34,7 +34,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 1. **Normalize input** → apply Input Normalization to the supplied raw requirements, `/design spec` output, or feature design output. *Done when* every source field is either preserved verbatim in a proposed row or explicitly carried as source context for that row.
 2. **Propose breakdown** → present Proposed Breakdown Format and wait for explicit approval; give FE and BE their own rows because they are separate Deployables. Revise and re-confirm requested merges, splits, reassignments, metadata, or dependencies. *Done when* the user explicitly approves the table; draft no story before approval.
 3. **Number and link** → assign each approved row a story number in table order, retain supplied Jira ID and Epic ID values or use `TBD`, and resolve dependencies from approved in-batch rows only. Render each dependency as `(Story {{n}}, {{jiraId|TBD}})`; use `None` when a row has no in-batch dependency. *Done when* every row has a number, both IDs, and a valid Blocked by value.
-4. **Draft each body** → *Run `draft-artifact` skill to draft one atomic User story using the Story tactic* exactly once per approved row, passing its optional Initiative tag, Deployable kind, Feature, Functional slice, verbatim Stakeholder requirement, Functional requirements addressed, and source Business rules, Edge cases, and error conditions. Also pass source Acceptance criteria, Implementation Decisions, and Contracts Delta when relevant. *Done when* every approved row has exactly one body beginning with the required `**Title:**` line and passing the **Story** tactic's Quality Check.
+4. **Draft each body** → *Load and follow the `draft-artifact` skill to draft one atomic User story using the Story tactic* exactly once per approved row, passing its optional Initiative tag, Deployable kind, Feature, Functional slice, verbatim Stakeholder requirement, Functional requirements addressed, and source Business rules, Edge cases, and error conditions. Also pass source Acceptance criteria, Implementation Decisions, and Contracts Delta when relevant. *Done when* every approved row has exactly one body beginning with the required `**Title:**` line and passing the **Story** tactic's Quality Check.
 5. **Assemble list** → emit one Output Format block per approved row in table order, placing that row's **Story** body after its heading and Jira-sync metadata. *Done when* the list has one numbered heading, one metadata block, and one complete body per approved row, with no wrapper prose or cross-story index.
 
 ## Proposed Breakdown Format
@@ -50,7 +50,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 - The proposed table was explicitly approved before any story body was drafted.
 - Every input requirement is traced to every Functional slice that implements it, without unexplained duplication.
 - Story count matches the approved table row for row, and numbering follows table order.
-- *Run `draft-artifact` skill to draft one atomic, testable User story using the Story tactic* exactly once per approved row; each run produces exactly one body.
+- *Load and follow the `draft-artifact` skill to draft one atomic, testable User story using the Story tactic* exactly once per approved row; each run produces exactly one body.
 - Every heading matches `## Story {{n}} — {{deployableKind}} {{[TAG]}} {{stakeholderRequirement}}`, omitting the Initiative tag and its following space when absent.
 - Each body Title repeats the row's optional Initiative tag, Deployable kind, and verbatim Stakeholder requirement in the **Story** tactic's required order and format.
 - Jira ID and Epic ID use supplied values or `TBD`.

@@ -4,6 +4,9 @@ description: >-
   Investigate primary sources and return cited findings. Use for 'research X', 'how does this work', 'inspect this system', 'why was this built this way', or 'check this cloud limit'.
 ---
 
+<!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->
+
+
 # Research
 
 Return cited findings inline or save at caller-selected destinations. How orchestrates current-system research; Hunter executes reusable Explore requests.
@@ -33,7 +36,7 @@ Apply to How, Why, Cloud, Web, prompts, and templates. **MUST NOT** define defau
 
 The caller sends this request verbatim directly to a `hunter` subagent. Hunter owns local target resolution, tool routing, read-only constraints, and evidence return. Repository evidence uses local checkouts only; missing checkouts/refs are blockers, not remote lookup requests. If Hunter is unavailable, report the blocked evidence request and continue independent work.
 
-- `@work` — question | prompt instruction | skill name to run. Pass instructions and skill names verbatim.
+- `@work` — question | prompt instruction | skill name to run. Pass instructions and skill names verbatim. For a named skill, resolve its exact name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. The worker reads its full body, selected route and required resources before acting.
 - `@depth` — `quick | medium | thorough`.
 - `[@shape]` — `literal | symbol | relationship | nuget`; routing hint. If omitted, Hunter classifies the request.
 - `[@target]` — repository or service names as stated. Default to the current repository.
@@ -50,7 +53,7 @@ A pure lookup (one literal, symbol, caller lookup, or package API) with no reque
 - Pass caller `@outputShape` verbatim to Why, Cloud, and Web. For system evidence, include it as report context and use the Explorer's Evidence return as inline `@outputShape`. Preserve the final destination only in coordinator delivery context.
 - **MUST** check codebase target roots for `graphify-out/`. When present, paste the Graphify line verbatim, filling `<root>`, into codebase-reading briefs for agents other than Hunter. Hunter handles Graphify itself.
 
-  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *run `graphify` skill for codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Read-only overrides its write steps. No `skill` tool → run `graphify query | path | explain` from the shell instead. Cite source files, not graph nodes; a missing node is never absence evidence.
+  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *Load and follow the `graphify` skill to inspect codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Read-only overrides its write steps. No `skill` tool → run `graphify query | path | explain` from the shell instead. Cite source files, not graph nodes; a missing node is never absence evidence.
 
 ## Routing
 
@@ -90,9 +93,9 @@ Read triggered resources in full from this skill base, not caller CWD. These dir
 
 ## Dispatch and delivery
 
-Large reading dispatch or material measurement claims → *Run `principles` skill to load only the engineering principles needed here; read its entire `SKILL.md`, then read each selected Index file in full from that skill's own folder.* Select `Guard the context window` for bounded source-reading briefs and `Explain the number` before relying on measurements. Keep source-based, inferred and observed evidence distinct; preserve existing delegation contracts.
+Large reading dispatch or material measurement claims → *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `Guard the context window` for bounded source-reading briefs and `Explain the number` before relying on measurements. Keep source-based, inferred and observed evidence distinct; preserve existing delegation contracts.
 
-For independent non-How workers, *run `subagents` skill to dispatch independent workers with role-based models* using Dispatch. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
+For independent non-How workers, *Load and follow the `subagents` skill to dispatch independent workers with role-based models* using Dispatch. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
 
 Cloud briefs include provider, mode (`question` or `implementation`), services, operations, region, account/subscription, relevant dimensions, and need for live values. Pass the loaded contract, template, and selected provider; request the filled report inline.
 

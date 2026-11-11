@@ -72,11 +72,15 @@ Register every new plugin in [marketplace.json](../plugin/marketplace.json) in t
 
 ## Skill invocation
 
-Reference the exact plain `skill-name` without a leading `/`, immediately followed by the word `skill` (e.g. `` `atlassian` skill ``). Wording may use run, follow, use, load, or equivalent prose; do not enforce one verb.
+**Invocation shape:** Every executable skill call **MUST** use *Load and follow the `skill-name` skill to <task>* with the exact discovered name, no leading `/`, immediately followed by `skill`. Include 3–6 distinctive keywords from its current description; do not copy the whole description. Italicize the entire invocation phrase. Preserve conditions, route/action, inputs, outputs and constraints in the call or adjacent prose. Dynamic callers resolve the exact name and description before rendering; never emit placeholders literally.
 
-Every skill invocation **MUST** include 3–6 distinctive keywords from the invoked skill's description to strengthen triggering. Do not copy the full description.
+**Load before execution:** Read the entire invoked `SKILL.md`, then select and read its entire applicable route procedure, when separate, before acting. Read required references, tactics and text templates fully before their dependent steps; load conditional resources when their conditions apply. Resolve paths from the invoked skill's base directory. Continue truncated reads to EOF; partial content counts as not loaded. Apply this contract to delegated calls. Missing required content blocks dependent work; report the gap and continue independent work.
 
-Wrap the whole invocation phrase in *italics* to mark it visibly. Example: *Run `atlassian` skill to fetch the Confluence page as Markdown.*
+**Discovery is not loading:** Names, descriptions, excerpts, remembered summaries and invocation announcements do not satisfy loading. Reuse complete content already available for the same revision; reload after context loss or changes.
+
+**Disclosure:** `SKILL.md` directly links every route and required resource with loading conditions. Routes name applicable resources from that index. Preserve one-level links and skill-local ownership; callers invoke the owner instead of opening its internals. A skill without routes executes its body procedure. Load only selected or triggered resources.
+
+**Scope:** These rules govern executable instructions and generated calls. Human slash examples, descriptions, command parsing, prohibitions and citations keep their natural form. Execute scripts and consume binary assets as instructed; reading their bytes as prose is unnecessary. External or generated targets resolve through the installed roster; verify their current description before rendering, and report missing dependencies rather than inventing names or instructions.
 
 ## Subagents
 
@@ -101,7 +105,7 @@ Keep `SKILL.md` body under 300 lines.
 
 Keep up to two category files at skill root; otherwise use the matching resource folder.
 
-**Composition:** keep shared invariants and route selection in `SKILL.md`; playbooks own route outcomes, tactics solve conditional subproblems, references supply knowledge. Use inline Workflow for short procedures; extract only substantial routes or techniques into required files and folders. Link every playbook and tactic directly from `SKILL.md`, with its loading condition; read only selected playbooks and triggered tactics. Apply one-level-deep rules to these folders too; no playbook → tactic → reference loading chains.
+**Composition:** keep shared invariants and route selection in `SKILL.md`; playbooks own route outcomes, tactics solve conditional subproblems, references supply knowledge. Use inline Workflow for short procedures; extract only substantial routes or techniques into required files and folders. Link every playbook and tactic directly from `SKILL.md`, with its loading condition; read selected playbooks fully before acting, then required or triggered resources fully before use. Apply one-level-deep rules to these folders too; no playbook → tactic → reference loading chains.
 
 **Kind folders:** a skill that routes to several same-kind playbooks MAY group them in a folder named by that kind (plural, lowercase, e.g. `kinds/`, `strategies/`, `modes/`) instead of `references/`. `SKILL.md` links each file directly from a routing table; bundled-path, skill-local, and one-level-deep rules apply unchanged. Name sibling playbooks in prose (`component` kind), never link between them.
 
@@ -115,7 +119,7 @@ Keep up to two category files at skill root; otherwise use the matching resource
 
 **Long references:** a reference file over 100 lines starts with a `## Contents` list naming every section by its exact heading. Rationale: a partial preview still shows the full scope. Source: [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) ("Structure longer reference files with a table of contents").
 
-**Read references fully:** every pointer to a reference requires reading the whole file; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
+**Read references fully:** every required or triggered reference requires reading the whole file; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
 
 **Structured response** (JSON/YAML an agent returns): open with a `| Field | Content |` table giving each field's meaning, allowed values, and empty case; then one compact example showing every field once (one array item each), not an exhaustive instance; then the failure shape. The table plus example must suffice to reconstruct any valid response.
 
@@ -134,7 +138,7 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 | Syntax | Meaning | Example |
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
-| *italic* | Skill invocation phrase | *Run Skill tool for `atlassian` skill to fetch the Confluence page as Markdown.* |
+| *italic* | Skill invocation phrase | *Load and follow the `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
@@ -184,6 +188,7 @@ See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the 
 
 ## Before finishing
 
+- Executable calls use the Skill invocation shape; full body, selected route and required-resource loading conditions are explicit.
 - Valid frontmatter; trigger-rich description free of forbidden description characters.
 - `SKILL.md` body under 300 lines.
 - No duplicate procedures within a skill; bundled resource paths stay inside that skill's folder.

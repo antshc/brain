@@ -6,7 +6,7 @@
 
 ## Steps
 
-1. **Find the local-run path.** From Discover `localInstance`: doc or skill that starts the local stack, its health/status command, endpoints (API, UI, dashboards), logs, and stop command. Prefer a repo skill that drives the stack; invoke it by name. **Done when:** start, health, stop, endpoints cited.
+1. **Find the local-run path.** If `localInstance` names a skill, resolve its exact name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. Read its full body, selected route and required resources before dependent steps. From Discover `localInstance`: doc or skill that starts the local stack, its health/status command, endpoints (API, UI, dashboards), logs, and stop command. Prefer a repo skill that drives the stack; invoke it by name. **Done when:** start, health, stop, endpoints cited.
 2. **Preflight.** Run its environment checks (doctor / container daemon / ports / built artifacts). **Done when:** checks OK.
 3. **Start + health.** Start the stack; poll health/status until every required service is up. **Done when:** health green, endpoints reachable.
 4. **Exercise.** REST API first: `curl` / repo HTTP files against the documented endpoints. Web GUI only when the behavior is UI-only or the visible GUI outcome is the question: repo browser-automation skill or scenario runner. One behavior per run. **Done when:** request/scenario executed.

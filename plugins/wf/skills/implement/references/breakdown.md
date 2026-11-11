@@ -15,7 +15,7 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 ## Prepare Plan
 
 1. Resolve **target repository, target/base branch, and initiative ID** from the request. Ask only for missing values. **MUST NOT** silently substitute the repository default branch.
-2. After validating execution options and runtime capabilities, *run `git` skill for verified branch naming using Branches* with the plan intent and summary. Run `GH_TOOL spec preflight --source-repository R --base-branch B --initiative-id I --mode MODE --pin-base --integration-branch H` with any supplied worker cap. Check local and remote ref availability in the resolved source repository before any tracker write. Preflight records `BASE_COMMIT`. Retain it and the returned branch.
+2. After validating execution options and runtime capabilities, *Load and follow the `git` skill to run verified branch naming using Branches* with the plan intent and summary. Run `GH_TOOL spec preflight --source-repository R --base-branch B --initiative-id I --mode MODE --pin-base --integration-branch H` with any supplied worker cap. Check local and remote ref availability in the resolved source repository before any tracker write. Preflight records `BASE_COMMIT`. Retain it and the returned branch.
 3. Run `GH_TOOL spec create` with the plan/description as `--body-file`; it creates the routing labels and reads back title prefix and routing. Run `GH_TOOL spec preflight --spec REF --mode MODE` with the same execution options and `--integration-branch H`, without `--pin-base`, to bind the spec and run directory. Require the same routing and checkout. Done when the remote spec matches the validated answers and the pinned base is retained.
 
 ## Breakdown Initiative
@@ -178,7 +178,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 ## Contracts Delta
 <!-- Omit this section entirely if this slice touches no API, Database, or Resource contract. -->
 
-*Run `doc-contracts` skill once per touched contract kind (API, Database, Resource) to write the REST endpoint, table schema, or resource contract delta as a terse diff;* inline its output verbatim here, one block per kind.
+*Load and follow the `doc-contracts` skill to write, once per touched contract kind (API, Database, Resource), the REST endpoint, table schema, or resource contract delta as a terse diff;* inline its output verbatim here, one block per kind.
 
 ## Affected layers & modules
 <affected-layers-rule>

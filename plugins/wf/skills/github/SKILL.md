@@ -17,6 +17,6 @@ Select one operation below. Load its tactic only, then follow any reference it s
 | Draft or finalize a review comment, inspect discussion, post, reply, or resolve | [Reviews](tactics/reviews.md) |
 | Verify checks at a pinned head | [Checks](tactics/checks.md) |
 
-`github` owns mechanics only. *Run `review` skill for PR findings, existing PR comments, and blast radius judgment*; long-running review and CI monitoring is the caller's loop.
+`github` owns mechanics only. *Load and follow the `review` skill to judge PR findings, existing PR comments, and blast radius judgment*; long-running review and CI monitoring is the caller's loop.
 
 For CLI operations, resolve `GH_TOOL` as `python3 <installed github skill directory>/scripts/github.py` before changing CWD. Use subcommand `--help` for flags and [CLI contract](references/cli-contract.md) when interpreting errors or adapting outputs. For remote operations, follow [Transports](references/transports.md). Explicit offline mode skips remote calls.

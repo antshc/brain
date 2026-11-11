@@ -15,8 +15,8 @@ Resolution gate the `atlassian` and `daily-briefing` skills run first. Never fai
 
 Preflight resolves facts only; never creates/updates content. Request is the operation itself → hand off to the owning skill, which runs Preflight first:
 
-- Fetch, publish, convert, search, or operate on Jira or Confluence content, or address page review comments → *run `atlassian` skill to fetch, publish, convert, and query Jira and Confluence content and address page comments (Fetch work, Publish work, Fetch page, Publish page, Address page comments, Map Markdown, TWG)*.
-- Daily blocked items and @mentions → *run `daily-briefing` skill for the daily briefing, standup update, and unanswered mentions*.
+- Fetch, publish, convert, search, or operate on Jira or Confluence content, or address page review comments → *Load and follow the `atlassian` skill to fetch, publish, convert, and query Jira and Confluence content and address page comments (Fetch work, Publish work, Fetch page, Publish page, Address page comments, Map Markdown, TWG)*.
+- Daily blocked items and @mentions → *Load and follow the `daily-briefing` skill to produce the daily briefing, standup update, and unanswered mentions*.
 
 ## Resolve
 
@@ -50,8 +50,8 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 
 Apply in every skill that runs Preflight:
 
-- **twg first.** Search and every non-body Jira/Confluence operation → *follow `atlassian` skill's TWG tactic for Jira workitems, JQL, Confluence pages, CQL, spaces, and people*, running Preflight's `twg` in place of bare `twg`. Never call the Atlassian MCP.
-- **REST + ADF for bodies.** For full Jira descriptions and Confluence page bodies (`<details>`, panels, status, TOC, wide tables, inline-comment anchors, diagrams, attachments), *run `atlassian` skill to fetch and publish Jira and Confluence content* using Fetch work, Publish work, Fetch page, or Publish page (`atl.py` over REST). Never read or write those bodies through twg, except each tactic's documented lossy fallback.
+- **twg first.** Search and every non-body Jira/Confluence operation → *Load and follow the `atlassian` skill to use its TWG tactic for Jira workitems, JQL, Confluence pages, CQL, spaces, and people*, running Preflight's `twg` in place of bare `twg`. Never call the Atlassian MCP.
+- **REST + ADF for bodies.** For full Jira descriptions and Confluence page bodies (`<details>`, panels, status, TOC, wide tables, inline-comment anchors, diagrams, attachments), *Load and follow the `atlassian` skill to fetch and publish Jira and Confluence content* using Fetch work, Publish work, Fetch page, or Publish page (`atl.py` over REST). Never read or write those bodies through twg, except each tactic's documented lossy fallback.
 - **Markdown, not HTML.** twg fallback reads use `--format md` and warn they are lossy; twg writes use markdown body formats. Never request or send `html`, except the `atlassian` Address page comments tactic's targeted edits.
 - JQL/CQL searches use resolved `maxResults`/`limit` as `--limit`, unless the caller bundles its own extraction script and declares a higher cap.
 - Large twg result → `-o json --output-file <file>.json`, `cd` there, extract with Python (`read_file` silently truncates lines at ~2000 chars). Unknown shape → `print(json.dumps(d, indent=2)[:2000])`.

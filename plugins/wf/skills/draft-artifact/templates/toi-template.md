@@ -47,7 +47,7 @@
 
 <Brief description of how the feature works: 3–6 sentences covering the trigger, the main steps across user-visible deployables, and the visible result. No classes, methods, or internal modules.>
 
-<!-- @: OPTIONAL diagram. Add only when it helps (for example handoffs between 2 or more deployables); otherwise delete this comment and the whole `<details>` block below. When added: *Run `doc-diagram` skill to create a Mermaid swimlane diagram of responsibility handoffs and who owns each step*: Swimlane Diagram, current mode, solution responsibility, TB, one lane per user-visible deployable plus the user, high level, 4–10 user-visible steps, no internals; Flowchart only when one deployable owns the flow; replace the scaffold below. -->
+<!-- @: OPTIONAL diagram. Add only when it helps (for example handoffs between 2 or more deployables); otherwise delete this comment and the whole `<details>` block below. When added: *Load and follow the `doc-diagram` skill to create a Mermaid swimlane diagram of responsibility handoffs and who owns each step*: Swimlane Diagram, current mode, solution responsibility, TB, one lane per user-visible deployable plus the user, high level, 4–10 user-visible steps, no internals; Flowchart only when one deployable owns the flow; replace the scaffold below. -->
 
 <details>
 <summary>Feature flow — Solution Responsibility</summary>

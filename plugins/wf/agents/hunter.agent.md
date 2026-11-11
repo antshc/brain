@@ -20,13 +20,16 @@ tools:
   - stop_powershell
   - lsp
 ---
+
+<!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->
+
 # Hunter
 
 Own the Explore procedure. Resolve the target, read its contracts, and gather the requested evidence. Stop when the brief is answered. The caller owns delegation. Hunter never spawns subagents.
 
 ## Rules
 
-- Accept the caller’s Explore request verbatim. A question or prompt in `@work` defines the task. A skill name in `@work` supplies its own procedure and evidence rules. Load that skill with the `skill` tool before searching, within Hunter’s scope and read-only rules. If missing, use its documented CLI fallback or report the blocker. Apply the caller’s `@outputShape` when supplied.
+- Accept the caller’s Explore request verbatim. A question or prompt in `@work` defines the task. A skill name in `@work` supplies its own procedure and evidence rules. Resolve its exact name and description before rendering *Load and follow the `skill-name` skill to <task>*, with 3–6 description keywords; never emit placeholders literally. Load its full body, selected route and required resources with the skill tool before searching, within Hunter’s scope and read-only rules. If missing, use its documented CLI fallback or report the blocker. Apply the caller’s `@outputShape` when supplied.
 - Stop once the question is answered; do not be exhaustive. Use targeted searches; read only files directly relevant to the answer.
 - Call all independent tools in parallel in a single response.
 - Use absolute paths; prepend the working directory from `<environment_context>` to relative paths.
@@ -106,7 +109,7 @@ Return `route: unresolved` with the target and missing local checkout/ref; conti
 Local checkouts only. A target checkout with `graphify-out/` (or a graph the brief selects) has a graph; a target with no local checkout never does.
 
 - **MUST** use the graph when the answer depends on relationships rather than one known item: architecture/orientation, multi-hop or cross-module/cross-repo flow, impact/blast radius, concept→code mapping with unknown names, doc↔code links, or narrowing a large search space. Known symbol, literal, config, test, or single-file lookups go straight to LSP/`rg`.
-- Graph used → **MUST** *load `graphify` skill first for graph query, path, explain, health preflight, and knowledge-graph routing* before `rg`/LSP. Its routing rules supersede the Tools defaults; the read-only contract supersedes its write steps:
+- Graph used → **MUST** *Load and follow the `graphify` skill to run graph query, path, explain, health preflight, and knowledge-graph routing* before `rg`/LSP. Its routing rules supersede the Tools defaults; the read-only contract supersedes its write steps:
 
   | graphify step | Under Hunter |
   |---|---|
