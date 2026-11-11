@@ -25,7 +25,7 @@
 ---
 
 ## Optional: Example
-<Diagram (*run `doc-diagram` skill for a Mermaid class diagram of responsibilities, interfaces, dependencies*), flow (*run `doc-diagram` skill for Mermaid flowchart, swimlane, or sequence behavior, preferring a **Sequence Diagram** for call-chain order, cross-boundary calls, decision paths*), code example (real implementation trimmed to rule-relevant lines; an invented one is labelled `Sketch — not the implementation`; MAY pair with the sequence diagram, showing the code behind its key steps), configuration, or package structure.>
+<Diagram (*run `doc-diagram` skill to create a Mermaid class diagram of type relationships, responsibilities, interfaces, and dependencies*), flow (*run `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams*, preferring a **Sequence Diagram** for call order, cross-boundary calls, and decision paths), code example (real implementation trimmed to rule-relevant lines; an invented one is labelled `Sketch — not the implementation`; MAY pair with the sequence diagram, showing the code behind its key steps), configuration, or package structure.>
 
 ## Optional: Benefits and Trade-offs
 **Benefits**

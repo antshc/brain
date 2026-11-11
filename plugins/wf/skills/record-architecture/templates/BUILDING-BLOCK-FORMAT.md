@@ -36,7 +36,7 @@
 
 ## Flow view
 
-*(optional)* <!-- Include only when the block's essential behavior is a lifecycle or process (transient resource, job, multi-step handoff) that a Container or Component view cannot show. *Run `doc-diagram` skill for Mermaid flowchart, swimlane, or sequence behavior*, using Flowchart, orientation `LR`, the Container view's component names, current mode, one diagram per block. Omit for long-running services whose structure the Container view already explains. -->
+*(optional)* <!-- Include only when the block's essential behavior is a lifecycle or process (transient resource, job, multi-step handoff) that a Container or Component view cannot show. *Run `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams*, using Flowchart, orientation `LR`, the Container view's component names, current mode, one diagram per block. Omit for long-running services whose structure the Container view already explains. -->
 
 ## Concepts
 
