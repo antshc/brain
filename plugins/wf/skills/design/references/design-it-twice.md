@@ -6,7 +6,7 @@ Write every output under `<artifact-root>/deep-modules/`.
 
 ## Frame
 
-Target: the module named by the user, or the module whose contract a verified Interrogate finding breaks.
+Target: the module named by the user, or the module whose contract a verified Challenge this finding breaks.
 
 Write `problem.md`:
 

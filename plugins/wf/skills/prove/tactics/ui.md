@@ -4,7 +4,7 @@ Use when the question is what a page, component, flow, or interaction should loo
 
 ## Build
 
-1. Take the frontend framework, routing, components, styles, data access, and host page from the Inspect step's facts; look up only gaps there, never re-search here.
+1. Take the frontend framework, routing, components, styles, data access, and host page from the supplied/discovered facts; look up only gaps there, never re-search here.
 2. Prefer an existing route/page. Create an experiment route only when no natural host exists.
 3. Reuse the current frontend stack and design system.
 4. Build one minimal variant for behavior validation; build 2-3 materially different variants when comparing design alternatives. Cap at 5.
@@ -12,7 +12,7 @@ Use when the question is what a page, component, flow, or interaction should loo
 6. When comparing variants, make them switchable on one route, preferably with a shareable URL parameter such as `?variant=`.
 7. Keep any switcher clearly experiment-only and excluded from production.
 8. Surface enough real state/data density to evaluate the variants.
-9. Capture observations and, when provided, the user's selected variant. Remove experiment variants/switcher from production code.
+9. Capture observations and, when provided, the user's selected variant. Keep variants/switcher disposable; retain them until coordinator verification or requested human review finishes.
 
 ## Constraints
 

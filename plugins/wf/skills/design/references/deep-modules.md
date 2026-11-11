@@ -23,7 +23,7 @@ Put much behaviour behind a small interface. Callers and tests cross the same se
 
 **Why:** depth gives callers leverage and maintainers locality; shallow contracts leak complexity into every call site.
 
-A broken contract found by Interrogate is resolved through `design deep-module`, not patched in place.
+A broken contract found by Challenge this is resolved through `design deep-module`, not patched in place.
 
 ## Vocabulary
 

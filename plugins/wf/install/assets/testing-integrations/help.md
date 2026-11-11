@@ -27,10 +27,8 @@ KINDS — what runs; ladder: lowest seam first
   /testing-integrations call <endpoint> on the local instance and show the stored record
   /testing-integrations start the app locally and check <feature> in the UI
 
- experiment         off ladder: one uncertain question via the experiment skill
-                    options: logic / runtime / integration (local or cloud) / ui
-  /testing-integrations check whether the test role can <cloud action> in the dev account
-  /testing-integrations does <serializer / middleware> handle <case>
+ select             read-only fastest valid test selection; no execution
+  /testing-integrations select test the role permission against the real cloud boundary
 
 STRATEGIES — how to test, combine with any kind
  reproduce          red → root cause → green
@@ -50,7 +48,7 @@ Repo commands, environments, and filters are discovered from the repo docs at ru
 
 1. **Discover.** Run **Discover (automatic, always first)**. **Done when:** `suites` table built.
 2. **Locate the behavior.** Map the request to code and tests: existing tests covering it (names via search), owning suite, whether it crosses a real cloud boundary, local environment support (mock covers it or not). **Done when:** covering tests listed, or `none` + nearest suite.
-3. **Build 3 options** from **Choose the kind — ladder**: the lowest rung that can show the behavior plus the next two viable rungs, each a different kind or environment, with a strategy (reproduce / regression) when the request implies it. Note why lower rungs were skipped. Behavior is an open question → one option may be an experiment (state its option: logic / runtime / integration / ui). Cover a gap with "write a new test in <suite>" as an option when no test exists. **Done when:** 3 distinct options.
+3. **Build 3 options** from **Choose the kind — ladder**: the lowest rung that can show the behavior plus the next two viable rungs, each a different kind or environment, with a strategy (reproduce / regression) when the request implies it. Note why lower rungs were skipped. Behavior is unknown → report the observation needed to select a test; do not dispatch an experiment. Cover a gap with "write a new test in <suite>" as an option when no test exists. **Done when:** 3 distinct options.
 4. **Print**, per option:
    - **Option N — <name>** (kind [+ strategy], environment)
    - **What it proves / misses:** behavior covered vs blind spots (mocked boundaries, real IAM, timing)

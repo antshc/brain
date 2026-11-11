@@ -1,7 +1,7 @@
 ---
 name: principles
 description: >-
-  Load only the engineering principles a task needs, verbatim, from an indexed list. Use when a step cites a principle by name, e.g. 'laziness protocol', 'attack the premise'. Not for running checks → `experiment`; debugging → `diagnosing-bugs`.
+  Load only the engineering principles a task needs, verbatim, from an indexed list. Use when a step cites a principle by name, e.g. 'laziness protocol', 'attack the premise'. Not for running checks → `prove`; debugging → `diagnosing-bugs`.
 ---
 
 # Principles

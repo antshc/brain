@@ -5,7 +5,7 @@ Design a deep module interface, compare genuinely different shapes, and recommen
 ## Route
 
 - **Direct request:** deepen a module interface, find deepening opportunities, select seam placement, or improve testability/AI navigation. User asks for a sketch too → run `design sketch` after the recommendation; asks to implement → use `design architect` with the recommendation as grounding.
-- **Contract finding:** Interrogate verified an interface, invariant, ordering, error mode, configuration, seam, or adapter defect. Propose a corrected interface through this route before Architect applies it. Interrogate itself reports findings, not fixes.
+- **Contract finding:** Challenge this verified an interface, invariant, ordering, error mode, configuration, seam, or adapter defect. Propose a corrected interface through this route before Architect applies it. Challenge this itself reports findings, not fixes.
 
 ## Procedure
 

@@ -1,6 +1,6 @@
-# Experiment examples
+# Prove examples
 
-Example prompts that should trigger an experiment when the answer requires observing real behavior.
+Example prompts that should trigger Prove when the answer requires observing real behavior.
 
 ## Logic / state
 

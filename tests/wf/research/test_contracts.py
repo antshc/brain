@@ -76,7 +76,7 @@ def test_research_routes_have_no_default_artifact_locations():
     'design/playbooks/wayfinder.md',
     'design/references/evidence-routing.md',
     'define/references/research.md',
-    'experiment/SKILL.md',
+    'prove/SKILL.md',
     'review/playbooks/blast-radius.md',
     'review/playbooks/hitl.md',
 ])
