@@ -8,7 +8,7 @@ No approval gate — record a building block as soon as it's identified.
 
 ## Sync the Deployables row — always
 
-1. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Generate trigger condition*** for `{{triggerCondition}}`.
+1. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Generate trigger condition*** for `{{triggerCondition}}`.
 2. Use its **Ensure section exists** for the `Deployables` table under `Building blocks`.
 3. Use its **Sync index row** with `{{action}}` and `{{rowMetadata}}` = `{{buildingBlockName}}`, `{{mermaidComponentName}}`, `{{triggerCondition}}`, `{{shortDescription}}`, `{{location}}`, plus a link to the full doc — the harness record below, or the repository's own documentation when it documents this block itself (no harness record in that case). Never edit the table directly.
 
@@ -20,4 +20,4 @@ Add the **Flow view** when the block's lifecycle or process is the point — e.g
 
 ## Redraw the system context — on add, supersede, or retire
 
-*Run `doc-diagram` skill for Mermaid System Context and Container diagrams* to redraw `docs/building-blocks/system-context.md`'s `C4Context` and solution-level `C4Container` diagrams whenever a Deployable is added, superseded, or retired. *Run `index-docs` skill for trigger-generation, scan/match, and row-sync; use **Ensure section exists*** for `Context` linking `docs/building-blocks/system-context.md`.
+*Run `doc-diagram` skill for Mermaid System Context and Container diagrams* to redraw `docs/building-blocks/system-context.md`'s `C4Context` and solution-level `C4Container` diagrams whenever a Deployable is added, superseded, or retired. *Run `index-docs` skill to sync index rows and Trigger condition tables; use **Ensure section exists*** for `Context` linking `docs/building-blocks/system-context.md`.

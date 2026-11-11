@@ -51,5 +51,5 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 ## Rules
 
 - Generate repo-specific skills only under the target's `.github/skills/`. Refresh bundled preflight files without changing `.atlassian.json.user` values. Ask before overwriting or migrating a `pub-*` wrapper.
-- Discover required Jira fields live. Confluence pages need no wrapper; use the `atlassian` skill's Publish page tactic.
+- Discover required Jira fields live. Confluence pages need no wrapper; *use `atlassian` skill to publish Confluence content* using Publish page.
 - Resolve both roots explicitly. Use a scratch file for live TWG identity output, extract only account ID and display name, then remove it.
