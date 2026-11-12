@@ -38,7 +38,7 @@ The caller sends this request verbatim directly to a `hunter` subagent. Hunter o
 
 - `@work` — question | prompt instruction | skill name to run. Pass instructions and skill names verbatim. For a named skill, resolve its exact name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. The worker reads its full body, selected route and required resources before acting.
 - `@depth` — `quick | medium | thorough`.
-- `[@shape]` — `literal | symbol | relationship | nuget`; routing hint. If omitted, Hunter classifies the request.
+- `[@shape]` — `literal | symbol | relationship | nuget`; routing hint. If omitted, Hunter classifies the request. For `relationship`, name both ends in `@work` when the question is a flow.
 - `[@target]` — repository or service names as stated. Default to the current repository.
 - `@outputShape` — caller's return shape. Default to Hunter's verdict.
 - `[@outputArtifact]` — the one caller-designated evidence file the run may write; otherwise return inline.
@@ -53,7 +53,7 @@ A pure lookup (one literal, symbol, caller lookup, or package API) with no reque
 - Pass caller `@outputShape` verbatim to Why, Cloud, and Web. For system evidence, include it as report context and use the Explorer's Evidence return as inline `@outputShape`. Preserve the final destination only in coordinator delivery context.
 - **MUST** find the graph covering each codebase target: `graphify-out/` under the launch repository root or the target's main checkout, never inside a git worktree (graphs are gitignored and built from the launch folder). A worktree target uses its main checkout's graph: main checkout = parent of `git -C <worktree> rev-parse --path-format=absolute --git-common-dir`; `<worktree>/<rel>` maps to `<mainCheckout>/<rel>`. When covered, paste the Graphify line verbatim, filling `<root>` with the graph root, into codebase-reading briefs for agents other than Hunter; for a worktree, append the main-checkout→worktree path mapping. Hunter handles Graphify itself.
 
-  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *Load and follow the `graphify` skill to inspect codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Run it from `<root>`. Read-only overrides its write steps. No `skill` tool → run `graphify query | path | explain` from the shell instead. Cite source files, not graph nodes; a missing node is never absence evidence.
+  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *Load and follow the `graphify` skill to inspect codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Run it from `<root>`. Read-only overrides its write steps. No `skill` tool → run the graphify skill's `scripts/focused_query.py` from `<root>` (`resolve` + `path` for a flow; `terms`, then `query` with 1-2 identifier terms for unknown names); never `graphify query` with question text. Cite source files, not graph nodes; a missing node is never absence evidence.
 
 ## Routing
 

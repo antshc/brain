@@ -35,7 +35,7 @@ def explore_enum(field: str) -> set[str]:
 
 
 def test_inspection_lookup_hints_remain_compatible_with_hunter():
-    table = INSPECTION.split('| Lookup | `@shape` | `@depth` |')[1].split('\n\n')[0]
+    table = INSPECTION.split('| Lookup | `@shape` | `@depth` | `@work` prefix |')[1].split('\n\n')[0]
     rows = [[cell.strip().strip('`') for cell in line.strip('|').split('|')]
             for line in table.strip().splitlines()[1:]]
     assert rows
