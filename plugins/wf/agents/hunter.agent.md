@@ -54,7 +54,9 @@ Preserve the repository or service names in `@target` and the question. Use the 
 
 **Enumerate the checkouts** — once per exploration, before any lookup. Three sources: `@repoRoot` itself for harness documents and its own source, the main codebase repository under `@repoRoot/workspace/`, and every local path the `Deployables` or `Shared dependency ownership` table gives a supporting repository. Build a `<name> → <absolute path>` list of those that exist on disk. A name with no existing local checkout is unresolved; report the missing checkout and continue independent local targets.
 
-**Graph coverage** — read `graphify-out/manifest.json` under each enumerated checkout, where present. Select the widest graph whose manifest covers the target path relative to the graph root. For a multi-target lookup, use a graph that covers the relationship being traced. If no manifest covers it, continue from source.
+**Worktree targets** — a target path or brief naming a git worktree (e.g. `@repoRoot/.worktrees/<repo>/<name>`) is a checkout of an enumerated repository on another branch. Set `@worktreeRoot` to its `git rev-parse --show-toplevel` and `@mainCheckout` to the parent of `git -C @worktreeRoot rev-parse --path-format=absolute --git-common-dir`. Source evidence (LSP, `rg`, reads, citations) stays inside `@worktreeRoot`; graph lookup uses `@mainCheckout`.
+
+**Graph coverage** — read `graphify-out/manifest.json` under `@repoRoot` and under each enumerated main checkout, where present. **MUST NOT** look for `graphify-out/` inside a worktree: graphs are gitignored, built from the launch folder, and `.graphifyignore` excludes worktrees by design; neither fact rules out coverage. Test coverage with the target path relative to the graph root; for a worktree target, first rewrite it as `@mainCheckout/<path relative to @worktreeRoot>`. Select the widest covering graph. For a multi-target lookup, use a graph that covers the relationship being traced. If no manifest covers it, continue from source.
 
 Use only resolved local checkouts for repository evidence, plus their resolved NuGet package caches for package inspection. Origin metadata does not authorize remote source lookup.
 
@@ -106,7 +108,10 @@ Return `route: unresolved` with the target and missing local checkout/ref; conti
 
 ## Graphify
 
-Local checkouts only. A target checkout with `graphify-out/` (or a graph the brief selects) has a graph; a target with no local checkout never does.
+Local checkouts only. A target has a graph when Graph coverage selected one (or the brief selects one); a target with no local checkout never does.
+
+- Run `graphify` commands from the selected graph root (usually `@repoRoot`), never from a worktree.
+- Worktree target → translate graph paths from `@mainCheckout/…` to `@worktreeRoot/…` before LSP/`rg`/reads. The graph reflects the main checkout's branch; worktree source wins on any difference.
 
 - **MUST** use the graph when the answer depends on relationships rather than one known item: architecture/orientation, multi-hop or cross-module/cross-repo flow, impact/blast radius, concept→code mapping with unknown names, doc↔code links, or narrowing a large search space. Known symbol, literal, config, test, or single-file lookups go straight to LSP/`rg`.
 - Graph used → **MUST** *Load and follow the `graphify` skill to run graph query, path, explain, health preflight, and knowledge-graph routing* before `rg`/LSP. Its routing rules supersede the Tools defaults; the read-only contract supersedes its write steps:
