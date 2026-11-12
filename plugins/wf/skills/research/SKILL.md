@@ -1,7 +1,7 @@
 ---
 name: research
 description: >-
-  Investigate primary sources and return cited findings. Use for 'research X', 'how does this work', 'inspect this system', 'why was this built this way', or 'check this cloud limit'.
+  Investigate code, docs, packages, cloud limits, and the web; return cited findings. Use when you need codebase navigation, a symbol or caller lookup, or web search, and for 'research X', 'how does this work', 'where is X', 'what calls X', 'why was this built this way'. Not for one claim → `prove`.
 ---
 
 <!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->
@@ -51,9 +51,9 @@ A pure lookup (one literal, symbol, caller lookup, or package API) with no reque
 - **MUST** delegate source reading. The coordinator routes, briefs, verifies citations, synthesizes, and delivers. If delegation is unavailable, report the blocker; continue independent work.
 - Send every Explore request and current-system evidence brief to `hunter`. Use read-only `general-purpose` workers for independent Cloud, Web, and Why evidence; preserve Why worker roles.
 - Pass caller `@outputShape` verbatim to Why, Cloud, and Web. For system evidence, include it as report context and use the Explorer's Evidence return as inline `@outputShape`. Preserve the final destination only in coordinator delivery context.
-- **MUST** check codebase target roots for `graphify-out/`. When present, paste the Graphify line verbatim, filling `<root>`, into codebase-reading briefs for agents other than Hunter. Hunter handles Graphify itself.
+- **MUST** find the graph covering each codebase target: `graphify-out/` under the launch repository root or the target's main checkout, never inside a git worktree (graphs are gitignored and built from the launch folder). A worktree target uses its main checkout's graph: main checkout = parent of `git -C <worktree> rev-parse --path-format=absolute --git-common-dir`; `<worktree>/<rel>` maps to `<mainCheckout>/<rel>`. When covered, paste the Graphify line verbatim, filling `<root>` with the graph root, into codebase-reading briefs for agents other than Hunter; for a worktree, append the main-checkout→worktree path mapping. Hunter handles Graphify itself.
 
-  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *Load and follow the `graphify` skill to inspect codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Read-only overrides its write steps. No `skill` tool → run `graphify query | path | explain` from the shell instead. Cite source files, not graph nodes; a missing node is never absence evidence.
+  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *Load and follow the `graphify` skill to inspect codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Run it from `<root>`. Read-only overrides its write steps. No `skill` tool → run `graphify query | path | explain` from the shell instead. Cite source files, not graph nodes; a missing node is never absence evidence.
 
 ## Routing
 
@@ -110,4 +110,4 @@ Use a read-only `general-purpose` worker with web access. Cite material claims i
 - Each independent question has its requested artifact at the exact caller destination, inline findings, or a named blocker. Each How explanation follows How report; saved paths and framing match the caller.
 - Material factual claims carry in-place primary-source citations. Assumptions/unknowns and runtime observations remain distinct from static evidence.
 - Included Mermaid blocks render; remove template placeholders, Rules blocks, and unfilled sections.
-- Codebase targets with `graphify-out/` record queries or skip reasons in evidence.
+- Codebase targets covered by a graph, including worktrees via their main checkout, record queries or skip reasons in evidence.

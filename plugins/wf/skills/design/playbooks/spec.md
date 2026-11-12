@@ -12,17 +12,24 @@ Explicit offline publishing or a reported GitHub/tool/authentication failure →
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any Concepts and ADRs in the area you're touching.
 
-2. Draft the Spec using the template below. If the Initiative changes an API, Database, or Resource contract, *Load and follow the `doc-contracts` skill to write an API, database, or resource contract delta* once per touched contract kind and inline its substantive contract content under **Contracts Delta**, preserving contract facts while removing skill references and authoring directives.
+2. Draft the Spec using the template below.
 
 Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
 Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
-3. Design sketch — apply only when `design architect` or `design sketch` produced a completed, accepted `synthesis/` package in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Design sketch handoff** below.
+3. **Contracts gate.** List every contract kind the Initiative touches: API, Database, Resource, other, GUI. Seed the list from the design's **Contracts touched** when present, then check the conversation and codebase for more. For each listed kind, *Load and follow the `doc-contracts` skill to write an API, database, resource, or GUI contract delta as a terse diff* and inline its substantive output under **Contracts Delta**, ordered API → Database → Resource → other → GUI, keeping contract facts and removing skill references and authoring directives. **MUST NOT** hand-write a delta. *Done when* each listed kind has a block opening with a `Legend:` line and one `#### header` + `<details>` per resource or surface; empty list → omit **Contracts Delta** and state "No contract change" in the run summary.
 
-4. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+4. Design sketch — apply only when `design architect` or `design sketch` produced a completed, accepted `synthesis/` package in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Design sketch handoff** below.
 
-5. Completed design package → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and bundle manifest. Offline → follow its offline branch instead.
+5. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. **Contracts Delta present ⇔ the Contracts gate listed kinds**; each kind's block has a `Legend:` line, `#### header` + `<details>` per resource or surface, and delta lines prefixed `+`, `-`, `%`, or `~`. Missing or hand-written → re-run the Contracts gate; do not publish. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+
+6. Completed design package → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and bundle manifest. Offline → follow its offline branch instead.
+
+## Gotchas
+
+- Run `doc-contracts` for every touched kind even when the delta is small, additive, or already settled in the design.
+- GUI changes (dialogs, pages, visible fields) are a contract kind; a new field shown in the UI usually means both an API and a GUI delta.
 
 ## Design sketch handoff
 
@@ -37,6 +44,7 @@ Map the selected `rationale.md` into the body; for an Architect Arena package, f
 - Behavior the design commits to → **Requirements**, solution agnostic.
 - Module shape, types, invariants, tradeoffs, rejected alternatives, and synthesis decision when present → **Implementation Decisions** as prose, after the **Design sketch** decision.
 - Open questions and risks → **Further Notes**.
+- Contracts touched → seed list for the Contracts gate; never copied into the body as a delta.
 
 The body MUST NOT name design routes, candidate labels, or the run's local paths.
 
@@ -127,9 +135,9 @@ Exception: if a prototype produced a snippet that encodes a decision more precis
 
 ## Contracts Delta
 
-<!-- Omit this section entirely if no API, Database, or Resource contract changed. -->
+<!-- Omit only when the Contracts gate listed no kinds. -->
 
-The changed API, Database, or Resource contracts, one block per kind. Include only the substantive contract content.
+*Load and follow the `doc-contracts` skill to write an API, database, resource, or GUI contract delta as a terse diff* once per touched kind (API, Database, Resource, other, GUI); inline its output verbatim, one block per kind, ordered API → Database → Resource → other → GUI.
 
 ## Testing Decisions
 
