@@ -1,7 +1,7 @@
 ---
 name: show-me-your-work
 description: >-
-  Keep a reviewable TSV decision trail for long or unattended work, audit it against the transcript with a cross-model review, and print the final report. Use for /show-me-your-work, autonomous or multi-phase runs, or work reviewed after stepping away.
+  Record significant decisions and evidence, audit them against the run transcript, and report the trail. Use for /show-me-your-work, 'log decisions', or 'audit this run'. Not for ordinary multi-step work.
 ---
 
 # Show me your work

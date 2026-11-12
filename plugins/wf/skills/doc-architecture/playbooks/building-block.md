@@ -20,4 +20,4 @@ Add the **Flow view** when the block's lifecycle or process is the point — e.g
 
 ## Redraw the system context — on add, supersede, or retire
 
-*Load and follow the `doc-diagram` skill to show system structure in Mermaid System Context and Container diagrams* to redraw `docs/building-blocks/system-context.md`'s `C4Context` and solution-level `C4Container` diagrams whenever a Deployable is added, superseded, or retired. Apply **Ensure section exists** for `Context` linking `docs/building-blocks/system-context.md`.
+*Load and follow the `doc-diagram` skill to create Mermaid architecture diagrams to show system structure in Mermaid System Context and Container diagrams* to redraw `docs/building-blocks/system-context.md`'s `C4Context` and solution-level `C4Container` diagrams whenever a Deployable is added, superseded, or retired. Apply **Ensure section exists** for `Context` linking `docs/building-blocks/system-context.md`.

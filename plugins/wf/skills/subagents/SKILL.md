@@ -1,7 +1,7 @@
 ---
 name: subagents
 description: >-
-  Dispatch independent workers with role-based models and isolated outputs. Use Arena to compare independent candidates and synthesize findings, or Swarm to partition work or race workers.
+  Dispatch independent workers using role-based models, Arena comparisons, or Swarm execution. Use for 'compare independent designs', 'review in parallel', 'fan out tasks', or 'race workers'.
 ---
 
 # Subagents

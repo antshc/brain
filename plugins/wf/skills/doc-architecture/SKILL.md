@@ -32,7 +32,7 @@ Record settled knowledge, render an established body, or maintain architecture i
 - Persist one record at a time, when settled. Grouping adds no approval, publication, execution, or discovery steps.
 - A Deployable describes what a block is; topology describes where it runs. Load both only when both artifacts are requested or topology requires a missing Deployable. Apply each prerequisite's gate before continuing.
 - Record routes author body-grounded index values; index actions perform mechanics. Record and index changes belong in the same change; never invent policy to fill a row.
-- *Load and follow the `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams* for diagrams. For code inspection, *Load and follow the `research` skill to investigate code via codebase navigation and return cited findings* and send its Explore request to `hunter`. Access other skills through invocation, never their private resources.
+- *Load and follow the `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams* for diagrams. For code inspection, *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* and send its Explore request to `hunter`. Access other skills through invocation, never their private resources.
 
 ## Index actions
 

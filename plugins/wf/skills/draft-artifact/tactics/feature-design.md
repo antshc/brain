@@ -49,11 +49,11 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 `design-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons.
 
-The reader-facing architecture-representation section is arc42's Building Block View, embedded inline within `Solution Overview` — not its own H2 or `<summary>`. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks.
+The reader-facing architecture-representation section is arc42's Building Block View, embedded inline within `Solution Overview` — not its own H2 or `<summary>`. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to create Mermaid architecture diagrams to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks.
 
 Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold.
 
-Include the optional bold `Cross Deployable Flow` section only when a flow crosses multiple deployables. *Load and follow the `doc-diagram` skill to show responsibility handoffs in a Mermaid swimlane diagram* across deployables, one lane per deployable, 1-5 major steps per lane.
+Include the optional bold `Cross Deployable Flow` section only when a flow crosses multiple deployables. *Load and follow the `doc-diagram` skill to create a Mermaid swimlane diagram to show responsibility handoffs in a Mermaid swimlane diagram* across deployables, one lane per deployable, 1-5 major steps per lane.
 
 A design has one or many functional slices. Synthesize each slice as the template's complete repeatable H2 block: an unprefixed behavior title, exactly one current-mode behavior diagram, then `**Decisions**`. *Load and follow the `doc-diagram` skill to show call order in a current Mermaid Sequence Diagram* of the slice. MUST load the router’s decision-bullet reference with the file-reading tool before rendering the slice's architectural decisions; append one compact bullet per decision under `**Decisions**`. Keep method-level behavior in `Detailed Design`.
 

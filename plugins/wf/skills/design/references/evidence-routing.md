@@ -18,7 +18,7 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 ## Research
 
-*Load and follow the `research` skill to investigate code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
+*Load and follow the `research` skill to investigate technical questions across source code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
 - `@outputPath`: exact file `<artifact-root>/research/<question-slug>.md` selected by Design; use distinct slugs for separate calls. For several independent reports, Design supplies a question-to-file mapping before dispatch; never pass only a directory.
@@ -37,7 +37,7 @@ Prove owns method selection, integration-test discovery through Testing Integrat
 
 ## Challenge this
 
-*Load and follow the `challenge-this` skill to find problems in a change or design*. Pass intent, scope/material claim, pinned revision, runnable target, prior reproductions, known suites, original launch/harness root, explicit checkout, safety limits, `adversaries` when supplied, exact `@outputPath=<artifact-root>/challenge-this.md` and repository root as `@outputBase`. For per-claim runs, select distinct report/worker destinations before dispatch and aggregate coverage in the review log. Challenge this owns its adversaries and independent reruns; no duplicated procedure or internal resource access.
+*Load and follow the `challenge-this` skill to adversarially test a change or design for reproducible counterexamples*. Pass intent, scope/material claim, pinned revision, runnable target, prior reproductions, known suites, original launch/harness root, explicit checkout, safety limits, `adversaries` when supplied, exact `@outputPath=<artifact-root>/challenge-this.md` and repository root as `@outputBase`. For per-claim runs, select distinct report/worker destinations before dispatch and aggregate coverage in the review log. Challenge this owns its adversaries and independent reruns; no duplicated procedure or internal resource access.
 
 Design interprets returned findings. Resolve verified contract findings through its Deep module route. No verified findings is valid; blocked coverage remains explicit.
 
