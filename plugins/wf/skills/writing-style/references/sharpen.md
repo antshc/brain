@@ -1,16 +1,10 @@
----
-name: sharpen
-description: >-
-  Make a task deeper, not bigger, then rewrite the prompt. Use for /sharpen.
----
-
 # Sharpen
 
 Select mode from the request; default **Deepen**. Run both, Restate first, when the user asks for both.
 
 | Mode | Trigger |
 |---|---|
-| **Deepen** | `/sharpen`, deepen, rewrite prompt, no mode named |
+| **Deepen** | sharpen, deepen, rewrite prompt, no mode named |
 | **Restate** | in your own words, restate, what am I trying to solve |
 
 ## Restate
