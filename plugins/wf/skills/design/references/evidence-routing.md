@@ -18,7 +18,7 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 ## Research
 
-*Load and follow the `research` skill to investigate primary sources (codebase, NuGet packages, cloud docs, web) via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
+*Load and follow the `research` skill to investigate code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
 - `@outputPath`: exact file `<artifact-root>/research/<question-slug>.md` selected by Design; use distinct slugs for separate calls. For several independent reports, Design supplies a question-to-file mapping before dispatch; never pass only a directory.

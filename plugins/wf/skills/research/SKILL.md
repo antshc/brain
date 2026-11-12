@@ -1,7 +1,7 @@
 ---
 name: research
 description: >-
-  Investigate primary sources and return cited findings. Use for 'research X', 'how does this work', 'inspect this system', 'why was this built this way', or 'check this cloud limit'.
+  Investigate code, docs, packages, cloud limits, and the web; return cited findings. Use when you need codebase navigation, a symbol or caller lookup, or web search, and for 'research X', 'how does this work', 'where is X', 'what calls X', 'why was this built this way'. Not for one claim → `prove`.
 ---
 
 <!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->
