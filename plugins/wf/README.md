@@ -110,7 +110,7 @@ swimlane-beta TB
 
 ### Story to implementation
 
-Starts from one existing User story: `/sharpen` hardens it, `/design architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
+Starts from one existing User story: `/writing-style sharpen` hardens it, `/design architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -142,7 +142,7 @@ swimlane-beta TB
 
 ### Story to direct implementation
 
-Starts from one existing User story with no spec: `/sharpen` hardens it, `/design architect` sketches the code, and the **implement** reply makes `/design architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
+Starts from one existing User story with no spec: `/writing-style sharpen` hardens it, `/design architect` sketches the code, and the **implement** reply makes `/design architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -188,7 +188,7 @@ swimlane-beta TB
 | Initialize docs | `/doc-architecture route: initialize` |
 | Story, bug report, feature handover, or feature design | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi`, `/draft-artifact design` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
-| Deepen a task prompt or restate intent | `/sharpen` |
+| Deepen a task prompt or restate intent | `/writing-style sharpen` |
 
 Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [behavior](skills/doc-diagram/examples/behavior.md), and [code](skills/doc-diagram/examples/code.md).
 
@@ -196,5 +196,5 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | --- | --- |
 | Discovery and research | `define` (`concept`, `research`), `prove`, `challenge-this`, `research`, Hunter (Explore and NuGet evidence) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
-| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `doc-architecture`, `sharpen`, `suggest`, `writing-style` |
+| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `doc-architecture`, `suggest`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

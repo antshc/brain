@@ -27,17 +27,15 @@ def test_define_routes_have_one_shared_questioning_contract():
     assert not (SKILLS / 'define-concept/SKILL.md').exists()
 
 
-def test_sharpen_is_a_standalone_skill():
-    entry = (SKILLS / 'sharpen/SKILL.md').read_text()
+def test_sharpen_is_a_writing_style_route():
+    reference = (SKILLS / 'writing-style/references/sharpen.md').read_text()
     writing_style = (SKILLS / 'writing-style/SKILL.md').read_text()
 
-    assert 'name: sharpen\n' in entry
-    assert '| **Deepen** |' in entry
-    assert '| **Restate** |' in entry
-    assert 'Make the task deeper, not bigger.' in entry
-    assert '/writing-style sharpen' not in entry
-    assert 'sharpen' not in writing_style.lower()
-    assert not (SKILLS / 'writing-style/tactics/sharpen.md').exists()
+    assert '| **Deepen** |' in reference
+    assert '| **Restate** |' in reference
+    assert 'Make the task deeper, not bigger.' in reference
+    assert '[references/sharpen.md](references/sharpen.md)' in writing_style
+    assert not (SKILLS / 'sharpen').exists()
 
 
 def test_define_local_markdown_links_resolve():
