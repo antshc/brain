@@ -1,6 +1,6 @@
 {
   "name": "wf",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Developer workflows, reviews, Git conventions, and documentation automation.",
   "skills": ["./skills"],
   "agents": ["./agents"]
