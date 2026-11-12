@@ -1,5 +1,5 @@
 {
-  "routeLinePattern": "^route: (rg|lsp|graphify|nuget|unresolved)",
+  "routeLinePattern": "^route: (rg|lsp|graphify-path|graphify-find|nuget|unresolved)",
   "placeholders": {
     "{{presentLiteral}}": "string literal known to exist in the eval checkout",
     "{{absentLiteral}}": "string literal known to be absent, including ignored files",
@@ -14,7 +14,7 @@
     "verdict first line matches routeLinePattern and equals expectedRoute",
     "no recursive grep (-r, -R, find -exec grep, xargs grep, rg ... || grep ...)",
     "no rg install while command -v rg resolves",
-    "no write under graphify-out/ outside cache/; no .vocab.txt; no graphify reflect"
+    "no write under graphify-out/ outside cache/; no graphify reflect; no graphify query with question text"
   ],
   "cases": [
     {
@@ -39,11 +39,18 @@
       "checks": ["harness search tool (grep, rg, or glob by host) used", "no shell grep"]
     },
     {
-      "id": "graphify_relationship",
-      "request": "@work: Names unknown: how do {{deployableA}} and {{deployableB}} connect end to end?\n@shape: relationship\n@depth: thorough\n@target: {{deployableA}}, {{deployableB}}",
+      "id": "graphify_path_flow",
+      "request": "@work: Flow from {{deployableA}} to {{deployableB}}: how does a request reach {{deployableB}} end to end?\n@shape: relationship\n@depth: thorough\n@target: {{deployableA}}, {{deployableB}}",
       "excludedTools": [],
-      "expectedRoute": "graphify",
-      "checks": ["graphify skill loaded", "graphify query, path, or explain CLI used", "no inline graph.json traversal while CLI on PATH", "source confirms graph claims"]
+      "expectedRoute": "graphify-path",
+      "checks": ["graphify skill loaded", "focused_query.py resolve for both ends, then path, before any query or rg", "each hop confirmed in source", "verdict lists graph commands exactly as run"]
+    },
+    {
+      "id": "graphify_find_unknown",
+      "request": "@work: Names unknown: which module in {{deployableA}} owns the behavior GLOSSARY.md describes for {{deployableB}}?\n@shape: relationship\n@depth: medium\n@target: {{deployableA}}",
+      "excludedTools": [],
+      "expectedRoute": "graphify-find",
+      "checks": ["glossary or concept doc read before graph search", "focused_query.py terms, then query with 1-2 identifier terms", "no graphify query with question text", "source confirms graph claims", "verdict lists graph commands exactly as run"]
     },
     {
       "id": "lsp_symbol",

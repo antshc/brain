@@ -13,7 +13,7 @@ SKILL = (REPO / 'plugins/wf/skills/research/SKILL.md').read_text()
 FRONTMATTER, SKILL_BODY = re.match(r'^---\n(.*?)\n---\n(.*)$', SKILL, re.S).groups()
 HUNTER = (REPO / 'plugins/wf/agents/hunter.agent.md').read_text()
 EVALS = Path(__file__).parent / 'evals'
-ROUTES = {'rg', 'lsp', 'graphify', 'nuget', 'unresolved'}
+ROUTES = {'rg', 'lsp', 'graphify-path', 'graphify-find', 'nuget', 'unresolved'}
 
 
 def section(title: str, text: str = HUNTER) -> str:
@@ -59,8 +59,8 @@ def test_request_lists_shape_enum():
 def test_route_the_lookup_precedes_tool_selection():
     assert HUNTER.index('### Route the lookup') < HUNTER.index('### Select tools by question shape')
     route = section('Route the lookup')
-    assert 'route: rg | lsp | graphify | nuget | unresolved' in route
-    assert {re.match(r'`(\w+)`', row[-1]).group(1) for row in table_rows(route)} == ROUTES
+    assert 'route: rg | lsp | graphify-path | graphify-find | nuget | unresolved' in route
+    assert {re.match(r'`([\w-]+)`', row[-1]).group(1) for row in table_rows(route)} == ROUTES
 
 
 def test_rg_rules():
@@ -72,7 +72,7 @@ def test_rg_rules():
 
 @pytest.mark.parametrize('step,verdict', [
     ('`graphify reflect --if-stale`', 'skip'),
-    ('`.vocab.txt`', 'never write'),
+    ('`scripts/focused_query.py`', 'writes nothing'),
     ('`graphify-out/cache/`', 'allowed'),
 ])
 def test_graphify_read_only_overrides(step, verdict):
@@ -80,8 +80,11 @@ def test_graphify_read_only_overrides(step, verdict):
     assert verdict in row[-1]
 
 
-def test_graphify_cli_first_cache_exception_and_not_found():
-    assert 'inline `graph.json` traversal only when the CLI is missing' in section('Graphify', HUNTER)
+def test_graphify_script_first_cache_exception_and_not_found():
+    graphify = section('Graphify', HUNTER)
+    assert 'inline `graph.json` traversal only when both are missing' in graphify
+    assert 'never `graphify query "<question>"`' in graphify
+    assert '`focused_query.py path <A> <B>` before any `query` or `rg`' in graphify
     assert '`graphify query | path | explain` updating `graphify-out/cache/`' in section('Read-only contract', HUNTER)
     read_only = section('Read-only contract')
     assert "brief's `@outputArtifact`" in read_only
@@ -94,7 +97,7 @@ def test_graphify_cli_first_cache_exception_and_not_found():
 def test_eval_scenarios_cover_every_route():
     scenarios = json.loads((EVALS / 'scenarios.json').read_text())
     cases = scenarios['cases']
-    assert {'rg_shell_literal', 'rg_shell_absent_literal', 'rg_backend_literal', 'graphify_relationship',
+    assert {'rg_shell_literal', 'rg_shell_absent_literal', 'rg_backend_literal', 'graphify_path_flow', 'graphify_find_unknown',
             'lsp_symbol', 'missing_local_checkout', 'nuget_restored_package'} <= {c['id'] for c in cases}
     assert {c['expectedRoute'] for c in cases} == ROUTES
     pattern = re.compile(scenarios['routeLinePattern'])

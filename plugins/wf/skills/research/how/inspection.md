@@ -6,19 +6,19 @@ Apply proof checks relevant to the assigned angle at How’s selected depth. Beh
 
 Send Explore requests directly to `hunter`; if unavailable, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for system evidence and bounded requests for gaps. Pass each Explore request:
 
-- `@work` — the filled explorer prompt or a bounded question. For a bounded question use a prefix such as `Exact literal X`, `Symbol Type.Member`, or `Names unknown` when applicable. Preserve literal and symbol spelling.
+- `@work` — the filled explorer prompt or a bounded question. For a bounded question use the lookup's `@work` prefix, or `Exact literal X` / `Symbol Type.Member` when applicable. A Flow request names both ends in user or code words so Hunter can trace the path. Preserve literal and symbol spelling.
 - `@shape` and `@depth` — from the lookup table for the assigned angle.
 - `@target` — deployable or repository names as stated.
 - `@outputShape` — the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up.
 
-| Lookup | `@shape` | `@depth` |
-|---|---|---|
-| Flow: handoffs, next handler, deployables a message crosses | `relationship` | `thorough` |
-| Behavior: trigger → executing symbol chain, names unknown | `relationship` | `medium` |
-| Behavior: known symbol's callers, implementations, double vs real | `symbol` | `medium` |
-| Data: writers and readers of an item or store | `relationship` | `medium` |
-| Isolated symbol or package call site | `symbol` | `quick` |
-| Citation line, config key, route path, table or queue name | `literal` | `quick` |
+| Lookup | `@shape` | `@depth` | `@work` prefix |
+|---|---|---|---|
+| Flow: handoffs, next handler, deployables a message crosses | `relationship` | `thorough` | `Flow from <A> to <B>:` |
+| Behavior: trigger → executing symbol chain, names unknown | `relationship` | `medium` | `Names unknown:` |
+| Behavior: known symbol's callers, implementations, double vs real | `symbol` | `medium` | `Symbol Type.Member:` |
+| Data: writers and readers of an item or store | `relationship` | `medium` | `Names unknown:` |
+| Isolated symbol or package call site | `symbol` | `quick` | `Symbol Type.Member:` |
+| Citation line, config key, route path, table or queue name | `literal` | `quick` | `Exact literal X:` |
 
 Hunter handles Graphify. For restored package evidence, send a request with `@shape: nuget`. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
 

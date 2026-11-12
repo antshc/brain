@@ -74,7 +74,7 @@ Prefer the nearest contract for documented intent. Verify as-built behavior agai
 
 ### Route the lookup
 
-Before the first search, print one line: `route: rg | lsp | graphify | nuget | unresolved — {{reason}}`. A target without a local checkout returns `unresolved` with the missing prerequisite. For a resolved local target, honor `@shape` when provided. Otherwise choose the first matching row.
+Before the first search, print one line: `route: rg | lsp | graphify-path | graphify-find | nuget | unresolved — {{reason}}`. A target without a local checkout returns `unresolved` with the missing prerequisite. For a resolved local target, honor `@shape` when provided. Otherwise choose the first matching row.
 
 | Signal in `@work` | Route |
 |---|---|
@@ -82,9 +82,12 @@ Before the first search, print one line: `route: rg | lsp | graphify | nuget | u
 | `@shape: nuget`; restored NuGet package, its API, or behavior | `nuget` — NuGet tactic |
 | `@shape: literal`; quoted literal, config key, error text, route path, test name, file glob | `rg` |
 | `@shape: symbol`; exact type or member name, asking definition, references, implementations, callers | `lsp`, then `rg` |
-| `@shape: relationship`; names unknown, "how do … connect", "which modules", "end to end", "flow", "impact", "blast radius", "across A and B", architecture, doc↔code | `graphify` when Graph coverage selected a graph, else `rg` on `GLOSSARY.md` terms |
+| `@shape: relationship` with two named or describable ends: "how does A reach B", "flow from A to B", "end to end", "which path", handoff | `graphify-path` when Graph coverage selected a graph, else `lsp` call hierarchy from A |
+| `@shape: relationship` with unknown names: "which service does X", concept→code, "which modules", architecture, doc↔code | `graphify-find` when Graph coverage selected a graph, else `rg` on `GLOSSARY.md` terms |
+| `@shape: relationship` about impact or blast radius of a known symbol | `lsp` references/implementations, then `graphify-find` for cross-module reach |
+| frontend component, hook, route, or UI text | `rg` (graph coverage of frontend components is weak) |
 
-`@depth: medium | thorough` with no literal or symbol in `@work` → relationship row.
+`@depth: medium | thorough` with no literal or symbol in `@work` → relationship rows; no flow ends and no known symbol → unknown-names row.
 
 **NuGet.** Resolve [the NuGet tactic](../skills/research/how/nuget.md) relative to this agent file in the installed WF plugin. Load it in full for `nuget`, or when a C# type or member has no definition in local source after LSP and `rg -uu`. An unknown package ID is a valid entry state. Report the final route in the verdict.
 
@@ -100,7 +103,7 @@ Return `route: unresolved` with the target and missing local checkout/ref; conti
 
 - Known symbol → LSP definitions, references, implementations, call hierarchy; then `rg`.
 - Literal, config key, error text, route path, test name, file glob → `rg`.
-- Fuzzy concept or unknown ownership → semantic search; verify final evidence with targeted reads.
+- Fuzzy concept or unknown ownership → read `GLOSSARY.md` and the matching concept doc for code vocabulary first, then `graphify-find` when a graph covers the target, else `rg` on the translated names; verify final evidence with targeted reads.
 - Exact search is rg-backed only: the `rg` or grep tool, or shell `rg` (`-t <lang>`/`-g <glob>` to narrow). **MUST NOT** run recursive `grep` (`-r`, `-R`, `find -exec grep`, `xargs grep`) or chain `rg … || grep …`; `grep` filtering piped rg output is fine. Holds after loading any skill; its shell snippets do not relax it.
 - `rg` exit codes: `0` match, `1` no match (a result, not a missing binary), `2` error. Only `command -v rg` decides presence.
 - `command -v rg` empty, and only then → install once per-user, no sudo: fetch the latest `BurntSushi/ripgrep` release asset for the platform (`x86_64-unknown-linux-musl`, `aarch64-unknown-linux-gnu`, `<arch>-apple-darwin` `.tar.gz`; `x86_64-pc-windows-msvc` `.zip`), verify it against its `.sha256` asset, extract only `rg` to `~/.local/bin/` (Windows: `%LOCALAPPDATA%\Programs\ripgrep\`), and run it by absolute path if that folder is not on `PATH`. If installation fails, use available LSP or bounded file reads and report any coverage gap. Never use sudo or a system package manager.
@@ -113,23 +116,26 @@ Local checkouts only. A target has a graph when Graph coverage selected one (or 
 - Run `graphify` commands from the selected graph root (usually `@repoRoot`), never from a worktree.
 - Worktree target → translate graph paths from `@mainCheckout/…` to `@worktreeRoot/…` before LSP/`rg`/reads. The graph reflects the main checkout's branch; worktree source wins on any difference.
 
-- **MUST** use the graph when the answer depends on relationships rather than one known item: architecture/orientation, multi-hop or cross-module/cross-repo flow, impact/blast radius, concept→code mapping with unknown names, doc↔code links, or narrowing a large search space. Known symbol, literal, config, test, or single-file lookups go straight to LSP/`rg`.
-- Graph used → **MUST** *Load and follow the `graphify` skill to run graph query, path, explain, health preflight, and knowledge-graph routing* before `rg`/LSP. Its routing rules supersede the Tools defaults; the read-only contract supersedes its write steps:
+- Use the graph only on routes `graphify-path` and `graphify-find`. Known symbol, literal, config, test, frontend component, or single-file lookups go straight to LSP/`rg`; do not load graphify for them.
+- Graph used → **MUST** *Load and follow the `graphify` skill to run graph query, path, explain, health preflight, and knowledge-graph routing* before `rg`/LSP. The recipes below are mandatory; the read-only contract supersedes its write steps:
 
   | graphify step | Under Hunter |
   |---|---|
   | `graphify reflect --if-stale` | skip; read `graphify-out/reflections/LESSONS.md` if present |
-  | query vocabulary file (`.vocab.txt`) | build in memory or print to stdout; never write |
+  | `scripts/focused_query.py` `terms` / `query` / `resolve` / `path` | allowed; read-only, writes nothing |
   | `save-result`, `--update`, add, watch, export, feedback, rebuild | never |
   | `graphify query`/`path`/`explain` updating `graphify-out/cache/` | allowed; the only tolerated `graphify-out/` write |
 
-- `graphify` skill or tool unavailable → shell `graphify query` for broad architecture or relationship questions, `graphify path` for an A-to-B connection or flow, `graphify explain` for one graph concept; inline `graph.json` traversal only when the CLI is missing.
+- `graphify-path`: `focused_query.py resolve` both ends, then `focused_query.py path <A> <B>` before any `query` or `rg`. Walk each hop in source (LSP/`rg`); a hop through a DTO, exception, or base class is a shortcut, not the dependency; on a shortcut, `query <hop> --anchor --both` for the real neighbor.
+- `graphify-find`: `focused_query.py terms "<question>"`, then `query` with the top 1-2 terms; open the top production hits.
+- **MUST NOT** pass question text to `graphify query`; pass 1-2 identifier terms.
+- `graphify` skill unavailable → run its `scripts/focused_query.py` with the interpreter in `graphify-out/.graphify_python` from the graph root (same recipes as above); `graphify path | explain` CLI only when the script cannot run; never `graphify query "<question>"`; inline `graph.json` traversal only when both are missing.
 - Graph orients; LSP/`rg` locate; source proves. Cite source files, not graph nodes. A missing node is never absence evidence; code changed after the graph build → trust source.
 - Graph, skill, or answer unavailable or unhelpful → continue with normal exploration.
 
 ## Return the verdict
 
-Use `@outputShape` when supplied. The default verdict repeats the `route:` line, then gives a concise answer with target-relative file names, symbols, and decisive evidence. Cite code claims with absolute `path:line` references so the caller can verify them. If the target has a graph, list the queries run or why it was skipped.
+Use `@outputShape` when supplied. The default verdict repeats the `route:` line, then gives a concise answer with target-relative file names, symbols, and decisive evidence. Cite code claims with absolute `path:line` references so the caller can verify them. List every graph command exactly as run (`focused_query.py <command> <args>`), or `graph skipped: <route reason>`.
 
 For a default verdict with no match after the `rg -uu` recheck, write exactly `NOT FOUND` plus the searched roots after the route line. Mark unresolved targets, incomplete evidence, and access or tooling blockers explicitly.
 

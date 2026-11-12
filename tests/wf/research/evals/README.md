@@ -8,7 +8,7 @@ Needs a workspace with:
 
 - `ARCHITECTURE.md` with a `Deployables` table;
 - at least one local checkout under `workspace/`;
-- a built `graphify-out/` covering two deployables, and `graphify` on `PATH`;
+- a built `graphify-out/` covering two deployables, `graphify-out/.graphify_python`, and the `graphify` skill with `scripts/focused_query.py`;
 - one Deployables row whose repository has no local checkout (`missing_local_checkout`);
 - a restored NuGet dependency with a known member (`nuget_restored_package`).
 

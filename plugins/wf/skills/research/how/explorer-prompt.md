@@ -10,6 +10,7 @@ Fill the placeholders; pass the brief verbatim to Hunter as `@work` in an Explor
 
 {EXPLORATION_ANGLE}
 
+- Flow ends — `Flow from {FROM} to {TO}` in user or code words; Flow angle only, else omit
 - Targets or refs — {TARGETS_OR_REFS}
 - Research depth — {DEPTH}
 - Applicable lens and proof checks — {LENS_AND_CHECKS}
