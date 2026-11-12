@@ -18,21 +18,25 @@ Missing kind, ownership, or stage → report missing input without a posting bod
 
 ## Conversation
 
-Default to 1–3 short sentences, more only when needed. Use common words, active voice, concrete results, and the thread's register. Keep the decisive reason and any question visible; supporting facts can stay hidden.
+- Default to 1–3 short sentences; go longer only when needed. Use common words, active voice, concrete results, and the thread's register.
+- Keep the decisive reason and any question visible; supporting facts may stay in hidden metadata.
+- Answer the latest concern; skip routine praise, repeated summaries, formal phrasing, long apologies, headings, and canned wording. Natural occasional thanks is fine.
+- Use plain words: "use" over "utilize"/"leverage", "help" over "facilitate"; no AI vocabulary, abstract metaphors, or needless jargon.
+- Cut filler, excess hedging, rhetorical "not just X, but Y", and decorative punctuation; write complete sentences, not over-compressed ones.
+- Use no classification labels (`Bug:`, `Suggestion:`, `Nit:`, `Issue:`, `Note:`) or severity/priority markers. Name exact symbols/paths needed to assess the concern.
+- Disagreement: apply Meaning–Mechanism–Goal internally (understand the concern, check actual behavior, name the intended outcome); show no framework headings or mandatory Triple-R praise. Circular discussion → state the unresolved tradeoff and ask for the decision needed.
 
-Avoid routine praise, repeated summaries, formal phrasing, long apologies, mandatory headings, and canned wording. Occasional thanks is fine when natural. Address the latest concern rather than repeating the reviewer or an earlier answer.
+**Tone** — write peer to peer:
 
-Prefer plain words. Use "use" instead of "utilize" or "leverage", and "help" instead of "facilitate". Avoid AI vocabulary, abstract metaphors, and unnecessary jargon.
-
-Cut filler, excessive hedging, and rhetorical phrases such as "not just X, but Y". Use complete, natural sentences. Avoid decorative punctuation and over-compression.
-
-Use no classification labels (`Bug:`, `Suggestion:`, `Nit:`, `Issue:`, `Note:`) or severity/priority markers anywhere in the message. Name exact symbols/paths when needed to assess the concern.
-
-For disagreement, use Meaning–Mechanism–Goal internally: understand the concern, check actual behavior, identify the intended outcome. Omit visible framework headings and mandatory Triple-R praise. If discussion becomes circular, state the unresolved tradeoff and ask for the decision needed.
+- Describe effects and offer options; never command or forbid ("don't", "you must", "please don't").
+- Never call an idea "obvious", "simply", "just", or "naive".
+- Never argue against a change the author did not propose; frame alternatives as options ("One option is …").
+- Match certainty to evidence: a finding from reading code that wasn't run says "would affect" or "could fail", not "would break".
+- End a finding that asks for action with a question ("Could we …?", "What do you think?").
 
 ## Message content
 
-**Finding** — one concern → concrete impact → smallest viable improvement. Start with the issue; include relevant triggers. Distinguish suggestions from demonstrated defects. Require no title or separate headings.
+**Finding** — one concern → concrete impact → smallest viable improvement, offered as an option or question. Start with the issue; include relevant triggers. Distinguish suggestions from demonstrated defects. No title or headings.
 
 **Reply** — outcome → decisive reason → focused question, when needed. Adapt to the situation:
 
@@ -65,7 +69,8 @@ Examples illustrate tone, not mandatory wording. Code Review and HITL share the 
 
 | Case | Visible body |
 |---|---|
-| Finding | `ReadAsync` receives no cancellation token, so cancelling the job leaves the read running. Pass the job token to this call. |
+| Finding | `ReadAsync` receives no cancellation token, so cancelling the job leaves the read running. Could we pass the job token to this call? |
+| Tone | Before: "The obvious next step is to switch that method to a filter as well, and that would break other callers." After: "Switching `X` to a filter would also affect its other callers. One option is to filter only at this call site. What do you think?" |
 | Fixed | Fixed. Empty batches now return before opening a connection. |
 | No change | This already runs under the per-object lock, so writes to the same entry cannot overlap. |
 | Question | Should cancellation stop the whole job, or only the current read? |
@@ -88,7 +93,7 @@ Fixed in abc1234. Cancellation test passed.
 Final agent finding:
 
 ```markdown
-`ReadAsync` receives no cancellation token, so cancelling the job leaves the read running. Pass the job token to this call.
+`ReadAsync` receives no cancellation token, so cancelling the job leaves the read running. Could we pass the job token to this call?
 
 <!-- agent:comment
 The job token reaches the queue but not this call.

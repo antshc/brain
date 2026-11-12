@@ -91,9 +91,11 @@ Drafts, approves, and posts one review comment.
 
 **2. Draft**
 
-2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability, etc.).
+*Load and follow the `github` skill to draft review threads and pull request comments using Reviews* with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Neither the WF plugin nor a standalone `github` install available → stop and report missing access.
 
-2.2 `IMPROVEMENT` — concrete fix or direction. *Load and follow the `github` skill to draft review threads and pull request comments using Reviews* with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Require the WF plugin or a standalone `github` install before drafting. Stop and report missing access if neither is available.
+2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability). Apply the comment's Tone rules; its wording carries into the drafted body.
+
+2.2 `IMPROVEMENT` — concrete fix or direction, offered as an option. Draft the comment, then run the Reviews unslop pass over `EXPLANATION` and the body. *Done when* the pass ran and no command, prohibition, or judgmental qualifier remains in either.
 
 2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 
