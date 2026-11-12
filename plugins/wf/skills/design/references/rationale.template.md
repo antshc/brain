@@ -26,6 +26,10 @@
 
 - {{alternative|Whole-shape alternative, the complexity it exposes to callers and hides, one line on why it lost. When constraints forced the answer, write "this was the only viable shape because ...". No flavors of the same shape.}}
 
+## Contracts touched
+
+- {{contract|One line per touched kind — API, Database, Resource, other, GUI — naming each resource or surface, e.g. "API: `GET /api/v2/orders`; GUI: Order details dialog". Write "None" when no contract changes.}}
+
 ## Open questions and risks
 
 - {{question|Phrased as a question, so the human's answer is the resolution. Include unresolved technical questions, risks, and conflicts with ADRs or Concepts with the reason for deviating.}}

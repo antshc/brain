@@ -26,7 +26,7 @@ Add a Scrap entry when Phase F triggers.
 
 ## Phase A: Ground the problem
 
-Build a mental model of touched subsystems from Repo docs and code. *Load and follow the `research` skill to investigate primary sources and save cited findings* using default Research for current behavior. Pass the relevant subsystems, repo docs, repository root as `@outputBase`, `@outputPath=<artifact-root>/grounding-how.md`, and content framing as `@outputShape`. When ownership or layering changes, call **Why** with the existing boundary and `@outputPath=<artifact-root>/grounding-why.md`. Architect owns both destinations; Research supplies no default. Treat supported rationale as a constraint.
+Build a mental model of touched subsystems from Repo docs and code. *Load and follow the `research` skill to investigate code via codebase navigation and save cited findings* using default Research for current behavior. Pass the relevant subsystems, repo docs, repository root as `@outputBase`, `@outputPath=<artifact-root>/grounding-how.md`, and content framing as `@outputShape`. When ownership or layering changes, call **Why** with the existing boundary and `@outputPath=<artifact-root>/grounding-why.md`. Architect owns both destinations; Research supplies no default. Treat supported rationale as a constraint.
 
 Skip subsystem grounding only when the work is genuinely greenfield with no surrounding system to integrate. Before Phase B, resolve technical questions through [Evidence routing](../references/evidence-routing.md), including greenfield work.
 
