@@ -26,6 +26,7 @@ Publish local Markdown to a Confluence page in one `run` command: extract → co
 - **mdPath** — required; local Markdown path.
 - **pageId** — optional; update that page instead of creating.
 - **spaceId** — optional; numeric Confluence space id, resolved in Step 1.
+- **parentId** — optional `--parent-id` for `run`; create directly under that page in the resolved space. Update verifies the existing parent before writing; a mismatch blocks rather than moving the page.
 - **title** — optional; defaults to the first `#` heading. Update writes the title too → a differing heading **renames** the page; pass the existing title to keep it. A leading level-1 heading is never published in the body; Confluence shows the title itself (Fetch page re-adds `# <title>`).
 
 ## Steps
@@ -35,7 +36,7 @@ Publish local Markdown to a Confluence page in one `run` command: extract → co
 **2 — Run.**
 
 ```bash
-python3 <skillDir>/scripts/atl.py publish-page run --md-path <mdPath> (--page-id <pageId> | --space-id <spaceId>) [--title "<title>"] --config "<configPath>"
+python3 <skillDir>/scripts/atl.py publish-page run --md-path <mdPath> (--page-id <pageId> | --space-id <spaceId>) [--title "<title>"] [--parent-id <parentId>] --config "<configPath>"
 ```
 
 Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```` ```mermaid ```` fences and standalone local image/file refs (as Fetch page writes them) with markers; convert Markdown to ADF; then:
@@ -51,7 +52,9 @@ Stdout JSON:
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published.
 - Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId`, `unknownCommentIds`, `partialCommentRemovals` `[{id,before,after}]`, `commentGuard` (`failed (<category>)`, `notice failed (<category>)`).
 
-**3 — Verify.** Re-fetch into a separate dir and assert:
+**3 — Verify.** With `--parent-id`, creation checks the parent belongs to the space and reads back the new page parent; update checks its existing parent before writing. Success includes `parentId`; post-create verification failure returns the created ID for recovery. Recheck hierarchy through Atlassian metadata when publishing a page collection.
+
+Re-fetch into a separate dir and assert:
 
 ```bash
 python3 <skillDir>/scripts/atl.py publish-page verify --page-id <pageId> --config "<configPath>" --expect-anchors <n> [--present <file>] [--absent <file>] --verify-dir <workingDir>/verify

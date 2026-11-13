@@ -27,7 +27,7 @@ from .env import (
 from .local_media import extract_local_media
 from .mermaid import extract_mermaid, render_diagrams
 from .patterns import HEADING_RE, strip_ignored_sections
-from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
+from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf, verify_page_parent
 from . import renderers
 
 
@@ -137,6 +137,7 @@ def _publish_with_diagrams(
     renderer: str,
     drawio_extension_key: str | None,
     swimlane_drawio_enabled: bool,
+    parent_id: str | None = None,
 ) -> tuple[dict, dict]:
     confluence = get_confluence(credentials)
 
@@ -145,10 +146,15 @@ def _publish_with_diagrams(
     else:
         placeholder_adf = copy.deepcopy(base_adf)
         substitute_diagram_notes(placeholder_adf, diagrams, local_media)
-        created = create_page_adf(confluence, space_id, title, placeholder_adf)
+        created = create_page_adf(
+            confluence, space_id, title, placeholder_adf,
+            **({"parent_id": parent_id} if parent_id is not None else {}),
+        )
         target_page_id = created["id"]
 
     try:
+        if parent_id is not None:
+            verify_page_parent(confluence, target_page_id, parent_id)
         if diagrams:
             render_diagrams(
                 diagrams,
@@ -222,6 +228,7 @@ def _publish_text_only(
     page_id: str | None,
     space_id: str | None,
     title: str,
+    parent_id: str | None = None,
 ) -> tuple[dict, dict]:
     confluence = get_confluence(credentials)
     if page_id:
@@ -229,8 +236,16 @@ def _publish_text_only(
         update_page_adf(confluence, page_id, title, base_adf, version)
         target_page_id = page_id
     else:
-        created = create_page_adf(confluence, space_id, title, base_adf)
+        created = create_page_adf(
+            confluence, space_id, title, base_adf,
+            **({"parent_id": parent_id} if parent_id is not None else {}),
+        )
         target_page_id = created["id"]
+        if parent_id is not None:
+            try:
+                verify_page_parent(confluence, target_page_id, parent_id)
+            except _POST_CREATE_ERRORS as exception:
+                raise CreatedPageError(target_page_id, exception) from exception
 
     result = {
         "method": "rest",
@@ -284,6 +299,7 @@ def publish(
     assets_dir: str,
     out_path: str,
     mermaid_bg: str = "white",
+    parent_id: str | None = None,
 ) -> dict:
     """Run extract -> md-to-adf -> create/attach -> substitute -> publish end to end, always
     over REST. Credentials are mandatory; a missing key raises `SystemExit` naming it before
@@ -311,6 +327,14 @@ def publish(
         drawio_extension_key = load_drawio_extension_key(config_path) if renderer == renderers.DRAWIO else None
 
     credentials = load_credentials(config_path)
+    if parent_id is not None:
+        confluence = get_confluence(credentials)
+        if page_id:
+            verify_page_parent(confluence, page_id, parent_id)
+        else:
+            parent = confluence.get(f"/api/v2/pages/{parent_id}")
+            if str(parent.get("spaceId")) != space_id:
+                raise ValueError("parent page does not belong to the creation space")
     guard, guard_keys = _plan_comment_guard(credentials, page_id, base_adf)
 
     if diagrams or local_media:
@@ -327,13 +351,16 @@ def publish(
             renderer,
             drawio_extension_key,
             swimlane_drawio_enabled,
+            parent_id,
         )
     else:
-        result, final_adf = _publish_text_only(base_adf, credentials, page_id, space_id, resolved_title)
+        result, final_adf = _publish_text_only(base_adf, credentials, page_id, space_id, resolved_title, parent_id)
 
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(final_adf, f, indent=2)
         f.write("\n")
+    if parent_id is not None:
+        result["parentId"] = parent_id
     result["renderer"] = renderer
     result["adfPath"] = out_path
     result.update(guard_keys)

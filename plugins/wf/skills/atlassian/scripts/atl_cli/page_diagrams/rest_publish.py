@@ -33,13 +33,22 @@ def update_page_adf(confluence: Any, page_id: str, title: str, adf: dict, versio
     )
 
 
-def create_page_adf(confluence: Any, space_id: str, title: str, adf: dict) -> dict:
+def create_page_adf(
+    confluence: Any, space_id: str, title: str, adf: dict, parent_id: str | None = None,
+) -> dict:
     return confluence.post(
         "/api/v2/pages",
         data={
             "spaceId": space_id,
+            **({"parentId": parent_id} if parent_id is not None else {}),
             "status": "current",
             "title": title,
             "body": {"representation": "atlas_doc_format", "value": json.dumps(adf)},
         },
     )
+
+
+def verify_page_parent(confluence: Any, page_id: str, parent_id: str) -> None:
+    page = confluence.get(f"/api/v2/pages/{page_id}")
+    if str(page.get("parentId")) != parent_id:
+        raise ValueError(f"page {page_id} parent differs from requested parent {parent_id}")

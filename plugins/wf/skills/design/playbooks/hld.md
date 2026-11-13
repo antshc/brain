@@ -12,11 +12,11 @@
 - 6. Verify before writing
 - Gotchas
 
-Use the current conversation context and codebase understanding to create or update one `docs/designs/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
+Use the current conversation context and codebase understanding to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`, with the exact reason they cannot yet be answered. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
 
 ## Evolving draft
 
-Wayfinder may supply `@evolvingDraft=true` with its exact document worktree/path. Read Living document registered in the router. Keep core headings/order and explicitly mark missing evidence/decisions Pending, including required diagrams/deltas not yet supportable; never fabricate them or mark unknown content not applicable. This mode permits a draft commit with named gaps, not readiness. All normal checks apply as evidence arrives and before declaring ready. Synthesis only consumes results; Wayfinder owns new evidence dispatch.
+Wayfinder may supply `@evolvingDraft=true` with its exact document worktree/path. Read Living document registered in the router. Keep core headings/order and explicitly mark missing evidence/decisions Pending, including required diagrams/deltas not yet supportable; never fabricate them or mark unknown content not applicable. This mode permits a draft commit with named gaps, not readiness. All normal checks apply as evidence arrives and before declaring ready. Synthesis consumes results; Wayfinder owns evidence dispatch for its HLD. Standalone HLD performs bounded material-risk verification through the router-disclosed Risk verification resource before final synthesis.
 
 Use Living document reconciliation for Question/Answer rows and provenance. Preserve source-ranked content and existing diagram approval requirements; a blocked update stays a named gap. Outside this mode, ordinary HLD authoring is unchanged.
 
@@ -48,7 +48,7 @@ Name capabilities with behavior and domain entities. Keep functional requirement
 
 ## 4. Synthesize the solution
 
-Open the design template listed in the router with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit the Building Block View only when its inclusion rule does not apply; omit implementation appendices that evidence does not trigger. `Current State` is the one exception to the `Not applicable` rule: remove it entirely unless the user explicitly asked for it.
+Open the design template listed in the router with the file-reading tool — even if already read this session, do not paraphrase it from memory. Populate every core section in the exact order and heading text the template defines. Use `Not applicable — {{reason}}` when a core section does not apply. Omit the Building Block View only when its inclusion rule does not apply; omit Detailed Design artifact blocks that evidence does not trigger; retain both appendix indexes. `Current State` is the one exception to the `Not applicable` rule: remove it entirely unless the user explicitly asked for it.
 
 Populate `Use cases` with one bold-titled bullet per actor goal within a Feature. A Feature may have multiple Use cases; an interaction point alone does not define one.
 
@@ -56,7 +56,7 @@ Keep `Solution Overview` at architecture level: responsibilities, interfaces, ow
 
 `design-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons.
 
-The reader-facing architecture-representation section is arc42's Building Block View, embedded inline within `Solution Overview` — not its own H2 or `<summary>`. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to create Mermaid architecture diagrams to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks.
+The reader-facing architecture-representation section is arc42's Building Block View, within `Solution Overview`, inside a titled expand without a separate H2. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to create Mermaid architecture diagrams to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks.
 
 Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold.
 
@@ -72,13 +72,13 @@ Select implementation artifacts from evidence and wrap each independently review
 
 Include supported artifacts in this deterministic type order: GUI mockups, screenshots, and other visuals; API, GUI, database, resource, and other contract deltas; low-level diagrams; prototype findings; research summaries. Preserve source order within a type unless the existing design has a stable order.
 
-Consume supplied GUI assets and existing research and prototype outputs only. Do not generate a missing mockup or run research or a prototype during synthesis. Put genuinely required missing implementation evidence in `Open Questions`.
+Consume supplied GUI assets and existing research and prototype outputs only. Do not generate a missing mockup or run research or a prototype during synthesis. Put genuinely required missing implementation evidence in `Open Questions`. Material risks use the router-disclosed Risk verification resource: record them in Open Questions, select Prove or Challenge this, and write the actual verification method/result or reason unproved in Answer. Verification precedes final synthesis; do not launch unrelated research/prototypes.
 
 - **GUI/visual:** Embed a supplied repository image with useful alt text and a repository-relative path; link a supplied non-image or external visual artifact. Summarize the implementation decision or state the visual establishes. Keep visual evidence separate from the GUI contract delta.
 - **Contract:** *Load and follow the `doc-contracts` skill to write an API, database, or resource contract delta* using **Assemble and write a contract delta** for each API, database, resource, or other contract kind the Contracts gate listed. *Load and follow the `doc-contracts` skill to write a GUI contract delta* using **Assemble and write a GUI delta** for each GUI surface the Contracts gate listed. Put the complete authoritative output inside its artifact block.
 - **Low-level diagram:** Include a Class Diagram or implementation-level Sequence Diagram only when the user explicitly requests it and evidence supports it. Include a Deployment View Delta when evidence shows deployment topology, hosting, or infrastructure node changes. *Load and follow the `doc-diagram` skill to create the requested Mermaid Class Diagram, Sequence Diagram, or C4 Deployment View* in delta mode. Put the complete Mermaid output inside its artifact block. Keep Flowcharts in `Solution Overview` only.
-- **Prototype:** State the technical question, observed facts, and resulting decision; link the throwaway branch or durable prototype result; include only the smallest decision-bearing code or configuration snippet. Present the snippet as prototype evidence, never production code.
-- **Research:** State terse findings and implementation consequences, then link exactly once to the durable research Markdown artifact. Keep primary-source links in that artifact, not the design body.
+- **Prototype:** State the technical question, observed facts, and resulting decision; index the retained report and code in Appendix B: Prototypes and Code Sketches; include only the smallest decision-bearing code or configuration snippet. Present the snippet as prototype evidence, never production code.
+- **Research:** State terse findings and implementation consequences, then link to its Appendix A: Research entry; that entry owns the single canonical relative report link. Keep primary-source links in that artifact, not the design body.
 
 GUI assets, prototype result links, and the single research artifact link are implementation evidence or deliverables, not attribution links. The body ban on ADR, Concept, Architecture, and ticket names and links still applies.
 
@@ -125,12 +125,12 @@ Maintain `Source Material`:
 5. Give every functional slice exactly one current-mode sequence diagram, followed by `**Decisions**` and one or more compact decision bullets rendered from the loaded the router’s decision-bullet reference. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
 6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
 7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
-8. Put every unresolved conflict in `Open Questions`.
+8. Account for every material risk through Risk verification; its Answer records mitigation, selected strategy/reason, actual method, evidence/reproduction, residual scope or precise blocker. Fill every Open Questions Answer cell with a supported answer or precise blocker, missing evidence and next step/decision owner. Retain answered rows and distinguish Partial, Conflict, Pending and Superseded; never leave blank answers or close questions merely because a blocker is documented.
 9. Compare an update with the pre-merge design. Restore unsupported loss.
 10. Remove duplicate Requirement sets, requirements, and source rows.
 11. Order artifact blocks by GUI/visual, contract delta, low-level diagram, prototype, then research; preserve source order within each type unless the existing design has a stable order. Remove duplicates and restore any unsupported artifact loss from the pre-merge design.
 12. Resolve every embedded image path and artifact link. Use useful image alt text and repository-relative paths for repository images.
-13. Keep prototype snippets minimal and decision-bearing. Give every research block exactly one durable research-artifact link and no copied primary-source link. Exclude Class Diagrams and implementation-level Sequence Diagrams unless explicitly requested, and require evidence for every Deployment View Delta.
+13. Keep prototype snippets minimal and decision-bearing. Give each research one canonical Appendix A artifact link; summaries reference the appendix anchor. Include no copied primary-source link. Exclude Class Diagrams and implementation-level Sequence Diagrams unless explicitly requested, and require evidence for every Deployment View Delta.
 14. Contract artifact blocks present ⇔ the Contracts gate listed kinds; each kind's output has a `Legend:` line, `#### header` + `<details>` per resource or surface, and delta lines prefixed `+`, `-`, `%`, or `~`. Missing or hand-written → re-run the Contracts gate before writing.
 15. Every included API contract Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
 16. Every included GUI contract Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source.
@@ -144,5 +144,7 @@ Maintain `Source Material`:
 - **`<!-- adf:toc -->`, `<!-- adf:wide-table -->`, and `<!-- adf:ignore:start -->`/`<!-- adf:ignore:end -->` are structural Confluence-importer syntax, not model placeholders** — never strip them while clearing template instructions.
 - Every touched kind requires a `doc-contracts` result even when the delta is small, additive, or already settled in a spec or design rationale; a spec's Contracts Delta is evidence, not a substitute.
 - GUI changes (dialogs, pages, visible fields) are a contract kind; a new field shown in the UI usually means both an API and a GUI delta.
+
+Wrap Requirements and every Mermaid fence in a meaningful expand; reuse an existing enclosing artifact expand instead of nesting redundantly. Preserve existing diagram content and approval gates. Keep Appendix A: Research and Appendix B: Prototypes and Code Sketches, even when empty (`None`). Index each consumed report/sketch once; verify relative links exist on the integration branch.
 
 Write the result. Call it a draft while questions are unresolved/partial/conflicting, core content is pending, or readiness checks are unmet; retained answered rows alone do not imply draft status.
