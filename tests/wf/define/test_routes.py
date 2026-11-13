@@ -17,7 +17,7 @@ def test_define_routes_have_one_shared_questioning_contract():
     assert '[Concept](references/concept.md)' in entry
     assert '[Questioning](references/questioning.md)' in entry
     assert 'docs/ongoing/{{destinationSlug}}-research-map.md' in research
-    assert 'doc-architecture' in concept
+    assert 'record-architecture' in concept
     assert '[questioning.md](questioning.md)' in research
     assert '[questioning.md](questioning.md)' in concept
     assert '[arc42-cross-cutting-concepts.md](arc42-cross-cutting-concepts.md)' in concept

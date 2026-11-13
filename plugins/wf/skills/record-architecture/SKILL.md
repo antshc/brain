@@ -1,11 +1,11 @@
 ---
-name: doc-architecture
+name: record-architecture
 description: >-
   Record settled architecture and maintain its indexes and glossary. Use for 'record an ADR', 'add a glossary term', 'load an index', or 'initialize missing docs'. Not for open decisions → `design`; Concept interviews → `define`; diagrams → `doc-diagram`.
 argument-hint: "route: adr | building-block | deployment-view | term | concept-body | concept-record | decision-bullet | initialize | index [action]"
 ---
 
-# Document Architecture
+# Record Architecture
 
 Record settled knowledge, render an established body, or maintain architecture indexes. Discovery and interviews remain with the caller; recording never starts another interview.
 
