@@ -104,6 +104,12 @@ Reconcile conflicts with focused checks; redispatch material gaps and fix mechan
 
 Use a read-only `general-purpose` worker with web access. Cite material claims in place from primary sources: official documentation, source code, specifications, first-party APIs. Return findings inline for coordinator verification and caller-directed delivery.
 
+## Gotchas
+
+- `scripts/focused_query.py` needs `graphifyy` and `networkx`. Before first run, read `scripts/requirements.txt` in full (resolve from this skill's base directory).
+- `ModuleNotFoundError` for `graphify`/`networkx` in the chosen interpreter → install with that interpreter: `<python> -m pip install -r <research>/scripts/requirements.txt`; rerun. Skip install when imports succeed.
+- Install only requirements.txt; **MUST NOT** upgrade or unpin versions.
+
 ## Completion criteria
 
 - Each independent question has its requested artifact at the exact caller destination, inline findings, or a named blocker. Each How explanation follows How report; saved paths and framing match the caller.
