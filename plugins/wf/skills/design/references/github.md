@@ -30,10 +30,8 @@
 - Update map or ticket
 - Prepare a document worktree
 - Prepare a result worktree
-- Open or reuse a PR
-- Link branches and PRs
-- Publish the document
-- Publish a result
+- Commit the document
+- Integrate a result
 - Wayfinder operation gotchas
 
 ## Spec publication
@@ -158,30 +156,21 @@ Read the latest body through *Load and follow the `github` skill to run GitHub p
 
 ### Prepare a result worktree
 
-**Reads:** captured harness root, repository, persisted session base branch, issue, question/revision/environment identity and prefix from Wayfinder. Reuse the ticket's existing verified branch/PR on resume; otherwise fetch and pin the session base tip, then use Prepare a document worktree's mechanics to create a separate ticket branch/worktree. Never base it on the document branch. Supply prerequisite evidence by exact commit/artifact refs; do not assume sibling PRs merged. Persist branch/base SHA/ownership on the ticket before dispatch. Wayfinder owns publication and cleanup. Done when the runner's scoped environment and evidence are accessible.
+Read the persisted integration branch/worktree and pin its current local HEAD. Require prerequisite artifacts already integrated. Reuse the ticket's verified local branch/worktree on resume; otherwise use Prepare a document worktree with this integration SHA and Wayfinder's prefix. Persist branch, base SHA, ownership and question/revision/environment before dispatch. Producers receive exact paths and cleanup handoff; Wayfinder owns commits and integration. Done when the scoped worktree contains required evidence.
 
-### Open or reuse a PR
+### Commit the document
 
-*Load and follow the `github` skill to run GitHub platform mechanics for pull requests and issues* using Pull requests. Derive title/body using its conventions; supply exact repository, branch head and persisted session base. Search by head/base before creating; reconcile interrupted creation. A found merged/closed PR requires user-directed continuation, never automatic reopening/replacement. Open the document PR as draft; result PRs describe evidence and limitations. Verify URL, head, base and remote commit, then persist immediately. Done when one PR exists for this head/base and no duplicate was created.
+1. Verify the integration worktree is on its recorded branch and read its latest local document. Preserve concurrent work; serialize writes. Stage only the HLD and explicitly retained artifacts. *Load and follow the `git` skill to run verified Git mechanics for commit messages and history* using Commits. Done when the local commit contains only intended changes.
+2. Verify document/artifact paths at HEAD and record synchronized result identity and HLD SHA through Update map or ticket. Keep tracker failures pending; do not repeat an already verified commit. Done when local synchronization and tracker state are separately confirmed. No push or PR.
 
-### Link branches and PRs
+### Integrate a result
 
-*Load and follow the `github` skill to run GitHub platform mechanics for issues and pull requests* using Issues and Pull requests. Document branch/PR belongs to the map issue; research/experiment/contract result branch/PR belongs to its ticket. Put the canonical issue link in the PR body and branch/PR links in the issue, preserving native parent-child links and other edits. Use non-closing references, no automatic closing keywords. If the document PR precedes map creation, finish these links immediately after map creation. Done when both sides read back correctly.
-
-### Publish the document
-
-1. Verify the dedicated document worktree is on its recorded branch; read its latest remote head and preserve concurrent edits. Stage only the selected document and explicitly retained document artifacts. *Load and follow the `git` skill to run verified Git mechanics for commit messages and creation* using Commits. Review diff/outgoing commits for unrelated changes before committing. Done when the commit contains only intended document changes.
-2. *Load and follow the `git` skill to run verified Git mechanics for branch fetch and push* using Branches with recorded previous remote SHA. Normal push only; on rejection fetch/reconcile the same document branch, preserving ambiguous conflicts as blockers. Never push or merge into the session base or merge result branches. Done when the document commit/artifact paths are verified on origin.
-3. Open or reuse a PR immediately; Link branches and PRs when its map exists. Update the existing PR summary as decisions evolve. Record synchronized result identities on the map only after verification; keep failures pending. Done when the same PR shows the latest document, or the exact missing publication step is recorded.
-
-### Publish a result
-
-1. Commit only verified report/evidence paths in the result worktree. *Load and follow the `git` skill to run verified Git mechanics for commit messages and creation* using Commits; inspect staged diff and outgoing commits for unrelated files, proof code and resources. Include runnable prototype code only when explicitly retained. Preserve runnable state through reproduction and requested review. Done when evidence is committed with its target revision/environment.
-2. *Load and follow the `git` skill to run verified Git mechanics for branch fetch and push* using Branches to push only this result branch with a verified previous remote SHA. Normal push only; preserve work on access/protection/conflict failure. For a rejected push fetch/reconcile this branch, not the session base. Verify publication commit/path on origin. Done when evidence has a durable commit-pinned URL.
-3. Open or reuse a PR targeting the session base and Link branches and PRs to the owning ticket. Keep artifact links commit-pinned until merged. Return control to Wayfinder for **Synchronize the document**, then comment/resolve or release the ticket according to its evidence/human phase. Done when result publication and document synchronization are separately confirmed.
-4. Resume interruptions at the first unconfirmed push/PR/document/comment/map step; inspect remote history and existing PRs/comments before retrying. Identical content reuses the published artifact. Conflicting edits preserve both versions and block synchronization rather than overwrite evidence. Done when no duplicate result or unrecorded pending work remains.
-5. After verified publication/linking and all declared consumers finish, *Load and follow the `git` skill to run verified worktree lifecycle and removal* using Worktrees with ownership and expected HEAD. Preserve worktrees needed for synchronization or follow-up review; retain branches with open PRs. Delete branches only after separately authorized, verified integration/closure cleanup. Done when resources are removed or explicitly retained with an owner/reason.
+1. Verify source citations and Prove's independent reproduction. Review the entire branch diff from its pinned integration base. Retain reports, logs, proof patches and accepted code sketches at assigned destinations. Keep source probes as patches under the prototype directory and restore production-source edits; reject any unintended production code in the branch. *Load and follow the `git` skill to run verified Git mechanics for commit messages and creation* using Commits. Done when the scoped result commit and artifact inventory are verified.
+2. In the dedicated integration worktree, *Load and follow the `git` skill to run verified Git mechanics for branch creation and history* using Integration. Supply exact result SHA, integration branch and expected integration HEAD. Serialize merges; verify full incoming diff and artifact paths before merging. Existing result ancestry skips a duplicate merge. Preserve conflicts as pending; never overwrite ambiguous edits. Reproduce affected claims again if resolution changes their tested mechanism. Done when result ancestry and retained artifacts are verified at the local integration HEAD.
+3. Return control to Wayfinder for Synchronize the document. Persist result/integrated/HLD SHAs and missing steps through Update map or ticket. Resolve factual tickets only after synchronized content and verified resolution comment; human choices remain open. Done when local integration, document reconciliation and tracker writes are individually confirmed.
+4. Resume the first unconfirmed step: merged evidence needs reconciliation only; synchronized HLD needs pending tracker writes only. Preserve worktrees on conflict or missing local state; report precise blockers. Done when a rerun creates no duplicate merge, source or question.
+5. After integration, synchronization and every reproduction/review consumer finishes, *Load and follow the `git` skill to run verified worktree lifecycle and removal* using Worktrees with ownership and expected HEAD. Keep branches by default; never remove the sole retained evidence. Done when each owned worktree is removed or retained with owner/reason.
 
 ### Wayfinder operation gotchas
 
-Verify native parent/child links independently from body links. Wayfinder blocker decisions use body references. Implementation Tickets use native blocker edges. A ticket's resolution or empty frontier never authorizes PR merge/close or auto-merge; only the user decides. A failed read is not proof a branch/PR/issue is absent.
+Verify native parent/child links independently from body links. Wayfinder blocker decisions use body references; implementation Tickets use native blocker edges. Tracker writes may contain local branch/path/SHA identifiers, never fictional remote URLs. A failed read is not proof an issue or local ref is absent. No automatic push, PR creation or merge into the original session base. Legacy PRs remain untouched; Confluence publishing is a separate explicit Design route.

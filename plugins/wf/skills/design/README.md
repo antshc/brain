@@ -9,9 +9,10 @@ One discoverable entry point for code architecture, standalone code sketches, de
 | `/design architect arena-agents=2 design retries` | `architect` | Compare two independently drafted architecture shapes |
 | `/design sketch add pagination to orders` | `sketch` | One usage-first design package, no production edits |
 | `/design deep-module order pricing seam` | `deep-module` | Three or more interface options, comparison, recommendation |
-| `/design hld` | `hld` | Authoritative high-level feature design, synthesized or merged in `docs/designs/` |
+| `/design hld` | `hld` | Authoritative high-level feature design, synthesized or merged in `docs/ongoing/` |
 | `/design grill` / `/design spec` / `/design tickets` | Corresponding route | Decisions, spec or approved ticket breakdown |
-| `/design wayfinder` | `wayfinder` | Living HLD, decision map, automatic research/proof, and separate PRs to the session base |
+| `/design wayfinder` | `wayfinder` | Living HLD and local evidence merges into its integration branch; no push or PR |
+| `/design publish-hld` | `publish-hld` | Confluence HLD, research child pages, prototype and sketch attachments |
 | `/design review` | `review` | Design-gap assessment |
 
 Architect accepts `arena-agents=1|2|3` (default 1); Challenge this accepts `adversaries=1|2|3` (default 1). `checkpoint` requires explicit request. Explicit design-only handoff stops before implementation and returns the accepted `synthesis/` package to `design spec`.

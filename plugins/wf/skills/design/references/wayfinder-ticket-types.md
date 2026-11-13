@@ -25,6 +25,10 @@ Use this to choose the right Wayfinder ticket type.
 
 **Quick test:** What exactly is preventing us from making this decision?
 
+## Artifact lifecycle
+
+Use separate local Research/Prove worktrees from pinned integration HEAD. Wayfinder commits verified artifacts and merges them into its local integration branch before HLD synchronization and ticket resolution. Research goes under `docs/research/<initiative-slug>/`; proof evidence and retained sketches under `docs/prototype/<initiative-slug>/`. No automatic push or PR.
+
 ## Source
 
 - [Wayfinder skill](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md)

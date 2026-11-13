@@ -1,6 +1,6 @@
 # High-level Design (HLD) Output Template
 
-Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every hidden instruction from the populated document.
+Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every hidden instruction from the populated document. Every Mermaid fence needs an enclosing expand; reuse an existing artifact expand. Preserve structural Confluence markers.
 
 ````markdown
 # {{initiativeName}}
@@ -38,6 +38,9 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 # Requirements
 
+<details>
+<summary>Requirements</summary>
+
 <!-- Keep this section fully synchronized with the PO. Make every requirement clear and self-explanatory; distinguish product requirements from technical requirements, and obtain PO approval for requirements from the development team. Use a top-level row for each stakeholder requirement and numbered sub-rows for its functional requirements. Italicize every functional sub-requirement. Leave Details empty on stakeholder requirement rows; only functional sub-requirement rows have Details. Render business rules as bullets and edge cases as bullets as unlabeled bullets lists in each functional sub-requirement's Details cell. Source is the requirement category (PO / Dev team), not source provenance. -->
 
 <!-- adf:wide-table -->
@@ -47,6 +50,8 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 | 1.1 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
 | 1.2 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
 | 2 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
+
+</details>
 
 # Assumptions and Limitations
 
@@ -79,7 +84,12 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 <!-- A diagram is optional. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to create Mermaid architecture diagrams to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
 
+<details>
+<summary>Building Block View</summary>
+
 {{architectureRepresentationDiagram}}
+
+</details>
 
 - **ElementName**: {{DiagramElementResponsibility| 1-3 sentences}}
 - **ElementName**: {{DiagramElementResponsibility| 1-3 sentences}}
@@ -88,7 +98,12 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 <!-- An optional section. Include only when a flow crosses multiple deployables. *Load and follow the `doc-diagram` skill to create a Mermaid swimlane diagram to show responsibility handoffs in a Mermaid swimlane diagram* across deployables, one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
 
+<details>
+<summary>Cross Deployable Flow</summary>
+
 {{crossDeployableFlowDiagram}}
+
+</details>
 
 ## Use cases
 <!-- Add one bullet per actor goal within a Feature. Include relevant circumstances; an interaction point alone is not a Use case. -->
@@ -101,7 +116,12 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 <!-- Include exactly one current-mode behavior diagram for this slice. *Load and follow the `doc-diagram` skill to show call order in a current Mermaid Sequence Diagram* of the slice. The diagram title names the behavior without a `Flow Diagram:` or `Sequence Diagram:` prefix. Do not compose a Mermaid skeleton from this template. -->
 
+<details>
+<summary>{{functionalSliceTitle}}</summary>
+
 {{functionalSliceBehaviorDiagram}}
+
+</details>
 
 **Decisions**
 
@@ -169,16 +189,16 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 <details>
 <summary>Open Questions</summary>
 
-<!-- Retain answered questions with supported answers. Mark incomplete answers Partial, conflicts Conflict, and missing evidence or choices Pending; extend questions as findings reveal gaps. Answered rows alone do not imply draft status. -->
+<!-- Fill every Answer with a supported answer or precise reason unanswered, missing prerequisite and next step/decision owner. Retain answered questions with supported answers. Mark incomplete answers Partial, conflicts Conflict, and missing evidence or choices Pending; extend questions as findings reveal gaps. Answered rows alone do not imply draft status. -->
 
 | **Question** | **Answer**  |
 | --- | --- |
-| {{unresolvedDecisionOrConflict}} |  |
+| {{unresolvedDecisionOrConflict}} | {{answerOrSpecificBlockerAndNextStep}} |
 
 </details>
 
 # Detailed Design
-<!-- Repeat the complete artifact block below once per independently reviewable implementation artifact, ordered by GUI/visual artifact, contract delta, low-level diagram, prototype finding, then research summary. Preserve source order within a type unless an existing design has a stable order. Remove this instruction and all child blocks when no artifacts apply. Supported content is a supplied GUI mockup, screenshot, or other visual; an API, GUI, database, resource, or other contract delta; an opt-in Class Diagram or implementation-level Sequence Diagram; an evidence-triggered Deployment View Delta; existing prototype findings; or an existing research summary. Embed repository images with useful alt text and repository-relative paths; link supplied non-image or external visuals. Contract and diagram producer skills own their complete artifact-specific output. Prototype content states the question, observed facts, resulting decision, and only the smallest decision-bearing code or configuration snippet, and links the throwaway branch or durable result. Research content states terse findings and consequences and links exactly once to the durable research Markdown artifact without copying its primary-source links. Remove the Artifact line when the block has no link. -->
+<!-- Repeat the complete artifact block below once per independently reviewable implementation artifact, ordered by GUI/visual artifact, contract delta, low-level diagram, prototype finding, then research summary. Preserve source order within a type unless an existing design has a stable order. Remove this instruction and all child blocks when no artifacts apply. Supported content is a supplied GUI mockup, screenshot, or other visual; an API, GUI, database, resource, or other contract delta; an opt-in Class Diagram or implementation-level Sequence Diagram; an evidence-triggered Deployment View Delta; existing prototype findings; or an existing research summary. Embed repository images with useful alt text and repository-relative paths; link supplied non-image or external visuals. Contract and diagram producer skills own their complete artifact-specific output. Prototype content states the question, observed facts, resulting decision, and only the smallest decision-bearing code or configuration snippet, and points to its Appendix B entry. Research content states terse findings and consequences and points to its Appendix A entry, which owns the canonical research Markdown link without copying its primary-source links. Remove the Artifact line when the block has no link. -->
 
 ## {{artifactTitle}}
 
@@ -192,6 +212,18 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 {{artifactSpecificContent}}
 
 </details>
+
+# Appendix A: Research
+
+<!-- One entry per consumed research report: title, contribution, relative report link. Use None when empty. Confluence publishing substitutes verified research child-page links in a publication copy. -->
+
+{{researchIndex|None, or one bullet per canonical report}}
+
+# Appendix B: Prototypes and Code Sketches
+
+<!-- One entry per consumed proof report or retained sketch: purpose, scoped conclusion, relative report and code/package links. Use None when empty; a report without code needs no invented sketch. Confluence publishing substitutes verified attachments in a publication copy. -->
+
+{{prototypeAndSketchIndex|None, or one bullet per canonical artifact}}
 
 # Checklists
 
@@ -260,7 +292,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 | **Component** | **Version** | **License** | **URL** | **Usage** |
 | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |
+|  |  |  |  |  |
 
 ## External Deliverables Change
 
