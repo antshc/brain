@@ -16,7 +16,7 @@ Use this to choose the right Wayfinder ticket type.
 - One ticket = one clear question.
 - Default to **Grilling** for decisions.
 - **Research** = learn facts; automatically dispatch ready in-scope codebase/cloud/web/rationale questions.
-- **Experiment** = prove a factual claim automatically; human preference or acceptance remains HITL.
+- **Experiment** = verify a factual claim automatically; material risks select Prove or Challenge this through the router-disclosed Risk verification resource. Record method, mitigation evidence and residual risk in Open Questions Answer; human preference or acceptance remains HITL.
 - **Task** = unblock a decision, not build the solution.
 - **Contract design** = new contract, inheritance abstraction, or significant contract change; options first, human picks later.
 - If the question is unclear, keep it under **Not yet specified**.
@@ -24,6 +24,10 @@ Use this to choose the right Wayfinder ticket type.
 - Wayfinder maintains a living HLD as decisions and evidence arrive; implementation comes afterward only with separate user authorization.
 
 **Quick test:** What exactly is preventing us from making this decision?
+
+## Artifact lifecycle
+
+Use separate local Research/verification worktrees from pinned integration HEAD. Wayfinder commits verified artifacts and merges them into its local integration branch before HLD synchronization and ticket resolution. Research goes under `docs/research/<initiative-slug>/`; proof evidence and retained sketches under `docs/prototype/<initiative-slug>/`. No automatic push or PR.
 
 ## Source
 

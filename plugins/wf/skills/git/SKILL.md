@@ -12,6 +12,7 @@ Select one tactic, loading references only when needed. Reselect for a different
 | --- | --- |
 | Identify a checkout and verify its remote | [Repository](tactics/repository.md) |
 | Name, inspect, create, fetch, push, or delete a branch | [Branches](tactics/branches.md) |
+| Merge a verified local result into a caller-owned branch | [Integration](tactics/integration.md) |
 | Draft a message, inspect history, or create an authorized commit | [Commits](tactics/commits.md) |
 | Inspect, create, reuse, remove, or reconcile a worktree | [Worktrees](tactics/worktrees.md) |
 

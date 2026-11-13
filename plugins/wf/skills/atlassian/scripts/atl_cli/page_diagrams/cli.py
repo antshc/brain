@@ -81,6 +81,7 @@ def build_arg_parser(prog: str | None = None) -> argparse.ArgumentParser:
     target = run.add_mutually_exclusive_group(required=True)
     target.add_argument("--page-id", help="Confluence pageId to update (update path)")
     target.add_argument("--space-id", help="Confluence spaceId to create the page in (create path)")
+    run.add_argument("--parent-id", help="Create under this page; on update verify the existing parent without moving")
     run.add_argument("--title", help="Page title (default: the Markdown's first '#' heading)")
     run.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     run.add_argument(
@@ -230,6 +231,7 @@ def _run_run(args: argparse.Namespace) -> None:
             assets_dir=assets_dir,
             out_path=out_path,
             mermaid_bg=args.mermaid_bg,
+            parent_id=args.parent_id,
         )
     except CreatedPageError as e:
         json.dump({"method": "rest", "pageId": e.page_id, "published": False}, sys.stdout)
