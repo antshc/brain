@@ -113,7 +113,7 @@ Return `route: unresolved` with the target and missing local checkout/ref; conti
 
 Local checkouts only. A target has a graph when Graph coverage selected one (or the brief selects one); a target with no local checkout never does.
 
-- Run `graphify` commands from the selected graph root (usually `@repoRoot`), never from a worktree.
+- Execute `graphify` commands from the selected graph root (usually `@repoRoot`), never from a worktree.
 - Worktree target → translate graph paths from `@mainCheckout/…` to `@worktreeRoot/…` before LSP/`rg`/reads. The graph reflects the main checkout's branch; worktree source wins on any difference.
 
 - Use the graph only on routes `graphify-path` and `graphify-find`. Known symbol, literal, config, test, frontend component, or single-file lookups go straight to LSP/`rg`; do not load graphify for them.

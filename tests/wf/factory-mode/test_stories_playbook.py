@@ -34,7 +34,7 @@ def test_current_guidance_has_no_standalone_stories_invocation():
         "plugins/wf/skills/design/SKILL.md",
         "plugins/wf/skills/design/playbooks/spec.md",
         "skills/productivity/doc-flow/references/subflow-template.md",
-        "docs/plans/idea-to-implementation-flow.md",
+        "plugins/wf/install/assets/factory-mode/playbooks/stories.md",
     ):
         text = (REPO / relative).read_text()
         assert "/to-stories" not in text, relative
