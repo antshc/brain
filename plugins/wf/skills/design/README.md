@@ -84,6 +84,26 @@ For Architecture first, explicitly request a **design-only handoff** from Archit
 
 Wayfinder automatically dispatches ready in-scope Research/Prove work, merges verified artifacts locally, updates `docs/ongoing/<initiative-slug>.md`, and repeats as new questions emerge. Human choices remain interactive; risk verification may select Challenge this. Confluence publication requires an explicit `/design publish-hld` request; discovery performs no push or PR creation.
 
+## Wayfinder: purpose and helpers
+
+**Purpose:** Build a navigable path from an uncertain idea to a decision-ready, evidence-backed high-level design. Wayfinder maps known questions, dependencies, risks and emerging unknowns; selects the next useful investigation; and keeps one living HLD in `docs/ongoing/` aligned with verified findings and human decisions. It does not assume the full path is known upfront.
+
+**Helpers and their intent**
+
+| Helper | Use when | Intended contribution |
+| --- | --- | --- |
+| [Grill](playbooks/grill.md) | Requirements, priorities, trade-offs or acceptance need human judgment | Interview the user; surface assumptions and record explicit decisions and remaining questions |
+| [Research](../research/SKILL.md) | The answer depends on existing code, system behavior, history, cloud services or external facts | Gather primary-source evidence and citations; narrow factual unknowns before choosing a design |
+| [Challenge this](../challenge-this/SKILL.md) | A proposed design or mitigation may hide failure modes or interacting risks | Adversarially search for blind spots; keep only reproducible counterexamples, not speculative findings or fixes |
+| [Prove](../prove/SKILL.md) | One technical claim, integration behavior or mitigation can be tested | Run the smallest meaningful check; return reproducible confirmed, refuted or inconclusive evidence within stated limits |
+| [Deep module](playbooks/deep-module.md) | A new or changed contract, interface, inheritance shape or module seam needs a decision | Compare 3+ substantially different interface options and recommend a seam; the user selects the contract |
+| [Code sketch](playbooks/sketch.md) | A proposed architecture needs concrete usage and type shapes before implementation | Illustrate caller usage, signatures, boundaries and module mapping in non-production source sketches |
+| [Architect](playbooks/architect.md) | Broader code architecture or multiple structural candidates need exploration | Ground and compare architectural shapes, then synthesize an accepted sketch; request **design-only handoff** to avoid its default implementation |
+
+**How Wayfinder uses them:** It automatically dispatches ready, in-scope factual Research and Prove work, chooses Challenge this for adversarial material-risk verification, and prepares Deep Module options for contract decisions. Grill obtains human decisions; contract selection, subjective trade-offs and scope changes never happen autonomously. Code Sketch and Architect are optional, explicitly requested design aids—not automatic Wayfinder ticket types. Architect's design-only handoff keeps discovery separate from production implementation.
+
+Every verified result updates the HLD and its source-linked appendices; unresolved or partially verified risks remain in Open Questions with the mitigation, verification method, outcome and residual uncertainty. Research and proof artifacts merge **locally** into the Wayfinder integration branch. No automatic push, PR or Confluence publication. Use `/design publish-hld` explicitly to publish.
+
 ## Routes
 
 | Request | Route | Outcome |
