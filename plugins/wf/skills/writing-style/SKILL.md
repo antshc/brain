@@ -1,7 +1,7 @@
 ---
 name: writing-style
 description: >-
-  Write, edit, or review prose. Use for technical docs, PR descriptions and commit messages, unslop, solution-agnostic requirements and stories, research bottom lines, or /writing-style sharpen to deepen and rewrite a task prompt.
+  Apply clear, precise writing to technical docs, PR text, requirements, and prompts. Use for 'unslop this', 'tighten this prose', 'rewrite requirements', or 'sharpen this prompt'. Not for artifact templates → `draft-artifact`.
 ---
 
 # Writing style

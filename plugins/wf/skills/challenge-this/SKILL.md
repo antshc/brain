@@ -1,7 +1,7 @@
 ---
 name: challenge-this
 description: >-
-  Find problems in a change or design and show them with a run. Use for 'challenge this', 'stress test this code', 'find blind spots', 'tear this apart'. Not for one claim → `prove`; bug fixes → `diagnosing-bugs`.
+  Adversarially test a change or design and report reproducible counterexamples. Use for 'challenge this', 'break this design', 'find blind spots', or 'stress test this change'. Not for ordinary PR review → `review`.
 ---
 
 # Challenge this

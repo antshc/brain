@@ -1,7 +1,7 @@
 ---
 name: design
 description: >-
-  Design architecture, sketch code, deepen modules, grill decisions, and publish specs or tickets. Use for 'architect this', 'sketch code', 'grill this', 'write a spec'. Not for empirical claim checks → `prove`; adversarial change review → `challenge-this`.
+  Design architecture, sketch modules, resolve decisions, and produce specs or tickets. Use for 'architect this', 'sketch code', 'grill this', 'wayfinder', 'write a spec', or 'design review'. Not for PR review → `review`.
 ---
 
 # Design
