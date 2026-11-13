@@ -163,3 +163,5 @@ After the sweep, pass the saved context to the [Spec playbook](./spec.md) for a 
 - Each `asked`, `corrected`, or `drift` line is repaired/resolved with evidence, or explicitly reported open with a blocker and next action.
 - Required records and indexes are confirmed written, or individually reported pending; source code, tests, configuration, and scaffolding remain unchanged.
 - The persisted ledger and handoff identify decisions, assumptions, evidence, unanswered questions, verification scope, blockers, and next action. Report closure as incomplete when storage, writes, or checks remain blocked.
+
+When called by Wayfinder, return confirmed answers and remaining questions after each session or pause for automatic document synchronization. Keep control with Wayfinder; do not independently publish the HLD or bypass the closing sweep when resolving the session. Ordinary requested handoffs remain unchanged.

@@ -169,7 +169,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 <details>
 <summary>Open Questions</summary>
 
-<!-- List unresolved questions when applicable. -->
+<!-- Retain answered questions with supported answers. Mark incomplete answers Partial, conflicts Conflict, and missing evidence or choices Pending; extend questions as findings reveal gaps. Answered rows alone do not imply draft status. -->
 
 | **Question** | **Answer**  |
 | --- | --- |
