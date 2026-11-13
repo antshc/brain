@@ -13,12 +13,12 @@ When available, use `GLOSSARY.md` for project-specific domain language and `ARCH
 - A **Functional slice** is a deployable-local, end-to-end implementation of one distinct behavior or outcome.
 
 ## Principle
-Describe system behavior, not implementation. Name the **entity and behavior**, never a widget, screen element, or technical artifact. If the input requirement already leaks a solution, raise it to the behavior it enables before writing the story; *Load and follow the `writing-style` skill to review solution-agnostic requirements and stories* for that rule.
+Describe system behavior, not implementation. Name the **entity and behavior**, never a widget, screen element, or technical artifact. If the input requirement already leaks a solution, raise it to the behavior it enables before writing the story; *Load and follow the `writing-style` skill to apply clear, precise writing to solution-agnostic requirements and stories* for that rule.
 
 ## Workflow
 1. **Assemble the body** → write the exact Title line, then list the verbatim Functional requirements addressed. *Done when* the User story is one Functional slice owned by the named Deployable kind and contains no unrelated behavior.
 2. **Derive Acceptance Criteria** → apply Acceptance Criteria below. *Done when* every applicable Business rule, Edge case, and error condition in the source lands in its own criterion, and input, processing, integration, state, and failure are covered.
-3. **Verify** → *Load and follow the `writing-style` skill to review solution-agnostic requirements and stories, scrubbing leaked implementation artifacts* over the Title, Requirements, and Acceptance Criteria, passing `GLOSSARY.md` as the domain glossary when it exists, then confirm each criterion implies concrete code changes and maps to the Functional slice's responsibility. *Done when* Quality Check passes line by line.
+3. **Verify** → *Load and follow the `writing-style` skill to apply clear, precise writing to solution-agnostic requirements and stories, scrubbing leaked implementation artifacts* over the Title, Requirements, and Acceptance Criteria, passing `GLOSSARY.md` as the domain glossary when it exists, then confirm each criterion implies concrete code changes and maps to the Functional slice's responsibility. *Done when* Quality Check passes line by line.
 4. **Contracts Delta (optional)** → if the User story changes an API, GUI, Database, Resource, or other contract, *Load and follow the `doc-contracts` skill to write an API, database, resource, or GUI contract delta* for each touched contract kind and append its output to the optional Contracts Delta appendix. *Done when* every changed contract kind passes `doc-contracts` skill's completion criteria.
 
 ## Acceptance Criteria
@@ -26,7 +26,7 @@ Describe system behavior, not implementation. Name the **entity and behavior**, 
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code.
 - Phrase as: `{{outcome}} when {{condition}}` for behaviors; `If {{condition}}, {{actor}} must {{outcome}}` for invariants/edge cases. Vary the subject (entity, actor, outcome) — don't force "The system" every time.
 - Cover: input, processing, integration, state, failure — one criterion each, not a labeled section.
-- Use domain language (`GLOSSARY.md`); state behavior, not implementation — no file paths, class/variable names, widget/screen, or other implementation details. *Load and follow the `writing-style` skill to review solution-agnostic requirements and stories*, raising any leaked artifact to the behavior and entity it enables.
+- Use domain language (`GLOSSARY.md`); state behavior, not implementation — no file paths, class/variable names, widget/screen, or other implementation details. *Load and follow the `writing-style` skill to apply clear, precise writing to solution-agnostic requirements and stories*, raising any leaked artifact to the behavior and entity it enables.
 - State the exact outcome — never "works", "correctly", "properly", "as expected".
 - Fold every applicable Business Rule, Edge Case, and relevant error condition from the source requirement into its own criterion here — do not create separate sections for them.
 </acceptance-criteria-rule>

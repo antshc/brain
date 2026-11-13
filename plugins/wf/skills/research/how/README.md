@@ -1,6 +1,6 @@
 # Current-system research
 
-*Load and follow the `research` skill to investigate code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. Hunter supplies the evidence.
+*Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. Hunter supplies the evidence.
 
 ## Write a strong instruction
 

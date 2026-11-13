@@ -1,7 +1,7 @@
 ---
 name: review
 description: >-
-  Review pull requests for findings, judge and fix existing PR comments, assess blast radius, or find regression test gaps. Use for 'review this PR', 'address PR comments', 'blast radius'. Not for posting or thread mechanics → `github`; technical design review → `design`.
+  Review code changes, PR comments, downstream risks, regression coverage, and architecture drift. Use for 'review this PR', 'address PR comments', 'blast radius', 'test gaps', or 'architecture drift'. Not for design review → `design`.
 argument-hint: '<code|comments|blast-radius|tests-gap|architecture|hitl> [target] [options]'
 ---
 

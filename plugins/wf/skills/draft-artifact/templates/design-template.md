@@ -77,7 +77,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 {{solutionOverview}}
 
-<!-- A diagram is optional. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
+<!-- A diagram is optional. This section is arc42's Building Block View. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to create Mermaid architecture diagrams to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks. Beneath the representation, describe every shown building block's responsibility in a bullet with the building block name in bold. -->
 
 {{architectureRepresentationDiagram}}
 
@@ -86,7 +86,7 @@ Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every 
 
 **{{the flow title| Cross Deployable Flow}}**
 
-<!-- An optional section. Include only when a flow crosses multiple deployables. *Load and follow the `doc-diagram` skill to show responsibility handoffs in a Mermaid swimlane diagram* across deployables, one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
+<!-- An optional section. Include only when a flow crosses multiple deployables. *Load and follow the `doc-diagram` skill to create a Mermaid swimlane diagram to show responsibility handoffs in a Mermaid swimlane diagram* across deployables, one lane per deployable, 1-5 major steps per lane. Do not compose a Mermaid skeleton from this template. -->
 
 {{crossDeployableFlowDiagram}}
 

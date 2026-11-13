@@ -32,8 +32,8 @@ def test_frontmatter_parses_and_description_is_safe():
     description = meta['description']
     assert meta['name'] == 'research'
     assert len(description) <= 1024
-    assert 'how does this work' in description
-    assert 'inspect this system' in description
+    assert 'trace this flow' in description
+    assert 'find callers of X' in description
     for char in ('—', '–', ': ', ' #', '<', '>'):
         assert char not in description, char
 

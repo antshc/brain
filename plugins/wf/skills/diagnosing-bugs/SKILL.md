@@ -1,7 +1,7 @@
 ---
 name: diagnosing-bugs
 description: >-
-  Run a diagnosis loop for hard bugs and performance regressions. Use for 'diagnose this', 'debug this', or reports of broken, throwing, failing, or slow behavior; also explicit bug-fix requests. Not for one-off behavior questions → `prove`.
+  Diagnose observed failures and regressions through reproduction, root-cause isolation, and verification. Use for 'debug X', 'X crashes', 'investigate this failing test', or 'performance regression'. Not for checking one assumption → `prove`.
 ---
 
 # Diagnosing Bugs

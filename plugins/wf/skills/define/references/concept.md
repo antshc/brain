@@ -8,7 +8,7 @@ Every fact in a suggestion, a question, or the recorded Concept is either a cite
 
 ## Inspection
 
-1. *Load and follow the `research` skill to navigate the codebase with a symbol or caller lookup and return cited findings*; use **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
+1. *Load and follow the `research` skill to investigate technical questions across source code with a symbol or caller lookup and return cited findings*; use **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
 2. Pick shape: one focused path → one subagent; distinct non-overlapping tracks (separate deployables, workflow boundaries, configuration versus tests, categories) → parallel subagents, each a bounded subquestion; a track needing another's answer → sequential. No duplicate lookups for areas already in flight.
 3. Spawn each lookup as a `hunter` subagent with its Explore request verbatim. If Hunter is unavailable, record the blocked evidence request and continue independent tracks.
 4. Consolidate results: resolve conflicts with targeted evidence; state remaining uncertainty.

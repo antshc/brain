@@ -1,7 +1,7 @@
 ---
 name: research
 description: >-
-  Investigate code, docs, packages, cloud limits, and the web; return cited findings. Use when you need codebase navigation, a symbol or caller lookup, or web search, and for 'research X', 'how does this work', 'where is X', 'what calls X', 'why was this built this way'. Not for one claim → `prove`.
+  Investigate technical questions across source code, documentation, packages, and external evidence. Return cited findings. Use for 'research X', 'trace this flow', 'find callers of X', or 'why was X built'. Not for testing one claim → `prove`.
 ---
 
 <!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->

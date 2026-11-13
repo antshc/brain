@@ -1,7 +1,7 @@
 ---
 name: doc-diagram
 description: >-
-  Create Mermaid architecture, flowchart, swimlane, sequence, and class diagrams. Use whenever a task needs a Mermaid diagram to show system structure, process flow, responsibility handoffs, call order, type relationships, or proposed changes.
+  Create Mermaid architecture, flowchart, swimlane, sequence, deployment, and class diagrams. Use for 'draw this flow', 'show a sequence diagram', 'draw system architecture', or requests to visualize process handoffs.
 argument-hint: "[diagram type] [current | delta] [scope]"
 ---
 

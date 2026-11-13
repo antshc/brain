@@ -28,7 +28,7 @@ Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly o
 
 ## Gotchas
 
-- Run `doc-contracts` for every touched kind even when the delta is small, additive, or already settled in the design.
+- Every touched kind requires a `doc-contracts` result even when the delta is small, additive, or already settled in the design.
 - GUI changes (dialogs, pages, visible fields) are a contract kind; a new field shown in the UI usually means both an API and a GUI delta.
 
 ## Design sketch handoff
