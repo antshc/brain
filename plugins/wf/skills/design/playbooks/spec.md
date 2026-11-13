@@ -1,28 +1,12 @@
 # Spec
 
-## Contents
-
-- Repository-document mode
-- Process
-- Gotchas
-- Design sketch handoff
-- Spec template
-
 Synthesize the conversation and codebase context into a spec (PRD). Ask only for missing publication inputs.
 
 An **Initiative** is a coordinated product change tracked as one planning effort and may encompass multiple Capabilities and Features. A **Requirements** is a set of one Stakeholder requirement together with its Functional requirements, Business rules, Edge cases. A **Spec** packages one or more Requirements sets for planning and handoff.
 
-For ordinary issue publication, load [Spec publication](../references/github.md#spec-publication) for GitHub repository resolution, labels, duplicate prevention, and publication.
+Load [Spec publication](../references/github.md#spec-publication) for GitHub repository resolution, labels, duplicate prevention, and publication.
 
-For ordinary issue publication, explicit offline publishing or a reported GitHub/tool/authentication failure → save the spec to `docs/specs/{{initiativeIdSlug}}.md` as Markdown, following [Offline spec publishing](../references/github.md#offline-spec-publishing). Local output is not a published GitHub issue.
-
-## Repository-document mode
-
-Wayfinder supplies `@documentMode=repository`, `@evolvingDraft=true`, exact document path/worktree, session base and available initiative/slug. Read Living document registered in the router. This is an explicit output mode, not offline failure. Apply Process for authoring, bypass issue publication, label setup and publication-only input questions. Return the rendered file to Wayfinder for its existing PR.
-
-Merge section by section; preserve resolved content, strengthen only with evidence, record conflicts in Open Questions and update Source Material idempotently. In evolving drafts, replace unknown core content with explicit Pending text; defer only unsupported contract/sketch artifacts with named gaps. Before readiness apply all ordinary content/contract checks. A draft commit is not issue publication or design readiness.
-
-Completed sketch in repository mode → retain the manifest's selected artifacts under `docs/specs/<slug>/artifacts/` and use verified repository-relative links; do not call issue attachment operations. Ordinary issue/offline artifact behavior remains unchanged.
+Explicit offline publishing or a reported GitHub/tool/authentication failure → save the spec to `docs/specs/{{initiativeIdSlug}}.md` as Markdown, following [Offline spec publishing](../references/github.md#offline-spec-publishing). Local output is not a published GitHub issue.
 
 ## Process
 
@@ -30,7 +14,7 @@ Completed sketch in repository mode → retain the manifest's selected artifacts
 
 2. Draft the Spec using the template below.
 
-Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill and ordinary issue publication is selected.
+Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
 
 Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
@@ -38,9 +22,9 @@ Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly o
 
 4. Design sketch — apply only when `design architect` or `design sketch` produced a completed, accepted `synthesis/` package in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Design sketch handoff** below.
 
-5. Before publishing (or marking a repository document ready), check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. **Contracts Delta present ⇔ the Contracts gate listed kinds**; each kind's block has a `Legend:` line, `#### header` + `<details>` per resource or surface, and delta lines prefixed `+`, `-`, `%`, or `~`. Missing or hand-written → re-run the Contracts gate; do not publish. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Repository-document mode → save the checked document and return to Wayfinder; otherwise follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
+5. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. **Contracts Delta present ⇔ the Contracts gate listed kinds**; each kind's block has a `Legend:` line, `#### header` + `<details>` per resource or surface, and delta lines prefixed `+`, `-`, `%`, or `~`. Missing or hand-written → re-run the Contracts gate; do not publish. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
 
-6. Repository-document mode → use its retained artifact links and finish without issue operations. Otherwise completed design package → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and bundle manifest. Offline → follow its offline branch instead.
+6. Completed design package → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and bundle manifest. Offline → follow its offline branch instead.
 
 ## Gotchas
 
@@ -59,7 +43,7 @@ Map the selected `rationale.md` into the body; for an Architect Arena package, f
 - Problem and caller usage → **Problem Statement** and **Solution**, user-facing.
 - Behavior the design commits to → **Requirements**, solution agnostic.
 - Module shape, types, invariants, tradeoffs, rejected alternatives, and synthesis decision when present → **Implementation Decisions** as prose, after the **Design sketch** decision.
-- Open questions → **Open Questions**; risks → **Further Notes**.
+- Open questions and risks → **Further Notes**.
 - Contracts touched → seed list for the Contracts gate; never copied into the body as a delta.
 
 The body MUST NOT name design routes, candidate labels, or the run's local paths.
@@ -71,8 +55,6 @@ python3 "<installed design directory>/scripts/bundle_artifacts.py" --sketch <syn
 ```
 
 Exit 2 → report stderr and stop before publishing; never drop a sketch file to make it pass. The printed manifest lists each artifact's `name`, `type`, and `file`; the first is the **Sketch index** mapping each file to its artifact names. Draft the **Design sketch** decision with every manifest name and `{{artifactUrl}}` placeholders that publication fills.
-
-## Spec template
 
 <spec-template>
 
@@ -164,14 +146,6 @@ A bullet list of agreed testing decisions: relevant test categories, observable 
 ## Out of Scope
 
 A description of the things that are out of scope for this spec.
-
-## Open Questions
-
-<!-- Keep answered rows; mark incomplete answers Partial, conflicts Conflict and missing evidence/choices Pending. In Wayfinder use Living document reconciliation; answered rows alone do not imply draft status. -->
-
-| Question | Answer |
-| --- | --- |
-| {{question}} | {{supportedAnswerOrRemainingGap}} |
 
 ## Further Notes
 

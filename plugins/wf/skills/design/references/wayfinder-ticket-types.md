@@ -21,7 +21,7 @@ Use this to choose the right Wayfinder ticket type.
 - **Contract design** = new contract, inheritance abstraction, or significant contract change; options first, human picks later.
 - If the question is unclear, keep it under **Not yet specified**.
 - After each resolved ticket, reconsider the remaining map.
-- Wayfinder maintains a living spec/HLD as decisions and evidence arrive; implementation comes afterward only with separate user authorization.
+- Wayfinder maintains a living HLD as decisions and evidence arrive; implementation comes afterward only with separate user authorization.
 
 **Quick test:** What exactly is preventing us from making this decision?
 

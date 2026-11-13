@@ -18,8 +18,8 @@ The [HLD route](skills/design/SKILL.md) renders slice decision bullets from its 
 
 ## Skill flow
 
-1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/design wayfinder`](skills/design/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, maintaining a living spec or HLD while automatically resolving factual tickets via `/research` or `/prove` and interviewing human choices via `/design grill`. Its document and evidence PRs target the session starting branch; the user chooses merge/close. `/design grill` directly interviews a smaller effort, followed by a requested `/design spec` or `/design hld` handoff.
-2. **Spec synthesis** — `/design spec` synthesizes a spec from resolved decisions or a Grill conversation; Wayfinder updates its selected spec automatically throughout discovery; a spec can feed `/design tickets` directly or go on into design synthesis.
+1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/design wayfinder`](skills/design/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, maintaining a living HLD while automatically resolving factual tickets via `/research` or `/prove` and interviewing human choices via `/design grill`. Its document and evidence PRs target the session starting branch; the user chooses merge/close. `/design grill` directly interviews a smaller effort, followed by a requested `/design spec` or `/design hld` handoff.
+2. **Spec synthesis** — `/design spec` synthesizes a spec from resolved decisions or a Grill conversation; Wayfinder maintains HLD output directly; standalone Spec synthesis remains a separate requested handoff; a spec can feed `/design tickets` directly or go on into design synthesis.
 3. **Design synthesis** — `/design hld` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
 4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](install/assets/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/design spec` output, or `/design hld` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row. Use `/draft-artifact story` for a standalone User story.
 5. **Story hardening** — `/design grill` interviews and sharpens each story, run once per story.
@@ -72,7 +72,7 @@ swimlane-beta TB
 
 ### Design and story breakdown
 
-Resolves unknowns with `/design wayfinder` (maintains a selected spec/HLD throughout discovery) or `/design grill` (one session, followed by requested `/design hld` synthesis), then breaks the design into User stories with `/factory-mode stories`.
+Resolves unknowns with `/design wayfinder` (maintains an HLD throughout discovery) or `/design grill` (one session, followed by requested `/design hld` synthesis), then breaks the design into User stories with `/factory-mode stories`.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -84,7 +84,7 @@ swimlane-beta TB
   subgraph discovery [Discovery]
     idea([Idea])
     effortSize{1 - Fits one session?}
-    wayfinder[1a.1 - /design wayfinder<br/>maintain spec/HLD and resolve tickets]
+    wayfinder[1a.1 - /design wayfinder<br/>maintain HLD and resolve tickets]
     grillDesign[1b.1 - /design grill<br/>interview in one session]
   end
 

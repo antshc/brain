@@ -17,13 +17,13 @@ One entry point; route to one playbook. Do not load unrelated routes.
 | `hld` | Create or update an authoritative high-level feature design from specs and resolved decisions. | [HLD](playbooks/hld.md) |
 | `spec` | Synthesize a spec or PRD from decisions or an accepted sketch. | [Spec](playbooks/spec.md) |
 | `tickets` | Break a spec into implementation tickets on explicit request. | [Tickets](playbooks/tickets.md) |
-| `wayfinder` | Chart or resume a decision map with a living spec/HLD and automatic evidence work on explicit request. | [Wayfinder](playbooks/wayfinder.md) |
+| `wayfinder` | Chart or resume a decision map with a living HLD and automatic evidence work on explicit request. | [Wayfinder](playbooks/wayfinder.md) |
 | `review` | Assess a technical design's gaps, risks, and implementation readiness on explicit request. | [Review](playbooks/review.md) |
 
 1. Honor an explicit route from the user or caller. On replies to pending questions or checkpoints, continue the active route. Otherwise infer from clear intent. Ambiguous requests → ask which outcome the user wants and wait.
 2. Select `tickets`, `wayfinder`, or `review` only on an explicit user request, including clear natural language relayed by a caller. Ticket publication requires separate approval of the breakdown; Wayfinder automatically runs in-scope factual research and proof; human choices stay interactive.
 3. Select `sketch` only when the user explicitly requests a sketch without implementation. General code-shape or multi-candidate work selects `architect`. `deep-module` is standalone when explicitly requested and can also be called by Architect. Empirical checks and adversarial review belong to the standalone Prove and Challenge this skills.
-4. Select `hld` only for an explicit request to create or update a high-level design or feature design, including `/design hld`. Wayfinder may select it for its user-selected living document and subsequent updates. A spec or design supplied as input alone does not select it.
+4. Select `hld` only for an explicit request to create or update a high-level design or feature design, including `/design hld`. Wayfinder may select it for its living HLD and subsequent updates. A spec or design supplied as input alone does not select it.
 5. Read the selected playbook fully before acting and required resources fully before use. For `hld`, load [Design template](templates/design-template.md) and [Decision bullets](references/decision-bullet.md); the playbook owns synthesis and merge checks. Wayfinder loads Grill for interviews and then resumes the map. Continue standalone Grill to Spec only after a requested handoff and closing sweep. Wayfinder synchronizes confirmed outcomes automatically and retains control.
 
 ## Conditional resources
@@ -34,14 +34,14 @@ Read triggered resources fully before use; resolve from this skill directory.
 | --- | --- |
 | Wayfinder tracker/publication; Spec issue publication; Tickets publication | [GitHub operations](references/github.md) |
 | Wayfinder ticket classification | [Ticket types](references/wayfinder-ticket-types.md) |
-| Wayfinder creation/update; HLD evolving draft; Spec repository-document mode | [Living document](references/living-document.md) |
+| Wayfinder creation/update; HLD evolving draft | [Living document](references/living-document.md) |
 | HLD synthesis, including Wayfinder HLD | [Design template](templates/design-template.md), [Decision bullets](references/decision-bullet.md) |
 | Grill session state | [Session ledger](references/track-ledger.md) |
 | Grill verification-scope trigger | [Verification](references/tactics-verification.md) |
 | Grill external-source trigger | [External source](references/tactics-external-source.md) |
 | Grill closing/handoff | [Closing sweep](references/closing-sweep.md) |
 
-Wayfinder additionally reads the full Grill playbook for interviews and the full selected HLD or Spec playbook for document authoring, using the route table above. Load the other document route only if the user changes the selected kind.
+Wayfinder additionally reads the full Grill playbook for interviews and the full HLD playbook for document authoring, using the route table above. Spec remains a separate explicitly requested route; Wayfinder does not select it as an output format.
 
 ## Principles
 

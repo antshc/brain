@@ -1,6 +1,6 @@
 # Wayfinder
 
-Chart a GitHub decision map and maintain one living spec or HLD throughout discovery. Produce decisions, evidence and the document; implementation requires separate authorization. The map schedules questions, tickets hold detailed resolutions, and the document synthesizes current requirements and decisions.
+Chart a GitHub decision map and maintain one living HLD throughout discovery. Produce decisions, evidence and the document; implementation requires separate authorization. The map schedules questions, tickets hold detailed resolutions, and the document synthesizes current requirements and decisions.
 
 ## Contents
 
@@ -27,19 +27,19 @@ Every map and ticket is an issue, so it has a name — its title. In everything 
 ## Session and document
 
 1. Before interviews or worktree switches, capture absolute harness root, repository, invocation worktree, `@sessionBaseBranch` and its SHA. This is the branch the user started from, not necessarily `main`; every PR targets it. Resolve detached HEAD before branch creation. On resume, use the map's persisted base instead of the caller's current branch. Done when the base and remote are verified.
-2. Honor explicit spec/HLD selection; otherwise ask which document the user wants. Automatically name/create its branch and dedicated owned worktree using **Prepare a document worktree**. Derive the branch summary from the initial request; keep that recorded name if Grill later refines the document slug. Do this before destination/frontier Grill. Done when ownership and branch are recorded outside disposable worktrees.
-3. After destination Grill establishes scope/slug, read the selected Spec or HLD playbook and Living document resource registered in the router. Seed `docs/specs/<initiative-id-or-slug>.md` or `docs/designs/<initiative-slug>.md` in that worktree using repository-document/evolving-draft mode. Use **Publish the document** before evidence dispatch. Done when the seed and its one draft PR exist.
+2. Use HLD as the only Wayfinder document format; no output-format selection question. Automatically name/create its branch and dedicated owned worktree using **Prepare a document worktree**. Derive the branch summary from the initial request; keep that recorded name if Grill later refines the document slug. Do this before destination/frontier Grill. Done when ownership and branch are recorded outside disposable worktrees.
+3. After destination Grill establishes scope/slug, read the HLD playbook and Living document resource registered in the router. Seed `docs/designs/<initiative-slug>.md` in that worktree using evolving-draft mode. Use **Publish the document** before evidence dispatch. Done when the seed and its one draft PR exist.
 
 Wayfinder owns branch prefixes; *Load and follow the `git` skill to run verified Git mechanics for branch naming, creation and worktree lifecycle* using Branches and Worktrees with the selected prefix and summary. Preserve Git's slug normalization, removed initiative/ticket IDs, worker ordinals, collision authorization and verified resumes. Explicit caller prefixes override its default feat/fix choice; standalone Research/Prove conventions stay unchanged.
 
 | Work | Prefix |
 | --- | --- |
-| Living spec/HLD | `wayfinder/<slug>` |
+| Living HLD | `wayfinder/<slug>` |
 | Research ticket | `research/<slug>` |
 | Experiment/verification ticket | `prove/<slug>` |
 | Contract design Options | `wayfinder/<slug>` |
 
-**Synchronize the document** after every research result, Grill session/pause, experiment result/review, Contract design phase, and on resume. Automatically update inside its dedicated worktree without a separate request or confirmation. Read the latest remote document; apply Living document reconciliation and the selected author's incremental rules, then **Publish the document**. Preserve existing diagram approval rules; record a blocked diagram update rather than claiming full readiness. Serialize writes, not whole evidence runs. Record last synchronized ticket/result commit and any pending updates on the map. Done when supported consequences appear in all affected sections and the document commit is verified on origin.
+**Synchronize the document** after every research result, Grill session/pause, experiment result/review, Contract design phase, and on resume. Automatically update inside its dedicated worktree without a separate request or confirmation. Read the latest remote document; apply Living document reconciliation and HLD's incremental rules, then **Publish the document**. Preserve existing diagram approval rules; record a blocked diagram update rather than claiming full readiness. Serialize writes, not whole evidence runs. Record last synchronized ticket/result commit and any pending updates on the map. Done when supported consequences appear in all affected sections and the document commit is verified on origin.
 
 ## The Map
 
@@ -54,8 +54,8 @@ The whole map at low resolution, loaded once per session. Open tickets are not l
 ```markdown
 ## Destination
 
-<what reaching the end of this map looks like — the spec, decision, or change
-this effort is finding its way to. One or two lines; every session orients to it
+<what reaching the end of this map looks like — the outcome and decisions
+this HLD must settle. One or two lines; every session orients to it
 before choosing a ticket.>
 
 ## Notes
@@ -66,7 +66,7 @@ effort>
 ## Document and branches
 
 - Session base: <branch>; starting SHA: <sha>
-- Document: <spec or HLD>; <path>; <branch link>; <PR link>
+- Document: HLD; <path>; <branch link>; <PR link>
 - Worktree: <absolute path>; ownership record: <path outside worktrees>
 - Last synchronized: <ticket/result commit or none>
 - Pending synchronization: <result refs and missing steps or none>
@@ -217,7 +217,7 @@ Expect concurrent tracker edits. Re-read before writes and preserve other sessio
 
 ## Completion criteria
 
-- The selected spec/HLD reflects every consumed result and confirmed session; partial/conflicting questions remain explicit. Reprocessing the same result creates no duplicate rows, sections, sources, tickets or PRs.
+- The HLD reflects every consumed result and confirmed session; partial/conflicting questions remain explicit. Reprocessing the same result creates no duplicate rows, sections, sources, tickets or PRs.
 - One persistent document PR and separate result PRs target the captured session base; branches/PRs link their owning issues. Report blocked publication/synchronization, open choices and remaining prerequisites.
 - Completion of the map or a ticket never merges/closes a PR or enables auto-merge. The user decides each PR's merge/close. A merged/closed PR requires a user-directed continuation, not automatic reopening/replacement.
 - Last, re-read the destination and requested scope; map every obligation to document content, evidence or an explicit remaining blocker. Do not declare the design ready with missing coverage.
