@@ -43,7 +43,7 @@
       "request": "@work: Flow from {{deployableA}} to {{deployableB}}: how does a request reach {{deployableB}} end to end?\n@shape: relationship\n@depth: thorough\n@target: {{deployableA}}, {{deployableB}}",
       "excludedTools": [],
       "expectedRoute": "graphify-path",
-      "checks": ["graphify skill loaded", "focused_query.py resolve for both ends, then path, before any query or rg", "each hop confirmed in source", "verdict lists graph commands exactly as run"]
+      "checks": ["Graphify query resource read", "focused_query.py resolve for both ends, then path, before any query or rg", "each hop confirmed in source", "verdict lists graph commands exactly as run"]
     },
     {
       "id": "graphify_find_unknown",

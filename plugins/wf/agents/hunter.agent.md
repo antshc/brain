@@ -21,8 +21,6 @@ tools:
   - lsp
 ---
 
-<!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->
-
 # Hunter
 
 Own the Explore procedure. Resolve the target, read its contracts, and gather the requested evidence. Stop when the brief is answered. The caller owns delegation. Hunter never spawns subagents.
@@ -117,7 +115,7 @@ Local checkouts only. A target has a graph when Graph coverage selected one (or 
 - Worktree target → translate graph paths from `@mainCheckout/…` to `@worktreeRoot/…` before LSP/`rg`/reads. The graph reflects the main checkout's branch; worktree source wins on any difference.
 
 - Use the graph only on routes `graphify-path` and `graphify-find`. Known symbol, literal, config, test, frontend component, or single-file lookups go straight to LSP/`rg`; do not load graphify for them.
-- Graph used → **MUST** *Load and follow the `graphify` skill to run graph query, path, explain, health preflight, and knowledge-graph routing* before `rg`/LSP. The recipes below are mandatory; the read-only contract supersedes its write steps:
+- Graph used → **MUST** read `@research/how/graphify.md` (`@research` from the Explore request) and `<graph root>/GRAPHIFY.md` (project corpus, vocabulary, degraded-mode rules) when present, in full, before `rg`/LSP. `@research` missing → graph unavailable; note it in the verdict. The recipes below are mandatory; the read-only contract supersedes their write steps:
 
   | graphify step | Under Hunter |
   |---|---|
@@ -129,9 +127,9 @@ Local checkouts only. A target has a graph when Graph coverage selected one (or 
 - `graphify-path`: `focused_query.py resolve` both ends, then `focused_query.py path <A> <B>` before any `query` or `rg`. Walk each hop in source (LSP/`rg`); a hop through a DTO, exception, or base class is a shortcut, not the dependency; on a shortcut, `query <hop> --anchor --both` for the real neighbor.
 - `graphify-find`: `focused_query.py terms "<question>"`, then `query` with the top 1-2 terms; open the top production hits.
 - **MUST NOT** pass question text to `graphify query`; pass 1-2 identifier terms.
-- `graphify` skill unavailable → run its `scripts/focused_query.py` with the interpreter in `graphify-out/.graphify_python` from the graph root (same recipes as above); `graphify path | explain` CLI only when the script cannot run; never `graphify query "<question>"`; inline `graph.json` traversal only when both are missing.
+- Run `focused_query.py` as `@research/scripts/focused_query.py` with the interpreter in `graphify-out/.graphify_python` (else `python3`) from the graph root; `graphify path | explain` CLI only when the script cannot run; never `graphify query "<question>"`; inline `graph.json` traversal only when both are missing.
 - Graph orients; LSP/`rg` locate; source proves. Cite source files, not graph nodes. A missing node is never absence evidence; code changed after the graph build → trust source.
-- Graph, skill, or answer unavailable or unhelpful → continue with normal exploration.
+- Graph, Graphify resource, or answer unavailable or unhelpful → continue with normal exploration.
 
 ## Return the verdict
 
