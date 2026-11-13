@@ -1,34 +1,29 @@
-# Wayfinder Cheat Sheet
+# Wayfinder ticket types
 
-Use this to choose the right Wayfinder ticket type.
+Unknowns/risks stay in root **Not yet specified** until resolved; concrete child issues track progress. One unknown may need several work items. HLD Open Questions are user-owned presentation content, never a discovery tracker.
 
-| Type | Use when | Why | Example question |
-|---|---|---|---|
-| **Grilling** | Human judgment or a tradeoff is needed | Prevents the agent from inventing product or architecture decisions | Should tests reuse shared environments or create isolated ones? |
-| **Research** | A decision depends on missing facts | Get evidence before deciding; do not mix research with implementation | What limitations does our current test infrastructure have? |
-| **Experiment** | You need to try or observe something | A cheap experiment can resolve uncertainty faster than discussion | Can isolated test environments be provisioned cheaply enough? |
-| **Task** | Prerequisite work blocks a decision | Unblock Wayfinding; never use it to implement the destination | What access or data must be obtained before we can evaluate the CI environment? |
-| **Contract design** | A new contract, an inheritance-based abstraction, or a significant contract change | Agent designs radically different options with class diagrams (AFK); human chooses (HITL) | What interface should the test-environment provider expose, and should providers share a base class? |
-| **Not yet specified** | You know an area matters but cannot state the question yet | Avoid speculative tickets based on assumptions | Keep it as fog until the exact question becomes clear |
+| Type | Use when | Execution / completion |
+| --- | --- | --- |
+| Research | Facts or coarse fog need clarification | AFK cited findings through Research; integrated deciding evidence resolves factual question |
+| Experiment | A falsifiable claim needs an actual check | AFK Prove; human acceptance remains HITL; inconclusive stays open/blocked |
+| Grilling | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep |
+| Contract design | New/significantly changed interface, inheritance abstraction, invariant/error/ordering/seam choice | AFK Deep Module generates 3+ Code Sketch options with individual Markdown rationales; retain worktree without merge. HITL Choice on same ticket, then selected-only merge plus considered-option notes and closure |
+| Task | Code Sketch or prerequisite access/data work unblocks a decision | AFK artifact generation or authorized work; otherwise HITL checklist; never implementation of the destination |
+
+Challenge this is supporting verification inside an existing issue or root-owned run, **not its own tracking ticket**. Record scope, evidence, coverage and pending steps on that owner; create follow-up issues only for actual discovered work. It can target the whole HLD but requires a safe runnable boundary for retained findings.
 
 ## Rules
 
-- One ticket = one clear question.
-- Default to **Grilling** for decisions.
-- **Research** = learn facts; automatically dispatch ready in-scope codebase/cloud/web/rationale questions.
-- **Experiment** = verify a factual claim automatically; material risks select Prove or Challenge this through the router-disclosed Risk verification resource. Record method, mitigation evidence and residual risk in Open Questions Answer; human preference or acceptance remains HITL.
-- **Task** = unblock a decision, not build the solution.
-- **Contract design** = new contract, inheritance abstraction, or significant contract change; options first, human picks later.
-- If the question is unclear, keep it under **Not yet specified**.
-- After each resolved ticket, reconsider the remaining map.
-- Wayfinder maintains a living HLD as decisions and evidence arrive; implementation comes afterward only with separate user authorization.
-
-**Quick test:** What exactly is preventing us from making this decision?
+- Contract test: new/significantly changed contract or inheritance abstraction → Contract design, not Grilling. Human Choice remains on the same open issue after Options; release claim while waiting.
+- Default human decisions → Grilling. Helpers clarify supporting facts automatically; no agent speaks for the user.
+- Directly spawn skill-capable general-purpose helpers using Wayfinder's supplied `@helperDispatch`; no Subagents skill. Forward to nested helpers. Use the Git skill for worktrees where isolation is needed.
+- Reassess root fog after every result/answer; retain partially resolved risks and blocked choices. Supported resolution moves to Decisions so far before removing active fog; reopening preserves stable ID.
+- A completed helper run does not by itself resolve its parent unknown or imply verified mitigation. No counterexample found establishes only tested coverage.
 
 ## Artifact lifecycle
 
-Use separate local Research/verification worktrees from pinned integration HEAD. Wayfinder commits verified artifacts and merges them into its local integration branch before HLD synchronization and ticket resolution. Research goes under `docs/research/<initiative-slug>/`; proof evidence and retained sketches under `docs/prototype/<initiative-slug>/`. No automatic push or PR.
+Wayfinder pins integration HEAD and exact outputs. Research uses `docs/research/<initiative-slug>/`; proof/sketch evidence uses `docs/prototype/<initiative-slug>/`. Producers do not commit/push. Wayfinder owns verified local commits/merges and cleanup. Contract design merges **after user selection**, selected artifacts and considered-option notes only; retain candidates through Choice/review. No evidence appendices, Confluence subpages/attachments, automatic push or PR.
 
 ## Source
 
-- [Wayfinder skill](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md)
+- [Wayfinder origin](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md)
