@@ -41,7 +41,7 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 3. Bootstrap the docs
 
-*Load and follow the `doc-architecture` skill to initialize missing docs* with route `initialize` at the docs root (reporoot for a wrapping repo).
+*Load and follow the `record-architecture` skill to initialize missing docs* with route `initialize` at the docs root (reporoot for a wrapping repo).
 
 ## 4. Set up GitHub labels
 
