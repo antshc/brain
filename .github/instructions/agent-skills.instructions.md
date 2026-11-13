@@ -86,7 +86,7 @@ Register every new plugin in [marketplace.json](../plugin/marketplace.json) in t
 
 Run subagents through prose instructions describing the task, scope, inputs, constraints, and expected output. Do not instruct agents to call `runSubagent` directly.
 
-A brief that tells the subagent to run a skill **MUST** name a skill-capable agent type: wf `hunter` for read-only codebase lookups, else `general-purpose` with edits forbidden when read-only. Send Explore requests directly to Hunter. If Hunter is unavailable, report the blocked evidence request and continue independent work. Plain grep or LSP checks outside that contract may still use the built-in `explore` agent.
+A brief that tells the subagent to run a skill **MUST** name a skill-capable agent type: wf `hunter` for read-only codebase lookups, else `general-purpose` with edits forbidden when read-only. Send Explore requests directly to Hunter by default. An explicit caller-owned `@helperDispatch` policy may require direct skill-capable `general-purpose` workers instead; preserve read-only evidence/target constraints and forward that policy to nested helpers. If Hunter is unavailable, report the blocked evidence request and continue independent work. Plain grep or LSP checks outside that contract may still use the built-in `explore` agent.
 
 ## Content and resources
 

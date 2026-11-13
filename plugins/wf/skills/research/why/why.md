@@ -4,7 +4,7 @@ Rationale procedure of the Research skill. Paths resolve from the skill base dir
 
 Investigate the motivation and intent behind code. How explains current behavior. `why` answers what forces led to its shape.
 
-At each dispatch, *Load and follow the `subagents` skill to dispatch independent workers using role-based models and isolated outputs* using **Dispatch**. Use `general-purpose` with read-only instructions for MCP access and citation spot-checks. Use the role fallback on rejection, then the closest valid model of the same family.
+At each dispatch with `@helperDispatch`, directly spawn general-purpose workers under that policy, retaining investigator/synthesizer roles; otherwise *Load and follow the `subagents` skill to dispatch independent workers using role-based models and isolated outputs* using **Dispatch**. Use `general-purpose` with read-only instructions for MCP access and citation spot-checks. Use the role fallback on rejection, then the closest valid model of the same family.
 
 ## Operating Posture
 

@@ -10,6 +10,10 @@ Adversaries try to break a change or design. Only findings proven by a run survi
 
 For example requests, read [Examples](README.md) in full.
 
+## Caller dispatch
+
+When supplied, `@helperDispatch` overrides default worker type/model/dispatch instructions throughout this skill and its selected resources, including nested calls. Forward it verbatim to every worker and helper; directly spawn skill-capable general-purpose workers without loading/invoking the Subagents skill. Preserve evidence, scope, local-target/read-only constraints, independent reproduction and isolation requirements. Reuse supplied verified checkouts; use the Git skill for additional worktrees where needed. Without this input, existing dispatch below is unchanged.
+
 ## Inputs
 
 - Scope/diff/PR/design and intent; default scope is branch merge-base through working tree, including scoped dirty inputs.
@@ -26,7 +30,7 @@ Reject an adversary count outside the documented values before dispatch. Resolve
 
 ## Fan out
 
-Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. *Load and follow the `subagents` skill to dispatch independent workers with isolated outputs* using Dispatch and the ordered `challenge-this reviewers` pool, with the resolved adversary count. Use skill-capable general-purpose reviewers; request one isolated owned worktree each, copying only scoped uncommitted changes, unless supplied verified checkouts already satisfy isolation. Pass Frame, facts, prior reproductions, limits, exact output destinations and the completed prompt. Keep ownership records and evidence outside worktrees. No safe target/isolation → report blocked scope; continue independent checks only. Done when every assignment has a terminal report or named blocker.
+Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. With `@helperDispatch`, directly spawn the resolved number of general-purpose reviewers under that policy; otherwise *Load and follow the `subagents` skill to dispatch independent workers with isolated outputs* using Dispatch and the ordered `challenge-this reviewers` pool, with the resolved adversary count. Use skill-capable general-purpose reviewers; request one isolated owned worktree each, copying only scoped uncommitted changes, unless supplied verified checkouts already satisfy isolation. Pass Frame, facts, prior reproductions, limits, exact output destinations and the completed prompt. Keep ownership records and evidence outside worktrees. No safe target/isolation → report blocked scope; continue independent checks only. Done when every assignment has a terminal report or named blocker.
 
 ## Verify
 
@@ -38,7 +42,7 @@ Independently rerun each finding's exact command in the reviewer's recorded envi
 - **Scope** — target/baseline, dirty inputs, environment, tested/excluded areas and blockers, including missing workers.
 - **Findings** — each verified failure: title, root cause/location, exact command/working directory, expected/actual output, violated intent, evidence/patch paths and adversaries. Say `no verified findings` when empty; report incomplete coverage separately.
 - **Dropped** — each adversary's dropped count and reasons.
-- **Handoff** — retained evidence, resource/worktree ownership and cleanup outcome. Contract findings return to Design for proposed Deep Module corrections; Challenge this supplies no interface redesign or fixes.
+- **Handoff** — retained evidence, resource/worktree ownership and cleanup outcome. Contract findings return to their caller for proposed Deep Module options; Wayfinder retains its Contract design Choice/selected-only integration gate; Challenge this supplies no interface redesign or fixes.
 
 Preserve reports, patches and rerun prerequisites until verification and requested follow-up finish. Remove only run-owned resources, using *Load and follow the `git` skill to run verified worktree lifecycle* with Worktrees; preserve caller-owned worktrees and report leftovers. Done when every resource is removed or explicitly handed back.
 

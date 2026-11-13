@@ -2,6 +2,10 @@
 
 Own the interview and session design state: when to look up, log, ask, or write. Delegate mechanics through the skill contracts below; apply their procedures without restating them.
 
+## Caller dispatch
+
+Wayfinder supplies `@helperDispatch`: forward it to Research and all nested helpers. It overrides default Hunter/Subagents dispatch with direct read-only general-purpose workers and the supplied model policy; preserve lookup evidence and full resource-loading requirements. Wayfinder relays each question and actual user answer, retains control and synchronizes root fog/HLD. Standalone dispatch below remains unchanged.
+
 ## Scope
 
 Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITECTURE.md`, `docs/adr/**`, `docs/concepts/**`, `docs/building-blocks/**`, and the session ledger. Source code, tests, configuration, and scaffolding **MUST remain read-only** throughout the grill.

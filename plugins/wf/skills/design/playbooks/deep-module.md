@@ -1,14 +1,15 @@
 # Deep module
 
-Design a deep module interface, compare genuinely different shapes, and recommend a seam. Standalone: report and stop, no production code or code sketch unless separately requested. Architect can invoke this route to resolve a verified contract finding.
+Design a deep module interface as 3+ genuinely different Code Sketch option packages, compare their depth and recommend a seam. Always generate source sketches and an individual Markdown rationale per option; no separate sketch request is needed. No production implementation.
 
 ## Route
 
-- **Direct request:** deepen a module interface, find deepening opportunities, select seam placement, or improve testability/AI navigation. User asks for a sketch too → run `design sketch` after the recommendation; asks to implement → use `design architect` with the recommendation as grounding.
-- **Contract finding:** Challenge this verified an interface, invariant, ordering, error mode, configuration, seam, or adapter defect. Propose a corrected interface through this route before Architect applies it. Challenge this itself reports findings, not fixes.
+- Direct request → return options and recommendation, then stop. Implementation is a separately requested handoff; never start Architect automatically.
+- Verified contract finding → treat its reproduced failure as a constraint and return proposed options to the caller; evidence skills supply no fixes.
+- Wayfinder Contract design → use supplied worktree/output root and `@helperDispatch`; retain options there until user Choice. Wayfinder owns selected-only commit/merge and cleanup.
 
 ## Procedure
 
-1. Read [Deep modules](../references/deep-modules.md) fully. Name the module, interface, seam, and dependency categories using its vocabulary and the repository glossary.
-2. Run [Design It Twice](../references/design-it-twice.md) on the target module; produce `deep-modules/problem.md`, three or more `option-<n>.md`, and `comparison.md` under the artifact root from `SKILL.md`.
-3. Present the recommended interface, alternatives, tradeoffs, evidence, and `comparison.md` path. Contract finding → return the recommendation as a proposed correction to its caller; standalone → stop.
+1. Read the router-disclosed Deep modules and Design It Twice resources fully. Name module, interface, seam and dependency categories in repository vocabulary. Done when constraints and caller needs are explicit.
+2. Run Design It Twice, using the router's Sketch playbook and shared sketch resources for each option. Produce `problem.md`, `comparison.md` and 3+ `option-<n>/{rationale.md,module-map.md,sketch/}` packages under the caller's exact option root, or `<artifact-root>/deep-modules/` standalone. Done when every option has distinct interface shape, real source sketches and its own rationale.
+3. Present options, trade-offs, recommendation and review paths. Wayfinder returns to Contract design Choice without merging; standalone returns and stops. Done when recommendation is distinguished from explicit human selection.
