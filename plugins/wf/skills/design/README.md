@@ -6,6 +6,8 @@ One discoverable entry point for code architecture, standalone code sketches, de
 
 ### Architecture first
 
+Best fit for a user story or task with clear requirements and no unresolved product or domain questions. Example: implement a functional slice from controller through application logic to the database, with behavior and contracts already defined.
+
 ```mermaid
 %% diagram-id: design-architecture-to-implementation-flow
 flowchart TD
