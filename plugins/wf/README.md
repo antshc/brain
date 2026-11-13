@@ -12,16 +12,16 @@ Its interview presents the entire ready decision frontier as one numbered batch 
 
 [doc-architecture](skills/doc-architecture/SKILL.md) owns architecture records, rendering, initialization, and index mechanics. Routes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, `decision-bullet`, `initialize`, and `index`. The index route takes `load`, `scan`, `trigger`, `ensure-section`, `sync-row`, or `sync-deployment`; row mutations use `rowAction`. The two render-only routes never save files or update indexes. Explicit routes take precedence; existing record mode inputs remain aliases, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [`/define concept`](skills/define/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview. `/define research` charts research and hypothesis topics.
 
-The [Feature design tactic](skills/draft-artifact/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
+The [HLD route](skills/design/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
 [github](skills/github/SKILL.md) provides Git conventions and one CLI for Git and GitHub operations. [Review](skills/review/SKILL.md) routes PR code review, comment follow-up, blast radius, test gaps, architecture drift, and human-led review through one skill. Use `/design review` to review a technical design for gaps and implementation readiness.
 
 ## Skill flow
 
-1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/design wayfinder`](skills/design/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/design grill`, `/research`, or `/experiment`; `/design grill` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/design spec` (or `/draft-artifact design` directly).
+1. **Discovery loop** — resolving unknowns before a spec or design is clear has two mechanics for the same purpose: [`/design wayfinder`](skills/design/SKILL.md) charts a map of decision tickets on the issue tracker for work too big for one session, resolving each ticket via `/design grill`, `/research`, or `/experiment`; `/design grill` run directly interviews a smaller effort in one session, with no map or tickets. Either way, once no unknowns are left, the next step is `/design spec` (or `/design hld` directly).
 2. **Spec synthesis** — `/design spec` synthesizes the spec from the resolved Wayfinder decisions or Grill conversation, the step right after the discovery loop; a spec can feed `/design tickets` directly or go on into design synthesis.
-3. **Design synthesis** — `/draft-artifact design` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
-4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](install/assets/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/design spec` output, or `/draft-artifact design` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row. Use `/draft-artifact story` for a standalone User story.
+3. **Design synthesis** — `/design hld` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
+4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](install/assets/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/design spec` output, or `/design hld` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) in Story mode once per approved row. Use `/draft-artifact story` for a standalone User story.
 5. **Story hardening** — `/design grill` interviews and sharpens each story, run once per story.
 6. **Ticket cut** — `/design tickets` proposes implementation slices from a spec and creates GitHub sub-issues after approval.
 
@@ -46,7 +46,7 @@ swimlane-beta TB
   end
 
   subgraph complex [Complex path - CMPLX]
-    toZdesign[2b.1 - draft-artifact design<br/>synthesize or merge feature design]
+    toZdesign[2b.1 - design hld<br/>synthesize or merge feature design]
     design[(2b.2 - Feature design)]
     toStories[2b.3 - factory-mode stories<br/>assemble design into stories]
     cmplxArchitect[2b.4 - design architect<br/>for each story]
@@ -72,14 +72,14 @@ swimlane-beta TB
 
 ### Design and story breakdown
 
-Resolves unknowns with `/design wayfinder` (work too big for one session) or `/design grill` (one session), synthesizes the feature design with `/draft-artifact design`, then breaks the design into User stories with `/factory-mode stories`.
+Resolves unknowns with `/design wayfinder` (work too big for one session) or `/design grill` (one session), synthesizes the feature design with `/design hld`, then breaks the design into User stories with `/factory-mode stories`.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: wf-design-to-stories-swimlane
 swimlane-beta TB
   accTitle: Design and story breakdown responsibility
-  accDescr: Shows unknowns resolved by /design wayfinder or /design grill, a feature design synthesized by draft-artifact design, and the design broken down into User stories by the factory-mode Stories playbook.
+  accDescr: Shows unknowns resolved by /design wayfinder or /design grill, a feature design synthesized by design hld, and the design broken down into User stories by the factory-mode Stories playbook.
 
   subgraph discovery [Discovery]
     idea([Idea])
@@ -89,7 +89,7 @@ swimlane-beta TB
   end
 
   subgraph design [Design]
-    toZdesign[2 - draft-artifact design<br/>synthesize or merge feature design]
+    toZdesign[2 - design hld<br/>synthesize or merge feature design]
     designDoc[(3 - Feature design)]
   end
 
@@ -186,7 +186,8 @@ swimlane-beta TB
 | --- | --- |
 | Architecture, behavior, or code diagrams | `/doc-diagram <diagram type>` with optional current or delta mode |
 | Initialize docs | `/doc-architecture route: initialize` |
-| Story, bug report, feature handover, or feature design | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi`, `/draft-artifact design` |
+| Story, bug report, or feature handover | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi` |
+| High-level feature design | `/design hld` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
 | Deepen a task prompt or restate intent | `/writing-style sharpen` |
 
