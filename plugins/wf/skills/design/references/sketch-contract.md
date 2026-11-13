@@ -1,6 +1,6 @@
 # Code-sketch contract
 
-Canonical code-shape instructions for both `design sketch` and every `design architect` Arena candidate. The candidate runner and standalone route MUST use this same procedure, not copy its discipline into another prompt.
+Canonical code-shape instructions for `design sketch`, each Deep Module option, Wayfinder and every Architect Arena candidate. The candidate runner and standalone route MUST use this same procedure, not copy its discipline into another prompt.
 
 ## Output contract
 
@@ -9,6 +9,7 @@ Canonical code-shape instructions for both `design sketch` and every `design arc
 - Small changes use one source file; larger ones use a file per module or concern. `module-map.md` names each new, modified, or deleted real repo-relative target path, mapped to its sketch file, responsibility, owned state, and public surface.
 - Every public type/function has a doc comment describing intent and invariants. Bodies raise the language's idiomatic `not implemented` error. Pseudocode comments describe tricky logic only; no working production code.
 - Use [Rationale template](rationale.template.md) for `rationale.md`: problem, usage, shape, tradeoffs, whole-shape alternatives, open questions, next step. The Architect Arena synthesis additionally records its synthesis decision; standalone and candidate outputs omit that section.
+- Deep Module candidates each require their own Markdown `rationale.md`, not one shared explanation. Use proposed trade-offs and recommendation reasons until the user selects; do not assert acceptance.
 - Screen every sketch using [Design red flags](red-flags.md), revising hits or recording unresolved ones. In a multi-candidate Arena screen each candidate before synthesis.
 
 ## Discipline

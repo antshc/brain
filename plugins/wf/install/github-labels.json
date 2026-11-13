@@ -37,7 +37,7 @@
   {
     "name": "wayfinder:task",
     "color": "d93f0b",
-    "description": "Manual-work decision ticket"
+    "description": "Prerequisite or code-sketch work ticket"
   },
   {
     "name": "wayfinder:contract-design",

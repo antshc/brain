@@ -189,16 +189,15 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <details>
 <summary>Open Questions</summary>
 
-<!-- Record material risks here as Risk — trigger, failure and impact; no separate Risks section. For each risk Answer include mitigation, selected Prove/Challenge this strategy and reason, actual verification method, revision/environment, expected/observed result, independent rerun, appendix evidence link and residual risk or exact reason unproved/next step. Planned checks and no counterexample found are not proof of mitigation. Fill every Answer with a supported answer or precise reason unanswered, missing prerequisite and next step/decision owner. Retain answered questions with supported answers. Mark incomplete answers Partial, conflicts Conflict, and missing evidence or choices Pending; extend questions as findings reveal gaps. Answered rows alone do not imply draft status. -->
+<!-- User-owned presentation questions. Leave empty on creation; preserve user entries verbatim on updates, including unanswered cells. Store agent unknowns/risks in Wayfinder root Not yet specified, never here. -->
 
-| **Question** | **Answer**  |
+| **Question** | **Answer** |
 | --- | --- |
-| {{unresolvedDecisionOrConflict}} | {{answerOrSpecificBlockerAndNextStep}} |
 
 </details>
 
 # Detailed Design
-<!-- Repeat the complete artifact block below once per independently reviewable implementation artifact, ordered by GUI/visual artifact, contract delta, low-level diagram, prototype finding, then research summary. Preserve source order within a type unless an existing design has a stable order. Remove this instruction and all child blocks when no artifacts apply. Supported content is a supplied GUI mockup, screenshot, or other visual; an API, GUI, database, resource, or other contract delta; an opt-in Class Diagram or implementation-level Sequence Diagram; an evidence-triggered Deployment View Delta; existing prototype findings; or an existing research summary. Embed repository images with useful alt text and repository-relative paths; link supplied non-image or external visuals. Contract and diagram producer skills own their complete artifact-specific output. Prototype content states the question, observed facts, resulting decision, and only the smallest decision-bearing code or configuration snippet, and points to its Appendix B entry. Research content states terse findings and consequences and points to its Appendix A entry, which owns the canonical research Markdown link without copying its primary-source links. Remove the Artifact line when the block has no link. -->
+<!-- Repeat the complete artifact block below once per independently reviewable implementation artifact, ordered by GUI/visual artifact, contract delta, low-level diagram, prototype finding, then research summary. Preserve source order within a type unless an existing design has a stable order. Remove this instruction and all child blocks when no artifacts apply. Supported content is a supplied GUI mockup, screenshot, or other visual; an API, GUI, database, resource, or other contract delta; an opt-in Class Diagram or implementation-level Sequence Diagram; an evidence-triggered Deployment View Delta; existing prototype findings; or an existing research summary. Embed repository images with useful alt text and repository-relative paths; link supplied non-image or external visuals. Contract and diagram producer skills own their complete artifact-specific output. Prototype/research content states only supported design consequences; reports, proof logs and retained sketch packages stay local and indexed by root/child issues. No artifact appendix, report/package inventory or duplicated full evidence in the design. Omit local evidence links from reader-facing prose; ignored Source Material retains provenance. Remove the Artifact line when the block has no link. -->
 
 ## {{artifactTitle}}
 
@@ -212,18 +211,6 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 {{artifactSpecificContent}}
 
 </details>
-
-# Appendix A: Research
-
-<!-- One entry per consumed research report: title, contribution, relative report link. Use None when empty. Confluence publishing substitutes verified research child-page links in a publication copy. -->
-
-{{researchIndex|None, or one bullet per canonical report}}
-
-# Appendix B: Prototypes and Code Sketches
-
-<!-- One entry per consumed proof report or retained sketch: purpose, scoped conclusion, relative report and code/package links. Use None when empty; a report without code needs no invented sketch. Confluence publishing substitutes verified attachments in a publication copy. -->
-
-{{prototypeAndSketchIndex|None, or one bullet per canonical artifact}}
 
 # Checklists
 

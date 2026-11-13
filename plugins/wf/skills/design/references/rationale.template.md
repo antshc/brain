@@ -17,6 +17,7 @@
 
 <!-- @: Architect Arena synthesis only: insert "## Synthesis decision" here with base candidate, adopted grafts, rejected ideas and run details. Omit in standalone Sketch and Arena candidate rationale. -->
 
+<!-- @: Unselected Deep Module option: render heading Tradeoffs proposed; do not assert user acceptance. -->
 ## Tradeoffs accepted
 
 - {{tradeoff|"we accept X in exchange for Y." Name anything a future reader might mistake for an oversight, including apparent premature optimization or premature simplification.}}
@@ -24,6 +25,7 @@
 ## Alternatives considered
 <!-- @: Required. At least one concrete alternative shape. Judge each on interface depth, not implementation simplicity alone. -->
 
+<!-- @: Candidate rejection reasons are recommendations, not user decisions; record actual user choice only after selection. -->
 - {{alternative|Whole-shape alternative, the complexity it exposes to callers and hides, one line on why it lost. When constraints forced the answer, write "this was the only viable shape because ...". No flavors of the same shape.}}
 
 ## Contracts touched

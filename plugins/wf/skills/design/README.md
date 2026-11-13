@@ -56,53 +56,138 @@ flowchart TD
 
 Sketch and Tickets are optional. Ticket publication follows approval of the breakdown. Implement receives the spec URL, with its tickets when created.
 
-### Living HLD
+### Alternating loop
+
+Wayfinder charts the path from uncertain idea to supported HLD. Every Grill answer or helper result can reveal more unknowns; control returns to Wayfinder to select useful technical investigation or the next human choice.
 
 ```mermaid
 %% diagram-id: design-wayfinder-to-confluence-flow
 flowchart TD
     start(["Living HLD"])
-    wayfinder[["1 - /design wayfinder"]]
-    evidence[["2 - Autonomous Research and Prove"]]
-    hld["3 - Merge evidence locally and update HLD"]
-    questions{"4 - More ready technical questions?"}
-    repeat(["Next iteration - back to step 2"])
-    publish[["5 - /design publish-hld"]]
-    finish(["Confluence HLD, research subpages and sketch attachments"])
+    setup["1 - Establish destination, scope and HLD"]
+    grill[["2 - Human decisions through Grill"]]
+    fog["3 - Update root Not yet specified fog"]
+    helpers[["4 - Fog solving"]]
+    sync["5 - Reconcile progress and supported HLD conclusions"]
+    next{"6 - Next ready work?"}
+    technical(["Next iteration - back to step 4"])
+    human(["Next iteration - back to step 2"])
+    blocked(["Pause with blocker and next action"])
+    ready["6d.1 - Report design readiness"]
+    publish[["6d.2 - Publish HLD page only"]]
+    finish(["Confluence HLD"])
 
-    start --> wayfinder --> evidence --> hld --> questions
-    questions -. "No; user requests publication" .-> publish
+    start --> setup --> grill --> fog --> helpers --> sync --> next
+    next -- "Technical unknown" --> technical
+    next -- "Human choice" --> human
+    next -- "Prerequisite missing" --> blocked
+    next -- "Scope covered" --> ready
+    ready -. "User requests publication" .-> publish
     publish --> finish
-    questions -- "Yes" --> repeat
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-Dotted arrows are user-requested handoffs; solid arrows show work within the selected route or decision branch. The loop connector resumes autonomous evidence work without an upward edge.
+Solid edges are work within Wayfinder; dotted edges require a separately requested handoff. Repeat connectors resume the numbered step. User answers are explicit; only the user ends Grill. Source sketch candidates do not enter the HLD before Contract design Choice.
 
-For Architecture first, explicitly request a **design-only handoff** from Architect; otherwise it implements by default. Pass the accepted sketch/rationale to Spec, then the published spec URL to Implement. Each handoff follows the requested route; the diagrams do not run the whole chain automatically.
+### Fog solving
 
-Wayfinder automatically dispatches ready in-scope Research/Prove work, merges verified artifacts locally, updates `docs/ongoing/<initiative-slug>.md`, and repeats as new questions emerge. Human choices remain interactive; risk verification may select Challenge this. Confluence publication requires an explicit `/design publish-hld` request; discovery performs no push or PR creation.
+```mermaid
+%% diagram-id: design-wayfinder-fog-solving-flow
+flowchart TD
+    start(["Fog solving"])
+    read["1 - Read unknowns, risks and linked issue progress"]
+    select["2 - Select cheapest sufficient helper and bounded question"]
+    work["3 - Link concrete work or root-owned verification run"]
+    spawn[["4 - Spawn general-purpose helper directly"]]
+    verify["5 - Verify findings, artifacts and coverage"]
+    outcome{"6 - Resolution criteria met?"}
+    clear["6a.1 - Record outcome in Decisions so far"]
+    update["6a.2 - Update supported HLD conclusions"]
+    remain["6b.1 - Refine fog, next action and owner"]
+    repeat(["Next iteration - back to step 2"])
+    finish(["Return to Wayfinder"])
 
-## Wayfinder: purpose and helpers
+    start --> read --> select --> work --> spawn --> verify --> outcome
+    outcome -- "Yes" --> clear --> update --> finish
+    outcome -- "No or new unknowns" --> remain --> repeat
 
-**Purpose:** Build a navigable path from an uncertain idea to a decision-ready, evidence-backed high-level design. Wayfinder maps known questions, dependencies, risks and emerging unknowns; selects the next useful investigation; and keeps one living HLD in `docs/ongoing/` aligned with verified findings and human decisions. It does not assume the full path is known upfront.
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
 
-**Helpers and their intent**
+Research clarifies facts, Prove checks a claim, Challenge this seeks reproduced failures, Deep Module/Code Sketch expose interface and code shapes, and Grill settles human choices. These are alternatives and follow-ups, not a mandatory sequence. Challenge this may target the whole HLD; record it on the existing issue/root, never its own tracking ticket. A bounded passing check clears only its supported claim; residual risks remain in fog.
 
-| Helper | Use when | Intended contribution |
+### Contract design
+
+```mermaid
+%% diagram-id: design-wayfinder-contract-choice-flow
+flowchart TD
+    start(["Contract design"])
+    options[["1 - Deep Module through Code Sketch"]]
+    retain["2 - Retain 3+ options and individual rationales in worktree"]
+    present["3 - Present sketches, comparison and recommendation"]
+    choice{"4 - User selects option or agreed hybrid?"}
+    wait(["Await user; retain worktree, no merge"])
+    payload["4a.1 - Prepare selected package and considered-option notes"]
+    merge["4a.2 - Verify and merge selected-only result locally"]
+    sync["4a.3 - Synchronize HLD and root; close ticket"]
+    finish(["Return to Wayfinder"])
+
+    start --> options --> retain --> present --> choice
+    choice -- "Selected" --> payload --> merge --> sync --> finish
+    choice -- "Pending" --> wait
+
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
+Contract design keeps its `wayfinder:contract-design` ticket across AFK Options and HITL Choice. Each option contains `sketch/`, `module-map.md` and its own Markdown `rationale.md`; `comparison.md` compares, never replaces, those rationales. Merge after user selection only: chosen source sketches/rationale plus notes describing considered alternatives and rejection reasons. Rejected source trees stay out of incoming integration history. Code Sketch Tasks retain their ordinary local artifact integration flow.
+
+## Key decisions
+
+| Decision | Purpose |
+| --- | --- |
+| Alternate human decisions and autonomous helpers | Answers and findings can reveal more work; Wayfinder keeps control |
+| Root Not yet specified is the fog of war | One home for unknowns/risks, coarse or precise, until resolved |
+| Child issues track concrete work | Progress, claims and dependencies stay distinct from design uncertainty |
+| Keep Contract design Options → Choice | Agent prepares options; user selects; only then merge chosen artifacts and considered-option notes |
+| Challenge this is embedded | Verify scoped design or whole HLD without another tracking-ticket type |
+| Direct general-purpose subagents | Random latest supported Opus/Sol, medium thinking; no Subagents skill |
+| Git skill owns conditional worktrees | Isolate source sketches/mutating proofs; Wayfinder owns commits and serialized local integration |
+| HLD contains supported conclusions | Open Questions belong to users during presentation; reports/sketches remain local |
+| Explicit HLD-page-only publication | No evidence appendices, research subpages or report/sketch attachments |
+
+## Responsibilities and handoffs
+
+All delegated helpers use skill-capable general-purpose subagents; these rows describe responsibilities, not worker types.
+
+| Owner/helper | Responsibility | Returns to Wayfinder |
 | --- | --- | --- |
-| [Grill](playbooks/grill.md) | Requirements, priorities, trade-offs or acceptance need human judgment | Interview the user; surface assumptions and record explicit decisions and remaining questions |
-| [Research](../research/SKILL.md) | The answer depends on existing code, system behavior, history, cloud services or external facts | Gather primary-source evidence and citations; narrow factual unknowns before choosing a design |
-| [Challenge this](../challenge-this/SKILL.md) | A proposed design or mitigation may hide failure modes or interacting risks | Adversarially search for blind spots; keep only reproducible counterexamples, not speculative findings or fixes |
-| [Prove](../prove/SKILL.md) | One technical claim, integration behavior or mitigation can be tested | Run the smallest meaningful check; return reproducible confirmed, refuted or inconclusive evidence within stated limits |
-| [Deep module](playbooks/deep-module.md) | A new or changed contract, interface, inheritance shape or module seam needs a decision | Compare 3+ substantially different interface options and recommend a seam; the user selects the contract |
-| [Code sketch](playbooks/sketch.md) | A proposed architecture needs concrete usage and type shapes before implementation | Illustrate caller usage, signatures, boundaries and module mapping in non-production source sketches |
-| [Architect](playbooks/architect.md) | Broader code architecture or multiple structural candidates need exploration | Ground and compare architectural shapes, then synthesize an accepted sketch; request **design-only handoff** to avoid its default implementation |
+| User | Scope, requirements, preferences, contract choice, residual-risk acceptance and publish request | Explicit decisions |
+| Wayfinder | Fog, scheduling, claims, dispatch, human relay, verification, commits/local integration and HLD synchronization | Next investigation, human choice, readiness or precise blocker |
+| Grill | One human decision at a time, session ledger and closing sweep | Actual user answers and new unknowns |
+| Research | Facts from code, cloud, history and primary sources | Cited findings and limits |
+| Prove | Smallest meaningful check of one claim | Reproducible confirmed/refuted/inconclusive evidence |
+| Challenge this | Reproduced counterexamples, no fixes or own tracking issue | Findings, tested coverage and gaps |
+| Deep Module | Compare 3+ interface options through Code Sketch | Option packages, rationales and recommendation for human Choice |
+| Code Sketch | Usage-first code shapes, module map and individual rationale | Source sketch package, no implementation |
+| HLD authoring | Synthesize supported design conclusions, preserve user presentation questions | Updated design and remaining root gaps |
+| Git skill | Verified branches, worktrees, selected-result integration and cleanup | Paths/refs/SHAs or recovery blocker |
+| HLD publisher | Explicit Confluence HLD-page create/update | Verified page URL; evidence remains local |
 
-**How Wayfinder uses them:** It automatically dispatches ready, in-scope factual Research and Prove work, chooses Challenge this for adversarial material-risk verification, and prepares Deep Module options for contract decisions. Grill obtains human decisions; contract selection, subjective trade-offs and scope changes never happen autonomously. Code Sketch and Architect are optional, explicitly requested design aids—not automatic Wayfinder ticket types. Architect's design-only handoff keeps discovery separate from production implementation.
+## Where state lives
 
-Every verified result updates the HLD and its source-linked appendices; unresolved or partially verified risks remain in Open Questions with the mitigation, verification method, outcome and residual uncertainty. Research and proof artifacts merge **locally** into the Wayfinder integration branch. No automatic push, PR or Confluence publication. Use `/design publish-hld` explicitly to publish.
+| Location | Records |
+| --- | --- |
+| Root Not yet specified | Stable unknown/risk IDs, state, resolution criteria, linked work, evidence/limits, next action and owner |
+| Child issues | Concrete progress, blockers, claims, worker/model, result/worktree/commit identities and resolution comments |
+| Root Decisions so far | Supported resolved outcomes; clear active fog only after recording the outcome |
+| Local `docs/research/` and `docs/prototype/` | Research/proof evidence, chosen sketch packages and considered-option notes |
+| HLD `docs/ongoing/<initiative-slug>.md` | Supported current design and ignored local provenance; no evidence appendices |
+| HLD Open Questions | User-filled presentation questions; agents preserve entries and blank answers |
+
+For each helper spawn, randomly choose Opus or Sol with equal probability, resolve the latest host-supported model and use medium thinking. Current repository names: `claude-opus-5.5`, `gpt-6.1-sol`; verify availability at execution. Forward the [Wayfinder direct-spawn policy](playbooks/wayfinder.md#helper-dispatch) to nested helpers without loading the Subagents skill. Read-only work may reuse a pinned checkout; source sketches/mutations use Git-skill worktrees. Producers do not commit/push; Wayfinder integrates locally, with Contract design deferred until Choice.
+
+Discovery creates no push/PR or publication. Explicit `/design publish-hld` publishes the HLD page only; reports, proof artifacts and sketch packages remain local, without appendices, subpages or artifact attachments. Existing remote artifacts are not automatically deleted. Architect is outside Wayfinder; Architecture first remains a separate flow. For that flow, request a **design-only handoff** explicitly; Architect otherwise implements by default.
 
 ## Routes
 
@@ -116,7 +201,7 @@ Every verified result updates the HLD and its source-linked appendices; unresolv
 | `/design hld` | `hld` | Authoritative high-level feature design, synthesized or merged in `docs/ongoing/` |
 | `/design grill` / `/design spec` / `/design tickets` | Corresponding route | Decisions, spec or approved ticket breakdown |
 | `/design wayfinder` | `wayfinder` | Living HLD and local evidence merges into its integration branch; no push or PR |
-| `/design publish-hld` | `publish-hld` | Confluence HLD, research child pages, prototype and sketch attachments |
+| `/design publish-hld` | `publish-hld` | Confluence HLD page only; evidence remains local |
 | `/design review` | `review` | Design-gap assessment |
 
 Architect accepts `arena-agents=1|2|3` (default 1); Challenge this accepts `adversaries=1|2|3` (default 1). `checkpoint` requires explicit request. Explicit design-only handoff stops before implementation and returns the accepted `synthesis/` package to `design spec`.
@@ -127,4 +212,4 @@ See [Skill router](SKILL.md) and [Architect playbook](playbooks/architect.md). `
 
 Use `/prove <claim>` for empirical evidence and `/challenge-this <scope>` for reproduced adversarial findings. Architect invokes these standalone skills as needed.
 
-Record design risks in Open Questions. Select Prove for a specific claim or Challenge this for adversarial blind spots; each Answer records mitigation, actual verification method/result, evidence and residual risk or reason unproved.
+Record unknowns and risks in root Not yet specified. Select Prove for a claim or embedded Challenge this for blind spots; record actual method/result, mitigation evidence and residual risk/next action there. Preserve HLD Open Questions for users during presentation.
