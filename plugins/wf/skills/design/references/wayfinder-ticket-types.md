@@ -15,13 +15,13 @@ Use this to choose the right Wayfinder ticket type.
 
 - One ticket = one clear question.
 - Default to **Grilling** for decisions.
-- **Research** = learn facts.
-- **Experiment** = try something.
+- **Research** = learn facts; automatically dispatch ready in-scope codebase/cloud/web/rationale questions.
+- **Experiment** = prove a factual claim automatically; human preference or acceptance remains HITL.
 - **Task** = unblock a decision, not build the solution.
 - **Contract design** = new contract, inheritance abstraction, or significant contract change; options first, human picks later.
 - If the question is unclear, keep it under **Not yet specified**.
 - After each resolved ticket, reconsider the remaining map.
-- Wayfinder ends with decisions; implementation comes afterward unless the map explicitly overrides that rule.
+- Wayfinder maintains a living spec/HLD as decisions and evidence arrive; implementation comes afterward only with separate user authorization.
 
 **Quick test:** What exactly is preventing us from making this decision?
 
