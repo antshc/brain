@@ -4,13 +4,81 @@ One discoverable entry point for code architecture, standalone code sketches, de
 
 ## Flows
 
-| Flow | Sequence | Handoff |
-| --- | --- | --- |
-| Architecture first | `/design architect` → `/design spec` → `/implement` | Accepted architecture sketch → published spec → implementation and draft PR |
-| Interview first | `/design grill` → optional `/design sketch` → `/design spec` → `/implement` | Resolved decisions, optionally a code sketch → published spec → implementation and draft PR |
-| Living HLD | `/design wayfinder` → autonomous Research and Prove → record findings in HLD → `/design publish-hld` | Living HLD → Confluence HLD, research child pages and prototype/sketch attachments |
+### Architecture first
 
-For Architecture first, explicitly request a **design-only handoff** from Architect; otherwise it implements by default. Pass the accepted sketch/rationale to Spec, then the published spec URL to Implement. Each handoff follows the requested route; this table does not run the whole chain automatically.
+```mermaid
+%% diagram-id: design-architecture-to-implementation-flow
+flowchart TD
+    start(["Architecture first"])
+    architect[["1 - /design architect"]]
+    spec[["2 - /design spec"]]
+    implement[["3 - /implement"]]
+    finish(["Implementation and draft PR"])
+
+    start --> architect
+    architect -. "User requests spec from accepted sketch" .-> spec
+    spec -. "User requests implementation from spec URL" .-> implement
+    implement --> finish
+
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
+### Interview first
+
+```mermaid
+%% diagram-id: design-interview-to-implementation-flow
+flowchart TD
+    start(["Interview first"])
+    grill[["1 - /design grill"]]
+    sketchChoice{"2 - Code sketch needed?"}
+    sketch[["2a.1 - /design sketch"]]
+    spec[["3 - /design spec"]]
+    ticketChoice{"4 - Create tickets first?"}
+    tickets[["4a.1 - /design tickets"]]
+    implement[["5 - /implement"]]
+    finish(["Implementation and draft PR"])
+
+    start --> grill
+    grill -. "User chooses next route" .-> sketchChoice
+    sketchChoice -. "Yes; user requests sketch" .-> sketch
+    sketch -. "User requests spec from accepted sketch" .-> spec
+    spec -. "User chooses implementation handoff" .-> ticketChoice
+    ticketChoice -. "Yes; user requests tickets" .-> tickets
+    tickets -. "User requests implementation" .-> implement
+    implement --> finish
+    sketchChoice -. "No; user requests spec from decisions" .-> spec
+    ticketChoice -. "No; user requests implementation" .-> implement
+
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
+Sketch and Tickets are optional. Ticket publication follows approval of the breakdown. Implement receives the spec URL, with its tickets when created.
+
+### Living HLD
+
+```mermaid
+%% diagram-id: design-wayfinder-to-confluence-flow
+flowchart TD
+    start(["Living HLD"])
+    wayfinder[["1 - /design wayfinder"]]
+    evidence[["2 - Autonomous Research and Prove"]]
+    hld["3 - Merge evidence locally and update HLD"]
+    questions{"4 - More ready technical questions?"}
+    repeat(["Next iteration - back to step 2"])
+    publish[["5 - /design publish-hld"]]
+    finish(["Confluence HLD, research subpages and sketch attachments"])
+
+    start --> wayfinder --> evidence --> hld --> questions
+    questions -. "No; user requests publication" .-> publish
+    publish --> finish
+    questions -- "Yes" --> repeat
+
+    classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+```
+
+Dotted arrows are user-requested handoffs; solid arrows show work within the selected route or decision branch. The loop connector resumes autonomous evidence work without an upward edge.
+
+For Architecture first, explicitly request a **design-only handoff** from Architect; otherwise it implements by default. Pass the accepted sketch/rationale to Spec, then the published spec URL to Implement. Each handoff follows the requested route; the diagrams do not run the whole chain automatically.
 
 Wayfinder automatically dispatches ready in-scope Research/Prove work, merges verified artifacts locally, updates `docs/ongoing/<initiative-slug>.md`, and repeats as new questions emerge. Human choices remain interactive; risk verification may select Challenge this. Confluence publication requires an explicit `/design publish-hld` request; discovery performs no push or PR creation.
 
