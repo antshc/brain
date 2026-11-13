@@ -189,7 +189,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <details>
 <summary>Open Questions</summary>
 
-<!-- Fill every Answer with a supported answer or precise reason unanswered, missing prerequisite and next step/decision owner. Retain answered questions with supported answers. Mark incomplete answers Partial, conflicts Conflict, and missing evidence or choices Pending; extend questions as findings reveal gaps. Answered rows alone do not imply draft status. -->
+<!-- Record material risks here as Risk — trigger, failure and impact; no separate Risks section. For each risk Answer include mitigation, selected Prove/Challenge this strategy and reason, actual verification method, revision/environment, expected/observed result, independent rerun, appendix evidence link and residual risk or exact reason unproved/next step. Planned checks and no counterexample found are not proof of mitigation. Fill every Answer with a supported answer or precise reason unanswered, missing prerequisite and next step/decision owner. Retain answered questions with supported answers. Mark incomplete answers Partial, conflicts Conflict, and missing evidence or choices Pending; extend questions as findings reveal gaps. Answered rows alone do not imply draft status. -->
 
 | **Question** | **Answer**  |
 | --- | --- |

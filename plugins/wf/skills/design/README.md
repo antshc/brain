@@ -22,3 +22,5 @@ Both `sketch` and `architect` use [one code-sketch contract](references/sketch-c
 See [Skill router](SKILL.md) and [Architect playbook](playbooks/architect.md). `design hld` owns of authoritative feature-design documents.
 
 Use `/prove <claim>` for empirical evidence and `/challenge-this <scope>` for reproduced adversarial findings. Architect invokes these standalone skills as needed.
+
+Record design risks in Open Questions. Select Prove for a specific claim or Challenge this for adversarial blind spots; each Answer records mitigation, actual verification method/result, evidence and residual risk or reason unproved.

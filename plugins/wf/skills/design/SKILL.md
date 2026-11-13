@@ -37,6 +37,7 @@ Read triggered resources fully before use; resolve from this skill directory.
 | Wayfinder ticket classification | [Ticket types](references/wayfinder-ticket-types.md) |
 | Wayfinder creation/update; HLD evolving draft | [Living document](references/living-document.md) |
 | Publish HLD sketch packaging | [Sketch packager](scripts/package_sketch.py); execute with `--help` from this skill directory |
+| HLD or Wayfinder material risks | [Risk verification](references/risk-verification.md); select Prove or Challenge this before final synthesis or through the existing Wayfinder queue |
 | HLD synthesis, including Wayfinder HLD | [Design template](templates/design-template.md), [Decision bullets](references/decision-bullet.md) |
 | Grill session state | [Session ledger](references/track-ledger.md) |
 | Grill verification-scope trigger | [Verification](references/tactics-verification.md) |
