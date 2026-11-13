@@ -1,4 +1,4 @@
-# Design Output Template
+# High-level Design (HLD) Output Template
 
 Instantiate this template at `docs/designs/{{initiativeSlug}}.md`. Remove every hidden instruction from the populated document.
 

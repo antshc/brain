@@ -1,4 +1,4 @@
-# Feature design
+# High-level design (HLD)
 
 ## Contents
 
@@ -18,7 +18,7 @@ Use the current conversation context and codebase understanding to create or upd
 - An **Initiative slug** is the Initiative's stable, filesystem-safe kebab-case identifier.
 - A **Requirement set** groups one Stakeholder requirement with its Functional requirements, Business rules, Edge cases, and Acceptance criteria.
 - A **Spec** packages one or more Requirement sets for planning and handoff.
-- A **Feature design** is the authoritative solution design for one Initiative and may cover multiple Capabilities, Features, and Functional slices.
+- A **High-level design (HLD)** is the authoritative solution design for one Initiative and may cover multiple Capabilities, Features, and Functional slices.
 - A **Functional slice** is an end-to-end implementation of one distinct behavior or outcome, bounded by functional responsibility, owned by one Deployable, and independently testable through observable inputs and outputs. Cross-deployable flows connect Functional slices through their contracts.
 
 ## 1. Resolve inputs

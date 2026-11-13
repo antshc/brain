@@ -155,7 +155,7 @@ Re-check each tactic's trigger after every user answer or new fact. A later answ
 
 When the user asks to close, confirms closure, or requests implementation, load [closing-sweep.md](../references/closing-sweep.md). Complete its reconciliation, repairs, and trigger refinement before handoff. If the user resumes questioning, persist outstanding work and return to the interview.
 
-After the sweep, pass the saved context to the [Spec playbook](./spec.md) for a requested spec handoff. For a requested authoritative feature design, *Load and follow the `draft-artifact` skill to draft a feature design document* in `design` mode with the saved context. If a handoff was requested and its output is unclear, return the saved context and ask which output the user wants.
+After the sweep, pass the saved context to the [Spec playbook](./spec.md) for a requested spec handoff. For a requested authoritative feature design, *Load and follow the `design` skill to produce a high-level feature design* in `hld` route with the saved context. If a handoff was requested and its output is unclear, return the saved context and ask which output the user wants.
 
 ## Completion criteria
 
