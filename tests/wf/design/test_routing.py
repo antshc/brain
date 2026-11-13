@@ -11,7 +11,7 @@ def test_design_is_the_only_entry_point_for_its_routes():
     assert router.split("---", 2)[1].startswith("\nname: design\n")
     assert "disable-model-invocation: true" not in router
     assert list(DESIGN.rglob("SKILL.md")) == [DESIGN / "SKILL.md"]
-    for mode in ("architect", "sketch", "deep-module", "grill", "spec", "tickets", "wayfinder", "review"):
+    for mode in ("architect", "sketch", "deep-module", "grill", "hld", "spec", "tickets", "wayfinder", "review"):
         assert f"](playbooks/{mode}.md)" in router
         assert not (DESIGN / f"playbooks/{mode}.md").read_text().startswith("---")
     for old_name in ("architect", "grill-design", "to-spec", "to-tickets", "wayfinder", "review-design"):
@@ -49,7 +49,7 @@ def test_spec_accepts_both_design_packages():
 
 def test_all_design_reference_links_resolve():
     for markdown in DESIGN.rglob("*.md"):
-        for target in re.findall(r"\]\((\.\.?/[^)\s]+)\)", markdown.read_text()):
+        for target in re.findall(r"\]\(((?:\.\.?/)?(?:references|playbooks|templates)/[^)\s]+|\.\.?/[^)\s]+)\)", markdown.read_text()):
             relative, _, anchor = target.partition("#")
             path = (markdown.parent / relative).resolve()
             assert path.is_relative_to(DESIGN), (markdown, target)

@@ -2,6 +2,7 @@
 
 ## Contents
 
+- Evolving draft
 - Vocabulary
 - 1. Resolve inputs
 - 2. Ground and rank evidence
@@ -12,6 +13,12 @@
 - Gotchas
 
 Use the current conversation context and codebase understanding to create or update one `docs/designs/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Put unresolved source conflicts in `Open Questions`.
+
+## Evolving draft
+
+Wayfinder may supply `@evolvingDraft=true` with its exact document worktree/path. Read Living document registered in the router. Keep core headings/order and explicitly mark missing evidence/decisions Pending, including required diagrams/deltas not yet supportable; never fabricate them or mark unknown content not applicable. This mode permits a draft commit with named gaps, not readiness. All normal checks apply as evidence arrives and before declaring ready. Synthesis only consumes results; Wayfinder owns new evidence dispatch.
+
+Use Living document reconciliation for Question/Answer rows and provenance. Preserve source-ranked content and existing diagram approval requirements; a blocked update stays a named gap. Outside this mode, ordinary HLD authoring is unchanged.
 
 ## Vocabulary
 
@@ -138,4 +145,4 @@ Maintain `Source Material`:
 - Every touched kind requires a `doc-contracts` result even when the delta is small, additive, or already settled in a spec or design rationale; a spec's Contracts Delta is evidence, not a substitute.
 - GUI changes (dialogs, pages, visible fields) are a contract kind; a new field shown in the UI usually means both an API and a GUI delta.
 
-Write the result. Call it a draft while `Open Questions` is non-empty.
+Write the result. Call it a draft while questions are unresolved/partial/conflicting, core content is pending, or readiness checks are unmet; retained answered rows alone do not imply draft status.

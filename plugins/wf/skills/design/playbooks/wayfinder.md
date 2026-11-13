@@ -1,22 +1,51 @@
 # Wayfinder
 
-A loose idea has arrived, too big for one agent session, and wrapped in fog: the way from here to the destination isn't visible yet. Wayfinding is about finding that way, not charging at the destination. This playbook charts the way as a shared map on the repo's issue tracker, then works its decision tickets (questions whose resolution is a decision, not slices of a build to execute) one at a time until the route is clear.
+Chart a GitHub decision map and maintain one living HLD throughout discovery. Produce decisions, evidence and the document; implementation requires separate authorization. The map schedules questions, tickets hold detailed resolutions, and the document synthesizes current requirements and decisions.
 
-The destination varies per effort, and naming it is the first act of charting: it shapes every ticket. It might be a spec to hand off and iterate on, a decision to lock before planning starts, or a change made in place like a data-structure migration. The map is domain-agnostic: engineering work, course content, whatever fits the shape.
+## Contents
 
-## Plan, don't do
-
-Wayfinder is planning by default: each ticket resolves a decision, and the map is done when the way is clear, with nothing left to decide before someone goes and does the thing. The pull to just do the work is usually the signal you've reached the edge of the map and it's time to hand off. An effort can override this in its Notes, carrying execution into the map itself, but absent that, produce decisions, not deliverables.
+- Refer by name
+- Session and document
+- The Map
+- The map body
+- Tickets
+- Ticket Types
+- Research routing
+- Fog of war
+- Out of scope
+- Tracker operations
+- Invocation
+- Chart the map
+- Automatic runs
+- Work through the map
+- Completion criteria
 
 ## Refer by name
 
 Every map and ticket is an issue, so it has a name — its title. In everything the human reads — narration, the map's Decisions-so-far — refer to it by that name, never by a bare id, number, or slug. A wall of `#42, #43, #44` is illegible; names read at a glance. The id and URL don't vanish — a name wraps its link — but they ride inside the name, never stand in for it.
 
+## Session and document
+
+1. Before interviews or worktree switches, capture absolute harness root, repository, invocation worktree, `@sessionBaseBranch` and its SHA. This is the branch the user started from, not necessarily `main`; every PR targets it. Resolve detached HEAD before branch creation. On resume, use the map's persisted base instead of the caller's current branch. Done when the base and remote are verified.
+2. Use HLD as the only Wayfinder document format; no output-format selection question. Automatically name/create its branch and dedicated owned worktree using **Prepare a document worktree**. Derive the branch summary from the initial request; keep that recorded name if Grill later refines the document slug. Do this before destination/frontier Grill. Done when ownership and branch are recorded outside disposable worktrees.
+3. After destination Grill establishes scope/slug, read the HLD playbook and Living document resource registered in the router. Seed `docs/designs/<initiative-slug>.md` in that worktree using evolving-draft mode. Use **Publish the document** before evidence dispatch. Done when the seed and its one draft PR exist.
+
+Wayfinder owns branch prefixes; *Load and follow the `git` skill to run verified Git mechanics for branch naming, creation and worktree lifecycle* using Branches and Worktrees with the selected prefix and summary. Preserve Git's slug normalization, removed initiative/ticket IDs, worker ordinals, collision authorization and verified resumes. Explicit caller prefixes override its default feat/fix choice; standalone Research/Prove conventions stay unchanged.
+
+| Work | Prefix |
+| --- | --- |
+| Living HLD | `wayfinder/<slug>` |
+| Research ticket | `research/<slug>` |
+| Experiment/verification ticket | `prove/<slug>` |
+| Contract design Options | `wayfinder/<slug>` |
+
+**Synchronize the document** after every research result, Grill session/pause, experiment result/review, Contract design phase, and on resume. Automatically update inside its dedicated worktree without a separate request or confirmation. Read the latest remote document; apply Living document reconciliation and HLD's incremental rules, then **Publish the document**. Preserve existing diagram approval rules; record a blocked diagram update rather than claiming full readiness. Serialize writes, not whole evidence runs. Record last synchronized ticket/result commit and any pending updates on the map. Done when supported consequences appear in all affected sections and the document commit is verified on origin.
+
 ## The Map
 
 The map is a single issue on this repo's GitHub tracker, labelled `wayfinder:map`. Its tickets are native sub-issues of the map — see **Tracker operations** and [Wayfinder operations](../references/github.md#wayfinder-operations) for map, child, blocking, and frontier operations.
 
-The map is an index, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
+The map is a scheduling index: gist decisions and link tickets; synthesize their supported consequences into the living document.
 
 ### The map body
 
@@ -25,14 +54,22 @@ The whole map at low resolution, loaded once per session. Open tickets are not l
 ```markdown
 ## Destination
 
-<what reaching the end of this map looks like — the spec, decision, or change
-this effort is finding its way to. One or two lines; every session orients to it
+<what reaching the end of this map looks like — the outcome and decisions
+this HLD must settle. One or two lines; every session orients to it
 before choosing a ticket.>
 
 ## Notes
 
 <domain; skills every session should consult; standing preferences for this
 effort>
+
+## Document and branches
+
+- Session base: <branch>; starting SHA: <sha>
+- Document: HLD; <path>; <branch link>; <PR link>
+- Worktree: <absolute path>; ownership record: <path outside worktrees>
+- Last synchronized: <ticket/result commit or none>
+- Pending synchronization: <result refs and missing steps or none>
 
 ## Decisions so far
 
@@ -69,7 +106,7 @@ Each ticket is a sub-issue of the map (or of the ticket it's narrower than); its
 <link to the map>
 ```
 
-For research tickets, add `## Research scope` after `## Question` (see Research routing).
+For research tickets, add `## Research scope` after `## Question` (see Research routing). After dispatch, persist a `## Result` section with branch link, pinned base SHA, PR link, exact report paths, question/revision/environment identity and pending work. Keep the answer in the resolution comment.
 
 Each ticket carries a `wayfinder:<type>` label — one of `research`, `experiment`, `grilling`, `task`, `contract-design` (see Ticket Types).
 
@@ -81,13 +118,13 @@ The answer isn't part of the body — it's recorded as a resolution comment on c
 
 ## Ticket Types
 
-Use the [ticket type guide](../references/wayfinder-ticket-types.md) when the distinction is unclear.
+Use the ticket type guide registered in the router when the distinction is unclear.
 
 Every ticket is either HITL — human in the loop, worked with a human who speaks for themselves — or AFK, driven by the agent alone. A HITL ticket only resolves through that live exchange; the agent never stands in for the human's side of it.
 
 - **Research** (AFK): Gather primary-source evidence a decision depends on. *Load and follow the `research` skill to investigate technical questions across source code, docs, and the web and return cited findings* using the ticket's question and scope (see Research routing).
-- **Experiment** (HITL): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to: *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence.* Link the published evidence and any explicitly retained prototype. Use when "does this call/logic behave as expected" is the key question.
-- **Grilling** (HITL): Conversation. The default case. Always use the [Grill playbook](./grill.md) to resolve the Wayfinder grilling ticket through an interview. Resolving one may surface decisions narrower than the question itself — child-scoped to it rather than independent frontier items; ticket those as sub-tickets of the grilling ticket (see Tracker operations) via GitHub's native sub-issue relationship, not a fresh body-text field.
+- **Experiment** (AFK for factual claims; HITL for human judgment): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to: *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence.* Link the published evidence and any explicitly retained prototype. Use when "does this call/logic behave as expected" is the key question. Verified empirical answers resolve automatically; acceptance of a trade-off, preference, or product choice still requires the user.
+- **Grilling** (HITL): Conversation. The default case. Always use the Grill playbook to resolve the Wayfinder grilling ticket through an interview. Resolving one may surface decisions narrower than the question itself — child-scoped to it rather than independent frontier items; ticket those as sub-tickets of the grilling ticket (see Tracker operations) via GitHub's native sub-issue relationship, not a fresh body-text field.
 - **Task** (HITL or AFK): Manual work that must happen before a decision can be made — nothing to decide, prototype, or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that does rather than decides — and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
 - **Contract design** (AFK → HITL): Choosing the shape of a contract from radically different designed options. Use instead of Grilling when the question introduces a new contract or interface, an abstraction built on inheritance (base class, interface hierarchy, polymorphic substitution), or a significant change to an existing contract (breaking signature, invariants, error modes, ordering, or seam placement). Two phases, never collapsed into one:
   1. **Options (AFK)** — when the ticket has no options comment yet. *Load and follow the `design` skill to design architecture by deepening modules and resolving interface decisions; use its `deep-module` route standalone (no sketch, no implementation) to design the deep-module interface with Design It Twice parallel sub-agents, classify dependencies for deepening, and place the seam*, producing 3+ radically different options plus a recommendation. For each option, *Load and follow the `doc-diagram` skill to create a Mermaid class diagram in delta mode to show the Mermaid class diagram of type relationships for contract changes, interfaces, and inheritance*. Write one Markdown options doc where the repo keeps design notes (e.g. `docs/research/<ticket-slug>.md`; match existing convention): per option the interface, delta class diagram, what hides behind the seam, dependency strategy, and trade-offs; then the comparison and recommendation. After **Publish a result** confirms the options on origin, comment the doc link and a one-line gist per option on the ticket (**Comment on ticket**), then **Release a ticket**. The ticket stays open; this phase never resolves it.
@@ -95,20 +132,20 @@ Every ticket is either HITL — human in the loop, worked with a human who speak
 
 ## Research routing
 
-When mapping the frontier or discovering new evidence gaps, consider all four options. Offer the relevant ones to the user and say what each would verify.
+Automatically select the relevant scope for factual gaps. Codebase questions use Research system scope (Explore for pure lookup; How for inspection); cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why (`@mode=why`). Missing external checkouts block system evidence; use Web when public documentation suffices.
 
 | Option | Route | Scope |
 |---|---|---|
 | Web | `web` | Public primary sources, such as specifications and official docs |
 | Cloud | `cloud` | Provider, service, and whether live values matter |
 | Current system | `system` | Repository or deployable being mapped and inspection axis |
-| External system | `system` | Named external repository or deployable and inspection axis. If only public docs are available, offer Web. |
+| External system | `system` | Named external repository or deployable and inspection axis. If only public docs suffice, use Web. |
 
 For a system question, choose `Behavior` for one deployable, `Flow` for handoffs across deployables, `Data` for a data boundary, or `focused` for an isolated call or package API. This axis sets the primary lens. The question sets the depth, with an explicit inspection requesting full coverage.
 
 Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for System), and the part's question when the ticket spans multiple parts. For Cloud, include the provider, service, and need for live values.
 
-For every research dispatch, pass the ticket's Question as `@question`, Research scope as `@researchScope`, and content framing as `@outputShape`. Wayfinder selects an exact report file per part before dispatch: preserve an explicit ticket destination; otherwise use `docs/research/<ticket-slug>.md` for one part or `docs/research/<ticket-slug>-<part-slug>.md` for separate parts. Pass these as `@outputPath` (a question-to-file mapping for multiple reports), with the ticket worktree's absolute repository root as `@outputBase`. Wayfinder owns this convention; Research never chooses filenames. Reject destination conflicts before writing. Omit `@researchScope` for older tickets without it.
+For every research dispatch, pass the ticket's Question as `@question`, Research scope as `@researchScope`, and content framing as `@outputShape`. Wayfinder selects an exact report file per part before dispatch: preserve an explicit ticket destination; otherwise use `docs/research/<ticket-slug>.md` for one part or `docs/research/<ticket-slug>-<part-slug>.md` for separate parts. Pass these as `@outputPath` (a question-to-file mapping for multiple reports), with the ticket worktree's absolute repository root as `@outputBase`. Wayfinder owns this convention; Research never chooses filenames. Reject destination conflicts before writing. For older tickets infer and persist scope before dispatch. For Why pass `@mode=why` instead of a conflicting scope.
 
 ## Fog of war
 
@@ -133,7 +170,7 @@ Ruling something out of scope is a scoping act, not a step on the route. When a 
 
 ## Tracker operations
 
-Load [Wayfinder operations](../references/github.md#wayfinder-operations) and follow its GitHub operations for this tracker repository. Keep GitHub-specific commands in the reference; do not configure another backlog backend.
+Load [Wayfinder operations](../references/github.md#wayfinder-operations) registered in the router and follow its GitHub operations for this tracker repository. Keep GitHub-specific commands in the reference; do not configure another backlog backend.
 
 - **Create the map**: **Create ticket** with label `wayfinder:map` and the map body template above.
 - **Create a ticket**: **Create Wayfinder sub-ticket** with `parentIssueNumber` = the map, label `wayfinder:<type>`, body = Question + Research scope (research only) + Blocked by + Part of.
@@ -141,7 +178,7 @@ Load [Wayfinder operations](../references/github.md#wayfinder-operations) and fo
 - **Claim a ticket**: **Assign ticket**.
 - **Release a ticket**: **Unassign ticket**. Use when a session ends without resolving (contract-design Options phase).
 - **Find the frontier**: **List sub-tickets** of the map, then of every open child recursively; keep open tickets with a `wayfinder:<type>` label, and drop any that's assigned, or whose `Blocked by` section names a still-open ticket.
-- **Resolve a ticket**: **Comment on ticket** with the answer, then **Close ticket**.
+- **Resolve a ticket**: **Synchronize the document**, **Comment on ticket** with the verified answer, then **Close ticket**. Human-choice tickets need the recorded user decision; factual questions need sufficient evidence, not human confirmation.
 - **Read the map / a ticket**: **Read ticket**. **Read a ticket's sub-tickets**: **List sub-tickets**.
 
 **Label not found** (`wayfinder:map`, `wayfinder:research`, `wayfinder:experiment`, `wayfinder:grilling`, `wayfinder:task`, or `wayfinder:contract-design` missing): ask the user to follow the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) in labels-only mode, then retry.
@@ -154,30 +191,33 @@ Supply a loose idea to chart a map, or a map issue number or URL and an optional
 
 ### Chart the map
 
-User invokes with a loose idea.
-
-1. Name the destination. Use the [Grill playbook](./grill.md) to resolve the Wayfinder destination, pinning down what this map is finding its way to — the spec, decision, or change. The destination fixes the scope, so it's settled first.
-2. Map the frontier. Use the [Grill playbook](./grill.md) again to resolve the Wayfinder frontier, breadth-first this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. If this surfaces no fog — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
-3. Create the map (**Create the map** above): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into Not yet specified.
-4. Create the tickets you can specify now (**Create a ticket** above), typing each by the Contract test — then fill in each ticket's `Blocked by` section in a second pass, once every ticket has a number. Everything you can't yet specify stays in the fog — the Not yet specified section.
-5. Run **Automatic runs**. Show the created map and tickets and stop at the confirmation gate.
+1. Complete Session and document setup through branch/worktree creation. Use Grill to name the destination; seed/publish its document and draft PR. Done when the selected document exists before frontier/evidence work.
+2. Use Grill breadth-first to chart open decisions and first ready steps. Synchronize confirmed answers and unknowns. Even a one-session effort retains its document/PR; a map is optional only if no tracked questions remain. Done when scope and unresolved questions are explicit.
+3. Create the map with Destination, Notes, Document and branches, and fog. Link its branch/PR bidirectionally using **Link branches and PRs**. Create currently specifiable tickets, typing each by the Contract test, then add blockers in a second pass. Done when native child links and dependencies are verified.
+4. Run **Automatic runs** without a dispatch confirmation gate. Done when ready factual work is resolved or blocked and the next human decision is presented.
 
 ### Automatic runs
 
-1. Capture the absolute harness root, invocation repository, branch, and worktree before switching directories. Use that branch locally and the same branch name on `origin` throughout the run. If HEAD is detached, ask for the target branch.
-2. After all GitHub tickets and their `Blocked by` sections are written, show the map and name the ready and waiting Research, Experiment, and Contract design runs. State which prerequisite or human decision each waiting run needs. Wait for explicit confirmation before claiming or dispatching automatic work. If confirmation is absent or declined, leave the tickets queued. Confirmation covers the listed tickets, their dependencies, and publication to the named branch on `origin`. Newly added tickets or material changes to the approved scope require fresh confirmation before dispatch.
-3. Re-read the confirmed tickets. Skip published Experiment runs awaiting review and Contract design tickets awaiting Choice. Claim and dispatch independent, open, unclaimed runs in parallel, each in its own temporary branch and worktree based on the invocation branch (see **Prepare a result worktree**). Start dependants only after every blocker is resolved and the named evidence is available. Treat unreadable blockers, missing evidence, and dependency cycles as blocked. Refresh eligibility after each resolution.
-4. Resolve the ticket's exact skill name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. Read its full body, selected route and required resources, then execute in its worktree. Keep the ticket question and GitHub references scoped to that ticket. For Research, use **Research routing**. For Experiment, pass Prove the ticket question as `@question`, linked research/design findings as `@repoFacts`, original harness root and the assigned worktree with Wayfinder-owned cleanup. Select an exact `@outputPath=docs/research/<ticket-slug>.md` (preserve an explicit ticket destination) and worktree repository root as `@outputBase`; this also supplies any Research fallback destination. Retain runnable artifacts through verification and requested human review. If a design blocker supplies the chosen design, wait for the recorded user choice. Run only Options automatically for Contract design. Keep Experiment's human review and Contract design's human choice.
-5. Verify the result and use **Publish a result**. Research reports are saved to the exact destinations Wayfinder supplied in **Research routing**; Wayfinder publishes those files. Contract design publishes its options and diagrams. Experiment publishes a Markdown record of observations, reproducible method, and evidence, or verified findings if it routes to Research. Include disposable experiment code only if explicitly requested. Publish before linking artifacts. Close a ticket only after its resolution is recorded, including human input where required. For a complete Research ticket, record the resolution and update the map as in **Work through the map**. For Experiment, comment with the published evidence and release the ticket for review. For Contract design, follow the Options phase's comment and release instructions. Leave incomplete work open, release the claim, and report the blocker.
+1. On initial creation, every result/session and resume, inspect unresolved document questions, fog and tickets. Reuse sufficient evidence for the same question/revision/environment. Create/reuse a precise ticket for each new in-scope factual gap; leave unphraseable fog un-ticketed. Scope expansion needs a user decision. Done when each sharp question has an owner or blocker.
+2. Classify factual questions via Research routing; empirical claims use Prove with a falsifiable condition and inferred `logic | runtime | integration-local | integration-cloud | ui` option. Product preferences, contract choices and trade-off acceptance stay human; gather their supporting facts automatically. Done when route and deciding observation/input are explicit.
+3. Re-read ready open, unclaimed tickets; claim and dispatch independent Research, Experiment, and Contract design Options runs in parallel via **Prepare a result worktree**. Require every blocker closed and its evidence accessible, even when its PR is unmerged; pass exact branch/SHA/artifact refs. Inaccessible blockers, missing inputs/access/budget, cycles and unavailable required isolation block only dependent work. Observe execution permissions and supplied limits. Done when each eligible ticket runs once or has a named blocker.
+4. Resolve the invoked skill's exact name/current description and render its invocation with 3–6 description keywords; read the full body, selected route and required resources before executing in the assigned worktree. Research uses Research routing. Experiment uses Prove with `@question`, falsifiable criteria, prior findings and original harness root in `@repoFacts`, explicit revision/environment/limits, assigned worktree and Wayfinder-owned cleanup. Select exact `@outputPath=docs/research/<ticket-slug>.md` (preserve an explicit destination), worktree root as `@outputBase`; forward to Research fallback. Run only Options for Contract design. Done when the runner returns verified evidence or an explicit gap.
+5. Verify sources and Prove's independent reproduction, then **Publish a result** and **Synchronize the document**. Research saves exactly Wayfinder's requested paths; experiments publish method, observations and scoped conclusion (confirmed/refuted/inconclusive), or labeled Research findings. Keep disposable code only if requested; retain runnable state through verification and requested human review. Done when evidence and document commits/PRs are verified and linked.
+6. Complete factual answers, including refuted assumptions, resolve the question/ticket and update Decisions so far. Partial/inconclusive results extend the question; do not close it. Human-choice experiments and Contract Options publish facts/options and release the claim, leaving the choice open. On failure release the claim and persist the pending step. Done when ticket status agrees with evidence and human-decision state.
+7. Graduate newly precise fog into typed tickets, preserving child-scoped questions under their parent and recording blockers. Re-evaluate dependants after each result; continue automatically until no eligible work remains. Reuse completed/in-flight question+revision+environment identities. Retry only with changed evidence/prerequisites or a bounded new method; unchanged inconclusive results wait. Done when every remaining question needs human input, prerequisites or a scope change.
 
 ### Work through the map
 
-User invokes with a map (URL or number). A ticket is optional — without one, you pick the next decision, not the user.
+1. Read the map and persisted document/base/branch/PR identities. Verify remote state and resume pending publication/synchronization before selecting new work. Legacy maps lacking these fields require Session and document setup; resolve the original base before creating branches. Done when the canonical worktree/document/PR are recovered, not duplicated.
+2. Run Automatic runs for eligible questions without waiting for a queue request. Then choose the named human ticket or next human frontier ticket; claim it before work. Done when supporting factual gaps are resolved or explicitly blocked.
+3. Use Ticket Types for the human phase: Grill, Contract Choice, or experiment judgment. Synchronize confirmed outcomes even on pause; complete Grill's closing sweep before declaring a session resolved. Done when user decisions are recorded or pending.
+4. Resolve completed tickets, append a context pointer to Decisions so far, and graduate fog into typed tickets with blockers. Re-scope invalidated tickets; out-of-scope closures belong in Out of scope, never Decisions so far. Synchronize and rerun Automatic runs for new in-scope factual questions. Done when the next frontier reflects current evidence.
 
-1. Load the map — the low-res view, not every ticket body.
-2. If the user asks to run the automatic queue, follow **Automatic runs**. When that queue stops, end this invocation. Otherwise choose the named ticket or the first frontier ticket. For Research, Experiment without published evidence, or Contract design Options, use **Automatic runs** scoped to that ticket and its recorded prerequisites, then end this invocation. For human phases, claim the ticket before work.
-3. Resolve the human phase using **Ticket Types**. Read related tickets and their published artifacts as needed. Use the [Grill playbook](./grill.md) for grilling. For Contract design Choice, present the published options and record the user's choice. For Experiment review, present the published observations and collect the user's response before resolution.
-4. Record the resolution (**Resolve a ticket** above); append a context pointer to the map's Decisions-so-far.
-5. Add newly-surfaced tickets, typing each by the Contract test. For each: if it's child-scoped to the ticket just resolved — narrower than that question, not a fresh frontier item — create it as a sub-ticket (**Create a sub-ticket** above, `parentIssueNumber` = the ticket just resolved); otherwise create it as an independent ticket (**Create a ticket** above). Either way, graduate any fog the answer has made specifiable, clearing each graduated patch from Not yet specified so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, rule it out of scope rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
+Expect concurrent tracker edits. Re-read before writes and preserve other sessions' contributions.
 
-When either mode creates newly surfaced tickets, record their dependencies before offering them for confirmation. Expect other sessions to edit the tracker concurrently.
+## Completion criteria
+
+- The HLD reflects every consumed result and confirmed session; partial/conflicting questions remain explicit. Reprocessing the same result creates no duplicate rows, sections, sources, tickets or PRs.
+- One persistent document PR and separate result PRs target the captured session base; branches/PRs link their owning issues. Report blocked publication/synchronization, open choices and remaining prerequisites.
+- Completion of the map or a ticket never merges/closes a PR or enables auto-merge. The user decides each PR's merge/close. A merged/closed PR requires a user-directed continuation, not automatic reopening/replacement.
+- Last, re-read the destination and requested scope; map every obligation to document content, evidence or an explicit remaining blocker. Do not declare the design ready with missing coverage.
