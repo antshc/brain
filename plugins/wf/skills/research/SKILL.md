@@ -1,11 +1,8 @@
 ---
 name: research
 description: >-
-  Investigate technical questions across source code, documentation, packages, and external evidence. Return cited findings. Use for 'research X', 'trace this flow', 'find callers of X', or 'why was X built'. Not for testing one claim → `prove`.
+  Investigate technical questions across source code, docs, packages, and external evidence, or search a Graphify knowledge graph. Return cited findings. Use for 'research X', 'trace this flow', 'find callers of X', 'why was X built', or 'query the graph'. Not for testing one claim → `prove`.
 ---
-
-<!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->
-
 
 # Research
 
@@ -43,6 +40,7 @@ The caller sends this request verbatim directly to a `hunter` subagent. Hunter o
 - `@outputShape` — caller's return shape. Default to Hunter's verdict.
 - `[@outputArtifact]` — the one caller-designated evidence file the run may write; otherwise return inline.
 - `[@inputs]` — caller-supplied inputs `@work` needs.
+- `@research` — absolute base directory of this research skill; the caller always fills it. Hunter resolves Graphify resources from it.
 
 A pure lookup (one literal, symbol, caller lookup, or package API) with no requested document or explicit inspection uses one Explore request. Return Hunter's verdict inline. Explicit inspection and requests for a document take precedence.
 
@@ -51,9 +49,9 @@ A pure lookup (one literal, symbol, caller lookup, or package API) with no reque
 - **MUST** delegate source reading. The coordinator routes, briefs, verifies citations, synthesizes, and delivers. If delegation is unavailable, report the blocker; continue independent work.
 - Send every Explore request and current-system evidence brief to `hunter`. Use read-only `general-purpose` workers for independent Cloud, Web, and Why evidence; preserve Why worker roles.
 - Pass caller `@outputShape` verbatim to Why, Cloud, and Web. For system evidence, include it as report context and use the Explorer's Evidence return as inline `@outputShape`. Preserve the final destination only in coordinator delivery context.
-- **MUST** find the graph covering each codebase target: `graphify-out/` under the launch repository root or the target's main checkout, never inside a git worktree (graphs are gitignored and built from the launch folder). A worktree target uses its main checkout's graph: main checkout = parent of `git -C <worktree> rev-parse --path-format=absolute --git-common-dir`; `<worktree>/<rel>` maps to `<mainCheckout>/<rel>`. When covered, paste the Graphify line verbatim, filling `<root>` with the graph root, into codebase-reading briefs for agents other than Hunter; for a worktree, append the main-checkout→worktree path mapping. Hunter handles Graphify itself.
+- **MUST** find the graph covering each codebase target: `graphify-out/` under the launch repository root or the target's main checkout, never inside a git worktree (graphs are gitignored and built from the launch folder). A worktree target uses its main checkout's graph: main checkout = parent of `git -C <worktree> rev-parse --path-format=absolute --git-common-dir`; `<worktree>/<rel>` maps to `<mainCheckout>/<rel>`. When covered, paste the Graphify line verbatim, filling `<root>` with the graph root and `<research>` with this skill's absolute base directory, into codebase-reading briefs for agents other than Hunter; for a worktree, append the main-checkout→worktree path mapping. Hunter handles Graphify itself.
 
-  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, *Load and follow the `graphify` skill to inspect codebase architecture, file relationships, and knowledge-graph query, path, explain* to orient. Run it from `<root>`. Read-only overrides its write steps. No `skill` tool → run the graphify skill's `scripts/focused_query.py` from `<root>` (`resolve` + `path` for a flow; `terms`, then `query` with 1-2 identifier terms for unknown names); never `graphify query` with question text. Cite source files, not graph nodes; a missing node is never absence evidence.
+  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, read `<research>/how/graphify.md` and `<root>/GRAPHIFY.md` (project rules, when present) in full to orient. Run from `<root>`. Read-only overrides their write steps. Search with `<research>/scripts/focused_query.py` using the interpreter in `graphify-out/.graphify_python`, else `python3` (`resolve` + `path` for a flow; `terms`, then `query` with 1-2 identifier terms for unknown names); never `graphify query` with question text. Cite source files, not graph nodes; a missing node is never absence evidence.
 
 ## Routing
 
@@ -67,6 +65,7 @@ A pure lookup (one literal, symbol, caller lookup, or package API) with no reque
 | Why | `@mode=why` | [Why](why/why.md), [Epistemics](why/epistemics.md), [Investigator prompt](why/investigator-prompt.md), [Synthesizer prompt](why/synthesizer-prompt.md), [Source playbook](why/source-playbook.md) | Rationale, source coverage, confidence |
 | Cloud | Independent AWS/Azure provider question | [Cloud inspection](cloud/cloud-inspection.md), [Cloud template](cloud/cloud-inspection-template.md), selected provider below | Cited constraints and applicability |
 | Web | Other external question | Generic brief below | Primary-source findings |
+| Graphify | Direct graph query, path, or explain request against an existing `graphify-out/`; build, update, or export requests → report the build entry point named in `<root>/GRAPHIFY.md`, never build | [Graphify search](how/graphify.md) | Graph-oriented answer verified against source |
 
 ## Conditional resources
 

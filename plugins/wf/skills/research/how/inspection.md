@@ -10,6 +10,7 @@ Send Explore requests directly to `hunter`; if unavailable, record the blocked e
 - `@shape` and `@depth` — from the lookup table for the assigned angle.
 - `@target` — deployable or repository names as stated.
 - `@outputShape` — the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up.
+- `@research` — this skill's absolute base directory.
 
 | Lookup | `@shape` | `@depth` | `@work` prefix |
 |---|---|---|---|

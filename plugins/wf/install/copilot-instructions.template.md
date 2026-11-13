@@ -7,8 +7,6 @@
 
 When invoking a skill, load and follow its complete `SKILL.md`; read the selected route procedure fully before acting, then required or conditionally triggered resources fully before their dependent steps. Resolve paths from that skill's base directory. Continue truncated reads to EOF; descriptions, summaries and partial reads do not count as loaded. Reuse complete content already available for the same revision; reload after context loss or changes. Apply this to skill-capable workers. Missing content blocks dependent work; report it and continue independent work. Resolve external/generated skills and their current descriptions from the installed roster before rendering a call; never invent missing instructions.
 
-<!-- skill-dependency: graphify; host-provided optional skill, discover its current description in the installed roster and report unavailable dependencies -->
-
 # Copilot Instructions
 
 ## 1. Scope and repository topology
@@ -102,7 +100,7 @@ Semantic results span both workspace roots: discard reporoot hits when the quest
 
 Resolve each selected skill's exact name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. Bind `<task>` to the requested action with 3–6 keywords from the selected installed description. Routing entries render the selected call; never emit the unfilled template.
 
-**Graphify gate (applies to the semantic-search row):** Graphify backs semantic search here, so it is a discovery index — never an authoritative source. Before trusting a graph, run the health preflight and *Load and follow the `graphify` skill to run graph query and health preflight*, selecting the installed workspace guidance for corpus, exclusion and degraded-mode rules. A code-only graph MUST NOT answer board-level architecture questions. Do not rebuild the graph unless the user asked for a build or update.
+**Graphify gate (applies to the semantic-search row):** Graphify backs semantic search here, so it is a discovery index — never an authoritative source. Before trusting a graph, read the reporoot `GRAPHIFY.md` for corpus, exclusion, health preflight and degraded-mode rules, then *Load and follow the `research` skill to search a Graphify knowledge graph, trace this flow, or find callers of X*. A code-only graph MUST NOT answer board-level architecture questions. Do not rebuild the graph unless the user asked for a build or update.
 
 ### Step 4 — Verify, then stop
 
@@ -124,7 +122,7 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 - You MUST create every skill under `.github/skills/<skill-name>/` at the reporoot — never in the user skills directory (`~/.copilot/skills/`) or inside `workspace/`. Each skill is its own folder holding `SKILL.md` plus any `reference/` files it needs.
 - You MUST NOT reference a skill's own files via bare relative markdown links (e.g. `[memory.md](reference/memory.md)`); such links resolve against the runtime CWD (which may be a worktree, not the skill folder) and silently fail to load. Load reference files via the skill's stated absolute base directory instead.
 ### Available skills:
-`preflight-atlassian`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws`, `graphify` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
+`preflight-atlassian`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
 
 ## 8. Tools
 

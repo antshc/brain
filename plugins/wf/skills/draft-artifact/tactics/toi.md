@@ -56,6 +56,7 @@ If `feature` is missing or matches more than one feature, ask the user with the 
    - `@target` := one of: current repository; GUI repository; pipeline definitions; other system components the feature touches (for example Payment gateway, Identity provider); third-party packages owning symbols absent from local source.
    - `@outputShape` := per checklist row: fact, file + symbol evidence, unknowns; row not applicable to the target → `n/a`.
    - `@inputs` := `feature`, keywords, user-supplied `sources`, the Exploration checklist.
+   - `@research` := the loaded `research` skill's absolute base directory.
    - No `@outputArtifact`; results return to the parent and feed the evidence map.
 
    Done when every Exploration checklist item has evidence, is marked not applicable, or is a gap.
