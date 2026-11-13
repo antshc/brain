@@ -2,6 +2,20 @@
 
 One discoverable entry point for code architecture, standalone code sketches, deep-module interfaces, decision interviews, high-level designs, specifications and tickets.
 
+## Flows
+
+| Flow | Sequence | Handoff |
+| --- | --- | --- |
+| Architecture first | `/design architect` → `/design spec` → `/implement` | Accepted architecture sketch → published spec → implementation and draft PR |
+| Interview first | `/design grill` → optional `/design sketch` → `/design spec` → `/implement` | Resolved decisions, optionally a code sketch → published spec → implementation and draft PR |
+| Living HLD | `/design wayfinder` → autonomous Research and Prove → record findings in HLD → `/design publish-hld` | Living HLD → Confluence HLD, research child pages and prototype/sketch attachments |
+
+For Architecture first, explicitly request a **design-only handoff** from Architect; otherwise it implements by default. Pass the accepted sketch/rationale to Spec, then the published spec URL to Implement. Each handoff follows the requested route; this table does not run the whole chain automatically.
+
+Wayfinder automatically dispatches ready in-scope Research/Prove work, merges verified artifacts locally, updates `docs/ongoing/<initiative-slug>.md`, and repeats as new questions emerge. Human choices remain interactive; risk verification may select Challenge this. Confluence publication requires an explicit `/design publish-hld` request; discovery performs no push or PR creation.
+
+## Routes
+
 | Request | Route | Outcome |
 | --- | --- | --- |
 | `/design architect design retries` | `architect` | Research, Arena sketch, evidence and verification, then implementation by default |
