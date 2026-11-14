@@ -11,7 +11,7 @@ description: >-
 | **Model selection** | Model and effort for a named role or the seats of an ordered panel; the caller spawns the worker | [models.md](models.md) |
 | **Arena** | Same task to independent runners, cross-judge, pick a base, graft, verify | [arena.md](arena.md), [models.md](models.md) |
 
-Read the listed files in full before acting. Explicit caller models take precedence. Unknown role and no explicit model → omit model and effort for harness defaults. Only Arena launches workers.
+Read the listed files in full before acting. [models.md](models.md) is the user's persistent model configuration: a resolved model and effort is a user-specified value, so pass it as the spawn tool's `model` and `reasoning_effort` even where harness guidance says to leave them unset unless the user names one. Explicit caller models take precedence. Unknown role and no explicit model → omit model and effort for harness defaults. Only Arena launches workers.
 
 ## Model selection
 
