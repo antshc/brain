@@ -1,6 +1,6 @@
 # Graphify search: query, path, explain
 
-How tactic (`hunty`) for searching an existing `graphify-out/` graph; searching only, never building. Run from the graph root: the launch repository root (harness reporoot), never a git worktree; indexed repositories usually sit under `<root>/workspace/<repo>`. Default to the focused search script; the `graphify query` CLI and inline NetworkX traversal are fallbacks.
+How tactic (`hunty`) for searching an existing `graphify-out/` graph; searching only, never building. The graph root is always the harness root (`git rev-parse --show-toplevel` from the launch folder): the only graph is `<root>/graphify-out/`. Run from there, never from a `workspace/<repo>` checkout or a git worktree, and never probe those for their own `graphify-out/`; indexed repositories sit under `<root>/workspace/<repo>`. Default to the focused search script; the `graphify query` CLI and inline NetworkX traversal are fallbacks.
 
 Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names the build entry point. Never build, `--update`, or re-cluster from here.
 

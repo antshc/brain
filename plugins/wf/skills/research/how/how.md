@@ -19,7 +19,7 @@ Read triggered resources in full; pass the ones a worker needs as absolute paths
 
 ## Workflow
 
-1. **Frame.** Preserve the original question, targets/refs, framing, start, outcome, and requested destination. Infer a bounded interpretation when possible; state it so the requester can redirect. *Done when* the question and observable outcome are explicit.
+1. **Frame.** Start from the router's Frame: rephrased question, glossary terms, resolved targets, Deployables/boundaries, and graph coverage. Preserve the original question, targets/refs, framing, start, outcome, and requested destination. Infer a bounded interpretation when possible; state it so the requester can redirect. *Done when* the question and observable outcome are explicit.
 2. **Select depth.** Narrow question → **Concise**, one focused pass. Cross-boundary or complex question → **Detailed**, relevant boundaries, failures, and edge cases. Explicit inspection or verification → **Full** within the requested scope, including runtime-dependent claims or named blockers. Escalate when conflicts or deciding boundaries leave the answer open; depth never implies full-repository coverage. *Done when* depth matches the requested proof.
 3. **Discover.** When topology or ownership is unknown, spawn `hunty` with a bounded discovery angle in the Explorer prompt: deployables, functional slices, triggers, candidate paths, boundaries. A known narrow target combines discovery and tracing in one pass. *Done when* relevant owners and candidate paths are cited or unresolved.
 4. **Plan evidence.** Select Behavior for a deployable's contribution, Flow for cross-deployable handoffs, Data for storage/ownership semantics, or focused checks for an isolated call. Mix only outcome-relevant checks into the same answer. Split independent angles only when useful; sequence dependent checks after discovery. *Done when* each angle has bounded scope, proof checks, and a `hunty` brief.
@@ -30,7 +30,7 @@ Read triggered resources in full; pass the ones a worker needs as absolute paths
 
 ## Evidence rules
 
-`hunty` owns local target resolution, graph coverage (including worktree → main checkout), Graphify, NuGet, and read-only enforcement; do not duplicate them in briefs. Repository evidence comes only from local checkouts; report missing checkouts/refs as blockers, without remote lookup, clone, or fetch. The router owns splitting; require neither multiple workers nor fixed models. Stop when the framed question is answered; leave unrelated branches unexplored.
+The router's Frame owns target resolution, contract discovery, and graph coverage (including worktree → main checkout); pass it as `@frame` in every `hunty` Brief. `hunty` owns the target checkout's own contracts, Graphify, NuGet, and read-only enforcement; do not duplicate them in briefs. Repository evidence comes only from local checkouts; report missing checkouts/refs as blockers, without remote lookup, clone, or fetch. The router owns splitting; require neither multiple workers nor fixed models. Stop when the framed question is answered; leave unrelated branches unexplored.
 
 Graph build, update, or export requests → report the build entry point named in `<root>/GRAPHIFY.md`; never build.
 

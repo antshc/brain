@@ -35,7 +35,7 @@ def test_inspection_lookup_prefixes_and_slim_hunty_brief():
     table = INSPECTION.split('| Lookup | `@work` prefix |')[1].split('\n\n')[0]
     assert table.strip().splitlines()[1:]
     hunty = (ROOT / 'agents/hunty.md').read_text()
-    assert set(re.findall(r'^- `(@\w+)`', hunty.split('## Brief')[1].split('\n## ')[0], re.M)) == {'@work', '@research'}
+    assert set(re.findall(r'^- `(@\w+)`', hunty.split('## Brief')[1].split('\n## ')[0], re.M)) == {'@work', '@frame', '@research'}
     for removed in ('@depth', '@shape', '@target', '@outputShape', '@inputs'):
         assert removed not in hunty, removed
     for path in ROOT.rglob('*.md'):
@@ -179,7 +179,7 @@ def test_explore_route_returns_hunty_verdicts_inline():
 def test_playbooks_spawn_only_bundled_prompt_agents_through_the_recipe():
     spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
     assert 'never a registered agent' in spawning
-    assert 'never an agent type, agent name, or `agentName`' in spawning
+    assert 'never an agent type or `agentName`; use it only as the spawn\'s display name' in spawning
     assert 'Read `agents/<name>.md` in full' in spawning
     for path in ROOT.rglob('*.md'):
         for name in re.findall(r'[Ss]pawn(?:s| one)? `([a-z]+)`', path.read_text()):

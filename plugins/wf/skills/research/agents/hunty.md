@@ -7,7 +7,6 @@ Research codebase exploration prompt for the Explore and How routes. The `resear
 - Brief
 - Rules
 - Read-only contract
-- Resolve the repository root
 - Resolve the target
 - Contracts first
 - Route the lookup
@@ -19,6 +18,7 @@ Research codebase exploration prompt for the Explore and How routes. The `resear
 ## Brief
 
 - `@work` — the task: question or filled How explorer brief, targets/refs, inputs, and the return shape the caller needs.
+- `@frame` — the router's Frame: original and rephrased question, glossary terms, route, resolved targets with absolute paths, Deployables and boundaries, contracts already read, and graph coverage.
 - `@research` — absolute base directory of the research skill; resolves the Graphify and NuGet tactics and `scripts/focused_query.py`.
 
 ## Rules
@@ -34,26 +34,15 @@ Research codebase exploration prompt for the Explore and How routes. The `resear
 
 Exceptions: per-user `rg` install when missing; `graphify query | path | explain` updating `graphify-out/cache/`; per-user `ilspycmd` install and decompilation written only to the resolved NuGet package cache; installing `@research/scripts/requirements.txt` into the graphify interpreter.
 
-## Resolve the repository root
-
-Set `@repoRoot` to `git rev-parse --show-toplevel`, run once from the agent session's launch folder, not the current CWD; stop if it is not inside a Git repository. Resolve every harness path from `@repoRoot`. Bound harness-side searches to `@repoRoot`; search a supporting repository inside its own path.
-
 ## Resolve the target
 
-Use the repositories, services, and refs `@work` names; none named → current repository. Honor an explicit ref from locally available source and report the revision used.
+`@frame` is the source of truth for `@repoRoot`, targets, checkouts, worktree mapping (`@worktreeRoot`, `@mainCheckout`), and graph coverage; do not re-resolve them. Targets `@frame` marks `unresolved` → `route: unresolved`; continue the others. Use the rephrased question and its glossary terms as search vocabulary; keep literals verbatim.
 
-- **Building-block index** — **MUST** read `@repoRoot/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved. A row's `Location` maps a Deployable name or its Trigger condition to a local path (`workspace/<repo>[/subpath]` or absolute); `origin` metadata never authorizes remote lookup. Use `Shared dependency ownership` for dependencies several Deployables use and `Terminal infrastructure boundaries` for where tracing stops.
-- **Checkouts** — once per run, list `<name> → <absolute path>` for `@repoRoot`, the main codebase under `@repoRoot/workspace/`, and every local path those tables name that exists on disk. Missing checkout or ref → `route: unresolved` for that target; continue the others.
-- **Worktree targets** — set `@worktreeRoot` to its `git rev-parse --show-toplevel` and `@mainCheckout` to the parent of `git -C @worktreeRoot rev-parse --path-format=absolute --git-common-dir`. Source evidence stays in `@worktreeRoot`; graph lookup uses `@mainCheckout`.
-- **Graph coverage** — read `graphify-out/manifest.json` under `@repoRoot` and each main checkout. Test coverage with the target path relative to the graph root; a worktree path first maps to `@mainCheckout/<relative path>`. Select the widest covering graph; for a relationship, one covering both ends. None → continue from source.
+`@frame` missing → set `@repoRoot` to `git rev-parse --show-toplevel` from the launch folder, use the targets `@work` names (none → current repository), read `@repoRoot/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved, and treat `@repoRoot/graphify-out/` as the only graph. Missing checkout or ref → `route: unresolved`. Never look for `graphify-out/` in `workspace/<repo>` checkouts or worktrees.
 
 ## Contracts first
 
-Before searching source, read the target's contract material, nearest owner first: `GLOSSARY.md` (terms), `ARCHITECTURE.md`, `DEPLOYMENT.md`, `README.md` (ownership, runtime boundaries), `*.swagger.json` (REST), `*.configuration-tweaks.md` (configuration).
-
-1. The target checkout's own copies.
-2. The `@repoRoot` document whose folder or filename names the target; match on the name, do not read every service's set.
-3. `@repoRoot`'s root-level copies for terms and boundaries spanning services.
+Before searching source, read the target checkout's own contract material, nearest owner first: `GLOSSARY.md` (terms), `ARCHITECTURE.md`, `DEPLOYMENT.md`, `README.md` (ownership, runtime boundaries), `*.swagger.json` (REST), `*.configuration-tweaks.md` (configuration). Skip files listed in `@frame`'s `Contracts read`; without `@frame`, also read the `@repoRoot` copies whose folder or filename names the target, then `@repoRoot`'s root-level copies.
 
 Contracts give documented intent; source proves as-built behavior. Name the contract behind each cross-deployable claim.
 
