@@ -413,9 +413,13 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert '`ready`' in workflow and 'blocked/incomplete' in workflow
     post = (FACTORY / 'references/post-implementation.md').read_text()
     review = post.split('## Code review\n')[1].split('\n## ')[0]
-    assert '`review` skill' in review and '`code` route' in review
+    assert '**Review** playbook' in review
+    proof_review = (FACTORY / 'playbooks/review.md').read_text()
+    assert proof_review.index('`review` skill') < proof_review.index('Read back the actual published comments') < proof_review.index('`prove` skill')
+    assert 'selecting `code`' in proof_review
     assert 'fresh detached worktree' in review
-    assert 'Review never fixes code' in review
+    assert 'This phase never fixes code' in review
+    assert 'corrective replies and applicable resolutions are verified' in review
     finalize = post.split('## Finalize\n')[1].split('\n## ')[0]
     assert 'posting failure' in post.lower()
     for text in ('stale', 'pending', 'failed', '`git` skill', 'Worktrees', 'RUN_DIR/worktrees/integration.json'):
