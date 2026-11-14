@@ -71,7 +71,7 @@ def test_graphify_is_a_tool_with_read_only_overrides():
     assert '**Graphify**' in tools and '**NuGet**' in tools
     assert 'skip `graphify reflect --if-stale`' in tools
     assert 'never `save-result`, `--update`' in tools
-    assert 'inline `graph.json` traversal only when both are missing' in tools
+    assert '`graph.py raw-path | explain | traverse` only when both are missing' in tools
     assert '`path <A> <B>` before any `query` or `rg`' in tools
     assert '**MUST NOT** pass question text to `graphify query`' in section('Gotchas')
     read_only = section('Read-only contract')

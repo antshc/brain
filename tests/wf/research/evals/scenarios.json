@@ -43,14 +43,14 @@
       "request": "@work: Flow from {{deployableA}} to {{deployableB}}: how does a request reach {{deployableB}} end to end? Target: {{deployableA}}, {{deployableB}}.",
       "excludedTools": [],
       "expectedRoute": "graphify-path",
-      "checks": ["Graphify query resource read", "focused_query.py resolve for both ends, then path, before any query or rg", "each hop confirmed in source", "verdict lists graph commands exactly as run"]
+      "checks": ["Graphify query resource read", "graph.py resolve for both ends, then path, before any query or rg", "each hop confirmed in source", "verdict lists graph commands exactly as run"]
     },
     {
       "id": "graphify_find_unknown",
       "request": "@work: Names unknown: which module in {{deployableA}} owns the behavior GLOSSARY.md describes for {{deployableB}}? Target: {{deployableA}}.",
       "excludedTools": [],
       "expectedRoute": "graphify-find",
-      "checks": ["glossary or concept doc read before graph search", "focused_query.py terms, then query with 1-2 identifier terms", "no graphify query with question text", "source confirms graph claims", "verdict lists graph commands exactly as run"]
+      "checks": ["glossary or concept doc read before graph search", "graph.py terms, then query with 1-2 identifier terms", "no graphify query with question text", "source confirms graph claims", "verdict lists graph commands exactly as run"]
     },
     {
       "id": "lsp_symbol",
