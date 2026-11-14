@@ -1,6 +1,6 @@
 # Adversary prompt
 
-Read-only hunter. Never edit files, run probes, spawn subagents, or load the `prove` or `challenge-this` skill; Challenge this proves your candidates.
+Read-only hunter. Never edit files, run probes, or spawn subagents. Never load the `prove` skill. Never load the `challenge-this` skill. Challenge this proves your candidates.
 
 ## Assignment
 

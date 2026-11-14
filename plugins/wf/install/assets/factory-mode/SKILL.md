@@ -18,7 +18,7 @@ This skill is the repo-level engineering instruction set, installed per repo by 
 Before any playbook or no-playbook fallback executes, apply Principles below. Name each principle that shaped a decision and the choice it changed in the reply.
 
 - **First message on a task** → restate the goal, the problem, and, if the task ships a change, the smallest change expected to meet it. Do not wait for confirmation. Evidence rules out the requested change → show it and stop. Restate the goal in every subagent brief, PR `## Why`, and final reply (skip for a fully specified one-line edit). *Load and follow the `writing-style` skill to apply clear, precise writing to sharpen a task prompt, deepen it and rewrite the prompt when the ask is vague or layered.*
-- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* and let observed behavior decide. Compare competing design alternatives through the `design` skill, and use `prove` to test observable claims. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
+- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* and let observed behavior decide. Compare competing design alternatives through the `design` skill, and use Prove to test observable claims. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
 - **Any code** → name the data shape and its organizing structure first (**Model the domain**).
 - **Code crossing a function boundary** → *Load and follow the `design` skill to design architecture and resolve decisions; use its `architect` route to sketch types, signatures, and module structure before code.*
 - **Module interface, seam, or testability question** → *Load and follow the `design` skill to design architecture by deepening modules and resolving interface decisions; use its `deep-module` route for deep-module vocabulary, seam placement, deepening opportunities, and Design It Twice interface options.*
@@ -95,7 +95,7 @@ For direct code-shipping playbooks. Feature uses the draft from `implement`.
 
 - *Load and follow the `git` skill to run verified Git mechanics using **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
 - *Load and follow the `github` skill to run GitHub platform mechanics using **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
-- *Load and follow the `github` skill to run GitHub platform mechanics using Pull requests* to open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. When requested, *Load and follow the `review` skill to review code changes and PR comments for findings*, selecting route `code`.
+- *Load and follow the `github` skill to run GitHub platform mechanics using Pull requests* to open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. When review is requested, run the Review playbook fully: code review publishes first, then read the comments, prove their claims, and reply with outcomes.
 - Post the URL and continue. Monitor checks when the caller requests it.
 
 ## Playbooks
@@ -106,9 +106,12 @@ Open a todo list whose first items are the matched playbook's steps, copied verb
 |---|---|---|
 | Bug fix | Reported defect to reproduce, root-cause, and fix with runtime evidence | [playbooks/bug-fix.md](playbooks/bug-fix.md) |
 | Design | Unresolved unknowns before building: grill or Wayfinder, optional code sketch with correction loop, then spec and feature design | [playbooks/design.md](playbooks/design.md) |
+| Review | PR code review, then proof of published comments and evidence replies; no fixes | [playbooks/review.md](playbooks/review.md) |
 | Stories | Requirements, spec, or feature design to an approved, ordered User story list with dependencies and Jira metadata; no code | [playbooks/stories.md](playbooks/stories.md) |
 | Feature | New or changed behavior: autonomous sketch, spec, implementation, verification, review, and address; optional design checkpoint | [playbooks/feature.md](playbooks/feature.md) |
 
+Opening a PR and Feature's Code review section reuse the Review playbook in this chat. Read its indexed file fully before that phase; preserve caller context and return to the next caller phase after proof replies.
+
 For Feature only, after a complete implementation handoff, read [Post-implementation](references/post-implementation.md) fully; execute its named sections from the playbook. At *App verification*, read [Verifier](agents/verifier.md) fully before launch. Resolve both from this skill's base directory; missing/unreadable → preserve/report and stop dependent work. Feature overrides generic PR title/body/opening instructions: reuse the handed-off PR; preserve initiative routing, draft state, rationale, and coverage.
 
-No playbook fits (including read-only investigation and behavior-preserving refactoring) → follow Non-negotiables and Principles directly and say so. Use `research` and `prove` when their evidence is needed.
+No playbook fits (including read-only investigation and behavior-preserving refactoring) → follow Non-negotiables and Principles directly and say so. *Load and follow the `research` skill to investigate technical questions and save cited findings* when reading evidence is needed. *Load and follow the `prove` skill to confirm or refute technical claims with reproducible evidence* when execution evidence is needed.
