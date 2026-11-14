@@ -12,6 +12,12 @@ Explain trigger to outcome; define concepts when they first matter. Name concret
 
 Integrate relevant Behavior, Flow, and Data findings into this explanation. Include the lane decision, storage detail, or provider rule that changes the answer at the point where it matters. Explain each step once. Add a diagram or table when it clarifies relationships or comparisons. Follow the applicable lens and diagram guidance and render every included Mermaid block.
 
+## Visualize
+
+Choose from confirmed evidence: topology/ownership → container or swimlane; interaction order → sequence; selection/failure → flowchart; data shape → table or class view. Prefer prose or a table when clearer. *Load and follow the `doc-diagram` skill to create Mermaid architecture, process flow, or class diagrams* using only the selected view's guidance. No lens requires a diagram type.
+
+Back nodes/crossings with evidence; label unresolved edges. Keep file/line detail in nearby citations. Split crowded views by question; render every Mermaid block or name the rendering blocker.
+
 ## Additional sections
 
 Include only needed sections, e.g. **Where things live**, **Failures and edge cases**, **Runtime observations**, **Assumptions and unknowns**. Give observations’ environment/check and unresolved claims’ blocker/exact next check. Explain non-obvious behavior where it changes the answer.

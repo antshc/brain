@@ -1,6 +1,6 @@
 # Source playbooks
 
-The `why/why.md` procedure spawns one investigator per available evidence category, each reading a single source-specific playbook below. The playbooks cover common MCPs and the installed Atlassian skills. Adapt the examples for other providers in the same category.
+Why investigates every available evidence category directly, using the selected source-specific playbook below. Research’s router loads triggered resources; this index does not start workers or another loading chain. The playbooks cover common MCPs and the installed Atlassian skills. Adapt the examples for other providers in the same category.
 
 | Category | Playbook | Provider it documents |
 |---|---|---|

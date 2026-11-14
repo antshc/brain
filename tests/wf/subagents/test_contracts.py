@@ -17,9 +17,9 @@ def test_subagents_owns_arena_swarm_and_model_roles():
         assert not (SKILLS / "architect" / old_path).exists()
 
 
-def test_research_preserves_why_and_routes_system_evidence_to_hunter():
+def test_research_preserves_why_with_caller_owned_hunter_dispatch():
     skill = (SKILLS / "research/SKILL.md").read_text()
-    for reference in ("how/how.md", "how/explorer-prompt.md", "how/explainer-prompt.md",
+    for reference in ("how/how.md", "how/explorer-prompt.md", "tactics/local-search.md",
                       "why/why.md", "why/sources/atlassian.md"):
         assert f"]({reference})" in skill
         assert (SKILLS / "research" / reference).is_file()
@@ -28,10 +28,11 @@ def test_research_preserves_why_and_routes_system_evidence_to_hunter():
     assert "## Routing" in skill
     how = (SKILLS / "research/how/how.md").read_text()
     assert "system/system-inspection.md" not in skill
-    assert "Hunter" in how and "Explainer" in how
+    assert "Explainer" not in how
+    assert "directly" in how
     assert "@outputPath" in skill and "@outputBase" in skill
     dispatch = (SKILLS / "subagents/SKILL.md").read_text()
-    assert "Send Explore requests verbatim to `hunter`" in dispatch
+    assert "Delegate research to `hunter`" in dispatch
     assert "report the blocked evidence request and continue independent work" in dispatch
 
 

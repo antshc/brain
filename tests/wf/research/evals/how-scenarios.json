@@ -1,70 +1,221 @@
 {
   "commonChecks": [
-    "How coordinates; Hunter executes read-only evidence requests; Explainer synthesizes evidence",
+    "Research investigates, verifies and explains directly in the invoking agent; delegated entry is caller \u2192 Hunter \u2192 Research; zero internal agent launches",
     "material claims have decisive citations; intent, source behavior, observations, and unknowns remain distinct",
     "no report is written without a caller-selected exact destination",
-    "included diagrams depict confirmed evidence and unresolved boundaries accurately"
+    "included diagrams depict confirmed evidence and unresolved boundaries accurately",
+    "Run paired direct Research and caller-delegated Hunter cases; Hunter loads full Research body and selected/triggered resources"
   ],
   "cases": [
     {
       "id": "focused_inline",
       "request": "How does one known validation function reject an expired token? Explain inline.",
-      "checks": ["one focused Hunter pass", "no mandatory fan-out or full-system inventory", "no artifact write"]
+      "checks": [
+        "one focused direct evidence pass",
+        "no mandatory fan-out or full-system inventory",
+        "no artifact write"
+      ]
     },
     {
       "id": "discover_ownership",
       "request": "Inspect how an order reaches fulfillment. The owning services are unknown.",
-      "checks": ["discover relevant deployables, functional slices, triggers, and candidate paths before deep tracing", "selected inspection checks follow discovery", "no invented save path"]
+      "checks": [
+        "discover relevant deployables, functional slices, triggers, and candidate paths before deep tracing",
+        "selected inspection checks follow discovery",
+        "no invented save path"
+      ]
     },
     {
       "id": "cross_repo_handoff",
       "request": "Trace an accepted order across the API and worker repositories. Both emit and receive code exist but no shared resource binding is available.",
-      "checks": ["search both repositories", "handoff remains unconfirmed without binding", "name the exact missing check and consequence"]
+      "checks": [
+        "search both repositories",
+        "handoff remains unconfirmed without binding",
+        "name the exact missing check and consequence"
+      ]
     },
     {
       "id": "nuget_implementation",
       "request": "Determine the retry behavior behind a wrapper call whose implementation is in a restored NuGet dependency.",
-      "checks": ["Hunter loads NuGet tactic", "resolve actual package version and consumed TFM", "inspect implementation when XML cannot establish behavior", "no restore or build"]
+      "checks": [
+        "executing agent loads NuGet tactic",
+        "resolve actual package version and consumed TFM",
+        "inspect implementation when XML cannot establish behavior",
+        "no restore or build"
+      ]
     },
     {
       "id": "terminal_and_access_gap",
       "request": "Trace all outcome-relevant branches: one reaches a managed database, one calls an inaccessible service, and one returns to an earlier service.",
-      "checks": ["record external contract and relevant provider semantics", "distinguish inaccessible-source limitation from proven downstream outcome", "record cycle without infinite tracing"]
+      "checks": [
+        "record external contract and relevant provider semantics",
+        "distinguish inaccessible-source limitation from proven downstream outcome",
+        "record cycle without infinite tracing"
+      ]
     },
     {
       "id": "provider_runtime_unknown",
       "request": "Which provider and fallback serve production requests? Code has configurable providers; production configuration and traces are unavailable.",
-      "checks": ["trace selector, precedence, fallback, terminal behavior, and doubles", "do not claim the actual production selection", "report blocker and exact runtime check"]
+      "checks": [
+        "trace selector, precedence, fallback, terminal behavior, and doubles",
+        "do not claim the actual production selection",
+        "report blocker and exact runtime check"
+      ]
     },
     {
       "id": "data_engine_specific",
       "request": "Can this write followed by a secondary-index read be stale? Inspect the actual configured database and read path.",
-      "checks": ["verify engine and index-specific guarantees", "avoid universal eventual-consistency or index-lag claims", "explain consequential storage behavior in the same answer"]
+      "checks": [
+        "verify engine and index-specific guarantees",
+        "avoid universal eventual-consistency or index-lag claims",
+        "explain consequential storage behavior in the same answer"
+      ]
     },
     {
       "id": "architect_wayfinder_destinations",
       "request": "Architect calls Research with @outputPath=/repo/tmp/design-orders/grounding-how.md. Separately Wayfinder calls with @outputPath=docs/research/order-retries.md and @outputBase=/repo.",
-      "checks": ["preserve distinct caller destinations exactly", "no directory prefix or filename suffix added", "workers return inline evidence rather than overwriting reports"]
+      "checks": [
+        "preserve distinct caller destinations exactly",
+        "no directory prefix or filename suffix added",
+        "Hunter returns the complete report inline; caller saves each exact resolved path"
+      ]
     },
     {
       "id": "missing_save_destination",
       "request": "Inspect the deletion flow and save a report. No destination was supplied.",
-      "checks": ["continue useful investigation", "return prepared findings inline", "identify missing destination and ask direct user where to save", "no fallback path"]
+      "checks": [
+        "continue useful investigation",
+        "return prepared findings inline",
+        "identify missing destination and ask direct user where to save",
+        "no fallback path"
+      ]
     },
     {
       "id": "conflicting_destinations",
       "request": "@question: Explain the retry flow. @outputPath: /repo/a.md. Legacy @outputShape explicitly requests saving to /repo/b.md.",
-      "checks": ["identify conflict before writing", "do not silently choose either destination", "content framing remains separate from destination handling"]
+      "checks": [
+        "identify conflict before writing",
+        "do not silently choose either destination",
+        "content framing remains separate from destination handling"
+      ]
     },
     {
       "id": "multiple_reports",
       "request": "Research two independent questions and save separate reports. @outputPath maps question A to /repo/a.md but question B has no destination.",
-      "checks": ["honor A destination", "do not derive B filename", "report B findings inline with missing-destination blocker"]
+      "checks": [
+        "honor A destination",
+        "do not derive B filename",
+        "report B findings inline with missing-destination blocker"
+      ]
     },
     {
       "id": "why_cloud_web_inline",
       "request": "Independently investigate historical rationale, an Azure provider limit, and a public protocol. Return all findings inline.",
-      "checks": ["Why, Cloud, and Web retain their evidence procedures", "no route invents a report path", "no automatic artifact writes"]
+      "checks": [
+        "Why, Cloud, and Web retain their evidence procedures",
+        "no route invents a report path",
+        "no automatic artifact writes"
+      ]
+    },
+    {
+      "id": "explicit_route",
+      "request": "Research @route: how, @question: Explain validation behavior, @target: the current local checkout. Return inline.",
+      "checks": [
+        "honor explicit how route",
+        "load How and required resources before source search",
+        "no Explainer or internal agent dispatch"
+      ]
+    },
+    {
+      "id": "auto_route",
+      "request": "Research which file defines a supplied exact literal, without an explicit route.",
+      "checks": [
+        "auto selects Explore",
+        "load only selected and triggered resources",
+        "no agent launch"
+      ]
+    },
+    {
+      "id": "invalid_route",
+      "request": "@route: unknown-route; @question: Explain this API.",
+      "checks": [
+        "name invalid route before dependent evidence work",
+        "do not silently choose a different route"
+      ]
+    },
+    {
+      "id": "conflicting_route",
+      "request": "@route: web; @mode: why; @question: Why was this local workaround added?",
+      "checks": [
+        "report route/mode conflict before dependent work",
+        "do not silently ignore either input"
+      ]
+    },
+    {
+      "id": "why_anchor",
+      "request": "@route: why; @whyDepth: anchor; @question: Anchor this local symbol to source, commits and PR discussion.",
+      "checks": [
+        "collect anchor directly",
+        "stop after anchor",
+        "no category fan-out or synthesis agent"
+      ]
+    },
+    {
+      "id": "why_full",
+      "request": "@route: why; @question: Why was the retry threshold introduced? Source history exists; chat is unavailable.",
+      "checks": [
+        "search available categories directly",
+        "all seven categories accounted for including nulls and access gaps",
+        "confidence tiers and competing hypotheses preserved",
+        "no investigator or synthesizer agents"
+      ]
+    },
+    {
+      "id": "hunter_save_boundary",
+      "request": "Caller delegates to Hunter: @route: how; @question: Explain the configured provider; @outputPath: /repo/report.md; @outputBase: /repo.",
+      "checks": [
+        "Hunter returns complete report inline",
+        "outputPath alone does not authorize Hunter final-report writes",
+        "caller verifies and saves exact destination"
+      ]
+    },
+    {
+      "id": "missing_web_access",
+      "request": "@route: web; @question: Verify a current external protocol fact; no web access is available.",
+      "checks": [
+        "name unavailable evidence tool/access",
+        "no uncited recollection presented as verified",
+        "no fallback worker launch"
+      ]
+    },
+    {
+      "id": "single_checkout",
+      "request": "@route: explore; @work: Exact literal supplied in a single checkout with no ARCHITECTURE.md, workspace folder or graph.",
+      "checks": [
+        "search supplied/current checkout",
+        "missing optional architecture index is not a blocker",
+        "graph skipped reason recorded"
+      ]
+    },
+    {
+      "id": "cloud_sdk_direct",
+      "request": "@route: cloud; @question: Verify the installed AWSSDK member signature and its current documented service limit.",
+      "checks": [
+        "resolve actual installed version",
+        "NuGet check runs directly in this agent",
+        "primary-source docs used for service limits",
+        "no nested Hunter launch"
+      ]
+    },
+    {
+      "id": "worktree_graph",
+      "request": "Inspect a caller-selected git worktree whose graph exists only in its main checkout and is stale.",
+      "checks": [
+        "use main checkout graph coverage",
+        "translate graph candidate paths to worktree source",
+        "worktree source wins over stale graph",
+        "no graph build or update"
+      ]
     }
   ]
 }

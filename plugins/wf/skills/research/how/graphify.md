@@ -24,7 +24,7 @@ Two traversal modes - choose based on the question:
 Run this preflight before every query, path, or explain operation against an existing graph:
 
 0. Read `<graph root>/GRAPHIFY.md` in full when present. Its corpus, exclusion, health preflight, search vocabulary, and degraded-mode rules override the generic steps below.
-1. Run `graphify reflect --if-stale` and read `graphify-out/reflections/LESSONS.md`. Do not repeat a known dead end unless the graph or source has changed.
+1. Skip `graphify reflect --if-stale`; read `graphify-out/reflections/LESSONS.md` when present. Do not repeat a known dead end unless the graph or source has changed.
 2. Read `graphify-out/.graphify_root` when present and the recorded commit: `built_at_commit` in `graphify-out/graph.json`. If the root is a Git checkout, compare the recorded commit with its current `HEAD`. A missing root or commit makes freshness unknown; a mismatch makes the graph stale.
 3. Inspect node `source_file` prefixes and `file_type` counts in `graphify-out/graph.json`. Report material generated/snapshot inputs such as `.artifacts/`, `bin/`, `obj/`, `TestResults/`, or `review_diff/`, and whether the source or documentation needed by the question is represented.
 4. Print one concise health line before the query: corpus roots/coverage, freshness (`current`, `stale`, or `unknown`), and material noise. Do not rebuild automatically. When coverage is missing or freshness is stale, use the graph only for candidate discovery and verify against current source or authoritative documentation.
@@ -92,12 +92,11 @@ for n in data['nodes']:
             t = p.lower()
             if 3 <= len(t) <= 30:
                 vocab.add(t)
-Path('graphify-out/.vocab.txt').write_text('\n'.join(sorted(vocab)), encoding='utf-8')
-print(f'vocab: {len(vocab)} tokens')
+print('\n'.join(sorted(vocab)))
 "
 ```
 
-2. Read `graphify-out/.vocab.txt`. Then for the user's question, select **up to 5 tokens from this exact list** that semantically match the query intent. For a symbol-oriented query that still needs traversal, use at most 3 discriminating tokens. Hard constraints:
+2. Read the printed vocabulary (keep it in memory; no graph writes). Then for the user's question, select **up to 5 tokens from this exact list** that semantically match the query intent. For a symbol-oriented query that still needs traversal, use at most 3 discriminating tokens. Hard constraints:
    - You MUST pick only tokens present in the vocabulary file. Do NOT invent tokens.
     - Prefer tokens from the exact symbol or path over generic terms such as `service`, `manager`, `result`, `configuration`, or `test`.
     - Do not add both singular and plural forms unless they identify genuinely different graph labels.
@@ -114,7 +113,7 @@ If the list is empty, say so plainly and stop — do not proceed to traversal.
 
 ### Step 1 — Traversal
 
-Build the **expanded query string** by joining the selected tokens with spaces. Use this string as `QUESTION` below — NOT the original user question. (The original question is preserved only for `save-result` at the end.)
+Build the **expanded query string** by joining the selected tokens with spaces. Use this string as `QUESTION` below — NOT the original user question. Keep the original question as report context; never save results into the graph.
 
 Prefer the CLI when it is installed:
 ```bash
@@ -321,23 +320,7 @@ print(output)
 
 Replace `QUESTION` with the **expanded** query string, `MODE` with `bfs` or `dfs`, `CONTEXT_FILTERS` with a Python list of observed edge contexts (empty by default), `RELATION_FILTERS` with a Python list of graph relations (empty by default), and `BUDGET` with the token budget (default `2000`, or whatever `--budget N` specifies). Then answer based on the subgraph output above, using only what the graph contains.
 
-After writing the answer, save it back into the graph so it improves future queries. Include the expanded tokens inside the `--answer` text (e.g. `"Expanded from original query via vocab: [tokens]. Then traversed..."`) so the next `--update` extracts the expansion history as a graph node:
-
-```bash
-$(cat graphify-out/.graphify_python) -m graphify save-result --question "ORIGINAL_QUESTION" --answer "ANSWER" --type query --nodes NODE1 NODE2
-```
-
-Replace `ORIGINAL_QUESTION` with the user's verbatim question, `ANSWER` with your full answer text (containing the expanded-token trace), `NODE1 NODE2` with the list of node labels you cited. This closes the feedback loop: the next `--update` will extract this Q&A as a node in the graph.
-
-**Work memory (self-improving loop).** Add an `--outcome` so future sessions learn from this one — append `--outcome useful|dead_end|corrected` to the `save-result` command (and `--correction "the right answer"` when correcting):
-
-- `useful` — the cited nodes answered the question well (they become *preferred sources*).
-- `dead_end` — the question/path led nowhere; don't re-derive it next time.
-- `corrected` — the saved answer was wrong; `--correction` records what was right.
-
-Judge the outcome against the user's intent, not incidental utility. For example, locating a class is still `dead_end` when the question asked for behavior and the graph omitted the controlling method calls. Prefix the saved answer with `Intent: architecture|symbol_location|behavior|dependency_path` so later reflection can distinguish why the same node succeeded or failed. Do not save a separate `useful` localization result when localization was only an unsuccessful substep of a behavior query.
-
-At the **start** of graph work, refresh and read the lessons: run `graphify reflect --if-stale` (cheap, deterministic, no LLM; `--if-stale` makes it a no-op when `LESSONS.md` is already newer than every input, e.g. when the git hook just refreshed it), then read `graphify-out/reflections/LESSONS.md`. It lists **preferred sources** (start there), **known dead ends** (skip them), and prior **corrections**. Running `reflect` yourself keeps the lessons current even without the git hook installed; if the post-commit hook *is* installed, `--if-stale` means your session-start run costs almost nothing.
+Return the source-verified answer under Research's Caller-owned destinations. Keep expanded-token traces and useful/dead-end/correction observations in the returned evidence only; do not save results, refresh lessons, or update graph data. Read existing lessons without regenerating them.
 
 ---
 
@@ -401,13 +384,9 @@ except nx.NodeNotFound as e:
 
 Replace `NODE_A` and `NODE_B` with the actual concept names from the user. Then explain the path in plain language - what each hop means, why it's significant.
 
-Use directed traversal by default. Retry with `--undirected` only when direction is irrelevant to the user's question. Reject an undirected path as a dead end when its only bridge is a generic high-degree contract (`IDisposable`, `IEquatable`, `Object`, and similar), a test base, or a generated/review-snapshot node unrelated to the question. A mathematically shortest path is not evidence of a meaningful architectural relationship. Save rejected paths with `--outcome dead_end`.
+Use directed traversal by default. Retry with `--undirected` only when direction is irrelevant to the user's question. Reject an undirected path as a dead end when its only bridge is a generic high-degree contract (`IDisposable`, `IEquatable`, `Object`, and similar), a test base, or a generated/review-snapshot node unrelated to the question. A mathematically shortest path is not evidence of a meaningful architectural relationship. Record rejected paths and their dead-end reason in returned evidence only.
 
-After writing the explanation, save it back:
-
-```bash
-$(cat graphify-out/.graphify_python) -m graphify save-result --question "Path from NODE_A to NODE_B" --answer "ANSWER" --type path_query --nodes NODE_A NODE_B
-```
+Return the verified explanation under Research’s Caller-owned destinations; do not save back into the graph.
 
 ---
 
@@ -464,8 +443,4 @@ for neighbor in G.neighbors(nid):
 
 Replace `NODE_NAME` with the concept the user asked about. Then write a 3-5 sentence explanation of what this node is, what it connects to, and why those connections are significant. Use the source locations as citations.
 
-After writing the explanation, save it back:
-
-```bash
-$(cat graphify-out/.graphify_python) -m graphify save-result --question "Explain NODE_NAME" --answer "ANSWER" --type explain --nodes NODE_NAME
-```
+Return the verified explanation under Research’s Caller-owned destinations; do not save back into the graph.

@@ -18,14 +18,14 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 ## Research
 
-*Load and follow the `research` skill to investigate technical questions across source code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
+Spawn `hunter` with this instruction: *Load and follow the `research` skill to investigate technical questions across source code, docs, packages and external evidence and return cited findings*. Supply explicit `@route` when known, otherwise auto; Hunter selects/executes Research directly without nested agents. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
 - `@outputPath`: exact file `<artifact-root>/research/<question-slug>.md` selected by Design; use distinct slugs for separate calls. For several independent reports, Design supplies a question-to-file mapping before dispatch; never pass only a directory.
 - `@outputBase`: absolute repository root.
 - `@outputShape`: Markdown; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
 
-Pass framing verbatim and destinations separately; Research owns discovery, classification, and fan-out and returns worker findings inline. **MUST NOT** dispatch separate research agents. Index the caller-selected report paths in the artifact root; no specialist may override them.
+Pass framing verbatim and destinations separately. Hunter returns the complete report inline; Design verifies citations and saves at each exact resolved `@outputPath`. If already inside a candidate/review worker, invoke Research directly for needed evidence instead of nesting Hunter; honor that worker’s writable destinations. Index saved paths in the artifact root. No Research-internal dispatch.
 
 Read final artifacts; check cited conclusions and applicable versions. Add findings to grounding/rationale before Arena or review; route empirical unknowns to Prove.
 

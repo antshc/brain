@@ -6,7 +6,7 @@ Identify the item and store first, then route every writer and reader through lo
 
 Add findings to the How explanation; the caller owns any save destination.
 
-The Explainer chooses visuals under Visualize. Supply access-order, ownership, shape, and key evidence; tables often explain data rules most directly.
+Choose visuals using How report’s Visualize. Supply access-order, ownership, shape, and key evidence; tables often explain data rules most directly.
 
 ## Workflow
 

@@ -12,11 +12,12 @@ REPO = Path(__file__).resolve().parents[3]
 SKILL = (REPO / 'plugins/wf/skills/research/SKILL.md').read_text()
 FRONTMATTER, SKILL_BODY = re.match(r'^---\n(.*?)\n---\n(.*)$', SKILL, re.S).groups()
 HUNTER = (REPO / 'plugins/wf/agents/hunter.agent.md').read_text()
+LOCAL = (REPO / 'plugins/wf/skills/research/tactics/local-search.md').read_text()
 EVALS = Path(__file__).parent / 'evals'
 ROUTES = {'rg', 'lsp', 'graphify-path', 'graphify-find', 'nuget', 'unresolved'}
 
 
-def section(title: str, text: str = HUNTER) -> str:
+def section(title: str, text: str = LOCAL) -> str:
     start = re.search(rf'^#{{2,3}} {re.escape(title)}\n', text, re.M).end()
     end = re.compile(r'^#{2,3} ', re.M).search(text, start)
     return text[start:end.start() if end else None]
@@ -42,13 +43,15 @@ def test_body_under_300_lines():
     assert len(SKILL_BODY.splitlines()) < 300
 
 
-def test_hunter_owns_explore_and_loads_the_nuget_tactic():
-    assert not (REPO / 'plugins/wf/skills/research/explore/explore.md').exists()
-    request = section('Explore request', SKILL_BODY)
-    assert 'verbatim directly to a `hunter` subagent' in request
-    assert 'If Hunter is unavailable, report the blocked evidence request' in request
-    assert '(../skills/research/how/nuget.md)' in section('Route the lookup')
+def test_research_owns_search_and_hunter_loads_research():
+    assert 'tactics/local-search.md' in SKILL_BODY
+    assert '*Load and follow the `research` skill' in HUNTER
     assert 'Hunter never spawns subagents' in HUNTER
+    assert '## Resolve the target' not in HUNTER
+    assert 'NuGet tactic' in section('Route the lookup')
+    assert '**MUST NOT** spawn subagents' in SKILL_BODY
+    assert '`subagents` skill' not in SKILL_BODY
+    assert '@research' not in section('Explore request', SKILL_BODY)
 
 
 def test_request_lists_shape_enum():
@@ -57,14 +60,14 @@ def test_request_lists_shape_enum():
 
 
 def test_route_the_lookup_precedes_tool_selection():
-    assert HUNTER.index('### Route the lookup') < HUNTER.index('### Select tools by question shape')
+    assert LOCAL.index('### Route the lookup') < LOCAL.index('### Select tools by question shape')
     route = section('Route the lookup')
     assert 'route: rg | lsp | graphify-path | graphify-find | nuget | unresolved' in route
     assert {re.match(r'`([\w-]+)`', row[-1]).group(1) for row in table_rows(route)} == ROUTES
 
 
 def test_rg_rules():
-    tools = section('Tools', HUNTER)
+    tools = section('Tools')
     for text in ('exit codes', '`1` no match', 'Only `command -v rg` decides presence',
                  '**MUST NOT** run recursive `grep`', 'rg … || grep …'):
         assert text in tools, text
@@ -76,17 +79,17 @@ def test_rg_rules():
     ('`graphify-out/cache/`', 'allowed'),
 ])
 def test_graphify_read_only_overrides(step, verdict):
-    row = next(r for r in table_rows(section('Graphify', HUNTER)) if step in r[0])
+    row = next(r for r in table_rows(section('Graphify')) if step in r[0])
     assert verdict in row[-1]
 
 
 def test_graphify_script_first_cache_exception_and_not_found():
-    graphify = section('Graphify', HUNTER)
+    graphify = section('Graphify')
     assert 'inline `graph.json` traversal only when both are missing' in graphify
     assert 'never `graphify query "<question>"`' in graphify
     assert '`focused_query.py path <A> <B>` before any `query` or `rg`' in graphify
-    assert '`graphify query | path | explain` updating `graphify-out/cache/`' in section('Read-only contract', HUNTER)
-    read_only = section('Read-only contract')
+    assert '`graphify query | path | explain` updating `graphify-out/cache/`' in section('Read-only contract', SKILL_BODY)
+    read_only = section('Read-only contract', SKILL_BODY)
     assert "brief's `@outputArtifact`" in read_only
     assert 'decompilation written only to the resolved NuGet package cache' in read_only
     verdict = section('Return the verdict')

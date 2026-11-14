@@ -1,6 +1,6 @@
 # Current-system research
 
-*Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. Hunter supplies the evidence.
+*Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. The invoking agent collects evidence and explains it directly.
 
 ## Write a strong instruction
 
@@ -22,7 +22,7 @@ Include the details that materially change the investigation:
 - To save output, provide an exact `@outputPath`; for relative paths include the absolute caller root as `@outputBase`. No save request → inline. Research defines no default output directory or filename.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
-Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document can return Hunter’s verdict inline. Keep outcome-relevant lens findings in the same answer.
+Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document can return the local-search verdict inline. Keep outcome-relevant lens findings in the same answer.
 
 ## Behavior instruction examples
 

@@ -1,10 +1,10 @@
-# Synthesizer Prompt Template
+# Why report
 
-Fill in the placeholders.
+Apply directly to the collected category notes; fill placeholders as working context.
 
 ---
 
-You are answering a "why" question about a piece of code by synthesizing findings from investigators who searched different historical sources (source control, issue / ticket tracker, long-form documents, real-time team chat, infrastructure observability, error / exception tracking, product analytics warehouse, and code comments). Produce a confidence-weighted, evidence-cited narrative that says honestly what the evidence supports, and just as honestly what it doesn't.
+Synthesize historical evidence collected in this agent across source control, tickets, documents, chat, observability, exceptions and analytics. Produce a confidence-weighted, cited narrative that states what evidence supports and what remains unknown.
 
 ## The Question
 
@@ -16,9 +16,9 @@ You are answering a "why" question about a piece of code by synthesizing finding
 
 **Key symbols:** {SYMBOLS}
 
-## Investigator Findings
+## Category Findings
 
-{ALL_INVESTIGATOR_FINDINGS}
+{ALL_CATEGORY_FINDINGS}
 
 ## Sources That Weren't Searched
 
@@ -26,7 +26,7 @@ You are answering a "why" question about a piece of code by synthesizing finding
 
 ## Epistemics Framework
 
-You MUST follow the epistemics framework appended to this prompt. Read it in full before writing. The key rules:
+You MUST follow the Epistemics resource registered by Research. Read it in full before writing. The key rules:
 
 1. Every claim must sit in one tier: **Direct**, **Supported**, **Inferred**, **Speculative**, **Unknown**. The tier sets its section and its phrasing.
 2. Every Direct/Supported claim must have a citation (PR #, ticket ID, doc URL, chat permalink, commit hash, or file:line).
@@ -37,11 +37,11 @@ You MUST follow the epistemics framework appended to this prompt. Read it in ful
 
 ## Instructions
 
-1. **Read all investigator findings** and weigh the evidence yourself. Investigators gathered raw evidence, not conclusions.
-2. **Merge overlaps.** When several investigators cite the same PR, ticket, or doc, give it one authoritative reference.
+1. **Read all category findings** and weigh the evidence before drawing conclusions.
+2. **Merge overlaps.** When several categories cite the same PR, ticket, or doc, give it one authoritative reference.
 3. **Surface contradictions.** When two items disagree, show both. Don't pick one.
 4. **Calibrate each claim.** Find its evidence and tier. Direct: cite it and state it plainly. Inferred: hedge it and show the inference. Speculative: mark it. No evidence: put it in the gaps.
-5. **Verify citations by spot-checking.** If you're uncertain a cited item exists or says what the investigator claims, check it by reading the codebase or calling MCP tools. Don't propagate errors. Do not write files, commit, or modify external state.
+5. **Verify citations by spot-checking.** If you're uncertain a cited item exists or supports the recorded claim, check it by reading the codebase or calling MCP tools. Don't propagate errors. Do not write files, commit, or modify external state.
 6. **Don't overreach.** The user will act on this. Leave an open question open rather than fill it with a confident guess.
 
 ## Output Format
@@ -98,7 +98,7 @@ Specific gaps: "We searched the issue tracker for [query1], [query2], [query3] a
 
 What was actually searched, so the user can judge coverage and redirect:
 
-- **Source control history**: {file paths}, {number of commits reviewed}, PRs #{numbers}, and code comments searched. Or "Not searched. This should not happen because git and `gh` are always expected."
+- **Source control history**: {file paths}, {number of commits reviewed}, PRs #{numbers}, and code comments searched. Or "Not searched. {Missing local checkout/history or PR access and consequence}."
 - **Issue / ticket tracker**: {ticket IDs and keyword searches}. Or "Not searched. No matching MCP available in this environment."
 - **Long-form documents**: {page titles and search queries}. Or "Not searched. No matching MCP available in this environment."
 - **Real-time team chat**: {channels searched, date ranges, queries}. Or "Not searched. No matching MCP available in this environment."

@@ -156,14 +156,14 @@ Contract design keeps its `wayfinder:contract-design` ticket across AFK Options 
 | Approve Prove/Experiment and sketch prototypes before integration | Retain its owned worktree, paths and reviewed revision; merge only the explicitly approved payload |
 | Keep Contract design Options → Choice | Agent prepares options; user selects; only then merge chosen artifacts and considered-option notes |
 | Challenge this is embedded and automatic | Verify scoped design or whole HLD without approval; isolate code changes/tests, then update fog/HLD |
-| Helpers run in Wayfinder session | No wrapper subagent; each helper's own dispatch is the only worker level (Research Explore → Hunter) |
+| Helpers run in Wayfinder session | Research: Wayfinder → Hunter → Research, no nested agents; other helpers retain their own dispatch without a wrapper |
 | Git skill owns worktrees | Isolate gated prototypes and Challenge this code changes/tests; Wayfinder owns commits and serialized local integration |
 | HLD contains supported conclusions | Open Questions belong to users during presentation; reports/sketches remain local |
 | Explicit HLD-page-only publication | No evidence appendices, research subpages or report/sketch attachments |
 
 ## Responsibilities and handoffs
 
-Wayfinder runs every helper in its own session; helpers spawn their own workers (Research Explore → `hunter`). These rows describe responsibilities, not worker types.
+Wayfinder delegates Research to Hunter and saves its complete inline report; Hunter runs Research directly. Other helpers run in the Wayfinder session with their existing dispatch. These rows describe responsibilities, not worker types.
 
 | Owner/helper | Responsibility | Returns to Wayfinder |
 | --- | --- | --- |
@@ -190,7 +190,7 @@ Wayfinder runs every helper in its own session; helpers spawn their own workers 
 | HLD `docs/ongoing/<initiative-slug>.md` | Supported current design and ignored local provenance; no evidence appendices |
 | HLD Open Questions | User-filled presentation questions; agents preserve entries and blank answers |
 
-Wayfinder runs Research, Prove, Challenge this, Deep Module, Code Sketch and Grill in its own session, never inside a wrapper subagent; each uses its default worker dispatch, so Research sends Explore requests to `hunter`. Every tracker issue the design skill creates (Spec, Tickets, Wayfinder map, child, sub-ticket or follow-up) is first shown to the user and created only after explicit approval of that exact proposal; prototype tickets also show their claim or sketch scope, artifact paths and worktree. Wayfinder research waits for the same approval. Research and read-only Challenge this inspection may reuse a pinned checkout. Prove/Experiment and sketch prototypes use Git-skill worktrees; Challenge this code changes or tests also require one. Producers do not commit/push. Wayfinder retains approval-gated prototypes without commit/merge until explicit approval of the exact reviewed payload, then integrates locally; Contract design also requires Choice. Challenge this evidence integrates automatically and updates fog/HLD without approval. Changes need renewed approval; silence or passing checks do not approve a prototype. Resume retains the same worktree and pending step; cleanup waits for verified integration, HLD/tracker synchronization and every consumer.
+Wayfinder delegates Research to Hunter with a selected route, then verifies and saves the returned report; Hunter runs Research without nested agents. Prove, Challenge this, Deep Module, Code Sketch and Grill run in the Wayfinder session without wrappers and retain their own worker dispatch. Every tracker issue the design skill creates (Spec, Tickets, Wayfinder map, child, sub-ticket or follow-up) is first shown to the user and created only after explicit approval of that exact proposal; prototype tickets also show their claim or sketch scope, artifact paths and worktree. Wayfinder research waits for the same approval. Research and read-only Challenge this inspection may reuse a pinned checkout. Prove/Experiment and sketch prototypes use Git-skill worktrees; Challenge this code changes or tests also require one. Producers do not commit/push. Wayfinder retains approval-gated prototypes without commit/merge until explicit approval of the exact reviewed payload, then integrates locally; Contract design also requires Choice. Challenge this evidence integrates automatically and updates fog/HLD without approval. Changes need renewed approval; silence or passing checks do not approve a prototype. Resume retains the same worktree and pending step; cleanup waits for verified integration, HLD/tracker synchronization and every consumer.
 
 Discovery creates no push/PR or publication. Explicit `/design publish-hld` publishes the HLD page only; reports, proof artifacts and sketch packages remain local, without appendices, subpages or artifact attachments. Existing remote artifacts are not automatically deleted. Architect is outside Wayfinder; Architecture first remains a separate flow. For that flow, request a **design-only handoff** explicitly; Architect otherwise implements by default.
 

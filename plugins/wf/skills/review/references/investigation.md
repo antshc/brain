@@ -4,7 +4,7 @@ One subagent per substantive `issue`, each returning a `verdict` backed by `evid
 
 ## Discover the investigation skills
 
-Resolve each exact skill name and description before rendering; never emit placeholders literally. Investigation skills are named `search-*`, `inspect-*`, and `explore-*`. The skills available to you are already enumerated in your system context. Filter that list to names matching those prefixes. Render each applicable call as *Load and follow the `skill-name` skill to <3–6 distinctive keywords from its description>*, using its exact plain name; never send the placeholder literally.
+Resolve each exact skill name and description before rendering; never emit placeholders literally. Investigation skills include `research`, `search-*`, `inspect-*`, and `explore-*`. The skills available to you are already enumerated in your system context. Include Research and names matching those prefixes. Render each applicable call as *Load and follow the `skill-name` skill to <3–6 distinctive keywords from its description>*, using its exact plain name; never send the placeholder literally.
 
 Prioritize these matched skills over generic search/read tools for any issue within their stated scope.
 
@@ -12,9 +12,9 @@ Prioritize these matched skills over generic search/read tools for any issue wit
 
 Spawn one `runSubagent` per substantive `issue`, in a single parallel batch of at most 3. Issues have separate `evidence` paths, so they never wait on each other.
 
-Use the WF `hunter` agent when the `issue` is answerable from this codebase alone. If Hunter is unavailable, fall back to the built-in `Explore` subagent: the caller renders the resolved calls from Discover the investigation skills, reads each full body, selected route and required resources, then includes their applicable read-only instructions in the brief, replacing the template's skill-invocation request. Explore performs those checks with its available tools and reports any capability gaps; do not ask it to invoke skills.
+Use the WF `hunter` agent for delegated research, including codebase and external facts; require it to load Research with an explicit route when known, otherwise auto, and return the issue verdict shape. Research runs directly inside Hunter. If Hunter is unavailable, fall back to the built-in `Explore` subagent: the caller renders the resolved calls from Discover the investigation skills, reads each full body, selected route and required resources, then includes their applicable read-only instructions in the brief, replacing the template's skill-invocation request. Explore performs those checks with its available tools and reports any capability gaps; do not ask it to invoke skills.
 
-Omit `agentName` when the issue turns on an external fact — a package's real API, a framework's documented behaviour, a spec — so the general-purpose subagent inherits skill, web, docs, and package tools. Preserve this caller-specific Hunter → Explore fallback when dispatching through `subagents`.
+For an existing general-purpose issue worker, invoke Research directly for package APIs, framework behavior or specifications; never spawn a nested Hunter. Preserve the caller-specific Hunter → Explore fallback when dispatching through `subagents`.
 
 ## Prompt template
 

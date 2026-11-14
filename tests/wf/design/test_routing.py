@@ -87,7 +87,10 @@ def test_wayfinder_gates_ticket_creation_and_runs_helpers_without_nesting():
     assert "- **Create the map**: only after Ticket approval." in wayfinder
     assert "- **Create a ticket**: only after Ticket approval." in wayfinder
     assert "- **Create a sub-ticket**: only after Ticket approval." in wayfinder
-    assert "**MUST NOT** wrap a helper in a subagent." in execution
+    assert "Delegate Research to `hunter`" in execution
+    assert "without nested agents" in execution
+    assert "**MUST NOT** wrap those helpers in a subagent." in execution
+    assert "Wayfinder verifies citations and saves each exact final destination" in wayfinder
     assert "`hunter`" in execution
     for helper in ("Research", "Prove", "Challenge this", "Deep Module", "Code Sketch", "Grill"):
         assert f"| {helper} |" in execution

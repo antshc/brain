@@ -4,13 +4,7 @@ Apply proof checks relevant to the assigned angle at How’s selected depth. Beh
 
 ## Codebase lookups
 
-Send Explore requests directly to `hunter`; if unavailable, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for system evidence and bounded requests for gaps. Pass each Explore request:
-
-- `@work` — the filled explorer prompt or a bounded question. For a bounded question use the lookup's `@work` prefix, or `Exact literal X` / `Symbol Type.Member` when applicable. A Flow request names both ends in user or code words so Hunter can trace the path. Preserve literal and symbol spelling.
-- `@shape` and `@depth` — from the lookup table for the assigned angle.
-- `@target` — deployable or repository names as stated.
-- `@outputShape` — the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up.
-- `@research` — this skill's absolute base directory.
+Execute bounded lookups directly using Research's Local search and Evidence checklist. Sequence dependent lookups. Preserve exact literal/symbol spelling; name both ends of a Flow. Set the angle's local hints below, target/ref and expected cited evidence; no agent dispatch.
 
 | Lookup | `@shape` | `@depth` | `@work` prefix |
 |---|---|---|---|
@@ -21,7 +15,7 @@ Send Explore requests directly to `hunter`; if unavailable, record the blocked e
 | Isolated symbol or package call site | `symbol` | `quick` | `Symbol Type.Member:` |
 | Citation line, config key, route path, table or queue name | `literal` | `quick` | `Exact literal X:` |
 
-Hunter handles Graphify. For restored package evidence, send a request with `@shape: nuget`. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
+Local search handles Graphify. For restored package evidence, apply the registered NuGet tactic directly with `@shape: nuget`. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
 
 ## Evidence checks
 
@@ -31,6 +25,6 @@ Hunter handles Graphify. For restored package evidence, send a request with `@sh
 
 ## Runtime checks
 
-Static source establishes possible behavior. When runtime selection, ordering, binding, or a live value could change the answer, use authorized access and a safe target to check the actual outcome. Prefer existing test results, read-only queries, or correlated traces. Stay within Hunter's read-only contract for delegated evidence. If a check needs an instrumented or state-changing probe, keep it outside Hunter and run it only when the request authorizes that probe on a safe target. Otherwise record the claim, blocker, and exact next check.
+Static source establishes possible behavior. When runtime selection, ordering, binding, or a live value could change the answer, use authorized access and a safe target to check the actual outcome. Prefer existing test results, read-only queries, or correlated traces. Stay within Research's Read-only contract. An instrumented or state-changing probe belongs outside Research and requires its own authorized safe execution context. Otherwise record the claim, blocker, and exact next check.
 
 Record the command or query, environment, and observation. For a distributed trace, record the correlation ID and observed handoffs. Keep runtime results separate from code-derived possibilities in the report.

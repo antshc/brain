@@ -17,7 +17,7 @@ Challenge this is supporting verification inside an existing issue or root-owned
 - Contract test: new/significantly changed contract or inheritance abstraction → Contract design, not Grilling. Human Choice remains on the same open issue after Options; release claim while waiting.
 - Default human decisions → Grilling. Helpers clarify supporting facts automatically; no agent speaks for the user.
 - Create tickets only after user approval of the proposed batch; approval precedes any Research or evidence dispatch for them.
-- Wayfinder runs every helper (Research, Prove, Challenge this, Deep Module, Code Sketch, Grill) in its own session; no wrapper subagent. Each helper spawns its own workers by default; Research sends Explore to `hunter`. Use the Git skill for worktrees where isolation is needed.
+- Wayfinder delegates Research to Hunter, which loads the selected Research route and executes without nested agents; Wayfinder saves returned reports. Prove, Challenge this, Deep Module, Code Sketch and Grill run in the Wayfinder session with their own dispatch; no wrapper subagent for those helpers. Use the Git skill for worktrees where isolation is needed.
 - Reassess root fog after every result/answer; retain partially resolved risks and blocked choices. Supported resolution moves to Decisions so far before removing active fog; reopening preserves stable ID.
 - A completed helper run does not by itself resolve its parent unknown or imply verified mitigation. No counterexample found establishes only tested coverage.
 

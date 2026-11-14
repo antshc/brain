@@ -170,15 +170,15 @@ Silence, destination approval or approval of an earlier batch is not ticket appr
 
 ## Helper execution
 
-Run each helper in the Wayfinder session with its default dispatch. **MUST NOT** wrap a helper in a subagent. Skip Architect.
+Delegate Research to `hunter`, instructing it to load and follow Research with the selected route. Research runs entirely inside Hunter, without nested agents. Run other helpers in the Wayfinder session with their default dispatch; **MUST NOT** wrap those helpers in a subagent. Skip Architect.
 
 | Helper | Run | Workers |
 | --- | --- | --- |
-| Research | *Load and follow the `research` skill to investigate technical questions across source code, docs, packages and external evidence and return cited findings* with Research routing inputs | Research-owned |
+| Research | Spawn `hunter` with this instruction: *Load and follow the `research` skill to investigate technical questions across source code, docs, packages and external evidence and return cited findings* with Research routing inputs | One Hunter; no nested agents |
 | Prove | *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* | Prove-owned |
-| Challenge this | Per Risk verification, *load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
+| Challenge this | Per Risk verification, *Load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
 | Deep Module | Read the Deep Module playbook registered in the router fully; run it | Design It Twice designers |
-| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; Explore requests → `hunter` |
+| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; direct Research, or caller-delegated Hunter for standalone gaps |
 | Grill | Read the Grill playbook registered in the router fully; run it | None; lookups via Research |
 
 Supply question/scope, pinned checkout/revision, unknown IDs, existing owner, prerequisites, limits, exact outputs and cleanup ownership. Run helpers sequentially. Dependent work waits for integrated prerequisites. Record returned artifacts, findings, coverage, actual worker type/model and new unknowns on the issue/root Result. Wayfinder owns commits/integration. Hunter or required worker unavailable → record the blocked request on the owner; continue independent work.
@@ -218,7 +218,7 @@ For a system question, choose `Behavior` for one deployable, `Flow` for handoffs
 
 Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for System), and the part's question when the ticket spans multiple parts. For Cloud, include the provider, service, and need for live values.
 
-For every research dispatch, pass the ticket's Question as `@question`, Research scope as `@researchScope`, and content framing as `@outputShape`. Wayfinder selects an exact report file per part before dispatch: preserve an explicit ticket destination; otherwise use `docs/research/<initiative-slug>/<ticket-slug>.md` for one part or `docs/research/<initiative-slug>/<ticket-slug>-<part-slug>.md` for separate parts. Pass these as `@outputPath` (a question-to-file mapping for multiple reports), with the ticket worktree's absolute repository root as `@outputBase`. Wayfinder owns this convention; Research never chooses filenames. Reject destination conflicts before writing. For older tickets infer and persist scope before dispatch. For Why pass `@mode=why` instead of a conflicting scope.
+For every research dispatch, spawn Hunter with the Research invocation from Helper execution and explicit `@route` when known (system lookup → explore, system inspection → how; otherwise why/cloud/web). Use auto only when unresolved. Hunter returns complete reports inline; Wayfinder verifies citations and saves each exact final destination before integration/synchronization. Pass the ticket's Question as `@question`, Research scope as `@researchScope`, and content framing as `@outputShape`. Wayfinder selects an exact report file per part before dispatch: preserve an explicit ticket destination; otherwise use `docs/research/<initiative-slug>/<ticket-slug>.md` for one part or `docs/research/<initiative-slug>/<ticket-slug>-<part-slug>.md` for separate parts. Pass these as `@outputPath` (a question-to-file mapping for multiple reports), with the ticket worktree's absolute repository root as `@outputBase`. Wayfinder owns this convention; Research never chooses filenames. Reject destination conflicts before writing. For older tickets infer and persist scope before dispatch. For Why pass `@mode=why` instead of a conflicting scope.
 
 ## Fog of war
 

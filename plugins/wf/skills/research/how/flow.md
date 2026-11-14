@@ -19,7 +19,7 @@ Add findings to the How explanation; the caller owns any save destination.
 
 ## Presentation
 
-The Explainer chooses the view under Visualize: ownership/responsibility → swimlane or container; interaction order → sequence. If lanes help, use one per deployable and 1–5 boundary-relevant steps per lane; label crossings with contracts. Back every node/crossing with evidence. Do not require a diagram when prose or a table answers the question.
+Choose the view using How report’s Visualize: ownership/responsibility → swimlane or container; interaction order → sequence. If lanes help, use one per deployable and 1–5 boundary-relevant steps per lane; label crossings with contracts. Back every node/crossing with evidence. Do not require a diagram when prose or a table answers the question.
 
 ## Deployable eligibility
 

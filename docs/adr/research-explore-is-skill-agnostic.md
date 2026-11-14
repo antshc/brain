@@ -1,12 +1,19 @@
-# Hunter owns the skill-agnostic Explore procedure
+# Research owns direct investigation; callers own Hunter delegation
 
-Hunter runs Explore for caller-supplied questions, prompt instructions, and named skills. It resolves targets, reads contracts, selects tools, enforces read-only rules, and returns evidence. The caller reads the Research skill's Explore request contract, forms the work and return shape, and dispatches Hunter with that request verbatim. If Hunter is unavailable, the caller reports the blocked evidence request and continues independent work.
+Research owns route selection, local target resolution, contract-first search, Graphify, NuGet, evidence collection, verification and synthesis. Each route executes in the invoking agent without subagents. Hunter is a read-only wrapper that loads Research and the supplied route, or lets Research infer it. All routes are available; only selected and triggered resources load.
 
-Research routes current-system questions to How. How owns discovery, depth, evidence dispatch and reconciliation, explanation, and delivery; Hunter executes the Explorer prompt. The Explainer synthesizes verified findings and selects useful diagrams. Callers own artifact destinations and supply exact `@outputPath` values and `@outputBase` for relative paths; all Research routes return inline findings when no save is requested. Research has no default report directory, filename, or lens suffix. It returns pure lookup verdicts inline. Hunter uses local checkouts only, Graphify for covered relationships, and the NuGet tactic for resolved package-cache evidence. Missing local checkouts or refs are blockers; Hunter does not use remote repository tools, clone, or fetch to fill them. A caller may name the one output artifact Hunter is allowed to write.
+Callers delegate research by spawning Hunter with a complete question, route when known, target/ref and return shape, instructing it to load Research. Loading Research directly runs in the current agent and never triggers Hunter. Existing review/proof workers invoke Research directly for their own evidence. Independent questions may have separate Hunters only when the caller chooses that decomposition.
+
+How explains current behavior directly. The Explainer role and prompt are removed; explanation and diagram guidance live in How/report. Why searches its seven evidence categories and synthesizes in the same agent while preserving source coverage, null results and confidence tiers.
+
+Repository evidence uses local checkouts and resolved package caches only. Missing checkout/ref is a blocker; remote documentation and PR discussion never replace missing implementation evidence. Graph coverage uses main checkouts; source evidence stays in the requested worktree. Preserve read-only query, cache and tooling exceptions from Research.
+
+Callers own exact report paths and bases. Hunter returns complete reports inline for the caller to save; only an explicitly assigned evidence artifact is writable. Direct Research may save its exact caller-selected final report. No default report directory or filename.
 
 ## Alternatives considered
 
-- Keeping Explore as a separate skill or Research worker route split ownership between the agent and skill. Callers had to instruct each worker to load that route.
-- Listing callable skills inside Explore would require a second roster to keep current. The caller already knows which question, prompt, or skill it needs.
-- Having Explore spawn its own workers would move the split away from the caller that knows the independent tracks and dependencies.
-- Inlining Graphify commands would bypass the graph health, corpus, and fallback rules maintained by its tool skill.
+- Caller-selected routes only: precise but duplicates routing knowledge; retain optional explicit routes plus automatic selection.
+- Multiple Hunters coordinated by the caller: useful for independent questions; optional caller behavior, never internal Research fan-out.
+- Research-owned evidence and explanation agents: rejected because Hunter forbids nested agents and direct execution should work without delegation.
+
+Hunter omits the tool allowlist so available web/cloud/MCP capabilities remain accessible. This is [documented custom-agent behavior](https://docs.github.com/en/copilot/reference/custom-agents-configuration); Research’s read-only/no-subagent rules still constrain use. Missing tools/access remain explicit evidence gaps.
