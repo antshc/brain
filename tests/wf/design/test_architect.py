@@ -45,17 +45,25 @@ def test_factory_uses_one_autonomous_feature_flow_and_optional_checkpoint():
     assert "Auto Address/Diagnose" not in (FACTORY / "references/post-implementation.md").read_text()
 
 
-def test_other_playbooks_do_not_route_to_feature():
-    for name in ("design", "prototype", "investigation", "refactoring"):
-        playbook = (FACTORY / f"playbooks/{name}.md").read_text()
-        assert "`feature` playbook" not in playbook
-        assert "`architect` playbook" not in playbook
-    assert "Next:" not in (FACTORY / "playbooks/design.md").read_text()
-    assert "Hand the chosen direction" not in (FACTORY / "playbooks/prototype.md").read_text()
-    assert "re-route" not in (FACTORY / "playbooks/investigation.md").read_text()
-    assert "route to the" not in (FACTORY / "playbooks/refactoring.md").read_text()
+def test_design_playbook_does_not_route_to_feature():
+    playbook = (FACTORY / "playbooks/design.md").read_text()
+    assert "`feature` playbook" not in playbook
+    assert "`architect` playbook" not in playbook
+    assert "Next:" not in playbook
 
     review = (ROOT / "review/playbooks/code.md").read_text()
     assert "Feature playbook" not in review
     assert "Architect playbook" not in review
     assert "Workflow invocation:" not in review
+
+def test_removed_factory_playbooks_have_no_stale_links():
+    skill = (FACTORY / "SKILL.md").read_text()
+    help_text = (FACTORY / "help.md").read_text()
+
+    for name in ("investigation", "prototype", "refactoring"):
+        assert not (FACTORY / f"playbooks/{name}.md").exists()
+        assert f"playbooks/{name}.md" not in skill
+
+    assert "/factory-mode prototype" not in help_text
+    assert " investigation      " not in help_text
+    assert " refactoring        " not in help_text
