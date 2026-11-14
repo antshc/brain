@@ -90,6 +90,8 @@ flowchart TD
 
 Solid edges are work within Wayfinder; dotted edges require a separately requested handoff. Repeat connectors resume the numbered step. User answers are explicit; only the user ends Grill. Prove/Experiment and sketch prototype artifacts enter integration/HLD after explicit payload approval; Challenge this evidence updates root fog/HLD automatically without approval. Contract design additionally requires Choice.
 
+Wayfinder saves proposed map and ticket bodies as temporary Markdown review drafts, then presents a clickable bullet list before asking for approval. Review files contain full bodies and metadata; opening them grants no approval. Drafts survive pauses and publication retries; changed proposals receive fresh revision links and require renewed approval. Tracker creation and ticket evidence dispatch wait for approval of the exact proposal.
+
 ### Fog solving
 
 ```mermaid

@@ -112,7 +112,7 @@ Resolve `{{trackerRepository}}` through *Load and follow the `git` skill to run 
 
 Missing workflow labels → ask the user to follow the [WF installer](https://github.com/antshc/brain/blob/main/plugins/wf/install/install.md) in labels-only mode. Missing tools, authentication, permissions, or failed writes → stop the dependent operation and report known remote changes; persist pending work where possible and continue independent questions. Do not claim a map/claim/resolution exists until confirmed; no Jira/local tracker fallback.
 
-Use `--body-file <file>` with a temporary UTF-8 file for literal multiline bodies, evidence, and comments. Remove temporary files after use. Placeholder values are arguments, not shell expressions.
+Use `--body-file <file>` with a temporary UTF-8 file for literal multiline bodies, evidence, and comments. Remove disposable transport files after use. Wayfinder Ticket approval review drafts are retained separately: keep pending/approved revisions through approval pauses, publication failures and reconciliation; clean only this run’s owned drafts after verified issue/link publication or explicit discard. Preserve unrelated files and pending proposals. Create from the recorded approved revision; resolve symbolic parent/blocker keys only to verified issue links, preserving all other approved content. Placeholder values are arguments, not shell expressions.
 
 ### Create ticket
 
@@ -160,7 +160,7 @@ Read the persisted integration branch/worktree and pin its current local HEAD. R
 
 ### Commit the document
 
-1. Verify the integration worktree is on its recorded branch and read its latest local document. Preserve concurrent work; serialize writes. Stage only the HLD and artifacts already eligible for integration; pending approval-gated prototypes stay in their result worktrees. Document synchronization cannot bypass Prototype approval. *Load and follow the `git` skill to run verified Git mechanics for commit messages and history* using Commits. Done when the local commit contains only intended changes.
+1. Verify the integration worktree is on its recorded branch and read its latest local document. Preserve concurrent work; serialize writes. Stage only the HLD and artifacts already eligible for integration; pending approval-gated prototypes stay in their result worktrees; temporary proposal review drafts remain untracked. Document synchronization cannot bypass Prototype approval. *Load and follow the `git` skill to run verified Git mechanics for commit messages and history* using Commits. Done when the local commit contains only intended changes.
 2. Verify document/artifact paths at HEAD and record synchronized result identity and HLD SHA through Update map or ticket. Keep tracker failures pending; do not repeat an already verified commit. Done when local synchronization and tracker state are separately confirmed. No push or PR.
 
 ### Integrate a result
