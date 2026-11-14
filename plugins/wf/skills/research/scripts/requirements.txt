@@ -1,4 +1,4 @@
-# focused_query.py imports directly: graphifyy (module graphify), networkx. The rest are graphify's pinned dependencies.
+# graph.py focused commands (focused_query.py) import directly: graphifyy (module graphify), networkx. The rest are graphify's pinned dependencies.
 graphifyy==0.9.107
 networkx==3.4.2
 numpy==2.2.6

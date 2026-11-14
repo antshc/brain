@@ -19,7 +19,7 @@ Research codebase exploration prompt for the Explore and How routes. The `resear
 
 - `@work` — the task: question or filled How explorer brief, targets/refs, inputs, and the return shape the caller needs.
 - `@frame` — the router's Frame: original and rephrased question, glossary terms, route, resolved targets with absolute paths, Deployables and boundaries, contracts already read, and graph coverage.
-- `@research` — absolute base directory of the research skill; resolves the Graphify and NuGet tactics and `scripts/focused_query.py`.
+- `@research` — absolute base directory of the research skill; resolves the Graphify and NuGet tactics and `scripts/graph.py`.
 
 ## Rules
 
@@ -65,10 +65,10 @@ Before the first search, print `route: rg | lsp | graphify-path | graphify-find 
 - **LSP** — definitions, references, implementations, call hierarchy for known symbols; follow with `rg`.
 - **rg** — literals, config keys, error text, routes, tests, globs: the `rg` or grep tool, or shell `rg` (`-t <lang>` / `-g <glob>`). Missing `command -v rg` → install once per-user, no sudo: latest `BurntSushi/ripgrep` release asset for the platform (`x86_64-unknown-linux-musl`, `aarch64-unknown-linux-gnu`, `<arch>-apple-darwin` `.tar.gz`; `x86_64-pc-windows-msvc` `.zip`), verified against its `.sha256`, only `rg` extracted to `~/.local/bin/` (Windows: `%LOCALAPPDATA%\Programs\ripgrep\`), run by absolute path when not on `PATH`. Install fails → LSP and bounded reads; report the coverage gap.
 - **Glossary** — fuzzy concept or unknown ownership → read `GLOSSARY.md` and the matching concept doc first to translate into code vocabulary.
-- **Graphify** — routes `graphify-path` and `graphify-find` only, on a covering graph. Before use, read `@research/how/graphify.md` and `<graph root>/GRAPHIFY.md` (when present) in full. Run `@research/scripts/focused_query.py` from the graph root with the interpreter in `graphify-out/.graphify_python`, else `python3`.
+- **Graphify** — routes `graphify-path` and `graphify-find` only, on a covering graph. Before use, read `@research/how/graphify.md` and `<graph root>/GRAPHIFY.md` (when present) in full. Run every graph operation through `@research/scripts/graph.py` from the graph root with the interpreter in `graphify-out/.graphify_python`, else `python3`.
   - `graphify-path`: `resolve` both ends, then `path <A> <B>` before any `query` or `rg`; walk each hop in source. A hop through a DTO, exception, or base class is a shortcut → `query <hop> --anchor --both` for the real neighbor.
   - `graphify-find`: `terms "<question>"`, then `query` with the top 1-2 identifier terms; open the top production hits.
-  - Fallbacks: `graphify path | explain` CLI only when the script cannot run; inline `graph.json` traversal only when both are missing.
+  - Fallbacks: `graphify path | explain` CLI only when the focused commands cannot run; `graph.py raw-path | explain | traverse` only when both are missing.
   - Read-only overrides: skip `graphify reflect --if-stale` (read `graphify-out/reflections/LESSONS.md` if present); never `save-result`, `--update`, add, watch, export, feedback, or rebuild.
   - Worktree target → translate graph paths from `@mainCheckout/…` to `@worktreeRoot/…` before reading source.
 - **NuGet** — route `nuget`: read `@research/how/nuget.md` in full and follow it. An unknown package ID is a valid entry state.
@@ -79,7 +79,7 @@ Before the first search, print `route: rg | lsp | graphify-path | graphify-find 
 - `rg` and the grep tool skip gitignored and hidden files (generated code, build output, `graphify-out/`, vendored folders). Re-search with `rg -uu` before claiming absence.
 - **MUST NOT** run recursive `grep` (`-r`, `-R`, `find -exec grep`, `xargs grep`) or chain `rg … || grep …`; `grep` filtering piped `rg` output is fine. Loaded skills' shell snippets do not relax this.
 - **MUST NOT** look for `graphify-out/` inside a worktree: graphs are gitignored, built from the launch folder, and `.graphifyignore` excludes worktrees. Run graphify from the graph root, never a worktree.
-- **MUST NOT** pass question text to `graphify query`; pass 1-2 identifier terms. `focused_query.py` `terms` takes the question.
+- **MUST NOT** pass question text to `graphify query`; pass 1-2 identifier terms. `graph.py terms` takes the question.
 - The graph reflects the main checkout's branch at build time; source wins on any difference. A missing node is never absence evidence. Cite source files, not graph nodes.
 - `@research` missing → Graphify and NuGet tactics unavailable; say so in the return.
 - `ModuleNotFoundError` for `graphify`/`networkx` → install `@research/scripts/requirements.txt` with that interpreter; never upgrade or unpin.
@@ -97,6 +97,6 @@ Run last, after every search and before Return:
 
 ## Return
 
-Repeat the `route:` line(s), then return everything the caller needs to act without re-reading the code, in the shape `@work` asks for, else: a direct answer, then findings with files, symbols, relationships, and short relevant code excerpts, ordered by relevance. Size follows the question, not a length limit. Cite code claims with absolute `path:line`. List every graph command as run (`focused_query.py <command> <args>`) or `graph skipped: <reason>`.
+Repeat the `route:` line(s), then return everything the caller needs to act without re-reading the code, in the shape `@work` asks for, else: a direct answer, then findings with files, symbols, relationships, and short relevant code excerpts, ordered by relevance. Size follows the question, not a length limit. Cite code claims with absolute `path:line`. List every graph command as run (`graph.py <command> <args>`) or `graph skipped: <reason>`.
 
 No match after the `rg -uu` recheck → exactly `NOT FOUND` plus the searched roots after the route line. Mark unresolved targets, incomplete evidence, and tooling blockers. Return inline; write no file.
