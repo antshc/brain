@@ -159,9 +159,9 @@ Every ticket is either HITL — human in the loop, worked with a human who speak
 
 ## Ticket approval
 
-**MUST** get user approval before creating any map child or sub-ticket and before dispatching Research or other evidence work for it. Applies on chart, after every result/answer and on resume.
+**MUST** get user approval before creating the map or any map child or sub-ticket and before dispatching Research or other evidence work for it. Applies on chart, after every result/answer and on resume.
 
-1. Present the proposed batch in one interaction: per ticket title, `wayfinder:<type>`, Mode, Helper, Question, Unknown IDs, Research scope (research only) and Blocked by. Ask the user to approve, edit, add, drop or merge tickets. Done when the user answered.
+1. Present the proposed batch in one interaction: per ticket title, `wayfinder:<type>`, Mode, Helper, Question, Unknown IDs, Research scope (research only), Blocked by and rendered body. Prototype tickets add: Experiment → claim, deciding criteria, report path; Code Sketch → target modules, sketch root; Contract design → contract scope, option count, option root; each → owned worktree and Prototype approval before integration. On chart, include the map title and body. Ask the user to approve, edit, add, drop or merge. Done when the user answered.
 2. Apply edits; rerun the Contract test on changed questions; re-present only materially changed tickets. Done when every proposal is approved or dropped.
 3. Create only approved tickets via **Create a ticket** / **Create a sub-ticket**. Dropped proposals stay in fog with next action `Awaiting ticket approval`, or move to Out of scope only on an explicit user scope decision. Done when created tickets are verified on the tracker.
 
@@ -241,7 +241,7 @@ Ruling something out of scope is a scoping act, not a step on the route. When a 
 
 Load [Wayfinder operations](../references/github.md#wayfinder-operations) registered in the router and follow its GitHub operations for this tracker repository. Keep GitHub-specific commands in the reference; do not configure another backlog backend.
 
-- **Create the map**: **Create ticket** with label `wayfinder:map` and the map body template above.
+- **Create the map**: only after Ticket approval. **Create ticket** with label `wayfinder:map` and the map body template above.
 - **Create a ticket**: only after Ticket approval. **Create Wayfinder sub-ticket** with `parentIssueNumber` = the map, label `wayfinder:<type>`, body = Question + Unknowns + Work + Research scope (research only) + Blocked by + Part of; Result is added on dispatch.
 - **Create a sub-ticket**: only after Ticket approval. **Create Wayfinder sub-ticket** with `parentIssueNumber` = the ticket it's narrower than, label `wayfinder:<type>`, body = Question + Unknowns + Work + Research scope (research only) + Blocked by + Part of; Result is added on dispatch. Use when a resolution surfaces a decision that's child-scoped to the ticket just worked, not a fresh frontier item.
 - **Claim a ticket**: **Assign ticket**.
@@ -262,7 +262,7 @@ Supply a loose idea to chart a map, or a map issue number or URL and an optional
 
 1. Complete Session and document setup through branch/worktree creation. Use Grill to name the destination; seed and locally commit its HLD. Done when the selected document exists before frontier/evidence work.
 2. Use Grill breadth-first to chart open decisions and first ready steps. Synchronize confirmed answers and unknowns. Even a one-session effort retains its document and integration branch; a map is optional only if no tracked questions remain. Done when scope and unresolved questions are explicit.
-3. Create the map with Destination, Notes, Document and branches, and fog. Persist local branch, worktree, ownership and commit identities using **Update map or ticket**. Propose currently specifiable tickets, typing each by the Contract test, and run Ticket approval; create only approved tickets, then add blockers in a second pass. Done when approved tickets, native child links and dependencies are verified.
+3. Propose the map (Destination, Notes, Document and branches, fog) with currently specifiable tickets, typing each by the Contract test, and run Ticket approval. Create the approved map; persist local branch, worktree, ownership and commit identities using **Update map or ticket**; create only approved tickets, then add blockers in a second pass. Done when the map, approved tickets, native child links and dependencies are verified.
 4. Run **Automatic runs** on approved tickets without a further dispatch confirmation gate. Done when ready factual work is resolved or blocked and the next human decision is presented.
 
 ### Automatic runs
