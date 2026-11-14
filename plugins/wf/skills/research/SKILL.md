@@ -8,12 +8,6 @@ description: >-
 
 Return cited findings inline or save at caller-selected destinations. How orchestrates current-system research; Hunter executes reusable Explore requests.
 
-## Caller dispatch
-
-When supplied, `@helperDispatch` overrides default worker type/model/dispatch instructions throughout this skill and its selected resources, including nested calls. Forward it verbatim to every worker and helper; directly spawn skill-capable general-purpose workers without loading/invoking the Subagents skill. Preserve evidence, scope, local-target/read-only constraints, independent reproduction and isolation requirements. Reuse supplied verified checkouts; use the Git skill for additional worktrees where needed. Without this input, existing dispatch below is unchanged.
-
-Under this override, general-purpose system-evidence workers perform the Explore/inspection contract directly: resolve the supplied local checkout/ref, read relevant repository contracts, use available Graphify/NuGet resources registered below when applicable, remain read-only and return cited path/line or symbol evidence with scope/gaps. No Hunter dependency; unavailable evidence tools yield precise blockers, not invented results.
-
 ## Inputs
 
 - `@question` — research question. Ask if missing.
@@ -100,7 +94,7 @@ Read triggered resources in full from this skill base, not caller CWD. These dir
 
 Large reading dispatch or material measurement claims → *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `Guard the context window` for bounded source-reading briefs and `Explain the number` before relying on measurements. Keep source-based, inferred and observed evidence distinct; preserve existing delegation contracts.
 
-For independent non-How workers with `@helperDispatch`, directly spawn general-purpose workers under that policy; otherwise *Load and follow the `subagents` skill to dispatch independent workers with role-based models* using Dispatch. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
+For independent non-How workers, *load and follow the `subagents` skill to dispatch independent workers with role-based models* using Dispatch. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
 
 Cloud briefs include provider, mode (`question` or `implementation`), services, operations, region, account/subscription, relevant dimensions, and need for live values. Pass the loaded contract, template, and selected provider; request the filled report inline.
 

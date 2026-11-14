@@ -4,7 +4,7 @@ Own the interview and session design state: when to look up, log, ask, or write.
 
 ## Caller dispatch
 
-Wayfinder supplies `@helperDispatch`: forward it to Research and all nested helpers. It overrides default Hunter/Subagents dispatch with direct read-only general-purpose workers and the supplied model policy; preserve lookup evidence and full resource-loading requirements. Wayfinder relays each question and actual user answer, retains control and synchronizes root fog/HLD. Standalone dispatch below remains unchanged.
+Wayfinder runs Grill in its own session: lookups follow the Fact lookup contract with Research default dispatch; no wrapper subagent. Preserve lookup evidence and full resource-loading requirements. Wayfinder retains control, records each actual user answer and synchronizes root fog/HLD. Standalone dispatch below remains unchanged.
 
 ## Scope
 
@@ -30,7 +30,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 
 | Operation | Invocation and inputs | Required result |
 |---|---|---|
-| Code/test lookup | *Load and follow the `research` skill to investigate technical questions across source code with a symbol or caller lookup and return cited findings*; use **Explore request**; form the bounded question, target, depth, and output shape. Send the request verbatim to one `hunter` per independent track. Sequence dependent tracks. If Hunter is unavailable, record the blocked lookup and continue independent tracks. | Findings with `path:line` or symbol evidence, unknowns, and completion/blocker status. |
+| Fact lookup | *Load and follow the `research` skill to investigate technical questions across source code, docs, packages and external evidence and return cited findings*. Read the full Research body; select the route per its Routing: Explore → one literal, symbol, caller or package API; How → current behavior or inspection; Why (`@mode=why`) → rationale behind existing code, constraint or workaround; Cloud → AWS/Azure provider or service constraint; Web → public spec, vendor or third-party API docs. Load that route's required resources fully; follow Research dispatch. Pass the bounded question, target, depth and inline `@outputShape`; no `@outputPath`. One request per independent track; sequence dependent tracks. Blocked route or worker → record the blocked lookup; continue independent tracks. | Selected route plus findings with `path:line`, symbol, commit/PR or source URL evidence, confidence (Why), unknowns, and completion/blocker status. |
 | Index load/scan/sync | *Load and follow the `record-architecture` skill to maintain architecture indexes.* Use route `index`, action `load`, `scan`, or `sync-row`, and required metadata; row mutations use `rowAction`. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
 | Record | *Load and follow the `record-architecture` skill to record settled architecture.* Select route `term`, `adr`, or `concept-record`; load the procedure before checking its gate. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
 
@@ -58,7 +58,7 @@ Before **every question**, including fact-gap, term, ADR-scope, and close questi
 
 After every answer, record it and perform required inline writes; run *Every turn*, re-check *Tactics* triggers and affected decision keys. When the answer changes evidence or dependencies, rebuild assumptions and the frontier before selecting the next question. Withdraw obsolete questions, defer blocked ones, and preserve stable IDs. Unanswered questions remain pending, never implicitly accepted. Newly unblocked dependents become eligible immediately; do not wait for other frontier questions to be answered.
 
-Use the code-lookup contract to obtain environmental facts rather than asking the user to research them. Running lookups are unsettled prerequisites: hold their dependent questions and select one other ready question without waiting. If a lookup fails or stays inconclusive, follow *Gotchas* rather than inventing a fact. Index loading, lookups, and ledger/record writes still use their required tools.
+Use Fact lookup to obtain environmental facts rather than asking the user to research them. Running lookups are unsettled prerequisites: hold their dependent questions and select one other ready question without waiting. If a lookup fails or stays inconclusive, follow *Gotchas* rather than inventing a fact. Index loading, lookups, and ledger/record writes still use their required tools.
 
 Before ending each turn, persist frontier changes, answers, evidence, blockers, and next action. During an active interview, end on the next question or explicit request to close; after a write, name the affected branches and return to questioning. If only running prerequisites remain, persist and report the wait without claiming the tree is resolved. An empty frontier is resolved only when no blocked prerequisites or unanswered questions remain.
 
@@ -98,7 +98,7 @@ Unknown applicability alone creates a fact-gap prerequisite, not a policy decisi
 
 - Communicate primarily through **context pointers**: linked record paths/anchors, code locations, source URLs, and ledger question/decision IDs.
 - Do not duplicate information already available through those pointers. In questions, reports, lookup briefs, and handoffs, link the source and state only the new question, decision, change, or uncertainty; keep required recommendations and decision summaries concise.
-- Prefer the code-lookup contract for broad code/test searches; use direct reads for a known evidence location.
+- Prefer Fact lookup for broad code/test searches; use direct reads for a known evidence location.
 - Re-fetch an artifact when first needed or when its required evidence is no longer available in context. Prefer reuse after a confirmed write; re-read when verification or a detected change requires it, not on a schedule.
 - Authority: `GLOSSARY.md` / `ARCHITECTURE.md` / ADR / Concept > code > external sources. Surface unresolved conflicts, including conflicts within the same rank; apply only explicit recorded overrides, otherwise ask rather than silently choosing an authority.
 
@@ -139,7 +139,11 @@ Re-check each tactic's trigger after every user answer or new fact. A later answ
 
 **Concrete scenarios** — when a domain relationship, boundary, or invariant is asserted as fact, invent edge cases that expose its limits.
 
-**Code cross-reference** — when the user states how something works, use the lookup contract to check user-facing, application, integration, and persistence boundaries: validation, constraints, models, schemas, contracts, relationships, and logic. Surface contradictions with both the claim/record anchor and code `path:line` or symbol evidence. A contradiction against a Concept/ADR is Drift; log both sources. Missing proof → label `unverified`, retain the fact gap, and avoid presenting it as an established contradiction.
+**Code cross-reference** — when the user states how something works, use Fact lookup to check user-facing, application, integration, and persistence boundaries: validation, constraints, models, schemas, contracts, relationships, and logic. Surface contradictions with both the claim/record anchor and code `path:line` or symbol evidence. A contradiction against a Concept/ADR is Drift; log both sources. Missing proof → label `unverified`, retain the fact gap, and avoid presenting it as an established contradiction.
+
+**Rationale probe** — when the user or a record asks why existing code, a constraint or a workaround exists, or a decision would remove it, run Fact lookup via Why before proposing the change. Report Why confidence as returned; low confidence or missing sources stay a fact gap.
+
+**External fact check** — when a decision depends on a provider limit, service behavior, public spec or third-party API, run Fact lookup via Cloud (AWS/Azure) or Web. Rank findings per the Authority rule; a conflict with a record or code becomes a question, never a silent override.
 
 **Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [tactics-verification.md](../references/tactics-verification.md) and apply the coverage-category check.
 

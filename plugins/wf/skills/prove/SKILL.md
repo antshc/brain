@@ -8,10 +8,6 @@ description: >-
 
 Test the uncertainty with the smallest executable artifact exercising the actual mechanism. A failed assumption is a valid result. Passing cases establish only their exercised conditions.
 
-## Caller dispatch
-
-When supplied, `@helperDispatch` overrides default worker type/model/dispatch instructions throughout this skill and its selected resources, including nested calls. Forward it verbatim to every worker and helper; directly spawn skill-capable general-purpose workers without loading/invoking the Subagents skill. Preserve evidence, scope, local-target/read-only constraints, independent reproduction and isolation requirements. Reuse supplied verified checkouts; use the Git skill for additional worktrees where needed. Without this input, existing dispatch below is unchanged.
-
 ## Inputs
 
 Callers supply facts and limits; Prove owns method selection. Fill omitted framing from the request; ask only when the claim or intent remains unclear.
@@ -39,7 +35,7 @@ Prove follows Workflow. Execute follows only Execute, Result and Cleanup with it
 
 1. **Frame.** State question, assumption, intent, expected behavior, criteria and exclusions. *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `In your own words` for intent. A supplied sketch is context, not required input. Done when one claim can be refuted by a named observation.
 2. **Reuse or read.** Valid evidence for the same revision/environment settles it → reuse with provenance. Reading or deterministic reasoning suffices → *Load and follow the `research` skill to investigate technical questions across source code, docs, and the web and return cited findings*, passing the original question, output destination/base and framing. Stop with evidence labeled observed, source-based or inferred; do not claim a new run. Done when the deciding fact is supported or the empirical unknown remains explicit.
-3. **Isolate, Prove only.** With `@helperDispatch`, directly spawn one general-purpose Execute worker under that policy; otherwise *Load and follow the `subagents` skill to dispatch independent workers using role-based models and isolated outputs* using Dispatch, one general-purpose `prover` role. Supply Frame, facts/limits, explicit artifact destinations, and the Execute action. Request an owned git worktree with only scoped dirty inputs unless a verified checkout is supplied. Preserve its ownership record outside the worktree. Required isolation unavailable → report blocker. Done when the worker has its bounded writable environment and cleanup owner.
+3. **Isolate, Prove only.** *Load and follow the `subagents` skill to dispatch independent workers using role-based models and isolated outputs* using Dispatch, one general-purpose `prover` role. Supply Frame, facts/limits, explicit artifact destinations, and the Execute action. Request an owned git worktree with only scoped dirty inputs unless a verified checkout is supplied. Preserve its ownership record outside the worktree. Required isolation unavailable → report blocker. Done when the worker has its bounded writable environment and cleanup owner.
 4. **Execute.** The assigned worker follows Execute below; default Prove collects its report. Done when every attempt has evidence or a named blocker.
 5. **Reproduce, Prove only.** Independently rerun the exact command in the worker environment against the recorded target/patch. A changed environment, zero tests, missing assertion or unreproducible observation cannot confirm the claim. Done when reproduced output supports the conclusion or it is marked inconclusive.
 6. **Report and finalize.** Apply Result and Cleanup. Done when evidence is retained and every owned resource is removed or explicitly handed back for retention.

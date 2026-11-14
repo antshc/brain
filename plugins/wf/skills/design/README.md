@@ -98,8 +98,8 @@ flowchart TD
     start(["Fog solving"])
     read["1 - Read unknowns, risks and linked issue progress"]
     select["2 - Select cheapest sufficient helper and bounded question"]
-    work["3 - Link concrete work or root-owned verification run"]
-    spawn[["4 - Spawn general-purpose helper directly"]]
+    work["3 - Propose work; user approves tickets, or root-owned verification run"]
+    spawn[["4 - Run helper skill in Wayfinder session"]]
     verify["5 - Verify findings, artifacts and coverage"]
     outcome{"6 - Evidence and required approval ready?"}
     clear["6a.1 - Record outcome in Decisions so far"]
@@ -154,18 +154,18 @@ Contract design keeps its `wayfinder:contract-design` ticket across AFK Options 
 | Approve Prove/Experiment and sketch prototypes before integration | Retain its owned worktree, paths and reviewed revision; merge only the explicitly approved payload |
 | Keep Contract design Options → Choice | Agent prepares options; user selects; only then merge chosen artifacts and considered-option notes |
 | Challenge this is embedded and automatic | Verify scoped design or whole HLD without approval; isolate code changes/tests, then update fog/HLD |
-| Direct general-purpose subagents | Random latest supported Opus/Sol, medium thinking; no Subagents skill |
+| Helpers run in Wayfinder session | No wrapper subagent; each helper's own dispatch is the only worker level (Research Explore → Hunter) |
 | Git skill owns worktrees | Isolate gated prototypes and Challenge this code changes/tests; Wayfinder owns commits and serialized local integration |
 | HLD contains supported conclusions | Open Questions belong to users during presentation; reports/sketches remain local |
 | Explicit HLD-page-only publication | No evidence appendices, research subpages or report/sketch attachments |
 
 ## Responsibilities and handoffs
 
-All delegated helpers use skill-capable general-purpose subagents; these rows describe responsibilities, not worker types.
+Wayfinder runs every helper in its own session; helpers spawn their own workers (Research Explore → `hunter`). These rows describe responsibilities, not worker types.
 
 | Owner/helper | Responsibility | Returns to Wayfinder |
 | --- | --- | --- |
-| User | Scope, requirements, preferences, prototype approval, contract choice, residual-risk acceptance and publish request | Explicit decisions |
+| User | Scope, requirements, preferences, ticket approval, prototype approval, contract choice, residual-risk acceptance and publish request | Explicit decisions |
 | Wayfinder | Fog, scheduling, claims, dispatch, human relay, verification, prototype approval relay, commits/local integration and HLD synchronization | Next investigation, human choice, readiness or precise blocker |
 | Grill | One human decision at a time, session ledger and closing sweep | Actual user answers and new unknowns |
 | Research | Facts from code, cloud, history and primary sources | Cited findings and limits |
@@ -188,7 +188,7 @@ All delegated helpers use skill-capable general-purpose subagents; these rows de
 | HLD `docs/ongoing/<initiative-slug>.md` | Supported current design and ignored local provenance; no evidence appendices |
 | HLD Open Questions | User-filled presentation questions; agents preserve entries and blank answers |
 
-For each helper spawn, randomly choose Opus or Sol with equal probability, resolve the latest host-supported model and use medium thinking. Current repository names: `claude-opus-5.5`, `gpt-6.1-sol`; verify availability at execution. Forward the [Wayfinder direct-spawn policy](playbooks/wayfinder.md#helper-dispatch) to nested helpers without loading the Subagents skill. Research and read-only Challenge this inspection may reuse a pinned checkout. Prove/Experiment and sketch prototypes use Git-skill worktrees; Challenge this code changes or tests also require one. Producers do not commit/push. Wayfinder retains approval-gated prototypes without commit/merge until explicit approval of the exact reviewed payload, then integrates locally; Contract design also requires Choice. Challenge this evidence integrates automatically and updates fog/HLD without approval. Changes need renewed approval; silence or passing checks do not approve a prototype. Resume retains the same worktree and pending step; cleanup waits for verified integration, HLD/tracker synchronization and every consumer.
+Wayfinder runs Research, Prove, Challenge this, Deep Module, Code Sketch and Grill in its own session, never inside a wrapper subagent; each uses its default worker dispatch, so Research sends Explore requests to `hunter`. New tickets need user approval of the proposed batch before creation and research. Research and read-only Challenge this inspection may reuse a pinned checkout. Prove/Experiment and sketch prototypes use Git-skill worktrees; Challenge this code changes or tests also require one. Producers do not commit/push. Wayfinder retains approval-gated prototypes without commit/merge until explicit approval of the exact reviewed payload, then integrates locally; Contract design also requires Choice. Challenge this evidence integrates automatically and updates fog/HLD without approval. Changes need renewed approval; silence or passing checks do not approve a prototype. Resume retains the same worktree and pending step; cleanup waits for verified integration, HLD/tracker synchronization and every consumer.
 
 Discovery creates no push/PR or publication. Explicit `/design publish-hld` publishes the HLD page only; reports, proof artifacts and sketch packages remain local, without appendices, subpages or artifact attachments. Existing remote artifacts are not automatically deleted. Architect is outside Wayfinder; Architecture first remains a separate flow. For that flow, request a **design-only handoff** explicitly; Architect otherwise implements by default.
 
