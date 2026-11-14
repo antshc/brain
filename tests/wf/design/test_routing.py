@@ -83,7 +83,8 @@ def test_wayfinder_gates_ticket_creation_and_runs_helpers_without_nesting():
     execution = wayfinder.split("## Helper execution", 1)[1].split("\n## ", 1)[0]
 
     assert "- Ticket approval" in wayfinder
-    assert "before creating any map child or sub-ticket and before dispatching Research" in approval
+    assert "before creating the map or any map child or sub-ticket and before dispatching Research" in approval
+    assert "- **Create the map**: only after Ticket approval." in wayfinder
     assert "- **Create a ticket**: only after Ticket approval." in wayfinder
     assert "- **Create a sub-ticket**: only after Ticket approval." in wayfinder
     assert "**MUST NOT** wrap a helper in a subagent." in execution

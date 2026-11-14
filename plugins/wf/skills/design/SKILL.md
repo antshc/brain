@@ -46,9 +46,13 @@ Read triggered resources fully before use; resolve from this skill directory.
 | Grill external-source trigger | [External source](references/tactics-external-source.md) |
 | Grill closing/handoff | [Closing sweep](references/closing-sweep.md) |
 
-New Wayfinder tickets require user approval of the proposed batch before creation and research. It owns Not yet specified fog; HLD Open Questions are user-owned presentation content. Evidence is local-only: no research/proof/sketch appendices, Confluence subpages or artifact attachments.
+Wayfinder owns Not yet specified fog; HLD Open Questions are user-owned presentation content. Evidence is local-only: no research/proof/sketch appendices, Confluence subpages or artifact attachments.
 
 Wayfinder additionally reads the full Grill playbook for interviews and the full HLD playbook for document authoring, using the route table above. Spec remains a separate explicitly requested route; Wayfinder does not select it as an output format.
+
+## Ticket approval
+
+**MUST NOT** create any tracker issue or offline ticket file (Spec issue, implementation ticket, Wayfinder map, child, sub-ticket, follow-up) before the user explicitly approves that exact proposal. Present title, labels, parent, blockers and rendered body. Prototype tickets (Experiment, Code Sketch Task, Contract design) also show the claim and deciding criteria or sketch/contract scope, planned artifact paths, owned worktree and the Prototype approval gate. Silence, partial feedback, corrections, passing checks, and approval of a plan, destination or earlier batch are not approval; a changed proposal needs fresh approval. Selected playbooks own batching and presentation order.
 
 ## Principles
 
