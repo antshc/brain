@@ -56,14 +56,21 @@ One selectable outcome or execution path within an activated skill, with a trigg
 _Avoid_: playbook, tactic, mode folder
 
 **Playbook**:
-The task-level procedure for one route, including decisions, ordered actions, verification, and completion criteria. A router selects the playbook; the playbook owns the end-to-end outcome.
+The reusable guide describing how to handle a specific scenario for one route, including decisions, ordered actions, verification, and completion criteria. A router selects the playbook; the playbook owns the end-to-end outcome.
 _Avoid_: tactic, reference, checklist
 
 **Tactic**:
 A focused, reusable method applied conditionally within a route or playbook, such as external-source checking or runtime verification. It solves one subproblem rather than owning the complete task outcome.
 _Avoid_: playbook, route, skill
 
-See [Skill routing research](docs/research/agent-skill-routing-and-progressive-disclosure.md) for standards, examples, and pattern selection.
+**Procedure**:
+A prescribed sequence of steps to accomplish a task. Strict; emphasizes repeatability and predictable execution.
+
+**Routine**:
+A standardized, frequently repeated set of actions. Emphasizes consistency and automation.
+
+**Workflow**:
+A sequence of connected activities with transitions, dependencies, and decisions. Emphasizes coordination and execution flow.
 
 **Harness environment**:
 The repository that owns the specs and issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
