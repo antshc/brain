@@ -18,14 +18,13 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 ## Research
 
-*Load and follow the `research` skill to investigate technical questions across source code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research delegates codebase and NuGet evidence to Hunter and owns routing and synthesis for this call. Pass:
+*Load and follow the `research` skill to investigate technical questions across source code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research spawns its own route agents (`hunty` for codebase and NuGet evidence) and owns routing and synthesis for this call. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
-- `@outputPath`: exact file `<artifact-root>/research/<question-slug>.md` selected by Design; use distinct slugs for separate calls. For several independent reports, Design supplies a question-to-file mapping before dispatch; never pass only a directory.
-- `@outputBase`: absolute repository root.
-- `@outputShape`: Markdown; require answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
+- Save path: absolute `<artifact-root>/research/<question-slug>.md`; distinct slugs for separate questions, one path per independent question.
+- Framing: answer, architectural implications, primary-source citations, version/applicability constraints, unknowns/blockers, and artifact path.
 
-Pass framing verbatim and destinations separately; Research owns discovery, classification, and fan-out and returns worker findings inline. **MUST NOT** dispatch separate research agents. Index the caller-selected report paths in the artifact root; no specialist may override them.
+Put framing and destinations in the request; Research owns discovery, classification, and fan-out and returns report pointers. **MUST NOT** dispatch separate research agents. Index the caller-selected report paths in the artifact root; no specialist may override them.
 
 Read final artifacts; check cited conclusions and applicable versions. Add findings to grounding/rationale before Arena or review; route empirical unknowns to Prove.
 

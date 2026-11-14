@@ -6,113 +6,67 @@ description: >-
 
 # Research
 
-Return cited findings inline or save at caller-selected destinations. How orchestrates current-system research; Hunter executes reusable Explore requests.
+Router. Read the request, select one route per independent question, load its playbook, spawn its agents, and deliver cited findings. The router never reads source itself. Only this skill spawns research agents; agents never spawn subagents or load this skill. Callers load this skill in their own session, never inside a wrapper subagent.
 
-## Inputs
+## Request
 
-- `@question` — research question. Ask if missing.
-- `@mode` [optional] — `why` for historical rationale.
-- `@whyDepth` [optional] — `anchor` for code/PR context only, or `full` (default); Why only.
-- `@researchScope` [optional] — one entry per independent question: route (`system`, `cloud`, `web`), target, question. System may name a primary lens (`Behavior`, `Flow`, `Data`, `focused`). Cloud includes provider/service and whether live values matter.
-- `@outputShape` [optional] — content, diagrams, framing, count; not destination policy. Preserve caller framing.
-- `@outputPath` [optional] — exact final artifact path, or question-to-path mapping for multiple saved questions. Required when saving.
-- `@outputBase` [optional] — caller's absolute repository/workspace root; required for relative output paths.
+The only input is the request text. Ask only when it holds no question. Discover from it:
 
-## Caller-owned destinations
+- **Questions** — split independent questions; keep dependent ones in order.
+- **Route** — a route the request names (`Route: Explore | How | Why | Cloud | Web`) wins; `/research why <question>` selects Why; otherwise infer per Routing.
+- **Why depth** — full by default; anchor when the request asks only for code, commit, and PR context.
+- **Targets** — repositories, deployables, symbols, checkouts/refs, providers, versions, live-value needs.
+- **Framing** — requested content, diagrams, sections, lens (Behavior, Flow, Data). Preserve it verbatim for the agents.
+- **Destination** — a file path or folder the request names for the result.
 
-Apply to How, Why, Cloud, Web, prompts, and templates. **MUST NOT** define default artifact directories, filenames, or lens/provider suffixes. Callers own placement conventions.
+Ambiguous scope → state a bounded interpretation and proceed.
 
-- No persistence requested → return inline; no path required. Explicit `@outputPath` requests saving.
-- Save only to the caller's exact `@outputPath`. Accept a legacy explicit path in `@outputShape`; if both specify different destinations, report the conflict before writing. A directory alone is not an exact artifact path.
-- Resolve a relative path against `@outputBase`; absolute paths need no base. Missing/ambiguous base → report it rather than infer one from worker CWD.
-- Persistence requested without a destination → continue useful research, return findings inline, name the missing-destination blocker. For a direct user request, ask where to save after preparing the result.
-- Multiple independent saved questions require an explicit question-to-path mapping. Do not derive sibling filenames. A combined report requires the caller's explicit request and one exact destination.
-- Workers return evidence and drafts inline. Only the coordinator/designated saver writes the resolved final path. Worker evidence artifacts require explicit caller destinations via `@outputArtifact`, separate from final reports.
+## Delivery
 
-## Explore request
+- Explore → return `hunty` verdicts inline to the requester; no file. The requester uses the cited findings directly.
+- How, Why, Cloud, Web → always save one Markdown report per independent question. Return only the report pointers, never the findings inline:
 
-The caller sends this request verbatim directly to a `hunter` subagent. Hunter owns local target resolution, tool routing, read-only constraints, and evidence return. Repository evidence uses local checkouts only; missing checkouts/refs are blockers, not remote lookup requests. If Hunter is unavailable, report the blocked evidence request and continue independent work.
+  ```
+  Research reports — read each in full before using its findings:
+  - <question> → <absolute path> (<route>; complete | partial: <gap> | blocked: <blocker>)
+  ```
 
-- `@work` — question | prompt instruction | skill name to run. Pass instructions and skill names verbatim. For a named skill, resolve its exact name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. The worker reads its full body, selected route and required resources before acting.
-- `@depth` — `quick | medium | thorough`.
-- `[@shape]` — `literal | symbol | relationship | nuget`; routing hint. If omitted, Hunter classifies the request. For `relationship`, name both ends in `@work` when the question is a flow.
-- `[@target]` — repository or service names as stated. Default to the current repository.
-- `@outputShape` — caller's return shape. Default to Hunter's verdict.
-- `[@outputArtifact]` — the one caller-designated evidence file the run may write; otherwise return inline.
-- `[@inputs]` — caller-supplied inputs `@work` needs.
-- `@research` — absolute base directory of this research skill; the caller always fills it. Hunter resolves Graphify resources from it.
-
-A pure lookup (one literal, symbol, caller lookup, or package API) with no requested document or explicit inspection uses one Explore request. Return Hunter's verdict inline. Explicit inspection and requests for a document take precedence.
-
-## Constraints
-
-- **MUST** delegate source reading. The coordinator routes, briefs, verifies citations, synthesizes, and delivers. If delegation is unavailable, report the blocker; continue independent work.
-- Send every Explore request and current-system evidence brief to `hunter`. Use read-only `general-purpose` workers for independent Cloud, Web, and Why evidence; preserve Why worker roles.
-- Pass caller `@outputShape` verbatim to Why, Cloud, and Web. For system evidence, include it as report context and use the Explorer's Evidence return as inline `@outputShape`. Preserve the final destination only in coordinator delivery context.
-- **MUST** find the graph covering each codebase target: `graphify-out/` under the launch repository root or the target's main checkout, never inside a git worktree (graphs are gitignored and built from the launch folder). A worktree target uses its main checkout's graph: main checkout = parent of `git -C <worktree> rev-parse --path-format=absolute --git-common-dir`; `<worktree>/<rel>` maps to `<mainCheckout>/<rel>`. When covered, paste the Graphify line verbatim, filling `<root>` with the graph root and `<research>` with this skill's absolute base directory, into codebase-reading briefs for agents other than Hunter; for a worktree, append the main-checkout→worktree path mapping. Hunter handles Graphify itself.
-
-  > Graph available at `<root>/graphify-out/`. Before `rg`/LSP, read `<research>/how/graphify.md` and `<root>/GRAPHIFY.md` (project rules, when present) in full to orient. Run from `<root>`. Read-only overrides their write steps. Search with `<research>/scripts/focused_query.py` using the interpreter in `graphify-out/.graphify_python`, else `python3` (`resolve` + `path` for a flow; `terms`, then `query` with 1-2 identifier terms for unknown names); never `graphify query` with question text. Cite source files, not graph nodes; a missing node is never absence evidence.
+  Present the paths as clickable links to the user.
+- Default location: the agent harness session workspace, `<session>/files/research/<question-slug>.md`; distinct slugs per question. No session workspace → `<repository root>/tmp/research/<question-slug>.md`.
+- Request names a location → save there instead; resolve a relative path against the requester's repository root; a folder gets `<question-slug>.md`. A combined report only when the request asks for one. Conflicting locations for one report → ask before writing.
+- Agents return evidence and drafts inline. Only the router writes reports.
 
 ## Routing
 
-`/research why <question>` sets Why mode. Reject conflicting explicit mode/scope and Why depth outside Why. Otherwise honor supplied scope, then infer from the question. Route independent questions separately; sequence dependent evidence. Provider/data facts determining a system answer stay in How rather than separate reports. If scope is ambiguous, state a bounded interpretation and proceed. After a route returns, verify/deliver before selecting the next requested question.
+Route independent questions separately; sequence dependent evidence. Provider/data facts that determine a system answer stay in How. After a route returns, deliver it before selecting the next question.
 
-| Route | Select when | Load in full | Result |
-|---|---|---|---|
-| Explore | Pure lookup under Explore request | No report playbook; Hunter owns procedure | Inline cited verdict or blocker |
-| How | Current behavior in source, configuration, restored packages; explicit system inspection | [How](how/how.md), [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [Explainer prompt](how/explainer-prompt.md), [How report](how/report.md) | One cited current-system explanation |
-| Why code anchor | `@mode=why`, `@whyDepth=anchor` | [Why](why/why.md), through Establish the Code Anchor | Cited symbols, commits, PRs, tickets, gaps; stop after anchor |
-| Why | `@mode=why` | [Why](why/why.md), [Epistemics](why/epistemics.md), [Investigator prompt](why/investigator-prompt.md), [Synthesizer prompt](why/synthesizer-prompt.md), [Source playbook](why/source-playbook.md) | Rationale, source coverage, confidence |
-| Cloud | Independent AWS/Azure provider question | [Cloud inspection](cloud/cloud-inspection.md), [Cloud template](cloud/cloud-inspection-template.md), selected provider below | Cited constraints and applicability |
-| Web | Other external question | Generic brief below | Primary-source findings |
-| Graphify | Direct graph query, path, or explain request against an existing `graphify-out/`; build, update, or export requests → report the build entry point named in `<root>/GRAPHIFY.md`, never build | [Graphify search](how/graphify.md) | Graph-oriented answer verified against source |
+Read the selected playbook in full before acting. Each playbook names which listed resources its triggers load; read those in full from this skill's base directory, not caller CWD.
 
-## Conditional resources
+| Route | Select when | Playbook | Agents | Resources | Result |
+|---|---|---|---|---|---|
+| Explore | Codebase exploration a calling agent uses as working evidence: find files or code, where is X, who calls Y, what does Z return, how parts connect, a restored package API, a graph query, path, or explain | [Explore](explore/explore.md) | `hunty` | None; `hunty` loads NuGet and Graphify | Inline `hunty` findings |
+| How | Current behavior in source, configuration, restored packages; explicit inspection | [How](how/how.md) | [hunty](agents/hunty.md), then [explainy](agents/explainy.md) for Detailed/Full | [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [How report](how/report.md), [Behavior](how/behavior.md), [Flow](how/flow.md), [Data](how/data.md), [NuGet](how/nuget.md), [Graphify](how/graphify.md), [How request guide](how/README.md) | Inline lookup verdict or one cited explanation |
+| Why | Rationale: why code, a constraint, or a workaround exists; what led to a change; `/research why <question>` | [Why](why/why.md) | [whyy](agents/whyy.md) anchor, then one per evidence category; [composy](agents/composy.md) | [Epistemics](why/epistemics.md), [Code archaeology](why/sources/code-archaeology.md), [Atlassian](why/sources/atlassian.md), [Linear](why/sources/linear.md), [Notion](why/sources/notion.md), [Slack](why/sources/slack.md), [Datadog](why/sources/datadog.md), [Sentry](why/sources/sentry.md), [Databricks](why/sources/databricks.md), [Incident postmortems](why/sources/incident-postmortem.md) | Rationale, source coverage, confidence; or cited anchor at anchor depth |
+| Cloud | Independent AWS/Azure provider question | [Cloud](cloud/cloud.md) | [cloudy](agents/cloudy.md); `hunty` for restored SDK gaps | [Cloud template](cloud/cloud-inspection-template.md), [AWS](cloud/aws.md), [Azure](cloud/azure.md) | Cited constraints and applicability |
+| Web | Other external question | [Web](web/web.md) | [weby](agents/weby.md) | None | Primary-source findings |
 
-Read triggered resources in full from this skill base, not caller CWD. These direct links own loading; playbooks name registered resources without loading chains.
+Graphify is a `hunty` tactic, not a route. Graph build, update, or export requests → report the build entry point named in `<root>/GRAPHIFY.md`; never build.
 
-| Trigger | Resource |
-|---|---|
-| How checks one deployable's triggers, implementation, outcomes | [Behavior](how/behavior.md) |
-| How checks cross-deployable handoffs/contracts/terminals | [Flow](how/flow.md) |
-| How checks data shape, keys, ownership, consistency, migration, concurrency, retention | [Data](how/data.md) |
-| Hunter needs restored NuGet API/implementation evidence, including direct Explore | [NuGet](how/nuget.md) |
-| Caller needs system question examples | [How request guide](how/README.md) |
-| Cloud evidence targets AWS | [AWS](cloud/aws.md) |
-| Cloud evidence targets Azure | [Azure](cloud/azure.md) |
-| Why searches source history | [Code archaeology](why/sources/code-archaeology.md) |
-| Why searches Jira/Confluence | [Atlassian](why/sources/atlassian.md) |
-| Why searches Linear | [Linear](why/sources/linear.md) |
-| Why searches Notion | [Notion](why/sources/notion.md) |
-| Why searches team chat | [Slack](why/sources/slack.md) |
-| Why searches observability | [Datadog](why/sources/datadog.md) |
-| Why searches exceptions | [Sentry](why/sources/sentry.md) |
-| Why searches product analytics | [Databricks](why/sources/databricks.md) |
-| Why investigates defensive code | [Incident postmortems](why/sources/incident-postmortem.md) |
+## Spawning agents
 
-## Dispatch and delivery
+Every route agent is a prompt file under `agents/`, discovered through this skill, never a registered agent. Playbook text *spawn `<name>`* means this recipe; `<name>` is never an agent type, agent name, or `agentName`. For each spawn:
 
-Large reading dispatch or material measurement claims → *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `Guard the context window` for bounded source-reading briefs and `Explain the number` before relying on measurements. Keep source-based, inferred and observed evidence distinct; preserve existing delegation contracts.
+1. Read `agents/<name>.md` in full and fill its Brief or placeholders: question, targets/refs, playbook-selected resources as absolute paths, `@research` (this skill's absolute base directory), and the request's framing where the prompt takes it.
+2. *Load and follow the `subagents` skill to select the model and effort for a named subagent role* with role `<name>`.
+3. Spawn a skill-capable general-purpose worker (`general-purpose`, or the harness's default subagent when it has no agent types) with the filled prompt as its whole task and that model; read-only unless the prompt grants a write. Batch independent spawns in one parallel response; sequence dependent ones.
+4. Spawn failed or unavailable → report the blocked request with its consequence and continue independent work.
 
-For independent non-How workers, *load and follow the `subagents` skill to dispatch independent workers with role-based models* using Dispatch. Brief question, target/refs, relevant tools/resources, caller framing, and read-only return. Why owns its investigator/synthesizer sequence; How owns current-system orchestration. No inaccessible target blocks unrelated work.
-
-Cloud briefs include provider, mode (`question` or `implementation`), services, operations, region, account/subscription, relevant dimensions, and need for live values. Pass the loaded contract, template, and selected provider; request the filled report inline.
-
-Reconcile conflicts with focused checks; redispatch material gaps and fix mechanical defects. Apply Caller-owned destinations. No findings → state completed scope and checked sources. Incomplete → name missing evidence and consequence. Preserve Why confidence language.
-
-## Generic brief
-
-Use a read-only `general-purpose` worker with web access. Cite material claims in place from primary sources: official documentation, source code, specifications, first-party APIs. Return findings inline for coordinator verification and caller-directed delivery.
-
-## Gotchas
-
-- `scripts/focused_query.py` needs `graphifyy` and `networkx`. Before first run, read `scripts/requirements.txt` in full (resolve from this skill's base directory).
-- `ModuleNotFoundError` for `graphify`/`networkx` in the chosen interpreter → install with that interpreter: `<python> -m pip install -r <research>/scripts/requirements.txt`; rerun. Skip install when imports succeed.
-- Install only requirements.txt; **MUST NOT** upgrade or unpin versions.
+Give follow-ups to a fresh worker with the original brief, the prior report, and the bounded gap. Large reading fan-out or material measurement claims → *Load and follow the `principles` skill to load indexed engineering principles by name*; select `Guard the context window` for bounded briefs and `Explain the number` before relying on measurements.
 
 ## Completion criteria
 
-- Each independent question has its requested artifact at the exact caller destination, inline findings, or a named blocker. Each How explanation follows How report; saved paths and framing match the caller.
-- Material factual claims carry in-place primary-source citations. Assumptions/unknowns and runtime observations remain distinct from static evidence.
-- Included Mermaid blocks render; remove template placeholders, Rules blocks, and unfilled sections.
-- Codebase targets covered by a graph, including worktrees via their main checkout, record queries or skip reasons in evidence.
+- Each How, Why, Cloud, or Web question has a saved report and a pointer with its status; each Explore lookup has an inline verdict or a named blocker; framing matches the request.
+- Material factual claims carry in-place primary-source citations. Source-based, inferred, and observed evidence stay distinct; Why confidence language is preserved.
+- Conflicts are reconciled or reported with both sources. No findings → completed scope and checked sources stated. Incomplete → missing evidence and its consequence named.
+- Included Mermaid blocks render; template placeholders, Rules blocks, and unfilled sections are removed.
+- Every evidence claim came from a spawned route agent; no agent spawned another.

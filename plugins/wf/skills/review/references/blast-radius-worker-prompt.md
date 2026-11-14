@@ -1,6 +1,6 @@
 # Blast-radius worker prompt
 
-Coordinator: fill placeholders and pass the complete brief verbatim through `subagents` Dispatch. Workers return evidence; the coordinator owns aggregation and delivery.
+Coordinator: fill placeholders and pass the complete brief verbatim to each spawned worker. Workers return evidence; the coordinator owns aggregation and delivery.
 
 ## Assignment
 

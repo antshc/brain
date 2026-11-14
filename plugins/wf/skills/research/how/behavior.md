@@ -8,7 +8,7 @@ Add findings to the How report. If the question refers to an existing chain, cit
 
 ## Presentation
 
-The Explainer chooses visuals from the question under Visualize. Supply confirmed convergence points, provider/fallback edges, and trace keywords; keep source references in evidence. A deployment, ownership, interaction, or branch question may need a different view.
+`explainy` chooses visuals from the question under Visualize. Supply confirmed convergence points, provider/fallback edges, and trace keywords; keep source references in evidence. A deployment, ownership, interaction, or branch question may need a different view.
 
 ## Workflow
 

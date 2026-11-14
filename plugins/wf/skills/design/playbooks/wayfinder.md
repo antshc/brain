@@ -178,10 +178,10 @@ Run each helper in the Wayfinder session with its default dispatch. **MUST NOT**
 | Prove | *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* | Prove-owned |
 | Challenge this | Per Risk verification, *load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
 | Deep Module | Read the Deep Module playbook registered in the router fully; run it | Design It Twice designers |
-| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; Explore requests → `hunter` |
-| Grill | Read the Grill playbook registered in the router fully; run it | None; lookups via Research |
+| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; wide lookups via Research Explore |
+| Grill | Read the Grill playbook registered in the router fully; run it | None; lookups via Research Explore |
 
-Supply question/scope, pinned checkout/revision, unknown IDs, existing owner, prerequisites, limits, exact outputs and cleanup ownership. Run helpers sequentially. Dependent work waits for integrated prerequisites. Record returned artifacts, findings, coverage, actual worker type/model and new unknowns on the issue/root Result. Wayfinder owns commits/integration. Hunter or required worker unavailable → record the blocked request on the owner; continue independent work.
+Supply question/scope, pinned checkout/revision, unknown IDs, existing owner, prerequisites, limits, exact outputs and cleanup ownership. Run helpers sequentially. Dependent work waits for integrated prerequisites. Record returned artifacts, findings, coverage, actual worker type/model and new unknowns on the issue/root Result. Wayfinder owns commits/integration. Required worker unavailable → record the blocked request on the owner; continue independent work.
 
 Grill asks one question at a time and records the user's actual answer. No agent speaks for the user or chooses subjective trade-offs. Only the user ends Grill; preserve its closing sweep. Done when each run has an accountable owner/result or named blocker.
 
@@ -205,7 +205,7 @@ On resume, recover the same pending worktree and approval identity; do not regen
 
 ## Research routing
 
-Automatically select the relevant scope for factual gaps. Codebase questions use Research system scope (Explore for pure lookup; How for inspection); cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why (`@mode=why`). Missing external checkouts block system evidence; use Web when public documentation suffices.
+Automatically select the relevant scope for factual gaps. Codebase lookups use Research Explore; mechanism and inspection questions use How; cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
 
 | Option | Route | Scope |
 |---|---|---|
@@ -216,9 +216,9 @@ Automatically select the relevant scope for factual gaps. Codebase questions use
 
 For a system question, choose `Behavior` for one deployable, `Flow` for handoffs across deployables, `Data` for a data boundary, or `focused` for an isolated call or package API. This axis sets the primary lens. The question sets the depth, with an explicit inspection requesting full coverage.
 
-Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for System), and the part's question when the ticket spans multiple parts. For Cloud, include the provider, service, and need for live values.
+Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for How), and the part's question when the ticket spans multiple parts. For Cloud, include the provider, service, and need for live values.
 
-For every research dispatch, pass the ticket's Question as `@question`, Research scope as `@researchScope`, and content framing as `@outputShape`. Wayfinder selects an exact report file per part before dispatch: preserve an explicit ticket destination; otherwise use `docs/research/<initiative-slug>/<ticket-slug>.md` for one part or `docs/research/<initiative-slug>/<ticket-slug>-<part-slug>.md` for separate parts. Pass these as `@outputPath` (a question-to-file mapping for multiple reports), with the ticket worktree's absolute repository root as `@outputBase`. Wayfinder owns this convention; Research never chooses filenames. Reject destination conflicts before writing. For older tickets infer and persist scope before dispatch. For Why pass `@mode=why` instead of a conflicting scope.
+For every research dispatch, write one request holding the ticket's Question, its Research scope bullets, content framing, and an exact absolute save path per part under the ticket worktree: preserve an explicit ticket destination; otherwise `docs/research/<initiative-slug>/<ticket-slug>.md` for one part or `docs/research/<initiative-slug>/<ticket-slug>-<part-slug>.md` for separate parts. Wayfinder owns this convention. For older tickets infer and persist scope before dispatch.
 
 ## Fog of war
 

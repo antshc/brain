@@ -4,7 +4,7 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 [Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [record-architecture](skills/record-architecture/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
-[subagents](skills/subagents/SKILL.md) owns worker dispatch, model roles, Arena candidate comparison, and Swarm partition or race runs. [research](skills/research/SKILL.md) routes current-system questions through How for discovery, tracing, verification, and explanation. Callers supply saved-report destinations; no save request returns inline. Hunter owns read-only Explore lookups and evidence gathering. Why handles historical rationale.
+[subagents](skills/subagents/SKILL.md) selects the model and effort for named roles and ordered panels, and runs Arena comparisons. [research](skills/research/SKILL.md) is a router: Explore (lookups; `hunty` verdicts inline), How (discovery, tracing, explanation; `hunty`, `explainy`), Why (`whyy`, `composy`), Cloud (`cloudy`), and Web (`weby`). Route agents are prompt files only Research spawns. The request is the only input; reports save to the session workspace with links, or to a location the request names.
 
 [`/design grill`](skills/design/SKILL.md) owns session-ledger operations through its [track-ledger reference](skills/design/references/track-ledger.md), including ownership, resumable questions, and pending writes. It loads closing, verification, and external-source procedures on demand from its bundled references. To configure a `grill!` shortcut, point it to `/design grill`.
 
@@ -195,7 +195,7 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 
 | Group | Skills |
 | --- | --- |
-| Discovery and research | `define` (`concept`, `research`), `prove`, `challenge-this`, `research`, Hunter (Explore and NuGet evidence) |
+| Discovery and research | `define` (`concept`, `research`), `prove`, `challenge-this`, `research` (route agents `hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `hld`, `publish-hld`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `record-architecture`, `suggest`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

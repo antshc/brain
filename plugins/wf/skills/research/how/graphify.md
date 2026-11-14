@@ -1,6 +1,6 @@
 # Graphify search: query, path, explain
 
-Research skill playbook for searching an existing `graphify-out/` graph; searching only, never building. Run from the graph root: the launch repository root (harness reporoot), never a git worktree; indexed repositories usually sit under `<root>/workspace/<repo>`. Default to the focused search script; the `graphify query` CLI and inline NetworkX traversal are fallbacks.
+How tactic (`hunty`) for searching an existing `graphify-out/` graph; searching only, never building. Run from the graph root: the launch repository root (harness reporoot), never a git worktree; indexed repositories usually sit under `<root>/workspace/<repo>`. Default to the focused search script; the `graphify query` CLI and inline NetworkX traversal are fallbacks.
 
 Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names the build entry point. Never build, `--update`, or re-cluster from here.
 
@@ -11,6 +11,7 @@ Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names t
 - CLI fallback: constrained query expansion and traversal
 - Path between two nodes
 - Explain one node
+- Gotchas
 
 Two traversal modes - choose based on the question:
 
@@ -469,3 +470,9 @@ After writing the explanation, save it back:
 ```bash
 $(cat graphify-out/.graphify_python) -m graphify save-result --question "Explain NODE_NAME" --answer "ANSWER" --type explain --nodes NODE_NAME
 ```
+
+## Gotchas
+
+- `scripts/focused_query.py` needs `graphifyy` and `networkx`. Before first run, read `scripts/requirements.txt` (research skill base directory) in full.
+- `ModuleNotFoundError` for `graphify`/`networkx` in the chosen interpreter → install with that interpreter: `<python> -m pip install -r <research>/scripts/requirements.txt`; rerun. Skip install when imports succeed.
+- Install only requirements.txt; **MUST NOT** upgrade or unpin versions.

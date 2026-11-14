@@ -12,9 +12,9 @@ Prioritize these matched skills over generic search/read tools for any issue wit
 
 Spawn one `runSubagent` per substantive `issue`, in a single parallel batch of at most 3. Issues have separate `evidence` paths, so they never wait on each other.
 
-Use the WF `hunter` agent when the `issue` is answerable from this codebase alone. If Hunter is unavailable, fall back to the built-in `Explore` subagent: the caller renders the resolved calls from Discover the investigation skills, reads each full body, selected route and required resources, then includes their applicable read-only instructions in the brief, replacing the template's skill-invocation request. Explore performs those checks with its available tools and reports any capability gaps; do not ask it to invoke skills.
+Use the built-in `Explore` subagent when the `issue` is answerable from this codebase alone: the caller renders the resolved calls from Discover the investigation skills, reads each full body, selected route and required resources, then includes their applicable read-only instructions in the brief, replacing the template's skill-invocation request. Explore performs those checks with its available tools and reports any capability gaps; do not ask it to invoke skills.
 
-Omit `agentName` when the issue turns on an external fact — a package's real API, a framework's documented behaviour, a spec — so the general-purpose subagent inherits skill, web, docs, and package tools. Preserve this caller-specific Hunter → Explore fallback when dispatching through `subagents`.
+Omit `agentName` when the issue turns on an external fact — a package's real API, a framework's documented behaviour, a spec — so the general-purpose subagent inherits skill, web, docs, and package tools. Investigation workers never load `research` or spawn subagents.
 
 ## Prompt template
 

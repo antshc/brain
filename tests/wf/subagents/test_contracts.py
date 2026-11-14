@@ -8,31 +8,31 @@ REPO = Path(__file__).resolve().parents[3]
 SKILLS = REPO / "plugins/wf/skills"
 
 
-def test_subagents_owns_arena_swarm_and_model_roles():
+def test_subagents_owns_model_selection_and_arena():
     skill = (SKILLS / "subagents/SKILL.md").read_text()
-    for reference in ("arena.md", "swarm.md", "models.md"):
-        assert f"]({reference})" in skill
-        assert (SKILLS / "subagents" / reference).is_file()
-    for old_path in ("models.md", "arena/subagents.md", "arena/arena.md", "how", "why"):
-        assert not (SKILLS / "architect" / old_path).exists()
+    assert "](models.md)" in skill and "](arena.md)" in skill
+    assert {path.name for path in (SKILLS / "subagents").iterdir() if path.suffix == ".md"} == {"SKILL.md", "models.md", "arena.md"}
+    for retired in ("## Dispatch", "Swarm", "## Fresh subagents"):
+        assert retired not in skill, retired
+    assert "Dispatch" not in (SKILLS / "subagents/arena.md").read_text()
+    for owner, playbook in (("design", "playbooks/architect.md"), ("review", "playbooks/blast-radius.md")):
+        assert not (SKILLS / owner / "references/arena.md").exists()
+        assert "`subagents` skill to run an Arena comparison" in (SKILLS / owner / playbook).read_text()
 
 
-def test_research_preserves_why_and_routes_system_evidence_to_hunter():
+def test_research_preserves_why_and_routes_system_evidence_to_hunty():
     skill = (SKILLS / "research/SKILL.md").read_text()
-    for reference in ("how/how.md", "how/explorer-prompt.md", "how/explainer-prompt.md",
+    for reference in ("how/how.md", "how/explorer-prompt.md", "agents/explainy.md", "agents/hunty.md",
                       "why/why.md", "why/sources/atlassian.md"):
         assert f"]({reference})" in skill
         assert (SKILLS / "research" / reference).is_file()
-    assert "`@whyDepth`" in skill
-    assert "Why code anchor" in skill
+    assert "Why depth" in skill
+    assert "At anchor depth, deliver the anchor and stop" in (SKILLS / "research/why/why.md").read_text()
     assert "## Routing" in skill
     how = (SKILLS / "research/how/how.md").read_text()
     assert "system/system-inspection.md" not in skill
-    assert "Hunter" in how and "Explainer" in how
-    assert "@outputPath" in skill and "@outputBase" in skill
-    dispatch = (SKILLS / "subagents/SKILL.md").read_text()
-    assert "Send Explore requests verbatim to `hunter`" in dispatch
-    assert "report the blocked evidence request and continue independent work" in dispatch
+    assert "`hunty`" in how and "`explainy`" in how
+    assert "## Delivery" in skill
 
 
 def test_review_loads_playbooks_by_route():
@@ -59,9 +59,9 @@ def test_review_impact_and_tests_keep_their_analysis_contracts():
     impact = (root / "blast-radius.md").read_text()
     assessment = (root / "tests-gap.md").read_text()
     assert re.findall(r"\*Load and follow the `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
-        "git", "principles", "research", "research", "testing-integrations", "subagents", "subagents", "git", "writing-style",
+        "git", "principles", "research", "research", "testing-integrations", "subagents", "git", "subagents", "git", "writing-style",
     ]
-    for action in ("Why code anchor", "**default Research**", "**Dispatch**", "**Arena**", "**Unslop only**"):
+    for action in ("asking only for code, commit, and PR context", "**default Research**", "**Arena**", "**Unslop only**"):
         assert action in impact
     assert "Prove every claim" in impact
     for name in ("blast-radius-worker-prompt.md", "blast-radius-report.md"):
