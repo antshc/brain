@@ -5,12 +5,12 @@ Unknowns/risks stay in root **Not yet specified** until resolved; concrete child
 | Type | Use when | Execution / completion |
 | --- | --- | --- |
 | Research | Facts or coarse fog need clarification | AFK cited findings through Research; integrated deciding evidence resolves factual question |
-| Experiment | A falsifiable claim needs an actual check | AFK Prove; human acceptance remains HITL; inconclusive stays open/blocked |
+| Experiment | A falsifiable claim needs an actual check | AFK Prove generation/verification; HITL prototype approval before integration/closure; inconclusive stays open/blocked |
 | Grilling | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep |
 | Contract design | New/significantly changed interface, inheritance abstraction, invariant/error/ordering/seam choice | AFK Deep Module generates 3+ Code Sketch options with individual Markdown rationales; retain worktree without merge. HITL Choice on same ticket, then selected-only merge plus considered-option notes and closure |
-| Task | Code Sketch or prerequisite access/data work unblocks a decision | AFK artifact generation or authorized work; otherwise HITL checklist; never implementation of the destination |
+| Task | Code Sketch or prerequisite access/data work unblocks a decision | AFK artifact generation or authorized work; Code Sketch awaits HITL prototype approval before integration/closure; otherwise HITL checklist; never implementation of the destination |
 
-Challenge this is supporting verification inside an existing issue or root-owned run, **not its own tracking ticket**. Record scope, evidence, coverage and pending steps on that owner; create follow-up issues only for actual discovered work. It can target the whole HLD but requires a safe runnable boundary for retained findings.
+Challenge this is supporting verification inside an existing issue or root-owned run, **not its own tracking ticket**. Record scope, evidence, coverage and pending steps on that owner; create follow-up issues only for actual discovered work. It can target the whole HLD but requires a safe runnable boundary for retained findings. No approval gate: code changes or test execution use an owned result worktree; verified evidence integrates and updates root fog/HLD automatically. Keep production-source edits out of the incoming payload.
 
 ## Rules
 
@@ -22,7 +22,7 @@ Challenge this is supporting verification inside an existing issue or root-owned
 
 ## Artifact lifecycle
 
-Wayfinder pins integration HEAD and exact outputs. Research uses `docs/research/<initiative-slug>/`; proof/sketch evidence uses `docs/prototype/<initiative-slug>/`. Producers do not commit/push. Wayfinder owns verified local commits/merges and cleanup. Contract design merges **after user selection**, selected artifacts and considered-option notes only; retain candidates through Choice/review. No evidence appendices, Confluence subpages/attachments, automatic push or PR.
+Wayfinder pins integration HEAD and exact outputs. Research uses `docs/research/<initiative-slug>/`; proof/sketch evidence uses `docs/prototype/<initiative-slug>/`. Prove/Experiment and sketch prototypes use owned result worktrees; Challenge this uses one for code changes or test execution. Producers do not commit/push. For Prove/Experiment and sketch prototypes, follow Wayfinder Prototype approval: generated → verified → awaiting approval → approved → integrated. Retain exact payload identity, worktree and open issue/root state until explicit approval; Research and Challenge this evidence remain automatic, including Challenge this verification patches. Wayfinder owns verified local commits/merges and cleanup after eligible integration, synchronization and all consumers finish. Contract design merges **after user selection**, selected artifacts and considered-option notes only; retain candidates through Choice/review. No evidence appendices, Confluence subpages/attachments, automatic push or PR.
 
 ## Source
 
