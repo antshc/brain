@@ -1,6 +1,6 @@
 # Define Concept
 
-Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns delegation and `hunter` owns read-only Explore lookups (where is, what calls, how a flow works); The architecture index route owns scan and match. *Load and follow the `record-architecture` skill to record settled architecture*; `concept-body` renders, `concept-record` persists and indexes. Do not reimplement their rules.
+Own candidate selection, the concept's scope, and its decisions. [questioning.md](questioning.md) defines the interview; Inspection owns lookups (where is, what calls, how a flow works) through `explore` subagents; The architecture index route owns scan and match. *Load and follow the `record-architecture` skill to record settled architecture*; `concept-body` renders, `concept-record` persists and indexes. Do not reimplement their rules.
 
 ## Evidence
 
@@ -8,12 +8,11 @@ Every fact in a suggestion, a question, or the recorded Concept is either a cite
 
 ## Inspection
 
-1. *Load and follow the `research` skill to investigate technical questions across source code with a symbol or caller lookup and return cited findings*; use **Explore request**; form per track: `@work`, `@depth`, `[@target]`, `@outputShape`, `[@inputs]`.
-2. Pick shape: one focused path → one subagent; distinct non-overlapping tracks (separate deployables, workflow boundaries, configuration versus tests, categories) → parallel subagents, each a bounded subquestion; a track needing another's answer → sequential. No duplicate lookups for areas already in flight.
-3. Spawn each lookup as a `hunter` subagent with its Explore request verbatim. If Hunter is unavailable, record the blocked evidence request and continue independent tracks.
-4. Consolidate results: resolve conflicts with targeted evidence; state remaining uncertainty.
+1. Form tracks: one focused path → one track; distinct non-overlapping tracks (separate deployables, workflow boundaries, configuration versus tests, categories) → one bounded subquestion each; a track needing another's answer → sequential. No duplicate lookups for areas already in flight.
+2. Spawn one built-in `explore` subagent per independent track, together in one batch; sequence dependent tracks. Brief: target, bounded question, read-only, return shape with `path:line` evidence. Blocked tracks → record the blocked evidence request and continue independent tracks.
+3. Consolidate results: resolve conflicts with targeted evidence; state remaining uncertainty.
 
-Done when every track returned its `@outputShape` or an explicit blocker.
+Done when every track returned its requested shape or an explicit blocker.
 
 ## Grill-design value
 

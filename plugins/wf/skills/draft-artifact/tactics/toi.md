@@ -50,14 +50,10 @@ If `feature` is missing or matches more than one feature, ask the user with the 
    - Locate these by searching the workspace; skip any that do not exist and record the gap.
    - Keep the evidence map (section → fact → source) outside the TOI.
 
-4. **Explore the codebase (legwork).** Find hard facts in source; docs and Jira are leads, not proof. *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings*; use **Explore request**. Send each request below verbatim to one `hunter` per target in parallel. If Hunter is unavailable, record the blocked evidence and continue independent work:
-   - `@work` := question: "For feature `{{feature}}` (keywords: {{keywords}}), answer the Exploration checklist rows marked for this target."
-   - `@depth` := `thorough`.
-   - `@target` := one of: current repository; GUI repository; pipeline definitions; other system components the feature touches (for example Payment gateway, Identity provider); third-party packages owning symbols absent from local source.
-   - `@outputShape` := per checklist row: fact, file + symbol evidence, unknowns; row not applicable to the target → `n/a`.
-   - `@inputs` := `feature`, keywords, user-supplied `sources`, the Exploration checklist.
-   - `@research` := the loaded `research` skill's absolute base directory.
-   - No `@outputArtifact`; results return to the parent and feed the evidence map.
+4. **Explore the codebase (legwork).** Find hard facts in source; docs and Jira are leads, not proof. Spawn one built-in `explore` subagent per target, together in one batch. Blocked targets → record the blocked evidence and continue independent work. Brief each with:
+   - Task: "For feature `{{feature}}` (keywords: {{keywords}}), answer the Exploration checklist rows marked for this target. Read-only; be thorough." Include `feature`, keywords, user-supplied `sources`, and the Exploration checklist.
+   - Target, one of: current repository; GUI repository; pipeline definitions; other system components the feature touches (for example Payment gateway, Identity provider); third-party packages owning symbols absent from local source.
+   - Return inline, per checklist row: fact, file + symbol evidence, unknowns; row not applicable to the target → `n/a`. Results feed the evidence map.
 
    Done when every Exploration checklist item has evidence, is marked not applicable, or is a gap.
 5. **Resolve conflicts.** Source code is authoritative for behavior, keys, defaults, endpoints, and labels; user-supplied Jira text for motivation and scope; ADRs for rationale. On conflict, follow the authority and add the conflict as an open question. Done when no contradiction remains unreported.

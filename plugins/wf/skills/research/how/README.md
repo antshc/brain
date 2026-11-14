@@ -1,6 +1,6 @@
 # Current-system research
 
-*Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. Hunter supplies the evidence.
+*Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. `hunty` supplies the evidence.
 
 ## Write a strong instruction
 
@@ -8,7 +8,7 @@ A useful instruction names the **unit to inspect**, the **question to settle**, 
 
 Use this shape:
 
-> Inspect **{{unit}}** to determine **{{question}}**. Start at **{{entry point}}** and stop at **{{observable outcome or terminal system}}**. Cover **{{important branches or concerns}}**. Return inline, or save to **{{caller-selected exact output path}}**.
+> Inspect **{{unit}}** to determine **{{question}}**. Start at **{{entry point}}** and stop at **{{observable outcome or terminal system}}**. Cover **{{important branches or concerns}}**. Optionally save to **{{path}}**.
 
 Include the details that materially change the investigation:
 
@@ -19,10 +19,10 @@ Include the details that materially change the investigation:
 - Ask for current **as-built** behavior. Use a design or review skill when the goal is a proposed change or a before-and-after delta.
 - Mention suspected mocks, emulators, or development-only stores so the inspection can distinguish wiring from production behavior.
 - Request a runtime check when static code cannot settle a runtime claim, and say which commands or environments are safe to use.
-- To save output, provide an exact `@outputPath`; for relative paths include the absolute caller root as `@outputBase`. No save request → inline. Research defines no default output directory or filename.
+- Reports save to the session workspace by default; name a path in the instruction to save elsewhere.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
-Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document can return Hunter’s verdict inline. Keep outcome-relevant lens findings in the same answer.
+Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document returns `hunty`’s verdict inline. Keep outcome-relevant lens findings in the same answer.
 
 ## Behavior instruction examples
 

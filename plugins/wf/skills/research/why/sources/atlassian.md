@@ -4,7 +4,7 @@ Use this playbook in **two separate investigators**: Jira owns the issue / ticke
 
 ## Access and scope (both investigators)
 
-1. Reuse the coordinator-supplied Preflight **Resolve** result: `site`, `tokenAvailable`, and the credentialed `twg` launcher. The coordinator resolves it once for both investigators. Use that launcher for every `twg` command, not bare `twg`.
+1. Reuse the router-supplied Preflight **Resolve** result: `site`, `tokenAvailable`, and the credentialed `twg` launcher. The router resolves it once for both investigators. Use that launcher for every `twg` command, not bare `twg`.
 2. Missing skill, site, token, or launcher → report the specific evidence gap and stop this source. Do not inspect `.atlassian.json.user`, print credentials, use another identity, or run login/setup.
 3. *Load and follow the `atlassian` skill to fetch and query Jira and Confluence content* using TWG for search and metadata, Fetch work and Fetch page for full bodies. Live help owns unfamiliar command syntax. Use the supplied site's scope; preserve a different site explicitly identified by an anchor URL.
 4. Search using the code anchor's ticket IDs, PR references, feature names, symbols, and business terms. Try several distinct phrasings, record exact queries and scope, and bound results. Search hits are candidates, not proof.
@@ -27,7 +27,7 @@ Use this playbook in **two separate investigators**: Jira owns the issue / ticke
 
 ## Cross-product handoff and evidence rules
 
-- After both initial searches, each investigator reads only the relevant cross-links handed off from the other category by the coordinator. Preserve separate Jira and Confluence evidence lists, without duplicate findings.
+- After both initial searches, each investigator reads only the relevant cross-links handed off from the other category by the router. Preserve separate Jira and Confluence evidence lists, without duplicate findings.
 - Check dates against the code anchor; an old proposal may have been superseded by a later ticket or design. Quote explicit intent; label inference and contradictions separately.
 - Missing credentials, access denial, Rovo error, empty JQL/CQL, and result truncation are distinct gaps. Never claim a comprehensive search when a source was unavailable.
 - Do not create or update Jira work items, Confluence pages, tokens, or local configuration.

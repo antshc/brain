@@ -10,7 +10,7 @@
     "{{packageMember}}": "member owned by a package restored in the local eval checkout"
   },
   "commonChecks": [
-    "runs the Explore request directly in Hunter without loading a Research worker route",
+    "runs the Brief in one hunty worker without loading research or spawning subagents",
     "verdict first line matches routeLinePattern and equals expectedRoute",
     "no recursive grep (-r, -R, find -exec grep, xargs grep, rg ... || grep ...)",
     "no rg install while command -v rg resolves",
@@ -19,60 +19,60 @@
   "cases": [
     {
       "id": "rg_shell_literal",
-      "request": "@work: Exact literal `{{presentLiteral}}`: which file defines it?\n@shape: literal\n@depth: quick",
+      "request": "@work: Exact literal `{{presentLiteral}}`: which file defines it?",
       "excludedTools": ["grep", "glob"],
       "expectedRoute": "rg",
       "checks": ["shell rg used", "verdict cites file:line holding the literal"]
     },
     {
       "id": "rg_shell_absent_literal",
-      "request": "@work: Exact literal `{{absentLiteral}}`: which file defines it?\n@shape: literal\n@depth: quick",
+      "request": "@work: Exact literal `{{absentLiteral}}`: which file defines it?",
       "excludedTools": ["grep", "glob"],
       "expectedRoute": "rg",
       "checks": ["rg exit 1 treated as no match, not missing binary", "rg -uu recheck", "verdict is exactly NOT FOUND plus searched roots"]
     },
     {
       "id": "rg_backend_literal",
-      "request": "@work: Exact literal `{{presentLiteral}}`: which file defines it?\n@shape: literal\n@depth: quick",
+      "request": "@work: Exact literal `{{presentLiteral}}`: which file defines it?",
       "excludedTools": [],
       "expectedRoute": "rg",
       "checks": ["harness search tool (grep, rg, or glob by host) used", "no shell grep"]
     },
     {
       "id": "graphify_path_flow",
-      "request": "@work: Flow from {{deployableA}} to {{deployableB}}: how does a request reach {{deployableB}} end to end?\n@shape: relationship\n@depth: thorough\n@target: {{deployableA}}, {{deployableB}}",
+      "request": "@work: Flow from {{deployableA}} to {{deployableB}}: how does a request reach {{deployableB}} end to end? Target: {{deployableA}}, {{deployableB}}.",
       "excludedTools": [],
       "expectedRoute": "graphify-path",
       "checks": ["Graphify query resource read", "focused_query.py resolve for both ends, then path, before any query or rg", "each hop confirmed in source", "verdict lists graph commands exactly as run"]
     },
     {
       "id": "graphify_find_unknown",
-      "request": "@work: Names unknown: which module in {{deployableA}} owns the behavior GLOSSARY.md describes for {{deployableB}}?\n@shape: relationship\n@depth: medium\n@target: {{deployableA}}",
+      "request": "@work: Names unknown: which module in {{deployableA}} owns the behavior GLOSSARY.md describes for {{deployableB}}? Target: {{deployableA}}.",
       "excludedTools": [],
       "expectedRoute": "graphify-find",
       "checks": ["glossary or concept doc read before graph search", "focused_query.py terms, then query with 1-2 identifier terms", "no graphify query with question text", "source confirms graph claims", "verdict lists graph commands exactly as run"]
     },
     {
       "id": "lsp_symbol",
-      "request": "@work: Symbol `{{symbol}}`: who calls it?\n@shape: symbol\n@depth: medium",
+      "request": "@work: Symbol `{{symbol}}`: who calls it?",
       "excludedTools": [],
       "expectedRoute": "lsp",
       "checks": ["no graphify skill or CLI", "LSP references or call hierarchy used before rg"]
     },
     {
       "id": "missing_local_checkout",
-      "request": "@work: Names unknown: where does {{missingLocalRepo}} define its public API?\n@shape: relationship\n@depth: medium\n@target: {{missingLocalRepo}}",
+      "request": "@work: Names unknown: where does {{missingLocalRepo}} define its public API? Target: {{missingLocalRepo}}.",
       "excludedTools": [],
       "expectedRoute": "unresolved",
       "checks": ["reports missing local checkout as a blocker", "no remote repository tools, clone, or fetch", "no guessed neighboring checkout or package-cache evidence"]
     },
     {
       "id": "nuget_restored_package",
-      "request": "@work: Verify the signature and behavior of `{{packageMember}}` in the restored NuGet package.\n@shape: nuget\n@depth: medium",
+      "request": "@work: Verify the signature and behavior of `{{packageMember}}` in the restored NuGet package.",
       "excludedTools": [],
       "expectedRoute": "nuget",
       "checks": [
-        "Hunter loads the NuGet tactic",
+        "hunty loads the NuGet tactic",
         "verdict cites restored package ID and version, assembly/TFM, and XML documentation or decompiled implementation",
         "decompilation, if needed, stays in the resolved NuGet package cache"
       ]

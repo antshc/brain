@@ -49,8 +49,8 @@ XML docs establish documented contracts, not executable behavior. For a signatur
 
 3. Search the decompiled folder with `rg`, read the relevant method, and distinguish actual implementation from the reference assembly.
 
-If the package is not restored, the symbol is not NuGet-owned, or tools are unavailable, report the precise unresolved step rather than claiming an API or implementation. Do not restore or build solely to obtain evidence under Hunter's read-only contract.
+If the package is not restored, the symbol is not NuGet-owned, or tools are unavailable, report the precise unresolved step rather than claiming an API or implementation. Do not restore or build solely to obtain evidence under `hunty`'s read-only contract.
 
 ## 4. Return evidence
 
-Give package ID, restored version, assembly/TFM, type/member, and the deciding XML/decompiled path or snippet. Label facts **XML documentation** or **decompiled implementation**; keep applicability and remaining uncertainty explicit. Apply the caller's `@outputShape` and `@outputArtifact` contract.
+Give package ID, restored version, assembly/TFM, type/member, and the deciding XML/decompiled path or snippet. Label facts **XML documentation** or **decompiled implementation**; keep applicability and remaining uncertainty explicit. Use the return shape `@work` asks for.

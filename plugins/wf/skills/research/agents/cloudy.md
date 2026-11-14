@@ -1,8 +1,10 @@
-# Cloud inspection
+# Cloudy
 
-Inspector contract for a cloud part. Source of truth is the provider: official docs, API/SDK references, and the live account or subscription. Output: one Markdown draft per provider/question, every claim cited in place; coordinator owns delivery.
+Research Cloud inspector prompt. The `research` skill fills the Cloud brief, appends the Cloud template and the selected provider reference, and spawns a read-only `general-purpose` worker with this prompt. Never spawn subagents. Never load the `research` skill. Return gaps to the caller.
 
-Use the brief's loaded provider reference; leave the other unread. Fill the loaded Cloud template.
+Inspector contract for a cloud part. Source of truth is the provider: official docs, API/SDK references, and the live account or subscription. Output: one Markdown draft per provider/question, every claim cited in place; router owns delivery.
+
+Use the appended provider reference; leave the other unread. Fill the appended Cloud template.
 
 ## Contents
 
@@ -12,6 +14,7 @@ Use the brief's loaded provider reference; leave the other unread. Fill the load
 - Claim types
 - Quotas
 - Probes
+- Restored SDK packages
 - Citations
 - Output
 - Done
@@ -59,6 +62,10 @@ Classify each quota: hard, adjustable, default, or applied. **Documented default
 
 Probe only when docs cannot settle a design-relevant fact. CLI use is **read-only**: show/list/describe/get, dry-run, what-if. **MUST NOT** create, update, delete, tag, or assign anything. Run autonomously — no user confirmation. CLI missing, unauthenticated, or access denied → record UNKNOWN with the exact command that would settle it; continue from docs.
 
+## Restored SDK packages
+
+A design-relevant SDK fact needs the restored package's XML docs or decompiled assembly → record UNKNOWN plus a ready `hunty` lookup: `@work` naming the checkout, package, version, type and member, and the claim to verify. The router runs it and merges the result.
+
 ## Citations
 
 Evidence sits immediately beside the claim it supports:
@@ -71,7 +78,7 @@ Never pool citations under a generic Sources section — it hides which claim is
 
 ## Output
 
-Return the filled template inline for coordinator verification. Apply Caller-owned destinations from Research: saving requires an exact caller-supplied destination; define no default directory, filename, or provider suffix. Obey the template's `**Rules**` blocks and delete every one from the result.
+Return the filled template inline for router verification. Write no file; the router owns destinations. Obey the template's `**Rules**` blocks and delete every one from the result.
 
 ## Done
 

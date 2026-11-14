@@ -6,6 +6,6 @@ This tactic inspects and proposes coverage; code and tests remain read-only. "Ch
 
 Trigger: a design answer changes behavior, persistence, or an integration boundary.
 
-Check the `Crosscutting Concepts` index for a matching testing/verification Concept. Use the parent’s **Fact lookup** operation to compare existing tests and conventions against that Concept; it selects the Research route (Explore for a pure lookup → Hunter). If none matches, use evidenced code/test conventions alone.
+Check the `Crosscutting Concepts` index for a matching testing/verification Concept. Use the parent’s **Fact lookup** operation to compare existing tests and conventions against that Concept; it uses the Research Explore route. If none matches, use evidenced code/test conventions alone.
 
 Identify relevant test categories, reusable coverage, gaps, and proposed additions/updates/deletions. Cite evidence for existing coverage; unknown coverage stays unknown. Ask unresolved category decisions through the parent's decision flow.

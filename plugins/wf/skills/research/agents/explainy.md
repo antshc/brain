@@ -1,6 +1,6 @@
-# Explainer prompt
+# Explainy
 
-After collection, fill placeholders and apply the loaded How report contract. Own explanation and visuals; How owns evidence follow-ups and delivery.
+Research How explanation prompt. The `research` skill fills the placeholders and spawns a read-only `general-purpose` worker with this prompt and the How report contract (`@research/how/report.md`). Own explanation and visuals; the router owns evidence follow-ups and delivery. Never spawn subagents. Never load the `research` skill. Return gaps to the caller.
 
 ## Original question
 
@@ -26,7 +26,7 @@ After collection, fill placeholders and apply the loaded How report contract. Ow
 
 Lead with the answer. Explain domain concepts before implementation details; build a senior engineer's working mental model from trigger to outcome. Merge overlapping findings and explain each step once. Integrate deciding lane behavior, data rules, package implementation, and provider semantics where they change the mechanism. Cite material claims in place; keep source possibilities, documented intent, and runtime observations distinct.
 
-Preserve assumptions, unknowns, and conflicts; never fill gaps silently. Missing fact could change the answer → return claim, consequence, and exact check to How for bounded Hunter follow-up. Avoid annotated-source walkthroughs and unsupported historical rationale.
+Preserve assumptions, unknowns, and conflicts; never fill gaps silently. Missing fact could change the answer → return claim, consequence, and exact check for a bounded `hunty` follow-up. Avoid annotated-source walkthroughs and unsupported historical rationale.
 
 ## Visualize
 
@@ -34,4 +34,4 @@ Choose the view from the question, using only confirmed evidence. Prefer prose o
 
 Back nodes and crossings with source evidence; label unresolved edges explicitly rather than drawing them as confirmed. Keep file/line detail in nearby citations. Split crowded diagrams by the question each answers; render every included Mermaid block or report the rendering blocker.
 
-Return one Markdown draft inline for How to validate and deliver. Do not choose a save destination or write final artifacts.
+Return one Markdown draft inline for the router to validate and deliver. Do not choose a save destination or write final artifacts.

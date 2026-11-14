@@ -4,7 +4,7 @@ Start with boundaries. One deployable and its functional slice form one lane. Tr
 
 Map each handoff to a row, then verify sender, wire contract, receiver, and deployment or configuration binding. Stop at a terminal infrastructure boundary only after recording the operation, protocol, authentication, errors, and relevant configuration.
 
-Add findings to the How explanation; the caller owns any save destination.
+Add findings to the How explanation.
 
 ## Contents
 
@@ -19,7 +19,7 @@ Add findings to the How explanation; the caller owns any save destination.
 
 ## Presentation
 
-The Explainer chooses the view under Visualize: ownership/responsibility → swimlane or container; interaction order → sequence. If lanes help, use one per deployable and 1–5 boundary-relevant steps per lane; label crossings with contracts. Back every node/crossing with evidence. Do not require a diagram when prose or a table answers the question.
+`explainy` chooses the view under Visualize: ownership/responsibility → swimlane or container; interaction order → sequence. If lanes help, use one per deployable and 1–5 boundary-relevant steps per lane; label crossings with contracts. Back every node/crossing with evidence. Do not require a diagram when prose or a table answers the question.
 
 ## Deployable eligibility
 

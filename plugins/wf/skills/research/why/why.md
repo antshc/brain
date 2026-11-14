@@ -1,10 +1,38 @@
 # Why
 
-Rationale procedure of the Research skill. Paths resolve from the skill base directory.
+Route procedure for historical rationale. Spawns `whyy` (anchor, then one per evidence category) and one `composy`. Paths resolve from the skill base directory.
 
 Investigate the motivation and intent behind code. How explains current behavior. `why` answers what forces led to its shape.
 
-At each dispatch, *load and follow the `subagents` skill to dispatch independent workers using role-based models and isolated outputs* using **Dispatch**. Use `general-purpose` with read-only instructions for MCP access and citation spot-checks. Use the role fallback on rejection, then the closest valid model of the same family.
+## Contents
+
+- Conditional resources
+- Operating Posture
+- Step 1. Understand the Target and the Question
+- Step 2. Establish the Code Anchor
+- Step 3. Spawn Parallel Investigators
+- Step 4. Synthesize
+- Step 5. Present
+- Output Format
+- Common Failure Modes to Avoid
+
+## Conditional resources
+
+Each `whyy` reads one category playbook. Playbooks document common providers; adapt the examples for other providers in the same category.
+
+| Trigger | Resource | Provider it documents |
+|---|---|---|
+| Full Why | `why/epistemics.md` | — |
+| Source control history, including the anchor | `why/sources/code-archaeology.md` | git, `gh` |
+| Issue / ticket tracker via Atlassian | `why/sources/atlassian.md` (Jira procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then JQL; Fetch work for bodies |
+| Issue / ticket tracker, other | `why/sources/linear.md` | Linear (adapt for Jira, GitHub Issues, Plane, Shortcut) |
+| Long-form documents via Atlassian | `why/sources/atlassian.md` (Confluence procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then CQL; Fetch page for bodies |
+| Long-form documents, other | `why/sources/notion.md` | Notion (adapt for Confluence, Google Docs, Coda) |
+| Real-time team chat | `why/sources/slack.md` | Slack (adapt for Discord, Microsoft Teams, Mattermost) |
+| Infrastructure observability | `why/sources/datadog.md` | Datadog (adapt for New Relic, Honeycomb, Grafana, Splunk) |
+| Error / exception tracking | `why/sources/sentry.md` | Sentry (adapt for Rollbar, Bugsnag, Airbrake) |
+| Product analytics warehouse | `why/sources/databricks.md` | Databricks SQL (adapt for Snowflake, BigQuery, ClickHouse, dbt) |
+| Target looks defensive (null checks, retry, timeout, rate limit, feature flag, egress guard, OOM handler) | `why/sources/incident-postmortem.md`, appended to every investigator | — |
 
 ## Operating Posture
 
@@ -18,7 +46,7 @@ If the target is vague ("why do we do it this way?" with no clear referent), mak
 
 ## Step 2. Establish the Code Anchor
 
-Dispatch one read-only worker with the `why investigators` role to build the seed context: file paths and line ranges, key symbols (functions, classes, constants), the last few commits touching the target, PR numbers from merge commits (pattern `(#1234)` in the subject line), and any linked ticket IDs. Run `git blame -L <start>,<end> <file>` for last-touch commits, `git log --follow -p -- <file>` for full history with patches through renames, `git log --oneline -20 -- <file>` for recent commits with PR numbers visible, and `git log -1 --format=%B <commit>` to extract PR numbers. Then pull the PR bodies and discussion for any substantive commit: *Load and follow the `github` skill to read pull requests in read-only mode and review threads* using Pull requests with the qualified PR, retaining body and discussion. Start with any PR or commit explicitly supplied by the caller. Return the cited anchor and any access gaps. For the Why code anchor action, stop here. For full Why, pass the anchor to every investigator and the synthesizer.
+Spawn one `whyy` (source control) to build the seed context; fill its Code Anchor placeholders with what the request supplies, else `to be built`, and pass this step as the assigned task: file paths and line ranges, key symbols (functions, classes, constants), the last few commits touching the target, PR numbers from merge commits (pattern `(#1234)` in the subject line), and any linked ticket IDs. Run `git blame -L <start>,<end> <file>` for last-touch commits, `git log --follow -p -- <file>` for full history with patches through renames, `git log --oneline -20 -- <file>` for recent commits with PR numbers visible, and `git log -1 --format=%B <commit>` to extract PR numbers. Then pull the PR bodies and discussion for any substantive commit: *Load and follow the `github` skill to read pull requests in read-only mode and review threads* using Pull requests with the qualified PR, retaining body and discussion. Start with any PR or commit explicitly supplied by the caller. Return the cited anchor and any access gaps. At anchor depth, deliver the anchor and stop. For full Why, pass the anchor to every investigator and the synthesizer.
 
 ## Step 3. Spawn Parallel Investigators
 
@@ -42,10 +70,10 @@ Use local Git for source history; *Load and follow the `github` skill to inspect
 
 When both `preflight-atlassian` and `atlassian` skills are installed, *Load and follow the `preflight-atlassian` skill to resolve the credentialed TWG launcher and site* using **Resolve** once. Use its credentialed `twg` launcher and site in two independent investigators: **Jira** for issue / ticket tracker, **Confluence** for long-form documents. Both use `why/sources/atlassian.md` with their own category's procedure. If `tokenAvailable` is false or the site/launcher is unavailable, mark both categories inaccessible with the exact prerequisite; never read credentials, start login, or silently switch identity. Do not spawn a second provider for either category. If the skills are absent, retain ordinary MCP discovery for those categories.
 
-Spawn one investigator per category with an available provider, all in a single message so they run concurrently, each owning one category and one provider. Atlassian's credentialed launcher may be shared by its Jira and Confluence investigators, but each must search and report only its assigned product. Don't ask one investigator to cover multiple categories or MCPs. `model`: the `why investigators` role.
+Spawn one `whyy` per category with an available provider, all in one parallel batch, each owning one category and one provider. Atlassian's credentialed launcher may be shared by its Jira and Confluence investigators, but each must search and report only its assigned product. Don't ask one investigator to cover multiple categories or MCPs.
 
-Each investigator's prompt is `why/investigator-prompt.md` filled in, plus:
-- the category playbook `why/sources/<source>.md` for the selected provider, adapted from the examples in `why/source-playbook.md`
+Each `whyy` prompt is `agents/whyy.md` filled in, plus:
+- the category playbook `why/sources/<source>.md` for the selected provider, adapted per Conditional resources
 - `why/sources/incident-postmortem.md` **if the target code looks defensive** (null checks, retry logic, timeout handling, rate limiting, feature flags, egress guards, OOM handlers)
 - the code anchor and the user's original question
 
@@ -70,24 +98,24 @@ Only with an **explicit, written justification** that goes in the final Sources 
 - **No matching provider is available for that category**, or its required credentials are unavailable. Flag it as a gap, not a choice: "Real-time team chat skipped. No matching MCP available, so the conversational record was not searchable."
 - **The source is provably irrelevant**, not just "probably irrelevant." A high bar: "Error / exception tracking skipped. Target is a build-time script with no runtime code path."
 
-If your scope assessment suggests a single-commit trivial target where the PR description already contains the complete answer, you may answer inline **only after** confirming all seven available category searches would be redundant. Say so explicitly. This should be rare.
+If your scope assessment suggests a single-commit trivial target where the PR description already contains the complete answer, you may skip the investigators and write the report from the anchor **only after** confirming all seven available category searches would be redundant. Say so explicitly. This should be rare.
 
 ## Step 4. Synthesize
 
-Spawn one synthesizer. `model`: the `why synthesizer` role. It gets:
+Spawn one `composy`. It gets:
 1. The investigator findings, including any null results and any categories skipped with justification
 2. The code anchor
 3. The user's original question
 4. The epistemics framework from `why/epistemics.md`
-5. The synthesizer prompt template from `why/synthesizer-prompt.md`
+5. Its prompt, `agents/composy.md`, filled in
 
 ## Step 5. Present
 
-Return the synthesizer's output inline to Research for coordinator delivery under Caller-owned destinations. You may lightly edit for clarity or add context from the conversation, but **do not rewrite the confidence language**.
+Spot-check deciding citations; send a material gap to one bounded `whyy` follow-up in the owning category, then re-run `composy`. Deliver `composy`'s output per Delivery. You may lightly edit for clarity or add context from the conversation, but **do not rewrite the confidence language**.
 
 ## Output Format
 
-The structure is the one in `why/synthesizer-prompt.md`: The Question, The Code in Question, What We Found, What We Can Reasonably Infer, Competing Hypotheses, What We Don't Know, Sources Consulted, Confidence Summary. Adapt as needed, but keep the confidence separation intact, and keep Sources Consulted as one line per investigator, including the ones that returned nothing or were skipped, with the reason.
+The structure is the one in `agents/composy.md`: The Question, The Code in Question, What We Found, What We Can Reasonably Infer, Competing Hypotheses, What We Don't Know, Sources Consulted, Confidence Summary. Adapt as needed, but keep the confidence separation intact, and keep Sources Consulted as one line per investigator, including the ones that returned nothing or were skipped, with the reason.
 
 After Sources Consulted, if the user's `why` question is a precursor to changing this code, convert the lineage findings into a Preserve / Change / Avoid / Risk constraint set for planning the change.
 

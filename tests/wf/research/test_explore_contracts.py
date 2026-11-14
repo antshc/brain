@@ -11,12 +11,12 @@ import yaml
 REPO = Path(__file__).resolve().parents[3]
 SKILL = (REPO / 'plugins/wf/skills/research/SKILL.md').read_text()
 FRONTMATTER, SKILL_BODY = re.match(r'^---\n(.*?)\n---\n(.*)$', SKILL, re.S).groups()
-HUNTER = (REPO / 'plugins/wf/agents/hunter.agent.md').read_text()
+HUNTY = (REPO / 'plugins/wf/skills/research/agents/hunty.md').read_text()
 EVALS = Path(__file__).parent / 'evals'
 ROUTES = {'rg', 'lsp', 'graphify-path', 'graphify-find', 'nuget', 'unresolved'}
 
 
-def section(title: str, text: str = HUNTER) -> str:
+def section(title: str, text: str = HUNTY) -> str:
     start = re.search(rf'^#{{2,3}} {re.escape(title)}\n', text, re.M).end()
     end = re.compile(r'^#{2,3} ', re.M).search(text, start)
     return text[start:end.start() if end else None]
@@ -42,56 +42,44 @@ def test_body_under_300_lines():
     assert len(SKILL_BODY.splitlines()) < 300
 
 
-def test_hunter_owns_explore_and_loads_the_nuget_tactic():
-    assert not (REPO / 'plugins/wf/skills/research/explore/explore.md').exists()
-    request = section('Explore request', SKILL_BODY)
-    assert 'verbatim directly to a `hunter` subagent' in request
-    assert 'If Hunter is unavailable, report the blocked evidence request' in request
-    assert '(../skills/research/how/nuget.md)' in section('Route the lookup')
-    assert 'Hunter never spawns subagents' in HUNTER
+def test_hunty_is_a_research_prompt_that_loads_the_nuget_tactic():
+    assert not (REPO / 'plugins/wf/agents/hunter.agent.md').exists()
+    assert '## Explore request' not in SKILL_BODY
+    assert '`@research/how/nuget.md`' in section('Tools')
+    assert 'Never spawn subagents. Never load the `research` skill.' in HUNTY
+    assert not HUNTY.startswith('---')
 
 
-def test_request_lists_shape_enum():
-    line = next(l for l in section('Explore request', SKILL_BODY).splitlines() if l.startswith('- `[@shape]`'))
-    assert re.search(r'`([^`]+)`;', line).group(1) == 'literal | symbol | relationship | nuget'
-
-
-def test_route_the_lookup_precedes_tool_selection():
-    assert HUNTER.index('### Route the lookup') < HUNTER.index('### Select tools by question shape')
+def test_sections_and_route_table():
+    order = ['## Brief', '## Read-only contract', '## Resolve the target', '## Route the lookup', '## Tools', '## Gotchas', '## Completeness sweep', '## Return']
+    assert [HUNTY.index(h) for h in order] == sorted(HUNTY.index(h) for h in order)
+    assert '## Graphify' not in HUNTY and '## Return the verdict' not in HUNTY
     route = section('Route the lookup')
     assert 'route: rg | lsp | graphify-path | graphify-find | nuget | unresolved' in route
     assert {re.match(r'`([\w-]+)`', row[-1]).group(1) for row in table_rows(route)} == ROUTES
 
 
-def test_rg_rules():
-    tools = section('Tools', HUNTER)
-    for text in ('exit codes', '`1` no match', 'Only `command -v rg` decides presence',
-                 '**MUST NOT** run recursive `grep`', 'rg … || grep …'):
-        assert text in tools, text
+def test_rg_gotchas():
+    gotchas = section('Gotchas')
+    for text in ('exit `1` means no match', 'only `command -v rg` decides presence',
+                 '**MUST NOT** run recursive `grep`', 'rg … || grep …', 'rg -uu'):
+        assert text in gotchas, text
 
 
-@pytest.mark.parametrize('step,verdict', [
-    ('`graphify reflect --if-stale`', 'skip'),
-    ('`scripts/focused_query.py`', 'writes nothing'),
-    ('`graphify-out/cache/`', 'allowed'),
-])
-def test_graphify_read_only_overrides(step, verdict):
-    row = next(r for r in table_rows(section('Graphify', HUNTER)) if step in r[0])
-    assert verdict in row[-1]
-
-
-def test_graphify_script_first_cache_exception_and_not_found():
-    graphify = section('Graphify', HUNTER)
-    assert 'inline `graph.json` traversal only when both are missing' in graphify
-    assert 'never `graphify query "<question>"`' in graphify
-    assert '`focused_query.py path <A> <B>` before any `query` or `rg`' in graphify
-    assert '`graphify query | path | explain` updating `graphify-out/cache/`' in section('Read-only contract', HUNTER)
+def test_graphify_is_a_tool_with_read_only_overrides():
+    tools = section('Tools')
+    assert '**Graphify**' in tools and '**NuGet**' in tools
+    assert 'skip `graphify reflect --if-stale`' in tools
+    assert 'never `save-result`, `--update`' in tools
+    assert 'inline `graph.json` traversal only when both are missing' in tools
+    assert '`path <A> <B>` before any `query` or `rg`' in tools
+    assert '**MUST NOT** pass question text to `graphify query`' in section('Gotchas')
     read_only = section('Read-only contract')
-    assert "brief's `@outputArtifact`" in read_only
+    assert '`graphify query | path | explain` updating `graphify-out/cache/`' in read_only
     assert 'decompilation written only to the resolved NuGet package cache' in read_only
-    verdict = section('Return the verdict')
-    assert 'repeats the `route:` line' in verdict
-    assert 'exactly `NOT FOUND`' in verdict
+    ret = section('Return')
+    assert 'Repeat the `route:` line' in ret
+    assert 'exactly `NOT FOUND`' in ret
 
 
 def test_eval_scenarios_cover_every_route():
@@ -102,17 +90,25 @@ def test_eval_scenarios_cover_every_route():
     assert {c['expectedRoute'] for c in cases} == ROUTES
     pattern = re.compile(scenarios['routeLinePattern'])
     for case in cases:
-        assert re.search(r'@shape: (literal|symbol|relationship|nuget)', case['request']), case['id']
+        assert case['request'].startswith('@work: '), case['id']
         assert pattern.match(f"route: {case['expectedRoute']} — reason"), case['id']
 
 
 def test_missing_checkout_blocks_lookup_without_remote_fallback():
     target = section('Resolve the target')
-    assert 'local checkout' in target and 'unresolved' in target
+    assert 'checkout' in target and 'unresolved' in target
     route = section('Route the lookup')
     row = next(row for row in table_rows(route) if 'no local checkout' in row[0])
     assert row[-1].startswith('`unresolved`')
     assert 'github' not in route.lower()
-    tools = section('Select tools by question shape')
-    assert 'clone' in tools and 'fetch' in tools
-    assert 'GitHub Repository tactic' not in HUNTER
+    read_only = section('Read-only contract')
+    assert 'clone' in read_only and 'fetch' in read_only
+    assert 'GitHub Repository tactic' not in HUNTY
+
+
+def test_completeness_sweep_runs_last_and_maps_every_obligation():
+    sweep = section('Completeness sweep')
+    assert 'Run last, after every search and before Return' in sweep
+    assert 'Re-read `@work`' in sweep
+    assert 'Map each obligation to cited evidence' in sweep
+    assert 'Return only when every obligation has evidence or an explicit mark' in sweep

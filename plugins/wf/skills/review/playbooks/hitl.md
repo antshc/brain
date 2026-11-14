@@ -130,10 +130,10 @@ On approval (1 or 2): follow [Posting](../references/posting.md#hitl), with `FIL
 
 Answers a code question; never drafts or posts.
 
-1. **Research:** check `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` first; answer from matching facts. Otherwise *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* on the checked-out PR head. Pass the question as `@question`, plus `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed. Route by question:
-   - **Lookup** — where is X, who calls Y, what does Z return: pure lookup; no document; research returns Hunter's verdict inline.
-   - **How** — flow, mechanism, or behavior across files or components: default Research; set `@outputPath` to `bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/inspect/{{slug}}.md` and `@outputBase` to the checked-out repository root. Keep content framing in `@outputShape`.
-   - **Why** — design rationale or what led to the change: **Why code anchor** (`@mode=why`, `@whyDepth=anchor`), returned inline; use full Why only when the user asks for rationale beyond code, commits, and PRs.
+1. **Research:** check `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` first; answer from matching facts. Otherwise pick the route below and *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* on the checked-out PR head. The request names the route (`Route: <route>`) and holds the question, `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed.
+   - **Lookup** — where is X, who calls Y, what does Z return: `Route: Explore`; no document; `hunty` verdicts return inline.
+   - **How** — flow, mechanism, or behavior across files or components: `Route: How`; ask in the request to save to `<checked-out repository root>/bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/inspect/{{slug}}.md` and state the content framing.
+   - **Why** — design rationale or what led to the change: `Route: Why`, asking only for code, commit, and PR context; read the returned report; use full Why only when the user asks for rationale beyond code, commits, and PRs.
 
    Done when research returns cited facts, a saved path, or a named blocker.
 2. **Record:** append to `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` (create if missing):

@@ -4,9 +4,9 @@ The unit is one data boundary: the governed item type, its authoritative writer,
 
 Identify the item and store first, then route every writer and reader through lookups. Verify keys, ownership, consistency, migration, concurrency, and retention in executing source.
 
-Add findings to the How explanation; the caller owns any save destination.
+Add findings to the How explanation.
 
-The Explainer chooses visuals under Visualize. Supply access-order, ownership, shape, and key evidence; tables often explain data rules most directly.
+`explainy` chooses visuals under Visualize. Supply access-order, ownership, shape, and key evidence; tables often explain data rules most directly.
 
 ## Workflow
 
