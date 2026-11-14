@@ -12,10 +12,6 @@ Print the block below verbatim, then stop.
 /factory-mode help <request>             3 ranked playbook options for <request>, with reasoning; runs nothing
 
 PLAYBOOKS — matched from the request
- investigation      read-only, cited answer or recommendation; no code
-  /factory-mode how does <flow> work end to end
-  /factory-mode are we sure <assumption> holds; should we use <X> or <Y>
-
  bug-fix            reproduce → binary-search root cause → fix → verify on same surface → draft PR
   /factory-mode fix <symptom> when <trigger>
   /factory-mode <Class.Method> throws <error> on <input>
@@ -33,13 +29,8 @@ PLAYBOOKS — matched from the request
   /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
   /factory-mode add <feature> checkpoint  (pause for design approval)
 
- refactoring        pin behavior → subtract → reshape in green steps → prove unchanged
-  /factory-mode extract <logic> from <Class> into <module>
-  /factory-mode dedupe <helpers> across <area>
-
- prototype          throwaway sketch or experiment to settle a fork by observation
-  /factory-mode prototype 2 layouts for <screen>
-  /factory-mode does <library> handle <case>; try it
+Read-only questions and behavior-preserving refactors use the no-playbook fallback.
+Research and empirical verification use the `research` and `prove` skills.
 
 Principles, autonomy, subagent, and reply rules apply to every playbook.
 ```
@@ -50,7 +41,7 @@ Principles, autonomy, subagent, and reply rules apply to every playbook.
 
 1. **Restate.** Goal, problem, and smallest change that meets it, in 2–3 lines. **Done when:** printed.
 2. **Locate.** Light read-only scan: owning module, existing tests, matching `ARCHITECTURE.md` / `GLOSSARY.md` rows, open unknowns. Names via search only; no subagents. **Done when:** owning area named, or `unknown`.
-3. **Build 3 options** from the Playbooks table, each a different playbook or approach (e.g. `design` before `feature`, `prototype` first, `feature` directly). **Done when:** 3 distinct options.
+3. **Build 3 options** from the Playbooks table, each a different playbook or approach (e.g. `design` before `feature`, `feature` directly, `stories` for planning-only work). **Done when:** 3 distinct options.
 4. **Print**, per option:
    - **Option N — {{playbook}}** ({{approach}})
    - **Delivers / skips:** artifact produced (answer, spec, design, draft PR, decision) vs what it leaves out
