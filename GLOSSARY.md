@@ -48,29 +48,29 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 ### Language
 
 **Router**:
-A selection block in an activated `SKILL.md` that maps task intent or observed conditions to one route and its supporting files. It selects instructions within a skill; unlike a router skill, it does not independently invoke another installed skill.
+A selection block in an activated `SKILL.md` that classifies task intent or observed conditions and directs it to one predefined route and its supporting files. It selects instructions within a skill; unlike a router skill, it does not independently invoke another installed skill.
 _Avoid_: automatic import, playbook, orchestrator
 
 **Route**:
-One selectable outcome or execution path within an activated skill, with a trigger and output contract. Represent it in the router, not a folder or independently discoverable skill.
+One predefined, specialized execution path within an activated skill that the router can select, with a trigger and output contract. Represent it in the router, not a folder or independently discoverable skill.
 _Avoid_: playbook, tactic, mode folder
 
 **Playbook**:
-The reusable guide describing how to handle a specific scenario for one route, including decisions, ordered actions, verification, and completion criteria. A router selects the playbook; the playbook owns the end-to-end outcome.
+The reusable guide for one scenario on a route. It lays out ordered actions, decision points and what to weigh at each, verification, and completion criteria, and owns the end-to-end outcome. Unlike a procedure, it leaves room for judgment. A router selects the playbook.
 _Avoid_: tactic, reference, checklist
 
 **Tactic**:
-A focused, reusable method applied conditionally within a route or playbook, such as external-source checking or runtime verification. It solves one subproblem rather than owning the complete task outcome.
+A focused, reusable instruction file for one subproblem or operation, such as runtime verification or NuGet inspection. A router selects it, or a playbook loads it on demand. It can combine with other tactics but does not own the task outcome. It is a method, not a goal.
 _Avoid_: playbook, route, skill
 
 **Procedure**:
-A prescribed sequence of steps to accomplish a task. Strict; emphasizes repeatability and predictable execution.
+A prescribed sequence of steps that leaves no judgment calls, so the outcome is the same on every run. Strict; emphasizes repeatability and predictable execution.
 
 **Routine**:
-A standardized, frequently repeated set of actions. Emphasizes consistency and automation.
+A set of instructions plus the tools an agent follows for one kind of request. Loosely defined; emphasizes a reusable unit that can be swapped in per request.
 
 **Workflow**:
-A sequence of connected activities with transitions, dependencies, and decisions. Emphasizes coordination and execution flow.
+A sequence of connected steps with transitions, dependencies, and decisions, run through predefined paths. The instructions or code, not the model, own the control flow. Emphasizes coordination and execution flow.
 
 **Harness environment**:
 The repository that owns the specs and issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
