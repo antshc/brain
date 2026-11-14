@@ -143,12 +143,52 @@ CloudFormation has **no CLI flag to deploy only arbitrary selected resources** f
 | **B. Nested stacks** | Split resource groups into nested child templates; root conditionally includes `AWS::CloudFormation::Stack` resources or passes child parameters | Modular templates; root coordinates one installation and lifecycle | Nested stacks remain parent-managed; changes should flow through root; disabling a nested stack can delete it | Optional resource groups needing unified lifecycle |
 | **C. Separate standalone stacks** | Publish one immutable template per independently deployable module; deploy/update each stack separately | Independent deployment, upgrades and lifecycle | More stack orchestration; parameters, outputs and cross-stack exports/imports require dependency management | Customers independently install or upgrade modules |
 | **D. Incremental stack update (not resource selection)** | Deploy an updated template or create/execute a change set | CloudFormation normally updates only changed or impacted resources, even if the full template is supplied | Cannot choose arbitrary operations from the change set; replacements and dependency effects still possible | Update existing deployments without unnecessary modifications |
+| **E. Direct Conditions (JSON or YAML, no parameters)** | Put a literal `Fn::Equals` expression in `Conditions`; apply `Condition` only to selected resources | No customer-facing parameter, no mapping, simplest static install-time toggle | Toggle is fixed in the published template, not runtime-overridable; creating a different variant requires a new immutable version; condition changes on updates can delete resources | Vendor-controlled resource selection packaged by Jenkins |
 
-**Default:** Preserve immutable root + child nested-stack release artifacts and full root-stack deployments. If selective initial installation is needed, use **A** for feature flags or **B** for optional nested modules. Choose **C** only when truly independent customer deployments/upgrades are required. **D** applies to every approach; it is not a selection mechanism.
+**Default:** Preserve immutable root + child nested-stack release artifacts and full root-stack deployments. Use **E** when Jenkins decides one fixed resource-selection configuration per release, **A** for customer-selectable features, or **B** for optional nested modules. Choose **C** only for independent customer module upgrades. **D** is incremental update behavior, not a selection mechanism.
+
+### E. Direct Conditions example — JSON
+
+No `Parameters` or `Mappings` required. Only the EC2 instance receives `Condition`; the IAM role and policy remain unconditional. The existing role, policy, and instance properties are omitted in this focused excerpt:
+
+```json
+{
+  "Conditions": {
+    "CreateInstance": {
+      "Fn::Equals": ["false", "true"]
+    }
+  },
+  "Resources": {
+    "InstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": { "...": "..." }
+    },
+    "InstancePolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": { "...": "..." }
+    },
+    "MyInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Condition": "CreateInstance",
+      "Properties": { "...": "..." }
+    }
+  }
+}
+```
+
+- `["false", "true"]` => condition false: skip EC2; still create IAM role and policy.
+- `["true", "true"]` => condition true: create EC2, role and policy.
+- This is an **illustrative JSON fragment**, not a complete deployable template; replace placeholder resource properties with valid definitions.
+- Jenkins sets the literal during the **build pipeline before the Artifactory archive is created**; the S3 release pipeline must not modify it. One version equals one configuration. Publishing different selections requires distinct immutable versions/artifacts.
+- Internal means **absent from the CloudFormation parameter form**, not secret: customers can inspect the JSON template.
+- On updates, a formerly true condition that becomes false can delete the instance. AWS also documents that conditions cannot be updated *by themselves* without accompanying resource changes. Use change sets and test transitions before customer upgrades.
+- For several flags or environment-specific configurations, `Mappings + Conditions` may centralize configuration; prefer direct conditions for one static switch.
+
+AWS reference: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/conditions-section-structure.html
 
 ### Compatibility with immutable releases
 
-- Keep selection parameters/conditions inside versioned templates stored in Artifactory and S3; parameters are supplied per customer deployment, never generated as different artifacts for a given release version.
+- Keep selection parameters/conditions inside versioned templates stored in Artifactory and S3. For **A**, customers supply parameters at deployment. For **E**, Jenkins embeds fixed condition literals before archive creation; each distinct selection requires its own immutable release identity.
 - If using **B**, publish all optional children under the same immutable version prefix; root references only same-version child URLs. Expand the ZIP manifest and release pipeline to include every child template.
 - If using **C**, publish each module's versioned template and dependency/installation contract; avoid assuming one root launch URL owns all resources.
 - Never toggle off a condition as a way to skip updates to an existing resource: it may remove the resource from the stack. Evaluate `DeletionPolicy`, `UpdateReplacePolicy` and dependency effects where appropriate.
@@ -156,17 +196,21 @@ CloudFormation has **no CLI flag to deploy only arbitrary selected resources** f
 
 ### Added implementation tasks
 
-- [ ] Decide selective installation versus selective update; choose **A**, **B** or **C** only if required.
-- [ ] Define customer-facing selection parameters, defaults and dependencies for conditional resources/modules.
+- [ ] Decide selective installation versus selective update; choose **A**, **B**, **C** or **E** only if required.
+- [ ] Define customer-facing selection parameters (A), or fixed Jenkins build-time condition toggles (E), including defaults and resource dependencies.
 - [ ] Validate each supported resource selection and its stack-update/removal behavior using change sets.
 - [ ] For optional children or standalone modules, extend immutable archive manifest, S3 publishing and customer URL contracts.
-- [ ] Test upgrades across different parameter combinations, including accidentally disabled resources and replacements.
+- [ ] Test upgrades across different parameter/condition combinations, including accidentally disabled resources and replacements.
+- [ ] For **E**, verify generated JSON toggles, role/policy independence, manifest checksums and immutability across release retries.
 
 ### Added acceptance tests
 
 | Scenario | Expected |
 |---|---|
 | Initial installation with optional feature off | Feature resource/module absent; rest deployed |
+| JSON direct condition `Fn::Equals: ["false", "true"]` (E) | EC2 skipped; IAM role and policy created; no parameter prompt |
+| JSON direct condition `Fn::Equals: ["true", "true"]` (E) | EC2, IAM role and policy created |
+| Jenkins produces different selection with existing release version (E) | Reject artifact/version conflict; no mutation of published S3 objects |
 | Initial installation with optional feature on | Selected resources/module deployed with same-version child references |
 | Update unchanged parameters and resources | Change set contains no unrelated modifications |
 | Turn feature off on existing stack | Deletion/retention behavior documented and previewed; no accidental removal |
