@@ -75,3 +75,18 @@ def test_playbook_links_resolve_to_bundled_references_and_sections():
         ("wayfinder", "wayfinder-operations"),
     ):
         assert f"](../references/github.md#{section})" in (DESIGN / f"playbooks/{mode}.md").read_text()
+
+
+def test_wayfinder_gates_ticket_creation_and_runs_helpers_without_nesting():
+    wayfinder = (DESIGN / "playbooks/wayfinder.md").read_text()
+    approval = wayfinder.split("## Ticket approval", 1)[1].split("\n## ", 1)[0]
+    execution = wayfinder.split("## Helper execution", 1)[1].split("\n## ", 1)[0]
+
+    assert "- Ticket approval" in wayfinder
+    assert "before creating any map child or sub-ticket and before dispatching Research" in approval
+    assert "- **Create a ticket**: only after Ticket approval." in wayfinder
+    assert "- **Create a sub-ticket**: only after Ticket approval." in wayfinder
+    assert "**MUST NOT** wrap a helper in a subagent." in execution
+    assert "`hunter`" in execution
+    for helper in ("Research", "Prove", "Challenge this", "Deep Module", "Code Sketch", "Grill"):
+        assert f"| {helper} |" in execution

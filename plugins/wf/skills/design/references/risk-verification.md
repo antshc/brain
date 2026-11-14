@@ -13,7 +13,7 @@ Choose the cheapest sufficient evidence for the actual failure boundary; record 
 | Missing facts needed to frame a runnable claim | Gather existing source evidence through the owner's Research routing first; label source-based/inferred conclusions, not observed proof. |
 | No safe runnable target, access, prerequisite or human decision | Keep risk unresolved; state the exact blocker and next check/decision owner. Continue independent risks. |
 
-Read the selected skill body, applicable procedure and required resources fully before execution; let it own method selection and independent reproduction. Forward supplied `@helperDispatch` transitively; it overrides default delegation only for Wayfinder, using direct general-purpose workers without the Subagents skill. Prefer existing tests/commands over new probes; a faster mock or simulation is sufficient only if it exercises the risk's actual mechanism. Reuse unchanged evidence rather than repeating runs.
+Read the selected skill body, applicable procedure and required resources fully before execution; let it own method selection, worker dispatch and independent reproduction. Run it in the caller's session; do not wrap it in a subagent. Prefer existing tests/commands over new probes; a faster mock or simulation is sufficient only if it exercises the risk's actual mechanism. Reuse unchanged evidence rather than repeating runs.
 
 ## Execute and reconcile
 

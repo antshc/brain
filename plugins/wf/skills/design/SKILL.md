@@ -46,7 +46,7 @@ Read triggered resources fully before use; resolve from this skill directory.
 | Grill external-source trigger | [External source](references/tactics-external-source.md) |
 | Grill closing/handoff | [Closing sweep](references/closing-sweep.md) |
 
-Wayfinder passes its direct general-purpose `@helperDispatch` policy transitively to helper routes, overriding their default worker/model dispatch only. It owns Not yet specified fog; HLD Open Questions are user-owned presentation content. Evidence is local-only: no research/proof/sketch appendices, Confluence subpages or artifact attachments.
+New Wayfinder tickets require user approval of the proposed batch before creation and research. It owns Not yet specified fog; HLD Open Questions are user-owned presentation content. Evidence is local-only: no research/proof/sketch appendices, Confluence subpages or artifact attachments.
 
 Wayfinder additionally reads the full Grill playbook for interviews and the full HLD playbook for document authoring, using the route table above. Spec remains a separate explicitly requested route; Wayfinder does not select it as an output format.
 

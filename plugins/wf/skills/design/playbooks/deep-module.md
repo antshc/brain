@@ -6,7 +6,7 @@ Design a deep module interface as 3+ genuinely different Code Sketch option pack
 
 - Direct request → return options and recommendation, then stop. Implementation is a separately requested handoff; never start Architect automatically.
 - Verified contract finding → treat its reproduced failure as a constraint and return proposed options to the caller; evidence skills supply no fixes.
-- Wayfinder Contract design → use supplied worktree/output root and `@helperDispatch`; retain options there until user Choice. Wayfinder owns selected-only commit/merge and cleanup.
+- Wayfinder Contract design → runs in Wayfinder's session with supplied worktree/output root; default designer dispatch; retain options there until user Choice. Wayfinder owns selected-only commit/merge and cleanup.
 
 ## Procedure
 

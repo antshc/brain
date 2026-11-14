@@ -18,7 +18,7 @@ Standalone → show `problem.md` to the user, then continue immediately without 
 
 ## Spawn designers
 
-With `@helperDispatch`, directly spawn 3+ general-purpose designers under that policy, forwarding it to nested work; do not invoke the Subagents skill. Otherwise *Load and follow the `subagents` skill to dispatch independent workers using role-based models and isolated outputs* using **Dispatch** with 3+ designer briefs and the ordered `architect runners` pool. Each MUST produce a **radically different** interface.
+*Load and follow the `subagents` skill to dispatch independent workers using role-based models and isolated outputs* using **Dispatch** with 3+ designer briefs and the ordered `architect runners` pool. Each MUST produce a **radically different** interface.
 
 Use skill-capable `general-purpose` designers. Pass Design’s shared Principles rule with the task, route, phase and mandatory names; each designer loads in its own context before shaping an interface. Give each a separate technical brief: file paths, coupling details, dependency categories, what sits behind the seam, absolute paths of `design/references/deep-modules.md` and the repo glossary, and its isolated package path `option-<n>/`. Each designer follows the Sketch playbook in Candidate context with supplied grounding; no Arena or implementation. Assign one constraint per designer:
 
