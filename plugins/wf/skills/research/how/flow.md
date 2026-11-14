@@ -19,7 +19,7 @@ Add findings to the How explanation.
 
 ## Presentation
 
-`explainy` chooses the view under Visualize: ownership/responsibility → swimlane or container; interaction order → sequence. If lanes help, use one per deployable and 1–5 boundary-relevant steps per lane; label crossings with contracts. Back every node/crossing with evidence. Do not require a diagram when prose or a table answers the question.
+`explainy` chooses the view under Visualize. A flow crossing two or more deployables → prefer the `doc-diagram` Swimlane Diagram with one lane per deployable (lane name = the `ARCHITECTURE.md` Deployable name), lanes in chain order, 1–5 boundary-relevant steps per lane, and every crossing labeled with its contract (route, message, queue, or call). Add a sequence diagram only when interaction order or timing decides the answer that the swimlane cannot show. Back every node/crossing with evidence; draw unresolved crossings as labeled gaps.
 
 ## Deployable eligibility
 
