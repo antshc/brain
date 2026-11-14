@@ -88,7 +88,7 @@ flowchart TD
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-Solid edges are work within Wayfinder; dotted edges require a separately requested handoff. Repeat connectors resume the numbered step. User answers are explicit; only the user ends Grill. Source sketch candidates do not enter the HLD before Contract design Choice.
+Solid edges are work within Wayfinder; dotted edges require a separately requested handoff. Repeat connectors resume the numbered step. User answers are explicit; only the user ends Grill. Prototype artifacts and their conclusions enter integration/HLD only after explicit approval of the reviewed payload. Contract design additionally requires Choice.
 
 ### Fog solving
 
@@ -101,21 +101,23 @@ flowchart TD
     work["3 - Link concrete work or root-owned verification run"]
     spawn[["4 - Spawn general-purpose helper directly"]]
     verify["5 - Verify findings, artifacts and coverage"]
-    outcome{"6 - Resolution criteria met?"}
+    outcome{"6 - Evidence and required approval ready?"}
     clear["6a.1 - Record outcome in Decisions so far"]
     update["6a.2 - Update supported HLD conclusions"]
-    remain["6b.1 - Refine fog, next action and owner"]
+    waitApproval(["Await user approval; retain prototype worktree"])
+    remain["6c.1 - Refine fog, next action and owner"]
     repeat(["Next iteration - back to step 2"])
     finish(["Return to Wayfinder"])
 
     start --> read --> select --> work --> spawn --> verify --> outcome
-    outcome -- "Yes" --> clear --> update --> finish
-    outcome -- "No or new unknowns" --> remain --> repeat
+    outcome -- "Yes; integrate eligible result" --> clear --> update --> finish
+    outcome -- "Prototype approval pending" --> waitApproval
+    outcome -- "More investigation needed" --> remain --> repeat
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-Research clarifies facts, Prove checks a claim, Challenge this seeks reproduced failures, Deep Module/Code Sketch expose interface and code shapes, and Grill settles human choices. These are alternatives and follow-ups, not a mandatory sequence. Challenge this may target the whole HLD; record it on the existing issue/root, never its own tracking ticket. A bounded passing check clears only its supported claim; residual risks remain in fog.
+Research clarifies facts, Prove checks a claim, Challenge this seeks reproduced failures, Deep Module/Code Sketch expose interface and code shapes, and Grill settles human choices. These are alternatives and follow-ups, not a mandatory sequence. Challenge this may target the whole HLD; record it on the existing issue/root, never its own tracking ticket. A bounded passing check clears only its supported claim after required approval/integration; residual risks remain in fog. Prototype approval gates every Prove/Experiment, Challenge this, Code Sketch and Contract payload. Retain its owned worktree and open issue/root state until the user approves the exact revision; research-only integration remains automatic.
 
 ### Contract design
 
@@ -140,7 +142,7 @@ flowchart TD
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-Contract design keeps its `wayfinder:contract-design` ticket across AFK Options and HITL Choice. Each option contains `sketch/`, `module-map.md` and its own Markdown `rationale.md`; `comparison.md` compares, never replaces, those rationales. Merge after user selection only: chosen source sketches/rationale plus notes describing considered alternatives and rejection reasons. Rejected source trees stay out of incoming integration history. Code Sketch Tasks retain their ordinary local artifact integration flow.
+Contract design keeps its `wayfinder:contract-design` ticket across AFK Options and HITL Choice. Each option contains `sketch/`, `module-map.md` and its own Markdown `rationale.md`; `comparison.md` compares, never replaces, those rationales. Merge after user selection only: chosen source sketches/rationale plus notes describing considered alternatives and rejection reasons. Rejected source trees stay out of incoming integration history. Code Sketch Tasks use the same prototype approval gate before local integration.
 
 ## Key decisions
 
@@ -149,10 +151,11 @@ Contract design keeps its `wayfinder:contract-design` ticket across AFK Options 
 | Alternate human decisions and autonomous helpers | Answers and findings can reveal more work; Wayfinder keeps control |
 | Root Not yet specified is the fog of war | One home for unknowns/risks, coarse or precise, until resolved |
 | Child issues track concrete work | Progress, claims and dependencies stay distinct from design uncertainty |
+| Approve every prototype before integration | Retain its owned worktree, paths and reviewed revision; merge only the explicitly approved payload |
 | Keep Contract design Options → Choice | Agent prepares options; user selects; only then merge chosen artifacts and considered-option notes |
 | Challenge this is embedded | Verify scoped design or whole HLD without another tracking-ticket type |
 | Direct general-purpose subagents | Random latest supported Opus/Sol, medium thinking; no Subagents skill |
-| Git skill owns conditional worktrees | Isolate source sketches/mutating proofs; Wayfinder owns commits and serialized local integration |
+| Git skill owns worktrees | Isolate every prototype-producing run; Wayfinder owns commits and serialized local integration |
 | HLD contains supported conclusions | Open Questions belong to users during presentation; reports/sketches remain local |
 | Explicit HLD-page-only publication | No evidence appendices, research subpages or report/sketch attachments |
 
@@ -162,8 +165,8 @@ All delegated helpers use skill-capable general-purpose subagents; these rows de
 
 | Owner/helper | Responsibility | Returns to Wayfinder |
 | --- | --- | --- |
-| User | Scope, requirements, preferences, contract choice, residual-risk acceptance and publish request | Explicit decisions |
-| Wayfinder | Fog, scheduling, claims, dispatch, human relay, verification, commits/local integration and HLD synchronization | Next investigation, human choice, readiness or precise blocker |
+| User | Scope, requirements, preferences, prototype approval, contract choice, residual-risk acceptance and publish request | Explicit decisions |
+| Wayfinder | Fog, scheduling, claims, dispatch, human relay, verification, prototype approval relay, commits/local integration and HLD synchronization | Next investigation, human choice, readiness or precise blocker |
 | Grill | One human decision at a time, session ledger and closing sweep | Actual user answers and new unknowns |
 | Research | Facts from code, cloud, history and primary sources | Cited findings and limits |
 | Prove | Smallest meaningful check of one claim | Reproducible confirmed/refuted/inconclusive evidence |
@@ -185,7 +188,7 @@ All delegated helpers use skill-capable general-purpose subagents; these rows de
 | HLD `docs/ongoing/<initiative-slug>.md` | Supported current design and ignored local provenance; no evidence appendices |
 | HLD Open Questions | User-filled presentation questions; agents preserve entries and blank answers |
 
-For each helper spawn, randomly choose Opus or Sol with equal probability, resolve the latest host-supported model and use medium thinking. Current repository names: `claude-opus-5.5`, `gpt-6.1-sol`; verify availability at execution. Forward the [Wayfinder direct-spawn policy](playbooks/wayfinder.md#helper-dispatch) to nested helpers without loading the Subagents skill. Read-only work may reuse a pinned checkout; source sketches/mutations use Git-skill worktrees. Producers do not commit/push; Wayfinder integrates locally, with Contract design deferred until Choice.
+For each helper spawn, randomly choose Opus or Sol with equal probability, resolve the latest host-supported model and use medium thinking. Current repository names: `claude-opus-5.5`, `gpt-6.1-sol`; verify availability at execution. Forward the [Wayfinder direct-spawn policy](playbooks/wayfinder.md#helper-dispatch) to nested helpers without loading the Subagents skill. Research-only read-only work may reuse a pinned checkout; every prototype-producing run uses a Git-skill worktree, including read-only proof reports. Producers do not commit/push. Wayfinder retains prototypes without commit/merge until explicit approval of the exact reviewed payload, then integrates locally; Contract design also requires Choice. Changes need renewed approval; silence or passing checks do not approve a prototype. Resume retains the same worktree and pending step; cleanup waits for verified integration, HLD/tracker synchronization and every consumer.
 
 Discovery creates no push/PR or publication. Explicit `/design publish-hld` publishes the HLD page only; reports, proof artifacts and sketch packages remain local, without appendices, subpages or artifact attachments. Existing remote artifacts are not automatically deleted. Architect is outside Wayfinder; Architecture first remains a separate flow. For that flow, request a **design-only handoff** explicitly; Architect otherwise implements by default.
 
