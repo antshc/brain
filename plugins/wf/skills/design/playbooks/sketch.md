@@ -9,7 +9,7 @@ Read [Code-sketch contract](../references/sketch-contract.md) in full before sta
 | Context | Inputs | Output location | Extra work |
 | --- | --- | --- | --- |
 | **Standalone** (`design sketch`) | Verbatim task/story/spec or resolved decisions; optional scope | `<artifact-root>/synthesis/` | Ground in code; one sketch; report and stop |
-| **Wayfinder** | Ticket question and supplied grounding, `@helperDispatch`, pinned worktree | Exact caller-assigned package root | Return package to Wayfinder for ordinary local integration |
+| **Wayfinder** | Ticket question and supplied grounding, `@helperDispatch`, pinned worktree | Exact caller-assigned package root | Return package to Wayfinder for prototype approval before local integration |
 | **Candidate** (Architect Arena or Deep Module option) | Task, supplied grounding/repo docs, isolated read-only working tree, assigned candidate path | `<artifact-root>/candidate-<n>/` (or Arena revision candidate) | Return to caller; no Arena, implementation or independent user handoff |
 
 The artifact root is `<repo-root>/tmp/design-<slug>/` per `SKILL.md`. Explicit caller roots override temporary defaults. In every context the package contains `rationale.md`, `module-map.md`, and `sketch/` with language-native source files. Candidate outputs must be independent and structurally distinct when Arena uses multiple runners.
