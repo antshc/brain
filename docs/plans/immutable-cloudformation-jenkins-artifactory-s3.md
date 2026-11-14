@@ -132,3 +132,42 @@ Input: immutable `version` (`X.Y.Z`), target AWS account/region/bucket, explicit
 4. **Pipeline approval:** who may publish production releases; whether promotion from staging is required.
 5. **Cryptographic provenance:** SHA-256 in manifest is integrity checking; decide whether manifest signatures/attestations are needed for stronger supply-chain guarantees.
 6. **CloudFormation packaging:** if Lambda assets or additional nested templates are introduced, extend upload/URL rewrite to package every dependent artifact immutably.
+
+## Alternatives — selective CloudFormation resource deployment
+
+CloudFormation has **no CLI flag to deploy only arbitrary selected resources** from a template or execute a subset of a change set. Select a deployment boundary or model optional resources explicitly; preview modifications through a change set.
+
+| Alternative | How | Advantages | Trade-offs | Best fit |
+|---|---|---|---|---|
+| **A. Conditions + parameters** | Resource-level `Condition`; customer supplies feature flags during root-stack deployment/update | Single installation URL, explicit optional features, same root/child artifact | Conditions must be designed in template; turning a flag off can delete previously created resources; dependency and output references require care | Select optional features at installation |
+| **B. Nested stacks** | Split resource groups into nested child templates; root conditionally includes `AWS::CloudFormation::Stack` resources or passes child parameters | Modular templates; root coordinates one installation and lifecycle | Nested stacks remain parent-managed; changes should flow through root; disabling a nested stack can delete it | Optional resource groups needing unified lifecycle |
+| **C. Separate standalone stacks** | Publish one immutable template per independently deployable module; deploy/update each stack separately | Independent deployment, upgrades and lifecycle | More stack orchestration; parameters, outputs and cross-stack exports/imports require dependency management | Customers independently install or upgrade modules |
+| **D. Incremental stack update (not resource selection)** | Deploy an updated template or create/execute a change set | CloudFormation normally updates only changed or impacted resources, even if the full template is supplied | Cannot choose arbitrary operations from the change set; replacements and dependency effects still possible | Update existing deployments without unnecessary modifications |
+
+**Default:** Preserve immutable root + child nested-stack release artifacts and full root-stack deployments. If selective initial installation is needed, use **A** for feature flags or **B** for optional nested modules. Choose **C** only when truly independent customer deployments/upgrades are required. **D** applies to every approach; it is not a selection mechanism.
+
+### Compatibility with immutable releases
+
+- Keep selection parameters/conditions inside versioned templates stored in Artifactory and S3; parameters are supplied per customer deployment, never generated as different artifacts for a given release version.
+- If using **B**, publish all optional children under the same immutable version prefix; root references only same-version child URLs. Expand the ZIP manifest and release pipeline to include every child template.
+- If using **C**, publish each module's versioned template and dependency/installation contract; avoid assuming one root launch URL owns all resources.
+- Never toggle off a condition as a way to skip updates to an existing resource: it may remove the resource from the stack. Evaluate `DeletionPolicy`, `UpdateReplacePolicy` and dependency effects where appropriate.
+- Run a change set before production updates; do not assume an unchanged resource is always unaffected by an update to a dependency.
+
+### Added implementation tasks
+
+- [ ] Decide selective installation versus selective update; choose **A**, **B** or **C** only if required.
+- [ ] Define customer-facing selection parameters, defaults and dependencies for conditional resources/modules.
+- [ ] Validate each supported resource selection and its stack-update/removal behavior using change sets.
+- [ ] For optional children or standalone modules, extend immutable archive manifest, S3 publishing and customer URL contracts.
+- [ ] Test upgrades across different parameter combinations, including accidentally disabled resources and replacements.
+
+### Added acceptance tests
+
+| Scenario | Expected |
+|---|---|
+| Initial installation with optional feature off | Feature resource/module absent; rest deployed |
+| Initial installation with optional feature on | Selected resources/module deployed with same-version child references |
+| Update unchanged parameters and resources | Change set contains no unrelated modifications |
+| Turn feature off on existing stack | Deletion/retention behavior documented and previewed; no accidental removal |
+| Independent module upgrade (if C) | Only targeted standalone stack updated, explicit shared dependencies respected |
