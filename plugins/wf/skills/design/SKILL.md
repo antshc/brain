@@ -52,7 +52,7 @@ Wayfinder additionally reads the full Grill playbook for interviews and the full
 
 ## Ticket approval
 
-**MUST NOT** create any tracker issue or offline ticket file (Spec issue, implementation ticket, Wayfinder map, child, sub-ticket, follow-up) before the user explicitly approves that exact proposal. Present title, labels, parent, blockers and rendered body. Prototype tickets (Experiment, Code Sketch Task, Contract design) also show the claim and deciding criteria or sketch/contract scope, planned artifact paths, owned worktree and the Prototype approval gate. Silence, partial feedback, corrections, passing checks, and approval of a plan, destination or earlier batch are not approval; a changed proposal needs fresh approval. Selected playbooks own batching and presentation order.
+**MUST NOT** create any tracker issue or offline ticket file (Spec issue, implementation ticket, Wayfinder map, child, sub-ticket, follow-up) before the user explicitly approves that exact proposal. Present title, labels, parent, blockers and rendered body. Prototype tickets (Experiment, Code Sketch Task, Contract design) also show the claim and deciding criteria or sketch/contract scope, planned artifact paths, owned worktree and the Prototype approval gate. Silence, partial feedback, corrections, passing checks, and approval of a plan, destination or earlier batch are not approval; a changed proposal needs fresh approval. Selected playbooks own batching and presentation order. Exception: Wayfinder writes temporary, explicitly unapproved Markdown review drafts before approval and presents clickable file links per Ticket approval in its playbook. These drafts grant no tracker creation, offline backlog publication or evidence-dispatch authority.
 
 ## Principles
 
