@@ -59,12 +59,12 @@ def test_review_impact_and_tests_keep_their_analysis_contracts():
     impact = (root / "blast-radius.md").read_text()
     assessment = (root / "tests-gap.md").read_text()
     assert re.findall(r"\*Load and follow the `([a-z-]+)` skill\b", impact, flags=re.IGNORECASE) == [
-        "git", "principles", "research", "research", "testing-integrations", "subagents", "git", "subagents", "git", "writing-style",
+        "research", "research", "prove", "research", "subagents", "writing-style",
     ]
-    for action in ("asking only for code, commit, and PR context", "**default Research**", "**Arena**", "**Unslop only**"):
+    for action in ("asking only for code, commit, and PR context", "**How** (`Route: How`", "**Arena**", "**Unslop only**"):
         assert action in impact
     assert "Prove every claim" in impact
-    for name in ("blast-radius-worker-prompt.md", "blast-radius-report.md"):
+    for name in ("blast-radius-proof-framing.md", "blast-radius-report.md"):
         assert f"../references/{name}" in impact
         assert (root.parent / "references" / name).is_file()
     assert "MUST NOT" in assessment and "edit production code or tests" in assessment

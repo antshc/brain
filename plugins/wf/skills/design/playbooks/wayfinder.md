@@ -175,7 +175,7 @@ Run each helper in the Wayfinder session with its default dispatch. **MUST NOT**
 | Helper | Run | Workers |
 | --- | --- | --- |
 | Research | *Load and follow the `research` skill to investigate technical questions across source code, docs, packages and external evidence and return cited findings* with Research routing inputs | Research-owned |
-| Prove | *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* | Prove-owned |
+| Prove | *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* | Prove-owned `prover` worker |
 | Challenge this | Per Risk verification, *load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
 | Deep Module | Read the Deep Module playbook registered in the router fully; run it | Design It Twice designers |
 | Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; wide lookups via Research Explore |

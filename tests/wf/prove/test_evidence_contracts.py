@@ -51,11 +51,12 @@ def test_removed_entry_points_and_testing_kind_have_no_live_consumers() -> None:
 
 
 def test_execution_calls_are_one_way() -> None:
-    integration = (SKILLS / 'prove/tactics/integration.md').read_text()
+    integration = (SKILLS / 'prove/playbooks/integration.md').read_text()
     adversary = (SKILLS / 'challenge-this/references/adversary-prompt.md').read_text()
     assert re.search(r'`testing-integrations` skill.*\*\*Select\*\*', integration)
     assert re.search(r'`testing-integrations` skill.*\*\*Run selected\*\*', integration)
-    assert re.search(r'`prove` skill.*\*\*Execute\*\*', adversary)
+    assert 'Execute' not in adversary
+    assert re.search(r'`prove` skill.*Claim', (SKILLS / 'challenge-this/SKILL.md').read_text())
     for resource in TESTING.rglob('*.md'):
         assert not re.search(r'\b(?:run|invoke|load|use)\s+`prove`\s+skill', resource.read_text(), re.I), resource
     assert not re.search(r'\b(?:run|invoke|load|use)\s+`challenge-this`\s+skill', (SKILLS / 'prove/SKILL.md').read_text(), re.I)
@@ -68,3 +69,16 @@ def test_testing_selection_and_execution_are_distinct_public_actions() -> None:
     routes = set(re.findall(r'^\| ([a-z-]+) \|', entry, re.M))
     assert {'component', 'functional-slice', 'local-runtime'} <= routes
     assert 'experiment' not in routes
+
+
+def test_prove_owns_parallel_prover_spawns_for_claim_batches() -> None:
+    root = SKILLS / 'prove'
+    entry = (root / 'SKILL.md').read_text()
+    assert (root / 'agents/prover.md').is_file()
+    assert not (root / 'tactics').exists()
+    assert '**Execute**' not in entry
+    assert re.search(r'`subagents` skill.*role `prover`', entry)
+    assert re.search(r'`git` skill.*Worktrees', entry)
+    assert 'Spawn: none' not in entry
+    assert re.search(r'one parallel response', entry)
+    assert re.search(r'`prove` skill.*batch', (SKILLS / 'review/playbooks/blast-radius.md').read_text())

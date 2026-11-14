@@ -6,7 +6,7 @@ description: >-
 
 # Challenge this
 
-Adversaries try to break a change or design. Only findings proven by a run survive. Report findings; do not apply fixes. No verified findings means no counterexample found within the reported coverage, not proof of correctness.
+Adversaries hunt for ways to break a change or design and return candidate claims; Prove runs them in parallel. Only findings proven by a run survive. Report findings; do not apply fixes. No verified findings means no counterexample found within the reported coverage, not proof of correctness.
 
 For example requests, read [Examples](README.md) in full.
 
@@ -15,7 +15,7 @@ For example requests, read [Examples](README.md) in full.
 - Scope/diff/PR/design and intent; default scope is branch merge-base through working tree, including scoped dirty inputs.
 - Pinned target/baseline, safe runnable target, repository facts, prior evidence and runtime/safety limits.
 - `adversaries=1|2|3`, default `1`; independent of design candidate counts.
-- `@outputPath`, `@outputBase` for a saved report and explicit worker artifact destinations; no save requested → inline. Missing requested destination → return findings inline and report the blocker.
+- `@outputPath`, `@outputBase` for a saved report and the Prove report folder; no save requested → inline. Missing requested destination → return findings inline and report the blocker.
 - Supplied verified worktrees, ownership records and retention/cleanup needs when present.
 
 ## Frame
@@ -24,23 +24,27 @@ Read relevant repository architecture, ADRs/Concepts and glossary. Derive intent
 
 Reject an adversary count outside the documented values before dispatch. Resolve relative report paths only against the supplied absolute base; an absent/ambiguous base blocks saving, not independent investigation.
 
-## Fan out
+## Hunt
 
-Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. *Load and follow the `subagents` skill to select the model and effort for an ordered model panel* with the `challenge-this reviewers` pool and the resolved adversary count. Spawn one skill-capable `general-purpose` reviewer per seat, together in the background; request one isolated owned worktree each via *Load and follow the `git` skill to run worktree lifecycle and creation* using Worktrees, copying only scoped uncommitted changes, unless supplied verified checkouts already satisfy isolation. Pass Frame, facts, prior reproductions, limits, exact output destinations and the completed prompt. Keep ownership records and evidence outside worktrees. No safe target/isolation → report blocked scope; continue independent checks only. Done when every assignment has a terminal report or named blocker.
+Read [Adversary prompt](references/adversary-prompt.md) in full; fill every placeholder. *Load and follow the `subagents` skill to select the model and effort for an ordered model panel* with the `challenge-this reviewers` pool and the resolved adversary count. Spawn one read-only skill-capable `general-purpose` hunter per seat, together in the background, with the completed prompt; hunters read the pinned source checkout and run nothing. No seat available → report blocked coverage. Done when every hunter returned candidate claims or a named blocker.
+
+## Prove
+
+Merge candidates sharing one failure mechanism; keep adversary provenance and distinct affected behaviors. Drop candidates without falsifiable criteria or an intent they violate, with reasons. *Load and follow the `prove` skill to confirm or refute technical claims with reproducible evidence* once with every remaining candidate as a Claim (ID, Question, Criteria = the observable failure that violates intent, Route hint, Baseline when attribution matters), Facts = Frame facts, suites, prior reproductions and cited locations, Limits = runtime/safety limits, Checkout = supplied verified checkouts or none, Framing = finding title, root cause/location, violated intent, Destination = the run's Prove report folder, and Retention when a follow-up needs runnable state. Read every returned report in full. Done when every candidate has a Prove report or blocker.
 
 ## Verify
 
-Independently rerun each finding's exact command in the reviewer's recorded environment/checkout. Keep it only when actual output reproduces a failure that violates intent against the scoped target. An unrelated failure, missing assertion, zero tests or modified behavior cannot establish the claimed defect. Drop unsupported candidates with reasons; merge common root causes while retaining distinct supported findings and adversary provenance. Reuse reproductions only for unchanged scope/revision/dependencies/environment. Done when every candidate is verified, dropped or explicitly blocked.
+Keep a finding only when its Prove report observed a reproduced failure that violates intent against the scoped target. An unrelated failure, missing assertion, zero tests, inconclusive report or modified behavior cannot establish the claimed defect. Drop unsupported candidates with reasons; merge common root causes while retaining distinct supported findings and adversary provenance. Reuse reproductions only for unchanged scope/revision/dependencies/environment. Done when every candidate is verified, dropped or explicitly blocked.
 
 ## Output
 
 - **Intent** — restatement and expected behavior.
 - **Scope** — target/baseline, dirty inputs, environment, tested/excluded areas and blockers, including missing workers.
-- **Findings** — each verified failure: title, root cause/location, exact command/working directory, expected/actual output, violated intent, evidence/patch paths and adversaries. Say `no verified findings` when empty; report incomplete coverage separately.
-- **Dropped** — each adversary's dropped count and reasons.
+- **Findings** — each verified failure: title, root cause/location, exact command/working directory, expected/actual output, violated intent, Prove report and patch paths and adversaries. Say `no verified findings` when empty; report incomplete coverage separately.
+- **Dropped** — each adversary's dropped candidates and reasons, before and after Prove.
 - **Handoff** — retained evidence, resource/worktree ownership and cleanup outcome. Contract findings return to their caller for proposed Deep Module options; Wayfinder retains its Contract design Choice/selected-only integration gate; Challenge this supplies no interface redesign or fixes.
 
-Preserve reports, patches and rerun prerequisites until verification and requested follow-up finish. Remove only run-owned resources, using *Load and follow the `git` skill to run verified worktree lifecycle* with Worktrees; preserve caller-owned worktrees and report leftovers. Done when every resource is removed or explicitly handed back.
+Prove owns proof worktrees and removes them unless Retention was requested; retained worktrees are handed back to the caller with Prove's ownership records. Preserve reports and patches outside worktrees. Done when every resource is removed or explicitly handed back.
 
 ## Completion criteria
 

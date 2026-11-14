@@ -121,7 +121,7 @@ Ask whether to resolve the frontier now. On decline, stop — the map file holds
 On acceptance:
 
 - Spawn one built-in `explore` subagent per frontier topic, together in one batch. Brief: the topic's Question or Claim with its confirm/refute conditions, the Destination, and the Notes verbatim; read-only; return cited findings inline (`path:line`, doc or source URL), unknowns, and blockers. Write each result to absolute `<map repository root>/docs/research/{{destinationSlug}}-{{topicSlug}}.md`, or an explicit caller destination. Use distinct topic slugs; separate reports within a topic each get their own path.
-- Offer each frontier experiment to the user one at a time; on acceptance, *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence*, filling `@question` = the Claim, `@criteria` = its confirm/refute conditions, `@repoFacts` = the Notes verbatim plus findings from resolved research topics. Supply the exact topic `@outputPath` and repository `@outputBase` using this caller's research-topic destination convention; request retention through any human review.
+- Offer each frontier experiment to the user one at a time; on acceptance, *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence*, filling `@question` = the Claim, `@criteria` = its confirm/refute conditions, `@repoFacts` = the Notes verbatim plus findings from resolved research topics. Supply the exact topic `@outputPath` and repository `@outputBase` using this caller's research-topic destination convention; request retention through any human review; read its returned report in full.
 
 **Done when:** every frontier topic has either returned a result or been declined by the user.
 
