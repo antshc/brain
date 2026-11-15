@@ -51,7 +51,7 @@ Include only facts that help the agents; omit empty lines.
 
 ## Delivery
 
-- Wayfinder → maintain the GitHub root map and living research document in owned worktrees; present frontier, fog and exclusions at checkpoints. Return root issue, document path, local integration branch/HEAD, evidence links, pending approvals and blockers. Its topic reports use the explicit map-owned destinations; only this route saves Explore verdicts to topic files. Report-only delivery below applies to standalone evidence routes, not Wayfinder checkpoints.
+- Wayfinder → interview destination, then frontier breadth-first, one question at a time. Small efforts return a chosen standalone continuation before map infrastructure. Mapped efforts maintain the GitHub root map and living research document in owned worktrees; present frontier, fog and exclusions at checkpoints. Return root issue, document path, local integration branch/HEAD, evidence links, pending approvals and blockers. Its topic reports use the explicit map-owned destinations; only this route saves Explore verdicts to topic files. Report-only delivery below applies to standalone evidence routes, not Wayfinder checkpoints.
 - Explore → return `hunty` verdicts inline to the requester; no file. The requester uses the cited findings directly.
 - How, Why, Cloud, Web → always save one Markdown report per independent question. Return only the report pointers, never the findings inline:
 
@@ -97,7 +97,7 @@ Give follow-ups to a fresh worker with the original brief, the prior report, and
 
 ## Completion criteria
 
-- Wayfinder: map and findings match the presented state; remaining work has explicit status and links; finish only when the destination has sufficient supported evidence or the user confirms remaining gaps cannot change its answer. Keep every unresolved claim explicit; completion never clears unresolved fog without evidence or a scope decision. Paused maps remain resumable, not complete. The caller retains the decision and implementation.
+- Wayfinder: small efforts record the chosen continuation without creating map infrastructure; mapped efforts ensure map and findings match the presented state; remaining work has explicit status and links; finish only when the destination has sufficient supported evidence or the user confirms remaining gaps cannot change its answer. Keep every unresolved claim explicit; coarse fog graduates only after verified owner transfer; precise unresolved claims remain on their tickets/proposals. Empty fog alone is not completion. Paused maps remain resumable, not complete. The caller retains the decision and implementation.
 - Each How, Why, Cloud, or Web question has a saved report and a pointer with its status; each Explore lookup has an inline verdict or a named blocker; framing matches the request.
 - Material factual claims carry in-place primary-source citations. Source-based, inferred, and observed evidence stay distinct; Why confidence language is preserved.
 - Conflicts are reconciled or reported with both sources. No findings → completed scope and checked sources stated. Incomplete → missing evidence and its consequence named.

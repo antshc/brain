@@ -6,6 +6,7 @@ Chart a destination, gather evidence, and maintain one living research document.
 
 - Shared procedures
 - Session and document
+- Small effort
 - Chart and approve
 - Frontier and dispatch
 - Validate and integrate
@@ -23,10 +24,10 @@ Chart a destination, gather evidence, and maintain one living research document.
 
 ## Session and document
 
-1. Capture original absolute harness root, repository, invocation checkout, session base branch/SHA and dirty state before switching worktrees. Resolve detached HEAD before creation; leave the caller's working branch untouched. On resume use persisted identities.
-2. Prepare a dedicated owned document worktree from the session base on `wayfinder/<slug>`. Persist its ownership record outside disposable worktrees. Keep the recorded branch name if destination questioning refines the document slug.
-3. Use [Questioning](questioning.md) to settle subject, constraints, exact versions and destination; the user confirms the destination. Facts use evidence routes, never user guesses. Destination confirmation does not approve tickets.
-4. Seed `docs/ongoing/<slug>-research.md` using [Research document](research-document.template.md); create missing directories. Commit it locally before frontier work. This is synthesized research, not another map.
+1. Capture original absolute harness root, repository, invocation checkout, session base branch/SHA and dirty state before interviews or worktree switches; leave the caller's working branch untouched. On resume use persisted identities. Keep interview state in session storage until ownership setup; create no branch, worktree, document seed or issue before the interview/small-effort decision.
+2. Use [Questioning](questioning.md) for the destination interview: settle subject, constraints, exact versions and evidence outcome; the user confirms the destination. Then conduct a separate breadth-first frontier interview, one question at a time with an answer before the next. Facts use evidence routes, never user guesses. Preserve open downstream questions rather than resolving the whole investigation. Destination confirmation does not approve tickets.
+3. Apply Small effort. For a mapped effort, resolve detached HEAD and prepare a dedicated owned document worktree from the captured session base on `wayfinder/<slug>`. Persist ownership and interview phase outside disposable worktrees. Done when the branch/worktree and original base are verified.
+4. Seed `docs/ongoing/<slug>-research.md` using [Research document](research-document.template.md); create missing directories. Commit locally before approved topic evidence dispatch. This is synthesized research, not another map.
 
 | Work | Branch | Output |
 |---|---|---|
@@ -36,11 +37,15 @@ Chart a destination, gather evidence, and maintain one living research document.
 
 No automatic push, PR, merge into session base, production implementation or Confluence publication. Standalone evidence routes and Prove defaults remain unchanged.
 
+## Small effort
+
+After both interviews, if the route is clear, no coarse fog remains and the whole journey fits one session, stop before branch/worktree, document seed or issue creation. Present the bounded outcome and ask one continuation question: standalone evidence route/bounded research, or an explicitly tracked map. Wait for the choice; do not dispatch the offered handoff automatically. Many precise questions or substantial dependencies still warrant a map even with empty fog. Reuse existing deliverable authorization after the chosen continuation. Existing maps resume normally; retain their documents/worktrees.
+
 ## Chart and approve
 
-1. Question breadth-first: identify sharp factual questions and falsifiable hypotheses, dependencies, unknowns, risks and exclusions. Order by feasibility, hard limits, performance/scale, reliability, security, operations, then ergonomics. The destination bounds the investigation.
+1. Use the confirmed destination and separate breadth-first interview from Session and document. Persist precise questions/hypotheses, dependencies, coarse fog and exclusions. Later human scope/evidence-criteria choices stay in direct Questioning, with one answer before the next question; no grilling ticket type or Design interview.
 2. Render the root and sub-issues using [Research map](research-map.template.md). The GitHub root with `wayfinder:map` is the authoritative workflow state. **Do not maintain another active Markdown research map.** Child issues track concrete work; the living document holds supported conclusions and evidence links.
-3. Keep **all unresolved unknowns and risks** in root **Not yet specified**, including those with active children. Assign stable IDs, status, consequence, deciding criterion, linked work, next action and owner. Coarse gaps graduate to precise questions without losing their IDs; actionable gaps become sub-issues. Preserve unresolved entries until integrated evidence meets the criterion or the user explicitly changes scope. Exclusions belong in Out of scope.
+3. Keep only in-scope concerns too vague to ticket in root **Not yet specified**. A precise question belongs in a research/experiment ticket even when blocked, partial or conflicting. Transfer stable IDs, provenance, consequence, criteria, risk/mitigation evidence and next action to its owner; remove graduated fog only after the approved issue/links are verified or its exact draft and pending-proposal state are durable. Keep genuinely coarse remainder with predecessor links. Pending approval is not fog; preserve uncreated precise proposals in retained drafts and Pending proposals, human choices in interview state, and exclusions in Out of scope.
 4. Follow shared Ticket approval: save temporary clickable Markdown drafts for root and each exact child proposal, including parent, blockers, labels, full body and stable proposal revision. Present one linked bullet per proposal, map first. Require explicit approval of each exact proposal before creation or evidence dispatch for it. Destination approval, previous approval, silence and passing checks are not ticket approval. Changed proposals require fresh review; unchanged approved issues may resume.
 5. Create only approved issues with `wayfinder:map`, `wayfinder:research`, or `wayfinder:experiment`. Record verified issue refs immediately; verify native parent/sub-issue edges. Resolve symbolic blockers in a second pass. Follow shared body-based Wayfinder blocked-by operations; reject cycles, missing parents and unknown blockers. Persist approved revision/content identity and pending publication steps. Use the WF installer labels-only repair procedure if labels are absent.
 
@@ -62,7 +67,7 @@ No automatic push, PR, merge into session base, production implementation or Con
 
 ## Synchronize and pause
 
-After each integrated result, session pause, human choice, approval and resume, reconcile the living document and root/child state. Persist result/source identity, pinned base, payload/approval identity, result/integrated/document SHAs, last reconciled evidence/HEAD and exact pending step outside disposable worktrees and on the owning issue where available. Read before writes and preserve concurrent contributions.
+Before mapped setup, persist interview state only. After setup, on each integrated result, session pause, human choice, approval and resume, reconcile the living document and root/child state. Persist result/source identity, pinned base, payload/approval identity, result/integrated/document SHAs, last reconciled evidence/HEAD and exact pending step outside disposable worktrees and on the owning issue where available. Read before writes and preserve concurrent contributions.
 
 A tracker failure leaves local progress valid but synchronization pending. Retry the first unconfirmed operation after read-back; do not duplicate issues, comments, commits or merges. Report known remote changes and blocked writes. Local identifiers are not published artifact URLs.
 
@@ -73,10 +78,10 @@ Clean an owned worktree only after verified integration, document synchronizatio
 1. Resume from the root issue number/URL and persisted branch/worktree/HEAD identities, without restarting the destination interview. Verify repository, refs, ownership, ancestry, report files, approvals/content identities and last sync. Missing refs or local evidence are blockers; never invent remote artifact links or silently replace worktrees.
 2. Recover pending approved proof integration before new dependent work. An already merged result needs reconciliation only; a synchronized document needs remaining tracker writes only. Never regenerate an unchanged approval candidate.
 3. A legacy `docs/ongoing/<slug>-research-map.md` is migration input only. Verify its identity, destination and evidence links; preserve files/history. Propose the GitHub root and children through Ticket approval, then explicitly record the root as authoritative and legacy map as inactive. Do not run two active maps or infer approval from old destination confirmation. Missing or unreadable map state blocks recovery.
-4. Reconcile fog and child results; reuse sufficient matching evidence and existing unchanged approved work. Preserve stable IDs, blockers, status and links. Resume approved ready work; present only required human decisions or exact blockers.
+4. On legacy resume, reconcile fog rows with existing owners first: transfer precise questions/risks and IDs, criteria, evidence/history to verified tickets or durable pending proposals before removing duplicate rows; retain coarse remainder only. Missing/ambiguous owners block affected migration, never lose evidence or recreate tickets. Reconcile fog and child results; reuse sufficient matching evidence and existing unchanged approved work. Preserve stable IDs, blockers, status and links. Resume approved ready work; present only required human decisions or exact blockers.
 
 ## Completion
 
-Finish only when the destination has sufficient supported evidence or the user confirms remaining gaps cannot change its answer. Every unresolved claim stays explicit; paused or incomplete work is resumable, never a fabricated answer.
+Finish only when the destination has sufficient supported evidence or the user confirms remaining gaps cannot change its answer. Every unresolved claim stays explicit; check open tickets, pending proposals, human choices, coarse fog and synchronization, since empty fog alone is not completion; paused or incomplete work is resumable, never a fabricated answer.
 
-Return root GitHub issue, clickable document path, local integration branch/HEAD, integrated topic/proof links, open unknowns/risks, pending approvals and blockers. Conclusions belong to the living document; detailed reports remain independently readable and linked. The caller owns decisions and implementation.
+A selected small-effort continuation returns its bounded outcome and chosen route without fabricating map/document refs. For mapped efforts return root GitHub issue, clickable document path, local integration branch/HEAD, integrated topic/proof links, open unknowns/risks, pending approvals and blockers. Conclusions belong to the living document; detailed reports remain independently readable and linked. The caller owns decisions and implementation.

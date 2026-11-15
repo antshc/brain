@@ -46,7 +46,7 @@ List the parent's children first. Reuse an unambiguous match. For a prior partia
 
 ### Update map or ticket
 
-Read the latest body through *Load and follow the `github` skill to run GitHub platform mechanics for issues, tickets, and repositories* using Issues. Preserve concurrent edits, decisions, fog and scope boundaries. Apply the intended section edit and verify the new body. Reconcile partial comment/close/map-update failures before retrying.
+Read the latest body through *Load and follow the `github` skill to run GitHub platform mechanics for issues, tickets, and repositories* using Issues. Preserve concurrent edits, decisions, coarse fog, ticket/pending-proposal state and scope boundaries. Graduation transfers stable IDs, criteria and evidence to verified owners before removing duplicate fog rows; approval-pending precise work is not fog. Apply the intended section edit and verify the new body. Reconcile partial comment/close/map-update failures before retrying.
 
 ### Prepare a document worktree
 
