@@ -23,14 +23,14 @@ Tests for `plugins/wf/skills/github/scripts/` (`github.py`, `github_cli`) and th
 
 In-process, always, after any change to the scripts:
 
-```
+```text
 python3 -m pytest tests/wf/github -q -m "not integration"
 python3 -m pytest tests/wf/github -q -m "not integration" -n auto   # parallel (pytest-xdist)
 ```
 
 Live, only when a risk below applies. Without `BRAIN_GH_LIVE` every live test is skipped:
 
-```
+```text
 BRAIN_GH_LIVE=pulls python3 -m pytest tests/wf/github -m integration -n 4 -q
 BRAIN_GH_LIVE=issues,specs python3 -m pytest tests/wf/github -m integration -n 4 -q
 BRAIN_GH_LIVE=all python3 -m pytest tests/wf/github -m integration -n 4 -q

@@ -36,7 +36,7 @@ Evidence routes: run once per request, before Routing. Define defers framing unt
 
 Frame shape, passed verbatim in each brief:
 
-```
+```text
 Question: <original>
 Rephrased: <glossary-term question>
 Terms: <term> — <meaning> (<GLOSSARY.md path>)
@@ -55,7 +55,7 @@ Include only facts that help the agents; omit empty lines.
 - Explore → return `hunty` verdicts inline to the requester; no file. The requester uses the cited findings directly.
 - How, Why, Cloud, Web → always save one Markdown report per independent question. Return only the report pointers, never the findings inline:
 
-  ```
+  ```text
   Research reports — read each in full before using its findings:
   - <question> → <absolute path> (<route>; complete | partial: <gap> | blocked: <blocker>)
   ```

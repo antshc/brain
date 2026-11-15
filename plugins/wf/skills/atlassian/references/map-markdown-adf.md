@@ -48,7 +48,7 @@ Source wording is never summarized, corrected, or reinterpreted in either direct
 Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `detect-adf-only` reports them so a caller knows Markdown alone will not carry the document.
 
 | Markdown | ADF |
-| --- | --- |
+|---|---|
 | Paragraph | `paragraph` |
 | Heading (`#`–`######`) | `heading` (`attrs.level`) |
 | Bullet list (`-`, `*`, `+`) | `bulletList` / `listItem` |
@@ -67,7 +67,7 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | `<!-- adf:attachment media-id="<id>" alt="<alt>" [width="<w>" height="<h>"] [display-width="<n>[%]"] [layout="<layout>"] -->` | `mediaSingle`/`media`/`mediaGroup` (one placeholder per file) — **ADF-only, `adf-to-md` direction only** |
 | n/a (no reverse mapping) | `inlineCard` (Confluence smart link) → `[<url>](<url>)` — **ADF-only, `adf-to-md` direction only** |
 
-A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `  continues here` is one `listItem`, not a list plus a stray paragraph:
+A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `continues here` is one `listItem`, not a list plus a stray paragraph:
 
 ```json
 {"type": "bulletList", "content": [
@@ -75,7 +75,7 @@ A list item's soft-wrapped continuation lines fold into its paragraph, joined by
     {"type": "paragraph", "content": [{"type": "text", "text": "first line continues here"}]}]}]}
 ```
 
-Marks spanning the join survive, so `- lead **bold` + `  spanning** tail` yields one `strong` span reading `bold spanning`. A deeper-indented marker still nests, and any block start — heading, table, fence, rule, blockquote, `</details>`, or a Confluence marker comment — ends the list instead of folding into it.
+Marks spanning the join survive, so `- lead **bold` + `spanning** tail` yields one `strong` span reading `bold spanning`. A deeper-indented marker still nests, and any block start — heading, table, fence, rule, blockquote, `</details>`, or a Confluence marker comment — ends the list instead of folding into it.
 
 ADF forbids a `table` inside a `listItem`, so a table indented under a list item at any depth (directly or after a blank line, optionally preceded by `<!-- adf:wide-table -->`) moves to a sibling right after the whole outermost list; the list stays one unbroken block. No pointer text is added — the source should say where the table is (e.g. "in the table below"). An ordered list starting at any number other than `1` carries that number as `attrs.order`.
 

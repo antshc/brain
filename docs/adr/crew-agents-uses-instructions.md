@@ -13,6 +13,6 @@
 - Every `codey-*` and `chorey` agent definition sets `include-custom-instructions: true` in its frontmatter, instead of gating on a named skill before implementing or reviewing.
 - The `crew-coding` skill and its `init-crew` generation step (stack selection, `coding.SKILL.template.md`, per-stack `stacks/<stack>.md` files) are not built for now; `.instructions.md` files remain the single place stack and general conventions are authored.
 - No `.instructions.md` template needs a line pointing the host agent at a coding skill — the frontmatter flag makes the repository's own instruction files reach the subagent directly.
-- Each `*.instructions.template.md`'s `description` must be written broadly enough to cover any change to files matched by its `applyTo` glob, not just the narrow topic named in its title — see [Findings](../research/crew-include-custom-instructions-loading.md#findings).
+- Each `*.instructions.template.md`'s `description` must be written broadly enough to cover any change to files matched by its `applyTo` glob, not just the narrow topic named in its title — see the original findings in `docs/research/crew-include-custom-instructions-loading.md` (not retained).
 
-See [Verifying include-custom-instructions loads repository instructions into subagents](../research/crew-include-custom-instructions-loading.md) for the test method and results.
+See `docs/research/crew-include-custom-instructions-loading.md` (not retained) for the test method and results.

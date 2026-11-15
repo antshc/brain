@@ -49,7 +49,7 @@ UPDATE subscriptions SET status = 'cancelled' WHERE customer_id = 'CUS-4821';
 
 ## Test it
 
-````
+````text
 **What you're checking:** {{the behaviour, in product words}}
 **Where:** {{deployed environment}} — {{URL or console to reach it}}
 
@@ -77,7 +77,7 @@ UPDATE subscriptions SET status = 'cancelled' WHERE customer_id = 'CUS-4821';
 
 ## Call it
 
-````
+````text
 **{{METHOD}} {{full path}}** — {{what it does}}
 
 - **Host:** {{deployed environment}} → {{host}}
@@ -100,7 +100,7 @@ UPDATE subscriptions SET status = 'cancelled' WHERE customer_id = 'CUS-4821';
 
 Prefer the front door: when an endpoint writes the same record, give that request instead of a direct write, and say why.
 
-````
+````text
 **Where it lives:** {{deployed environment}} → {{store}} → {{table or collection}} — {{what one record represents}}
 **Open:** {{the console or client to use, and how to get to the table in it}}
 
@@ -123,7 +123,7 @@ Prefer the front door: when an endpoint writes the same record, give that reques
 
 These are the settings a tester can set to make the application behave differently — flags, toggles, thresholds, timeouts, sandbox and stub modes.
 
-````
+````text
 **Settings you can change in {{deployed environment}}** — {{config file path}}
 **Open:** {{how to get to the file — the machine, container, or portal page it sits on}}
 

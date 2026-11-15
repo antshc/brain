@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 <!-- skill-dependency: lsp-recover; consuming repository or host provides this extension; discover its current name and description before use -->
 <!-- skill-dependency: query-aws; consuming repository or host provides this extension; discover its current name and description before use -->
 <!-- skill-dependency: search-aws-docs; consuming repository or host provides this extension; discover its current name and description before use -->
@@ -30,7 +33,7 @@ Verify the target repo before any **code/build** `git`/`gh pr` command by checki
 
 Runs unmodified on Linux, macOS, and Windows (no bash- or PowerShell-only syntax):
 
-```
+```text
 python -c 'import re,subprocess,sys; url=subprocess.run(["git","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); slug=re.sub(r"\.git$","",re.sub(r"^(git@github\.com:|https://github\.com/)","",url)); sys.exit(0 if slug=="{{codeRepoSlug}}" else 1)'
 ```
 
@@ -47,7 +50,7 @@ You MUST actually execute the check command above — not merely reference or re
 ### Action → target repo
 
 | Action | Target repo | How to target |
-| --- | --- | --- |
+|---|---|---|
 | **Code** `git worktree add`, `git commit`, `git push`, code `gh pr create` | workspace (`{{project}}`) | `cd workspace/{{project}}` first |
 | Code-modifying, build, test, package, and source-repository Git commands | workspace (`{{project}}`) | run from inside `workspace/{{project}}` |
 | **Docs** `git commit`, `git push`, `gh pr create` (for `GLOSSARY.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, reporoot docs) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
@@ -73,7 +76,7 @@ Consult these before searching the code:
 {{proejctName}} (`{{project}}`) is the only codebase checked out locally; everything else is reached through a skill.
 
 | Target | Where to look |
-| --- | --- |
+|---|---|
 | {{proejctName}} source, tests, config | local `workspace/{{project}}` — continue to Step 2 |
 | {{proj}} codebase | *Load and follow the `search-{{proj}}` skill to <task>* |
 | `{{proejctPrefix}}.Infrastructure.*` / `{{proejctPrefix}}.Infra.Utils` source | *Load and follow the `search-infra-nuget` skill to <task>* |
@@ -91,7 +94,7 @@ Consult the relevant [authoritative source](#3-authoritative-sources) first, and
 ### Step 3 — Pick the search tool
 
 | You know | Use | If it fails |
-| --- | --- | --- |
+|---|---|---|
 | The exact symbol, and need definition, references, rename, hover, implementations, or call hierarchy | **LSP** — semantic search cannot perform these | *Load and follow the `lsp-recover` skill to <task>*, then text search |
 | The concept or behavior but not the symbol (e.g. "where is failover progress tracked?") | **Semantic search**, which is served by the Graphify graph — see the gate below | text search on domain terms from `GLOSSARY.md` |
 | A literal, configuration value, or generated file | **Text search** with `includePattern: workspace/{{project}}/**` | manual directory browsing under `workspace/{{project}}` |
@@ -121,7 +124,9 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 
 - You MUST create every skill under `.github/skills/<skill-name>/` at the reporoot — never in the user skills directory (`~/.copilot/skills/`) or inside `workspace/`. Each skill is its own folder holding `SKILL.md` plus any `reference/` files it needs.
 - You MUST NOT reference a skill's own files via bare relative markdown links (e.g. `[memory.md](reference/memory.md)`); such links resolve against the runtime CWD (which may be a worktree, not the skill folder) and silently fail to load. Load reference files via the skill's stated absolute base directory instead.
+
 ### Available skills:
+
 `preflight-atlassian`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
 
 ## 8. Tools

@@ -53,12 +53,12 @@ Omit process detail (`using bundled best practices`, `from a brief`) unless it s
 |---|---|
 | `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`address-page-comments`) allowed |
 | `<` `>` | Rejected by skill validators (XML/HTML injection guard) |
-| `: ` (colon + space) | YAML reads it as a nested mapping key |
-| ` #` (space + hash) | YAML starts a comment; rest of description dropped |
+| `:` (colon + space) | YAML reads it as a nested mapping key |
+| `#` (space + hash) | YAML starts a comment; rest of description dropped |
 | Leading `-` `?` `:` `[` `]` `{` `}` `,` `&` `*` `!` `\|` `>` `'` `"` `%` `@` `` ` `` | YAML indicator; plain scalar cannot start with it |
 | Tabs, line breaks in a plain scalar, leading/trailing whitespace | Multiline/indent parse errors |
 
-**YAML safety:** frontmatter MUST parse. Use a folded block scalar (`description: >-`, text indented two spaces) for `description` and values containing `: `, quotes, backticks, `#`, or leading `[`, `{`, `*`, `&`, `!`, `%`, `@`. Never use `: ` inside a plain scalar.
+**YAML safety:** frontmatter MUST parse. Use a folded block scalar (`description: >-`, text indented two spaces) for `description` and values containing `:`, quotes, backticks, `#`, or leading `[`, `{`, `*`, `&`, `!`, `%`, `@`. Never use `:` inside a plain scalar.
 
 **Description as context pointer:** name the skill and its triggering branches. Pointer wording controls discovery; prune always-loaded descriptions harder than bodies:
 
@@ -134,7 +134,7 @@ End every step with a checkable completion condition, exhaustive where omissions
 - **Loop** — repeat-until work (interview, review, validate → fix → repeat). State the exit condition and the steps every pass runs; a step that always runs belongs in the loop, not in Tactics.
 - **Tactics** — unordered techniques, each with an observable trigger, an action, and a result; state when triggers are re-checked. Use bold-lead lines, not tables, so a tactic can carry bullets and pointers.
 - **Examples** — input → output pairs when output style or quality matters; examples outperform descriptions of style.
-- Defend premature completion in order: sharpen the bound first; only if irreducibly fuzzy _and_ the rush is observed, split the sequence. Hiding later steps works only across a real context boundary (hand-off or subagent); an inline call clears nothing.
+- Defend premature completion in order: sharpen the bound first; only if irreducibly fuzzy *and* the rush is observed, split the sequence. Hiding later steps works only across a real context boundary (hand-off or subagent); an inline call clears nothing.
 
 **`## Completion criteria` section:** when results are not self-evident, define observable conditions on files, output, or state, not effort.
 
@@ -190,7 +190,6 @@ Verify critical constraints through observable actions or external checks; ratio
 | Testing | Medium–Low | Define required checks and results |
 | Migration | Low | Specify ordering, mechanism, recovery |
 | Destructive operations | Very low | Require authorization and explicit safeguards |
-
 
 **Failure policies** — pick one per critical step:
 

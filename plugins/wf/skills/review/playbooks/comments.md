@@ -144,4 +144,3 @@ Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is go
 - One `issue`, one commit. One run, one push.
 - Ask the reviewer outright the moment the `evidence` runs out. A question costs the reviewer less than a wrong guess.
 - Reply to new work; reconcile unresolved agent threads without duplicate replies. An unanswered question remains open until clarification; a posted answer alone is not completion.
-

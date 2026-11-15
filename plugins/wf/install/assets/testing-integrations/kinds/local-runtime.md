@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Local Runtime Playbook
 
 **Kind:** run a local instance of the application (local stack: app services + emulated dependencies + UI) and test it from outside like a user, without the integration testing framework (that is `functional-slice` kind). Ladder rungs 6–7: REST API first, web GUI last.

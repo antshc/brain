@@ -11,7 +11,7 @@ Both agents are from the `crew` plugin and are invoked by `/dev` via `runSubagen
 
 **Via `/dev` skill** (fully automated — fetches the spec's sub-tickets, picks tasks, loops):
 
-```
+```text
 /dev <spec-issue-number-or-url>
 ```
 

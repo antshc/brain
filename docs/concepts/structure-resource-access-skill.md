@@ -22,7 +22,7 @@ affecting its callers.
 
 Direct use of the underlying infrastructure tool is still allowed; what is barred is a caller inlining that
 command *in place of* a skill reference it is otherwise making. The call style itself is owned by
-[0010](0010-skill-composition.md).
+[Skill composition](structure-skill-composition.md).
 
 Swapping a backend — GitHub → Jira, local files → a wiki — rewrites the skill's internals only. Callers and
 their invocation style stay unchanged, which is the whole return on the encapsulation.

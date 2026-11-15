@@ -13,7 +13,7 @@ argument-hint: "[diagram type] [current | delta] [scope]"
 4. **Check the result.** Apply the selected tactic's checks. For behavior diagrams run the layout script as specified under **Render and check order**. Done when those checks pass.
 
 | View | Select for | Tactic | Template |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | System Context Diagram | One system, its actors, and external integrations | [Architecture](tactics/architecture.md) | [System context](templates/system-context-template.md) |
 | Container Diagram | Deployables and their dependencies | Architecture | [Container](templates/container-diagram-template.md) |
 | Component Diagram | Responsibilities within one deployable | Architecture | [Component](templates/component-diagram-template.md) |

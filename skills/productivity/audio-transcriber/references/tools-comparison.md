@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # Transcription Tools Comparison
 
 Comprehensive comparison of audio transcription engines supported by the audio-transcriber skill.
@@ -17,17 +20,19 @@ Comprehensive comparison of audio transcription engines supported by the audio-t
 ## Faster-Whisper (Recommended)
 
 ### Pros
-✅ **4-5x faster** than original Whisper  
-✅ **Same quality** as original Whisper  
-✅ **Lower memory usage** (50-60% less RAM)  
-✅ **Free and open-source**  
-✅ **100% offline** (privacy guaranteed)  
-✅ **Easy installation** (`pip install faster-whisper`)  
+
+✅ **4-5x faster** than original Whisper
+✅ **Same quality** as original Whisper
+✅ **Lower memory usage** (50-60% less RAM)
+✅ **Free and open-source**
+✅ **100% offline** (privacy guaranteed)
+✅ **Easy installation** (`pip install faster-whisper`)
 ✅ **Drop-in replacement** for Whisper
 
 ### Cons
-❌ Requires Python 3.8+  
-❌ Initial model download (~100MB-1.5GB)  
+
+❌ Requires Python 3.8+
+❌ Initial model download (~100MB-1.5GB)
 ❌ GPU optional but speeds up significantly
 
 ### Installation
@@ -69,17 +74,19 @@ for segment in segments:
 ## Whisper (Original)
 
 ### Pros
-✅ **Official OpenAI model**  
-✅ **Excellent quality**  
-✅ **Free and open-source**  
-✅ **100% offline**  
-✅ **Well-documented**  
+
+✅ **Official OpenAI model**
+✅ **Excellent quality**
+✅ **Free and open-source**
+✅ **100% offline**
+✅ **Well-documented**
 ✅ **Large community**
 
 ### Cons
-❌ **Slower** than Faster-Whisper (4-5x)  
-❌ **Higher memory usage**  
-❌ Requires PyTorch (large dependency)  
+
+❌ **Slower** than Faster-Whisper (4-5x)
+❌ **Higher memory usage**
+❌ Requires PyTorch (large dependency)
 ❌ GPU highly recommended for larger models
 
 ### Installation
@@ -106,11 +113,13 @@ print(result["text"])
 ### When to Use Whisper vs. Faster-Whisper
 
 **Use Faster-Whisper if:**
+
 - Speed is important
 - Limited RAM available
 - Processing many files
 
 **Use Original Whisper if:**
+
 - Faster-Whisper installation issues
 - Need exact OpenAI implementation
 - Already have Whisper in project dependencies
@@ -120,18 +129,20 @@ print(result["text"])
 ## Google Cloud Speech-to-Text
 
 ### Pros
-✅ **Very accurate** (industry-leading)  
-✅ **Fast processing** (cloud infrastructure)  
-✅ **125+ languages**  
-✅ **Word-level timestamps**  
-✅ **Punctuation & capitalization**  
+
+✅ **Very accurate** (industry-leading)
+✅ **Fast processing** (cloud infrastructure)
+✅ **125+ languages**
+✅ **Word-level timestamps**
+✅ **Punctuation & capitalization**
 ✅ **Speaker diarization** (premium)
 
 ### Cons
-❌ **Requires internet** (cloud-only)  
-❌ **Costs money** (after free tier)  
-❌ **Privacy concerns** (audio uploaded to Google)  
-❌ Requires GCP account setup  
+
+❌ **Requires internet** (cloud-only)
+❌ **Costs money** (after free tier)
+❌ **Privacy concerns** (audio uploaded to Google)
+❌ Requires GCP account setup
 ❌ Complex authentication
 
 ### Pricing
@@ -152,6 +163,7 @@ pip install google-cloud-speech
 2. Enable Speech-to-Text API
 3. Create service account & download JSON key
 4. Set environment variable:
+
    ```bash
    export GOOGLE_APPLICATION_CREDENTIALS="path/to/key.json"
    ```
@@ -184,17 +196,19 @@ for result in response.results:
 ## Azure Speech Services
 
 ### Pros
-✅ **High accuracy**  
-✅ **100+ languages**  
-✅ **Real-time transcription**  
-✅ **Custom models** (train on your data)  
+
+✅ **High accuracy**
+✅ **100+ languages**
+✅ **Real-time transcription**
+✅ **Custom models** (train on your data)
 ✅ **Good Microsoft ecosystem integration**
 
 ### Cons
-❌ **Requires internet**  
-❌ **Costs money** (after free tier)  
-❌ **Privacy concerns** (cloud processing)  
-❌ Requires Azure account  
+
+❌ **Requires internet**
+❌ **Costs money** (after free tier)
+❌ **Privacy concerns** (cloud processing)
+❌ Requires Azure account
 ❌ Complex setup
 
 ### Pricing
@@ -214,6 +228,7 @@ pip install azure-cognitiveservices-speech
 2. Create Speech resource
 3. Get API key and region
 4. Set environment variables:
+
    ```bash
    export AZURE_SPEECH_KEY="your-key"
    export AZURE_SPEECH_REGION="your-region"
@@ -244,17 +259,19 @@ print(result.text)
 ## AssemblyAI
 
 ### Pros
-✅ **Modern, developer-friendly API**  
-✅ **Excellent accuracy**  
-✅ **Advanced features** (sentiment, topic detection, PII redaction)  
-✅ **Speaker diarization** (included)  
-✅ **Fast processing**  
+
+✅ **Modern, developer-friendly API**
+✅ **Excellent accuracy**
+✅ **Advanced features** (sentiment, topic detection, PII redaction)
+✅ **Speaker diarization** (included)
+✅ **Fast processing**
 ✅ **Good documentation**
 
 ### Cons
-❌ **Requires internet**  
-❌ **Costs money** (no free tier, only trial credits)  
-❌ **Privacy concerns** (cloud processing)  
+
+❌ **Requires internet**
+❌ **Costs money** (no free tier, only trial credits)
+❌ **Privacy concerns** (cloud processing)
 ❌ Requires API key
 
 ### Pricing
@@ -273,6 +290,7 @@ pip install assemblyai
 1. Sign up at assemblyai.com
 2. Get API key
 3. Set environment variable:
+
    ```bash
    export ASSEMBLYAI_API_KEY="your-key"
    ```
@@ -299,6 +317,7 @@ for utterance in transcript.utterances:
 ## Recommendation Matrix
 
 ### Use Faster-Whisper if:
+
 - ✅ Privacy is critical (local processing)
 - ✅ Want zero cost (free forever)
 - ✅ Need offline capability
@@ -306,18 +325,21 @@ for utterance in transcript.utterances:
 - ✅ Limited budget
 
 ### Use Google Speech-to-Text if:
+
 - ✅ Need absolute best accuracy
 - ✅ Have budget for cloud services
 - ✅ Want advanced features (punctuation, diarization)
 - ✅ Already using GCP ecosystem
 
 ### Use Azure Speech if:
+
 - ✅ In Microsoft ecosystem
 - ✅ Need custom model training
 - ✅ Want real-time transcription
 - ✅ Have Azure credits
 
 ### Use AssemblyAI if:
+
 - ✅ Need advanced features (sentiment, topics)
 - ✅ Want easiest API experience
 - ✅ Need automatic PII redaction

@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Reference loading
 
 Before task actions, read fully every absolute path in caller-supplied `requiredReferences`; this role requires none. Continue truncated reads by range; never preview. Confirm each path is absolute, readable, and under caller-supplied absolute `referencesRoot`; read it directly, never infer paths from CWD or accept inline contents. Missing, unreadable, or incomplete handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes the worktree-only restrictions below.

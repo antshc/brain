@@ -1,0 +1,35 @@
+{
+  "plugins/verify/install/references/eshop-example/v1/catalog.md": {
+    "../SKILL.md": "Resolves relative to the installed or generated document in the consuming repository."
+  },
+  "plugins/verify/install/templates/maintain-verify/maintain-verify.SKILL.template.md": {
+    "../../../proof/README.md": "Resolves relative to the installed or generated document in the consuming repository.",
+    "../../../proof/AGENT.md": "Resolves relative to the installed or generated document in the consuming repository."
+  },
+  "plugins/verify/install/templates/typescript/app/components/README.md": {
+    "../AGENT.md": "Resolves relative to the installed or generated document in the consuming repository."
+  },
+  "plugins/verify/install/templates/verify-mole/verify-mole.SKILL.template.md": {
+    "../../../proof/README.md": "Resolves relative to the installed or generated document in the consuming repository.",
+    "../../../proof/AGENT.md": "Resolves relative to the installed or generated document in the consuming repository."
+  },
+  "plugins/wf/install/copilot-instructions.template.md": {
+    "../GLOSSARY.md": "Resolves relative to the installed or generated document in the consuming repository.",
+    "../ARCHITECTURE.md": "Resolves relative to the installed or generated document in the consuming repository.",
+    "../docs/building-blocks/support-service.swagger.json": "Resolves relative to the installed or generated document in the consuming repository.",
+    "../.crew/CODE.md": "Resolves relative to the installed or generated document in the consuming repository."
+  },
+  "plugins/wf/skills/architecture-records/templates/DEPLOYMENT-VIEW-FORMAT.md": {
+    "./ARCHITECTURE.md": "Resolves relative to the installed or generated document in the consuming repository."
+  },
+  "plugins/wf/skills/research/agents/composy.md": {
+    "url": "Example destination replaced by a source URL or path when authoring the report."
+  },
+  "skills/engineering/prototype-cloud-scenario/SKILL.md": {
+    "path#Lline": "Example destination replaced by a source URL or path when authoring the report."
+  },
+  "skills/engineering/prototype-cloud-scenario/templates/scenario.template.md": {
+    "path": "Example destination replaced by a source URL or path when authoring the report.",
+    "path#Lline": "Example destination replaced by a source URL or path when authoring the report."
+  }
+}

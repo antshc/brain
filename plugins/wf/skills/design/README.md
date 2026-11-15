@@ -149,7 +149,7 @@ Contract design keeps its `wayfinder:contract-design` ticket across AFK Options 
 ## Key decisions
 
 | Decision | Purpose |
-| --- | --- |
+|---|---|
 | Alternate human decisions and autonomous helpers | Answers and findings can reveal more work; Wayfinder keeps control |
 | Root Not yet specified is the fog of war | One home for unknowns/risks, coarse or precise, until resolved |
 | Child issues track concrete work | Progress, claims and dependencies stay distinct from design uncertainty |
@@ -166,7 +166,7 @@ Contract design keeps its `wayfinder:contract-design` ticket across AFK Options 
 Wayfinder runs every helper in its own session; helpers spawn their own workers (Research → its route agents). These rows describe responsibilities, not worker types.
 
 | Owner/helper | Responsibility | Returns to Wayfinder |
-| --- | --- | --- |
+|---|---|---|
 | User | Scope, requirements, preferences, ticket approval, prototype approval, contract choice, residual-risk acceptance and publish request | Explicit decisions |
 | Wayfinder | Fog, scheduling, claims, dispatch, human relay, verification, prototype approval relay, commits/local integration and HLD synchronization | Next investigation, human choice, readiness or precise blocker |
 | Grill | One human decision at a time, session ledger and closing sweep | Actual user answers and new unknowns |
@@ -182,7 +182,7 @@ Wayfinder runs every helper in its own session; helpers spawn their own workers 
 ## Where state lives
 
 | Location | Records |
-| --- | --- |
+|---|---|
 | Root Not yet specified | Stable unknown/risk IDs, state, resolution criteria, linked work, evidence/limits, next action and owner |
 | Child issues | Concrete progress, blockers, claims, worker/model, result/worktree/commit identities and resolution comments |
 | Root Decisions so far | Supported resolved outcomes; clear active fog only after recording the outcome |
@@ -197,7 +197,7 @@ Discovery creates no push/PR or publication. Explicit `/design publish-hld` publ
 ## Routes
 
 | Request | Route | Outcome |
-| --- | --- | --- |
+|---|---|---|
 | `/design architect design retries` | `architect` | Research, Arena sketch, evidence and verification, then implementation by default |
 | `/design architect checkpoint design retries` | `architect` | Review the sketch before implementing or handing off |
 | `/design architect arena-agents=2 design retries` | `architect` | Compare two independently drafted architecture shapes |

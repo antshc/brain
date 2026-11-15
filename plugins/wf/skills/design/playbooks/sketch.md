@@ -7,7 +7,7 @@ Read [Code-sketch contract](../references/sketch-contract.md) in full before sta
 ## Contexts
 
 | Context | Inputs | Output location | Extra work |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | **Standalone** (`design sketch`) | Verbatim task/story/spec or resolved decisions; optional scope | `<artifact-root>/synthesis/` | Ground in code; one sketch; report and stop |
 | **Wayfinder** | Ticket question and supplied grounding, pinned worktree; runs in Wayfinder's session | Exact caller-assigned package root | Return package to Wayfinder for prototype approval before local integration |
 | **Candidate** (Architect Arena or Deep Module option) | Task, supplied grounding/repo docs, isolated read-only working tree, assigned candidate path | `<artifact-root>/candidate-<n>/` (or Arena revision candidate) | Return to caller; no Arena, implementation or independent user handoff |

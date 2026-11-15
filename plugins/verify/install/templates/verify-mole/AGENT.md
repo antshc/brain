@@ -1,3 +1,6 @@
+<!-- Language alternatives retain the step numbers of the generated procedure. -->
+<!-- markdownlint-disable MD029 -->
+
 # Authoring scenarios
 
 Read before you add or change a scenario, flow, check, page or component in `proof/`. `{{MOLE}}` runs and records; you write the flows, checks and map lines. Run the rules in order.

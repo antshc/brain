@@ -26,13 +26,16 @@ Infer from context; ask only when required input is missing.
 **4 — Update or create.**
 
 `workItemKey` named → **update**; pass `--summary` only when changed:
+
 ```bash
 python3 <skillDir>/scripts/atl.py publish-work update --config "<configPath>" --key <workItemKey> --markdown <description.md> [--summary "<summary>"] [--fields-json <fields.json>] [--attach <path> ...]
 ```
 
 Else → **create**:
+
 1. `projectKey`: supplied → use. Else Preflight `defaultProjectKey` if non-empty. Else `<twg> jira space query --action create --limit 25`: one → use, report as resolved; several → ask, never choose silently.
 2. Run:
+
 ```bash
 python3 <skillDir>/scripts/atl.py publish-work create --config "<configPath>" --project <projectKey> --issue-type "<issueType>" --summary "<summary>" --markdown <description.md> [--parent <KEY>] [--fields-json <fields.json>] [--attach <path> ...]
 ```

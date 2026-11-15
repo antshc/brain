@@ -136,12 +136,12 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
    | `{{diffDir}}` | `@diffDir` |
    | `{{baseCommit}}` | `BASE_COMMIT` |
    | `{{historyTip}}` | `@prevHead` |
-   | `{{commitSubjectPrefix}}` | `chore: ` |
+   | `{{commitSubjectPrefix}}` | `chore:` |
 
    Verify: `result.commit` equals `HEAD`, exactly one commit since `@prevHead`, subject match, clean worktree, checks reported. A verified no-change result must report null and leave `HEAD` at `@prevHead`. Record actual model/effort or unavailable-model failure.
    After verified success: checkpoint the chore result and SHA before pushing, or reconcile an already verified chore on resume. Confirm the pushed head, remove `@diffDir` if created, and report out-of-scope findings without acting.
    → Missing, failed, or invalid result: record the chore blocker, preserve the worktree, remove `@diffDir`, and continue to the blocked handoff without pushing.
-   Done when chore changes are committed (one `chore: ` commit, or none needed), pushed to `INTEGRATION_BRANCH`, remote head equals `HEAD`, and the worktree is clean.
+   Done when chore changes are committed (one `chore:` commit, or none needed), pushed to `INTEGRATION_BRANCH`, remote head equals `HEAD`, and the worktree is clean.
 
 8. Run *Publication verification* ([publication.md](./references/publication.md)), refresh spec/ticket pointers, and write *Implementation handoff*. Preserve the integration worktree, branch, draft PR, and run/evidence directories; keep the spec open. Done when the handoff matches the read-back remote state. Publication failure or unresolved tickets → `blocked`; never report ready from a PR URL alone.
 

@@ -30,5 +30,5 @@ gh skill update --all
 
 ## Use a skill
 
-Copilot picks the skill automatically based on your prompt and the skill's description.  
+Copilot picks the skill automatically based on your prompt and the skill's description.
 To invoke explicitly: `Use the /<skill-name> skill to ...`

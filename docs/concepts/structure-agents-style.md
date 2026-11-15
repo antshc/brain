@@ -19,7 +19,7 @@ stays predictable and reviewable.
 
 Keep the agent body on orchestration and its own judgment; everything specialized moves behind a skill with
 documented inputs and outputs. Delegation and the call style that carries it are owned by
-[0010](0010-skill-composition.md), and the ordered-execution mechanism by
+[Skill composition](structure-skill-composition.md), and the ordered-execution mechanism by
 [structure-checklist-workflow](structure-checklist-workflow.md).
 
 How to word the agent file itself is write-time guidance — see

@@ -196,7 +196,7 @@ A Concept governing multiple building blocks is indexed in `ARCHITECTURE.md`'s `
 
 The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skill, not projected from the record — the record carries nothing to project.
 
-1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
+1. `title` is the `#` heading text, used as the record-name column linked to the record path.
 2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
 3. Use the already-loaded index defaults contract and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `architecture-records`, route `define-concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
 4. Derive the Trigger condition: Apply **Generate trigger condition**, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.

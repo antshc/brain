@@ -101,7 +101,7 @@ For relationship or URL discovery, use sufficient inline or compact records, or 
 ## Output Size Controls
 
 | Option | Result |
-| --- | --- |
+|---|---|
 | `--output-summary stats` | Smallest stdout. Use for broad discovery. |
 | `--output-summary auto` | Shows small results inline and summarizes large results. |
 | `--output-summary inline` | Requests inline selected data. In agent mode, oversized results fall back to a file summary. |

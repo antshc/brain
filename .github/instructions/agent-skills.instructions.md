@@ -4,6 +4,9 @@ description: >-
 applyTo: "**/skills/**/*.md,**/agents/*.agent.md,.github/instructions/*.instructions.md"
 ---
 
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Writing agent-facing documents
 
 Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, and `.crew/` convention files. Design-time composition guidance lives in [ARCHITECTURE.md](../../ARCHITECTURE.md).
@@ -59,12 +62,12 @@ CI runs [lint_skill_descriptions.py](../scripts/lint_skill_descriptions.py) over
 |---|---|
 | `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`address-page-comments`) allowed |
 | `<` `>` | Rejected by skill validators (XML/HTML injection guard) |
-| `: ` (colon + space) | YAML reads it as a nested mapping key |
-| ` #` (space + hash) | YAML starts a comment; rest of description dropped |
+| `:` (colon + space) | YAML reads it as a nested mapping key |
+| `#` (space + hash) | YAML starts a comment; rest of description dropped |
 | Leading `-` `?` `:` `[` `]` `{` `}` `,` `&` `*` `!` `\|` `>` `'` `"` `%` `@` `` ` `` | YAML indicator; plain scalar cannot start with it |
 | Tabs, line breaks in a plain scalar, leading/trailing whitespace | Multiline/indent parse errors |
 
-**YAML safety:** frontmatter MUST parse as YAML; a plain scalar containing `: ` or ` #` breaks parsing and the skill silently disappears. Write `description` (and any value with `: `, quotes, backticks, `#`, or a leading `[`, `{`, `*`, `&`, `!`, `%`, `@`) as a folded block scalar: `description: >-` then the text indented two spaces on the next line. Never use `: ` inside a plain scalar.
+**YAML safety:** frontmatter MUST parse as YAML; a plain scalar containing `:` or `#` breaks parsing and the skill silently disappears. Write `description` (and any value with `:`, quotes, backticks, `#`, or a leading `[`, `{`, `*`, `&`, `!`, `%`, `@`) as a folded block scalar: `description: >-` then the text indented two spaces on the next line. Never use `:` inside a plain scalar.
 
 Name skills by existing verb-prefix family. Start a new family only when needed.
 
@@ -142,10 +145,10 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
-| `{{camelCase\\|hint}}` | Preferred field-local guidance | `{{priority\\|MVP or Should have}}` |
+| `{{camelCase\\ \| hint}}` | Preferred field-local guidance | `{{priority\\ \| MVP or Should have}}` |
 | `<!-- @: instruction -->` | Hidden structural/rendering directive; **MUST** be one terse line | `<!-- @: repeat per component -->` |
 | `[optional]` | Optional input | `[target-path]` |
-| `value1 \\| value2` | Allowed values | `completed \\| failed` |
+| `value1 \| value2` | Allowed values | `completed \| failed` |
 | ``literal`` | Fixed command/path/value | `dotnet test` |
 | `$snake_case` | Local Bash variable (shell only) | `$repo_root` |
 | `$UPPER_SNAKE_CASE` | Bash environment variable (shell only) | `$REPOSITORY_ROOT` |
@@ -178,7 +181,7 @@ Completion criteria check whether the defined result meets its contract; a compl
 - Resolve uncovered obligations by implementing them, asking for clarification, or reporting explicit deferral. **MUST NOT** declare completion with an unaccounted obligation.
 - Omit the sweep for small, bounded work when procedural checks or completion criteria already prove full coverage (e.g. a method rename or single defined diagram). **MUST NOT** duplicate the same checks under both sections.
 
-See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the closing procedure and [comparison research](../../docs/research/skill-result-check-section-naming.md) for selection examples.
+See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the closing procedure. Comparison research `docs/research/skill-result-check-section-naming.md` is not retained.
 
 ## Pruning
 

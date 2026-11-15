@@ -1,7 +1,7 @@
 # CodeGraphContext vs graphify — measured code search on a C#/TypeScript product
 
-Researched: 2026-11-12  
-Scope: [CodeGraphContext (CGC)](https://github.com/CodeGraphContext/CodeGraphContext) 0.6.13 (Tree-sitter and SCIP variants) vs [graphify](https://pypi.org/project/graphifyy/) 0.9.107 on one private product codebase.  
+Researched: 2026-11-12
+Scope: [CodeGraphContext (CGC)](https://github.com/CodeGraphContext/CodeGraphContext) 0.6.13 (Tree-sitter and SCIP variants) vs [graphify](https://pypi.org/project/graphifyy/) 0.9.107 on one private product codebase.
 Related research: [CGC SCIP indexing for C# and TypeScript](cgc-scip-csharp-typescript.md), [CGC multi-repository workspaces](https://github.com/antshc/brain/blob/research/cgc-multirepo/docs/research/cgc-multirepo.md).
 
 ## Question

@@ -73,7 +73,7 @@ On every exit, report observed, reusable gotchas from this run, or `none`.
 
 `complete` requires every material changed behavior to have a passed check without new relevant errors or warnings; distinguish pre-existing warnings. Report exactly:
 
-```
+```text
 STATUS: complete | blocked | partial
 SUMMARY: <change and key decision>
 FILES: <changed files or none>

@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # {{systemName}} Deployment View
 
 <!-- 1-3 sentences: the production hosting model (single VM, Docker Compose host, Kubernetes cluster, managed PaaS), how many nodes, and what fronts it. -->

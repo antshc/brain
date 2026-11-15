@@ -11,7 +11,8 @@ Commit all uncommitted changes using the format below.
 **Source:** Use the agent's status report if available. Otherwise run `git add -A 2>/dev/null; DIFF=$(git diff --cached 2>/dev/null); [ -n "$DIFF" ] && echo "$DIFF" || echo "No uncommitted changes"` and derive the message from the diff.
 
 **Format:**
-```
+
+```text
 - **SUBJECT** → Use **ccode:** prefix, than one line commit summary
 - **SUMMARY** → commit body (key technical decisions)
 - **FILES** → list of files changed

@@ -20,7 +20,6 @@ Show deployment topology, hosting, runtime, or infrastructure placement. Model t
 
 Official Mermaid C4 syntax: https://mermaid.ai/open-source/syntax/c4.html
 
-
 ## Delta routing
 
 System Context is current-mode only. For a System Context delta, select Container when the change affects deployables or Component when it affects responsibilities inside one deployable.
