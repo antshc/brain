@@ -26,13 +26,16 @@ def test_wayfinder_route_resources_and_migration():
     assert 'preserve files/history' in WAYFINDER
 
 
-def test_root_owns_all_fog_and_children_own_concrete_work():
+def test_root_owns_coarse_fog_and_children_own_precise_work():
     assert re.findall(r'^## (.+)', MAP.split('```markdown\n')[1].split('```')[0], re.M) == [
         'Destination', 'Notes', 'Document and branches', 'Findings so far', 'Not yet specified', 'Out of scope']
     for field in ('Question', 'Unknowns', 'Work', 'Research scope', 'Blocked by', 'Part of', 'Result'):
         assert f'## {field}' in MAP
-    assert 'all unresolved unknowns and risks' in WAYFINDER
-    assert 'including those with active children' in WAYFINDER
+    assert 'all unresolved unknowns and risks' not in WAYFINDER
+    assert 'including those with active children' not in WAYFINDER
+    assert 'no live root fog row required' in MAP
+    assert 'Pending proposals:' in MAP
+    assert 'Transfer stable IDs, provenance, consequence, criteria' in WAYFINDER
     assert 'Do not maintain another active Markdown research map' in WAYFINDER
     assert 'native parent/sub-issue edges' in WAYFINDER
     assert 'reject cycles' in WAYFINDER
