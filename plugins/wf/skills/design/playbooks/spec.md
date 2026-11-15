@@ -1,7 +1,5 @@
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
 
 # Spec
 
@@ -86,7 +84,7 @@ One subsection per Requirement set. Each groups a Stakeholder requirement with i
 <details>
 <summary>{{n}}. {{stakeholderRequirement}}</summary>
 
-**Functional Requirements**
+**Functional Requirements:**
 
 What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
 
@@ -101,7 +99,7 @@ A LONG, numbered list of functional requirements. Each functional requirement sh
 
 This list of Functional requirements should cover all relevant behavior in this Requirement set.
 
-**Business Rules**
+**Business Rules:**
 
 <!-- Omit if no business rules exist for this Requirement set. -->
 
@@ -109,7 +107,7 @@ Invariants that must always hold, independent of any single user action. Each ru
 
 {{n}}. If {{condition}}, {{invariant}}.
 
-**Edge Cases**
+**Edge Cases:**
 
 <!-- Omit if no edge cases exist for this Requirement set. -->
 

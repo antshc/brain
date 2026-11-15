@@ -1,5 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
 
@@ -21,24 +19,24 @@ If `{{input}}` is empty, ask: "Please provide the GitHub PR URL (https://github.
 
 Run once per session, before Review loop. Steps 1 to 3 complete before step 4.
 
-**1. Fetch PR details**
+**1. Fetch PR details:**
 
 If `git status --porcelain` is non-empty, stop and ask the user before checkout.
 
 *Load and follow the `github` skill to read pull requests and review evidence* using Pull requests, Diff, HITL setup to check out the PR branch and build the per-file diff and manifest under `bin/review_diff/`. Use the returned `DIFF_DIR`, `MANIFEST`, and `COMMIT_ID`. Done when the manifest exists and the reviewed commit is recorded.
 
-**2. Load existing review comments**
+**2. Load existing review comments:**
 
 Use `GH_TOOL pr snapshot OWNER/REPO#PR_NUMBER --inline` for paginated dedup context. Report only new findings.
 
-**3. Load architecture documentation**
+**3. Load architecture documentation:**
 
 Locate existing architecture docs — overview, Crosscutting Concepts, ADRs — and read the overview and indexes into context.
 
 - **Found:** keep loaded for the session; cross-reference every input against it.
 - **Not found:** proceed on code evidence alone.
 
-**4. Run changes brief**
+**4. Run changes brief:**
 
 Runs on the user's behalf despite the on-initiative restriction; the human reads the output, the assistant does not summarize it.
 
@@ -78,7 +76,7 @@ Classify the input, then follow exactly one branch:
 
 Drafts, approves, and posts one review comment.
 
-**1. Analyse**
+**1. Analyse:**
 
 1.1 **Anchor** — resolve from the input:
 
@@ -99,7 +97,7 @@ Drafts, approves, and posts one review comment.
 - Already raised in an existing review comment → don't draft; cite that comment.
 - Architecture/Concept/ADR-only concern and change conforms → don't draft; report "conforms to the documented architecture — nothing to flag"; let the user decide. Correctness concerns pass on evidence alone.
 
-**2. Draft**
+**2. Draft:**
 
 *Load and follow the `github` skill to draft review threads and pull request comments using Reviews* with kind `finding`, ownership `human`, stage `draft`, and verified evidence. Neither the WF plugin nor a standalone `github` install available → stop and report missing access.
 
@@ -109,7 +107,7 @@ Drafts, approves, and posts one review comment.
 
 2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 
-**3. Human approval**
+**3. Human approval:**
 
 Show the comment and menu in this format; wait for the user's selection:
 
@@ -128,7 +126,7 @@ Show the comment and menu in this format; wait for the user's selection:
 >
 > Or just type your feedback to revise the comment.
 
-**4. Handle the reply**
+**4. Handle the reply:**
 
 On approval (1 or 2): follow [Posting](../references/posting.md#hitl), with `FILE_PATH`, `LINE_NUMBER`, `REVIEW_COMMENT`, and the reviewed `COMMIT_ID` to post the approved body unchanged, without appending metadata. Capture the returned `COMMENT_ID`; add `{FILE_PATH, LINE_NUMBER, REVIEW_COMMENT, COMMENT_ID}` to the **posted queue**. Then, by reply:
 
