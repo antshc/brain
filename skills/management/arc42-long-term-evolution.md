@@ -1,6 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
-
 # Evolving PM-Focused arc42 Documentation for Long-Term Projects
 
 For systems and products that exist for many years, arc42 documentation should be treated as **living documentation**, not as a one-time project snapshot.
@@ -48,11 +45,11 @@ The key principle is to separate:
 
 ### Example
 
-**Current goal**
+**Current goal:**
 
 > Support all customer-facing transactional notifications through one shared platform.
 
-**Historical change**
+**Historical change:**
 
 > 2024: Scope expanded from email-only delivery to email and SMS. See ADR-027.
 
@@ -140,15 +137,15 @@ Do not turn the main solution strategy into a chronological history.
 
 ### Example
 
-**Current**
+**Current:**
 
 > Notification delivery uses an asynchronous Kafka-based pipeline with provider adapters.
 
-**History**
+**History:**
 
 > RabbitMQ was replaced by Kafka during the 2024 scaling initiative. See ADR-041.
 
-**Future**
+**Future:**
 
 > Migration to managed Kafka is planned as part of the 2027 platform modernization roadmap.
 
@@ -172,10 +169,10 @@ Recommended states:
 
 ### Example
 
-**ADR-014 — Use RabbitMQ for notification jobs**
+**ADR-014 — Use RabbitMQ for notification jobs:**
 Status: **Superseded by ADR-041**
 
-**ADR-041 — Use Kafka for notification jobs**
+**ADR-041 — Use Kafka for notification jobs:**
 Status: **Accepted**
 
 This preserves causal history without polluting the current architecture description.

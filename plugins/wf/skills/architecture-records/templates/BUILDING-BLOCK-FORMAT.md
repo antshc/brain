@@ -1,6 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
-
 # {{buildingBlockName}}
 
 <!-- Purpose/Responsibility: 1-3 sentences on what the building block is (container/process name, deployment type — e.g. feature module vs. independent service) and its core responsibility. -->
@@ -11,15 +8,15 @@
 
 ## Interfaces
 
-*(optional)* {{contractSurfaceDescription}}. {{contractDocLink}} <!-- agent to fill in during design -->
+**Optional:** {{contractSurfaceDescription}}. {{contractDocLink}} <!-- agent to fill in during design -->
 
 ## Tweaks/Configuration
 
-*(optional)* {{tweaksDescription}}. {{tweaksDocLink}} <!-- agent to fill in during design -->
+**Optional:** {{tweaksDescription}}. {{tweaksDocLink}} <!-- agent to fill in during design -->
 
 ## Persisted data
 
-*(optional)* {{persistedDataDescription}}. {{persistedDataDocLinks}} <!-- agent to fill in during design -->
+**Optional:** {{persistedDataDescription}}. {{persistedDataDocLinks}} <!-- agent to fill in during design -->
 
 ## Source-folder structure
 
@@ -27,7 +24,7 @@
 
 ### Layers (`{{location}}/` folder)
 
-*(optional)* <!-- One subsection per layer when a single tree isn't enough; the number of layers varies (e.g. main application layer, platform integration layer, core layer). -->
+**Optional:** <!-- One subsection per layer when a single tree isn't enough; the number of layers varies (e.g. main application layer, platform integration layer, core layer). -->
 
 ## Container view
 
@@ -35,11 +32,11 @@
 
 ## Component view
 
-*(optional)* <!-- C4Component diagram, only when a Container view isn't enough to navigate the block. -->
+**Optional:** <!-- C4Component diagram, only when a Container view isn't enough to navigate the block. -->
 
 ## Flow view
 
-*(optional)* <!-- Include only when the block's essential behavior is a lifecycle or process (transient resource, job, multi-step handoff) that a Container or Component view cannot show. *Load and follow the `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams*, using Flowchart, orientation `LR`, the Container view's component names, current mode, one diagram per block. Omit for long-running services whose structure the Container view already explains. -->
+**Optional:** <!-- Include only when the block's essential behavior is a lifecycle or process (transient resource, job, multi-step handoff) that a Container or Component view cannot show. *Load and follow the `doc-diagram` skill to create Mermaid flowchart, swimlane, or sequence diagrams*, using Flowchart, orientation `LR`, the Container view's component names, current mode, one diagram per block. Omit for long-running services whose structure the Container view already explains. -->
 
 ## Concepts
 
@@ -61,4 +58,4 @@
 
 ## Key features
 
-*(optional)* <!-- 1-N bullet items, each a short named feature/capability with a one-line description. -->
+**Optional:** <!-- 1-N bullet items, each a short named feature/capability with a one-line description. -->

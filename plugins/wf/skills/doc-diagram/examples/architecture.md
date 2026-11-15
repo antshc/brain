@@ -1,6 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
-
 # Architecture Diagram
 
 Presentation examples for the `doc-diagram` skill (architecture).
@@ -192,7 +189,7 @@ C4Container
     UpdateRelStyle(service, legacyQueue, $textColor="#c9d1d9", $lineColor="#8a4a4a")
 ```
 
-**Behaviour changes**
+**Behaviour changes:**
 
 - `+` Order Export Queue replaces the legacy export path.
 - `-` Legacy Order Queue is removed.
@@ -316,7 +313,7 @@ C4Deployment
     UpdateRelStyle(api, legacy, $textColor="#c9d1d9", $lineColor="#8a4a4a")
 ```
 
-**Behaviour changes**
+**Behaviour changes:**
 
 - `+` Fraud Check Worker node added to run asynchronous fraud review.
 - `-` Legacy Batch Job node and its host are being decommissioned.

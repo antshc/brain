@@ -1,6 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
-
 # Brain
 
 My agent skills and plugins for GitHub Copilot — workflow automation, autonomous coding crews, PR review, and documentation lookups.
@@ -115,7 +112,7 @@ gh skill install JetBrains/skills slides --agent github-copilot --scope user -f
 
 ### mattpocock skills (external)
 
-**Productivity**
+**Productivity:**
 
 ```sh
 gh skill install mattpocock/skills skills/productivity/writing-great-skills --agent github-copilot --scope user -f && \
@@ -125,7 +122,7 @@ gh skill install mattpocock/skills skills/productivity/teach --agent github-copi
 gh skill install github/awesome-copilot skills/mini-context-graph --agent universal --scope user -f
 ```
 
-**Engineering**
+**Engineering:**
 
 ```sh
 gh skill install mattpocock/skills skills/engineering/codebase-design --agent github-copilot --scope user -f

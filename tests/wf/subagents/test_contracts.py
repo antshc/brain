@@ -90,7 +90,7 @@ def test_pr_review_routes_share_diff_acquisition_and_preserve_posting_contracts(
     assert "GH_TOOL pr checkout" in diff
     assert "_manifest.tsv" in diff
     hitl = (root / "playbooks/hitl.md").read_text()
-    assert hitl.index("**3. Human approval**") < hitl.index("On approval (1 or 2): follow [Posting]")
+    assert hitl.index("**3. Human approval:**") < hitl.index("On approval (1 or 2): follow [Posting]")
     posting = (root / "references/posting.md").read_text()
     assert "Require explicit human approval" in posting
     assert "current PR head and base" in posting

@@ -4,13 +4,11 @@ description: >-
   Authorize Azure CLI with a service principal on Windows or Linux. Use when az authentication is missing or expired, 'az login fails', or for /ms:auth-principal.
 ---
 
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
 
-**Step 0 — Detect OS**
+**Step 0 — Detect OS:**
 Run `uname -s 2>/dev/null`. If it fails or returns a Windows-like environment, use the Windows steps. Otherwise use the Linux steps.
 
-**Step 1 — Check credentials in the current environment**
+**Step 1 — Check credentials in the current environment:**
 
 Linux:
 
@@ -34,7 +32,7 @@ foreach ($variable in $requiredVariables) {
 }
 ```
 
-**Step 2 — Log in and configure defaults**
+**Step 2 — Log in and configure defaults:**
 
 Linux:
 
@@ -68,7 +66,7 @@ az config set defaults.location=westeurope
 if ($LASTEXITCODE -ne 0) { throw 'az config set location failed.' }
 ```
 
-**Step 3 — Verify**
+**Step 3 — Verify:**
 
 ```bash
 az account show
