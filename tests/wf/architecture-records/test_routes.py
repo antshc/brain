@@ -66,10 +66,11 @@ def test_index_actions_and_render_only_selectors_remain_distinct():
     assert 'mode' in entry
 
 
-def test_concept_discovery_resources_move_without_changing_research_questioning():
+def test_concept_discovery_retains_its_own_questioning():
     assert (ROOT / 'references/arc42-cross-cutting-concepts.md').is_file()
-    assert (ROOT / 'references/questioning.md').read_bytes() == (
-        ROOT.parent / 'define/references/questioning.md').read_bytes()
+    questioning = (ROOT / 'references/questioning.md').read_text()
+    assert 'Ask the whole frontier in one round' in questioning
+    assert 'The _decisions_ are the user' in questioning
     concept = (ROOT / 'playbooks/define-concept.md').read_text()
     assert 'user-confirmed' in concept
     assert 'no second permission prompt' in concept
