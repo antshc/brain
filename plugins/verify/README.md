@@ -1,6 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
-
 # Proving AI Agent Work: Verification, Evidence, and Receipts
 
 ## 1. Overview
@@ -92,27 +89,27 @@ Example requirement:
 
 > Creating an order must persist it, and subsequent requests must return the same order.
 
-**Preconditions**
+**Preconditions:**
 
 - The application is running.
 - The database is initialized.
 - A test user is authenticated.
 - Required inventory exists.
 
-**Actions**
+**Actions:**
 
 1. Submit an order using the public HTTP API.
 2. Retrieve the order through the API.
 3. Verify the persisted database record.
 
-**Expected outcomes**
+**Expected outcomes:**
 
 - Creation returns HTTP 201.
 - The response contains a valid order identifier.
 - Retrieving the order returns submitted values.
 - The database contains the corresponding record.
 
-**Failure conditions**
+**Failure conditions:**
 
 - The API reports success without persisting the order.
 - The retrieved order has incorrect values.

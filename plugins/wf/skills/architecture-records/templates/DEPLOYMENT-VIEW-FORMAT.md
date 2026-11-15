@@ -1,6 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
-
 # {{systemName}} Deployment View
 
 <!-- 1-3 sentences: the production hosting model (single VM, Docker Compose host, Kubernetes cluster, managed PaaS), how many nodes, and what fronts it. -->
@@ -49,7 +46,7 @@ C4Deployment
 - **Runs as:** {{userAndGroup}}
 - **Listens on:** {{port}}/{{protocol}} — {{boundInterface}}
 
-**Host paths**
+**Host paths:**
 
 <!-- Every path the instance reads or writes. Absolute, with what lives there and whether it survives a redeploy. -->
 
@@ -68,7 +65,7 @@ C4Deployment
 - **Healthcheck:** {{healthcheckCommandOrEndpoint}}
 - **Resource limits:** {{cpuAndMemoryLimits}}
 
-**Volumes**
+**Volumes:**
 
 <!-- Host paths and named volumes the container mounts — the container equivalent of the VM host-paths table. -->
 
@@ -152,7 +149,7 @@ C4Deployment
 
 ### Metrics
 
-*(optional)* <!-- What exposes metrics, on which endpoint/port, what scrapes or receives them, and where they're visualised. -->
+**Optional:** <!-- What exposes metrics, on which endpoint/port, what scrapes or receives them, and where they're visualised. -->
 
 - **Exposed by:** {{mermaidComponentName}} on `{{metricsEndpoint}}`
 - **Collected by:** {{collector\| e.g. Prometheus scrape, OTLP push, provider agent }}
@@ -160,16 +157,16 @@ C4Deployment
 
 ### Traces
 
-*(optional)* <!-- Instrumentation, exporter endpoint, backend, and sampling rate. -->
+**Optional:** <!-- Instrumentation, exporter endpoint, backend, and sampling rate. -->
 
 ### Health and alerting
 
-*(optional)* <!-- Health endpoints and who probes them; alert rules, where they live, and the channel they page. -->
+**Optional:** <!-- Health endpoints and who probes them; alert rules, where they live, and the channel they page. -->
 
 ## External dependencies
 
-*(optional)* <!-- Managed data stores, queues, identity providers, and third-party endpoints the system depends on but doesn't deploy. One bullet each: what it is, endpoint or region, and how access is granted. -->
+**Optional:** <!-- Managed data stores, queues, identity providers, and third-party endpoints the system depends on but doesn't deploy. One bullet each: what it is, endpoint or region, and how access is granted. -->
 
 ## Operational notes
 
-*(optional)* <!-- Startup order, schema migrations, and backup targets and retention. -->
+**Optional:** <!-- Startup order, schema migrations, and backup targets and retention. -->

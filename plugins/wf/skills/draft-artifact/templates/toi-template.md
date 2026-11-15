@@ -1,7 +1,5 @@
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
 
 # TOI: `<Feature / Topic Name>`
 
@@ -113,13 +111,13 @@ Try it in Swagger UI: `<host>/<swagger UI route>#/<tag>/<operationId>`
 
 <!-- @: Microsoft REST reference style; one row per field in the bodies below; delete a table with no rows; nested object → `parent.child` row -->
 
-**URI parameters**
+**URI parameters:**
 
 | Name | In | Required | Type | Default | Possible values | Description |
 |---|---|---|---|---|---|---|
 | `<name>` | `<path / query>` | `<yes / no>` | `<string / integer / boolean / enum / date-time>` | `<real default or —>` | `<enum values / range / —>` | `<what the parameter controls>` |
 
-**Request body**
+**Request body:**
 
 ```json
 <required fields + scenario fields only>
@@ -129,14 +127,14 @@ Try it in Swagger UI: `<host>/<swagger UI route>#/<tag>/<operationId>`
 |---|---|---|---|---|---|
 | `<field>` | `<yes / no>` | `<type>` | `<real default or —>` | `<enum values / range / —>` | `<what the field controls>` |
 
-**Responses**
+**Responses:**
 
 | Status code | Type | Description |
 |---|---|---|
 | `<200 OK>` | `<response type>` | `<when it is returned>` |
 | `<4xx / 5xx>` | `<error type>` | `<cause>` |
 
-**Response `<status code>`**
+**Response `<status code>`:**
 
 ```json
 <fields the scenario reads only>

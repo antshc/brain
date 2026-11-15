@@ -1,6 +1,3 @@
-<!-- Bold labels and optional markers are intentional, not section headings. -->
-<!-- markdownlint-disable MD036 -->
-
 # Transcription Tools Comparison
 
 Comprehensive comparison of audio transcription engines supported by the audio-transcriber skill.
@@ -359,7 +356,7 @@ for utterance in transcript.utterances:
 | Azure Speech | 3 min | 95% | $1.00 |
 | AssemblyAI | 4 min | 96% | $0.90 |
 
-*Benchmarks run on MacBook Pro M1, 16GB RAM*
+*Benchmarks run on MacBook Pro M1, 16GB RAM.*
 
 ---
 
