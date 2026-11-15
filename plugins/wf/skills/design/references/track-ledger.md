@@ -17,9 +17,9 @@ Use five sections: `Opened records`, `Touched surface`, `Decisions / assumptions
 
 One entry per repo-relative record path; update in place. Paths, not row numbers or ranges, identify records.
 
-* `{{path}} — opened, trigger matched: "{{clause}}"`
-* `{{path}} — opened, direct: {{topic}}`
-* `{{path}} — skipped, checked "{{clause1}}", "{{clause2}}": no match`
+- `{{path}} — opened, trigger matched: "{{clause}}"`
+- `{{path}} — opened, direct: {{topic}}`
+- `{{path}} — skipped, checked "{{clause1}}", "{{clause2}}": no match`
 
 Return the written line. `opened` preserves match history, not a guarantee that the body remains in context. Derive separate opened Deployable, Concept, and ADR counts from unique record paths with a confirmed successful body read in this session, including restored same-session history. Deduplicate global/block references and repeat reads; exclude index-only, skipped, failed, and unread records. Counts are cumulative body-read history, not records currently in context or records authored without a body read; do not reopen files just to count them.
 
@@ -33,29 +33,29 @@ Append only new terms/paths; return which were new. A skipped verdict is valid o
 
 Keep one human-readable bullet list under `Decisions / assumptions`; do not split by kind. Prefix each choice with `[assumed]`, `[decided]`, or `[rejected]`, then its stable item/question ID and a plain-language statement of what and why (1–3 sentences). Link evidence/record anchors; retain key, applicability condition, gate results, corrections, and pending-write status as supporting detail. A decision and its gate miss remain separate entries sharing an ID; update by ID **and entry kind**, not item text alone.
 
-* `[assumed] {{id}} {{choice}} — {{rationale}}. Key: {{decisionKey}}; applies when {{establishedCondition}}; evidence: [{{sourceTitle}}]({{path}}#{{anchor}}).`
-* `[assumed] {{id}} {{choice}} — {{rationale}}. Existing policy: [{{sourceTitle}}]({{path}}#{{key}}).`
-* `[decided] {{id}} {{choice}} — {{rationale}}. Feature decision; decided by user; evidence: {{answerOrLinkedSource}}.`
-* `[decided] {{id}} {{choice}} — {{rationale}}. ADR decision; decided by user; recorded: [{{title}}]({{path}}).`
-* `[rejected] {{id}} {{option}} — {{reason}}; evidence: {{answerOrLinkedSource}}.`
+- `[assumed] {{id}} {{choice}} — {{rationale}}. Key: {{decisionKey}}; applies when {{establishedCondition}}; evidence: [{{sourceTitle}}]({{path}}#{{anchor}}).`
+- `[assumed] {{id}} {{choice}} — {{rationale}}. Existing policy: [{{sourceTitle}}]({{path}}#{{key}}).`
+- `[decided] {{id}} {{choice}} — {{rationale}}. Feature decision; decided by user; evidence: {{answerOrLinkedSource}}.`
+- `[decided] {{id}} {{choice}} — {{rationale}}. ADR decision; decided by user; recorded: [{{title}}]({{path}}).`
+- `[rejected] {{id}} {{option}} — {{reason}}; evidence: {{answerOrLinkedSource}}.`
 
 Keep legacy entries readable; add key/condition/anchors when next evaluated. Conflicting clauses retain all source anchors; unknown applicability links to its fact-gap prerequisite. Multiple keys under one question share the question ID but use distinct decision keys; update by ID, entry kind, and key when present.
 
 Gap forms:
 
-* `{{id}} {{item}} — asked, key: {{decisionKey}}, gate miss: {{gates}}, nearest source: {{sourceAnchors|none}}`
-* `{{id}} {{item}} — corrected, evidence was: {{path}}#{{key}}, answer: "{{userCorrection}}"`
-* `{{id}} {{item}} — drift, code contradicts: {{path}}#{{key}}, code evidence: {{codePath:line|symbol}}, finding: "{{contradiction}}"`
+- `{{id}} {{item}} — asked, key: {{decisionKey}}, gate miss: {{gates}}, nearest source: {{sourceAnchors|none}}`
+- `{{id}} {{item}} — corrected, evidence was: {{path}}#{{key}}, answer: "{{userCorrection}}"`
+- `{{id}} {{item}} — drift, code contradicts: {{path}}#{{key}}, code evidence: {{codePath:line|symbol}}, finding: "{{contradiction}}"`
 
 For a suspected contradiction without proof, use `code evidence: unverified` and link a fact-gap frontier entry; this is not established Drift.
 
 After confirmed resolution, append one:
 
-* `, repaired: {{path}}#{{key}}` — record and required index sync confirmed.
-* `, resolved: feature decision` — no reusable record change needed.
-* `, resolved: recorded {{path}}` — answer persisted as an ADR.
-* `, resolved: ledger only, no existing Concept owner` — reusable answer with no owner.
-* `, resolved: {{reason}}, evidence: "{{source}}"` — evidenced dismissal, term write, or other non-repair resolution.
+- `, repaired: {{path}}#{{key}}` — record and required index sync confirmed.
+- `, resolved: feature decision` — no reusable record change needed.
+- `, resolved: recorded {{path}}` — answer persisted as an ADR.
+- `, resolved: ledger only, no existing Concept owner` — reusable answer with no owner.
+- `, resolved: {{reason}}, evidence: "{{source}}"` — evidenced dismissal, term write, or other non-repair resolution.
 
 Deferred, unanswered, unverified, or failed work stays open; do not add a resolved suffix merely because it was reported. If later evidence invalidates a resolution, remove the stale suffix and reopen it.
 

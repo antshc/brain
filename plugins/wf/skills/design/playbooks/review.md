@@ -16,7 +16,7 @@ Review decisions, not document style. A section may have any name or location. D
 ## Gap categories
 
 | # | Category | Review for |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Summary | Problem, users, change, value, scope, design status |
 | 2 | Goals | Measurable outcomes and success criteria |
 | 3 | Non-goals | Explicit boundaries and likely scope assumptions |

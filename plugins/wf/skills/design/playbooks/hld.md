@@ -5,11 +5,11 @@
 - Evolving draft
 - Vocabulary
 - 1. Resolve inputs
-- 2. Ground and rank evidence
-- 3. Reconcile capabilities
-- 4. Synthesize the solution
-- 5. Merge incrementally
-- 6. Verify before writing
+- 1. Ground and rank evidence
+- 1. Reconcile capabilities
+- 1. Synthesize the solution
+- 1. Merge incrementally
+- 1. Verify before writing
 - Gotchas
 
 Use the current conversation context and codebase understanding to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder root Not yet specified, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
@@ -29,9 +29,11 @@ Use Living document reconciliation for supported design consequences and interna
 - A **Functional slice** is an end-to-end implementation of one distinct behavior or outcome, bounded by functional responsibility, owned by one Deployable, and independently testable through observable inputs and outputs. Cross-deployable flows connect Functional slices through their contracts.
 
 ## 1. Resolve inputs
+
 Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the design, and respect the Architecture and relevant ADRs and Concepts.
 
 ## 2. Ground and rank evidence
+
 Treat existing content outside `Open Questions` as resolved unless marked draft, tentative, or assumed.
 
 Let stronger evidence update weaker content. Preserve equal-authority conflicts and return them to root fog/caller without inventing a design decision. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.

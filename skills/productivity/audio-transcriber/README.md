@@ -44,6 +44,7 @@ npx claude-superskills@latest install audio-transcriber
 ```
 
 This automatically:
+
 - Downloads the skill
 - Installs Python dependencies (faster-whisper, tqdm, rich)
 - Installs ffmpeg (macOS via Homebrew)
@@ -54,11 +55,13 @@ This automatically:
 #### 1. Install Transcription Engine
 
 **Recommended (fastest):**
+
 ```bash
 pip install faster-whisper tqdm rich
 ```
 
 **Alternative (original Whisper):**
+
 ```bash
 pip install openai-whisper tqdm rich
 ```
@@ -66,6 +69,7 @@ pip install openai-whisper tqdm rich
 #### 2. Install Audio Tools (Optional)
 
 For format conversion support:
+
 ```bash
 # macOS
 brew install ffmpeg
@@ -77,11 +81,13 @@ apt install ffmpeg
 #### 3. Install LLM CLI (Optional - for intelligent summaries)
 
 **Claude CLI (recommended):**
+
 ```bash
 # Follow: https://docs.anthropic.com/en/docs/claude-cli
 ```
 
 **GitHub Copilot CLI (alternative):**
+
 ```bash
 gh extension install github/gh-copilot
 ```
@@ -89,12 +95,14 @@ gh extension install github/gh-copilot
 #### 4. Install Skill
 
 **Global installation:**
+
 ```bash
 cd /path/to/claude-superskills
 ./scripts/local-install.sh
 ```
 
 **Repository only:**
+
 ```bash
 # Skill is already available if you cloned the repo
 ```
@@ -108,6 +116,7 @@ copilot> transcribe audio to markdown: meeting.mp3
 ```
 
 **Output:**
+
 - `meeting.md` - Full Markdown report with metadata, transcription, minutes, summary
 
 ### With Subtitles
@@ -117,6 +126,7 @@ copilot> convert audio file to text with subtitles: interview.wav
 ```
 
 **Generates:**
+
 - `interview.md` - Markdown report
 - `interview.srt` - Subtitle file
 
@@ -141,32 +151,42 @@ Activate the skill with any of these phrases:
 ## 📋 Use Cases
 
 ### 1. Team Meetings
+
 Record standups, planning sessions, or retrospectives and automatically generate:
+
 - Participant list
 - Discussion topics with timestamps
 - Decisions made
 - Action items assigned
 
 ### 2. Client Calls
+
 Transcribe client conversations with:
+
 - Speaker identification
 - Key agreements documented
 - Follow-up tasks extracted
 
 ### 3. Interviews
+
 Convert interviews to text with:
+
 - Question/answer attribution
 - Subtitle generation for video
 - Searchable transcript
 
 ### 4. Lectures & Training
+
 Document educational content with:
+
 - Timestamped notes
 - Topic breakdown
 - Key concepts summary
 
 ### 5. Content Creation
+
 Analyze podcasts, videos, YouTube content:
+
 - Full transcription
 - Chapter markers (timestamps)
 - Summary for show notes
@@ -251,6 +271,7 @@ Next steps include production deployment of the dashboard by end of week and sch
 ## ⚙️ Configuration
 
 No configuration needed! The skill automatically:
+
 - Detects Faster-Whisper or Whisper installation
 - Chooses the fastest available engine
 - Selects appropriate model based on file size
@@ -259,26 +280,34 @@ No configuration needed! The skill automatically:
 ## 🔧 Troubleshooting
 
 ### "No transcription tool found"
+
 **Solution:** Install Whisper:
+
 ```bash
 pip install faster-whisper
 ```
 
 ### "Unsupported format"
+
 **Solution:** Install ffmpeg:
+
 ```bash
 brew install ffmpeg  # macOS
 apt install ffmpeg   # Linux
 ```
 
 ### Slow processing
+
 **Solution:** Use a smaller Whisper model:
+
 ```bash
 # Edit the skill to use "tiny" or "base" model instead of "medium"
 ```
 
 ### Poor speaker identification
-**Solution:** 
+
+**Solution:**
+
 - Ensure clear audio with minimal background noise
 - Use a better microphone for recordings
 - Try the "medium" or "large" Whisper model
@@ -288,6 +317,7 @@ apt install ffmpeg   # Linux
 ### Custom Model Selection
 
 Edit `SKILL.md` Step 2 to change model:
+
 ```python
 model = WhisperModel("small", device="cpu")  # Change "base" to "small", "medium", etc.
 ```
@@ -295,6 +325,7 @@ model = WhisperModel("small", device="cpu")  # Change "base" to "small", "medium
 ### Output Language Control
 
 Force output in specific language:
+
 ```bash
 # Edit Step 3 to set language explicitly
 ```
@@ -302,28 +333,29 @@ Force output in specific language:
 ### Batch Settings
 
 Process specific file types only:
+
 ```bash
 copilot> transcribe audio: recordings/*.wav  # Only WAV files
 ```
 
 ## 📚 FAQ
 
-**Q: Does this work offline?**  
+**Q: Does this work offline?**
 A: Yes! 100% local processing, no internet required after initial model download.
 
-**Q: What's the difference between Whisper and Faster-Whisper?**  
+**Q: What's the difference between Whisper and Faster-Whisper?**
 A: Faster-Whisper is 4-5x faster with same quality. Always prefer it if available.
 
-**Q: Can I transcribe YouTube videos?**  
+**Q: Can I transcribe YouTube videos?**
 A: Not directly. Use a YouTube downloader first, then transcribe the audio file. Or use the `youtube-summarizer` skill instead.
 
-**Q: How accurate is speaker identification?**  
+**Q: How accurate is speaker identification?**
 A: Accuracy depends on audio quality. Clear recordings with distinct voices work best. Currently uses simple estimation; future versions will use advanced diarization.
 
-**Q: What languages are supported?**  
+**Q: What languages are supported?**
 A: 99 languages including English, Portuguese, Spanish, French, German, Chinese, Japanese, Arabic, and more.
 
-**Q: Can I edit the meeting minutes format?**  
+**Q: Can I edit the meeting minutes format?**
 A: Yes! Edit the Markdown template in SKILL.md Step 3.
 
 ## 🔗 Related Skills
@@ -333,12 +365,12 @@ A: Yes! Edit the Markdown template in SKILL.md Step 3.
 
 ## 📄 License
 
-This skill is part of the claude-superskills repository.  
+This skill is part of the claude-superskills repository.
 MIT License - See repository LICENSE file.
 
 ## 🤝 Contributing
 
-Found a bug or have a feature request?  
+Found a bug or have a feature request?
 Open an issue in the [claude-superskills repository](https://github.com/yourusername/claude-superskills).
 
 ---
@@ -346,7 +378,7 @@ Open an issue in the [claude-superskills repository](https://github.com/youruser
 ## Metadata
 
 | Field | Value |
-|-------|-------|
+| ------- | ------- |
 | Version | 2.1.0 |
 | Author | Eric Andrade |
 | Created | 2025-02-01 |

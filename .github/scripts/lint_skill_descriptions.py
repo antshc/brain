@@ -48,15 +48,20 @@ def tracked_skill_files(repo: Path) -> list[Path]:
     ]
 
 
-def read_skill(repo: Path, relative: Path) -> Skill | None:
+def read_skill(repo: Path, relative: Path) -> Skill:
     text = (repo / relative).read_text(encoding="utf-8")
     match = re.match(r"---\n(.*?)\n---\n", text, re.DOTALL)
     if match is None:
-        return None
-    front = yaml.safe_load(match.group(1)) or {}
+        raise ValueError(f"{relative}: missing frontmatter block")
+    try:
+        front = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as exception:
+        raise ValueError(f"{relative}: invalid YAML frontmatter: {exception}") from exception
+    if not isinstance(front, dict):
+        raise ValueError(f"{relative}: frontmatter must be a mapping")
     name, description = front.get("name"), front.get("description")
-    if not isinstance(name, str) or not isinstance(description, str):
-        return None
+    if not all(isinstance(value, str) and value.strip() for value in (name, description)):
+        raise ValueError(f"{relative}: frontmatter requires nonempty string name and description")
     return Skill(relative, name, " ".join(description.split()))
 
 
@@ -100,13 +105,15 @@ def lint(checked: list[Skill], known_names: set[str]) -> list[str]:
 
 
 def main(repo: Path = Path.cwd()) -> int:
-    skills = [
-        skill
-        for relative in tracked_skill_files(repo)
-        if (skill := read_skill(repo, relative)) is not None
-    ]
+    skills = []
+    errors = []
+    for relative in tracked_skill_files(repo):
+        try:
+            skills.append(read_skill(repo, relative))
+        except ValueError as exception:
+            errors.append(str(exception))
     checked = [skill for skill in skills if skill.path.is_relative_to(CHECKED_ROOT)]
-    errors = lint(checked, {skill.name for skill in skills})
+    errors.extend(lint(checked, {skill.name for skill in skills}))
     for error in errors:
         print(error, file=sys.stderr)
     return 1 if errors else 0

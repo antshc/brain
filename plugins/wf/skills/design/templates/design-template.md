@@ -1,3 +1,6 @@
+<!-- Independent prompt sections or embedded document examples retain their titles. -->
+<!-- markdownlint-disable MD025 -->
+
 # High-level Design (HLD) Output Template
 
 Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every hidden instruction from the populated document. Every Mermaid fence needs an enclosing expand; reuse an existing artifact expand. Preserve structural Confluence markers.
@@ -302,5 +305,5 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 
 | **Source** | **Kind** | **Contribution** |
 | --- | --- | --- |
-| {{canonicalSource}} | {{sourceKind|Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
+| {{canonicalSource}} | {{sourceKind \| Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
 <!-- adf:ignore:end -->

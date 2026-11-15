@@ -1,7 +1,7 @@
 # CodeGraphContext — SCIP indexing for C#/.NET and TypeScript
 
-Researched: 2026-11-12  
-Scope: [CodeGraphContext (CGC)](https://github.com/CodeGraphContext/CodeGraphContext), [scip-dotnet](https://github.com/sourcegraph/scip-dotnet), and [scip-typescript](https://github.com/sourcegraph/scip-typescript).  
+Researched: 2026-11-12
+Scope: [CodeGraphContext (CGC)](https://github.com/CodeGraphContext/CodeGraphContext), [scip-dotnet](https://github.com/sourcegraph/scip-dotnet), and [scip-typescript](https://github.com/sourcegraph/scip-typescript).
 Related research: [CGC multi-repository workspaces](https://github.com/antshc/brain/blob/research/cgc-multirepo/docs/research/cgc-multirepo.md).
 
 ## Question

@@ -1,7 +1,7 @@
 # CodeGraphContext vs graphify — measured code search on a C#/TypeScript product
 
-Researched: 2026-11-12  
-Scope: [CodeGraphContext (CGC)](https://github.com/CodeGraphContext/CodeGraphContext) 0.6.13 (Tree-sitter and SCIP variants) vs [graphify](https://pypi.org/project/graphifyy/) 0.9.107 on one private product codebase.  
+Researched: 2026-11-12
+Scope: [CodeGraphContext (CGC)](https://github.com/CodeGraphContext/CodeGraphContext) 0.6.13 (Tree-sitter and SCIP variants) vs [graphify](https://pypi.org/project/graphifyy/) 0.9.107 on one private product codebase.
 Related research: [CGC SCIP indexing for C# and TypeScript](cgc-scip-csharp-typescript.md), [CGC multi-repository workspaces](https://github.com/antshc/brain/blob/research/cgc-multirepo/docs/research/cgc-multirepo.md).
 
 ## Question
@@ -13,7 +13,7 @@ Is CGC a better code-search graph than graphify for an AI agent answering "where
 **No, not overall; CGC was evaluated and not adopted.** Its strength is narrow: with SCIP it gives exact "who calls X / what implements I" answers through interfaces. graphify wins on multi-hop flow tracing, frontend code, docs coverage, and in the agent-in-the-loop run.
 
 | Dimension | graphify | CGC (best variant) | Winner |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Locate code, best skill script | 0.536 | 0.621 (SCIP) | CGC, but the gain comes from a custom script, not CGC's own commands |
 | Locate code, raw CLI | 0.302 | 0.279 (Tree-sitter) | graphify (slightly) |
 | Trace A→B, best skill script | 0.950 | 0.794 (SCIP) | graphify |
@@ -39,7 +39,7 @@ Scores are 0-1 means over golden cases; see Method.
 22 golden cases verified against source: 14 `locate`, 6 `flow` (endpoints + required intermediate files), 2 `explain`. Questions use user wording and do not name the answer classes.
 
 | Metric | Definition |
-|---|---|
+| --- | --- |
 | Query score | 0.35 MRR + 0.35 recall of expected files in the visible output (first 2,000 tokens) + 0.2 precision (hits inside the case's code area) + 0.1 non-noise (not test/mock/generated/manifest) |
 | Path score | 0.3 endpoints resolved + 0.2 path found + 0.3 recall of required intermediate files + 0.2 share of semantic hops (not import/file/namespace hubs) |
 | Agent score | 0.5 answer recall (cited files) + 0.3 best graph-call score + 0.2 clean citations |
@@ -49,7 +49,7 @@ Both backends consumed the same fixed term sets per case (raw question terms, gr
 ### Strategies
 
 | CGC strategy | Mirrors graphify | What it does |
-|---|---|---|
+| --- | --- | --- |
 | `cgc_find_raw` | `raw` (`graphify query "<question>"`) | `cgc find name` per question term |
 | `cgc_find_skill` | `skill_q2` | `cgc find name` for the graphify skill's top-2 terms |
 | `cgc_pattern_skill` | `compound` | `cgc find pattern` for the same terms |
@@ -65,7 +65,7 @@ Both backends consumed the same fixed term sets per case (raw question terms, gr
 ### Index cost and graph shape
 
 | | CGC Tree-sitter | CGC SCIP | graphify |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Index wall time backend / frontend | 350 s / 32 s | 481 s / 85 s | not measured |
 | Peak RSS backend / frontend | 323 / 194 MB | 839 / 844 MB | — |
 | DB / export bundle | 7.8 / 3.3 MB | 8.4 / 3.2 MB | 85 MB `graph.json` |
@@ -76,7 +76,7 @@ Both backends consumed the same fixed term sets per case (raw question terms, gr
 ### Locate (22 cases)
 
 | Strategy | graphify | CGC Tree-sitter | CGC SCIP |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | raw CLI search | 0.302 | 0.279 | 0.252 |
 | `find name` with graphify skill terms | 0.536 (`skill_q2`) | 0.253 | 0.248 |
 | `find pattern` | 0.499 (`compound`) | 0.506 | 0.511 |
@@ -94,7 +94,7 @@ Both backends consumed the same fixed term sets per case (raw question terms, gr
 ### Trace A→B (6 flow cases)
 
 | Strategy | graphify | CGC Tree-sitter | CGC SCIP |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | CLI path (directed) | 0.075 | 0.300 (0/6 found) | 0.300 (0/6) |
 | CLI path (undirected / both directions) | 0.176 | 0.300 (0/6) | 0.300 (0/6) |
 | **best skill script** | **0.950** (6/6, via 0.83) | 0.359 (1/6, via 0.00) | 0.794 (6/6, via 0.58) |
@@ -106,7 +106,7 @@ CGC endpoints score 1.0 because its CLI strategies got exact symbol names; "foun
 A read-only code-search agent run headless through GitHub Copilot CLI, in a sandbox that offered only one skill: graphify's or CGC's (SCIP DB).
 
 | Case shape | graphify score / recall | CGC score / recall |
-|---|---|---|
+| --- | --- | --- |
 | locate backend service (2 cases) | 0.91 / 1.00 | 0.96 / 1.00 |
 | locate frontend component | 0.76 / 0.67 | 0.37 / 0.33 |
 | locate cross-module reaction | 0.73 / 1.00 | 0.70 / 1.00 |
@@ -122,7 +122,7 @@ A read-only code-search agent run headless through GitHub Copilot CLI, in a sand
 ### Latency (median per call, in-process)
 
 | Call | ms |
-|---|---|
+| --- | --- |
 | `cgc find name` (fuzzy, Python-side scan of ~20k names on FalkorDB) | 500-1,000 |
 | `cgc find pattern`, Cypher 1-2 hops | 25-35 |
 | `cgc find content` | ~100 |
@@ -134,7 +134,7 @@ Each CLI invocation an agent makes adds ~2 s Python/CGC start-up.
 ## CGC behaviour worth knowing
 
 | Finding | Impact |
-|---|---|
+| --- | --- |
 | FalkorDB Lite (embedded default) Linux wheels need glibc ≥ 2.39 (Ubuntu 24.04+); older hosts fall back to an sdist build that fails | install gate |
 | CGC pins `protobuf<3.21`; overriding to protobuf 7 works for indexing, but the bundled `scip_pb2` needs `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` | SCIP fails silently to Tree-sitter otherwise |
 | Per-repo context mode resolves from the **index path**: `cgc index <path>` creates `.codegraphcontext/` inside that root (writes into nested repos) | use a named context for multi-root indexing |

@@ -16,7 +16,6 @@ description: Mixed-identity manager chains, direct reports, reporting peers, and
 Keep the IDs, site, and time window that a command returns, and reuse them. Replace placeholders
 with returned values. Check focused `twg help describe "<command>"` for availability.
 
-
 ## Routes
 
 1P = Atlassian identity, not employment class or workstream;

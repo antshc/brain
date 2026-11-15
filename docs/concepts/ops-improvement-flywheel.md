@@ -24,7 +24,7 @@ scattered corrections into a loop that compounds.
 Match the tier to the failure, cheapest first:
 
 | Failure looks like | Tier | Where the fix lands |
-|--------------------|------|---------------------|
+| -------------------- | ------ | --------------------- |
 | forgets a convention, re-asks a settled fact | memory | `/memories/repo/`, `/memories/`, or the per-repo gotchas, code style file |
 | reaches for the wrong tool, edits without validating, misses a guardrail | harness | the `SKILL.md`, `.github/instructions/` file, or `*.agent.md` that routes the work |
 | fails broadly and consistently across tasks and languages | model | outside this repo's reach — record the observation and stop |

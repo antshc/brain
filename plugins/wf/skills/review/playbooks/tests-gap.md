@@ -32,7 +32,7 @@ Done when target, baseline, and affected behaviors are explicit, or ambiguity is
 ## Report
 
 | Risk / behavior | Existing test and evidence | Seam / assertion quality | Gap, priority, recommended case and level |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Concrete failure mechanism | Test identifier and `file:line`, or none found | Reaches mechanism and fails on wrong observable output, or limitation | Specific input → expected result, or no identified gap |
 
 Recheck the pinned head before reporting when remote state may have changed. Follow the table with: scope and baseline inspected, any diagnostic command run with its result, and limitations. No gaps found means only the inspected risks have suitable tests, not that the change is verified.

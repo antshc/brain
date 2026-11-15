@@ -21,7 +21,7 @@ Two phases: **Draft** — agent drafts the runnable scenario and scenario code f
 `scenarioSlug :=` short kebab-case name of the simulated scenario; prefix ticket id when one exists.
 
 | File | Path | Template |
-|---|---|---|
+| --- | --- | --- |
 | Scenario | `repository root/tmp/{{scenarioSlug}}/{{scenarioSlug}}-scenario.md` | `templates/scenario.template.md` |
 | Log | `repository root/tmp/{{scenarioSlug}}/{{scenarioSlug}}-log.md` | `templates/scenario-log.template.md` |
 | Scenario code | `repository root/tmp/{{scenarioSlug}}/{{scenarioSlug}}.cs` | `templates/script-app.template.cs` (Shape A for rungs 2–4, Shape B for rung 1) |
@@ -31,7 +31,7 @@ Resolve `templates/` from this skill's base directory.
 ## Inputs
 
 | Input | Required | Effect |
-|---|---|---|
+| --- | --- | --- |
 | Symptom | yes | Red signal the symptom check asserts |
 | Root cause / mechanism | no | Narrows Resource map |
 | Workaround / fix option | no | Present → add Apply remediation + Validation; absent → reproduce-only |
@@ -178,4 +178,3 @@ User correction → save edit to `{{scenarioSlug}}.cs` and/or the scenario file 
 - Scenario md links to `{{scenarioSlug}}.cs`, never embeds its code.
 - No source/IaC file changed; code exploration went through `Explore` subagent.
 - No unredacted secret or tenant identifier.
-

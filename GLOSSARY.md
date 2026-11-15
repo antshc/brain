@@ -1,3 +1,6 @@
+<!-- Independent prompt sections or embedded document examples retain their titles. -->
+<!-- markdownlint-disable MD025 -->
+
 # Leading words
 <!--
  **Leading Word**- A compact concept — also called a _Leitwort_ — already living in the model's pretraining, that the agent thinks with while running the skill. It encodes a behavioural principle in the fewest possible tokens by invoking priors the model already holds (e.g. _lesson_, _proximal zone of development_, _fog of war_, _tracer bullets_). Repeated as a token, never as a sentence, it accumulates a distributed definition across the skill and anchors a whole region of behaviour. Coining your own works if you define it clearly, but a made-up word recruits no priors — you pay in definition tokens what a pretrained word gives free. Reach for an existing word first.
@@ -12,33 +15,34 @@ one particular aspect, side, or feature of something.
 
 **Fact**:
 Information discoverable by exploring the codebase (validation rules, constraints, domain concepts, data models, contracts, schemas, relationships, business logic) — looked up directly during grilling, never asked of the user.
-_Avoid_: assumption, guess
-_Plugins_set_: wf
+*Avoid*: assumption, guess
+*Plugins_set*: wf
 
 **Decision**:
 A resolved choice that is the user's call, not derivable from the codebase — put to the user during grilling and captured only once they confirm it.
-_Avoid_: fact, assumption
-_Plugins_set_: wf
+*Avoid*: fact, assumption
+*Plugins_set*: wf
 
 **Seam**:
 A place in the codebase where a test can observe or alter behavior without changing the code at that point. Existing seams are preferred over new ones, and the highest seam through which a feature can still be verified is preferred over a lower one — the fewer seams a change introduces, the better.
-_Avoid_: test point, hook, injection point
-_Plugins_set_: wf
+*Avoid*: test point, hook, injection point
+*Plugins_set*: wf
 
 **Prior art**:
 Existing tests in the codebase of the same type as the ones being planned for a change — surfaced and followed as the pattern for new tests instead of inventing a new testing style.
-_Avoid_: existing tests, precedent
-_Plugins_set_: wf
+*Avoid*: existing tests, precedent
+*Plugins_set*: wf
 
 **Verbatim**:
 Copied exactly as written, with no paraphrasing, summarizing, or restructuring — used to mark content (a template, a settings block) that must be reproduced word-for-word rather than reinterpreted.
-_Avoid_: as-is, unmodified
-_Plugins_set_: wf
+*Avoid*: as-is, unmodified
+*Plugins_set*: wf
 
 **Flywheel**:
 A self-reinforcing cycle in which each turn closes a gap in the source, producing better outputs that in turn close further gaps — improvement compounds automatically rather than depending on external intervention.
 
 # Contexts
+
 ## Shared
 
 Location: plugins/
@@ -49,19 +53,19 @@ Terms used across more than one plugin — not owned by a single plugin's contex
 
 **Router**:
 A selection block in an activated `SKILL.md` that classifies task intent or observed conditions and directs it to one predefined route and its supporting files. It selects instructions within a skill; unlike a router skill, it does not independently invoke another installed skill.
-_Avoid_: automatic import, playbook, orchestrator
+*Avoid*: automatic import, playbook, orchestrator
 
 **Route**:
 One predefined, specialized execution path within an activated skill that the router can select, with a trigger and output contract. Represent it in the router, not a folder or independently discoverable skill.
-_Avoid_: playbook, tactic, mode folder
+*Avoid*: playbook, tactic, mode folder
 
 **Playbook**:
 The reusable guide for one scenario on a route. It lays out ordered actions, decision points and what to weigh at each, verification, and completion criteria, and owns the end-to-end outcome. Unlike a procedure, it leaves room for judgment. A router selects the playbook.
-_Avoid_: tactic, reference, checklist
+*Avoid*: tactic, reference, checklist
 
 **Tactic**:
 A focused, reusable instruction file for one subproblem or operation, such as runtime verification or NuGet inspection. A router selects it, or a playbook loads it on demand. It can combine with other tactics but does not own the task outcome. It is a method, not a goal.
-_Avoid_: playbook, route, skill
+*Avoid*: playbook, route, skill
 
 **Procedure**:
 A prescribed sequence of steps that leaves no judgment calls, so the outcome is the same on every run. Strict; emphasizes repeatability and predictable execution.
@@ -76,95 +80,97 @@ A sequence of connected steps with transitions, dependencies, and decisions, run
 The repository that owns the specs and issues and hosts the docs. Separate from the **Codebase Repo Path** when a **Harness Repo Path**/workspace folder exists; otherwise the two are the same.
 **Harness Repo Path**:
 The repository that owns the specs and issues and hosts the repo-local development workflow, resolved once from the location of its **Harness skill** and passed explicitly downstream rather than re-derived by each component. Distinct from the `Codebase Repo Path` and `Worktree Path`, though one repository can serve all three roles.
-_Avoid_: repo root, home repo, harness root
-_Plugins_set_: ralph, crew, wf
+*Avoid*: repo root, home repo, harness root
+*Plugins_set*: ralph, crew, wf
 
 **Codebase Repo Path**:
 The Git repository containing the source code Ralph develops, derived from the `Harness Repo Path` and the target repository — the spec's `repo:` label, or the pull request's — as that repository's checkout in the **Workspace folder**, or the `Harness Repo Path` itself when the target is the harness; never looked up in the developer's working set. Supplied explicitly to `/create-worktree`. Distinct from the `Harness Repo Path` and `Worktree Path`, though it can also be the Harness Repo Path.
-_Avoid_: codebase, source checkout, source repository
-_Plugins_set_: ralph, wf
+*Avoid*: codebase, source checkout, source repository
+*Plugins_set*: ralph, wf
 
 **Worktree Path**:
 The git worktree Ralph uses for code, Git, build, test, and PR operations. Ralph launches the crew agents from it when applicable; each agent treats its invocation directory as its workspace and does not receive this path.
-_Avoid_: working directory, checkout
-_Plugins_set_: ralph, crew, wf
+*Avoid*: working directory, checkout
+*Plugins_set*: ralph, crew, wf
 
 **Ledger**:
 A session-scoped record, persisted via the memory tool at `/memories/session/domain-model-ledger.md`, of every Concept/ADR/building-block doc opened so far in the session — one line per record, checked before discussing any module, boundary, or service to avoid re-opening or re-scanning the index.
-_Avoid_: log, history
-_Plugins_set_: wf
+*Avoid*: log, history
+*Plugins_set*: wf
 
 **Trigger Indexer**:
 The mechanism that owns an index table end to end — abstract over any table with a Trigger condition column (Services, ADRs, Concepts, or custom tables): generates concise, domain-specific phrases natural to grilling, keeps caller-supplied row cells in sync on add/supersede/retire, and semantically matches clauses against the current change's touched surface and grilling context before opening linked records. Blank Trigger condition cells never match, and columns the caller did not name are preserved.
-_Avoid_: local RAG, index scanner, retrieval index
-_Plugins_set_: wf
+*Avoid*: local RAG, index scanner, retrieval index
+*Plugins_set*: wf
 
 **Workspace layout**:
 The shape of a harness and the repositories it develops: `single-repo`, where the harness is the codebase, or `multi-repo`, where the harness sits alongside one or more separate repositories.
-_Avoid_: simple project, harness-plus-repo, project type
-_Plugins_set_: wf, ralph, crew
+*Avoid*: simple project, harness-plus-repo, project type
+*Plugins_set*: wf, ralph, crew
 
 **Harness skill**:
 The repository-level skill generated into a `multi-repo` harness whose own location marks the **Harness Repo Path** and whose folder holds the **Harness user settings**. When it is absent — a `single-repo` workspace — or its Harness user settings are missing, the current directory stands in for the Harness Repo Path.
-_Avoid_: resolve-harness, harness anchor
-_Plugins_set_: wf, ralph, crew
+*Avoid*: resolve-harness, harness anchor
+*Plugins_set*: wf, ralph, crew
 
 **Harness user settings**:
 The per-developer, uncommitted harness settings kept beside the **Harness skill**. Holds only the harness's own settings; every other plugin keeps its per-developer settings beside its own repository-level skill.
-_Avoid_: harness env, .atlassian, config file
-_Plugins_set_: wf, ralph, crew
+*Avoid*: harness env, .atlassian, config file
+*Plugins_set*: wf, ralph, crew
 
 **Workspace folder**:
 The one fixed folder under the Harness Repo Path holding every repository checkout and worktree a `multi-repo` workspace develops; it bounds every search into those repositories.
-_Avoid_: workspace root, repos folder, sources
-_Plugins_set_: wf, ralph, crew
+*Avoid*: workspace root, repos folder, sources
+*Plugins_set*: wf, ralph, crew
 
 **Repository access**:
 How a pull treats a repository in the developer's working set, set per repository by each developer: `read` — a reference repository kept identical to its remote, whose local changes are disposable; `write` — a repository under development, whose local changes are protected. Absent means `read`. It governs pulling only; it never decides where Ralph develops.
-_Avoid_: repo mode, permissions, readonly flag
-_Plugins_set_: ralph, crew, wf
+*Avoid*: repo mode, permissions, readonly flag
+*Plugins_set*: ralph, crew, wf
 
 ## ralph
+
 ### Language
 
 ## crew
+
 ### Language
 
 **Codey**:
 The implementation agent. Crew agents run one task in their invocation directory and return the five-field report. The WF agent `wf:codey` also handles `implement` tickets in assigned worktrees and returns edits and verification evidence. The caller owns worktree selection and commits.
-_Avoid_: droid, implementer, coder
+*Avoid*: droid, implementer, coder
 
 **Chorey**:
 The maintainability-review agent. Reviews the staged change set in cwd for behavior-preserving refactors — the caller stages it with `git add` before invoking Chorey — runs only behind a Codey `STATUS: complete` gate, reports informationally, and reports `failed` instead of reverting when its own cleanup cannot be verified.
-_Avoid_: reviewer, refactorer, cleanup agent
+*Avoid*: reviewer, refactorer, cleanup agent
 
 **Stack**:
 A family of repository conventions with Copilot instruction and Chore rule templates. Crew ships `py`, `dotnet`, and `ai` templates. One repository can use several stacks.
-_Avoid_: language, platform, toolchain, tech
+*Avoid*: language, platform, toolchain, tech
 
 **Stack agent**:
 A self-contained implementation agent for one Stack, with declared scope, implementation flow, focused verification, and a five-field report. Repo-specific style lives in applicable Copilot instructions.
-_Avoid_: language agent, specialised codey, subclass agent
+*Avoid*: language agent, specialised codey, subclass agent
 
 **Agent flow**:
 Chorey owns review, verification and its verdict. `chorey-diff` owns change capture and restoration mechanics. Implementation agents own their implementation and verification flows and report observed gotchas.
-_Avoid_: base agent, parent agent, agent template
+*Avoid*: base agent, parent agent, agent template
 
 **Convention skills**:
 Repository-specific Chore rules are installed in `.github/skills/crew-chore/`. Copilot instructions reside in the codebase's `.github/instructions/`.
-_Avoid_: convention folder, .crew, .droid, config folder
+*Avoid*: convention folder, .crew, .droid, config folder
 
 **Gotchas**:
 Reusable findings observed during a run, such as a required test setting or a misleading fixture. Agents return them in their result.
-_Avoid_: decisions, durable decisions, problem log
+*Avoid*: decisions, durable decisions, problem log
 
 **Module**:
 The unit of code plus its build config, identified by walking up from a changed file to the nearest relevant build marker. Its agent uses the repository's actual project and test references to select checks.
-_Avoid_: project, package
+*Avoid*: project, package
 
 **Verification counterpart**:
 The existing tests that exercise a Module's observable behavior, identified by following its project references, test naming, and affected functional slice.
-_Avoid_: test project, test suite
+*Avoid*: test project, test suite
 
 ## wf
 
@@ -174,17 +180,17 @@ _Avoid_: test project, test suite
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
 %% diagram-id: requirement-to-story-hierarchy
 flowchart TD
-	stakeholderRequirement["Stakeholder requirement: desired outcome"] -->|decomposes into| functionalRequirement["Functional requirement: required system behavior"]
-	functionalRequirement -->|governed by| businessRules["Business rules: governing constraints"]
-	functionalRequirement -->|qualified by| edgeCases["Edge cases: boundary and failure scenarios"]
-	functionalRequirement -->|proven by| acceptanceCriteria["Acceptance criteria: observable proof"]
+ stakeholderRequirement["Stakeholder requirement: desired outcome"] -->|decomposes into| functionalRequirement["Functional requirement: required system behavior"]
+ functionalRequirement -->|governed by| businessRules["Business rules: governing constraints"]
+ functionalRequirement -->|qualified by| edgeCases["Edge cases: boundary and failure scenarios"]
+ functionalRequirement -->|proven by| acceptanceCriteria["Acceptance criteria: observable proof"]
 
-	capability["Capability: stable system ability"] -->|realized by| feature["Feature: user-meaningful behavior"]
-	feature -->|implemented by| functionalSlice["Functional slice: deployable-local end-to-end behavior"]
-	functionalRequirement -.->|specifies| functionalSlice
-	functionalSlice -->|delivered through| userStory["User story: atomic work toward the slice"]
+ capability["Capability: stable system ability"] -->|realized by| feature["Feature: user-meaningful behavior"]
+ feature -->|implemented by| functionalSlice["Functional slice: deployable-local end-to-end behavior"]
+ functionalRequirement -.->|specifies| functionalSlice
+ functionalSlice -->|delivered through| userStory["User story: atomic work toward the slice"]
 
-	classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
+ classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
 Arrows express relationship direction, not cardinality; the definitions below state the allowed cardinality.
@@ -194,18 +200,18 @@ An independently runnable or deployed production unit, such as a process, servic
 
 **Building block**:
 One Deployable as documented in the architecture, with its own record indexed from `ARCHITECTURE.md`; when its repository documents it, the index links to that documentation.
-_Avoid_: service, module, component
-_Plugins_set_: wf
+*Avoid*: service, module, component
+*Plugins_set*: wf
 
 **Shared dependency**:
 A package family, pipeline repository, or infrastructure repository the system relies on but does not deploy — indexed in `ARCHITECTURE.md` alongside the Building blocks, never as one, and without a record of its own.
-_Avoid_: dependency, supporting repo, tooling repo, shared package
-_Plugins_set_: wf
+*Avoid*: dependency, supporting repo, tooling repo, shared package
+*Plugins_set*: wf
 
 **Documentation setup**:
 Where a `multi-repo` workspace keeps its Building block documentation: all in the harness, or in the harness with references to documentation each repository owns.
-_Avoid_: docs placement, docs mode
-_Plugins_set_: wf
+*Avoid*: docs placement, docs mode
+*Plugins_set*: wf
 
 **Capability**:
 A stable, coarse-grained system ability. A Capability may be realized by multiple Features, and a Feature may contribute to multiple Capabilities.
@@ -224,11 +230,11 @@ An atomic, testable unit of planned work that advances one Functional slice and 
 
 **Stakeholder requirement**:
 States the desired outcome: *An administrator can control session lifetime.*
-**Functional requirement**: 
+**Functional requirement**:
 States the required system behavior: *The system lets an administrator configure session lifetime.*
-**Business rule**: 
+**Business rule**:
 States the governing constraint: *Session lifetime must be from one hour through 30 days.*
-**Edge case**: 
+**Edge case**:
 States a boundary, unusual, failure, or exceptional scenario: *A configured session lifetime is zero, absent, expired, or changes while sessions are active.*
 **Acceptance criterion**:
 States observable proof: *When the administrator configures a session lifetime of zero, the system rejects it and explains the validation failure.*
@@ -241,15 +247,15 @@ An artifact that packages one or more Requirement sets for planning and handoff.
 
 **Initiative**:
 A coordinated product change tracked as one planning effort. An Initiative may encompass multiple Capabilities, Features, Specs, and one Feature design.
-_Avoid_: feature when referring to the whole planning effort
+*Avoid*: feature when referring to the whole planning effort
 
 **Initiative slug**:
 A stable, filesystem-safe kebab-case identifier for an Initiative, used in artifact paths.
-_Avoid_: feature slug, Initiative tag
+*Avoid*: feature slug, Initiative tag
 
 **Initiative tag**:
 An optional SCREAMING_SNAKE_CASE label that groups User stories under an Initiative without changing their Functional-slice scope.
-_Avoid_: feature tag, Initiative slug
+*Avoid*: feature tag, Initiative slug
 
 **Feature design**:
 The authoritative solution design for one Initiative, potentially covering multiple Capabilities, Features, and Functional slices.
@@ -259,37 +265,37 @@ An actor-oriented description of one goal within a Feature, including preconditi
 
 **Tracer-bullet ticket**:
 An agent-executable planning unit that delivers a narrow, complete, verifiable path through every integration layer needed for one behavior. It may implement part or all of one Functional slice but is not itself a Functional slice.
-_Avoid_: slice, vertical slice
+*Avoid*: slice, vertical slice
 
 **Inspect**:
 Look at something directly and record what is there.
-_Typical question_: “What does this code/config/system contain?”
-_Typical output_: Facts, inventory, observations.
+*Typical question*: “What does this code/config/system contain?”
+*Typical output*: Facts, inventory, observations.
 
 **Analyze**:
 Break something down and explain its structure, behavior, relationships, or impact.
-_Typical question_: “How does this work, and what does it imply?”
-_Typical output_: Model, explanation, dependencies, findings.
+*Typical question*: “How does this work, and what does it imply?”
+*Typical output*: Model, explanation, dependencies, findings.
 
 **Investigate**:
 Follow evidence to resolve a specific uncertainty, problem, or question.
-_Typical question_: “Why is this happening?” / “Where is this implemented?”
-_Typical output_: Conclusion backed by evidence, root cause, answer.
+*Typical question*: “Why is this happening?” / “Where is this implemented?”
+*Typical output*: Conclusion backed by evidence, root cause, answer.
 
 **Research**:
 Gather knowledge from multiple sources to understand a topic or support a decision.
-_Typical question_: “What do we need to know about X?”
-_Typical output_: Consolidated knowledge, options, constraints, citations.
+*Typical question*: “What do we need to know about X?”
+*Typical output*: Consolidated knowledge, options, constraints, citations.
 
 **Completeness sweep**:
 A closing check, run before concluding a session that opened at least one full Concept or ADR, that outputs one disposition line (`Applied`, `Not applicable`, `Violated`, or `Superseded`) per row in `ARCHITECTURE.md`'s Architecture Decision Records and Crosscutting Concepts index tables.
-_Avoid_: final review, wrap-up
-_Plugins_set_: wf
+*Avoid*: final review, wrap-up
+*Plugins_set*: wf
 
 **Assumption-gap harvest**:
 The final closing-sweep step that reads every logged gate-miss, corrected assumption, and drift entry from the session ledger and repairs the record behind each — adding missing `default`/`owns` keys, correcting wrong ones, or flagging drifted anchors — so the next session is not forced to ask the same question again.
-_Avoid_: gap repair, assumption cleanup
-_Plugins_set_: wf
+*Avoid*: gap repair, assumption cleanup
+*Plugins_set*: wf
 
 ## review
 
@@ -297,7 +303,7 @@ _Plugins_set_: wf
 
 **Review comment**:
 A finding one review axis discovered and returned, anchored to the change (`AXIS`, `FILE_PATH`, `LINE_NUMBER`, `LABEL`), with its body phrased `issue → impact → fix`.
-_Avoid_: comment, finding, issue
+*Avoid*: comment, finding, issue
 
 ## atlassian
 
@@ -307,41 +313,41 @@ Location: plugins/wf/skills/atlassian/ (WF plugin)
 
 **Work item**:
 The Jira unit of work the `atlassian` skill reads or publishes — Story, Task, Bug, Epic, or a child of one. Names the Jira half of the Fetch work/Publish work axis of the `atlassian` skill, opposite **Page**.
-_Avoid_: issue, ticket, card
-_Plugins_set_: atlassian
+*Avoid*: issue, ticket, card
+*Plugins_set*: atlassian
 
 **Page**:
 The Confluence page the `atlassian` skill reads or publishes. Names the Confluence half of the Fetch page/Publish page axis of the `atlassian` skill, opposite **Work item**.
-_Avoid_: document, article, wiki page
-_Plugins_set_: atlassian
+*Avoid*: document, article, wiki page
+*Plugins_set*: atlassian
 
 **ADF**:
 Atlassian Document Format — the structured JSON body Jira and Confluence store content in. Markdown is what the user and the agent read, and the `atlassian` skill's converter (`atl.py map-markdown`) is the single boundary between the two, in both directions; it also decides which representation goes over the wire, since Jira accepts plain Markdown but only ADF carries panels, expands, status lozenges, and Confluence macros.
-_Avoid_: rich text, Atlassian JSON, doc format
-_Plugins_set_: atlassian
+*Avoid*: rich text, Atlassian JSON, doc format
+*Plugins_set*: atlassian
 
 **Atlassian config**:
 The gitignored settings file holding one developer's Atlassian connection facts — site, email, API token (shared by twg and the REST scripts), default Jira project keys, default Confluence space IDs — kept beside the repository-level `preflight-atlassian` skill, never searched for and never part of the **Harness user settings**. Deliberately not a **Convention skill**: it holds a credential rather than committed team conventions.
-_Avoid_: .atlmcp, .env, credentials file, convention folder
-_Plugins_set_: atlassian
+*Avoid*: .atlmcp, .env, credentials file, convention folder
+*Plugins_set*: atlassian
 
 **Preflight**:
 The single resolution gate the `atlassian` and `daily-briefing` skills run first, returning `site`, `twg` (the credentialed twg command), `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, and the cached identity. It never fails on missing **Atlassian config** — an unresolved field comes back empty and the caller names the missing prerequisite.
-_Avoid_: auth, init, bootstrap, config check
-_Plugins_set_: atlassian
+*Avoid*: auth, init, bootstrap, config check
+*Plugins_set*: atlassian
 
 **Wrapper skill**:
 A repository-level skill under `.github/skills/`, generated by the ATL installer, that pins one item type's fields or one space's settings and delegates the operation to the `atlassian` skill. The only place per-repository Atlassian specialisation lives — never a skill shipped inside `atlassian`.
-_Avoid_: override, template skill, custom skill
-_Plugins_set_: atlassian
+*Avoid*: override, template skill, custom skill
+*Plugins_set*: atlassian
 
 **Review axis**:
 One independent review dimension performed by its own standalone skill (`quality`, `smells`, `reqs`) — each parses the PR, fetches the diff, reviews inline, and posts its own comments.
-_Avoid_: review type, review category, sub-agent
+*Avoid*: review type, review category, sub-agent
 
 **Review guidance file**:
 The `<axis>-review-guidance.md` co-located with a review axis skill, holding that axis's checklist/baseline, LSP workflow, review rules, and output contract.
-_Avoid_: checklist.md, agent instructions
+*Avoid*: checklist.md, agent instructions
 
 # Relationships
 

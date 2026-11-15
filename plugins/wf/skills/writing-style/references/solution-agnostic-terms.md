@@ -1,15 +1,18 @@
 # Solution-Agnostic De-referencing Tables
 
-Catalog of leaked implementation artifacts and the behavior to state instead. 
+Catalog of leaked implementation artifacts and the behavior to state instead.
 
 Anchor the intent with a reject/prefer pair:
+
 - Reject: *Display a cart badge in the page header.* (names a widget + placement)
 - Prefer: *Keep shoppers aware of the number of items in their cart so they can proceed to purchase without leaving their current view.* (names behavior, entity, scope, value)
 
 ## De-referencing tables
+
 Raise each named artifact to the behavior it enables.
 
 ### UI / presentation
+
 Screens, components, and placements (badge, banner, dropdown, grid, header, panel, tab). State what the user sees or does, not the control.
 
 | Leaked artifact | Behavior to state instead |
@@ -19,7 +22,9 @@ Screens, components, and placements (badge, banner, dropdown, grid, header, pane
 | grid / table / list view | let the user review the set of items |
 | modal / dialog | prompt the user to confirm or supply the missing input |
 | tab / page / screen | give the user access to the behavior (name the behavior, not the placement) |
+
 ### Persistence / data
+
 | Leaked artifact | Behavior to state instead |
 | --- | --- |
 | column / field | keep … recorded so a later read returns the same value |
@@ -30,6 +35,7 @@ Screens, components, and placements (badge, banner, dropdown, grid, header, pane
 | null / missing value | treat an absent … as "the user gave no value" |
 
 ### API / protocol
+
 Transport surface (endpoint, HTTP verb, payload, response field, query param, status code, id). State what the client asks for or learns.
 
 | Leaked artifact | Behavior to state instead |
@@ -43,6 +49,7 @@ Transport surface (endpoint, HTTP verb, payload, response field, query param, st
 | identifier in response | give the client a handle to come back to the same … later |
 
 ### Domain-state / enum
+
 Status values, flags, and derived states. State which phase the actor sees or what now needs action.
 
 | Leaked artifact | Behavior to state instead |
@@ -54,6 +61,7 @@ Status values, flags, and derived states. State which phase the actor sees or wh
 | completion / outcome value | tell the user how a … ended — success or failure |
 
 ### Process / infrastructure
+
 | Leaked artifact | Behavior to state instead |
 | --- | --- |
 | background service / worker | get … done for the user without them waiting |
@@ -66,6 +74,7 @@ Status values, flags, and derived states. State which phase the actor sees or wh
 | license / entitlement type | let the user unlock the … they have paid for |
 
 ### Access / identity
+
 Permissions and cross-account trust (access role, grant, role status, delegated access, account list). State what access the owner grants or the user controls.
 
 | Leaked artifact | Behavior to state instead |
@@ -77,6 +86,7 @@ Permissions and cross-account trust (access role, grant, role status, delegated 
 ## Criteria obey solution-agnostic too
 
 A criterion states an observable outcome, not the control that produces it. Write what the user perceives or can do, not what they tap.
+
 - Reject: *Selecting the cart badge opens the cart panel.* (names widget + interaction)
 - Prefer: *The shopper can reach the full cart contents in a single step from the notification.*
 
@@ -85,4 +95,3 @@ A criterion states an observable outcome, not the control that produces it. Writ
 Map behavior verbs to the component types they imply, so design can pick up where the requirement stops:
 
 `persist → repository/accessor · validate → validator · create → provisioner · external API → client/gateway · emit alert → alert service · process async → worker · expose API → controller`
-

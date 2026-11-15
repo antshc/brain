@@ -14,7 +14,7 @@ The whole run is **read-only**. You gather evidence and hand over instructions; 
 ## 1. Route the question
 
 | The tester asks | Branch | Groups to explore |
-|---|---|---|
+| --- | --- | --- |
 | How do I test / verify / reproduce this? | Test it | Behaviour, API surface, Data |
 | What does the request look like? How do I call it? | Call it | API surface, Config |
 | How do I set up / fix / seed test data? | Change the data | Data, API surface |
@@ -27,7 +27,7 @@ When a question hits two branches, answer both and take the union of their group
 Spawn one `runSubagent` with `agentName: Explore` **per group, all in a single parallel batch**. Groups have separate evidence paths, so they never wait on each other.
 
 | Group | The agent brings back |
-|---|---|
+| --- | --- |
 | API surface | Method, full path, base URL per deployed environment, auth header, required and optional fields with allowed values, success status, error statuses and their causes |
 | Data | Store, table or collection name per environment, the format it is edited in (SQL, JSON item), key attributes, one real record's field names and value shapes, and any endpoint or job that writes the same record |
 | Config | Config file path and format per environment, setting names with their current and default values, what each one controls, and the settings that make the application behave differently for a test — flags, toggles, thresholds, timeouts, sandbox and stub modes — with what each one simulates and when it takes effect |

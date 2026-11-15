@@ -1,3 +1,8 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
+# Story
+
 Draft and print one standalone **User story** body that advances one **Functional slice**. Own the formatted Title, Requirements, Acceptance Criteria, Implementation Decisions, Contracts Delta, and Technical notes for that body.
 
 **Input:** an optional Initiative tag, required Deployable kind (`[FE]` or `[BE]`), Feature, Functional slice, verbatim Stakeholder requirement, Functional requirements addressed, and any source Business rules, Edge cases, error conditions, and Acceptance criteria needed to draft the story. Anything absent is derived from the standalone requirement text in context.
@@ -13,15 +18,18 @@ When available, use `GLOSSARY.md` for project-specific domain language and `ARCH
 - A **Functional slice** is a deployable-local, end-to-end implementation of one distinct behavior or outcome.
 
 ## Principle
+
 Describe system behavior, not implementation. Name the **entity and behavior**, never a widget, screen element, or technical artifact. If the input requirement already leaks a solution, raise it to the behavior it enables before writing the story; *Load and follow the `writing-style` skill to apply clear, precise writing to solution-agnostic requirements and stories* for that rule.
 
 ## Workflow
+
 1. **Assemble the body** → write the exact Title line, then list the verbatim Functional requirements addressed. *Done when* the User story is one Functional slice owned by the named Deployable kind and contains no unrelated behavior.
 2. **Derive Acceptance Criteria** → apply Acceptance Criteria below. *Done when* every applicable Business rule, Edge case, and error condition in the source lands in its own criterion, and input, processing, integration, state, and failure are covered.
 3. **Verify** → *Load and follow the `writing-style` skill to apply clear, precise writing to solution-agnostic requirements and stories, scrubbing leaked implementation artifacts* over the Title, Requirements, and Acceptance Criteria, passing `GLOSSARY.md` as the domain glossary when it exists, then confirm each criterion implies concrete code changes and maps to the Functional slice's responsibility. *Done when* Quality Check passes line by line.
 4. **Contracts Delta (optional)** → if the User story changes an API, GUI, Database, Resource, or other contract, *Load and follow the `doc-contracts` skill to write an API, database, resource, or GUI contract delta* for each touched contract kind and append its output to the optional Contracts Delta appendix. *Done when* every changed contract kind passes `doc-contracts` skill's completion criteria.
 
 ## Acceptance Criteria
+
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code.
 - Phrase as: `{{outcome}} when {{condition}}` for behaviors; `If {{condition}}, {{actor}} must {{outcome}}` for invariants/edge cases. Vary the subject (entity, actor, outcome) — don't force "The system" every time.
@@ -52,7 +60,7 @@ Write the body for Product Owners and QA in plain business language, without cod
 - **Implementation Decisions** — omit unless the story requires a specific implementation decision. Class, type, object, and endpoint names are allowed for navigation; omit file paths and line numbers.
 - **Contracts Delta** — omit unless this User story changes an API, GUI, Database, Resource, or other contract. Order its blocks API → Database → Resource → other → GUI.
 
-```
+```text
 **Title:** {{[initiativeTag]|optional}}{{deployableKind|[FE] or [BE]}} {{stakeholderRequirement|verbatim Stakeholder requirement}}
 
 **Requirements:**

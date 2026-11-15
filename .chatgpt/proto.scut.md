@@ -1,3 +1,5 @@
+# Proto
+
 If the user prefixes a request with `proto!`, use the disposable prototype workflow.
 
 1. Identify the single question the prototype must answer and the GitHub issue that owns it. If either is unclear, ask before coding.

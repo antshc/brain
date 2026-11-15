@@ -5,20 +5,20 @@
 Both agents are from the `crew` plugin and are invoked by `/dev` via `runSubagent`; see [dev/SKILL.md](dev/SKILL.md) steps 3 and 6 for their prompts and gating.
 
 | Agent | Role | Defined in |
-|-------|------|-----------|
+| ------- | ------ | ----------- |
 | `codey-py`, `codey-dotnet` | Stack-specific implementers selected per task. Agents return gotchas. Unmatched work uses `general-purpose`. | [crew agents](../../crew/agents) |
 | `chorey` | Maintainability-review agent — reviews Codey's staged changes in step 6, gated on `STATUS: complete`; its own `STATUS` never overrides Codey's recorded outcome | [`plugins/crew/agents/chorey.agent.md`](../../crew/agents/chorey.agent.md) |
 
 **Via `/dev` skill** (fully automated — fetches the spec's sub-tickets, picks tasks, loops):
 
-```
+```text
 /dev <spec-issue-number-or-url>
 ```
 
 ## Skills
 
 | Skill | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `/dev` | AFK loop — picks next issue, invokes `codey` then (gated) `chorey`, pushes |
 | `/fix` | Apply PR review comments |
 | [Ralph installer](../install/install.md) | One-time setup for a multi-repo/wrapping harness — generates the repository-level `harness` skill and its pull command |

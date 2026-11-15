@@ -7,7 +7,7 @@ Return task outcomes/exclusions, producer assumptions, blocker graph, footprints
 Judge outputs against the raw requirements, not an exact task count or golden wording:
 
 | Case | Required observations |
-|---|---|
+| --- | --- |
 | API feature | Cohesive endpoint/store/test outcome; found and missing cases; existing-route compatibility; API checks and concrete evidence. |
 | Pure relocation | Exact source/destination and import/reference checks; unchanged behavior; no new business logic. |
 | Shared contract | Backward-compatible schema deliverable with named consumers and independent migration check; real producer-consumer ordering. A cohesive combined task is also valid if justified. |
@@ -24,7 +24,7 @@ CLI regression tests exercise edge preservation, native-edge union, HITL propaga
 One fresh agent used the revised instructions and raw cases, without the rubric or previous outputs. No implementation, live tracker access, or model override was used. Raw drafts are retained in `planning-smoke-results.json`; their verification commands were proposed, not executed.
 
 | Case | Observed result | Review |
-|---|---|---|
+| --- | --- | --- |
 | API feature | One functional task; 200/404 and existing-route criteria; supplied API command. | Covers requested behavior without separate layer/test tickets. Order representation remains an explicit assumption. |
 | Pure relocation | One relocation task; exact old/new paths, imports, package discovery, regression checks. | No new logic. Packaging command is explicitly unknown rather than invented. |
 | Shared contract | Three tasks: additive nullable migration, order consumer, invoice consumer; both consumers blocked by migration. | Stable prerequisite and named consumers. Column representation and nullable response details remain unresolved; these drafts are not execution authorization. |

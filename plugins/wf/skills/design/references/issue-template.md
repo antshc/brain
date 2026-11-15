@@ -1,9 +1,15 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+<!-- This fragment is embedded in a larger document. -->
+<!-- markdownlint-disable MD041 -->
+
 <issue-template>
 ## Parent Spec
 
-#{{specIssueNumber}}
+# {{specIssueNumber}}
 
 ## What to build
+
 <what-to-build-rule>
 - State included outcome, explicit exclusions, and enough behavior context to understand the task; leave implementation discovery to the implementer.
 - For functional changes, describe behavior across all touched integration layers, not a layer-by-layer breakdown. For structural changes, describe the complete relocation and required reference updates without introducing logic changes.
@@ -12,6 +18,7 @@
 </what-to-build-rule>
 
 ## Acceptance criteria
+
 <acceptance-criteria-rule>
 - Each criterion is a single, self-contained pass/fail check, verifiable without reading code or the spec.
 - Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions. For structural work, include checks of intended locations, updated references, and unchanged regression behavior.
@@ -25,6 +32,7 @@
 - [ ] Acceptance criteria 3
 
 ## Requirements addressed
+
 <requirements-addressed-rule>
 - One bullet per addressed spec item: its number, then the spec's text copied verbatim — never numbers alone, never paraphrased, merged, or shortened.
 - Omit a subsection if the spec has none of that kind, or none apply to this slice.
@@ -46,6 +54,7 @@
 ...
 
 ## Implementation Decisions
+
 <implementation-decisions-rule>
 - State producer contracts and supplying tickets when applicable, compatibility constraints, and assumptions; distinguish observed contracts from assumptions needing confirmation.
 - Use short technical statements and implementation-oriented language.
@@ -66,6 +75,7 @@
 - {{artifactPiece}} ([{{artifactName}}]({{artifactUrl}})): {{requirementOrCriterionRelationship}}
 
 ## Relevant Concepts
+
 <relevant-concepts-rule>
 - Mandatory whenever at least one Concept or ADR applies to this slice.
 - One bullet per constraining Concept or ADR. Must carry enough detail to implement the rule without opening the file — the link back to the record is optional supporting context, not a substitute for the summary.
@@ -84,6 +94,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 *Load and follow the `doc-contracts` skill to write, once per touched contract kind (API, Database, Resource, GUI), the REST endpoint, table schema, resource, or GUI contract delta as a terse diff;* inline its output verbatim here, one block per kind.
 
 ## Affected layers & modules
+
 <affected-layers-rule>
 - State which layers/modules this task touches (or relocates) and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
 - Source layer headings and Cross-Module Dependency Rules from the Concept or ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
@@ -95,6 +106,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 ## Verify section
 
 List tests to add, update, and run for this task.
+
 - *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. Include the commands that will run the integration or REST API automation tests.
 - For functional changes, test external behavior, not implementation details. For structural tasks, verify intended paths/references and unchanged behavior using existing regression/API integration tests; add tests only where coverage is insufficient.
 - Map every criterion to a concrete check, exact command/manual action, prerequisites, expected result, and retained evidence. Name affected test modules and prior art; report unavailable prerequisites, never invent commands.

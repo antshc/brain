@@ -29,7 +29,7 @@ Constrain invariants; prescribe mechanisms only when needed; explain non-obvious
 ## Frontmatter and description
 
 | Key | Required | Rule |
-|---|---|---|
+| --- | --- | --- |
 | `name` | yes | Lowercase, hyphenated, matches folder name. Name by existing verb-prefix family; start a new family only when needed. |
 | `description` | yes | See Description shape. |
 | `disable-model-invocation` | no | `true` = human-only; omit when model or other skills must discover it. |
@@ -43,22 +43,22 @@ Constrain invariants; prescribe mechanisms only when needed; explain non-obvious
 Omit process detail (`using bundled best practices`, `from a brief`) unless it sets the skill apart. User-invoked skills: the What sentence only.
 
 | Invocation | Example |
-|---|---|
+| --- | --- |
 | Model-invoked | `Investigate a question against primary sources and save cited findings as Markdown. Use for /research, 'research X', 'gather docs on Y', or delegating reading legwork. Use why for design rationale.` |
 | User-invoked | `Write, rewrite, or shrink an agent skill and its bundled references.` |
 
 **Description characters:** plain text, max 1024 chars. Separate clauses with `.`, `;`, or `,`. **MUST NOT** use:
 
 | Character | Why |
-|---|---|
+| --- | --- |
 | `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`address-page-comments`) allowed |
 | `<` `>` | Rejected by skill validators (XML/HTML injection guard) |
-| `: ` (colon + space) | YAML reads it as a nested mapping key |
-| ` #` (space + hash) | YAML starts a comment; rest of description dropped |
+| `:` (colon + space) | YAML reads it as a nested mapping key |
+| `#` (space + hash) | YAML starts a comment; rest of description dropped |
 | Leading `-` `?` `:` `[` `]` `{` `}` `,` `&` `*` `!` `\|` `>` `'` `"` `%` `@` `` ` `` | YAML indicator; plain scalar cannot start with it |
 | Tabs, line breaks in a plain scalar, leading/trailing whitespace | Multiline/indent parse errors |
 
-**YAML safety:** frontmatter MUST parse. Use a folded block scalar (`description: >-`, text indented two spaces) for `description` and values containing `: `, quotes, backticks, `#`, or leading `[`, `{`, `*`, `&`, `!`, `%`, `@`. Never use `: ` inside a plain scalar.
+**YAML safety:** frontmatter MUST parse. Use a folded block scalar (`description: >-`, text indented two spaces) for `description` and values containing `:`, quotes, backticks, `#`, or leading `[`, `{`, `*`, `&`, `!`, `%`, `@`. Never use `:` inside a plain scalar.
 
 **Description as context pointer:** name the skill and its triggering branches. Pointer wording controls discovery; prune always-loaded descriptions harder than bodies:
 
@@ -101,7 +101,7 @@ Order by need: **steps** (ordered actions) → **inline reference** (rules, defi
 Use these repository conventions; they are not Agent Skills specification fields.
 
 | Term | Responsibility |
-|---|---|
+| --- | --- |
 | Router | Select outcomes or execution variants inside an activated `SKILL.md`. |
 | Route | One selectable path with a trigger and output contract; represented in the router, not a folder. |
 | Playbook | Own one route's end-to-end procedure: inputs, decisions, steps, failures, output, completion. |
@@ -109,7 +109,7 @@ Use these repository conventions; they are not Agent Skills specification fields
 | Reference | Supply knowledge, schemas, examples, or conventions without owning a task. |
 
 | Need | Structure |
-|---|---|
+| --- | --- |
 | One short procedure | Inline Workflow; no router needed |
 | Related outcomes with distinct substantial procedures | Routing in `SKILL.md`; `playbooks/<route>.md` |
 | One or two short methods | Inline Tactics |
@@ -134,7 +134,7 @@ End every step with a checkable completion condition, exhaustive where omissions
 - **Loop** — repeat-until work (interview, review, validate → fix → repeat). State the exit condition and the steps every pass runs; a step that always runs belongs in the loop, not in Tactics.
 - **Tactics** — unordered techniques, each with an observable trigger, an action, and a result; state when triggers are re-checked. Use bold-lead lines, not tables, so a tactic can carry bullets and pointers.
 - **Examples** — input → output pairs when output style or quality matters; examples outperform descriptions of style.
-- Defend premature completion in order: sharpen the bound first; only if irreducibly fuzzy _and_ the rush is observed, split the sequence. Hiding later steps works only across a real context boundary (hand-off or subagent); an inline call clears nothing.
+- Defend premature completion in order: sharpen the bound first; only if irreducibly fuzzy *and* the rush is observed, split the sequence. Hiding later steps works only across a real context boundary (hand-off or subagent); an inline call clears nothing.
 
 **`## Completion criteria` section:** when results are not self-evident, define observable conditions on files, output, or state, not effort.
 
@@ -183,14 +183,13 @@ Verify critical constraints through observable actions or external checks; ratio
 **Degrees of freedom** — match prescription to task risk:
 
 | Task | Agent freedom | Instruction style |
-|---|---|---|
+| --- | --- | --- |
 | Exploration | High | Define objective and evidence |
 | Design | High–Medium | Define constraints and decision criteria |
 | Implementation | Medium | Preserve contracts and conventions |
 | Testing | Medium–Low | Define required checks and results |
 | Migration | Low | Specify ordering, mechanism, recovery |
 | Destructive operations | Very low | Require authorization and explicit safeguards |
-
 
 **Failure policies** — pick one per critical step:
 
@@ -209,7 +208,7 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 ## Resources
 
 | Folder | Holds |
-|---|---|
+| --- | --- |
 | `playbooks/` | substantial route procedures; create only when needed |
 | `tactics/` | substantial conditional techniques shared or used by routes; create only when needed |
 | `scripts/` | executable automation |
@@ -237,7 +236,7 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 ## Syntax legend
 
 | Syntax | Meaning | Example |
-|---|---|---|
+| --- | --- | --- |
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
 | *italic* | Skill invocation phrase | *Run `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |

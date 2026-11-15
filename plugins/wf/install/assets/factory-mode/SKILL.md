@@ -103,7 +103,7 @@ For direct code-shipping playbooks. Feature uses the draft from `implement`.
 Open a todo list whose first items are the matched playbook's steps, copied verbatim, before task-specific todos. A skipped step stays with `skip: {{reason}}`. Read the playbook file fully before acting.
 
 | Playbook | Use when | File |
-|---|---|---|
+| --- | --- | --- |
 | Bug fix | Reported defect to reproduce, root-cause, and fix with runtime evidence | [playbooks/bug-fix.md](playbooks/bug-fix.md) |
 | Design | Unresolved unknowns before building: grill or Wayfinder, optional code sketch with correction loop, then spec and feature design | [playbooks/design.md](playbooks/design.md) |
 | Review | PR code review, then proof of published comments and evidence replies; no fixes | [playbooks/review.md](playbooks/review.md) |

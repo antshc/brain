@@ -31,7 +31,7 @@ Done when every index has reconciled per-table counts or an explicit load blocke
 Read every inventoried record in full. Extract checkable claims with record section/line evidence; distinguish approved intent, implemented behavior, and proposals. Inspect the relevant current contracts, source, configuration, tests, and deployment definitions read-only. Use bounded built-in `explore` subagent lookups when useful, with `path:line` evidence and explicit blockers. A passing test supports only its exercised behavior; syntax/link health alone cannot prove currency.
 
 | Artifact | Check |
-|---|---|
+| --- | --- |
 | ADR | Decision/scope applicability, named components and rejected alternatives, documented reversals, implementation disagreement. An approved decision awaiting implementation remains valid; report its implementation state separately |
 | Concept | Rules/defaults, selection conditions, exceptions, examples, terminology, Implementation Map locators, overlapping or conflicting authority; keep observed behavior distinct from decided policy |
 | Building block | Responsibility, ownership/location, dependencies/direction, interfaces, persisted data, configuration, folder structure, context/container/component/flow diagrams, nested indexes and external documentation |
@@ -54,7 +54,7 @@ Done when each row has an evidence-backed result or blocker and each record's ex
 Assign each claim/record one verdict; mixed records take the strongest supported issue (`obsolete`, then `drift`), otherwise `unknown` if any claim is unresolved, else `current`. Preserve unresolved claims even when the record has another verdict.
 
 | Verdict | Evidence required |
-|---|---|
+| --- | --- |
 | `current` | Applicable claims and index relationships agree with current evidence or an explicit approved decision awaiting implementation |
 | `drift` | Cited contradiction, stale locator/row/link, conflicting authority, or required missing record/index |
 | `obsolete` | Affirmative retirement, supersession, or removal evidence; identify replacement when known |

@@ -59,6 +59,7 @@ classDiagram
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Class Diagram Delta Example
@@ -94,4 +95,5 @@ classDiagram
     classDef removed stroke:#8a4a4a,stroke-width:1px
     classDef memberChanged stroke:#8b949e,stroke-width:1px,stroke-dasharray:5 5
 ```
+
 </details>

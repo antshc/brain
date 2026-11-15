@@ -5,7 +5,7 @@ Verifies {{APP_NAME}} like a user, scenario by scenario, and writes a receipt wi
 ## Layout
 
 | Path | Owner | What it is |
-|---|---|---|
+| --- | --- | --- |
 | `kit/` | the kit | The independent proof lib: `types.ts`, `surfaces.ts`, `evidence.ts`, `features.ts`, `map.ts`, `receipt.ts`, `run.ts`. Knows nothing of the app or the mole. Do not edit; an upgrade replaces this folder. |
 | `../mole/` | the mole | The runner at the repo root: `mole.ts` (CLI), `prove.ts`, `prove-cli.ts`, `maps.ts`, `artifacts.ts`, `receipts.ts`, `runtime.ts`, `config.ts`, `commands.ts`, `selftest.ts`. It uses the kit. Do not edit; an upgrade replaces this folder. |
 | `app.ts` | you | `APP`: the URL, start command, source paths, API discovery and page hooks. The only place the mole learns about this app. |

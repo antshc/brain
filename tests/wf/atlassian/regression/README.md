@@ -5,7 +5,7 @@ Proves Markdown → Confluence → Markdown → Confluence keeps every capabilit
 ## Scenario
 
 | Step | Real call | Artifact in the run directory |
-|---|---|---|
+| --- | --- | --- |
 | 1. Init | `scripts/regression.py init --space <space>` | `page.md`, `assets/`, `run.json`, `checklist.md` (all unchecked) |
 | 2. Publish (create) | Publish page on `page.md` into `<space>` | `publish-1.json` |
 | 3. Comment | twg inline comment on `regression anchor phrase`, twg footer comment | `comments.log` |

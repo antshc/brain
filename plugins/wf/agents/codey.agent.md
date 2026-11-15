@@ -96,7 +96,7 @@ NOTES: <strategy, criterion-to-check evidence, exact commands and counts, outcom
 For a workflow ticket, return exactly one JSON object:
 
 | Field | Content |
-|---|---|
+| --- | --- |
 | `status` | `completed` when the evidence gate passes, otherwise `failed`. |
 | `result.summary` | `completed` only. One-line outcome. |
 | `result.files` | `completed` only. Changed paths relative to the assigned workspace. In commit mode, report the paths in the full ticket commit. `[]` for verified no change. |

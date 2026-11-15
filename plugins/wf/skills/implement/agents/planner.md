@@ -1,3 +1,6 @@
+<!-- Independent prompt sections or embedded document examples retain their titles. -->
+<!-- markdownlint-disable MD025 -->
+
 # Reference loading
 
 Before task actions, read fully every absolute path in caller-supplied `requiredReferences`; `breakdown` from `referenceManifest` is required only when `{{operation}}` is `breakdown`. Continue truncated reads by range; never preview. Confirm each path is absolute, readable, and under caller-supplied absolute `referencesRoot`; read it directly, never infer paths from CWD or accept inline contents. Missing, unreadable, or incomplete handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes the worktree-only restrictions below.
@@ -63,7 +66,7 @@ Choose per ticket from the exact model/effort pairs in `{{implementerModels}}`, 
 ## Response
 
 | Field | Content |
-|---|---|
+| --- | --- |
 | `specRef` | Qualified parent spec identity matching the fetched graph; required. |
 | `tickets[]` | One entry per ticket, deferred included; preserve full coverage on reanalysis. |
 | `tickets[].blockers` | Native plus validated inferred blockers; each integrates before the ticket starts; `[]` = root. New external blockers require explicit resolution before use. |

@@ -7,7 +7,7 @@ Scripted, not agent-driven: [scripts/apc_regression.py](./scripts/apc_regression
 ## Scenario
 
 | Step | Real call | Artifact in the run directory |
-|---|---|---|
+| --- | --- | --- |
 | 1. Publish | `atl.py publish-page run` on [fixtures/page.md](./fixtures/page.md): three comment-target paragraphs plus every construct from the round-trip fixture (TOC, marks, status, headings, lists, panels, code, breakouts, tables, expands, two draw.io diagrams, image, file) | `page.md`, `publish.json`, `run.json` |
 | 2. Seed | twg inline comments on `retry limit`, `Legacy export`, `rotate daily`; one footer comment | `seed.json` |
 | 3. Gate 1 | twg `attachments list`, `comments list`, `content get --draft --format html` + `comment_state.py` | `attachments-before.json`, `before.html`, `gate-1.json` |
@@ -26,7 +26,7 @@ A failed step writes `<step>.err` and stops; verify still runs, marking every ca
 [scripts/cases.py](./scripts/cases.py) is the single catalogue:
 
 | Id | Case |
-|---|---|
+| --- | --- |
 | G1 | First gate lists every seeded thread with its anchor |
 | E1 | Targeted edit update succeeds |
 | E2 | `replaceNode` changes text and keeps the annotation |

@@ -17,7 +17,7 @@
 4. Independently per eligible axis, choose GPT Sol or Claude Opus with equal probability and `reasoning_effort: high`. Use the latest runtime-advertised version supporting High; without discovery, try `gpt-6.1-sol` or `claude-opus-5.5`. On rejection, try the other family; if neither works, report a blocker. If model selection is unsupported, inherit and disclose that limitation. Record each axis's requested model and effort, actual model when exposed, and fallbacks. Spawn one fresh read-only `general-purpose` subagent per eligible axis, in parallel. Give each `REVIEW_REPO`, `REVIEW_HEAD`, `REVIEW_BASE`, `DIFF_DIR` and manifest, PR context, existing comments, shared contract, and absolute axis-reference path. Pass the shared contract’s `github` **Draft or finalize review comment** invocation to each reviewer before drafting findings. Each reviews the complete change for its axis and returns posting-ready JSON. **MUST NOT** reuse implementer/chore contexts or substitute parent review when delegation is unavailable; report the blocker. Rationale: independent review context limits implementation bias. Subagents must not refetch/check out the diff, edit source, commit, push, or post.
 
    | Axis | Spawn condition | Reference and extra input |
-   |---|---|---|
+   | --- | --- | --- |
    | `bugs` | Always | [Bug rules](../references/bug-review-guidance.md) |
    | `quality-attributes` | Always | [Quality rules](../references/quality-review-guidance.md) |
    | `code-smells` | Always | [Code-smells rules](../references/smells-review-guidance.md) |

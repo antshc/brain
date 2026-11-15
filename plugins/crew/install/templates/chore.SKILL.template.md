@@ -3,6 +3,9 @@ name: crew-chore
 description: Repository-specific, stack-aware cleanup rules for Chorey. Used only by Chorey during behavior-preserving review.
 ---
 
+<!-- Repeated template sections are intentional. -->
+<!-- markdownlint-disable MD024 -->
+
 # Crew Chore rules
 
 Accept the manifest's JSON array from Chorey as `STACKS`. Do not infer stacks from the review scope.

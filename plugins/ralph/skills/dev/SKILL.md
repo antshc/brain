@@ -5,6 +5,11 @@ description: >-
 argument-hint: '<spec-issue-number-or-url>'
 ---
 
+<!-- Independent prompt sections or embedded document examples retain their titles. -->
+<!-- markdownlint-disable MD025 -->
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # WORKTREE SETUP
 
 Before entering the orchestrator loop, resolve the spec and set up the worktree.
@@ -15,6 +20,7 @@ Before entering the orchestrator loop, resolve the spec and set up the worktree.
 
 2. Bring `HARNESS_REPO_PATH` up to date with its remote before any reads or the final push depend on it.
 **GUARD**:  Run only when `/harness` found its settings file and emitted a non-empty `harnessRepoPath`.
+
 ```bash
 git -C "$HARNESS_REPO_PATH" fetch --all --prune
 git -C "$HARNESS_REPO_PATH" pull
@@ -50,6 +56,7 @@ gh issue view "$spec" --repo "$repo" --json number,title,body,labels,state
 If the issue is missing or lacks the `spec` label, **exit** and report "Spec not found: `$spec`".
 
 Read spec metadata from the title and labels only; never parse `spec.body`:
+
 - `initiative_id` — `spec.title` prefix before the first `:`.
 - `target_branch` — the single `repo:base:<branch>` label. This branch lives in the **source repository** the worktree is created from, not necessarily the harness repo.
 - `repository` (`owner/name`) — the single `repo:target:<owner>/<name>` label.
@@ -63,6 +70,7 @@ Derive the checkout for `repository`: equals `$HARNESS_REPO_PATH`'s own `origin`
 Format: `<version_underscored>_<spec-title-slug>` — or just `<spec-title-slug>` when `target_branch` carries no version.
 
 Rules:
+
 - Take the version from the target branch (e.g. `release/1.3.10` → `1.3.10`), replace dots with underscores → `1_3_10`. No version segment found (e.g. `main`, `develop`) → the branch name is the slug alone, with no version prefix.
 - Slugify the full spec title: lowercase, replace spaces and special chars (including `:`) with hyphens, strip consecutive hyphens, max 50 chars
 
@@ -72,7 +80,7 @@ Example: spec `PROJ-1234: Azure Storage Circuit Breaker`, target `release/1.3.10
 
 Run `/create-worktree` skill to create or reuse an isolated git worktree for the feature branch:
 
-```
+```text
 /create-worktree $CODEBASE_REPO_PATH <target-branch> <feature-branch>
 ```
 
@@ -127,7 +135,7 @@ Read the installed `codey-*.agent.md` descriptions in the crew plugin's `agents/
 
 After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` if unavailable) via `runSubagent`. Its invocation directory is the worktree. For `general-purpose`, require focused verification, uncommitted delivery, and the five-field report (`STATUS`, `SUMMARY`, `FILES`, `GOTCHAS`, `NOTES`). Return observed, reusable gotchas or `none` on every exit. Use the following prompt (substitute actual values):
 
-```
+```text
 ## TASK
 - Title: <title>
 - Body: <body>
@@ -142,6 +150,7 @@ After changing to `WORKTREE_PATH`, run the selected agent (or `general-purpose` 
 Surface Codey's `GOTCHAS` with agent and ticket attribution, including partial and blocked outcomes. Distill Codey's SUMMARY into Implementation Decisions. Use this in **Commit & push** (commit body) and **Update Spec** (spec update).
 
 **Implementation Decisions** — 1–3 compressed technical bullets:
+
 - Short, implementation-oriented statements.
 - No file paths or code snippets.
 - No filler — every word carries information.
@@ -173,21 +182,23 @@ Read Codey's `STATUS` field from **Invoke implementation agent**:
 - **partial**: Increment the issue's attempt counter. If this is the 2nd consecutive `partial` for the issue, add `hitl` with `gh issue edit <number> --repo "$repo" --add-label "hitl"`; otherwise comment with the agent's SUMMARY using `gh issue comment <number> --repo "$repo" --body "..."`.
 - **blocked**: Add `hitl` label with `gh issue edit <number> --repo "$repo" --add-label "hitl"`.
 
-
 ## 7. Update Spec
 
 Using the Implementation Decisions from **Distill**, update the spec issue.
 
 1. Fetch the open spec issue:
+
    ```bash
    gh issue view "$spec" --repo "$repo" --json number,body
    ```
+
 2. If the spec is closed or unreadable, skip steps 3-4 below.
 3. For the `Implementation Decisions` section, apply the merge logic, keeping the leading `metadata` block untouched:
    - If the section is absent from the spec body, append it.
    - Replace any entry that conflicts with or is superseded by a new decision.
    - Append decisions that are additive.
 4. Write the updated body back:
+
    ```bash
    gh issue edit "$spec" --repo "$repo" --body "<updated-body>"
    ```
@@ -233,7 +244,7 @@ Stage all changes, commit if anything is staged, and push — using the appropri
 
 Run **once**, after **Commit & Push Harness Repo** completes — development on `$branch` is finished for this invocation.
 
-```
+```text
 /delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $branch
 ```
 

@@ -3,7 +3,7 @@
 Select mode from the request; default **Deepen**. Run both, Restate first, when the user asks for both.
 
 | Mode | Trigger |
-|---|---|
+| --- | --- |
 | **Deepen** | sharpen, deepen, rewrite prompt, no mode named |
 | **Restate** | in your own words, restate, what am I trying to solve |
 

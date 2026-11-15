@@ -37,7 +37,7 @@ Each map starts with an H1 and one paragraph on the user-visible behavior, then 
 ## Features
 
 | Feature | Surfaces | Map | Run |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | example | {{SURFACES_TEXT}} | [example.md](example.md) | `{{MOLE}} run example` |
 
 Open only the maps for the features your files touch: `{{MOLE}} features --changed`.

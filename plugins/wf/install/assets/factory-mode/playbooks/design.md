@@ -1,3 +1,6 @@
+<!-- This fragment is embedded in a larger document. -->
+<!-- markdownlint-disable MD041 -->
+
 ### Design
 
 **You own the destination. Resolve unknowns, then synthesize.** Produces a spec and an authoritative feature design, not code.

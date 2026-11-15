@@ -31,7 +31,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 For every `architecture-records` call in this playbook, read its entire `SKILL.md`, selected route playbook, and required or triggered resources before checking gates or acting. Reuse complete content at the same revision; partial reads, names, and announcements do not count as loading. Pass the established docs root, target, route/action, and settled context; record returned evidence or a blocker before continuing dependent work.
 
 | Operation | Invocation and inputs | Required result |
-|---|---|---|
+| --- | --- | --- |
 | Fact lookup | *Load and follow the `research` skill to investigate technical questions across source code with a symbol or caller lookup and return cited findings* using the Explore route, in this session. Put independent tracks in one request, each with its bounded question and target checkout/ref; sequence dependent tracks. Rationale or external facts → the same skill with default routing. Blocked lookup → record it; continue independent tracks. | Selected route plus findings with `path:line`, symbol, commit/PR or source URL evidence, confidence (Why), unknowns, and completion/blocker status. |
 | Index load/scan/sync | *Load and follow the `architecture-records` skill to load an index and maintain architecture indexes.* Use route `index`, action `load`, `scan`, or `sync-row`, and required metadata; row mutations use `rowAction`. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
 | Record | *Load and follow the `architecture-records` skill to record ADRs, Concepts, and glossary terms.* Select route `term`, `adr`, or `concept-record`; pass the resolved term/decision, governing scope, source evidence, and existing record/owning index when known. Apply its gate before writing; recording settled content adds no discovery interview. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
@@ -70,15 +70,15 @@ At closure, report every Feature Decision, ADR decision, and Feature Assumption:
 
 Evaluate each independently answerable **decision key**; use the record's key when supplied, otherwise name the choice being settled. All four checks pass → Feature Assumption; any miss → keep only that key unresolved.
 
-* **Direct policy** (`direct-policy`) — at least one opened Concept or ADR directly settles the key through its default, normative rule, or decision. A reference, analogy, recommendation, or code observation alone fails.
-* **Established applicability** (`applicability`) — evidence establishes the governing scope and branch conditions. Apply a settled exception when its condition holds; unknown conditions require fact lookup, then a fact-gap question if unresolved. MUST NOT widen scope from similarity or treat an unknown exception as absent.
-* **Unambiguous answer** (`agreement`) — applicable clauses agree, govern different keys, or have an explicit recorded override. Multiple records and documented alternatives do not fail by themselves; unresolved competing answers do. MUST NOT invent precedence from specificity, record type, or recency. A default may select among genuine alternatives; an open menu without a selection rule fails.
-* **No explicit contradiction** (`contradiction`) — the current user choice and available evidence do not contradict the applicable policy. Surface a user-policy conflict for explicit resolution; MUST NOT replace an explicit answer with a default or use a default to bypass known drift.
+- **Direct policy** (`direct-policy`) — at least one opened Concept or ADR directly settles the key through its default, normative rule, or decision. A reference, analogy, recommendation, or code observation alone fails.
+- **Established applicability** (`applicability`) — evidence establishes the governing scope and branch conditions. Apply a settled exception when its condition holds; unknown conditions require fact lookup, then a fact-gap question if unresolved. MUST NOT widen scope from similarity or treat an unknown exception as absent.
+- **Unambiguous answer** (`agreement`) — applicable clauses agree, govern different keys, or have an explicit recorded override. Multiple records and documented alternatives do not fail by themselves; unresolved competing answers do. MUST NOT invent precedence from specificity, record type, or recency. A default may select among genuine alternatives; an open menu without a selection rule fails.
+- **No explicit contradiction** (`contradiction`) — the current user choice and available evidence do not contradict the applicable policy. Surface a user-policy conflict for explicit resolution; MUST NOT replace an explicit answer with a default or use a default to bypass known drift.
 
 Rationale: reuse settled policy per choice; overlapping records need not mean ambiguity. Keep covered keys assumed while uncovered keys remain in the frontier. Existing single-sentence defaults remain usable under these checks. A default applies only when the design is silent on that key.
 
 | State | Resolved by | Home and write timing |
-|---|---|---|
+| --- | --- | --- |
 | Feature Assumption | model, checklist passed | Ledger only; applicable records already cover the key. |
 | ADR decision | user, ADR gate passed | Ledger + ADR, same turn; the answer authorizes the write. |
 | Feature Decision | user, ADR gate failed, not a term | Ledger only, whether feature-scoped or reusable. |
@@ -87,7 +87,7 @@ Rationale: reuse settled policy per choice; overlapping records need not mean am
 Every decision question **MUST** get a gate-miss line per unresolved key that turn, identifying the failed gate(s) and relevant source anchors; preserve it alongside the resulting state:
 
 | Outcome | Ledger entries |
-|---|---|
+| --- | --- |
 | Feature Decision | Gate miss + decided by user; no policy uses `direct-policy`, source `none`. |
 | ADR decision | Gate miss + recorded path, or pending write until persistence succeeds. |
 | Feature Assumption | Assumed with key, applied condition, and governing source anchors; no gate miss. |
@@ -109,9 +109,10 @@ Unknown applicability alone creates a fact-gap prerequisite, not a policy decisi
 Run in order after every user answer or new fact, before the next question; each step no-ops when it has nothing new.
 
 **Scan and match** — append newly surfaced terms and repo-relative verbatim file/folder paths to the ledger, including lookup results.
-* Nothing new → reason over the current index; no scan or surface write.
-* New terms/paths → use the index contract's **Scan and match** on not-yet-opened global ADR, Concept, and Deployable rows, passing only the new surface plus the required questioning context and glossary.
-* Matched Deployable → open its record read-only, whether harness-owned under `docs/building-blocks/` or repo-owned documentation, and log it in `Opened records`. Load its Concepts and ADR tables via **Load index** with the record path, then scan them; for repo-owned blocks, use their own architecture indexes. Deduplicate records across global and block tables by path.
+
+- Nothing new → reason over the current index; no scan or surface write.
+- New terms/paths → use the index contract's **Scan and match** on not-yet-opened global ADR, Concept, and Deployable rows, passing only the new surface plus the required questioning context and glossary.
+- Matched Deployable → open its record read-only, whether harness-owned under `docs/building-blocks/` or repo-owned documentation, and log it in `Opened records`. Load its Concepts and ADR tables via **Load index** with the record path, then scan them; for repo-owned blocks, use their own architecture indexes. Deduplicate records across global and block tables by path.
 
 Matches are monotonic as surface grows: an opened record needs no matching re-scan. Skipped rows remain candidates when new surface arrives.
 
@@ -120,14 +121,16 @@ Matches are monotonic as surface grows: an opened record needs no matching re-sc
 Extract mandates, prohibitions, open choices, and default clauses from the body and the matched row's `**Default:**` cell. Group by decision key; retain scope, selection conditions, exceptions, and body anchors. A trigger match opens a candidate, not every default's applicability. Frame questions and alternatives against them.
 
 **Classify conflicts** — re-evaluate already-opened records after every answer/new fact; use in-context evidence, reloading only missing details.
-* Violation → cite the rule or ADR rejected option; present the conflict, not an equally valid alternative.
-* Supersession → identify the outdated rule; repair a Concept during closing, or rewrite a user-reversed ADR inline.
-* Out of scope → explain why the record does not apply.
+
+- Violation → cite the rule or ADR rejected option; present the conflict, not an equally valid alternative.
+- Supersession → identify the outdated rule; repair a Concept during closing, or rewrite a user-reversed ADR inline.
+- Out of scope → explain why the record does not apply.
 
 **Record inline** — resolve terms and architectural decisions in the turn answered, before the next question:
-* Explicitly resolved term → use the record contract's `term` route.
-* Explicitly resolved decision → load `adr` route and check its gate; pass → write; miss → Feature Decision in the ledger.
-* Model resolution → Feature Assumption in the ledger, not an ADR.
+
+- Explicitly resolved term → use the record contract's `term` route.
+- Explicitly resolved decision → load `adr` route and check its gate; pass → write; miss → Feature Decision in the ledger.
+- Model resolution → Feature Assumption in the ledger, not an ADR.
 
 Existing Concept repairs belong to closing; other reusable rules remain ledger-only. Apply *Gotchas* when a write is blocked. Question sequencing does not delay authorized inline writes.
 

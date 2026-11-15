@@ -1,8 +1,12 @@
+<!-- Delta fragments use heading levels required by the containing document. -->
+<!-- markdownlint-disable MD001 -->
+
 # GUI delta — worked example
 
 <!-- Referenced from gui-delta-template.md and SKILL.md. Full worked example: a page with tabs, a table, a popover, a modal, and its Components referenced declaration. -->
 
 #### Alerts
+
 <details>
 <summary>Alerts</summary>
 
@@ -52,9 +56,9 @@
 
 **Behaviour changes:**
 
-- + Refresh reloads the active tab.
-- + Successful delete closes the modal and reloads Alerts.
-- + Failed delete keeps the modal open and shows the error.
+- - Refresh reloads the active tab.
+- - Successful delete closes the modal and reloads Alerts.
+- - Failed delete keeps the modal open and shows the error.
 
 **Scenarios:**
 
@@ -69,6 +73,7 @@ Scenario: Delete alert
 </details>
 
 #### Components referenced
+
 <details>
 <summary>Components referenced</summary>
 
@@ -78,4 +83,5 @@ Header
   Alerts -> /alerts
   Settings -> /settings
 ```
+
 </details>

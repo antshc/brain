@@ -23,8 +23,8 @@ description: {{description|imperative What sentence with concrete result, then U
 ## Routing
 
 | Route | Select when | Playbook |
-|---|---|---|
-| {{routeName}} | {{trigger|Unambiguous intent or observable condition}} | [{{routeTitle}}](playbooks/{{routeName}}.md) |
+| --- | --- | --- |
+| {{routeName}} | {{trigger \| Unambiguous intent or observable condition}} | [{{routeTitle}}](playbooks/{{routeName}}.md) |
 
 Select {{selectionPolicy|Explicit precedence or mutually exclusive conditions}}. Read only the selected playbook in full. If the requested outcome remains ambiguous, {{ambiguityPolicy|Ask the smallest clarifying question}}. For combined requests, {{combinedPolicy|Route order and dependency handling}}. After its output, {{continuationPolicy|Stop or select the next requested route}}.
 

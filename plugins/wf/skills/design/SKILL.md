@@ -69,7 +69,7 @@ Wayfinder additionally reads the full Grill playbook for interviews and the full
 
 For standalone Architect, Sketch, Deep-module and their evidence calls, use `<repo-root>/tmp/design-<slug>/`, with a kebab-case task slug; never system `/tmp` or a session folder. Grounding, experiments, Arena outputs, findings, and review logs stay under this root; Design names exact absolute Research destinations under this root in each Research request. Design supplies exact Prove/Challenge this report paths and repository base under this root; evidence skills own no Design path policy. Production code, when authorized, goes in the working tree.
 
-```
+```text
 <artifact-root>/
   task.md
   grounding-*.md

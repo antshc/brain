@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # {{scenarioSlug}} — {{title|one-line scenario title}}: cloud scenario ({{optionUnderTest|fix option under test, or reproduce-only}})
 
 **Status:** {{status|Draft | Working — verified <date> | Blocked — <reason>}}
@@ -32,13 +35,13 @@
 
 | Item | Value |
 | --- | --- |
-| {{item|account/subscription, resource group, region, image, size, scenarioTag, prereqTag}} | {{value}} |
+| {{item \| account/subscription, resource group, region, image, size, scenarioTag, prereqTag}} | {{value}} |
 
 ## Naming convention
 
 | Test resource | Ticket analog | Role |
 | --- | --- | --- |
-| {{testResource|scenarioTag'd test resource; never a real app resource}} | {{ticketAnalog|real resource/ID it stands in for; never a command target}} | {{role}} |
+| {{testResource \| scenarioTag'd test resource; never a real app resource}} | {{ticketAnalog \| real resource/ID it stands in for; never a command target}} | {{role}} |
 
 ## Prerequisites (reusable)
 
@@ -46,13 +49,13 @@
 
 | Resource | Why not load-bearing | Ensure command | Settings check |
 | --- | --- | --- | --- |
-| {{prerequisite}} | {{whyNotLoadBearing}} | {{ensureCommand|idempotent exists-check → create, tagged prereqTag}} | {{settingsCheck}} |
+| {{prerequisite}} | {{whyNotLoadBearing}} | {{ensureCommand \| idempotent exists-check → create, tagged prereqTag}} | {{settingsCheck}} |
 
 ## Packages
 
 | Package | Version | Source |
 | --- | --- | --- |
-| {{package}} | {{version}} | {{source|path:line in csproj/Directory.Packages.props, or nuget.org for LightBDD.XUnit3/xunit.v3}} |
+| {{package}} | {{version}} | {{source \| path:line in csproj/Directory.Packages.props, or nuget.org for LightBDD.XUnit3/xunit.v3}} |
 
 <!-- @: repeat per stage; each stage has exact commands or a scenario-code link, verification, and one **Expected:** checkable from output alone -->
 
@@ -75,8 +78,8 @@
 
 | Stage | Step method | Mirrors code | Expected |
 | --- | --- | --- | --- |
-| Build broken state | `Given_{{step}}` | [`keyword`](path#Lline) | {{expected|resource reaches the broken end-state}} |
-| Reproduce | `Then_{{step}}` | [`keyword`](path#Lline) | {{expected|symptom check red with the user's exact symptom}} |
+| Build broken state | `Given_{{step}}` | [`keyword`](path#Lline) | {{expected \| resource reaches the broken end-state}} |
+| Reproduce | `Then_{{step}}` | [`keyword`](path#Lline) | {{expected \| symptom check red with the user's exact symptom}} |
 | Apply remediation | `When_{{step}}` | [`keyword`](path#Lline) | {{expected}} |
 <!-- @: omit Apply remediation and Validation rows when reproduce-only -->
 | Validation | `Then_{{step}}` | [`keyword`](path#Lline) | {{expected|same symptom check green}} |

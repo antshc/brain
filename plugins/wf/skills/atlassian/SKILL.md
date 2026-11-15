@@ -13,7 +13,7 @@ Operations and tactics for Jira and Confluence. Pick the tactic by trigger, load
 ## Tactics
 
 | Tactic | Trigger | Load | Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Fetch work** | Jira key/URL, or a selected Jira search result, needs its full body | [references/fetch-work.md](references/fetch-work.md) | `work.md` + assets + linked `work.comments.json` sidecar or failure note |
 | **Publish work** | Create or update a Jira work item, issue, story, task, bug, or epic from Markdown; repeat once per item | [references/publish-work.md](references/publish-work.md) | Key, URL, attachment outcomes, read-back when ADF-only constructs exist |
 | **Fetch page** | Confluence page ID/URL/tiny link, or a selected search hit, needs its full body | [references/fetch-page.md](references/fetch-page.md) | `page.md` with anchors, assets, comments per mode |
@@ -41,7 +41,7 @@ Out of scope here: daily blocked items and @mentions → *Load and follow the `d
 Read [references/twg/jira/rules.md](references/twg/jira/rules.md) before any Jira write or authoritative Jira answer, and [references/twg/confluence/rules.md](references/twg/confluence/rules.md) before any Confluence write or pre-edit read. Then load the narrowest row.
 
 | Intent | Load |
-|---|---|
+| --- | --- |
 | Known or several known work items, related artifacts, links | [references/twg/jira/workitems.md](references/twg/jira/workitems.md) |
 | Jira fuzzy text, exact JQL, board, backlog, sprint ordering | [references/twg/jira/querying.md](references/twg/jira/querying.md) |
 | Duplicate work item detection | [references/twg/jira/duplicates.md](references/twg/jira/duplicates.md) and Jira querying |

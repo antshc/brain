@@ -10,7 +10,7 @@ Spawn `hunty` for every codebase lookup; if the spawn fails, record the blocked 
 - `@research` — this skill's absolute base directory.
 
 | Lookup | `@work` prefix |
-|---|---|
+| --- | --- |
 | Flow: handoffs, next handler, deployables a message crosses | `Flow from <A> to <B>:` |
 | Behavior: trigger → executing symbol chain, names unknown | `Names unknown:` |
 | Behavior: known symbol's callers, implementations, double vs real | `Symbol Type.Member:` |

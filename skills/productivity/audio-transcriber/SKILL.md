@@ -4,6 +4,9 @@ description: This skill should be used when the user needs to transform audio re
 license: MIT
 ---
 
+<!-- This fragment is embedded in a larger document. -->
+<!-- markdownlint-disable MD041 -->
+
 ## Purpose
 
 This skill automates audio-to-text transcription with professional Markdown output, extracting rich technical metadata (speakers, timestamps, language, file size, duration) and generating structured meeting minutes and executive summaries. It uses Faster-Whisper or Whisper with zero configuration, working universally across projects without hardcoded paths or API keys.
@@ -112,7 +115,6 @@ This ensures users can install dependencies with one confirmation, or opt for ma
 
 Proceed to Step 0b (CLI Detection).
 
-
 ### Step 1: Validate Audio File
 
 **Objective:** Verify file exists, check format, and extract metadata.
@@ -125,37 +127,37 @@ Proceed to Step 0b (CLI Detection).
 
 2. **Verify file exists:**
 
-```bash
-if [[ ! -f "$AUDIO_FILE" ]]; then
+   ```bash
+   if [[ ! -f "$AUDIO_FILE" ]]; then
     echo "❌ File not found: $AUDIO_FILE"
     exit 1
-fi
-```
+   fi
+   ```
 
 3. **Extract metadata** using ffprobe or file utilities:
 
-```bash
-# Get file size
-FILE_SIZE=$(du -h "$AUDIO_FILE" | cut -f1)
+   ```bash
+   # Get file size
+   FILE_SIZE=$(du -h "$AUDIO_FILE" | cut -f1)
 
-# Get duration and format using ffprobe
-DURATION=$(ffprobe -v error -show_entries format=duration \
+   # Get duration and format using ffprobe
+   DURATION=$(ffprobe -v error -show_entries format=duration \
     -of default=noprint_wrappers=1:nokey=1 "$AUDIO_FILE" 2>/dev/null)
-FORMAT=$(ffprobe -v error -select_streams a:0 -show_entries \
+   FORMAT=$(ffprobe -v error -select_streams a:0 -show_entries \
     stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$AUDIO_FILE" 2>/dev/null)
 
-# Convert duration to HH:MM:SS
-DURATION_HMS=$(date -u -r "$DURATION" +%H:%M:%S 2>/dev/null || echo "Unknown")
-```
+   # Convert duration to HH:MM:SS
+   DURATION_HMS=$(date -u -r "$DURATION" +%H:%M:%S 2>/dev/null || echo "Unknown")
+   ```
 
 4. **Check file size** (warn if large for cloud APIs):
 
-```bash
-SIZE_MB=$(du -m "$AUDIO_FILE" | cut -f1)
-if [[ $SIZE_MB -gt 25 ]]; then
+   ```bash
+   SIZE_MB=$(du -m "$AUDIO_FILE" | cut -f1)
+   if [[ $SIZE_MB -gt 25 ]]; then
     echo "⚠️  Large file ($FILE_SIZE) - processing may take several minutes"
-fi
-```
+   fi
+   ```
 
 5. **Validate format** (supported: MP3, WAV, M4A, OGG, FLAC, WEBM):
 
@@ -175,7 +177,6 @@ if [[ ! " ${SUPPORTED_FORMATS[@]} " =~ " ${EXTENSION,,} " ]]; then
     fi
 fi
 ```
-
 
 ### Step 3: Generate Markdown Output
 
@@ -232,13 +233,14 @@ fi
 After transcription completes, launch three extraction agents simultaneously:
 
 | Agent | Role |
-|-------|------|
+| ------- | ------ |
 | `TopicExtractor` | Cluster transcript segments by topic using keyword proximity and temporal grouping. Output: ordered topic list with timestamps. |
 | `ActionExtractor` | Find all action items. Signals: "will", "should", "needs to", "by [date]", owner assignments, commitments. Output: action list with owner + due date. |
 | `DecisionExtractor` | Find all decisions made. Signals: "decided", "agreed", "we will", "the plan is", "confirmed". Output: decision list with rationale. |
 
 Each agent prompt begins with:
-```
+
+```text
 # {AgentName} — Transcript Analysis Agent
 Role: Analyze the transcript below and extract ONLY {topic/action items/decisions}. Return structured list with timestamps.
 Input: [full transcript text with speaker labels]
@@ -308,13 +310,13 @@ if [[ -n "$SUMMARY_CONTENT" ]]; then
 fi
 ```
 
-
 #### **SCENARIO A: User Provided Custom Prompt**
 
 **Workflow:**
 
 1. **Display user's prompt:**
-   ```
+
+   ```text
    📝 User-provided prompt:
    ┌──────────────────────────────────┐
    │ [User's prompt preview]          │
@@ -322,13 +324,15 @@ fi
    ```
 
 2. **Automatically improve with prompt-engineer (if available):**
+
    ```bash
    🔧 Improving prompt with prompt-engineer...
    [Invokes: gh copilot -p "improve this prompt: {user_prompt}"]
    ```
 
 3. **Show both versions:**
-   ```
+
+   ```text
    ✨ Improved version:
    ┌──────────────────────────────────┐
    │ Role: You are a documentarian... │
@@ -344,6 +348,7 @@ fi
    ```
 
 4. **Ask which to use:**
+
    ```bash
    💡 Use improved version? [y/n] (default: y):
    ```
@@ -351,7 +356,6 @@ fi
 5. **Process with selected prompt:**
    - If "s": use improved
    - If "n": use original
-
 
 #### **LLM Processing (Both Scenarios)**
 
@@ -396,16 +400,17 @@ def process_with_llm(transcript, prompt, cli_tool='claude'):
 ```
 
 **Progress output:**
-```
+
+```text
 🤖 Processing with claude... ⠋
 [After completion:]
 ✅ Summary generated successfully!
 ```
 
-
 #### **Final Output**
 
 **Success (both files):**
+
 ```bash
 💾 Saving files...
 
@@ -419,6 +424,7 @@ def process_with_llm(transcript, prompt, cli_tool='claude'):
 ```
 
 **Transcript only (user declined LLM):**
+
 ```bash
 💾 Saving files...
 
@@ -431,7 +437,6 @@ def process_with_llm(transcript, prompt, cli_tool='claude'):
 
 ✅ Done!
 ```
-
 
 ### Step 5: Display Results Summary
 
@@ -463,11 +468,10 @@ echo "  2. Share report with participants"
 echo "  3. Track action items to completion"
 ```
 
-
 ## Error Handling
 
 | Error | Likely Cause | Action |
-|-------|-------------|--------|
+| ------- | ------------- | -------- |
 | Transcription tool not found | `faster-whisper` and `openai-whisper` not installed | Offer to auto-install with `pip install faster-whisper`; show manual instructions |
 | Unsupported audio format | File extension not in supported list (MP3/WAV/M4A/OGG/FLAC/WEBM) | If ffmpeg available, convert automatically; otherwise prompt to install ffmpeg |
 | File not found | Path is incorrect or file was moved | Show exact path error; ask user to verify and provide correct path |
@@ -482,6 +486,7 @@ echo "  3. Track action items to completion"
 ### **Example 1: Basic Transcription**
 
 **User Input:**
+
 ```bash
 copilot> transcribe audio to markdown: meeting-2026-02-02.mp3
 ```
@@ -522,10 +527,10 @@ copilot> transcribe audio to markdown: meeting-2026-02-02.mp3
   3. Track action items to completion
 ```
 
-
 ### **Example 3: Batch Processing**
 
 **User Input:**
+
 ```bash
 copilot> transcribe these audio files: recordings/*.mp3
 ```
@@ -553,10 +558,10 @@ copilot> transcribe these audio files: recordings/*.mp3
 ⏱️  Total processing time: 6m 15s
 ```
 
-
 ### **Example 5: Large File Warning**
 
 **User Input:**
+
 ```bash
 copilot> transcribe audio to markdown: conference-keynote.mp3
 ```
@@ -580,6 +585,5 @@ Continue? [Y/n]:
 🎙️  Processing... (this may take 10-15 minutes)
 [████░░░░░░░░░░░░░░░░] 20% - Estimated time remaining: 12m
 ```
-
 
 This skill is **platform-agnostic** and works in any terminal context where GitHub Copilot CLI is available. It does not depend on specific project configurations or external APIs, following the zero-configuration philosophy.

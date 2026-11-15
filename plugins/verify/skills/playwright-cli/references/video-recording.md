@@ -122,7 +122,7 @@ Embrace creativity, overlays are powerful.
 ### Overlay API Summary
 
 | Method | Use Case |
-|--------|----------|
+| -------- | ---------- |
 | `page.screencast.showChapter(title, { description?, duration?, styleSheet? })` | Full-screen chapter card with blurred backdrop — ideal for section transitions |
 | `page.screencast.showOverlay(html, { duration? })` | Custom HTML overlay — use for callouts, labels, highlights |
 | `disposable.dispose()` | Remove a sticky overlay added without duration |
@@ -131,7 +131,7 @@ Embrace creativity, overlays are powerful.
 ## Tracing vs Video
 
 | Feature | Video | Tracing |
-|---------|-------|---------|
+| --------- | ------- | --------- |
 | Output | WebM file | Trace file (viewable in Trace Viewer) |
 | Shows | Visual recording | DOM snapshots, network, console, actions |
 | Use case | Demos, documentation | Debugging, analysis |

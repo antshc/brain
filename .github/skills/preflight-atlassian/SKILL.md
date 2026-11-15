@@ -32,7 +32,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 **Config handoff:** `atl.py` and the other ATL scripts read the config themselves; pass `--config "<configPath>"`, never rebuild the path.
 
 | Key | Meaning | API | Default |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `cloudId` | Site URL `https://<host>` (scheme required); reported as `site`; else step 3 | Yes | — |
 | `email` | Account email; REST and twg user | Yes | — |
 | `apiToken` | API token; REST and twg credential | Yes | — |

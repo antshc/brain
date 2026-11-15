@@ -5,7 +5,7 @@ Route procedure for an independent AWS or Azure provider question. Spawns `cloud
 ## Conditional resources
 
 | Trigger | Resource |
-|---|---|
+| --- | --- |
 | Every Cloud brief | `cloud/cloud-inspection-template.md` |
 | Provider is AWS | `cloud/aws.md` |
 | Provider is Azure | `cloud/azure.md` |

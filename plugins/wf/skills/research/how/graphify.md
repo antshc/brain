@@ -16,8 +16,8 @@ Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names t
 Two traversal modes - choose based on the question:
 
 | Mode | Flag | Best for |
-|------|------|----------|
-| BFS (default) | _(none)_ | "What is X connected to?" - broad context, nearest neighbors first |
+| ------ | ------ | ---------- |
+| BFS (default) | *(none)* | "What is X connected to?" - broad context, nearest neighbors first |
 | DFS | `--dfs` | "How does X reach Y?" - trace a specific chain or dependency path |
 
 ## Query health and intent preflight
@@ -40,9 +40,11 @@ Classify the query before choosing traversal:
 - **Path between concepts:** `resolve` both endpoints to exact class labels before path traversal and apply the path-quality rules below.
 
 Run the health check; it covers steps 2-3 and exits `1` when the graph is missing:
+
 ```bash
 $GRAPH check
 ```
+
 If it fails, report the missing graph and the build entry point named in `GRAPHIFY.md` (if any), then continue without the graph.
 
 ## Focused search (default)
@@ -57,7 +59,7 @@ $GRAPH --help
 `--graph PATH` selects another graph. Focused commands (`terms`, `query`, `resolve`, `path`) need the `graphify` module; they drop nodes that are never the answer to a code question: tests, folders named `*deprecated*`, generated/build output, `graphify-out/`, `mocks/`/`mocker/` servers, project/package manifests, namespace and solution-project nodes, and sourceless external types. Pass `--keep test` (comma list) when the question is about tests. Fallback commands (`check`, `contexts`, `vocab`, `slice`, `traverse`, `raw-path`, `explain`) need only the stdlib.
 
 | Command | Use |
-|---|---|
+| --- | --- |
 | `terms "<question>"` | Candidate terms: adjacent question words joined into compounds the graph contains (`memberaccounthealth`), longest first, then rare single words, with label hit counts. |
 | `query <T1> [<T2>]` | BFS depth 2 from the best match of each term. `--anchor` seeds only the top match; `--both --anchor` lists 1-hop callers and callees; `--context call` filters edges. |
 | `resolve "<Label or phrase>"` | Exact class label first, then best compound match; returns `label file:line` to pick path endpoints. |
@@ -84,22 +86,26 @@ graphify's `query` CLI matches nodes via case-folded substring + IDF — there i
 Fix this **without inventing tokens** by expanding the query against the actual graph vocabulary first:
 
 1. Print the token vocabulary from node labels (read-only; nothing is written):
-```bash
-$GRAPH vocab
-```
+
+   ```bash
+   $GRAPH vocab
+   ```
+
 2. From the `vocab` output, for the user's question, select **up to 5 tokens from this exact list** that semantically match the query intent. For a symbol-oriented query that still needs traversal, use at most 3 discriminating tokens. Hard constraints:
    - You MUST pick only tokens present in the `vocab` output. Do NOT invent tokens.
-    - Prefer tokens from the exact symbol or path over generic terms such as `service`, `manager`, `result`, `configuration`, or `test`.
-    - Do not add both singular and plural forms unless they identify genuinely different graph labels.
+   - Prefer tokens from the exact symbol or path over generic terms such as `service`, `manager`, `result`, `configuration`, or `test`.
+   - Do not add both singular and plural forms unless they identify genuinely different graph labels.
    - If a query concept has no plausible token in the vocab, skip it — do not substitute a near-synonym from training memory.
    - If **no** vocab tokens match the query at all, output an empty list and tell the user the corpus has no relevant vocabulary for this question. Do not fabricate a search.
    - Translate cross-language: Russian "аутентификация" → look for `auth`, `credential`, `token`, `security` IFF present in vocab.
    - Morphology: "handlers" maps to `handler` IFF present; "todos" maps to `todo` IFF present.
 
 3. Print the selection explicitly to the user before running the query, so the expansion is auditable:
-```
+
+```text
 Query expanded to (from graph vocab, N tokens): [token1, token2, ...]
 ```
+
 If the list is empty, say so plainly and stop — do not proceed to traversal.
 
 ### Step 1 — Traversal
@@ -107,6 +113,7 @@ If the list is empty, say so plainly and stop — do not proceed to traversal.
 Build the **expanded query string** by joining the selected tokens with spaces. Use this string as `QUESTION` below — NOT the original user question. (The original question is preserved only for `save-result` at the end.)
 
 Prefer the CLI when it is installed:
+
 ```bash
 graphify query "QUESTION"
 # or: graphify query "QUESTION" --dfs --budget 3000

@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # {{systemName}} Deployment View
 
 <!-- 1-3 sentences: the production hosting model (single VM, Docker Compose host, Kubernetes cluster, managed PaaS), how many nodes, and what fronts it. -->
@@ -51,7 +54,7 @@ C4Deployment
 <!-- Every path the instance reads or writes. Absolute, with what lives there and whether it survives a redeploy. -->
 
 | Path | Purpose | Owner | Persisted? |
-|------|---------|-------|------------|
+| ------ | --------- | ------- | ------------ |
 | `{{path}}` | {{binariesConfigDataLogsSocketsTls}} | {{userAndGroup}} | {{yesOrNo}} |
 
 #### Container (Docker)
@@ -70,7 +73,7 @@ C4Deployment
 <!-- Host paths and named volumes the container mounts — the container equivalent of the VM host-paths table. -->
 
 | Host path or volume | Container path | Mode | Purpose |
-|---------------------|----------------|------|---------|
+| --------------------- | ---------------- | ------ | --------- |
 | `{{hostPathOrVolumeName}}` | `{{containerPath}}` | {{roOrRw}} | {{whatLivesThere}} |
 
 #### Orchestrated (Kubernetes and similar)
@@ -104,7 +107,7 @@ C4Deployment
 <!-- Sources in precedence order, lowest first — later rows override earlier ones. Location is the path inside the container/host or the mechanism that injects it. Mark "only source" explicitly when there is exactly one, so a reader doesn't go looking for a file that isn't there. -->
 
 | # | Source | Location | Supplied by | Overrides |
-|---|--------|----------|-------------|-----------|
+| --- | -------- | ---------- | ------------- | ----------- |
 | 1 | {{sourceKind\| e.g. appsettings.json, per-environment appsettings overlay, environment variables, mounted secret file, key vault, command-line args }} | `{{pathOrVariablePrefix}}` | {{whoSuppliesIt\| e.g. baked into the image, compose environment:, ConfigMap, systemd EnvironmentFile }} | {{previousRowOrNone}} |
 
 - **Environment selector:** {{selectorVariable\| e.g. ASPNETCORE_ENVIRONMENT=Production }} — {{whatItSwitches}}
@@ -116,7 +119,7 @@ C4Deployment
 <!-- One row per Rel in the diagram, plus anything reaching the system from outside. -->
 
 | From | To | Protocol | Port | Direction | Auth |
-|------|----|----------|------|-----------|------|
+| ------ | ---- | ---------- | ------ | ----------- | ------ |
 | {{fromAlias}} | {{toAlias}} | {{protocol}} | {{port}} | {{oneWayOrBidirectional}} | {{authMechanism}} |
 
 ## Authentication
@@ -140,7 +143,7 @@ C4Deployment
 <!-- One row per log stream. Destination is where an operator actually reads it, not just the first hop. -->
 
 | Producer | Format | Local location | Shipped by | Destination | Retention |
-|----------|--------|----------------|------------|-------------|-----------|
+| ---------- | -------- | ---------------- | ------------ | ------------- | ----------- |
 | {{mermaidComponentName}} | {{format\| e.g. structured JSON, plain text }} | `{{pathOrStdout}}` | {{shipper\| e.g. Promtail, Fluent Bit, Docker logging driver, agent sidecar, none }} | {{sink\| e.g. Loki, Elasticsearch, CloudWatch, Application Insights }} | {{retentionPeriod}} |
 
 - **Rotation:** {{rotationPolicy\| e.g. logrotate daily ×7, Docker max-size/max-file }}

@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # Evolving PM-Focused arc42 Documentation for Long-Term Projects
 
 For systems and products that exist for many years, arc42 documentation should be treated as **living documentation**, not as a one-time project snapshot.
@@ -169,10 +172,10 @@ Recommended states:
 
 ### Example
 
-**ADR-014 — Use RabbitMQ for notification jobs**  
+**ADR-014 — Use RabbitMQ for notification jobs**
 Status: **Superseded by ADR-041**
 
-**ADR-041 — Use Kafka for notification jobs**  
+**ADR-041 — Use Kafka for notification jobs**
 Status: **Accepted**
 
 This preserves causal history without polluting the current architecture description.
@@ -336,13 +339,13 @@ This creates three clean views:
 
 When updating long-term architecture documentation, ask:
 
-1. **Is this true now?**  
+1. **Is this true now?**
    Keep it in the main arc42 documentation.
 
-2. **Was this important in explaining how we got here?**  
+2. **Was this important in explaining how we got here?**
    Preserve it in an ADR, migration record, or historical note.
 
-3. **Is this planned but not yet true?**  
+3. **Is this planned but not yet true?**
    Put it in the evolution roadmap.
 
 This keeps multi-year documentation useful without mixing obsolete, current, and planned architecture into the same view.

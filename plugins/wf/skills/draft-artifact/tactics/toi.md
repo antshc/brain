@@ -2,7 +2,6 @@
 
 TOI = engineering hands a developed feature to technical teams (Support, QA, Docs, Training, Field). Not formal training; those teams reuse it to build training, documentation, and labs. Reader did **not** build the feature.
 
-
 ## Contents
 
 - Inputs
@@ -41,7 +40,7 @@ If `feature` is missing or matches more than one feature, ask the user with the 
 3. **Collect doc evidence** from every source below. Done when each template section has leads with a source, or is marked a gap.
 
    | Source | Gives |
-   |---|---|
+   | --- | --- |
    | User-supplied `sources` (pasted Jira text, acceptance criteria, design doc) | overview, motivation, scope, limits, owner |
    | Workspace glossary | the approved term for each concept |
    | Workspace architecture docs, ADRs, concepts | rationale, flow, lifecycle |
@@ -71,7 +70,7 @@ If `feature` is missing or matches more than one feature, ask the user with the 
 ## Exploration checklist
 
 | Item | Find | Target(s) and where |
-|---|---|---|
+| --- | --- | --- |
 | Deployables | user-visible deployables the feature touches (Storefront web app, Admin portal, CLI, Order service, Payment gateway, Identity provider) and their handoffs | current repository and other system components: architecture / system-context docs, service entry points |
 | Scenarios | user-visible scenarios: trigger, visible result, failure result | current repository and GUI repository: controllers, GUI pages, tests; user-supplied acceptance criteria |
 | GUI | per scenario: page name, element titles (buttons, menus, columns, fields, dialogs, messages) as shown to the user | GUI repository: page and component templates, localization strings |
@@ -118,7 +117,7 @@ Write in ASD-STE100 Simplified Technical English (STE) in every section, includi
 - Include version names or IDs only when the topic is an upgrade. The header-table release field is metadata, not prose.
 
 | Weak | Plain |
-|---|---|
+| --- | --- |
 | Carts are deleted by `AbandonedCartCleanupJob` every `cart_cleanup_interval`. | The Cart service deletes abandoned carts on a fixed interval. A setting controls the interval. The default is 1 hour. |
 | We added a fallback in case the payment gateway might be unreachable. | If the payment gateway is unreachable, the Checkout service retries the request three times. |
 | Look for `Payment capture failed` in `/var/log/shop/checkout.log`. | Search the Checkout service log for the message that reports a failed payment capture. |

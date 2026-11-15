@@ -46,7 +46,7 @@ Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm c
 Two kinds of crossing, with different stop semantics.
 
 | | Terminal | Continuable |
-|---|---|---|
+| --- | --- | --- |
 | What | managed service reached through an SDK or API (DynamoDB, S3, SQS, Stripe), database engine, third-party API, OS primitive | a deployable whose source you can open — microservice, container, lambda, queue consumer, sibling repo |
 | Record | the integration contract and the IaC/config naming the real resource, region, and account | the integration contract plus emit site, receive site, and binding |
 | Becomes | a terminal Boundary contract | the next Flow row plus an internal Boundary contract |

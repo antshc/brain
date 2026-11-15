@@ -4,6 +4,8 @@ description: 'Make an instructions, skill, or agent file shorter and more compac
 disable-model-invocation: true
 ---
 
+# Shrink
+
 Make instructions shorter, compact while preserving the essential meaning and behavior.
 
 Rules: write the actual rule or action first. remove repetition, be extremely concise, terse, agent-optimized, and use no fillers. Sacrifice grammar for concision. Add the reason only when it changes interpretation or application. Omit explanation that does not change agent behavior.

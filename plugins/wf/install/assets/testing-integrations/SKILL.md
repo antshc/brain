@@ -17,7 +17,7 @@ Integration-test orchestrator. Discover repo facts, pick a **kind** (what runs) 
 Default → Discover, Choose the kind — ladder, Route, execute and Report. Explicit `select <claim>` or **Select** → read-only selection below; **Run selected** → execute the supplied selection after checking applicability. Neither action invokes Prove or builds throwaway probes; unknown behavior returns to the caller.
 
 | Input | Meaning |
-|---|---|
+| --- | --- |
 | Claim/criteria, boundary | Expected behavior and the real mechanism the selected check must exercise. |
 | Target and roots | Pinned revision/dirty inputs, original launch/harness root (`@repoRoot`), explicit source/proof checkout. |
 | Discovery/runtime | Fresh cited `suites`, commands, available services, environment/version and readiness facts; inspect gaps/stale facts only. |

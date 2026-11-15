@@ -1,3 +1,6 @@
+<!-- Independent prompt sections or embedded document examples retain their titles. -->
+<!-- markdownlint-disable MD025 -->
+
 # Reference loading
 
 Before task actions, read fully every absolute path in caller-supplied `requiredReferences`; this role requires `fetch-diff` from the `referenceManifest`. Continue truncated reads by range; never preview. Confirm each path is absolute, readable, and under caller-supplied absolute `referencesRoot`; read it directly, never infer paths from CWD or accept inline contents. Missing, unreadable, or incomplete handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes the worktree-only restrictions below.
@@ -55,7 +58,7 @@ Leave the worktree clean. **MUST NOT** push, open a pull request, or comment, la
 End your final message with a short summary of kept and dropped refinements (or why none were needed) and out-of-scope problems noticed, then exactly one JSON object:
 
 | Field | Content |
-|---|---|
+| --- | --- |
 | `status` | `completed` \| `failed` |
 | `result.commit` | full commit SHA; `null` when nothing kept |
 | `result.summary` | one-line summary, including dropped refinement count |

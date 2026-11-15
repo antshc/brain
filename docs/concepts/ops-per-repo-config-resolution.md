@@ -37,7 +37,7 @@ runs with no conventions at all. This Concept fixes how such a file is located a
 Every file sits at a fixed path; the shape of the path follows what the file holds:
 
 | Shape | Use when | Reference |
-|----------|----------|-----------|
+| ---------- | ---------- | ----------- |
 | Fixed path | a setup skill scaffolds the file, so its location is guaranteed | `$HARNESS_REPO_PATH/.crew/<FILE>` ([Crew agents own their workflows and use codebase instructions](../adr/crew-is-agnostic.md)) |
 | Fixed path, variant-suffixed | the same config exists once per variant, and one root still holds them all | `$HARNESS_REPO_PATH/.crew/CHORE-<stack>.md` ([Crew agents own their workflows and use codebase instructions](../adr/crew-is-agnostic.md)) |
 | Fixed path, beside the owning skill | per-developer settings and credentials for one plugin | `.github/skills/harness/.harness.json.user`, `.github/skills/preflight-atlassian/.atlassian.json.user` |
@@ -53,7 +53,7 @@ to treat the parent directory as a fallback.
 Split by lifecycle, because the two halves have different readers and different homes:
 
 | Content | Home | In git |
-|---------|------|--------|
+| --------- | ------ | -------- |
 | Credentials | the owning plugin's settings file, beside its repository-level skill | no |
 | Per-developer connection facts, working-set repos and pull branches | the owning plugin's settings file, beside its repository-level skill | no |
 | Team conventions, field maps, item-type defaults | committed files or generated repo-level skills under `.github/skills/` | yes |

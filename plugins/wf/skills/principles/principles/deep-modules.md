@@ -29,8 +29,8 @@ A broken contract is resolved through a deep-module redesign, not patched in pla
 
 Use these terms exactly; never substitute "component", "service", "API", or "boundary". Repo glossary terms still name domain concepts.
 
-- **Module**: anything with an interface and an implementation; scale-agnostic (function, class, package, tier-spanning slice). _Avoid_: unit, component, service.
-- **Interface**: everything a caller must know to use the module correctly: type signature plus invariants, ordering constraints, error modes, required configuration, performance characteristics. _Avoid_: API, signature (type-level surface only).
+- **Module**: anything with an interface and an implementation; scale-agnostic (function, class, package, tier-spanning slice). *Avoid*: unit, component, service.
+- **Interface**: everything a caller must know to use the module correctly: type signature plus invariants, ordering constraints, error modes, required configuration, performance characteristics. *Avoid*: API, signature (type-level surface only).
 - **Implementation**: the module's body of code. Distinct from **Adapter**: a small adapter may have a large implementation (Postgres repo) and vice versa (in-memory fake). Say "adapter" when the seam is the topic; "implementation" otherwise.
 - **Depth**: leverage at the interface; behaviour a caller or test can exercise per unit of interface learned. **Deep**: much behaviour behind a small interface. **Shallow**: interface nearly as complex as the implementation.
 - **Seam** (Feathers): a place where behaviour can change without editing in that place; the location where a module's interface lives. Seam placement is its own decision, distinct from what goes behind it.
@@ -49,7 +49,7 @@ Use these terms exactly; never substitute "component", "service", "API", or "bou
 
 ## Deep vs shallow
 
-```
+```text
 Deep:     [ small interface ]          Shallow:  [     large interface     ]
           [                 ]                    [ thin pass-through impl  ]
           [ deep impl, much ]
@@ -71,15 +71,19 @@ When designing an interface, ask:
 ## Designing for testability
 
 1. **Accept dependencies; don't create them.**
+
    ```typescript
    function processOrder(order, paymentGateway) {}          // testable
    function processOrder(order) { new StripeGateway(); }    // hard to test
    ```
+
 2. **Return results; don't produce side effects.**
+
    ```typescript
    function calculateDiscount(cart): Discount {}            // testable
    function applyDiscount(cart): void { cart.total -= d; }  // hard to test
    ```
+
 3. **Small surface area.** Fewer methods → fewer tests; fewer params → simpler setup.
 
 ## Dependency categories

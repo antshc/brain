@@ -7,7 +7,7 @@ description: >-
 # Subagents
 
 | Action | Use | Load |
-|---|---|---|
+| --- | --- | --- |
 | **Model selection** | Model and effort for a named role or the seats of an ordered panel; the caller spawns the worker | [models.md](models.md) |
 | **Arena** | Same task to independent runners, cross-judge, pick a base, graft, verify | [arena.md](arena.md), [models.md](models.md) |
 

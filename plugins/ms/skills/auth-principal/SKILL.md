@@ -4,12 +4,18 @@ description: >-
   Authorize Azure CLI with a service principal on Windows or Linux. Use when az authentication is missing or expired, 'az login fails', or for /ms:auth-principal.
 ---
 
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
+# Auth principal
+
 **Step 0 — Detect OS**
 Run `uname -s 2>/dev/null`. If it fails or returns a Windows-like environment, use the Windows steps. Otherwise use the Linux steps.
 
 **Step 1 — Check credentials in the current environment**
 
 Linux:
+
 ```bash
 for variable in AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID; do
   if [[ -z "${!variable}" ]]; then
@@ -20,6 +26,7 @@ done
 ```
 
 Windows (PowerShell):
+
 ```powershell
 $requiredVariables = 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET', 'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID'
 foreach ($variable in $requiredVariables) {
@@ -32,6 +39,7 @@ foreach ($variable in $requiredVariables) {
 **Step 2 — Log in and configure defaults**
 
 Linux:
+
 ```bash
 if ! az login --service-principal \
   --username "$AZURE_CLIENT_ID" \
@@ -52,6 +60,7 @@ fi
 ```
 
 Windows (PowerShell):
+
 ```powershell
 az login --service-principal --username $env:AZURE_CLIENT_ID --password $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID --output none 2>$null
 if ($LASTEXITCODE -ne 0) { throw 'az login failed.' }
@@ -62,6 +71,7 @@ if ($LASTEXITCODE -ne 0) { throw 'az config set location failed.' }
 ```
 
 **Step 3 — Verify**
+
 ```bash
 az account show
 ```

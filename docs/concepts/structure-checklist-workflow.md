@@ -31,7 +31,7 @@ own plus each of its skills' — distinguishable when they land in working notes
 
 Minimal skill instruction to embed:
 
-```
+```text
 ## <Task name> Workflow
 
 Copy this checklist and check off items as you complete them:

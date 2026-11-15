@@ -1,9 +1,15 @@
+<!-- This fragment is embedded in a larger document. -->
+<!-- markdownlint-disable MD041 -->
+<!-- Delta fragments use heading levels required by the containing document. -->
+<!-- markdownlint-disable MD001 -->
+
 ## {{contractType}} delta
 <!-- One copy per contract kind touched; delete unused copies. -->
 
 Legend: `+` add · `-` remove · `% old → new` rename · `~` modify (same name, `oldSpec → newSpec`; spec = type, constraint, validation, default, or required↔optional) · `{{tag}}` {{meaning}} · `{{tag}}` {{meaning}}.
 
 #### {{resourceHeader| e.g. "METHOD /path?[sort]&[order]", "{{table}}", or "{{resourceType}}: {{resourceName}}"; CSV multiple resources sharing the same delta: "{{resourceHeader1}}, {{resourceHeader2}}"}}
+
 <details>
 <summary>{{resourceHeader}}</summary>
 
@@ -22,7 +28,7 @@ Legend: `+` add · `-` remove · `% old → new` rename · `~` modify (same name
 
 **Scenarios:**
 
-**_{{shortScenarioName}}_**
+***{{shortScenarioName}}***
 
 ```http
 {{method}} {{path}}{{?query}} HTTP/1.1
@@ -38,14 +44,17 @@ Content-Type: application/json
 
 {{responseBody}}
 ```
+
 </details>
 
 #### Objects referenced
+
 <details>
 <summary>Objects referenced</summary>
 
-```
+```text
 {{name}} (object) = { "type":"{{typeName}}", {{field}}({{type|type name+constraint, e.g. string≤4000}}), {{field}}?({{type|type name+constraint}}) }
 {{name}} (enum)   = {{member}}={{value}} | {{member}}={{value}}
 ```
+
 </details>

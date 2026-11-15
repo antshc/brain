@@ -25,13 +25,13 @@
 **Rules:** facts the Answer rests on that no dimension section below holds.
 
 | ID | Type | Finding | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | F1 | FACT / LIMIT | {{statement; a LIMIT states its impact}} | {{doc URL + section, or CLI/MCP query + field}} |
 
 ## Assumptions / Unknowns
 
 | Type | Finding | Verification |
-|---|---|---|
+| --- | --- | --- |
 | ASSUMPTION / UNKNOWN | {{finding}} | {{exact doc lookup or read-only probe that would settle it}} |
 
 ## Resources
@@ -43,13 +43,13 @@
 **Rules:** API version — the Azure `api-version` read against; `—` for AWS.
 
 | Operation | API version | Semantics / parameters | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | {{API, REST, or ARM operation}} | {{version or —}} | {{required fields, allowed values, defaults, response shape, errors}} | {{doc URL + section, or CLI/MCP query + field}} |
 
 ## SDK
 
 | Package @ version | Client / method | Behavior | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | {{package@version}} | {{client/method}} | {{behavior, version-specific notes}} | {{doc URL + section, or restored package type/member}} |
 
 ## Identity and Credentials
@@ -61,13 +61,13 @@
 **Rules:** Plane — Azure `control` / `data`; `—` for AWS. Scope — AWS resource ARN and condition keys; Azure subscription, resource group, or resource.
 
 | Action / role | Plane | Scope / resource / conditions | Reason | Evidence |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | {{action or role}} | {{plane or —}} | {{scope}} | {{reason}} | {{evidence}} |
 
 ## Quotas
 
 | Quota | Region | Value | Type | Implementation impact | Evidence |
-|---|---|---:|---|---|---|
+| --- | --- | ---: | --- | --- | --- |
 | {{quota}} | {{region}} | {{value}} | hard / adjustable / default / applied | {{impact}} | {{evidence}} |
 
 ## Pagination, Throttling, Retries
@@ -81,5 +81,5 @@
 ## Failure Handling
 
 | Failure | Operation / error code | Implementation impact | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | {{failure}} | {{operation / code}} | {{impact}} | {{evidence}} |

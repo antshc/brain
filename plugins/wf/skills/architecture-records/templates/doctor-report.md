@@ -19,31 +19,31 @@
 ## Coverage
 
 | Artifact kind | Inventoried | Assessed | Blocked |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | {{kind}} | {{inventoried}} | {{assessed}} | {{blocked}} |
 
 <!-- @: Assessed and blocked are disjoint; a partially assessed artifact counts blocked, retaining known findings. Inventoried equals assessed plus blocked; excluded artifacts are listed in Scope. -->
 
 | Index / table | Total rows | Consumed rows | Load result / gaps |
-|---|---|---|---|
-| {{indexAndTable}} | {{total|unknown if loading failed}} | {{consumed}} | {{loadResult}} |
+| --- | --- | --- | --- |
+| {{indexAndTable}} | {{total \| unknown if loading failed}} | {{consumed}} | {{loadResult}} |
 
 ## Findings
 
 | ID | Artifact / claim | Verdict | Impact | Documented statement | Observed evidence | Suggested correction / owning route |
-|---|---|---|---|---|---|---|
-| {{id}} | {{recordAndSection}} | {{verdict|drift, obsolete, or unknown}} | {{impact}} | {{statementAndCitation}} | {{observationAndCitation}} | {{correctionAndRoute}} |
+| --- | --- | --- | --- | --- | --- | --- |
+| {{id}} | {{recordAndSection}} | {{verdict \| drift, obsolete, or unknown}} | {{impact}} | {{statementAndCitation}} | {{observationAndCitation}} | {{correctionAndRoute}} |
 
 ## Current records
 
 | Artifact | Verdict | Evidence / implementation state |
-|---|---|---|
-| {{record}} | current | {{supportingEvidence|Explicit approved decision awaiting implementation, with decision citation}} |
+| --- | --- | --- |
+| {{record}} | current | {{supportingEvidence \| Explicit approved decision awaiting implementation, with decision citation}} |
 
 ## Unknowns and blockers
 
 | Artifact / claim | Missing evidence or access | What resolves it |
-|---|---|---|
+| --- | --- | --- |
 | {{artifactOrClaim}} | {{gap}} | {{resolution}} |
 
 ## Recommended next actions

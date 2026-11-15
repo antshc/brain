@@ -16,7 +16,7 @@ Review the PR, read its published findings, prove their claims, then reply with 
 ## Outcomes
 
 | Result | Reply | Thread and retained findings |
-|---|---|---|
+| --- | --- | --- |
 | Proved | **Proved** with observed behavior, exercised conditions, and deciding verification detail | Keep open for remediation; retain the finding |
 | Refuted | **Refuted: false positive** with the deciding counterevidence | Exclude refuted claims from actionable findings; resolve only when every allegation is refuted and the corrective reply/resolution are verified |
 | Blocked | **Unverified: proof blocked** with concrete missing prerequisite and check | Keep open and retain as unverified |

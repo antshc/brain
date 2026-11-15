@@ -180,18 +180,18 @@ twg -o text help describe "jira workitem query"
 
 ## Common Discovery Patterns
 
-| Need                                         | Discovery path                                                                                                                                                                                      |
+| Need | Discovery path |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Detailed product or workflow guidance        | `twg help discover-skills "<intent>"`, optionally scoped with `--skill`, then load the returned skill and reference                                                                                 |
-| Person lookup                                | `twg help user search`, then use positional name, `--name`, or `--email`                                                                                                                            |
-| Jira workitem detail or JQL                  | `twg help describe "jira workitem"`, then inspect the chosen exact command                                                                                                                          |
+| Detailed product or workflow guidance | `twg help discover-skills "<intent>"`, optionally scoped with `--skill`, then load the returned skill and reference |
+| Person lookup | `twg help user search`, then use positional name, `--name`, or `--email` |
+| Jira workitem detail or JQL | `twg help describe "jira workitem"`, then inspect the chosen exact command |
 | Jira required/custom fields on create/update | `twg help jira custom fields`, then use `jira workitem field create-metadata` or `update-metadata`; prefer returned `customfield_*` IDs; do not duplicate keys across `--field` and `--fields-json` |
-| Jira custom field value readback             | `twg jira workitem get <KEY> --field customfield_*`, or `--fields customfield_*,summary` for comma-separated REST fields                                                                            |
-| Confluence page by title, ID, or URL         | `twg help confluence content` and `twg help describe "confluence content get"`                                                                                                                      |
-| Bitbucket PR/repo                            | `twg help bb`, then `twg help describe "bb"`                                                                                                                                                        |
-| Project/goal/focus area key or search result | `twg help projects`, `twg help goals`, `twg help focus-areas`, then describe the exact `get` or `query` command                                                                                     |
-| Relationships or dependencies                | `twg help context`, then `twg help describe "context"`                                                                                                                                              |
-| Assets / CMDB                                | `twg help assets`, then inspect object schema/type help before AQL                                                                                                                                  |
+| Jira custom field value readback | `twg jira workitem get <KEY> --field customfield_*`, or `--fields customfield_*,summary` for comma-separated REST fields |
+| Confluence page by title, ID, or URL | `twg help confluence content` and `twg help describe "confluence content get"` |
+| Bitbucket PR/repo | `twg help bb`, then `twg help describe "bb"` |
+| Project/goal/focus area key or search result | `twg help projects`, `twg help goals`, `twg help focus-areas`, then describe the exact `get` or `query` command |
+| Relationships or dependencies | `twg help context`, then `twg help describe "context"` |
+| Assets / CMDB | `twg help assets`, then inspect object schema/type help before AQL |
 
 For manager-chain/direct-report/peer selectors, partial person results, or
 person-to-artifact handoffs, return control to the orchestrator for *Routing*

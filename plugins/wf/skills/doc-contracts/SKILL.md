@@ -5,6 +5,8 @@ description: >-
 name: doc-contracts
 ---
 
+# Doc contracts
+
 Document contract and GUI changes as a terse diff — never restate untouched contract or surface. Look up facts yourself (swagger.json, codebase, DB schema, GUI source).
 
 ## Assemble and write a contract delta
@@ -39,4 +41,3 @@ Instantiate one copy of the skeleton in [gui-delta-template.md](templates/gui-de
 - `**Scenarios**` — one `Scenario:` (Gherkin `Given`/`When`/`Then`) per important multi-step flow, in its own fenced `gherkin` block outside the surface's diff block — never nested inside it; omit the heading when there are no scenarios.
 
 **Done when:** every touched surface has its own `#### <Page>` heading + `<details>` block; every touched surface contains only changed UI; nesting makes ownership clear; renames use `%` and in-place changes use `~` — never combined; shared components are declared once under a `#### Components referenced` + `<details>` block; Behaviour changes and Scenarios sit outside the fenced diff block, headed by `**Behaviour changes:**`/`**Scenarios:**` when present; no component-specific grammar is introduced when indentation plus `key: value`, `->`, or `<-` is sufficient.
-

@@ -1,3 +1,8 @@
+<!-- This fragment is embedded in a larger document. -->
+<!-- markdownlint-disable MD041 -->
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 <!-- skill-dependency: lsp-recover; consuming repository or host provides this extension; discover its current name and description before use -->
 <!-- skill-dependency: query-aws; consuming repository or host provides this extension; discover its current name and description before use -->
 <!-- skill-dependency: search-aws-docs; consuming repository or host provides this extension; discover its current name and description before use -->
@@ -30,7 +35,7 @@ Verify the target repo before any **code/build** `git`/`gh pr` command by checki
 
 Runs unmodified on Linux, macOS, and Windows (no bash- or PowerShell-only syntax):
 
-```
+```text
 python -c 'import re,subprocess,sys; url=subprocess.run(["git","remote","get-url","origin"],capture_output=True,text=True,check=True).stdout.strip(); slug=re.sub(r"\.git$","",re.sub(r"^(git@github\.com:|https://github\.com/)","",url)); sys.exit(0 if slug=="{{codeRepoSlug}}" else 1)'
 ```
 
@@ -121,7 +126,9 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 
 - You MUST create every skill under `.github/skills/<skill-name>/` at the reporoot — never in the user skills directory (`~/.copilot/skills/`) or inside `workspace/`. Each skill is its own folder holding `SKILL.md` plus any `reference/` files it needs.
 - You MUST NOT reference a skill's own files via bare relative markdown links (e.g. `[memory.md](reference/memory.md)`); such links resolve against the runtime CWD (which may be a worktree, not the skill folder) and silently fail to load. Load reference files via the skill's stated absolute base directory instead.
+
 ### Available skills:
+
 `preflight-atlassian`, `search-{{proj}}`, `search-infra-nuget`, `search-aws-sdk-nuget`, `search-aws-docs`, `lsp-recover`, `query-aws` — see each skill's own frontmatter `description` for full trigger conditions; do not restate them here.
 
 ## 8. Tools

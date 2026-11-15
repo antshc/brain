@@ -70,7 +70,7 @@ def test_concept_discovery_retains_its_own_questioning():
     assert (ROOT / 'references/arc42-cross-cutting-concepts.md').is_file()
     questioning = (ROOT / 'references/questioning.md').read_text()
     assert 'Ask the whole frontier in one round' in questioning
-    assert 'The _decisions_ are the user' in questioning
+    assert 'The *decisions* are the user' in questioning
     concept = (ROOT / 'playbooks/define-concept.md').read_text()
     assert 'user-confirmed' in concept
     assert 'no second permission prompt' in concept

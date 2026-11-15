@@ -4,6 +4,9 @@ description: >-
 applyTo: "**/skills/**/*.md,**/agents/*.agent.md,.github/instructions/*.instructions.md"
 ---
 
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Writing agent-facing documents
 
 Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, and `.crew/` convention files. Design-time composition guidance lives in [ARCHITECTURE.md](../../ARCHITECTURE.md).
@@ -25,7 +28,7 @@ Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, 
 ## Frontmatter and discovery
 
 | Key | Required | Rule |
-|---|---|---|
+| --- | --- | --- |
 | `name` | yes | Lowercase, hyphenated, matches folder name. |
 | `description` | yes | See Description shape. |
 | `disable-model-invocation` | no | `true` = human-only; omit when model or other skills must discover it. |
@@ -49,22 +52,22 @@ Omit process detail (`using bundled best practices`, `from a brief`) unless it s
 CI runs [lint_skill_descriptions.py](../scripts/lint_skill_descriptions.py) over `plugins/wf/`: length, duplicate or near-duplicate quoted triggers, and `Not for` targets that do not exist.
 
 | Invocation | Example |
-|---|---|
+| --- | --- |
 | Model-invoked | `Investigate a question against primary sources and save cited findings as Markdown. Use for /research, 'research X', 'gather docs on Y', or delegating reading legwork. Use why for design rationale.` |
 | User-invoked | `Write, rewrite, or shrink an agent skill and its bundled references.` |
 
 **Description characters:** plain text, max 1024 chars. Separate clauses with `.`, `;`, or `,`. **MUST NOT** use:
 
 | Character | Why |
-|---|---|
+| --- | --- |
 | `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`address-page-comments`) allowed |
 | `<` `>` | Rejected by skill validators (XML/HTML injection guard) |
-| `: ` (colon + space) | YAML reads it as a nested mapping key |
-| ` #` (space + hash) | YAML starts a comment; rest of description dropped |
+| `:` (colon + space) | YAML reads it as a nested mapping key |
+| `#` (space + hash) | YAML starts a comment; rest of description dropped |
 | Leading `-` `?` `:` `[` `]` `{` `}` `,` `&` `*` `!` `\|` `>` `'` `"` `%` `@` `` ` `` | YAML indicator; plain scalar cannot start with it |
 | Tabs, line breaks in a plain scalar, leading/trailing whitespace | Multiline/indent parse errors |
 
-**YAML safety:** frontmatter MUST parse as YAML; a plain scalar containing `: ` or ` #` breaks parsing and the skill silently disappears. Write `description` (and any value with `: `, quotes, backticks, `#`, or a leading `[`, `{`, `*`, `&`, `!`, `%`, `@`) as a folded block scalar: `description: >-` then the text indented two spaces on the next line. Never use `: ` inside a plain scalar.
+**YAML safety:** frontmatter MUST parse as YAML; a plain scalar containing `:` or `#` breaks parsing and the skill silently disappears. Write `description` (and any value with `:`, quotes, backticks, `#`, or a leading `[`, `{`, `*`, `&`, `!`, `%`, `@`) as a folded block scalar: `description: >-` then the text indented two spaces on the next line. Never use `:` inside a plain scalar.
 
 Name skills by existing verb-prefix family. Start a new family only when needed.
 
@@ -95,7 +98,7 @@ Order content by need: **steps → inline reference → disclosed reference**. I
 Keep `SKILL.md` body under 300 lines.
 
 | Folder | Holds |
-|---|---|
+| --- | --- |
 | `playbooks/` | substantial route procedures; create only when needed |
 | `tactics/` | substantial conditional techniques shared or used by routes; create only when needed |
 | `scripts/` | executable automation |
@@ -136,16 +139,16 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 ## Syntax legend
 
 | Syntax | Meaning | Example |
-|---|---|---|
+| --- | --- | --- |
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
 | *italic* | Skill invocation phrase | *Load and follow the `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
-| `{{camelCase\\|hint}}` | Preferred field-local guidance | `{{priority\\|MVP or Should have}}` |
+| `{{camelCase\\ \| hint}}` | Preferred field-local guidance | `{{priority\\ \| MVP or Should have}}` |
 | `<!-- @: instruction -->` | Hidden structural/rendering directive; **MUST** be one terse line | `<!-- @: repeat per component -->` |
 | `[optional]` | Optional input | `[target-path]` |
-| `value1 \\| value2` | Allowed values | `completed \\| failed` |
+| `value1 \| value2` | Allowed values | `completed \| failed` |
 | ``literal`` | Fixed command/path/value | `dotnet test` |
 | `$snake_case` | Local Bash variable (shell only) | `$repo_root` |
 | `$UPPER_SNAKE_CASE` | Bash environment variable (shell only) | `$REPOSITORY_ROOT` |
@@ -178,7 +181,7 @@ Completion criteria check whether the defined result meets its contract; a compl
 - Resolve uncovered obligations by implementing them, asking for clarification, or reporting explicit deferral. **MUST NOT** declare completion with an unaccounted obligation.
 - Omit the sweep for small, bounded work when procedural checks or completion criteria already prove full coverage (e.g. a method rename or single defined diagram). **MUST NOT** duplicate the same checks under both sections.
 
-See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the closing procedure and [comparison research](../../docs/research/skill-result-check-section-naming.md) for selection examples.
+See [Completeness Sweep](../../docs/concepts/ops-completeness-sweep.md) for the closing procedure. Comparison research `docs/research/skill-result-check-section-naming.md` is not retained.
 
 ## Pruning
 

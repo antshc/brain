@@ -112,7 +112,7 @@ Input: immutable `version` (`X.Y.Z`), target AWS account/region/bucket, explicit
 ## Acceptance tests
 
 | Scenario | Expected |
-|---|---|
+| --- | --- |
 | Build `v1.2.0` | Exactly one immutable archive with manifest in Artifactory |
 | Rebuild `1.2.0` with different bytes | Rejected |
 | Release `1.2.0` | Versioned S3 child and root are published; root links to child 1.2.0 |
@@ -138,7 +138,7 @@ Input: immutable `version` (`X.Y.Z`), target AWS account/region/bucket, explicit
 CloudFormation has **no CLI flag to deploy only arbitrary selected resources** from a template or execute a subset of a change set. Select a deployment boundary or model optional resources explicitly; preview modifications through a change set.
 
 | Alternative | How | Advantages | Trade-offs | Best fit |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **A. Conditions + parameters** | Resource-level `Condition`; customer supplies feature flags during root-stack deployment/update | Single installation URL, explicit optional features, same root/child artifact | Conditions must be designed in template; turning a flag off can delete previously created resources; dependency and output references require care | Select optional features at installation |
 | **B. Nested stacks** | Split resource groups into nested child templates; root conditionally includes `AWS::CloudFormation::Stack` resources or passes child parameters | Modular templates; root coordinates one installation and lifecycle | Nested stacks remain parent-managed; changes should flow through root; disabling a nested stack can delete it | Optional resource groups needing unified lifecycle |
 | **C. Separate standalone stacks** | Publish one immutable template per independently deployable module; deploy/update each stack separately | Independent deployment, upgrades and lifecycle | More stack orchestration; parameters, outputs and cross-stack exports/imports require dependency management | Customers independently install or upgrade modules |
@@ -206,7 +206,7 @@ AWS reference: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/co
 ### Added acceptance tests
 
 | Scenario | Expected |
-|---|---|
+| --- | --- |
 | Initial installation with optional feature off | Feature resource/module absent; rest deployed |
 | JSON direct condition `Fn::Equals: ["false", "true"]` (E) | EC2 skipped; IAM role and policy created; no parameter prompt |
 | JSON direct condition `Fn::Equals: ["true", "true"]` (E) | EC2, IAM role and policy created |

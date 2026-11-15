@@ -208,7 +208,7 @@ On resume, recover the same pending worktree and approval identity; do not regen
 Automatically select the relevant scope for factual gaps. Codebase lookups use Research Explore; mechanism and inspection questions use How; cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
 
 | Option | Route | Scope |
-|---|---|---|
+| --- | --- | --- |
 | Web | `web` | Public primary sources, such as specifications and official docs |
 | Cloud | `cloud` | Provider, service, and whether live values matter |
 | Current system | `system` | Repository or deployable being mapped and inspection axis |

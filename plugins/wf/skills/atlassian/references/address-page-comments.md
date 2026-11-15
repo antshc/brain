@@ -9,12 +9,12 @@ Safe to repeat. Remaining work comes from the Rerun gate, never from memory of a
 ## Contents
 
 - 1. Preflight
-- 2. Rerun gate
-- 3. Understand each thread
-- 4. Edit the page in place
-- 5. Reply
+- 1. Rerun gate
+- 1. Understand each thread
+- 1. Edit the page in place
+- 1. Reply
 - Reply style
-- 6. Report
+- 1. Report
 - Gotchas
 - Completion criteria
 
@@ -29,22 +29,27 @@ Done when `@pageId`, `site`, `twg`, `accountId` are set.
 ## 2. Rerun gate
 
 1. List open comments, every page:
+
    ```bash
    <twg> confluence content comments list --id <pageId> --resolution-status open --include-replies true --body-format md --limit 250 -o json --output-file comments-1.json
    ```
+
    `data.nextCursor` present → repeat with `--cursor <value>` into `comments-2.json`, ... until absent.
 2. Fetch the draft body and token:
+
    ```bash
    <twg> confluence content get <pageId> --draft --detail full --format html --body-only --output-file draft.html -o json > envelope.json
    ```
+
    `@snapshotToken := data.snapshotToken` from `envelope.json`.
 3. Classify:
+
    ```bash
    python3 <skillDir>/scripts/comment_state.py --comments comments-1.json [comments-2.json ...] --html draft.html --account-id <accountId> --site <site> --pretty > state.json
    ```
 
 | `action` | Do |
-|---|---|
+| --- | --- |
 | `skip` | Report `counts`; no work left; **stop**. |
 | `stop` | Report `reason`; **stop**. |
 | `proceed` | Work `threads[]`. |
@@ -52,7 +57,7 @@ Done when `@pageId`, `site`, `twg`, `accountId` are set.
 Each thread: `id`, `type` (`inline`/`footer`), `anchor`, `replyTarget`, `markerRef`, `selection` (original highlighted text), `url`, `comments[]` (`author` `me`/`other`, `body`, `createdAt`) in order. Only pending threads are listed. A thread is answered when its latest entry is yours, or, for an orphaned thread, when your footer comment linking `focusedCommentId=<id>` is newer than the latest reviewer entry.
 
 | `anchor` | Meaning | `replyTarget` |
-|---|---|---|
+| --- | --- | --- |
 | `anchored` | Inline highlight still in the body | `thread` |
 | `orphaned` | Inline highlight's `data-annotation-id` no longer in the body | `page` |
 | `page` | Footer comment | `thread` |
@@ -68,7 +73,7 @@ Group threads naming the same underlying problem into one issue; keep per-thread
 Classify each issue:
 
 | Class | Comment is | Next |
-|---|---|---|
+| --- | --- | --- |
 | `edit` | A change request the evidence supports: wording, removal, addition, correction | Edit, then reply |
 | `answer` | A question, or a change the evidence shows is wrong or unneeded | Reply only |
 | `unclear` | Ambiguous intent, or facts you cannot verify | Ask one focused question |
@@ -85,7 +90,7 @@ Skip when no issue is `edit`.
 2. Write `edits.json`: one JSON array, all `edit` issues. Operations (all `value` fields are HTML strings; `localId` from `draft.html`):
 
    | Operation | Shape |
-   |---|---|
+   | --- | --- |
    | `replaceNode` | `{"name":"replaceNode","localId":"<id>","value":"<p>...</p>"}` |
    | `insertNodeAfter` / `insertNodeBefore` | `{"name":"insertNodeAfter","localId":"<id>","value":"<p>...</p>"}` |
    | `deleteNode` | `{"name":"deleteNode","localId":"<id>"}` |
@@ -96,9 +101,11 @@ Skip when no issue is `edit`.
 
    `replaceNode` value = the node's full current HTML from `draft.html` with only the requested change applied: keep its tag, `data-local-id`, every attribute, and every `<span class="annotation" ...>` wrapper whose text survives. Change the smallest node that holds the edit.
 3. Apply:
+
    ```bash
    <twg> confluence content update <pageId> --snapshot-token "<snapshotToken>" --edits-file edits.json --ack-body-formats --version-message "Address review comments" -y -o json > update.json
    ```
+
    Publishes by default; add `--draft` only when the user asks for a draft.
 4. Stale or missing token → refetch `draft.html` and token (step 2.2), revalidate every `localId` and annotation, rebuild `edits.json`, retry once. Second stale → report active editing; **stop** before replying. A target deleted or changed incompatibly → carry its issue as `unclear`.
 5. Read back: refetch the body (`--draft` only if you saved a draft) to `after.html`. Confirm each edited node holds the intended text and every `data-annotation-id` present before the edit is still present, except highlights whose text the edit removed on purpose.
@@ -112,7 +119,7 @@ Done when `update.json` reports success and read-back confirms every edit, or ea
 Draft each reply per *Reply style*. Claim a change only after step 4 read-back confirmed it.
 
 | Target | Command |
-|---|---|
+| --- | --- |
 | `thread` (anchored inline or footer) | `<twg> confluence content comments reply --comment-id <thread id> --body-file reply-<id>.md --body-format md -o json` |
 | `page` (orphaned, or lost by this run's edit) | One footer comment for the run: `<twg> confluence content comments create --id <pageId> --comment-type footer --body-file reply-page.md --body-format md -o json` |
 
@@ -141,7 +148,7 @@ Done when every pending thread has one confirmed reply (thread or page table row
 1–3 short sentences, more only when needed. Outcome → decisive reason → focused question when needed. Common words, active voice, the thread's register. Address the latest concern; do not repeat the reviewer or an earlier answer.
 
 | Situation | Reply |
-|---|---|
+| --- | --- |
 | Edited | Name the change briefly; a typo may need only `Fixed.` |
 | No change needed | Give the decisive reason with evidence. |
 | Unclear | Ask one focused question that unblocks the decision. |
@@ -154,7 +161,7 @@ No praise, apologies, headings, canned wording, or labels (`Bug:`, `Nit:`, `Note
 ## 6. Report
 
 | Section | Contents |
-|---|---|
+| --- | --- |
 | Gate | `counts` from step 2. |
 | Issues | One row per issue: class, threads, edits (`localId`s) or `none`, reply target. |
 | Page | Version message and whether published or saved as draft; annotations lost by edits. |

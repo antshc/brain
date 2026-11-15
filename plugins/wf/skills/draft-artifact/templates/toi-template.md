@@ -1,3 +1,8 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # TOI: `<Feature / Topic Name>`
 
 > **Transfer of Information (TOI)** — engineering hands a new product, feature, or topic to technical teams (Support, QA, Docs, Training, Field).

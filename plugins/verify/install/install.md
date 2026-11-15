@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Install Verify
 
 Follow this file only on explicit request in Copilot CLI. `installDir :=` the parent of this `install.md`'s absolute path. Read [references/concept.md](references/concept.md) first: it defines features, scenarios, evidence, receipts and revisions, and the rules for good checks.
@@ -7,7 +10,7 @@ Outcome: `proof/kit/` (the proof lib), `mole/` (the runner), `proof/` (app seams
 Commands by language (`<mole>`, `<run>`, `<prove>`, `<test>`, `<typecheck>` below):
 
 | | typescript | python |
-|---|---|---|
+| --- | --- | --- |
 | mole | `pnpm mole` | `python3 -m mole` |
 | run (a `<mole>` verb) | `run` | `run` |
 | prove (throwaway browser) | `pnpm prove` | `python3 -m mole.prove_cli` |

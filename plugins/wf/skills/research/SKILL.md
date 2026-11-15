@@ -36,7 +36,7 @@ Evidence routes: run once per request, before Routing. Define defers framing unt
 
 Frame shape, passed verbatim in each brief:
 
-```
+```text
 Question: <original>
 Rephrased: <glossary-term question>
 Terms: <term> — <meaning> (<GLOSSARY.md path>)
@@ -55,7 +55,7 @@ Include only facts that help the agents; omit empty lines.
 - Explore → return `hunty` verdicts inline to the requester; no file. The requester uses the cited findings directly.
 - How, Why, Cloud, Web → always save one Markdown report per independent question. Return only the report pointers, never the findings inline:
 
-  ```
+  ```text
   Research reports — read each in full before using its findings:
   - <question> → <absolute path> (<route>; complete | partial: <gap> | blocked: <blocker>)
   ```
@@ -72,7 +72,7 @@ Route independent questions separately; sequence dependent evidence. Provider/da
 Read the selected playbook in full before acting. Each playbook names which listed resources its triggers load; read those in full from this skill's base directory, not caller CWD.
 
 | Route | Select when | Playbook | Agents | Resources | Result |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Define | Chart or resume a research map; `/research define <prompt-or-map-path>` | [Define](playbooks/define.md) | No dedicated agent; existing evidence routes per topic | [Questioning](references/define-questioning.md), [Research map](templates/research-map.md); both required in full before charting/resuming | Saved map, checkpoint tables, topic reports and final or paused state |
 | Explore | Codebase exploration a calling agent uses as working evidence: find files or code, where is X, who calls Y, what does Z return, how parts connect, a restored package API, a graph query, path, or explain | [Explore](explore/explore.md) | `hunty` | None; `hunty` loads NuGet and Graphify | Inline `hunty` findings |
 | How | Current behavior in source, configuration, restored packages; explicit inspection | [How](how/how.md) | [hunty](agents/hunty.md), then [explainy](agents/explainy.md) for Detailed/Full | [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [How report](how/report.md), [Behavior](how/behavior.md), [Flow](how/flow.md), [Data](how/data.md), [NuGet](how/nuget.md), [Graphify](how/graphify.md), [How request guide](how/README.md) | Inline lookup verdict or one cited explanation |

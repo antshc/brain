@@ -41,7 +41,7 @@ Missing kind, ownership, or stage → report missing input without a posting bod
 **Reply** — outcome → decisive reason → focused question, when needed. Adapt to the situation:
 
 | Situation | Reply |
-|---|---|
+| --- | --- |
 | Committed and pushed | Briefly name the change; a typo can need only `Fixed.`. |
 | No change needed | Give the decisive reason; cite evidence when needed to assess it. |
 | Unclear | Ask one focused question that unblocks the decision. |
@@ -68,7 +68,7 @@ For recognition, count only a complete terminal block with an exact opener and c
 Examples illustrate tone, not mandatory wording. Code Review and HITL share the visible finding format.
 
 | Case | Visible body |
-|---|---|
+| --- | --- |
 | Finding | `ReadAsync` receives no cancellation token, so cancelling the job leaves the read running. Could we pass the job token to this call? |
 | Tone | Before: "The obvious next step is to switch that method to a filter as well, and that would break other callers." After: "Switching `X` to a filter would also affect its other callers. One option is to filter only at this call site. What do you think?" |
 | Fixed | Fixed. Empty batches now return before opening a connection. |
