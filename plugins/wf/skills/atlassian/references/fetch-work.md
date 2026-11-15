@@ -5,6 +5,7 @@ Return a Jira **Work item** as Markdown from a key, URL, or selected Jira search
 ## Steps
 
 **1 — Parse input.**
+
 - `https://<site>/browse/<key>` → `<site>`, `<key>`; `<site>` differs from Preflight `site` → pass `--site https://<site>`.
 - Bare `<key>` or search hit key → Preflight `site`.
 

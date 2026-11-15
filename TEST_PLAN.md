@@ -9,6 +9,7 @@ This document defines the test scenarios for the **ralph** AFK review service us
 - **Manual** — verified manually via CLI invocation.
 
 Integration test boundary:
+
 - `GhCli` → replaced with `FakeGhCli` (in-memory test double).
 - `AIAgent` → replaced with a spy that records calls and verifies arguments.
 - `ExecutionLog` → replaced with a mock/stub.
@@ -146,23 +147,23 @@ Scenario: Thread with no recognized label is NOT actionable
 
 Scenario: Last comment is excluded (question!) — thread not actionable
   Given an unresolved thread with comments:
-    | body                       |
-    | fix!: issue                |
+    | body           |
+    | fix!: issue       |
     | question!: Clarification?  |
   When is_actionable is evaluated
   Then the result is False
 
 Scenario: Last comment is excluded (Fixed.) — thread not actionable
   Given an unresolved thread with comments:
-    | body              |
+    | body           |
     | fix!: issue       |
-    | Fixed.            |
+    | Fixed.                     |
   When is_actionable is evaluated
   Then the result is False
 
 Scenario: Unlabeled comment after fix! — thread not actionable
   Given an unresolved thread with comments:
-    | body                          |
+    | body           |
     | fix!: broken null check       |
     | I think this is fine actually |
   When is_actionable is evaluated
@@ -170,7 +171,7 @@ Scenario: Unlabeled comment after fix! — thread not actionable
 
 Scenario: fix! after question! — last fix wins, thread actionable
   Given an unresolved thread with comments:
-    | body                       |
+    | body           |
     | fix!: original issue       |
     | question!: Clarification?  |
     | fix!: new fix              |
@@ -179,7 +180,7 @@ Scenario: fix! after question! — last fix wins, thread actionable
 
 Scenario: fix! after Fixed. — last fix wins, thread actionable
   Given an unresolved thread with comments:
-    | body                       |
+    | body           |
     | fix!: old issue            |
     | Fixed.                     |
     | fix!: actually not fixed   |
@@ -203,7 +204,7 @@ Scenario: Single labeled comment is the actionable comment
 
 Scenario: Last labeled comment is used when multiple comments exist
   Given an unresolved thread with comments:
-    | body                          |
+    | body           |
     | LGTM overall                  |
     | fix!: but this part is wrong  |
   When actionable_comment is evaluated
@@ -234,8 +235,8 @@ Scenario: Empty comment list returns empty string
 ```gherkin
 Scenario: Only actionable threads are returned
   Given a list of threads:
-    | id  | body                       | resolved |
-    | T1  | fix!: broken null check    | false    |
+    | id | body                    | resolved |
+    | T1 | fix!: broken null check | false    |
     | T2  | nit: minor style           | false    |
     | T3  | suggest!: extract method   | false    |
     | T4  | fix!: issue                | true     |
@@ -244,7 +245,7 @@ Scenario: Only actionable threads are returned
 
 Scenario: All threads are non-actionable — empty list returned
   Given a list of threads:
-    | id  | body              | resolved |
+    | id | body                    | resolved |
     | T1  | nit: minor style  | false    |
     | T2  | good: nice        | false    |
   When get_actionable_threads() is called
@@ -1082,7 +1083,6 @@ Scenario: Current repository's architecture index matches its records
 
 **Coverage:** Unit test
 
-
 ## Feature: GhCli Issue Pagination
 
 ```gherkin
@@ -1098,7 +1098,6 @@ Scenario: All open issue pages are returned without a spec number
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Surface Selection
 
@@ -1117,7 +1116,6 @@ Scenario: Unknown or empty surface choice is refused
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Repository Gate
 
@@ -1155,7 +1153,6 @@ Scenario: Cli exits 2 with error for non pnpm repo
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Kit Independence
 
 ```gherkin
@@ -1176,7 +1173,6 @@ Scenario: Mole uses the kit
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Scaffold Output
 
@@ -1234,7 +1230,6 @@ Scenario: Unresolved todo markers remain for the research step
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Scaffold No Overwrite
 
 ```gherkin
@@ -1250,7 +1245,6 @@ Scenario: Second run creates nothing
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Package Setup
 
@@ -1283,7 +1277,6 @@ Scenario: Ignored build scripts are approved
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Gitignore
 
 ```gherkin
@@ -1304,7 +1297,6 @@ Scenario: Equivalent existing entry is respected
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Surface Markers
 
@@ -1342,7 +1334,6 @@ Scenario: Unresolved placeholder is an error
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Plugin Layout
 
 ```gherkin
@@ -1379,7 +1370,6 @@ Scenario: Playwright cli has name and description frontmatter
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Language Selection
 
 > Script unit test (Verify installer `scaffold.py`, `--language`)
@@ -1408,7 +1398,6 @@ Scenario: Python language is accepted on the command line
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Python Kit Gate
 
 ```gherkin
@@ -1424,7 +1413,6 @@ Scenario: Old python is refused and untouched
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Python Kit Scaffold Output
 
@@ -1497,7 +1485,6 @@ Scenario: Typescript scaffold is unchanged by the python templates
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Python Kit No Overwrite
 
 ```gherkin
@@ -1513,7 +1500,6 @@ Scenario: Second run creates nothing
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Python Kit Install
 
@@ -1541,7 +1527,6 @@ Scenario: Failed install is reported not raised
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Python Kit Gitignore
 
 ```gherkin
@@ -1557,7 +1542,6 @@ Scenario: Existing entries are respected and missing ones appended
 ```
 
 **Coverage:** Unit test
-
 
 ## Feature: Proof Python Kit Engine
 
@@ -1597,7 +1581,6 @@ Scenario: Commands that need a session say nothing is running
 
 **Coverage:** Unit test
 
-
 ## Feature: Proof Python Kit End To End
 
 > Needs playwright and its Chromium
@@ -1631,7 +1614,6 @@ Scenario: A scenario fails before the fix passes after it and goes stale on the 
 ```
 
 **Coverage:** Integration test
-
 
 ## Feature: WF Skill Invocation Loading
 

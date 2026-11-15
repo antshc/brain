@@ -31,6 +31,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 - **Done when** every requirement is traced to the Functional slice or slices that implement it and every proposed User story advances exactly one Functional slice.
 
 ## Workflow
+
 1. **Normalize input** → apply Input Normalization to the supplied raw requirements, `/design spec` output, or feature design output. *Done when* every source field is either preserved verbatim in a proposed row or explicitly carried as source context for that row.
 2. **Propose breakdown** → present Proposed Breakdown Format and wait for explicit approval; give FE and BE their own rows because they are separate Deployables. Revise and re-confirm requested merges, splits, reassignments, metadata, or dependencies. *Done when* the user explicitly approves the table; draft no story before approval.
 3. **Number and link** → assign each approved row a story number in table order, retain supplied Jira ID and Epic ID values or use `TBD`, and resolve dependencies from approved in-batch rows only. Render each dependency as `(Story {{n}}, {{jiraId|TBD}})`; use `None` when a row has no in-batch dependency. *Done when* every row has a number, both IDs, and a valid Blocked by value.
@@ -41,7 +42,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 
 | Story | Deployable kind | Initiative tag | Feature | Functional slice | Stakeholder requirement | Functional requirements addressed | Business rules | Edge cases and error conditions | Source Acceptance criteria | Jira ID | Epic ID | Depends on |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| {{n}} | {{deployableKind|[FE] or [BE]}} | {{[TAG]|optional}} | {{feature}} | {{functionalSlice}} | {{stakeholderRequirement|verbatim}} | {{functionalRequirements|verbatim references or statements}} | {{businessRules|verbatim or None}} | {{edgeCasesAndErrors|verbatim or None}} | {{sourceAcceptanceCriteria|verbatim or None}} | {{jiraId|supplied or TBD}} | {{epicId|supplied or TBD}} | {{approved in-batch rows|None}} |
+| {{n}} | {{deployableKind \| [FE] or [BE]}} | {{[TAG] \| optional}} | {{feature}} | {{functionalSlice}} | {{stakeholderRequirement \| verbatim}} | {{functionalRequirements \| verbatim references or statements}} | {{businessRules \| verbatim or None}} | {{edgeCasesAndErrors \| verbatim or None}} | {{sourceAcceptanceCriteria \| verbatim or None}} | {{jiraId \| supplied or TBD}} | {{epicId \| supplied or TBD}} | {{approved in-batch rows \| None}} |
 
 ## Completion criteria
 
@@ -62,7 +63,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 
 This is the sole composed story-list template. Emit one block per approved row in table order, separated by one blank line. Add no wrapper prose, summary section, or cross-story index.
 
-```
+```text
 ## Story {{n}} — {{deployableKind|[FE] or [BE]}} {{[TAG]|optional Initiative tag followed by one space}}{{stakeholderRequirement|verbatim Stakeholder requirement}}
 
 **Jira ID:** {{jiraId|supplied or TBD}}

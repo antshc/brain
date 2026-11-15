@@ -4,14 +4,14 @@ Yes — for project management, I would structure Claude around the **project de
 
 The strongest dedicated PM skill set I found includes:
 
-* `senior-pm`
-* `scrum-master`
-* `jira-expert`
-* `confluence-expert`
-* `meeting-analyzer`
-* `team-communications`
-* `program-manager`
-* `sprint-retrospective`
+- `senior-pm`
+- `scrum-master`
+- `jira-expert`
+- `confluence-expert`
+- `meeting-analyzer`
+- `team-communications`
+- `program-manager`
+- `sprint-retrospective`
 
 The Composio collection then supplies the **action layer** for Jira, Asana, ClickUp, Slack, Google Calendar, Google Drive, Google Sheets, Gmail, and similar tools.
 
@@ -60,11 +60,11 @@ meeting-recap
 
 ### Key artifacts
 
-* Project Brief / Charter
-* Stakeholder Register
-* RACI Matrix
-* Communication Plan
-* Kickoff documentation
+- Project Brief / Charter
+- Stakeholder Register
+- RACI Matrix
+- Communication Plan
+- Kickoff documentation
 
 These are the traditional project-management artifacts needed to establish scope, responsibilities, stakeholders, and communication.
 
@@ -94,8 +94,8 @@ Schedule
 
 ### Skills
 
-* `senior-pm`
-* `program-manager`
+- `senior-pm`
+- `program-manager`
 
 ### Outputs
 
@@ -161,9 +161,9 @@ Owner + Mitigation + Due Date
 
 ### Recommended skills
 
-* `senior-pm`
-* `program-manager`
-* `jira-expert`
+- `senior-pm`
+- `program-manager`
+- `jira-expert`
 
 ### Artifacts
 
@@ -191,11 +191,11 @@ Notify Slack
 
 Recurring governance artifacts include:
 
-* Risk Register
-* RAID Log
-* Issue Log
-* Assumption Log
-* Dependency Log
+- Risk Register
+- RAID Log
+- Issue Log
+- Assumption Log
+- Dependency Log
 
 ---
 
@@ -217,42 +217,42 @@ Execution Health
 
 ### Skills
 
-* `jira-expert`
-* `scrum-master`
-* `senior-pm`
+- `jira-expert`
+- `scrum-master`
+- `senior-pm`
 
 Claude can answer questions such as:
 
-* What changed since yesterday?
-* What was completed?
-* What is in progress?
-* What is blocked?
-* What is overdue?
-* What is waiting on another team?
-* What has no owner?
-* Which milestones are at risk?
+- What changed since yesterday?
+- What was completed?
+- What is in progress?
+- What is blocked?
+- What is overdue?
+- What is waiting on another team?
+- What has no owner?
+- Which milestones are at risk?
 
 Then act through:
 
-* Jira Automation
-* GitHub Automation
-* Slack Automation
+- Jira Automation
+- GitHub Automation
+- Slack Automation
 
 The Jira integration covers issues, boards, sprints, and JQL.
 
 GitHub covers:
 
-* Issues
-* Pull requests
-* Actions
-* Development activity
+- Issues
+- Pull requests
+- Actions
+- Development activity
 
 Slack provides:
 
-* Messages
-* Threads
-* Search
-* Notifications
+- Messages
+- Threads
+- Search
+- Notifications
 
 ---
 
@@ -300,19 +300,19 @@ Publish recap
 
 A dedicated PM meeting skill can identify:
 
-* Decisions
-* Actions
-* Open questions
-* Risks
-* Dependencies
-* Ownerless actions
+- Decisions
+- Actions
+- Open questions
+- Risks
+- Dependencies
+- Ownerless actions
 
 ### Useful integrations
 
-* Google Calendar Automation
-* Google Drive Automation
-* Slack Automation
-* Gmail Automation
+- Google Calendar Automation
+- Google Drive Automation
+- Slack Automation
+- Gmail Automation
 
 ---
 
@@ -338,17 +338,17 @@ Retrospective
 
 ### Skills
 
-* `scrum-master`
-* `jira-expert`
-* `sprint-retrospective`
+- `scrum-master`
+- `jira-expert`
+- `sprint-retrospective`
 
 The `scrum-master` skill can cover:
 
-* Sprint health
-* Velocity forecasting
-* Capacity planning
-* Blocker detection
-* Retrospectives
+- Sprint health
+- Velocity forecasting
+- Capacity planning
+- Blocker detection
+- Retrospectives
 
 ### Sprint monitoring flow
 
@@ -414,13 +414,13 @@ confluence-expert
 
 to produce:
 
-* Change Request
-* Impact Assessment
-* Recommendation
-* Decision Record
-* Updated Schedule
-* Updated RAID
-* Updated Scope
+- Change Request
+- Impact Assessment
+- Recommendation
+- Decision Record
+- Updated Schedule
+- Updated RAID
+- Updated Scope
 
 For larger programs, `program-manager` becomes especially useful because changes can introduce cross-project dependencies.
 
@@ -476,12 +476,12 @@ team-communications
 
 A Status Report and executive or steering-committee briefing normally draw from:
 
-* Project Schedule
-* RAID Log
-* Work completed
-* Upcoming milestones
-* Decisions
-* Escalations
+- Project Schedule
+- RAID Log
+- Work completed
+- Upcoming milestones
+- Decisions
+- Escalations
 
 ---
 
@@ -503,30 +503,30 @@ Executive Summary
 
 ### Produce
 
-* Overall RAG status
-* Milestones
-* Budget / Resource status
-* Top 3 risks
-* Top 3 issues
-* Decisions needed
-* Escalations
+- Overall RAG status
+- Milestones
+- Budget / Resource status
+- Top 3 risks
+- Top 3 issues
+- Decisions needed
+- Escalations
 
 Then publish to:
 
-* Google Slides
-* Google Docs
-* Google Drive
-* Email
+- Google Slides
+- Google Docs
+- Google Drive
+- Email
 
 The Google Workspace skill bundle covers:
 
-* Gmail
-* Calendar
-* Chat
-* Docs
-* Sheets
-* Slides
-* Drive
+- Gmail
+- Calendar
+- Chat
+- Docs
+- Sheets
+- Slides
+- Drive
 
 ---
 
@@ -548,19 +548,19 @@ Archive
 
 ### Skills
 
-* `senior-pm`
-* `sprint-retrospective`
-* `meeting-analyzer`
-* `confluence-expert`
+- `senior-pm`
+- `sprint-retrospective`
+- `meeting-analyzer`
+- `confluence-expert`
 
 ### Outputs
 
-* Final Project Status
-* Lessons Learned
-* Open Follow-up Actions
-* Handover
-* Project Retrospective
-* Archive Structure
+- Final Project Status
+- Lessons Learned
+- Open Follow-up Actions
+- Handover
+- Project Retrospective
+- Archive Structure
 
 Project and milestone retrospectives, together with lessons learned, are standard closure artifacts.
 
@@ -645,7 +645,7 @@ Project and milestone retrospectives, together with lessons learned, are standar
 ## Skills
 
 | Skill                  | Primary Use                                         |
-| ---------------------- | --------------------------------------------------- |
+|----------------------|---------------------------------------------------|
 | `senior-pm`            | Project planning, governance, status, scope, risks  |
 | `program-manager`      | Cross-project dependencies and program coordination |
 | `scrum-master`         | Sprint planning, capacity, velocity, blockers       |
@@ -658,7 +658,7 @@ Project and milestone retrospectives, together with lessons learned, are standar
 ## Action Plugins
 
 | Plugin / Integration | Use                                      |
-| -------------------- | ---------------------------------------- |
+|--------------------|----------------------------------------|
 | Jira                 | Tasks, issues, sprints, workflows, JQL   |
 | Google Calendar      | Meetings, scheduling, kickoff, reviews   |
 | Google Drive         | Project files and shared artifacts       |

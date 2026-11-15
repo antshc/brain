@@ -6,13 +6,16 @@ argumentHint: "<description> | @plan | <github-issue-url>"
 disable-model-invocation: true
 ---
 
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 Resolve the task from the argument first: use a description verbatim, load `@plan` from session memory, or fetch a GitHub issue's title, body, and comments. For a fetched issue URL, retain its canonical repository and number as `RELATED_ISSUE`; leave it unset for other inputs. Missing or empty task → ask the user for a description; an unreachable issue → stop and report. Read the installed `codey-*.agent.md` descriptions in this plugin's `agents/` directory. Choose the agent whose description best fits the task; if several fit, choose the one central to the requested outcome. No matching technology → `general-purpose`. **Emit**: "Primary agent: <agent>."
 
 ## 1. Invoke implementation agent
 
 Run the commands below, substitute their output into the prompt, then pass it to `runSubagent`:`<primary agent>`. For `general-purpose`, require focused verification, uncommitted delivery, and the five-field report (`STATUS`, `SUMMARY`, `FILES`, `GOTCHAS`, `NOTES`). Return observed, reusable gotchas or `none` on every exit.
 
-```
+```text
 ## TASK
 <resolved task content>
 

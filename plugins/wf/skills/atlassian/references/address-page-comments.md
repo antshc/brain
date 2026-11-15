@@ -9,12 +9,12 @@ Safe to repeat. Remaining work comes from the Rerun gate, never from memory of a
 ## Contents
 
 - 1. Preflight
-- 2. Rerun gate
-- 3. Understand each thread
-- 4. Edit the page in place
-- 5. Reply
+- 1. Rerun gate
+- 1. Understand each thread
+- 1. Edit the page in place
+- 1. Reply
 - Reply style
-- 6. Report
+- 1. Report
 - Gotchas
 - Completion criteria
 
@@ -29,16 +29,21 @@ Done when `@pageId`, `site`, `twg`, `accountId` are set.
 ## 2. Rerun gate
 
 1. List open comments, every page:
+
    ```bash
    <twg> confluence content comments list --id <pageId> --resolution-status open --include-replies true --body-format md --limit 250 -o json --output-file comments-1.json
    ```
+
    `data.nextCursor` present → repeat with `--cursor <value>` into `comments-2.json`, ... until absent.
 2. Fetch the draft body and token:
+
    ```bash
    <twg> confluence content get <pageId> --draft --detail full --format html --body-only --output-file draft.html -o json > envelope.json
    ```
+
    `@snapshotToken := data.snapshotToken` from `envelope.json`.
 3. Classify:
+
    ```bash
    python3 <skillDir>/scripts/comment_state.py --comments comments-1.json [comments-2.json ...] --html draft.html --account-id <accountId> --site <site> --pretty > state.json
    ```
@@ -96,9 +101,11 @@ Skip when no issue is `edit`.
 
    `replaceNode` value = the node's full current HTML from `draft.html` with only the requested change applied: keep its tag, `data-local-id`, every attribute, and every `<span class="annotation" ...>` wrapper whose text survives. Change the smallest node that holds the edit.
 3. Apply:
+
    ```bash
    <twg> confluence content update <pageId> --snapshot-token "<snapshotToken>" --edits-file edits.json --ack-body-formats --version-message "Address review comments" -y -o json > update.json
    ```
+
    Publishes by default; add `--draft` only when the user asks for a draft.
 4. Stale or missing token → refetch `draft.html` and token (step 2.2), revalidate every `localId` and annotation, rebuild `edits.json`, retry once. Second stale → report active editing; **stop** before replying. A target deleted or changed incompatibly → carry its issue as `unclear`.
 5. Read back: refetch the body (`--draft` only if you saved a draft) to `after.html`. Confirm each edited node holds the intended text and every `data-annotation-id` present before the edit is still present, except highlights whose text the edit removed on purpose.

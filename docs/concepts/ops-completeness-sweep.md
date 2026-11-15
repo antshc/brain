@@ -30,7 +30,7 @@ An explicit deferral is an acceptable close; silence is not.
 
 Minimal instruction to embed as a closing step:
 
-```
+```text
 ## Completeness sweep
 
 Before completion:

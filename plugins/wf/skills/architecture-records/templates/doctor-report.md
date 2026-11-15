@@ -26,19 +26,19 @@
 
 | Index / table | Total rows | Consumed rows | Load result / gaps |
 |---|---|---|---|
-| {{indexAndTable}} | {{total|unknown if loading failed}} | {{consumed}} | {{loadResult}} |
+| {{indexAndTable}} | {{total \| unknown if loading failed}} | {{consumed}} | {{loadResult}} |
 
 ## Findings
 
 | ID | Artifact / claim | Verdict | Impact | Documented statement | Observed evidence | Suggested correction / owning route |
 |---|---|---|---|---|---|---|
-| {{id}} | {{recordAndSection}} | {{verdict|drift, obsolete, or unknown}} | {{impact}} | {{statementAndCitation}} | {{observationAndCitation}} | {{correctionAndRoute}} |
+| {{id}} | {{recordAndSection}} | {{verdict \| drift, obsolete, or unknown}} | {{impact}} | {{statementAndCitation}} | {{observationAndCitation}} | {{correctionAndRoute}} |
 
 ## Current records
 
 | Artifact | Verdict | Evidence / implementation state |
 |---|---|---|
-| {{record}} | current | {{supportingEvidence|Explicit approved decision awaiting implementation, with decision citation}} |
+| {{record}} | current | {{supportingEvidence \| Explicit approved decision awaiting implementation, with decision citation}} |
 
 ## Unknowns and blockers
 

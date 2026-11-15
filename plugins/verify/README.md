@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # Proving AI Agent Work: Verification, Evidence, and Receipts
 
 ## 1. Overview

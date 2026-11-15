@@ -178,4 +178,3 @@ User correction → save edit to `{{scenarioSlug}}.cs` and/or the scenario file 
 - Scenario md links to `{{scenarioSlug}}.cs`, never embeds its code.
 - No source/IaC file changed; code exploration went through `Explore` subagent.
 - No unredacted secret or tenant identifier.
-

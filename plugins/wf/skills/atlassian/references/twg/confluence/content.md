@@ -136,7 +136,7 @@ connector result by provider identity.
    lookup.
 
    | Destination                                                                                    | Action                                                                                         |
-   | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+   |----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
    | A Confluence path such as `<site>.atlassian.net/wiki/...`                                      | Read it with the **Fetch page** tactic (fallback `twg confluence content get "<url>"`, lossy). Do not search Rovo. |
    | A Jira issue path such as `<site>.atlassian.net/browse/<KEY>`                                  | Read the full body with the **Fetch work** tactic; metadata only: `twg jira workitem get <KEY> --site <site>`. Do not search Rovo. |
    | Another Atlassian product                                                                      | Hand off to that product's native skill and command when available; otherwise report and stop. |
@@ -144,7 +144,7 @@ connector result by provider identity.
    | Anything else, including public sites                                                          | Report the destination as an external link and stop. Do not search Rovo.                       |
 
 3. Search that connector by the exact title as stored in Confluence. Preserve
-   the whole title, including prefixes such as `Copy of `. If the quoted search
+   the whole title, including prefixes such as `Copy of`. If the quoted search
    returns no canonical match, retry once unquoted with the same complete title.
    Do not broaden further. Raw provider URLs and document IDs have poor search
    recall.
@@ -236,7 +236,7 @@ Export accepts a content ID or URL and a format. The backend resolves the conten
 type from the ID. Supported combinations:
 
 | Format | Content types             |
-| ------ | ------------------------- |
+|------|-------------------------|
 | `png`  | Whiteboard                |
 | `pdf`  | Page, blog post, live doc |
 | `word` | Page                      |

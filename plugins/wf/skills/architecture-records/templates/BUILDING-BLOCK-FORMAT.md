@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # {{buildingBlockName}}
 
 <!-- Purpose/Responsibility: 1-3 sentences on what the building block is (container/process name, deployment type — e.g. feature module vs. independent service) and its core responsibility. -->
@@ -57,6 +60,5 @@
 |----------|---------|-----------------------------|
 
 ## Key features
-
 
 *(optional)* <!-- 1-N bullet items, each a short named feature/capability with a one-line description. -->

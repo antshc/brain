@@ -44,7 +44,7 @@ Repo facts come from the repo, never from this skill. Reuse caller-supplied disc
 5. Build the `suites` table (one row per suite, plus one `localInstance` row) and keep it in context:
 
 | Field | Meaning |
-| --- | --- |
+|---|---|
 | `suite` | test project / scope |
 | `environments` | local (mock, emulator, docker, in-process) and cloud variants; how selected (env var, flag, config) |
 | `runFrom` | working directory for commands |
@@ -85,7 +85,7 @@ Pick one **kind** via the ladder, then add a **strategy** when the task asks for
 ### Kinds (what runs)
 
 | Kind | Seam | Playbook |
-| --- | --- | --- |
+|---|---|---|
 | component | One accessor/adapter against its real dependency: DB emulator or cloud SDK. Smallest seam. | [kinds/component.md](kinds/component.md) |
 | functional-slice | Integration testing framework: test project owns and starts its environment (mock / fake config / in-process / real cloud: new instance or existing deployment) and asserts end to end through the public API. Distinct from local-runtime. | [kinds/functional-slice.md](kinds/functional-slice.md) |
 | local-runtime | Separately started local app instance (local stack) exercised like a user, no test framework: REST API first, web GUI last. | [kinds/local-runtime.md](kinds/local-runtime.md) |
@@ -93,7 +93,7 @@ Pick one **kind** via the ladder, then add a **strategy** when the task asks for
 ### Strategies (how to test)
 
 | Strategy | Use when | Playbook |
-| --- | --- | --- |
+|---|---|---|
 | reproduce | Failing or flaky test / behavior → red, root cause, green | [strategies/reproduce.md](strategies/reproduce.md) |
 | regression | Area / category / full run before merge or release; report delta vs baseline | [strategies/regression.md](strategies/regression.md) |
 | (none) | Single run of the kind | — |

@@ -16,7 +16,7 @@ A compact arc42 subset for project managers. It focuses on information that affe
 ### Key stakeholders
 
 | Stakeholder | Interest / responsibility |
-| --- | --- |
+|---|---|
 | Product Manager | Scope, business outcomes, roadmap |
 | Project Manager | Delivery plan, dependencies, risks, coordination |
 | Engineering | Architecture, implementation, operability |
@@ -82,7 +82,7 @@ These constraints define fixed boundaries that can affect schedule, staffing, de
 ### External dependencies
 
 | Dependency | Relationship | Delivery concern |
-| --- | --- | --- |
+|---|---|---|
 | Product applications | Submit notification requests | Migration coordination |
 | Identity provider | Authenticates callers | Access setup |
 | Kafka | Buffers notification jobs | Platform capacity |
@@ -125,7 +125,7 @@ The strategy highlights major workstreams, integration points, sequencing constr
 Only project-significant decisions are surfaced here. Detailed ADRs can live separately.
 
 | Decision | Reason | Project impact |
-| --- | --- | --- |
+|---|---|---|
 | Use Kafka for delivery jobs | Existing supported platform; absorbs traffic spikes | Requires Kafka capacity and access before integration testing |
 | Use asynchronous delivery | Provider calls may be slow or unavailable | API completion does not mean message delivery |
 | Start with email and SMS only | Limits first-release scope | Push notifications require a later phase |
@@ -143,7 +143,7 @@ For each decision that materially changes cost, schedule, scope, risk, or an ext
 Quality goals should be measurable enough to influence acceptance and planning.
 
 | Quality | Scenario / target |
-| --- | --- |
+|---|---|
 | Availability | Submission API available 99.9% per month |
 | Performance | p95 submission latency < 300 ms under expected load |
 | Scalability | Sustain 5M notifications/day without architecture change |
@@ -164,7 +164,7 @@ These requirements create non-functional acceptance criteria and often introduce
 ### Active risks
 
 | Risk | Impact | Mitigation / action | Owner |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Kafka capacity is insufficient for peak load | Pilot delay or degraded delivery | Capacity test before production readiness review | Platform team |
 | Provider rate limits are lower than expected | Delivery backlog | Confirm limits and test throttling behavior | Engineering |
 | Product teams migrate late | Legacy system must remain longer | Agree migration dates and track each product as a dependency | Project Manager |
@@ -174,7 +174,7 @@ These requirements create non-functional acceptance criteria and often introduce
 ### Accepted technical debt
 
 | Debt | Reason accepted | Follow-up trigger |
-| --- | --- | --- |
+|---|---|---|
 | Only one email provider in v1 | Meets current availability requirement | Add second provider if availability target changes |
 | Template editor is API-only | UI is not required for pilot | Revisit after three product migrations |
 | Manual replay of terminal failures | Expected volume is initially low | Automate when support volume exceeds agreed threshold |

@@ -301,6 +301,6 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <!-- Record each consumed source once. Use a repository-relative path or canonical issue URL. Update the matching row when reprocessing a source. Do not infer provenance for legacy content. -->
 
 | **Source** | **Kind** | **Contribution** |
-| --- | --- | --- |
-| {{canonicalSource}} | {{sourceKind|Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
+|---|---|---|
+| {{canonicalSource}} | {{sourceKind \| Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
 <!-- adf:ignore:end -->

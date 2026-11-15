@@ -32,17 +32,17 @@ Read-only research of the live subscription. Check `command -v az`; absent → U
 3. **Discover** — `az <group> <command> --help` for unfamiliar commands or flags.
 4. **Read** — only `show`, `list`, `list-*`, `get-*`, plus:
 
-| Need | Command |
-|---|---|
-| Compute usage vs limit | `az vm list-usage --location <region>` |
-| Network usage vs limit | `az network list-usages --location <region>` |
-| Applied quota (any provider) | `az quota show` / `az quota usage list --scope <scope>` |
-| Role assignments | `az role assignment list --assignee <id> --scope <scope> [--include-inherited]` |
-| Role actions / data actions | `az role definition list --name <role>` |
-| Provider API versions, regions | `az provider show --namespace <ns> --query "resourceTypes[?resourceType=='<type>']"` |
-| SKU / regional availability | service `list-skus` (e.g. `az vm list-skus --location <region>`) |
-| ARM read with pinned version | `az rest --method get --url <ARM url>?api-version=<v>` |
-| Deployment validation | `az deployment group what-if` |
+   | Need | Command |
+   |---|---|
+   | Compute usage vs limit | `az vm list-usage --location <region>` |
+   | Network usage vs limit | `az network list-usages --location <region>` |
+   | Applied quota (any provider) | `az quota show` / `az quota usage list --scope <scope>` |
+   | Role assignments | `az role assignment list --assignee <id> --scope <scope> [--include-inherited]` |
+   | Role actions / data actions | `az role definition list --name <role>` |
+   | Provider API versions, regions | `az provider show --namespace <ns> --query "resourceTypes[?resourceType=='<type>']"` |
+   | SKU / regional availability | service `list-skus` (e.g. `az vm list-skus --location <region>`) |
+   | ARM read with pinned version | `az rest --method get --url <ARM url>?api-version=<v>` |
+   | Deployment validation | `az deployment group what-if` |
 
 5. **Shape output** — `--query '<JMESPath>' -o json` to extract the cited field.
 

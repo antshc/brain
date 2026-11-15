@@ -3,6 +3,7 @@ name: suggest
 description: 'Propose improvements, options, or ideas with supporting reasoning for provided information.'
 disable-model-invocation: true
 ---
+
 Analyze the provided information, then propose what fits the request:
 
 - **Improvements:** actionable changes to existing content, each with reasoning.

@@ -31,6 +31,7 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 **6 — Check TWG and cache identity.** If email or token is absent, report the missing credential and skip wrapper generation. Follow **Resolve** in the copied preflight `SKILL.md` to get the site, credentialed TWG command, and token availability, forcing the live identity check (ignore its cache-skip rule; this populates the cache). `<twg>` exit `127` → report missing "twg CLI" (user installs it), skip wrapper generation. Auth failure → report missing "valid `email`/`apiToken`", skip wrapper generation. On success, merge live `accountId` and `displayName` into missing or empty cache fields. Preserve populated fields.
 
 **7 — Offer `pub-<issue-type>` wrappers.** All lookups through Preflight's `twg`, `-o json --output-file`.
+
 1. `projectKey :=` Preflight `defaultProjectKey`; empty → `<twg> jira space query --limit 25`: one → use; many → ask; zero → report missing "a visible Jira project", skip wrapper generation.
 2. `<twg> jira space issue-types --id-or-key <projectKey>` → `data.issueTypes`.
 3. Per type ask: "Generate a repository-level skill for creating a `<issueType.name>` in `<projectKey>`? (yes/no)".

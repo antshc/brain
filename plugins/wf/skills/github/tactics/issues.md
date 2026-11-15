@@ -3,7 +3,7 @@
 Resolve the tracker separately from source. Use qualified `OWNER/REPO#NUMBER` or GitHub issue URLs. Use `issue read --comments` for complete issue context and `issue list --repo R --label LABEL` to reconcile candidates.
 
 | Operation | CLI |
-| --- | --- |
+|---|---|
 | Create | `issue create --repo R --title TITLE --body-file FILE --label LABEL` |
 | Update | `issue edit-body REF --body-file FILE`; prepare from the latest body and preserve unrelated changes |
 | Claim or release | `issue assign/unassign REF --login @me`; read back the sole claimant before work |

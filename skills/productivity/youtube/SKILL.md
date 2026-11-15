@@ -7,14 +7,13 @@ description: Fetch YouTube video transcripts, metadata, and downloads using yt-d
 
 Fetch transcripts, metadata, video, and audio from YouTube through `yt-dlp`, the one tool this skill wraps for every operation below.
 
-
 ## Install
 
 Run only when the user explicitly runs `/youtube install`.
 
 Confirm `yt-dlp` is not on PATH before installation:
 
-```
+```text
 yt-dlp --version
 ```
 
@@ -33,7 +32,8 @@ Done when `yt-dlp --version` and, if needed, `ffmpeg -version` both succeed.
 ## Common operations
 
 ### Download video
-```
+
+```text
 # 720p + subtitles if available (default)
 yt-dlp -f "bestvideo[height<=720]+bestaudio/best[height<=720]" --write-sub --write-auto-sub --sub-lang en -o "%(title)s.%(ext)s" "URL"
 
@@ -48,13 +48,16 @@ yt-dlp -x --audio-format mp3 -o "%(title)s.%(ext)s" "URL"
 ```
 
 ### Get full metadata (JSON)
-```
+
+```text
 yt-dlp --dump-json "URL"
 ```
+
 Pipe through `python3 -c "import sys,json; d=json.load(sys.stdin); print({k:d[k] for k in ('title','description','duration','uploader','upload_date')})"` to narrow the fields.
 
 ### Download transcript/subtitles
-```
+
+```text
 # Auto-generated English subtitles
 yt-dlp --write-auto-sub --skip-download --sub-lang en -o "output_name" "URL"
 
@@ -63,13 +66,14 @@ yt-dlp --write-sub --skip-download --sub-lang en -o "output_name" "URL"
 ```
 
 ### List available subtitles
-```
+
+```text
 yt-dlp --list-subs "URL"
 ```
 
-
 ### Download playlist
-```
+
+```text
 yt-dlp -o "%(playlist_title)s/%(title)s.%(ext)s" "PLAYLIST_URL"
 ```
 

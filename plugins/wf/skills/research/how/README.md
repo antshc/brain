@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # Current-system research
 
 *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. `hunty` supplies the evidence.

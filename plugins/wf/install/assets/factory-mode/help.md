@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Help Playbook
 
 **Trigger:** Invocation args start with `help`. `help` alone → usage examples. `help <request>` → 3 ranked ways to run the request. Never edits files, runs playbooks, or calls other skills.

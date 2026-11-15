@@ -73,6 +73,7 @@ When both `preflight-atlassian` and `atlassian` skills are installed, *Load and 
 Spawn one `whyy` per category with an available provider, all in one parallel batch, each owning one category and one provider. Atlassian's credentialed launcher may be shared by its Jira and Confluence investigators, but each must search and report only its assigned product. Don't ask one investigator to cover multiple categories or MCPs.
 
 Each `whyy` prompt is `agents/whyy.md` filled in, plus:
+
 - the category playbook `why/sources/<source>.md` for the selected provider, adapted per Conditional resources
 - `why/sources/incident-postmortem.md` **if the target code looks defensive** (null checks, retry logic, timeout handling, rate limiting, feature flags, egress guards, OOM handlers)
 - the code anchor and the user's original question
@@ -103,6 +104,7 @@ If your scope assessment suggests a single-commit trivial target where the PR de
 ## Step 4. Synthesize
 
 Spawn one `composy`. It gets:
+
 1. The investigator findings, including any null results and any categories skipped with justification
 2. The code anchor
 3. The user's original question

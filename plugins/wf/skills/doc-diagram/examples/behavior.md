@@ -1,3 +1,6 @@
+<!-- Bold labels and optional markers are intentional, not section headings. -->
+<!-- markdownlint-disable MD036 -->
+
 # Behavior Diagram
 
 Presentation examples for the `doc-diagram` skill (behavior).
@@ -33,6 +36,7 @@ flowchart TD
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Subprocess Detail Example
@@ -63,6 +67,7 @@ flowchart TD
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Flowchart Delta Example
@@ -90,6 +95,7 @@ flowchart TD
     classDef added stroke:#4a7a5a,stroke-width:1px
     classDef removed stroke:#8a4a4a,stroke-width:1px
 ```
+
 </details>
 
 ## Swimlane Diagram Example
@@ -131,6 +137,7 @@ swimlane-beta TB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Swimlane Internal Responsibility Example
@@ -172,6 +179,7 @@ swimlane-beta TB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Swimlane Diagram Delta Example
@@ -215,6 +223,7 @@ swimlane-beta TB
 ```
 
 **Behaviour changes**
+
 - `-` The entire "Legacy Order Queue" lane is being removed; Mermaid's `subgraph` has no supported border-color hook, so the removal is called out here in prose.
 
 </details>
@@ -267,6 +276,7 @@ sequenceDiagram
 
     note over Svc,Repo: persistence is transactional
 ```
+
 </details>
 
 ## Sequence Diagram Delta Example
@@ -310,4 +320,5 @@ sequenceDiagram
 
     note over Svc,Legacy: REMOVED: OrderService no longer notifies LegacyOrderQueue
 ```
+
 </details>

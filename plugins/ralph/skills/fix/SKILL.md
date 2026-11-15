@@ -12,14 +12,18 @@ Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://githu
 1. Run `/harness` skill from cwd. Unavailable, or exits reporting `missing` — use cwd as `$HARNESS_REPO_PATH`. Exits reporting `invalid` — **exit** and report. Otherwise `HARNESS_REPO_PATH := harnessRepoPath` from its emitted JSON.
 2. Derive the checkout for `<owner>/<repo>`: equals `$HARNESS_REPO_PATH`'s own `origin` remote (`git -C "$HARNESS_REPO_PATH" remote get-url origin`, normalized the same way as a `repos` entry) → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH`. Otherwise → `CODEBASE_REPO_PATH := $HARNESS_REPO_PATH/workspace/<repo>`. Confirm the checkout exists and its own `origin` normalizes to `<owner>/<repo>` — missing or a clone of another repository → **stop** before creating any worktree or touching any review thread, post no replies, and report why. Never read `repos` to make this decision.
 3. Get PR branch names:
-  ```bash
-  eval "$(gh pr view <number> --repo <owner>/<repo> --json headRefName,baseRefName \
-    -q '"branch=\(.headRefName)\ntarget_branch=\(.baseRefName)"')"
-  ```
+
+   ```bash
+   eval "$(gh pr view <number> --repo <owner>/<repo> --json headRefName,baseRefName \
+     -q '"branch=\(.headRefName)\ntarget_branch=\(.baseRefName)"')"
+   ```
+
 4. Run `/create-worktree` skill to create or reuse an isolated git worktree for the PR branch:
+
+   ```text
+   /create-worktree $CODEBASE_REPO_PATH $target_branch $branch
    ```
-  /create-worktree $CODEBASE_REPO_PATH $target_branch $branch
-   ```
+
    Parse the output to capture `WORKTREE_PATH`. Switch into `WORKTREE_PATH`.
 5. Run `/ralph-build` skill with `$HARNESS_REPO_PATH $WORKTREE_PATH` to build the project in the worktree and report pass or fail:
    A non-pass build → **exit** and report. Never fix threads on a broken build.
@@ -64,7 +68,7 @@ Output is a JSON array of actionable threads. Each thread has this structure:
 
 Reply to each thread via GraphQL:
 
-```
+```text
 gh api graphql -f query='
   mutation($threadId: ID!, $body: String!) {
     addPullRequestReviewThreadReply(input: { pullRequestReviewThreadId: $threadId, body: $body }) {
@@ -81,7 +85,7 @@ Do not resolve threads.
 
 ## 6. Cleanup
 
-```
+```text
 /delete-worktree $CODEBASE_REPO_PATH $WORKTREE_PATH $branch
 ```
 

@@ -14,16 +14,21 @@
 **2 — Resolve period.** Parse `{{input}}`: empty → default `1 month`. Convert it into a JQL relative-date modifier in **days only** — never the `M` (month) unit (see Gotchas) — using 1 month ≈ 30 days: `1 month` → `-30d`, `"2 weeks"` → `-14d`, `"3 months"` → `-90d`. Keep the day count: it is Step 5's `--cutoff-days`.
 
 **3 — Query A: blocked items assigned to me.**
+
 ```bash
 <twg> jira workitem query --jql 'assignee = currentUser() AND (status = "Blocked" OR flagged = Impediment) AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,issuetype,priority,updated --limit 25 -o json --output-file queryA-1.json
 ```
+
 Renders as section 1 of the output template.
+
 - **Fallback:** some Jira instances have no `"Blocked"` status literal and the clause errors — retry with `jql: 'flagged = Impediment AND updated >= <cutoffJql> ORDER BY updated DESC'`, record the dropped clause under Excluded, and never fail the whole report over it.
 
 **4 — Query B: mentions.**
+
 ```bash
 <twg> jira workitem query --jql 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,comment --limit 25 -o json --output-file queryB-1.json
 ```
+
 Search by Preflight's `accountId`, never display name — a display-name search both false-positives on comments the user authored and misses real `@mentions`. Issue this in the same shell call as Step 3, separated by `;`.
 
 **Pagination** (Steps 3 and 4): `--limit` caps each call, not the result set. Page with `--after <pageInfo.nextCursor>` into `query<A|B>-<n>.json` until `pageInfo.hasNextPage` is `false` or 5 pages. Pass one `--content` per page rather than merging by hand. Both scripts report `"truncated": true` when the last page still had more.

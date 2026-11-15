@@ -7,7 +7,7 @@ Publish only the requested HLD Confluence page, on explicit request. Consume the
 Read canonical HLD/revision and resolve existing target page ID or creation space/parent; reuse persisted targets. Ambiguous destination requires the user's decision, never a guessed title match. Preserve `<hld-path>.publication.json` outside disposable staging; record each confirmed operation immediately. Never infer absence from a failed read.
 
 | Field | Content |
-| --- | --- |
+|---|---|
 | `hld` | Canonical path/revision, target page ID/URL, creation space/parent; null target before creation |
 | `publishedHash` | Last verified publication-copy hash, null before publication |
 | `pending` | First unconfirmed operation or null after verified completion |

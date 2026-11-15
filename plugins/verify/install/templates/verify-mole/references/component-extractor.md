@@ -1,3 +1,6 @@
+<!-- Language alternatives retain the step numbers of the generated procedure. -->
+<!-- markdownlint-disable MD029 -->
+
 # Component extractor
 
 Prompt for a subagent. The parent launches a new subagent session whose prompt is the body of this file, with the inputs below appended. Run it while you author or run a scenario. Task: find or create the reusable UI controls the scenario needs, and help write the scenario around them, so flows and checks never repeat selectors.
@@ -24,6 +27,7 @@ Do:
 Return: components created or changed, the methods they expose, the usage snippets and draft scenario line from step 7, what was verified in the live UI, and every selector that is unverified.
 
 Rules:
+
 - Write only inside `proof/components/`. The parent owns flows, checks, pages, maps and features: report what they should call.
 - Components observe and act on one control only. They never judge: no assertions.
 - Do not weaken a failing scenario to make the component pass.

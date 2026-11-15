@@ -13,7 +13,7 @@ Coordinator: fill from verified Prove reports after aggregation and the complete
 ## Risks and cleared claims
 
 | ID / claim | Failure mechanism, location, likelihood / impact | Verdict | Ladder level | Proof method and evidence | Unproven reason / next step |
-| --- | --- | --- | --- | --- | --- |
+|---|---|---|---|---|---|
 | {ID and claim} | {Mechanism and file:line} | {confirmed / cleared / unresolved} | {1–5} | {Source trace or execution evidence link} | {Reason and next check, or none} |
 
 Include confirmed defects, cleared risks, and unresolved claims. For each execution, inline or link its exact command, environment, executed tests and counts or runtime observation, result, target/patch identity, and artifacts. Preserve baseline comparisons and Prove report provenance; distinguish an existing defect from a demonstrated regression.

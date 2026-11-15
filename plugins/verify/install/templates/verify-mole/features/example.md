@@ -1,3 +1,6 @@
+<!-- Repeated template sections are intentional. -->
+<!-- markdownlint-disable MD024 -->
+
 # example (placeholder)
 
 <!-- lang: python -->

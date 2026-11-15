@@ -52,7 +52,8 @@ Before continuing, run [Evidence routing](../references/evidence-routing.md) on 
 
 1. Present in chat: usage sketch, module map, key types and signatures, synthesis decision, the rationale's open questions and risks, evidence conclusions and limitations, proposed corrections, and absolute paths of the synthesized sketch, module map, and rationale.
 2. Offer these replies verbatim, then stop and wait for the user:
-   ```
+
+   ```text
    Reply with one:
    - **corrections**: `Q2 → keep per-tenant tables` (edits sketch, design, rationale; add `; arena` to also run a new arena that creates a new candidate)
    - **challenge-this**: `risk 1; intent: ...; target: DynamoDB Local` (adversaries try to prove it)
@@ -61,6 +62,7 @@ Before continuing, run [Evidence routing](../references/evidence-routing.md) on 
    - **accept**: continue implementation (or the caller's design-only handoff)
    - **implement**: build against the sketch in this working tree (overrides a design-only handoff)
    ```
+
 3. Act on the reply:
    - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place under the [shared sketch contract](../references/sketch-contract.md), then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite with [red flags](../references/red-flags.md) and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
    - **Corrections with `arena`** → apply as above, then *Load and follow the `subagents` skill to run an Arena comparison of independent candidates* using **Arena**, Re-run for corrections, with the corrected incumbent, next revision number, same Phase B contract, and corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
@@ -111,4 +113,3 @@ When you scrap:
 ## Outputs
 
 The caller's usage is written first and the type sketch derived from it. Files follow the artifact contract in `design/SKILL.md`: `synthesis/sketch/` source files (one file for small changes), `synthesis/module-map.md`, and `synthesis/rationale.md` shaped by the [shared template](../references/rationale.template.md), including usage and the synthesis decision. Sketch, synthesized design, and rationale reflect every correction and Phase E deviation; `review-log.md` records each decision. Phase E produces a scaffold commit, then working code filling it in the current branch.
-
