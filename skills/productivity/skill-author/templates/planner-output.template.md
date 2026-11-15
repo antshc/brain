@@ -1,6 +1,3 @@
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
-
 <!-- @: Planner task-graph output contract; inline into the planner agent's Output section. -->
 <!-- @: Ticket-backed systems: replace `id` with real issue refs and `dependsOn` with native blocker edges; do not invent a second task database. -->
 

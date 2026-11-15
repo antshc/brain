@@ -1,6 +1,3 @@
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
-
 ## Constraints
 
 - Capture the absolute harness root before changing directories. From a linked worktree, require an explicit or recorded root. Verify the source checkout against the intended repository and pass it separately.

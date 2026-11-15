@@ -4,9 +4,6 @@ description: This skill should be used when the user needs to transform audio re
 license: MIT
 ---
 
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
-
 ## Purpose
 
 This skill automates audio-to-text transcription with professional Markdown output, extracting rich technical metadata (speakers, timestamps, language, file size, duration) and generating structured meeting minutes and executive summaries. It uses Faster-Whisper or Whisper with zero configuration, working universally across projects without hardcoded paths or API keys.

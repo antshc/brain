@@ -1,6 +1,3 @@
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
-
 ### Stories
 
 **You own the breakdown.** Turn conversation, raw requirements, spec or design into an approved ordered list of atomic, testable **User stories**, broken down by **Functional slice**. This playbook produces stories, not code or implementation tickets.

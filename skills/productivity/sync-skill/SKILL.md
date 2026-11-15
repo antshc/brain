@@ -4,8 +4,6 @@ description: Merge improvements from an upstream skill version into your local c
 disable-model-invocation: true
 ---
 
-# Sync skill
-
 You have a **local** skill with intentional **drift** from the **upstream** original. This skill extracts the upstream **delta**, classifies each change, and applies the ones that sharpen the local skill without touching its drift.
 
 ## Process

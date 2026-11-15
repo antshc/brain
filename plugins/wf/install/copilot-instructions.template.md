@@ -1,5 +1,3 @@
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
 

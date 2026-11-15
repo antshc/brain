@@ -1,6 +1,3 @@
-<!-- Independent prompt sections or embedded document examples retain their titles. -->
-<!-- markdownlint-disable MD025 -->
-
 # Claude for Project Management
 
 Yes — for project management, I would structure Claude around the **project delivery lifecycle**, not product discovery.

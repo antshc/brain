@@ -1,5 +1,3 @@
-# Feat
-
 If the user prefixes a request with `feat!`, use the feature-branch workflow:
 
 1. Run the `github` **Name branch** tactic. Verify and create the resulting `feat/` or `fix/` branch.

@@ -4,8 +4,6 @@ description: >-
   Commit current staged or unstaged work with a ccode-prefixed message derived from Codey's report or the diff. Use after a Codey task completes or when the user says 'commit it'. Require confirmation for partial or blocked work.
 ---
 
-# Crew commit
-
 Commit all uncommitted changes using the format below.
 
 **Gate:** a status report of `partial` or `blocked` means the work is unverified. Surface the status and its NOTES, and commit only after the user confirms. (`ralph:dev` makes its own single commit on an isolated worktree branch instead — it never routes through this skill.)

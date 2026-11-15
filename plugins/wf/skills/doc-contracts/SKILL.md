@@ -5,8 +5,6 @@ description: >-
 name: doc-contracts
 ---
 
-# Doc contracts
-
 Document contract and GUI changes as a terse diff — never restate untouched contract or surface. Look up facts yourself (swagger.json, codebase, DB schema, GUI source).
 
 ## Assemble and write a contract delta

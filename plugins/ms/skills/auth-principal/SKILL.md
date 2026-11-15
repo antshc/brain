@@ -7,8 +7,6 @@ description: >-
 <!-- Bold labels and optional markers are intentional, not section headings. -->
 <!-- markdownlint-disable MD036 -->
 
-# Auth principal
-
 **Step 0 — Detect OS**
 Run `uname -s 2>/dev/null`. If it fails or returns a Windows-like environment, use the Windows steps. Otherwise use the Linux steps.
 

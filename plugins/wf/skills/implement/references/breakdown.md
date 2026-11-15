@@ -1,7 +1,5 @@
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
-<!-- Independent prompt sections or embedded document examples retain their titles. -->
-<!-- markdownlint-disable MD025 -->
 
 # Breakdown
 

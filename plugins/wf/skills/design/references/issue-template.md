@@ -1,7 +1,5 @@
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
 
 <issue-template>
 ## Parent Spec

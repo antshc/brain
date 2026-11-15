@@ -9,8 +9,6 @@ disable-model-invocation: true
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
 
-# To crew
-
 Resolve the task from the argument first: use a description verbatim, load `@plan` from session memory, or fetch a GitHub issue's title, body, and comments. For a fetched issue URL, retain its canonical repository and number as `RELATED_ISSUE`; leave it unset for other inputs. Missing or empty task → ask the user for a description; an unreachable issue → stop and report. Read the installed `codey-*.agent.md` descriptions in this plugin's `agents/` directory. Choose the agent whose description best fits the task; if several fit, choose the one central to the requested outcome. No matching technology → `general-purpose`. **Emit**: "Primary agent: <agent>."
 
 ## 1. Invoke implementation agent

@@ -1,5 +1,3 @@
-# Sand
-
 If the user prefixes a request with `sand!`, use the disposable sandbox workflow.
 
 1. Identify the single question the sandbox must answer and the GitHub issue that owns it. If either is unclear, ask before coding.

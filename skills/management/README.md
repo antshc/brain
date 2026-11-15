@@ -1,6 +1,3 @@
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
-
 ## Install
 
 ### Meeting management

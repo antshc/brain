@@ -5,9 +5,6 @@ description: >-
 argument-hint: '<PR URL> (e.g., "https://github.com/owner/repo/pull/1245")'
 ---
 
-<!-- Independent prompt sections or embedded document examples retain their titles. -->
-<!-- markdownlint-disable MD025 -->
-
 # Setup
 
 Parse `{{input}}` to extract `<owner>`, `<repo>`, `<number>` from `https://github.com/{owner}/{repo}/pull/{number}`.

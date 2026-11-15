@@ -1,5 +1,3 @@
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
 <!-- Delta fragments use heading levels required by the containing document. -->
 <!-- markdownlint-disable MD001 -->
 

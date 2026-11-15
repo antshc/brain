@@ -1,6 +1,3 @@
-<!-- This fragment is embedded in a larger document. -->
-<!-- markdownlint-disable MD041 -->
-
 ### Bug fix
 
 **You own this task. Plan, review, verify.** Delegate investigation and the fix to subagents; stay in the lead.
