@@ -1,75 +1,106 @@
-"""Research-map ownership, disclosure, and resumable lifecycle regressions."""
+"""Research Wayfinder ownership, isolation and resumable lifecycle contracts."""
 import re
 from pathlib import Path
-
 
 REPO = Path(__file__).resolve().parents[3]
 ROOT = REPO / 'plugins/wf/skills/research'
 ENTRY = (ROOT / 'SKILL.md').read_text()
-DEFINE = (ROOT / 'playbooks/define.md').read_text()
-TEMPLATE = (ROOT / 'templates/research-map.md').read_text()
-QUESTIONING = (ROOT / 'references/define-questioning.md').read_text()
+WAYFINDER = (ROOT / 'wayfinder/wayfinder.md').read_text()
+MAP = (ROOT / 'wayfinder/research-map.template.md').read_text()
+DOCUMENT = (ROOT / 'wayfinder/research-document.template.md').read_text()
+LIVING = (ROOT / 'wayfinder/living-document.md').read_text()
 
 
-def test_define_is_body_only_and_old_owner_is_removed():
-    frontmatter = ENTRY.split('---')[1]
-    assert 'define' not in frontmatter.lower()
-    assert '/research define <prompt-or-map-path>' in ENTRY
-    assert 'Route: Define' in ENTRY
-    assert 'Select Define before requiring a factual question' in ENTRY
-    assert not (ROOT.parent / 'define').exists()
-    for resource in ('playbooks/define.md', 'references/define-questioning.md', 'templates/research-map.md'):
-        assert f']({resource})' in ENTRY
-        assert (ROOT / resource).is_file()
-    assert 'both required in full before charting/resuming' in ENTRY
+def test_wayfinder_route_resources_and_migration():
+    assert 'wayfinder' not in ENTRY.split('---')[1].lower()
+    assert '/research wayfinder <prompt-or-map-path>' in ENTRY
+    assert 'Route: Wayfinder' in ENTRY
+    for name in ('wayfinder.md', 'questioning.md', 'living-document.md',
+                 'research-map.template.md', 'research-document.template.md'):
+        assert f'](wayfinder/{name})' in ENTRY
+    for removed in ('playbooks/define.md', 'references/define-questioning.md', 'templates/research-map.md'):
+        assert not (ROOT / removed).exists()
+    assert not (ROOT / 'playbooks').exists()
+    assert not (ROOT / 'templates').exists()
+    assert 'legacy map as inactive' in WAYFINDER
+    assert 'preserve files/history' in WAYFINDER
 
 
-def test_map_and_topics_keep_the_persistent_contract():
-    assert re.findall(r'^## (.+)', TEMPLATE.split('```markdown\n')[1].split('```')[0], re.M) == [
-        'Destination', 'Notes', 'Topics', 'Findings so far', 'Not yet specified', 'Out of scope']
-    for field in ('Type', 'Question', 'Claim', 'Resolve via', 'Blocked by'):
-        assert f'**{field}:**' in TEMPLATE
-    assert 'confirmed when' in TEMPLATE and 'refuted when' in TEMPLATE
-    assert 'docs/ongoing/{{destinationSlug}}-research-map.md' in DEFINE
-    assert 'docs/research/{{destinationSlug}}-{{topicSlug}}.md' in DEFINE
-    assert 'or an explicit caller destination' in DEFINE
-    assert 'explicit paths override session defaults' in DEFINE
+def test_root_owns_all_fog_and_children_own_concrete_work():
+    assert re.findall(r'^## (.+)', MAP.split('```markdown\n')[1].split('```')[0], re.M) == [
+        'Destination', 'Notes', 'Document and branches', 'Findings so far', 'Not yet specified', 'Out of scope']
+    for field in ('Question', 'Unknowns', 'Work', 'Research scope', 'Blocked by', 'Part of', 'Result'):
+        assert f'## {field}' in MAP
+    assert 'all unresolved unknowns and risks' in WAYFINDER
+    assert 'including those with active children' in WAYFINDER
+    assert 'Do not maintain another active Markdown research map' in WAYFINDER
+    assert 'native parent/sub-issue edges' in WAYFINDER
+    assert 'reject cycles' in WAYFINDER
 
 
-def test_resume_and_chart_preserve_user_checkpoints():
-    assert 'without restarting the destination interview' in DEFINE
-    assert 'Missing or unreadable map' in DEFINE
-    assert 'overwrite it or resume it' in DEFINE
-    assert 'the user confirms the destination' in DEFINE
-    assert 'Ask the user to confirm or correct the map' in DEFINE
-    assert 'On decline, stop' in DEFINE
-    assert 'one at a time; on acceptance' in DEFINE
-    assert 'The decision itself and any implementation belong to the caller' in DEFINE
-    assert 'Ask the whole frontier in one round' in QUESTIONING
+def test_shared_mechanics_and_exact_proposal_approval():
+    shared = REPO / 'plugins/wf/skills/github/references/wayfinder.md'
+    design = (REPO / 'plugins/wf/skills/design/references/github.md').read_text()
+    assert 'using **Wayfinder operations**' in design
+    assert '### Create Wayfinder sub-ticket' in shared.read_text()
+    assert '### Create Wayfinder sub-ticket' not in design
+    assert '`github` skill' in WAYFINDER and '`git` skill' in WAYFINDER
+    assert '**Ticket approval** and **Prototype approval**' in WAYFINDER
+    assert 'temporary clickable Markdown drafts' in WAYFINDER
+    assert 'Changed proposals require fresh review' in WAYFINDER
+    assert 'without another dispatch question' in WAYFINDER
+    assert 'Do not start Design' in WAYFINDER
 
 
-def test_evidence_uses_existing_pipeline_without_recursive_dispatch():
-    assert 'Frame, Routing and Spawning agents' in DEFINE
-    assert 'Never recursively invoke Research or select Define for a topic' in DEFINE
-    assert 'Batch independent topics in parallel' in DEFINE
-    assert 'sequence dependent topics' in DEFINE
-    assert 'built-in `explore` subagent' not in DEFINE
-    assert 'Frame, Routing and Spawning agents' in QUESTIONING
-    assert 'Save Explore verdicts unabridged to the topic path' in DEFINE
+def test_owned_worktrees_pinned_dependencies_and_payload_gate():
+    for prefix in ('wayfinder/<slug>', 'research/<slug>', 'prove/<slug>'):
+        assert prefix in WAYFINDER
+    assert 'outside disposable worktrees' in WAYFINDER
+    assert 'leave the caller\'s working branch untouched' in WAYFINDER
+    assert 'pinned current integration HEAD' in WAYFINDER
+    assert 'prerequisite evidence is integrated' in WAYFINDER
+    assert 'research report-only payloads integrate automatically' in WAYFINDER
+    assert 'explicit user approval before any payload commit/merge' in WAYFINDER
+    assert 'actual payload content identity' in WAYFINDER
+    assert 'revised payloads require fresh approval' in WAYFINDER
+    assert 'Restore unrelated production-source edits' in WAYFINDER
+    assert 'No automatic push, PR, merge into session base' in WAYFINDER
+    assert 'Retain blocked, rejected or approval-pending worktrees' in WAYFINDER
+
+
+def test_evidence_pipeline_and_standalone_delivery_are_preserved():
+    assert 'Frame, Routing and Spawning agents' in WAYFINDER
+    assert 'Never recursively invoke Research or select Wayfinder for a topic' in WAYFINDER
+    assert 'Save Explore verdicts unabridged' in WAYFINDER
+    assert 'Batch independent research' in WAYFINDER
+    assert 'only the Research router writes reports' in WAYFINDER
+    for field in ('@question', '@criteria', '@repoFacts', '@outputPath', '@outputBase'):
+        assert field in WAYFINDER
+    assert 'retention through reproduction and human review' in WAYFINDER
     assert 'Report-only delivery below applies to standalone evidence routes' in ENTRY
     assert 'route `define-concept`' in ENTRY
 
 
-def test_incomplete_work_remains_resumable_and_does_not_unblock_dependants():
-    assert 'Keep partial, blocked, declined and inconclusive topics open' in DEFINE
-    assert 'their dependants remain blocked' in DEFINE
-    assert 'hand back their status and the resumable map' in DEFINE
-    assert 'Check closure before offering more work' in DEFINE
-    assert 'Graduate any fog' in DEFINE
-    assert 'Out of scope' in DEFINE
-    assert 're-rank Topics by risk' in DEFINE
-    assert 'Topics and Not yet specified are both empty' in DEFINE
-    assert 'user confirms the remaining topics cannot change the destination' in DEFINE
-    for field in ('@question', '@criteria', '@repoFacts', '@outputPath', '@outputBase'):
-        assert field in DEFINE
-    assert 'request retention through any human review; read its returned report in full' in DEFINE
+def test_incremental_synthesis_keeps_evidence_and_status_separate():
+    assert re.findall(r'^## (.+)', DOCUMENT.split('```markdown\n')[1].split('```')[0], re.M) == [
+        'Bottom line', 'What we did', 'Open questions / decisions', 'Remaining work', 'Next steps', 'References']
+    for contract in ('Update matching subjects and sections in place',
+                     'Preserve verified findings and human decisions',
+                     'Avoid duplicate findings, references and outcome rows',
+                     '**Not confirmed**', 'references/bottom-line.md',
+                     'repository-relative links', 'first unconfirmed synchronization step',
+                     'A no-change rerun creates no commit'):
+        assert contract in LIVING
+    assert 'pending proof is not integrated evidence' in LIVING
+    assert 'not a competing fog register' in LIVING
+
+
+def test_resume_retains_incomplete_work_without_unblocking_dependents():
+    for contract in ('their dependents remain blocked',
+                     'without restarting the destination interview',
+                     'Never regenerate an unchanged approval candidate',
+                     'Missing refs or local evidence are blockers',
+                     'never invent remote artifact links',
+                     'a synchronized document needs remaining tracker writes only',
+                     'Every unresolved claim stays explicit'):
+        assert contract in WAYFINDER

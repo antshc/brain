@@ -18,7 +18,7 @@ REPORT = (ROOT / 'how/report.md').read_text()
 PROMPT = (ROOT / 'how/explorer-prompt.md').read_text()
 EXPLAINER = (ROOT / 'agents/explainy.md').read_text()
 AGENTS = ('hunty', 'explainy', 'whyy', 'composy', 'cloudy', 'weby')
-ROUTES = {'Define': ('playbooks/define.md', ()), 'Explore': ('explore/explore.md', ('hunty',)), 'How': ('how/how.md', ('hunty', 'explainy')), 'Why': ('why/why.md', ('whyy', 'composy')),
+ROUTES = {'Wayfinder': ('wayfinder/wayfinder.md', ()), 'Explore': ('explore/explore.md', ('hunty',)), 'How': ('how/how.md', ('hunty', 'explainy')), 'Why': ('why/why.md', ('whyy', 'composy')),
           'Cloud': ('cloud/cloud.md', ('cloudy',)), 'Web': ('web/web.md', ('weby',))}
 
 
@@ -26,7 +26,7 @@ def local_markdown_links(path: Path) -> set[Path]:
     links = set()
     for link in re.findall(r'\]\(([^)]+)\)', path.read_text()):
         parts = urlsplit(link)
-        if not parts.scheme and parts.path.endswith('.md'):
+        if not parts.scheme and parts.path.endswith('.md') and not re.search(r'[<>{}]', parts.path):
             links.add((path.parent / unquote(parts.path)).resolve())
     return links
 
@@ -97,7 +97,7 @@ def test_every_bundled_markdown_resource_is_reachable_directly_from_entry():
 
 def test_research_routes_have_no_default_artifact_locations():
     for path in ROOT.rglob('*.md'):
-        if path.relative_to(ROOT).as_posix() in {'playbooks/define.md', 'templates/research-map.md'}:
+        if path.relative_to(ROOT).parts[0] == 'wayfinder':
             continue
         content = path.read_text()
         for obsolete in ('docs/research/', '<slug>-chain.md', '<slug>-data.md', '<slug>-<provider>.md'):
