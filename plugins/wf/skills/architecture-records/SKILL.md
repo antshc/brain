@@ -1,7 +1,7 @@
 ---
 name: architecture-records
 description: >-
-  Define Concepts, record architecture, and check documentation drift. Use for 'define concept', 'record an ADR', 'architecture doctor', 'load an index', or 'initialize missing docs'. Not for feature design → `design`; diagrams → `doc-diagram`.
+  Record ADRs, Concepts, building blocks, and glossary terms; maintain architecture indexes and check documentation drift. Use for 'record an ADR', 'check architecture records', 'load an index', or 'initialize missing docs'. Not for feature design → `design`; diagrams → `doc-diagram`.
 argument-hint: "route: define-concept | adr | building-block | deployment-view | term | concept-body | concept-record | decision-bullet | initialize | index [action] | doctor [scope]"
 ---
 
