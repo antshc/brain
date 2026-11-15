@@ -40,7 +40,7 @@ Split on **when the rule is needed**:
 | which approach was chosen and its structural decisions | Concept, `docs/concepts/` | this skill — continue below |
 | why it was chosen, and the rejected alternatives | standalone ADR linking to the Concept, or feature design when it fails the ADR gate | return control to the router for **Select and load** with route `adr`; otherwise session ledger / feature design |
 | how to word, name, format, or lay out the file being written | an instructions file under `.github/instructions/`, scoped by `applyTo` | edit that file directly |
-| what a contested term means | glossary, `GLOSSARY.md` | return control to the router for **Record term** |
+| what a contested term means | glossary, `GLOSSARY.md` | return control to the router for **Select and load**, route `term` |
 | which command, path, or version this one repo uses | the repo's own convention file or memory | edit that file directly |
 
 Two tests settle most cases:
@@ -198,7 +198,7 @@ The `ARCHITECTURE.md` row (or the block's row) is authored directly by this skil
 
 1. `title` is the `# ` heading text, used as the record-name column linked to the record path.
 2. Author `summary` — 1-2 plain-text sentences describing what the Concept covers; no link.
-3. Use the already-loaded index defaults contract and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `/define concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
+3. Use the already-loaded index defaults contract and author `default` under its contract. A caller-supplied, user-confirmed `default` (from `architecture-records`, route `define-concept`) is used verbatim after the contract check; report a mismatch rather than silently rewriting it.
 4. Derive the Trigger condition: Apply **Generate trigger condition**, passing the rendered body as `{{recordContent}}` and the authored default as `{{rowValues}}`. Confirm every clause's applicability is discoverable.
 5. Apply **Ensure section exists** for `Crosscutting Concepts`, then its **Sync index row** with `{{rowMetadata}}` = `title`, `summary`, and the `Trigger condition & Default` cell `**Trigger:** {{triggerCondition}}. **Default:** {{default}}` — never edit the table in `ARCHITECTURE.md` directly.
 
@@ -207,5 +207,5 @@ Superseding or retiring a Concept applies the marker to its index row via the sa
 ## Approval gate
 
 - **Explicit direct request** ("record a Concept for X") — approval is already given; draft and write immediately.
-- **Invoked by `/define concept`** — its questioning confirmation settled the concept. Write immediately without a second prompt.
+- **Invoked by `architecture-records`, route `define-concept`** — its questioning confirmation settled the concept. Write immediately without a second prompt.
 - **Invoked by `/design grill`** — the caller already owns the decision to record, whether it came from the user's answer or from the caller's own assumption. Write immediately; never stop to offer, confirm, or defer. The user reviews the result in `git diff`.

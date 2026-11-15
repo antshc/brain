@@ -1,19 +1,12 @@
 ---
 name: define
 description: >-
-  Define a research map or an arc42 Crosscutting Concept. Use 'define research' to chart or resume research and hypothesis topics, or 'define concept' to discover, question, and record a Concept against codebase evidence.
-argument-hint: "research {{researchPromptOrMapPath}} | concept {{conceptOrContext}}"
+  Define or resume a research map with questions and hypotheses. Use for 'define research', 'chart research topics', or 'resume a research map'. Not for Concepts → `architecture-records`.
+argument-hint: "research {{researchPromptOrMapPath}}"
 ---
 
-# Define
+# Define Research
 
-Route the request to exactly one procedure. Read that route and every reference it requires in full; do not load the other route.
+Accept `research` or a research prompt/map path. Concept requests → *Load and follow the `architecture-records` skill to record Concepts and maintain architecture indexes*, route `define-concept`, with the concern, established repository/docs root, and available context. Read its entire `SKILL.md`, selected route playbook, and required or triggered resources before acting; return its recorded paths/index result or explicit blocker. That owner handles candidate selection and interviews.
 
-| Request | Route |
-|---|---|
-| Chart or resume a research map, list unknowns or hypotheses to resolve | [Research](references/research.md) |
-| Define, improve, or recommend an arc42 Crosscutting Concept | [Concept](references/concept.md) |
-
-Explicit `research` or `concept` arguments win. Otherwise infer from the requested artifact: a research map under `docs/ongoing/` selects Research; a Crosscutting Concept or architecture default selects Concept. Ask when neither is clear.
-
-Both routes use [Questioning](references/questioning.md). Research maps only evidence work and hands off decisions; Concept confirms decisions; *Load and follow the `record-architecture` skill to record settled architecture* with route `concept-record`.
+For Research requests, read [Research](references/research.md) and [Questioning](references/questioning.md) fully before acting. Chart or resume a research map; evidence work supports the caller's decision without making it.
