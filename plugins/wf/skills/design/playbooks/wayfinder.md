@@ -6,6 +6,7 @@ Chart a GitHub decision map and maintain one living HLD throughout discovery. Pr
 
 - Refer by name
 - Session and document
+- Interview phases
 - The Map
 - The map body
 - Tickets
@@ -54,6 +55,16 @@ Research results use `docs/research/<initiative-slug>/`; proof reports, retained
 Use owned result worktrees for Prove/Experiment, Deep Module and Code Sketch. Challenge this requires an owned result worktree whenever it changes code or runs tests; read-only inspection and Research may reuse a pinned checkout with isolated outputs. All result worktrees start from a pinned current integration HEAD, not the session base. Independent runs may share that base; dependent runs require prerequisite integration first. Producers never commit or push; Wayfinder owns commit, local merge and cleanup. Keep ownership/state outside disposable worktrees. Preserve runnable proof state through reproduction, user approval and requested review. Prototype approval governs approval-gated payloads at all paths, including explicitly assigned custom destinations; changing a destination does not bypass the gate.
 
 Resume locally: verify refs, ancestry and artifact files before reuse. Missing local state blocks recovery; do not fabricate a remote link or regenerate a guessed result. Legacy maps retain existing PR history untouched; adopt verified content into local integration mode and record the transition without updating, closing or replacing their PRs.
+
+## Interview phases
+
+Wayfinder owns interview phase and breadth-first selection; Grill supplies its existing one-question pacing, fact lookups, ledger/coverage checks, inline records and closing sweep. Read Grill fully as registered in the router. In charting, apply these phase boundaries before its next-question selection or document synchronization:
+
+1. Destination: settle outcome, scope, exclusions and completion boundary only; ask one ready question, wait, and record the answer. User confirmation ends this phase with Grill's closing sweep, then starts the separate frontier interview. Done when the destination is confirmed without requiring downstream decisions to be settled.
+2. Frontier: cover major in-scope areas before deepening a single thread. Ask one ready question at a time and wait; recompute dependencies after each answer. Newly unblocked dependents are eligible, but prefer uncovered main areas where dependencies allow. Hold questions awaiting lookups and ask one independent ready question instead. Persist phase, coverage, answers, dependencies and next question in the session ledger. Done when the user confirms sufficient shared understanding of precise questions, coarse fog and dependencies; open downstream decisions remain mapped work.
+3. Return: after frontier confirmation and Grill's closing sweep, apply Small effort before branch/worktree, HLD seed or issue creation. Before mapped setup, synchronize interview state only. On existing maps, restore the phase and ask only changed scope/new human choices; document synchronization follows Session and document. Done when the continuation or mapped setup is explicit.
+
+These Wayfinder phase boundaries limit the charting interview, not the overall map's completion criteria. Standalone Grill follows its existing procedure unchanged.
 
 ## The Map
 

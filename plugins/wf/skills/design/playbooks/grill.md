@@ -4,9 +4,7 @@ Own the interview and session design state: when to look up, log, ask, or write.
 
 ## Caller dispatch
 
-Wayfinder runs separate destination and breadth-first frontier interviews in its own session: lookups follow the Fact lookup contract with Research default dispatch; no wrapper subagent. Preserve lookup evidence and full resource-loading requirements. Wayfinder retains control, records each actual user answer and synchronizes root fog/HLD. Standalone dispatch below remains unchanged.
-
-For Wayfinder charting, first settle and confirm only the destination; then cover the major in-scope areas breadth-first to expose precise questions, dependencies and coarse fog. Ask **one question at a time**, wait for its answer, then recompute readiness; breadth-first is coverage order, never batching. Preserve ledger/coverage checks and inline writes before each next question. User confirmation of shared understanding ends that interview phase after the closing sweep; downstream mapped decisions may remain open. After destination confirmation return to Wayfinder to start its separate frontier interview; only frontier confirmation returns for the small-effort decision before map infrastructure or HLD synchronization. On mapped resumes, retain the current phase and interview only changed scope/new human choices.
+Wayfinder runs Grill in its own session: lookups follow the Fact lookup contract with Research default dispatch; no wrapper subagent. Preserve lookup evidence and full resource-loading requirements. Wayfinder retains control, records each actual user answer and synchronizes root fog/HLD. Standalone dispatch below remains unchanged.
 
 ## Scope
 
@@ -60,7 +58,7 @@ Before **every question**, including fact-gap, term, ADR-scope, and close questi
 ➡️ <recommended answer and reason>
 ```
 
-After every answer, record it and perform required inline writes; run *Every turn*, re-check *Tactics* triggers and affected decision keys. When the answer changes evidence or dependencies, rebuild assumptions and the frontier before selecting the next question. Withdraw obsolete questions, defer blocked ones, and preserve stable IDs. Unanswered questions remain pending, never implicitly accepted. Newly unblocked dependents become eligible immediately. In Wayfinder breadth-first charting, prefer ready questions in uncovered main areas before deeper follow-ups; standalone Grill need not wait for other frontier questions to be answered.
+After every answer, record it and perform required inline writes; run *Every turn*, re-check *Tactics* triggers and affected decision keys. When the answer changes evidence or dependencies, rebuild assumptions and the frontier before selecting the next question. Withdraw obsolete questions, defer blocked ones, and preserve stable IDs. Unanswered questions remain pending, never implicitly accepted. Newly unblocked dependents become eligible immediately; do not wait for other frontier questions to be answered.
 
 Use Fact lookup to obtain environmental facts rather than asking the user to research them. Running lookups are unsettled prerequisites: hold their dependent questions and select one other ready question without waiting. If a lookup fails or stays inconclusive, follow *Gotchas* rather than inventing a fact. Index loading, lookups, and ledger/record writes still use their required tools.
 
