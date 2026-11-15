@@ -21,6 +21,8 @@ Render the root body below into the GitHub `wayfinder:map` issue after exact-pro
 - Worktree: <absolute path>; ownership record: <durable path outside disposable worktrees>
 - Last reconciled: <evidence identity, result/integrated/document SHAs or none>
 - Pending synchronization: <first unconfirmed step or none>
+- Pending proposals: <retained draft paths/revisions, status and next action, or none>
+- Pending human choice: <interview phase/question pointer and owner, or none>
 
 ## Findings so far
 
@@ -28,10 +30,10 @@ Render the root body below into the GitHub `wayfinder:map` issue after exact-pro
 
 ## Not yet specified
 
-- <stable unknown/risk ID>: <unknown, risk, conflict and consequence>
-  - Status: <open | investigating | blocked | pending approval | resolved>
+- <stable unknown/risk ID>: <in-scope concern too vague to ticket and consequence>
+  - Status: <unframed | awaiting prerequisite framing>
   - Resolve when: <evidence criterion or missing framing; risk trigger, mitigation and verification>
-  - Linked work: <approved sub-issue or pending proposal key>
+  - Linked work: <related context or predecessor link; concrete work lives on its owner>
   - Next action / owner: <what settles it and who acts>
   - Outcome / limits: <supported evidence and residual risk>
 
@@ -39,6 +41,8 @@ Render the root body below into the GitHub `wayfinder:map` issue after exact-pro
 
 - <excluded work and reason; user scope decision and existing issue link when applicable>
 ```
+
+Keep only coarse concerns in root Not yet specified. Graduate precise portions to approved children or durable pending drafts before removing their fog rows; retain coarse remainder. Pending approvals and open precise questions are not fog.
 
 ## Sub-issue body
 
@@ -51,7 +55,7 @@ Use `wayfinder:research` for a sharp factual question; `wayfinder:experiment` fo
 
 ## Unknowns
 
-<root Not yet specified link and stable unknown/risk IDs>
+<stable unknown/risk IDs and provenance; criteria, consequence and risk/mitigation details owned here; no live root fog row required>
 
 ## Work
 
@@ -79,4 +83,4 @@ findings/evidence links and limits, exact payload identity, approval/integration
 result/integrated/document SHAs, last sync and next action>
 ```
 
-Remove Research scope for experiments and Result until dispatch. A partial, blocked, conflicting, rejected or inconclusive result remains open with its limitation and next action. Retain its root unknown IDs and block dependent work.
+Remove Research scope for experiments and Result until dispatch. A partial, blocked, conflicting, rejected or inconclusive result remains open with its limitation and next action. Retain its stable unknown IDs and block dependent work.

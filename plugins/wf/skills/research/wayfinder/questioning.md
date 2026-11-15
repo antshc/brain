@@ -1,25 +1,27 @@
 # Questioning
 
-Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
+Run interviews directly in the Research Wayfinder session. Research has research and experiment tickets only; scope, priorities and evidence criteria are human choices asked here, never grilling tickets or Design execution.
 
-Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask *now* without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
+## Destination first
 
-Format a round like so:
+Settle subject, outcome, scope, exclusions, exact versions, constraints and sufficient evidence. Ask only what is needed to establish the destination; then get user confirmation. Destination approval is not ticket approval.
+
+## Separate breadth-first interview
+
+After destination confirmation, start a separate frontier interview. Cover major in-scope areas before deepening one thread: feasibility, hard limits, performance/scale, reliability, security, operations, ergonomics. Surface precise factual questions, falsifiable hypotheses, dependencies and concerns not yet sharp enough to ticket. Do not exhaust every downstream question before charting.
+
+Maintain the dependency tree and ready frontier. **Ask one question at a time**, with a stable ID, descriptive title and recommended answer. Word it so yes accepts the recommendation; do not hide independent questions inside one item. Wait for the user's answer before asking the next question; silence never accepts an answer.
 
 ```text
-❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+❓ **Q1** - **<title>**: <one question phrased so yes accepts the recommendation>
 
-➡️ <your recommended answer>
-
----
-
-❓ **Q2** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
-
-➡️ <your recommended answer>
+➡️ <recommended answer and reason>
 ```
 
-Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a *later* round, not this one.
+After each answer, record it, recompute readiness and select one ready question, favoring uncovered main areas before deeper follow-ups where dependencies allow. Hold questions whose prerequisites remain unanswered or whose lookups are running; ask one independent ready question and wait. Finding facts is the agent's job: use the router's Frame, Routing and Spawning agents evidence pipeline rather than asking the user to research them. Name inaccessible/inconclusive evidence as a fact gap; never invent a fact.
 
-Finding *facts* is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), use the router's Frame, Routing and Spawning agents procedures to find it through an evidence route; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the evidence route to return; ask the rest of the frontier now. The *decisions* are the user's: put each to them and wait.
+## Pause and return
 
-The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on it until the user confirms you have reached a shared understanding.
+Persist interview phase, stable question IDs, coverage, answers, pending lookups, dependencies, one next question and next action in session state; after worktree setup use the existing ownership record outside disposable worktrees. This is interview state, not another active Markdown research map. Missing durable session storage blocks resumability claims, not independent read-only discussion.
+
+When the current interview phase has sufficient shared understanding, ask the user to confirm that phase is complete. Destination confirmation starts the separate breadth-first frontier interview; only frontier confirmation returns to the small-effort decision. An empty ready frontier with blocked prerequisites is not completion. After frontier confirmation return to Wayfinder's small-effort decision; preserve downstream questions for proposals/fog. On resume restore the phase and pending question rather than restarting. Later human scope or evidence-criteria choices use this same one-question pacing directly in session.
