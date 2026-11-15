@@ -135,10 +135,10 @@ def test_research_callers_name_destinations_in_the_request(relative_path: str):
 @pytest.mark.parametrize('relative_path', [
     'draft-artifact/tactics/toi.md',
     'draft-artifact/tactics/bug.md',
-    'record-architecture/SKILL.md',
-    'record-architecture/playbooks/concept.md',
+    'architecture-records/SKILL.md',
+    'architecture-records/playbooks/concept.md',
     'define/references/research.md',
-    'define/references/concept.md',
+    'architecture-records/playbooks/define-concept.md',
 ])
 def test_lookup_callers_spawn_explore_directly(relative_path: str):
     caller = (SKILLS / relative_path).read_text()

@@ -16,7 +16,7 @@ Record **one point-in-time, localized architectural decision** into `docs/adr/` 
 
 ## Where it belongs
 
-An ADR answers **which option was chosen and why the others were not**. How the decision is applied or implemented belongs elsewhere — a Concept, a design doc, or the code — and the ADR links to it rather than restating it. Contested terminology → return control to the router for **Record term**.
+An ADR answers **which option was chosen and why the others were not**. How the decision is applied or implemented belongs elsewhere — a Concept, a design doc, or the code — and the ADR links to it rather than restating it. Contested terminology → return control to the router for **Select and load**, route `term`.
 
 ## ADR gate
 
