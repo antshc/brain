@@ -7,23 +7,19 @@ SKILLS = REPO / 'plugins/wf/skills'
 DEFINE = SKILLS / 'define'
 
 
-def test_define_routes_have_one_shared_questioning_contract():
+def test_define_retains_research_and_hands_off_concepts():
     entry = (DEFINE / 'SKILL.md').read_text()
     research = (DEFINE / 'references/research.md').read_text()
-    concept = (DEFINE / 'references/concept.md').read_text()
 
     assert 'name: define\n' in entry
     assert '[Research](references/research.md)' in entry
-    assert '[Concept](references/concept.md)' in entry
     assert '[Questioning](references/questioning.md)' in entry
     assert 'docs/ongoing/{{destinationSlug}}-research-map.md' in research
-    assert 'record-architecture' in concept
     assert '[questioning.md](questioning.md)' in research
-    assert '[questioning.md](questioning.md)' in concept
-    assert '[arc42-cross-cutting-concepts.md](arc42-cross-cutting-concepts.md)' in concept
-    assert (DEFINE / 'references/questioning.md').is_file()
-    assert (DEFINE / 'references/arc42-cross-cutting-concepts.md').is_file()
-    assert not (SKILLS / 'define-research/SKILL.md').exists()
+    assert 'route `define-concept`' in entry
+    assert '`architecture-records` skill' in entry
+    assert not (DEFINE / 'references/concept.md').exists()
+    assert not (DEFINE / 'references/arc42-cross-cutting-concepts.md').exists()
     assert not (SKILLS / 'define-concept/SKILL.md').exists()
 
 

@@ -18,7 +18,7 @@ Ask the user:
 1. Check `copilot plugin marketplace list --json`. If `brain` is absent, run `copilot plugin marketplace add antshc/brain`. Use the existing Brain marketplace when it points to that repository or to this installer checkout for local testing. Stop on a source conflict.
 2. Check `copilot plugin list --json`. Install a missing plugin with `copilot plugin install wf@brain`. Local marketplaces can show uninstalled entries as disabled with `source: live`. For these entries, check only the matching `enabledPlugins` key in Copilot settings. An absent key permits the initial install; an explicit `false` is disabled. Recheck that `wf` is enabled from `brain` and that its version matches [plugin.json](../plugin.json). Report policy blocks, disabled installs, version mismatches, and failed commands before writing target files. Leave upgrades and enablement of existing installs to the user.
 
-Check that WF Doc architecture and GitHub are available before writing target files; load each owning skill at its action below. If it is missing after installation, ask the user to run `/restart` and say “Resume the WF installer for <target> in <topology> mode.”
+Check that `architecture-records` and `github` are available before writing target files; load each owning skill at its action below. If it is missing after installation, ask the user to run `/restart` and say “Resume the WF installer for <target> in <topology> mode.”
 
 ## Configure the selected topology
 
@@ -41,7 +41,7 @@ Seed content: [copilot-instructions.template.md](./copilot-instructions.template
 
 ## 3. Bootstrap the docs
 
-*Load and follow the `record-architecture` skill to initialize missing docs* with route `initialize` at the docs root (reporoot for a wrapping repo).
+*Load and follow the `architecture-records` skill to initialize missing docs* with route `initialize` at the docs root (reporoot for a wrapping repo). Read its entire `SKILL.md`, selected route playbook, and required or triggered resources before acting. Pass the confirmed topology and system/glossary context; preserve existing files. Continue after both files are confirmed present; otherwise report the bootstrap blocker.
 
 ## 4. Set up GitHub labels
 

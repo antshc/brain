@@ -2,7 +2,7 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
-[Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [record-architecture](skills/record-architecture/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+[Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [architecture-records](skills/architecture-records/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
 [subagents](skills/subagents/SKILL.md) selects the model and effort for named roles and ordered panels, and runs Arena comparisons. [research](skills/research/SKILL.md) is a router: Explore (lookups; `hunty` verdicts inline), How (discovery, tracing, explanation; `hunty`, `explainy`), Why (`whyy`, `composy`), Cloud (`cloudy`), and Web (`weby`). Route agents are prompt files only Research spawns. The request is the only input; reports save to the session workspace with links, or to a location the request names.
 
@@ -10,7 +10,7 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 Its interview presents the entire ready decision frontier as one numbered batch per round, with recommendations phrased for "yes" to accept. Dependent questions wait for later rounds; partial answers leave the remaining ready questions together for batched follow-up. Inline recording and user-controlled closure remain unchanged.
 
-[record-architecture](skills/record-architecture/SKILL.md) owns architecture records, rendering, initialization, and index mechanics. Routes are `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, `decision-bullet`, `initialize`, and `index`. The index route takes `load`, `scan`, `trigger`, `ensure-section`, `sync-row`, or `sync-deployment`; row mutations use `rowAction`. The two render-only routes never save files or update indexes. Explicit routes take precedence; existing record mode inputs remain aliases, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [`/define concept`](skills/define/SKILL.md) still owns concept discovery and questioning; recording settled knowledge does not repeat the interview. `/define research` charts research and hypothesis topics.
+[architecture-records](skills/architecture-records/SKILL.md) owns architecture records, rendering, initialization, and index mechanics. Routes are `define-concept`, `doctor`, `adr`, `building-block`, `deployment-view`, `term`, `concept-body`, `concept-record`, `decision-bullet`, `initialize`, and `index`. The index route takes `load`, `scan`, `trigger`, `ensure-section`, `sync-row`, or `sync-deployment`; row mutations use `rowAction`. The two render-only routes never save files or update indexes. Explicit routes take precedence; existing record mode inputs remain aliases, clear natural-language requests route automatically, and ambiguous requests prompt for the intended artifact. [`define-concept`](skills/architecture-records/README.md) owns Concept discovery and questioning; `doctor` checks ADRs, Concepts, building blocks, and indexes against evidence; recording settled knowledge does not repeat the interview. `/define research` charts research and hypothesis topics.
 
 The [HLD route](skills/design/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
@@ -185,7 +185,9 @@ swimlane-beta TB
 | Task | Entry |
 | --- | --- |
 | Architecture, behavior, or code diagrams | `/doc-diagram <diagram type>` with optional current or delta mode |
-| Initialize docs | `/record-architecture route: initialize` |
+| Check architecture currency | `/architecture-records route: doctor` |
+| Define a Concept | `/architecture-records route: define-concept` |
+| Initialize docs | `/architecture-records route: initialize` |
 | Story, bug report, or feature handover | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi` |
 | High-level feature design | `/design hld` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
@@ -195,7 +197,7 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 
 | Group | Skills |
 | --- | --- |
-| Discovery and research | `define` (`concept`, `research`), `prove`, `challenge-this`, `research` (route agents `hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`) |
+| Discovery and research | `define` (`research`), `architecture-records` (`define-concept`), `prove`, `challenge-this`, `research` (route agents `hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `hld`, `publish-hld`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
-| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `record-architecture`, `suggest`, `writing-style` |
+| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `architecture-records`, `suggest`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

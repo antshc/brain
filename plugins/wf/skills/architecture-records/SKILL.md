@@ -1,13 +1,15 @@
 ---
-name: record-architecture
+name: architecture-records
 description: >-
-  Record settled architecture and maintain its indexes and glossary. Use for 'record an ADR', 'add a glossary term', 'load an index', or 'initialize missing docs'. Not for open decisions → `design`; Concept interviews → `define`; diagrams → `doc-diagram`.
-argument-hint: "route: adr | building-block | deployment-view | term | concept-body | concept-record | decision-bullet | initialize | index [action]"
+  Record ADRs, Concepts, building blocks, and glossary terms; maintain architecture indexes and check documentation drift. Use for 'record an ADR', 'check architecture records', 'load an index', or 'initialize missing docs'. Not for feature design → `design`; diagrams → `doc-diagram`.
+argument-hint: "route: define-concept | adr | building-block | deployment-view | term | concept-body | concept-record | decision-bullet | initialize | index [action] | doctor [scope]"
 ---
 
-# Record Architecture
+# Architecture Records
 
-Record settled knowledge, render an established body, or maintain architecture indexes. Discovery and interviews remain with the caller; recording never starts another interview.
+## Purpose
+
+Define a Concept, record settled knowledge, maintain architecture indexes, or diagnose documentation drift. Only `define-concept` interviews; recording routes accept settled input without another interview.
 
 ## Select and load
 
@@ -15,17 +17,23 @@ Record settled knowledge, render an established body, or maintain architecture i
 2. MUST read the selected playbook fully before checking its gate or acting. Read only resources selected below, resolving bundled paths from this skill's base directory. A playbook names actions and headings in already-loaded resources; return here for conditional loads or another route, never recursively invoke this skill.
 3. Apply the procedure's evidence, authorization, output, and completion rules. A failed gate returns the miss and appropriate home; it never produces an unsupported record. Preserve caller inputs and authored-document paths.
 
+## Routes
+
 | Route | Select when | Procedure |
 |---|---|---|
+| `define-concept` | Discover, improve, or recommend a crosscutting Concept through evidence and questioning | [Define Concept](playbooks/define-concept.md) |
 | `adr` | Persist a hard-to-reverse choice, why it won, and rejected alternatives | [ADR](playbooks/adr.md) |
 | `building-block` | Record one Deployable's responsibility, interfaces, and structure | [Building block](playbooks/building-block.md) |
 | `deployment-view` | Record where production nodes and containers run | [Deployment view](playbooks/deployment-view.md) |
-| `term` | Capture one resolved domain term | Record term below |
+| `term` | Capture one resolved domain term | [Term](playbooks/term.md) |
 | `concept-body` | Render or revise a shared approach without saving | [Concept](playbooks/concept.md), Body through Quality gate only |
 | `concept-record` | Persist or extend a settled shared approach and its index row | [Concept](playbooks/concept.md) |
 | `decision-bullet` | Return one compact established decision | Decision bullet below |
-| `initialize` | Create missing architecture and glossary files, only when requested | Initialize missing docs below |
+| `initialize` | Create missing architecture and glossary files, only when requested | [Initialize](playbooks/initialize.md) |
 | `index` | Load, match, generate triggers, or sync indexes | [Index](playbooks/index.md); select action below |
+| `doctor` | Check currency of ADRs, Concepts, building blocks, and indexes | [Doctor](playbooks/doctor.md) |
+
+## Shared rules
 
 - `concept-body` and `decision-bullet` MUST NOT write files, name records, sync indexes, or switch to persistence. Return output to the caller.
 - Both Concept routes share body rules. `concept-record` reuses a compliant supplied body without rendering or interviewing again.
@@ -36,7 +44,7 @@ Record settled knowledge, render an established body, or maintain architecture i
 
 ## Index actions
 
-Load the index playbook for `index`, `adr`, `building-block`, `deployment-view`, and `concept-record`. Record routes use its named operations directly; external index requests supply `action` or the exact operation name. Infer only an unambiguous operation; otherwise ask. `load` and `scan` are read-only and never initialize files.
+Load the index playbook for `index`, `adr`, `building-block`, `deployment-view`, `concept-record`, `define-concept`, and `doctor`. The latter two use only read-only operations until an explicitly selected recording handoff. Record routes use its named operations directly; external index requests supply `action` or the exact operation name. Infer only an unambiguous operation; otherwise ask. `load` and `scan` are read-only and never initialize files.
 
 | Action | Operation |
 |---|---|
@@ -55,6 +63,9 @@ Read selected resources fully; all links resolve from this skill's base director
 
 | Resource | Load when |
 |---|---|
+| [Questioning](references/questioning.md) | `define-concept` frames or resolves a decision tree |
+| [Concept categories](references/arc42-cross-cutting-concepts.md) | `define-concept` maps recorded Concepts or sweeps candidates |
+| [Doctor report](templates/doctor-report.md) | `doctor` renders its result |
 | [Index defaults](references/defaults.md) | `adr` or `concept-record` authors or repairs a row |
 | [Architecture format](templates/ARCHITECTURE-FORMAT.md) | Ensure section exists needs a skeleton or section position; includes record-route index prerequisites |
 | [Architecture bootstrap](templates/ARCHITECTURE-BOOTSTRAP-FORMAT.md) | `initialize` finds ARCHITECTURE.md missing |
@@ -68,19 +79,6 @@ Read selected resources fully; all links resolve from this skill's base director
 | [Index loader](scripts/load_index.py) | Execute for Load index; preserve its JSON, options, exit codes, and completeness checks |
 
 Select the Concept kind using Body before loading exactly one body template; skip rendering resources when reusing a compliant body. For conditional resource needs, return control to the router for **Resource map**, load the required resource, then resume the named action. A route change returns to **Select and load**.
-
-## Initialize missing docs
-
-Run only when requested. Use the caller's docs root; for a direct request use the established repository docs root or ask if unclear. Check each file independently, create missing files immediately using established context, and preserve existing files byte for byte.
-
-- ARCHITECTURE.md: render only the system overview and Context from the architecture bootstrap. Add optional sections later through Ensure section exists when content exists.
-- GLOSSARY.md: render the glossary bootstrap's context heading and empty Language section. Settled terms require the separate `term` route.
-
-Create only these two files. Record routes create docs/adr/, docs/concepts/, and docs/building-blocks/ lazily. Done when both files exist under the supplied root and every pre-existing file is unchanged.
-
-## Record term
-
-Capture one resolved term in the existing GLOSSARY.md in the same turn it crystallises; never batch. Apply the glossary format's context, terminology, and definition rules. Keep implementation detail and implementation decisions out of the glossary. Missing glossary → report the prerequisite; initialize only when requested. Done when the resolved term appears in its context and unrelated content is preserved.
 
 ## Decision bullet
 
@@ -97,6 +95,12 @@ Render one established architectural decision as a single bullet; return only th
 - Keep method bodies, local variables, exact algorithms, and details that can change without changing the decision outside the bullet.
 
 Done when one grounded bullet matches the scaffold and these rules; no files or indexes changed.
+
+## Gotchas
+
+- Return to **Select and load**, route `term`, for **Record term**, or route `initialize` for **Initialize missing docs**; read the playbook before the named action.
+- `doctor` reads records without applying authoring or repair gates; missing evidence remains unknown. A report destination authorizes only that report write.
+- Missing docs are prerequisites for record routes, findings for `doctor`; only requested `initialize` creates them.
 
 ## Completion criteria
 
