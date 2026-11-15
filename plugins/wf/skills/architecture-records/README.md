@@ -22,7 +22,7 @@ Other index actions: `scan`, `trigger`, `ensure-section`, `sync-row`, `sync-depl
 
 ## Define versus record
 
-`define-concept` owns candidate selection, evidence-backed questioning, and confirmed defaults. `concept-body` renders resolved content; `concept-record` persists it without another interview. ADRs, terms, blocks, and topology retain their own recording gates. The `research` skill's `define` route charts Research maps.
+`define-concept` owns candidate selection, evidence-backed questioning, and confirmed defaults. `concept-body` renders resolved content; `concept-record` persists it without another interview. ADRs, terms, blocks, and topology retain their own recording gates. The `research` skill's `wayfinder` route charts Research maps.
 
 ## Doctor scope and output
 

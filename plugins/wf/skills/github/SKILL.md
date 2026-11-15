@@ -11,6 +11,7 @@ Select one operation below. Load its tactic only, then follow any reference it s
 | Intent | Tactic |
 |---|---|
 | Read/search GitHub repository metadata or pinned evidence | [Repository](tactics/repository.md) |
+| Coordinate caller-owned Wayfinder tracker, local document/result worktrees and integration | [Wayfinder operations](references/wayfinder.md) |
 | Read or change issues, labels, assignees, or relationships | [Issues](tactics/issues.md) |
 | Publish a spec or ticket, read a graph, or handle issue artifacts | [Specs and tickets](tactics/specs-and-tickets.md) |
 | Draft or read PR metadata, publish, get a diff, or post a conversation comment | [Pull requests](tactics/pull-requests.md) |
