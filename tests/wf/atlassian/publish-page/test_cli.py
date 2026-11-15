@@ -296,7 +296,7 @@ def _fake_render_diagrams(diagrams, assets_dir, background="white", renderer="pn
 def test_run_with_diagrams_and_creds_creates_placeholder_then_publishes(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# My Page\n\n```mermaid\ngraph TD; A-->B;\n```\n")
-    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
+    base_adf = {"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
     out_path = tmp_path / "final.json"
 
     confluence = MagicMock()
@@ -345,7 +345,7 @@ def test_run_with_diagrams_and_creds_creates_placeholder_then_publishes(tmp_path
 def test_run_with_diagrams_and_page_id_updates_in_place_no_placeholder(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# My Page\n\n```mermaid\ngraph TD; A-->B;\n```\n")
-    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
+    base_adf = {"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
     out_path = tmp_path / "final.json"
 
     confluence = MagicMock()
@@ -384,7 +384,7 @@ def test_run_without_credentials_fails_naming_the_missing_keys_before_touching_a
     md_path = tmp_path / "page.md"
     md_path.write_text("# My Page\n\n```mermaid\ngraph TD; A-->B;\n```\n")
 
-    with patch("atl_cli.page_diagrams.pipeline.convert_markdown_to_adf", return_value={"content": []}), patch(
+    with patch("atl_cli.page_diagrams.pipeline.convert_markdown_to_adf", return_value={"type": "doc", "content": []}), patch(
         "atl_cli.page_diagrams.pipeline.get_confluence"
     ) as get_confluence, pytest.raises(SystemExit) as excinfo:
         main(["run", "--md-path", str(md_path), "--page-id", "123", "--config", config_path(tmp_path)])
@@ -397,7 +397,7 @@ def test_run_no_diagrams_publishes_over_rest_and_writes_pretty_printed_adf(tmp_p
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\nSome text\n")
     write_config(tmp_path, {'cloudId': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
-    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
+    base_adf = {"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
     out_path = tmp_path / "final.json"
 
     with patch("atl_cli.page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
@@ -427,7 +427,7 @@ def test_run_reports_mmdc_missing(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# Title\n\n```mermaid\ngraph TD; A-->B;\n```\n")
     write_config(tmp_path, {'cloudId': 'example.atlassian.net', 'email': 'me@example.com', 'apiToken': 'secret'})
-    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
+    base_adf = {"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "\x00MEDIA:0\x00"}]}]}
 
     with patch("atl_cli.page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
         "atl_cli.page_diagrams.pipeline.get_confluence", return_value=MagicMock()
@@ -449,7 +449,7 @@ def test_run_reports_mmdc_missing(tmp_path, capsys):
 def test_run_defaults_artifacts_to_md_filename_tmp_beside_the_source(tmp_path, capsys):
     md_path = tmp_path / "design.md"
     md_path.write_text("# Title\n\nSome text\n")
-    base_adf = {"content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
+    base_adf = {"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Some text"}]}]}
 
     write_config(tmp_path, {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"})
 

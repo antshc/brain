@@ -1,0 +1,8 @@
+{
+  "plugins": {
+    "selectively_enable_rules": true,
+    "md010": {"enabled": true, "code_blocks": false},
+    "md012": {"enabled": true, "maximum": 2}
+  },
+  "extensions": {"pragmas": {"enabled": false}}
+}

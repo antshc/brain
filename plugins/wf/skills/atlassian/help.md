@@ -49,3 +49,5 @@ OTHER SCRIPTS
 ELSEWHERE
  /daily-briefing [period]             blocked items and @mentions (engineering skill)
 ```
+
+Conversion validation: [guard policy](references/conversion-guards.md). `publish-page verify --expected-manifest <manifestPath>` adds raw-ADF fidelity checks.

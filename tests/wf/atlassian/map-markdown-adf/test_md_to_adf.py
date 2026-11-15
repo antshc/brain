@@ -29,9 +29,11 @@ def test_code_block_known_language(md_to_adf):
     ]
 
 
-def test_code_block_unknown_language_omits_attrs(md_to_adf):
-    doc = md_to_adf("```wat\nabc\n```")
-    assert "attrs" not in doc["content"][0]
+def test_code_block_unknown_language_is_rejected(run_cli):
+    result = run_cli("md-to-adf", "```notalanguage\nx\n```\n")
+    assert result.returncode == 1
+    assert "unsupported code language" in result.stderr
+    assert result.stdout == ""
 
 
 def test_blockquote(md_to_adf):
@@ -233,9 +235,9 @@ def test_continuation_join_preserves_inline_marks(md_to_adf):
     [
         "# Heading",
         "| a | b |\n| --- | --- |",
-        "```python",
+        "```python\n```",
         "---",
-        "</details>",
+        "<details>\n<summary>x</summary>\n\nbody\n</details>",
         "> quoted",
         "<!-- adf:toc -->",
     ],
@@ -278,12 +280,11 @@ def test_parse_blocks_no_marker_keeps_default_layout(md_to_adf):
     assert doc["content"][0]["attrs"]["layout"] == "default"
 
 
-def test_parse_blocks_wide_table_marker_dropped_if_not_followed_by_table(md_to_adf):
-    doc = md_to_adf("<!-- adf:wide-table -->\nJust a paragraph.\n\n| a | b |\n| --- | --- |\n| 1 | 2 |")
-    blocks = doc["content"]
-    assert blocks[0]["type"] == "paragraph"
-    table_block = next(b for b in blocks if b["type"] == "table")
-    assert table_block["attrs"]["layout"] == "default"
+def test_wide_table_marker_without_adjacent_table_is_rejected(run_cli):
+    result = run_cli("md-to-adf", "<!-- adf:wide-table -->\nJust a paragraph.")
+    assert result.returncode == 1
+    assert "table marker must precede" in result.stderr
+    assert result.stdout == ""
 
 
 @pytest.mark.parametrize(

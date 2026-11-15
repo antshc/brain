@@ -13,6 +13,8 @@ from pathlib import Path
 
 from .adf import replace_markers, substitute_media
 from ..confluence_client import get_confluence
+from ..conversion_guard import GuardError, guard_adf, lint_markdown
+from ..converter.adf_to_md import adf_to_markdown
 from .env import load_credentials, load_renderer
 from .mermaid import extract_mermaid, render_diagrams
 from .attachments import upload_diagrams
@@ -185,6 +187,12 @@ def _run_substitute_media(args: argparse.Namespace) -> None:
 def _run_publish_adf(args: argparse.Namespace) -> None:
     payload = json.loads(sys.stdin.read())
     adf = payload["adf"]
+    try:
+        guard_adf(adf)
+        lint_markdown(adf_to_markdown(adf) + "\n")
+    except (GuardError, NotImplementedError) as exception:
+        print(f"error: {exception}", file=sys.stderr)
+        raise SystemExit(1) from None
     size_bytes = adf_body_size(adf)
     credentials = load_credentials(args.config)
     confluence = get_confluence(credentials)

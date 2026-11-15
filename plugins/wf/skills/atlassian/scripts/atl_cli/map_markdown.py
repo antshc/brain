@@ -1,5 +1,5 @@
 """`map-markdown`: the single boundary for Markdown <-> Atlassian Document Format conversion.
-Pure and offline; no filesystem, configuration, network, or Atlassian dependency.
+Offline; guarded CLI uses a packaged lint profile, with no network or Atlassian dependency.
 
 Usage:
     atl.py map-markdown md-to-adf        < input.md   > output.json
@@ -24,17 +24,34 @@ class ConversionError(Exception):
     """The converter rejected its input; the message is the reason only, never a traceback."""
 
 
-def md_to_adf(markdown: str) -> dict:
+def md_to_adf(markdown: str, *, guarded: bool = False) -> dict:
     try:
-        return markdown_to_adf(markdown)
+        if guarded:
+            from .conversion_guard import guard_adf, lint_markdown, validate_markdown
+            from .page_diagrams.patterns import strip_ignored_sections
+            markdown = strip_ignored_sections(markdown)
+            validate_markdown(markdown)
+            lint_markdown(markdown)
+        doc = markdown_to_adf(markdown)
+        if guarded:
+            guard_adf(doc)
+        return doc
     except (ValueError, NotImplementedError) as exception:
         raise ConversionError(str(exception)) from None
 
 
-def adf_to_md(doc: object) -> str:
+def adf_to_md(doc: object, *, guarded: bool = False) -> str:
     """ADF document -> Markdown, newline-terminated exactly like the CLI's stdout."""
     try:
-        return adf_to_markdown(doc) + "\n"
+        if guarded:
+            from .conversion_guard import guard_adf, lint_markdown, validate_markdown
+            for warning in guard_adf(doc, fetching=True):
+                print(f"warning: {warning}", file=sys.stderr)
+        markdown = adf_to_markdown(doc) + "\n"
+        if guarded:
+            validate_markdown(markdown, placeholders=True)
+            lint_markdown(markdown)
+        return markdown
     except (ValueError, NotImplementedError) as exception:
         raise ConversionError(str(exception)) from None
 
@@ -51,7 +68,7 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> int:
 
     try:
         if args.direction == "md-to-adf":
-            doc = markdown_to_adf(source)
+            doc = md_to_adf(source, guarded=True)
             json.dump(doc, sys.stdout, indent=2)
             sys.stdout.write("\n")
         elif args.direction == "detect-adf-only":
@@ -60,9 +77,8 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> int:
             sys.stdout.write("\n")
         else:
             doc = json.loads(source)
-            sys.stdout.write(adf_to_markdown(doc))
-            sys.stdout.write("\n")
-    except (ValueError, NotImplementedError) as exception:
+            sys.stdout.write(adf_to_md(doc, guarded=True))
+    except (ConversionError, ValueError, NotImplementedError) as exception:
         print(f"error: {exception}", file=sys.stderr)
         return 1
 

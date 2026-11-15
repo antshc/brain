@@ -1,5 +1,7 @@
 # Publish page
 
+Read [Conversion guards](conversion-guards.md) for lint policy, fidelity checks, supported exceptions, and read-back manifests.
+
 Publish local Markdown to a Confluence page in one `run` command: extract → convert → attach → substitute → publish, always over REST. Not twg: only `atl.py`'s Markdown → ADF conversion carries `<details>`, panels, status, TOC, wide tables, inline-comment anchors, and diagrams intact.
 
 ## Contents
@@ -116,6 +118,8 @@ Ordinary edits of an existing page without thread replies. Review-thread replies
 - `png`/`drawio` also attach `{name}.source.mmd` (fence verbatim); Fetch page uses it to restore the mermaid block. `mermaid` mode skips it. Never read on publish.
 
 ## Rules
+
+- Pass `manifestPath` from `run` to `verify --expected-manifest` alongside the existing anchor/phrase expectations. Keep the manifest and final ADF until verification passes.
 
 - Never rephrase Markdown; the converter preserves source wording verbatim.
 - Named `pageId` → update in place; create only when none named.

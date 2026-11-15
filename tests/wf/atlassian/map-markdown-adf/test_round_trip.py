@@ -103,9 +103,11 @@ def test_breakout_marker_sets_the_mark_on_the_next_expand_or_code_block(md_to_ad
     assert "width" not in wide["attrs"]
 
 
-def test_breakout_marker_before_a_paragraph_is_dropped(md_to_adf):
-    doc = md_to_adf('<!-- adf:breakout mode="wide" -->\nplain text')
-    assert doc["content"] == [{"type": "paragraph", "content": [{"type": "text", "text": "plain text"}]}]
+def test_breakout_marker_before_a_paragraph_is_rejected(run_cli):
+    result = run_cli("md-to-adf", '<!-- adf:breakout mode="wide" -->\nplain text')
+    assert result.returncode == 1
+    assert "breakout marker must precede" in result.stderr
+    assert result.stdout == ""
 
 
 def test_float_table_width_from_confluence_renders_as_an_integer(adf_to_md):
