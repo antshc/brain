@@ -18,7 +18,7 @@ REPORT = (ROOT / 'how/report.md').read_text()
 PROMPT = (ROOT / 'how/explorer-prompt.md').read_text()
 EXPLAINER = (ROOT / 'agents/explainy.md').read_text()
 AGENTS = ('hunty', 'explainy', 'whyy', 'composy', 'cloudy', 'weby')
-ROUTES = {'Explore': ('explore/explore.md', ('hunty',)), 'How': ('how/how.md', ('hunty', 'explainy')), 'Why': ('why/why.md', ('whyy', 'composy')),
+ROUTES = {'Define': ('playbooks/define.md', ()), 'Explore': ('explore/explore.md', ('hunty',)), 'How': ('how/how.md', ('hunty', 'explainy')), 'Why': ('why/why.md', ('whyy', 'composy')),
           'Cloud': ('cloud/cloud.md', ('cloudy',)), 'Web': ('web/web.md', ('weby',))}
 
 
@@ -97,6 +97,8 @@ def test_every_bundled_markdown_resource_is_reachable_directly_from_entry():
 
 def test_research_routes_have_no_default_artifact_locations():
     for path in ROOT.rglob('*.md'):
+        if path.relative_to(ROOT).as_posix() in {'playbooks/define.md', 'templates/research-map.md'}:
+            continue
         content = path.read_text()
         for obsolete in ('docs/research/', '<slug>-chain.md', '<slug>-data.md', '<slug>-<provider>.md'):
             assert obsolete not in content, f'{path.relative_to(ROOT)}: {obsolete}'
@@ -137,7 +139,6 @@ def test_research_callers_name_destinations_in_the_request(relative_path: str):
     'draft-artifact/tactics/bug.md',
     'architecture-records/SKILL.md',
     'architecture-records/playbooks/concept.md',
-    'define/references/research.md',
     'architecture-records/playbooks/define-concept.md',
 ])
 def test_lookup_callers_spawn_explore_directly(relative_path: str):

@@ -6,14 +6,14 @@ description: >-
 
 # Research
 
-Router. Read the request, frame it against the repository's contracts, select one route per independent question, load its playbook, spawn its agents, and deliver cited findings. The router reads only contract documents and the graph manifest; it never reads source code. Only this skill spawns research agents; agents never spawn subagents or load this skill. Callers load this skill in their own session, never inside a wrapper subagent.
+Router. Read the request, frame it against the repository's contracts, select one route per independent question, load its playbook, spawn its agents, and deliver cited findings. The router reads only contract documents and the graph manifest; it never reads source code. Define charts or resumes a research map in the caller's session; its evidence topics use the same route pipeline. The router may read map state and write map/report files; source investigation remains in evidence workers. Only this skill spawns research agents; agents never spawn subagents or load this skill. Callers load this skill in their own session, never inside a wrapper subagent.
 
 ## Request
 
-The only input is the request text. Ask only when it holds no question. Discover from it:
+The only input is the request text. Select Define before requiring a factual question: `/research define <prompt-or-map-path>`, `Route: Define`, or an unambiguous request to chart/resume a research map selects Define. A destination prompt or existing map path suffices; ordinary factual questions keep evidence routing. Ask only when there is neither a question nor a map prompt/path. Discover from it:
 
 - **Questions** — split independent questions; keep dependent ones in order.
-- **Route** — a route the request names (`Route: Explore | How | Why | Cloud | Web`) wins; `/research why <question>` selects Why; otherwise infer per Routing.
+- **Route** — a route the request names (`Route: Define | Explore | How | Why | Cloud | Web`) wins; `/research why <question>` selects Why; otherwise infer per Routing.
 - **Why depth** — full by default; anchor when the request asks only for code, commit, and PR context.
 - **Targets** — repositories, deployables, symbols, checkouts/refs, providers, versions, live-value needs.
 - **Framing** — requested content, diagrams, sections, lens (Behavior, Flow, Data). Preserve it verbatim for the agents.
@@ -23,7 +23,7 @@ Ambiguous scope → state a bounded interpretation and proceed.
 
 ## Frame
 
-Run once per request, before Routing. Produce one **Frame** per question and pass it to every agent the question spawns.
+Evidence routes: run once per request, before Routing. Define defers framing until each interview lookup or research topic has a sharp question; reuse established repository facts, frame each topic, and pass its requested destination. Produce one **Frame** per question and pass it to every agent the question spawns.
 
 1. **Repository root.** Set `@repoRoot` to `git rev-parse --show-toplevel`, run once from the agent session's launch folder, not the current CWD. Not inside a Git repository → no Frame; pass targets as named.
 2. **Contracts.** Read the `@repoRoot` contract material, nearest owner first: `GLOSSARY.md` (terms), `ARCHITECTURE.md`, `DEPLOYMENT.md`, `README.md` (ownership, runtime boundaries); then the `@repoRoot` copies whose folder or filename names the target, including `*.swagger.json` (REST) and `*.configuration-tweaks.md` (configuration). Match on the name; do not read every service's set.
@@ -51,6 +51,7 @@ Include only facts that help the agents; omit empty lines.
 
 ## Delivery
 
+- Define → save the research map, present its topic table, fog and exclusions at checkpoints, and return the final or paused map with clickable map/report links. Its topic reports use the explicit map-owned destinations; only this route saves Explore verdicts to topic files. Report-only delivery below applies to standalone evidence routes, not Define checkpoints.
 - Explore → return `hunty` verdicts inline to the requester; no file. The requester uses the cited findings directly.
 - How, Why, Cloud, Web → always save one Markdown report per independent question. Return only the report pointers, never the findings inline:
 
@@ -66,17 +67,20 @@ Include only facts that help the agents; omit empty lines.
 
 ## Routing
 
-Route independent questions separately; sequence dependent evidence. Provider/data facts that determine a system answer stay in How. After a route returns, deliver it before selecting the next question.
+Route independent questions separately; sequence dependent evidence. Provider/data facts that determine a system answer stay in How. After a standalone evidence route returns, deliver it before selecting the next question. Define may batch independent frontier topics; record their results in the map before the next frontier.
 
 Read the selected playbook in full before acting. Each playbook names which listed resources its triggers load; read those in full from this skill's base directory, not caller CWD.
 
 | Route | Select when | Playbook | Agents | Resources | Result |
 |---|---|---|---|---|---|
+| Define | Chart or resume a research map; `/research define <prompt-or-map-path>` | [Define](playbooks/define.md) | No dedicated agent; existing evidence routes per topic | [Questioning](references/define-questioning.md), [Research map](templates/research-map.md); both required in full before charting/resuming | Saved map, checkpoint tables, topic reports and final or paused state |
 | Explore | Codebase exploration a calling agent uses as working evidence: find files or code, where is X, who calls Y, what does Z return, how parts connect, a restored package API, a graph query, path, or explain | [Explore](explore/explore.md) | `hunty` | None; `hunty` loads NuGet and Graphify | Inline `hunty` findings |
 | How | Current behavior in source, configuration, restored packages; explicit inspection | [How](how/how.md) | [hunty](agents/hunty.md), then [explainy](agents/explainy.md) for Detailed/Full | [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [How report](how/report.md), [Behavior](how/behavior.md), [Flow](how/flow.md), [Data](how/data.md), [NuGet](how/nuget.md), [Graphify](how/graphify.md), [How request guide](how/README.md) | Inline lookup verdict or one cited explanation |
 | Why | Rationale: why code, a constraint, or a workaround exists; what led to a change; `/research why <question>` | [Why](why/why.md) | [whyy](agents/whyy.md) anchor, then one per evidence category; [composy](agents/composy.md) | [Epistemics](why/epistemics.md), [Code archaeology](why/sources/code-archaeology.md), [Atlassian](why/sources/atlassian.md), [Linear](why/sources/linear.md), [Notion](why/sources/notion.md), [Slack](why/sources/slack.md), [Datadog](why/sources/datadog.md), [Sentry](why/sources/sentry.md), [Databricks](why/sources/databricks.md), [Incident postmortems](why/sources/incident-postmortem.md) | Rationale, source coverage, confidence; or cited anchor at anchor depth |
 | Cloud | Independent AWS/Azure provider question | [Cloud](cloud/cloud.md) | [cloudy](agents/cloudy.md); `hunty` for restored SDK gaps | [Cloud template](cloud/cloud-inspection-template.md), [AWS](cloud/aws.md), [Azure](cloud/azure.md) | Cited constraints and applicability |
 | Web | Other external question | [Web](web/web.md) | [weby](agents/weby.md) | None | Primary-source findings |
+
+Define selects evidence routes internally through Frame, Routing and Spawning agents, never by recursively loading this skill. Interview facts follow the same pipeline; Concepts belong to `architecture-records` route `define-concept`.
 
 Graphify is a `hunty` tactic, not a route. Graph build, update, or export requests → report the build entry point named in `<root>/GRAPHIFY.md`; never build.
 
@@ -93,8 +97,9 @@ Give follow-ups to a fresh worker with the original brief, the prior report, and
 
 ## Completion criteria
 
+- Define: map and findings match the presented state; remaining work has explicit status and links; finish only when Topics and Not yet specified are empty or the user confirms remaining work cannot change the destination. Paused maps remain resumable, not complete. The caller retains the decision and implementation.
 - Each How, Why, Cloud, or Web question has a saved report and a pointer with its status; each Explore lookup has an inline verdict or a named blocker; framing matches the request.
 - Material factual claims carry in-place primary-source citations. Source-based, inferred, and observed evidence stay distinct; Why confidence language is preserved.
 - Conflicts are reconciled or reported with both sources. No findings → completed scope and checked sources stated. Incomplete → missing evidence and its consequence named.
 - Included Mermaid blocks render; template placeholders, Rules blocks, and unfilled sections are removed.
-- Every evidence claim came from a spawned route agent; no agent spawned another.
+- Every research evidence claim came from a spawned route agent; experiment conclusions come from retained Prove reports; no route agent spawned another.
