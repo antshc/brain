@@ -89,7 +89,7 @@ Never create a follow-up issue or ticket in this flow, even after confirmation. 
 ## Known gaps and policy limits
 
 | Case | Current behavior | Proposed follow-up |
-| --- | --- | --- |
+|---|---|---|
 | Human edits an earlier comment after Address replied | New work is selected by position after the last marked reply. An edited earlier comment can remain `answered` in a human-origin thread and be skipped. Agent reconciliation includes full context, but the gate does not flag the edit as new work. | Compare bodies and timestamps with the last handled snapshot; reevaluate material edits. |
 | Human adds an objection to an already resolved thread | Resolved threads are excluded, so Address does not see the new objection. | Explicitly require reopening, or detect new activity after resolution. |
 | Separate human contests the outcome in an agent-origin thread | Origin stays `agent`. Address can still resolve after an evidence-backed answer; human participation does not transfer closure control. | Decide whether an explicit human objection transfers closure control. Recommendation: require manual closure after that objection. |

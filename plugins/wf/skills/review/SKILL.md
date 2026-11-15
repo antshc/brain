@@ -8,7 +8,7 @@ argument-hint: '<code|comments|blast-radius|tests-gap|architecture|hitl> [target
 # Review
 
 | Route | Select for | Playbook |
-| --- | --- | --- |
+|---|---|---|
 | `code` | Review a PR for new findings. Accept a PR URL. | [Code review](playbooks/code.md) |
 | `comments` | Investigate and address existing PR review threads. Accept a PR URL. | [PR comments](playbooks/comments.md) |
 | `blast-radius` | Assess downstream breakage or what a change could affect. | [Blast radius](playbooks/blast-radius.md) |

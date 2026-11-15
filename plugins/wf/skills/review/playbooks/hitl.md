@@ -45,7 +45,7 @@ Runs on the user's behalf despite the on-initiative restriction; the human reads
 Set `@diffSize` to `additions + deletions` from `GH_TOOL pr snapshot OWNER/REPO#PR_NUMBER`. Set `@agentSize` from `@diffSize`:
 
 | `@diffSize` | `@agentSize` |
-| --- | --- |
+|---|---|
 | under 200 | small: fastest, cheapest model |
 | 200 to 1000 | medium: standard model |
 | over 1000 | large: most capable model available |

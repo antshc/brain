@@ -7,7 +7,7 @@ Resolve technical questions during Architect Ground and before each Review round
 Take the first applicable route per question; reevaluate after each result.
 
 | Condition | Action |
-| --- | --- |
+|---|---|
 | Reliable evidence answers it for the same sketch revision and environment/version | Reuse; record the answer |
 | Needs facts from the codebase, installed NuGet packages, cloud/API, or web documentation | Research |
 | Needs observed behavior, including a CLI/API command | Prove |
@@ -45,7 +45,7 @@ Design interprets returned findings. Resolve verified contract findings through 
 Record question/claim, sketch revision, environment/version, evidence paths, outcome, and Challenge this coverage in the artifact root's `review-log.md`, including artifacts saved elsewhere.
 
 | Outcome | Action |
-| --- | --- |
+|---|---|
 | Confirmed and compatible | Close factual question; cite evidence in rationale |
 | Refuted or verified finding | Without checkpoint: apply supported correction and log rationale; with checkpoint: present proposed correction for acceptance |
 | Verified Challenge this finding on a contract (interface, invariant, ordering, error mode, configuration, seam, adapter) | Derive the correction through [Deep module](../playbooks/deep-module.md), then act as for a verified finding |

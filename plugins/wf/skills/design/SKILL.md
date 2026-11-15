@@ -9,7 +9,7 @@ description: >-
 One entry point; route to one playbook. Do not load unrelated routes.
 
 | Route | Select for | Playbook |
-| --- | --- | --- |
+|---|---|---|
 | `architect` | Design code shape across modules, compare candidates, then implement or hand off an accepted sketch. | [Architect](playbooks/architect.md) |
 | `sketch` | Explicit request for a usage-first code sketch only, without Arena or implementation. | [Sketch](playbooks/sketch.md) |
 | `deep-module` | Deepen an interface, place a seam, or compare module shapes. | [Deep module](playbooks/deep-module.md) |
@@ -32,7 +32,7 @@ One entry point; route to one playbook. Do not load unrelated routes.
 Read triggered resources fully before use; resolve from this skill directory.
 
 | Trigger | Resource |
-| --- | --- |
+|---|---|
 | Wayfinder tracker/local integration; Spec issue publication; Tickets publication | [GitHub operations](references/github.md) |
 | Wayfinder ticket classification | [Ticket types](references/wayfinder-ticket-types.md) |
 | Wayfinder creation/update; HLD evolving draft | [Living document](references/living-document.md) |

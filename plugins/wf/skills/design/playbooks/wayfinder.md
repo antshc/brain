@@ -38,7 +38,7 @@ Every map and ticket is an issue, so it has a name — its title. In everything 
 Wayfinder owns branch prefixes; *Load and follow the `git` skill to run verified Git mechanics for branch naming, creation and worktree lifecycle* using Branches and Worktrees with the selected prefix and summary. Preserve Git's slug normalization, removed initiative/ticket IDs, worker ordinals, collision authorization and verified resumes. Explicit caller prefixes override its default feat/fix choice; standalone Research/Prove conventions stay unchanged.
 
 | Work | Prefix |
-| --- | --- |
+|---|---|
 | Living HLD | `wayfinder/<slug>` |
 | Research ticket | `research/<slug>` |
 | Experiment/verification ticket | `prove/<slug>` |
@@ -173,7 +173,7 @@ Silence, destination approval or approval of an earlier batch is not ticket appr
 Run each helper in the Wayfinder session with its default dispatch. **MUST NOT** wrap a helper in a subagent. Skip Architect.
 
 | Helper | Run | Workers |
-| --- | --- | --- |
+|---|---|---|
 | Research | *Load and follow the `research` skill to investigate technical questions across source code, docs, packages and external evidence and return cited findings* with Research routing inputs | Research-owned |
 | Prove | *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* | Prove-owned `prover` worker |
 | Challenge this | Per Risk verification, *Load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
@@ -208,7 +208,7 @@ On resume, recover the same pending worktree and approval identity; do not regen
 Automatically select the relevant scope for factual gaps. Codebase lookups use Research Explore; mechanism and inspection questions use How; cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
 
 | Option | Route | Scope |
-| --- | --- | --- |
+|---|---|---|
 | Web | `web` | Public primary sources, such as specifications and official docs |
 | Cloud | `cloud` | Provider, service, and whether live values matter |
 | Current system | `system` | Repository or deployable being mapped and inspection axis |

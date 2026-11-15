@@ -3,7 +3,7 @@
 Unknowns/risks stay in root **Not yet specified** until resolved; concrete child issues track progress. One unknown may need several work items. HLD Open Questions are user-owned presentation content, never a discovery tracker.
 
 | Type | Use when | Execution / completion |
-| --- | --- | --- |
+|---|---|---|
 | Research | Facts or coarse fog need clarification | AFK cited findings through Research; integrated deciding evidence resolves factual question |
 | Experiment | A falsifiable claim needs an actual check | AFK Prove generation/verification; HITL prototype approval before integration/closure; inconclusive stays open/blocked |
 | Grilling | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep |

@@ -44,7 +44,7 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 ## Proposed Breakdown Format
 
 | Story | Deployable kind | Initiative tag | Feature | Functional slice | Stakeholder requirement | Functional requirements addressed | Business rules | Edge cases and error conditions | Source Acceptance criteria | Jira ID | Epic ID | Depends on |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | {{n}} | {{deployableKind \| [FE] or [BE]}} | {{[TAG] \| optional}} | {{feature}} | {{functionalSlice}} | {{stakeholderRequirement \| verbatim}} | {{functionalRequirements \| verbatim references or statements}} | {{businessRules \| verbatim or None}} | {{edgeCasesAndErrors \| verbatim or None}} | {{sourceAcceptanceCriteria \| verbatim or None}} | {{jiraId \| supplied or TBD}} | {{epicId \| supplied or TBD}} | {{approved in-batch rows \| None}} |
 
 ## Completion criteria

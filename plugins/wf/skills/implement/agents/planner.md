@@ -66,7 +66,7 @@ Choose per ticket from the exact model/effort pairs in `{{implementerModels}}`, 
 ## Response
 
 | Field | Content |
-| --- | --- |
+|---|---|
 | `specRef` | Qualified parent spec identity matching the fetched graph; required. |
 | `tickets[]` | One entry per ticket, deferred included; preserve full coverage on reanalysis. |
 | `tickets[].blockers` | Native plus validated inferred blockers; each integrates before the ticket starts; `[]` = root. New external blockers require explicit resolution before use. |

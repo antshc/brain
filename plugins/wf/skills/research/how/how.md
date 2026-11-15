@@ -7,7 +7,7 @@ Route procedure for current-system research: frame → discover → trace → ve
 Read triggered resources in full; pass the ones a worker needs as absolute paths in its brief.
 
 | Trigger | Resource |
-| --- | --- |
+|---|---|
 | Every How run | `how/inspection.md`, `how/explorer-prompt.md` |
 | Detailed or Full depth | `how/report.md` (pass to `explainy`) |
 | Checks one deployable's triggers, implementation, outcomes | `how/behavior.md` |

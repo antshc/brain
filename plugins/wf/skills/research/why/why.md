@@ -21,7 +21,7 @@ Investigate the motivation and intent behind code. How explains current behavior
 Each `whyy` reads one category playbook. Playbooks document common providers; adapt the examples for other providers in the same category.
 
 | Trigger | Resource | Provider it documents |
-| --- | --- | --- |
+|---|---|---|
 | Full Why | `why/epistemics.md` | — |
 | Source control history, including the anchor | `why/sources/code-archaeology.md` | git, `gh` |
 | Issue / ticket tracker via Atlassian | `why/sources/atlassian.md` (Jira procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then JQL; Fetch work for bodies |

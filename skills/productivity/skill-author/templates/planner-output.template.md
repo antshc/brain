@@ -7,7 +7,7 @@
 Return exactly one JSON object.
 
 | Field | Content |
-| --- | --- |
+|---|---|
 | `status` | `completed \| blocked` |
 | `tasks[]` | One per task; never empty when `completed` |
 | `tasks[].id` | Stable ID (`T1`) or issue ref; preserved across replans |

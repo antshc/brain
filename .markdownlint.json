@@ -9,5 +9,6 @@
   "MD033": { "allowed_elements": ["summary", "details", "kbd", "br"] },
   "MD034": false,
   "MD049": { "style": "asterisk" },
-  "MD060": { "style": "compact" }
+  "MD060": false,
+  "brain-table-separator": true
 }

@@ -5,7 +5,7 @@ Tests for `plugins/wf/skills/github/scripts/` (`github.py`, `github_cli`) and th
 ## Layout
 
 | File | Covers | Runs |
-| --- | --- | --- |
+|---|---|---|
 | `test_gh.py` | refs, `Gh` wrapper, pagination, GraphQL, `run_cmd` | in-process |
 | `test_git.py` | separate Git CLI: branch, commit, push, fetch, remote identity (real git, bare remote) | in-process |
 | `test_issues.py` | issue, label, comment, assignment, sub-issue (fake `gh`) | in-process |
@@ -43,7 +43,7 @@ BRAIN_GH_LIVE=all python3 -m pytest tests/wf/github -m integration -n 4 -q
 Run the in-process suite first. Go live only for a risk the fake cannot prove, then select the narrowest area.
 
 | Change touches | Risk the fake cannot show | `BRAIN_GH_LIVE` |
-| --- | --- | --- |
+|---|---|---|
 | REST path, query string, payload, `--paginate`/`--slurp`, API version header in `issues.py`, `pulls.py`, `reviews.py`, `specs.py`, `implement_spec.py` | endpoint or field GitHub rejects or shapes differently | the area of the module |
 | GraphQL text in `reviews.py` | schema, thread fields, mutation names | `pulls` |
 | `gh` flags or output parsing (`pr diff`, `pr checks`, `issue artifact`, `label`, `search code`) | CLI version drift | `pulls`, `issues`, `specs`, `repo` |

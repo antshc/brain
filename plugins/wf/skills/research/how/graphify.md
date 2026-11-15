@@ -16,7 +16,7 @@ Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names t
 Two traversal modes - choose based on the question:
 
 | Mode | Flag | Best for |
-| ------ | ------ | ---------- |
+|------|------|----------|
 | BFS (default) | *(none)* | "What is X connected to?" - broad context, nearest neighbors first |
 | DFS | `--dfs` | "How does X reach Y?" - trace a specific chain or dependency path |
 
@@ -59,7 +59,7 @@ $GRAPH --help
 `--graph PATH` selects another graph. Focused commands (`terms`, `query`, `resolve`, `path`) need the `graphify` module; they drop nodes that are never the answer to a code question: tests, folders named `*deprecated*`, generated/build output, `graphify-out/`, `mocks/`/`mocker/` servers, project/package manifests, namespace and solution-project nodes, and sourceless external types. Pass `--keep test` (comma list) when the question is about tests. Fallback commands (`check`, `contexts`, `vocab`, `slice`, `traverse`, `raw-path`, `explain`) need only the stdlib.
 
 | Command | Use |
-| --- | --- |
+|---|---|
 | `terms "<question>"` | Candidate terms: adjacent question words joined into compounds the graph contains (`memberaccounthealth`), longest first, then rare single words, with label hit counts. |
 | `query <T1> [<T2>]` | BFS depth 2 from the best match of each term. `--anchor` seeds only the top match; `--both --anchor` lists 1-hop callers and callees; `--context call` filters edges. |
 | `resolve "<Label or phrase>"` | Exact class label first, then best compound match; returns `label file:line` to pick path endpoints. |

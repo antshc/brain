@@ -147,23 +147,23 @@ Scenario: Thread with no recognized label is NOT actionable
 
 Scenario: Last comment is excluded (question!) — thread not actionable
   Given an unresolved thread with comments:
-    | body                       |
-    | fix!: issue                |
+    | body           |
+    | fix!: issue       |
     | question!: Clarification?  |
   When is_actionable is evaluated
   Then the result is False
 
 Scenario: Last comment is excluded (Fixed.) — thread not actionable
   Given an unresolved thread with comments:
-    | body              |
+    | body           |
     | fix!: issue       |
-    | Fixed.            |
+    | Fixed.                     |
   When is_actionable is evaluated
   Then the result is False
 
 Scenario: Unlabeled comment after fix! — thread not actionable
   Given an unresolved thread with comments:
-    | body                          |
+    | body           |
     | fix!: broken null check       |
     | I think this is fine actually |
   When is_actionable is evaluated
@@ -171,7 +171,7 @@ Scenario: Unlabeled comment after fix! — thread not actionable
 
 Scenario: fix! after question! — last fix wins, thread actionable
   Given an unresolved thread with comments:
-    | body                       |
+    | body           |
     | fix!: original issue       |
     | question!: Clarification?  |
     | fix!: new fix              |
@@ -180,7 +180,7 @@ Scenario: fix! after question! — last fix wins, thread actionable
 
 Scenario: fix! after Fixed. — last fix wins, thread actionable
   Given an unresolved thread with comments:
-    | body                       |
+    | body           |
     | fix!: old issue            |
     | Fixed.                     |
     | fix!: actually not fixed   |
@@ -204,7 +204,7 @@ Scenario: Single labeled comment is the actionable comment
 
 Scenario: Last labeled comment is used when multiple comments exist
   Given an unresolved thread with comments:
-    | body                          |
+    | body           |
     | LGTM overall                  |
     | fix!: but this part is wrong  |
   When actionable_comment is evaluated
@@ -235,8 +235,8 @@ Scenario: Empty comment list returns empty string
 ```gherkin
 Scenario: Only actionable threads are returned
   Given a list of threads:
-    | id  | body                       | resolved |
-    | T1  | fix!: broken null check    | false    |
+    | id | body                    | resolved |
+    | T1 | fix!: broken null check | false    |
     | T2  | nit: minor style           | false    |
     | T3  | suggest!: extract method   | false    |
     | T4  | fix!: issue                | true     |
@@ -245,7 +245,7 @@ Scenario: Only actionable threads are returned
 
 Scenario: All threads are non-actionable — empty list returned
   Given a list of threads:
-    | id  | body              | resolved |
+    | id | body                    | resolved |
     | T1  | nit: minor style  | false    |
     | T2  | good: nice        | false    |
   When get_actionable_threads() is called

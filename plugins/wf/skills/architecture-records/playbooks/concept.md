@@ -35,7 +35,7 @@ Runs first, before the Concept gate. Most rules that reach this skill belong som
 Split on **when the rule is needed**:
 
 | The rule answers | Home | Written by |
-| --- | --- | --- |
+|---|---|---|
 | how a shared business process, implementation, or operational policy governs several building blocks | Concept, `docs/concepts/` | this skill — continue below |
 | which approach was chosen and its structural decisions | Concept, `docs/concepts/` | this skill — continue below |
 | why it was chosen, and the rejected alternatives | standalone ADR linking to the Concept, or feature design when it fails the ADR gate | return control to the router for **Select and load** with route `adr`; otherwise session ledger / feature design |
@@ -83,7 +83,7 @@ A record carries no frontmatter — it opens directly with `# {{conceptTitle}}`.
 Runs before Body. Give every rule a source and check it by that source:
 
 | Rule source | Check | Record shows it as |
-| --- | --- | --- |
+|---|---|---|
 | **Implemented** — target code exists | Spawn a built-in `explore` subagent with the rule's bounded, read-only lookup and its output shape, `path:line` evidence. Blocked lookup → record it and continue independent rules. Code contradicts the rule → stop; ask the user which wins. | `Implementation Map` row |
 | **Decided** — target code does not exist yet | Decision comes from the user, the caller, or an ADR. Do not search for an implementation; do not mark it `not verified`. | Rule only, no map row; add the row once code exists |
 | **Ported** — rule comes from another project | Restate it in the target's stack and conventions; it then counts as Implemented or Decided. | Per the resulting source |
@@ -101,7 +101,7 @@ For ported content:
 Choose by the shared concern, not the component where it was found; return control to the router for **Resource map** to load only the selected template. Return the chosen row's **kind** with the body.
 
 | Concern | Kind | Template |
-| --- | --- | --- |
+|---|---|---|
 | Business capabilities — the processes that deliver them, and the scenarios each process handles | `dom` | `domain-business-process.md` already selected and loaded by the router |
 | Architecture/design patterns (including codebase-specific patterns), domain rules, user-facing validation, transactions, persistence, caching, concurrency, integration | `str` | `structure-implementation.md` already selected and loaded by the router |
 | Security, error handling, testing, configuration, migration, installation, logging, disaster recovery, domain safety, runtime safety or batch operations | `ops` | `ops-policy.md` already selected and loaded by the router |

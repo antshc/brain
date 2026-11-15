@@ -81,5 +81,5 @@ Entered via Discovery Step 3. Interactive — confirm with user, apply resolutio
 ### `docs/architecture-drift-log.md` format
 
 | Date | Source (Architecture section / SSR #) | Documented | Observed | Status | Notes |
-| ------ | ---------------------------------------- | ------------ | ---------- | -------- | ------- |
+|------|----------------------------------------|------------|----------|--------|-------|
 | YYYY-MM-DD | e.g. SSR 0009 | what the doc says | what the code does | Open / Resolved | owner, follow-up |

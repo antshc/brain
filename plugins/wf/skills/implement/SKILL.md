@@ -22,7 +22,7 @@ Orchestrate a routed ticket graph into one integration branch and a draft PR whe
 *Load and follow the `github` skill to run GitHub platform mechanics for specs, tickets, and issues* using Specs and tickets. *Load and follow the `git` skill to verify branch naming, commit messages, and worktree lifecycle*. Resolve `GH_TOOL` = `python3 <installed github skill directory>/scripts/github.py` and `GIT_TOOL` = `python3 <installed git skill directory>/scripts/git.py` before changing into a worktree. Only the orchestrator and planner call `GH_TOOL`. JSON on stdout; exit `0` ok · `1` tool failure · `2` invalid input/routing · `3` read-back problems. Non-zero → report error and stop dependent work.
 
 | Intent | Command |
-| --- | --- |
+|---|---|
 | Validate an existing spec or resolved plan; use `--pin-base --integration-branch H` once on a new run to fetch the exact `BASE_COMMIT` | `GH_TOOL spec preflight --spec REF --mode MODE` or `GH_TOOL spec preflight --source-repository R --base-branch B --initiative-id I --mode MODE` |
 | Atomically save publication progress | `GH_TOOL run checkpoint --run-dir RUN_DIR --input FILE` |
 | Create spec from plan/description | `GH_TOOL spec create --source-repository R --base-branch B --initiative-id I --summary S --body-file F --source-note N` |
@@ -66,7 +66,7 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
    Before: require the pinned `BASE_COMMIT` (or the reconciled resume baseline) and validated implementer candidates per *Implementer model routing*; create `NOTES_DIR` = `RUN_DIR/notes` outside the repository; `RUN_DIR/spec.json` exists from `graph read`. Done when checkout and base match routing.
 
    | Placeholder | Value |
-   | --- | --- |
+   |---|---|
    | `{{operation}}` | `breakdown` for zero sub-issues; `analyze` for existing sub-issues |
    | `{{ghTool}}` | `GH_TOOL` (absolute) |
    | `{{specRef}}` | spec `OWNER/REPO#NUMBER` |
@@ -104,7 +104,7 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
    For either worker, select and validate the workspace, branch or caller-managed rebase state, HEAD, and index. Instruct the worker to enter and verify the absolute assigned worktree before repository work. Set it as the runtime working directory where supported. Ask the worker to implement the assigned ticket and return the workflow ticket JSON result. Capture the integration HEAD at each launch for history and record the worker's starting HEAD and index separately. Keep `@prevHead` as the original ticket start and track the validated ticket base separately if rebased.
 
    | Handoff field | Sequential | Parallel |
-   | --- | --- | --- |
+   |---|---|---|
    | `ticketRef` | `OWNER/REPO#NUMBER` | same |
    | `ticketFile` | the ticket’s `file` from the effective graph | same |
    | `baseCommit` | `BASE_COMMIT` | same |
@@ -129,7 +129,7 @@ Evaluate Sonnet/high and Opus/medium defaults on comparable tasks; do not treat 
    Before: *Load and follow the `git` skill to run verified commit messages using Commits* for a conventional `chore` subject format. Load [fetch-diff.md](./references/fetch-diff.md); split PR diff into `@diffDir`; record `@prevHead` from the integration worktree. Instruct Chore to enter and verify that worktree before repository work and explicitly authorize one local cleanup commit after verification.
 
    | Placeholder | Value |
-   | --- | --- |
+   |---|---|
    | `{{featureBranch}}` | `INTEGRATION_BRANCH` |
    | `{{pullRequestUrl}}` | PR URL |
    | `{{worktreePath}}` | `WORKTREE_PATH` |
@@ -177,7 +177,7 @@ For `general-purpose`, give the same assigned worktree, Git range, commit instru
 - Follow the *Implementation focus* evidence gate. Rerun affected checks on the final tree and report commands, executed counts, outcomes, and risks. Leave edits unstaged and uncommitted in edit-only mode. In commit mode, stop before edits if there are pre-existing staged changes. After verification, stage only ticket-owned changes and make one local commit with the supplied subject and body instructions. Amend only the explicitly authorized unpublished SHA at HEAD, with no active rebase or merge. If fresh verification confirms that commit and no edits are needed, return its SHA without amending. Create no empty commit. Preserve work and report failures. Return exactly one JSON object:
 
 | Field | Content |
-| --- | --- |
+|---|---|
 | `status` | `completed` when the evidence gate passes, otherwise `failed`. |
 | `result.summary` | `completed` only. One-line outcome. |
 | `result.files` | `completed` only. Changed paths relative to the assigned workspace. In commit mode, report the paths in the full ticket commit. `[]` for verified no change. |
@@ -228,7 +228,7 @@ Table of ticket, blocked by (`none` = explicit root), paths, conflicts with kind
 Write data-only `RUN_DIR/implementation-handoff.json`; pass its absolute path, never internal scripts/references. Use `null` for unavailable scalar data and `[]` for no entries; missing required state makes `status` `blocked`. An `already-satisfied` handoff intentionally has null PR and pushed-head fields, no publication verification, and no chore needed.
 
 | Field | Content |
-| --- | --- |
+|---|---|
 | `status`, `blockers` | `ready` after integrated changes and verified publication/chore; `already-satisfied` for a verified zero-change run on base; otherwise `blocked` plus reasons. |
 | `specRef`, `specUrl`, `sourceRepository`, `trackerRepository`, `prUrl` | Qualified spec identity and URLs; explicit source/tracker `owner/repo`. |
 | `initiativeId`, `remote`, `integrationBranch`, `baseBranch`, `baseCommit`, `headCommit` | Validated routing, verified source remote, base SHA, final pushed SHA. |

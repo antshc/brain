@@ -95,7 +95,7 @@ Ordinary edits of an existing page without thread replies. Review-thread replies
 `diagramRenderer` in `.atlassian.json.user`. Absent/empty → `png`.
 
 | Value | Page output | Extra prerequisite | Status |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `png` | Static image attached to the page | none beyond `mmdc` | Usable |
 | `drawio` | Editable Confluence Draw.io diagram | Draw.io app, `drawio` CLI on PATH, `drawioExtensionKey` | Usable |
 | `mermaid` | Live Confluence Mermaid macro | Confluence Mermaid app | Refused; macro shape not yet captured |

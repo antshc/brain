@@ -57,7 +57,7 @@ Omit empty lines.
 Select one route per claim; pass its playbook, and Integration's when a Runtime harness crosses a real external boundary, as absolute paths from this skill's base directory. The router does not read playbooks; workers read them in full.
 
 | Route | Select when | Playbook | Result |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Logic | Pure logic, state/transitions, reducers, transformations | [Logic](playbooks/logic.md) | Per-case actual vs expected state |
 | Runtime | Framework/runtime, lifecycle, concurrency, hosting, serializer, process | [Runtime](playbooks/runtime.md) | Observed mechanism behavior |
 | Integration | SDK/API, cloud, broker, database, service boundary | [Integration](playbooks/integration.md) | Selected seam with executed assertions or probe output |

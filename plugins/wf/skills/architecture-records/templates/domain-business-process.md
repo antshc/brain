@@ -42,7 +42,7 @@ Actor: <who>; Trigger: <what starts it>; Action: <major business flow>; Outcome:
 ## Selecting the level
 
 | Level | Select | Exclude | Example |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | **Business Capability** — the page | One area of what the business can do, decomposing into multiple business processes. | A single process, a phase, a technical workflow. | Customer Relationship Management |
 | **Business Process** — a `###` section | A major end-to-end flow producing a stakeholder-recognizable outcome, decomposable into multiple subprocesses. | Phases, activities, tasks, technical workflows, implementation steps. | Handle Customer Complaints |
 | **Business Scenario** — an optional table row | A concrete business situation or meaningful variation, defined by context, conditions, or outcomes. | Process structure, subprocesses, activities, tasks, implementation detail. | Customer reports a damaged product |

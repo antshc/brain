@@ -31,7 +31,7 @@ Launch verifier → `AGENTS_ROOT/verifier.md` subagent in `WORKTREE_PATH`:
    → Subagents unavailable: record skip reason; never drive the app in the orchestrator.
 
    | Placeholder | Value |
-   | --- | --- |
+|---|---|
    | `{{featureBranch}}` | `INTEGRATION_BRANCH` |
    | `{{pullRequestUrl}}` | PR URL |
    | `{{worktreePath}}` | `WORKTREE_PATH` |

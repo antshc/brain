@@ -15,7 +15,7 @@ Can CGC use SCIP to semantically index both a .NET/C# backend and a TypeScript f
 A shared database does **not** imply semantic cross-language edges (for example, a TypeScript HTTP client invoking a C# controller). SCIP indexes symbols and references in each language's compilation model; CGC has no confirmed automatic API-boundary mapping.
 
 | Requirement | Status | Explanation |
-| --- | --- | --- |
+|---|---|---|
 | C# symbols and references via SCIP | Supported | External `scip-dotnet`; needs a buildable/restorable solution or project |
 | TypeScript/TSX symbols and references via SCIP | Supported | External `scip-typescript`; requires working TypeScript project configuration and dependencies |
 | Both languages searchable through the same CGC MCP server | Supported by design | Use one named context and sequentially index separate paths |
@@ -48,7 +48,7 @@ The [`scip_pipeline.py`](https://github.com/CodeGraphContext/CodeGraphContext/bl
 ### 1.2 Project discovery and prerequisites
 
 | Language | External indexer | CGC invocation/discovery | Important constraint |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | C# | `scip-dotnet` | First `*.sln` at indexed root; else first recursive `*.csproj`. Invokes `scip-dotnet index <solution-or-project> --working-directory <project-dir> --output <temp>/index.scip`. | Many solutions/projects under one root are **not** all selected automatically; CGC's discovery does not check `*.slnx`, although upstream scip-dotnet accepts that format |
 | TypeScript/TSX | `scip-typescript` | `scip-typescript index --output <temp>/index.scip` from selected root | TypeScript project configuration and installed dependencies must resolve |
 | TS monorepo | `scip-typescript` | Adds `--pnpm-workspaces` for `pnpm-workspace.yaml`, or `--yarn-workspaces` for `package.json` with `workspaces` | Run at a configured workspace root |

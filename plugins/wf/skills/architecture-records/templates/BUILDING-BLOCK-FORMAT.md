@@ -48,7 +48,7 @@
 <!-- rows: 0 -->
 
 | Concept | Summary | Trigger condition & Default |
-| --------- | --------- | ----------------------------- |
+|---------|---------|-----------------------------|
 
 ## Architecture Decision Records
 
@@ -57,7 +57,7 @@
 <!-- rows: 0 -->
 
 | Decision | Summary | Trigger condition & Default |
-| ---------- | --------- | ----------------------------- |
+|----------|---------|-----------------------------|
 
 ## Key features
 

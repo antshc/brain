@@ -43,7 +43,7 @@ python3 <skillDir>/scripts/mentions.py --content <queryB-1.json> [--content ...]
 `blocked.py` prints `{"rows": [...], "truncated": bool}` for section 1. `mentions.py` prints the buckets below, each row carrying `key`, `url`, `summary`, `status`, `mentionedBy`, `mentionedOn` — plus `answeredOn` and `answeredBy` where they apply. It keeps only comments whose ADF holds a `mention` node for `accountId` and `created` on or after the cutoff — JQL has no comment-date operator, so that filter runs after fetch, never in the JQL — then takes each issue's **latest** surviving mention and buckets it by what follows:
 
 | JSON key | Rule | Renders as |
-| --- | --- | --- |
+|---|---|---|
 | `answeredByYou` | a comment authored by `accountId` created after the mention | section 3, `Answered by: you` |
 | `answeredByOther` | a third party's comment created after the mention, no reply from you | section 3, `Answered by: <name>` |
 | `unanswered` | no comment of either kind follows | section 2 |

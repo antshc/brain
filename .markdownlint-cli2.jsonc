@@ -10,5 +10,8 @@
     "**/.venv/**",
     "**/fixtures/**",
     "tests/wf/atlassian/regression/panel-alternatives.md"
+  ],
+  "customRules": [
+    ".github/scripts/markdownlint-table-separator.mjs"
   ]
 }

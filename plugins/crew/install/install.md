@@ -16,7 +16,7 @@ Present the stack rule options from the template table below (`ai`, `dotnet`, `p
 For every chosen stack, create each missing target below and its parent directories. Never overwrite an existing target; add it to `Skipped` instead. Copy Copilot instruction templates verbatim. Their `applyTo` scope determines when Copilot loads each instruction.
 
 | Stack | Target | Template |
-| --- | --- | --- |
+|---|---|---|
 | `ai` | `$REPO_PATH/.github/instructions/ai-authoring.instructions.md` | `templates/ai-authoring.instructions.template.md` |
 | `dotnet` | `$REPO_PATH/.github/instructions/dotnet.instructions.md` | `templates/dotnet.instructions.template.md` |
 | `py` | `$REPO_PATH/.github/instructions/python.instructions.md` | `templates/python.instructions.template.md` |

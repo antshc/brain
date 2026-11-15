@@ -16,7 +16,7 @@ This installs two CLI entry points: `ralph` and `ralph-fetch-threads`.
 **Runtime (must be on your `PATH`):**
 
 | Tool | Purpose | Install |
-| --- | --- | --- |
+|---|---|---|
 | `gh` | GitHub CLI — fetches PRs and review threads | https://cli.github.com |
 | `copilot` | GitHub Copilot CLI — drives the AI agent | `gh extension install github/gh-copilot` |
 | `git` | Repository operations | https://git-scm.com |

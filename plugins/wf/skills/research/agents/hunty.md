@@ -51,7 +51,7 @@ Contracts give documented intent; source proves as-built behavior. Name the cont
 Before the first search, print `route: rg | lsp | graphify-path | graphify-find | nuget | unresolved — {{reason}}`. Use the first matching row for each part of `@work`; a multi-part task may use several routes.
 
 | Signal in `@work` | Route |
-| --- | --- |
+|---|---|
 | Target has no local checkout or lacks the requested ref | `unresolved` |
 | Restored NuGet package, its API or behavior; C# type absent from local source after LSP and `rg -uu` | `nuget` |
 | Quoted literal, config key, error text, route path, test name, file glob, frontend component or UI text | `rg` |

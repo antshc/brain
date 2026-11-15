@@ -34,7 +34,7 @@ Use familiar **leading words** (*lesson*, *tracer bullets*, *red*) to anchor beh
 ## Precision patterns
 
 | Intent | Weak | Better |
-| --- | --- | --- |
+|---|---|---|
 | Imperative | Consider running tests | Run the relevant tests |
 | Constraint | Try to use existing tools | MUST use the existing tool |
 | Conditional | Handle missing dependencies | If the dependency is unavailable, report the blocker |

@@ -116,7 +116,7 @@ Capture for each case:
 Score each dimension from 0 to 3:
 
 | Dimension | 0 | 1 | 2 | 3 |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | Grounded accuracy | Wrong/misleading | Mostly unsupported | Correct but incomplete | Correct and evidenced |
 | Precision | Dominated by noise | Much irrelevant output | Minor noise | Focused |
 | Coverage | Expected facts absent | Major gaps | Small gaps | Complete for intent |

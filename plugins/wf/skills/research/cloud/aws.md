@@ -33,7 +33,7 @@ Read-only research of the live account. Check `command -v aws`; absent → UNKNO
 4. **Read** — only `describe-*`, `list-*`, `get-*`, plus:
 
    | Need | Command |
-   | --- | --- |
+   |---|---|
    | Applied quota | `aws service-quotas get-service-quota --service-code <code> --quota-code <code>` |
    | Default quota | `aws service-quotas get-aws-default-service-quota --service-code <code> --quota-code <code>` |
    | Quota codes | `aws service-quotas list-service-quotas --service-code <code>` |

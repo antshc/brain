@@ -19,7 +19,7 @@ The script excludes resolved threads and unpublished (`PENDING`) review comments
 Use its JSON as the discussion source: `pr` gives `{{owner}}`, `{{repo}}`, `{{number}}`; `headRef`/`baseRef` give `$headRef`/`$baseRef`; `headOid` pins the fetched PR head. `threads[]` includes `pending` reply work and unresolved agent threads in `reconcile`, whose latest published comment is a marked reply. Replies suppress duplicates, not resolution retries; prose status is never parsed.
 
 | `action` | Do |
-| --- | --- |
+|---|---|
 | `skip` | Report the counts and no new reply work; **stop** before checkout. |
 | `stop` | Report `reason` verbatim and stop; any unresolved truncated thread blocks the run. |
 | `proceed` | Inspect `threads[]`. For `reconcile`, read full context: wait for unanswered questions or agreed deferrals without a supplied ticket, without another reply; reassess settled outcomes or failed resolution retries. If only unchanged waiting questions or untracked deferrals remain, report waiting and stop before checkout. Otherwise continue with actionable threads. |
@@ -46,7 +46,7 @@ Done when each holds a real command or is recorded as absent, and the build pass
 Each entry carries `id`, `origin` (`agent` or `human/unknown`), `state`, `anchor` (`path`, `line`, `startLine`, `basis`), `mode`, and published comments in order. `basis: original` means an outdated thread's original position; `diffHunk` holds its source context. Retain raw `body`, IDs, and `updatedAt` for freshness; use `visibleBody` only for visible/semantic comparison.
 
 | Work | Read and act |
-| --- | --- |
+|---|---|
 | `pending`, `first-pass` | Read the whole thread. A marked finding is actionable even under the same GitHub login. |
 | `pending`, `follow-up` | Read the whole thread; answer the latest concern using `newComments` and `lastReply` in context. A human clarification resumes the work even under the same login. |
 | `reconcile` | Read the whole thread and latest reply. Re-establish the outcome and current evidence; wait quietly for unanswered questions, or retry safe closure without repeating an already posted answer. |
@@ -64,7 +64,7 @@ Done when each actionable thread belongs to exactly one `issue` and counts match
 ## 5. Triage each issue
 
 | Class | The issue is | Next |
-| --- | --- | --- |
+|---|---|---|
 | `chore` | A rename, a typo, wording, formatting, an unused import — the reviewer's instruction is the whole specification. | Step 7 |
 | `substantive` | Behaviour, correctness, design, performance, or security — knowing whether the reviewer is right requires reading the code. | Step 6 |
 
@@ -103,7 +103,7 @@ Name the exact type, method, or file when needed to understand the answer. Cite 
 Apply independently per thread:
 
 | Origin and outcome | Action |
-| --- | --- |
+|---|---|
 | Agent; fix pushed and verified | Reply, then resolve. |
 | Agent; evidence shows concern satisfied or incorrect | Explain briefly, then resolve. |
 | Agent; clarification or preference needed | Ask one focused question; leave open. |
@@ -131,7 +131,7 @@ Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is go
 ## 10. Report
 
 | Section | Contents |
-| --- | --- |
+|---|---|
 | Gate | The `counts` from §0 and the `action` that let the run continue. |
 | Issues | One row per `issue`: `issueId`, class, verdict, commit sha or `none`, threads replied and resolved. |
 | Open threads | Questions/blockers awaiting clarification or evidence; agreed deferrals awaiting a supplied ticket (follow-up agreed, ticket not created); answered human/unknown threads awaiting manual closure. |

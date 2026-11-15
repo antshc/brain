@@ -233,7 +233,7 @@ fi
 After transcription completes, launch three extraction agents simultaneously:
 
 | Agent | Role |
-| ------- | ------ |
+|-------|------|
 | `TopicExtractor` | Cluster transcript segments by topic using keyword proximity and temporal grouping. Output: ordered topic list with timestamps. |
 | `ActionExtractor` | Find all action items. Signals: "will", "should", "needs to", "by [date]", owner assignments, commitments. Output: action list with owner + due date. |
 | `DecisionExtractor` | Find all decisions made. Signals: "decided", "agreed", "we will", "the plan is", "confirmed". Output: decision list with rationale. |
@@ -471,7 +471,7 @@ echo "  3. Track action items to completion"
 ## Error Handling
 
 | Error | Likely Cause | Action |
-| ------- | ------------- | -------- |
+|-------|-------------|--------|
 | Transcription tool not found | `faster-whisper` and `openai-whisper` not installed | Offer to auto-install with `pip install faster-whisper`; show manual instructions |
 | Unsupported audio format | File extension not in supported list (MP3/WAV/M4A/OGG/FLAC/WEBM) | If ffmpeg available, convert automatically; otherwise prompt to install ffmpeg |
 | File not found | Path is incorrect or file was moved | Show exact path error; ask user to verify and provide correct path |

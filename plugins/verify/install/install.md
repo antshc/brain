@@ -10,7 +10,7 @@ Outcome: `proof/kit/` (the proof lib), `mole/` (the runner), `proof/` (app seams
 Commands by language (`<mole>`, `<run>`, `<prove>`, `<test>`, `<typecheck>` below):
 
 | | typescript | python |
-| --- | --- | --- |
+|---|---|---|
 | mole | `pnpm mole` | `python3 -m mole` |
 | run (a `<mole>` verb) | `run` | `run` |
 | prove (throwaway browser) | `pnpm prove` | `python3 -m mole.prove_cli` |

@@ -9,7 +9,7 @@ Source analysis, 21 October 2026. This describes the original implementation and
 There are four separate concerns:
 
 | Concern | Responsibility |
-| --- | --- |
+|---|---|
 | Feature map | Describe features, sub-features, entry points, and observable results |
 | `verify-<app>/SKILL.md` | Explain launch, doctor, drive, evidence, cleanup, and helpers |
 | App control harness | Execute interactions (commands, browser controls, HTTP) |
@@ -106,7 +106,7 @@ The original proof standard requires using the real user path, not test-only set
 There is **no specified deterministic code-diff-to-sub-feature algorithm** in the original skill. The agent uses the task description, affected feature file, user entry points and behavioral variants to choose relevant coverage. Selection therefore depends on its reasoning and on the accuracy of the map.
 
 | Mode | Coverage requirement |
-| --- | --- |
+|---|---|
 | Generate skill | Drive one mapped feature end-to-end to prove the harness works |
 | Verify fix/new feature | Use the relevant feature file; exercise reachable affected entry points, modes, gated variants and relevant success/error/cancel/empty/persistence paths |
 | Full regression | Traverse the full feature-map index, including cross-surface journeys |
@@ -140,7 +140,7 @@ It never silently fixes product code or weakens a journey to make it pass.
 The local Proof design already includes the Verify installer, `verify-mole`, a feature map, explicit executable feature checks, surface adapters, and durable receipts. The systems are complementary.
 
 | Aspect | pstack | Proof kit |
-| --- | --- | --- |
+|---|---|---|
 | Verification selection | Agent interprets feature map | Feature metadata and registered checks can explicitly select cases |
 | Test execution | Agent-driven harness recipes | Executable checks through adapters |
 | Evidence | Screenshots/responses/logs and reported observations | Structured evidence and receipts |

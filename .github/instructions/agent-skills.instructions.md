@@ -28,7 +28,7 @@ Write-time guidance for `SKILL.md`, bundled references/templates, `*.agent.md`, 
 ## Frontmatter and discovery
 
 | Key | Required | Rule |
-| --- | --- | --- |
+|---|---|---|
 | `name` | yes | Lowercase, hyphenated, matches folder name. |
 | `description` | yes | See Description shape. |
 | `disable-model-invocation` | no | `true` = human-only; omit when model or other skills must discover it. |
@@ -52,14 +52,14 @@ Omit process detail (`using bundled best practices`, `from a brief`) unless it s
 CI runs [lint_skill_descriptions.py](../scripts/lint_skill_descriptions.py) over `plugins/wf/`: length, duplicate or near-duplicate quoted triggers, and `Not for` targets that do not exist.
 
 | Invocation | Example |
-| --- | --- |
+|---|---|
 | Model-invoked | `Investigate a question against primary sources and save cited findings as Markdown. Use for /research, 'research X', 'gather docs on Y', or delegating reading legwork. Use why for design rationale.` |
 | User-invoked | `Write, rewrite, or shrink an agent skill and its bundled references.` |
 
 **Description characters:** plain text, max 1024 chars. Separate clauses with `.`, `;`, or `,`. **MUST NOT** use:
 
 | Character | Why |
-| --- | --- |
+|---|---|
 | `—` `–` (em/en dash), ` - ` / `--` as punctuation | Breaks naive parsers; hyphens inside identifiers (`address-page-comments`) allowed |
 | `<` `>` | Rejected by skill validators (XML/HTML injection guard) |
 | `:` (colon + space) | YAML reads it as a nested mapping key |
@@ -98,7 +98,7 @@ Order content by need: **steps → inline reference → disclosed reference**. I
 Keep `SKILL.md` body under 300 lines.
 
 | Folder | Holds |
-| --- | --- |
+|---|---|
 | `playbooks/` | substantial route procedures; create only when needed |
 | `tactics/` | substantial conditional techniques shared or used by routes; create only when needed |
 | `scripts/` | executable automation |
@@ -139,7 +139,7 @@ Prefer Python over shell-specific scripts for cross-platform automation. Use the
 ## Syntax legend
 
 | Syntax | Meaning | Example |
-| --- | --- | --- |
+|---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
 | *italic* | Skill invocation phrase | *Load and follow the `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |

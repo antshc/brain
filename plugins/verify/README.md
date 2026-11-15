@@ -40,7 +40,7 @@ All four illustrate the same problem: **the available evidence does not establis
 Verification must target the real artifact relevant to the claim.
 
 | Claim | Appropriate verification target |
-| --- | --- |
+|---|---|
 | A REST endpoint works | Running API over HTTP |
 | An order is persisted | Actual database state and successful readback |
 | A React feature works | Running application through browser interactions |
@@ -71,7 +71,7 @@ The important distinction is between executing actual application behavior and s
 Yes. The verification boundary depends on the requirement.
 
 | Setup | What it establishes |
-| --- | --- |
+|---|---|
 | Mocked order service called by a unit test | Controller or component behavior under controlled conditions |
 | Real API and real application services | HTTP and service-layer behavior |
 | Real API and PostgreSQL test container | HTTP behavior and database persistence |
@@ -142,7 +142,7 @@ For a large application, feature maps provide targeted context rather than requi
 Evidence is not necessarily proof by itself. It becomes useful when evaluated against a defined requirement.
 
 | Evidence | Example | What it establishes |
-| --- | --- | --- |
+|---|---|---|
 | HTTP trace | POST /orders returns 201 | The API accepted a request |
 | HTTP readback | GET /orders/123 returns 200 | The API returned an order |
 | Database record | SELECT returns the order | The record exists in the inspected database |
@@ -265,7 +265,7 @@ A receipt establishes the outcome only for the recorded scope, environment, inpu
 **A receipt is not another test and does not execute assertions.** E2E tests check whether the running application behaves as expected. A receipt identifies **which tests ran, for which task and revision, what happened, and where the test evidence can be found**.
 
 | Item | Responsibility |
-| --- | --- |
+|---|---|
 | E2E test | Executes real application behavior and evaluates assertions |
 | Evidence | Test results, HTTP traces, database checks, logs, or screenshots |
 | Receipt | Compact record of the task, revision, environment, verdict, and evidence references |
@@ -362,7 +362,7 @@ The demo illustrates why verification must match the actual application contract
 The workshop's prove command executes deterministic checks in a fresh browser context and saves a receipt.
 
 | Exit code | Meaning |
-| --- | --- |
+|---|---|
 | 0 | PASS |
 | 1 | FAIL |
 | 2 | INCONCLUSIVE |

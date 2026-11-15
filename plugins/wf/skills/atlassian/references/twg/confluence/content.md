@@ -135,13 +135,13 @@ connector result by provider identity.
    point at Atlassian content or ordinary web pages, and neither is a connector
    lookup.
 
-   | Destination | Action |
-   | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-   | A Confluence path such as `<site>.atlassian.net/wiki/...` | Read it with the **Fetch page** tactic (fallback `twg confluence content get "<url>"`, lossy). Do not search Rovo. |
-   | A Jira issue path such as `<site>.atlassian.net/browse/<KEY>` | Read the full body with the **Fetch work** tactic; metadata only: `twg jira workitem get <KEY> --site <site>`. Do not search Rovo. |
-   | Another Atlassian product | Hand off to that product's native skill and command when available; otherwise report and stop. |
-   | A connector-backed provider such as `docs.google.com` or `drive.google.com` for `google-drive` | Continue to step 3. |
-   | Anything else, including public sites | Report the destination as an external link and stop. Do not search Rovo. |
+   | Destination                                                                                    | Action                                                                                         |
+   |----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+   | A Confluence path such as `<site>.atlassian.net/wiki/...`                                      | Read it with the **Fetch page** tactic (fallback `twg confluence content get "<url>"`, lossy). Do not search Rovo. |
+   | A Jira issue path such as `<site>.atlassian.net/browse/<KEY>`                                  | Read the full body with the **Fetch work** tactic; metadata only: `twg jira workitem get <KEY> --site <site>`. Do not search Rovo. |
+   | Another Atlassian product                                                                      | Hand off to that product's native skill and command when available; otherwise report and stop. |
+   | A connector-backed provider such as `docs.google.com` or `drive.google.com` for `google-drive` | Continue to step 3.                                                                            |
+   | Anything else, including public sites                                                          | Report the destination as an external link and stop. Do not search Rovo.                       |
 
 3. Search that connector by the exact title as stored in Confluence. Preserve
    the whole title, including prefixes such as `Copy of`. If the quoted search
@@ -235,11 +235,11 @@ Inspect the exact contract and do not imply a subtree copy without evidence.
 Export accepts a content ID or URL and a format. The backend resolves the content
 type from the ID. Supported combinations:
 
-| Format | Content types |
-| ------ | ------------------------- |
-| `png` | Whiteboard |
-| `pdf` | Page, blog post, live doc |
-| `word` | Page |
+| Format | Content types             |
+|------|-------------------------|
+| `png`  | Whiteboard                |
+| `pdf`  | Page, blog post, live doc |
+| `word` | Page                      |
 
 Unsupported combinations are rejected by the backend. Export behavior depends
 on the requested format:

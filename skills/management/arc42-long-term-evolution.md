@@ -18,7 +18,7 @@ The key principle is to separate:
 ## How the PM-Focused Sections Evolve
 
 | arc42 section | How it evolves over time |
-| --- | --- |
+|---|---|
 | **1. Introduction & Goals** | Business goals, ownership, and stakeholders change. Keep current goals and stakeholders in the main document. Preserve major historical shifts through linked decisions or dated notes. |
 | **2. Constraints** | Constraints change with platforms, compliance, budget, organization, and technology policy. Mark important constraints as current, retired, or superseded instead of silently replacing them. |
 | **3. Context & Scope** | System boundaries and dependencies change continuously. Keep the current system context accurate and track ownership and lifecycle for important dependencies. |
@@ -85,7 +85,7 @@ Use one of:
 ### Example
 
 | Constraint | Status | Notes |
-| --- | --- | --- |
+|---|---|---|
 | Workloads must run on Kubernetes | Current | Corporate platform standard |
 | .NET 8 required | Retiring | Migration to .NET 10 planned |
 | On-prem deployment required | Superseded | Replaced by cloud-first policy in 2025 |
@@ -103,7 +103,7 @@ Track important dependencies with ownership and lifecycle.
 ### Recommended dependency fields
 
 | Field | Purpose |
-| --- | --- |
+|---|---|
 | Dependency | External system, provider, platform, or team |
 | Relationship | Why the system depends on it |
 | Owner | Responsible team or organization |
@@ -113,7 +113,7 @@ Track important dependencies with ownership and lifecycle.
 ### Example
 
 | Dependency | Relationship | Owner | Status | Delivery concern |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | Kafka | Notification job transport | Platform team | Current | Capacity |
 | RabbitMQ | Legacy job transport | Messaging team | Deprecated | Remove after final migration |
 | SendGrid | Email delivery | External vendor | Current | Rate limits |
@@ -212,7 +212,7 @@ They often evolve as:
 ### Example
 
 | Period | Availability target | Throughput target |
-| --- | --- | --- |
+|---|---|---|
 | 2023 pilot | 99.5% | 500k/day |
 | 2025 production | 99.9% | 5M/day |
 | Current | 99.95% | 20M/day |
@@ -256,7 +256,7 @@ Each significant debt item should include:
 ### Example
 
 | Debt | Why accepted | Impact | Trigger |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Single email provider | Faster initial delivery | Provider outage affects all email | Add second provider when availability SLA exceeds 99.95% |
 | Manual failed-message replay | Low current support volume | Operational effort | Automate when failures exceed 100/week |
 
@@ -283,7 +283,7 @@ Use it for planned architectural changes such as:
 ### Example
 
 | Horizon | Planned evolution | Driver | Dependency |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Q1 2027 | Move to managed Kafka | Reduce operational overhead | Platform team |
 | Q2 2027 | Remove RabbitMQ compatibility layer | Complete migration | Final legacy client migration |
 | H2 2027 | Add provider failover | Higher availability target | Procurement + engineering |

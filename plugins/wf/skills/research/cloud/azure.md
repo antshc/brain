@@ -33,7 +33,7 @@ Read-only research of the live subscription. Check `command -v az`; absent → U
 4. **Read** — only `show`, `list`, `list-*`, `get-*`, plus:
 
    | Need | Command |
-   | --- | --- |
+   |---|---|
    | Compute usage vs limit | `az vm list-usage --location <region>` |
    | Network usage vs limit | `az network list-usages --location <region>` |
    | Applied quota (any provider) | `az quota show` / `az quota usage list --scope <scope>` |

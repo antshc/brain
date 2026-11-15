@@ -14,7 +14,7 @@ Select one playbook, execute, then check results. Writable surface: target skill
 Pick the first matching row. Resolve every path from this skill's base directory.
 
 | Mode | Route when | Playbook | Loads | Runs in |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | Grill | Request is a skill idea to define, design, or interview; or a skill request too vague to fill the skill brief | [grill.md](playbooks/grill.md) | none | this session (interactive), then Write |
 | Agent | Request is to write or rewrite a custom coding agent definition (`*.agent.md`, an `agents/` file, a planner or decomposer agent) | [agent.md](playbooks/agent.md) | [agent-best-practices.md](references/agent-best-practices.md), [agent-examples.md](references/agent-examples.md), [agent-platforms.md](references/agent-platforms.md), [agent.template.md](templates/agent.template.md); planner only: [planner.template.md](templates/planner.template.md), [planner-output.template.md](templates/planner-output.template.md) | this session |
 | Shrink | Request is to shrink, tighten, compress, or condense existing skill, agent, or instructions files | [shrink.md](playbooks/shrink.md) | [wording.md](references/wording.md), [best-practices.md](references/best-practices.md) | fresh subagent |

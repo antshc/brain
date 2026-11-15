@@ -48,7 +48,7 @@ Source wording is never summarized, corrected, or reinterpreted in either direct
 Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `detect-adf-only` reports them so a caller knows Markdown alone will not carry the document.
 
 | Markdown | ADF |
-| --- | --- |
+|---|---|
 | Paragraph | `paragraph` |
 | Heading (`#`–`######`) | `heading` (`attrs.level`) |
 | Bullet list (`-`, `*`, `+`) | `bulletList` / `listItem` |

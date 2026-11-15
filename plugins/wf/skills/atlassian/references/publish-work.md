@@ -45,7 +45,7 @@ python3 <skillDir>/scripts/atl.py publish-work create --config "<configPath>" --
 Stdout `{"key":..., "url":..., "attached":[...], "attachFailed":[{"file","error"}]}` (attachment keys only with `--attach`).
 
 | Failure | Meaning | Do |
-| --- | --- | --- |
+|---|---|---|
 | `error: Jira rejected the request: <message>` | Jira refused; nothing created or changed | Required-field error → `<twg> jira workitem field create-metadata --space <projectKey> --type "<issueType>"`, ask for the missing values, re-run |
 | `error: Jira request outcome unknown (...)` | Connection dropped or timed out; the item may exist | **MUST NOT** re-run `create`. Search `<twg> jira workitem query --jql 'project = <projectKey> AND summary ~ "<summary>" AND created >= -1d'`; found → continue with `update --key`; not found → report and ask before creating |
 | `error: Markdown conversion failed: <reason>` | Source rejected before any call | Fix the Markdown, re-run |

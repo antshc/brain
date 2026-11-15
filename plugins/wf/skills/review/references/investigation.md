@@ -47,7 +47,7 @@ Choose `unclear` when the reviewer's intent has two defensible readings, and sta
 ## Verdict contract
 
 | Verdict | Means |
-| --- | --- |
+|---|---|
 | `fix-needed` | The reviewer is right and the code needs an edit. |
 | `no-change-needed` | Cited evidence shows the code already satisfies the reviewer, or the concern rests on a misreading. |
 | `unclear` | Two defensible readings of the reviewer's intent survive the evidence. |

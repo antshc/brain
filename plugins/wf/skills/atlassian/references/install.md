@@ -17,7 +17,7 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 **4 — Ask for missing settings.** Use the existing configuration values. Ask only for missing non-secret settings from this table.
 
 | Key | Prompt |
-| --- | --- |
+|---|---|
 | `cloudId` | "Enter your Atlassian site URL (e.g. `https://<organization>.atlassian.net`):" |
 | `jiraProjectKeys` | "Enter your Jira project key(s), comma-separated, first = default:" → trimmed JSON array |
 | `confluenceSpaceIds` | "Enter your Confluence space id(s), comma-separated, first = default:" → trimmed JSON array |

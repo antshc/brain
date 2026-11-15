@@ -9,7 +9,7 @@ description: >-
 Keep one canonical log. Select mode from the request; default **Log**.
 
 | Mode | Trigger |
-| --- | --- |
+|---|---|
 | **Log** | start of a run, a decision to record, no mode named |
 | **Report** | end of a run, print report, hand back |
 
@@ -18,7 +18,7 @@ Keep one canonical log. Select mode from the request; default **Log**.
 One TSV file, one row per decision. Cells single-line. Evidence is a pointer, not prose. Header: [references/decision-log-template.tsv](references/decision-log-template.tsv).
 
 | Column | Content |
-| --- | --- |
+|---|---|
 | `ts` | ISO8601 UTC timestamp |
 | `phase` | phase or workstream |
 | `decision` | what was chosen or done, one line |

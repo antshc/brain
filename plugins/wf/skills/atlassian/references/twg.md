@@ -24,7 +24,7 @@ General `twg` CLI guidance for the **Query or operate with TWG** tactic. Run eve
 ## Fast path
 
 | Need | Command |
-| --- | --- |
+|---|---|
 | Find sources about a topic | `<twg> rovo search "<topic>" --limit 10` |
 | Read a Confluence page (search hit, ID, or URL) | **Fetch page** tactic. Fallback only when it is unavailable or fails: `<twg> confluence content get <id-or-url> --detail full --format md`; warn it is lossy (diagrams, media, attachments, comments may be missing) |
 | Read a Jira work item body | **Fetch work** tactic. Fallback: `<twg> jira workitem get <KEY>`; warn the body may lose ADF-only constructs |
@@ -40,7 +40,7 @@ For other tasks or unclear syntax, follow Plan First.
 `twg help-map` is the live, complete map (`*` = write); use this index to pick a route, then confirm grammar with `twg help describe`.
 
 | Namespace | Covers |
-| --- | --- |
+|---|---|
 | `rovo search`, `rovo deep-search` | Cross-product discovery, deep research (`twg help rovo`) |
 | `jira workitem` | get, bulk-get, query (JQL), search, similar, create, update, transition, comment, link/unlink, attachment, worklog, field metadata |
 | `jira board`, `jira sprint`, `jira filter`, `jira dashboard`, `jira space`, `jira field`, `spaces` | Boards, backlogs, sprints, filters, dashboards, Jira projects, field admin |

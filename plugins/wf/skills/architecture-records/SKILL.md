@@ -20,7 +20,7 @@ Define a Concept, record settled knowledge, maintain architecture indexes, or di
 ## Routes
 
 | Route | Select when | Procedure |
-| --- | --- | --- |
+|---|---|---|
 | `define-concept` | Discover, improve, or recommend a crosscutting Concept through evidence and questioning | [Define Concept](playbooks/define-concept.md) |
 | `adr` | Persist a hard-to-reverse choice, why it won, and rejected alternatives | [ADR](playbooks/adr.md) |
 | `building-block` | Record one Deployable's responsibility, interfaces, and structure | [Building block](playbooks/building-block.md) |
@@ -47,7 +47,7 @@ Define a Concept, record settled knowledge, maintain architecture indexes, or di
 Load the index playbook for `index`, `adr`, `building-block`, `deployment-view`, `concept-record`, `define-concept`, and `doctor`. The latter two use only read-only operations until an explicitly selected recording handoff. Record routes use its named operations directly; external index requests supply `action` or the exact operation name. Infer only an unambiguous operation; otherwise ask. `load` and `scan` are read-only and never initialize files.
 
 | Action | Operation |
-| --- | --- |
+|---|---|
 | `load` | Load index |
 | `scan` | Scan and match |
 | `trigger` | Generate trigger condition |
@@ -62,7 +62,7 @@ For `sync-row`, pass mutation as `rowAction` = `add`, `supersede`, or `retire`; 
 Read selected resources fully; all links resolve from this skill's base directory. The index loader runs with the caller's repository root as CWD.
 
 | Resource | Load when |
-| --- | --- |
+|---|---|
 | [Questioning](references/questioning.md) | `define-concept` frames or resolves a decision tree |
 | [Concept categories](references/arc42-cross-cutting-concepts.md) | `define-concept` maps recorded Concepts or sweeps candidates |
 | [Doctor report](templates/doctor-report.md) | `doctor` renders its result |

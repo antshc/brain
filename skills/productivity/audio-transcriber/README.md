@@ -378,7 +378,7 @@ Open an issue in the [claude-superskills repository](https://github.com/youruser
 ## Metadata
 
 | Field | Value |
-| ------- | ------- |
+|-------|-------|
 | Version | 2.1.0 |
 | Author | Eric Andrade |
 | Created | 2025-02-01 |

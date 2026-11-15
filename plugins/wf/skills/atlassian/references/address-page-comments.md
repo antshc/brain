@@ -49,7 +49,7 @@ Done when `@pageId`, `site`, `twg`, `accountId` are set.
    ```
 
 | `action` | Do |
-| --- | --- |
+|---|---|
 | `skip` | Report `counts`; no work left; **stop**. |
 | `stop` | Report `reason`; **stop**. |
 | `proceed` | Work `threads[]`. |
@@ -57,7 +57,7 @@ Done when `@pageId`, `site`, `twg`, `accountId` are set.
 Each thread: `id`, `type` (`inline`/`footer`), `anchor`, `replyTarget`, `markerRef`, `selection` (original highlighted text), `url`, `comments[]` (`author` `me`/`other`, `body`, `createdAt`) in order. Only pending threads are listed. A thread is answered when its latest entry is yours, or, for an orphaned thread, when your footer comment linking `focusedCommentId=<id>` is newer than the latest reviewer entry.
 
 | `anchor` | Meaning | `replyTarget` |
-| --- | --- | --- |
+|---|---|---|
 | `anchored` | Inline highlight still in the body | `thread` |
 | `orphaned` | Inline highlight's `data-annotation-id` no longer in the body | `page` |
 | `page` | Footer comment | `thread` |
@@ -73,7 +73,7 @@ Group threads naming the same underlying problem into one issue; keep per-thread
 Classify each issue:
 
 | Class | Comment is | Next |
-| --- | --- | --- |
+|---|---|---|
 | `edit` | A change request the evidence supports: wording, removal, addition, correction | Edit, then reply |
 | `answer` | A question, or a change the evidence shows is wrong or unneeded | Reply only |
 | `unclear` | Ambiguous intent, or facts you cannot verify | Ask one focused question |
@@ -90,7 +90,7 @@ Skip when no issue is `edit`.
 2. Write `edits.json`: one JSON array, all `edit` issues. Operations (all `value` fields are HTML strings; `localId` from `draft.html`):
 
    | Operation | Shape |
-   | --- | --- |
+   |---|---|
    | `replaceNode` | `{"name":"replaceNode","localId":"<id>","value":"<p>...</p>"}` |
    | `insertNodeAfter` / `insertNodeBefore` | `{"name":"insertNodeAfter","localId":"<id>","value":"<p>...</p>"}` |
    | `deleteNode` | `{"name":"deleteNode","localId":"<id>"}` |
@@ -119,7 +119,7 @@ Done when `update.json` reports success and read-back confirms every edit, or ea
 Draft each reply per *Reply style*. Claim a change only after step 4 read-back confirmed it.
 
 | Target | Command |
-| --- | --- |
+|---|---|
 | `thread` (anchored inline or footer) | `<twg> confluence content comments reply --comment-id <thread id> --body-file reply-<id>.md --body-format md -o json` |
 | `page` (orphaned, or lost by this run's edit) | One footer comment for the run: `<twg> confluence content comments create --id <pageId> --comment-type footer --body-file reply-page.md --body-format md -o json` |
 
@@ -148,7 +148,7 @@ Done when every pending thread has one confirmed reply (thread or page table row
 1–3 short sentences, more only when needed. Outcome → decisive reason → focused question when needed. Common words, active voice, the thread's register. Address the latest concern; do not repeat the reviewer or an earlier answer.
 
 | Situation | Reply |
-| --- | --- |
+|---|---|
 | Edited | Name the change briefly; a typo may need only `Fixed.` |
 | No change needed | Give the decisive reason with evidence. |
 | Unclear | Ask one focused question that unblocks the decision. |
@@ -161,7 +161,7 @@ No praise, apologies, headings, canned wording, or labels (`Bug:`, `Nit:`, `Note
 ## 6. Report
 
 | Section | Contents |
-| --- | --- |
+|---|---|
 | Gate | `counts` from step 2. |
 | Issues | One row per issue: class, threads, edits (`localId`s) or `none`, reply target. |
 | Page | Version message and whether published or saved as draft; annotations lost by edits. |

@@ -10,7 +10,7 @@ compatibility: Primarily uses the Microsoft Learn MCP Server (https://learn.micr
 ## Tools
 
 | Tool | Purpose |
-| --- | --- |
+|---|---|
 | `microsoft_docs_search` | Verify packages, types, and members. |
 | `microsoft_code_sample_search` | Find official working samples. |
 | `microsoft_docs_fetch` | Read full API and migration details. |

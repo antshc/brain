@@ -5,7 +5,7 @@ Verifies {{APP_NAME}} like a user, scenario by scenario, and writes a receipt wi
 ## Layout
 
 | Path | Owner | What it is |
-| --- | --- | --- |
+|---|---|---|
 | `kit/` | the kit | The independent proof lib: `types.py`, `builder.py`, `surfaces.py`, `features.py`, `evidence.py`, `receipt.py`, `run.py`. It imports nothing from the app or the mole. Do not edit; an upgrade replaces this folder. |
 | `../mole/` | the kit | The runner at the repository root: `mole.py` (CLI), `commands.py`, `runner.py`, `receipts.py`, `prove_cli.py`, `runtime.py`, `config.py`, `selftest.py`. It uses the kit, never the reverse. Do not edit; an upgrade replaces this folder. |
 | `app.py` | you | `APP`: the URL, start command, source paths, API discovery and page hooks. The only place the mole learns about this app. |

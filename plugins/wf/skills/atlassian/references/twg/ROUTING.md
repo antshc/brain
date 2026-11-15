@@ -50,17 +50,17 @@ with the **Fetch page** tactic.
 
 ## Product Boundaries
 
-| Product | Use it for |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Jira | Workitems, issue fields, comments, links, transitions, boards, sprints, filters, dashboards, and Jira project configuration |
-| JSM | Requests, portals, queues, request types, approvals, SLAs, services, incidents, and service-management workflows |
-| Confluence | Content bodies, comments, hierarchy, spaces, versions, permissions, tasks, labels, and exports |
-| Bitbucket | Repositories, files, branches, commits, pull requests, reviews, and pipelines |
-| Atlas projects | Cross-team initiatives, owners, contributors, updates, risks, links, and target dates |
-| Atlas goals | Goals and key results, owners, health, updates, and contributing projects |
-| Compass | Components, ownership, scorecards, metrics, dependencies, packages, and operational attention |
-| Assets | Site-specific object schemas and CMDB data; inspect schemas and types before AQL |
-| People and teams | Identity, profiles, reporting structure, membership, and organization relationships |
+| Product          | Use it for                                                                                                                  |
+|----------------|---------------------------------------------------------------------------------------------------------------------------|
+| Jira             | Workitems, issue fields, comments, links, transitions, boards, sprints, filters, dashboards, and Jira project configuration |
+| JSM              | Requests, portals, queues, request types, approvals, SLAs, services, incidents, and service-management workflows            |
+| Confluence       | Content bodies, comments, hierarchy, spaces, versions, permissions, tasks, labels, and exports                              |
+| Bitbucket        | Repositories, files, branches, commits, pull requests, reviews, and pipelines                                               |
+| Atlas projects   | Cross-team initiatives, owners, contributors, updates, risks, links, and target dates                                       |
+| Atlas goals      | Goals and key results, owners, health, updates, and contributing projects                                                   |
+| Compass          | Components, ownership, scorecards, metrics, dependencies, packages, and operational attention                               |
+| Assets           | Site-specific object schemas and CMDB data; inspect schemas and types before AQL                                            |
+| People and teams | Identity, profiles, reporting structure, membership, and organization relationships                                         |
 
 Do not confuse Jira projects with Atlas projects or Compass components. Do not
 use Jira workitem commands for JSM approval semantics.

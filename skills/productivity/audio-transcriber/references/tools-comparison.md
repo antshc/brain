@@ -8,7 +8,7 @@ Comprehensive comparison of audio transcription engines supported by the audio-t
 ## Overview
 
 | Tool | Type | Speed | Quality | Cost | Privacy | Offline | Languages |
-| ------ | ------ | ------- | --------- | ------ | --------- | --------- | ----------- |
+|------|------|-------|---------|------|---------|---------|-----------|
 | **Faster-Whisper** | Open-source | ⚡⚡⚡⚡⚡ | ⭐⭐⭐⭐⭐ | Free | 100% | ✅ | 99 |
 | **Whisper** | Open-source | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | Free | 100% | ✅ | 99 |
 | Google Speech-to-Text | Commercial API | ⚡⚡⚡⚡ | ⭐⭐⭐⭐⭐ | $0.006/15s | Partial | ❌ | 125+ |
@@ -60,7 +60,7 @@ for segment in segments:
 ### Model Sizes
 
 | Model | Size | RAM | Speed (CPU) | Quality |
-| ------- | ------ | ----- | ------------- | --------- |
+|-------|------|-----|-------------|---------|
 | `tiny` | 39 MB | ~1 GB | Very fast (~10x realtime) | Basic |
 | `base` | 74 MB | ~1 GB | Fast (~7x realtime) | Good |
 | `small` | 244 MB | ~2 GB | Moderate (~4x realtime) | Very good |
@@ -352,7 +352,7 @@ for utterance in transcript.utterances:
 **Test:** 1-hour podcast (MP3, 44.1kHz, stereo)
 
 | Tool | Processing Time | Accuracy | Cost |
-| ------ | ---------------- | ---------- | ------ |
+|------|----------------|----------|------|
 | Faster-Whisper (small) | 8 min | 94% | $0 |
 | Whisper (small) | 32 min | 94% | $0 |
 | Google Speech | 2 min | 96% | $1.44 |

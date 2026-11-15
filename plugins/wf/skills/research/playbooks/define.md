@@ -90,7 +90,7 @@ Write the map. When a map with the same `destinationSlug` already exists, ask wh
 Print to the user:
 
 | Topic | Type | Resolve via | Blocked by |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | {{topic title}} | {{type}} | {{resolver}} | {{blocking titles or none}} |
 
 followed by the Not yet specified and Out of scope lists. Ask the user to confirm or correct the map; return to the already-loaded Questioning procedure when a correction exposes an unresolved branch.

@@ -24,7 +24,7 @@ centralisation adds a sync mapping for code only one plugin will ever run.
 Placement follows the number of consumers, not the size of the code:
 
 | Consumers | Home | Sync |
-| ----------- | ------ | ------ |
+|-----------|------|------|
 | one skill | that skill's folder; tests under `tests/<plugin>/<skill>/` | none |
 | several skills, one plugin | the one skill that owns the capability; siblings invoke it | none |
 | more than one plugin | `tools/src/modules/<module>/`, tests under `tools/tests/` | pre-commit mapping per destination |

@@ -14,7 +14,7 @@ When a stack frame, exception, or failing test hands you a symbol, that symbol i
 Map each capability to a tool this host exposes. The host's tool list is the source of truth; columns are known bindings, not a closed set.
 
 | Capability | Copilot CLI | VS Code | If unavailable |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | File outline | `documentSymbol` | — | read the file |
 | Find symbol by name | `workspaceSymbol` | — | text search the declaration, scoped to owning area |
 | Definition | `goToDefinition` | `vscode_listCodeUsages` | text search the declaration |
@@ -42,7 +42,7 @@ An empty result from a *scoped* search is unproven. Re-run unscoped across all r
 A usages lookup answers only "who names this symbol in compiled C#". These bindings are invisible to it:
 
 | Binding | Why it is missed | Cross-check |
-| --- | --- | --- |
+|---|---|---|
 | DI registration | composition sits in module/startup classes; the interface→implementation binding may name neither type | text search the type name across DI module and startup files |
 | Configuration keys / feature switches | bound by string, not symbol | text search the key string, not the property |
 | REST contracts | property names travel over the wire and into the API contract; renaming silently changes the API | check the API contract/schema and any serializer attribute |

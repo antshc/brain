@@ -52,7 +52,7 @@ You MUST actually execute the check command above — not merely reference or re
 ### Action → target repo
 
 | Action | Target repo | How to target |
-| --- | --- | --- |
+|---|---|---|
 | **Code** `git worktree add`, `git commit`, `git push`, code `gh pr create` | workspace (`{{project}}`) | `cd workspace/{{project}}` first |
 | Code-modifying, build, test, package, and source-repository Git commands | workspace (`{{project}}`) | run from inside `workspace/{{project}}` |
 | **Docs** `git commit`, `git push`, `gh pr create` (for `GLOSSARY.md`, `ARCHITECTURE.md`, ADRs, Crosscutting Concepts, reporoot docs) | board (`{{project-board}}`) | `--repo {{repository-board}}/{{project-board}}` or run from the reporoot |
@@ -78,7 +78,7 @@ Consult these before searching the code:
 {{proejctName}} (`{{project}}`) is the only codebase checked out locally; everything else is reached through a skill.
 
 | Target | Where to look |
-| --- | --- |
+|---|---|
 | {{proejctName}} source, tests, config | local `workspace/{{project}}` — continue to Step 2 |
 | {{proj}} codebase | *Load and follow the `search-{{proj}}` skill to <task>* |
 | `{{proejctPrefix}}.Infrastructure.*` / `{{proejctPrefix}}.Infra.Utils` source | *Load and follow the `search-infra-nuget` skill to <task>* |
@@ -96,7 +96,7 @@ Consult the relevant [authoritative source](#3-authoritative-sources) first, and
 ### Step 3 — Pick the search tool
 
 | You know | Use | If it fails |
-| --- | --- | --- |
+|---|---|---|
 | The exact symbol, and need definition, references, rename, hover, implementations, or call hierarchy | **LSP** — semantic search cannot perform these | *Load and follow the `lsp-recover` skill to <task>*, then text search |
 | The concept or behavior but not the symbol (e.g. "where is failover progress tracked?") | **Semantic search**, which is served by the Graphify graph — see the gate below | text search on domain terms from `GLOSSARY.md` |
 | A literal, configuration value, or generated file | **Text search** with `includePattern: workspace/{{project}}/**` | manual directory browsing under `workspace/{{project}}` |

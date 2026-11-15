@@ -58,7 +58,7 @@ Leave the worktree clean. **MUST NOT** push, open a pull request, or comment, la
 End your final message with a short summary of kept and dropped refinements (or why none were needed) and out-of-scope problems noticed, then exactly one JSON object:
 
 | Field | Content |
-| --- | --- |
+|---|---|
 | `status` | `completed` \| `failed` |
 | `result.commit` | full commit SHA; `null` when nothing kept |
 | `result.summary` | one-line summary, including dropped refinement count |

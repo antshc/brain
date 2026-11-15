@@ -183,7 +183,7 @@ swimlane-beta TB
 ## Skills
 
 | Task | Entry |
-| --- | --- |
+|---|---|
 | Architecture, behavior, or code diagrams | `/doc-diagram <diagram type>` with optional current or delta mode |
 | Check architecture currency | `/architecture-records route: doctor` |
 | Define a Concept | `/architecture-records route: define-concept` |
@@ -196,7 +196,7 @@ swimlane-beta TB
 Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [behavior](skills/doc-diagram/examples/behavior.md), and [code](skills/doc-diagram/examples/code.md).
 
 | Group | Skills |
-| --- | --- |
+|---|---|
 | Discovery and research | `architecture-records` (`define-concept`), `prove`, `challenge-this`, `research` (route agents `hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `hld`, `publish-hld`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `architecture-records`, `suggest`, `writing-style` |

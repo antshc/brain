@@ -5,7 +5,7 @@ Define crosscutting Concepts, record settled architecture, maintain its indexes,
 ## Routes and examples
 
 | Request | Route | Result |
-| --- | --- | --- |
+|---|---|---|
 | `/architecture-records route: define-concept caching` | `define-concept` | Inspect candidates, settle decisions with the user, record and index one Concept |
 | `/architecture-records route: adr` | `adr` | A qualifying decision, alternatives, and its owning index row |
 | `/architecture-records route: building-block` | `building-block` | Deployable record/index and applicable context diagrams |

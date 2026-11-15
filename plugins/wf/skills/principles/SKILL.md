@@ -20,7 +20,7 @@ Unknown name, unavailable skill or unreadable file → report the exact gap; blo
 ## Index
 
 | Principle | Load when | File |
-| --- | --- | --- |
+|---|---|---|
 | Attack the premise | two or more fixes sharing one premise failed the same gate | [principles/attack-the-premise.md](principles/attack-the-premise.md) |
 | Boundary discipline | wiring validation, error handling, or framework adapters | [principles/boundary-discipline.md](principles/boundary-discipline.md) |
 | Build the lever | nontrivial edits, migrations, analyses or verification need a rerunnable artifact | [principles/build-the-lever.md](principles/build-the-lever.md) |

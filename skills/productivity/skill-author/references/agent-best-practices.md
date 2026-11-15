@@ -21,7 +21,7 @@ Cross-vendor synthesis (Claude Code, GitHub Copilot, OpenAI Codex, Grok Build, G
 An agent defines **who**; place other content in its owning layer.
 
 | Layer | Owns | Examples |
-| --- | --- | --- |
+|---|---|---|
 | Repository instructions | Durable, generally applicable project rules | `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md` |
 | Custom agent | Specialized role, invocation, responsibilities, output | Developer, Reviewer, Tester |
 | Skill | Reusable procedure, references, scripts (**how**) | `code-review`, `verify` |
@@ -44,7 +44,7 @@ Treat the description as the automatic **routing interface**: short, concrete, e
 - YAML-safe: quote the value or use a folded block scalar (`description: >-`) when it contains `:`, `#`, backticks, or a leading YAML indicator.
 
 | Role | Example description |
-| --- | --- |
+|---|---|
 | Developer | Implement actionable GitHub tickets. Use when requirements are clear and no human decision blocks implementation. |
 | Reviewer | Review completed changes for correctness, regressions, security, and test gaps. Use before PR merge. |
 | Tester | Create and execute behavior verification. Use when functionality changes or test coverage is insufficient. |
@@ -56,7 +56,7 @@ Treat the description as the automatic **routing interface**: short, concrete, e
 Normative words carry clarity, not keyword semantics:
 
 | Word | Intent | Example |
-| --- | --- | --- |
+|---|---|---|
 | `MUST` | Required | MUST run relevant tests before completion. |
 | `MUST NOT` | Prohibited | MUST NOT modify unrelated files. |
 | `SHOULD` | Preferred | SHOULD reuse an existing domain service. |
@@ -95,7 +95,7 @@ For code-editing agents. Risk-based guidance, not a standard: validate policy ch
 - **Test strategy:** classify changed behavior and risk, then select; mandatory red-green-refactor for every change is not the default.
 
 | Change | Strategy |
-| --- | --- |
+|---|---|
 | Bug, regression | Reproduce with a failing test first |
 | Uncertain or critical logic | Test-first (TDD) |
 | Behavior-preserving refactor, legacy code | Characterization tests first |
@@ -107,7 +107,7 @@ For code-editing agents. Risk-based guidance, not a standard: validate policy ch
 - **Architectural invariants:** enforce through structural tests, linters, dependency rules (Gate layer); the agent preserves existing conventions even when a shortcut looks simpler.
 
 | Level | Owner | Scope | Trigger |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Fast feedback | Implementer | Affected project, selected tests, diagnostics | Meaningful increments |
 | Focused completion | Implementer | All changed behavior and affected integrations | Before handoff |
 | Independent verification | Verifier, reviewer | Acceptance criteria, boundaries, architecture, omissions | After implementation |
@@ -142,7 +142,7 @@ Decomposition:
 7. Validate: acyclic, every requirement covered, no unowned shared write surface, verification feasible, acceptance actionable.
 
 | Decision | When |
-| --- | --- |
+|---|---|
 | Split | Behaviors have independent acceptance and write surfaces; unrelated modules; uncertain contract needs investigation first |
 | Keep together | Same critical files; untestable in isolation; split creates heavy communication |
 | Sequence | Schema, public API, shared abstraction, or migration must exist before consumer compiles or verifies |
@@ -171,7 +171,7 @@ Scheduler and integration guidance (record as workflow or gate, not planner pros
 ## Anti-patterns
 
 | Avoid | Replace with |
-| --- | --- |
+|---|---|
 | "Think step by step" / "think harder" / "never stop" | Model-specific reasoning or effort controls |
 | Loading entire repo architecture before every edit | Conditional links to relevant documents |
 | Generic engineering advice, repo facts discoverable from code | Delete |

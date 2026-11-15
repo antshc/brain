@@ -31,7 +31,7 @@ Produce **questions** and **records**. Writable surface: `GLOSSARY.md`, `ARCHITE
 For every `architecture-records` call in this playbook, read its entire `SKILL.md`, selected route playbook, and required or triggered resources before checking gates or acting. Reuse complete content at the same revision; partial reads, names, and announcements do not count as loading. Pass the established docs root, target, route/action, and settled context; record returned evidence or a blocker before continuing dependent work.
 
 | Operation | Invocation and inputs | Required result |
-| --- | --- | --- |
+|---|---|---|
 | Fact lookup | *Load and follow the `research` skill to investigate technical questions across source code with a symbol or caller lookup and return cited findings* using the Explore route, in this session. Put independent tracks in one request, each with its bounded question and target checkout/ref; sequence dependent tracks. Rationale or external facts → the same skill with default routing. Blocked lookup → record it; continue independent tracks. | Selected route plus findings with `path:line`, symbol, commit/PR or source URL evidence, confidence (Why), unknowns, and completion/blocker status. |
 | Index load/scan/sync | *Load and follow the `architecture-records` skill to load an index and maintain architecture indexes.* Use route `index`, action `load`, `scan`, or `sync-row`, and required metadata; row mutations use `rowAction`. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
 | Record | *Load and follow the `architecture-records` skill to record ADRs, Concepts, and glossary terms.* Select route `term`, `adr`, or `concept-record`; pass the resolved term/decision, governing scope, source evidence, and existing record/owning index when known. Apply its gate before writing; recording settled content adds no discovery interview. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
@@ -78,7 +78,7 @@ Evaluate each independently answerable **decision key**; use the record's key wh
 Rationale: reuse settled policy per choice; overlapping records need not mean ambiguity. Keep covered keys assumed while uncovered keys remain in the frontier. Existing single-sentence defaults remain usable under these checks. A default applies only when the design is silent on that key.
 
 | State | Resolved by | Home and write timing |
-| --- | --- | --- |
+|---|---|---|
 | Feature Assumption | model, checklist passed | Ledger only; applicable records already cover the key. |
 | ADR decision | user, ADR gate passed | Ledger + ADR, same turn; the answer authorizes the write. |
 | Feature Decision | user, ADR gate failed, not a term | Ledger only, whether feature-scoped or reusable. |
@@ -87,7 +87,7 @@ Rationale: reuse settled policy per choice; overlapping records need not mean am
 Every decision question **MUST** get a gate-miss line per unresolved key that turn, identifying the failed gate(s) and relevant source anchors; preserve it alongside the resulting state:
 
 | Outcome | Ledger entries |
-| --- | --- |
+|---|---|
 | Feature Decision | Gate miss + decided by user; no policy uses `direct-policy`, source `none`. |
 | ADR decision | Gate miss + recorded path, or pending write until persistence succeeds. |
 | Feature Assumption | Assumed with key, applied condition, and governing source anchors; no gate miss. |

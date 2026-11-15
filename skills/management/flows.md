@@ -647,30 +647,30 @@ Project and milestone retrospectives, together with lessons learned, are standar
 
 ## Skills
 
-| Skill | Primary Use |
-| ---------------------- | --------------------------------------------------- |
-| `senior-pm` | Project planning, governance, status, scope, risks |
-| `program-manager` | Cross-project dependencies and program coordination |
-| `scrum-master` | Sprint planning, capacity, velocity, blockers |
-| `jira-expert` | Jira queries, issue management, boards and sprints |
-| `confluence-expert` | Project documentation and knowledge management |
-| `meeting-analyzer` | Decisions, actions, risks and follow-ups |
-| `team-communications` | Stakeholder-specific communication |
-| `sprint-retrospective` | Retrospectives and improvement actions |
+| Skill                  | Primary Use                                         |
+|----------------------|---------------------------------------------------|
+| `senior-pm`            | Project planning, governance, status, scope, risks  |
+| `program-manager`      | Cross-project dependencies and program coordination |
+| `scrum-master`         | Sprint planning, capacity, velocity, blockers       |
+| `jira-expert`          | Jira queries, issue management, boards and sprints  |
+| `confluence-expert`    | Project documentation and knowledge management      |
+| `meeting-analyzer`     | Decisions, actions, risks and follow-ups            |
+| `team-communications`  | Stakeholder-specific communication                  |
+| `sprint-retrospective` | Retrospectives and improvement actions              |
 
 ## Action Plugins
 
-| Plugin / Integration | Use |
-| -------------------- | ---------------------------------------- |
-| Jira | Tasks, issues, sprints, workflows, JQL |
-| Google Calendar | Meetings, scheduling, kickoff, reviews |
-| Google Drive | Project files and shared artifacts |
-| Google Docs | Charters, reports, meeting notes |
-| Google Sheets | RAID, budgets, capacity and trackers |
-| Google Slides | Steering and executive reporting |
-| Slack | Team communication and alerts |
-| Gmail | Customer and stakeholder communication |
-| GitHub | Software delivery, PRs, issues and CI/CD |
+| Plugin / Integration | Use                                      |
+|--------------------|----------------------------------------|
+| Jira                 | Tasks, issues, sprints, workflows, JQL   |
+| Google Calendar      | Meetings, scheduling, kickoff, reviews   |
+| Google Drive         | Project files and shared artifacts       |
+| Google Docs          | Charters, reports, meeting notes         |
+| Google Sheets        | RAID, budgets, capacity and trackers     |
+| Google Slides        | Steering and executive reporting         |
+| Slack                | Team communication and alerts            |
+| Gmail                | Customer and stakeholder communication   |
+| GitHub               | Software delivery, PRs, issues and CI/CD |
 
 ---
 

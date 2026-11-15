@@ -22,7 +22,7 @@ Record each answer into the brief; rebuild later questions when an answer change
 ## Question tree
 
 | # | Topic | Resolve | Recommend by |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | 1 | **Purpose** | One-phrase responsibility | More than one phrase → propose a split |
 | 2 | **Callers** | User, agent, other skills | Who must reach it unprompted |
 | 3 | **Invocation** | Model-invoked or user-invoked | Model-invoked if agent or another skill must reach it; else user-invoked (zero context load) |

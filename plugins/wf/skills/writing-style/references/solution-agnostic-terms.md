@@ -16,7 +16,7 @@ Raise each named artifact to the behavior it enables.
 Screens, components, and placements (badge, banner, dropdown, grid, header, panel, tab). State what the user sees or does, not the control.
 
 | Leaked artifact | Behavior to state instead |
-| --- | --- |
+|---|---|
 | badge / banner in the header | let the user see the current count or status at a glance |
 | dropdown / picker | let the user choose from the allowed options |
 | grid / table / list view | let the user review the set of items |
@@ -26,7 +26,7 @@ Screens, components, and placements (badge, banner, dropdown, grid, header, pane
 ### Persistence / data
 
 | Leaked artifact | Behavior to state instead |
-| --- | --- |
+|---|---|
 | column / field | keep … recorded so a later read returns the same value |
 | record / row / document | remember one … so it survives restarts and crashes |
 | serialized blob / metadata blob | keep … attached to the operation it describes |
@@ -39,7 +39,7 @@ Screens, components, and placements (badge, banner, dropdown, grid, header, pane
 Transport surface (endpoint, HTTP verb, payload, response field, query param, status code, id). State what the client asks for or learns.
 
 | Leaked artifact | Behavior to state instead |
-| --- | --- |
+|---|---|
 | endpoint / route / URL | let the client ask the system to … |
 | GET / POST / PUT / DELETE | let the client read / start / change / remove a … |
 | request body / payload | let the client hand the system the … it needs to do the work |
@@ -53,7 +53,7 @@ Transport surface (endpoint, HTTP verb, payload, response field, query param, st
 Status values, flags, and derived states. State which phase the actor sees or what now needs action.
 
 | Leaked artifact | Behavior to state instead |
-| --- | --- |
+|---|---|
 | status / state enum value | let the user see which phase a … has reached |
 | boolean flag (e.g. `isDismissed`) | let the user tell an active … from one already handled |
 | derived / computed state | surface to the user that a … now needs their action |
@@ -63,7 +63,7 @@ Status values, flags, and derived states. State which phase the actor sees or wh
 ### Process / infrastructure
 
 | Leaked artifact | Behavior to state instead |
-| --- | --- |
+|---|---|
 | background service / worker | get … done for the user without them waiting |
 | queue / job / task record | run each … reliably and in the right order |
 | retry / backoff | keep trying … until it succeeds |
@@ -78,7 +78,7 @@ Status values, flags, and derived states. State which phase the actor sees or wh
 Permissions and cross-account trust (access role, grant, role status, delegated access, account list). State what access the owner grants or the user controls.
 
 | Leaked artifact | Behavior to state instead |
-| --- | --- |
+|---|---|
 | access role / permission | let only authorized actors perform the behavior |
 | grant / delegated access | let the owner give another party controlled access |
 | account / tenant scope | keep each owner's data separate from every other owner's |

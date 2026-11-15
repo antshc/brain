@@ -44,7 +44,7 @@ GIT_TOOL worktree remove --harness ROOT --source CHECKOUT --record FILE --expect
 The helper emits one JSON object on stdout.
 
 | Field | Content |
-| --- | --- |
+|---|---|
 | `status` | `created`, `removed`, `absent` or `blocked`. |
 | `record` | On creation, `owner` is the caller's run ID, `token` is the generation identity, `path` is the canonical worktree path, `commonDir` is the source Git common directory, `gitDir` is the linked Git directory, `branch` is the local branch or null for detached HEAD, and `head` is the creation SHA. |
 | `changedExcludeFiles` | On creation, paths changed by the helper. Empty if none. |

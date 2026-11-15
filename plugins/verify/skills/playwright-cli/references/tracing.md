@@ -54,7 +54,7 @@ When you start tracing, Playwright creates a `traces/` directory with several fi
 ## What Traces Capture
 
 | Category | Details |
-| ---------- | --------- |
+|----------|---------|
 | **Actions** | Clicks, fills, hovers, keyboard input, navigations |
 | **DOM** | Full DOM snapshot before/after each action |
 | **Screenshots** | Visual state at each step |
@@ -106,7 +106,7 @@ playwright-cli tracing-stop
 ## Trace vs Video vs Screenshot
 
 | Feature | Trace | Video | Screenshot |
-| --------- | ------- | ------- | ------------ |
+|---------|-------|-------|------------|
 | **Format** | .trace file | .webm video | .png/.jpeg image |
 | **DOM inspection** | Yes | No | No |
 | **Network details** | Yes | No | No |
