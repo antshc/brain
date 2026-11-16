@@ -139,7 +139,7 @@ Plugins bundle related skills (and, for `crew`, agents). Follow a link to read a
 
 ### wf
 
-Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tasks. `implement` delegates work items to `wf:codey`, with a `general-purpose` fallback.
+Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tasks. `implement` delegates implementation tasks to `wf:codey`, with a `general-purpose` fallback.
 
 - [diagnosing-bugs](plugins/wf/skills/diagnosing-bugs/SKILL.md): diagnose hard bugs or performance regressions, and fix them when explicitly requested.
 
@@ -150,7 +150,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [draft-work](plugins/wf/skills/draft-work/SKILL.md): create and update stories, implementation tasks and bug reports; owns work templates and requirements wording.
 - [draft-document](plugins/wf/skills/draft-document/SKILL.md): create and update specifications, HLDs and TOI documents; owns document templates and requirements wording.
 - [github](plugins/wf/skills/github/SKILL.md): route Git conventions, branches, commits, owned worktrees, specs, issues, PRs, review discussions, and checks through one skill and CLI. Install WF for Factory Mode's GitHub routes.
-- [implement](plugins/wf/skills/implement/SKILL.md): integrate the work item graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
+- [implement](plugins/wf/skills/implement/SKILL.md): integrate the task graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
 - [writing-style](plugins/wf/skills/writing-style/SKILL.md): write, review, or unslop prose; sharpen a task prompt (deepen or restate intent).

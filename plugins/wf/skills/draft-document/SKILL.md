@@ -19,10 +19,10 @@ Own specification, HLD and TOI structure, rendering, incremental updates and doc
 
 ## Execution
 
-1. Honor an explicit route; otherwise infer the artifact type. Standalone requirements normalization selects `spec`. Requests outside owned routes return to the caller with `draft-work` as the work-artifact owner. Ambiguous type → ask and wait. Replies continue the active route unless redirected. Combined requests → author in dependency order, then request order for independent artifacts. Done when each requested artifact has a route.
+1. Honor an explicit route; otherwise infer the artifact type. Requests outside owned routes return to the caller with `draft-work` as owner. Ambiguous type → ask and wait. Replies continue the active route unless redirected. Combined requests → author in dependency order, then request order for independent artifacts. Done when each requested artifact has a route.
 2. Select `draft` (new), `update` (existing) or `normalize` (requirements wording only). Standalone requirements without an artifact type, including `draft-document normalize`, use `spec normalize`; preserve the supplied fragment's structure. Done when operation, scope and caller constraints are known.
 3. Read the selected playbook and its required resources fully; for `normalize`, load local requirements resources only, omitting template-only resources; load conditional resources only when triggered. Resolve paths from this skill directory. Done when all inputs for the next action are loaded.
-4. For `normalize`, apply Requirements rules and return without executing full-template rendering or contract/diagram generation. Otherwise execute the route. Use supplied context and permitted local reads; return missing evidence or decisions to the caller. Do not independently dispatch research/proof, decompose work, publish, commit or manage worktrees. Existing TOI read-only exploration remains permitted. Done when the artifact or an explicit incomplete result is returned.
+4. For `normalize`, apply Requirements rules and return. Otherwise execute the route. Use supplied context and permitted local reads; return missing evidence or decisions to the caller. Do not independently dispatch research/proof, decompose work, publish, commit or manage worktrees. Existing TOI read-only exploration remains permitted. Done when the artifact or an explicit incomplete result is returned.
 
 ## Requirements rules
 

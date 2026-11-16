@@ -8,7 +8,7 @@ Preserve authoritative verbatim source text and identifiers; report implementati
 
 ## The rule
 
-Name a **behavior and entity**: what the system does and the actor's outcome, never its implementation (widget, screen, table, endpoint, flag, access role). Apply to behavioral **capability titles**, **feature descriptions**, **functional slice descriptions**, **stakeholder requirements**, **functional requirements**, **business rules**, **edge cases**, **acceptance criteria** and behavioral constraints. Keep design decisions and technical contracts exact.
+Name a **behavior and entity**: what the system does and the actor's outcome, never its implementation (widget, screen, table, endpoint, flag, access role). Apply to behavioral **capability titles**, **feature descriptions**, **functional slice descriptions**, **stakeholder requirements**, **functional requirements**, **business rules**, **edge cases**, **acceptance criteria** and behavioral constraints.
 
 ## Preserve requirement structure
 

@@ -151,7 +151,7 @@ For research topics, add `## Research scope` after `## Question` (see Research r
 
 Experiment topics use Prove. Challenge this is supporting verification on the current issue or a root-owned run, never its own tracking issue. Persist run identity, scope, method, worker/model, evidence, pending integration and risk/mitigation criteria on that existing owner; use Risk verification registered in the router.
 
-Each topic carries a `wayfinder:<type>` label — one of `research`, `experiment`, `grilling`, `task`, `contract-design` (see Topic Types).
+Each topic carries its tracker label: Research → `wayfinder:research`; Experiment → `wayfinder:experiment`; Decision → `wayfinder:grilling`; Task → `wayfinder:task`; Contract design → `wayfinder:contract-design` (see Topic Types). Preserve these label names.
 
 A session claims a topic by assigning it to itself, first, before any work, so concurrent sessions skip it. That assignee is the claim: an open, unassigned topic is unclaimed.
 

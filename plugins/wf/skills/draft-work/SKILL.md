@@ -19,10 +19,10 @@ Own story, task and bug structure, rendering, updates and document checks. Calle
 
 ## Execution
 
-1. Honor an explicit route; otherwise infer the artifact type. Untyped requirements normalization and requests outside owned routes return to the caller with `draft-document` as the document-artifact owner. Ambiguous type → ask and wait. Replies continue the active route unless redirected. Combined requests → author in dependency order, then request order for independent artifacts. Done when each requested artifact has a route.
+1. Honor an explicit route; otherwise infer the artifact type. Requests outside owned routes return to the caller with `draft-document` as owner. Ambiguous type → ask and wait. Replies continue the active route unless redirected. Combined requests → author in dependency order, then request order for independent artifacts. Done when each requested artifact has a route.
 2. Select `draft` (new), `update` (existing) or `normalize` (requirements wording only). Untyped requirements fragments belong to `draft-document normalize`; return that routing gap to the caller. Done when operation, scope and caller constraints are known.
 3. Read the selected playbook and its required resources fully; for `normalize`, load local requirements resources only, omitting template-only resources; load conditional resources only when triggered. Resolve paths from this skill directory. Done when all inputs for the next action are loaded.
-4. For `normalize`, apply Requirements rules and return without executing full-template rendering or contract/diagram generation. Otherwise execute the route. Use supplied context and permitted local reads; return missing evidence or decisions to the caller. Do not independently dispatch research/proof, decompose work, publish, commit or manage worktrees. Existing Bug read-only exploration remains permitted. Done when the artifact or an explicit incomplete result is returned.
+4. For `normalize`, apply Requirements rules and return. Otherwise execute the route. Use supplied context and permitted local reads; return missing evidence or decisions to the caller. Do not independently dispatch research/proof, decompose work, publish, commit or manage worktrees. Existing Bug read-only exploration remains permitted. Done when the artifact or an explicit incomplete result is returned.
 
 ## Requirements rules
 

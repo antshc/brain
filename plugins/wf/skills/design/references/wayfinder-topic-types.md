@@ -6,7 +6,7 @@ Root **Not yet specified** holds only concerns too vague to frame as a topic; pr
 |---|---|---|
 | Research | Facts or coarse fog need clarification | AFK cited findings through Research; integrated deciding evidence resolves factual question |
 | Experiment | A falsifiable claim needs an actual check | AFK Prove generation/verification; HITL prototype approval before integration/closure; inconclusive stays open/blocked |
-| Decision | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep |
+| Decision | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep; tracker label remains `wayfinder:grilling` |
 | Contract design | New/significantly changed interface, inheritance abstraction, invariant/error/ordering/seam choice | AFK Deep Module generates 3+ Code Sketch options with individual Markdown rationales; retain worktree without merge. HITL Choice on same topic, then selected-only merge plus considered-option notes and closure |
 | Task | Code Sketch or prerequisite access/data work unblocks a decision | AFK artifact generation or authorized work; Code Sketch awaits HITL prototype approval before integration/closure; otherwise HITL checklist; never implementation of the destination |
 

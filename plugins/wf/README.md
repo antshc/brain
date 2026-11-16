@@ -2,7 +2,7 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
-[Design](skills/design/SKILL.md) keeps Spec, Work items, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and work item publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [architecture-records](skills/architecture-records/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+[Design](skills/design/SKILL.md) keeps Spec, Task, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and task publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [architecture-records](skills/architecture-records/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
 [subagents](skills/subagents/SKILL.md) selects the model and effort for named roles and ordered panels, and runs Arena comparisons. [research](skills/research/SKILL.md) is a router: Wayfinder (chart/resume research maps; `/research wayfinder <prompt-or-map-path>`), Explore (lookups; `hunty` verdicts inline), How (discovery, tracing, explanation; `hunty`, `explainy`), Why (`whyy`, `composy`), Cloud (`cloudy`), and Web (`weby`). Route agents are prompt files only Research spawns. The request is the only input; reports save to the session workspace with links, or to a location the request names.
 
@@ -23,7 +23,7 @@ The [HLD route](skills/design/SKILL.md) renders slice decision bullets from its 
 3. **Design synthesis** — `/design hld` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
 4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](install/assets/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/design spec` output, or `/design hld` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-work`](skills/draft-work/SKILL.md) using the `story` route once per approved row. Use `/draft-work story` for a standalone User story.
 5. **Story hardening** — `/design grill` interviews and sharpens each story, run once per story.
-6. **Work item cut** — `/design tasks` proposes implementation slices from a spec and creates GitHub sub-issues after approval.
+6. **Task breakdown** — `/design tasks` proposes implementation slices from a spec and creates GitHub sub-issues after approval.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -188,7 +188,7 @@ swimlane-beta TB
 | Check architecture currency | `/architecture-records route: doctor` |
 | Define a Concept | `/architecture-records route: define-concept` |
 | Initialize docs | `/architecture-records route: initialize` |
-| Story, bug report, or feature handover | `/draft-work story`, `/draft-work bug`, `/draft-document toi` |
+| Story, bug report, or TOI | `/draft-work story`, `/draft-work bug`, `/draft-document toi` |
 | High-level feature design | `/design hld` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
 | Deepen a task prompt or restate intent | `/writing-style sharpen` |
