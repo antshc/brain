@@ -87,7 +87,7 @@ Inside a table cell, `<br>` maps to an ADF `hardBreak` and converts back to `<br
 
 `**strong**`, `*em*`, `` `code` ``, `[link](href)`, `~~strike~~`.
 
-Marks nest and combine onto one text node, innermost first: `` [`Foo.Bar`](href) `` is a single text node carrying `code` **and** `link`, and `**[label](href)**` carries `link` **and** `strong`. A partly marked label splits into several nodes that all keep the outer mark. Both directions agree — `adf-to-md` re-wraps a combined node in the same order. A code span's content is literal, so nothing nests inside it.
+Marks nest and combine onto one text node, innermost first: `**[label](href)**` carries `link` **and** `strong`. A partly marked label splits into several nodes that all keep the outer mark. Both directions agree — `adf-to-md` re-wraps a combined node in the same order. A code span's content is literal, so nothing nests inside it. **A code span inside a link label (`` [`Foo.Bar`](href) ``) is unsupported:** Markdown lint rejects it on publish, and `adf-to-md` renders such linked text as a plain link with the warning `code inside link omitted` (Confluence does not store the combination reliably).
 
 `<emoji>[text]` maps to the inline `status` node — **ADF-only**. The emoji gives the color and renders as a colored dot in any Markdown viewer: `⚪` neutral, `🟣` purple, `🔵` blue, `🔴` red, `🟡` yellow, `🟢` green (e.g. `🔵[In Progress]`). `adf-to-md` writes this form; a status with a color outside the six falls back to `[STATUS:text|color]`.
 

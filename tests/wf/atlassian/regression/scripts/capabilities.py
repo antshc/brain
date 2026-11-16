@@ -197,7 +197,6 @@ CAPABILITIES: tuple[Capability, ...] = (
     Capability("M01", "Structure", "TOC macro (`<!-- adf:toc -->`)", F1, _contains("fetched_1", "<!-- adf:toc -->")),
     Capability("M02", "Structure", "Headings level 2 to 6", F1, _contains("fetched_1", "## Inline Marks", "### Heading Level Three", "#### Heading Level Four", "##### Heading Level Five", "###### Heading Level Six")),
     Capability("M03", "Marks", "strong, em, code, link, strike", F1, _contains("fetched_1", "**strong text**", "*emphasis text*", "`inline code`", "[plain link](https://example.com/plain)", "~~struck text~~")),
-    Capability("M04", "Marks", "Code span inside link", F1, _contains("fetched_1", "[`Foo.Bar`](https://example.com/code-link)")),
     Capability("M05", "Marks", "Strong + link merged on one node", F1, _contains("fetched_1", "[**bold link**](https://example.com/bold-link)")),
     Capability("M06", "Marks", "Partly marked link label keeps the link", F1, _contains("fetched_1", "[label with ](https://example.com/partial)[**bold part**](https://example.com/partial)[ inside](https://example.com/partial)")),
     Capability("M07", "Inline", "Emoji status lozenges, all six colors", F1, _contains("fetched_1", "⚪[Neutral] 🟣[Purple] 🔵[Blue] 🔴[Red] 🟡[Yellow] 🟢[In Progress]")),

@@ -317,15 +317,11 @@ def test_link_without_label_uses_href(md_to_adf):
     assert doc["content"][0]["content"][0]["text"] == "https://example.com"
 
 
-def test_code_span_inside_link_merges_both_marks(md_to_adf):
-    doc = md_to_adf("[`Foo.Bar`](https://example.com)")
-    assert doc["content"][0]["content"] == [
-        {
-            "type": "text",
-            "text": "Foo.Bar",
-            "marks": [{"type": "code"}, {"type": "link", "attrs": {"href": "https://example.com"}}],
-        }
-    ]
+def test_code_span_inside_link_is_rejected(run_cli):
+    result = run_cli("md-to-adf", "[`Foo.Bar`](https://example.com)")
+    assert result.returncode == 1
+    assert "code span inside a link is not supported" in result.stderr
+    assert result.stdout == ""
 
 
 def test_link_inside_strong_merges_both_marks(md_to_adf):

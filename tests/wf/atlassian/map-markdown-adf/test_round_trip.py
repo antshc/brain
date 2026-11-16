@@ -1,4 +1,5 @@
 """Round-trip: Markdown -> ADF -> Markdown preserves wording word for word."""
+import json
 import re
 
 _ORIGINAL_MD = """<!-- adf:toc -->
@@ -54,9 +55,13 @@ def test_round_trip_preserves_wording(md_to_adf, adf_to_md):
     assert _words(round_tripped) == _words(_ORIGINAL_MD)
 
 
-def test_round_trip_preserves_code_span_inside_link(md_to_adf, adf_to_md):
-    source = "see [`Foo.Bar`](https://example.com) here"
-    assert adf_to_md(md_to_adf(source)).strip() == source
+def test_linked_code_from_adf_comes_back_as_a_plain_link_with_a_warning(run_cli):
+    marks = [{"type": "code"}, {"type": "link", "attrs": {"href": "https://example.com"}}]
+    doc = {"type": "doc", "version": 1, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Foo.Bar", "marks": marks}]}]}
+    result = run_cli("adf-to-md", json.dumps(doc))
+    assert result.returncode == 0
+    assert result.stdout.strip() == "[Foo.Bar](https://example.com)"
+    assert "code inside link omitted" in result.stderr
 
 
 _LAYOUT_MD = """<!-- adf:breakout mode="wide" width="760" -->

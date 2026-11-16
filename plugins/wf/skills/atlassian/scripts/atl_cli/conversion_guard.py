@@ -45,6 +45,13 @@ def lint_markdown(markdown: str) -> None:
         raise GuardError("Markdown lint failed: " + "; ".join(report["failures"]))
 
 
+def _has_code_in_link(line: str) -> bool:
+    # Mask code spans first so a literal `[x](y)` inside code is not mistaken for a link.
+    masked = re.sub(r"\\.", "  ", line)
+    masked = re.sub(r"(`+)(.+?)\1(?!`)", "\0", masked)
+    return bool(re.search(r"\[[^\]]*\0[^\]]*\]\(", masked))
+
+
 def validate_markdown(markdown: str, *, placeholders: bool = False, media: bool = False) -> None:
     lines = list(syntax_lines(markdown))
     details = []
@@ -70,6 +77,9 @@ def validate_markdown(markdown: str, *, placeholders: bool = False, media: bool 
             raise GuardError(f"line {number}: indented code is unsupported; use a code fence")
         if not media and re.search(r"!\[", line):
             raise GuardError(f"line {number}: image requires the publish-page media pipeline")
+        # `syntax_lines` blanks code spans, so this check reads the raw line; fenced lines stay empty.
+        if line and _has_code_in_link(markdown.splitlines()[number - 1]):
+            raise GuardError(f"line {number}: code span inside a link is not supported; drop the backticks or the link")
         if re.match(r"^\s*\[[^\]]+\]:", line):
             raise GuardError(f"line {number}: reference links are not supported; use inline links")
         if re.fullmatch(r"=+", line.strip()):
@@ -145,6 +155,8 @@ _DEFAULTS = {
     "tableCell": {"colspan": 1, "rowspan": 1},
     "tableHeader": {"colspan": 1, "rowspan": 1},
     "mediaSingle": {"layout": "center", "widthType": "pixel"},
+    # Confluence stores every status lozenge with style "bold"; Markdown has no form for it.
+    "status": {"style": "bold"},
 }
 
 
@@ -208,6 +220,25 @@ def compare_documents(expected: dict, actual: dict, *, transport: bool = False) 
         raise GuardError(f"conversion changes semantic content at {difference}")
 
 
+def _is_code_in_link(marks: list[dict]) -> bool:
+    kinds = {mark.get("type") for mark in marks}
+    return {"link", "code"} <= kinds
+
+
+def drop_code_in_links(doc: dict) -> dict:
+    """Copy of `doc` without the `code` mark on linked text, which Markdown does not carry."""
+    def visit(value):
+        if isinstance(value, list):
+            return [visit(item) for item in value]
+        if not isinstance(value, dict):
+            return value
+        node = {key: visit(item) for key, item in value.items()}
+        if node.get("type") == "text" and isinstance(node.get("marks"), list) and _is_code_in_link(node["marks"]):
+            node["marks"] = [mark for mark in node["marks"] if mark.get("type") != "code"]
+        return node
+    return visit(doc)
+
+
 def check_round_trip(doc: dict, *, fetching: bool = False) -> list[str]:
     projected = copy.deepcopy(doc)
     warnings = []
@@ -222,6 +253,9 @@ def check_round_trip(doc: dict, *, fetching: bool = False) -> list[str]:
                     warnings.append("non-comment annotation omitted")
                 else:
                     kept.append(mark)
+            if _is_code_in_link(kept):
+                warnings.append("code inside link omitted")
+                kept = [mark for mark in kept if mark.get("type") != "code"]
             if kept:
                 node["marks"] = kept
             else:

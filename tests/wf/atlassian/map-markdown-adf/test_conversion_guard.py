@@ -130,6 +130,45 @@ def test_unknown_attributes_are_not_silently_dropped():
         guard.guard_adf(doc)
 
 
+def test_confluence_status_style_bold_is_a_default_but_other_styles_are_not():
+    def status(**extra):
+        return document(paragraph({"type": "status", "attrs": {"text": "Neutral", "color": "neutral", **extra}}))
+
+    confluence = status(style="bold", localId="648ee447-17c9-4901-8ea8-e369e79194d7")
+    guard.guard_adf(confluence, fetching=True)
+    guard.compare_documents(confluence, markdown_to_adf(adf_to_markdown(confluence)))
+    with pytest.raises(guard.GuardError, match="attrs.keys"):
+        guard.compare_documents(status(style="subtle"), markdown_to_adf(adf_to_markdown(status(style="subtle"))))
+
+
+@pytest.mark.parametrize("source", [
+    "[`Foo.Bar`](https://example.com)", "see **[`Foo.Bar`](https://example.com)** here", "[a `b` c](https://example.com)",
+    "| Form | [`Foo.Bar`](https://example.com) |",
+])
+def test_code_span_inside_a_link_is_rejected_with_its_line(source):
+    with pytest.raises(guard.GuardError, match=r"line 2: code span inside a link"):
+        guard.validate_markdown("intro\n" + source)
+
+
+@pytest.mark.parametrize("source", [
+    "[Foo.Bar](https://example.com) and `Foo.Bar`", "`[Foo.Bar](https://example.com)`", "`` [`Foo.Bar`](https://example.com) ``",
+    "\\[`Foo.Bar`](https://example.com)",
+])
+def test_code_and_link_apart_or_quoted_as_code_are_accepted(source):
+    guard.validate_markdown(source)
+
+
+def test_linked_code_from_confluence_fetches_as_a_plain_link_and_cannot_be_republished(capsys):
+    node = text("Foo.Bar", marks=[{"type": "code"}, {"type": "link", "attrs": {"href": "https://example.com"}}])
+    doc = document(paragraph(node))
+
+    assert guard.guard_adf(doc, fetching=True) == ["code inside link omitted"]
+    assert adf_to_md(doc, guarded=True) == "[Foo.Bar](https://example.com)\n"
+    assert "warning: code inside link omitted" in capsys.readouterr().err
+    with pytest.raises(guard.GuardError, match="lossy conversion"):
+        guard.guard_adf(doc)
+
+
 def test_plain_jira_wrappers_do_not_enable_confluence_lint(monkeypatch):
     monkeypatch.setattr(guard, 'lint_markdown', MagicMock(side_effect=AssertionError('unexpected lint')))
     assert md_to_adf('body\ttab')['type'] == 'doc'

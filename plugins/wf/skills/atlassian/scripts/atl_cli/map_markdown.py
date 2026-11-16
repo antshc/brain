@@ -44,9 +44,10 @@ def adf_to_md(doc: object, *, guarded: bool = False) -> str:
     """ADF document -> Markdown, newline-terminated exactly like the CLI's stdout."""
     try:
         if guarded:
-            from .conversion_guard import guard_adf, lint_markdown, validate_markdown
+            from .conversion_guard import drop_code_in_links, guard_adf, lint_markdown, validate_markdown
             for warning in guard_adf(doc, fetching=True):
                 print(f"warning: {warning}", file=sys.stderr)
+            doc = drop_code_in_links(doc)
         markdown = adf_to_markdown(doc) + "\n"
         if guarded:
             validate_markdown(markdown, placeholders=True)
