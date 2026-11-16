@@ -108,7 +108,7 @@ Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 Before any write, confirm the approval guard holds for the current breakdown; otherwise return to step 4.
 
-Render each ticket body from [issue-template.md](../references/issue-template.md) verbatim — every section (Contracts Delta and Related Spec Artifacts only when they apply), each drafted per its `<...-rule>`. Copy each addressed requirement's spec text verbatim into **Requirements addressed**; numbers alone are insufficient.
+*Load and follow the `draft-artifact` skill to create and update implementation tasks* using `task` once per approved slice. Supply parent Spec, approved scope/exclusions, verbatim requirements, decisions, Concepts/ADRs, affected layers, sketch/artifact excerpts and criteria-to-check mapping. Require complete bodies and return authoring gaps before publication; numbers alone never replace source text. Decomposition, approval, labels and native links remain here.
 
 Branch on mode:
 

@@ -3,7 +3,7 @@
 
 # Breakdown
 
-Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Artifacts, Design sketch contract, Breakdown ticket operations, Ticket body template.
+Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Artifacts, Design sketch contract, Breakdown ticket operations, Ticket body authoring.
 
 ## Contents
 
@@ -13,7 +13,7 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 - Artifacts
 - Design sketch contract
 - Breakdown ticket operations
-- Ticket body template
+- Ticket body authoring
 
 ## Prepare Plan
 
@@ -60,9 +60,9 @@ Choose boundaries from the spec/plan and observed codebase, not a predetermined 
 
 Prefer the fewest cohesive tasks that cover all requirements. Size by cohesion, context load, stable contracts, write ownership, and integration risk—not estimated duration. Keep multi-hour cohesive work with one capable implementer; merge trivial work when coordination dominates. Split at independently verifiable, stable-contract context boundaries. Serialize shared writes; disjoint ownership gates concurrency, not task validity. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
 
-Choose the highest meaningful, reliable verification seam supported by the codebase: existing API integration tests for API behavior; builds and existing regression/API tests for structural changes; lower-level tests where higher seams cannot reliably prove an important rule. Each task must be independently demonstrable or verifiable, with included outcome, exclusions, producer assumptions, and acceptance-to-check evidence mapping per *Ticket body template*. Classify HITL or AFK for planning only; prefer AFK; neither becomes a label. An unresolved human decision stops publication; never invent an answer.
+Choose the highest meaningful, reliable verification seam supported by the codebase: existing API integration tests for API behavior; builds and existing regression/API tests for structural changes; lower-level tests where higher seams cannot reliably prove an important rule. Each task must be independently demonstrable or verifiable, with included outcome, exclusions, producer assumptions, and acceptance-to-check evidence mapping per *Ticket body authoring*. Classify HITL or AFK for planning only; prefer AFK; neither becomes a label. An unresolved human decision stops publication; never invent an answer.
 
-Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Overlapping slices → merge them, move the shared edit into one slice, or record a `file` conflict; a shared path alone never becomes a blocker edge; never schedule shared file writes together. A ticket that changes a contract another ticket consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a task; uncovered scope blocks publication. Render complete ticket bodies with *Ticket body template*, not summaries or requirement numbers alone. The planner returns implementer recommendations separately in its JSON result; do not write them into ticket bodies.
+Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Overlapping slices → merge them, move the shared edit into one slice, or record a `file` conflict; a shared path alone never becomes a blocker edge; never schedule shared file writes together. A ticket that changes a contract another ticket consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a task; uncovered scope blocks publication. Render complete ticket bodies with *Ticket body authoring*, not summaries or requirement numbers alone. The planner returns implementer recommendations separately in its JSON result; do not write them into ticket bodies.
 
 For EVERY ticket, map EVERY artifact piece relevant to its behavior, acceptance criteria or implementation decisions. Repeat a shared piece in every related ticket; exclude unrelated pieces. Check both directions: no relevant piece omitted, no included piece lacking a stated relationship. Each Related Spec Artifacts entry holds the piece or bounded excerpt, canonical source/anchor, and a short explanation tying it to the requirement or criterion. Keep non-text links/embeds readable. No artifacts → omit that section. Design sketch present → also apply *Design sketch contract*.
 
@@ -94,118 +94,8 @@ Only the authorized planner following *Planner procedure* uses these writes, via
 3. **Link blocking** after all ticket identities exist: `{{ghTool}} issue block REF --by BLOCKER_REF…` (idempotent; reads back every edge). Body links never substitute for native edges.
 4. **Verify publication:** `{{ghTool}} graph read` and compare bodies, labels, parents, blockers, drafted requirements, criteria and artifact mapping; record created/reused IDs and completed/pending links. Exit `1` → stop dependent operations, report the exact failure, and preserve known issues/drafts/links in planner notes; never offline-publish or claim completion. Remove only temporary files created by this run.
 
-## Ticket body template
+## Ticket body authoring
 
-Render every section per its rule; conditional sections only when applicable. Template placeholders are data to fill, not launch-template placeholders.
+*Load and follow the `draft-artifact` skill to create and update implementation tasks* using `task` once per planned ticket. Supply parent Spec, bounded scope/exclusions, verbatim addressed requirements/rules/edge cases, producer assumptions, decisions, Concepts/ADRs, affected layers/modules, every mapped artifact piece and criteria-to-check evidence. Require full bodies with every mandatory section and applicable conditional section; authoring gaps stop publication.
 
-<issue-template>
-## Parent Spec
-
-# {{specIssueNumber}}
-
-## What to build
-
-<what-to-build-rule>
-- State included outcome, explicit exclusions, and enough behavior context to understand the task; leave implementation discovery to the implementer.
-- For functional changes, describe behavior across all touched integration layers, not a layer-by-layer breakdown. For structural changes, describe the complete relocation and required reference updates without introducing logic changes.
-- Avoid specific file paths or code snippets — they go stale fast. Exception: structural relocation tasks must identify intended source and destination paths.
-- Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
-</what-to-build-rule>
-
-## Acceptance criteria
-
-<acceptance-criteria-rule>
-- Each criterion is a single, self-contained pass/fail check, verifiable without reading code or the spec.
-- Phrase as an observable check: "When {{action}}, then {{observableOutcome}}" for behaviors; "If {{condition}}, then {{expectedOutcome}}" for invariants and boundary conditions. For structural work, include checks of intended locations, updated references, and unchanged regression behavior.
-- Use the domain language of the spec or `GLOSSARY.md`; keep functional criteria solution-agnostic. Structural criteria may name exact source/destination paths, namespaces, symbols, and project references needed to prove the relocation.
-- State the exact expected outcome — never vague words like "works", "correctly", "properly", "as expected".
-- Fold every applicable Business Rule (`If {{condition}}, {{invariant}}`), Edge Case (`{{boundaryCondition}} → {{expectedHandling}}`), and relevant error condition into its own criterion here, rephrased per the format above — do not create separate sections for them.
-</acceptance-criteria-rule>
-
-- [ ] Acceptance criteria 1
-- [ ] Acceptance criteria 2
-- [ ] Acceptance criteria 3
-
-## Requirements addressed
-
-<requirements-addressed-rule>
-- One bullet per addressed spec item: its number, then the spec's text copied verbatim — never numbers alone, never paraphrased, merged, or shortened.
-- Omit a subsection if the spec has none of that kind, or none apply to this slice.
-</requirements-addressed-rule>
-
-**Functional Requirements:**
-
-- {{number}}. {{verbatimSpecText}}
-...
-
-**Business Rule:**
-
-- {{number}}. {{verbatimSpecText}}
-...
-
-**Edge cases:**
-
-- {{number}}. {{verbatimSpecText}}
-...
-
-## Related Spec Artifacts
-
-<related-spec-artifacts-rule>
-- Omit this section when the spec has no artifacts relevant to this slice.
-- For every relevant piece: bounded excerpt or precise binary location/description, canonical source/anchor and revision when available, and relationship to a requirement or criterion.
-- Repeat shared pieces in every related ticket; exclude unrelated pieces. Preserve readable links/embeds; never invent an image excerpt.
-- Design sketch artifacts: quote the exact sketch excerpt in a fenced block, prefixed with its sketch path, artifact name, and URL, plus the matching `module-map.md` rows (target repo paths); the implementer uses them as the map for where logic goes and how code is structured.
-</related-spec-artifacts-rule>
-
-- {{artifactPiece}} ([{{sourceAnchor}}]({{canonicalSource}}), {{revision}}): {{requirementOrCriterionRelationship}}
-
-## Implementation Decisions
-
-<implementation-decisions-rule>
-- State producer contracts and supplying tickets when applicable, compatibility constraints, and assumptions; distinguish observed contracts from assumptions needing confirmation.
-- Use short technical statements and implementation-oriented language.
-- Avoid file paths or code snippets except exact structural relocation constraints.
-</implementation-decisions-rule>
-
-- {{implementationDecision1}}
-- {{implementationDecision2}}
-
-## Relevant Concepts
-
-<relevant-concepts-rule>
-- Mandatory whenever at least one Concept or ADR applies to this slice.
-- One bullet per constraining Concept or ADR. Must carry enough detail to implement the rule without opening the file — the link back to the record is optional supporting context, not a substitute for the summary.
-- Bullet must be self-explanatory — no further repo exploration needed to implement.
-- No specific file paths or code snippets (they become outdated quickly).
-</relevant-concepts-rule>
-
-- {{ruleSummaryAsItAppliesToThisSlice}} ([{{conceptTitle}}](docs/concepts/{{kind}}-{{slug}}.md))
-- {{ruleSummaryAsItAppliesToThisSlice}} ([{{decisionTitle}}](docs/adr/{{slug}}.md))
-
-If a summary above isn't enough to implement its rule, open the linked record for full detail before implementing.
-
-## Contracts Delta
-<!-- Omit this section entirely if this slice touches no API, Database, Resource, or GUI contract. -->
-
-*Load and follow the `doc-contracts` skill to write, once per touched contract kind (API, Database, Resource, GUI), the REST endpoint, table schema, resource, or GUI contract delta as a terse diff;* inline its output verbatim here, one block per kind.
-
-## Affected layers & modules
-
-<affected-layers-rule>
-- State which layers/modules this task touches (or relocates) and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
-- Source layer headings and Cross-Module Dependency Rules from the Concept or ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
-- If the slice belongs to a specific building block, also scan the `Deployables` table (under `Building blocks` in `ARCHITECTURE.md`) and load the matching block's record (`docs/building-blocks/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
-</affected-layers-rule>
-
-- {{layerOrModuleName}}: {{crossModuleDependencyRule}}
-
-## Verify section
-
-List tests to add, update, and run for this task.
-
-- *Mandatory*: The Verify section must be present in every issue. If a Concept about testing/verification exists in `docs/concepts/`, use it (and its link/summary above) to guide the verification. Include the commands that will run the integration or REST API automation tests.
-- For functional changes, test external behavior, not implementation details. For structural tasks, verify intended paths/references and unchanged behavior using existing regression/API integration tests; add tests only where coverage is insufficient.
-- Map every criterion to a concrete check, exact command/manual action, prerequisites, expected result, and retained evidence. Name affected test modules and prior art; report unavailable prerequisites, never invent commands.
-- Default to existing API integration tests for API behavior; add focused contract, concurrency, retry, or boundary checks where the API seam cannot adequately expose the risk. For structural work, include deterministic location/reference checks and existing regression tests.
-
-</issue-template>
+The planner remains online-only and non-interactive, owns decomposition and publication, and never invokes Design Tickets or launches subagents. Authoring does not add approval, offline publication or tracker authority.

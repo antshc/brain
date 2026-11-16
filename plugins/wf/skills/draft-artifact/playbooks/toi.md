@@ -1,17 +1,20 @@
-# Draft TOI
+# TOI
 
 TOI = engineering hands a developed feature to technical teams (Support, QA, Docs, Training, Field). Not formal training; those teams reuse it to build training, documentation, and labs. Reader did **not** build the feature.
 
 ## Contents
 
 - Inputs
+- Required resources
 - Constraints
 - Workflow
 - Exploration checklist
 - How does it work rules
 - Plain language
 - Gaps
+- Update behavior
 - Completion criteria
+- Output
 
 ## Inputs
 
@@ -21,6 +24,10 @@ TOI = engineering hands a developed feature to technical teams (Support, QA, Doc
 - [`outputPath`] — default `toi/{{featureSlug}}.md` under the current workspace root.
 
 If `feature` is missing or matches more than one feature, ask the user with the ask_user tool before collecting evidence.
+
+## Required resources
+
+Read the TOI template registered in the router on every run.
 
 ## Constraints
 
@@ -126,6 +133,10 @@ Write in ASD-STE100 Simplified Technical English (STE) in every section, includi
 
 When evidence for a needed fact is missing or conflicting, write it under FAQ / Open questions as `Open: <question> — owner: <name or team>`. Do not fill the related section with a guess. Report all gaps to the user.
 
+## Update behavior
+
+Update supported changes in place; preserve unaffected content and unresolved evidence gaps. Recheck facts against current source before changing them.
+
 ## Completion criteria
 
 - File exists at `outputPath` with template headings in template order.
@@ -136,3 +147,7 @@ When evidence for a needed fact is missing or conflicting, write it under FAQ / 
 - Artifact structure exists when the feature adds or changes an artifact.
 - No link or citation to a workspace Markdown file; no pull request used as a source.
 - Report lists sources not reached and open questions.
+
+## Output
+
+Return the TOI path, evidence map summary, open questions and sources not reached.

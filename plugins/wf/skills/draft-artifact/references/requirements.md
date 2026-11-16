@@ -1,4 +1,4 @@
-# Solution-Agnostic
+# Requirements
 
 Scrub requirement, capability, feature, functional slice, or story text of implementation artifacts so every statement names a **behavior and entity** — what the system *does* and the outcome the actor gets — never the thing that is built to deliver it (widget, screen, table, endpoint, flag, access role).
 
@@ -81,7 +81,7 @@ When a statement names an artifact, raise it **one level** to the behavior it en
 
 ## Apply the de-referencing tables
 
-**Always** apply the bundled tables in [solution-agnostic-terms.md](solution-agnostic-terms.md) — they map leaked artifacts (UI, data, API, domain-state, process, access) to the behavior to state instead.
+**Always** apply the Requirements terms tables registered in the router — they map leaked artifacts (UI, data, API, domain-state, process, access) to the behavior to state instead.
 
 ## Output
 
