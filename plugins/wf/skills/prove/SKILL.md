@@ -37,7 +37,7 @@ Run once per request, before Routing.
 
 Frame shape, one per claim, passed verbatim in its Brief and kept in its report:
 
-```
+```text
 ID: <claim id>
 Question: <original claim>
 Assumption: <falsifiable assumption>
@@ -83,7 +83,7 @@ Per claim, rerun the worker's exact deciding command in its `@proofRoot` against
 
 - Always save one Markdown report per claim. Return only the pointers:
 
-  ```
+  ```text
   Prove reports — read each in full before using its conclusion:
   - <id>: <claim> → <absolute path> (<route>; confirmed | refuted | inconclusive: <reason>)
   ```

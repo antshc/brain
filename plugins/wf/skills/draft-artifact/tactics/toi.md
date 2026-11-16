@@ -2,7 +2,6 @@
 
 TOI = engineering hands a developed feature to technical teams (Support, QA, Docs, Training, Field). Not formal training; those teams reuse it to build training, documentation, and labs. Reader did **not** build the feature.
 
-
 ## Contents
 
 - Inputs

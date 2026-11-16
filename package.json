@@ -1,0 +1,14 @@
+{
+  "name": "brain-markdown-checks",
+  "private": true,
+  "scripts": {
+    "lint:markdown": "markdownlint-cli2",
+    "lint:markdown:fix": "markdownlint-cli2 --fix",
+    "lint:links": "node .github/scripts/check-markdown-links.mjs",
+    "test:markdown": "node --test .github/scripts/*.test.mjs"
+  },
+  "devDependencies": {
+    "markdown-it": "15.0.3",
+    "markdownlint-cli2": "0.24.1"
+  }
+}

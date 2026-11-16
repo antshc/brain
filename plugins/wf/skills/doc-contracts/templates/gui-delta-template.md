@@ -1,3 +1,6 @@
+<!-- Delta fragments use heading levels required by the containing document. -->
+<!-- markdownlint-disable MD001 -->
+
 ## GUI delta
 
 <!-- One copy per surface (page or route family) touched; delete unused copies. -->
@@ -5,6 +8,7 @@
 Legend: `+` added · `~` changed · `-` removed · `% old → new` rename (same meaning) · `->` interaction/navigation · `<-` data binding · `*` default item · `@` shared component · `match:` existing implementation anchor.
 
 #### {{surfaceHeader| e.g. a new page name, or an existing route/component name/visible label when modifying one}}
+
 <details>
 <summary>{{surfaceHeader}}</summary>
 

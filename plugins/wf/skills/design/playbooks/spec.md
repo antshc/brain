@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Spec
 
 Synthesize the conversation and codebase context into a spec (PRD). Ask only for missing publication inputs.
@@ -14,9 +17,9 @@ Explicit offline publishing or a reported GitHub/tool/authentication failure →
 
 2. Draft the Spec using the template below.
 
-Ask the user: _"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"_ if not provided as arguments to this skill.
+   Ask the user: *"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"* if not provided as arguments to this skill.
 
-Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
+   Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
 3. **Contracts gate.** List every contract kind the Initiative touches: API, Database, Resource, other, GUI. Seed the list from the design's **Contracts touched** when present, then check the conversation and codebase for more. For each listed kind, *Load and follow the `doc-contracts` skill to write an API, database, resource, or GUI contract delta as a terse diff* and inline its substantive output under **Contracts Delta**, ordered API → Database → Resource → other → GUI, keeping contract facts and removing skill references and authoring directives. **MUST NOT** hand-write a delta. *Done when* each listed kind has a block opening with a `Legend:` line and one `#### header` + `<details>` per resource or surface; empty list → omit **Contracts Delta** and state "No contract change" in the run summary.
 
@@ -50,7 +53,7 @@ The body MUST NOT name design routes, candidate labels, or the run's local paths
 
 Wrap the selected `synthesis/` sketch — never an Arena candidate's — and its module map into artifacts. Resolve the script path from the installed `design/` skill directory:
 
-```
+```text
 python3 "<installed design directory>/scripts/bundle_artifacts.py" --sketch <synthesis/sketch path> --module-map <synthesis/module-map.md path> --out-dir <new empty temp dir outside the repository>
 ```
 
@@ -81,7 +84,7 @@ One subsection per Requirement set. Each groups a Stakeholder requirement with i
 <details>
 <summary>{{n}}. {{stakeholderRequirement}}</summary>
 
-**Functional Requirements**
+**Functional Requirements:**
 
 What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
 
@@ -96,7 +99,7 @@ A LONG, numbered list of functional requirements. Each functional requirement sh
 
 This list of Functional requirements should cover all relevant behavior in this Requirement set.
 
-**Business Rules**
+**Business Rules:**
 
 <!-- Omit if no business rules exist for this Requirement set. -->
 
@@ -104,7 +107,7 @@ Invariants that must always hold, independent of any single user action. Each ru
 
 {{n}}. If {{condition}}, {{invariant}}.
 
-**Edge Cases**
+**Edge Cases:**
 
 <!-- Omit if no edge cases exist for this Requirement set. -->
 

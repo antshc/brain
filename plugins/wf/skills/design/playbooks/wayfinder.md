@@ -1,11 +1,12 @@
 # Wayfinder
 
-Chart a GitHub decision map and maintain one living HLD throughout discovery. Produce decisions, evidence and the document; implementation requires separate authorization. The root Not yet specified section holds unknowns and risks; child issues track concrete work; the HLD synthesizes supported conclusions. Alternate human decisions and autonomous investigation; helpers always return control here.
+Chart a GitHub decision map and maintain one living HLD throughout discovery. Produce decisions, evidence and the document; implementation requires separate authorization. The root Not yet specified section holds concerns too vague to ticket; child issues own precise questions and risks; the HLD synthesizes supported conclusions. Alternate human decisions and autonomous investigation; helpers always return control here.
 
 ## Contents
 
 - Refer by name
 - Session and document
+- Interview phases
 - The Map
 - The map body
 - Tickets
@@ -20,6 +21,7 @@ Chart a GitHub decision map and maintain one living HLD throughout discovery. Pr
 - Tracker operations
 - Invocation
 - Chart the map
+- Small effort
 - Automatic runs
 - Work through the map
 - Completion criteria
@@ -31,26 +33,38 @@ Every map and ticket is an issue, so it has a name — its title. In everything 
 
 ## Session and document
 
-1. Before interviews or worktree switches, capture absolute harness root, repository, invocation worktree, `@sessionBaseBranch` and its SHA. This is the branch the user started from, not necessarily `main`; leave it unchanged. Resolve detached HEAD before branch creation. On resume, use the map's persisted base instead of the caller's current branch. Done when the local base and repository are verified.
-2. Use HLD as the only Wayfinder document format; no output-format selection question. Automatically name/create its branch and dedicated owned worktree using **Prepare a document worktree**. Derive the branch summary from the initial request; keep that recorded name if Grill later refines the document slug. Do this before destination/frontier Grill. Done when ownership and branch are recorded outside disposable worktrees.
-3. After destination Grill establishes scope/slug, read the HLD playbook and Living document resource registered in the router. Seed `docs/ongoing/<initiative-slug>.md` in that worktree using evolving-draft mode. Use **Commit the document** before evidence dispatch. Done when the seed is committed locally on the integration branch.
+Existing maps resume as mapped efforts: restore the current interview phase, skip initial charting and Small effort, and recover only missing verified document infrastructure. Re-interview changed scope/new human choices only.
+
+1. Before interviews or worktree switches, capture absolute harness root, repository, invocation worktree, dirty state, `@sessionBaseBranch` and its SHA. This is the branch the user started from, not necessarily `main`; leave it unchanged. Persist interview phase/frontier in Grill's session ledger. On resume, use persisted identities. Done when the local base and repository are verified without creating map infrastructure.
+2. Run Chart the map through destination interview, separate breadth-first frontier interview and small-effort decision before creating a branch, worktree, HLD seed or issue. Done when the user selected a mapped effort or a standalone continuation.
+3. For a mapped effort, use HLD as the only document format; no format question. Resolve detached HEAD, then **Prepare a document worktree** from the captured base. Derive its summary from the confirmed destination; persist branch and ownership outside disposable worktrees. Read the HLD playbook and Living document resource registered in the router; seed `docs/ongoing/<initiative-slug>.md` in evolving-draft mode and **Commit the document** before map-topic evidence dispatch. Done when the integration branch, worktree and seed commit are verified.
 
 Wayfinder owns branch prefixes; *Load and follow the `git` skill to run verified Git mechanics for branch naming, creation and worktree lifecycle* using Branches and Worktrees with the selected prefix and summary. Preserve Git's slug normalization, removed initiative/ticket IDs, worker ordinals, collision authorization and verified resumes. Explicit caller prefixes override its default feat/fix choice; standalone Research/Prove conventions stay unchanged.
 
 | Work | Prefix |
-| --- | --- |
+|---|---|
 | Living HLD | `wayfinder/<slug>` |
 | Research ticket | `research/<slug>` |
 | Experiment/verification ticket | `prove/<slug>` |
 | Contract design Options | `wayfinder/<slug>` |
 
-**Synchronize the document** after every research result, Grill session/pause, experiment result/review, Contract design phase, and on resume. Pending approval-gated prototypes update fog/progress only; their design consequences enter the HLD after explicit approval and verified integration. Contract design retains selected-only integration after Choice. Automatically update inside its dedicated worktree without a separate request or confirmation. Read the latest local integration-branch document; apply Living document reconciliation and HLD's incremental rules, then **Commit the document**. Preserve existing diagram approval rules; record a blocked diagram update rather than claiming full readiness. Serialize writes, not whole evidence runs. Record last synchronized ticket/result commit and any pending updates on the map. Done when supported consequences appear in all affected sections and the document commit is verified locally.
+**Synchronize the document** only after mapped-effort setup; before then persist interview state in the ledger. Synchronize after every research result, Grill session/pause, experiment result/review, Contract design phase, and on resume. Pending approval-gated prototypes update fog/progress only; their design consequences enter the HLD after explicit approval and verified integration. Contract design retains selected-only integration after Choice. Automatically update inside its dedicated worktree without a separate request or confirmation. Read the latest local integration-branch document; apply Living document reconciliation and HLD's incremental rules, then **Commit the document**. Preserve existing diagram approval rules; record a blocked diagram update rather than claiming full readiness. Serialize writes, not whole evidence runs. Record last synchronized ticket/result commit and any pending updates on the map. Done when supported consequences appear in all affected sections and the document commit is verified locally.
 
 Research results use `docs/research/<initiative-slug>/`; proof reports, retained evidence and accepted sketches use `docs/prototype/<initiative-slug>/`. Select exact filenames before dispatch; pass the assigned absolute worktree root as output base. Retain accepted sketch packages with rationale, module map and language-native `sketch/` files; standalone temporary roots stay unchanged.
 
 Use owned result worktrees for Prove/Experiment, Deep Module and Code Sketch. Challenge this requires an owned result worktree whenever it changes code or runs tests; read-only inspection and Research may reuse a pinned checkout with isolated outputs. All result worktrees start from a pinned current integration HEAD, not the session base. Independent runs may share that base; dependent runs require prerequisite integration first. Producers never commit or push; Wayfinder owns commit, local merge and cleanup. Keep ownership/state outside disposable worktrees. Preserve runnable proof state through reproduction, user approval and requested review. Prototype approval governs approval-gated payloads at all paths, including explicitly assigned custom destinations; changing a destination does not bypass the gate.
 
 Resume locally: verify refs, ancestry and artifact files before reuse. Missing local state blocks recovery; do not fabricate a remote link or regenerate a guessed result. Legacy maps retain existing PR history untouched; adopt verified content into local integration mode and record the transition without updating, closing or replacing their PRs.
+
+## Interview phases
+
+Wayfinder owns interview phase and breadth-first selection; Grill supplies its existing one-question pacing, fact lookups, ledger/coverage checks, inline records and closing sweep. Read Grill fully as registered in the router. In charting, apply these phase boundaries before its next-question selection or document synchronization:
+
+1. Destination: settle outcome, scope, exclusions and completion boundary only; ask one ready question, wait, and record the answer. User confirmation ends this phase with Grill's closing sweep, then starts the separate frontier interview. Done when the destination is confirmed without requiring downstream decisions to be settled.
+2. Frontier: cover major in-scope areas before deepening a single thread. Ask one ready question at a time and wait; recompute dependencies after each answer. Newly unblocked dependents are eligible, but prefer uncovered main areas where dependencies allow. Hold questions awaiting lookups and ask one independent ready question instead. Persist phase, coverage, answers, dependencies and next question in the session ledger. Done when the user confirms sufficient shared understanding of precise questions, coarse fog and dependencies; open downstream decisions remain mapped work.
+3. Return: after frontier confirmation and Grill's closing sweep, apply Small effort before branch/worktree, HLD seed or issue creation. Before mapped setup, synchronize interview state only. On existing maps, restore the phase and ask only changed scope/new human choices; document synchronization follows Session and document. Done when the continuation or mapped setup is explicit.
+
+These Wayfinder phase boundaries limit the charting interview, not the overall map's completion criteria. Standalone Grill follows its existing procedure unchanged.
 
 ## The Map
 
@@ -81,6 +95,8 @@ effort>
 - Worktree: <absolute path>; ownership record: <path outside worktrees>
 - Last synchronized: <result commit>; integrated commit: <sha>; HLD commit: <sha>, or none
 - Pending synchronization: <result refs and missing steps or none>
+- Pending proposals: <review draft paths/revisions and next action, or none>
+- Root-owned verification: <run/status/evidence/next action, or none>
 
 ## Decisions so far
 
@@ -93,7 +109,7 @@ the link for the detail the ticket holds -->
 
 | ID | Unknown / risk and impact | State | Resolve when | Work / next action / owner | Outcome / evidence |
 | --- | --- | --- | --- | --- | --- |
-| <stable U1> | <coarse concern or precise question> | <Open / Investigating / Awaiting human / Blocked> | <criterion or missing framing> | <named child links or root-owned run; next action; owner> | <supported facts, limits and local evidence paths> |
+| <stable U1> | <in-scope concern too vague to ticket> | <Open / Investigating / Awaiting human / Blocked> | <criterion or missing framing> | <related context; missing framing; next action; owner> | <supported facts, limits and local evidence paths> |
 
 ## Out of scope
 
@@ -111,7 +127,7 @@ Each ticket is a sub-issue of the map (or of the ticket it's narrower than); its
 
 ## Unknowns
 
-<root Not yet specified anchor and stable IDs; or whole-HLD discovery scope>
+<stable unknown/risk IDs, provenance and precise criteria/impact now owned here; no live root fog row required; or whole-HLD discovery scope>
 
 ## Work
 
@@ -164,7 +180,7 @@ Every ticket is either HITL — human in the loop, worked with a human who speak
 1. Save the proposed batch before requesting approval: one `map.md` on chart, one unique numbered Markdown file per child/sub-ticket (for example `01-blob-read-behavior.md`) under `<document-worktree>/tmp/wayfinder/<initiative-slug>/proposals/<batch-id>/r<revision>/`. Use collision-safe batch IDs; keep drafts untracked and out of document/result commits. Each file contains `Draft — unapproved`, stable proposal key/revision, title, labels, parent, blockers and the full rendered issue body. Preserve Mode, Helper, Question, Unknown IDs and Research scope where applicable. Prototype tickets add: Experiment → claim, deciding criteria, report path; Code Sketch → target modules, sketch root; Contract design → contract scope, option count, option root; each → owned worktree and Prototype approval before integration. Use stable proposal keys for unpublished parents/blockers, never invented issue numbers or URLs. Record paths/revisions and pending state in the ownership record outside disposable worktrees. Done when every proposal has a complete readable file.
 2. Present one bullet per proposal, map first, with its title linked to the actual Markdown file and a short type/mode summary. Use host-supported clickable file links; ChatGPT uses `[Title](sandbox:/absolute/path/file.md)`. Verify files exist and link targets match; report write/link failures and repair before requesting approval. Ask the user to approve all or selected titles, edit, add, drop or merge. Opening links is not approval. Done when the user answered against the linked revision.
 3. Apply edits and rerun the Contract test on changed questions. Write changed proposals into a new revision directory; retain previous revisions and re-present changed titles with fresh links for approval. Keep unchanged approvals tied to their original files; leave unapproved items pending on partial approval. Done when each proposal is approved, pending or dropped with its exact revision recorded.
-4. Create only approved tickets via **Create a ticket** / **Create a sub-ticket**, using the approved title, labels and body. Record approved revision/content identity before creation; substitute only verified parent/blocker issue links for proposal keys, recording that mapping. Substantive changes require fresh approval. Dropped proposals stay in fog with next action `Awaiting ticket approval`, or move to Out of scope only on an explicit user scope decision. Retain pending drafts across pauses, publication failures and reconciliation; on resume verify the same files/content before use, reporting missing or changed drafts instead of assuming approval. Clean only owned drafts after their publication and links are verified or explicit discard; preserve unrelated files and pending proposals. Done when approved tracker writes are verified and remaining drafts retain their next action.
+4. Create only approved tickets via **Create a ticket** / **Create a sub-ticket**, using the approved title, labels and body. Record approved revision/content identity before creation; substitute only verified parent/blocker issue links for proposal keys, recording that mapping. Substantive changes require fresh approval. Uncreated precise proposals stay in retained drafts and Pending proposals with their next action; approval delay or dropping a proposal does not make its question fog. Explicit discard retains an unresolved question/owner in pending state unless the user excludes it; only then move it to Out of scope. Retain pending drafts across pauses, publication failures and reconciliation; on resume verify the same files/content before use, reporting missing or changed drafts instead of assuming approval. Clean only owned drafts after their publication and links are verified or explicit discard; preserve unrelated files and pending proposals. Done when approved tracker writes are verified and remaining drafts retain their next action.
 
 Silence, destination approval or approval of an earlier batch is not ticket approval. Reusing an existing open ticket unchanged needs no new approval; changing its question or scope does. Root-owned Challenge this runs are not tickets. While approval is pending, continue only already-approved independent work.
 
@@ -173,7 +189,7 @@ Silence, destination approval or approval of an earlier batch is not ticket appr
 Run each helper in the Wayfinder session with its default dispatch. **MUST NOT** wrap a helper in a subagent. Skip Architect.
 
 | Helper | Run | Workers |
-| --- | --- | --- |
+|---|---|---|
 | Research | *Load and follow the `research` skill to investigate technical questions across source code, docs, packages and external evidence and return cited findings* with Research routing inputs | Research-owned |
 | Prove | *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence* | Prove-owned `prover` worker |
 | Challenge this | Per Risk verification, *Load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
@@ -187,10 +203,10 @@ Grill asks one question at a time and records the user's actual answer. No agent
 
 ## Prototype approval
 
-Apply to Prove/Experiment, Code Sketch and Contract design payloads. Research and Challenge this evidence integrate automatically, regardless of report destination. Challenge this requires no approval, including when its verification changes code or runs tests: isolate those actions in an owned result worktree, independently reproduce findings, retain reports/proof patches and restore production-source edits, then Integrate a result and Synchronize the document. Update root Not yet specified and supported HLD design conclusions automatically; residual risks remain in fog. Challenge this does not authorize production fixes or human risk acceptance. Supporting Prove runs used solely for Challenge this verification inherit this automatic evidence flow; separately requested prototype work retains the gate. Generation and independent verification remain AFK. Prototype lifecycle: generated → verified → awaiting approval → approved → integrated.
+Apply to Prove/Experiment, Code Sketch and Contract design payloads. Research and Challenge this evidence integrate automatically, regardless of report destination. Challenge this requires no approval, including when its verification changes code or runs tests: isolate those actions in an owned result worktree, independently reproduce findings, retain reports/proof patches and restore production-source edits, then Integrate a result and Synchronize the document. Update the owning ticket/root run, coarse root fog and supported HLD design conclusions automatically; precise residual risks remain on their owner. Challenge this does not authorize production fixes or human risk acceptance. Supporting Prove runs used solely for Challenge this verification inherit this automatic evidence flow; separately requested prototype work retains the gate. Generation and independent verification remain AFK. Prototype lifecycle: generated → verified → awaiting approval → approved → integrated.
 
 1. Validate the result in its owned worktree. Retain reports, patches, runnable reproduction state and sketch packages there; restore production-source edits before preparing the incoming payload. Persist worktree/branch, pinned base, exact payload inventory/content identity, evidence/limits and review state on the existing issue/root run. Done when the concrete reviewed revision is recoverable without integration.
-2. Present the result, limits and exact payload for explicit user approval; release the claim and keep the issue open with fog Awaiting human. Contract Options await Choice; follow Contract selection for the selected payload. Keep pending prototype artifacts out of integration commits/merges and their conclusions out of the HLD. Continue independent work; dependent runs requiring integrated artifacts wait. Done when the user can review the retained prototype and its pending step is recorded.
+2. Present the result, limits and exact payload for explicit user approval; release the claim and keep the issue open with status Awaiting human. Contract Options await Choice; follow Contract selection for the selected payload. Keep pending prototype artifacts out of integration commits/merges and their conclusions out of the HLD. Continue independent work; dependent runs requiring integrated artifacts wait. Done when the user can review the retained prototype and its pending step is recorded.
 3. Record approval against that payload identity. Passing checks, silence, recommendations, partial feedback and approval of a plan are not prototype approval. An explicit Contract Choice approving the concrete selected package satisfies this gate once; a not-yet-reviewed hybrid requires review. Changes/rejection retain the worktree and exact next action; revisions require fresh approval. Done when approval covers the current payload or the result remains awaiting human input.
 4. Verify approval, payload identity and integration drift before Integrate a result; material payload/contract changes require renewed approval. Then synchronize HLD/tracker and resolve only when evidence and completion criteria also pass. Clean owned worktrees only after verified integration, synchronization and all reproduction/review consumers finish. Done when approved artifacts and their consequences are verified locally, or the exact pending step/worktree is retained.
 
@@ -222,13 +238,13 @@ For every research dispatch, write one request holding the ticket's Question, it
 
 ## Fog of war
 
-Not yet specified is the root's single fog-of-war register: store **all unresolved unknowns and risks**, coarse or precise, including those with active child issues. Do not create a separate Unknowns and risks section or copy fog into HLD Open Questions. Child issues track work, not a competing unknown inventory.
+Not yet specified holds only in-scope concerns too vague to ticket. Test sharpness, not answerability: a precise question belongs in a typed ticket even when blocked, partial, conflicting or awaiting proof approval. Keep decided work in Decisions so far and excluded work in Out of scope; preserve HLD Open Questions for users.
 
-Assign stable initiative-local IDs. Keep state, consequence, resolution criterion (or exact missing framing), next action/owner, linked work and supported outcome/limits. Preserve IDs when refining wording; split independent new questions with predecessor links. Risk entries include trigger/failure/impact, mitigation, verification method/result and residual risk through Risk verification. A passing narrow check or no counterexample is not universal safety.
+Assign stable initiative-local IDs; retain consequence, missing framing, next action/owner and evidence pointers. As a concern becomes precise, transfer its ID, provenance, criteria, risk trigger/failure/impact, mitigation and verification limits to its owning ticket through Ticket approval. Remove the graduated portion only after the approved ticket and links are verified, or its exact draft and Pending proposals state are durable. Keep genuinely coarse remainder with predecessor links. Pending approval is a workflow state, not fog.
 
-After each answer/result/resume, choose the cheapest useful next helper: Research clarifies facts, Prove tests a claim, Challenge this searches for interacting blind spots, Deep Module/Code Sketch expose shapes, Grill settles human choices. A coarse concern can justify a bounded Research question before the whole area is specified. Create/reuse concrete typed work when frameable; keep the entry in fog until its resolution criterion is met. Challenge this runs within the current owner or root, never a dedicated issue.
+After each answer/result/resume, choose the cheapest useful next helper: Research for facts, Prove for a claim, Challenge this for blind spots, Deep Module/Code Sketch for shapes, Grill for human choices. A bounded precise research question may clarify a larger coarse area; ticket that question and retain only the unspecified remainder in fog. Challenge this stays embedded on an existing owner or root-owned verification run, never its own tracking issue; concrete run status belongs in Result/Root-owned verification, not coarse fog.
 
-Partial, conflicting, blocked or unmitigated risks remain; mark their limitation and next action. When resolved, persist supported outcome, stable ID, linked work and evidence pointer in Decisions so far before removing the active fog entry. Reopen the same ID when new evidence invalidates the outcome. Never repeat unchanged inconclusive runs; retry with changed prerequisites/evidence or a bounded new method. Out-of-scope work belongs in Out of scope and needs an explicit scope decision before investigation.
+Keep inconclusive or unmitigated precise work open on its owner with limits and next action. Reopen the same owning question/ID when new evidence invalidates a result; do not return it to fog merely because it is unresolved. Persist supported outcomes in ticket resolution and a Decisions so far pointer. Never repeat unchanged inconclusive runs; change prerequisites, evidence or method. Completion checks include open tickets, pending proposals, human choices, root-owned runs, coarse fog and synchronization; empty fog alone is not completion.
 
 ## Out of scope
 
@@ -261,10 +277,14 @@ Supply a loose idea to chart a map, or a map issue number or URL and an optional
 
 ### Chart the map
 
-1. Complete Session and document setup through branch/worktree creation. Use Grill to name the destination; seed and locally commit its HLD. Done when the selected document exists before frontier/evidence work.
-2. Use Grill breadth-first to chart open decisions and first ready steps. Synchronize confirmed answers and unknowns. Even a one-session effort retains its document and integration branch; a map is optional only if no tracked questions remain. Done when scope and unresolved questions are explicit.
-3. Propose the map (Destination, Notes, Document and branches, fog) with currently specifiable tickets, typing each by the Contract test, and run Ticket approval through saved Markdown drafts and clickable bullets. Create the approved map; persist local branch, worktree, ownership and commit identities using **Update map or ticket**; create only approved tickets, then add blockers in a second pass. Done when the map, approved tickets, native child links and dependencies are verified.
+1. Capture session identity per Session and document. Use Grill to name the destination: settle outcome, scope, exclusions and completion boundary, then get user confirmation. Ask one question at a time and wait for its answer. Done when the destination is confirmed; this does not approve tickets.
+2. Start a separate breadth-first frontier interview through Grill. Cover major in-scope areas before deepening one thread; ask exactly one ready question, wait, then recompute dependencies. Identify precise decisions, blocked questions, coarse fog and first useful steps. The interview maps work rather than resolving every downstream decision; user confirmation of sufficient shared understanding ends this phase, with Grill's closing sweep. Done when breadth, dependencies and remaining work are explicit.
+3. Apply Small effort before infrastructure creation. If mapped, finish Session and document setup, then propose the map and currently specifiable tickets, typing each by the Contract test. Run Ticket approval with saved Markdown drafts and clickable bullets; create approved issues, verify native child links, then wire blockers in a second pass. Done when integration state and approved tracker state are verified.
 4. Run **Automatic runs** on approved tickets without a further dispatch confirmation gate. Done when ready factual work is resolved or blocked and the next human decision is presented.
+
+### Small effort
+
+If the route is clear, no coarse fog remains and the whole journey fits one session, stop before branch/worktree, HLD seed or issue creation. Present the bounded outcome and ask one continuation question: standalone Grill, requested HLD/Spec, or explicitly tracked map. Wait for the choice; no automatic implementation or handoff. Many precise questions or substantial dependencies still warrant a map even with empty fog. Reuse existing deliverable authorization after the chosen continuation. Existing maps resume normally; retain their documents/worktrees rather than collapsing or deleting them.
 
 ### Automatic runs
 
@@ -280,20 +300,20 @@ Supply a loose idea to chart a map, or a map issue number or URL and an optional
 1. Read the map and persisted document/base/integration-branch/worktree/commit identities. Verify local state and pending approval identity; resume approved prototype integration, automatic Research/Challenge this integration or pending synchronization before selecting new work. Keep unapproved prototypes awaiting human review. Legacy maps lacking these fields require Session and document setup; resolve the original base before creating branches. Done when the canonical worktree/document/integration branch are recovered, not duplicated.
 2. Run Automatic runs for eligible questions without waiting for a queue request. Then choose the named human ticket or next human frontier ticket; claim it before work. Done when supporting factual gaps are resolved or explicitly blocked.
 3. Use Ticket Types for the human phase: Grill, Prototype approval, Contract Choice, or experiment judgment. Synchronize confirmed outcomes even on pause; complete Grill's closing sweep before declaring a session resolved. Done when user decisions are recorded or pending.
-4. Resolve completed tickets, append a context pointer to Decisions so far, and link newly concrete work to fog entries with blockers after Ticket approval; clear only resolved entries. Re-scope invalidated tickets; out-of-scope closures belong in Out of scope, never Decisions so far. Synchronize and rerun Automatic runs for new in-scope factual questions. Done when the next frontier reflects current evidence.
+4. Resolve completed tickets, append a context pointer to Decisions so far, and graduate newly precise fog into approved work or durable pending proposals through Fog of war; preserve criteria and blockers on its owner. Re-scope invalidated tickets; out-of-scope closures belong in Out of scope, never Decisions so far. Synchronize and rerun Automatic runs for new in-scope factual questions. Done when the next frontier reflects current evidence.
 
 Expect concurrent tracker edits. Re-read before writes and preserve other sessions' contributions.
 
 ## Completion criteria
 
-- The HLD reflects supported integrated results and confirmed sessions; partial/conflicting questions remain in root Not yet specified, while HLD Open Questions remain user-owned. Reprocessing the same result creates no duplicate rows, sections, sources, tickets or merges.
+- The HLD reflects supported integrated results and confirmed sessions; precise partial/conflicting questions remain on open tickets, pending proposals or root-owned runs; only unframeable concerns remain in root Not yet specified, while HLD Open Questions remain user-owned. Reprocessing the same result creates no duplicate rows, sections, sources, tickets or merges.
 - Verified evidence is retained locally and indexed by root/child issues; Prove/Experiment and sketch prototypes merge only after explicit approval of their current payload. Challenge this evidence integrates and updates root fog/HLD automatically, with code changes/tests isolated in an owned worktree. Contract design merges selected artifacts only after user choice. HLD contains conclusions without evidence appendices. Report its HEAD, paths, open choices and blocked integration/synchronization.
 - No automatic push, PR creation, PR merge/close or merge into the session base. Confluence publishing requires explicit `design publish-hld`; it grants no GitHub publication authority.
 - Last, re-read the destination and requested scope; map every obligation to document content, evidence or an explicit remaining blocker. Do not declare the design ready with missing coverage.
 
 ## Gotchas
 
-- Resume legacy maps by verified identity. Merge any separate unknown/risk register into Not yet specified preserving IDs/evidence/links; keep Contract design identity and Options/Choice state. Do not rewrite existing candidate history; identify legacy integrated alternatives as superseded.
-- Move unambiguously agent-owned discovery rows from legacy HLD Open Questions into root fog before removing them; preserve user presentation rows, and ask when ownership is ambiguous.
+- Resume legacy maps by verified identity. Reconcile legacy root rows and separate registers with existing tickets: transfer precise questions/risks to verified owners, preserving IDs, criteria, evidence and history before removing duplicate rows; retain coarse remainder only. Missing/ambiguous owners block affected migration, never justify dropped evidence or duplicate tickets; keep Contract design identity and Options/Choice state. Do not rewrite existing candidate history; identify legacy integrated alternatives as superseded.
+- Move unambiguously agent-owned discovery rows from legacy HLD Open Questions to their precise owner or coarse root fog before removing them; preserve user presentation rows, and ask when ownership is ambiguous.
 - Preserve prior Challenge this history. Pending verification belongs to the current issue/root; reconcile any legacy wrapper before retiring it, never create another wrapper.
 - Missing local refs/worktrees block recovery; retain candidates across Choice pauses. Never invent remote artifact links or delete the sole evidence copy. Expect concurrent edits: reread root/issue before writes and preserve others' contributions.

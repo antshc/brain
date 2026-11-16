@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Install Verify
 
 Follow this file only on explicit request in Copilot CLI. `installDir :=` the parent of this `install.md`'s absolute path. Read [references/concept.md](references/concept.md) first: it defines features, scenarios, evidence, receipts and revisions, and the rules for good checks.

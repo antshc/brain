@@ -29,7 +29,8 @@ A category is **applicable** only when inspection cites its presence in the code
 ## Workflow
 
 Copy this checklist and check off items as you complete them:
-```
+
+```text
 Define Concept Progress:
 - [ ] 1. Load recorded Concepts
 - [ ] 2. Match the described candidate, or sweep for candidates

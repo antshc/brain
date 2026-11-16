@@ -1,9 +1,9 @@
 # Wayfinder ticket types
 
-Unknowns/risks stay in root **Not yet specified** until resolved; concrete child issues track progress. One unknown may need several work items. HLD Open Questions are user-owned presentation content, never a discovery tracker.
+Root **Not yet specified** holds only concerns too vague to ticket; precise questions/risks belong to typed children even when blocked. Retain uncreated precise proposals in review drafts and pending state; preserve IDs/criteria/evidence on graduation. One unknown may need several work items. HLD Open Questions are user-owned presentation content, never a discovery tracker.
 
 | Type | Use when | Execution / completion |
-| --- | --- | --- |
+|---|---|---|
 | Research | Facts or coarse fog need clarification | AFK cited findings through Research; integrated deciding evidence resolves factual question |
 | Experiment | A falsifiable claim needs an actual check | AFK Prove generation/verification; HITL prototype approval before integration/closure; inconclusive stays open/blocked |
 | Grilling | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep |
@@ -18,7 +18,7 @@ Challenge this is supporting verification inside an existing issue or root-owned
 - Default human decisions → Grilling. Helpers clarify supporting facts automatically; no agent speaks for the user.
 - Create tickets only after user approval of the proposed batch; approval precedes any Research or evidence dispatch for them.
 - Wayfinder runs every helper (Research, Prove, Challenge this, Deep Module, Code Sketch, Grill) in its own session; no wrapper subagent. Each helper spawns its own workers by default; Research spawns its own route agents. Use the Git skill for worktrees where isolation is needed.
-- Reassess root fog after every result/answer; retain partially resolved risks and blocked choices. Supported resolution moves to Decisions so far before removing active fog; reopening preserves stable ID.
+- Reassess ownership after every result/answer: only unframeable concerns remain in root fog; precise partial risks and blocked choices stay on their owning tickets/proposals/runs. Transfer IDs, criteria and evidence before removing graduated fog; resolutions are indexed in Decisions so far. Reopening preserves the owning question and stable ID.
 - A completed helper run does not by itself resolve its parent unknown or imply verified mitigation. No counterexample found establishes only tested coverage.
 
 ## Artifact lifecycle

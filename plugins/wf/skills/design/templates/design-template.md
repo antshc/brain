@@ -189,7 +189,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <details>
 <summary>Open Questions</summary>
 
-<!-- User-owned presentation questions. Leave empty on creation; preserve user entries verbatim on updates, including unanswered cells. Store agent unknowns/risks in Wayfinder root Not yet specified, never here. -->
+<!-- User-owned presentation questions. Leave empty on creation; preserve user entries verbatim on updates, including unanswered cells. Store precise agent questions/risks on owning tickets/proposals; only concerns too vague to ticket belong in root Not yet specified, never here. -->
 
 | **Question** | **Answer** |
 | --- | --- |
@@ -301,6 +301,6 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <!-- Record each consumed source once. Use a repository-relative path or canonical issue URL. Update the matching row when reprocessing a source. Do not infer provenance for legacy content. -->
 
 | **Source** | **Kind** | **Contribution** |
-| --- | --- | --- |
-| {{canonicalSource}} | {{sourceKind|Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
+|---|---|---|
+| {{canonicalSource}} | {{sourceKind \| Spec / GitHub issue / Wayfinder map / Wayfinder decision / Wayfinder evidence / Grill conversation}} | {{consumedEvidence}} |
 <!-- adf:ignore:end -->

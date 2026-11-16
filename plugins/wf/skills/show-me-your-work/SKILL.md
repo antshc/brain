@@ -26,10 +26,10 @@ One TSV file, one row per decision. Cells single-line. Evidence is a pointer, no
 | `evidence` | commit SHA, PR/issue number, `file:line`, artifact/trace/screenshot path; never a paragraph |
 | `result` | outcome or predicate state: `tests green`, `reverted`, `INCONCLUSIVE`, `open` |
 
-```
-ts	phase	decision	why	evidence	result
-2026-05-24T09:02:00Z	frame	counted the work first, about 100 components	wanted the size before a long run	commit 3a9f1c2	found 5 blockers to sort first
-2026-05-24T12:30:00Z	widget	threw out a helper's work because its screenshots were blank	checked the real files instead of trusting its summary	worktree reset	reverted, tightened the brief
+```text
+ts phase decision why evidence result
+2026-05-24T09:02:00Z frame counted the work first, about 100 components wanted the size before a long run commit 3a9f1c2 found 5 blockers to sort first
+2026-05-24T12:30:00Z widget threw out a helper's work because its screenshots were blank checked the real files instead of trusting its summary worktree reset reverted, tightened the brief
 ```
 
 ## Location

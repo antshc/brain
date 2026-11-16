@@ -16,14 +16,13 @@ description: Mixed-identity manager chains, direct reports, reporting peers, and
 Keep the IDs, site, and time window that a command returns, and reuse them. Replace placeholders
 with returned values. Check focused `twg help describe "<command>"` for availability.
 
-
 ## Routes
 
 1P = Atlassian identity, not employment class or workstream;
 3P = `IdentityThirdPartyUser` ARI.
 
 | Intent | Command / selector | Handoff or boundary |
-| --- | --- | --- |
+|---|---|---|
 | Immediate manager | `user manager --identifier` | 1P requester; manager may be 1P or 3P |
 | 1P direct reports, one level | `user direct-reports --account-id` or `people describe '<aaid>' --direct-reports` | No 3P gate needed; check facet status |
 | 1P reporting subtree, all levels | `org-tree --account-id --down-only --depth` | One tree query, not recursive direct-report calls; disclose depth/coverage limits |
@@ -64,13 +63,13 @@ twg work query --scope user --identifier '<manager-identifier>' --activity all -
 ```
 
 | Manager response | Downstream `--identifier` |
-| --- | --- |
+|---|---|
 | `data.managerIdentifier.ari` present | That exact 3P ARI, even if `data.manager` is null |
 | Otherwise `data.manager.accountId` present | That 1P AAID |
 | Neither present in a successful response | No manager returned; stop this handoff |
 
 | Returned evidence | Say | Do not infer |
-| --- | --- | --- |
+|---|---|---|
 | Null profile, manager identifier present | “No 1P profile returned”; query the identity | No 1P account exists; identity unqueryable |
 | Document relationship + update date | “Document updated; personal activity date unknown” | Personal activity date, authorship, impact |
 
@@ -152,7 +151,7 @@ twg docs query --actor-identifier '<actor-ari-1>' --actor-identifier '<actor-ari
 (`--first`) and partial scans include `data.pageInfo`; complete automatic scans omit it.
 
 | Evidence | Action |
-| --- | --- |
+|---|---|
 | Exit 3 / `meta.partial` / `meta.failures` | Keep usable data; disclose failed/uncovered sections and people |
 | Policy/organization denial | Stop that route; neither empty evidence nor proof the identity gate is off; no unchanged retry or automatic relogin |
 | Docs automatic scan: exit 0, no partial/truncation signal, no `data.pageInfo` | Requested scan complete; do not rescan merely to obtain pagination metadata |
@@ -184,7 +183,7 @@ twg collaborators --account-id '<verified-aaid>' --limit 10 --site '<site>' -o j
 ```
 
 | 3P context contract | Returned value |
-| --- | --- |
+|---|---|
 | Relationships | `user_member_of_conversation` → `ExternalConversation`; `user_mentioned_in_message` → `ExternalMessage` |
 | Subject | `data.object.ari` preserves input; type `IdentityThirdPartyUser`; no alias expansion |
 | Summary | `data.relationshipSummary[]`: `relationshipName`, `count`, `targets[]` |

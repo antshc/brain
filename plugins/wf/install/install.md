@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Install WF
 
 Follow this file only on explicit request in Copilot CLI. Resolve the target with `git rev-parse --show-toplevel` and assets from this file's absolute path. Stop if the target is outside a Git repository.
@@ -24,10 +27,12 @@ Check that `architecture-records` and `github` are available before writing targ
 
 - **Single repo** → copilot instructions in `.github/copilot-instructions.md`. No `workspace/` split.
 - **Wrapping repo** → first follow [the Ralph installer](../../ralph/install/install.md) with the same explicit harness root. If the Brain `plugins/` source directory is unavailable to the session, ask the user to allow it with `/add-dir`. Stop on failed Ralph installation. Then put copilot instructions in the reporoot's `.github/copilot-instructions.md`. If `workspace/` isn't set up or git-ignored:
+
   ```bash
   echo "workspace/" >> .gitignore
   git status --short   # confirm the harness ignores the nested source
   ```
+
   Resolve `{{codeRepoName}}`/`{{codeRepoSlug}}` from the nested repo (e.g. `git -C workspace/{{codeRepoName}} remote get-url origin`).
 
 - **Both** → git worktrees live in `.worktrees/<repo-name>/<name>` at the reporoot. `git check-ignore -q .worktrees/` fails → `echo "/.worktrees/" >> .gitignore`.

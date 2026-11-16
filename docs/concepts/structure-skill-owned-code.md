@@ -29,7 +29,7 @@ Placement follows the number of consumers, not the size of the code:
 | several skills, one plugin | the one skill that owns the capability; siblings invoke it | none |
 | more than one plugin | `tools/src/modules/<module>/`, tests under `tools/tests/` | pre-commit mapping per destination |
 
-Cross-skill invocation uses the call style owned by [0010](0010-skill-composition.md) — run `` `/{{skillName}}` `` **{{ActionName}}** —
+Cross-skill invocation uses the call style owned by [Skill composition](structure-skill-composition.md) — run `` `/{{skillName}}` `` **{{ActionName}}** —
 so the owning skill's documented actions stay the interface and its internals stay private.
 
 A capability with two directions — a conversion to and from some format, an encode paired with a decode — counts

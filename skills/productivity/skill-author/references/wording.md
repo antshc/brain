@@ -24,12 +24,12 @@ State desired behavior ("write one-line comments"). Keep prohibitions only for h
 
 ## Leading words
 
-Use familiar **leading words** (_lesson_, _tracer bullets_, _red_) to anchor behavior. Repeat the word, not its explanation.
+Use familiar **leading words** (*lesson*, *tracer bullets*, *red*) to anchor behavior. Repeat the word, not its explanation.
 
-- Collapse restatements: a triad spelled out at several sites, or a sentence gesturing at one idea → one word. "fast, deterministic, low-overhead" → _tight_ loop; "a loop you believe in" → _red_ (binary observable state).
+- Collapse restatements: a triad spelled out at several sites, or a sentence gesturing at one idea → one word. "fast, deterministic, low-overhead" → *tight* loop; "a loop you believe in" → *red* (binary observable state).
 - Prefer existing words; coined words need definitions.
 - Reuse leading words across descriptions, bodies, prompts, and docs.
-- A word too weak to beat the default (_be thorough_) is a no-op; use a stronger word (_relentless_).
+- A word too weak to beat the default (*be thorough*) is a no-op; use a stronger word (*relentless*).
 
 ## Precision patterns
 

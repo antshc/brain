@@ -15,7 +15,7 @@ The key principle is to separate:
 ## How the PM-Focused Sections Evolve
 
 | arc42 section | How it evolves over time |
-| --- | --- |
+|---|---|
 | **1. Introduction & Goals** | Business goals, ownership, and stakeholders change. Keep current goals and stakeholders in the main document. Preserve major historical shifts through linked decisions or dated notes. |
 | **2. Constraints** | Constraints change with platforms, compliance, budget, organization, and technology policy. Mark important constraints as current, retired, or superseded instead of silently replacing them. |
 | **3. Context & Scope** | System boundaries and dependencies change continuously. Keep the current system context accurate and track ownership and lifecycle for important dependencies. |
@@ -45,11 +45,11 @@ The key principle is to separate:
 
 ### Example
 
-**Current goal**
+**Current goal:**
 
 > Support all customer-facing transactional notifications through one shared platform.
 
-**Historical change**
+**Historical change:**
 
 > 2024: Scope expanded from email-only delivery to email and SMS. See ADR-027.
 
@@ -82,7 +82,7 @@ Use one of:
 ### Example
 
 | Constraint | Status | Notes |
-| --- | --- | --- |
+|---|---|---|
 | Workloads must run on Kubernetes | Current | Corporate platform standard |
 | .NET 8 required | Retiring | Migration to .NET 10 planned |
 | On-prem deployment required | Superseded | Replaced by cloud-first policy in 2025 |
@@ -100,7 +100,7 @@ Track important dependencies with ownership and lifecycle.
 ### Recommended dependency fields
 
 | Field | Purpose |
-| --- | --- |
+|---|---|
 | Dependency | External system, provider, platform, or team |
 | Relationship | Why the system depends on it |
 | Owner | Responsible team or organization |
@@ -110,7 +110,7 @@ Track important dependencies with ownership and lifecycle.
 ### Example
 
 | Dependency | Relationship | Owner | Status | Delivery concern |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | Kafka | Notification job transport | Platform team | Current | Capacity |
 | RabbitMQ | Legacy job transport | Messaging team | Deprecated | Remove after final migration |
 | SendGrid | Email delivery | External vendor | Current | Rate limits |
@@ -137,15 +137,15 @@ Do not turn the main solution strategy into a chronological history.
 
 ### Example
 
-**Current**
+**Current:**
 
 > Notification delivery uses an asynchronous Kafka-based pipeline with provider adapters.
 
-**History**
+**History:**
 
 > RabbitMQ was replaced by Kafka during the 2024 scaling initiative. See ADR-041.
 
-**Future**
+**Future:**
 
 > Migration to managed Kafka is planned as part of the 2027 platform modernization roadmap.
 
@@ -169,10 +169,10 @@ Recommended states:
 
 ### Example
 
-**ADR-014 — Use RabbitMQ for notification jobs**  
+**ADR-014 — Use RabbitMQ for notification jobs:**
 Status: **Superseded by ADR-041**
 
-**ADR-041 — Use Kafka for notification jobs**  
+**ADR-041 — Use Kafka for notification jobs:**
 Status: **Accepted**
 
 This preserves causal history without polluting the current architecture description.
@@ -209,7 +209,7 @@ They often evolve as:
 ### Example
 
 | Period | Availability target | Throughput target |
-| --- | --- | --- |
+|---|---|---|
 | 2023 pilot | 99.5% | 500k/day |
 | 2025 production | 99.9% | 5M/day |
 | Current | 99.95% | 20M/day |
@@ -253,7 +253,7 @@ Each significant debt item should include:
 ### Example
 
 | Debt | Why accepted | Impact | Trigger |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Single email provider | Faster initial delivery | Provider outage affects all email | Add second provider when availability SLA exceeds 99.95% |
 | Manual failed-message replay | Low current support volume | Operational effort | Automate when failures exceed 100/week |
 
@@ -280,7 +280,7 @@ Use it for planned architectural changes such as:
 ### Example
 
 | Horizon | Planned evolution | Driver | Dependency |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Q1 2027 | Move to managed Kafka | Reduce operational overhead | Platform team |
 | Q2 2027 | Remove RabbitMQ compatibility layer | Complete migration | Final legacy client migration |
 | H2 2027 | Add provider failover | Higher availability target | Procurement + engineering |
@@ -336,13 +336,13 @@ This creates three clean views:
 
 When updating long-term architecture documentation, ask:
 
-1. **Is this true now?**  
+1. **Is this true now?**
    Keep it in the main arc42 documentation.
 
-2. **Was this important in explaining how we got here?**  
+2. **Was this important in explaining how we got here?**
    Preserve it in an ADR, migration record, or historical note.
 
-3. **Is this planned but not yet true?**  
+3. **Is this planned but not yet true?**
    Put it in the evolution roadmap.
 
 This keeps multi-year documentation useful without mixing obsolete, current, and planned architecture into the same view.

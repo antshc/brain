@@ -264,6 +264,7 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
 
 def test_template_parity_except_intentional_artifact_section():
     standalone = (REPO / 'plugins/wf/skills/design/references/issue-template.md').read_text()
+    standalone = standalone[standalone.index('<issue-template>'):]
     embedded = BREAKDOWN[BREAKDOWN.index('<issue-template>'):]
     artifact_section = re.compile(r'^## Related Spec Artifacts\n.*?(?=^## )', re.M | re.S)
     embedded_core, embedded_sections = artifact_section.subn('', embedded)

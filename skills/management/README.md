@@ -1,12 +1,13 @@
 ## Install
+
 ### Meeting management
-```
+
+```text
 gh skill install ericgandrade/claude-superskills audio-transcriber --agent github-copilot --scope user -f 
 ```
 
-
 | PM flow                           | Real skill/plugin           | Repository                           | Sources / inputs used                                                                                                          | Output                                                                                                                                                                                           |
-| --------------------------------- | --------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|---------------------------------|---------------------------|------------------------------------|------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Project initiation**            | `stakeholder-map`           | `phuryn/pm-skills`                   | Project brief, stakeholder names, org/team information, known responsibilities                                                 | Stakeholder map, influence/interest matrix, engagement/communication recommendations                                                                                                             |
 |                                   | `doc-coauthoring`           | `anthropics/skills`                  | User context, existing project docs, notes, requirements, proposals, decision material                                         | Project charter, project brief, governance doc, kickoff document. The skill explicitly supports structured documentation and decision/spec documents. ([GitHub][1])                              |
 |                                   | `googlecalendar-automation` | `ComposioHQ/awesome-claude-skills`   | Live **Google Calendar** through Rube MCP                                                                                      | Kickoff meeting, recurring status meetings, steering meetings, updated events. ([GitHub][2])                                                                                                     |
@@ -54,5 +55,3 @@ gh skill install ericgandrade/claude-superskills audio-transcriber --agent githu
 [15]: https://github.com/davepoon/buildwithclaude/blob/main/plugins/all-skills/skills/gmail-automation/SKILL.md?utm_source=chatgpt.com "buildwithclaude/plugins/all-skills/skills/gmail-automation/SKILL.md at main · davepoon/buildwithclaude · GitHub"
 [16]: https://github.com/davepoon/buildwithclaude/blob/main/plugins/all-skills/skills/google-drive-automation/SKILL.md?utm_source=chatgpt.com "buildwithclaude/plugins/all-skills/skills/google-drive-automation/SKILL.md at main · davepoon/buildwithclaude · GitHub"
 [17]: https://github.com/ericgandrade/claude-superskills/blob/main/skills/audio-transcriber/SKILL.md "claude-superskills/skills/audio-transcriber/SKILL.md at main · ericgandrade/claude-superskills · GitHub"
-
-

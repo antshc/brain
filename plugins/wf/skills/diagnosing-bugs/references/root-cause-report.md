@@ -7,6 +7,7 @@ Render and print one root-cause summary. Drafting is transcription: add no new f
 Resolve `logPath` per the [Hypothesis log](hypothesis-log.md), or use the log path a caller provides.
 
 Use:
+
 - checked hypotheses from the log;
 - current-run evidence for mechanism-chain facts not represented as hypotheses;
 - analysis inputs (images, log archives, logs, HAR, dumps) with what each contributed.

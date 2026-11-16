@@ -6,7 +6,7 @@ Every step carries a hierarchical number in its label — main path `1 - …`, `
 
 ## Flowchart Example
 
-**Prompt**
+**Prompt:**
 
 > Draw the order-processing flow. Show request input, validation, payment as a subprocess, order persistence, confirmation output, and explicit start/end.
 
@@ -33,11 +33,12 @@ flowchart TD
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Subprocess Detail Example
 
-**Prompt**
+**Prompt:**
 
 > Expand the `Process payment` subprocess from the order-processing flow. Show payment input, authorization, approval decision, persistence, output, and explicit start/end.
 
@@ -63,11 +64,12 @@ flowchart TD
 
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Flowchart Delta Example
 
-**Prompt**
+**Prompt:**
 
 > Show the order-processing delta where fraud checking is added before payment and the legacy order queue is removed. Include only changed behavior plus minimum context.
 
@@ -90,11 +92,12 @@ flowchart TD
     classDef added stroke:#4a7a5a,stroke-width:1px
     classDef removed stroke:#8a4a4a,stroke-width:1px
 ```
+
 </details>
 
 ## Swimlane Diagram Example
 
-**Prompt**
+**Prompt:**
 
 > Draw the order-fulfillment responsibility flow across Customer, Order Service, and Order Database. Show input/output, validation decision, payment subprocess, persistence, and start/end.
 
@@ -131,11 +134,12 @@ swimlane-beta TB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Swimlane Internal Responsibility Example
 
-**Prompt**
+**Prompt:**
 
 > Draw the internal order-processing responsibility flow across OrderController, OrderService, and OrderRepository. Show request input, validation, persistence, response output, and start/end.
 
@@ -172,11 +176,12 @@ swimlane-beta TB
 
   classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
+
 </details>
 
 ## Swimlane Diagram Delta Example
 
-**Prompt**
+**Prompt:**
 
 > Show the order-fulfillment responsibility delta: add fraud validation before persistence and remove the legacy queue handoff. Include only changed behavior plus minimum context.
 
@@ -214,14 +219,15 @@ swimlane-beta TB
   class notifyLegacy removed
 ```
 
-**Behaviour changes**
+**Behaviour changes:**
+
 - `-` The entire "Legacy Order Queue" lane is being removed; Mermaid's `subgraph` has no supported border-color hook, so the removal is called out here in prose.
 
 </details>
 
 ## Sequence Diagram Example
 
-**Prompt**
+**Prompt:**
 
 > Draw the order-submission sequence between User, OrderController, OrderService, repository, and export job. Include activation, validation branching, returns, and the persistence note.
 
@@ -267,11 +273,12 @@ sequenceDiagram
 
     note over Svc,Repo: persistence is transactional
 ```
+
 </details>
 
 ## Sequence Diagram Delta Example
 
-**Prompt**
+**Prompt:**
 
 > Show the order-submission sequence delta where OrderService calls FraudCheckService before persistence and no longer notifies LegacyOrderQueue. Include only enough unchanged interaction for context.
 
@@ -310,4 +317,5 @@ sequenceDiagram
 
     note over Svc,Legacy: REMOVED: OrderService no longer notifies LegacyOrderQueue
 ```
+
 </details>

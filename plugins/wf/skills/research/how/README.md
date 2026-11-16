@@ -28,15 +28,15 @@ Research selects depth from the question. An explicit inspection requests full c
 
 Use the Behavior axis for implementation behavior inside one deployable.
 
-**Focused call chain**
+**Focused call chain:**
 
 > Inspect how `OrderApi` submits an order. Start at `POST /orders` and stop when the API returns a response or schedules downstream work. Explain validation, payment-provider selection, persistence, failure branches, and which concrete implementations serve the calls. Document the current as-built behavior with filename-only file links followed by visible line numbers.
 
-**Configuration decision**
+**Configuration decision:**
 
 > Inspect how the billing worker chooses a payment provider. Start where the worker reads the provider configuration and stop at the selected provider call or terminal failure. Cover missing configuration, feature flags, fallback behavior, and test doubles. Determine which provider production configuration selects.
 
-**Weak instruction**
+**Weak instruction:**
 
 > Inspect order processing.
 
@@ -46,11 +46,11 @@ This leaves the entry point, outcome, deployable, and deciding question undefine
 
 Use the Flow axis when the behavior crosses independently runnable or deployed processes.
 
-**End-to-end message path**
+**End-to-end message path:**
 
 > Inspect the deployable chain for an accepted order. Start when `OrderApi` publishes `OrderAccepted` and stop when every outcome-relevant branch reaches a system whose source is unavailable or outside the order-confirmation outcome. For each boundary, identify the emitted contract, receiving trigger, transport binding, retries, and terminal failures. Include all deployables whose executing source is available.
 
-**Known starting contract**
+**Known starting contract:**
 
 > Inspect what handles the `customer.deleted.v2` event after `CustomerService` emits it. Trace every in-repo deployable that receives or forwards the event, including dead-letter and retry paths, and stop at external systems. Settle whether deletion of analytics and notification data is synchronous, asynchronous, or absent.
 
@@ -58,11 +58,11 @@ Use the Flow axis when the behavior crosses independently runnable or deployed p
 
 Use the Data axis when the answer turns on one item type and its store.
 
-**Ownership and consistency**
+**Ownership and consistency:**
 
 > Inspect the `Session` item and its production store. Determine the key design, authoritative writer, readers, serialization shape, consistency guarantees, concurrent-write behavior, expiry, and deletion path. Distinguish production configuration from local emulators and identify any claim that requires a runtime check.
 
-**Migration safety**
+**Migration safety:**
 
 > Inspect how `Order.status` is stored and migrated. Identify every writer and reader, the serialized values, backward-compatibility handling, migration or backfill behavior, and what happens when old and new application versions run concurrently. Settle whether adding a new status is safe during a rolling deployment.
 

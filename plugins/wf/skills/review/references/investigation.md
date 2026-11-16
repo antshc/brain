@@ -18,7 +18,7 @@ Omit `agentName` when the issue turns on an external fact — a package's real A
 
 ## Prompt template
 
-```
+```text
 Read-only investigation. Gather evidence and report; leave every file unchanged.
 
 ISSUE: {{issueStatement}}

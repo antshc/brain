@@ -51,6 +51,7 @@ Exits non-zero naming the cause on: missing `cloudId`/`email`/`apiToken`; missin
 Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); override with `--assets-dir`, `--out`.
 
 Stdout JSON:
+
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published.
 - Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId`, `unknownCommentIds`, `partialCommentRemovals` `[{id,before,after}]`, `commentGuard` (`failed (<category>)`, `notice failed (<category>)`).
 

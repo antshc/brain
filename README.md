@@ -112,7 +112,7 @@ gh skill install JetBrains/skills slides --agent github-copilot --scope user -f
 
 ### mattpocock skills (external)
 
-**Productivity**
+**Productivity:**
 
 ```sh
 gh skill install mattpocock/skills skills/productivity/writing-great-skills --agent github-copilot --scope user -f && \
@@ -122,7 +122,7 @@ gh skill install mattpocock/skills skills/productivity/teach --agent github-copi
 gh skill install github/awesome-copilot skills/mini-context-graph --agent universal --scope user -f
 ```
 
-**Engineering**
+**Engineering:**
 
 ```sh
 gh skill install mattpocock/skills skills/engineering/codebase-design --agent github-copilot --scope user -f
@@ -156,7 +156,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [suggest](plugins/wf/skills/suggest/SKILL.md): propose improvements, options, or ideas with reasoning; never apply without approval.
 - [prove](plugins/wf/skills/prove/SKILL.md): confirm or refute one or more technical claims with reproducible evidence, one parallel prover worker per claim.
 - [challenge-this](plugins/wf/skills/challenge-this/SKILL.md): try to break a change or design; report problems shown by a run.
-- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and save cited findings to the session workspace; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template. Define charts or resumes a research map via `/research define <prompt-or-map-path>`. Evidence routes are Explore, How, Why, Cloud, and Web; each route spawns its own prompt-file agents (`hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`); Explore returns inline lookup verdicts. Reports save to the session workspace with links, or to a location the request names.
+- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and save cited findings to the session workspace; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template. Wayfinder charts or resumes a research map via `/research wayfinder <prompt-or-map-path>`. Evidence routes are Explore, How, Why, Cloud, and Web; each route spawns its own prompt-file agents (`hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`); Explore returns inline lookup verdicts. Reports save to the session workspace with links, or to a location the request names.
 - [subagents](plugins/wf/skills/subagents/SKILL.md): select the model and effort for named subagent roles and ordered panels; run Arena candidate comparisons.
 - [architecture-records](plugins/wf/skills/architecture-records/SKILL.md): define Concepts through evidence and questioning; diagnose documentation drift with `doctor`; record settled ADRs, Concepts, Deployables, topology, and glossary terms; render bodies or bullets without saving; initialize missing docs and load, match, or sync architecture indexes. Select a route; index requests also select an action.
 - [review](plugins/wf/skills/review/SKILL.md): use `code` for PR findings, `comments` for existing threads, `blast-radius` for downstream risk, `tests-gap` for regression coverage, `architecture` for drift, or `hitl` for human-led PR review.
@@ -191,7 +191,6 @@ AFK PR review and autonomous development loop.
 - [ralph-build](plugins/ralph/skills/ralph-build/SKILL.md): build the project in a worktree before implementation.
 - [Ralph installer](plugins/ralph/install/install.md): copy the `harness` skill from template into `.github/skills/harness/`, ensure its settings file exists, and install its pull command.
 
-
 ### ms
 
 Microsoft documentation, SDK reference, Azure CLI setup, authentication, and resource operation skills.
@@ -205,8 +204,7 @@ Microsoft documentation, SDK reference, Azure CLI setup, authentication, and res
 
 AWS documentation and SDK reference skills.
 
-- [search-aws-docs](plugins/aws/skills/search-aws-docs/SKILL.md): understand AWS services and find API references from official docs.
-- [search-aws-sdk-nuget](plugins/aws/skills/search-aws-sdk-nuget/SKILL.md): AWS SDK for .NET NuGet package contract coverage — versions, APIs, signatures, upgrade guidance.
+- [AWS research](plugins/wf/skills/research/cloud/aws.md): AWS service documentation and SDK for .NET package contracts.
 
 ### verify
 
@@ -229,7 +227,9 @@ General-purpose skills not tied to a specific platform.
 - [render-mermaid-png](skills/engineering/render-mermaid-png/SKILL.md): render Mermaid diagrams as high-resolution PNGs.
 - [suggest-graphify-improvements](skills/engineering/suggest-graphify-improvements/SKILL.md): audit a Graphify knowledge graph and suggest evidence-backed improvements.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
-- [sync-skill](skills/engineering/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
+- [sync-skill](skills/productivity/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
 - [daily-briefing](skills/engineering/daily-briefing/SKILL.md): report your blocked Jira items and unanswered or answered @mentions; read-only. Requires the `atlassian` skill and its installer-generated `preflight-atlassian` skill.
 - [factory-mode](plugins/wf/install/assets/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by the WF installer and customized by its users.
+
+Research Wayfinder tracks unknowns and risks in a GitHub map with explicitly approved sub-issues. It maintains `docs/ongoing/<slug>-research.md` on `wayfinder/<slug>`, gathers reports in owned `research/<slug>` worktrees, and retains experiments in `prove/<slug>` until exact-payload approval. Evidence routes retain their standalone delivery defaults. Results and the Bottom line update incrementally; no automatic push, PR, base merge or Confluence publication.

@@ -41,7 +41,7 @@ Treat the description as the automatic **routing interface**: short, concrete, e
 - Capability: imperative verb first, one observable outcome; triggers in words users type.
 - Exclusion or redirect names the nearest sibling's territory; prefer a redirect when a sibling owns it.
 - Reject vague, overlapping text: "expert developer", "general-purpose coding assistant", "helps with software engineering".
-- YAML-safe: quote the value or use a folded block scalar (`description: >-`) when it contains `: `, ` #`, backticks, or a leading YAML indicator.
+- YAML-safe: quote the value or use a folded block scalar (`description: >-`) when it contains `:`, `#`, backticks, or a leading YAML indicator.
 
 | Role | Example description |
 |---|---|

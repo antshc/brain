@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # Tickets
 
 Turn one Spec into user-approved, self-contained implementation tickets linked to that Spec.
@@ -89,7 +92,6 @@ Present a numbered list; per task show:
 - **Functional Requirements covered**: spec requirement numbers addressed (full verbatim text is copied into each ticket in step 5)
 
 Then print the blocker graph as a table `Slice | Blocked by` with one row per slice, using `none` for roots; list the initial ready frontier, anticipated write conflicts (with shared paths), uncovered requirements, and source conflicts.
-
 
 Ask in ordinary conversation; **MUST NOT** use question/input tools:
 

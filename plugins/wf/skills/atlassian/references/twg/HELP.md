@@ -181,7 +181,7 @@ twg -o text help describe "jira workitem query"
 ## Common Discovery Patterns
 
 | Need                                         | Discovery path                                                                                                                                                                                      |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Detailed product or workflow guidance        | `twg help discover-skills "<intent>"`, optionally scoped with `--skill`, then load the returned skill and reference                                                                                 |
 | Person lookup                                | `twg help user search`, then use positional name, `--name`, or `--email`                                                                                                                            |
 | Jira workitem detail or JQL                  | `twg help describe "jira workitem"`, then inspect the chosen exact command                                                                                                                          |

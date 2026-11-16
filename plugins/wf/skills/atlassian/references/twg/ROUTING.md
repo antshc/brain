@@ -51,7 +51,7 @@ with the **Fetch page** tactic.
 ## Product Boundaries
 
 | Product          | Use it for                                                                                                                  |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+|----------------|---------------------------------------------------------------------------------------------------------------------------|
 | Jira             | Workitems, issue fields, comments, links, transitions, boards, sprints, filters, dashboards, and Jira project configuration |
 | JSM              | Requests, portals, queues, request types, approvals, SLAs, services, incidents, and service-management workflows            |
 | Confluence       | Content bodies, comments, hierarchy, spaces, versions, permissions, tasks, labels, and exports                              |

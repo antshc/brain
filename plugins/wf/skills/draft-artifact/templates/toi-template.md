@@ -1,3 +1,6 @@
+<!-- Prompt XML and literal placeholders are intentional. -->
+<!-- markdownlint-disable MD033 -->
+
 # TOI: `<Feature / Topic Name>`
 
 > **Transfer of Information (TOI)** — engineering hands a new product, feature, or topic to technical teams (Support, QA, Docs, Training, Field).
@@ -5,7 +8,7 @@
 > Write for readers who did **not** build the feature. Remove all `<…>` hints and unused sections before publishing.
 
 | Field | Value |
-| --- | --- |
+|---|---|
 | Feature / topic | `<name>` |
 | Product / component | `<e.g. Storefront, Checkout service, Admin portal>` |
 | Version / release | `<first version containing the feature>` |
@@ -36,7 +39,7 @@
 ### Permissions / roles
 
 | Account / scope | Permission | Purpose |
-| --- | --- | --- |
+|---|---|---|
 | `<account / tenant / role>` | `<permission>` | `<why needed>` |
 
 ### Other requirements
@@ -108,37 +111,37 @@ Try it in Swagger UI: `<host>/<swagger UI route>#/<tag>/<operationId>`
 
 <!-- @: Microsoft REST reference style; one row per field in the bodies below; delete a table with no rows; nested object → `parent.child` row -->
 
-**URI parameters**
+**URI parameters:**
 
 | Name | In | Required | Type | Default | Possible values | Description |
-| --- | --- | --- | --- | --- | --- | --- |
+|---|---|---|---|---|---|---|
 | `<name>` | `<path / query>` | `<yes / no>` | `<string / integer / boolean / enum / date-time>` | `<real default or —>` | `<enum values / range / —>` | `<what the parameter controls>` |
 
-**Request body**
+**Request body:**
 
 ```json
 <required fields + scenario fields only>
 ```
 
 | Name | Required | Type | Default | Possible values | Description |
-| --- | --- | --- | --- | --- | --- |
+|---|---|---|---|---|---|
 | `<field>` | `<yes / no>` | `<type>` | `<real default or —>` | `<enum values / range / —>` | `<what the field controls>` |
 
-**Responses**
+**Responses:**
 
 | Status code | Type | Description |
-| --- | --- | --- |
+|---|---|---|
 | `<200 OK>` | `<response type>` | `<when it is returned>` |
 | `<4xx / 5xx>` | `<error type>` | `<cause>` |
 
-**Response `<status code>`**
+**Response `<status code>`:**
 
 ```json
 <fields the scenario reads only>
 ```
 
 | Name | Type | Possible values | Description |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `<field>` | `<type>` | `<enum values / range / —>` | `<what the field reports>` |
 
 </details>
@@ -166,7 +169,7 @@ Try it in Swagger UI: `<host>/<swagger UI route>#/<tag>/<operationId>`
 ```
 
 | File / folder | Contains |
-| --- | --- |
+|---|---|
 | `<file>` | `<what the file holds and when it appears>` |
 
 ### Components and data
@@ -174,7 +177,7 @@ Try it in Swagger UI: `<host>/<swagger UI route>#/<tag>/<operationId>`
 <Key components, resources, tables, files, mount paths, naming conventions, directory structure.>
 
 | Property / item | Description |
-| --- | --- |
+|---|---|
 | `<name>` | `<value / meaning>` |
 
 ### Normal path vs. fallback
@@ -207,7 +210,7 @@ Try it in Swagger UI: `<host>/<swagger UI route>#/<tag>/<operationId>`
 <!-- @: real key and real default from the source configuration read call; never a placeholder or paraphrase -->
 
 | Tweak key | Default | Supported values | Restart needed | Description / impact |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | `<TWEAK_KEY>` | `<real default>` | `<values>` | `<yes / no>` | `<meaning, side effects>` |
 
 ## Tips & tricks

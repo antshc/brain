@@ -32,15 +32,15 @@ Read-only research of the live account. Check `command -v aws`; absent → UNKNO
 3. **Discover** — `aws <service> help` or `aws <service> <command> help` for unfamiliar commands or flags.
 4. **Read** — only `describe-*`, `list-*`, `get-*`, plus:
 
-| Need | Command |
-|---|---|
-| Applied quota | `aws service-quotas get-service-quota --service-code <code> --quota-code <code>` |
-| Default quota | `aws service-quotas get-aws-default-service-quota --service-code <code> --quota-code <code>` |
-| Quota codes | `aws service-quotas list-service-quotas --service-code <code>` |
-| Service codes | `aws service-quotas list-services` |
-| Effective permissions | `aws iam simulate-principal-policy --policy-source-arn <arn> --action-names <action> [--resource-arns <arn>]` |
-| Resource state | `aws <service> describe-*` / `list-*` / `get-*` |
-| Request validation | `--dry-run` on EC2 calls that support it |
+   | Need | Command |
+   |---|---|
+   | Applied quota | `aws service-quotas get-service-quota --service-code <code> --quota-code <code>` |
+   | Default quota | `aws service-quotas get-aws-default-service-quota --service-code <code> --quota-code <code>` |
+   | Quota codes | `aws service-quotas list-service-quotas --service-code <code>` |
+   | Service codes | `aws service-quotas list-services` |
+   | Effective permissions | `aws iam simulate-principal-policy --policy-source-arn <arn> --action-names <action> [--resource-arns <arn>]` |
+   | Resource state | `aws <service> describe-*` / `list-*` / `get-*` |
+   | Request validation | `--dry-run` on EC2 calls that support it |
 
 5. **Shape output** — `--output json --query '<JMESPath>'` to extract the cited field.
 

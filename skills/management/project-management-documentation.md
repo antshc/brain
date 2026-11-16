@@ -3,7 +3,7 @@
 A practical set of project-management documents that complements architecture documentation such as arc42.
 
 | Document | Purpose |
-| --- | --- |
+|---|---|
 | **Project Charter / Project Brief** | Why the project exists, objectives, scope, sponsor, and success criteria. |
 | **Roadmap / Milestone Plan** | Major phases, releases, target dates, dependencies, and sequencing. |
 | **RAID Log** | Tracks risks, assumptions, issues, and dependencies. |

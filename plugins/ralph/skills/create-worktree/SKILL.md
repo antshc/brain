@@ -39,15 +39,19 @@ git merge origin/<target-branch>
 If the merge exits non-zero (conflicts detected):
 
 1. Collect the list of conflicting files:
+
    ```bash
    git diff --name-only --diff-filter=U
    ```
+
 2. Resolve each conflict directly in the current context, preserving the intent of both sides.
 3. After resolving the conflicts:
+
    ```bash
    git add .
    git merge --continue --no-edit
    ```
+
 4. If the merge still fails, **exit** and report the unresolved files as blockers.
 
 ## 1. Check current branch
@@ -82,9 +86,11 @@ git worktree add -b <feature-branch> "$repo_root.worktrees/<feature-branch>" "$b
 Preferring an existing `origin/<feature-branch>` preserves commits from a prior run on the same branch; falling back to `origin/<target-branch>` is the fresh-branch case.
 
 - If the worktree already exists (exit code 128), `cd` into it and run **Actualize Branch**:
+
   ```bash
   cd "$repo_root.worktrees/<feature-branch>"
   ```
+
 - If creation fails for any other reason, **exit** and report the error.
 
 ## 3. Switch into worktree
@@ -97,7 +103,7 @@ cd "$repo_root.worktrees/<feature-branch>"
 
 Report the result:
 
-```
+```text
 CODEBASE_REPO_PATH: $CODEBASE_REPO_PATH
 WORKTREE_PATH: $repo_root.worktrees/<feature-branch>
 BRANCH: <feature-branch>

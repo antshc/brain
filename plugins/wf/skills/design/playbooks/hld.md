@@ -5,14 +5,14 @@
 - Evolving draft
 - Vocabulary
 - 1. Resolve inputs
-- 2. Ground and rank evidence
-- 3. Reconcile capabilities
-- 4. Synthesize the solution
-- 5. Merge incrementally
-- 6. Verify before writing
+- 1. Ground and rank evidence
+- 1. Reconcile capabilities
+- 1. Synthesize the solution
+- 1. Merge incrementally
+- 1. Verify before writing
 - Gotchas
 
-Use the current conversation context and codebase understanding to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder root Not yet specified, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
+Use the current conversation context and codebase understanding to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder for precise ticket/proposal ownership or coarse Not yet specified classification, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
 
 ## Evolving draft
 
@@ -29,12 +29,14 @@ Use Living document reconciliation for supported design consequences and interna
 - A **Functional slice** is an end-to-end implementation of one distinct behavior or outcome, bounded by functional responsibility, owned by one Deployable, and independently testable through observable inputs and outputs. Cross-deployable flows connect Functional slices through their contracts.
 
 ## 1. Resolve inputs
+
 Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the design, and respect the Architecture and relevant ADRs and Concepts.
 
 ## 2. Ground and rank evidence
+
 Treat existing content outside `Open Questions` as resolved unless marked draft, tentative, or assumed.
 
-Let stronger evidence update weaker content. Preserve equal-authority conflicts and return them to root fog/caller without inventing a design decision. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
+Let stronger evidence update weaker content. Preserve equal-authority conflicts and return them to the owning ticket/proposal, coarse root fog or standalone caller without inventing a design decision. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
 
 **Provenance stays out of the body.** ADRs, Concepts, Architecture, and tickets are grounding evidence, not citable content — never name or link them anywhere in the document body (`Requirements`, `Current State`, `Solution Overview`, `Decisions`, appendices, etc.). Absorb what they establish as plain, self-contained statements instead of attributing it to the source document. The only place any of these four may be named or linked is a row in `Source Material`.
 
@@ -72,7 +74,7 @@ Select implementation artifacts from evidence and wrap each independently review
 
 Include supported artifacts in this deterministic type order: GUI mockups, screenshots, and other visuals; API, GUI, database, resource, and other contract deltas; low-level diagrams; prototype findings; research summaries. Preserve source order within a type unless the existing design has a stable order.
 
-Consume supplied GUI assets and existing research and prototype outputs only. Do not generate a missing mockup or run research or a prototype during synthesis. Return genuinely required missing evidence to root Not yet specified or standalone caller. Material risks use router-disclosed Risk verification: keep outcome, actual method/result and residual uncertainty on the owning issue/root, never user Open Questions. Verification precedes final synthesis; do not launch unrelated research/prototypes.
+Consume supplied GUI assets and existing research and prototype outputs only. Do not generate a missing mockup or run research or a prototype during synthesis. Return genuinely required missing evidence to Wayfinder for precise owner/coarse fog classification or to the standalone caller. Material risks use router-disclosed Risk verification: keep outcome, actual method/result and residual uncertainty on the owning issue/root, never user Open Questions. Verification precedes final synthesis; do not launch unrelated research/prototypes.
 
 - **GUI/visual:** Embed a supplied repository image with useful alt text and a repository-relative path; link a supplied non-image or external visual artifact. Summarize the implementation decision or state the visual establishes. Keep visual evidence separate from the GUI contract delta.
 - **Contract:** *Load and follow the `doc-contracts` skill to write an API, database, or resource contract delta* using **Assemble and write a contract delta** for each API, database, resource, or other contract kind the Contracts gate listed. *Load and follow the `doc-contracts` skill to write a GUI contract delta* using **Assemble and write a GUI delta** for each GUI surface the Contracts gate listed. Put the complete authoritative output inside its artifact block.

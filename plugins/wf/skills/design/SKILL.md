@@ -9,7 +9,7 @@ description: >-
 One entry point; route to one playbook. Do not load unrelated routes.
 
 | Route | Select for | Playbook |
-| --- | --- | --- |
+|---|---|---|
 | `architect` | Design code shape across modules, compare candidates, then implement or hand off an accepted sketch. | [Architect](playbooks/architect.md) |
 | `sketch` | Explicit request for a usage-first code sketch only, without Arena or implementation. | [Sketch](playbooks/sketch.md) |
 | `deep-module` | Deepen an interface, place a seam, or compare module shapes. | [Deep module](playbooks/deep-module.md) |
@@ -25,14 +25,14 @@ One entry point; route to one playbook. Do not load unrelated routes.
 2. Select `tickets`, `wayfinder`, or `review` only on an explicit user request, including clear natural language relayed by a caller. Ticket publication requires separate approval of the breakdown; Wayfinder automatically runs in-scope factual research and proof; human choices stay interactive. Publication requires an explicit `publish-hld` request; HLD synthesis and Wayfinder completion never select it automatically.
 3. Select `sketch` for an explicit standalone request or as a Deep Module/Wayfinder helper without implementation. General code-shape or multi-candidate work selects `architect`. `deep-module` generates option sketch packages standalone or for Wayfinder/Architect; Wayfinder retains Prove/Experiment and sketch prototypes in owned result worktrees until explicit user approval; Challenge this verification integrates automatically and updates fog/HLD without approval; Contract Options require user Choice. Empirical checks and adversarial review belong to the standalone Prove and Challenge this skills.
 4. Select `hld` only for an explicit request to create or update a high-level design or feature design, including `/design hld`. Wayfinder may select it for its living HLD and subsequent updates. A spec or design supplied as input alone does not select it.
-5. Read the selected playbook fully before acting and required resources fully before use. For `hld`, load [Design template](templates/design-template.md) and [Decision bullets](references/decision-bullet.md); the playbook owns synthesis and merge checks. Wayfinder loads Grill for interviews and then resumes the map. Continue standalone Grill to Spec only after a requested handoff and closing sweep. Wayfinder synchronizes confirmed outcomes automatically and retains control.
+5. Read the selected playbook fully before acting and required resources fully before use. For `hld`, load [Design template](templates/design-template.md) and [Decision bullets](references/decision-bullet.md); the playbook owns synthesis and merge checks. Wayfinder loads Grill for separate destination and breadth-first frontier interviews, one question at a time, then applies its small-effort decision before map setup. Continue standalone Grill to Spec only after a requested handoff and closing sweep. Wayfinder synchronizes confirmed outcomes automatically and retains control.
 
 ## Conditional resources
 
 Read triggered resources fully before use; resolve from this skill directory.
 
 | Trigger | Resource |
-| --- | --- |
+|---|---|
 | Wayfinder tracker/local integration; Spec issue publication; Tickets publication | [GitHub operations](references/github.md) |
 | Wayfinder ticket classification | [Ticket types](references/wayfinder-ticket-types.md) |
 | Wayfinder creation/update; HLD evolving draft | [Living document](references/living-document.md) |
@@ -46,9 +46,9 @@ Read triggered resources fully before use; resolve from this skill directory.
 | Grill external-source trigger | [External source](references/tactics-external-source.md) |
 | Grill closing/handoff | [Closing sweep](references/closing-sweep.md) |
 
-Wayfinder owns Not yet specified fog; HLD Open Questions are user-owned presentation content. Evidence is local-only: no research/proof/sketch appendices, Confluence subpages or artifact attachments.
+Wayfinder keeps only concerns too vague to ticket in Not yet specified; precise questions/risks belong to typed tickets or retained pending proposals; HLD Open Questions are user-owned presentation content. Evidence is local-only: no research/proof/sketch appendices, Confluence subpages or artifact attachments.
 
-Wayfinder additionally reads the full Grill playbook for interviews and the full HLD playbook for document authoring, using the route table above. Spec remains a separate explicitly requested route; Wayfinder does not select it as an output format.
+Wayfinder additionally reads the full Grill playbook for interviews and, after the mapped-effort decision, the full HLD playbook for document authoring, using the route table above. Spec remains a separate explicitly requested route; Wayfinder does not select it as an output format.
 
 ## Ticket approval
 
@@ -69,7 +69,7 @@ Wayfinder additionally reads the full Grill playbook for interviews and the full
 
 For standalone Architect, Sketch, Deep-module and their evidence calls, use `<repo-root>/tmp/design-<slug>/`, with a kebab-case task slug; never system `/tmp` or a session folder. Grounding, experiments, Arena outputs, findings, and review logs stay under this root; Design names exact absolute Research destinations under this root in each Research request. Design supplies exact Prove/Challenge this report paths and repository base under this root; evidence skills own no Design path policy. Production code, when authorized, goes in the working tree.
 
-```
+```text
 <artifact-root>/
   task.md
   grounding-*.md

@@ -19,9 +19,11 @@ Return a Confluence **Page** as Markdown from a page ID, tiny ID, URL, or select
    - Bare numeric ID or search hit ID → `<page_id>` as-is.
    - Tiny link `https://<site>/wiki/x/<tiny_id>`, or bare tiny ID → URL `<site>/wiki/x/<tiny_id>`; resolve with `<twg> confluence content get <url> --detail summary -o json --output-file tiny.json` → `<page_id> := data.id`.
 2. **Fetch and assemble.**
+
    ```bash
    python3 <skillDir>/scripts/atl.py fetch-page --page-id <page_id> --config "<configPath>" --md-path page.md [--site https://<site>] [--assets-dir <dir>] [--attachments auto|skip|required] [--comments auto|skip]
    ```
+
    Fetches title + ADF over REST v2 (`body-format=atlas_doc_format`), converts to Markdown (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Assets default to `page.md.assets/`.
    - Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
    - REST failure → `Page fetch failed: <category>`, no `page.md`; category = exception class + HTTP status, plus a hint for 404 (`check site URL and page id; wrong API base?`) and 401/403 (`check email/apiToken`).
@@ -32,6 +34,7 @@ Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `pag
 ## Attachments
 
 **Detection:** offline recursive scan of raw ADF; no match → no attachment call regardless of mode. Matches:
+
 - `media` with `attrs.type == "file"`;
 - `media` with `attrs.alt` ending `.png|.jpg|.jpeg|.gif|.svg|.webp|.bmp`;
 - `extension` with `attrs.extensionKey` containing `drawio`.
@@ -39,6 +42,7 @@ Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `pag
 **Caching:** on match, list and download all page attachments once; stage in a sibling dir, then atomically replace the assets dir; failure never leaves a partial cache or damages a prior one. TLS verification always on.
 
 **Placeholder resolution:**
+
 1. `{stem}.source.mmd` sidecar attached → verbatim ```` ```mermaid ```` fence only, no image (Publish page re-renders).
 2. Image, no sidecar → `![<alt or filename>](page.md.assets/<file>)`; if the placeholder has `width`/`height`, `display-width`, or `layout`, add `<!-- media-size: [width=<w> height=<h>] [display-width=<n>[%]] [layout=<layout>] -->` on the next line (Publish page restores display size and position from it).
 3. Other file → `[<filename>](page.md.assets/<file>)`.

@@ -14,6 +14,7 @@ Run one behavior-preserving cleanup pass over the identified change set. Never i
 Require `/crew-chore` skill before beginning review. If it is unavailable, make the review `skipped`: emit `Chorey skipped.`, change no files, skip review and verification, then continue to **Discard artifacts** and **Report**.
 
 ### 2. Discover the change set
+
 run `git add -A` immediately before diff capture. This is the single permitted staging action: it records all incoming tracked, untracked, and deleted paths in the index, ensuring that the diff accurately reflects the current state of the working directory.
 
 Work in cwd for all exploration, edits, git commands, builds, and tests; never change directories. Chorey reviews whatever is currently staged.
@@ -57,7 +58,7 @@ Follow `/chorey-diff`'s skill **Discard artifacts** before every report, includi
 
 Report exactly on every exit:
 
-```
+```text
 STATUS: complete | skipped | failed
 SUMMARY: <what was reviewed and whether cleanup was kept, unnecessary, skipped, or failed verification>
 FILES: <files changed, or none with the reason>

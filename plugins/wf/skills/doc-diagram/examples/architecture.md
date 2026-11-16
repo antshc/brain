@@ -45,6 +45,7 @@ C4Context
     UpdateRelStyle(oms, email_system, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="30", $offsetY="-20")
     UpdateRelStyle(oms, catalogue, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetX="-60", $offsetY="120")
 ```
+
 </details>
 
 ## Solution Diagram Example
@@ -98,6 +99,7 @@ C4Container
     UpdateRelStyle(svc, email_system, $textColor="#c9d1d9", $lineColor="#8b949e")
     UpdateRelStyle(auditor, db, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
+
 </details>
 
 ## Component Diagram Example
@@ -143,6 +145,7 @@ C4Component
     UpdateRelStyle(engine, accessor, $textColor="#c9d1d9", $lineColor="#8b949e")
     UpdateRelStyle(engine, payment, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
+
 </details>
 
 ## Container Diagram Delta Example
@@ -186,7 +189,8 @@ C4Container
     UpdateRelStyle(service, legacyQueue, $textColor="#c9d1d9", $lineColor="#8a4a4a")
 ```
 
-**Behaviour changes**
+**Behaviour changes:**
+
 - `+` Order Export Queue replaces the legacy export path.
 - `-` Legacy Order Queue is removed.
 - `~` Order Service publishes exports through Azure Service Bus.
@@ -268,6 +272,7 @@ C4Deployment
     UpdateRelStyle(db, db2, $textColor="#c9d1d9", $lineColor="#8b949e", $offsetY="-10")
     UpdateRelStyle(api, mainframe, $textColor="#c9d1d9", $lineColor="#8b949e")
 ```
+
 </details>
 
 ## Deployment View Delta Example
@@ -308,7 +313,8 @@ C4Deployment
     UpdateRelStyle(api, legacy, $textColor="#c9d1d9", $lineColor="#8a4a4a")
 ```
 
-**Behaviour changes**
+**Behaviour changes:**
+
 - `+` Fraud Check Worker node added to run asynchronous fraud review.
 - `-` Legacy Batch Job node and its host are being decommissioned.
 
