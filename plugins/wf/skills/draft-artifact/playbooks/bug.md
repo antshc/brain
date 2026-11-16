@@ -1,5 +1,7 @@
 # Bug
 
+## Purpose
+
 Print one standalone bug report: affected behavior, reproduction, actual/expected results and useful technical context.
 
 ## Inputs

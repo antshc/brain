@@ -67,7 +67,7 @@ If swapping the UI or the technology would force a reword, the statement is over
 
 ## The de-referencing move
 
-Raise artifacts **one level** to their enabling behavior; keep implementation in design:
+Raise artifacts **one level** to the behavior they enable; keep implementation in design:
 
 1. Find the artifact term (a screen, column, endpoint, status flag, worker, access role).
 2. Ask what the actor actually gets from it — what they perceive, can do, or are told.

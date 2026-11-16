@@ -2,6 +2,7 @@
 
 ## Contents
 
+- Purpose
 - Evolving draft
 - Vocabulary
 - Inputs
@@ -14,6 +15,8 @@
 - Completion criteria
 - Gotchas
 - Output
+
+## Purpose
 
 Use supplied decisions, evidence and codebase context to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder for precise ticket/proposal ownership or coarse Not yet specified classification, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
 
