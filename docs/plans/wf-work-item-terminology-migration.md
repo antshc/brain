@@ -35,6 +35,30 @@ Keep `draft-artifact task` as the implementation-artifact route. Rename `design 
 
 The same implementation Task can be stored in a GitHub issue or Jira work item. Artifact meaning and tracker representation remain separate.
 
+## Term assignments by skill
+
+Use the following assignments in skill instructions, route examples, templates, agent briefs and caller handoffs. Choose the term by the operation being described; a skill may use several terms.
+
+| Skill or workflow | Assigned terms | Where to use them |
+|---|---|---|
+| `draft-artifact` | Story, Task, Bug | Name the authored artifact in the `story`, `task` and `bug` routes and their templates. Spec and HLD retain their artifact names. |
+| `draft-artifact` HLD authoring and updates | Topic, Decision, Issue, Work item | Use topic for discovery entries, decision for recorded choices, issue for GitHub references and work item for generic or Jira references. |
+| `design tasks` | Task | Describe implementation breakdown, dependencies, task approval and handoff to `implement`. |
+| `design wayfinder` | Topic; Research, Experiment, Decision, Contract design, Task | Use topic for map entries collectively and the five named types for classification. Task means discovery sketches or prerequisite work here. |
+| Other `design` routes and shared gates | Story, Task, Decision, Work item, Issue | Preserve the input artifact kind; use decision for choices, Work item approval for the shared tracker-creation gate and issue for GitHub objects. |
+| `implement` | Task, Work item, Issue | Use task for decomposition, graphs, workers, commits, verification, publication and closure; work item for generic tracked inputs; issue for GitHub operations. |
+| `research` | Topic, Research, Experiment, Issue, Work item | Use topic for discovery questions and map entries; Research and Experiment within its existing execution scope; issue or provider-specific work item for tracker evidence. References to Design topic types grant no execution authority. |
+| `github` | Issue, Topic, Task, Work item, Follow-up | Use issue for native objects and relationships. Retain topic, task or work item when describing the caller's intent; use follow-up for deferred review work before referring to its supplied issue. |
+| `git` | Task, Work item | Use task commit for implementation history and work item ID for generic branch naming guidance. |
+| `review` | Follow-up, Issue, Work item | Use follow-up for deferred work; issue or work item only for the supplied tracking reference. |
+| `atlassian` | Work item, Follow-up, Bug | Use Jira work item for tracker operations, follow-up for deferred page-comment work and bug for the defect artifact when applicable. Preserve literal duplicate-search input. |
+| `diagnosing-bugs` | Bug, Work item, Issue | Use bug for the defect under diagnosis, work item reference in the report and issue for a concrete GitHub evidence source. |
+| Installed Factory Mode assets | Story, Task, Topic, Decision, Follow-up | Use story for user-facing requirement breakdown, task for implementation and verification, topic and decision for discovery, and follow-up for deferred review work. Use issue or work item when the workflow describes the tracker object. |
+
+Generic cross-platform guidance in all affected skills uses work item. GitHub-specific tracker operations use issue; Jira-specific tracker operations use Jira work item. Keep the artifact kind when naming its content: an implementation task may be published as a GitHub issue.
+
+These assignments preserve existing route ownership and behavior. They do not introduce routes, topic types, tracker creation authority or compatibility support.
+
 ## Route and resource changes
 
 | Current | Target |
@@ -137,7 +161,7 @@ Add no automatic translation for old topic-type names. Do not mutate existing re
 
 ## Implementation sequence
 
-1. Classify each existing occurrence as implementation, discovery, tracker mechanics, review follow-up, machine identifier or protected source text.
+1. Classify each existing occurrence as implementation, discovery, tracker mechanics, review follow-up, machine identifier or protected source text; apply the Term assignments by skill table.
 2. Rename routes/resources and update every caller, direct resource link and section anchor in one change.
 3. Update skill prose, agent briefs, installed workflow assets and active documentation.
 4. Update affected checks and fixtures to the canonical names only.
@@ -146,6 +170,7 @@ Add no automatic translation for old topic-type names. Do not mutate existing re
 
 ## Validation
 
+- [ ] Each affected skill, route and installed workflow uses the terms assigned in Term assignments by skill; artifact meaning and tracker representation remain distinct.
 - [ ] `design tasks` resolves to its renamed playbook; `design tickets` has no alias or executable fallback.
 - [ ] `draft-artifact task` remains the canonical implementation-artifact author.
 - [ ] Wayfinder uses exactly Research, Experiment, Decision, Contract design and Task as its topic types.
