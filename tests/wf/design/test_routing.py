@@ -11,12 +11,12 @@ def test_design_is_the_only_entry_point_for_its_routes():
     assert router.split("---", 2)[1].startswith("\nname: design\n")
     assert "disable-model-invocation: true" not in router
     assert list(DESIGN.rglob("SKILL.md")) == [DESIGN / "SKILL.md"]
-    for mode in ("architect", "sketch", "deep-module", "grill", "hld", "publish-hld", "spec", "tickets", "wayfinder", "review"):
+    for mode in ("architect", "sketch", "deep-module", "grill", "hld", "publish-hld", "spec", "tasks", "wayfinder", "review"):
         assert f"](playbooks/{mode}.md)" in router
         assert not (DESIGN / f"playbooks/{mode}.md").read_text().startswith("---")
     for old_name in ("architect", "grill-design", "to-spec", "to-tickets", "wayfinder", "review-design"):
         assert not (SKILLS / old_name / "SKILL.md").exists()
-    assert "Select `tickets`, `wayfinder`, or `review` only on an explicit user request" in router
+    assert "Select `tasks`, `wayfinder`, or `review` only on an explicit user request" in router
     assert "ask which outcome" in router
     assert "continue the active route" in router
 
@@ -71,7 +71,7 @@ def test_playbook_links_resolve_to_bundled_references_and_sections():
                 assert anchor in {heading.lower().replace(" ", "-") for heading in headings}
     for mode, section in (
         ("spec", "spec-publication"),
-        ("tickets", "ticket-operations"),
+        ("tasks", "task-operations"),
         ("wayfinder", "wayfinder-operations"),
     ):
         assert f"](../references/github.md#{section})" in (DESIGN / f"playbooks/{mode}.md").read_text()
@@ -79,14 +79,14 @@ def test_playbook_links_resolve_to_bundled_references_and_sections():
 
 def test_wayfinder_gates_ticket_creation_and_runs_helpers_without_nesting():
     wayfinder = (DESIGN / "playbooks/wayfinder.md").read_text()
-    approval = wayfinder.split("## Ticket approval", 1)[1].split("\n## ", 1)[0]
+    approval = wayfinder.split("## Work item approval", 1)[1].split("\n## ", 1)[0]
     execution = wayfinder.split("## Helper execution", 1)[1].split("\n## ", 1)[0]
 
-    assert "- Ticket approval" in wayfinder
-    assert "before creating the map or any map child or sub-ticket and before dispatching Research" in approval
-    assert "- **Create the map**: only after Ticket approval." in wayfinder
-    assert "- **Create a ticket**: only after Ticket approval." in wayfinder
-    assert "- **Create a sub-ticket**: only after Ticket approval." in wayfinder
+    assert "- Work item approval" in wayfinder
+    assert "before creating the map or any map child or sub-issue and before dispatching Research" in approval
+    assert "- **Create the map**: only after Work item approval." in wayfinder
+    assert "- **Create a topic**: only after Work item approval." in wayfinder
+    assert "- **Create a sub-issue**: only after Work item approval." in wayfinder
     assert "**MUST NOT** wrap a helper in a subagent." in execution
     assert "wide lookups via Research Explore" in execution
     for helper in ("Research", "Prove", "Challenge this", "Deep Module", "Code Sketch", "Grill"):

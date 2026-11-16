@@ -3,7 +3,7 @@
 
 # Breakdown
 
-Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Artifacts, Design sketch contract, Breakdown ticket operations, Ticket body authoring.
+Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Artifacts, Design sketch contract, Breakdown task operations, Task body authoring.
 
 ## Contents
 
@@ -12,8 +12,8 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 - Planner procedure
 - Artifacts
 - Design sketch contract
-- Breakdown ticket operations
-- Ticket body authoring
+- Breakdown task operations
+- Task body authoring
 
 ## Prepare Plan
 
@@ -24,12 +24,12 @@ Orchestrator: Prepare Plan, Breakdown Initiative. Planner: Planner procedure, Ar
 ## Breakdown Initiative
 
 1. Return control to the orchestrator for *Launch planner*. Done when its JSON result is returned.
-2. Only the planner writes tickets; never create them inline. Done when publication, artifact coverage, and native links are verified.
-3. Re-run `GH_TOOL graph read`; validate ticket bodies, artifact mappings, parents, and blockers. Return control to the orchestrator for *Effective graph* before the *Graph report*, then continue without waiting. Done when native publication matches remote state and the effective graph preserves planner-discovered blockers.
+2. Only the planner writes tasks; never create them inline. Done when publication, artifact coverage, and native links are verified.
+3. Re-run `GH_TOOL graph read`; validate task bodies, artifact mappings, parents, and blockers. Return control to the orchestrator for *Effective graph* before the *Graph report*, then continue without waiting. Done when native publication matches remote state and the effective graph preserves planner-discovered blockers.
 
 ## Planner procedure
 
-Online-only and non-interactive; the planner writes tickets only within the orchestrator's breakdown authorization. Never invoke, check availability of, or fall back to `/design tickets`; never delegate, request approval, add `hitl` or `afk` labels, publish offline, edit/close the parent spec, or create execution branches/worktrees. Missing inputs, unresolved conflicts, unavailable prerequisites, inaccessible relevant artifacts, or incomplete GitHub operations → stop and return `failed`; preserve partial results without claiming success.
+Online-only and non-interactive; the planner writes tasks only within the orchestrator's breakdown authorization. Never invoke, check availability of, or fall back to `/design tasks`; never delegate, request approval, add `hitl` or `afk` labels, publish offline, edit/close the parent spec, or create execution branches/worktrees. Missing inputs, unresolved conflicts, unavailable prerequisites, inaccessible relevant artifacts, or incomplete GitHub operations → stop and return `failed`; preserve partial results without claiming success.
 
 ### 1. Resolve source and routing
 
@@ -41,9 +41,9 @@ Slicing source = spec title/body/comments, or supplied implementation details wh
 
 Before slicing, inspect the spec body and every comment for attachments, uploaded images/diagrams, linked design documents, repository files, and other explicitly referenced artifacts. Also inventory every native spec issue artifact listed in `spec.json` `artifacts`; its saved file under `RUN_DIR/artifacts` is its content and its `url` is its canonical source. Inventory each canonical source URL/path, type, version/revision when available, retrieval status, and retrieval error. Read actual contents via *Artifacts*; never infer them from titles or filenames.
 
-A relevant artifact that cannot be fetched or interpreted (including no suitable reader) stops breakdown BEFORE publishing any incomplete ticket; report the exact source and error; never invent or silently omit content.
+A relevant artifact that cannot be fetched or interpreted (including no suitable reader) stops breakdown BEFORE publishing any incomplete task; report the exact source and error; never invent or silently omit content.
 
-Partition fetched artifacts into bounded meaningful pieces: document sections, page ranges, diagram regions, tables, examples, or code excerpts. Give each a stable source pointer/anchor and the requirements it informs. Binary artifacts: retain the original link plus precise location/description; embed actual image/diagram excerpts only when available. Never copy entire large artifacts into tickets.
+Partition fetched artifacts into bounded meaningful pieces: document sections, page ranges, diagram regions, tables, examples, or code excerpts. Give each a stable source pointer/anchor and the requirements it informs. Binary artifacts: retain the original link plus precise location/description; embed actual image/diagram excerpts only when available. Never copy entire large artifacts into tasks.
 
 ### 3. Explore records and code
 
@@ -60,15 +60,15 @@ Choose boundaries from the spec/plan and observed codebase, not a predetermined 
 
 Prefer the fewest cohesive tasks that cover all requirements. Size by cohesion, context load, stable contracts, write ownership, and integration risk—not estimated duration. Keep multi-hour cohesive work with one capable implementer; merge trivial work when coordination dominates. Split at independently verifiable, stable-contract context boundaries. Serialize shared writes; disjoint ownership gates concurrency, not task validity. Never split solely to shorten runtime or increase concurrency, even if it appears faster.
 
-Choose the highest meaningful, reliable verification seam supported by the codebase: existing API integration tests for API behavior; builds and existing regression/API tests for structural changes; lower-level tests where higher seams cannot reliably prove an important rule. Each task must be independently demonstrable or verifiable, with included outcome, exclusions, producer assumptions, and acceptance-to-check evidence mapping per *Ticket body authoring*. Classify HITL or AFK for planning only; prefer AFK; neither becomes a label. An unresolved human decision stops publication; never invent an answer.
+Choose the highest meaningful, reliable verification seam supported by the codebase: existing API integration tests for API behavior; builds and existing regression/API tests for structural changes; lower-level tests where higher seams cannot reliably prove an important rule. Each task must be independently demonstrable or verifiable, with included outcome, exclusions, producer assumptions, and acceptance-to-check evidence mapping per *Task body authoring*. Classify HITL or AFK for planning only; prefer AFK; neither becomes a label. An unresolved human decision stops publication; never invent an answer.
 
-Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Overlapping slices → merge them, move the shared edit into one slice, or record a `file` conflict; a shared path alone never becomes a blocker edge; never schedule shared file writes together. A ticket that changes a contract another ticket consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a task; uncovered scope blocks publication. Render complete ticket bodies with *Ticket body authoring*, not summaries or requirement numbers alone. The planner returns implementer recommendations separately in its JSON result; do not write them into ticket bodies.
+Derive an acyclic directed blocker graph, `file` conflict pairs for shared paths (plus advisory `soft` pairs for contract consumers that need no ordering), the initial ready frontier and critical path. Overlapping slices → merge them, move the shared edit into one slice, or record a `file` conflict; a shared path alone never becomes a blocker edge; never schedule shared file writes together. A task that changes a contract another task consumes becomes a blocker edge when order matters, not a conflict. Map every requirement, rule, edge case, and acceptance criterion to a task; uncovered scope blocks publication. Render complete task bodies with *Task body authoring*, not summaries or requirement numbers alone. The planner returns implementer recommendations separately in its JSON result; do not write them into task bodies.
 
-For EVERY ticket, map EVERY artifact piece relevant to its behavior, acceptance criteria or implementation decisions. Repeat a shared piece in every related ticket; exclude unrelated pieces. Check both directions: no relevant piece omitted, no included piece lacking a stated relationship. Each Related Spec Artifacts entry holds the piece or bounded excerpt, canonical source/anchor, and a short explanation tying it to the requirement or criterion. Keep non-text links/embeds readable. No artifacts → omit that section. Design sketch present → also apply *Design sketch contract*.
+For EVERY task, map EVERY artifact piece relevant to its behavior, acceptance criteria or implementation decisions. Repeat a shared piece in every related task; exclude unrelated pieces. Check both directions: no relevant piece omitted, no included piece lacking a stated relationship. Each Related Spec Artifacts entry holds the piece or bounded excerpt, canonical source/anchor, and a short explanation tying it to the requirement or criterion. Keep non-text links/embeds readable. No artifacts → omit that section. Design sketch present → also apply *Design sketch contract*.
 
 ### 5. Publish and verify
 
-Publish the complete breakdown immediately per *Breakdown ticket operations*, in order; add blocker edges only after all ticket identities exist. Read-back also verifies every template section. Report created/reused ticket identities, complete/pending links, artifact coverage, blocker graph/ready frontier/conflicts/critical path, notes, and exact failures in the planner output contract.
+Publish the complete breakdown immediately per *Breakdown task operations*, in order; add blocker edges only after all task identities exist. Read-back also verifies every template section. Report created/reused task identities, complete/pending links, artifact coverage, blocker graph/ready frontier/conflicts/critical path, notes, and exact failures in the planner output contract.
 
 ## Artifacts
 
@@ -80,22 +80,22 @@ Applies when the spec's Implementation Decisions hold a binding **Design sketch*
 
 1. Read the Sketch index first; it maps each file to its artifact names. Read every listed artifact, including `module-map.md` when listed; a missing or unreadable one stops breakdown.
 2. Follow the sketch's module boundaries for task ownership; keep functional tasks end-to-end and structural tasks scoped to complete relocations. Prefactoring and scaffolding the sketch defines come first.
-3. Every sketch file maps to at least one ticket: an exact excerpt (or the whole file when short) under **Related Spec Artifacts**, with its sketch path, artifact name, and artifact URL. A sketch file mapped to no ticket blocks publication. `module-map.md` is not a sketch file; quote its rows for each ticket's files in the same section.
-4. Sketch files are grouped by module or concern, not by target location. Target repo paths come from `module-map.md` (new, modified, deleted files with their sketch file); without a module map, sketch paths are intended target locations. Quote them in Related Spec Artifacts even though Implementation Decisions avoid file paths. A sketch file holding hook-point snippets for several existing files may map to several tickets, each quoting only its excerpt.
-5. Sketch conflicts with a Requirement, a Concept/ADR, or current code → the Requirement wins first, then Concepts/ADRs. Choose the option that best fits them and the sketch's intent without asking; record `Sketch deviation: {{what}} — {{chosen}} because {{reason}}` in that ticket's Implementation Decisions. Never drop a sketch type, signature, or boundary silently.
+3. Every sketch file maps to at least one task: an exact excerpt (or the whole file when short) under **Related Spec Artifacts**, with its sketch path, artifact name, and artifact URL. A sketch file mapped to no task blocks publication. `module-map.md` is not a sketch file; quote its rows for each task's files in the same section.
+4. Sketch files are grouped by module or concern, not by target location. Target repo paths come from `module-map.md` (new, modified, deleted files with their sketch file); without a module map, sketch paths are intended target locations. Quote them in Related Spec Artifacts even though Implementation Decisions avoid file paths. A sketch file holding hook-point snippets for several existing files may map to several tasks, each quoting only its excerpt.
+5. Sketch conflicts with a Requirement, a Concept/ADR, or current code → the Requirement wins first, then Concepts/ADRs. Choose the option that best fits them and the sketch's intent without asking; record `Sketch deviation: {{what}} — {{chosen}} because {{reason}}` in that task's Implementation Decisions. Never drop a sketch type, signature, or boundary silently.
 6. Report sketch coverage (sketch files mapped/total, excluding `module-map.md`) in planner output `coverage.sketch` and every deviation in `notes`.
 
-## Breakdown ticket operations
+## Breakdown task operations
 
-Only the authorized planner following *Planner procedure* uses these writes, via `{{ghTool}}`. Online only; preserve the parent spec. Children live in the tracker repository, carry the spec's `repo:target:` label, and never `hitl` or `afk`; preserve existing ticket labels.
+Only the authorized planner following *Planner procedure* uses these writes, via `{{ghTool}}`. Online only; preserve the parent spec. Children live in the tracker repository, carry the spec's `repo:target:` label, and never `hitl` or `afk`; preserve existing task labels.
 
-1. **Create each ticket:** write the complete body to a temporary UTF-8 file outside the repo; `{{ghTool}} ticket create --spec SPEC_REF --title TITLE --body-file BODY_FILE`. It ensures the label, reuses an unambiguous existing child or unlinked match (conflicting matches stop), creates, links as a native sub-issue, and verifies the link. A lost create response means unknown publication; rerun the same command, never create blindly.
+1. **Create each task:** write the complete body to a temporary UTF-8 file outside the repo; `{{ghTool}} ticket create --spec SPEC_REF --title TITLE --body-file BODY_FILE`. It ensures the label, reuses an unambiguous existing child or unlinked match (conflicting matches stop), creates, links as a native sub-issue, and verifies the link. A lost create response means unknown publication; rerun the same command, never create blindly.
 2. **Reconcile artifact bodies:** read the latest existing body first; append only missing relevant pieces with source anchors, without duplicates or overwriting user-authored content; save the full body; `{{ghTool}} issue edit-body REF --body-file BODY_FILE`. Never repurpose mismatching children.
-3. **Link blocking** after all ticket identities exist: `{{ghTool}} issue block REF --by BLOCKER_REF…` (idempotent; reads back every edge). Body links never substitute for native edges.
+3. **Link blocking** after all task identities exist: `{{ghTool}} issue block REF --by BLOCKER_REF…` (idempotent; reads back every edge). Body links never substitute for native edges.
 4. **Verify publication:** `{{ghTool}} graph read` and compare bodies, labels, parents, blockers, drafted requirements, criteria and artifact mapping; record created/reused IDs and completed/pending links. Exit `1` → stop dependent operations, report the exact failure, and preserve known issues/drafts/links in planner notes; never offline-publish or claim completion. Remove only temporary files created by this run.
 
-## Ticket body authoring
+## Task body authoring
 
-*Load and follow the `draft-artifact` skill to create and update implementation tasks* using `task` once per planned ticket. Supply parent Spec, bounded scope/exclusions, verbatim addressed requirements/rules/edge cases, producer assumptions, decisions, Concepts/ADRs, affected layers/modules, every mapped artifact piece and criteria-to-check evidence. Require full bodies with every mandatory section and applicable conditional section; authoring gaps stop publication.
+*Load and follow the `draft-work` skill to create and update implementation tasks* using `task` once per planned task. Supply parent Spec, bounded scope/exclusions, verbatim addressed requirements/rules/edge cases, producer assumptions, decisions, Concepts/ADRs, affected layers/modules, every mapped artifact piece and criteria-to-check evidence. Require full bodies with every mandatory section and applicable conditional section; authoring gaps stop publication.
 
-The planner remains online-only and non-interactive, owns decomposition and publication, and never invokes Design Tickets or launches subagents. Authoring does not add approval, offline publication or tracker authority.
+The planner remains online-only and non-interactive, owns decomposition and publication, and never invokes Design Tasks or launches subagents. Authoring does not add approval, offline publication or tracker authority.

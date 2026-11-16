@@ -18,7 +18,7 @@
 
 ## Purpose
 
-Use supplied decisions, evidence and codebase context to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder for precise ticket/proposal ownership or coarse Not yet specified classification, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
+Use supplied decisions, evidence and codebase context to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder for precise topic/proposal ownership or coarse Not yet specified classification, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
 
 ## Evolving draft
 
@@ -40,7 +40,7 @@ Use supplied current-state context, specs, resolved decisions, verified risks, i
 
 ## Required resources
 
-Read the router's HLD template, Decision bullets, HLD updates and shared requirements resources. For `normalize`, preserve the supplied structure and return after Shared requirements rules.
+Read the router's HLD template, Decision bullets, HLD updates and local requirements resources. For `normalize`, preserve the supplied structure and return after Requirements rules.
 
 ## Workflow
 
@@ -50,9 +50,9 @@ Follow Ground and rank evidence, Reconcile capabilities, Synthesize the solution
 
 Treat existing content outside `Open Questions` as resolved unless marked draft, tentative, or assumed.
 
-Let stronger evidence update weaker content. Preserve equal-authority conflicts and return them to the owning ticket/proposal, coarse root fog or standalone caller without inventing a design decision. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
+Let stronger evidence update weaker content. Preserve equal-authority conflicts and return them to the owning topic/proposal, coarse root fog or standalone caller without inventing a design decision. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
 
-**Provenance stays out of the body.** Name/link ADRs, Concepts, Architecture and tickets only in `Source Material` rows. Throughout the body, including appendices, restate their facts as plain, self-contained statements without attribution.
+**Provenance stays out of the body.** Name/link ADRs, Concepts, Architecture and issues only in `Source Material` rows. Throughout the body, including appendices, restate their facts as plain, self-contained statements without attribution.
 
 ## Reconcile capabilities
 
@@ -60,7 +60,7 @@ Assign every sourced Requirement set to one Capability. Match by purpose and cha
 
 Open the design template listed in the router with the file-reading tool and draft `Requirements` from its exact table shape: one top-level row per Stakeholder requirement and one numbered sub-row per Functional requirement. Put the requirement text in `Requirement`; italicize Functional requirements. Leave Stakeholder requirement `Details` empty. Only Functional requirements have `Details`; render their Business rules and Edge cases as separate unlabeled bullets. Use `Source` only for PO or Dev team. Capability is the classification used during reconciliation, not a table row or label.
 
-Apply shared requirements rules to authored capabilities and behavioral requirements; preserve protected source text. Add design-discovered behavior only when supplied evidence supports it.
+Apply requirements rules to authored capabilities and behavioral requirements; preserve protected source text. Add design-discovered behavior only when supplied evidence supports it.
 
 ## Synthesize the solution
 

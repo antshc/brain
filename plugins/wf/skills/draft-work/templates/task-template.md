@@ -60,7 +60,7 @@ Render every section with its local rule. Omit Parent Spec only for a standalone
 <related-spec-artifacts-rule>
 - Omit this section when the spec has no artifacts relevant to this slice.
 - For every relevant piece: bounded excerpt or precise binary location/description, canonical source/anchor and revision when available, and relationship to a requirement or criterion.
-- Repeat shared pieces in every related ticket; exclude unrelated pieces. Preserve readable links/embeds; never invent an image excerpt.
+- Repeat shared pieces in every related task; exclude unrelated pieces. Preserve readable links/embeds; never invent an image excerpt.
 - Design sketch artifacts: quote the exact sketch excerpt in a fenced block, prefixed with its sketch path, artifact name, and URL, plus the matching `module-map.md` rows (target repo paths); the implementer uses them as the map for where logic goes and how code is structured.
 </related-spec-artifacts-rule>
 
@@ -69,7 +69,7 @@ Render every section with its local rule. Omit Parent Spec only for a standalone
 ## Implementation Decisions
 
 <implementation-decisions-rule>
-- State producer contracts and supplying tickets when applicable, compatibility constraints, and assumptions; distinguish observed contracts from assumptions needing confirmation.
+- State producer contracts and supplying tasks when applicable, compatibility constraints, and assumptions; distinguish observed contracts from assumptions needing confirmation.
 - Use short technical statements and implementation-oriented language.
 - Avoid file paths or code snippets except exact structural relocation constraints.
 </implementation-decisions-rule>

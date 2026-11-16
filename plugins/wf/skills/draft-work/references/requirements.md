@@ -1,10 +1,14 @@
 # Requirements
 
-Scrub implementation artifacts from requirements, capabilities, features, functional slices and stories.
+Normalize authored story outcomes, task acceptance criteria and Bug expected behavior/definition of fixed. Preserve implementation scope, structural relocation constraints, exact reproduction, actual observations and evidence.
+
+## Protected content
+
+Preserve authoritative verbatim source text and identifiers; report implementation leaks in protected source text as source conflicts. Keep technical decisions, structural relocation paths/symbols/project references, contracts, reproduction steps, observations and evidence exact. Never invent requirements, constraints, facts or expected outcomes.
 
 ## The rule
 
-Name a **behavior and entity**: what the system does and the actor's outcome, never its implementation (widget, screen, table, endpoint, flag, access role). Apply to **capability titles**, **feature descriptions**, **functional slice descriptions**, **stakeholder requirements**, **functional requirements**, **business rules**, **edge cases** and **acceptance criteria**.
+Name a **behavior and entity**: what the system does and the actor's outcome, never its implementation (widget, screen, table, endpoint, flag, access role). Apply to authored **story titles**, **requirements**, **acceptance criteria**, **Bug expected behavior** and **definition of fixed**. Feature and slice descriptions remain domain context; preserve supplied source fields verbatim.
 
 ## Preserve requirement structure
 

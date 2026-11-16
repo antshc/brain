@@ -21,7 +21,7 @@ Work like a **careful, cautious, and precise investigator**. Surface evidence an
 
 **PR numbers extracted from commit messages:** {PR_NUMBERS}
 
-**Ticket IDs mentioned in commits or PR bodies (if any):** {TICKET_IDS}
+**Work item IDs mentioned in commits or PR bodies (if any):** {Work item_IDS}
 
 ## Your Assigned Source
 
@@ -32,9 +32,9 @@ Work like a **careful, cautious, and precise investigator**. Surface evidence an
 ## Investigation Loop
 
 1. **Cast a wide net first** so you don't miss related context. Only then narrow in on specific items.
-2. **Read the whole thing.** Read each PR, ticket, doc, or thread fully, not just the title or summary. The key evidence is often in a comment, a subtask, or a follow-up.
-3. **Follow links within your source only.** Pull the PR or commit a PR references, the parent or sibling of a ticket, the doc a doc links. Do NOT chase a cross-source reference. Record it under Additional Leads for that source's investigator. The one-investigator-per-category design depends on this. Chasing it duplicates work and confuses scope.
-4. **Quote verbatim**, with the exact location (PR number, ticket ID, URL, commit hash, file:line), so the reader can confirm the claim in seconds.
+2. **Read the whole thing.** Read each PR, work item, doc, or thread fully, not just the title or summary. The key evidence is often in a comment, a subtask, or a follow-up.
+3. **Follow links within your source only.** Pull the PR or commit a PR references, the parent or sibling of a work item, the doc a doc links. Do NOT chase a cross-source reference. Record it under Additional Leads for that source's investigator. The one-investigator-per-category design depends on this. Chasing it duplicates work and confuses scope.
+4. **Quote verbatim**, with the exact location (PR number, work item ID, URL, commit hash, file:line), so the reader can confirm the claim in seconds.
 5. **Record what you searched, not just what you found.** Write queries verbatim. An empty search is a finding.
 6. **Resist the story.** If two items in your source disagree, record both. Don't suppress the inconvenient one. If three items line up and a fourth contradicts them, the contradiction is the most interesting finding.
 
@@ -42,7 +42,7 @@ Before reporting a finding as strong, ask whether you would expect to find it if
 
 ## Epistemic Discipline
 
-- **Mechanics are not motivation.** A commit changing `limit = 50` to `limit = 100` shows the change, not necessarily why. Look for the reason in the commit message, PR description, linked ticket, or review comments.
+- **Mechanics are not motivation.** A commit changing `limit = 50` to `limit = 100` shows the change, not necessarily why. Look for the reason in the commit message, PR description, linked work item, or review comments.
 - **No intent from code behavior or style.** You may read code to learn what the target *is*. "The author chose a functional approach" is an observation about code, not evidence of intent. Claim intent only where the author stated it.
 - **Preserve uncertainty.** Say when evidence is ambiguous, or when one reading is more plausible but not certain. Don't collapse ambiguity to look decisive.
 - **No silent substitutions.** If the question is about feature X and you only find evidence about feature Y, don't present Y's evidence as if it answers X.
@@ -54,7 +54,7 @@ Return your findings in this structure. The synthesizer reads it directly.
 
 ### Source
 
-Which source you investigated (source control, issue / ticket tracker, long-form documents, real-time team chat, infrastructure observability, error / exception tracking, product analytics warehouse, code comments, etc.).
+Which source you investigated (source control, issue / work item tracker, long-form documents, real-time team chat, infrastructure observability, error / exception tracking, product analytics warehouse, code comments, etc.).
 
 ### What I Searched
 
@@ -65,7 +65,7 @@ The queries you ran, items you opened, and places you looked. Be specific. This 
 For each item that explicitly addresses the question:
 
 - **What it says**: verbatim quote or accurate paraphrase
-- **Where it's from**: PR #123, ticket ID, doc URL, chat permalink, commit hash, or file:line
+- **Where it's from**: PR #123, work item ID, doc URL, chat permalink, commit hash, or file:line
 - **Author and date** (if available)
 - **Relevance**: one sentence on how it bears on the question
 

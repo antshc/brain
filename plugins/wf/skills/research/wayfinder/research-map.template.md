@@ -30,7 +30,7 @@ Render the root body below into the GitHub `wayfinder:map` issue after exact-pro
 
 ## Not yet specified
 
-- <stable unknown/risk ID>: <in-scope concern too vague to ticket and consequence>
+- <stable unknown/risk ID>: <in-scope concern too vague to frame as a topic and consequence>
   - Status: <unframed | awaiting prerequisite framing>
   - Resolve when: <evidence criterion or missing framing; risk trigger, mitigation and verification>
   - Linked work: <related context or predecessor link; concrete work lives on its owner>

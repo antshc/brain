@@ -10,13 +10,13 @@ Task title, included outcome, exclusions, parent Spec when present, verbatim add
 
 ## Required resources
 
-Read the router's Task template and shared requirements resources. For `normalize`, return after Shared requirements rules without rendering a full task.
+Read the router's Task template and local requirements resources. For `normalize`, return after Requirements rules without rendering a full task.
 
 ## Workflow
 
 1. **Check coverage.** Match the supplied scope to source requirements, constraints and artifact pieces. Do not split or expand the task. Done when all supplied obligations have a destination or an explicit gap.
 2. **Render.** Fill the Task template; include every mandatory section and each triggered conditional section. Copy addressed source text verbatim, with its identifiers. Keep technical relocation paths, symbols, project references, selected sketch excerpts and evidence exact. Done when the body is independently implementable.
-3. **Normalize.** Apply shared requirements rules to authored behavior and acceptance criteria, preserving technical sections and verbatim sources. Done when each criterion states a concrete pass/fail result.
+3. **Normalize.** Apply requirements rules to authored behavior and acceptance criteria, preserving technical sections and verbatim sources. Done when each criterion states a concrete pass/fail result.
 4. **Contracts and checks.** Use the router's Contracts producer for every touched kind; populate Verify section with supplied or verified commands, prerequisites, expected results and retained evidence. Report unavailable prerequisites and unknown commands rather than inventing them. Done when each criterion has a check and no required contract output is missing.
 
 ## Update behavior

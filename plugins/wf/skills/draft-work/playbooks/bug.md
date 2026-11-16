@@ -10,7 +10,7 @@ Observed behavior and any available affected users, expected behavior, impact, b
 
 ## Required resources
 
-Read the router's Bug template and shared requirements resources; apply normalization only to authored expected behavior and definition of fixed. Preserve exact reproduction, observed labels, errors, identifiers and evidence.
+For `normalize`, apply Requirements rules and return without rendering a full bug report. Otherwise read the router's Bug template and local requirements resources; apply normalization only to authored expected behavior and definition of fixed. Preserve exact reproduction, observed labels, errors, identifiers and evidence.
 
 ## Workflow
 

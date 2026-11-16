@@ -1,6 +1,6 @@
 # Commits
 
-Load [Commit messages](../references/commit-messages.md) for ordinary, ticket and squash conventions. Codey, Chore and the fallback worker read their caller-supplied history range oldest first.
+Load [Commit messages](../references/commit-messages.md) for ordinary, task and squash conventions. Codey, Chore and the fallback worker read their caller-supplied history range oldest first.
 
 ## Execute
 
