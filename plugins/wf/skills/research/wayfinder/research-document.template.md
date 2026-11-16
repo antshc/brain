@@ -1,6 +1,6 @@
 # Research document template
 
-Render this block; remove placeholders. Conclusions summarize integrated evidence. References link independently readable reports. Use the writing-style Bottom line procedure through the living-document instructions.
+Render this block; remove placeholders. Conclusions summarize integrated evidence. References link independently readable reports. Use `write-document research update` through the living-document instructions; its internal `bottom-line` procedure authors conclusions. These fields specialize the shared research report for map state and integrated evidence.
 
 ```markdown
 # [Research] <title>

@@ -1,6 +1,6 @@
-# Draft work
+# Write work
 
-Create or update user stories, implementation tasks and bug reports.
+Write or update user stories, implementation tasks and bug reports.
 
 | Route | Result |
 |---|---|
@@ -8,9 +8,9 @@ Create or update user stories, implementation tasks and bug reports.
 | `task` | Implementation task |
 | `bug` | Defect report |
 
-Use `draft` for new content, `update` for existing content, or `normalize` to revise only behavioral requirements. Use `draft-document normalize` for untyped requirements fragments.
+Use `draft` for new content, `update` for existing content, or `normalize` to revise only behavioral requirements. Use `write-document normalize` for untyped requirements fragments.
 
-Examples: `draft-work story`, `draft-work task update`, `draft-work bug`.
+Examples: `write-work story`, `write-work task update`, `write-work bug`.
 
 [SKILL.md](SKILL.md) selects the route and directly discloses its resources. Playbooks own procedures; templates own output structure; local references own requirements.
 

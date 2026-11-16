@@ -96,6 +96,6 @@ Only the authorized planner following *Planner procedure* uses these writes, via
 
 ## Task body authoring
 
-*Load and follow the `draft-work` skill to create and update implementation tasks* using `task` once per planned task. Supply parent Spec, bounded scope/exclusions, verbatim addressed requirements/rules/edge cases, producer assumptions, decisions, Concepts/ADRs, affected layers/modules, every mapped artifact piece and criteria-to-check evidence. Require full bodies with every mandatory section and applicable conditional section; authoring gaps stop publication.
+*Load and follow the `write-work` skill to write and update implementation tasks* using `task` once per planned task. Supply parent Spec, bounded scope/exclusions, verbatim addressed requirements/rules/edge cases, producer assumptions, decisions, Concepts/ADRs, affected layers/modules, every mapped artifact piece and criteria-to-check evidence. Require full bodies with every mandatory section and applicable conditional section; authoring gaps stop publication.
 
 The planner remains online-only and non-interactive, owns decomposition and publication, and never invokes Design Tasks or launches subagents. Authoring does not add approval, offline publication or tracker authority.

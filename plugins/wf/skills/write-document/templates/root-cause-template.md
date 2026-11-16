@@ -1,22 +1,15 @@
-# Draft Root Cause
+# Root-cause template
 
-Render and print one root-cause summary. Drafting is transcription: add no new facts and run no probes.
+<!-- Evidence tables intentionally use HTML details. -->
+<!-- markdownlint-disable MD033 -->
 
-## Input
+## Contents
 
-Resolve `logPath` per the [Hypothesis log](hypothesis-log.md), or use the log path a caller provides.
-
-Use:
-
-- checked hypotheses from the log;
-- current-run evidence for mechanism-chain facts not represented as hypotheses;
-- analysis inputs (images, log archives, logs, HAR, dumps) with what each contributed.
-
-## Gate
-
-At least one hypothesis MUST be `confirmed`.
-
-If none is confirmed, stop and report that the root cause is not established.
+- Map
+- Business language
+- Writing style
+- Template
+- Redact
 
 ## Map
 
@@ -126,8 +119,3 @@ This reads as a **{{verdict|regression, bug, works as designed, feature request}
 
 Replace secrets with `<REDACTED>`. Quote only signal lines.
 
-## Output
-
-Print the rendered summary without wrapper prose.
-
-MUST NOT save the rendered summary to a file.

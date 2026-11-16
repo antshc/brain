@@ -1,32 +1,6 @@
-# Bottom line
+# Research template
 
-A bottom line answers three questions per investigated subject, in one bullet. Use one or more concise sentences per answer as needed:
-
-1. **What did we find?** — the finding.
-2. **So what?** — why it matters.
-3. **Now what?** — the recommended action, or the confirmed/unconfirmed status.
-
-## Write it
-
-1. List the investigated subjects (services, components, options). Done when every subject in the research scope has one bullet.
-2. Open each bullet with the finding in **bold**, as the answer itself, not the path to it. Done when a reader who reads only the bold text knows every conclusion.
-3. Follow with so what — the deciding fact or consequence (cost, risk, capability unlocked). Done when each finding is tied to a fact or outcome.
-4. End with now what — the recommended action. Done when each bullet has an action or status.
-5. Mark gaps explicitly: bold the risk or partial result as the finding; end any claim the evidence does not prove with bold **Not confirmed**, the same tag as What we did. Done when no bullet implies more certainty than the evidence gives.
-6. Cut everything else — method, evidence detail, open questions, work items — into the sections below. Done when the bottom line alone still reads as complete.
-
-## Rules
-
-- Decision-oriented, not information-oriented: a reader acting on the bottom line alone makes the right call.
-- **Plain language** in every section of the research document: write in ASD-STE100 Simplified Technical English (STE) — active voice, max 25 words per sentence, one idea per sentence, one meaning per word; name no actors ("we", "a team member") — start with the action ("Checked …", "Did not check …") or make the system the subject; keep high-level technical terms (components, runtimes, libraries, protocols, e.g. OpenSSL, ICU, Python 3, certificate export); exclude low-level identifiers (class, script, and file names, paths, commands) except in Remaining work and Next steps; include version names/IDs only when the topic is an upgrade.
-- Lead with the conclusion; never with the setup or method.
-- Negative results count: state "does not need X" as its own bullet with the one-line reason.
-- No hedging ("it depends", "could potentially") unless the recommendation is genuinely conditional — then state the condition as part of the action.
-- Not an **executive summary**: a summary spans paragraphs and covers findings, evidence, and conclusions; a bottom line is one decision per subject, stated once. Add sentences only to clarify the finding, consequence, or action.
-
-## In a full research document
-
-Place the bottom line first, before any method or evidence. Fill this structure; omit an empty optional section.
+Place the bottom line first, before any method or evidence. Insert the Bottom line procedure's returned bullets. Fill this structure; omit an empty optional section. Preserve supplied route-specific explanations, evidence tables, diagrams, source coverage and confidence as additional sections before References; never discard material evidence to fit the scaffold.
 
 ```markdown
 # [Research] {{topic|question or change, with subjects in parentheses}}
@@ -57,7 +31,7 @@ Place the bottom line first, before any method or evidence. Fill this structure;
 - [{{title|research outcome page or source name}}]({{link|URL, or repo-relative path for local pages}})
 ```
 
-### Example
+## Example
 
 ```markdown
 # [Research] Node.js 22 upgrade for (Checkout service, Product catalog, Order email worker)
