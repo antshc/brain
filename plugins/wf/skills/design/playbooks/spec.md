@@ -15,24 +15,17 @@ Explicit offline publishing or a reported GitHub/tool/authentication failure →
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any Concepts and ADRs in the area you're touching.
 
-2. Draft the Spec using the template below.
+2. Prepare the authoring context: requirements, resolved decisions, source context and accepted design package when present.
 
    Ask the user: *"What is the target branch and Initiative ID? (e.g. `release/1.1.10`, `PROJ-1234`)"* if not provided as arguments to this skill.
 
    Resolve `{{repository}}` (`owner/name`): a `workspace/` folder holding exactly one checkout → that checkout's own `origin` remote. More than one checkout → ask which. No `workspace/` folder → the current repository's `origin` remote. Never ask for it when exactly one candidate exists.
 
-3. **Contracts gate.** List every contract kind the Initiative touches: API, Database, Resource, other, GUI. Seed the list from the design's **Contracts touched** when present, then check the conversation and codebase for more. For each listed kind, *Load and follow the `doc-contracts` skill to write an API, database, resource, or GUI contract delta as a terse diff* and inline its substantive output under **Contracts Delta**, ordered API → Database → Resource → other → GUI, keeping contract facts and removing skill references and authoring directives. **MUST NOT** hand-write a delta. *Done when* each listed kind has a block opening with a `Legend:` line and one `#### header` + `<details>` per resource or surface; empty list → omit **Contracts Delta** and state "No contract change" in the run summary.
+3. Design sketch — apply only when `design architect` or `design sketch` produced a completed, accepted `synthesis/` package in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Design sketch handoff** below.
 
-4. Design sketch — apply only when `design architect` or `design sketch` produced a completed, accepted `synthesis/` package in this conversation; otherwise skip and omit the **Design sketch** decision. Follow **Design sketch handoff** below.
+4. *Load and follow the `draft-artifact` skill to create and update specifications* using `spec` draft or update. Pass current source context, requirements, decisions, accepted rationale and prepared sketch manifest; receive the title, checked body and gaps. Return missing decisions/evidence to their owner before publication. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. **Contracts Delta present ⇔ authoring identified touched contract kinds**; each kind's block has a `Legend:` line, `#### header` + `<details>` per resource or surface, and delta lines prefixed `+`, `-`, `%`, or `~`. Missing or hand-written → return to Draft artifact's `spec` route for correction; do not publish. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Present the title, labels and checked body per Ticket approval; end the turn awaiting explicit approval, and re-present after any change. After approval, follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
 
-5. Before publishing, check the entire rendered ticket body: **no skill references** — no skill names, skill paths, invocation instructions, or template directives, including in inlined contract output. **Contracts Delta present ⇔ the Contracts gate listed kinds**; each kind's block has a `Legend:` line, `#### header` + `<details>` per resource or surface, and delta lines prefixed `+`, `-`, `%`, or `~`. Missing or hand-written → re-run the Contracts gate; do not publish. Only the **Design sketch** `{{artifactUrl}}` placeholders may remain; attaching fills them. Skills guide authoring internally; publish only their substantive decisions and content. Derive `{{specTitle}}` as a short title naming the Spec's outcome. Present the title, labels and checked body per Ticket approval; end the turn awaiting explicit approval, and re-present after any change. After approval, follow [Publish spec](../references/github.md#publish-spec) with the checked body (no Initiative, branch, or repository metadata — publication adds them as title prefix and labels), `{{initiativeId}}`, `{{specTitle}}`, `{{targetBranch}}`, and `{{repository}}` — no additional triage.
-
-6. Completed design package → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and bundle manifest. Offline → follow its offline branch instead.
-
-## Gotchas
-
-- Every touched kind requires a `doc-contracts` result even when the delta is small, additive, or already settled in the design.
-- GUI changes (dialogs, pages, visible fields) are a contract kind; a new field shown in the UI usually means both an API and a GUI delta.
+5. Completed design package → after the issue is verified, follow [Attach design artifacts](../references/github.md#attach-design-artifacts) with the issue number and bundle manifest. Offline → follow its offline branch instead.
 
 ## Design sketch handoff
 
@@ -41,117 +34,10 @@ Classify the run's outputs by role, never by file name. Both `design architect` 
 - **Selected design** — `synthesis/`: its `rationale.md`, `module-map.md`, and `sketch/` are the final package. For Architect Arena, the synthesis decision names the base candidate. Correction re-runs: the `arena-r<k>/synthesis/` the user picked.
 - **Excluded** — every Arena `candidate-<n>/` (including the base candidate), `synthesis-note.md`, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
 
-Map the selected `rationale.md` into the body; for an Architect Arena package, fall back to the base candidate's `rationale.md` only for sections the synthesis leaves empty:
-
-- Problem and caller usage → **Problem Statement** and **Solution**, user-facing.
-- Behavior the design commits to → **Requirements**, solution agnostic.
-- Module shape, types, invariants, tradeoffs, rejected alternatives, and synthesis decision when present → **Implementation Decisions** as prose, after the **Design sketch** decision.
-- Open questions and risks → **Further Notes**.
-- Contracts touched → seed list for the Contracts gate; never copied into the body as a delta.
-
-The body MUST NOT name design routes, candidate labels, or the run's local paths.
-
 Wrap the selected `synthesis/` sketch — never an Arena candidate's — and its module map into artifacts. Resolve the script path from the installed `design/` skill directory:
 
 ```text
 python3 "<installed design directory>/scripts/bundle_artifacts.py" --sketch <synthesis/sketch path> --module-map <synthesis/module-map.md path> --out-dir <new empty temp dir outside the repository>
 ```
 
-Exit 2 → report stderr and stop before publishing; never drop a sketch file to make it pass. The printed manifest lists each artifact's `name`, `type`, and `file`; the first is the **Sketch index** mapping each file to its artifact names. Draft the **Design sketch** decision with every manifest name and `{{artifactUrl}}` placeholders that publication fills.
-
-<spec-template>
-
-## Problem Statement
-
-<!-- Writing style: terse, concise, non-technical -->
-
-The problem that the user is facing, from the user's perspective.
-
-## Solution
-
-<!-- Writing style: terse, concise, non-technical -->
-
-The solution to the problem, from the user's perspective.
-
-## Requirements
-
-<!-- Writing style: non-technical, solution agnostic -->
-
-One subsection per Requirement set. Each groups a Stakeholder requirement with its own Functional Requirements, Business Rules, and Edge Cases. Repeat the `### {{n}}. {{stakeholderRequirement}}` heading and its `<details>` block for every Requirement set covering the Initiative.
-
-### {{n}}. {{stakeholderRequirement}}
-
-<details>
-<summary>{{n}}. {{stakeholderRequirement}}</summary>
-
-**Functional Requirements:**
-
-What the system must do — concrete, testable, externally visible behavior. Avoid implementation detail. Write each as an imperative behavior, without a `The system must` prefix.
-
-A LONG, numbered list of functional requirements. Each functional requirement should be in the format of:
-
-{{n}}. {{behavior}} when {{condition}}.
-
-<functional-requirement-example>
-1. *Retain deleted files for 30 days before permanent deletion.*
-2. *Allow administrators to restore a deleted file to its original location.*
-</functional-requirement-example>
-
-This list of Functional requirements should cover all relevant behavior in this Requirement set.
-
-**Business Rules:**
-
-<!-- Omit if no business rules exist for this Requirement set. -->
-
-Invariants that must always hold, independent of any single user action. Each rule should be in the format of:
-
-{{n}}. If {{condition}}, {{invariant}}.
-
-**Edge Cases:**
-
-<!-- Omit if no edge cases exist for this Requirement set. -->
-
-Boundary conditions and their expected handling. Each edge case should be in the format of:
-
-{{n}}. {{boundaryCondition}} → {{expectedHandling}}.
-
-</details>
-
-## Implementation Decisions
-
-<!-- Omit the Design sketch decision when no accepted design package exists. -->
-
-- **Design sketch (binding):** the selected design sketch is attached to this issue as artifacts. Use it as the map for where logic goes and how code is structured: its types, signatures, module boundaries, and file locations. Start from the **Sketch index**; the module map, when attached, maps sketch files to target locations. When the sketch conflicts with the Requirements or the codebase, the Requirements win; choose the option that best fits them.
-  - [{{artifactName}}]({{artifactUrl}}) — one entry per artifact, Sketch index first.
-
-A list of implementation decisions that were made. This can include:
-
-- The modules that will be built/modified
-- The interfaces of those modules that will be modified
-- Architectural decisions and Concepts
-- Technical clarifications from the developer
-- Specific interactions
-
-MUST NOT include specific file paths or code snippets. They may end up being outdated very quickly.
-
-Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
-
-## Contracts Delta
-
-<!-- Omit only when the Contracts gate listed no kinds. -->
-
-*Load and follow the `doc-contracts` skill to write an API, database, resource, or GUI contract delta as a terse diff* once per touched kind (API, Database, Resource, other, GUI); inline its output verbatim, one block per kind, ordered API → Database → Resource → other → GUI.
-
-## Testing Decisions
-
-A bullet list of agreed testing decisions: relevant test categories, observable seams, reusable coverage described by behavior, and known gaps. Omit test-file paths, fixed test-method names, and all skill references.
-
-## Out of Scope
-
-A description of the things that are out of scope for this spec.
-
-## Further Notes
-
-Any further notes about the Initiative.
-
-</spec-template>
+Exit 2 → report stderr and stop before publishing; never drop a sketch file to make it pass. The printed manifest lists each artifact's `name`, `type`, and `file`; the first is the **Sketch index** mapping each file to its artifact names. Pass the manifest to Draft artifact's `spec` route for the binding Design sketch decision; publication fills its `{{artifactUrl}}` placeholders.

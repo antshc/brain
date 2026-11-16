@@ -16,7 +16,7 @@ def test_auto_rejected_without_approval_exception():
     github = (ROOT / 'references/github.md').read_text()
     github = github.split('## Ticket operations', 1)[1].split('## Wayfinder operations', 1)[0]
     assert 'auto`' not in github
-    assert 'auto`' not in (ROOT / 'references/issue-template.md').read_text()
+    assert 'auto`' not in (ROOT.parent / 'draft-artifact/templates/task-template.md').read_text()
 
 
 def test_online_offline_and_corrections_require_explicit_approval():

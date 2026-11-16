@@ -249,7 +249,8 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
                  'Requirement wins', 'without asking', 'Sketch deviation:'):
         assert text in contract
     assert "`spec.json` `artifacts`" in BREAKDOWN and 'RUN_DIR/artifacts' in BREAKDOWN
-    rule = BREAKDOWN.split('<related-spec-artifacts-rule>')[1].split('</related-spec-artifacts-rule>')[0]
+    template = (REPO / 'plugins/wf/skills/draft-artifact/templates/task-template.md').read_text()
+    rule = template.split('<related-spec-artifacts-rule>')[1].split('</related-spec-artifacts-rule>')[0]
     assert 'Design sketch artifacts' in rule
     implementer = CODEY.read_text()
     for text in ('artifact index', 'Use the sketch as the map', 'read the relevant source artifact', 'never ask'):
@@ -262,15 +263,24 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
     assert 'deviations' not in MAIN + (ROOT / 'references/publication.md').read_text()
 
 
-def test_template_parity_except_intentional_artifact_section():
-    standalone = (REPO / 'plugins/wf/skills/design/references/issue-template.md').read_text()
-    standalone = standalone[standalone.index('<issue-template>'):]
-    embedded = BREAKDOWN[BREAKDOWN.index('<issue-template>'):]
-    artifact_section = re.compile(r'^## Related Spec Artifacts\n.*?(?=^## )', re.M | re.S)
-    embedded_core, embedded_sections = artifact_section.subn('', embedded)
-    standalone_core, standalone_sections = artifact_section.subn('', standalone)
-    assert embedded_sections == standalone_sections == 1
-    assert embedded_core == standalone_core
+def test_task_authoring_has_one_owner_without_changing_planner_authority():
+    author = REPO / 'plugins/wf/skills/draft-artifact'
+    template = (author / 'templates/task-template.md').read_text()
+    design = REPO / 'plugins/wf/skills/design'
+    assert not (design / 'references/issue-template.md').exists()
+    assert '<issue-template>' not in BREAKDOWN
+    for caller in (BREAKDOWN, (design / 'playbooks/tickets.md').read_text()):
+        assert '`draft-artifact` skill' in caller
+        assert 'using `task`' in caller
+    assert 'never delegate, request approval' in BREAKDOWN
+    for section in ('## Parent Spec', '## What to build', '## Acceptance criteria',
+                    '## Requirements addressed', '## Implementation Decisions',
+                    '## Related Spec Artifacts', '## Relevant Concepts',
+                    '## Contracts Delta', '## Affected layers & modules', '## Verify section'):
+        assert section in template
+    assert 'Structural criteria may name exact' in template
+    assert 'canonical source/anchor' in template
+    assert 'verbatim' in template
 
 
 def test_implementation_stops_at_handoff_and_factory_owns_completion():
@@ -317,7 +327,7 @@ def test_graph_only_outputs_and_scheduler_guards():
         *ROOT.rglob('*.md'),
         design / 'playbooks/tickets.md',
         design / 'references/github.md',
-        design / 'references/issue-template.md',
+        REPO / 'plugins/wf/skills/draft-artifact/templates/task-template.md',
     ):
         assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
     parallel = (ROOT / 'references/parallel.md').read_text()

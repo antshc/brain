@@ -135,8 +135,8 @@ def test_research_callers_name_destinations_in_the_request(relative_path: str):
 
 
 @pytest.mark.parametrize('relative_path', [
-    'draft-artifact/tactics/toi.md',
-    'draft-artifact/tactics/bug.md',
+    'draft-artifact/playbooks/toi.md',
+    'draft-artifact/playbooks/bug.md',
     'architecture-records/SKILL.md',
     'architecture-records/playbooks/concept.md',
     'architecture-records/playbooks/define-concept.md',

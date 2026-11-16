@@ -1,17 +1,24 @@
-# Draft TOI
+# TOI
+
+## Purpose
 
 TOI = engineering hands a developed feature to technical teams (Support, QA, Docs, Training, Field). Not formal training; those teams reuse it to build training, documentation, and labs. Reader did **not** build the feature.
 
 ## Contents
 
+- Purpose
+
 - Inputs
+- Required resources
 - Constraints
 - Workflow
 - Exploration checklist
 - How does it work rules
 - Plain language
 - Gaps
+- Update behavior
 - Completion criteria
+- Output
 
 ## Inputs
 
@@ -22,12 +29,15 @@ TOI = engineering hands a developed feature to technical teams (Support, QA, Doc
 
 If `feature` is missing or matches more than one feature, ask the user with the ask_user tool before collecting evidence.
 
+## Required resources
+
+**MUST** read the router's TOI template on every run and use it as the single structure source.
+
 ## Constraints
 
-- **MUST** use the TOI template listed in the router as the single structure source. Read it on every run.
 - **MUST** keep template headings, heading levels, and section order.
 - **MUST** ground every statement in collected evidence. **MUST NOT** invent behavior, numbers, defaults, permissions, or limits. Unverified → record as an open question (see Gaps).
-- **MUST** write every section in plain language per Plain language. No section is exempt.
+- **MUST** apply Plain language to every section.
 - **MUST NOT** change source code or commit. Author only the TOI file.
 - Draft locally only: read the local workspace and user-supplied `sources`. **MUST NOT** call Jira, Confluence, GitHub, or other remote services; **MUST NOT** scan pull requests — scan the codebase instead.
 - **MUST NOT** link or cite workspace Markdown files (glossary, architecture, ADRs, concepts, service docs) in the TOI; Support cannot open them. Restate the needed fact in plain language. Link only externally reachable URLs from `sources` (Jira, design doc, demo, public docs/KB).
@@ -80,17 +90,15 @@ If `feature` is missing or matches more than one feature, ask the user with the 
 | Behavior | permissions, fallback, cleanup jobs and intervals, upgrade handling, log messages, limits | current repository: source and tests; third-party packages: behavior outside local code |
 | Delivery | how the feature ships and is installed or upgraded (packages, images, installers) | pipeline definitions |
 
-Use the docs only as a starting point for keys and defaults; the source call site wins on conflict.
-
 ## How does it work rules
 
 - Stay high level, at user-visible deployable level. No classes, methods, or internal modules.
-- Start with a brief description of how the feature works: 3–6 sentences in one paragraph. State the trigger, the main steps across the user-visible deployables, and the visible result.
-- The diagram is optional. Add it only when it helps, for example when the flow has handoffs between 2 or more deployables. Skip it for simple flows; the description and scenarios are enough. When skipped, delete the diagram instruction line and the scaffold from the template.
+- Open with one paragraph of 3–6 sentences: trigger, main steps across user-visible deployables, visible result.
+- Add a diagram only when useful, such as handoffs between 2 or more deployables. For simple flows, keep description/scenarios and delete the diagram instruction and scaffold.
 - When a diagram is added: *Load and follow the `doc-diagram` skill to create a Mermaid swimlane diagram of responsibility handoffs and who owns each step*, using Swimlane Diagram, solution responsibility, one lane per user-visible deployable (and the user). Use Flowchart instead only when one deployable owns the whole flow. Labels follow Plain language.
 - Swimlane stays high level: user-visible steps and handoffs only, about 3–7 lanes and 4–10 steps; no internal components, calls, retries, or data stores; collapse internal work into one step or a subprocess.
 - Wrap every diagram in `<details>` with a `<summary>` naming the flow and view, for example `<summary>Guest checkout — Solution Responsibility</summary>`.
-- Group scenarios by client section, in order: GUI, REST API, Other clients (CLI, Postman collection, scripts). Example scenarios: "Place an order as a guest", "Refund an order". One subsection per user-visible scenario under each client that supports it; clients can differ in steps, options, and results. Delete a client section with no scenarios. A scenario missing from a client → state it is not available there.
+- Group scenarios by client, ordered GUI, REST API, Other clients (CLI, Postman collection, scripts). Give each supported scenario (for example "Place an order as a guest", "Refund an order") a subsection; client steps/options/results may differ. Delete clients without scenarios; state when a scenario is unavailable in a client.
 - Start every scenario with its own paragraph: user goal, action, visible result.
 - GUI: name the page and the exact element titles in **bold**, in click order.
 - REST API: give the operation name, `METHOD <host>/path`, the request body, the response body, and the main status codes. Bodies carry the smallest field set: required fields plus fields the scenario needs; drop optional and unrelated fields; keep JSON valid; real field names and realistic sample values. Use JSON code blocks. Use `<host>` for the host, never a real IP or hostname.
@@ -126,13 +134,18 @@ Write in ASD-STE100 Simplified Technical English (STE) in every section, includi
 
 When evidence for a needed fact is missing or conflicting, write it under FAQ / Open questions as `Open: <question> — owner: <name or team>`. Do not fill the related section with a guess. Report all gaps to the user.
 
+## Update behavior
+
+Update supported changes in place; preserve unaffected content and unresolved evidence gaps. Recheck facts against current source before changing them.
+
 ## Completion criteria
 
 - File exists at `outputPath` with template headings in template order.
 - Every statement traces to the evidence map, or is an open question.
 - Every section follows Plain language; no low-level identifier remains outside the Exceptions.
 - How does it work? has a brief description of how the feature works, an optional swimlane (or flowchart) at deployable level, and scenarios grouped by client section (GUI, REST API, Other clients), each with its own paragraph; REST API details wrapped in `<details>`; `<!-- adf:toc -->` present.
-- Every tweak row has the real key and the real default from source.
-- Artifact structure exists when the feature adds or changes an artifact.
 - No link or citation to a workspace Markdown file; no pull request used as a source.
-- Report lists sources not reached and open questions.
+
+## Output
+
+Return the TOI path, evidence map summary, open questions and sources not reached.

@@ -147,12 +147,12 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 
 - [design](plugins/wf/skills/design/SKILL.md): `grill` for decision interviews, `sketch` for a single-pass usage-first code sketch, `spec` for GitHub or offline specs, and `tickets` for approved implementation breakdowns, `wayfinder` for decision maps, and `review` for technical design review.
 - [factory-mode Stories playbook](plugins/wf/install/assets/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-artifact` Story run per row. Requires repo-level `factory-mode` installation.
-- [draft-artifact](plugins/wf/skills/draft-artifact/SKILL.md): draft a User story, bug report, or feature handover (TOI). Use `/design hld` for high-level feature designs.
+- [draft-artifact](plugins/wf/skills/draft-artifact/SKILL.md): create and update stories, implementation tasks, bugs, specs, HLDs, and feature handovers (TOI). Own artifact templates and requirements wording; Design coordinates decisions and publication.
 - [github](plugins/wf/skills/github/SKILL.md): route Git conventions, branches, commits, owned worktrees, specs, issues, PRs, review discussions, and checks through one skill and CLI. Install WF for Factory Mode's GitHub routes.
 - [implement](plugins/wf/skills/implement/SKILL.md): integrate the ticket graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
-- [writing-style](plugins/wf/skills/writing-style/SKILL.md): write, review, or unslop prose; normalize requirement or story text by stripping implementation artifacts; sharpen a task prompt (deepen or restate intent).
+- [writing-style](plugins/wf/skills/writing-style/SKILL.md): write, review, or unslop prose; sharpen a task prompt (deepen or restate intent).
 - [suggest](plugins/wf/skills/suggest/SKILL.md): propose improvements, options, or ideas with reasoning; never apply without approval.
 - [prove](plugins/wf/skills/prove/SKILL.md): confirm or refute one or more technical claims with reproducible evidence, one parallel prover worker per claim.
 - [challenge-this](plugins/wf/skills/challenge-this/SKILL.md): try to break a change or design; report problems shown by a run.
