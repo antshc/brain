@@ -77,7 +77,7 @@ Give a follow-up to a fresh `prover` with the original Brief, the prior Return a
 
 ## Verify
 
-Per newly executed claim, rerun the worker's exact deciding command in its `@proofRoot` against the recorded target/patch. Keep `confirmed` or `refuted` only when actual output reproduces the deciding observation and meets the claim's criteria. Source reading, a written but unexecuted prototype, successful setup/build, zero tests, missing assertion, changed environment or unrelated failure cannot decide the claim. No execution possible → `blocked`; executed evidence insufficient or unreproducible → `inconclusive`. *Done when* every claim has a reproduced execution verdict, validated reuse, or explicit incomplete outcome.
+Per newly executed claim, rerun the worker's exact deciding command in its `@proofRoot` against the recorded target/patch. Keep `confirmed` or `refuted` only when rerun output reproduces the deciding observation and meets the criteria. Source reading, a written but unexecuted prototype, successful setup/build, zero tests, missing assertion, changed environment or unrelated failure cannot decide the claim. No execution possible → `blocked`; executed evidence insufficient or unreproducible → `inconclusive`. *Done when* every claim has a reproduced execution verdict, validated reuse, or explicit incomplete outcome.
 
 ## Delivery
 
@@ -102,7 +102,6 @@ Save reports, logs and proof patches outside worktrees before removal. Retention
 ## Guardrails
 
 - **MUST** base confirmed/refuted verdicts on deciding execution evidence; code search, source analysis and documentation are preparation or supporting context. Apply the same gate to caller-requested verdict vocabulary.
-
 - Keep state local or in authorized sandboxes; never use destructive production targets or expand credentials/permissions. Redact secrets from commands, output and artifacts.
 - Do not commit, push, apply design corrections or promote proof code to production. The caller owns implementation decisions and risk judgment.
 - Subjective UI preferences remain human judgments; a preferred variant cannot confirm or refute a technical claim.
