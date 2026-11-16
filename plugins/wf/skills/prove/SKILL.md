@@ -1,7 +1,7 @@
 ---
 name: prove
 description: >-
-  Confirm or refute one or more technical claims with reproducible evidence. Use for /prove, 'run an experiment', 'try it and see'. Not for adversarial change review → `challenge-this`; broken or slow behavior → `diagnosing-bugs`.
+  Prove technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments. Use for /prove, 'run an experiment', 'try it and see'. Not for source analysis → `research`; adversarial review → `challenge-this`; debugging → `diagnosing-bugs`.
 ---
 
 # Prove
@@ -10,7 +10,7 @@ Router. Read the request, frame each claim, isolate proof checkouts, select one 
 
 ## Request
 
-Discover from the request; ask only when it holds no claim.
+Discover from the request; ask only when it holds no claim. Source-only search, tracing or analysis belongs to `research`; return that handoff without starting proof work. An explicit proof request still requires execution even when source reading suggests the answer.
 
 - **Claims** — one or more. Per claim:
   - **ID** — the caller's claim ID; none → `P1`, `P2`, ….
@@ -32,7 +32,7 @@ Run once per request, before Routing.
 
 1. **Intent.** *Load and follow the `principles` skill to load indexed engineering principles by name*; select `In your own words`. *Done when* each claim's intent is restated.
 2. **Checkout.** Set `@repoRoot` to `git rev-parse --show-toplevel` from the launch folder; record branch, HEAD and scoped dirty inputs. *Done when* target revision and dirty state are recorded.
-3. **Reuse.** Valid evidence for the same claim, revision and environment → reuse with provenance; that claim skips to Delivery. *Done when* reuse is decided per claim.
+3. **Reuse.** Reuse only retained execution evidence matching claim, criteria, revision/patch, dependencies and environment, with deciding command, actual output and successful verification rerun. Validate provenance, label it reused and link the original report; that claim skips to Delivery. Source citations, inferred conclusions and planned checks cannot satisfy reuse. *Done when* reuse is accepted or rejected per claim.
 4. **Isolate.** Supplied verified checkout or run-in-place request → use it as `@proofRoot` for every claim and run writing claims sequentially. Otherwise *Load and follow the `git` skill to run worktree lifecycle and creation* using Worktrees: one owned worktree per claim from the target revision with only scoped dirty inputs, plus one per Baseline ref; keep ownership records outside the worktrees. Isolation unavailable → that claim is blocked. *Done when* every claim has `@proofRoot`, optional `@baselineRoot`, and a cleanup owner.
 
 Frame shape, one per claim, passed verbatim in its Brief and kept in its report:
@@ -58,10 +58,10 @@ Select one route per claim; pass its playbook, and Integration's when a Runtime 
 
 | Route | Select when | Playbook | Result |
 |---|---|---|---|
-| Logic | Pure logic, state/transitions, reducers, transformations | [Logic](playbooks/logic.md) | Per-case actual vs expected state |
+| Logic | Pure logic, state/transitions, reducers, transformations | [Logic](playbooks/logic.md) | Executed cases with actual vs expected state |
 | Runtime | Framework/runtime, lifecycle, concurrency, hosting, serializer, process | [Runtime](playbooks/runtime.md) | Observed mechanism behavior |
 | Integration | SDK/API, cloud, broker, database, service boundary | [Integration](playbooks/integration.md) | Selected seam with executed assertions or probe output |
-| UI | Page/component appearance or interaction | [UI](playbooks/ui.md) | Observed variants and selection |
+| UI | Observable page/component appearance or interaction claim | [UI](playbooks/ui.md) | Browser execution with deciding assertions and artifacts |
 
 Requester needs example requests → read [Examples](README.md).
 
@@ -77,15 +77,15 @@ Give a follow-up to a fresh `prover` with the original Brief, the prior Return a
 
 ## Verify
 
-Per claim, rerun the worker's exact deciding command in its `@proofRoot` against the recorded target/patch; keep the conclusion only when actual output reproduces it. A changed environment, zero tests, missing assertion or unreproducible observation cannot confirm the claim; mark it inconclusive. *Done when* every conclusion is reproduced or marked inconclusive.
+Per newly executed claim, rerun the worker's exact deciding command in its `@proofRoot` against the recorded target/patch. Keep `confirmed` or `refuted` only when actual output reproduces the deciding observation and meets the claim's criteria. Source reading, a written but unexecuted prototype, successful setup/build, zero tests, missing assertion, changed environment or unrelated failure cannot decide the claim. No execution possible → `blocked`; executed evidence insufficient or unreproducible → `inconclusive`. *Done when* every claim has a reproduced execution verdict, validated reuse, or explicit incomplete outcome.
 
 ## Delivery
 
-- Always save one Markdown report per claim. Return only the pointers:
+- Always save one Markdown report per proof claim. Return only the pointers:
 
   ```text
   Prove reports — read each in full before using its conclusion:
-  - <id>: <claim> → <absolute path> (<route>; confirmed | refuted | inconclusive: <reason>)
+  - <id>: <claim> → <absolute path> (<route>; confirmed | refuted | inconclusive | blocked: <reason>)
   ```
 
   Present paths as clickable links.
@@ -93,7 +93,7 @@ Per claim, rerun the worker's exact deciding command in its `@proofRoot` against
 - Request names a location → save there; resolve a relative path against `@outputBase`, else `@repoRoot`; a folder gets `<id>-<claim-slug>.md` per claim. Conflicting locations → ask before writing.
 - Workers return evidence inline. Only the router writes reports.
 
-Report sections: **Question** (Frame block, intent, exclusions), then the worker's **Method**, **Observation**, **Conclusion**, **Evidence** and requested framing fields, with the Verify rerun added to Observation, then **Cleanup** (owned resources, removed/retained status, cleanup owner, leftovers).
+Report sections: **Question** (Frame block, intent, exclusions), then the worker's **Method**, **Observation**, **Conclusion**, **Evidence** and requested framing fields, with the Verify rerun added to Observation or reused evidence provenance recorded, then **Cleanup** (owned resources, removed/retained status, cleanup owner, leftovers).
 
 ## Cleanup
 
@@ -101,13 +101,15 @@ Save reports, logs and proof patches outside worktrees before removal. Retention
 
 ## Guardrails
 
+- **MUST** base confirmed/refuted verdicts on deciding execution evidence; code search, source analysis and documentation are preparation or supporting context. Apply the same gate to caller-requested verdict vocabulary.
+
 - Keep state local or in authorized sandboxes; never use destructive production targets or expand credentials/permissions. Redact secrets from commands, output and artifacts.
 - Do not commit, push, apply design corrections or promote proof code to production. The caller owns implementation decisions and risk judgment.
-- Subjective UI preferences remain human judgments; observed behavior and variant comparisons are evidence, not universal proof.
+- Subjective UI preferences remain human judgments; a preferred variant cannot confirm or refute a technical claim.
 
 ## Completion criteria
 
-- Every claim has a saved report with a supported, scoped conclusion or explicit inconclusive/blocked reason, and a returned pointer.
-- Every observed conclusion includes the actual deciding output and the router's rerun.
+- Every proof claim has a saved report with a supported, scoped execution verdict or explicit inconclusive/blocked reason, and a returned pointer.
+- Every confirmed/refuted verdict includes actual deciding output and the router's rerun, or validated provenance for reused execution evidence.
 - Every created patch/resource, including owned worktrees, has a cleanup or retention outcome; runnable evidence survives declared consumers.
-- Every evidence claim came from a `prover` worker; no worker spawned another.
+- Every new execution evidence claim came from a `prover` worker; no worker spawned another.
