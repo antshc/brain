@@ -25,7 +25,7 @@ Not covered from Markdown: Confluence smart links (`inlineCard`) and Draw.io mac
 ## Known Confluence behaviors
 
 - `bash` code blocks are stored as `shell`; the converter reads `shell` back as `bash` (B03).
-- **Open — M04 fails live:** on full pages Confluence drops the `code` mark from a span that also carries `link` (`[`Foo.Bar`](url)` returns as `[Foo.Bar](url)`). The ADF sent is correct; small isolated documents sometimes keep both marks, so the trigger is server-side and not yet isolated. the converter cannot recover a mark Confluence did not store.
+- A code span inside a link (`` [`Foo.Bar`](url) ``) is unsupported: Confluence's v2 ADF read intermittently drops the `code` mark from such text, so it cannot round-trip. The Markdown lint rejects it on publish; fetch renders existing linked code as a plain link and reports `code inside link omitted`. The fixture therefore has no instance of it.
 
 ## Runs
 

@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import re
 
+from ..converter.syntax import syntax_lines
+
 MEDIA_MARKER_RE = re.compile(r"^\x00MEDIA:(\d+)\x00$")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)", re.MULTILINE)
 SUMMARY_RE = re.compile(r"^\s*<summary>(.*)</summary>\s*$", re.MULTILINE)
@@ -26,16 +28,20 @@ def strip_ignored_sections(md_text: str) -> str:
     Pairs are matched left to right and do not nest. An unterminated `start` marker is a
     hard error rather than a silent to-EOF strip or an accidental publish.
     """
-    result_parts: list[str] = []
-    pos = 0
-    while True:
-        start_m = IGNORE_START_RE.search(md_text, pos)
-        if not start_m:
-            result_parts.append(md_text[pos:])
-            break
-        end_m = IGNORE_END_RE.search(md_text, start_m.end())
-        if not end_m:
-            raise ValueError("unterminated adf:ignore:start (no matching adf:ignore:end)")
-        result_parts.append(md_text[pos : start_m.start()])
-        pos = end_m.end()
-    return "".join(result_parts)
+    result = []
+    ignoring = False
+    raw_lines = md_text.splitlines(keepends=True)
+    for (number, syntax), original in zip(syntax_lines(md_text), raw_lines):
+        if IGNORE_START_RE.fullmatch(syntax):
+            if ignoring:
+                raise ValueError("nested adf:ignore:start")
+            ignoring = True
+        elif IGNORE_END_RE.fullmatch(syntax):
+            if not ignoring:
+                raise ValueError("stray adf:ignore:end")
+            ignoring = False
+        elif not ignoring:
+            result.append(original)
+    if ignoring:
+        raise ValueError("unterminated adf:ignore:start (no matching adf:ignore:end)")
+    return "".join(result)

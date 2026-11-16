@@ -149,7 +149,7 @@ def _publish(md_path, tmp_path):
 
 def test_publish_png_branch_passes_the_selected_renderer_through(tmp_path):
     md_path = _write_page(tmp_path)
-    base_adf = {"content": [_marker_paragraph(0)]}
+    base_adf = {"type": "doc", "content": [_marker_paragraph(0)]}
 
     def fake_render(diagrams, assets_dir, background="white", renderer="png", swimlane_drawio_enabled=False):
         for d in diagrams:
@@ -205,7 +205,7 @@ def _fake_drawio_render(diagrams, assets_dir, background="white", renderer="png"
 
 def test_publish_drawio_branch_registers_custom_content_and_injects_the_macro(tmp_path):
     md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
-    base_adf = {"content": [_marker_paragraph(0)]}
+    base_adf = {"type": "doc", "content": [_marker_paragraph(0)]}
     file_ids = {"00-title.drawio": "file-1", "00-title.drawio.png": "file-2"}
 
     with patch("atl_cli.page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(
@@ -237,7 +237,7 @@ def test_publish_drawio_branch_registers_custom_content_and_injects_the_macro(tm
 
 def test_publish_drawio_republish_reuses_the_existing_custom_content(tmp_path):
     md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
-    base_adf = {"content": [_marker_paragraph(0)]}
+    base_adf = {"type": "doc", "content": [_marker_paragraph(0)]}
     confluence = MagicMock()
     confluence.get.side_effect = [
         {"results": [{"id": "999", "title": "00-title.drawio", "version": {"number": 1}}]},
@@ -263,7 +263,7 @@ def test_publish_drawio_republish_reuses_the_existing_custom_content(tmp_path):
 
 def test_publish_drawio_branch_injects_a_media_node_for_a_diagram_that_fell_back_to_png(tmp_path):
     md_path = _write_page(tmp_path, "drawio", "app-1/env-1/static/drawio")
-    base_adf = {"content": [_marker_paragraph(0)]}
+    base_adf = {"type": "doc", "content": [_marker_paragraph(0)]}
 
     def fell_back_to_png(diagrams, assets_dir, background="white", renderer="png", swimlane_drawio_enabled=False):
         for d in diagrams:
@@ -318,7 +318,7 @@ def test_publish_uploads_local_attachments_with_no_diagrams_present(tmp_path):
         tmp_path,
         {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"},
     )
-    base_adf = {"content": [_marker_paragraph(0), _marker_paragraph(1)]}
+    base_adf = {"type": "doc", "content": [_marker_paragraph(0), _marker_paragraph(1)]}
     file_ids = {"screenshot.png": "file-1", "notes.pdf": "file-2"}
 
     with patch("atl_cli.page_diagrams.pipeline.convert_markdown_to_adf", return_value=base_adf), patch(

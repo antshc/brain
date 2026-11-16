@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 
+from .syntax import syntax_lines
 from .patterns import (
     COMMENT_OPEN_RE,
     DETAILS_OPEN_RE,
@@ -26,16 +27,8 @@ _QUOTE_PREFIX_RE = re.compile(r"^\s*>\s?")
 def detect_adf_only(markdown: str) -> list[dict]:
     """Return one `{"kind", "line"}` entry per ADF-only construct, in source order."""
     found: list[dict] = []
-    in_fence = False
 
-    for number, line in enumerate(markdown.splitlines(), start=1):
-        if _FENCE_RE.match(line):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            # A marker shown inside a code sample is literal text, not a node.
-            continue
-
+    for number, line in syntax_lines(markdown):
         if DETAILS_OPEN_RE.match(line):
             found.append({"kind": "expand", "line": number})
         elif TOC_COMMENT_RE.match(line):

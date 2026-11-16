@@ -23,6 +23,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import os
+import tempfile
 from pathlib import Path
 
 from requests.exceptions import RequestException
@@ -31,6 +33,7 @@ from ..config import load_credentials, require_supported_library, site_url
 from ..confluence_client import error_label, get_confluence
 from ..map_markdown import ConversionError as ConverterRejected
 from ..map_markdown import adf_to_md
+from ..conversion_guard import GuardError, guard_adf, lint_markdown, validate_markdown
 from .comments import (
     CommentRetrievalError,
     comments_note,
@@ -83,7 +86,7 @@ def fetch_page(confluence, page_id: str) -> tuple[str, dict]:
 
 def convert_adf_to_markdown(body: dict) -> str:
     try:
-        return adf_to_md(body)
+        return adf_to_md(body, guarded=True)
     except ConverterRejected as exception:
         raise ConversionError(f"error: {exception}") from None
 
@@ -92,7 +95,7 @@ def _with_title(markdown: str, title: str) -> str:
     # a body whose own first heading already is the title needs no second `# <title>` line
     if markdown.startswith(f"# {title}\n"):
         return markdown
-    return f"# {title}\n\n{markdown}"
+    return f"# {title}\n\n{markdown}" if markdown.strip() else f"# {title}\n"
 
 
 def default_assets_dir(md_path: Path) -> Path:
@@ -201,4 +204,25 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
         print(f"Attachment retrieval failed: {exception}", file=sys.stderr)
         raise SystemExit(1)
 
-    md_path.write_text(markdown)
+    try:
+        warnings = guard_adf(body, fetching=True)
+        if warnings:
+            markdown += "\n<!-- adf:lossy -->\n<!-- adf:ignore:start -->\nConversion degradation: " + "; ".join(warnings) + "\n<!-- adf:ignore:end -->\n"
+        validate_markdown(markdown, placeholders=True, media=True)
+        lint_markdown(markdown)
+    except (GuardError, ValueError, NotImplementedError) as exception:
+        print(f"Markdown validation failed: {exception}", file=sys.stderr)
+        raise SystemExit(1) from None
+    atomic_write_markdown(md_path, markdown)
+
+
+def atomic_write_markdown(path: Path, markdown: str) -> None:
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(markdown)
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)

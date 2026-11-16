@@ -120,3 +120,32 @@ def test_fetch_markdown_returns_the_written_page(tmp_path, monkeypatch):
     monkeypatch.setattr("atl_cli.fetch_page.assemble_page.main", fetch)
 
     assert verify_publish.fetch_markdown("1", "cfg", tmp_path / "verify" / "page.md") == "# Title\n\nBody.\n"
+
+
+@pytest.mark.parametrize("change,expected_code", [(None, 0), ("mark", 1), ("title", 1), ("media-id", 1)])
+def test_semantic_manifest_checks_raw_adf_even_when_markdown_matches(tmp_path, change, expected_code, capsys):
+    import copy
+    import json
+
+    expected = {"type": "doc", "content": [
+        {"type": "paragraph", "content": [{"type": "text", "text": "same words", "marks": [{"type": "strong"}]}]},
+        {"type": "mediaSingle", "content": [{"type": "media", "attrs": {"id": "uploaded-id", "type": "file"}}]},
+    ]}
+    actual = copy.deepcopy(expected)
+    title = "Title"
+    if change == "mark":
+        actual['content'][0]['content'][0].pop('marks')
+    elif change == "title":
+        title = "Changed"
+    elif change == "media-id":
+        actual['content'][1]['content'][0]['attrs']['id'] = 'wrong-id'
+    path = tmp_path / 'manifest.json'
+    path.write_text(json.dumps({"title": "Title", "adf": expected}))
+    code = verify_publish.main(
+        ['--page-id', '1', '--config', 'cfg', '--expect-anchors', '0', '--expected-manifest', str(path), '--verify-dir', str(tmp_path / 'verify')],
+        fetch=lambda *_: '# Title\n\nsame words\n', fetch_raw=lambda *_: (title, actual),
+    )
+    assert code == expected_code
+    assert path.exists()
+    if change == 'mark':
+        assert 'FAIL semantic-body' in capsys.readouterr().out

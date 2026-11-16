@@ -32,7 +32,7 @@ def _main(tmp_path, *extra: str) -> None:
 def test_main_writes_markdown_to_md_path_with_default_assets_dir(confluence, tmp_path):
     _main(tmp_path)
 
-    assert (tmp_path / "page.md").read_text() == "# Simple Page\n\n\n"
+    assert (tmp_path / "page.md").read_text() == "# Simple Page\n"
     assert not (tmp_path / "page.md.assets").exists()
     confluence.get.assert_called_once_with("/api/v2/pages/123", params={"body-format": "atlas_doc_format"})
 
@@ -42,7 +42,7 @@ def test_main_accepts_an_explicit_assets_dir_override(confluence, tmp_path):
 
     _main(tmp_path, "--assets-dir", str(assets_dir))
 
-    assert (tmp_path / "page.md").read_text() == "# Simple Page\n\n\n"
+    assert (tmp_path / "page.md").read_text() == "# Simple Page\n"
     assert not assets_dir.exists()
 
 

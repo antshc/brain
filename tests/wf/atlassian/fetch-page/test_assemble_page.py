@@ -278,3 +278,4 @@ def test_assemble_required_mode_raises_when_attachment_placeholder_cannot_be_res
 
     with pytest.raises(AttachmentRetrievalError, match="unresolved attachment reference"):
         assemble("Complex Page", body, "123", MagicMock(), str(tmp_path / "page.md.tmp"), attachments="required")
+

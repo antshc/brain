@@ -1,6 +1,8 @@
 # Map Markdown
 
-Markdown <-> Atlassian Document Format conversion and the ADF-only detection gate. Pure and offline: no config, credentials, network, or `atlassian-python-api`; runs before Preflight is needed. Fetch and publish commands use the same converter in-process.
+Read [Conversion guards](conversion-guards.md) for lint policy, fidelity checks, supported exceptions, and read-back manifests.
+
+Markdown <-> Atlassian Document Format conversion and the ADF-only detection gate. Offline: packaged lint config only, no credentials, network, or `atlassian-python-api`; runs before Preflight is needed. Fetch and publish commands use the same converter in-process.
 
 ## Contents
 
@@ -41,7 +43,7 @@ Exits `0` whether or not anything is found — branch on `adfOnly`, not the exit
 
 ## Preserved verbatim
 
-Source wording is never summarized, corrected, or reinterpreted in either direction — only structure and marks are translated.
+Source wording is never summarized or corrected. Unsupported or lossy constructs are rejected or explicitly reported; only supported structure and marks are translated.
 
 ## Supported structure
 
@@ -62,7 +64,7 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | `<!-- adf:toc -->` | `expand` + `toc` extension (`md-to-adf`); a bare `toc` extension, standalone or alongside other content in an `expand`, also converts back (`adf-to-md`) — **ADF-only** |
 | `<!-- adf:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
 | `<!-- adf:table [layout="<layout>"] [width="<px>"] -->` before a table | `table.attrs.layout` / `table.attrs.width`; emitted instead of `adf:wide-table` when a width or a non-wide layout must survive — **ADF-only** |
-| `<!-- adf:breakout mode="<wide\|full-width>" [width="<px>"] -->` on the line before `<details>` or a code fence | `breakout` mark on that `expand`/`codeBlock`; ignored before any other block — **ADF-only** |
+| `<!-- adf:breakout mode="<wide\|full-width>" [width="<px>"] -->` on the line before `<details>` or a code fence | `breakout` mark on that `expand`/`codeBlock`; rejected before any other block — **ADF-only** |
 | `<!-- adf:diagram drawio="<name>" -->` | `extension` (Draw.io macro) — **ADF-only, `adf-to-md` direction only** |
 | `<!-- adf:attachment media-id="<id>" alt="<alt>" [width="<w>" height="<h>"] [display-width="<n>[%]"] [layout="<layout>"] -->` | `mediaSingle`/`media`/`mediaGroup` (one placeholder per file) — **ADF-only, `adf-to-md` direction only** |
 | n/a (no reverse mapping) | `inlineCard` (Confluence smart link) → `[<url>](<url>)` — **ADF-only, `adf-to-md` direction only** |
@@ -85,7 +87,7 @@ Inside a table cell, `<br>` maps to an ADF `hardBreak` and converts back to `<br
 
 `**strong**`, `*em*`, `` `code` ``, `[link](href)`, `~~strike~~`.
 
-Marks nest and combine onto one text node, innermost first: `` [`Foo.Bar`](href) `` is a single text node carrying `code` **and** `link`, and `**[label](href)**` carries `link` **and** `strong`. A partly marked label splits into several nodes that all keep the outer mark. Both directions agree — `adf-to-md` re-wraps a combined node in the same order. A code span's content is literal, so nothing nests inside it.
+Marks nest and combine onto one text node, innermost first: `**[label](href)**` carries `link` **and** `strong`. A partly marked label splits into several nodes that all keep the outer mark. Both directions agree — `adf-to-md` re-wraps a combined node in the same order. A code span's content is literal, so nothing nests inside it. **A code span inside a link label (`` [`Foo.Bar`](href) ``) is unsupported:** Markdown lint rejects it on publish, and `adf-to-md` renders such linked text as a plain link with the warning `code inside link omitted` (Confluence does not store the combination reliably).
 
 `<emoji>[text]` maps to the inline `status` node — **ADF-only**. The emoji gives the color and renders as a colored dot in any Markdown viewer: `⚪` neutral, `🟣` purple, `🔵` blue, `🔴` red, `🟡` yellow, `🟢` green (e.g. `🔵[In Progress]`). `adf-to-md` writes this form; a status with a color outside the six falls back to `[STATUS:text|color]`.
 
