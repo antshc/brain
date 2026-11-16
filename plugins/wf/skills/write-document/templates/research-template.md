@@ -7,7 +7,7 @@ Place the bottom line first, before any method or evidence. Insert the Bottom li
 
 ## Bottom line
 
-- **{{finding|what did we find; plain language}}** {{soWhat|why it matters}} {{nowWhat|recommended action, or status ending in bold **Not confirmed**}}
+{{bottomLine|insert the Bottom line procedure's returned bullets unchanged}}
 
 ## What we did
 

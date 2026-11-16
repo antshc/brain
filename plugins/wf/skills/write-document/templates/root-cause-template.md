@@ -118,4 +118,3 @@ This reads as a **{{verdict|regression, bug, works as designed, feature request}
 ## Redact
 
 Replace secrets with `<REDACTED>`. Quote only signal lines.
-
