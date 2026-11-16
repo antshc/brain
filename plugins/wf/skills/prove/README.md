@@ -1,6 +1,8 @@
 # Prove examples
 
-Example prompts that should trigger Prove when the answer requires observing real behavior, grouped by route.
+Example prompts that should trigger Prove when the answer requires executing a check against the actual mechanism, grouped by route.
+
+Source-only requests such as "find the guard that prevents this transition", "trace this retry flow", or "analyze this IAM policy" belong to Research. Writing a test or prototype without running it does not complete Prove.
 
 ## Logic
 
@@ -10,9 +12,9 @@ Example prompts that should trigger Prove when the answer requires observing rea
 
 ## UI
 
-- Try three layouts for this settings page and see which interaction works.
-- Prototype alternative ways to show validation errors in this React form.
-- Test how this table feels with realistic data density and long values.
+- Run a browser E2E check that submitting an invalid form shows the field error and sends no request.
+- Test that keyboard focus returns to the triggering button after this dialog closes.
+- Run this table at a narrow viewport with long values and assert that its actions remain reachable.
 
 ## Runtime
 

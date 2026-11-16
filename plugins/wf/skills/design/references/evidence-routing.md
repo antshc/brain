@@ -10,7 +10,7 @@ Take the first applicable route per question; reevaluate after each result.
 |---|---|
 | Reliable evidence answers it for the same sketch revision and environment/version | Reuse; record the answer |
 | Needs facts from the codebase, installed NuGet packages, cloud/API, or web documentation | Research |
-| Needs observed behavior, including a CLI/API command | Prove |
+| Needs observed behavior from an executed test, prototype, GUI E2E check, or cloud experiment | Prove |
 | Material falsifiable design claim has a safe runnable target | Challenge this |
 | Needs user intent, policy, tradeoff, or unavailable authority | Recommend and document a reversible choice; ask only when authority is required or a checkpoint was requested |
 
@@ -30,7 +30,7 @@ Read final artifacts; check cited conclusions and applicable versions. Add findi
 
 ## Prove
 
-*Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence*. Pass `@question`, `@criteria` (assumption and confirm/refute observations), `@repoFacts` (launch/harness root, explicit checkout, revision, sketch/grounding/research paths, prior suites/evidence), and `@limits` (runtime/safety, exclusions, writable paths). Design chooses a fresh exact `@outputPath=<artifact-root>/prove/<question-id>-<revision>-<attempt>/report.md`, repository root as `@outputBase`, and distinct evidence/patch destinations in that run directory. Request method, observed output, rerun, conclusion, limitations and cleanup in `@outputShape`. Read the returned report in full.
+*Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments*. Pass `@question`, `@criteria` (assumption and confirm/refute observations), `@repoFacts` (launch/harness root, explicit checkout, revision, sketch/grounding/research paths, prior suites/evidence), and `@limits` (runtime/safety, exclusions, writable paths). Design chooses a fresh exact `@outputPath=<artifact-root>/prove/<question-id>-<revision>-<attempt>/report.md`, repository root as `@outputBase`, and distinct evidence/patch destinations in that run directory. Request method, observed output, rerun, conclusion, limitations and cleanup in `@outputShape`. Read the returned report in full. Accept confirmed/refuted only with deciding execution evidence against the actual mechanism; source analysis is grounding. Missing execution leaves the question unresolved.
 
 Prove owns method selection, integration-test discovery through Testing Integrations, isolation, rerun and cleanup. CLI-only requires no app/patch; require a patch only when code changed. When a following adversarial review needs runnable evidence, pass deferred cleanup and reuse its environment; Design releases owned resources after both runs. Material claims still receive Challenge this coverage below.
 
@@ -52,7 +52,7 @@ Record question/claim, sketch revision, environment/version, evidence paths, out
 | Inconclusive | Preserve unknown, missing evidence, and impact |
 | Tool, permission, or sandbox unavailable | Record blocker; invent no result |
 | Material change | Recheck only invalidated assumptions |
-| Unchanged question, dependencies, and sketch | Reuse evidence and prior Challenge this coverage |
+| Unchanged question, dependencies, and sketch | Reuse matching prior execution evidence and Challenge this coverage |
 
 Retry once per question/revision only when new evidence or setup addresses the failure; otherwise record blocker/unknown. Without checkpoint, apply evidence-backed Prove or Challenge this corrections to the sketch; with checkpoint, require approval for proposed corrections. Neither path permits production code before Phase E.
 

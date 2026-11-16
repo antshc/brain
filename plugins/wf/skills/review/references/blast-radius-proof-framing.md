@@ -29,7 +29,7 @@ Permitted edits: tests and temporary production instrumentation only inside Prov
 Apply the How sure are you ladder at {PROOF_CONTRACT}. Return per claim, in addition to Prove's fields:
 
 - **Finding:** failure mechanism, source `file:line`, likelihood, impact, verdict (`confirmed | cleared | unresolved`), highest supported ladder level, and scope of the conclusion.
-- **Unproven:** without executable proof, write `unproven`, reason, consequence, and exact next check. Preserve supported source conclusions; distinguish regression attribution from defect existence.
+- **Unproven:** without executable proof, write `unproven`, reason, consequence, and exact next check. Keep supported source findings as grounding only; they cannot confirm or clear a claim. Distinguish regression attribution from defect existence.
 - **Coverage:** behaviors checked/excluded, stopping reasons, assumptions, conflicting evidence, newly discovered risks.
 
 ## Destination
