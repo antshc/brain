@@ -5,7 +5,7 @@ import pytest
 
 
 SKILLS = Path(__file__).resolve().parents[3] / "plugins/wf/skills"
-ROOT = SKILLS / "draft-work"
+ROOT = SKILLS / "write-work"
 
 
 @pytest.mark.parametrize("route", ["story", "task", "bug"])
@@ -40,12 +40,12 @@ def test_work_normalization_preserves_sources_and_technical_evidence():
                    "domain glossary", "Preserve the hierarchy", "actual observations",
                    "Never invent"):
         assert phrase in requirements
-    assert "draft-document/" not in entry
+    assert "write-document/" not in entry
     for route in ("story", "task", "bug"):
         assert "normalize" in (ROOT / f"playbooks/{route}.md").read_text()
 
 
 def test_design_and_implement_delegate_one_task_to_the_work_author():
     design = SKILLS / "design"
-    assert "`draft-work` skill" in (design / "playbooks/tasks.md").read_text()
-    assert "`draft-work` skill" in (SKILLS / "implement/references/breakdown.md").read_text()
+    assert "`write-work` skill" in (design / "playbooks/tasks.md").read_text()
+    assert "`write-work` skill" in (SKILLS / "implement/references/breakdown.md").read_text()

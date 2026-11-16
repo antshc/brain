@@ -4,12 +4,12 @@
 
 Use precise leading words for implementation, discovery, tracker mechanics and review follow-ups across WF. Build on the artifact-authoring consolidation in `feat/draft-artifact-routes` at `723ed69edfc7394a0e0c28f156cc512fed83efce`.
 
-Split `draft-artifact` into `draft-work` (`story`, `task`, `bug`) and `draft-document` (`spec`, `hld`, `toi`). Use `draft-work task` as the implementation-artifact route. Rename `design tickets` to `design tasks`. Retain the existing Wayfinder `Task` type.
+Split `draft-artifact` into `write-work` (`story`, `task`, `bug`) and `write-document` (`spec`, `hld`, `toi`). Use `write-work task` as the implementation-artifact route. Rename `design tickets` to `design tasks`. Retain the existing Wayfinder `Task` type.
 
 ## Decisions
 
 - Use meaning-specific terms; classify occurrences before editing.
-- Replace `draft-artifact` with exactly two skills: `draft-work` and `draft-document`. The work-authoring skill is named `draft-work`.
+- Replace `draft-artifact` with exactly two skills: `write-work` and `write-document`. The work-authoring skill is named `write-work`.
 - Keep `toi` as the technical transfer-of-information route; do not rename it to `handover`.
 - Each drafting skill owns its own requirements instructions and terminology references, tailored to its artifacts. Keep normalization internal, with no shared requirements-resource dependency or separate normalization skill.
 - Add no compatibility aliases, legacy route spellings, old-type translation or fallback behavior.
@@ -44,9 +44,9 @@ Use the following assignments in skill instructions, route examples, templates, 
 
 | Skill or workflow | Assigned terms | Where to use them |
 |---|---|---|
-| `draft-work` | Story, Task, Bug | Name the authored artifact in the `story`, `task` and `bug` routes and their templates. |
-| `draft-document` | Spec, HLD, TOI | Name specifications, high-level designs and technical transfer-of-information documents in the `spec`, `hld` and `toi` routes. |
-| `draft-document hld` authoring and updates | Topic, Decision, Issue, Work item | Use topic for discovery entries, decision for recorded choices, issue for GitHub references and work item for generic or Jira references. |
+| `write-work` | Story, Task, Bug | Name the authored artifact in the `story`, `task` and `bug` routes and their templates. |
+| `write-document` | Spec, HLD, TOI | Name specifications, high-level designs and technical transfer-of-information documents in the `spec`, `hld` and `toi` routes. |
+| `write-document hld` authoring and updates | Topic, Decision, Issue, Work item | Use topic for discovery entries, decision for recorded choices, issue for GitHub references and work item for generic or Jira references. |
 | `design tasks` | Task | Describe implementation breakdown, dependencies, task approval and handoff to `implement`. |
 | `design wayfinder` | Topic; Research, Experiment, Decision, Contract design, Task | Use topic for map entries collectively and the five named types for classification. Task means discovery sketches or prerequisite work here. |
 | Other `design` routes and shared gates | Story, Task, Decision, Work item, Issue | Preserve the input artifact kind; use decision for choices, Work item approval for the shared tracker-creation gate and issue for GitHub objects. |
@@ -71,13 +71,13 @@ These assignments preserve semantic ownership and behavior while moving authorin
 | `design/playbooks/tickets.md` | `design/playbooks/tasks.md` |
 | `design/references/wayfinder-ticket-types.md` | `design/references/wayfinder-topic-types.md` |
 | `github/tactics/specs-and-tickets.md` | `github/tactics/specs-and-issues.md` |
-| `draft-artifact story` | `draft-work story` |
-| `draft-artifact task` | `draft-work task` |
-| `draft-artifact bug` | `draft-work bug` |
-| `draft-artifact spec` | `draft-document spec` |
-| `draft-artifact hld` | `draft-document hld` |
-| `draft-artifact toi` | `draft-document toi` |
-| Standalone requirements normalization | `draft-document normalize` |
+| `draft-artifact story` | `write-work story` |
+| `draft-artifact task` | `write-work task` |
+| `draft-artifact bug` | `write-work bug` |
+| `draft-artifact spec` | `write-document spec` |
+| `draft-artifact hld` | `write-document hld` |
+| `draft-artifact toi` | `write-document toi` |
+| Standalone requirements normalization | `write-document normalize` |
 
 Update route selection, argument examples, headings, direct resource disclosure, links and callers together. Remove obsolete resource files; keep no forwarding files.
 
@@ -89,12 +89,12 @@ Rename the standalone decomposition workflow's headings to Task operations and T
 
 | Skill | Routes | Responsibility |
 |---|---|---|
-| `draft-work` | `story`, `task`, `bug` | Author and update one work artifact from supplied scope or observed behavior. |
-| `draft-document` | `spec`, `hld`, `toi` | Author and update specifications, high-level designs and TOI documents from supplied requirements, decisions and evidence. |
+| `write-work` | `story`, `task`, `bug` | Author and update one work artifact from supplied scope or observed behavior. |
+| `write-document` | `spec`, `hld`, `toi` | Author and update specifications, high-level designs and TOI documents from supplied requirements, decisions and evidence. |
 
 Both skills own artifact structure, rendering, incremental updates and document checks. Callers retain discovery, decisions, decomposition, evidence dispatch, approvals, worktrees, integration and publication. Preserve existing Bug and TOI read-only exploration.
 
-`design tasks` determines the implementation breakdown; `draft-work task` writes one supplied task. Design and Wayfinder continue to own their existing workflows and delegate document authoring to `draft-document`.
+`design tasks` determines the implementation breakdown; `write-work task` writes one supplied task. Design and Wayfinder continue to own their existing workflows and delegate document authoring to `write-document`.
 
 ### Target structure
 
@@ -102,14 +102,14 @@ All paths below are relative to `plugins/wf/skills/`.
 
 | Directory | Files |
 |---|---|
-| `draft-work/` | `SKILL.md` |
-| `draft-work/playbooks/` | `story.md`, `task.md`, `bug.md` |
-| `draft-work/templates/` | `story-template.md`, `task-template.md`, `bug-template.md` |
-| `draft-work/references/` | `requirements.md`, `requirements-terms.md` |
-| `draft-document/` | `SKILL.md` |
-| `draft-document/playbooks/` | `spec.md`, `hld.md`, `toi.md` |
-| `draft-document/templates/` | `spec-template.md`, `hld-template.md`, `toi-template.md` |
-| `draft-document/references/` | `requirements.md`, `requirements-terms.md`, `decision-bullet.md`, `hld-updates.md` |
+| `write-work/` | `SKILL.md` |
+| `write-work/playbooks/` | `story.md`, `task.md`, `bug.md` |
+| `write-work/templates/` | `story-template.md`, `task-template.md`, `bug-template.md` |
+| `write-work/references/` | `requirements.md`, `requirements-terms.md` |
+| `write-document/` | `SKILL.md` |
+| `write-document/playbooks/` | `spec.md`, `hld.md`, `toi.md` |
+| `write-document/templates/` | `spec-template.md`, `hld-template.md`, `toi-template.md` |
+| `write-document/references/` | `requirements.md`, `requirements-terms.md`, `decision-bullet.md`, `hld-updates.md` |
 
 Move any additional route-specific resources discovered during implementation with their owning route; update every reference. Remove the old `draft-artifact/` directory after migrating callers. Add no forwarding skill or compatibility route.
 
@@ -132,14 +132,14 @@ Each skill owns a local `references/requirements.md` and `references/requirement
 
 | Skill | Normalization rules |
 |---|---|
-| `draft-work` | Express stories as observable user outcomes, task acceptance criteria as verifiable behavior and bug expected behavior precisely. Preserve task technical scope, reproduction steps, actual results and evidence. |
-| `draft-document` | Express behavioral requirements through domain language, business rules, constraints and edge cases. Preserve HLD decisions, responsibilities, technical contracts and evidence. Apply to TOI only where it states required behavior; preserve descriptions of implemented behavior. |
+| `write-work` | Express stories as observable user outcomes, task acceptance criteria as verifiable behavior and bug expected behavior precisely. Preserve task technical scope, reproduction steps, actual results and evidence. |
+| `write-document` | Express behavioral requirements through domain language, business rules, constraints and edge cases. Preserve HLD decisions, responsibilities, technical contracts and evidence. Apply to TOI only where it states required behavior; preserve descriptions of implemented behavior. |
 
 Both local rule sets retain the small common principles: observable behavior, domain language, source fidelity and no invented requirements. Preserve the existing distinctions between business requirements, technical decisions and structural relocation constraints.
 
 Normalize internally during drafting and updates at the supplied level of detail. Preserve authoritative verbatim text and report source conflicts separately. Retain source relationships when deriving acceptance criteria from rules and edge cases.
 
-For an explicit normalization request, use the relevant artifact route with the normalize operation. Standalone requirements without an artifact type use `draft-document normalize` (the spec requirements rules). Preserve the fragment's structure, skip full-template rendering, contract/diagram generation and unrelated edits, and return corrected wording with a brief correction note. Report no corrections when applicable.
+For an explicit normalization request, use the relevant artifact route with the normalize operation. Standalone requirements without an artifact type use `write-document normalize` (the spec requirements rules). Preserve the fragment's structure, skip full-template rendering, contract/diagram generation and unrelated edits, and return corrected wording with a brief correction note. Report no corrections when applicable.
 
 ## Wayfinder topic types
 
@@ -169,11 +169,11 @@ Add no automatic translation for old topic-type names. Do not mutate existing re
 - [ ] Update `design/playbooks/sketch.md`, `spec.md`, `hld.md`, `references/living-document.md` and `references/risk-verification.md` according to meaning.
 - [ ] Update Design README examples, diagrams and handoffs. Preserve `design grill`, prototype approval, evidence eligibility and publication rules.
 
-### Draft work and draft document
+### Write work and draft document
 
 - [ ] Create both skills with the target structure and entry-point sections above.
-- [ ] Move story/task/bug playbooks and templates to `draft-work`; retain their route names.
-- [ ] Move spec/HLD/TOI playbooks, templates and related references to `draft-document`; retain `toi`.
+- [ ] Move story/task/bug playbooks and templates to `write-work`; retain their route names.
+- [ ] Move spec/HLD/TOI playbooks, templates and related references to `write-document`; retain `toi`.
 - [ ] Give each skill its own tailored requirements and requirements-terms references; preserve internal normalization and protected source wording.
 - [ ] Preserve exact artifact output formats, defaults, incremental HLD updates, gaps reporting and existing read-only exploration.
 - [ ] Use task for implementation-related references in the task template.
@@ -187,7 +187,7 @@ Add no automatic translation for old topic-type names. Do not mutate existing re
 - [ ] Update `references/breakdown.md`, `sequential.md`, `parallel.md`, `publication.md` and `worktrees.md`.
 - [ ] Update `agents/planner.md` and `agents/chore.md` briefs and prose.
 - [ ] Keep graph identities, JSON keys, checkpoint fields, CLI calls, commit recognizers and scheduling behavior unchanged.
-- [ ] Invoke `draft-work task` once per planned implementation task.
+- [ ] Invoke `write-work task` once per planned implementation task.
 
 ### GitHub
 
@@ -220,7 +220,7 @@ Add no automatic translation for old topic-type names. Do not mutate existing re
 
 - [ ] Update `atlassian/references/address-page-comments.md` to distinguish follow-ups from Jira work items.
 - [ ] Inspect Jira duplicate-search wording; retain literal input/search terms when they are data.
-- [ ] Update `diagnosing-bugs/references/root-cause-report.md`: work item reference instead of generic ticket ID.
+- [ ] Update `write-document/templates/root-cause-template.md`: work item reference instead of generic ticket ID.
 - [ ] Preserve provider schemas and evidence.
 
 ### Factory Mode and documentation
@@ -235,7 +235,7 @@ Add no automatic translation for old topic-type names. Do not mutate existing re
 ## Implementation sequence
 
 1. Classify each existing occurrence as implementation, discovery, tracker mechanics, review follow-up, machine identifier or protected source text; apply the Term assignments by skill table.
-2. Split drafting into `draft-work` and `draft-document`, tailor their independent requirements instructions, rename routes/resources and update every caller, direct resource link and section anchor in one change.
+2. Split drafting into `write-work` and `write-document`, tailor their independent requirements instructions, rename routes/resources and update every caller, direct resource link and section anchor in one change.
 3. Update skill prose, agent briefs, installed workflow assets and active documentation.
 4. Update affected checks and fixtures to the canonical names only.
 5. Load and follow the repository's `skill-author` Shrink procedure on changed agent-facing instructions. Preserve behavior, literal machine contracts and output formats.
@@ -245,12 +245,12 @@ Add no automatic translation for old topic-type names. Do not mutate existing re
 
 - [ ] Each affected skill, route and installed workflow uses the terms assigned in Term assignments by skill; artifact meaning and tracker representation remain distinct.
 - [ ] `design tasks` resolves to its renamed playbook; `design tickets` has no alias or executable fallback.
-- [ ] Exactly two drafting skills exist: `draft-work` with story/task/bug and `draft-document` with spec/hld/toi.
-- [ ] `draft-work task` is the canonical implementation-artifact author; design and implementation callers use it.
+- [ ] Exactly two drafting skills exist: `write-work` with story/task/bug and `write-document` with spec/hld/toi.
+- [ ] `write-work task` is the canonical implementation-artifact author; design and implementation callers use it.
 - [ ] TOI remains the `toi` route; no `handover` route is introduced.
 - [ ] Each skill loads only its own requirements instructions and terminology references, with no shared requirements-resource dependency.
 - [ ] Representative drafting/update/normalize walkthroughs preserve observable behavior, source fidelity and technical details.
-- [ ] Standalone requirements normalization preserves the supplied structure through `draft-document normalize`.
+- [ ] Standalone requirements normalization preserves the supplied structure through `write-document normalize`.
 - [ ] Old `draft-artifact` invocations, resource links and registrations are absent from active guidance; no aliases remain.
 - [ ] Wayfinder uses exactly Research, Experiment, Decision, Contract design and Task as its topic types.
 - [ ] Wayfinder Task still means sketches/prerequisite work; no Preparation or Prerequisite replacement type is introduced.

@@ -1,7 +1,7 @@
 ---
 name: writing-style
 description: >-
-  Apply clear, precise writing to technical docs, PR text, and prompts. Use for 'unslop this', 'tighten this prose', or 'sharpen this prompt'. Not for work-item templates → `draft-work`. Not for document templates → `draft-document`.
+  Apply clear, precise writing to technical docs, PR text, and prompts. Use for 'unslop this', 'tighten this prose', or 'sharpen this prompt'. Not for work-item templates → `write-work`. Not for document templates → `write-document`.
 ---
 
 # Writing style
@@ -25,13 +25,14 @@ Orchestrator. Pick the task row, read each listed reference fully (no previews),
 | Write a PR description or commit message | [references/docs-and-prs.md](references/docs-and-prs.md), [references/sentences-google.md](references/sentences-google.md), [references/unslop.md](references/unslop.md) |
 | Review or tighten existing text | [references/rhythm.md](references/rhythm.md), [references/ambiguity-global-english.md](references/ambiguity-global-english.md), [references/unslop.md](references/unslop.md) |
 | Unslop only, remove AI tells | [references/unslop.md](references/unslop.md) |
-| Write a bottom line (research conclusion, key finding, recommended action, executive takeaway) | [references/bottom-line.md](references/bottom-line.md), [references/steps-ste.md](references/steps-ste.md), [references/unslop.md](references/unslop.md) |
 | Sharpen a task prompt: deepen it or restate the user's intent | [references/sharpen.md](references/sharpen.md); its output replaces Pipeline |
 | Another skill needs text written through this style | The row matching the text kind |
 
 Doc-mode choice (tutorial, how-to, reference, explanation) applies to whole documents only. Skip `references/modes-diataxis.md` for short text.
 
-For story/task/bug requirements normalization, *Load and follow the `draft-work` skill to create and update user stories, implementation tasks and bug reports* using the matching route with `normalize`. For spec/HLD/TOI or untyped requirements, *Load and follow the `draft-document` skill to create and update specifications, high-level designs and TOI documents* using the matching route with `normalize`; use `normalize` for an untyped fragment.
+For story/task/bug requirements normalization, *Load and follow the `write-work` skill to write and update user stories, implementation tasks and bug reports* using the matching route with `normalize`. For spec/HLD/TOI or untyped requirements, *Load and follow the `write-document` skill to write and update specifications, high-level designs and TOI documents* using the matching route with `normalize`; use `normalize` for an untyped fragment.
+
+For a bottom line or research report, *Load and follow the `write-document` skill to write research reports and bottom lines* using `bottom-line` for a standalone conclusion or `research` for a full report. This skill owns prose refinement only; preserve the owner's structure, evidence and confidence.
 
 ## Pipeline
 
