@@ -1,1 +1,2 @@
 atlassian-python-api>=5.0.5
+pymarkdownlnt==0.9.41

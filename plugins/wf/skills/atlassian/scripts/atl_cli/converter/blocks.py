@@ -48,7 +48,7 @@ _RULE_RE = re.compile(r"^(-{3,}|\*{3,}|_{3,})\s*$")
 # Leading whitespace is allowed so a table indented under a list item is still a table.
 _TABLE_ROW_RE = re.compile(r"^(\s*)\|(.*)\|\s*$")
 _TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
-_FENCE_OPEN_RE = re.compile(r"^```(\w*)\s*$")
+_FENCE_OPEN_RE = re.compile(r"^(`{3,}|~{3,})(\w*)\s*$")
 
 # Column widths (px) for headers this skill recognizes by name, stripped of markdown marks
 # (e.g. "**#**" -> "#"). Only applied when a table has at least one of these headers, so
@@ -138,12 +138,15 @@ def parse_blocks(lines: list[str]) -> list[dict]:
 
         fence_m = _FENCE_OPEN_RE.match(line)
         if fence_m:
-            lang = fence_m.group(1).lower()
+            fence, lang = fence_m.group(1), fence_m.group(2).lower()
+            closing = re.compile(r"^" + re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*$")
             code_lines = []
             i += 1
-            while i < n and not lines[i].startswith("```"):
+            while i < n and not closing.match(lines[i]):
                 code_lines.append(lines[i])
                 i += 1
+            if i >= n:
+                raise ValueError("unterminated code fence")
             i += 1  # skip closing fence
             attrs = {}
             if lang in CODE_LANG_ALLOWLIST:
@@ -168,11 +171,11 @@ def parse_blocks(lines: list[str]) -> list[dict]:
                     {
                         "type": "panel",
                         "attrs": {"panelType": panel_type},
-                        "content": paragraphs_from_lines(quote_lines[1:]),
+                        "content": parse_blocks(quote_lines[1:]),
                     }
                 )
             else:
-                blocks.append({"type": "blockquote", "content": paragraphs_from_lines(quote_lines)})
+                blocks.append({"type": "blockquote", "content": parse_blocks(quote_lines)})
             continue
 
         if DETAILS_OPEN_RE.match(line):
@@ -231,7 +234,7 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             # A block-start marker no branch above claimed (e.g. a stray `</details>`) is literal text.
             para_lines.append(lines[i])
             i += 1
-        text = " ".join(l.strip() for l in para_lines)
+        text = join_paragraph_lines(para_lines)
         blocks.append({"type": "paragraph", "content": parse_inline(text)})
 
     return blocks
@@ -272,6 +275,9 @@ def _table_start(lines: list[str], i: int) -> int | None:
 
 def _parse_table(lines: list[str], i: int, table_attrs: dict) -> tuple[dict, int]:
     header_cells = split_table_row(lines[i])
+    separator_cells = split_table_row(lines[i + 1])
+    if len(separator_cells) != len(header_cells):
+        raise ValueError("table header and separator column count mismatch")
     i += 2
     rows = []
     while i < len(lines) and _TABLE_ROW_RE.match(lines[i]):
@@ -283,18 +289,32 @@ def _parse_table(lines: list[str], i: int, table_attrs: dict) -> tuple[dict, int
     return table, i
 
 
+def join_paragraph_lines(lines: list[str]) -> str:
+    parts = []
+    for index, line in enumerate(lines):
+        if index == len(lines) - 1:
+            parts.append(line.strip())
+        elif line.endswith("  "):
+            parts.append(line.strip() + "  \n")
+        elif line.endswith("\\"):
+            parts.append(line.strip() + "\n")
+        else:
+            parts.append(line.strip() + " ")
+    return "".join(parts)
+
+
 def paragraphs_from_lines(lines: list[str]) -> list[dict]:
     paras: list[dict] = []
     buf: list[str] = []
     for line in lines:
         if not line.strip():
             if buf:
-                paras.append({"type": "paragraph", "content": parse_inline(" ".join(buf))})
+                paras.append({"type": "paragraph", "content": parse_inline(join_paragraph_lines(buf))})
                 buf = []
         else:
-            buf.append(line.strip())
+            buf.append(line)
     if buf:
-        paras.append({"type": "paragraph", "content": parse_inline(" ".join(buf))})
+        paras.append({"type": "paragraph", "content": parse_inline(join_paragraph_lines(buf))})
     if not paras:
         paras = [{"type": "paragraph", "content": [{"type": "text", "text": ""}]}]
     return paras
@@ -318,6 +338,7 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
     """Parse a list at `lines[i]`. Tables indented under its items are appended to
     `deferred_tables` (ADF has no table-in-listItem) instead of ending the list."""
     n = len(lines)
+    start_index = i
     is_ordered, first_m = _match_list_marker(lines[i])
     base_indent = len(first_m.group(1))
     list_type = "orderedList" if is_ordered else "bulletList"
@@ -380,7 +401,7 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
                 continue
             if sub_m or item_content or _is_block_start(lines[i], lines, i):
                 break  # keep list-item parsing simple: one paragraph + optional nested list only
-            item_text = f"{item_text} {lines[i].strip()}"
+            item_text = join_paragraph_lines([item_text, lines[i]])
             i += 1
 
         if not item_content:
@@ -388,7 +409,12 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
 
         items.append({"type": "listItem", "content": item_content})
 
-    return {"type": list_type, "content": items}, i
+    block = {"type": list_type, "content": items}
+    if is_ordered:
+        order = int(_ORDERED_NUMBER_RE.match(lines[start_index]).group(1))
+        if order != 1:
+            block["attrs"] = {"order": order}
+    return block, i
 
 
 def _strip_md_marks(text: str) -> str:

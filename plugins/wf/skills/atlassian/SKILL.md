@@ -34,7 +34,7 @@ Out of scope here: daily blocked items and @mentions → *Load and follow the `d
 3. **Body transport.** Full Jira descriptions and Confluence page bodies move over REST + ADF through `atl.py` only. Search, discovery, metadata, Jira comments, transitions, and every other non-body operation use Preflight's `<twg>`. Never use the Atlassian MCP. Request Markdown, never HTML, from twg; the only HTML exception is the Address page comments tactic's targeted edits.
 4. **Fallbacks.** Each fetch reference names its lossy twg fallback and warning; use it only when `atl.py` is unavailable or fails for a non-auth reason. Auth failure or policy denial → stop and report; no fallback.
 5. **Read-only intents** (read, show, summarize, search, compare) issue no create, update, transition, comment, attach, or publish call.
-6. **Prerequisites.** `tokenAvailable` false, `atlassian-python-api` missing or unsupported, or Preflight unavailable → ask the user to run `/atlassian install` (Install tactic) in Copilot CLI, then stop; never start it unasked.
+6. **Prerequisites.** `tokenAvailable` false, `atlassian-python-api` missing or unsupported, required `pymarkdownlnt` missing, or Preflight unavailable → ask the user to run `/atlassian install` (Install tactic) in Copilot CLI, then stop; never start it unasked.
 
 ## TWG routes
 

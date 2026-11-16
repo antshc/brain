@@ -1,5 +1,7 @@
 # Fetch page
 
+Read [Conversion guards](conversion-guards.md) for lint policy, fidelity checks, supported exceptions, and read-back manifests.
+
 Return a Confluence **Page** as Markdown from a page ID, tiny ID, URL, or selected search hit. REST v2 reads the real ADF body, attachments, and comments; `atl.py` converts ADF back to Markdown verbatim. Not twg: its Markdown export drops ADF-only constructs and comment anchors. Use for every page body read; twg only finds pages.
 
 ## Contents

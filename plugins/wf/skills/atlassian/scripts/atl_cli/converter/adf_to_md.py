@@ -1,6 +1,8 @@
 """Atlassian Document Format -> Markdown entrypoint (pure)."""
 from __future__ import annotations
 
+import re
+
 from .patterns import COMMENT_CLOSE_TAG, STATUS_EMOJI, comment_open_tag
 from .table_grid import validate_table_grid
 
@@ -32,7 +34,7 @@ def render_block(node: dict) -> str:
 
 
 def _breakout_marker(attrs: dict) -> str:
-    fields = "".join(f' {key}="{_number(value) if key == "width" else value}"' for key, value in attrs.items())
+    fields = "".join(f' {key}="{_number(value) if key == "width" else value}"' for key, value in sorted(attrs.items()))
     return f"<!-- adf:breakout{fields} -->"
 
 
@@ -74,7 +76,8 @@ def _render_block_body(node: dict) -> str:
         lang = node.get("attrs", {}).get("language", "")
         lang = _LANGUAGE_ALIASES.get(lang, lang)
         text = "".join(c.get("text", "") for c in node.get("content", []))
-        return f"```{lang}\n{text}\n```"
+        fence = "`" * max(3, max((len(m.group()) + 1 for m in re.finditer(r"`+", text)), default=3))
+        return f"{fence}{lang}\n{text}\n{fence}"
     if node_type == "rule":
         return "---"
     if node_type == "expand":
@@ -171,7 +174,9 @@ def render_list_item(item: dict, depth: int) -> list[str]:
             nested = render_list(child, ordered=(child["type"] == "orderedList"), depth=depth + 1)
             lines.extend(nested.split("\n"))
         else:
-            lines.extend(render_block(child).split("\n"))
+            rendered = render_block(child).split("\n")
+            lines.append(rendered[0])
+            lines.extend("  " * (depth + 1) + line for line in rendered[1:])
     return lines
 
 
@@ -220,7 +225,7 @@ def render_table_cell(cell: dict) -> str:
             parts.append(render_inline(block.get("content", [])).replace("  \n", "<br>"))
         else:
             parts.append(render_block(block))
-    return " ".join(p.replace("\n", " ") for p in parts if p)
+    return " ".join(p.replace("\n", " ") for p in parts if p).replace("|", "\\|")
 
 
 def _comment_ids(node: dict) -> list[str]:
@@ -271,7 +276,7 @@ def render_inline_card(node: dict) -> str:
     url = node.get("attrs", {}).get("url", "")
     if not url:
         raise ValueError("inlineCard node is missing a non-empty url")
-    return f"[{url}]({url})"
+    return render_text({"type": "text", "text": url, "marks": [{"type": "link", "attrs": {"href": url}}]})
 
 
 def render_inline_extension(node: dict) -> str:
@@ -293,12 +298,18 @@ def render_status(node: dict) -> str:
 def render_text(node: dict) -> str:
     text = node.get("text", "")
     marks_by_type = {m.get("type"): m for m in node.get("marks", [])}
+    if "code" not in marks_by_type:
+        text = re.sub(r"([\\`*_\[\]<])", r"\\\1", text)
+        text = re.sub(r"^(#{1,6}|>|[-+])(?=\s)", r"\\\1", text)
+        text = re.sub(r"^(\d+)\.(?=\s)", r"\1\\.", text)
     for mark_type in _MARK_ORDER:
         mark = marks_by_type.get(mark_type)
         if mark is None:
             continue
         if mark_type == "code":
-            text = f"`{text}`"
+            delimiter = "`" * max(1, max((len(m.group()) + 1 for m in re.finditer(r"`+", text)), default=1))
+            padding = " " if text.strip() and (text.startswith(("`", " ")) or text.endswith(("`", " "))) else ""
+            text = f"{delimiter}{padding}{text}{padding}{delimiter}"
         elif mark_type == "strike":
             text = f"~~{text}~~"
         elif mark_type == "em":

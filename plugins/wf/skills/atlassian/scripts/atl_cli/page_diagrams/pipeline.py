@@ -17,6 +17,7 @@ from .attachments import upload_diagrams, upload_files
 from .custom_content import upsert_diagram
 from ..confluence_client import get_confluence
 from ..map_markdown import ConversionError, md_to_adf
+from ..conversion_guard import guard_adf, lint_markdown, validate_markdown
 from .env import (
     load_credentials,
     load_drawio_extension_key,
@@ -70,7 +71,9 @@ def strip_title_heading(adf: dict) -> dict:
 
 def convert_markdown_to_adf(processed_md: str) -> dict:
     try:
-        return md_to_adf(processed_md)
+        doc = md_to_adf(processed_md)
+        guard_adf(doc)
+        return doc
     except ConversionError as exception:
         raise RuntimeError(f"map-markdown-adf md-to-adf failed: error: {exception}") from None
 
@@ -204,6 +207,7 @@ def _publish_with_diagrams(
         nodes_by_index.update(local_media_nodes)
         final_adf, _ = substitute_drawio(base_adf, nodes_by_index)
 
+        guard_adf(final_adf)
         version = get_page_version(confluence, target_page_id)
         update_page_adf(confluence, target_page_id, title, final_adf, version)
 
@@ -312,9 +316,17 @@ def publish(
     md_text = Path(md_path).read_text(encoding="utf-8")
     resolved_title = resolve_title(md_text, title)
     processed = strip_ignored_sections(md_text)
+    validate_markdown(processed, media=True)
+    lint_markdown(processed)
     processed, diagrams = extract_mermaid(processed)
     processed, local_media = extract_local_media(processed, Path(md_path).parent, start_index=len(diagrams))
     base_adf = strip_title_heading(convert_markdown_to_adf(processed))
+    guard_adf(base_adf)
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    manifest_path = str(Path(out_path).with_suffix(".manifest.json"))
+    # Save the pre-mutation expectation, including typed media placeholders. Read-back
+    # comparison uses the final ADF written below after media IDs have been resolved.
+    Path(manifest_path).write_text(json.dumps({"title": resolved_title, "adf": base_adf}, indent=2) + "\n", encoding="utf-8")
 
     # A page with only local attachments and no mermaid fence must not be blocked by an
     # unrelated/unusable diagramRenderer setting.
@@ -363,6 +375,8 @@ def publish(
         result["parentId"] = parent_id
     result["renderer"] = renderer
     result["adfPath"] = out_path
+    result["manifestPath"] = manifest_path
+    Path(manifest_path).write_text(json.dumps({"title": resolved_title, "adf": final_adf}, indent=2) + "\n", encoding="utf-8")
     result.update(guard_keys)
     if guard is not None:
         result.update(_apply_comment_guard(guard, credentials, page_id))

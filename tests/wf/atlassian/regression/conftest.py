@@ -33,7 +33,22 @@ def simulate_fetch(page_md: str, fetch_number: int) -> str:
     `map-markdown-adf` round trip plus fetch-page's documented substitutions (mermaid fence from
     the sidecar, cached attachment links, inline anchor from the twg comment, `## Comments`)."""
     published = _IGNORED_RE.sub("", page_md)
+    # Media-size belongs to the full media pipeline, not the pure text converter.
+    media_sizes = re.findall(r"(!\[[^\]]+\]\([^)]+\))\n(<!-- media-size:.*?-->)", published)
+    published = re.sub(r"^<!-- media-size:.*?-->\n?", "", published, flags=re.MULTILINE)
+    diagrams = re.findall(r"```mermaid\n.*?\n```", published, re.DOTALL)
+    for index, diagram in enumerate(diagrams):
+        published = published.replace(diagram, f"ATL-DIAGRAM-{index}")
+    images = re.findall(r"!\[[^\]]+\]\([^)]+\)", published)
+    for index, image in enumerate(images):
+        published = published.replace(image, f"ATL-IMAGE-{index}")
     markdown = _convert("adf-to-md", _convert("md-to-adf", published))
+    for index, diagram in enumerate(diagrams):
+        markdown = markdown.replace(f"ATL-DIAGRAM-{index}", diagram)
+    for index, image in enumerate(images):
+        markdown = markdown.replace(f"ATL-IMAGE-{index}", image)
+    for image, size in media_sizes:
+        markdown = markdown.replace(image, image + "\n" + size)
     markdown = markdown.replace("```\n%% diagram-id:", "```mermaid\n%% diagram-id:")
     markdown = markdown.replace("](assets/", f"](fetched-{fetch_number}.md.assets/")
     markdown = markdown.replace(") <!-- media-size:", ")\n<!-- media-size:")

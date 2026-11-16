@@ -1,5 +1,7 @@
 # Install
 
+Read [Conversion guards](conversion-guards.md) for lint policy, fidelity checks, supported exceptions, and read-back manifests.
+
 The **Install** tactic. Follow only on explicit request in Copilot CLI; it needs no Preflight (it creates it). Resolve the target with `git rev-parse --show-toplevel` and use it as CWD. Stop outside a Git repository. Resolve `assets/` and `scripts/` from the `atlassian` skill's base directory (`<skillDir>`, the parent of this file's `references/` folder). This installer does not install TWG, edit shell profiles, set persistent environment variables, or run `twg login` or `twg setup`.
 
 ## Skill install

@@ -13,10 +13,12 @@ from .patterns import (
 )
 
 _INLINE_RE = re.compile(
-    r"`(?P<code_txt>[^`]+)`"
+    r"(?P<escape>\\[!\"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])"
+    r"|(?P<hard_break><br\s*/?>| {2,}\n|\\\n)"
+    r"|(?P<code_delim>`+)(?P<code_txt>.+?)(?P=code_delim)(?!`)"
     r"|" + STATUS_PATTERN +
     r"|" + EMOJI_STATUS_PATTERN +
-    r"|\[(?P<link_txt>[^\]]*)\]\((?P<link_href>[^)\s]+)\)"
+    r"|\[(?P<link_txt>(?:\\.|[^\]])*)\]\((?P<link_href>(?:\\.|[^()\s]|\([^()]*\))+)\)"
     r"|\*\*(?P<strong_txt>.+?)\*\*"
     r"|__(?P<strong_u_txt>.+?)__"
     r"|~~(?P<strike_txt>.+?)~~"
@@ -76,8 +78,12 @@ def _parse_inline_marks(text: str) -> list[dict]:
         if m is None:
             break
         _append_plain(nodes, text[pos : m.start()])
-        if m.group("code_txt") is not None:
-            nodes.append({"type": "text", "text": m.group("code_txt"), "marks": [{"type": "code"}]})
+        if m.group("escape") is not None:
+            nodes.append({"type": "text", "text": m.group("escape")[1:]})
+        elif m.group("hard_break") is not None:
+            nodes.append({"type": "hardBreak"})
+        elif m.group("code_txt") is not None:
+            nodes.append({"type": "text", "text": _code_text(m.group("code_txt")), "marks": [{"type": "code"}]})
         elif m.group("status_text") is not None:
             nodes.append(
                 {
@@ -121,11 +127,12 @@ def _parse_inline_marks(text: str) -> list[dict]:
     return nodes
 
 
+def _code_text(text: str) -> str:
+    text = text.replace("\n", " ")
+    if text.startswith(" ") and text.endswith(" ") and text.strip():
+        return text[1:-1]
+    return text
+
+
 def parse_inline(text: str) -> list[dict]:
-    segments = re.split(r"<br\s*/?>", text)
-    nodes: list[dict] = []
-    for i, seg in enumerate(segments):
-        if i > 0:
-            nodes.append({"type": "hardBreak"})
-        nodes.extend(_parse_inline_marks(seg))
-    return nodes or [{"type": "text", "text": ""}]
+    return _parse_inline_marks(text) or [{"type": "text", "text": ""}]
