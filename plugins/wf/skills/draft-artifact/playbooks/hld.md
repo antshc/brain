@@ -15,13 +15,13 @@
 - Gotchas
 - Output
 
-Use supplied decisions, evidence and codebase context to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Synthesize the solution. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder for precise ticket/proposal ownership or coarse Not yet specified classification, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
+Use supplied decisions, evidence and codebase context to create or update one `docs/ongoing/{{initiativeSlug}}.md`. Do not interview during synthesis. Return unresolved source conflicts to Wayfinder for precise ticket/proposal ownership or coarse Not yet specified classification, with the exact blocker/next action; standalone returns discovery gaps inline without creating a map. HLD Open Questions are user-owned presentation content: leave empty on creation and preserve existing user entries verbatim. On a requested legacy update, move the canonical HLD into `docs/ongoing/` and repair active links; preserve history and avoid duplicate authoritative copies. Do not bulk-migrate unrelated designs.
 
 ## Evolving draft
 
 Wayfinder may supply `@evolvingDraft=true` with its exact document worktree/path. Read HLD updates registered in the router. Keep core headings/order and explicitly mark missing evidence/decisions Pending, including required diagrams/deltas not yet supportable; never fabricate them or mark unknown content not applicable. Return a draft with named gaps for the caller's commit; this does not establish readiness. All normal checks apply as evidence arrives and before declaring ready. Synthesis consumes results; Wayfinder owns evidence dispatch for its HLD. The caller supplies material-risk verification outcomes before final synthesis; direct authoring returns missing verification as a gap.
 
-Use HLD updates reconciliation for supported design consequences and internal provenance; do not reconcile user presentation questions. Preserve source-ranked content and existing diagram approval requirements; a blocked update stays a named gap. Outside this mode, ordinary HLD authoring is unchanged.
+Apply HLD updates reconciliation to supported design consequences and internal provenance, preserving source ranks and diagram approvals. Exclude user presentation questions; return blocked updates as named gaps. Outside this mode, use ordinary HLD authoring.
 
 ## Vocabulary
 
@@ -49,7 +49,7 @@ Treat existing content outside `Open Questions` as resolved unless marked draft,
 
 Let stronger evidence update weaker content. Preserve equal-authority conflicts and return them to the owning ticket/proposal, coarse root fog or standalone caller without inventing a design decision. NEVER remove or weaken sourced or existing resolved content without stronger explicit evidence.
 
-**Provenance stays out of the body.** ADRs, Concepts, Architecture, and tickets are grounding evidence, not citable content — never name or link them anywhere in the document body (`Requirements`, `Current State`, `Solution Overview`, `Decisions`, appendices, etc.). Absorb what they establish as plain, self-contained statements instead of attributing it to the source document. The only place any of these four may be named or linked is a row in `Source Material`.
+**Provenance stays out of the body.** Name/link ADRs, Concepts, Architecture and tickets only in `Source Material` rows. Throughout the body, including appendices, restate their facts as plain, self-contained statements without attribution.
 
 ## Reconcile capabilities
 
@@ -67,7 +67,7 @@ Populate `Use cases` with one bold-titled bullet per actor goal within a Feature
 
 Keep `Solution Overview` at architecture level: responsibilities, interfaces, ownership, cross-boundary flows, failures, and testing implications.
 
-`hld-template.md` holds diagram placement and routing comments only. It does not own reusable Mermaid skeletons.
+`hld-template.md` owns diagram placement/routing comments, not reusable Mermaid skeletons.
 
 The reader-facing architecture-representation section is arc42's Building Block View, within `Solution Overview`, inside a titled expand without a separate H2. Include it when the solution spans multiple components and teams across the organization; otherwise include it only when the user explicitly requests it. *Load and follow the `doc-diagram` skill to create Mermaid architecture diagrams to show system structure in a current Mermaid C4 Container Diagram* of deployable building blocks.
 
@@ -93,7 +93,7 @@ Consume supplied GUI assets and existing research and prototype outputs only. Do
 - **Prototype:** State only supported observations and design consequences. Keep proof reports, logs, patches and sketch packages local, indexed on root/child issues; do not reproduce them in an appendix or disguised artifact inventory.
 - **Research:** State terse supported findings and implementation consequences; no report appendix, local report link or copied full report. Root/child issues and ignored Source Material retain provenance.
 
-GUI assets and selected contract/diagram descriptions are design content. Keep research/proof/sketch artifact inventories and local links in issue metadata or ignored Source Material only; the body ban on ADR, Concept, Architecture, and ticket attribution still applies.
+Treat GUI assets and selected contract/diagram descriptions as design content. Keep research/proof/sketch inventories and local links only in issue metadata or ignored Source Material; apply Ground and rank evidence provenance rules.
 
 Populate every `Checklists` subsection. Per the template's own row rule, keep only the applicable/not-applicable value and fill `Details` when relevant; remove a whole subsection only when its entire category is not applicable, and note that in `Details`.
 
@@ -105,24 +105,24 @@ Apply HLD updates registered in the router. Compare the existing design and inco
 
 1. Confirm every required template was opened this run, not recalled from memory.
 2. Map every source obligation to a capability, solution element, testing decision, and relevant diagram or internal evidence source.
-3. Populate every core section, in the template's section order, or mark it not applicable. `Current State` is removed entirely, never marked not applicable, unless the user asked for it. `Use cases` has one bold-titled bullet per actor goal within a Feature.
-4. Include the arc42 Building Block View — a Container Diagram embedded inline within `Solution Overview` — when the solution spans multiple components and teams across the organization; otherwise include it only on explicit request. Preserve every existing architecture diagram unless the user confirmed a change.
-5. Give every functional slice exactly one current-mode sequence diagram, followed by `**Decisions**` and one or more compact decision bullets rendered from the loaded the router’s decision-bullet reference. Use titles without `Flow Diagram:` or `Sequence Diagram:` prefixes, and emit no shared top-level `Decisions` section.
-6. Give every implementation artifact its own generic block with a unique title and purpose, concise evidence summary, optional valid artifact link, and applicable artifact-specific content; emit no empty block or child heading when no artifacts apply.
+3. Verify core sections, `Current State` inclusion and `Use cases` against Synthesize the solution.
+4. Verify Building Block View inclusion/placement and existing-diagram approvals against Synthesize the solution.
+5. Verify each slice's complete diagram/`**Decisions**` block against Synthesize the solution. Render one or more bullets from the loaded decision-bullet reference; omit `Flow Diagram:`/`Sequence Diagram:` title prefixes and shared top-level `Decisions`.
+6. Verify each implementation artifact's complete generic block against Synthesize the solution; no empty block or child heading.
 7. Remove template instructions and unresolved placeholders; keep Confluence markers verbatim (see Gotchas).
-8. Account for every material risk through caller-supplied verification on the owning issue/root or standalone return. Record mitigation, actual method/result, reproduction, residual scope/blocker and next action; never mark planned checks as proof. Preserve user Open Questions exactly, including blank answers; no agent risk/unknown rows.
+8. Account for every material risk through caller-supplied verification on the owning issue/root or standalone return: mitigation, actual method/result, reproduction, residual scope/blocker, next action. Planned checks are not proof. Preserve user Open Questions verbatim, including blank answers; no agent risk/unknown rows.
 9. Compare an update with the pre-merge design. Restore unsupported loss.
 10. Remove duplicate Requirement sets, requirements, and source rows.
-11. Order artifact blocks by GUI/visual, contract delta, low-level diagram, prototype, then research; preserve source order within each type unless the existing design has a stable order. Remove duplicates and restore any unsupported artifact loss from the pre-merge design.
-12. Resolve every embedded image path and artifact link. Use useful image alt text and repository-relative paths for repository images.
-13. Exclude research/proof/sketch appendices, report/package inventories and local evidence links from reader-facing content. Keep supported consequences in ordinary design sections and source provenance only in ignored Source Material. Exclude Class Diagrams and implementation-level Sequence Diagrams unless explicitly requested; require evidence for every Deployment View Delta.
-14. Contract artifact blocks present ⇔ the Contracts gate listed kinds; each kind's output has a `Legend:` line, `#### header` + `<details>` per resource or surface, and delta lines prefixed `+`, `-`, `%`, or `~`. Missing or hand-written → re-run the Contracts gate before writing.
+11. Verify artifact ordering against Synthesize the solution; remove duplicates and restore unsupported pre-merge artifact loss.
+12. Resolve every image path/artifact link; verify repository image paths and alt text against GUI/visual.
+13. Verify reader-facing evidence exclusions, provenance placement and low-level diagram gates against Synthesize the solution.
+14. Verify contract artifact blocks against Contracts gate, plus delta prefixes `+`, `-`, `%`, `~`. Missing or hand-written → re-run Contracts gate before writing.
 15. Every included API contract Scenario is backed by a delta bullet or requirement, with no invented scenarios, and its schema field names and enum values verified against the swagger/contract file.
 16. Every included GUI contract Scenario is backed by a delta row or requirement, with no invented scenarios, and its component/field names verified against the GUI source.
 17. Scan the full body (everything outside `Source Material`) for any ADR, Concept, ARCHITECTURE, or Jira reference (link, ID like `PROJ-NNNN`, or title mention) and rewrite each as a plain statement of what it establishes, with no attribution or link. This applies to legacy content in an existing design being merged, not only newly drafted text.
-18. In `Checklists`, confirm every subsection is present unless its whole category is not applicable (noted in `Details`), and every row keeps only one applicable/not-applicable value.
+18. Verify every `Checklists` subsection, row value and `Details` against Synthesize the solution.
 19. Verify every design-delta obligation against the coverage map and written design. Every affected existing section is extended, every distinct new behavior has a complete functional-slice H2 block, and every triggered independently reviewable artifact has its own `Detailed Design` H2 block.
-20. Mentally reapply the same inputs and confirm the result would be unchanged; remove any requirement row, slice, artifact, or source-row duplicate that a rerun could create.
+20. Mentally reapply inputs; remove rerun duplicates of requirement rows, slices, artifacts and sources. Result must remain unchanged.
 
 ## Gotchas
 

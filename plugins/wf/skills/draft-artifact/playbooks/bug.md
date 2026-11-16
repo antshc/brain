@@ -1,10 +1,10 @@
 # Bug
 
-Draft and print one standalone bug report that defines the affected behavior, reproduction, actual result, expected result, and useful technical context.
+Print one standalone bug report: affected behavior, reproduction, actual/expected results and useful technical context.
 
 ## Inputs
 
- observed behavior and any available affected users, expected behavior, impact, boundaries, preconditions, reproduction steps, evidence, and technical context. Derive omitted details from the conversation and repository when evidence is available.
+Observed behavior and any available affected users, expected behavior, impact, boundaries, preconditions, reproduction steps, evidence, and technical context. Derive omitted details from the conversation and repository when evidence is available.
 
 ## Required resources
 
@@ -28,7 +28,6 @@ Read the router's Bug template and shared requirements resources; apply normaliz
 - Expected Results define one externally verifiable outcome.
 - Technical notes contain only useful known evidence, references, environment details, explicit unknowns, or a root cause; they do not speculate about an unverified root cause.
 - Unknown required details are marked `Unknown` rather than invented.
-
 
 ## Update behavior
 

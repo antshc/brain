@@ -32,7 +32,6 @@ Maintain `Source Material`:
 - Do not invent sources for legacy content.
 - Keep the section wrapped in `<!-- adf:ignore:start -->`/`<!-- adf:ignore:end -->` — it is repo-internal provenance, not Confluence-reader content.
 
-
 ## Protected presentation and evidence
 
 Leave Open Questions empty on creation; preserve user entries verbatim, including blank answers. Return precise questions/risks to their owning ticket/proposal; only unframeable concerns belong in the caller's root Not yet specified. Do not populate presentation questions with agent discovery gaps.

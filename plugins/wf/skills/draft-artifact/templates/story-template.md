@@ -1,6 +1,5 @@
 # User story template
 
-
 Write the body for Product Owners and QA in plain business language, without code, class names, or technical jargon; each criterion is a clear, testable statement of expected behavior. The optional appendices are technical and live inside the collapsed **Technical notes** block.
 
 - **Implementation Decisions** — omit unless the story requires a specific implementation decision. Class, type, object, and endpoint names are allowed for navigation; omit file paths and line numbers.

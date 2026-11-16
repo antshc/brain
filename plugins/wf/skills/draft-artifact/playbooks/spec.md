@@ -29,9 +29,7 @@ Map the selected `rationale.md` into the body; for an Architect Arena package, f
 - Open questions and risks → **Further Notes**.
 - Contracts touched → seed list for the Contracts gate; never copied into the body as a delta.
 
-The body MUST NOT name design routes, candidate labels, or the run's local paths.
-
-The caller supplies only the selected accepted package and manifest; never select Arena candidates or package artifacts here. Include the binding Design sketch decision only when such a package exists, listing Sketch index first. The body names neither design routes, candidate labels nor local run paths. Only its `{{artifactUrl}}` placeholders may remain while the caller attaches artifacts.
+The caller supplies only the selected accepted package and manifest; never select Arena candidates or package artifacts here. Include the binding Design sketch decision only when such a package exists, listing Sketch index first. The body MUST NOT name design routes, candidate labels or local run paths. Only its `{{artifactUrl}}` placeholders may remain while the caller attaches artifacts.
 
 ## Update behavior
 
