@@ -4,11 +4,11 @@ Record precise material risks and their criteria/evidence on the owning topic or
 
 ## Select the strategy
 
-Choose the cheapest sufficient evidence for the actual failure boundary; record why it is sufficient. Reuse verified evidence only for matching claim, revision, dependencies and environment. Do not run both skills by default.
+Choose the cheapest sufficient evidence for the actual failure boundary; record why it is sufficient. Reuse verified execution evidence only for matching claim, revision, dependencies and environment. Do not run both skills by default.
 
 | Risk uncertainty | Action |
 |---|---|
-| One falsifiable behavior or mitigation claim | *Load and follow the `prove` skill to confirm or refute one technical claim with reproducible evidence*. Supply claim, deciding criteria, revision/environment, prior evidence, assigned checkout, limits and exact output path/base. Let Prove select its smallest adequate method; integrations retain its Testing Integrations selection. Read the returned report in full. |
+| One falsifiable behavior or mitigation claim | *Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments*. Supply claim, deciding criteria, revision/environment, prior evidence, assigned checkout, limits and exact output path/base. Let Prove select its smallest adequate method; integrations retain its Testing Integrations selection. Read the returned report in full; confirmed/refuted requires deciding execution evidence, otherwise keep the risk unresolved. |
 | Design blind spots, interacting assumptions, or ways a mitigation could fail | *Load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples*. Supply scoped design/mitigation, intent, pinned target/baseline, runnable boundary, prior evidence, limits, exact output path/base and retention/cleanup ownership. Use its default adversary count unless distinct risk surfaces justify more. |
 | Missing facts needed to frame a runnable claim | Gather existing source evidence through the owner's Research routing first; label source-based/inferred conclusions, not observed proof. |
 | No safe runnable target, access, prerequisite or human decision | Keep risk unresolved; state the exact blocker and next check/decision owner. Continue independent risks. |
