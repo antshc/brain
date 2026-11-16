@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[3] / 'plugins/wf/skills/design'
-SKILL = (ROOT / 'playbooks/tickets.md').read_text()
+SKILL = (ROOT / 'playbooks/tasks.md').read_text()
 
 
 def test_auto_rejected_without_approval_exception():
@@ -14,9 +14,9 @@ def test_auto_rejected_without_approval_exception():
     assert 'non-interactive auto mode' not in SKILL
     assert SKILL.count('`auto`') == 1
     github = (ROOT / 'references/github.md').read_text()
-    github = github.split('## Ticket operations', 1)[1].split('## Wayfinder operations', 1)[0]
+    github = github.split('## Task operations', 1)[1].split('## Wayfinder operations', 1)[0]
     assert 'auto`' not in github
-    assert 'auto`' not in (ROOT.parent / 'draft-artifact/templates/task-template.md').read_text()
+    assert 'auto`' not in (ROOT.parent / 'draft-work/templates/task-template.md').read_text()
 
 
 def test_online_offline_and_corrections_require_explicit_approval():
@@ -35,7 +35,7 @@ def test_publishes_blocker_graph_online_and_offline():
     assert 'from blocker to dependent' in SKILL
     assert 'Reject cycles and missing blocker nodes' in SKILL
     assert '`Slice | Blocked by`' in SKILL
-    assert '`Ticket | Blocked by`' in SKILL
+    assert '`Task | Blocked by`' in SKILL
     assert 'none` for roots' in SKILL
     assert 'fully qualified issue identities' in SKILL
     assert 'recompute the blocker graph and ready frontier' in SKILL

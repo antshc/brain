@@ -15,11 +15,11 @@ Render this block; remove placeholders. Conclusions summarize integrated evidenc
 
 ## Open questions / decisions
 
-- <human decision, or none; link related stable IDs, owning tickets/proposals or interview state>
+- <human decision, or none; link related stable IDs, owning topics/proposals or interview state>
 
 ## Remaining work
 
-- <unproven claim, required verification and canonical ticket/proposal/coarse-fog pointer, or no remaining work>
+- <unproven claim, required verification and canonical topic/proposal/coarse-fog pointer, or no remaining work>
 
 ## Next steps
 

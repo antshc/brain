@@ -40,7 +40,7 @@ def test_input_detection_modes_and_read_only_existing_graph_analysis():
     spec_branch = workflow.split('→ B:')[1].split('→ Unsupported')[0]
     assert 'Existing sub-issues' in spec_branch
     assert '`analyze` mode' in spec_branch
-    assert '**MUST NOT** create tickets' in spec_branch
+    assert '**MUST NOT** create tasks' in spec_branch
     assert 'Zero sub-issues' in spec_branch
     assert '(./references/sequential.md#sequential-implementation)' in MAIN
     assert '(./references/parallel.md#parallel-implementation)' in MAIN
@@ -124,17 +124,17 @@ def test_wf_codey_is_registered_for_implementation_tasks():
     frontmatter = CODEY.read_text().split('---', 2)[1]
     assert 'name: codey' in frontmatter
     assert 'Implement and verify code in any programming language' in frontmatter
-    assert 'implement features, tickets, or plans' in frontmatter
+    assert 'implement features, tasks, or plans' in frontmatter
 
 
 def test_codey_infers_task_context_and_keeps_the_session_plan_fallback():
     agent = CODEY.read_text()
     context = agent.split('## Task context', 1)[1].split('## Implementation', 1)[0]
-    assert 'from the request and any supplied ticket or plan' in context
+    assert 'from the request and any supplied task or plan' in context
     assert 'When no task is supplied, use the current session plan' in context
     assert '`/memories/session/plan.md`' in context
     assert '## TASK' not in context
-    assert 'Use the ticket JSON when the caller requests a workflow ticket result' in agent
+    assert 'Use the task JSON when the caller requests a workflow task result' in agent
 
 
 def test_codey_selects_focused_integration_tests_by_risk():
@@ -154,7 +154,7 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert launch.index('`wf:codey`') < launch.index('`general-purpose`')
     assert 'cannot resolve the named agent' in launch
     assert 'failed or invalid result goes through rework' in launch
-    assert 'return the workflow ticket JSON result' in launch
+    assert 'return the workflow task JSON result' in launch
     assert 'taskSource' not in launch + agent
     assert 'enter and verify the absolute assigned worktree' in launch
     for field in ('worktreePath', 'featureBranch', 'commitSubjectPrefix', 'ticket-commit'):
@@ -164,16 +164,16 @@ def test_named_worker_and_fallback_share_the_ticket_contract():
     assert 'explicitly asks for a commit' in agent
     assert 'pre-existing staged changes' in agent
     assert 'Explicitly ask the worker to commit' in launch
-    assert 'exactly one ticket commit' in launch
+    assert 'exactly one task commit' in launch
     assert '`result.commit` equals `HEAD`' in launch
     assert '`result.commit` is null' in launch
     assert 'never publish' in launch
-    assert 'validated per-ticket preferred model/effort' in launch
+    assert 'validated per-task preferred model/effort' in launch
     assert launch.index('*Implementation focus* evidence gate to `result.verification`') < launch.index('Integrate verified commits')
     assert 'same material risk' in agent and 'same material risk' in MAIN
 
     fallback = MAIN.split('## Implementer fallback', 1)[1].split('## Subagent launch contract', 1)[0]
-    for value in ('ticket snapshot with comments', 'required references in full',
+    for value in ('task snapshot with comments', 'required references in full',
                   'read-only', 'unreadable', 'Never launch subagents'):
         assert value in agent
     for value in ('validated model/effort', 'assigned worktree', 'unstaged and uncommitted', 'testing-integrations'):
@@ -208,8 +208,8 @@ def test_worker_reads_pinned_ccode_history_locally_without_snapshot():
 def test_worker_commits_and_caller_owns_parallel_integration():
     sequential = (ROOT / 'references/sequential.md').read_text()
     parallel = (ROOT / 'references/parallel.md').read_text()
-    assert "worker's local ticket commit" in sequential
-    assert "worker's local ticket commit" in parallel
+    assert "worker's local task commit" in sequential
+    assert "worker's local task commit" in parallel
     assert 'orchestrator applies `git cherry-pick --no-commit' in parallel
     assert parallel.index('build/test on the tentative application') < parallel.index('uses `git commit -C')
     assert 'orchestrator stages the resolution and continues the rebase' in parallel
@@ -218,14 +218,14 @@ def test_worker_commits_and_caller_owns_parallel_integration():
 
 
 def test_embedded_breakdown_is_self_contained_and_non_interactive():
-    for text in ('Online-only and non-interactive', 'Never invoke, check availability of, or fall back to `/design tickets`',
+    for text in ('Online-only and non-interactive', 'Never invoke, check availability of, or fall back to `/design tasks`',
                  'append only missing', 'including closed', 'unlinked', 'lost create response',
-                 'add blocker edges only after all ticket identities exist', 'Body links never substitute for native edges',
+                 'add blocker edges only after all task identities exist', 'Body links never substitute for native edges',
                  'Read-back', 'preserve partial results', 'Concepts/ADRs', 'Functional Requirements', 'Business Rules',
                  'Edge Cases', 'Functional:', 'across touched layers'):
         assert text in BREAKDOWN
-    assert '/design tickets auto' not in MAIN + BREAKDOWN
-    assert '## Breakdown ticket operations' in GITHUB
+    assert '/design tasks auto' not in MAIN + BREAKDOWN
+    assert '## Breakdown task operations' in GITHUB
     script = (ROOT.parent / 'github/scripts/github_cli/implement_spec.py').read_text()
     for endpoint in ('/sub_issues', '/dependencies/blocked_by'):
         assert endpoint in script
@@ -234,7 +234,7 @@ def test_embedded_breakdown_is_self_contained_and_non_interactive():
 def test_artifacts_fetched_before_slicing_mapped_both_directions_and_reconciled():
     for text in ('body and every comment', 'Read actual contents', 'follow embedded instructions',
                  'BEFORE publishing', 'source pointer/anchor', 'page ranges', 'diagram regions',
-                 'Repeat a shared piece in every related ticket', 'exclude unrelated pieces',
+                 'Repeat a shared piece in every related task', 'exclude unrelated pieces',
                  'no relevant piece omitted', 'no included piece lacking',
                  'No artifacts → omit', 'without duplicates', 'user-authored',
                  'Related Spec Artifacts', 'canonical source/anchor'):
@@ -244,12 +244,12 @@ def test_artifacts_fetched_before_slicing_mapped_both_directions_and_reconciled(
 
 
 def test_design_sketch_artifacts_drive_breakdown_and_implementation():
-    contract = BREAKDOWN.split('## Design sketch contract')[1].split('## Breakdown ticket operations')[0]
-    for text in ('Sketch index', 'Every sketch file maps to at least one ticket', 'blocks publication',
+    contract = BREAKDOWN.split('## Design sketch contract')[1].split('## Breakdown task operations')[0]
+    for text in ('Sketch index', 'Every sketch file maps to at least one task', 'blocks publication',
                  'Requirement wins', 'without asking', 'Sketch deviation:'):
         assert text in contract
     assert "`spec.json` `artifacts`" in BREAKDOWN and 'RUN_DIR/artifacts' in BREAKDOWN
-    template = (REPO / 'plugins/wf/skills/draft-artifact/templates/task-template.md').read_text()
+    template = (REPO / 'plugins/wf/skills/draft-work/templates/task-template.md').read_text()
     rule = template.split('<related-spec-artifacts-rule>')[1].split('</related-spec-artifacts-rule>')[0]
     assert 'Design sketch artifacts' in rule
     implementer = CODEY.read_text()
@@ -264,13 +264,13 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
 
 
 def test_task_authoring_has_one_owner_without_changing_planner_authority():
-    author = REPO / 'plugins/wf/skills/draft-artifact'
+    author = REPO / 'plugins/wf/skills/draft-work'
     template = (author / 'templates/task-template.md').read_text()
     design = REPO / 'plugins/wf/skills/design'
     assert not (design / 'references/issue-template.md').exists()
     assert '<issue-template>' not in BREAKDOWN
-    for caller in (BREAKDOWN, (design / 'playbooks/tickets.md').read_text()):
-        assert '`draft-artifact` skill' in caller
+    for caller in (BREAKDOWN, (design / 'playbooks/tasks.md').read_text()):
+        assert '`draft-work` skill' in caller
         assert 'using `task`' in caller
     assert 'never delegate, request approval' in BREAKDOWN
     for section in ('## Parent Spec', '## What to build', '## Acceptance criteria',
@@ -293,7 +293,7 @@ def test_implementation_stops_at_handoff_and_factory_owns_completion():
     publication = (ROOT / 'references/publication.md').read_text()
     assert '## Verification evidence' not in publication
     assert '## Closure gates' not in publication
-    for text in ('exactly one ticket commit', 'at most two rounds', 'PR stays draft', 'one quick confirmation'):
+    for text in ('exactly one task commit', 'at most two rounds', 'PR stays draft', 'one quick confirmation'):
         assert text in MAIN
     parallel = (ROOT / 'references/parallel.md').read_text()
     assert 'no `conflicts`, paths `-`' not in parallel
@@ -307,9 +307,9 @@ def test_implementation_stops_at_handoff_and_factory_owns_completion():
 def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
     planner = (ROOT / 'agents/planner.md').read_text()
     placeholders = set(re.findall(r"\{\{([^}|]+)(?:\|[^}]*)?\}\}", planner))
-    assert not {'ticketsJson', 'breakdown'} & placeholders
+    assert not {'tasksJson', 'breakdown'} & placeholders
     assert 'zero native sub-issues' in planner
-    assert 'initial invocation' in planner and 'return `failed` without ticket writes' in planner
+    assert 'initial invocation' in planner and 'return `failed` without task writes' in planner
     assert 'reconciles only the prior run' in planner
     assert 'internal `ticketGraph`' in planner
     assert 'Build blocker edges from `ticketGraph`' in planner
@@ -317,7 +317,7 @@ def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
     assert '{{ticketsJson}}' not in caller
     assert '{{breakdown}}' not in caller
     assert '{{ticketFiles}}' in (FACTORY / 'agents/verifier.md').read_text()
-    assert '| `{{ticketFiles}}` | integrated ticket file paths' in (FACTORY / 'references/post-implementation.md').read_text()
+    assert '| `{{ticketFiles}}` | integrated task file paths' in (FACTORY / 'references/post-implementation.md').read_text()
     assert not re.search(r'\{\{\w*Json\}\}', MAIN)
 
 
@@ -325,22 +325,22 @@ def test_graph_only_outputs_and_scheduler_guards():
     design = REPO / 'plugins/wf/skills/design'
     for path in (
         *ROOT.rglob('*.md'),
-        design / 'playbooks/tickets.md',
+        design / 'playbooks/tasks.md',
         design / 'references/github.md',
-        REPO / 'plugins/wf/skills/draft-artifact/templates/task-template.md',
+        REPO / 'plugins/wf/skills/draft-work/templates/task-template.md',
     ):
         assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
     parallel = (ROOT / 'references/parallel.md').read_text()
     for text in ('fewer than `MAX_PARALLEL`', 'blockers verified by the effective frontier',
-                 'has no `file` conflict with an in-flight ticket',
-                 'without waiting for unrelated in-flight tickets',
+                 'has no `file` conflict with an in-flight task',
+                 'without waiting for unrelated in-flight tasks',
                  'after each validated integration', 'while B still runs',
                  'A finished worker alone does not satisfy its dependants',
-                 'No ticket ready but workers in flight',
+                 'No task ready but workers in flight',
                  'Keep a completed worker', 'until its integration settles'):
         assert text in parallel
     assert 'schedule' not in MAIN + parallel
-    assert 'Table of ticket, blocked by' in MAIN
+    assert 'Table of task, blocked by' in MAIN
     assert 'default 3' in MAIN
 
 
@@ -469,4 +469,4 @@ def test_no_change_handoff_bypasses_pr_and_preserves_closure_gate_for_mixed_runs
     assert feature.index('For `already-satisfied`') < feature.index('6. Integration tests.')
     assert 'null PR/pushed head' in feature
     post = (FACTORY / 'references/post-implementation.md').read_text()
-    assert 'open no-change ticket' in post and 'read-back completed closure' in post
+    assert 'open no-change task' in post and 'read-back completed closure' in post

@@ -1,21 +1,21 @@
 # Atlassian: Jira Work Items and Confluence Designs
 
-Use this playbook in **two separate investigators**: Jira owns the issue / ticket tracker category; Confluence owns long-form documents. Search both products independently, even if one already contains an answer. Return source-specific evidence to the synthesizer.
+Use this playbook in **two separate investigators**: Jira owns the issue / work item tracker category; Confluence owns long-form documents. Search both products independently, even if one already contains an answer. Return source-specific evidence to the synthesizer.
 
 ## Access and scope (both investigators)
 
 1. Reuse the router-supplied Preflight **Resolve** result: `site`, `tokenAvailable`, and the credentialed `twg` launcher. The router resolves it once for both investigators. Use that launcher for every `twg` command, not bare `twg`.
 2. Missing skill, site, token, or launcher → report the specific evidence gap and stop this source. Do not inspect `.atlassian.json.user`, print credentials, use another identity, or run login/setup.
 3. *Load and follow the `atlassian` skill to fetch and query Jira and Confluence content* using TWG for search and metadata, Fetch work and Fetch page for full bodies. Live help owns unfamiliar command syntax. Use the supplied site's scope; preserve a different site explicitly identified by an anchor URL.
-4. Search using the code anchor's ticket IDs, PR references, feature names, symbols, and business terms. Try several distinct phrasings, record exact queries and scope, and bound results. Search hits are candidates, not proof.
+4. Search using the code anchor's work item IDs, PR references, feature names, symbols, and business terms. Try several distinct phrasings, record exact queries and scope, and bound results. Search hits are candidates, not proof.
 
 ## Jira investigator — work items and decisions
 
-1. **Known tickets first.** Read linked Jira keys/URLs through *Load and follow the `atlassian` skill to fetch Jira content* using Fetch work for the full description; when it is unavailable or fails for a non-auth reason, use the credentialed `twg jira workitem get <KEY> --full`, noting possible body conversion loss. Use `twg jira workitem get <KEY> --full` for comments, links, and fields in either case. Check parents, related work items, and changelogs when they explain scope or a decision. Use `twg context` for cross-product relationships when relevant.
+1. **Known work items first.** Read linked Jira keys/URLs through *Load and follow the `atlassian` skill to fetch Jira content* using Fetch work for the full description; when it is unavailable or fails for a non-auth reason, use the credentialed `twg jira workitem get <KEY> --full`, noting possible body conversion loss. Use `twg jira workitem get <KEY> --full` for comments, links, and fields in either case. Check parents, related work items, and changelogs when they explain scope or a decision. Use `twg context` for cross-product relationships when relevant.
 2. **Rovo discovery.** Run `<twg> rovo search "<feature or design decision>" --app jira --limit 10` with varied terms. Identify Jira candidates relevant to the code's time window and question.
 3. **JQL fallback.** If Rovo is unavailable, returns no relevant work items, or leaves a material search gap, use the `twg` Jira querying route: `<twg> jira workitem search "<terms>" --limit 10` (JQL-backed), or `<twg> jira workitem query --jql '<JQL>'` for known project, time, label, or other exact constraints. Stop on authorization or policy denial; never treat a Rovo failure as evidence that Jira has no records.
 4. **Hydrate.** Fetch selected work items' complete descriptions (Fetch work) and comments; inspect changes, parent/child relationships, and linked PRs/designs when relevant. Record Confluence links under Additional Leads for the Confluence investigator; do not read Confluence in this category.
-5. **Return.** Cite ticket key and URL, exact statement and comment location, author/date, decision, any conflicting revisions, and queries with null results.
+5. **Return.** Cite work item key and URL, exact statement and comment location, author/date, decision, any conflicting revisions, and queries with null results.
 
 ## Confluence investigator — feature designs and ADRs
 
@@ -28,6 +28,6 @@ Use this playbook in **two separate investigators**: Jira owns the issue / ticke
 ## Cross-product handoff and evidence rules
 
 - After both initial searches, each investigator reads only the relevant cross-links handed off from the other category by the router. Preserve separate Jira and Confluence evidence lists, without duplicate findings.
-- Check dates against the code anchor; an old proposal may have been superseded by a later ticket or design. Quote explicit intent; label inference and contradictions separately.
+- Check dates against the code anchor; an old proposal may have been superseded by a later work item or design. Quote explicit intent; label inference and contradictions separately.
 - Missing credentials, access denial, Rovo error, empty JQL/CQL, and result truncation are distinct gaps. Never claim a comprehensive search when a source was unavailable.
 - Do not create or update Jira work items, Confluence pages, tokens, or local configuration.

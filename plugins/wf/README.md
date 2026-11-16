@@ -2,7 +2,7 @@
 
 Everyday workflow automation skills that carry an Initiative from an open-ended idea to agent-executable GitHub issues.
 
-[Design](skills/design/SKILL.md) keeps Spec, Tickets, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and ticket publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [architecture-records](skills/architecture-records/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
+[Design](skills/design/SKILL.md) keeps Spec, Work items, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and work item publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [architecture-records](skills/architecture-records/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
 [subagents](skills/subagents/SKILL.md) selects the model and effort for named roles and ordered panels, and runs Arena comparisons. [research](skills/research/SKILL.md) is a router: Wayfinder (chart/resume research maps; `/research wayfinder <prompt-or-map-path>`), Explore (lookups; `hunty` verdicts inline), How (discovery, tracing, explanation; `hunty`, `explainy`), Why (`whyy`, `composy`), Cloud (`cloudy`), and Web (`weby`). Route agents are prompt files only Research spawns. The request is the only input; reports save to the session workspace with links, or to a location the request names.
 
@@ -18,12 +18,12 @@ The [HLD route](skills/design/SKILL.md) renders slice decision bullets from its 
 
 ## Skill flow
 
-1. **Discovery loop** — [`/design wayfinder`](skills/design/SKILL.md) alternates human decisions with autonomous helpers. Confirm the destination, then interview breadth-first one question at a time. Check for a clear one-session effort before map/worktree setup. Root Not yet specified holds concerns too vague to ticket; child issues own precise questions/risks and progress. Direct general-purpose subagents use random latest supported Opus/Sol with medium thinking, without the Subagents skill. Git skill worktrees isolate source sketches/mutating checks. Contract design retains 3+ Code Sketch options and individual rationales until user selection; only the chosen package and considered-option notes merge locally. Research/Prove evidence stays local; embedded Challenge this has no dedicated tracking issue. Supported conclusions update `docs/ongoing/`; Open Questions belong to users during presentation. No automatic push/PR. Explicit `/design publish-hld` publishes the HLD page only, without evidence appendices, research subpages or report/sketch attachments. Smaller efforts can use `/design grill`, followed by a requested Spec or HLD handoff.
-2. **Spec synthesis** — `/design spec` synthesizes a spec from resolved decisions or a Grill conversation; Wayfinder maintains HLD output directly; standalone Spec synthesis remains a separate requested handoff; a spec can feed `/design tickets` directly or go on into design synthesis.
+1. **Discovery loop** — [`/design wayfinder`](skills/design/SKILL.md) alternates human decisions with autonomous helpers. Confirm the destination, then interview breadth-first one question at a time. Check for a clear one-session effort before map/worktree setup. Root Not yet specified holds concerns too vague to frame as a topic; child issues own precise questions/risks and progress. Direct general-purpose subagents use random latest supported Opus/Sol with medium thinking, without the Subagents skill. Git skill worktrees isolate source sketches/mutating checks. Contract design retains 3+ Code Sketch options and individual rationales until user selection; only the chosen package and considered-option notes merge locally. Research/Prove evidence stays local; embedded Challenge this has no dedicated tracking issue. Supported conclusions update `docs/ongoing/`; Open Questions belong to users during presentation. No automatic push/PR. Explicit `/design publish-hld` publishes the HLD page only, without evidence appendices, research subpages or report/sketch attachments. Smaller efforts can use `/design grill`, followed by a requested Spec or HLD handoff.
+2. **Spec synthesis** — `/design spec` synthesizes a spec from resolved decisions or a Grill conversation; Wayfinder maintains HLD output directly; standalone Spec synthesis remains a separate requested handoff; a spec can feed `/design tasks` directly or go on into design synthesis.
 3. **Design synthesis** — `/design hld` combines resolved Wayfinder decisions and one or more specs into an authoritative feature design, reconciling capabilities and merging stronger evidence into an existing design.
-4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](install/assets/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/design spec` output, or `/design hld` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-artifact`](skills/draft-artifact/SKILL.md) using the `story` route once per approved row. Use `/draft-artifact story` for a standalone User story.
+4. **Story breakdown** — `/factory-mode stories` ([Stories playbook](install/assets/factory-mode/playbooks/stories.md), installed per repo) accepts requirements, `/design spec` output, or `/design hld` output and assembles an approved ordered story list with numbered headings, dependencies, and Jira metadata; it runs [`draft-work`](skills/draft-work/SKILL.md) using the `story` route once per approved row. Use `/draft-work story` for a standalone User story.
 5. **Story hardening** — `/design grill` interviews and sharpens each story, run once per story.
-6. **Ticket cut** — `/design tickets` proposes implementation slices from a spec and creates GitHub sub-issues after approval.
+6. **Work item cut** — `/design tasks` proposes implementation slices from a spec and creates GitHub sub-issues after approval.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -84,7 +84,7 @@ swimlane-beta TB
   subgraph discovery [Discovery]
     idea([Idea])
     effortSize{1 - Fits one session?}
-    wayfinder[1a.1 - /design wayfinder<br/>maintain HLD and resolve tickets]
+    wayfinder[1a.1 - /design wayfinder<br/>maintain HLD and resolve topics]
     grillDesign[1b.1 - /design grill<br/>interview in one session]
   end
 
@@ -95,7 +95,7 @@ swimlane-beta TB
 
   subgraph breakdown [Story breakdown]
     toStories[4 - factory-mode stories<br/>assemble ordered story list]
-    draftStory[[5 - draft-artifact story<br/>once per approved row]]
+    draftStory[[5 - draft-work story<br/>once per approved row]]
     stories[/6 - User stories/]
     done([Stories ready])
   end
@@ -188,7 +188,7 @@ swimlane-beta TB
 | Check architecture currency | `/architecture-records route: doctor` |
 | Define a Concept | `/architecture-records route: define-concept` |
 | Initialize docs | `/architecture-records route: initialize` |
-| Story, bug report, or feature handover | `/draft-artifact story`, `/draft-artifact bug`, `/draft-artifact toi` |
+| Story, bug report, or feature handover | `/draft-work story`, `/draft-work bug`, `/draft-document toi` |
 | High-level feature design | `/design hld` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
 | Deepen a task prompt or restate intent | `/writing-style sharpen` |
@@ -198,12 +198,12 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 | Group | Skills |
 |---|---|
 | Discovery and research | `architecture-records` (`define-concept`), `prove`, `challenge-this`, `research` (route agents `hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`) |
-| Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `hld`, `publish-hld`, `spec`, `tickets`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
-| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-artifact`, `architecture-records`, `suggest`, `writing-style` |
+| Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `hld`, `publish-hld`, `spec`, `tasks`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
+| Documentation and drafting | `doc-contracts`, `doc-diagram`, `draft-work`, `draft-document`, `architecture-records`, `suggest`, `writing-style` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |
 
-Research Wayfinder confirms the destination, then interviews breadth-first one question at a time directly in session, without grilling tickets. Clear one-session efforts can choose standalone research before map/worktree setup. Mapped efforts keep coarse fog in the GitHub root, precise questions/risks in explicitly approved sub-issues, and uncreated proposals in retained drafts/pending state. It maintains `docs/ongoing/<slug>-research.md` on `wayfinder/<slug>`, gathers reports in owned `research/<slug>` worktrees, and retains experiments in `prove/<slug>` until exact-payload approval. Evidence routes retain their standalone delivery defaults. Results and the Bottom line update incrementally; no automatic push, PR, base merge or Confluence publication.
+Research Wayfinder confirms the destination, then interviews breadth-first one question at a time directly in session, without Decision topics. Clear one-session efforts can choose standalone research before map/worktree setup. Mapped efforts keep coarse fog in the GitHub root, precise questions/risks in explicitly approved sub-issues, and uncreated proposals in retained drafts/pending state. It maintains `docs/ongoing/<slug>-research.md` on `wayfinder/<slug>`, gathers reports in owned `research/<slug>` worktrees, and retains experiments in `prove/<slug>` until exact-payload approval. Evidence routes retain their standalone delivery defaults. Results and the Bottom line update incrementally; no automatic push, PR, base merge or Confluence publication.
 
 ## Artifact authoring
 
-[`draft-artifact`](skills/draft-artifact/SKILL.md) owns `story`, `task`, `bug`, `spec`, `hld`, and retained `toi` routes, their templates and shared requirements rules. Design and Implement supply decisions, task scope and evidence, then invoke the authoring route. They retain workflow approvals, dependencies, integration and publishing. GitHub issues and Jira work items are destinations for the same artifact types.
+[`draft-work`](skills/draft-work/SKILL.md) owns `story`, `task` and `bug`; [`draft-document`](skills/draft-document/SKILL.md) owns `spec`, `hld` and `toi`. Each owns its templates and tailored requirements instructions, including internal normalization. Design and Implement supply decisions, task scope and evidence, then invoke the authoring route. They retain workflow approvals, dependencies, integration and publishing. GitHub issues and Jira work items are destinations for the same artifact types.

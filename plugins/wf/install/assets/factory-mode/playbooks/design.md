@@ -5,7 +5,7 @@
 1. Research the current state through Non-negotiables: how the affected flow works, where it lives, and relevant architecture documentation and domain terminology. Done when the current state is cited.
 2. Resolve unknowns; pick by size.
    - Fits one session → *Load and follow the `design` skill to design architecture and resolve decisions; use `grill` mode to stress-test the design through a relentless interview, resolving decisions and recording glossary terms, assumptions, and ADRs.*
-   - Larger than one session → ask the user to run `/design wayfinder` with the loose idea to maintain an HLD while resolving decision tickets and running factual research/proof automatically. Reuse its local HLD and integration branch in later steps; Spec remains a separate requested handoff.
+   - Larger than one session → ask the user to run `/design wayfinder` with the loose idea to maintain an HLD while resolving decision tasks and running factual research/proof automatically. Reuse its local HLD and integration branch in later steps; Spec remains a separate requested handoff.
    - Empirical fork inside either → run the `prototype` playbook and let the result decide.
    Done when no open unknowns remain.
 3. Optional: sketch it. Run when the user asks for a sketch or the code shape (types, signatures, module boundaries) is still contested; otherwise skip. *Load and follow the `design` skill to design architecture and resolve decisions; use `sketch` mode to draft a usage-first code sketch with types, signatures, module map, and rationale* from the resolved decisions. Then loop:
@@ -17,4 +17,4 @@
 5. Design it. If Wayfinder already maintains an HLD, reuse its current local document and integration branch. Otherwise: Ask the user to run `/design hld` with the spec, Wayfinder map or Grill context, and any existing design to create or extend the authoritative feature design. Done when the design file exists and holds every resolved decision.
 6. Check the design against the decisions from step 2; surface any decision lost, contradicted, or still open.
 
-**Reply:** decisions resolved and how (grill, ticket, prototype), approved sketch paths when sketched, spec and design links, open decisions, recommended next step.
+**Reply:** decisions resolved and how (grill, task, prototype), approved sketch paths when sketched, spec and design links, open decisions, recommended next step.

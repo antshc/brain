@@ -1,14 +1,14 @@
 # Questioning
 
-Run interviews directly in the Research Wayfinder session. Research has research and experiment tickets only; scope, priorities and evidence criteria are human choices asked here, never grilling tickets or Design execution.
+Run interviews directly in the Research Wayfinder session. Research has research and experiment topics only; scope, priorities and evidence criteria are human choices asked here, never Decision topics or Design execution.
 
 ## Destination first
 
-Settle subject, outcome, scope, exclusions, exact versions, constraints and sufficient evidence. Ask only what is needed to establish the destination; then get user confirmation. Destination approval is not ticket approval.
+Settle subject, outcome, scope, exclusions, exact versions, constraints and sufficient evidence. Ask only what is needed to establish the destination; then get user confirmation. Destination approval is not work item approval.
 
 ## Separate breadth-first interview
 
-After destination confirmation, start a separate frontier interview. Cover major in-scope areas before deepening one thread: feasibility, hard limits, performance/scale, reliability, security, operations, ergonomics. Surface precise factual questions, falsifiable hypotheses, dependencies and concerns not yet sharp enough to ticket. Do not exhaust every downstream question before charting.
+After destination confirmation, start a separate frontier interview. Cover major in-scope areas before deepening one thread: feasibility, hard limits, performance/scale, reliability, security, operations, ergonomics. Surface precise factual questions, falsifiable hypotheses, dependencies and concerns not yet sharp enough to frame as a topic. Do not exhaust every downstream question before charting.
 
 Maintain the dependency tree and ready frontier. **Ask one question at a time**, with a stable ID, descriptive title and recommended answer. Word it so yes accepts the recommendation; do not hide independent questions inside one item. Wait for the user's answer before asking the next question; silence never accepts an answer.
 

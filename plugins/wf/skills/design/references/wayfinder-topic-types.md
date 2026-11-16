@@ -1,24 +1,24 @@
-# Wayfinder ticket types
+# Wayfinder topic types
 
-Root **Not yet specified** holds only concerns too vague to ticket; precise questions/risks belong to typed children even when blocked. Retain uncreated precise proposals in review drafts and pending state; preserve IDs/criteria/evidence on graduation. One unknown may need several work items. HLD Open Questions are user-owned presentation content, never a discovery tracker.
+Root **Not yet specified** holds only concerns too vague to frame as a topic; precise questions/risks belong to typed children even when blocked. Retain uncreated precise proposals in review drafts and pending state; preserve IDs/criteria/evidence on graduation. One unknown may need several work items. HLD Open Questions are user-owned presentation content, never a discovery tracker.
 
 | Type | Use when | Execution / completion |
 |---|---|---|
 | Research | Facts or coarse fog need clarification | AFK cited findings through Research; integrated deciding evidence resolves factual question |
 | Experiment | A falsifiable claim needs an actual check | AFK Prove generation/verification; HITL prototype approval before integration/closure; inconclusive stays open/blocked |
-| Grilling | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep |
-| Contract design | New/significantly changed interface, inheritance abstraction, invariant/error/ordering/seam choice | AFK Deep Module generates 3+ Code Sketch options with individual Markdown rationales; retain worktree without merge. HITL Choice on same ticket, then selected-only merge plus considered-option notes and closure |
+| Decision | Requirements, preferences or trade-offs need a user choice | HITL Grill; explicit answer and closing sweep |
+| Contract design | New/significantly changed interface, inheritance abstraction, invariant/error/ordering/seam choice | AFK Deep Module generates 3+ Code Sketch options with individual Markdown rationales; retain worktree without merge. HITL Choice on same topic, then selected-only merge plus considered-option notes and closure |
 | Task | Code Sketch or prerequisite access/data work unblocks a decision | AFK artifact generation or authorized work; Code Sketch awaits HITL prototype approval before integration/closure; otherwise HITL checklist; never implementation of the destination |
 
-Challenge this is supporting verification inside an existing issue or root-owned run, **not its own tracking ticket**. Record scope, evidence, coverage and pending steps on that owner; propose follow-up issues only for actual discovered work, creating them after Ticket approval. It can target the whole HLD but requires a safe runnable boundary for retained findings. No approval gate: code changes or test execution use an owned result worktree; verified evidence integrates and updates root fog/HLD automatically. Keep production-source edits out of the incoming payload.
+Challenge this is supporting verification inside an existing issue or root-owned run, **not its own tracking issue**. Record scope, evidence, coverage and pending steps on that owner; propose follow-up issues only for actual discovered work, creating them after Work item approval. It can target the whole HLD but requires a safe runnable boundary for retained findings. No approval gate: code changes or test execution use an owned result worktree; verified evidence integrates and updates root fog/HLD automatically. Keep production-source edits out of the incoming payload.
 
 ## Rules
 
-- Contract test: new/significantly changed contract or inheritance abstraction → Contract design, not Grilling. Human Choice remains on the same open issue after Options; release claim while waiting.
-- Default human decisions → Grilling. Helpers clarify supporting facts automatically; no agent speaks for the user.
-- Create tickets only after user approval of the proposed batch; approval precedes any Research or evidence dispatch for them.
+- Contract test: new/significantly changed contract or inheritance abstraction → Contract design, not Decision. Human Choice remains on the same open issue after Options; release claim while waiting.
+- Default human decisions → Decision. Helpers clarify supporting facts automatically; no agent speaks for the user.
+- Create issues only after user approval of the proposed batch; approval precedes any Research or evidence dispatch for them.
 - Wayfinder runs every helper (Research, Prove, Challenge this, Deep Module, Code Sketch, Grill) in its own session; no wrapper subagent. Each helper spawns its own workers by default; Research spawns its own route agents. Use the Git skill for worktrees where isolation is needed.
-- Reassess ownership after every result/answer: only unframeable concerns remain in root fog; precise partial risks and blocked choices stay on their owning tickets/proposals/runs. Transfer IDs, criteria and evidence before removing graduated fog; resolutions are indexed in Decisions so far. Reopening preserves the owning question and stable ID.
+- Reassess ownership after every result/answer: only unframeable concerns remain in root fog; precise partial risks and blocked choices stay on their owning topics/proposals/runs. Transfer IDs, criteria and evidence before removing graduated fog; resolutions are indexed in Decisions so far. Reopening preserves the owning question and stable ID.
 - A completed helper run does not by itself resolve its parent unknown or imply verified mitigation. No counterexample found establishes only tested coverage.
 
 ## Artifact lifecycle

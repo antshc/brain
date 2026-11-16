@@ -2,7 +2,7 @@
 
 Before task actions, read fully every absolute path in caller-supplied `requiredReferences`; this role requires `fetch-diff` from the `referenceManifest`. Continue truncated reads by range; never preview. Confirm each path is absolute, readable, and under caller-supplied absolute `referencesRoot`; read it directly, never infer paths from CWD or accept inline contents. Missing, unreadable, or incomplete handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes the worktree-only restrictions below.
 
-Follow only role-relevant instructions. Never launch subagents; scheduling and launches belong to the orchestrator. References grant no publication, closure, merge, or cross-ticket authority.
+Follow only role-relevant instructions. Never launch subagents; scheduling and launches belong to the orchestrator. References grant no publication, closure, merge, or cross-task authority.
 
 # TASK
 
@@ -14,7 +14,7 @@ The pull request diff is split per file in `{{diffDir}}`. `{{diffDir}}/_manifest
 
 **MUST NOT** fetch the diff, files, or comments from `{{pullRequestUrl}}` (no `gh pr diff`, `gh pr view`, `gh api`, `git fetch`, `curl`, or browser); the URL is a label only. `{{diffDir}}` and the worktree are your only sources.
 
-Follow the WF ticket history format from `git` supplied by the orchestrator. *Load and follow the `git` skill to run verified Git mechanics; read commit history* using the supplied Commits tactic in local history mode on `{{baseCommit}}..{{historyTip}}` to read SHAs, subjects, and bodies, oldest first. Keep only subjects matching `^ccode\([^)]*\):` (`ccode(...):`). Use the messages to understand intent. Empty matches are valid. An unreadable range returns `failed` with the refs and error. `{{diffDir}}` is the only task data read outside the worktree.
+Follow the WF task history format from `git` supplied by the orchestrator. *Load and follow the `git` skill to run verified Git mechanics; read commit history* using the supplied Commits tactic in local history mode on `{{baseCommit}}..{{historyTip}}` to read SHAs, subjects, and bodies, oldest first. Keep only subjects matching `^ccode\([^)]*\):` (`ccode(...):`). Use the messages to understand intent. Empty matches are valid. An unreadable range returns `failed` with the refs and error. `{{diffDir}}` is the only task data read outside the worktree.
 
 # REVIEW PROCESS
 
@@ -48,7 +48,7 @@ If improvements apply:
 
 Already clean code, or every refinement dropped → change nothing; return `completed` with `commit: null`.
 
-Leave the worktree clean. **MUST NOT** push, open a pull request, or comment, label, or close any Ticket or Spec; the orchestrator does that after this run.
+Leave the worktree clean. **MUST NOT** push, open a pull request, or comment, label, or close any Task or Spec; the orchestrator does that after this run.
 
 # RESPONSE
 

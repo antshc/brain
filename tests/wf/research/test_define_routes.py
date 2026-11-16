@@ -45,10 +45,10 @@ def test_shared_mechanics_and_exact_proposal_approval():
     shared = REPO / 'plugins/wf/skills/github/references/wayfinder.md'
     design = (REPO / 'plugins/wf/skills/design/references/github.md').read_text()
     assert 'using **Wayfinder operations**' in design
-    assert '### Create Wayfinder sub-ticket' in shared.read_text()
-    assert '### Create Wayfinder sub-ticket' not in design
+    assert '### Create Wayfinder sub-issue' in shared.read_text()
+    assert '### Create Wayfinder sub-issue' not in design
     assert '`github` skill' in WAYFINDER and '`git` skill' in WAYFINDER
-    assert '**Ticket approval** and **Prototype approval**' in WAYFINDER
+    assert '**Work item approval** and **Prototype approval**' in WAYFINDER
     assert 'temporary clickable Markdown drafts' in WAYFINDER
     assert 'Changed proposals require fresh review' in WAYFINDER
     assert 'without another dispatch question' in WAYFINDER

@@ -113,7 +113,7 @@ This reads as a **{{verdict|regression, bug, works as designed, feature request}
 ## Known gap / tracking
 
 <!-- @: omit section if unsupported -->
-{{ticket id, TODO path:line, or upstream issue URL}}
+{{work item reference, TODO path:line, or upstream issue URL}}
 
 ## Prevention
 
