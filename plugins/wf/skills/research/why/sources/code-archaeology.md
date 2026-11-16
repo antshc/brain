@@ -9,7 +9,7 @@
 - Tests, whose names and assertions often encode the edge cases that motivated a change
 - Related files modified in the same commits (co-change signal)
 - CHANGELOG entries and release notes in the repo
-- Issue/ticket IDs in commit messages and PR bodies
+- Issue/work item IDs in commit messages and PR bodies
 
 The most trustworthy source, tied directly to the code, and the most complete. Everything that went through the repo should be here.
 

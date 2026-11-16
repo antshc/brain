@@ -10,14 +10,14 @@ Problem, user-facing solution, Requirement sets, decisions, testing decisions, e
 
 ## Required resources
 
-Read the router's Spec template and shared requirements resources. For `normalize`, preserve the supplied fragment and return after Shared requirements rules.
+Read the router's Spec template and local requirements resources. For `normalize`, preserve the supplied fragment and return after Requirements rules.
 
 ## Workflow
 
 1. **Reconcile inputs.** Respect the domain glossary, applicable Concepts/ADRs and supplied decisions. Treat missing evidence or conflicting source obligations as gaps; do not interview or choose an architecture during authoring. Done when each Requirement set and known decision has a source.
 2. **Render.** Fill the Spec template. Keep behavior solution-agnostic and testable, separate from implementation decisions. Done when every source requirement/rule/edge case is represented.
 3. **Contracts.** Inventory touched kinds API, Database, Resource, other and GUI from supplied context and verified local contracts. Invoke the router's Contracts producer per kind. Order outputs API → Database → Resource → other → GUI. Done when each kind has a substantive delta, or no contract change is recorded in the run summary.
-4. **Check.** Apply shared requirements rules to authored behavior. Remove skill names, paths, invocation instructions and template directives from the entire publishable body, including inlined contract output. Done when required deltas have a `Legend:` line, a `#### header` and `<details>` per surface, with `+`, `-`, `%` or `~` delta lines; missing or hand-written deltas block readiness.
+4. **Check.** Apply requirements rules to authored behavior. Remove skill names, paths, invocation instructions and template directives from the entire publishable body, including inlined contract output. Done when required deltas have a `Legend:` line, a `#### header` and `<details>` per surface, with `+`, `-`, `%` or `~` delta lines; missing or hand-written deltas block readiness.
 
 ## Accepted design content
 

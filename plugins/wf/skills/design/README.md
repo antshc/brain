@@ -1,6 +1,6 @@
 # Design skill
 
-One discoverable entry point for code architecture, standalone code sketches, deep-module interfaces, decision interviews, high-level designs, specifications and tickets.
+One discoverable entry point for code architecture, standalone code sketches, deep-module interfaces, decision interviews, high-level designs, specifications and tasks.
 
 ## Flows
 
@@ -35,8 +35,8 @@ flowchart TD
     sketchChoice{"2 - Code sketch needed?"}
     sketch[["2a.1 - /design sketch"]]
     spec[["3 - /design spec"]]
-    ticketChoice{"4 - Create tickets first?"}
-    tickets[["4a.1 - /design tickets"]]
+    ticketChoice{"4 - Create tasks first?"}
+    tickets[["4a.1 - /design tasks"]]
     implement[["5 - /implement"]]
     finish(["Implementation and draft PR"])
 
@@ -45,7 +45,7 @@ flowchart TD
     sketchChoice -. "Yes; user requests sketch" .-> sketch
     sketch -. "User requests spec from accepted sketch" .-> spec
     spec -. "User chooses implementation handoff" .-> ticketChoice
-    ticketChoice -. "Yes; user requests tickets" .-> tickets
+    ticketChoice -. "Yes; user requests tasks" .-> tickets
     tickets -. "User requests implementation" .-> implement
     implement --> finish
     sketchChoice -. "No; user requests spec from decisions" .-> spec
@@ -54,7 +54,7 @@ flowchart TD
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-Sketch and Tickets are optional. Ticket publication follows approval of the breakdown. Implement receives the spec URL, with its tickets when created.
+Sketch and Tasks are optional. Task publication follows approval of the breakdown. Implement receives the spec URL, with its tasks when created.
 
 ### Alternating loop
 
@@ -96,7 +96,7 @@ flowchart TD
 
 Solid edges are work within Wayfinder; dotted edges require a separately requested handoff. Repeat connectors resume the numbered step. User answers are explicit; only the user ends Grill. Prove/Experiment and sketch prototype artifacts enter integration/HLD after explicit payload approval; Challenge this evidence updates root fog/HLD automatically without approval. Contract design additionally requires Choice.
 
-Wayfinder saves proposed map and ticket bodies as temporary Markdown review drafts, then presents a clickable bullet list before asking for approval. Review files contain full bodies and metadata; opening them grants no approval. Drafts survive pauses and publication retries; changed proposals receive fresh revision links and require renewed approval. Tracker creation and ticket evidence dispatch wait for approval of the exact proposal.
+Wayfinder saves proposed map and topic bodies as temporary Markdown review drafts, then presents a clickable bullet list before asking for approval. Review files contain full bodies and metadata; opening them grants no approval. Drafts survive pauses and publication retries; changed proposals receive fresh revision links and require renewed approval. Tracker creation and topic evidence dispatch wait for approval of the exact proposal.
 
 ### Fog solving
 
@@ -106,7 +106,7 @@ flowchart TD
     start(["Fog solving"])
     read["1 - Read unknowns, risks and linked issue progress"]
     select["2 - Select cheapest sufficient helper and bounded question"]
-    work["3 - Propose work; user approves tickets, or root-owned verification run"]
+    work["3 - Propose work; user approves work items, or root-owned verification run"]
     spawn[["4 - Run helper skill in Wayfinder session"]]
     verify["5 - Verify findings, artifacts and coverage"]
     outcome{"6 - Evidence and required approval ready?"}
@@ -125,7 +125,7 @@ flowchart TD
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-Research clarifies facts, Prove checks a claim, Challenge this seeks reproduced failures, Deep Module/Code Sketch expose interface and code shapes, and Grill settles human choices. These are alternatives and follow-ups, not a mandatory sequence. Challenge this may target the whole HLD; record it on the existing issue/root, never its own tracking ticket. A bounded passing check clears only its supported claim after required approval/integration; precise residual risks remain open on their owning tickets/runs; unframeable remainder stays in fog. Prototype approval gates Prove/Experiment, Code Sketch and Contract payloads. Challenge this requires no approval: code changes or tests run in an owned result worktree, followed by automatic evidence integration and root fog/HLD updates. For approval-gated prototypes, retain the owned worktree and open issue/root state until the user approves the exact revision; Research and Challenge this integration remain automatic.
+Research clarifies facts, Prove checks a claim, Challenge this seeks reproduced failures, Deep Module/Code Sketch expose interface and code shapes, and Grill settles human choices. These are alternatives and follow-ups, not a mandatory sequence. Challenge this may target the whole HLD; record it on the existing issue/root, never its own tracking issue. A bounded passing check clears only its supported claim after required approval/integration; precise residual risks remain open on their owning topics/runs; unframeable remainder stays in fog. Prototype approval gates Prove/Experiment, Code Sketch and Contract payloads. Challenge this requires no approval: code changes or tests run in an owned result worktree, followed by automatic evidence integration and root fog/HLD updates. For approval-gated prototypes, retain the owned worktree and open issue/root state until the user approves the exact revision; Research and Challenge this integration remain automatic.
 
 ### Contract design
 
@@ -140,7 +140,7 @@ flowchart TD
     wait(["Await user; retain worktree, no merge"])
     payload["4a.1 - Prepare selected package and considered-option notes"]
     merge["4a.2 - Verify and merge selected-only result locally"]
-    sync["4a.3 - Synchronize HLD and root; close ticket"]
+    sync["4a.3 - Synchronize HLD and root; close issue"]
     finish(["Return to Wayfinder"])
 
     start --> options --> retain --> present --> choice
@@ -150,14 +150,14 @@ flowchart TD
     classDef default fill:#242424,stroke:#8b949e,color:#c9d1d9,stroke-width:1px
 ```
 
-Contract design keeps its `wayfinder:contract-design` ticket across AFK Options and HITL Choice. Each option contains `sketch/`, `module-map.md` and its own Markdown `rationale.md`; `comparison.md` compares, never replaces, those rationales. Merge after user selection only: chosen source sketches/rationale plus notes describing considered alternatives and rejection reasons. Rejected source trees stay out of incoming integration history. Code Sketch Tasks use the same prototype approval gate before local integration.
+Contract design keeps its `wayfinder:contract-design` topic across AFK Options and HITL Choice. Each option contains `sketch/`, `module-map.md` and its own Markdown `rationale.md`; `comparison.md` compares, never replaces, those rationales. Merge after user selection only: chosen source sketches/rationale plus notes describing considered alternatives and rejection reasons. Rejected source trees stay out of incoming integration history. Code Sketch Tasks use the same prototype approval gate before local integration.
 
 ## Key decisions
 
 | Decision | Purpose |
 |---|---|
 | Alternate human decisions and autonomous helpers | Answers and findings can reveal more work; Wayfinder keeps control |
-| Root Not yet specified is the fog of war | Only in-scope concerns too vague to ticket; precise questions graduate to approved owners or durable pending drafts |
+| Root Not yet specified is the fog of war | Only in-scope concerns too vague to frame as a topic; precise questions graduate to approved owners or durable pending drafts |
 | Child issues track concrete work | Progress, claims and dependencies stay distinct from design uncertainty |
 | Approve Prove/Experiment and sketch prototypes before integration | Retain its owned worktree, paths and reviewed revision; merge only the explicitly approved payload |
 | Keep Contract design Options → Choice | Agent prepares options; user selects; only then merge chosen artifacts and considered-option notes |
@@ -173,7 +173,7 @@ Wayfinder runs every helper in its own session; helpers spawn their own workers 
 
 | Owner/helper | Responsibility | Returns to Wayfinder |
 |---|---|---|
-| User | Scope, requirements, preferences, ticket approval, prototype approval, contract choice, residual-risk acceptance and publish request | Explicit decisions |
+| User | Scope, requirements, preferences, work item approval, prototype approval, contract choice, residual-risk acceptance and publish request | Explicit decisions |
 | Wayfinder | Fog, scheduling, claims, dispatch, human relay, verification, prototype approval relay, commits/local integration and HLD synchronization | Next investigation, human choice, readiness or precise blocker |
 | Grill | One human decision at a time, session ledger and closing sweep | Actual user answers and new unknowns |
 | Research | Facts from code, cloud, history and primary sources | Cited findings and limits |
@@ -191,12 +191,12 @@ Wayfinder runs every helper in its own session; helpers spawn their own workers 
 |---|---|
 | Root Not yet specified | Coarse concerns, stable IDs, missing framing, context, next action and owner |
 | Child issues | Precise questions/risks and their stable IDs, criteria, evidence/limits, concrete progress, blockers, claims, worker/model, result/worktree/commit identities and resolution comments |
-| Root Decisions so far | Supported resolved outcomes and ticket pointers; graduated work leaves active fog after verified owner transfer |
+| Root Decisions so far | Supported resolved outcomes and topic pointers; graduated work leaves active fog after verified owner transfer |
 | Local `docs/research/` and `docs/prototype/` | Research/proof evidence, chosen sketch packages and considered-option notes |
 | HLD `docs/ongoing/<initiative-slug>.md` | Supported current design and ignored local provenance; no evidence appendices |
 | HLD Open Questions | User-filled presentation questions; agents preserve entries and blank answers |
 
-Wayfinder runs Research, Prove, Challenge this, Deep Module, Code Sketch and Grill in its own session, never inside a wrapper subagent; each uses its default worker dispatch, so Research spawns its own route agents. Every tracker issue the design skill creates (Spec, Tickets, Wayfinder map, child, sub-ticket or follow-up) is first shown to the user and created only after explicit approval of that exact proposal; prototype tickets also show their claim or sketch scope, artifact paths and worktree. Wayfinder research waits for the same approval. Research and read-only Challenge this inspection may reuse a pinned checkout. Prove/Experiment and sketch prototypes use Git-skill worktrees; Challenge this code changes or tests also require one. Producers do not commit/push. Wayfinder retains approval-gated prototypes without commit/merge until explicit approval of the exact reviewed payload, then integrates locally; Contract design also requires Choice. Challenge this evidence integrates automatically and updates fog/HLD without approval. Changes need renewed approval; silence or passing checks do not approve a prototype. Resume retains the same worktree and pending step; cleanup waits for verified integration, HLD/tracker synchronization and every consumer.
+Wayfinder runs Research, Prove, Challenge this, Deep Module, Code Sketch and Grill in its own session, never inside a wrapper subagent; each uses its default worker dispatch, so Research spawns its own route agents. Every tracker issue the design skill creates (Spec, Tasks, Wayfinder map, child, sub-issue or follow-up) is first shown to the user and created only after explicit approval of that exact proposal; prototype topics also show their claim or sketch scope, artifact paths and worktree. Wayfinder research waits for the same approval. Research and read-only Challenge this inspection may reuse a pinned checkout. Prove/Experiment and sketch prototypes use Git-skill worktrees; Challenge this code changes or tests also require one. Producers do not commit/push. Wayfinder retains approval-gated prototypes without commit/merge until explicit approval of the exact reviewed payload, then integrates locally; Contract design also requires Choice. Challenge this evidence integrates automatically and updates fog/HLD without approval. Changes need renewed approval; silence or passing checks do not approve a prototype. Resume retains the same worktree and pending step; cleanup waits for verified integration, HLD/tracker synchronization and every consumer.
 
 Discovery creates no push/PR or publication. Explicit `/design publish-hld` publishes the HLD page only; reports, proof artifacts and sketch packages remain local, without appendices, subpages or artifact attachments. Existing remote artifacts are not automatically deleted. Architect is outside Wayfinder; Architecture first remains a separate flow. For that flow, request a **design-only handoff** explicitly; Architect otherwise implements by default.
 
@@ -210,7 +210,7 @@ Discovery creates no push/PR or publication. Explicit `/design publish-hld` publ
 | `/design sketch add pagination to orders` | `sketch` | One usage-first design package, no production edits |
 | `/design deep-module order pricing seam` | `deep-module` | Three or more interface options, comparison, recommendation |
 | `/design hld` | `hld` | Authoritative high-level feature design, synthesized or merged in `docs/ongoing/` |
-| `/design grill` / `/design spec` / `/design tickets` | Corresponding route | Decisions, spec or approved ticket breakdown |
+| `/design grill` / `/design spec` / `/design tasks` | Corresponding route | Decisions, spec or approved task breakdown |
 | `/design wayfinder` | `wayfinder` | Living HLD and local evidence merges into its integration branch; no push or PR |
 | `/design publish-hld` | `publish-hld` | Confluence HLD page only; evidence remains local |
 | `/design review` | `review` | Design-gap assessment |
@@ -223,8 +223,8 @@ See [Skill router](SKILL.md) and [Architect playbook](playbooks/architect.md). `
 
 Use `/prove <claim>` for empirical evidence and `/challenge-this <scope>` for reproduced adversarial findings. Architect invokes these standalone skills as needed.
 
-Record precise questions/risks on their owning tickets or pending proposals; keep only concerns too vague to ticket in root Not yet specified. Select Prove for a claim or embedded Challenge this for blind spots; record actual method/result, mitigation evidence and residual risk/next action on the owner. Preserve HLD Open Questions for users during presentation.
+Record precise questions/risks on their owning topics or pending proposals; keep only concerns too vague to frame as a topic in root Not yet specified. Select Prove for a claim or embedded Challenge this for blind spots; record actual method/result, mitigation evidence and residual risk/next action on the owner. Preserve HLD Open Questions for users during presentation.
 
 ## Artifact authoring ownership
 
-Design prepares decisions and evidence; `draft-artifact` owns templates and rendering. The `spec` and `hld` routes invoke the corresponding authoring routes. Tickets invokes `draft-artifact task` for each approved slice. Wayfinder uses the HLD orchestration for living document updates. Design retains risk verification, approval gates, worktrees, integration and publication.
+Design prepares decisions and evidence; `draft-document` owns Spec/HLD templates and rendering. The `spec` and `hld` routes invoke the corresponding authoring routes. Tasks invokes `draft-work task` for each approved slice. Wayfinder uses the HLD orchestration for living document updates. Design retains risk verification, approval gates, worktrees, integration and publication.

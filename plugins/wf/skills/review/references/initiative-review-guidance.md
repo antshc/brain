@@ -18,6 +18,6 @@ Conclude internally for each candidate: confirmed gap or no issue found. Emit on
 
 ## Finding content
 
-Supply the requirement gap, concrete impact, and smallest correction to the shared conversation draft. Name the exact symbol or code path and state the required behavior: quote the supplied issue/ticket description text verbatim when available, otherwise restate it. Never add the initiative ID, link, or URL.
+Supply the requirement gap, concrete impact, and smallest correction to the shared conversation draft. Name the exact symbol or code path and state the required behavior: quote the supplied issue/work-item description text verbatim when available, otherwise restate it. Never add the initiative ID, link, or URL.
 
 Contrast required and implemented behavior. For scope creep, state the intended scope explicitly rather than treating an unmapped symbol as proof. Suggest the smallest change that meets the requirement or removes the extra behavior.

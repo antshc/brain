@@ -189,7 +189,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <details>
 <summary>Open Questions</summary>
 
-<!-- User-owned presentation questions. Leave empty on creation; preserve user entries verbatim on updates, including unanswered cells. Store precise agent questions/risks on owning tickets/proposals; only concerns too vague to ticket belong in root Not yet specified, never here. -->
+<!-- User-owned presentation questions. Leave empty on creation; preserve user entries verbatim on updates, including unanswered cells. Store precise agent questions/risks on owning topics/proposals; only concerns too vague to frame as a topic belong in root Not yet specified, never here. -->
 
 | **Question** | **Answer** |
 |---|---|

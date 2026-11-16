@@ -153,10 +153,10 @@ Done when every pending thread has one confirmed reply (thread or page table row
 | No change needed | Give the decisive reason with evidence. |
 | Unclear | Ask one focused question that unblocks the decision. |
 | Earlier mistake | Acknowledge briefly; give the correction. |
-| Deferral proposed | Ask whether to track it separately; claim no ticket exists. |
-| Existing ticket supplied | Name the supplied key; invent none. |
+| Deferral proposed | Ask whether to track it separately; claim no work item exists. |
+| Existing work item supplied | Name the supplied key; invent none. |
 
-No praise, apologies, headings, canned wording, or labels (`Bug:`, `Nit:`, `Note:`). Prefer "use" over "utilize"/"leverage". Name exact sections, Jira keys, or URLs when needed to assess the answer. **MUST NOT** create Jira tickets or follow-up pages; ask whether separate tracking is wanted.
+No praise, apologies, headings, canned wording, or labels (`Bug:`, `Nit:`, `Note:`). Prefer "use" over "utilize"/"leverage". Name exact sections, Jira keys, or URLs when needed to assess the answer. **MUST NOT** create Jira work items or follow-up pages; ask whether separate tracking is wanted.
 
 ## 6. Report
 

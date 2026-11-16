@@ -1,7 +1,7 @@
 ---
 name: writing-style
 description: >-
-  Apply clear, precise writing to technical docs, PR text, and prompts. Use for 'unslop this', 'tighten this prose', or 'sharpen this prompt'. Not for artifact templates → `draft-artifact`.
+  Apply clear, precise writing to technical docs, PR text, and prompts. Use for 'unslop this', 'tighten this prose', or 'sharpen this prompt'. Not for work-item templates → `draft-work`. Not for document templates → `draft-document`.
 ---
 
 # Writing style
@@ -31,7 +31,7 @@ Orchestrator. Pick the task row, read each listed reference fully (no previews),
 
 Doc-mode choice (tutorial, how-to, reference, explanation) applies to whole documents only. Skip `references/modes-diataxis.md` for short text.
 
-For requirements normalization, *Load and follow the `draft-artifact` skill to create and update specifications or user stories* using the matching artifact route with `normalize`; use `spec normalize` for an untyped requirements fragment.
+For story/task/bug requirements normalization, *Load and follow the `draft-work` skill to create and update user stories, implementation tasks and bug reports* using the matching route with `normalize`. For spec/HLD/TOI or untyped requirements, *Load and follow the `draft-document` skill to create and update specifications, high-level designs and TOI documents* using the matching route with `normalize`; use `normalize` for an untyped fragment.
 
 ## Pipeline
 

@@ -134,7 +134,7 @@ How a pull treats a repository in the developer's working set, set per repositor
 ### Language
 
 **Codey**:
-The implementation agent. Crew agents run one task in their invocation directory and return the five-field report. The WF agent `wf:codey` also handles `implement` tickets in assigned worktrees and returns edits and verification evidence. The caller owns worktree selection and commits.
+The implementation agent. Crew agents run one task in their invocation directory and return the five-field report. The WF agent `wf:codey` also handles `implement` tasks in assigned worktrees and returns edits and verification evidence. The caller owns worktree selection and commits.
 *Avoid*: droid, implementer, coder
 
 **Chorey**:
@@ -260,7 +260,7 @@ The authoritative solution design for one Initiative, potentially covering multi
 **Use case**:
 An actor-oriented description of one goal within a Feature, including preconditions, a main flow, alternate flows, and postconditions. A Feature may have multiple Use cases.
 
-**Tracer-bullet ticket**:
+**Tracer-bullet task**:
 An agent-executable planning unit that delivers a narrow, complete, verifiable path through every integration layer needed for one behavior. It may implement part or all of one Functional slice but is not itself a Functional slice.
 *Avoid*: slice, vertical slice
 

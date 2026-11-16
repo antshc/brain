@@ -31,7 +31,7 @@ If `feature` is missing or matches more than one feature, ask the user with the 
 
 ## Required resources
 
-**MUST** read the router's TOI template on every run and use it as the single structure source.
+For `normalize`, apply Requirements rules only to supplied required-behavior statements and return without full-template rendering or exploration. For draft/update, **MUST** read the router's TOI template on every run and use it as the single structure source.
 
 ## Constraints
 

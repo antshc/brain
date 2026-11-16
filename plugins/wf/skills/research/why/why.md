@@ -24,8 +24,8 @@ Each `whyy` reads one category playbook. Playbooks document common providers; ad
 |---|---|---|
 | Full Why | `why/epistemics.md` | — |
 | Source control history, including the anchor | `why/sources/code-archaeology.md` | git, `gh` |
-| Issue / ticket tracker via Atlassian | `why/sources/atlassian.md` (Jira procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then JQL; Fetch work for bodies |
-| Issue / ticket tracker, other | `why/sources/linear.md` | Linear (adapt for Jira, GitHub Issues, Plane, Shortcut) |
+| Issue / work item tracker via Atlassian | `why/sources/atlassian.md` (Jira procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then JQL; Fetch work for bodies |
+| Issue / work item tracker, other | `why/sources/linear.md` | Linear (adapt for Jira, GitHub Issues, Plane, Shortcut) |
 | Long-form documents via Atlassian | `why/sources/atlassian.md` (Confluence procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then CQL; Fetch page for bodies |
 | Long-form documents, other | `why/sources/notion.md` | Notion (adapt for Confluence, Google Docs, Coda) |
 | Real-time team chat | `why/sources/slack.md` | Slack (adapt for Discord, Microsoft Teams, Mattermost) |
@@ -46,7 +46,7 @@ If the target is vague ("why do we do it this way?" with no clear referent), mak
 
 ## Step 2. Establish the Code Anchor
 
-Spawn one `whyy` (source control) to build the seed context; fill its Code Anchor placeholders with what the request supplies, else `to be built`, and pass this step as the assigned task: file paths and line ranges, key symbols (functions, classes, constants), the last few commits touching the target, PR numbers from merge commits (pattern `(#1234)` in the subject line), and any linked ticket IDs. Run `git blame -L <start>,<end> <file>` for last-touch commits, `git log --follow -p -- <file>` for full history with patches through renames, `git log --oneline -20 -- <file>` for recent commits with PR numbers visible, and `git log -1 --format=%B <commit>` to extract PR numbers. Then pull the PR bodies and discussion for any substantive commit: *Load and follow the `github` skill to read pull requests in read-only mode and review threads* using Pull requests with the qualified PR, retaining body and discussion. Start with any PR or commit explicitly supplied by the caller. Return the cited anchor and any access gaps. At anchor depth, deliver the anchor and stop. For full Why, pass the anchor to every investigator and the synthesizer.
+Spawn one `whyy` (source control) to build the seed context; fill its Code Anchor placeholders with what the request supplies, else `to be built`, and pass this step as the assigned task: file paths and line ranges, key symbols (functions, classes, constants), the last few commits touching the target, PR numbers from merge commits (pattern `(#1234)` in the subject line), and any linked work item IDs. Run `git blame -L <start>,<end> <file>` for last-touch commits, `git log --follow -p -- <file>` for full history with patches through renames, `git log --oneline -20 -- <file>` for recent commits with PR numbers visible, and `git log -1 --format=%B <commit>` to extract PR numbers. Then pull the PR bodies and discussion for any substantive commit: *Load and follow the `github` skill to read pull requests in read-only mode and review threads* using Pull requests with the qualified PR, retaining body and discussion. Start with any PR or commit explicitly supplied by the caller. Return the cited anchor and any access gaps. At anchor depth, deliver the anchor and stop. For full Why, pass the anchor to every investigator and the synthesizer.
 
 ## Step 3. Spawn Parallel Investigators
 
@@ -59,7 +59,7 @@ Before spawning investigators, list the MCP servers and installed skills availab
 Map available evidence providers to these categories:
 
 1. Source control history
-2. Issue / ticket tracker
+2. Issue / work item tracker
 3. Long-form documents
 4. Real-time team chat
 5. Infrastructure observability
@@ -68,7 +68,7 @@ Map available evidence providers to these categories:
 
 Use local Git for source history; *Load and follow the `github` skill to inspect repositories in read-only mode and pull requests* for remote source and PR evidence. For the other six, classify using MCP names, server instructions, tool names, skill descriptions, and resource descriptors. If a provider fits more than one category, choose its primary evidence, except for the Atlassian pair below. Record ambiguous cases in the coverage map.
 
-When both `preflight-atlassian` and `atlassian` skills are installed, *Load and follow the `preflight-atlassian` skill to resolve the credentialed TWG launcher and site* using **Resolve** once. Use its credentialed `twg` launcher and site in two independent investigators: **Jira** for issue / ticket tracker, **Confluence** for long-form documents. Both use `why/sources/atlassian.md` with their own category's procedure. If `tokenAvailable` is false or the site/launcher is unavailable, mark both categories inaccessible with the exact prerequisite; never read credentials, start login, or silently switch identity. Do not spawn a second provider for either category. If the skills are absent, retain ordinary MCP discovery for those categories.
+When both `preflight-atlassian` and `atlassian` skills are installed, *Load and follow the `preflight-atlassian` skill to resolve the credentialed TWG launcher and site* using **Resolve** once. Use its credentialed `twg` launcher and site in two independent investigators: **Jira** for issue / work item tracker, **Confluence** for long-form documents. Both use `why/sources/atlassian.md` with their own category's procedure. If `tokenAvailable` is false or the site/launcher is unavailable, mark both categories inaccessible with the exact prerequisite; never read credentials, start login, or silently switch identity. Do not spawn a second provider for either category. If the skills are absent, retain ordinary MCP discovery for those categories.
 
 Spawn one `whyy` per category with an available provider, all in one parallel batch, each owning one category and one provider. Atlassian's credentialed launcher may be shared by its Jira and Confluence investigators, but each must search and report only its assigned product. Don't ask one investigator to cover multiple categories or MCPs.
 
@@ -85,9 +85,9 @@ After the initial results, dispatch targeted Jira-to-Confluence and Confluence-t
 Each category below is uniquely positioned to surface one shape of "why", shown after "Best at". Use it to know what to expect back, to name a gap when a category returns empty, and, only in the rare provably-irrelevant case, to justify a skip.
 
 1. **Source control** (git history, `gh` for PRs, code comments, tests). Always spawn, the only guaranteed source. Best at *implementation-time rationale captured during review*.
-2. **Issue / ticket tracker** (e.g. Atlassian `twg`/Jira, Linear, GitHub Issues, Plane, Shortcut MCP). Best at *the product or business forcing function*. Strongest when the why is external to engineering.
+2. **Issue / work item tracker** (e.g. Atlassian `twg`/Jira, Linear, GitHub Issues, Plane, Shortcut MCP). Best at *the product or business forcing function*. Strongest when the why is external to engineering.
 3. **Long-form documents** (e.g. Atlassian `twg`/Confluence, Notion, Google Docs, Coda MCP). Best at *long-form design rationale*, written out before it becomes code.
-4. **Real-time team chat** (e.g. Slack, Discord, Microsoft Teams, Mattermost MCP). Best at *real-time deliberation that never reached a doc*. Especially important when the source control, ticket, and doc paper trail is thin.
+4. **Real-time team chat** (e.g. Slack, Discord, Microsoft Teams, Mattermost MCP). Best at *real-time deliberation that never reached a doc*. Especially important when the source control, work item, and doc paper trail is thin.
 5. **Infrastructure observability** (e.g. Datadog, New Relic, Honeycomb, Grafana, Splunk MCP). Best at *infrastructure and runtime reality that motivated the code*. Strongest when the target reacts to an infra signal (timeouts, retries, rate limits, circuit breakers).
 6. **Error / exception tracking** (e.g. Sentry, Rollbar, Bugsnag, Airbrake MCP). Best at *the specific exceptions and error trajectories that motivated defensive or corrective code*. Strongest for catch blocks, null guards, type checks, retries, and other defenses.
 7. **Product analytics warehouse** (e.g. Databricks, Snowflake, BigQuery, ClickHouse, dbt, Redshift MCP). Best at *product and data reality that shaped the code*. Strongest for flag-gated code, experiment-driven ships, data migrations, and "where did this number come from" questions.

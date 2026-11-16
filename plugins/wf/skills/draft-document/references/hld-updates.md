@@ -34,7 +34,7 @@ Maintain `Source Material`:
 
 ## Protected presentation and evidence
 
-Leave Open Questions empty on creation; preserve user entries verbatim, including blank answers. Return precise questions/risks to their owning ticket/proposal; only unframeable concerns belong in the caller's root Not yet specified. Do not populate presentation questions with agent discovery gaps.
+Leave Open Questions empty on creation; preserve user entries verbatim, including blank answers. Return precise questions/risks to their owning topic/proposal; only unframeable concerns belong in the caller's root Not yet specified. Do not populate presentation questions with agent discovery gaps.
 
 Consume only supported integrated results and explicit human decisions. Approval-gated prototype conclusions remain Pending until approved integration; Contract Options additionally require the caller's Choice and selected-only integration. Challenge this evidence follows the caller's automatic integration policy. Authoring never grants integration authority.
 

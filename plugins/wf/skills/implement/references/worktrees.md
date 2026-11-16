@@ -8,7 +8,7 @@ Orchestrator-only worktree procedures. Implementation workers run in the launch 
 - `WORKTREES_ROOT` = `HARNESS_ROOT/.worktrees/<REPO>`, `<REPO>` = source repository name from `OWNER/REPO`. Same root for both layouts: harness repo only (`SOURCE_ROOT` = `HARNESS_ROOT`) and harness with sub-repositories (`SOURCE_ROOT` = `HARNESS_ROOT/workspace/<REPO>`). Never derive a root from the current worktree or `SOURCE_ROOT`.
 - `INTEGRATION_BRANCH` = the new branch validated by preflight or the exact branch from a verified resume checkpoint.
 - For a new run, use the integration branch slug as the single-segment worktree leaf under `WORKTREES_ROOT`. On resume use the recorded path.
-- Parallel only: assign unused stable worker ordinals, one per qualified ticket. *Load and follow the `git` skill to run verified branch naming using Branches* for the worker suffix and use the resulting branch slug as its worktree leaf. Record the exact branch and path by ticket key in the publication checkpoint before creating the worktree. Reuse that mapping for retries and resume. Recover a legacy mapping from its verified worktree record before reuse.
+- Parallel only: assign unused stable worker ordinals, one per qualified task. *Load and follow the `git` skill to run verified branch naming using Branches* for the worker suffix and use the resulting branch slug as its worktree leaf. Record the exact branch and path by task key in the publication checkpoint before creating the worktree. Reuse that mapping for retries and resume. Recover a legacy mapping from its verified worktree record before reuse.
 - Confirm every resolved path stays under `WORKTREES_ROOT`; reuse existing paths or branches only after explicit resume verifies their recorded ownership.
 
 ## Integration setup
@@ -19,19 +19,19 @@ Verify the preflight-pinned `BASE_COMMIT` exists locally. Use that SHA without f
 
 ## Integration writes
 
-- `WORKTREE_PATH` is the sole location for integrated ticket commits, publishing, and chore; preserve it for the caller’s post-implementation checks.
+- `WORKTREE_PATH` is the sole location for integrated task commits, publishing, and chore; preserve it for the caller’s post-implementation checks.
 - One writer at a time: start a writer only after the previous result is verified. No merger subagents.
-- Sequential: each verified ticket commit lands directly on `INTEGRATION_BRANCH`.
-- Parallel: implementers write only in their ticket worktrees; the orchestrator applies verified ticket commits here one at a time and commits after the integration check. Tickets with a `file` conflict never run concurrently. `soft` conflicts may run concurrently. Follow the parallel reference for integration rework.
+- Sequential: each verified task commit lands directly on `INTEGRATION_BRANCH`.
+- Parallel: implementers write only in their task worktrees; the orchestrator applies verified task commits here one at a time and commits after the integration check. Tasks with a `file` conflict never run concurrently. `soft` conflicts may run concurrently. Follow the parallel reference for integration rework.
 - Failed or incomplete changes: preserve them and stop advancement.
 
-## Ticket worktrees
+## Task worktrees
 
 Parallel only.
 
 1. **Create:** *Load and follow the `git` skill to run worktree lifecycle and creation using Worktrees* at `TICKET_WORKTREE(key)` on `TICKET_BRANCH(key)` from the pinned integration HEAD. Save its ownership record at `RUN_DIR/worktrees/<key>.json` and record `@prevHead(key)` before launch.
-2. **Remove after integration:** Wait for the worker to exit and verify the ticket result is integrated or the worktree is a verified no-change result. *Load and follow the `git` skill to run verified worktree lifecycle and removal using Worktrees* using the ticket record and last verified ticket HEAD. After verified removal, confirm the local ticket branch still points to that HEAD, then delete only that branch with `git -C SOURCE_ROOT branch -D TICKET_BRANCH(key)` (a cherry-picked commit may not be an ancestor). Preserve and report changed refs or blocked removal.
-3. Dirty, unmerged, or blocked ticket worktrees: preserve and report path/branch.
+2. **Remove after integration:** Wait for the worker to exit and verify the task result is integrated or the worktree is a verified no-change result. *Load and follow the `git` skill to run verified worktree lifecycle and removal using Worktrees* using the task record and last verified task HEAD. After verified removal, confirm the local task branch still points to that HEAD, then delete only that branch with `git -C SOURCE_ROOT branch -D TICKET_BRANCH(key)` (a cherry-picked commit may not be an ancestor). Preserve and report changed refs or blocked removal.
+3. Dirty, unmerged, or blocked task worktrees: preserve and report path/branch.
 
 ## Preserve integration worktree
 
