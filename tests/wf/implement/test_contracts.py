@@ -307,7 +307,7 @@ def test_implementation_stops_at_handoff_and_factory_owns_completion():
 def test_planner_has_no_empty_ticket_or_breakdown_switch_input():
     planner = (ROOT / 'agents/planner.md').read_text()
     placeholders = set(re.findall(r"\{\{([^}|]+)(?:\|[^}]*)?\}\}", planner))
-    assert not {'tasksJson', 'breakdown'} & placeholders
+    assert not {'ticketsJson', 'breakdown'} & placeholders
     assert 'zero native sub-issues' in planner
     assert 'initial invocation' in planner and 'return `failed` without task writes' in planner
     assert 'reconciles only the prior run' in planner
