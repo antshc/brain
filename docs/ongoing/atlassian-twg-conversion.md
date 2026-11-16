@@ -58,7 +58,11 @@ Goal: decide whether body fetch and publish can move to `twg`, and through which
 - Baseline is `main` at the revision that includes the Confluence conversion guards; later converter changes require re-running the comparison.
 - twg 1.4.2 exposes `html` and `md` body formats only, with no raw ADF body; constructs that exist only in ADF must survive through HTML macros, the Markdown dialect, or a REST fallback.
 - Prototype verdicts depend on the twg version under test; a twg upgrade can change verdicts.
-- Pending — twg-html and twg-md documented feature support (Research).
+- twg owns its HTML and Markdown conversions and publishes no per-node contract; documentation alone cannot establish byte-identical parity, so prototypes decide every row not explicitly documented.
+- twg Markdown is documented as lossy for rich Confluence content: panels, status and emoji render as text, other macros as placeholders, layouts and ADF-only nodes may be lost.
+- twg HTML is documented as the lossless editing format; macros are written as extension HTML, and targeted HTML edits preserve untouched nodes exactly.
+- twg returns Jira descriptions as ADF on read, so Jira fetch can reuse the current ADF→Markdown converter; Jira writes accept HTML, Markdown or plain text.
+- Attachments (upload/download) and inline comments (read with highlight marker id, create with text selection) have twg commands; Draw.io custom-content records have none found.
 - Pending — selected Markdown package pair and its licence (Research).
 
 # Out of Scope
@@ -151,9 +155,18 @@ Pending — dependency changes (Markdown package added, REST library retained or
 <details>
 <summary>Compatibility matrix</summary>
 
-**Evidence summary:** Pending — twg documentation research, baseline capability inventory, and both prototype comparisons.
+**Evidence summary:** The baseline has 37 regression capabilities and 14 converter-test behaviours (51 rows). Documentation establishes support for structural HTML, extension-HTML macros, attachments, inline-comment markers and Jira ADF reads; it documents Markdown loss for panels, status, emoji, macros and layouts; per-node forms for most dialect constructs are undocumented. Prototype verdicts pending.
 
-Pending — one row per capability with publish and fetch verdicts for twg-html and twg-md.
+| Row group | twg-html (documented) | twg-md (documented) | Jira |
+| --- | --- | --- | --- |
+| Headings, marks, lists, blockquote, rule, plain tables | Structural HTML supported; exact form pending prototype | Exact form pending prototype | Fetch reuses current converter (ADF read); publish pending |
+| Status lozenges, panels | Form pending prototype | Flattened to text | Fetch reuses current converter |
+| TOC, expand | Extension HTML supported; read form pending | Placeholder or lost | Not applicable / reuses converter |
+| Breakout, table layout and width | Pending prototype | Layout loss documented | Not applicable |
+| Inline-comment anchors | Marker id present in HTML; preserved by targeted edits; full-body write pending | Lost | Not applicable |
+| Attachments, media, diagram sidecars | twg attachment commands; media node form pending | Media may be missing | twg attachment commands |
+| Draw.io custom content | No twg command found — REST fallback candidate | Same | Not applicable |
+| Validation, detection, error guards | Client-side converter, unchanged | Client-side converter, unchanged | Unchanged |
 
 </details>
 
@@ -228,4 +241,6 @@ Not applicable — no containers or appliance.
 | Wayfinder charting session 2026-11-16 | Grill conversation | Destination, scope, parity bar (byte-identical), comparison oracle, verdict set, test targets, package-selection approach, baseline revision. |
 | docs/adr/atl-is-twg-first-with-rest-adf-content.md | Spec | Current access split and the previously rejected twg-for-content option this effort re-evaluates. |
 | tests/wf/atlassian/regression/scripts/capabilities.py | Spec | Capability catalogue for matrix rows. |
+| https://github.com/antshc/brain/issues/396 | Wayfinder map | Destination, notes, test targets. |
+| docs/research/atlassian-twg-conversion/twg-feature-support.md | Wayfinder evidence | Combined twg-html vs twg-md documented-support matrix (partial: authenticated body-formats and live samples blocked); baseline inventory of 51 rows; Jira ADF read path; non-body twg commands. |
 <!-- adf:ignore:end -->
