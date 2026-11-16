@@ -1,6 +1,6 @@
-# Solution-Agnostic De-referencing Tables
+# Work requirements terms
 
-Catalog of leaked implementation artifacts and the behavior to state instead.
+Apply these swaps only to authored story behavior, task acceptance criteria and bug expected behavior. Preserve glossary terms, verbatim sources, technical scope, structural relocation constraints, reproduction and actual results; do not infer new commitments from a swap.
 
 Anchor the intent with a reject/prefer pair:
 

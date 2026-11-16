@@ -12,13 +12,13 @@ An Initiative tag is SCREAMING_SNAKE_CASE. A Functional slice is one deployable-
 
 ## Required resources
 
-Read the router's Story template and shared requirements resources. For `normalize`, apply Shared requirements rules and return without full-template rendering.
+Read the router's Story template and local requirements resources. For `normalize`, apply Requirements rules and return without full-template rendering.
 
 ## Workflow
 
 1. **Assemble.** Render the Title and addressed requirements from the template; keep scope within one slice. Done when required fields and verbatim sources are accounted for.
 2. **Derive criteria.** Write single, self-contained pass/fail checks, verifiable without reading code. Use `{{outcome}} when {{condition}}` for behaviors; `If {{condition}}, {{actor}} must {{outcome}}` for invariants and edge cases. Vary subjects. Cover input, processing, integration, state and failure; fold every applicable rule, edge case and error into its own criterion without separate rule/edge-case sections. Done when each source obligation maps to an observable criterion with an exact result.
-3. **Normalize.** Apply shared requirements rules to authored Title, Requirements and criteria. Preserve supplied Feature, Functional slice, Stakeholder requirement and Functional requirements verbatim; report source conflicts separately. Done when each criterion implies concrete code changes, belongs to the slice and can be tested by QA.
+3. **Normalize.** Apply requirements rules to authored Title, Requirements and criteria. Preserve supplied Feature, Functional slice, Stakeholder requirement and Functional requirements verbatim; report source conflicts separately. Done when each criterion implies concrete code changes, belongs to the slice and can be tested by QA.
 4. **Contracts.** For changed contracts, invoke the router's Contracts producer per touched kind; put its output in Technical notes. Done when every changed kind passes its producer's completion criteria.
 
 ## Update behavior

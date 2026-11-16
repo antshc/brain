@@ -16,6 +16,6 @@ Render one established architectural decision as one bullet. Use only caller-est
 - Keep method bodies, local variables, exact algorithms, and changeable details outside the bullet.
 - Prefer application abstractions over nonessential vendor terminology.
 - Add rationale, alternatives, consequences, or implementation steps only when explicitly requested.
-- Follow the caller's provenance boundary: ADRs, Concepts, Architecture, and tickets are named or linked only in `Source Material`, never in decision bullets.
+- Follow the caller's provenance boundary: ADRs, Concepts, Architecture, and issues are named or linked only in `Source Material`, never in decision bullets.
 
 **Done when:** exactly one bullet matches the template, contains only established decision facts, and follows the rules above.
