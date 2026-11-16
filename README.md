@@ -146,9 +146,9 @@ Agent: [Codey](plugins/wf/agents/codey.agent.md) implements requested coding tas
 Common everyday workflow automation skills. Expected to be useful to all developers.
 
 - [design](plugins/wf/skills/design/SKILL.md): `grill` for decision interviews, `sketch` for a single-pass usage-first code sketch, `spec` for GitHub or offline specs, and `tasks` for approved implementation breakdowns, `wayfinder` for decision maps, and `review` for technical design review.
-- [factory-mode Stories playbook](plugins/wf/install/assets/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `draft-work` Story run per row. Requires repo-level `factory-mode` installation.
-- [draft-work](plugins/wf/skills/draft-work/SKILL.md): create and update stories, implementation tasks and bug reports; owns work templates and requirements wording.
-- [draft-document](plugins/wf/skills/draft-document/SKILL.md): create and update specifications, HLDs and TOI documents; owns document templates and requirements wording.
+- [factory-mode Stories playbook](plugins/wf/install/assets/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `write-work` Story run per row. Requires repo-level `factory-mode` installation.
+- [write-work](plugins/wf/skills/write-work/SKILL.md): write and update stories, implementation tasks and bug reports; owns work templates and requirements wording.
+- [write-document](plugins/wf/skills/write-document/SKILL.md): write and update specifications, HLDs, TOI documents, research reports, bottom lines and root-cause reports; owns document templates and requirements wording.
 - [github](plugins/wf/skills/github/SKILL.md): route Git conventions, branches, commits, owned worktrees, specs, issues, PRs, review discussions, and checks through one skill and CLI. Install WF for Factory Mode's GitHub routes.
 - [implement](plugins/wf/skills/implement/SKILL.md): integrate the task graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.

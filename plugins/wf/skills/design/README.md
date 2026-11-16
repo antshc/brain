@@ -227,4 +227,4 @@ Record precise questions/risks on their owning topics or pending proposals; keep
 
 ## Artifact authoring ownership
 
-Design prepares decisions and evidence; `draft-document` owns Spec/HLD templates and rendering. The `spec` and `hld` routes invoke the corresponding authoring routes. Tasks invokes `draft-work task` for each approved slice. Wayfinder uses the HLD orchestration for living document updates. Design retains risk verification, approval gates, worktrees, integration and publication.
+Design prepares decisions and evidence; `write-document` owns Spec/HLD templates and rendering. The `spec` and `hld` routes invoke the corresponding authoring routes. Tasks invokes `write-work task` for each approved slice. Wayfinder uses the HLD orchestration for living document updates. Design retains risk verification, approval gates, worktrees, integration and publication.

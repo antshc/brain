@@ -63,7 +63,7 @@ Include only facts that help the agents; omit empty lines.
   Present the paths as clickable links to the user.
 - Default location: the agent harness session workspace, `<session>/files/research/<question-slug>.md`; distinct slugs per question. No session workspace → `<repository root>/tmp/research/<question-slug>.md`.
 - Request names a location → save there instead; resolve a relative path against the requester's repository root; a folder gets `<question-slug>.md`. A combined report only when the request asks for one. Conflicting locations for one report → ask before writing.
-- Agents return evidence and drafts inline. Only the router writes reports.
+- Agents return evidence and drafts inline. Before saving a How, Why, Cloud or Web report, *Load and follow the `write-document` skill to write research reports and bottom lines* using `research`; supply the question, route findings, methods, environments, confidence, evidence, gaps, next steps and resolved destination. Preserve route-specific explanations, diagrams, citations, source coverage and confidence as additional sections. Only the router writes reports. Explore stays inline and bypasses report rendering.
 
 ## Routing
 

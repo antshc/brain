@@ -1,13 +1,13 @@
 ---
-name: draft-work
+name: write-work
 description: >-
-  Create and update user stories, implementation tasks and bug reports. Use for drafting or revising work items from supplied scope or observed behavior.
+  Write and update user stories, implementation tasks and bug reports. Use for 'write a user story', 'write an implementation task' or 'write a bug report'. Not for document authoring → `write-document`.
 argument-hint: "story | task | bug"
 ---
 
-# Draft work
+# Write work
 
-Own story, task and bug structure, rendering, updates and document checks. Callers own discovery, design decisions, decomposition, evidence dispatch, approvals, worktrees, integration and publication. `design tasks` selects the breakdown; `draft-work task` renders one supplied task.
+Own story, task and bug structure, rendering, updates and document checks. Callers own discovery, design decisions, decomposition, evidence dispatch, approvals, worktrees, integration and publication. `design tasks` selects the breakdown; `write-work task` renders one supplied task.
 
 ## Routing
 
@@ -19,8 +19,8 @@ Own story, task and bug structure, rendering, updates and document checks. Calle
 
 ## Execution
 
-1. Honor an explicit route; otherwise infer the artifact type. Requests outside owned routes return to the caller with `draft-document` as owner. Ambiguous type → ask and wait. Replies continue the active route unless redirected. Combined requests → author in dependency order, then request order for independent artifacts. Done when each requested artifact has a route.
-2. Select `draft` (new), `update` (existing) or `normalize` (requirements wording only). Untyped requirements fragments belong to `draft-document normalize`; return that routing gap to the caller. Done when operation, scope and caller constraints are known.
+1. Honor an explicit route; otherwise infer the artifact type. Requests outside owned routes return to the caller with `write-document` as owner. Ambiguous type → ask and wait. Replies continue the active route unless redirected. Combined requests → author in dependency order, then request order for independent artifacts. Done when each requested artifact has a route.
+2. Select `draft` (new), `update` (existing) or `normalize` (requirements wording only). Untyped requirements fragments belong to `write-document normalize`; return that routing gap to the caller. Done when operation, scope and caller constraints are known.
 3. Read the selected playbook and its required resources fully; for `normalize`, load local requirements resources only, omitting template-only resources; load conditional resources only when triggered. Resolve paths from this skill directory. Done when all inputs for the next action are loaded.
 4. For `normalize`, apply Requirements rules and return. Otherwise execute the route. Use supplied context and permitted local reads; return missing evidence or decisions to the caller. Do not independently dispatch research/proof, decompose work, publish, commit or manage worktrees. Existing Bug read-only exploration remains permitted. Done when the artifact or an explicit incomplete result is returned.
 

@@ -249,7 +249,7 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
                  'Requirement wins', 'without asking', 'Sketch deviation:'):
         assert text in contract
     assert "`spec.json` `artifacts`" in BREAKDOWN and 'RUN_DIR/artifacts' in BREAKDOWN
-    template = (REPO / 'plugins/wf/skills/draft-work/templates/task-template.md').read_text()
+    template = (REPO / 'plugins/wf/skills/write-work/templates/task-template.md').read_text()
     rule = template.split('<related-spec-artifacts-rule>')[1].split('</related-spec-artifacts-rule>')[0]
     assert 'Design sketch artifacts' in rule
     implementer = CODEY.read_text()
@@ -264,13 +264,13 @@ def test_design_sketch_artifacts_drive_breakdown_and_implementation():
 
 
 def test_task_authoring_has_one_owner_without_changing_planner_authority():
-    author = REPO / 'plugins/wf/skills/draft-work'
+    author = REPO / 'plugins/wf/skills/write-work'
     template = (author / 'templates/task-template.md').read_text()
     design = REPO / 'plugins/wf/skills/design'
     assert not (design / 'references/issue-template.md').exists()
     assert '<issue-template>' not in BREAKDOWN
     for caller in (BREAKDOWN, (design / 'playbooks/tasks.md').read_text()):
-        assert '`draft-work` skill' in caller
+        assert '`write-work` skill' in caller
         assert 'using `task`' in caller
     assert 'never delegate, request approval' in BREAKDOWN
     for section in ('## Parent Spec', '## What to build', '## Acceptance criteria',
@@ -327,7 +327,7 @@ def test_graph_only_outputs_and_scheduler_guards():
         *ROOT.rglob('*.md'),
         design / 'playbooks/tasks.md',
         design / 'references/github.md',
-        REPO / 'plugins/wf/skills/draft-work/templates/task-template.md',
+        REPO / 'plugins/wf/skills/write-work/templates/task-template.md',
     ):
         assert not re.search(r'\bwaves?\b', path.read_text(), re.I), path
     parallel = (ROOT / 'references/parallel.md').read_text()
