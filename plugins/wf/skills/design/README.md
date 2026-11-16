@@ -224,3 +224,7 @@ See [Skill router](SKILL.md) and [Architect playbook](playbooks/architect.md). `
 Use `/prove <claim>` for empirical evidence and `/challenge-this <scope>` for reproduced adversarial findings. Architect invokes these standalone skills as needed.
 
 Record precise questions/risks on their owning tickets or pending proposals; keep only concerns too vague to ticket in root Not yet specified. Select Prove for a claim or embedded Challenge this for blind spots; record actual method/result, mitigation evidence and residual risk/next action on the owner. Preserve HLD Open Questions for users during presentation.
+
+## Artifact authoring ownership
+
+Design prepares decisions and evidence; `draft-artifact` owns templates and rendering. The `spec` and `hld` routes invoke the corresponding authoring routes. Tickets invokes `draft-artifact task` for each approved slice. Wayfinder uses the HLD orchestration for living document updates. Design retains risk verification, approval gates, worktrees, integration and publication.

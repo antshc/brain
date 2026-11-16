@@ -1,7 +1,7 @@
 ---
 name: writing-style
 description: >-
-  Apply clear, precise writing to technical docs, PR text, requirements, and prompts. Use for 'unslop this', 'tighten this prose', 'rewrite requirements', or 'sharpen this prompt'. Not for artifact templates → `draft-artifact`.
+  Apply clear, precise writing to technical docs, PR text, and prompts. Use for 'unslop this', 'tighten this prose', or 'sharpen this prompt'. Not for artifact templates → `draft-artifact`.
 ---
 
 # Writing style
@@ -26,11 +26,12 @@ Orchestrator. Pick the task row, read each listed reference fully (no previews),
 | Review or tighten existing text | [references/rhythm.md](references/rhythm.md), [references/ambiguity-global-english.md](references/ambiguity-global-english.md), [references/unslop.md](references/unslop.md) |
 | Unslop only, remove AI tells | [references/unslop.md](references/unslop.md) |
 | Write a bottom line (research conclusion, key finding, recommended action, executive takeaway) | [references/bottom-line.md](references/bottom-line.md), [references/steps-ste.md](references/steps-ste.md), [references/unslop.md](references/unslop.md) |
-| Normalize requirements, capabilities, features, functional slices, or stories (scrub implementation artifacts) | [references/solution-agnostic.md](references/solution-agnostic.md), [references/solution-agnostic-terms.md](references/solution-agnostic-terms.md); its Output replaces Pipeline |
 | Sharpen a task prompt: deepen it or restate the user's intent | [references/sharpen.md](references/sharpen.md); its output replaces Pipeline |
 | Another skill needs text written through this style | The row matching the text kind |
 
 Doc-mode choice (tutorial, how-to, reference, explanation) applies to whole documents only. Skip `references/modes-diataxis.md` for short text.
+
+For requirements normalization, *Load and follow the `draft-artifact` skill to create and update specifications or user stories* using the matching artifact route with `normalize`; use `spec normalize` for an untyped requirements fragment.
 
 ## Pipeline
 

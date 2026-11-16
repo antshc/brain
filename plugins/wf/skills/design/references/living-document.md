@@ -1,19 +1,17 @@
 # Living document
 
-Wayfinder owns dispatch, fog, progress and local integration; HLD owns synthesis. Standalone Spec publication is unchanged.
+Wayfinder owns dispatch, fog, progress and local integration; Design HLD coordinates evidence/readiness and invokes Draft artifact for document creation or incremental updates. Standalone Spec publication is unchanged.
 
 ## Draft authoring
 
-- Preserve HLD core order; use specific Pending markers for unsupported core content/diagrams. Keep Confluence structural markers.
-- Keep concerns too vague to ticket in root Not yet specified; precise uncertainties, risks, conflicts and next actions belong to owning tickets or pending proposals; HLD Open Questions are user-owned presentation content, including empty answers. Do not populate or reconcile that section automatically.
-- Consume supported integrated findings and explicit human decisions. Pending approval-gated prototypes remain outside integration/HLD until explicit approval and verified integration; Contract Options additionally require Choice. While awaiting approval, update fog/progress only, not prototype-derived HLD conclusions. Challenge this evidence is exempt: integrate it and update root fog and supported HLD conclusions automatically, including findings verified through isolated code changes/tests. Return new gaps to Wayfinder, not more research launched by synthesis.
-- Synthesize consequences in requirements, solution, decisions, assumptions/limitations, testing and rollout. Retain reports/sketches locally with root/child issue inventories; no artifact appendices or disguised report/package copies in Detailed Design. Keep source provenance only in ignored Source Material.
+Pass the exact document worktree/path, `@evolvingDraft=true`, source identities, stable unknown/risk IDs, canonical owners, supported integrated evidence, explicit human decisions and user presentation/diagram protections to the HLD orchestration.
+
+Pending approval-gated prototypes remain outside integration/HLD until explicit approval and verified integration; Contract Options additionally require Choice. While awaiting approval, update fog/progress only. Challenge this evidence integrates automatically, including verification through isolated code changes/tests. Return new gaps here rather than authoring launching research.
 
 ## Incremental reconciliation
 
-1. Read latest HLD and incoming result/session; match canonical source and stable unknown/risk ID and its canonical owner in internal provenance. Done when stronger/conflicting evidence and affected design surfaces are identified.
-2. Update supported consequences in place; preserve untouched content, user choices and diagram approval gates. Preserve the user Open Questions section verbatim. Done when changed requirements, decisions, diagrams, testing and rollout agree, or a blocker is explicit.
-3. Return incomplete/conflicting evidence and risks to Wayfinder for classification: precise ticket/proposal updates or coarse root fog; standalone HLD returns them inline to caller. Keep approval-gated prototype conclusions Pending until approved integration, and candidate choices Pending until selected-only integration. Done when every gap has an owner/next action outside user presentation questions.
-4. Maintain one cumulative Source Material row per canonical map/ticket/report/Grill stream; no invented legacy provenance or duplicate rows. Retain publication-exclusion markers. Done when reprocessing would leave row counts unchanged.
-5. Remove legacy report/sketch appendices and repair their references while preserving local evidence/issue inventories. For legacy agent-owned Open Questions, migrate to a precise owner or coarse root fog before removing only unambiguously agent-owned entries; preserve user entries and ask on ambiguous ownership. Done when no evidence is lost and presentation content remains intact.
-6. Return result identity/gaps for local commit and tracker synchronization. Draft means pending core content, unresolved design obligations on tickets, pending proposals/root runs or coarse fog or unmet readiness checks; user presentation questions alone do not set readiness. Done when every consumed obligation is supported in design or has a precise owned blocker.
+1. Read latest integration-branch HLD and incoming result/session; identify stronger or conflicting evidence and affected obligations. Done when supported evidence and pending payloads are separated.
+2. Invoke HLD orchestration for the Draft artifact `hld update` handoff. Supply exact current document and protected user Open Questions, including empty answers. Done when supported consequences are reflected or precise authoring gaps return.
+3. Classify gaps: precise ticket/proposal updates or coarse root fog; standalone HLD returns them inline. Keep prototype conclusions Pending until approved integration and selected-only Choice where required. Done when every gap has an owner/next action outside presentation questions.
+4. Preserve local reports/sketches and issue inventories before authoring removes legacy appendices. Migrate unambiguously agent-owned legacy Open Questions to a precise owner or coarse fog before removing them; preserve user entries and ask on ambiguous ownership. Done when evidence and user presentation content survive.
+5. Commit through Wayfinder's Commit the document and synchronize tracker state. Record first unconfirmed step and resume only that step on failure. Done when document identity, source reconciliation and pending gaps are persisted; a draft is never reported ready from presentation questions alone.

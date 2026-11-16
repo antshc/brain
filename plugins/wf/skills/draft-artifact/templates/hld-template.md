@@ -11,7 +11,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <summary>Reviewers</summary>
 
 | **Role** | **Name** |
-| --- | --- |
+|---|---|
 | Author (Feature Lead) | |
 | Reviewers (Architect \ TL) | |
 | PO | |
@@ -31,7 +31,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <summary>Glossary and Abbreviations</summary>
 
 | **Term** | **Description** |
-| --- | --- |
+|---|---|
 | {{term}} | {{description}} |
 
 </details>
@@ -45,7 +45,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 
 <!-- adf:wide-table -->
 | **#** | **Requirement** | **Priority** | **Details** | **Source** |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | 1 | {{stakeholderRequirement\|states the desired outcome}} | {{priority\|MVP / Should have / Nice to have}} |  | {{requirementSource\|PO / Dev team}} |
 | 1.1 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
 | 1.2 | *{{functionalRequirement\|states the required behavior}}* | {{priority\|MVP / Should have / Nice to have}} | • {{businessRule\|State invariants, or None.}}<br>• {{edgeCase\|Boundary handling, or None.}} | {{requirementSource\|PO / Dev team}} |
@@ -192,7 +192,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <!-- User-owned presentation questions. Leave empty on creation; preserve user entries verbatim on updates, including unanswered cells. Store precise agent questions/risks on owning tickets/proposals; only concerns too vague to ticket belong in root Not yet specified, never here. -->
 
 | **Question** | **Answer** |
-| --- | --- |
+|---|---|
 
 </details>
 
@@ -222,7 +222,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 ## Main Workflows
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | VPG Workflows | {{applicable / not applicable}} |  |
 | VRA Workflows | {{applicable / not applicable}} |  |
 | Undo | {{applicable / not applicable}} |  |
@@ -230,14 +230,14 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 ## Interfaces & Operations
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | Alerts / Events / Tasks | {{applicable / not applicable}} |  |
 | API | {{applicable / not applicable}} |  |
 
 ## Resiliency
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | ZVM Restart | {{applicable / not applicable}} |  |
 | VRA Restart | {{applicable / not applicable}} |  |
 | Network Disconnections | {{applicable / not applicable}} |  |
@@ -246,7 +246,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 ## Supportability
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | Analytics (CallHome, Transmitter, Google Analytics) | {{applicable / not applicable}} |  |
 | Tweaks | {{applicable / not applicable}} |  |
 | Log Collection | {{applicable / not applicable}} |  |
@@ -255,7 +255,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 ## Security
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | STRIDE analysis, Passwords, Data Validations | {{applicable / not applicable}} |  |
 | Authentication, Authorization | {{applicable / not applicable}} |  |
 | New endpoints created and their security features | {{applicable / not applicable}} |  |
@@ -268,7 +268,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 ## Containers \\ Appliance Changes
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | Was new container added? [New Container Checklist](https://site.atlassian.net/wiki/spaces/ZA/pages/2241921025) | {{applicable / not applicable}} |  |
 | New container expected resources (storage, CPU, Memory) | {{applicable / not applicable}} |  |
 | Any other appliance related changes | {{applicable / not applicable}} |  |
@@ -278,7 +278,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <!-- If a new third-party resource is used, list it here. You may exclude Microsoft and .NET default NuGets (System.* or Microsoft.*). Include relevant open-source projects even if already OSRB-approved elsewhere. -->
 
 | **Component** | **Version** | **License** | **URL** | **Usage** |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 |  |  |  |  |  |
 
 ## External Deliverables Change
@@ -286,7 +286,7 @@ Instantiate this template at `docs/ongoing/{{initiativeSlug}}.md`. Remove every 
 <!-- If any of the below applies to your work, state it clearly and ensure everything is delivered, updated, and acknowledged, handing it over as necessary. -->
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | Requires Change to Documentation? | {{applicable / not applicable}} |  |
 | Requires or affects Swagger? Was this executed? | {{applicable / not applicable}} |  |
 | New Permissions or change in policies? | {{applicable / not applicable}} |  |

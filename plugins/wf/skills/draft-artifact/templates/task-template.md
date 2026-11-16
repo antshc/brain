@@ -1,6 +1,10 @@
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
 
+# Implementation task template
+
+Render every section with its local rule. Omit Parent Spec only for a standalone task without a parent. Requirements addressed lists supplied source items verbatim; omit absent or unaddressed kinds. Omit Related Spec Artifacts and Contracts Delta only when their conditions do not apply.
+
 <issue-template>
 ## Parent Spec
 
@@ -51,6 +55,17 @@
 - {{number}}. {{verbatimSpecText}}
 ...
 
+## Related Spec Artifacts
+
+<related-spec-artifacts-rule>
+- Omit this section when the spec has no artifacts relevant to this slice.
+- For every relevant piece: bounded excerpt or precise binary location/description, canonical source/anchor and revision when available, and relationship to a requirement or criterion.
+- Repeat shared pieces in every related ticket; exclude unrelated pieces. Preserve readable links/embeds; never invent an image excerpt.
+- Design sketch artifacts: quote the exact sketch excerpt in a fenced block, prefixed with its sketch path, artifact name, and URL, plus the matching `module-map.md` rows (target repo paths); the implementer uses them as the map for where logic goes and how code is structured.
+</related-spec-artifacts-rule>
+
+- {{artifactPiece}} ([{{sourceAnchor}}]({{canonicalSource}}), {{revision}}): {{requirementOrCriterionRelationship}}
+
 ## Implementation Decisions
 
 <implementation-decisions-rule>
@@ -61,16 +76,6 @@
 
 - {{implementationDecision1}}
 - {{implementationDecision2}}
-
-## Related Spec Artifacts
-<!-- Omit this section entirely when no design sketch was read or no piece is relevant to this slice. -->
-<related-spec-artifacts-rule>
-- Per relevant sketch file: the exact excerpt in a fenced block, prefixed with its sketch path, artifact name, and URL, plus the matching `module-map.md` rows (target repo paths) when a module map exists.
-- Repeat a shared piece in every related ticket; exclude unrelated pieces. Never paste whole large files.
-- The implementer uses these as the map for where logic goes and how code is structured; Requirements stay the behavior contract.
-</related-spec-artifacts-rule>
-
-- {{artifactPiece}} ([{{artifactName}}]({{artifactUrl}})): {{requirementOrCriterionRelationship}}
 
 ## Relevant Concepts
 
@@ -95,7 +100,7 @@ If a summary above isn't enough to implement its rule, open the linked record fo
 
 <affected-layers-rule>
 - State which layers/modules this task touches (or relocates) and any Cross-Module Dependency Rules that constrain it, so the implementing agent doesn't need to rediscover placement in the repo.
-- Source layer headings and Cross-Module Dependency Rules from the Concept or ADR opened in step 2. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
+- Source layer headings and Cross-Module Dependency Rules from the caller-supplied or locally verified Concept or ADR. Fall back to `ARCHITECTURE.md`'s structural sections (Building blocks/layering) only if neither suffices to place the code.
 - If the slice belongs to a specific building block, also scan the `Deployables` table (under `Building blocks` in `ARCHITECTURE.md`) and load the matching block's record (`docs/building-blocks/{{slug}}.md`) for its layer headings and Cross-Module Dependency Rules.
 </affected-layers-rule>
 

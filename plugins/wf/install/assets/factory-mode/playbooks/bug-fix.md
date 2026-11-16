@@ -9,7 +9,7 @@ Be scientific. Every shipped line traces to runtime evidence. "Might help" is a 
 3. Run **Prepare a direct branch** before implementation. Plan the fix. Crosses a function boundary → *Load and follow the `design` skill to design architecture and resolve decisions*, selecting `architect` first. Delegate implementation with a specific scope: files, data shape, the repro to turn green.
 4. Verify on the same surface. The original repro now passes. "Inconclusive" or wrong-surface is not a pass; flag it. Unit tests show branch behavior, not bug absence (**Prove it works**).
 5. *Load and follow the `git` skill to run verified Git mechanics using **Draft commit***. Stage commits so the failing repro lands before the fix (**Sequence verifiable units**). Skip the separate failing-test commit when that test would be expensive or integration-heavy; say so.
-6. Not fixing now, or the user wants a report → *Load and follow the `draft-artifact` skill to draft a reproducible bug report from observed behavior using **Bug report**.*
+6. Not fixing now, or the user wants a report → *Load and follow the `draft-artifact` skill to create and update bug reports from observed behavior using the `bug` route.*
 7. Run Opening a PR.
 
 **Reply:** what was broken, root cause, fix, how you verified. Paste failing-then-passing repro output verbatim.

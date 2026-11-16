@@ -1,10 +1,10 @@
-# Solution-Agnostic
+# Requirements
 
-Scrub requirement, capability, feature, functional slice, or story text of implementation artifacts so every statement names a **behavior and entity** — what the system *does* and the outcome the actor gets — never the thing that is built to deliver it (widget, screen, table, endpoint, flag, access role).
+Scrub implementation artifacts from requirements, capabilities, features, functional slices and stories.
 
 ## The rule
 
-Every statement is solution-agnostic: it names a behavior and an entity, never an implementation artifact. This governs **capability titles**, **feature descriptions**, **functional slice descriptions**, **stakeholder requirements**, **functional requirements**, **business rules**, **edge cases**, and **acceptance criteria** alike.
+Name a **behavior and entity**: what the system does and the actor's outcome, never its implementation (widget, screen, table, endpoint, flag, access role). Apply to **capability titles**, **feature descriptions**, **functional slice descriptions**, **stakeholder requirements**, **functional requirements**, **business rules**, **edge cases** and **acceptance criteria**.
 
 ## Preserve requirement structure
 
@@ -25,11 +25,9 @@ Functional requirement
 - An **Edge case** states a boundary, unusual, failure, or exceptional scenario: *A configured session lifetime is zero, absent, expired, or changes while sessions are active.*
 - An **Acceptance criterion** states observable proof: *When the administrator configures a session lifetime of zero, the system rejects it and explains the validation failure.*
 
-Normalize each item at its own level. Do not turn a business rule or edge case into an acceptance criterion, collapse several criteria into a functional requirement, or introduce implementation details while making a criterion observable.
+Normalize each item at its existing level: preserve scope and hierarchy. Do not turn rules/edge cases into criteria, collapse criteria into requirements, or add implementation details to make criteria observable.
 
 ## Preserve the hierarchy
-
-Keep the source text at its existing level. Normalize wording; do not promote or demote scope.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -58,11 +56,7 @@ Do not replace a defined **Feature** or **Functional slice** with a generic capa
 
 ## The domain glossary exception
 
-A **domain glossary** is an allowed list of terms the business already uses to name entities and behaviors. When one is provided:
-
-- **Prefer the domain glossary.** Use its terms verbatim for entities, states, and behaviors instead of inventing paraphrases, even when a term looks like an artifact.
-- **Allow any term defined in the glossary.** A term on the allowed list is treated as domain language, not a leaked artifact — keep it as-is and do not de-reference it.
-- Continue to scrub every term that is **not** in the glossary using the swap test and the de-referencing tables below.
+Use supplied **domain glossary** terms verbatim for entities, states and behaviors, even when they resemble artifacts. Every glossary-defined term is allowed domain language: do not de-reference it. Scrub terms absent from the glossary with the swap test and Requirements terms tables.
 
 ## The swap test
 
@@ -73,7 +67,7 @@ If swapping the UI or the technology would force a reword, the statement is over
 
 ## The de-referencing move
 
-When a statement names an artifact, raise it **one level** to the behavior it enables and push the artifact down into design:
+Raise artifacts **one level** to the behavior they enable; keep implementation in design:
 
 1. Find the artifact term (a screen, column, endpoint, status flag, worker, access role).
 2. Ask what the actor actually gets from it — what they perceive, can do, or are told.
@@ -81,8 +75,8 @@ When a statement names an artifact, raise it **one level** to the behavior it en
 
 ## Apply the de-referencing tables
 
-**Always** apply the bundled tables in [solution-agnostic-terms.md](solution-agnostic-terms.md) — they map leaked artifacts (UI, data, API, domain-state, process, access) to the behavior to state instead.
+**Always** apply the router's Requirements terms tables for UI, data, API, domain-state, process and access leaks.
 
 ## Output
 
-Return the same text with every artifact term scrubbed and raised to behavior + entity, preserving each item's Capability, Feature, Functional slice, or Story level and relationships. Follow with a short note listing each correction made (the leaked term → the behavior it became). If no artifact terms remain, say so.
+Return text with every leak corrected, preserving structure, levels and relationships. Add a short correction note (each leaked term → behavior); no leaks → say so.
