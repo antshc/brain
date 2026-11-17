@@ -31,7 +31,7 @@ Before any playbook or no-playbook fallback executes, apply Principles below. Na
 
 ## Principles
 
-*Load and follow the `principles` skill to load indexed engineering principles by name*. Pass the task and canonical names cited by the selected playbook. Apply at matching decision points; re-evaluate at phase changes. Fresh workers load applicable principles themselves. Missing dependency → report it and block dependent decisions; downstream calls do not replace this invocation. Help-only requests keep their early exit.
+*Load and follow the `principles` skill to load the principles the selected playbook cites by canonical name, plus Index matches for the task, and apply them at matching decision points.* re-evaluate at phase changes. Fresh workers load applicable principles themselves. Missing dependency → report it and block dependent decisions; downstream calls do not replace this invocation. Help-only requests keep their early exit.
 
 Repository policy and explicit task, scope, approval and product-decision gates govern permitted actions; shared principles do not override them.
 

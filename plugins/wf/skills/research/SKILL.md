@@ -93,7 +93,7 @@ Every route agent is a prompt file under `agents/`, discovered through this skil
 3. Spawn a skill-capable general-purpose worker (`general-purpose`, or the harness's default subagent when it has no agent types) with the filled prompt as its whole task, passing the resolved model as `model` and effort as `reasoning_effort`, `<name>` as `name`, and a description starting with `<name>:` (e.g. `hunty: Discover upgrade topology`) so the UI shows the role; read-only unless the prompt grants a write. Batch independent spawns in one parallel response; sequence dependent ones.
 4. Spawn failed or unavailable → report the blocked request with its consequence and continue independent work.
 
-Give follow-ups to a fresh worker with the original brief, the prior report, and the bounded gap. Large reading fan-out or material measurement claims → *Load and follow the `principles` skill to load indexed engineering principles by name*; select `Guard the context window` for bounded briefs and `Explain the number` before relying on measurements.
+Give follow-ups to a fresh worker with the original brief, the prior report, and the bounded gap. Large reading fan-out → *Load and follow the `principles` skill to load `Guard the context window` and apply it to bound worker briefs.* Material measurement claim → *Load and follow the `principles` skill to load `Explain the number` and apply it before relying on the measurement.*
 
 ## Completion criteria
 

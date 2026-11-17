@@ -22,7 +22,7 @@ Never launch subagents, switch branches, manage worktrees, run a rebase, publish
 
 ## Implementation
 
-*Load and follow the `principles` skill to load indexed engineering principles by name*. Pass task, phase, scope and constraints; let the Index select for data/type shape, abstractions, nontrivial mechanical work, eligible internal migration and tests. Apply `Foundational thinking` and `Model the domain` before logic, `Test behavior, not implementation` for assertions and `Prove it works` before completion; re-evaluate when the phase changes. Existing scope, no-subagent and commit limits still apply.
+*Load and follow the `principles` skill to load the principles matching this task's phase, scope and constraints, and apply them at their decision points.* Index matches cover data/type shape, abstractions, nontrivial mechanical work, eligible internal migration and tests. Apply `Foundational thinking` and `Model the domain` before logic, `Test behavior, not implementation` for assertions and `Prove it works` before completion; re-evaluate when the phase changes. Existing scope, no-subagent and commit limits still apply.
 
 Implement the task using the smallest change that satisfies its requirements.
 If observed evidence proves the task is already satisfied, return the verified no-change result.
