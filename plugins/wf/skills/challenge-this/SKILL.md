@@ -20,7 +20,7 @@ For example requests, read [Examples](README.md) in full.
 
 ## Frame
 
-Read relevant repository architecture, ADRs/Concepts and glossary. Derive intent from the user, commits and PR description. *Load and follow the `principles` skill to load indexed engineering principles by name*. Select `In your own words`. Ask when intent is unclear. Pin committed refs and record dirty inputs; for CLI-only evidence scope the claim, command and observation instead of requiring a diff. Done when intent, scope/revision, safe target and limits are explicit.
+Read relevant repository architecture, ADRs/Concepts and glossary. Derive intent from the user, commits and PR description. *Load and follow the `principles` skill to load `In your own words` and apply it to restate the change's intent.* Ask when intent is unclear. Pin committed refs and record dirty inputs; for CLI-only evidence scope the claim, command and observation instead of requiring a diff. Done when intent, scope/revision, safe target and limits are explicit.
 
 Reject an adversary count outside the documented values before dispatch. Resolve relative report paths only against the supplied absolute base; an absent/ambiguous base blocks saving, not independent investigation.
 

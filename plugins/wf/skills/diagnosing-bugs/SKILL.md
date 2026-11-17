@@ -23,7 +23,7 @@ If the redacted output is not enough to diagnose the bug, say so and ask the use
 
 ## Phase 1: Build a feedback loop
 
-*Load and follow the `principles` skill to load indexed engineering principles by name*. Select `Build the lever` and `Test behavior, not implementation` for the feedback loop. Re-evaluate at each phase: `Fix root causes` for diagnosis, `Attack the premise` after two fixes sharing a premise fail, `Explain the number` for measurements, `Prove it works` before completion. Existing diagnosis/fix authorization gates still apply.
+*Load and follow the `principles` skill to load `Build the lever` and `Test behavior, not implementation` and apply them to the feedback loop.* Re-evaluate at each phase and load: `Fix root causes` → diagnosis; `Attack the premise` → two fixes sharing a premise failed; `Explain the number` → measurements; `Prove it works` → before completion. Existing diagnosis/fix authorization gates still apply.
 
 **This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug (one that goes red on *this* bug), you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
 

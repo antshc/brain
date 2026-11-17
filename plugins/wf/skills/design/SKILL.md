@@ -55,7 +55,7 @@ Wayfinder additionally reads the full Grill playbook for interviews and, after t
 
 ## Principles
 
-*Load and follow the `principles` skill to load indexed engineering principles by name*. Pass task, selected route, phase and explicitly named principles; select `In your own words` for intent. Let the Index select for consumer experience, domain/type shape, seams, boundaries, concurrency and alternatives. Apply before the selected playbook; re-evaluate at phase changes. Fresh candidate workers apply this rule in their own context.
+*Load and follow the `principles` skill to load `In your own words` plus principles named in the request or matching the task, selected route and phase, and apply them before the selected playbook.* Use `In your own words` for intent; Index matches cover consumer experience, domain/type shape, seams, boundaries, concurrency and alternatives. re-evaluate at phase changes. Fresh candidate workers apply this rule in their own context.
 
 ## Architect options and behavior
 

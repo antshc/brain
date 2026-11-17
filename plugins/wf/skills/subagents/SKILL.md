@@ -13,6 +13,10 @@ description: >-
 
 Read the listed files in full before acting. [models.md](models.md) is the user's persistent model configuration: a resolved model and effort is a user-specified value, so pass it as the spawn tool's `model` and `reasoning_effort` even where harness guidance says to leave them unset unless the user names one. Explicit caller models take precedence. Unknown role and no explicit model → omit model and effort for harness defaults. Only Arena launches workers.
 
+## Load and follow skills
+
+For every call to the `principles` skill, load and follow its skill content in full, then read each selected principle file through EOF before applying it. Reuse complete content already loaded for the same revision.
+
 ## Model selection
 
 Before spawning a named role, start with its configured value or fallback and adjust reasoning effort to the job. Raise one step for the hardest work, lower one for judgment and two or more for routine work. Keep the model family and use its nearest supported effort. For `auto` or `inherit-parent`, omit model and effort.

@@ -30,7 +30,7 @@ Each smell states the pattern and a candidate refactor. Preserve intentional bou
 
 ## Investigation guidance
 
-*Load and follow the `principles` skill to load indexed engineering principles by name*. Pass the changed shape and concern; select `Laziness protocol`, `Minimize reader load`, `Deep modules`, `Model the domain` and `Type system discipline` only when their triggers match. Select `Migrate callers, then delete legacy APIs` only for eligible internal migrations. Principles guide judgment; findings still require demonstrated maintenance cost.
+*Load and follow the `principles` skill to load the principles below whose triggers match the changed shape and concern, and apply them to smell judgment.* Candidates: `Laziness protocol`, `Minimize reader load`, `Deep modules`, `Model the domain`, `Type system discipline`; `Migrate callers, then delete legacy APIs` only for eligible internal migrations. Principles guide judgment; findings still require demonstrated maintenance cost.
 
 Use the baseline to identify plausible design concerns, then select evidence that supports or rules them out. Inspect relevant implementations, callers, ownership, and maintenance points as needed. Counts, chain length, and superficial similarity alone are insufficient.
 
