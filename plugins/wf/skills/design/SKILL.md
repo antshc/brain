@@ -59,7 +59,7 @@ Wayfinder additionally reads the full Grill playbook for interviews and, after t
 
 ## Architect options and behavior
 
-- Accept `arena-agents=1|2|3`, default `1`; reject other values before Arena. Retain the count across correction re-runs.
+- Accept explicit `arena-agents=1|2|3` as an Arena request; reject other values before work. Otherwise Architect compares two shapes locally for bounded designs with clear requirements and precedent; new cross-subsystem ownership/state coordination, material unresolved tradeoffs or an unsettled comparison use Arena with one runner by default. Preserve explicit counts through handoffs and correction reruns.
 - Forward caller-supplied `adversaries` to Challenge this; it owns count validation/defaults.
 - `checkpoint` is opt-in, only when explicitly requested; preserve it through caller handoffs. Otherwise Architect implements after review by default. An explicit **design-only handoff** returns the sketch for `design spec` without implementing.
 - `architect sketch` routes to `sketch` only, and `architect deep-module` to `deep-module`, for intent compatibility. Prefer the direct `design <route>` spelling.
@@ -72,6 +72,10 @@ For standalone Architect, Sketch, Deep-module and their evidence calls, use `<re
 <artifact-root>/
   task.md
   grounding-*.md
+  local/candidate-<n>/           # local comparison; preserve on Arena escalation
+    rationale.md
+    module-map.md
+    sketch/
   candidate-<n>/                 # Arena candidates
     rationale.md
     module-map.md

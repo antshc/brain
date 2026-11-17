@@ -6,7 +6,9 @@ description: >-
 
 # Principles
 
-Indexed engineering principles. Bodies are verbatim from [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack/skills) `principle-*` skills; cross-links became bold names and skill-call wording follows the repository invocation contract. The seven additions (Build the lever, Experience first, Guard the context window, Migrate callers, then delete legacy APIs, Model the domain, Never block on the human, Type system discipline) use [pinned source 5866df5](https://github.com/cursor/plugins/tree/5866df557357d005b3c0c9d3da0d9e739b4bdde3/pstack/skills); only frontmatter removal and principle-link/name normalization were applied.
+Indexed engineering principles from [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack/skills). Fourteen leaves are adapted from [2f87c854](https://github.com/cursor/plugins/commit/2f87c854fe3e2fcda44ca86b46ede35aad3c46b7): Attack the premise, Boundary discipline, Build the lever, Explain the number, Fix root causes, Foundational thinking, Make operations idempotent, Minimize reader load, Model the domain, Prove it works, Separate before serializing shared state, Sequence verifiable units, Test behavior, not implementation, and Type system discipline. Adaptations retain interface depth, domain ownership, restart diagnostics, contract-specific assertions and repository skill invocation/discovery rules. These bodies are not verbatim.
+
+Untouched pstack leaves retain their earlier source. Experience first, Guard the context window, Migrate callers, then delete legacy APIs and Never block on the human retain [5866df5](https://github.com/cursor/plugins/tree/5866df557357d005b3c0c9d3da0d9e739b4bdde3/pstack/skills); cross-links use canonical principle names. Deep modules retains its own attribution.
 
 ## Load
 

@@ -18,7 +18,7 @@ This skill is the repo-level engineering instruction set, installed per repo by 
 Before any playbook or no-playbook fallback executes, apply Principles below. Name each principle that shaped a decision and the choice it changed in the reply.
 
 - **First message on a task** → restate the goal, the problem, and, if the task ships a change, the smallest change expected to meet it. Do not wait for confirmation. Evidence rules out the requested change → show it and stop. Restate the goal in every subagent brief, PR `## Why`, and final reply (skip for a fully specified one-line edit). Vague or layered ask → *Load and follow the `writing` skill to sharpen the task prompt by deepening it and rewriting the prompt; select the applicable route.*
-- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable technical uncertainty (behavior, timing, output, layout) that research cannot settle → *Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments* and let observed behavior decide. Compare competing design alternatives through the `design` skill, and use Prove to test observable claims. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
+- **About to ask "which approach / how should I / what should this do"** → classify first. How/why or read-only investigation → use the Research call below. Observable uncertainty research cannot settle → *Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments* and let observed behavior decide. Competing architecture shapes → use the Design playbook. Ask only for product or preference calls no research or experiment settles; ask via the ask tool with a recommended default.
 - **Any code** → name the data shape and its organizing structure first (**Model the domain**).
 - **Code crossing a function boundary** → *Load and follow the `design` skill to design architecture and resolve decisions; use its `architect` route to sketch types, signatures, and module structure before code.*
 - **Module interface, seam, or testability question** → *Load and follow the `design` skill to design architecture by deepening modules and resolving interface decisions; use its `deep-module` route for deep-module vocabulary, seam placement, deepening opportunities, and Design It Twice interface options.*
@@ -52,7 +52,8 @@ Prefer the smallest change that satisfies the requirements. Apply YAGNI; avoid s
 ## Subagents
 
 - Run the playbook in this chat; delegate steps, never the playbook itself.
-- Spawn skill-capable `general-purpose` workers for independent steps, together in the background, with separate output paths. Brief with file paths, the restated goal, scope, named data shape, constraints, and success criteria. Load skills that spawn their own workers (`research`, `prove`, `challenge-this`, `design`) in this chat, never inside a worker.
+- Spawn skill-capable `general-purpose` workers for independent steps, together in the background, with separate output paths. Resolve [Worker contract](worker.md) to its installed absolute path before changing CWD; read it fully before preparing a direct worker kickoff. Start every direct kickoff with `Read <absolute worker contract path> in full before task actions.` and supply that path as `workerContractPath`. Brief with file paths, the restated goal, scope, named data shape, constraints and success criteria. Missing/unreadable contract → report the path/error and stop dependent launches.
+- Load worker-owning skills (`research`, `prove`, `challenge-this`, `design`) in this chat. Pass applicable constraints through their request fields; preserve their dispatch ownership, worker types and no-spawn restrictions.
 - Use harness model and effort defaults unless the user names them. For Challenge this, pass the adversary count directly to that skill; it owns the configured `challenge-this reviewers` role.
 - Review worker diffs and own the summary.
 
@@ -91,10 +92,10 @@ Before editing for Bug Fix or a direct code change handled by the no-playbook fa
 
 ## Opening a PR
 
-For direct code-shipping playbooks. Feature uses the draft from `implement`.
+For direct code-shipping playbooks; Feature reuses the draft from `implement`. Git owns commit mechanics; GitHub owns PR format and publication.
 
 - *Load and follow the `git` skill to run verified Git mechanics using **Draft commit*** for ordinary subjects. Keep commits small and ordered before opening the PR. Amend only when the fix belongs in the last commit and repository policy permits it.
-- *Load and follow the `github` skill to run GitHub platform mechanics using **Draft PR*** with the resolved initiative ID, verified head/base, rationale, actual changes, and observed checks. Resolve a missing initiative ID before publication.
+- *Load and follow the `github` skill to run GitHub platform mechanics using **Draft PR*** with initiative ID, verified head/base, rationale, changes and observed checks. Missing initiative ID blocks publication.
 - *Load and follow the `github` skill to run GitHub platform mechanics using Pull requests* to open as draft and specify both head and base. Read it back and confirm its metadata and pushed head before reporting. When review is requested, run the Review playbook fully: code review publishes first, then read the comments, prove their claims, and reply with outcomes.
 - Post the URL and continue. Monitor checks when the caller requests it.
 

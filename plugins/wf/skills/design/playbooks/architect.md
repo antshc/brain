@@ -1,6 +1,6 @@
 # Design
 
-Full architecture procedure of the `design` skill's `architect` route. Paths resolve from `plugins/wf/skills/design/`. Route options, artifact location, and repo-doc rules are in `SKILL.md`. Before each phase, apply its shared Principles rule, selecting names cited in that phase.
+`design architect` procedure. Resolve paths from `plugins/wf/skills/design/`; follow `SKILL.md` for options, artifact locations and repo-doc rules. Before each phase, apply its Principles rule, selecting that phase's cited names.
 
 ## Contents
 
@@ -32,15 +32,24 @@ Skip subsystem grounding only when the work is genuinely greenfield with no surr
 
 ## Phase B: Sketch
 
-*Load and follow the `subagents` skill to run an Arena comparison of independent candidates* using **Arena**. Pass the design task, Phase A grounding, `architect runners` role, resolved `arena-agents` count, rubric inputs, screening rules below, and artifact layout from `design/SKILL.md`. Use that artifact root for Arena outputs. Pass [Runner prompt](../references/runner-prompt.md), the absolute paths to `design/SKILL.md`, [Sketch](sketch.md), its [shared sketch contract](../references/sketch-contract.md), and [Rationale template](../references/rationale.template.md). Each runner follows Sketch's **Candidate** context; do not create a second sketch implementation. Require each candidate and the synthesized result to contain `rationale.md`, `module-map.md`, and `sketch/`. Arena fills the synthesized rationale's synthesis decision. Verify these against the artifact contract, repo docs, and design criteria.
+Select execution before generating candidates; record the choice and reason in `review-log.md`.
 
-With multiple runners, require structurally distinct candidates before synthesis, per `Exhaust the design space`. Whole-shape alternatives, not point fixes inside one shape.
+| Condition, first match | Execution |
+|---|---|
+| Explicit `arena-agents=1\|2\|3`, a natural-language Arena request, or correction with `arena` | Arena with the requested count, otherwise one runner; retain the count for correction reruns |
+| New cross-subsystem ownership/state coordination, material unresolved architecture tradeoffs, or viable shapes local comparison cannot settle | Arena; default one runner unless a count was supplied |
+| Bounded design, clear requirements and existing architectural precedent | Local comparison in this session |
+| Any remaining design | Arena; default one runner unless a count was supplied |
+
+Candidate alternatives and runner count are independent. Produce two structurally distinct shapes before selecting, per `Exhaust the design space`; one runner does not constitute a multi-model comparison.
+
+**Local comparison.** Follow [Sketch](sketch.md) in **Candidate** context for two packages under `<artifact-root>/local/candidate-1/` and `local/candidate-2/`, using Phase A grounding and the [shared sketch contract](../references/sketch-contract.md). Read and screen both, compare them using the criteria below, and place the selected coherent package under `synthesis/`. Fill its [Rationale template](../references/rationale.template.md) synthesis decision with the execution choice, rejected alternative and selection reason. Report local comparison without inventing Arena runners or a judge. If comparison cannot settle the architecture, pass both shapes and their unresolved tradeoff to Arena as grounding; preserve the local packages.
+
+**Arena.** *Load and follow the `subagents` skill to run an Arena comparison of independent candidates* using **Arena**. Pass the design task, Phase A grounding, any existing alternatives, `architect runners` role, resolved count, criteria and screening rules below, and artifact layout from `design/SKILL.md`. Pass [Runner prompt](../references/runner-prompt.md), absolute paths to `design/SKILL.md`, Sketch, the shared sketch contract and rationale template. Runners use **Candidate** context; each considers two whole-shape alternatives before producing its recommended package. Multiple runners produce independent, structurally distinct candidates. Arena owns synthesis and fills its rationale's synthesis decision. Require `rationale.md`, `module-map.md`, and language-native `sketch/` in every candidate and the synthesis; verify the artifact contract and repo docs.
 
 Screen every candidate with [shared design red flags](../references/red-flags.md) and the Repo docs rules before synthesis. Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the design where a change that looks right from one file is right for the whole repo.
 
-Compare viable candidates on interface depth. Prefer the design that hides more complexity behind a smaller, simpler public surface. A rich interface can keep call chains short by concentrating capability instead of scattering it across layers.
-
-Arena returns one synthesized design package. Its synthesis decision fills the rationale's "Synthesis decision" section.
+Compare viable shapes by one owner per piece of state, one coherent way to perform each responsibility, minimum caller knowledge, repository domain/architecture constraints and interface depth. Prefer a smaller interface hiding more complexity; concentrate capability rather than distributing coordination across callers. Both execution paths return the same accepted `synthesis/` package.
 
 ## Phase C: Review (optional checkpoint)
 
@@ -65,7 +74,7 @@ Before continuing, run [Evidence routing](../references/evidence-routing.md) on 
 
 3. Act on the reply:
    - **Corrections** → apply them directly; without `arena`, never re-run arena. Rewrite `synthesis/sketch/` in place under the [shared sketch contract](../references/sketch-contract.md), then update `synthesis/module-map.md` and `synthesis/rationale.md` (usage sketch, affected sections, synthesis decision, alternatives, open questions) so all three agree. Screen the rewrite with [red flags](../references/red-flags.md) and the Repo docs rules; surface hits as questions. Append the correction and resulting changes to `review-log.md` in the artifact root. Start the next round.
-   - **Corrections with `arena`** → apply as above, then *Load and follow the `subagents` skill to run an Arena comparison of independent candidates* using **Arena**, Re-run for corrections, with the corrected incumbent, next revision number, same Phase B contract, and corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
+   - **Corrections with `arena`** → apply as above, then *Load and follow the `subagents` skill to run an Arena comparison of independent candidates* using **Arena**, Re-run for corrections, with the corrected incumbent, next revision number, same Phase B contract and resolved runner count (default one if the prior comparison was local), and corrections folded into the task; the new synthesized design is a new candidate against the corrected current one. Present both with the same round contents; the user picks which stays via **corrections**. Append the run to `review-log.md`. Start the next round.
    - **Challenge this** → *Load and follow the `challenge-this` skill to adversarially test a change or design for reproducible counterexamples* on the current sketch, using the Phase C handoff. Resolve verified contract findings through [Deep module](deep-module.md). Present findings as proposed corrections; apply only those the user accepts, as above. Start the next round.
    - **Prove** → *Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments* on the question, passing sketch/grounding, limits and an exact report destination under `<artifact-root>/prove/`; read the returned report in full. For `; challenge-this`, request retained runnable state, then Design invokes Challenge this with that evidence before releasing owned resources. Present evidence-backed proposed corrections; apply only those the user accepts, citing evidence in the rationale. Start the next round.
    - **Ask** → answer from Phase A grounding, using Phase A’s default Research or **Why** call when needed, with a distinct grounding output for the new question; present the answer, then start the next round.
@@ -108,7 +117,7 @@ When you scrap:
 2. Use Phase A’s default Research call over what was built. Save revised grounding beside the original and pass it into the new Phase B.
 3. Redesign as if the new constraints had been day-one assumptions, per `Redesign from first principles`.
 4. Subtract before adding, per `Subtract before you add`. The new sketch is smaller than the old one before it grows.
-5. Return to Phase B and re-run arena, then Phase C review.
+5. Return to Phase B with the new constraints; select execution again, then run Phase C review. Retain explicit runner counts.
 
 ## Outputs
 

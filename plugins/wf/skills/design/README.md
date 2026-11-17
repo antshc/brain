@@ -204,7 +204,7 @@ Discovery creates no push/PR or publication. Explicit `/design publish-hld` publ
 
 | Request | Route | Outcome |
 |---|---|---|
-| `/design architect design retries` | `architect` | Research, Arena sketch, evidence and verification, then implementation by default |
+| `/design architect design retries` | `architect` | Research, local comparison or Arena, evidence and verification, then implementation by default |
 | `/design architect checkpoint design retries` | `architect` | Review the sketch before implementing or handing off |
 | `/design architect arena-agents=2 design retries` | `architect` | Compare two independently drafted architecture shapes |
 | `/design sketch add pagination to orders` | `sketch` | One usage-first design package, no production edits |
@@ -215,9 +215,9 @@ Discovery creates no push/PR or publication. Explicit `/design publish-hld` publ
 | `/design publish-hld` | `publish-hld` | Confluence HLD page only; evidence remains local |
 | `/design review` | `review` | Design-gap assessment |
 
-Architect accepts `arena-agents=1|2|3` (default 1); Challenge this accepts `adversaries=1|2|3` (default 1). `checkpoint` requires explicit request. Explicit design-only handoff stops before implementation and returns the accepted `synthesis/` package to `design spec`.
+Architect compares two shapes locally for bounded designs with clear requirements and precedent. Large or contested designs use Arena with one runner by default; explicit `arena-agents=1|2|3` requests Arena with that count. A runner compares alternatives; one runner is not a multi-model panel. Selection favors one state owner, coherent responsibilities, little caller knowledge and deep interfaces. Both paths return the same synthesis package. Challenge this accepts `adversaries=1|2|3` (default 1). `checkpoint` requires explicit request. Explicit design-only handoff stops before implementation and returns the accepted `synthesis/` package to `design spec`.
 
-Both `sketch` and `architect` use [one code-sketch contract](references/sketch-contract.md). The former makes one package; the latter uses that procedure for Arena candidates and synthesizes the selected package. Artifacts live under `<repo-root>/tmp/design-<slug>/` and the accepted package is always `synthesis/{sketch/,module-map.md,rationale.md}`.
+Both `sketch` and `architect` use [one code-sketch contract](references/sketch-contract.md). The former makes one package; the latter uses that procedure for local or Arena candidates and synthesizes the selected package. Artifacts live under `<repo-root>/tmp/design-<slug>/` and the accepted package is always `synthesis/{sketch/,module-map.md,rationale.md}`.
 
 See [Skill router](SKILL.md) and [Architect playbook](playbooks/architect.md). `design hld` owns of authoritative feature-design documents.
 

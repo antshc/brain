@@ -26,7 +26,7 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 Put framing and destinations in the request; Research owns discovery, classification, and fan-out and returns report pointers. **MUST NOT** dispatch separate research agents. Index the caller-selected report paths in the artifact root; no specialist may override them.
 
-Read final artifacts; check cited conclusions and applicable versions. Add findings to grounding/rationale before Arena or review; route empirical unknowns to Prove.
+Read final artifacts; check cited conclusions and applicable versions. Add findings to grounding/rationale before local comparison, Arena or review; route empirical unknowns to Prove.
 
 ## Prove
 

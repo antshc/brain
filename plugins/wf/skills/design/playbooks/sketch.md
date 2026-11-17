@@ -1,6 +1,6 @@
 # Sketch
 
-One canonical code-sketch procedure reused standalone, for Deep Module options, Wayfinder and inside the Architect Arena. Usage first; types, signatures, module map, and rationale follow. No production code or source edits.
+One canonical code-sketch procedure reused standalone, for Deep Module options, Wayfinder and inside Architect local comparison or Arena. Usage first; types, signatures, module map, and rationale follow. No production code or source edits.
 
 Read [Code-sketch contract](../references/sketch-contract.md) in full before starting. It owns output shape, local discipline, red flags and acceptance criteria; Design owns shared Principles loading. No parallel copy of those rules.
 
@@ -10,16 +10,16 @@ Read [Code-sketch contract](../references/sketch-contract.md) in full before sta
 |---|---|---|---|
 | **Standalone** (`design sketch`) | Verbatim task/story/spec or resolved decisions; optional scope | `<artifact-root>/synthesis/` | Ground in code; one sketch; report and stop |
 | **Wayfinder** | Topic question and supplied grounding, pinned worktree; runs in Wayfinder's session | Exact caller-assigned package root | Return package to Wayfinder for prototype approval before local integration |
-| **Candidate** (Architect Arena or Deep Module option) | Task, supplied grounding/repo docs, isolated read-only working tree, assigned candidate path | `<artifact-root>/candidate-<n>/` (or Arena revision candidate) | Return to caller; no Arena, implementation or independent user handoff |
+| **Candidate** (Architect local comparison, Arena or Deep Module option) | Task, supplied grounding/repo docs, isolated read-only working tree, assigned candidate path | Exact caller-assigned candidate path, including `<artifact-root>/local/candidate-<n>/` or Arena/revision paths | Return to caller; no Arena, implementation or independent user handoff |
 
 The artifact root is `<repo-root>/tmp/design-<slug>/` per `SKILL.md`. Explicit caller roots override temporary defaults. In every context the package contains `rationale.md`, `module-map.md`, and `sketch/` with language-native source files. Candidate outputs must be independent and structurally distinct when Arena uses multiple runners.
 
 ## Workflow
 
 1. **Repository contract.** Read the architecture, relevant ADRs/Concepts, and glossary. Candidate context reuses the supplied files, reading any not already loaded. Record deviations as open questions.
-2. **Ground.** Standalone: inspect affected entry points, callers, types, and boundary invariants. For wide lookups, *Load and follow the `research` skill to investigate technical questions across source code with a symbol or caller lookup and return cited findings* using the Explore route; blocked lookup → record it and continue independent work. Skip only for genuinely greenfield work. Wayfinder: use supplied grounding and send wide gaps to the same Research call. Candidate (runs inside an Arena or Design It Twice worker): use supplied grounding, inspect only missing local evidence directly, and report wide gaps as unknowns; never load `research` or spawn subagents. Unreadable touched code → report 'Sketch incomplete'; never invent its shape.
+2. **Ground.** Standalone: inspect affected entry points, callers, types, and boundary invariants. For wide lookups, *Load and follow the `research` skill to investigate technical questions across source code with a symbol or caller lookup and return cited findings* using the Explore route; blocked lookup → record it and continue independent work. Skip only for genuinely greenfield work. Wayfinder: use supplied grounding and send wide gaps to the same Research call. Candidate (runs in Architect local comparison, an Arena or Design It Twice worker): use supplied grounding, inspect only missing local evidence directly, and report wide gaps as unknowns; never load `research` or spawn subagents. Unreadable touched code → report 'Sketch incomplete'; never invent its shape.
 3. **Usage.** Write quickstart and two or three concrete consumer call sites before designing the types. Explicitly state incompatible callers and invariants.
-4. **Shape.** Apply Design’s shared Principles rule for this phase; draft module map, types, signatures, and `not implemented` bodies. Confirm every call site resolves. Follow [Code-sketch contract](../references/sketch-contract.md), not an Arena-specific copy of its rules.
+4. **Shape.** Apply Design’s shared Principles rule for this phase; draft module map, types, signatures, and `not implemented` bodies. Confirm every call site resolves under the [Code-sketch contract](../references/sketch-contract.md).
 5. **Screen.** Load the shared red flags and correct every hit or record an open question.
 6. **Rationale.** Use the shared rationale template, with concrete whole-shape alternatives and no placeholders. Candidate/Wayfinder: leave choice to caller; Deep Module writes per-option proposed rationale. Standalone: omit synthesis decision.
 7. **Finish.** Candidate/Wayfinder: return the assigned package to caller and stop; no commits, merges or cleanup of caller-owned worktrees. Standalone: report absolute artifact paths, usage excerpt, module map, and open questions, then stop.
