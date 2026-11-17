@@ -53,8 +53,8 @@ def test_removed_entry_points_and_testing_kind_have_no_live_consumers() -> None:
 def test_execution_calls_are_one_way() -> None:
     integration = (SKILLS / 'prove/playbooks/integration.md').read_text()
     adversary = (SKILLS / 'challenge-this/references/adversary-prompt.md').read_text()
-    assert re.search(r'`testing-integrations` skill.*\*\*Select\*\*', integration)
-    assert re.search(r'`testing-integrations` skill.*\*\*Run selected\*\*', integration)
+    assert re.search(r'Load and follow the `testing-integrations` skill[^\n]*using route `Select`', integration)
+    assert re.search(r'Load and follow the `testing-integrations` skill[^\n]*using route `Run selected`', integration)
     assert 'Execute' not in adversary
     assert re.search(r'`prove` skill.*Claim', (SKILLS / 'challenge-this/SKILL.md').read_text())
     for resource in TESTING.rglob('*.md'):

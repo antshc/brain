@@ -4,7 +4,7 @@ Arena dispatches this brief to each independent candidate runner with the task, 
 
 1. Read `design/SKILL.md`, [Architect](../playbooks/architect.md), and [Sketch](../playbooks/sketch.md) fully. Read its [shared code-sketch contract](sketch-contract.md) before generating code shape. Apply Design’s Principles rule in this worker context with the supplied task, route, phase and mandatory names; parent loading does not count.
 2. Run **Sketch in Candidate context**. Write `rationale.md`, `module-map.md`, and language-native `sketch/` files only under your assigned `candidate-<n>/`. The module map uses real repository-relative target paths. Do not modify production code.
-3. Produce one strong, coherent design independently of other runners. Prefer structural differences over small tweaks. When a runner is asked to optimize a particular tradeoff, honor it; do not hedge against other candidates.
+3. Compare two structurally distinct whole-shape alternatives, then produce one strong, coherent recommended design independently of other runners. Prefer structural differences over small tweaks. When a runner is asked to optimize a particular tradeoff, honor it; do not hedge against other candidates.
 4. Screen the candidate with the shared red flags. Leave the rationale synthesis decision absent; the Arena orchestrator selects and synthesizes candidates.
 
 The Sketch playbook is the sole authority for usage-first sketch generation and acceptance criteria. This runner prompt owns only Arena isolation and candidate framing.

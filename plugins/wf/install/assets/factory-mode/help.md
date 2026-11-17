@@ -31,7 +31,7 @@ PLAYBOOKS — matched from the request
   /factory-mode review https://github.com/owner/repo/pull/123
   /factory-mode review this PR and prove its published comments
 
- feature            research → architect sketch → resolve questions → /design spec → implement parallel → verify app → Review playbook → /review comments → finalize draft PR
+ feature            research → architect local comparison or Arena → resolve questions → /design spec → implement parallel → verify app → Review playbook → /review comments → finalize draft PR
   /factory-mode add <behavior> to <module>
   /factory-mode add <feature>, Initiative <PROJ-1234>, branch <main>, repo <owner/name>
   /factory-mode add <feature> checkpoint  (pause for design approval)

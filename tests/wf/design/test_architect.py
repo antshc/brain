@@ -34,7 +34,8 @@ def test_factory_uses_one_autonomous_feature_flow_and_optional_checkpoint():
     assert "## Interactive" not in playbook
     assert "## Auto" not in playbook
     assert "Select mode" not in playbook
-    assert "arena-agents=1" in playbook
+    assert "Let Architect select local comparison or Arena by scope" in playbook
+    assert "forward `arena-agents` only when explicitly supplied" in playbook
     assert "`challenge-this` with `adversaries=3`" in playbook
     assert "design-only handoff" in playbook
     assert "forward `checkpoint` only when the user explicitly asks" in playbook
