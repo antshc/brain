@@ -25,6 +25,8 @@ Keep source Business rules, Edge cases, error conditions, and Acceptance criteri
 
 ## Breakdown
 
+*Load and follow the `principles` skill to load `Experience first` and apply it to consumer outcomes and story boundaries.* Preserve supplied requirements and the breakdown approval gate.
+
 - **Identify Features by user-meaningful behavior.** A Feature may require several Functional slices.
 - **Identify Functional slices by deployable-local responsibility.** FE and BE are separate Deployables, so each owns a distinct Functional slice prefixed with its Deployable kind. A cross-deployable flow becomes related Functional slices connected by contracts, not one cross-deployable slice.
 - **Identify User stories by testable progress.** Split a Functional slice only where each User story has a distinct observable outcome; within one Deployable, never split merely at database, API, or other technical-layer boundaries.
