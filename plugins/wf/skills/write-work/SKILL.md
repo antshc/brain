@@ -44,7 +44,7 @@ Changed contracts → *Load and follow the `doc-contracts` skill to write an API
 
 Required diagrams → *Load and follow the `doc-diagram` skill to create Mermaid architecture or behavior diagrams* using the selected route's view and source facts. Missing decisions/evidence return as gaps.
 
-General prose refinement when needed → *Load and follow the `writing` skill to refine the work item prose; select the applicable route.* Keep the artifact template and protected text.
+General prose refinement when needed → *Load and follow the `write` skill to refine the work item prose; select the applicable route.* Keep the artifact template and protected text.
 
 ## Output contract
 

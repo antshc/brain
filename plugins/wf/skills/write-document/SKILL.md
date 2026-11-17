@@ -52,7 +52,7 @@ Changed contracts in `spec`, `hld` or `toi` → *Load and follow the `doc-contra
 
 Required diagrams in `spec`, `hld` or `toi` → *Load and follow the `doc-diagram` skill to create Mermaid architecture or behavior diagrams* using the selected route's view and source facts. Missing decisions/evidence return as gaps.
 
-General prose refinement for `spec`, `hld` or `toi` when needed → *Load and follow the `writing` skill to refine the spec, HLD, or TOI prose; select the applicable route.* Keep the artifact template and protected text.
+General prose refinement for `spec`, `hld` or `toi` when needed → *Load and follow the `write` skill to refine the spec, HLD, or TOI prose; select the applicable route.* Keep the artifact template and protected text.
 
 ## Output contract
 

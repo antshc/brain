@@ -153,7 +153,7 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [implement](plugins/wf/skills/implement/SKILL.md): integrate the task graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
-- [writing](plugins/wf/skills/writing/SKILL.md): write, edit, or unslop prose; sharpen or rephrase a task prompt.
+- [write](plugins/wf/skills/write/SKILL.md): write, edit, or unslop prose; sharpen or rephrase a task prompt.
 - [suggest](plugins/wf/skills/suggest/SKILL.md): propose improvements, options, or ideas with reasoning; never apply without approval.
 - [prove](plugins/wf/skills/prove/SKILL.md): confirm or refute one or more technical claims with reproducible evidence, one parallel prover worker per claim.
 - [challenge-this](plugins/wf/skills/challenge-this/SKILL.md): try to break a change or design; report problems shown by a run.
