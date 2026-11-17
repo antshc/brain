@@ -1,10 +1,10 @@
 ---
-name: writing
+name: write
 description: >-
   Write or edit plain prose for guides, how-tos, GitHub text, reports and messages; sharpen or rephrase prompts. Use for 'unslop this', 'tighten this prose', 'sharpen this prompt', 'rephrase my ask'. Not for work items → `write-work`. Not for specs → `write-document`. Not for skills → `skill-author`.
 ---
 
-# Writing
+# Write
 
 Router. Select one route, read each listed reference fully (no previews), then run Pipeline unless the route supplies its own output. Load nothing the route does not list. Resolve paths from this skill's base directory.
 
@@ -34,7 +34,7 @@ Router. Select one route, read each listed reference fully (no previews), then r
 
 Pick the first rule that matches:
 
-1. **Explicit route.** The user or caller names a valid route (`/writing sharpen`) → use it. Unknown route → report it and list the routes.
+1. **Explicit route.** The user or caller names a valid route (`/write sharpen`) → use it. Unknown route → report it and list the routes.
 2. **Active route.** A reply to an active `sharpen` or `rephrase` output → continue that route.
 3. **Prompt work.** Ask to deepen, sharpen, or rewrite a prompt → `sharpen`. Ask to restate, rephrase, or say in your own words → `rephrase`. Both → `rephrase`, then `sharpen`.
 4. **Unslop only.** Ask to unslop or remove AI tells with no other ask → `unslop`.
