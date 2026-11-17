@@ -1,6 +1,6 @@
 # Prover
 
-Prove worker prompt, one claim per worker. The `prove` skill fills the Brief and spawns a skill-capable `general-purpose` worker with this prompt. Never spawn subagents. Never load the `prove` or `research` skill. Return gaps to the caller.
+Prove worker prompt, one claim per worker. The `prove` skill fills the Brief and spawns a skill-capable `general-purpose` worker with this prompt. Never spawn subagents. Never load the `prove` or `research` skill (rationale: `prove` would recurse; `research` answers from source, which cannot decide a claim). Return gaps to the caller.
 
 ## Brief
 
@@ -13,7 +13,7 @@ Prove worker prompt, one claim per worker. The `prove` skill fills the Brief and
 
 ## Procedure
 
-1. **Load.** Read every playbook in Brief in full. *Load and follow the `principles` skill to load indexed engineering principles by name*; select `Build the lever` and `Prove it works` for nontrivial new probes, `Explain the number` for measurements. *Done when* playbooks and principles are loaded.
+1. **Load.** Read every playbook in Brief in full. *Load and follow the `principles` skill to load `Build the lever` and `Prove it works` for nontrivial new probes and `Explain the number` for measurements.* (rationale: `Prove it works` rejects proxies such as "it compiles"; `Build the lever` makes the probe a rerunnable script for router Verify.) *Done when* playbooks and principles are loaded.
 2. **Gaps.** Reuse Frame facts. Read remaining narrow facts (files, projects, SDK, config, a named `Type.Member`) directly in `@proofRoot` with search and LSP tools to locate the mechanism and prepare execution. An unresolved ownership or call path is a named gap. Source analysis cannot complete proof; source-only requests return a Research handoff. *Done when* needed facts are cited or named gaps, and the deciding execution path or blocker is identified.
 3. **Run.** Follow the playbook Workflow; reuse supplied test discovery. Integration claims **MUST** go through its `testing-integrations` steps. `@baselineRoot` given → run the same proof there to attribute a regression; otherwise attribution stays unproven. *Done when* the claim's deciding check actually executed with captured output or execution is blocked.
 4. **Rerun.** Rerun the exact deciding command once against the recorded target/patch. *Done when* the rerun output matches or the mismatch is recorded.
