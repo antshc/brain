@@ -96,7 +96,7 @@ def test_root_cause_requires_confirmed_evidence_and_stays_print_only():
     assert "hypothesis log remains unchanged" in procedure
     assert "Run no probes" in procedure or "run no probes" in procedure
     assert "Every mechanism claim MUST cite re-checkable evidence" in template
-    assert "canonical URL" in template and "<REDACTED>" in template
+    assert "canonical URL" in template and "[REDACTED]" in template
     assert "`write-document` skill to write root-cause reports" in diagnostic
     assert not (SKILLS / "diagnosing-bugs/references/root-cause-report.md").exists()
 

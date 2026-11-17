@@ -39,6 +39,8 @@ Troubleshooting follows the main content and verification, before related docume
 
 The document writer owns structure. It invokes `write guide` for whole-page prose and `write how-to` for procedural blocks, including troubleshooting actions. Those routes own writing rules: clear sentences and headings, stable terminology, concise commands, conditions before actions and a final unslop pass. Direct prose requests remain available through `write`; callbacks for refinement never redirect to the document writer again.
 
+For Confluence output, use Atlassian-supported code-fence languages. Replace unsupported tags with `text`, name the original language before the block and preserve its content. Mermaid diagrams keep their fences for the Publish page pipeline. Other destinations retain their language tags. Root-cause reports redact secrets with `[REDACTED]`.
+
 ## Ownership
 
 [SKILL.md](SKILL.md) selects the route and directly discloses its resources. Playbooks own procedures; templates own output structure; local references own requirements and HLD update rules.

@@ -60,6 +60,10 @@ General prose refinement for `spec`, `hld` or `toi` when needed → *Load and fo
 
 For `documentation`, the selected playbook invokes `write guide` for page prose and `write how-to` for procedural blocks. Preserve the template, selected mode, supplied facts, confidence and protected text. Writing notes and gaps stay outside publishable content.
 
+## Confluence formatting
+
+When Confluence is the target, *Load and follow the `atlassian` skill to determine supported Markdown code-fence languages, using the Map Markdown tactic.* Use supported tags. For an unsupported language, use a `text` fence and name the original language in the preceding prose. Preserve the code content exactly. Keep `mermaid` diagram fences for the Publish page pipeline; offline Map Markdown does not handle diagrams or attachments. Other destinations keep their existing language tags.
+
 ## Output contract
 
 Return the selected route's artifact. Use an explicit output path when supplied; HLD and TOI define defaults. Save drafts only within caller authorization; otherwise print the body. `root-cause` is print-only even when a destination is supplied: return the report inline and report the unsatisfied save request separately. Research returns the report body to its caller, which owns the delivery path and save. Return update summaries, source conflicts and missing evidence separately from publishable content. Keep exact-body-only route outputs free of wrapper prose; report blockers to the caller separately.
