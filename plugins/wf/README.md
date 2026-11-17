@@ -110,7 +110,7 @@ swimlane-beta TB
 
 ### Story to implementation
 
-Starts from one existing User story: `/writing-style sharpen` hardens it, `/design architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
+Starts from one existing User story: `/writing sharpen` hardens it, `/design architect` sketches the code, `/design spec` writes the spec, and `/implement` implements it.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -142,7 +142,7 @@ swimlane-beta TB
 
 ### Story to direct implementation
 
-Starts from one existing User story with no spec: `/writing-style sharpen` hardens it, `/design architect` sketches the code, and the **implement** reply makes `/design architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
+Starts from one existing User story with no spec: `/writing sharpen` hardens it, `/design architect` sketches the code, and the **implement** reply makes `/design architect` build against the accepted sketch in the current branch. It commits the scaffold first, then fills in code, surfacing every deviation from the sketch. If the same friction keeps coming back, it scraps the sketch and re-runs the design. Replying **accept** instead follows Story to implementation.
 
 ```mermaid
 %%{init: {'themeVariables': {'lineColor': '#8b949e'}}}%%
@@ -191,7 +191,8 @@ swimlane-beta TB
 | Story, bug report, or TOI | `/write-work story`, `/write-work bug`, `/write-document toi` |
 | High-level feature design | `/design hld` |
 | Jira work items, Confluence pages, and Atlassian setup | [`/atlassian`](skills/atlassian/SKILL.md) and `/atlassian install` |
-| Deepen a task prompt or restate intent | `/writing-style sharpen` |
+| Deepen a task prompt | `/writing sharpen` |
+| Restate your ask in the agent's own words | `/writing rephrase` |
 
 Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [behavior](skills/doc-diagram/examples/behavior.md), and [code](skills/doc-diagram/examples/code.md).
 
@@ -199,7 +200,7 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 |---|---|
 | Discovery and research | `architecture-records` (`define-concept`), `prove`, `challenge-this`, `research` (route agents `hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `hld`, `publish-hld`, `spec`, `tasks`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
-| Documentation and drafting | `doc-contracts`, `doc-diagram`, `write-work`, `write-document`, `architecture-records`, `suggest`, `writing-style` |
+| Documentation and drafting | `doc-contracts`, `doc-diagram`, `write-work`, `write-document`, `architecture-records`, `suggest`, `writing` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |
 
 Research Wayfinder confirms the destination, then interviews breadth-first one question at a time directly in session, without Decision topics. Clear one-session efforts can choose standalone research before map/worktree setup. Mapped efforts keep coarse fog in the GitHub root, precise questions/risks in explicitly approved sub-issues, and uncreated proposals in retained drafts/pending state. It maintains `docs/ongoing/<slug>-research.md` on `wayfinder/<slug>`, gathers reports in owned `research/<slug>` worktrees, and retains experiments in `prove/<slug>` until exact-payload approval. Evidence routes retain their standalone delivery defaults. Results and the Bottom line update incrementally; no automatic push, PR, base merge or Confluence publication.

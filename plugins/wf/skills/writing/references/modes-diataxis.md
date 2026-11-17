@@ -7,7 +7,7 @@ One document, one mode. Two questions pick it: does the content inform action (d
 - Understanding + work: **reference**.
 - Understanding + learning: **explanation**.
 
-Use the compass on a whole document or on one sentence.
+Use the compass on whole documents only. Skip it for short text.
 
 **Tutorial: learning by doing.** The learner's success is your job, not theirs. Open by saying what the learner will build, not what they will "learn". Every step produces a visible result, early and often. Tell them what they should see: the expected output, the prompt change, the log line. Cut explanation to one clause and a link. Stay concrete. Write as "we", in commands: "First, do x. Now, do y."
 

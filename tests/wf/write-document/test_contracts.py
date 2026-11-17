@@ -33,11 +33,11 @@ def test_authoring_resources_are_local_and_directly_disclosed():
 def test_document_normalization_is_local_and_preserves_implemented_behavior():
     entry = (ROOT / "SKILL.md").read_text()
     requirements = (ROOT / "references/requirements.md").read_text()
-    writing = (SKILLS / "writing-style/SKILL.md").read_text()
+    writing = (SKILLS / "writing/SKILL.md").read_text()
     assert "`write-document` skill" in writing
     assert "normalize" in writing
-    assert not (SKILLS / "writing-style/references/solution-agnostic.md").exists()
-    assert not (SKILLS / "writing-style/references/solution-agnostic-terms.md").exists()
+    assert not (SKILLS / "writing/references/solution-agnostic.md").exists()
+    assert not (SKILLS / "writing/references/solution-agnostic-terms.md").exists()
     assert "normalize" not in entry.split("---", 2)[1].lower()
     assert "`write-document normalize`" in entry
     assert "`spec normalize`" in entry
@@ -67,13 +67,13 @@ def test_design_retains_risk_and_publication_control():
 def test_report_ownership_and_bottom_line_reuse():
     entry = (ROOT / "SKILL.md").read_text()
     research = (ROOT / "playbooks/research.md").read_text()
-    writing = (SKILLS / "writing-style/SKILL.md").read_text()
+    writing = (SKILLS / "writing/SKILL.md").read_text()
     assert "disable-model-invocation" not in entry.split("---", 2)[1]
     assert "Bottom line procedure" in research
     assert "do not recursively invoke this skill" in research
     assert "Report language" in research
     assert "`bottom-line` for a standalone conclusion" in writing
-    assert not (SKILLS / "writing-style/references/bottom-line.md").exists()
+    assert not (SKILLS / "writing/references/bottom-line.md").exists()
     assert not (SKILLS.parent.parent.parent / "skills/engineering/bottom-line").exists()
     template = (ROOT / "templates/research-template.md").read_text()
     for heading in ("Bottom line", "What we did", "Open questions / decisions",
@@ -109,4 +109,4 @@ def test_investigation_supplies_evidence_and_retains_delivery():
     assert "Explore stays inline and bypasses report rendering" in router
     assert "`research update`" in living
     assert "`write-document` skill" in living
-    assert "writing-style" not in living
+    assert "`writing` skill" not in living
