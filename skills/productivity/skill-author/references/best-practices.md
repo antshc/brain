@@ -79,11 +79,35 @@ Pick one mode:
 
 ## Skill invocation syntax
 
-Reference the exact plain `skill-name` without leading `/`, immediately followed by the word `skill` (e.g. `` `atlassian` skill ``). Verb may vary (run, follow, use, load).
+**Identity and task:** Use the exact discovered skill identifier, without a leading `/`, immediately followed by `skill`; retain a namespace when the installed runtime requires it. State the concrete task and expected result in wording consistent with its current description; keyword counts and copied descriptions are unnecessary. Preserve conditions, route/action, inputs, outputs and constraints in the call or adjacent prose. Dynamic callers resolve the exact name and description before rendering; never emit placeholders literally.
 
-Every skill invocation **MUST** include 3–6 distinctive keywords from the invoked skill's description. Do not copy the full description.
+**Standalone calls:** Italicize the invocation phrase. Use these forms; replace illustrative placeholders before rendering:
 
-Wrap the whole invocation phrase in *italics*. Example: *Run `atlassian` skill to fetch the Confluence page as Markdown.*
+| Case | Form |
+|---|---|
+| Simple skill | *Load and follow the `skill-name` skill to \<task and expected result\>.* |
+| Explicit route | *Load and follow the `skill-name` skill to \<task and expected result\>, using route `route-name`.* |
+| Inferred route | *Load and follow the `skill-name` skill to \<task and expected result\>; select the applicable route.* |
+
+**Repeated dependencies:** Add an optional **Load and follow skills** section to the caller's `SKILL.md`, naming only its actual dependency skills. Example declaration:
+
+> For every call to the `research`, `prove`, or `review` skill, load and follow its skill content in full and the selected route procedure. Read required resources before acting. Reuse complete content already loaded for the same revision.
+
+The declaration governs calls when their conditions apply; listing a dependency does not load it immediately. Under this contract, use compact italicized calls: *Invoke the `skill-name` skill, route `route-name`, to \<task and expected result\>*; omit the route clause for simple skills or let the target router select it. Repeat skill identity, route when known, and task at separate decision points; keep the loading procedure shared. For alternatives at one decision point, a sentence naming the target skill may govern a condition/route/task table.
+
+**Context:** The named-dependency contract must be available to the executing agent, including when it follows the caller's selected playbook. Independent prompts and workers receive a standalone call or their own contract naming the dependencies; expand compact calls when that context would be absent.
+
+**Route selection:** Honor an explicit valid route. Otherwise continue an active route per the target's continuation policy, then infer from clear intent. Apply the target's ambiguity and combined-request policies. Unknown explicit route → report it and available routes; do not silently substitute. Use exact route identifiers from the target router; these call forms and routes are repository conventions, not Agent Skills specification fields.
+
+**Optional rationale:** Append ordinary prose outside the italicized call: `(rationale: ...)`. Use one short clause only when it explains a non-obvious skill/route choice, unusual constraint, or required evidence. Put observable conditions before calls and mandatory behavior in the call or adjacent constraints; rationale explains rather than carries requirements. Omit generic benefits and repeated tasks. Applies to standalone, compact, simple and routed calls.
+
+**Load before execution:** Load and follow the invoked skill content in full, then select and read its entire applicable route procedure, when separate, before acting. Read required references, tactics and text templates fully before their dependent steps; load conditional resources when their conditions apply. Resolve paths from the invoked skill's base directory. Continue truncated reads to EOF; partial content counts as not loaded. Apply this contract to delegated calls. Missing required content blocks dependent work; report the gap and continue independent work.
+
+**Discovery is not loading:** Use the runtime's supported loading mechanism. Names, descriptions, excerpts, remembered summaries and invocation announcements do not satisfy loading. The phrase “load and follow” and italics do not add discovery capabilities. Reuse complete content already available for the same revision; reload after context loss or changes.
+
+**Disclosure:** `SKILL.md` directly links every route and required resource with loading conditions. Routes name applicable resources from that index. Preserve one-level links and skill-local ownership; callers invoke the owner instead of opening its internals. A skill without routes executes its body procedure. Load only selected or triggered resources.
+
+**Scope:** These rules govern executable instructions and generated calls. Human slash examples, descriptions, command parsing, prohibitions and citations keep their natural form. Execute scripts and consume binary assets as instructed; reading their bytes as prose is unnecessary. External or generated targets resolve through the installed roster; verify their current description before rendering, and report missing dependencies rather than inventing names or instructions.
 
 ## Information hierarchy
 
@@ -238,7 +262,7 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 | Syntax | Meaning | Example |
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
-| *italic* | Skill invocation phrase | *Run `atlassian` skill to fetch the Confluence page as Markdown.* |
+| *italic* | Skill invocation phrase | *Load and follow the `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
@@ -263,6 +287,8 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 Treat authoring as iterative: run representative tasks without the skill, identify the failing behavior, write the smallest instruction that fixes it, rerun, compare. Judge actual traces and artifacts, not wording alone. Dimensions: trigger accuracy (positive, negative, near-miss prompts), execution correctness, constraint compliance (include prompts tempting a bypass), recovery, regression, efficiency.
 
 ## Before finishing
+
+- Executable calls use a standalone form or a compact form covered by a named-dependency contract; workers receive their own loading context.
 
 - Valid frontmatter; trigger-rich description free of forbidden description characters.
 - `SKILL.md` body under 300 lines.

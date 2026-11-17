@@ -43,6 +43,7 @@ For skill composition, read Route composition in [best-practices.md](references/
 ## Completion criteria
 
 - Every target `SKILL.md` has valid frontmatter: `name` matches folder; description passes the forbidden description character table in best-practices.md.
+- Executable calls follow Skill invocation syntax in best-practices.md: standalone or compact under a named-dependency loading contract available to the executing agent; optional rationale carries no mandatory behavior.
 - `SKILL.md` body under 300 lines; no template placeholder or `<!-- @: -->` directive left in a produced skill or agent.
 - Every relative link resolves inside its own skill folder; every conditional playbook, tactic, and reference has a direct body link and loading condition, without loading chains.
 - Every route has an unambiguous trigger, playbook, output contract, and selection/ambiguity/continuation/combined-request policy; every tactic has a trigger, consumer, and result. Simple skills retain only justified blocks/files.

@@ -19,6 +19,12 @@ description: {{description|imperative What sentence with concrete result, then U
 - **MUST** {{constraint}}. {{mechanism}}. Rationale: {{rationale}}. If {{blocker}}, {{failurePolicy|fail closed, controlled fallback, or graceful degradation}}.
 
 <!-- @: Block selection: inline Workflow for a short procedure; Routing plus playbooks for distinct substantial outcomes; add Loop, Tactics, Reference only as needed; free-form when output dictates structure. -->
+<!-- @: Optional for repeated dependency calls; name actual discovered skills, omit if unnecessary. Compact calls retain skill, route when known, and task; independent workers need their own contract or standalone call. -->
+## Load and follow skills
+
+For every call to {{dependencySkills|exact identifiers in backticks, e.g. the `research`, `prove`, or `review` skill}}, load and follow its skill content in full and the selected route procedure. Read required resources before acting. Reuse complete content already loaded for the same revision.
+
+<!-- @: Compact call shape under this contract: italicized Invoke the `skill-name` skill, route `route-name`, to task; omit route for simple skills. Optional ordinary prose after call: (rationale: non-obvious reason). Listing dependencies does not load them until called. -->
 <!-- @: BLOCK Routing: omit for a single short procedure; repeat rows per route and keep shared invariants here. -->
 ## Routing
 
@@ -26,7 +32,7 @@ description: {{description|imperative What sentence with concrete result, then U
 |---|---|---|
 | {{routeName}} | {{trigger \| Unambiguous intent or observable condition}} | [{{routeTitle}}](playbooks/{{routeName}}.md) |
 
-Select {{selectionPolicy|Explicit precedence or mutually exclusive conditions}}. Read only the selected playbook in full. If the requested outcome remains ambiguous, {{ambiguityPolicy|Ask the smallest clarifying question}}. For combined requests, {{combinedPolicy|Route order and dependency handling}}. After its output, {{continuationPolicy|Stop or select the next requested route}}.
+Honor an explicit valid route. Unknown explicit route → report it and available choices; do not substitute. Otherwise continue an active route per {{continuationPolicy|When to resume, stop or select the next requested route}}, then select {{selectionPolicy|Mutually exclusive conditions or precedence}}. Read only the selected playbook in full. If the requested outcome remains ambiguous, {{ambiguityPolicy|Ask the smallest clarifying question}}. For combined requests, {{combinedPolicy|Route order and dependency handling}}.
 
 <!-- @: BLOCK Workflow: ordered steps; add the branch step only when cases need different steps. -->
 ## Workflow
