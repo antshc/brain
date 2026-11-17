@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 SKILLS = Path(__file__).resolve().parents[3] / 'plugins/wf/skills'
-ROOT = SKILLS / 'writing'
+ROOT = SKILLS / 'write'
 ROUTES = ('guide', 'how-to', 'github', 'report', 'message', 'unslop', 'sharpen', 'rephrase')
 
 
@@ -28,7 +28,7 @@ def test_sharpen_and_rephrase_are_separate_routes():
     assert not (SKILLS / 'sharpen').exists()
 
 
-def test_callers_let_writing_select_the_route():
+def test_callers_let_write_select_the_route():
     callers = (
         'git/references/commit-messages.md', 'github/tactics/pull-requests.md',
         'github/tactics/reviews.md', 'review/playbooks/blast-radius.md',
@@ -36,6 +36,6 @@ def test_callers_let_writing_select_the_route():
     )
     for caller in callers:
         text = (SKILLS / caller).read_text()
-        assert '`writing` skill' in text and 'select the applicable route' in text
+        assert '`write` skill' in text and 'select the applicable route' in text
         assert '**Unslop only**' not in text
         assert '**Write a PR description or commit message**' not in text
