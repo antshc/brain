@@ -29,12 +29,12 @@ Explicit offline publishing or a reported GitHub/tool/authentication failure →
 
 ## Design sketch handoff
 
-Classify the run's outputs by role, never by file name. Both `design architect` and standalone `design sketch` use `<repo-root>/tmp/design-<slug>/synthesis/` with `rationale.md`, `module-map.md`, and `sketch/`. Architect additionally has `task.md`, `grounding-*.md`, and `candidate-<n>/`.
+Classify the run's outputs by role, never by file name. Both `design architect` and standalone `design sketch` use `<repo-root>/tmp/design-<slug>/synthesis/` with `rationale.md`, `module-map.md`, and `sketch/`. Architect additionally has grounding and local or Arena candidate packages.
 
-- **Selected design** — `synthesis/`: its `rationale.md`, `module-map.md`, and `sketch/` are the final package. For Architect Arena, the synthesis decision names the base candidate. Correction re-runs: the `arena-r<k>/synthesis/` the user picked.
-- **Excluded** — every Arena `candidate-<n>/` (including the base candidate), `synthesis-note.md`, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
+- **Selected design** — `synthesis/`: its `rationale.md`, `module-map.md`, and `sketch/` are the final package. For Architect, the synthesis decision names the local or Arena base candidate. Correction re-runs: the `arena-r<k>/synthesis/` the user picked.
+- **Excluded** — every local or Arena candidate package (including the base candidate), `synthesis-note.md`, task statement, rubric, grounding notes, run scratch. Never attach or quote them.
 
-Wrap the selected `synthesis/` sketch — never an Arena candidate's — and its module map into artifacts. Resolve the script path from the installed `design/` skill directory:
+Wrap only the selected `synthesis/` sketch and its module map into artifacts. Resolve the script path from the installed `design/` skill directory:
 
 ```text
 python3 "<installed design directory>/scripts/bundle_artifacts.py" --sketch <synthesis/sketch path> --module-map <synthesis/module-map.md path> --out-dir <new empty temp dir outside the repository>

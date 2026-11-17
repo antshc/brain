@@ -4,7 +4,7 @@ Edit the supplied prose for its audience. Keep the author's meaning, level of ce
 
 ## Ground each claim
 
-Name the source of an attributed claim. Drop unsupported assertions and loose trailing clauses that imply an effect the text never establishes. Describe behavior through the actor, action, and observable result. Close with a finding, decision, or next action when the text has one.
+Name attribution sources. Remove unsupported assertions and trailing claims of unestablished effects. State the actor, action and observable result. Close with the actual finding, decision or next action.
 
 | Pattern | Before | After |
 |---|---|---|
@@ -15,7 +15,7 @@ Name the source of an attributed claim. Drop unsupported assertions and loose tr
 
 ## Make the sentence easy to parse
 
-Name the actor where it matters. Use direct verbs and everyday words. Give one idea its own sentence when a clause is hard to follow. Replace vague intensifiers with a measurement when one is available. Use complete sentences where shorthand would make the reader reconstruct the thought. Leave passive voice where the actor is unknown or irrelevant.
+Name the actor and use direct verbs and everyday words. Split hard-to-follow clauses. Replace vague intensifiers with available measurements. Use complete sentences instead of cryptic shorthand; keep passive when the actor is unknown or irrelevant.
 
 | Pattern | Before | After |
 |---|---|---|
@@ -26,7 +26,7 @@ Name the actor where it matters. Use direct verbs and everyday words. Give one i
 
 ## Keep terms and structure literal
 
-Repeat the same name for the same thing. Use the actual component name or describe what it does when a metaphor would make the reader guess. Group items by their relationship and let that determine the list length. Use a range only when its endpoints belong to the same scale. State a contrast only when the reader needs both sides.
+Use one name per thing. Replace unclear metaphors with actual components or operations. Group by relationships, without forcing a list length. Range endpoints need one scale; contrasts need both sides to be useful.
 
 | Pattern | Before | After |
 |---|---|---|
@@ -38,7 +38,7 @@ Repeat the same name for the same thing. Use the actual component name or descri
 
 ## Clear the page
 
-Use sentence case for headings and straight quotation marks in prose. Use bold for information the reader needs to spot and avoid decorative emoji. Remove list labels that repeat their own sentence. Use a colon to introduce a list or an example. When thoughts need separation, use a period or a comma where the grammar allows.
+Use sentence case, straight quotes and meaningful bold. Remove decorative emoji and labels repeating their sentence. Reserve colons for lists or examples; separate thoughts with grammatical periods or commas.
 
 | Pattern | Before | After |
 |---|---|---|
@@ -50,7 +50,7 @@ Use sentence case for headings and straight quotation marks in prose. Use bold f
 
 ## Read it as the recipient
 
-Remove greetings, praise, canned closings, and verbal padding when they add no information. Keep qualifiers that change the claim and remove stacked qualifiers that repeat it. Read the revision once for natural rhythm, then compare it with the input for changes to facts, scope, or confidence.
+Remove empty greetings, praise, canned closings and padding. Keep meaningful qualifiers; remove repetitive hedging. Check natural rhythm, then compare facts, scope and confidence with the input.
 
 | Pattern | Before | After |
 |---|---|---|

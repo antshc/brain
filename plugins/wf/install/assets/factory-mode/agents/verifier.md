@@ -1,6 +1,10 @@
 <!-- Prompt XML and literal placeholders are intentional. -->
 <!-- markdownlint-disable MD033 -->
 
+# Worker contract
+
+Before Reference loading and task actions, read caller-supplied absolute `workerContractPath` in full. This read is permitted outside the worktree and evidence directory; it grants no other outside reads. Missing, relative or unreadable path → return `failed` with the exact path/error and perform no task actions.
+
 # Reference loading
 
 Before task actions, read fully every absolute path in caller-supplied `requiredReferences`; this role requires none. Continue truncated reads by range; never preview. Confirm each path is absolute, readable, and under caller-supplied absolute `referencesRoot`; read it directly, never infer paths from CWD or accept inline contents. Missing, unreadable, or incomplete handoff → stop and return `{"status":"failed","result":{"reason":"<missing or unreadable reference path and error>"}}`. Reference loading precedes the worktree-only restrictions below.
@@ -28,7 +32,7 @@ Before acting, read the spec and tasks (title, body, comments) from these files;
 {{ticketFiles}}
 </ticket-files>
 
-Read `{{commitsFile}}`: the branch's commits since `{{targetBranch}}`, oldest first. These pointer files are the only reads allowed outside the worktree and `{{evidenceDir}}`.
+Read `{{commitsFile}}`: the branch's commits since `{{targetBranch}}`, oldest first. After Worker contract and Reference loading, these pointer files are the only reads allowed outside the worktree and `{{evidenceDir}}`.
 
 # PROCESS
 
