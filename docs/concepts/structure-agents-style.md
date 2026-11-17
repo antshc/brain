@@ -23,7 +23,7 @@ documented inputs and outputs. Delegation and the call style that carries it are
 [structure-checklist-workflow](structure-checklist-workflow.md).
 
 How to word the agent file itself is write-time guidance — see
-[agent-skills.instructions.md](../../.github/instructions/agent-skills.instructions.md).
+[skill-author](../../skills/productivity/skill-author/SKILL.md).
 
 ## Examples
 
