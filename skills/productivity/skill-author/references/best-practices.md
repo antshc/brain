@@ -1,6 +1,6 @@
 # Skill best practices
 
-Structure and content rules for agent-facing documents: `SKILL.md`, bundled references and templates, `*.agent.md`, instructions files. Wording rules live in [wording.md](wording.md). Repository-local rules (e.g. `.github/instructions/*.instructions.md`) override this file on conflict.
+Structure and content rules for agent-facing documents: `SKILL.md`, bundled references and templates, `*.agent.md`, instructions and `.crew/` convention files. Wording rules live in wording.md. Repository-local overrides win on conflict; a repository stub invoking this skill adds no separate rules. In this repository, design-time composition guidance lives in `ARCHITECTURE.md`.
 
 **Predictability:** repeat the process, not the output.
 
@@ -42,6 +42,15 @@ Constrain invariants; prescribe mechanisms only when needed; explain non-obvious
 
 Omit process detail (`using bundled best practices`, `from a brief`) unless it sets the skill apart. User-invoked skills: the What sentence only.
 
+**Overlap rules:**
+
+- Put the strongest trigger phrases first; listings may truncate long descriptions.
+- Every quoted trigger phrase is unique across all skills; near-duplicates (`'how does this work'` vs `'how does this code work'`) count as duplicates.
+- Where skills overlap, end with ``Not for X → `skill`.``, one `→ skill` redirect per neighbor, each naming an existing skill other than itself.
+- Assign one role per skill; name the owner of each neighboring role in `Not for`.
+
+Repository CI uses `.github/scripts/lint_skill_descriptions.py` over `plugins/wf/` to check length, duplicate/near-duplicate quoted triggers, and unresolved `Not for` targets.
+
 | Invocation | Example |
 |---|---|
 | Model-invoked | `Investigate a question against primary sources and save cited findings as Markdown. Use for /research, 'research X', 'gather docs on Y', or delegating reading legwork. Use why for design rationale.` |
@@ -79,11 +88,35 @@ Pick one mode:
 
 ## Skill invocation syntax
 
-Reference the exact plain `skill-name` without leading `/`, immediately followed by the word `skill` (e.g. `` `atlassian` skill ``). Verb may vary (run, follow, use, load).
+**Identity and task:** Use the exact discovered skill identifier, without a leading `/`, immediately followed by `skill`; retain a namespace when the installed runtime requires it. State the concrete task and expected result in wording consistent with its current description; keyword counts and copied descriptions are unnecessary. Preserve conditions, route/action, inputs, outputs and constraints in the call or adjacent prose. Dynamic callers resolve the exact name and description before rendering; never emit placeholders literally.
 
-Every skill invocation **MUST** include 3–6 distinctive keywords from the invoked skill's description. Do not copy the full description.
+**Standalone calls:** Italicize the invocation phrase. Use these forms; replace illustrative placeholders before rendering:
 
-Wrap the whole invocation phrase in *italics*. Example: *Run `atlassian` skill to fetch the Confluence page as Markdown.*
+| Case | Form |
+|---|---|
+| Simple skill | *Load and follow the `skill-name` skill to \<task and expected result\>.* |
+| Explicit route | *Load and follow the `skill-name` skill to \<task and expected result\>, using route `route-name`.* |
+| Inferred route | *Load and follow the `skill-name` skill to \<task and expected result\>; select the applicable route.* |
+
+**Repeated dependencies:** Add an optional **Load and follow skills** section to the caller's `SKILL.md`, naming only its actual dependency skills. Example declaration:
+
+> For every call to the `research`, `prove`, or `review` skill, load and follow its skill content in full and the selected route procedure. Read required resources before acting. Reuse complete content already loaded for the same revision.
+
+The declaration governs calls when their conditions apply; listing a dependency does not load it immediately. Under this contract, use compact italicized calls: *Invoke the `skill-name` skill, route `route-name`, to \<task and expected result\>*; omit the route clause for simple skills or let the target router select it. Repeat skill identity, route when known, and task at separate decision points; keep the loading procedure shared. For alternatives at one decision point, a sentence naming the target skill may govern a condition/route/task table.
+
+**Context:** The named-dependency contract must be available to the executing agent, including when it follows the caller's selected playbook. Independent prompts and workers receive a standalone call or their own contract naming the dependencies; expand compact calls when that context would be absent.
+
+**Route selection:** Honor an explicit valid route. Otherwise continue an active route per the target's continuation policy, then infer from clear intent. Apply the target's ambiguity and combined-request policies. Unknown explicit route → report it and available routes; do not silently substitute. Use exact route identifiers from the target router; these call forms and routes are repository conventions, not Agent Skills specification fields.
+
+**Optional rationale:** Append ordinary prose outside the italicized call: `(rationale: ...)`. Use one short clause only when it explains a non-obvious skill/route choice, unusual constraint, or required evidence. Put observable conditions before calls and mandatory behavior in the call or adjacent constraints; rationale explains rather than carries requirements. Omit generic benefits and repeated tasks. Applies to standalone, compact, simple and routed calls.
+
+**Load before execution:** Load and follow the invoked skill content in full, then select and read its entire applicable route procedure, when separate, before acting. Read required references, tactics and text templates fully before their dependent steps; load conditional resources when their conditions apply. Resolve paths from the invoked skill's base directory. Continue truncated reads to EOF; partial content counts as not loaded. Apply this contract to delegated calls. Missing required content blocks dependent work; report the gap and continue independent work.
+
+**Discovery is not loading:** Use the runtime's supported loading mechanism. Names, descriptions, excerpts, remembered summaries and invocation announcements do not satisfy loading. The phrase “load and follow” and italics do not add discovery capabilities. Reuse complete content already available for the same revision; reload after context loss or changes.
+
+**Disclosure:** `SKILL.md` directly links every route and required resource with loading conditions. Routes name applicable resources from that index. Preserve one-level links and skill-local ownership; callers invoke the owner instead of opening its internals. A skill without routes executes its body procedure. Load only selected or triggered resources.
+
+**Scope:** These rules govern executable instructions and generated calls. Human slash examples, descriptions, command parsing, prohibitions and citations keep their natural form. Execute scripts and consume binary assets as instructed; reading their bytes as prose is unnecessary. External or generated targets resolve through the installed roster; verify their current description before rendering, and report missing dependencies rather than inventing names or instructions.
 
 ## Information hierarchy
 
@@ -121,7 +154,9 @@ Use these repository conventions; they are not Agent Skills specification fields
 
 Generate only justified files and directories. Keep shared invariants and selection in `SKILL.md`; the selected playbook owns execution. For each route define an unambiguous trigger, playbook, and output contract; specify ambiguity handling, continuation, and combined-request order. Read only the selected playbook, then select again only per the continuation policy.
 
-Link every conditional playbook, tactic, and reference directly from `SKILL.md` with its loading condition; read triggered files fully. A playbook may name a registered tactic or reference and its trigger in prose, but must not introduce a loading chain or second router. Resolve bundled paths from the target skill base directory. Keep one authoritative tactic definition for all consuming routes.
+Link every conditional playbook, tactic, and reference directly from `SKILL.md` with its loading condition; read selected playbooks fully before acting and required or triggered resources fully before dependent steps. A playbook may name a registered tactic or reference and its trigger in prose, but must not introduce a loading chain or second router. Resolve bundled paths from the target skill base directory. Keep one authoritative tactic definition for all consuming routes.
+
+**Kind folders:** A skill with several same-kind playbooks MAY group them in a plural lowercase kind folder (`kinds/`, `strategies/`, `modes/`) instead of `references/`. Link every file directly from the `SKILL.md` routing table; bundled-path, skill-local and one-level-deep rules apply. Name sibling playbooks in prose (`component` kind), never link between them.
 
 ## Steps and completion criteria
 
@@ -145,9 +180,11 @@ End every step with a checkable completion condition, exhaustive where omissions
 **Completeness sweep** — checks whether required scope was omitted (completion criteria check the result meets its contract).
 
 - Add for multi-part work with independently missable obligations: features, cross-file refactors, migrations, broad research.
-- When used, it **MUST** run last. Re-read the request, reconstruct explicit and implied obligations, map each to evidence across code, tests, docs, configuration, failure/compatibility paths.
+- When used, it **MUST** run last, after every other pass. Re-read the request and acceptance criteria; reconstruct explicit and implied obligations from existing architecture/conventions, affected paths, tests, docs, configuration/migrations, and error/security/observability/compatibility concerns. Map every obligation through `Requirement → Implementation → Test → Documentation`; state when a link is not applicable.
 - Resolve uncovered obligations by implementing, asking, or reporting explicit deferral. **MUST NOT** declare completion with an unaccounted obligation.
 - Omit for small bounded work already proven by checks. **MUST NOT** duplicate checks across sweep and completion criteria.
+
+Repository concept: `docs/concepts/ops-completeness-sweep.md`.
 
 ## Output contract
 
@@ -205,6 +242,8 @@ When a skill depends on an external tool, API, or platform quirk, add `## Gotcha
 
 Run subagents through prose instructions describing task, scope, inputs, constraints, and expected output. Do not instruct agents to call `runSubagent` directly. Pass context pointers (paths, IDs) rather than duplicated content; pass absolute paths to bundled files.
 
+A brief requiring a skill **MUST** name a skill-capable agent type, `general-purpose`; forbid edits for read-only work. Codebase lookups use the `research` skill's Explore route in the caller's session. Never wrap a skill that spawns workers (`research`, `prove`, `challenge-this`) inside another subagent. Batch many claims into one `prove` call. Plain grep or LSP checks may use the built-in `explore` agent.
+
 ## Resources
 
 | Folder | Holds |
@@ -217,28 +256,28 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 | `templates/` | scaffolds to fill or modify |
 
 - Keep up to two category files at skill root; otherwise use the matching resource folder. Name linked files for what they hold.
-- **Bundled paths** resolve from the skill base directory, never caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
+- **Bundled paths**, including kind folders, resolve from the skill base directory, never caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
 - **Skill-local resources:** each skill **MUST** bundle required resource files inside its own folder; **MUST NOT** read, link, or execute resource files from another skill's folder. Copy required resources in. Invoking another skill remains allowed.
 - **Keep references one level deep:** `SKILL.md` links every reference directly; references **MUST NOT** load another file. Cite exact headings in already-loaded files instead. Loading chains risk partial reads. See sources below.
 - **Hand-back by action:** a reference returns control by naming the action and the target section's exact heading, never the file name or a step number. Example: "Return control to the orchestrator for *Frontier check*."
 - **Long references:** over 100 lines, start with `## Contents` listing every section by exact heading so previews expose the full scope.
-- **Read references fully:** every pointer to a reference requires reading the whole file; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
+- **Read references fully:** read every required or conditionally triggered reference in full before dependent work; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
 - Use scripts for repetitive or fragile operations. Prefer Python over shell-specific scripts; use the repository-supported Python command.
-- New plugin → register it in the repository's plugin marketplace/manifest in the same change.
+- New plugin → register it in the repository's plugin marketplace/manifest in the same change; this repository uses `.github/plugin/marketplace.json`.
 
 ## Template ownership
 
 - **Template owns rendering; skill owns orchestration.** Template: structure, format, conditions, local constraints. `SKILL.md`: selection, workflow, inputs/outputs, shared rules.
 - `{{value|hint}}` — preferred field-local guidance.
 - `<!-- @: instruction -->` — hidden structural/rendering directive; **MUST** be one terse line.
-- Templates MAY define local **Rules** and **Gotchas**. Move only shared guidance to `SKILL.md` or `references/`.
+- Templates MAY define local **Rules** and **Gotchas**. Keep template-specific guidance in the template; move only shared/cross-template guidance to `SKILL.md` or `references/`.
 
 ## Syntax legend
 
 | Syntax | Meaning | Example |
 |---|---|---|
 | **bold** | Required rule, label, warning | **Required:** Run tests. |
-| *italic* | Skill invocation phrase | *Run `atlassian` skill to fetch the Confluence page as Markdown.* |
+| *italic* | Skill invocation phrase | *Load and follow the `atlassian` skill to fetch the Confluence page as Markdown.* |
 | `@camelCase` | Agent-resolved conceptual value | Use `@currentBranch` as target. |
 | `set @camelCase to instruction` | Runtime assignment | `set @currentBranch to current Git branch` |
 | `{{camelCase}}` | Replaced placeholder | `reports/{{camelCase}}.md` |
@@ -256,7 +295,7 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 - **Single source of truth:** one meaning, one place within a skill. Duplicate across skills only to preserve skill-local resources.
 - **Environment:** use `package.json`, config, layout, `--help`; record only undiscoverable conventions, reasons, gotchas.
 - **Relevance:** delete unrelated or stale lines.
-- **No-ops** — apply the No-op test in [wording.md](wording.md).
+- **No-ops** — apply No-op test in the already-loaded wording.md; delete stale rules and no-ops.
 
 ## Evaluation
 
@@ -264,6 +303,7 @@ Treat authoring as iterative: run representative tasks without the skill, identi
 
 ## Before finishing
 
+- Executable calls use a standalone form or a compact form covered by a named-dependency contract; full body, selected route and required-resource loading conditions are explicit, and workers receive their own loading context.
 - Valid frontmatter; trigger-rich description free of forbidden description characters.
 - `SKILL.md` body under 300 lines.
 - No duplicate procedures within a skill; bundled resource paths stay inside the skill folder and resolve.
@@ -271,4 +311,4 @@ Treat authoring as iterative: run representative tasks without the skill, identi
 - Every critical step has a failure policy; every step has a checkable completion condition.
 - No credentials, tokens, or secrets.
 
-Sources: repository `agent-skills.instructions.md`; [mattpocock/skills](https://github.com/mattpocock/skills) `writing-for-agents` and `writing-great-skills` (v1.1.0) GLOSSARY; Agent Skills best practices KB and AI diff review agent KB (October 2026), drawing on the [Agent Skills specification](https://agentskills.io/specification), [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), and OpenAI/Anthropic skill-creator guidance.
+Sources: migrated repository agent-facing authoring instructions; [mattpocock/skills](https://github.com/mattpocock/skills) `writing-for-agents` and `writing-great-skills` (v1.1.0) GLOSSARY; Agent Skills best practices KB and AI diff review agent KB (October 2026), drawing on the [Agent Skills specification](https://agentskills.io/specification), [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), and OpenAI/Anthropic skill-creator guidance.
