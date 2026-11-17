@@ -8,7 +8,7 @@ SKILLS = Path(__file__).resolve().parents[3] / "plugins/wf/skills"
 ROOT = SKILLS / "write-document"
 
 
-@pytest.mark.parametrize("route", ["spec", "hld", "toi", "research", "bottom-line", "root-cause"])
+@pytest.mark.parametrize("route", ["spec", "hld", "toi", "research", "bottom-line", "root-cause", "documentation"])
 def test_routes_disclose_their_procedure_and_template(route):
     entry = (ROOT / "SKILL.md").read_text()
     assert f"](playbooks/{route}.md)" in entry
@@ -26,7 +26,7 @@ def test_authoring_resources_are_local_and_directly_disclosed():
     for target in linked:
         assert (ROOT / target).resolve().is_relative_to(ROOT.resolve())
         assert (ROOT / target).is_file()
-    assert {path.stem for path in (ROOT / "playbooks").glob("*.md")} == {"spec", "hld", "toi", "research", "bottom-line", "root-cause"}
+    assert {path.stem for path in (ROOT / "playbooks").glob("*.md")} == {"spec", "hld", "toi", "research", "bottom-line", "root-cause", "documentation"}
     assert not (ROOT / "playbooks/handover.md").exists()
 
 

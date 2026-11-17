@@ -49,11 +49,14 @@ Pick the first rule that matches:
 | Story, task, or bug requirements | *Load and follow the `write-work` skill to write or normalize the user story, implementation task, or bug report; select the applicable route.* Use operation `normalize` for existing text. |
 | Spec, HLD, TOI, or untyped requirements | *Load and follow the `write-document` skill to write or normalize the specification, high-level design, or TOI document; select the applicable route.* Use operation `normalize` for an untyped fragment. |
 | Bottom line or research report | *Load and follow the `write-document` skill to write the research report or bottom line; select the applicable route.* Use `bottom-line` for a standalone conclusion or `research` for a full report. |
+| Structure a standalone documentation page or choose its template/sections | *Load and follow the `write-document` skill to structure the Markdown documentation page, using route `documentation`.* Preserve the supplied purpose, audience and facts. |
 | ADR, Concept, or glossary term | *Load and follow the `architecture-records` skill to record the architecture decision, Concept, or term; select the applicable route.* |
 | `SKILL.md`, agent, or instructions file | *Load and follow the `skill-author` skill to apply authoring rules to the agent-facing document, using route `guidance`.* |
 | Product UI strings | Report that the product's copy guidelines own them. |
 
 This skill owns prose refinement only. Preserve the owner's structure, evidence, and confidence.
+
+Direct prose requests still use `guide` or `how-to`, including writing new prose. Delegate requests for document structure, templates or sections to `write-document documentation`. When `write-document` calls back for prose, honor its selected writing route and refine only; never redirect back. `guide` handles page prose and whole-document mode rules; `how-to` handles procedural blocks, including troubleshooting actions.
 
 ## Pipeline
 
