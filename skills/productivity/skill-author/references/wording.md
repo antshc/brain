@@ -1,6 +1,6 @@
 # Wording rules
 
-How to phrase agent-facing text. Structure and content rules live in [best-practices.md](best-practices.md).
+How to phrase agent-facing text. Structure and content rules live in the already-loaded best-practices.md.
 
 ## Style
 
@@ -56,4 +56,4 @@ Delete sentences that do not change the model's default behavior. Settle disagre
 
 Keep one authoritative copy per meaning; replace duplicates with pointers or delete them. Repeating leading words remains intentional.
 
-Sources: repository `agent-skills.instructions.md` Style; [mattpocock/skills](https://github.com/mattpocock/skills) `writing-for-agents` leading words, negation, pruning; Agent Skills best practices KB and AI diff review agent KB (October 2026) wording tables; `shrink` skill rules.
+Sources: migrated repository authoring Style rules; [mattpocock/skills](https://github.com/mattpocock/skills) `writing-for-agents` leading words, negation, pruning; Agent Skills best practices KB and AI diff review agent KB (October 2026) wording tables; `shrink` skill rules.

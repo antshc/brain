@@ -51,7 +51,7 @@ agent never needs to find. This Concept fixes how a capability is divided and ho
   encapsulates, and the [skill-owned-code concept](structure-skill-owned-code.md) owns where skill code and tests
   live.
 - **Leave authoring mechanics to authoring guidance** - Use
-  [agent-skills.instructions.md](../../.github/instructions/agent-skills.instructions.md) for wording descriptions,
+  [skill-author](../../skills/productivity/skill-author/SKILL.md) for wording descriptions,
   naming skills, and laying out folders.
 
 ## Violation signals

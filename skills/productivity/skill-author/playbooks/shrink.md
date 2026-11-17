@@ -1,6 +1,6 @@
 # Shrink phase
 
-Make agent-facing files shorter and more consistent while preserving every behavior. Apply [wording.md](../references/wording.md); keep frontmatter valid per Frontmatter and description in [best-practices.md](../references/best-practices.md).
+Make agent-facing files shorter and more consistent while preserving every behavior. Read and apply wording.md and best-practices.md in full, including Frontmatter and description. Apply independent repository overrides; a stub invoking `skill-author` is already satisfied by this phase and does not trigger a recursive invocation.
 
 ## Inputs
 

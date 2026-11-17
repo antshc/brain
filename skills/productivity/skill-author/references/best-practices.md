@@ -1,6 +1,6 @@
 # Skill best practices
 
-Structure and content rules for agent-facing documents: `SKILL.md`, bundled references and templates, `*.agent.md`, instructions files. Wording rules live in [wording.md](wording.md). Repository-local rules (e.g. `.github/instructions/*.instructions.md`) override this file on conflict.
+Structure and content rules for agent-facing documents: `SKILL.md`, bundled references and templates, `*.agent.md`, instructions and `.crew/` convention files. Wording rules live in wording.md. Repository-local overrides win on conflict; a repository stub invoking this skill adds no separate rules. In this repository, design-time composition guidance lives in `ARCHITECTURE.md`.
 
 **Predictability:** repeat the process, not the output.
 
@@ -41,6 +41,15 @@ Constrain invariants; prescribe mechanisms only when needed; explain non-obvious
 3. **Redirect** (optional): point to the nearest sibling (``Use `why` for motivation.``) or `Skip when …`.
 
 Omit process detail (`using bundled best practices`, `from a brief`) unless it sets the skill apart. User-invoked skills: the What sentence only.
+
+**Overlap rules:**
+
+- Put the strongest trigger phrases first; listings may truncate long descriptions.
+- Every quoted trigger phrase is unique across all skills; near-duplicates (`'how does this work'` vs `'how does this code work'`) count as duplicates.
+- Where skills overlap, end with ``Not for X → `skill`.``, one `→ skill` redirect per neighbor, each naming an existing skill other than itself.
+- Assign one role per skill; name the owner of each neighboring role in `Not for`.
+
+Repository CI uses `.github/scripts/lint_skill_descriptions.py` over `plugins/wf/` to check length, duplicate/near-duplicate quoted triggers, and unresolved `Not for` targets.
 
 | Invocation | Example |
 |---|---|
@@ -145,7 +154,9 @@ Use these repository conventions; they are not Agent Skills specification fields
 
 Generate only justified files and directories. Keep shared invariants and selection in `SKILL.md`; the selected playbook owns execution. For each route define an unambiguous trigger, playbook, and output contract; specify ambiguity handling, continuation, and combined-request order. Read only the selected playbook, then select again only per the continuation policy.
 
-Link every conditional playbook, tactic, and reference directly from `SKILL.md` with its loading condition; read triggered files fully. A playbook may name a registered tactic or reference and its trigger in prose, but must not introduce a loading chain or second router. Resolve bundled paths from the target skill base directory. Keep one authoritative tactic definition for all consuming routes.
+Link every conditional playbook, tactic, and reference directly from `SKILL.md` with its loading condition; read selected playbooks fully before acting and required or triggered resources fully before dependent steps. A playbook may name a registered tactic or reference and its trigger in prose, but must not introduce a loading chain or second router. Resolve bundled paths from the target skill base directory. Keep one authoritative tactic definition for all consuming routes.
+
+**Kind folders:** A skill with several same-kind playbooks MAY group them in a plural lowercase kind folder (`kinds/`, `strategies/`, `modes/`) instead of `references/`. Link every file directly from the `SKILL.md` routing table; bundled-path, skill-local and one-level-deep rules apply. Name sibling playbooks in prose (`component` kind), never link between them.
 
 ## Steps and completion criteria
 
@@ -169,9 +180,11 @@ End every step with a checkable completion condition, exhaustive where omissions
 **Completeness sweep** — checks whether required scope was omitted (completion criteria check the result meets its contract).
 
 - Add for multi-part work with independently missable obligations: features, cross-file refactors, migrations, broad research.
-- When used, it **MUST** run last. Re-read the request, reconstruct explicit and implied obligations, map each to evidence across code, tests, docs, configuration, failure/compatibility paths.
+- When used, it **MUST** run last, after every other pass. Re-read the request and acceptance criteria; reconstruct explicit and implied obligations from existing architecture/conventions, affected paths, tests, docs, configuration/migrations, and error/security/observability/compatibility concerns. Map every obligation through `Requirement → Implementation → Test → Documentation`; state when a link is not applicable.
 - Resolve uncovered obligations by implementing, asking, or reporting explicit deferral. **MUST NOT** declare completion with an unaccounted obligation.
 - Omit for small bounded work already proven by checks. **MUST NOT** duplicate checks across sweep and completion criteria.
+
+Repository concept: `docs/concepts/ops-completeness-sweep.md`.
 
 ## Output contract
 
@@ -229,6 +242,8 @@ When a skill depends on an external tool, API, or platform quirk, add `## Gotcha
 
 Run subagents through prose instructions describing task, scope, inputs, constraints, and expected output. Do not instruct agents to call `runSubagent` directly. Pass context pointers (paths, IDs) rather than duplicated content; pass absolute paths to bundled files.
 
+A brief requiring a skill **MUST** name a skill-capable agent type, `general-purpose`; forbid edits for read-only work. Codebase lookups use the `research` skill's Explore route in the caller's session. Never wrap a skill that spawns workers (`research`, `prove`, `challenge-this`) inside another subagent. Batch many claims into one `prove` call. Plain grep or LSP checks may use the built-in `explore` agent.
+
 ## Resources
 
 | Folder | Holds |
@@ -241,21 +256,21 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 | `templates/` | scaffolds to fill or modify |
 
 - Keep up to two category files at skill root; otherwise use the matching resource folder. Name linked files for what they hold.
-- **Bundled paths** resolve from the skill base directory, never caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
+- **Bundled paths**, including kind folders, resolve from the skill base directory, never caller CWD; write them relative to the skill root (`references/x.md`). Example: **Run `./scripts/run.py` from this skill's base directory**.
 - **Skill-local resources:** each skill **MUST** bundle required resource files inside its own folder; **MUST NOT** read, link, or execute resource files from another skill's folder. Copy required resources in. Invoking another skill remains allowed.
 - **Keep references one level deep:** `SKILL.md` links every reference directly; references **MUST NOT** load another file. Cite exact headings in already-loaded files instead. Loading chains risk partial reads. See sources below.
 - **Hand-back by action:** a reference returns control by naming the action and the target section's exact heading, never the file name or a step number. Example: "Return control to the orchestrator for *Frontier check*."
 - **Long references:** over 100 lines, start with `## Contents` listing every section by exact heading so previews expose the full scope.
-- **Read references fully:** every pointer to a reference requires reading the whole file; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
+- **Read references fully:** read every required or conditionally triggered reference in full before dependent work; **MUST NOT** preview (`head`, partial ranges). A truncated read continues by range to end of file; a partially read reference counts as not loaded.
 - Use scripts for repetitive or fragile operations. Prefer Python over shell-specific scripts; use the repository-supported Python command.
-- New plugin → register it in the repository's plugin marketplace/manifest in the same change.
+- New plugin → register it in the repository's plugin marketplace/manifest in the same change; this repository uses `.github/plugin/marketplace.json`.
 
 ## Template ownership
 
 - **Template owns rendering; skill owns orchestration.** Template: structure, format, conditions, local constraints. `SKILL.md`: selection, workflow, inputs/outputs, shared rules.
 - `{{value|hint}}` — preferred field-local guidance.
 - `<!-- @: instruction -->` — hidden structural/rendering directive; **MUST** be one terse line.
-- Templates MAY define local **Rules** and **Gotchas**. Move only shared guidance to `SKILL.md` or `references/`.
+- Templates MAY define local **Rules** and **Gotchas**. Keep template-specific guidance in the template; move only shared/cross-template guidance to `SKILL.md` or `references/`.
 
 ## Syntax legend
 
@@ -280,7 +295,7 @@ Run subagents through prose instructions describing task, scope, inputs, constra
 - **Single source of truth:** one meaning, one place within a skill. Duplicate across skills only to preserve skill-local resources.
 - **Environment:** use `package.json`, config, layout, `--help`; record only undiscoverable conventions, reasons, gotchas.
 - **Relevance:** delete unrelated or stale lines.
-- **No-ops** — apply the No-op test in [wording.md](wording.md).
+- **No-ops** — apply No-op test in the already-loaded wording.md; delete stale rules and no-ops.
 
 ## Evaluation
 
@@ -288,8 +303,7 @@ Treat authoring as iterative: run representative tasks without the skill, identi
 
 ## Before finishing
 
-- Executable calls use a standalone form or a compact form covered by a named-dependency contract; workers receive their own loading context.
-
+- Executable calls use a standalone form or a compact form covered by a named-dependency contract; full body, selected route and required-resource loading conditions are explicit, and workers receive their own loading context.
 - Valid frontmatter; trigger-rich description free of forbidden description characters.
 - `SKILL.md` body under 300 lines.
 - No duplicate procedures within a skill; bundled resource paths stay inside the skill folder and resolve.
@@ -297,4 +311,4 @@ Treat authoring as iterative: run representative tasks without the skill, identi
 - Every critical step has a failure policy; every step has a checkable completion condition.
 - No credentials, tokens, or secrets.
 
-Sources: repository `agent-skills.instructions.md`; [mattpocock/skills](https://github.com/mattpocock/skills) `writing-for-agents` and `writing-great-skills` (v1.1.0) GLOSSARY; Agent Skills best practices KB and AI diff review agent KB (October 2026), drawing on the [Agent Skills specification](https://agentskills.io/specification), [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), and OpenAI/Anthropic skill-creator guidance.
+Sources: migrated repository agent-facing authoring instructions; [mattpocock/skills](https://github.com/mattpocock/skills) `writing-for-agents` and `writing-great-skills` (v1.1.0) GLOSSARY; Agent Skills best practices KB and AI diff review agent KB (October 2026), drawing on the [Agent Skills specification](https://agentskills.io/specification), [Anthropic skill best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), and OpenAI/Anthropic skill-creator guidance.
