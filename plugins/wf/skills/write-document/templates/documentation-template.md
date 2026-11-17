@@ -2,6 +2,7 @@
 <!-- @: Rules: preserve caller-owned structures and markers; updates retain unaffected content unless restructuring was requested. -->
 <!-- @: Rules: standalone pages use one H1 and logical heading levels; fragments keep their owner's format; headings name navigable sections and short labels stay within sections. -->
 <!-- @: Rules: use language-tagged code fences, numbered sequences, bullets for unordered items and tables for comparisons or structured facts. -->
+<!-- @: Rules: for Confluence code-fence tags and unsupported-language replacements, apply the router's Confluence formatting; preserve code content. -->
 <!-- @: Rules: prefer relative repository links; preserve destination-specific link constraints and TOC markers; GitHub needs no literal [TOC] directive. -->
 <!-- @: Rules: unknown is not inapplicable; report missing facts separately; never invent content to fill optional sections. -->
 <!-- @: Rules: troubleshooting follows main content and verification, before related documentation; retain evidence-supported causes and conditional fixes only. -->
@@ -58,7 +59,7 @@
 <!-- @: OPTIONAL Examples; include concrete examples that clarify facts or use; tutorial examples belong in the walkthrough. -->
 ## Examples
 
-{{examples|Realistic examples; tag code fences with their language.}}
+{{examples|Realistic examples; tag code fences per the destination's supported languages.}}
 
 <!-- @: OPTIONAL Limitations; include verified boundaries or unsupported cases affecting use. -->
 ## Limitations
