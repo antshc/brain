@@ -129,6 +129,8 @@ After each check, append the result per [Hypothesis log](references/hypothesis-l
 
 Run this phase only for an explicit fix request with a confirmed cause.
 
+*Load and follow the `principles` skill to load `Encode lessons in structure` and apply it to the root-cause fix.* Preserve the confirmed mechanism and fix scope.
+
 Write the regression test **before the fix**, but only if there is a **correct seam** for it.
 
 A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
