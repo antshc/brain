@@ -80,6 +80,6 @@ Report **coverage complete | incomplete** with omitted or inaccessible scope, se
 
 ## Final prose check
 
-*Load and follow the `writing-style` skill to apply clear, precise writing to review prose with unslop and remove AI tells* using **Unslop only** on the assembled report. Edit prose only. Preserve citations, commands, observed output, proof status, and risk judgments. Strip private details before sharing publicly.
+*Load and follow the `writing` skill to tighten the assembled blast-radius report; select the applicable route.* Edit prose only. Preserve citations, commands, observed output, proof status, and risk judgments. Strip private details before sharing publicly.
 
 **Reply:** one final report following the loaded report contract, not concatenated Prove reports.

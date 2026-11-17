@@ -1,18 +1,5 @@
 # Sharpen
 
-Select mode from the request; default **Deepen**. Run both, Restate first, when the user asks for both.
-
-| Mode | Trigger |
-|---|---|
-| **Deepen** | sharpen, deepen, rewrite prompt, no mode named |
-| **Restate** | in your own words, restate, what am I trying to solve |
-
-## Restate
-
-Restate in your own words what you think the user's goals are and what problem they're trying to solve.
-
-## Deepen
-
 Make the task deeper, not bigger. Before rewriting it, do four things:
 
 1. Say what a top professional in this field would do here that the user is not asking for.
@@ -22,4 +9,4 @@ Make the task deeper, not bigger. Before rewriting it, do four things:
 
 Then rewrite the user's prompt to ask for exactly that.
 
-Leave choices that are the user's to make open instead of deciding them.
+Have the rewritten prompt ask the agent to prototype any choice an experiment can settle and recommend an option based on what it observed. Leave product or preference choices that no experiment can settle for the user to make.

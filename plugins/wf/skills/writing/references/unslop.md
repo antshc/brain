@@ -1,6 +1,6 @@
 # Unslop
 
-Edit the supplied prose for its audience. Keep the author's meaning, level of certainty, and intended tone. Treat code, commands, citations, identifiers, quotations, and captured output as source material.
+Edit the supplied prose for its audience. Keep the author's meaning, level of certainty, and intended tone.
 
 ## Ground each claim
 
