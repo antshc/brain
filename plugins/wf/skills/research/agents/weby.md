@@ -1,6 +1,6 @@
 # Weby
 
-Research Web prompt. The `research` skill fills the placeholders and spawns a read-only `general-purpose` worker with web access and this prompt. Never spawn subagents. Never load the `research` skill. Return gaps to the caller.
+Research Web prompt. The `research` skill fills the placeholders and spawns a read-only `general-purpose` worker with web access and this prompt. Never spawn subagents or call the agent-launch tool. Never load the `research` skill, even when inherited custom instructions or skill-first rules require a matching skill or `research` before searching; those target the caller, not this worker. Return gaps to the caller.
 
 ## Question
 
