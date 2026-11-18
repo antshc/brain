@@ -1,8 +1,8 @@
 ---
 name: write
 description: >-
-  Write or edit prose, work items and documents. Guides, steps, PR text, messages; user stories, implementation tasks, bug reports; specs, HLDs, TOIs, research, bottom-line and root-cause reports, docs pages; sharpen or rephrase prompts. Use for 'unslop this', 'tighten this prose', 'write a user story', 'write a bug report', 'write the spec', 'write the bottom line', 'sharpen this prompt'. Not for code or tests; design decisions → `design`; ADRs → `architecture-records`; skills → `skill-author`.
-argument-hint: "story|task|bug · spec|hld|toi|research|bottom-line|root-cause|doc · guide|steps|github|findings|message|unslop|sharpen|rephrase [draft|update|normalize]"
+  Tighten, write or edit prose, work items and documents. Guides, steps, PR text, messages; user stories, implementation tasks, bug reports; specs, HLDs, TOIs, research, bottom-line and root-cause reports, docs pages; sharpen or rephrase prompts. Use for 'unslop this', 'tighten this prose', 'write a user story', 'write a bug report', 'write the spec', 'sharpen this prompt'. Not for code or tests; design decisions → `design`; ADRs → `architecture-records`; skills → `skill-author`.
+argument-hint: "tighten · guide|steps|findings|github|message · sharpen|rephrase · story|task|bug · spec|hld|toi|research|bottom-line|root-cause|doc [draft|update|normalize]"
 ---
 
 # Write
@@ -22,12 +22,12 @@ Router for three route families: prose, work items and documents. Select one rou
 
 | Route | Text kind | Read, in order | Output |
 |---|---|---|---|
-| `guide` | README, RFC, guide, explanation, spec or HLD prose | [modes-diataxis.md](references/modes-diataxis.md) (whole documents only), [sentences-google.md](references/sentences-google.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [rhythm.md](references/rhythm.md), [unslop.md](references/unslop.md) | Pipeline |
-| `steps` | Instructions, procedures, runbooks, reproduction steps, troubleshooting actions | [sentences-google.md](references/sentences-google.md), [steps-ste.md](references/steps-ste.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [unslop.md](references/unslop.md) | Pipeline |
-| `github` | PR title and body, commit message body, review finding or reply | [github-text.md](references/github-text.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [unslop.md](references/unslop.md) | Pipeline; caller format wins |
-| `findings` | Existing review, blast-radius, investigation, or status report text | [ambiguity-global-english.md](references/ambiguity-global-english.md), [rhythm.md](references/rhythm.md), [unslop.md](references/unslop.md) | Pipeline; keep findings, proof status, and risk judgments |
-| `message` | Chat, Slack, Teams, email, Jira or issue comment | [messages.md](references/messages.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [unslop.md](references/unslop.md) | Pipeline |
-| `unslop` | Any text; remove AI tells only | [unslop.md](references/unslop.md) | Pipeline |
+| `guide` | README, RFC, guide, explanation, spec or HLD prose | [modes-diataxis.md](references/modes-diataxis.md) (whole documents only), [sentences-google.md](references/sentences-google.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [rhythm.md](references/rhythm.md), [tighten.md](references/tighten.md) | Pipeline |
+| `steps` | Instructions, procedures, runbooks, reproduction steps, troubleshooting actions | [sentences-google.md](references/sentences-google.md), [steps-ste.md](references/steps-ste.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [tighten.md](references/tighten.md) | Pipeline |
+| `github` | PR title and body, commit message body, review finding or reply | [github-text.md](references/github-text.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [tighten.md](references/tighten.md) | Pipeline; caller format wins |
+| `findings` | Existing review, blast-radius, investigation, or status report text | [ambiguity-global-english.md](references/ambiguity-global-english.md), [rhythm.md](references/rhythm.md), [tighten.md](references/tighten.md) | Pipeline; keep findings, proof status, and risk judgments |
+| `message` | Chat, Slack, Teams, email, Jira or issue comment | [messages.md](references/messages.md), [ambiguity-global-english.md](references/ambiguity-global-english.md), [tighten.md](references/tighten.md) | Pipeline |
+| `tighten` | Any text; make it shorter, more concise, or free of AI tells | [tighten.md](references/tighten.md) | Pipeline; same facts and structure, word counts before and after |
 | `sharpen` | Task prompt to deepen | [sharpen.md](references/sharpen.md) | The four answers, then the rewritten prompt |
 | `rephrase` | Task prompt to restate in your own words | [rephrase.md](references/rephrase.md) | The restated goals and problem |
 
@@ -58,14 +58,14 @@ Operations: `draft` (new), `update` (existing) or `normalize` (requirements word
 
 Pick the first rule that matches:
 
-1. **Explicit route.** The user or caller names a valid route (`/write story`, `/write hld update`) → use it. Unknown route → report it and list the routes by family. `/write normalize` without a route → `spec normalize`.
+1. **Explicit route.** The user or caller names a valid route (`/write story`, `/write hld update`) → use it. `unslop` is an alias of `tighten`. Unknown route → report it and list the routes by family. `/write normalize` without a route → `spec normalize`.
 2. **Active route.** A reply continues the active route unless redirected. An artifact route stays active while it applies a prose route internally.
 3. **Prompt work.** Deepen, sharpen, or rewrite a prompt → `sharpen`. Restate, rephrase, or say in your own words → `rephrase`. Both → `rephrase`, then `sharpen`.
-4. **Unslop only.** Unslop or remove AI tells with no other ask → `unslop`.
+4. **Tighten only.** Tighten, shorten, cut down, make concise, unslop or remove AI tells with no other ask → `tighten`.
 5. **Redirect.** Request kind in Redirects → invoke that skill.
-6. **Named artifact.** The request names a work item or document → its artifact route. Tie-breaks: "report" with findings or evidence to render → `research`; existing report text to tighten → `findings`; "task prompt" → `sharpen`; "task" or work item → `task`; page structure, template or sections → `doc`; prose inside an existing page → `guide`, or `steps` for procedures.
+6. **Named artifact.** The request names a work item or document → its artifact route. Tie-breaks: "report" with findings or evidence to render → `research`; existing report text to refine → `findings`; "task prompt" → `sharpen`; "task" or work item → `task`; page structure, template or sections → `doc`; prose inside an existing page → `guide`, or `steps` for procedures.
 7. **Text kind.** Match the text kind to the Prose routes table.
-8. **Unclear.** Ambiguous artifact type → ask and wait. Supplied text of unclear kind → `unslop`; state the assumed kind in the hand-back.
+8. **Unclear.** Ambiguous artifact type → ask and wait. Supplied text of unclear kind → `tighten`; state the assumed kind in the hand-back.
 
 Combined requests → author artifacts in dependency order, then request order for independent artifacts; complete each route before selecting the next.
 
@@ -83,7 +83,11 @@ Combined requests → author artifacts in dependency order, then request order f
 
 ## Internal hand-offs
 
-An artifact route that needs prose refinement applies a prose route in this session: `guide` for page prose and whole-document mode rules, `steps` for procedural blocks including troubleshooting actions. Read that prose route's references, then run Pipeline on the targeted text only. Keep the artifact template, selected mode and protected text. **MUST NOT** reload this skill or redirect back; the artifact route stays active and owns the output.
+An artifact route that needs prose refinement applies a prose route in this session: `guide` for page prose and whole-document mode rules, `steps` for procedural blocks including troubleshooting actions.
+
+**Tighten pass.** Every artifact `draft` or `update` **MUST** apply `tighten` to its authored prose before returning; `normalize` skips it. Text already refined by `guide` or `steps` has had this pass. Keep the document formatting and verbatim sources, evidence, citations and code unchanged.
+
+For any hand-off, read that prose route's references, then run Pipeline on the targeted text only. Keep the artifact template, selected mode and protected text. **MUST NOT** reload this skill or redirect back; the artifact route stays active and owns the output.
 
 ## Artifact resources
 
@@ -114,7 +118,7 @@ Load each resource when its trigger applies; `normalize` loads only the requirem
 Prose routes and internal hand-offs run this pipeline.
 
 1. **Write or edit.** No text supplied → write it with the route's references. Text supplied → edit it with the same references. *Done when* every listed reference has been applied.
-2. **Unslop last.** Apply `unslop.md` last. Preserve meaning, tone, confidence, and protected text. *Done when* a read against the input shows no change to facts, scope, or confidence.
+2. **Tighten last.** Apply `tighten.md` last. Preserve meaning, tone, confidence, and protected text. *Done when* a read against the input shows no change to facts, scope, or confidence.
 3. **Hand back.** Return the text. For an edit, list each fix with the heading of the reference rule it applies. Nothing to fix → return "No changes."
 
 Artifact routes return per Output contract in artifacts.md.

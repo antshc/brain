@@ -1,6 +1,39 @@
-# Unslop
+# Tighten
 
-Edit the supplied prose for its audience. Keep the author's meaning, level of certainty, and intended tone.
+Edit the supplied prose for its audience: cut words, not information, and remove AI tells. Keep the author's meaning, every fact, condition, number and caveat, the level of certainty, the intended tone and protected text. Keep sentences grammatical; tightened text is still written for people.
+
+**Formatting is structure, not wording.** Keep every heading, its level and order, every list, table, row, column, code fence, link, template section and structural marker. Edit only the words inside them. Remove a list item or table row only when it duplicates another.
+
+## Cut what the reader already has
+
+Delete sentences that restate a heading, the previous sentence or a later summary. Delete announcements of what the text is about to say. Keep one statement of each point, in its most useful place.
+
+| Pattern | Before | After |
+|---|---|---|
+| Restated heading | `## Retries` The following section describes how retries work. The worker retries a failed write once. | `## Retries` The worker retries a failed write once. |
+| Restated point | The cache expires after 10 minutes. After 10 minutes, cached entries are no longer valid. | The cache expires after 10 minutes. |
+| Recap | In summary, the worker retries once and then records the batch ID. | Delete when the paragraph above already says it. |
+
+## Use the short form
+
+Turn noun phrases back into verbs. Drop words implied by their partner. Replace multi-word phrases with one word.
+
+| Pattern | Before | After |
+|---|---|---|
+| Nominalization | The service performs validation of the token. | The service validates the token. |
+| Redundant pair | Each and every request must include a valid and correct token. | Every request must include a valid token. |
+| Implied word | The batch is retried again at a later point in time. | The batch is retried later. |
+| Wordy phrase | In order to export the file, due to the fact that the job is running, … | To export the file, because the job is running, … |
+| Empty subject | There are three workers that read from the queue. | Three workers read from the queue. |
+
+## Merge what shares a subject
+
+Combine consecutive sentences with the same actor or object into one sentence when it stays easy to parse. Split again if the merged sentence needs a second reading.
+
+| Pattern | Before | After |
+|---|---|---|
+| Same actor | The worker reads the batch. The worker writes it to storage. The worker then deletes the message. | The worker reads the batch, writes it to storage and deletes the message. |
+| Same object | The token expires after one hour. The token cannot be renewed. | The token expires after one hour and cannot be renewed. |
 
 ## Ground each claim
 
@@ -50,7 +83,7 @@ Use sentence case, straight quotes and meaningful bold. Remove decorative emoji 
 
 ## Read it as the recipient
 
-Remove empty greetings, praise, canned closings and padding. Keep meaningful qualifiers; remove repetitive hedging. Check natural rhythm, then compare facts, scope and confidence with the input.
+Remove empty greetings, praise, canned closings and padding. Keep meaningful qualifiers; remove repetitive hedging. Check natural rhythm, then compare against the input: every fact, condition and caveat survives, and no claim became stronger or weaker.
 
 | Pattern | Before | After |
 |---|---|---|

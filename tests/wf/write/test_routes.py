@@ -4,7 +4,7 @@ import re
 
 SKILLS = Path(__file__).resolve().parents[3] / 'plugins/wf/skills'
 ROOT = SKILLS / 'write'
-PROSE_ROUTES = ('guide', 'steps', 'github', 'findings', 'message', 'unslop', 'sharpen', 'rephrase')
+PROSE_ROUTES = ('tighten', 'guide', 'steps', 'findings', 'github', 'message', 'sharpen', 'rephrase')
 ARTIFACT_ROUTES = ('story', 'task', 'bug', 'spec', 'hld', 'toi', 'research', 'bottom-line', 'root-cause', 'doc')
 
 
@@ -12,13 +12,15 @@ def test_every_route_is_in_the_routing_table_and_its_references_exist():
     entry = (ROOT / 'SKILL.md').read_text()
     for route in PROSE_ROUTES + ARTIFACT_ROUTES:
         assert f'| `{route}` |' in entry
-    for retired in ('how-to', 'report', 'documentation'):
+    for retired in ('how-to', 'report', 'documentation', 'unslop'):
         assert f'| `{retired}` |' not in entry
     for link in ('references/github-text.md', 'references/messages.md',
-                 'references/sharpen.md', 'references/rephrase.md', 'references/artifacts.md'):
+                 'references/sharpen.md', 'references/rephrase.md', 'references/artifacts.md',
+                 'references/tighten.md'):
         assert f']({link})' in entry
         assert (ROOT / link).is_file()
     assert not (ROOT / 'references/docs-and-prs.md').exists()
+    assert not (ROOT / 'references/unslop.md').exists()
     assert not (SKILLS / 'writing-style').exists()
 
 
@@ -60,6 +62,14 @@ def test_artifact_routes_refine_prose_without_reloading_the_skill():
     for route in ('`guide`', '`steps`'):
         assert route in doc
     assert "router's Internal hand-offs" in doc
+
+
+def test_artifact_routes_always_tighten_and_keep_formatting():
+    entry = (ROOT / 'SKILL.md').read_text()
+    tighten = (ROOT / 'references/tighten.md').read_text()
+    assert 'Every artifact `draft` or `update` **MUST** apply `tighten`' in entry
+    assert "apply the router's Tighten pass" in (ROOT / 'references/artifacts.md').read_text()
+    assert '**Formatting is structure, not wording.**' in tighten
 
 
 def test_callers_let_write_select_the_route():
