@@ -1,6 +1,6 @@
-# Work requirements terms
+# Requirements terms
 
-Apply these swaps only to authored story behavior, task acceptance criteria and bug expected behavior. Preserve glossary terms, verbatim sources, technical scope, structural relocation constraints, reproduction and actual results; do not infer new commitments from a swap.
+Apply these swaps only to authored story behavior, task acceptance criteria, bug expected behavior, behavioral requirements in specs/HLDs and required-behavior statements in TOI. Preserve glossary terms, verbatim sources, technical scope, structural relocation constraints, reproduction, actual results, HLD decisions/contracts and implemented TOI facts; do not infer new commitments from a swap.
 
 Anchor the intent with a reject/prefer pair:
 
