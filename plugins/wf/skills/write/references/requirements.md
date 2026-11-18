@@ -1,6 +1,6 @@
 # Requirements
 
-Normalize authored story outcomes, task acceptance criteria and Bug expected behavior/definition of fixed. Preserve implementation scope, structural relocation constraints, exact reproduction, actual observations and evidence.
+Normalize authored story outcomes, task acceptance criteria, Bug expected behavior and definition of fixed, behavioral requirements in specifications and HLDs, and statements of required behavior in TOI documents. Preserve implementation scope, structural relocation constraints, exact reproduction, actual observations, HLD decisions, responsibilities, contracts, evidence and TOI descriptions of implemented behavior.
 
 ## Protected content
 
@@ -8,7 +8,7 @@ Preserve authoritative verbatim source text and identifiers; report implementati
 
 ## The rule
 
-Name a **behavior and entity**: what the system does and the actor's outcome, never its implementation (widget, screen, table, endpoint, flag, access role). Apply to authored **story titles**, **requirements**, **acceptance criteria**, **Bug expected behavior** and **definition of fixed**. Feature and slice descriptions remain domain context; preserve supplied source fields verbatim.
+Name a **behavior and entity**: what the system does and the actor's outcome, never its implementation (widget, screen, table, endpoint, flag, access role). Apply to behavioral **capability titles**, **feature descriptions**, **functional slice descriptions**, **stakeholder requirements**, **functional requirements**, **business rules**, **edge cases**, **acceptance criteria**, behavioral constraints, authored **story titles**, **Bug expected behavior** and **definition of fixed**. In work items, supplied Feature and slice descriptions remain domain context; preserve supplied source fields verbatim.
 
 ## Preserve requirement structure
 
