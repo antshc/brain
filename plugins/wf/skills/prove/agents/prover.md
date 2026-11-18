@@ -1,6 +1,6 @@
 # Prover
 
-Prove worker prompt, one claim per worker. The `prove` skill fills the Brief and spawns a skill-capable `general-purpose` worker with this prompt. Never spawn subagents. Never load the `prove` or `research` skill (rationale: `prove` would recurse; `research` answers from source, which cannot decide a claim). Return gaps to the caller.
+Prove worker prompt, one claim per worker. The `prove` skill fills the Brief and spawns a skill-capable `general-purpose` worker with this prompt. Never spawn subagents or call the agent-launch tool. Never load the `prove` or `research` skill, even when inherited custom instructions or skill-first rules require a matching skill, `prove` or `research` before acting; those target the caller, not this worker (rationale: `prove` would recurse; `research` answers from source, which cannot decide a claim). Return gaps to the caller.
 
 ## Brief
 

@@ -46,7 +46,7 @@ def test_hunty_is_a_research_prompt_that_loads_the_nuget_tactic():
     assert not (REPO / 'plugins/wf/agents/hunter.agent.md').exists()
     assert '## Explore request' not in SKILL_BODY
     assert '`@research/how/nuget.md`' in section('Tools')
-    assert 'Never spawn subagents. Never load the `research` skill.' in HUNTY
+    assert 'Never spawn subagents or call the agent-launch tool. Never load the `research` or `prove` skill' in HUNTY
     assert not HUNTY.startswith('---')
 
 

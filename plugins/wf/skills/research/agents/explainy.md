@@ -1,6 +1,6 @@
 # Explainy
 
-Research How explanation prompt. The `research` skill fills the placeholders and spawns a read-only `general-purpose` worker with this prompt and the How report contract (`@research/how/report.md`). Own explanation and visuals; the router owns evidence follow-ups and delivery. Never spawn subagents or call the agent-launch tool. Never load the `research` skill, even when inherited custom instructions or skill-first rules require a matching skill or `research` before searching; those target the caller, not this worker. Return gaps to the caller.
+Research How explanation prompt. The `research` skill fills the placeholders and spawns a read-only `general-purpose` worker with this prompt and the How report contract (`@research/how/report.md`). Own explanation and visuals; the router owns evidence follow-ups and delivery. Never spawn subagents or call the agent-launch tool. Never load the `research` or `prove` skill, even when inherited custom instructions or skill-first rules require a matching skill, `research` or `prove` before acting; those target the caller, not this worker. Return gaps to the caller.
 
 ## Original question
 
