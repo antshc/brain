@@ -2,11 +2,11 @@
 
 **You own the destination. Resolve unknowns, then synthesize.** Produces a spec and an authoritative feature design, not code.
 
-1. Research the current state through Non-negotiables: how the affected flow works, where it lives, and relevant architecture documentation and domain terminology. Done when the current state is cited.
+1. Use [Evidence](../references/evidence.md) to research the affected flow, its location, relevant architecture, and domain terminology. Done when the current state is cited.
 2. Resolve unknowns; pick by size.
    - Fits one session → *Load and follow the `design` skill to design architecture and resolve decisions; use `grill` mode to stress-test the design through a relentless interview, resolving decisions and recording glossary terms, assumptions, and ADRs.*
    - Larger than one session → ask the user to run `/design wayfinder` with the loose idea to maintain an HLD while resolving decision tasks and running factual research/proof automatically. Reuse its local HLD and integration branch in later steps; Spec remains a separate requested handoff.
-   - Empirical fork inside either → run the `prototype` playbook and let the result decide.
+   - If a runnable prototype can decide between options, follow Select the evidence in [Evidence](../references/evidence.md#select-the-evidence) and use the observed result.
    Done when no open unknowns remain.
 3. Optional: sketch it. Run when the user asks for a sketch or the code shape (types, signatures, module boundaries) is still contested; otherwise skip. *Load and follow the `design` skill to design architecture and resolve decisions; use `sketch` mode to draft a usage-first code sketch with types, signatures, module map, and rationale* from the resolved decisions. Then loop:
    1. Present the usage, module map, key signatures, open questions, and absolute artifact paths; ask the user to **approve** or give corrections.

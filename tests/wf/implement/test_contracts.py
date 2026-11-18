@@ -424,10 +424,9 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert '`ready`' in workflow and 'blocked/incomplete' in workflow
     post = (FACTORY / 'references/post-implementation.md').read_text()
     review = post.split('## Code review\n')[1].split('\n## ')[0]
-    assert '**Review** playbook' in review
-    proof_review = (FACTORY / 'playbooks/review.md').read_text()
-    assert proof_review.index('`review` skill') < proof_review.index('Read back the actual published comments') < proof_review.index('`prove` skill')
-    assert 'selecting `code`' in proof_review
+    assert '[Review](review.md)' in review
+    assert review.index('[Review](review.md)') < review.index('proof summary') < review.index('[HITL]')
+    assert 'explicitly requested human review' in review
     assert 'fresh detached worktree' in review
     assert 'This phase never fixes code' in review
     assert 'corrective replies and applicable resolutions are verified' in review
@@ -438,6 +437,42 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert 'do not restart Address' in finalize
     assert 'Diagnose' not in finalize
     assert 'two verifier fix attempts' in finalize
+
+
+def test_factory_routes_help_and_discloses_hitl_dependencies():
+    router = (FACTORY / 'SKILL.md').read_text()
+    selection = router.split('## Select a route\n')[1].split('## Routes')[0]
+    assert selection.index('Resume an active route') < selection.index('no clear match')
+    assert 'original request' in selection and '`help <request>`' in selection
+    help_text = (FACTORY / 'help.md').read_text()
+    assert 'Wait for the user' in help_text
+    assert 'Load the chosen route only then' in help_text
+    table = router.split('| Route |')[1].split('## Load shared instructions')[0]
+    assert '| `review` |' not in table
+    assert '| Fallback |' not in table
+    hitl_row = next(row for row in table.splitlines() if row.startswith('| `hitl` |'))
+    for dependency in ('(playbooks/hitl.md)', '(references/review.md)', '[review]', '[github]', '[prove]'):
+        assert dependency in hitl_row
+
+
+def test_factory_proof_summary_precedes_human_review():
+    assert not (FACTORY / 'playbooks/review.md').exists()
+    review = (FACTORY / 'references/review.md').read_text()
+    code = review.index('using route `code`')
+    read_back = review.index('Read back the actual published comments')
+    prove = review.index('`prove` skill')
+    proof_summary = review.index('**Proof report**')
+    assert code < read_back < prove < proof_summary
+    assert review.count('`prove` skill') == 1
+
+    hitl = (FACTORY / 'playbooks/hitl.md').read_text()
+    assert hitl.index('(../references/review.md)') < hitl.index('**Proof report**')
+    assert hitl.index('**Proof report**') < hitl.index('using route `hitl`') < hitl.index('**Changes brief**')
+    assert 'approve the exact text' in hitl
+
+    shipping = (FACTORY / 'references/shipping.md').read_text()
+    assert shipping.index('[Review](review.md)') < shipping.index('[HITL]')
+    assert 'explicitly requested' in shipping
 
 
 def test_implementation_handoff_contains_routing_and_durable_data_pointers():
