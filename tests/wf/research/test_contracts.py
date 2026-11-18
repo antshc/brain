@@ -69,7 +69,7 @@ def test_agent_prompts_never_nest_and_have_model_roles():
     for agent in AGENTS:
         prompt = (ROOT / f'agents/{agent}.md').read_text()
         assert not prompt.startswith('---'), agent
-        assert 'Never spawn subagents. Never load the `research` skill.' in prompt, agent
+        assert 'Never spawn subagents or call the agent-launch tool. Never load the `research` or `prove` skill' in prompt, agent
         assert f'| {agent} |' in models, agent
     assert 'Only this skill spawns research agents' in ENTRY
     assert '*Load and follow the `subagents` skill to select the model and effort for a named subagent role*' in ENTRY
