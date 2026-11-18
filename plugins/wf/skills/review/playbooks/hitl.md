@@ -103,7 +103,7 @@ Drafts, approves, and posts one review comment.
 
 2.1 `EXPLANATION` — why it matters (correctness, readability, performance, maintainability). Apply the comment's Tone rules; its wording carries into the drafted body.
 
-2.2 `IMPROVEMENT` — concrete fix or direction, offered as an option. Draft the comment, then run the Reviews unslop pass over `EXPLANATION` and the body. *Done when* the pass ran and no command, prohibition, or judgmental qualifier remains in either.
+2.2 `IMPROVEMENT` — concrete fix or direction, offered as an option. Draft the comment, then run the Reviews tighten pass over `EXPLANATION` and the body. *Done when* the pass ran and no command, prohibition, or judgmental qualifier remains in either.
 
 2.3 `REVIEW_COMMENT` — the complete returned human-owned body. Keep it unmarked for manual closure; agent drafting does not transfer ownership.
 

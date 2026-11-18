@@ -147,12 +147,12 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 
 - [design](plugins/wf/skills/design/SKILL.md): `grill` for decision interviews, `sketch` for a single-pass usage-first code sketch, `spec` for GitHub or offline specs, and `tasks` for approved implementation breakdowns, `wayfinder` for decision maps, and `review` for technical design review.
 - [factory-mode Stories playbook](plugins/wf/install/assets/factory-mode/playbooks/stories.md): turn requirements, `/design spec` output, or feature design into an approved ordered story list, with numbered headings, dependencies, Jira metadata, and one `write story` run per row. Requires repo-level `factory-mode` installation.
-- [write](plugins/wf/skills/write/SKILL.md): one writing skill with three route families. Prose routes refine guides, steps, GitHub text, findings and messages, and sharpen or rephrase prompts. Work item routes write stories, implementation tasks and bug reports. Document routes write specifications, HLDs, TOI documents, research reports, bottom lines, root-cause reports and docs pages. Owns the templates and requirements wording.
+- [write](plugins/wf/skills/write/SKILL.md): one writing skill with three route families. Prose routes tighten any text and remove AI tells, refine guides, steps, findings, GitHub text and messages, and sharpen or rephrase prompts. Work item routes write stories, implementation tasks and bug reports. Document routes write specifications, HLDs, TOI documents, research reports, bottom lines, root-cause reports and docs pages. Owns the templates and requirements wording.
 - [github](plugins/wf/skills/github/SKILL.md): route Git conventions, branches, commits, owned worktrees, specs, issues, PRs, review discussions, and checks through one skill and CLI. Install WF for Factory Mode's GitHub routes.
 - [implement](plugins/wf/skills/implement/SKILL.md): integrate the task graph sequentially or through parallel worktrees into a draft PR; hand off app verification and code review to factory mode.
 - [doc-diagram](plugins/wf/skills/doc-diagram/SKILL.md): document architecture, behavior, or code structure as Mermaid diagrams and deltas.
 - [doc-contracts](plugins/wf/skills/doc-contracts/SKILL.md): document contract deltas.
-- [write](plugins/wf/skills/write/SKILL.md): write, edit, or unslop prose; sharpen or rephrase a task prompt.
+- [write](plugins/wf/skills/write/SKILL.md): write, edit, or tighten prose; sharpen or rephrase a task prompt.
 - [suggest](plugins/wf/skills/suggest/SKILL.md): propose improvements, options, or ideas with reasoning; never apply without approval.
 - [prove](plugins/wf/skills/prove/SKILL.md): confirm or refute one or more technical claims with reproducible evidence, one parallel prover worker per claim.
 - [challenge-this](plugins/wf/skills/challenge-this/SKILL.md): try to break a change or design; report problems shown by a run.
