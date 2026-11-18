@@ -90,7 +90,7 @@ def test_incremental_synthesis_keeps_evidence_and_status_separate():
     for contract in ('Update matching subjects and sections in place',
                      'Preserve verified findings and human decisions',
                      'Avoid duplicate findings, references and outcome rows',
-                     '**Not confirmed**', '`write-document` skill', '`research update`',
+                     '**Not confirmed**', '`write` skill', '`research update`',
                      'repository-relative links', 'first unconfirmed synchronization step',
                      'A no-change rerun creates no commit'):
         assert contract in LIVING

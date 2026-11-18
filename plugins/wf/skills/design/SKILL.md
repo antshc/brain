@@ -1,7 +1,7 @@
 ---
 name: design
 description: >-
-  Design architecture, resolve decisions, and coordinate specs, HLDs and task breakdowns. Use for 'architect this', 'grill this', 'publish HLD to Confluence', or 'design review'. Drafting belongs to `write-work` and `write-document`; PR review belongs to `review`.
+  Design architecture, resolve decisions, and coordinate specs, HLDs and task breakdowns. Use for 'architect this', 'grill this', 'publish HLD to Confluence', or 'design review'. Drafting belongs to `write`; PR review belongs to `review`.
 ---
 
 # Design
@@ -25,7 +25,7 @@ One entry point; route to one playbook. Do not load unrelated routes.
 2. Select `tasks`, `wayfinder`, or `review` only on an explicit user request, including clear natural language relayed by a caller. Task publication requires separate approval of the breakdown; Wayfinder automatically runs in-scope factual research and proof; human choices stay interactive. Publication requires an explicit `publish-hld` request; HLD synthesis and Wayfinder completion never select it automatically.
 3. Select `sketch` for an explicit standalone request or as a Deep Module/Wayfinder helper without implementation. General code-shape or multi-candidate work selects `architect`. `deep-module` generates option sketch packages standalone or for Wayfinder/Architect; Wayfinder retains Prove/Experiment and sketch prototypes in owned result worktrees until explicit user approval; Challenge this verification integrates automatically and updates fog/HLD without approval; Contract Options require user Choice. Empirical checks and adversarial review belong to the standalone Prove and Challenge this skills.
 4. Select `hld` only for an explicit request to create or update a high-level design or feature design, including `/design hld`. Wayfinder may select it for its living HLD and subsequent updates. A spec or design supplied as input alone does not select it.
-5. Read the selected playbook fully before acting and required resources fully before use. For `hld`, the playbook prepares evidence and invokes `write-document hld`; Write document owns template loading, rendering and merge checks. Wayfinder loads Grill for separate destination and breadth-first frontier interviews, one question at a time, then applies its small-effort decision before map setup. Continue standalone Grill to Spec only after a requested handoff and closing sweep. Wayfinder synchronizes confirmed outcomes automatically and retains control.
+5. Read the selected playbook fully before acting and required resources fully before use. For `hld`, the playbook prepares evidence and invokes `write hld`; Write owns template loading, rendering and merge checks. Wayfinder loads Grill for separate destination and breadth-first frontier interviews, one question at a time, then applies its small-effort decision before map setup. Continue standalone Grill to Spec only after a requested handoff and closing sweep. Wayfinder synchronizes confirmed outcomes automatically and retains control.
 
 ## Conditional resources
 
@@ -47,7 +47,7 @@ Read triggered resources fully before use; resolve from this skill directory.
 
 Wayfinder keeps only concerns too vague to frame as a topic in Not yet specified; precise questions/risks belong to typed topics or retained pending proposals; HLD Open Questions are user-owned presentation content. Evidence is local-only: no research/proof/sketch appendices, Confluence subpages or artifact attachments.
 
-Wayfinder additionally reads the full Grill playbook for interviews and, after the mapped-effort decision, the full HLD orchestration playbook for the Write document handoff, using the route table above. Spec remains a separate explicitly requested route; Wayfinder does not select it as an output format.
+Wayfinder additionally reads the full Grill playbook for interviews and, after the mapped-effort decision, the full HLD orchestration playbook for the Write handoff, using the route table above. Spec remains a separate explicitly requested route; Wayfinder does not select it as an output format.
 
 ## Work item approval
 
@@ -95,4 +95,4 @@ For standalone Architect, Sketch, Deep-module and their evidence calls, use `<re
 - `sketch/` contains language-native source files with `not implemented` bodies, not Markdown with embedded code; `module-map.md` maps them to repo-relative targets. `rationale.md` contains usage, decisions, alternatives, and open questions. The complete `synthesis/` package is the only accepted design handed to Spec; never publish raw candidates.
 - Before grounding, read present repository architecture, relevant ADRs, Concepts, and glossary. Preserve their terms and boundaries; document conflicts as open questions and raise them during review. Pass source paths to delegated runners.
 - Wayfinder retains accepted sketches and proof evidence under `docs/prototype/<initiative-slug>/`, Research under `docs/research/<initiative-slug>/`; its playbook owns exact destinations, prototype approval and local integration. Prove/Experiment and sketch prototypes require owned worktrees and explicit payload approval before local merge. Challenge this requires no approval: isolate code changes/test execution in an owned worktree, then integrate evidence and update fog/HLD automatically. Standalone temporary roots remain unchanged.
-- `hld` coordinates Write document authoring of authoritative feature-design documents in `docs/ongoing/{{initiativeSlug}}.md`; `factory-mode stories` owns story breakdown.
+- `hld` coordinates Write authoring of authoritative feature-design documents in `docs/ongoing/{{initiativeSlug}}.md`; `factory-mode stories` owns story breakdown.
