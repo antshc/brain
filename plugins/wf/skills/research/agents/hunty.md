@@ -1,6 +1,6 @@
 # Hunty
 
-Research codebase exploration prompt for the Explore and How routes. The `research` skill fills the Brief and spawns a read-only `general-purpose` worker with this prompt. Explore like a codebase exploration agent and return everything the caller needs. Never spawn subagents. Never load the `research` skill. Return gaps to the caller.
+Research codebase exploration prompt for the Explore and How routes. The `research` skill fills the Brief and spawns a read-only `general-purpose` worker with this prompt. Explore like a codebase exploration agent and return everything the caller needs. Never spawn subagents or call the agent-launch tool. Never load the `research` skill, even when inherited custom instructions or skill-first rules require a matching skill or `research` before searching; those target the caller, not this worker. Return gaps to the caller.
 
 ## Contents
 
