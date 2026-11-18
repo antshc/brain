@@ -9,7 +9,7 @@ from atl_cli.page_diagrams.pipeline import convert_markdown_to_adf
 
 
 def test_instantiated_hld_keeps_requirements_and_all_diagrams_inside_expands():
-    template = (Path(__file__).resolve().parents[4] / "plugins/wf/skills/write-document/templates/hld-template.md").read_text()
+    template = (Path(__file__).resolve().parents[4] / "plugins/wf/skills/write/templates/hld-template.md").read_text()
     markdown = template.split("````markdown\n", 1)[1].split("\n````", 1)[0]
     diagram = "```mermaid\nflowchart TD\n    A --> B\n```"
     for placeholder in ("architectureRepresentationDiagram", "crossDeployableFlowDiagram", "functionalSliceBehaviorDiagram", "artifactSpecificContent"):

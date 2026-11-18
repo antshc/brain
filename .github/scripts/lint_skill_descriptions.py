@@ -2,7 +2,7 @@
 """Lint SKILL.md descriptions for trigger overlap and broken redirects.
 
 Checks every skill under `plugins/wf/`:
-- description is at most `MAX_DESCRIPTION_CHARS` characters;
+- description is at most `MAX_DESCRIPTION_CHARS` characters, or its `MAX_OVERRIDES` entry;
 - a quoted trigger phrase is not reused, or nearly reused, by another skill;
 - every `Not for ... → \\`skill\\`` redirect names an existing skill other than itself.
 
@@ -20,6 +20,8 @@ from pathlib import Path
 import yaml
 
 MAX_DESCRIPTION_CHARS = 300
+# The merged `write` router covers prose, work-item and document routes in one description.
+MAX_OVERRIDES = {"write": 500}
 NEAR_DUPLICATE_RATIO = 0.85
 CHECKED_ROOT = Path("plugins/wf")
 IGNORED_PARTS = {"_backup", "_in-progress", "templates", "kbs"}
@@ -82,10 +84,9 @@ def lint(checked: list[Skill], known_names: set[str]) -> list[str]:
     errors: list[str] = []
     seen: list[tuple[str, str, str]] = []
     for skill in checked:
-        if len(skill.description) > MAX_DESCRIPTION_CHARS:
-            errors.append(
-                f"{skill.path}: description is {len(skill.description)} chars, max {MAX_DESCRIPTION_CHARS}"
-            )
+        limit = MAX_OVERRIDES.get(skill.name, MAX_DESCRIPTION_CHARS)
+        if len(skill.description) > limit:
+            errors.append(f"{skill.path}: description is {len(skill.description)} chars, max {limit}")
         for target in redirect_targets(skill.description):
             if target == skill.name:
                 errors.append(f"{skill.path}: 'Not for' redirects to itself")

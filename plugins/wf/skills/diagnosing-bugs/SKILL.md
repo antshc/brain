@@ -168,7 +168,7 @@ For a fix, also verify:
 
 ## Output
 
-For a confirmed cause, *Load and follow the `write-document` skill to write root-cause reports from confirmed evidence* using `root-cause`. Pass the resolved hypothesis log path, checked hypotheses, current-run mechanism evidence and analysis artifacts. Diagnosis retains cause confirmation; the writer renders and prints the report without saving it. Track any user-supplied artifacts used during diagnosis and what each contributed. For a fix, also report the change, regression-test result or missing seam, other instances of the pattern fixed or left, and verification of the original scenario. Include the hypothesis log path.
+For a confirmed cause, *Load and follow the `write` skill to write root-cause reports from confirmed evidence, using route `root-cause`.* Pass the resolved hypothesis log path, checked hypotheses, current-run mechanism evidence and analysis artifacts. Diagnosis retains cause confirmation; the writer renders and prints the report without saving it. Track any user-supplied artifacts used during diagnosis and what each contributed. For a fix, also report the change, regression-test result or missing seam, other instances of the pattern fixed or left, and verification of the original scenario. Include the hypothesis log path.
 
 If the deciding fact took a deep dig to find, propose a cheap always-on signal (log line, metric, assertion, error message) that would have shown it at first look.
 

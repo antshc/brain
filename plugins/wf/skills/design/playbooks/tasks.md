@@ -108,7 +108,7 @@ Ask in ordinary conversation; **MUST NOT** use question/input tools:
 
 Before any write, confirm the approval guard holds for the current breakdown; otherwise return to step 4.
 
-*Load and follow the `write-work` skill to write and update implementation tasks* using `task` once per approved slice. Supply parent Spec, approved scope/exclusions, verbatim requirements, decisions, Concepts/ADRs, affected layers, sketch/artifact excerpts and criteria-to-check mapping. Require complete bodies and return authoring gaps before publication; numbers alone never replace source text. Decomposition, approval, labels and native links remain here.
+*Load and follow the `write` skill to write and update implementation tasks, using route `task`*, once per approved slice. Supply parent Spec, approved scope/exclusions, verbatim requirements, decisions, Concepts/ADRs, affected layers, sketch/artifact excerpts and criteria-to-check mapping. Require complete bodies and return authoring gaps before publication; numbers alone never replace source text. Decomposition, approval, labels and native links remain here.
 
 Branch on mode:
 

@@ -18,7 +18,7 @@ def test_stories_preserves_approval_and_output_contract():
     assert text.index("**Propose breakdown**") < text.index("**Draft each body**")
     assert "wait for explicit approval" in text
     assert "exactly once per approved row" in text
-    assert "`write-work` skill" in text
+    assert "`write` skill" in text
     assert "**Jira ID:**" in text
     assert "**Epic ID:**" in text
     assert "**Blocked by:**" in text
