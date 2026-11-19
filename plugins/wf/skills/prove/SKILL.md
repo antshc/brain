@@ -97,7 +97,7 @@ Report sections: **Question** (Frame block, intent, exclusions), then the worker
 
 ## Cleanup
 
-Save reports, logs and proof patches outside worktrees before removal. Retention requested → keep worktrees and runnable state and hand them back with ownership records. Otherwise remove only Prove-owned resources: workers' reported scratch files, probes, authorized cloud resources and owned worktrees via *Load and follow the `git` skill to remove each owned worktree with its ownership record, using route `Worktrees`.* Never remove supplied checkouts or caller resources. Report cleanup failures and leftovers.
+Save reports, logs and proof patches outside worktrees before removal. Retention requested → keep worktrees and runnable state and hand them back with ownership records. Otherwise remove only Prove-owned resources: workers' reported scratch files, probes, authorized cloud resources and owned worktrees via *Load and follow the `git` skill to remove each owned worktree with its ownership record, using route `Worktrees`.* First revert proof patches in each worktree (patches already saved), then remove with `--discard-ignored` so build output does not block cleanup. Never remove supplied checkouts or caller resources. Report cleanup failures and leftovers.
 
 ## Guardrails
 
