@@ -435,3 +435,6 @@ build/
 .atlassian
 tmp
 .envrc
+
+# Local Python virtual environment
+.venv/
