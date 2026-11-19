@@ -76,7 +76,14 @@ Done when every `issue` carries one class.
 
 **Follow `references/investigation.md`** for the discovery command, the dispatch rules, the prompt template, and the verdict contract.
 
-Done when every `substantive` issue holds a `verdict` backed by at least one `path:line` citation.
+Separate concern validity from remedy selection:
+
+- Verify the claimed problem against the current head, explicit requirements, and established behavior; a review suggestion is not proof.
+- For a valid concern, compare credible remedies by correctness, compatibility, scope, and reversibility. Select the smallest evidence-backed correction; uncertainty about a globally optimal solution alone is not a blocker.
+- Prefer preserving established behavior when compatible with explicit requirements; check semantic equivalence before restoring an earlier implementation or value.
+- Ask only when a missing fact, conflicting requirement, or required authorization blocks a safe choice. Name the blocked decision and give a recommendation when evidence supports one. Without a blocker, carry the selected remedy into implementation.
+
+Done when every `substantive` issue holds a `verdict` backed by at least one `path:line` citation and either a selected remedy, evidence that no change is needed, or a specific blocking question.
 
 ## 7. Resolve each issue on its own
 
@@ -142,5 +149,5 @@ Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is go
 
 - Push to `$headRef` through *Load and follow the `git` skill to run verified branch naming and lifecycle* using Branches with the originally observed remote SHA. `--force`, `--force-with-lease`, `--amend`, and rebasing a pushed commit stay off the table — the reviewer is reading these commits as you write them.
 - One `issue`, one commit. One run, one push.
-- Ask the reviewer outright the moment the `evidence` runs out. A question costs the reviewer less than a wrong guess.
+- Apply the decision rule in Investigate every substantive issue before asking the reviewer; escalate blocking uncertainty, not routine remedy selection.
 - Reply to new work; reconcile unresolved agent threads without duplicate replies. An unanswered question remains open until clarification; a posted answer alone is not completion.
