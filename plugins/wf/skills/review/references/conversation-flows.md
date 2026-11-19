@@ -1,6 +1,6 @@
 # Address PR comments conversation flows
 
-[Address PR comments](../playbooks/comments.md) investigates PR review discussions, fixes verified concerns, and replies through *Load and follow the `github` skill to read pull requests and review threads*.
+[Address PR comments](../playbooks/address.md) investigates PR review discussions, fixes verified concerns, and replies through *Load and follow the `github` skill to read pull requests and review threads*.
 
 These flows describe PR #172 behavior. The gaps below are limitations and proposed follow-ups, not implemented guarantees.
 
@@ -21,7 +21,7 @@ Flow: Review conversation
 2. Reviewer opens a thread.
    → A: /review code finding → Run Agent Review
    → B: Human finding → Run Human Review
-3. On each later /review comments invocation:
+3. On each later /review address invocation:
    → Read full thread.
    → Reevaluate new concerns and answers.
 4. End
@@ -31,13 +31,13 @@ Subflow A: Agent Review
 
 1. /review code posts finding with agent:comment.
    → Same account as PR author is allowed.
-2. /review comments investigates.
+2. /review address investigates.
    → Fix clear: implement → verify → push → reply → resolve.
    → Finding incorrect: explain evidence → resolve.
    → Decision missing: ask focused question → leave open.
 3. Author answers in a new comment.
    → Same account is allowed.
-4. /review comments reevaluates against code and answer.
+4. /review address reevaluates against code and answer.
    → Enough information: fix or explain → resolve when settled.
    → Still unclear: ask focused question → leave open.
 5. No answer:
@@ -49,13 +49,13 @@ Subflow B: Human Review
 
 1. Human posts unmarked finding.
    → Direct comment or human-approved /review hitl comment.
-2. /review comments investigates.
+2. /review address investigates.
    → Agree: implement → verify → push → reply.
    → Unclear: ask focused question.
    → Disagree: explain decisive evidence.
 3. Leave thread open for manual closure.
 4. Reviewer answers or challenges the reply.
-5. /review comments reevaluates the full conversation.
+5. /review address reevaluates the full conversation.
    → Valid concern: fix → verify → push → reply.
    → Missing decision: ask focused question.
    → Disagreement remains: explain tradeoff and request decision.

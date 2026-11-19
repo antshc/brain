@@ -2,7 +2,7 @@
 name: review
 description: >-
   Review code changes, PR comments, downstream risks, and regression coverage. Use for 'review this PR', 'address PR comments', 'blast radius', or 'test gaps'. Not for design review → `design`.
-argument-hint: '<code|comments|blast-radius|tests-gap|hitl> [target] [--axes list] [options]'
+argument-hint: '<code|address|blast-radius|tests-gap|hitl> [target] [--axes list] [options]'
 ---
 
 # Review
@@ -10,7 +10,7 @@ argument-hint: '<code|comments|blast-radius|tests-gap|hitl> [target] [--axes lis
 | Route | Select for | Playbook |
 |---|---|---|
 | `code` | Review a PR for new findings. Accept a PR URL and optional `--axes <list>`; all axes run by default. | [Code review](playbooks/code.md) |
-| `comments` | Investigate and address existing PR review threads. Accept a PR URL. | [PR comments](playbooks/comments.md) |
+| `address` | Investigate and address existing PR review threads. Accept a PR URL. | [Address PR comments](playbooks/address.md) |
 | `blast-radius` | Assess downstream breakage or what a change could affect. | [Blast radius](playbooks/blast-radius.md) |
 | `tests-gap` | Assess regression coverage or identify missing tests. | [Tests gap](playbooks/tests-gap.md) |
 | `hitl` | Explicit request for a human-led PR review with approval before posting. Accept a PR URL. | [Human-led review](playbooks/hitl.md) |

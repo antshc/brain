@@ -38,7 +38,7 @@ def test_research_preserves_why_and_routes_system_evidence_to_hunty():
 def test_review_loads_playbooks_by_route():
     root = SKILLS / "review"
     skill = (root / "SKILL.md").read_text()
-    playbooks = ("blast-radius", "comments", "code", "hitl", "tests-gap")
+    playbooks = ("address", "blast-radius", "code", "hitl", "tests-gap")
 
     assert "name: review\n" in skill
     assert "Read only the selected playbook" in skill
@@ -94,7 +94,7 @@ def test_pr_review_routes_share_diff_acquisition_and_preserve_posting_contracts(
     posting = (root / "references/posting.md").read_text()
     assert "Require explicit human approval" in posting
     assert "current PR head and base" in posting
-    comments = (root / "playbooks/comments.md").read_text()
-    assert 'GH_TOOL review discussion' in comments
+    address = (root / "playbooks/address.md").read_text()
+    assert 'GH_TOOL review discussion' in address
     assert (SKILLS / "github/tactics/reviews.md").is_file()
     assert all(path.is_file() for path in (root / "references").iterdir())
