@@ -1,0 +1,14 @@
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#8b949e', 'stateBkg': '#242424', 'stateBorder': '#8b949e', 'labelColor': '#c9d1d9', 'transitionColor': '#8b949e', 'transitionLabelColor': '#c9d1d9'}}}%%
+%% diagram-id: statechart-model
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: Breaks NotNine
+    lg1: Path to the NotNine bug
+  }
+  class lg0 breaks
+  class lg1 bugPath
+  s0: 9
+  [*] --> s0
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s0 breaks
+  class s0 bugPath
