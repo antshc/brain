@@ -14,7 +14,7 @@ Its interview asks one ready question at a time, with a recommendation phrased f
 
 The [HLD route](skills/design/SKILL.md) renders slice decision bullets from its bundled decision reference, without invoking the recording skill.
 
-[github](skills/github/SKILL.md) provides Git conventions and one CLI for Git and GitHub operations. [Review](skills/review/SKILL.md) routes PR code review, comment follow-up, blast radius, test gaps, architecture drift, and human-led review through one skill. Use `/design review` to review a technical design for gaps and implementation readiness.
+[github](skills/github/SKILL.md) provides Git conventions and one CLI for Git and GitHub operations. [Review](skills/review/SKILL.md) routes PR code review, comment follow-up, blast radius, test gaps, and human-led review through one skill. Use `/design review` to review a technical design for gaps and implementation readiness.
 
 ## Skill flow
 

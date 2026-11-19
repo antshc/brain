@@ -424,10 +424,9 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert '`ready`' in workflow and 'blocked/incomplete' in workflow
     post = (FACTORY / 'references/post-implementation.md').read_text()
     review = post.split('## Code review\n')[1].split('\n## ')[0]
-    assert '**Review** playbook' in review
-    proof_review = (FACTORY / 'playbooks/review.md').read_text()
-    assert proof_review.index('`review` skill') < proof_review.index('Read back the actual published comments') < proof_review.index('`prove` skill')
-    assert 'selecting `code`' in proof_review
+    assert '[Automated review](automated-review.md)' in review
+    assert review.index('[Automated review](automated-review.md)') < review.index('proof summary') < review.index('[Review](../playbooks/review.md)')
+    assert 'explicitly requested human review' in review
     assert 'fresh detached worktree' in review
     assert 'This phase never fixes code' in review
     assert 'corrective replies and applicable resolutions are verified' in review
@@ -438,6 +437,57 @@ def test_feature_workflow_verifies_and_reviews_after_implementation():
     assert 'do not restart Address' in finalize
     assert 'Diagnose' not in finalize
     assert 'two verifier fix attempts' in finalize
+
+
+def test_factory_routes_help_and_discloses_review_dependencies():
+    router = (FACTORY / 'SKILL.md').read_text()
+    selection = router.split('## Select a route\n')[1].split('## Routes')[0]
+    assert selection.index('Resume an active route') < selection.index('no clear match')
+    assert 'original request' in selection and '`help <request>`' in selection
+    help_text = (FACTORY / 'help.md').read_text()
+    assert 'Wait for the user' in help_text
+    assert 'Load the chosen route only then' in help_text
+    table = router.split('| Route |')[1].split('## Load shared instructions')[0]
+    assert '| `hitl` |' not in table
+    assert '| Fallback |' not in table
+    assert '](https://' not in router.split('## Routes')[1]
+    review_row = next(row for row in table.splitlines() if row.startswith('| `review` |'))
+    for dependency in ('(playbooks/review.md)', '(references/automated-review.md)', '`review` `code`', '`review` `blast-radius`', '`review` `hitl`', '`github`', '`prove`'):
+        assert dependency in review_row
+    assert '/factory-mode review https://' in help_text
+
+
+def test_factory_proof_summary_precedes_human_review():
+    assert not (FACTORY / 'playbooks/hitl.md').exists()
+    review = (FACTORY / 'references/automated-review.md').read_text()
+    code = review.index('using route `code`')
+    read_back = review.index('Read back the actual published comments')
+    prove = review.index('`prove` skill')
+    proof_summary = review.index('**Proof report**')
+    assert code < read_back < prove < proof_summary
+    assert review.count('`prove` skill') == 1
+
+    playbook = (FACTORY / 'playbooks/review.md').read_text()
+    order = ('triage.md', '(../references/automated-review.md)', 'Decide blast radius after code review', 'using route `blast-radius`', 'Prove gap sweep', '**Proof report**', 'using route `hitl`', '**Changes brief**')
+    positions = [playbook.index(marker) for marker in order]
+    assert positions == sorted(positions)
+    assert '--axes' in playbook
+    assert 'approve the exact text' in playbook
+
+    shipping = (FACTORY / 'references/shipping.md').read_text()
+    assert shipping.index('[Automated review](automated-review.md)') < shipping.index('[Review](../playbooks/review.md)')
+    assert 'explicitly requested' in shipping
+
+
+def test_review_code_runs_selected_axes_with_all_by_default():
+    code = (REPO / 'plugins/wf/skills/review/playbooks/code.md').read_text()
+    inputs = code.split('## Inputs\n')[1].split('\n## ')[0]
+    assert '`--axes <list>`' in inputs and 'Omitted → select every axis' in inputs
+    assert 'unknown name → stop' in inputs
+    assert '| Always |' not in code
+    assert '`not selected`' in code.split('## Completion criteria\n')[1]
+    automated = (FACTORY / 'references/automated-review.md').read_text()
+    assert '`--axes` only when the caller supplied an axis list' in automated
 
 
 def test_implementation_handoff_contains_routing_and_durable_data_pointers():
