@@ -2,14 +2,14 @@
 name: review
 description: >-
   Review code changes, PR comments, downstream risks, and regression coverage. Use for 'review this PR', 'address PR comments', 'blast radius', or 'test gaps'. Not for design review → `design`.
-argument-hint: '<code|comments|blast-radius|tests-gap|hitl> [target] [options]'
+argument-hint: '<code|comments|blast-radius|tests-gap|hitl> [target] [--axes list] [options]'
 ---
 
 # Review
 
 | Route | Select for | Playbook |
 |---|---|---|
-| `code` | Review a PR for new findings. Accept a PR URL. | [Code review](playbooks/code.md) |
+| `code` | Review a PR for new findings. Accept a PR URL and optional `--axes <list>`; all axes run by default. | [Code review](playbooks/code.md) |
 | `comments` | Investigate and address existing PR review threads. Accept a PR URL. | [PR comments](playbooks/comments.md) |
 | `blast-radius` | Assess downstream breakage or what a change could affect. | [Blast radius](playbooks/blast-radius.md) |
 | `tests-gap` | Assess regression coverage or identify missing tests. | [Tests gap](playbooks/tests-gap.md) |

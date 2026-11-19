@@ -20,5 +20,5 @@ Use these steps for direct code-shipping playbooks. Feature uses the draft retur
 
 1. *Load and follow the `github` skill to draft the PR title and description, using Pull requests and Draft PR.* Supply the initiative ID, verified head and base, rationale, changes, and observed checks. Resolve a missing initiative ID before publication.
 2. *Load and follow the `github` skill to open the draft PR, using Pull requests.* Specify head and base explicitly. Read back the metadata and pushed head.
-3. If review was requested, run [Review](review.md) from the source checkout through the proof summary. If human review was explicitly requested, follow the Human review handoff in [HITL](../playbooks/hitl.md) with the saved results. Reuse that automated pass.
+3. If review was requested, run [Automated review](automated-review.md) from the source checkout through the proof summary. If human review was explicitly requested, follow the Human review handoff in [Review](../playbooks/review.md) with the saved results. Reuse that automated pass.
 4. Show the PR URL and continue. Monitor checks when requested by the caller.

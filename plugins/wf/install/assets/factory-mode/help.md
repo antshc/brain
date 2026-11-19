@@ -11,7 +11,7 @@ For `help` without a request, list the routes and show one example for each. Inc
 /factory-mode help
 /factory-mode help <request>
 /factory-mode stories from <requirements or spec>
-/factory-mode hitl https://github.com/owner/repo/pull/123
+/factory-mode review https://github.com/owner/repo/pull/123
 ```
 
 Done when the usage and examples are visible.

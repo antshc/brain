@@ -65,9 +65,9 @@ Write `VERDICT_FILE` outside the repository; copy to `EVIDENCE_DIR/verdict.md`. 
 
 Run *Publication verification* before review, including when app verification was skipped. Publication failure blocks review acquisition.
 
-Run [Review](review.md) in this chat from `SOURCE_ROOT`. Pass the PR URL, `SOURCE_ROOT`, `RUN_DIR`, and caller limits. Review uses a fresh detached worktree from `SOURCE_ROOT`. Keep the integration worktree and clone out of this phase. This phase never fixes code.
+Run [Automated review](automated-review.md) in this chat from `SOURCE_ROOT`. Pass the PR URL, `SOURCE_ROOT`, `RUN_DIR`, and caller limits. Review uses a fresh detached worktree from `SOURCE_ROOT`. Keep the integration worktree and clone out of this phase. This phase never fixes code.
 
-After the proof summary, follow the Human review handoff in [HITL](../playbooks/hitl.md) if this is the initial Code review and the user explicitly requested human review. Pass these saved results and reuse this automated pass. Continue to the next caller phase subject to the existing blockers.
+After the proof summary, follow the Human review handoff in [Review](../playbooks/review.md) if this is the initial Code review and the user explicitly requested human review. Pass these saved results and reuse this automated pass. Continue to the next caller phase subject to the existing blockers.
 
 Retain axes, findings, posting IDs/read-backs, models/fallbacks, reviewed head/base, claim/report mappings, proof outcomes, and reply/resolution results. Refuted claims leave actionable findings only after corrective replies and applicable resolutions are verified. Proved and unverified concerns retain their existing severity and closure gates. Preserve known earlier unresolved bug/initiative concerns. Unavailable review/proof, unreadable comments, stale evidence, or failed follow-up → report blockers; keep spec open.
 
