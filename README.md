@@ -79,6 +79,7 @@ gh skill install antshc/brain plugins/wf/install/assets/testing-integrations/SKI
 gh skill install antshc/brain engineering/render-mermaid-png --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/suggest-graphify-improvements --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/remove-zone-identifiers --agent github-copilot --scope user -f
+gh skill install antshc/brain engineering/architecture-drift --agent github-copilot --scope user -f
 ```
 
 Repo-level (run from the target repo; the WF installer offers it), then edit the copy to match the repo's conventions:
@@ -229,6 +230,7 @@ General-purpose skills not tied to a specific platform.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/productivity/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.
+- [architecture-drift](skills/engineering/architecture-drift/SKILL.md): audit the codebase against `ARCHITECTURE.md` and SSRs; log or resolve drift. Docs-only.
 - [daily-briefing](skills/engineering/daily-briefing/SKILL.md): report your blocked Jira items and unanswered or answered @mentions; read-only. Requires the `atlassian` skill and its installer-generated `preflight-atlassian` skill.
 - [factory-mode](plugins/wf/install/assets/factory-mode/SKILL.md): repo-level engineering instructions; restate the goal, route to a playbook, delegate, and verify on the real artifact. Installed per repo by the WF installer and customized by its users.
 
