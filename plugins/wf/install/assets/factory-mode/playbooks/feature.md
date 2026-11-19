@@ -18,6 +18,8 @@ Record evidence, conclusions, and changes to the sketch/rationale. Never treat a
 
 ## Workflow
 
+*Load and follow the `principles` skill to load `Never block on the human` and apply it to routine reversible execution choices.* Preserve scope, product-decision, explicit checkpoint and required-authority gates.
+
 **Goal: deliver the entire feature autonomously.** No open questions: every question gets an answer you recommend and then apply, with the reason and rejected alternative logged. Impossible to answer (needs access, data, or authority you lack) → log the question as `unanswerable` with the concrete reason why, then continue on the safest reversible path. Never ask the user after step 1 except for an explicitly requested checkpoint or required authority; a called skill's routine decision gets your evidence-backed recommendation. Decide calls the Principles cover by them; decide product, preference, and operator-only calls by the best recommendation from evidence. Never merge, force-push, or mark the PR ready.
 
 Trail: *Load and follow the `show-me-your-work` skill to record significant decisions and evidence in a trail using Log mode* at `tmp/factory-mode-{{featureSlug}}/decisions.tsv` from step 1; log every fork, default, research finding, experiment result, review verdict, and fix with its evidence.

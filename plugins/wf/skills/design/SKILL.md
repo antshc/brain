@@ -57,6 +57,8 @@ Wayfinder additionally reads the full Grill playbook for interviews and, after t
 
 *Load and follow the `principles` skill to load `In your own words` plus principles named in the request or matching the task, selected route and phase, and apply them before the selected playbook.* Use `In your own words` for intent; Index matches cover consumer experience, domain/type shape, seams, boundaries, concurrency and alternatives. re-evaluate at phase changes. Fresh candidate workers apply this rule in their own context.
 
+For `architect`, `sketch`, `deep-module`, and `spec`, *Load and follow the `principles` skill to load `Experience first` and apply it before choosing consumer workflows, interfaces or requirements.* For `architect` designing state-changing operations, *Load and follow the `principles` skill to load `Make operations idempotent` and apply it to retries, interruptions and partial completion.* Pass these route-specific names to candidate workers through the shared Principles rule.
+
 ## Architect options and behavior
 
 - Accept explicit `arena-agents=1|2|3` as an Arena request; reject other values before work. Otherwise Architect compares two shapes locally for bounded designs with clear requirements and precedent; new cross-subsystem ownership/state coordination, material unresolved tradeoffs or an unsettled comparison use Arena with one runner by default. Preserve explicit counts through handoffs and correction reruns.

@@ -22,7 +22,7 @@ Never launch subagents, switch branches, manage worktrees, run a rebase, publish
 
 ## Implementation
 
-*Load and follow the `principles` skill to load the principles matching this task's phase, scope and constraints, and apply them at their decision points.* Index matches cover data/type shape, abstractions, nontrivial mechanical work, eligible internal migration and tests. Apply `Foundational thinking` and `Model the domain` before logic, `Test behavior, not implementation` for assertions and `Prove it works` before completion; re-evaluate when the phase changes. Existing scope, no-subagent and commit limits still apply.
+*Load and follow the `principles` skill to load `Never block on the human` plus the principles matching this task's phase, scope and constraints, and apply them at their decision points.* Index matches cover data/type shape, abstractions, nontrivial mechanical work, eligible internal migration and tests. Apply `Never block on the human` to routine reversible implementation choices, `Foundational thinking` and `Model the domain` before logic, `Test behavior, not implementation` for assertions and `Prove it works` before completion; re-evaluate when the phase changes. Existing scope, approval, required-authority, no-subagent and commit limits still apply; material requirement or contract gaps still block dependent work.
 
 Implement the task using the smallest change that satisfies its requirements.
 If observed evidence proves the task is already satisfied, return the verified no-change result.
