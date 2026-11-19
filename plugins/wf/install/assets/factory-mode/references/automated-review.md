@@ -23,7 +23,7 @@ Run this procedure in the Factory Mode caller for an existing PR. The Review ski
 
 For mixed results, reply per claim; any proved or unverified allegation keeps the thread open. Inability to prove is not evidence of falsity. Preserve the original comment and corrective reply; do not delete comments. A refuted allegation with failed reply/resolution remains an incomplete remote correction, never a clean review.
 
-Summarize evidence in each reply itself, following GitHub's conversation format and ownership metadata. Keep local report links in the caller's output, not remote replies. Preserve Review's restrictions on linking repository Markdown and tasks. Publish no duplicate findings, approval, or review submission. Do not invoke `review` route `comments` for fixes during this proof pass.
+Summarize evidence in each reply itself, following GitHub's conversation format and ownership metadata. Keep local report links in the caller's output, not remote replies. Preserve Review's restrictions on linking repository Markdown and tasks. Publish no duplicate findings, approval, or review submission. Do not invoke `review` route `address` for fixes during this proof pass.
 
 ## Resume and freshness
 
