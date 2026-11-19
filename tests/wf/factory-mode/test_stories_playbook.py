@@ -9,7 +9,9 @@ def test_stories_is_factory_playbook_not_standalone_skill():
     assert not (REPO / "plugins/wf/skills/to-stories/SKILL.md").exists()
     playbook = FACTORY / "playbooks/stories.md"
     assert playbook.is_file()
-    assert "[playbooks/stories.md](playbooks/stories.md)" in (FACTORY / "SKILL.md").read_text()
+    routes = (FACTORY / "SKILL.md").read_text().splitlines()
+    stories = next(row for row in routes if row.startswith("| `stories` |"))
+    assert "(playbooks/stories.md)" in stories
     assert "/factory-mode stories" in (FACTORY / "help.md").read_text()
 
 

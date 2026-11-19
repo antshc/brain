@@ -1,4 +1,11 @@
-# Architecture drift review
+---
+name: architecture-drift
+description: >-
+  Audit the codebase against ARCHITECTURE.md and docs/ssr records and log drift. Use for 'architecture drift', 'check architecture docs against code', or 'is the architecture doc still accurate'. Accepts `auto` or `human`. Docs-only; never edits code.
+argument-hint: '[auto|human]'
+---
+
+# Architecture drift
 
 Scope: codebase vs `ARCHITECTURE.md` (non-ADR) + `docs/ssr/*.md`. ADRs out of scope. Verify codebase facts via `explore` agent, never ask. Exclude claims already in `docs/architecture-drift-log.md` (any status). Docs-only — never edit code.
 

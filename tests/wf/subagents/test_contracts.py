@@ -38,7 +38,7 @@ def test_research_preserves_why_and_routes_system_evidence_to_hunty():
 def test_review_loads_playbooks_by_route():
     root = SKILLS / "review"
     skill = (root / "SKILL.md").read_text()
-    playbooks = ("architecture", "blast-radius", "comments", "code", "hitl", "tests-gap")
+    playbooks = ("blast-radius", "comments", "code", "hitl", "tests-gap")
 
     assert "name: review\n" in skill
     assert "Read only the selected playbook" in skill
