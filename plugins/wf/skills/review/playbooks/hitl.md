@@ -54,6 +54,8 @@ Follow [Changes brief](../references/changes-brief.md) for the PR change. Write 
 
 Pass the subagent the absolute path of the reference file under this skill's `references/` folder; it opens that path directly and does not search for it. It writes the reference's reply verbatim to its output file, creating the folder if missing, and returns only the absolute output path plus `done` or `failed: <reason>`.
 
+Set `@findingsFile` to `<checked-out repository root>/bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/hitl-findings.md`, beside the brief; it holds session findings for the Review and Inspect branches.
+
 Then show the user one Markdown link to the output file (absolute path, `/` separators) and the line "Open and read this before the review." Failed subagent → show its reason in place of the link. Done when the file exists or a reason is shown; do not read, summarize, or critique it. Continue to Review loop without waiting for the user to finish reading.
 
 ## Review loop
@@ -85,7 +87,7 @@ Drafts, approves, and posts one review comment.
 
 1.2 **Evidence** — gather definitions, usages, callers; confirm the issue is real in actual code. **Default to an `Explore` subagent; reserve direct reads for anchor-precision.** `Explore` returns a condensed verdict, keeping raw tool output out of main context.
 
-- **Reuse findings:** if `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` exists, check it first; use matching facts instead of re-exploring.
+- **Reuse findings:** if `@findingsFile` exists, check it first; use matching facts instead of re-exploring.
 - **Default — broad sweep → `Explore`:** wide or throwaway checks (pattern/exception/route elsewhere? who calls this? concern real across files?). Pass the input and `FILE_PATH`; consume only its summary — don't re-`view`/`grep` files it reported.
 - **Exception — anchor-precision → direct reads:** targeted `view` with `view_range`, or `grep`, only for exact lines/signatures/type hierarchy to quote or anchor the comment, evidence in a small known file set, or iteration on those files across turns. Read ranges, not whole files.
 - **Architecture lens** (docs loaded; input-scoped, never proactive): flag documented-rule violations (e.g., layering direction, module isolation, folder placement).
@@ -140,13 +142,13 @@ On approval (1 or 2): follow [Posting](../references/posting.md#hitl), with `FIL
 
 Answers a code question; never drafts or posts.
 
-1. **Research:** check `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` first; answer from matching facts. Otherwise pick the route below and *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* on the checked-out PR head. The request names the route (`Route: <route>`) and holds the question, `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed.
+1. **Research:** check `@findingsFile` first; answer from matching facts. Otherwise pick the route below and *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* on the checked-out PR head. The request names the route (`Route: <route>`) and holds the question, `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed.
    - **Lookup** — where is X, who calls Y, what does Z return: `Route: Explore`; no document; `hunty` verdicts return inline.
    - **How** — flow, mechanism, or behavior across files or components: `Route: How`; ask in the request to save to `<checked-out repository root>/bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/inspect/{{slug}}.md` and state the content framing.
    - **Why** — design rationale or what led to the change: `Route: Why`, asking only for code, commit, and PR context; read the returned report; use full Why only when the user asks for rationale beyond code, commits, and PRs.
 
    Done when research returns cited facts, a saved path, or a named blocker.
-2. **Record:** append to `/memories/session/hitl-findings-<OWNER>-<REPO>-<PR_NUMBER>.md` (create if missing):
+2. **Record:** append to `@findingsFile` (create if missing):
 
    ```text
    ## <question>

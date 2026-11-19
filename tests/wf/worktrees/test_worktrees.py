@@ -48,11 +48,14 @@ def create(
                harness=harness)
 
 
-def remove(source: Path, tmp_path: Path, record: dict, *, head: str | None = None) -> dict:
+def remove(
+    source: Path, tmp_path: Path, record: dict, *, head: str | None = None, discard_ignored: bool = False
+) -> dict:
     record_file = tmp_path / "record.json"
     record_file.write_text(json.dumps(record))
+    extra = ("--discard-ignored",) if discard_ignored else ()
     return run(source, "remove", "--record", str(record_file), "--expect-head",
-               head or record["head"], "--recoverable")
+               head or record["head"], "--recoverable", *extra)
 
 
 @pytest.mark.parametrize("branch", [None, "feat/task-1"])
@@ -78,6 +81,26 @@ def test_remove_preserves_dirty_worktree(repository: Path, tmp_path: Path, filen
     file = Path(record["path"]) / filename
     file.write_text("preserve me")
     result = remove(repository, tmp_path, record)
+    assert result["status"] == "blocked", result
+    assert file.read_text() == "preserve me"
+
+
+def test_remove_discard_ignored_removes_build_output(repository: Path, tmp_path: Path):
+    record = create(repository)["record"]
+    path = Path(record["path"])
+    (path / "ignored.txt").write_text("build output")
+    assert remove(repository, tmp_path, record, discard_ignored=True)["status"] == "removed"
+    assert not path.exists()
+
+
+@pytest.mark.parametrize("filename", ["untracked.txt", ".gitignore"])
+def test_remove_discard_ignored_still_preserves_dirty_worktree(repository: Path, tmp_path: Path, filename: str):
+    record = create(repository)["record"]
+    path = Path(record["path"])
+    (path / "ignored.txt").write_text("build output")
+    file = path / filename
+    file.write_text("preserve me")
+    result = remove(repository, tmp_path, record, discard_ignored=True)
     assert result["status"] == "blocked", result
     assert file.read_text() == "preserve me"
 
