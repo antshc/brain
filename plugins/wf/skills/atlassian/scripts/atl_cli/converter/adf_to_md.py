@@ -173,14 +173,18 @@ def render_list(node: dict, ordered: bool, depth: int = 0) -> str:
 
 def render_list_item(item: dict, depth: int) -> list[str]:
     lines: list[str] = []
+    indent = "  " * (depth + 1)
     for child in item.get("content", []):
         if child.get("type") in ("bulletList", "orderedList"):
             nested = render_list(child, ordered=(child["type"] == "orderedList"), depth=depth + 1)
             lines.extend(nested.split("\n"))
         else:
             rendered = render_block(child).split("\n")
-            lines.append(rendered[0])
-            lines.extend("  " * (depth + 1) + line for line in rendered[1:])
+            # The first child shares the marker's line; later children start on their own
+            # line and must be indented in full, or a code fence opens at column 0.
+            first = rendered[0] if not lines else indent + rendered[0]
+            lines.append(first)
+            lines.extend(indent + line for line in rendered[1:])
     return lines
 
 
