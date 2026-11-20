@@ -32,8 +32,10 @@ Persist `record` as standalone JSON outside the worktree. The linked Git directo
 
 Supply `--recoverable` only after verifying the caller's completion policy. Run outside the target. If source is target, use another checkout of the same repository. Pass expected current HEAD, which can differ from creation SHA. The helper verifies ownership, registration and identity, preserves locked or dirty worktrees including ignored and untracked files, blocks if index flags can hide edits, and removes without force.
 
+Add `--discard-ignored` only for a run-owned worktree whose ignored files are disposable (build output such as `bin/`, `obj/`, `node_modules/`) and whose evidence is saved outside it. Modified or untracked files still block removal.
+
 ```text
-GIT_TOOL worktree remove --harness ROOT --source CHECKOUT --record FILE --expect-head SHA --recoverable
+GIT_TOOL worktree remove --harness ROOT --source CHECKOUT --record FILE --expect-head SHA --recoverable [--discard-ignored]
 ```
 
 ## Results
