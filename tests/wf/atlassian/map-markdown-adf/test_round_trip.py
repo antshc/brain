@@ -135,3 +135,30 @@ def test_breakout_on_the_toc_expand_round_trips_and_does_not_leak(md_to_adf, adf
 def test_children_macro_round_trips_through_the_publish_guard(md_to_adf, adf_to_md):
     source = '# Upgrades\n\n<!-- adf:children depth="2" -->\n\nTail.'
     assert adf_to_md(md_to_adf(source)) == source
+
+
+def test_code_block_inside_list_items_round_trips_through_the_guard(md_to_adf, adf_to_md):
+    source = (
+        "1. Run:\n"
+        "  ```bash\n"
+        "  echo a\n"
+        "  \n"
+        "    indented\n"
+        "  ```\n"
+        "2. ```text\n"
+        "  first-child code\n"
+        "  ```\n"
+        "3. Nested\n"
+        "  - inner\n"
+        "    ```bash\n"
+        "    echo b\n"
+        "    ```"
+    )
+    from atl_cli.conversion_guard import check_round_trip
+
+    doc = md_to_adf(source)
+    first_item = doc["content"][0]["content"][0]["content"]
+    assert [child["type"] for child in first_item] == ["paragraph", "codeBlock"]
+    assert first_item[1]["content"][0]["text"] == "echo a\n\n  indented"
+    assert adf_to_md(doc) == source
+    assert check_round_trip(doc) == []

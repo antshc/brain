@@ -50,6 +50,7 @@ _RULE_RE = re.compile(r"^(-{3,}|\*{3,}|_{3,})\s*$")
 _TABLE_ROW_RE = re.compile(r"^(\s*)\|(.*)\|\s*$")
 _TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 _FENCE_OPEN_RE = re.compile(r"^(`{3,}|~{3,})(\w*)\s*$")
+_INDENTED_FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})(\w*)\s*$")
 
 # Column widths (px) for headers this skill recognizes by name, stripped of markdown marks
 # (e.g. "**#**" -> "#"). Only applied when a table has at least one of these headers, so
@@ -159,22 +160,7 @@ def parse_blocks(lines: list[str]) -> list[dict]:
 
         fence_m = _FENCE_OPEN_RE.match(line)
         if fence_m:
-            fence, lang = fence_m.group(1), fence_m.group(2).lower()
-            closing = re.compile(r"^" + re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*$")
-            code_lines = []
-            i += 1
-            while i < n and not closing.match(lines[i]):
-                code_lines.append(lines[i])
-                i += 1
-            if i >= n:
-                raise ValueError("unterminated code fence")
-            i += 1  # skip closing fence
-            attrs = {}
-            if lang in CODE_LANG_ALLOWLIST:
-                attrs["language"] = lang
-            node = {"type": "codeBlock", "content": [{"type": "text", "text": "\n".join(code_lines)}]}
-            if attrs:
-                node["attrs"] = attrs
+            node, i = _parse_code_block(lines, i, fence_m.group(1), fence_m.group(2), 0)
             if apply_breakout:
                 node["marks"] = [apply_breakout]
             blocks.append(node)
@@ -259,6 +245,24 @@ def parse_blocks(lines: list[str]) -> list[dict]:
         blocks.append({"type": "paragraph", "content": parse_inline(text)})
 
     return blocks
+
+
+def _parse_code_block(lines: list[str], i: int, fence: str, lang: str, indent: int) -> tuple[dict, int]:
+    """Parse the fenced block opened at `lines[i]`; `indent` is the column its content and
+    closing fence sit at (0 at top level, the item's content column inside a list item)."""
+    closing = re.compile(r"^\s{0," + str(indent) + "}" + re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*$")
+    code_lines = []
+    i += 1
+    while i < len(lines) and not closing.match(lines[i]):
+        line = lines[i]
+        code_lines.append(line[min(indent, len(line) - len(line.lstrip())):] if indent else line)
+        i += 1
+    if i >= len(lines):
+        raise ValueError("unterminated code fence")
+    node = {"type": "codeBlock", "content": [{"type": "text", "text": "\n".join(code_lines)}]}
+    if lang.lower() in CODE_LANG_ALLOWLIST:
+        node["attrs"] = {"language": lang.lower()}
+    return node, i + 1  # skip closing fence
 
 
 def _is_block_start(line: str, lines: list[str], i: int) -> bool:
@@ -410,9 +414,25 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
         i += 1
         item_content: list[dict] = []
 
+        # A code block can open on the marker line (`- ```bash`) or on an indented line below.
+        first_fence = _FENCE_OPEN_RE.match(item_text)
+        if first_fence:
+            code, i = _parse_code_block(lines, i - 1, first_fence.group(1), first_fence.group(2), indent + 2)
+            item_content.append(code)
+            item_text = ""
+
         # Fold soft-wrapped continuation lines into the item's paragraph; a deeper-indented
-        # list nests under it instead.
+        # list or fenced code block nests under it instead.
         while i < n and lines[i].strip():
+            fence_m = _INDENTED_FENCE_RE.match(lines[i])
+            if fence_m and len(fence_m.group(1)) > indent:
+                if not item_content:
+                    item_content.append({"type": "paragraph", "content": parse_inline(item_text)})
+                code, i = _parse_code_block(
+                    lines, i, fence_m.group(2), fence_m.group(3), len(fence_m.group(1))
+                )
+                item_content.append(code)
+                continue
             _, sub_m = _match_list_marker(lines[i])
             if sub_m and len(sub_m.group(1)) > indent:
                 if not item_content:
