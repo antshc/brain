@@ -16,6 +16,7 @@ def test_plain_commonmark_is_markdown_safe(detect_adf_only):
         ("Ticket is [STATUS:Done|green] now.", "status"),
         ("Ticket is 🟢[Done] now.", "status"),
         ("<!-- adf:toc -->", "toc"),
+        ('<!-- adf:children depth="2" -->', "children"),
         ("<!-- adf:wide-table -->\n\n| a |\n| --- |", "wideTable"),
         ('<!-- adf:table layout="wide" width="960" -->\n\n| a |\n| --- |', "tableLayout"),
         ('<!-- adf:breakout mode="wide" width="760" -->\n<details>\n<summary>S</summary>\n</details>', "breakout"),

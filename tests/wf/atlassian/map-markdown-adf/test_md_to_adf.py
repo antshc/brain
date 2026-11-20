@@ -377,3 +377,18 @@ def test_emoji_before_a_link_stays_text_and_link(md_to_adf):
 
 def test_legacy_status_converts_to_the_emoji_form(md_to_adf, adf_to_md):
     assert adf_to_md(md_to_adf("[STATUS:Done|green] [STATUS:Draft]")).strip() == "🟢[Done] ⚪[Draft]"
+
+
+def test_children_marker_builds_child_pages_macro_with_params(md_to_adf):
+    doc = md_to_adf('<!-- adf:children depth="2" -->')
+    assert doc["content"] == [
+        {
+            "type": "extension",
+            "attrs": {
+                "layout": "default",
+                "extensionType": "com.atlassian.confluence.macro.core",
+                "extensionKey": "children",
+                "parameters": {"macroParams": {"depth": {"value": "2"}}},
+            },
+        }
+    ]

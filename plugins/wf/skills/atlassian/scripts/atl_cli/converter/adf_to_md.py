@@ -106,6 +106,10 @@ def _render_block_body(node: dict) -> str:
                 .get("diagramName", {}).get("value", "")
             )
             return f'<!-- adf:diagram drawio="{diagram_name}" -->'
+        if extension_key == "children":
+            macro_params = node.get("attrs", {}).get("parameters", {}).get("macroParams", {})
+            fields = "".join(f' {name}="{param.get("value", "")}"' for name, param in sorted(macro_params.items()))
+            return f"<!-- adf:children{fields} -->"
         raise NotImplementedError(f"unhandled ADF extension '{extension_key}'")
     if node_type in ("mediaSingle", "media"):
         media_node = node if node_type == "media" else next(

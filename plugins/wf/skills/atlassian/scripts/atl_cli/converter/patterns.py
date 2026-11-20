@@ -5,6 +5,8 @@ import re
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)", re.MULTILINE)
 TOC_COMMENT_RE = re.compile(r"^\s*<!--\s*adf:toc\s*-->\s*$", re.IGNORECASE)
+# Confluence "Child pages" macro, e.g. `<!-- adf:children depth="2" -->`; attributes are its macro parameters.
+CHILDREN_MARKER_RE = re.compile(r"^\s*<!--\s*adf:children((?:\s+[a-z-]+=\"[^\"]*\")*)\s*-->\s*$", re.IGNORECASE)
 WIDE_TABLE_MARKER_RE = re.compile(r"^\s*<!--\s*adf:wide-table\s*-->\s*$", re.IGNORECASE)
 # General table attributes, e.g. `<!-- adf:table layout="wide" width="960" -->`; a table with only
 # `layout: wide` keeps the shorter `adf:wide-table` marker above.
@@ -34,6 +36,14 @@ def table_marker_attrs(line: str) -> dict | None:
     if "width" in attrs:
         result["width"] = marker_number(attrs["width"])
     return result
+
+
+def children_marker_params(line: str) -> dict[str, str] | None:
+    """Macro parameters a children marker line sets, or None for any other line."""
+    match = CHILDREN_MARKER_RE.match(line)
+    if not match:
+        return None
+    return dict(_MARKER_ATTR_RE.findall(match.group(1)))
 
 
 def breakout_marker_mark(line: str) -> dict | None:
