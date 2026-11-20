@@ -7,6 +7,7 @@ Follow the parent's shared review contract. Review the complete change against t
 - **Missing or partial**: required behavior absent or incompletely implemented.
 - **Scope creep**: changed behavior outside the initiative requirements and stated PR scope. An unmapped symbol is a candidate, not proof; supporting implementation alone is not scope creep.
 - **Implemented but wrong**: behavior differs from the requirement's intent.
+- **Unconfirmed user-facing change**: alert or notification text, alert severity, a new alert, an API contract, or any other user-facing attribute changed without the initiative description or its comments stating that change. Ask for product-owner confirmation; a change the description or a supplied initiative comment states explicitly is not a finding. Use comments only as confirmation evidence for this rule, never as requirements.
 
 Ground each finding in the initiative description and specific code evidence. Consider the whole change, cross-symbol behavior, and design intent.
 

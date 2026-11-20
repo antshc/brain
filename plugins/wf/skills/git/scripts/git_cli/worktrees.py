@@ -99,14 +99,16 @@ def check_state(
     return admin
 
 
-def check_clean(path: Path, admin: Path) -> None:
+def check_clean(path: Path, admin: Path, *, discard_ignored: bool = False) -> None:
     operations = ("MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "rebase-apply",
                   "rebase-merge", "sequencer", "BISECT_START")
     if any((admin / operation).exists() for operation in operations):
         raise WorktreeError(f"Worktree has a Git operation in progress: {path}")
+    ignored = "--ignored=no" if discard_ignored else "--ignored=matching"
     if git(path, "status", "--porcelain=v1", "-z", "--untracked-files=all",
-           "--ignored=matching", "--ignore-submodules=none").stdout:
-        raise WorktreeError(f"Worktree contains modified, untracked or ignored files: {path}")
+           ignored, "--ignore-submodules=none").stdout:
+        kinds = "modified or untracked" if discard_ignored else "modified, untracked or ignored"
+        raise WorktreeError(f"Worktree contains {kinds} files: {path}")
 
 
 def ensure_ignored(harness: Path, path: Path, changed: list[str]) -> None:
@@ -203,7 +205,7 @@ def remove(
     if (str(admin) != record["gitDir"] or marker.is_symlink() or not marker.is_file()
             or json.loads(marker.read_text(encoding="utf-8")) != record):
         raise WorktreeError(f"Worktree ownership could not be verified: {path}")
-    check_clean(path, admin)
+    check_clean(path, admin, discard_ignored=args.discard_ignored)
     index_entries = git(path, "ls-files", "-v", "-z").stdout.split(b"\0")
     if any(entry[:1].islower() or entry.startswith(b"S ") for entry in index_entries):
         raise WorktreeError(f"Index flags may hide worktree changes: {path}")
@@ -227,6 +229,8 @@ def register(actions: Any) -> None:
     remove_parser.add_argument("--record", type=Path, required=True)
     remove_parser.add_argument("--expect-head", required=True)
     remove_parser.add_argument("--recoverable", action="store_true")
+    # git worktree remove deletes ignored files without --force; only this helper's check blocks them.
+    remove_parser.add_argument("--discard-ignored", action="store_true")
     for action_parser in (create_parser, remove_parser):
         action_parser.set_defaults(entry=run)
     for name in ("inspect", "reconcile", "reuse"):

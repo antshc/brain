@@ -51,11 +51,15 @@ Each entry carries `id`, `origin` (`agent` or `human/unknown`), `state`, `anchor
 | `pending`, `follow-up` | Read the whole thread; answer the latest concern using `newComments` and `lastReply` in context. A human clarification resumes the work even under the same login. |
 | `reconcile` | Read the whole thread and latest reply. Re-establish the outcome and current evidence; wait quietly for unanswered questions, or retry safe closure without repeating an already posted answer. |
 
+Bot-opened threads (GitHub App or `[bot]` login: code-review bots, code scanning) are findings like any other: investigate and answer them. Origin stays `human/unknown`; closure stays manual.
+
+Report and do not reply when the latest new comment needs no agent answer: addressed to another participant (`@mention` debate), praise only, or the author's own note without a request.
+
 Done when every actionable thread's target code has been located from its `anchor`, falling back to `diffHunk` and then to the symbol named in the comment when `basis` is `unknown`.
 
 ## 4. Group the discussion into issues
 
-One `issue` is one underlying problem, however many comments describe it. Cluster on the same file and symbol, a comment that points at another ("same as above", "and here"), a reviewer restating one concern across several files, or a review body elaborated in a thread.
+One `issue` is one underlying problem, however many comments describe it. Cluster on the same file and symbol, a comment that points at another ("same as above", "and here"), a reviewer restating one concern across several files, a review body elaborated in a thread, or identical bot findings.
 
 Record per `issue`: `issueId`, a one-sentence statement, its member thread ids, the affected paths and line ranges, and the verbatim comment excerpts.
 
@@ -65,8 +69,11 @@ Done when each actionable thread belongs to exactly one `issue` and counts match
 
 | Class | The issue is | Next |
 |---|---|---|
+| `question` | The reviewer asks why, what happens, or how something works, without requesting a change. | Answer in step 8 with `path:line` evidence; no commit. |
 | `chore` | A rename, a typo, wording, formatting, an unused import — the reviewer's instruction is the whole specification. | Step 7 |
 | `substantive` | Behaviour, correctness, design, performance, or security — knowing whether the reviewer is right requires reading the code. | Step 6 |
+
+A question that implies a change ("shouldn't this be…?", "is this on purpose?") or whose evidence reveals a defect is `chore` or `substantive`, not `question`.
 
 For a `follow-up`, recheck challenged assumptions against the code. Lack of new facts proves neither understanding nor correctness; investigate substantive concerns before replying.
 
@@ -76,17 +83,31 @@ Done when every `issue` carries one class.
 
 **Follow `references/investigation.md`** for the discovery command, the dispatch rules, the prompt template, and the verdict contract.
 
-Done when every `substantive` issue holds a `verdict` backed by at least one `path:line` citation.
+Separate concern validity from remedy selection:
+
+- Verify the claimed problem against the current head, explicit requirements, and established behavior; a review suggestion is not proof.
+- For a valid concern, compare credible remedies by correctness, compatibility, scope, and reversibility. Select the smallest evidence-backed correction; uncertainty about a globally optimal solution alone is not a blocker.
+- Prefer preserving established behavior when compatible with explicit requirements; check semantic equivalence before restoring an earlier implementation or value.
+- Ask only when a missing fact, conflicting requirement, or required authorization blocks a safe choice. Name the blocked decision and give a recommendation when evidence supports one. Without a blocker, carry the selected remedy into implementation.
+- Scope: fix pre-existing problems on lines the PR touches or ports. Untouched code may be deferred with a stated reason; "pre-existing" or "out of scope" alone is no reason. Never defer a `chore`.
+- Reviewer-pasted code is a candidate remedy: verify referenced symbols exist and the logic is not redundant. Apply it verbatim when it checks out; otherwise apply the corrected form and state the deviation and why.
+- Changes to alert or notification text, alert severity, new alerts, API contracts, or any other user-facing attribute require product-owner confirmation. Make no change; reply in the spirit of "Thanks, I'll confirm this with the PO before changing it" and leave the thread open as `unclear`.
+- A follow-up rejecting an earlier fix whose explanation is still insufficient: state the reviewer's goal in one sentence, check the remedy achieves that goal rather than only touching the anchored line, and carry the sentence into the reply.
+- Offer an alternative remedy or follow-up only after *Load and follow the `prove` skill to run an experiment and prove the claim* shows it is feasible.
+- Code scanning alerts close by code change or dismissal in code scanning, never by thread reply; without a code fix, report the alert for human dismissal.
+
+Done when every `substantive` issue holds a `verdict` backed by at least one `path:line` citation and either a selected remedy, evidence that no change is needed, or a specific blocking question.
 
 ## 7. Resolve each issue on its own
 
 Take the issues one at a time. Per `issue`:
 
-1. `chore`, or `verdict: fix-needed` → apply the change, scoped to that `issue` alone.
-2. Run `$buildCommand`, then `$testCommand` over the changed files. A failure this `issue` caused → `git checkout -- {{paths}}` and carry the `issue` forward as `unclear`.
-3. *Load and follow the `git` skill to run verified commit messages using Commits* for the verified fix. Commit on the existing PR head and name the `issue` and threads it answers in the body.
+1. `chore`, or `verdict: fix-needed` → apply the change, scoped to that `issue` alone. Then search the PR diff, the touched types, and mirrored copies (paired scripts, duplicated configs) for the same pattern; fix those occurrences in the same change and record the verified count.
+2. `substantive` fix → add or extend a regression test that fails before the fix, in a test project the repository's test command runs. When no existing test covers the behaviour, name the cases the new test covers; prefer the smallest set that proves the fix.
+3. Run `$buildCommand`, then `$testCommand` over the changed files. A failure this `issue` caused → `git checkout -- {{paths}}` and carry the `issue` forward as `unclear`.
+4. *Load and follow the `git` skill to run verified commit messages using Commits* for the verified fix. Commit on the existing PR head and name the `issue` and threads it answers in the body.
 
-An `issue` whose `verdict` is `no-change-needed` or `unclear` produces no commit.
+A `question`, or an `issue` whose `verdict` is `no-change-needed` or `unclear`, produces no commit.
 
 Once every `issue` has been through the loop, push any commits to `$headRef` — once, for all of them. A rejected push → stop and report before replying; the remote has moved and every reply would be describing code that is not there.
 
@@ -96,7 +117,15 @@ Done when each issue has an evidence-backed outcome or explicit blocker, and any
 
 *Load and follow the `github` skill to draft review threads and pull request comments using Reviews*. Pass kind `reply`, ownership `agent`, stage `draft`, latest concern, and verified outcome; then stage `final` with the validated visible body. Claim a fix only after its commit is pushed; report only actual verification.
 
-Name the exact type, method, or file when needed to understand the answer. Cite the package, pinned version, and pin location when the answer rests on third-party behaviour.
+Each reply opens with that thread's own outcome (fixed, declined, answered, waiting) and states:
+
+- Fix: what changed, the type, method, or file, the commit SHA, the occurrence count from the sweep, and the regression test added or run.
+- Every sub-point of the comment answered; when the reviewer offered options, the option chosen.
+- Decline or answer: the decisive `path:line` evidence.
+
+Cite the package, pinned version, and pin location when the answer rests on third-party behaviour.
+
+When this run's commits make an earlier marked reply in another thread inaccurate, post a correction in that thread naming what changed.
 
 *Load and follow the `github` skill to post replies to review threads* using Reviews, **Reply**, for one final marked answer per pending thread. Save the complete published comments array before replying and retain the returned confirmed comment. Require no GraphQL `errors`, a returned comment ID, and exact complete-body read-back before treating it as confirmed. A failed or uncertain reply leaves the thread open; refetch before retrying to avoid duplicates. A reconciliation retry needs no new reply solely to resolve an existing answer.
 
@@ -112,6 +141,8 @@ Apply independently per thread:
 | Agent; deferral confirmed, no existing work item supplied | Acknowledge only; leave open and report follow-up agreed, work item not created. |
 | Agent; deferral explicitly accepted and existing work item supplied | Reference the supplied destination; resolve after the usual checks. |
 | Agent; failed verification, push, reply, or unresolved evidence | Report blocker; leave open for a safe rerun. |
+| Any; product-owner confirmation required | Thank the reviewer and say it will be confirmed with the PO; leave open; report as a human action. |
+| Any; reviewer asks the agent to create a work item | Reply that a human will create it; leave open; report a human action with a drafted title and body. |
 | Human/unknown; any outcome | Fix or answer; manual closure only. |
 
 **MUST NOT** create a follow-up issue or work item, even after confirmation or if automatic creation seems faster/simpler. Rationale: this flow records agreement only; work item creation is reserved for a future workflow. After confirmation, take no work item action or deferred implementation action. On rerun, wait without repeating the request while no existing work item is supplied. An accepted but untracked deferral is not settled and must not resolve.
@@ -135,6 +166,8 @@ Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is go
 | Gate | The `counts` from §0 and the `action` that let the run continue. |
 | Issues | One row per `issue`: `issueId`, class, verdict, commit sha or `none`, threads replied and resolved. |
 | Open threads | Questions/blockers awaiting clarification or evidence; agreed deferrals awaiting a supplied work item (follow-up agreed, work item not created); answered human/unknown threads awaiting manual closure. |
+| Human actions | Product-owner confirmations needed; requested work items with drafted title and body; code scanning alerts needing dismissal. |
+| Skipped threads | Threads reported without a reply and why. |
 | Verification | `$buildCommand` and `$testCommand`, or the note that they are absent and which issues went unverified. |
 | Residual findings | Anything the investigation turned up that no reviewer asked about. Reported, not fixed. |
 
@@ -142,5 +175,5 @@ Done when `WORKTREE_PATH` no longer exists and the local `$headRef` branch is go
 
 - Push to `$headRef` through *Load and follow the `git` skill to run verified branch naming and lifecycle* using Branches with the originally observed remote SHA. `--force`, `--force-with-lease`, `--amend`, and rebasing a pushed commit stay off the table — the reviewer is reading these commits as you write them.
 - One `issue`, one commit. One run, one push.
-- Ask the reviewer outright the moment the `evidence` runs out. A question costs the reviewer less than a wrong guess.
+- Apply the decision rule in Investigate every substantive issue before asking the reviewer; escalate blocking uncertainty, not routine remedy selection.
 - Reply to new work; reconcile unresolved agent threads without duplicate replies. An unanswered question remains open until clarification; a posted answer alone is not completion.
