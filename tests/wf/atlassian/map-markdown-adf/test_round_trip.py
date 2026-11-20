@@ -130,3 +130,8 @@ def test_breakout_on_the_toc_expand_round_trips_and_does_not_leak(md_to_adf, adf
     assert toc["marks"] == [{"type": "breakout", "attrs": {"mode": "wide", "width": 760}}]
     assert "marks" not in later
     assert adf_to_md(md_to_adf(source)).strip() == source
+
+
+def test_children_macro_round_trips_through_the_publish_guard(md_to_adf, adf_to_md):
+    source = '# Upgrades\n\n<!-- adf:children depth="2" -->\n\nTail.'
+    assert adf_to_md(md_to_adf(source)) == source

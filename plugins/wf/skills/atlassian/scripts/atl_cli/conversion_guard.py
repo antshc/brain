@@ -12,7 +12,7 @@ from .converter.adf_to_md import adf_to_markdown, render_block
 from .converter.md_to_adf import markdown_to_adf
 from .converter.blocks import CODE_LANG_ALLOWLIST
 from .converter.syntax import syntax_lines
-from .converter.patterns import breakout_marker_mark, table_marker_attrs
+from .converter.patterns import breakout_marker_mark, children_marker_params, table_marker_attrs
 
 _PROFILE = Path(__file__).resolve().parent.parent / "config" / "confluence-markdown.json"
 _WORKER = Path(__file__).with_name("lint_worker.py")
@@ -98,7 +98,7 @@ def validate_markdown(markdown: str, *, placeholders: bool = False, media: bool 
                         raise GuardError(f"line {number}: unresolved attachment/diagram placeholder")
                 elif re.match(r"<!--\s*(?:media-size:|adf:ignore:(?:start|end))", tag):
                     continue
-                elif not (re.fullmatch(r"<!--\s*adf:toc\s*-->", tag) or table_marker_attrs(tag) or breakout_marker_mark(tag)):
+                elif not (re.fullmatch(r"<!--\s*adf:toc\s*-->", tag) or children_marker_params(tag) is not None or table_marker_attrs(tag) or breakout_marker_mark(tag)):
                     raise GuardError(f"line {number}: unsupported or malformed ATL marker")
                 if table_marker_attrs(tag) is not None or breakout_marker_mark(tag) is not None:
                     is_table = table_marker_attrs(tag) is not None

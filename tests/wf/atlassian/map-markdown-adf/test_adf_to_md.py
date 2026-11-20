@@ -160,6 +160,27 @@ def test_standalone_toc_extension_renders_toc_comment(adf_to_md):
     assert adf_to_md(doc) == "<!-- adf:toc -->"
 
 
+def _children_extension(**params):
+    return {
+        "type": "extension",
+        "attrs": {
+            "layout": "default",
+            "extensionType": "com.atlassian.confluence.macro.core",
+            "extensionKey": "children",
+            "parameters": {"macroParams": {name: {"value": value} for name, value in params.items()}},
+        },
+    }
+
+
+def test_children_extension_renders_children_comment(adf_to_md):
+    assert adf_to_md(_doc(_children_extension())) == "<!-- adf:children -->"
+
+
+def test_children_extension_keeps_macro_params(adf_to_md):
+    doc = _doc(_children_extension(sort="title", depth="2"))
+    assert adf_to_md(doc) == '<!-- adf:children depth="2" sort="title" -->'
+
+
 def test_expand_with_toc_among_other_content_keeps_details_wrapper(adf_to_md):
     doc = _doc(
         {

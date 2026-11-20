@@ -17,6 +17,7 @@ from .patterns import (
     BREAKOUT_MARKER_RE,
     TABLE_MARKER_RE,
     TOC_COMMENT_RE,
+    children_marker_params,
     WIDE_TABLE_MARKER_RE,
 )
 
@@ -33,6 +34,8 @@ def detect_adf_only(markdown: str) -> list[dict]:
             found.append({"kind": "expand", "line": number})
         elif TOC_COMMENT_RE.match(line):
             found.append({"kind": "toc", "line": number})
+        elif children_marker_params(line) is not None:
+            found.append({"kind": "children", "line": number})
         elif WIDE_TABLE_MARKER_RE.match(line):
             found.append({"kind": "wideTable", "line": number})
         elif TABLE_MARKER_RE.match(line):

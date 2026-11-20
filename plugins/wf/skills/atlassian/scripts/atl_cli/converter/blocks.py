@@ -14,6 +14,7 @@ from .patterns import (
     SUMMARY_RE,
     TOC_COMMENT_RE,
     breakout_marker_mark,
+    children_marker_params,
     table_marker_attrs,
 )
 from .table_grid import validate_table_grid
@@ -82,6 +83,19 @@ def build_toc_extension() -> dict:
     }
 
 
+def build_children_extension(params: dict[str, str]) -> dict:
+    """A Confluence-native child pages macro node, for the `<!-- adf:children -->` marker."""
+    return {
+        "type": "extension",
+        "attrs": {
+            "layout": "default",
+            "extensionType": "com.atlassian.confluence.macro.core",
+            "extensionKey": "children",
+            "parameters": {"macroParams": {name: {"value": value} for name, value in params.items()}},
+        },
+    }
+
+
 def parse_blocks(lines: list[str]) -> list[dict]:
     """Parse a list of Markdown lines into ADF block nodes."""
     blocks: list[dict] = []
@@ -101,6 +115,13 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             if pending_breakout:
                 toc["marks"] = [pending_breakout]
             blocks.append(toc)
+            pending_table_attrs = pending_breakout = None
+            i += 1
+            continue
+
+        children_params = children_marker_params(line)
+        if children_params is not None:
+            blocks.append(build_children_extension(children_params))
             pending_table_attrs = pending_breakout = None
             i += 1
             continue
