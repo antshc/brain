@@ -75,3 +75,92 @@ def test_traverse_filters_context(graph_path: Path, capsys: pytest.CaptureFixtur
     _, out = run(capsys, graph_path, 'traverse', 'OrderJanitor', '--context', 'call')
     assert "Start: ['OrderJanitor']" in out
     assert 'EDGE OrderJanitor --calls' in out and 'implements' not in out
+
+
+@pytest.fixture
+def impact_graph(tmp_path: Path) -> Path:
+    nodes = [
+        ('controller', 'OrderController', 'src/OrderController.cs'),
+        ('handler', 'OrderHandler', 'src/OrderHandler.cs'),
+        ('service', 'OrderService', 'src/OrderService.cs'),
+        ('other_service', 'OrderService', 'src/LegacyOrderService.cs'),
+        ('repository', 'OrderRepository', 'src/OrderRepository.cs'),
+        ('config', 'OrderConfig', 'src/OrderConfig.cs'),
+        ('generated', 'OrderGenerated', 'obj/OrderGenerated.cs'),
+    ]
+    edges = [
+        ('controller', 'handler', 'calls'),
+        ('handler', 'service', 'calls'),
+        ('service', 'repository', 'calls'),
+        ('config', 'service', 'references'),
+        ('generated', 'service', 'calls'),
+    ]
+    path = tmp_path / 'graph.json'
+    path.write_text(json.dumps({
+        'directed': False,  # Graphify can serialize directed edges with this flag off.
+        'nodes': [
+            {'id': nid, 'label': label, 'source_file': source, 'source_location': 'L1'}
+            for nid, label, source in nodes
+        ],
+        'edges': [
+            {'source': src, 'target': dst, 'relation': rel, 'source_location': 'L12'}
+            for src, dst, rel in edges
+        ],
+    }))
+    return path
+
+
+def test_affected_follows_reverse_edges_and_production_filters(impact_graph, capsys):
+    code, out = run(capsys, impact_graph, 'affected', 'service')
+    assert code == 0
+    assert 'OrderHandler [calls] src/OrderHandler.cs:L12' in out
+    assert 'OrderController [calls]' in out
+    assert 'OrderConfig [references]' in out
+    assert 'OrderRepository' not in out
+    assert 'OrderGenerated' not in out
+    assert [p.name for p in impact_graph.parent.iterdir()] == ['graph.json']
+
+
+def test_affected_limits_depth_and_relations(impact_graph, capsys):
+    code, out = run(capsys, impact_graph, 'affected', 'src/OrderService.cs::OrderService',
+                    '--depth', '1', '--relation', 'calls', '--relation', 'imports')
+    assert code == 0
+    assert 'OrderHandler [calls]' in out
+    assert 'OrderController' not in out
+    assert 'OrderConfig' not in out
+    assert 'Relations: calls, imports' in out
+
+
+def test_affected_distinguishes_ambiguous_missing_and_empty(impact_graph, capsys):
+    argv = ['--graph', str(impact_graph), 'affected']
+    assert graph.main([*argv, 'OrderService']) == 5
+    err = capsys.readouterr().err
+    assert 'ambiguous symbol' in err
+    assert 'service: OrderService' in err and 'other_service: OrderService' in err
+    assert graph.main([*argv, 'AbsentService']) == 4
+    assert "no node matches 'AbsentService'" in capsys.readouterr().err
+    code, out = run(capsys, impact_graph, 'affected', 'other_service')
+    assert code == 0
+    assert 'No affected nodes found.' in out
+
+
+def test_focused_path_preserves_dependency_direction(impact_graph, capsys):
+    code, out = run(capsys, impact_graph, 'path', 'OrderController', 'OrderRepository', '--directed')
+    assert code == 0
+    assert out.startswith('Path (3 hops):')
+    code, out = run(capsys, impact_graph, 'path', 'OrderRepository', 'OrderController', '--directed')
+    assert code == 0
+    assert out.startswith('No path between')
+
+
+def test_focused_path_leaves_interface_binding_for_source_trace(graph_path, capsys):
+    code, out = run(capsys, graph_path, 'path', 'OrdersController', 'IOrderJanitor', '--directed')
+    assert code == 0
+    assert out.startswith('Path (1 hops):')
+    code, out = run(capsys, graph_path, 'path', 'OrdersController', 'OrderJanitor', '--directed')
+    assert code == 0
+    assert out.startswith('No path between')
+    code, out = run(capsys, graph_path, 'affected', 'IOrderJanitor')
+    assert code == 0
+    assert 'OrdersController [references]' in out
+    assert 'OrderJanitor [implements]' in out
