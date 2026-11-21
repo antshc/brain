@@ -69,6 +69,7 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | `<!-- adf:diagram drawio="<name>" -->` | `extension` (Draw.io macro) — **ADF-only, `adf-to-md` direction only** |
 | `<!-- adf:attachment media-id="<id>" alt="<alt>" [width="<w>" height="<h>"] [display-width="<n>[%]"] [layout="<layout>"] -->` | `mediaSingle`/`media`/`mediaGroup` (one placeholder per file) — **ADF-only, `adf-to-md` direction only** |
 | n/a (no reverse mapping) | `inlineCard` (Confluence smart link) → `[<url>](<url>)` — **ADF-only, `adf-to-md` direction only** |
+| `<!-- adf:error id="<id>" node="<type>" -->⚠️ **Conversion error <id>:** <reason>` | Any node Fetch page / Fetch work could not convert; `md-to-adf` rejects it — see [Conversion errors](conversion-guards.md#conversion-errors). The offline `adf-to-md` CLI stays strict and never writes it |
 
 A list item's soft-wrapped continuation lines fold into its paragraph, joined by a single space. `- first line` followed by `continues here` is one `listItem`, not a list plus a stray paragraph:
 

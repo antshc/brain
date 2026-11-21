@@ -49,6 +49,7 @@ Stdout `{"key":..., "url":..., "attached":[...], "attachFailed":[{"file","error"
 | `error: Jira rejected the request: <message>` | Jira refused; nothing created or changed | Required-field error → `<atl> jira workitem field create-metadata --space <projectKey> --type "<issueType>"`, ask for the missing values, re-run |
 | `error: Jira request outcome unknown (...)` | Connection dropped or timed out; the item may exist | **MUST NOT** re-run `create`. Search `<atl> jira workitem query --jql 'project = <projectKey> AND summary ~ "<summary>" AND created >= -1d'`; found → continue with `update --id`; not found → report and ask before creating |
 | `error: Markdown conversion failed: <reason>` | Source rejected before any call | Fix the Markdown, re-run |
+| `... unresolved conversion error <id> (adf:error)` | Fetched content that could not be converted is still tagged | Resolve per [Conversion errors](conversion-guards.md#conversion-errors), re-run |
 | `error: <KEY> was published but the remaining twg fields failed` | Item exists with its description; the extra twg flags did not apply | Keep the key; run the printed `jira workitem update --id <KEY> ...` retry through `<atl>` |
 | `attachFailed` entries | Item exists; those files did not attach | Keep the `key`; retry only them: `<atl> publish-work update --key <key> --attach <path> ...` (fields untouched) |
 

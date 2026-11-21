@@ -1,9 +1,12 @@
 """Atlassian Document Format -> Markdown entrypoint (pure)."""
 from __future__ import annotations
 
+import json
 import re
+from contextvars import ContextVar
+from dataclasses import dataclass
 
-from .patterns import COMMENT_CLOSE_TAG, STATUS_EMOJI, comment_open_tag
+from .patterns import COMMENT_CLOSE_TAG, STATUS_EMOJI, comment_open_tag, error_marker
 from .table_grid import validate_table_grid
 
 # Applied innermost-first, so combined marks on one text node wrap in a fixed order
@@ -15,10 +18,68 @@ _MARK_ORDER = ("code", "strike", "em", "strong", "link")
 _LANGUAGE_ALIASES = {"shell": "bash"}
 
 
+@dataclass(frozen=True)
+class ConversionIssue:
+    """One part of a fetched document that could not be converted; `raw` is its ADF, if any."""
+
+    error_id: str
+    node: str
+    reason: str
+    raw: object = None
+
+
+# Set only while `adf_to_markdown_tolerant` runs; None keeps every other caller strict.
+_issues: ContextVar[list[ConversionIssue] | None] = ContextVar("adf_conversion_issues", default=None)
+
+
 def adf_to_markdown(doc: dict) -> str:
     if not isinstance(doc, dict):
         raise ValueError(f"ADF body must be a parsed JSON object, got {type(doc).__name__}")
     return render_blocks(doc.get("content", []))
+
+
+def adf_to_markdown_tolerant(doc: dict) -> tuple[str, list[ConversionIssue]]:
+    """Like `adf_to_markdown`, but a node that cannot be converted becomes a one-line
+    `adf:error` tag plus visible reason in place, and is reported instead of aborting."""
+    issues: list[ConversionIssue] = []
+    token = _issues.set(issues)
+    try:
+        return adf_to_markdown(doc), issues
+    finally:
+        _issues.reset(token)
+
+
+def new_issue(issues: list[ConversionIssue], node: str, reason: str, raw: object = None) -> ConversionIssue:
+    issue = ConversionIssue(f"e{len(issues) + 1}", re.sub(r"[^A-Za-z0-9_-]", "", node) or "unknown", reason, raw)
+    issues.append(issue)
+    return issue
+
+
+def issue_line(issue: ConversionIssue) -> str:
+    """The in-place tag and visible reason; one line, so it is safe in lists and table cells."""
+    reason = render_text({"type": "text", "text": issue.reason})
+    return f"{error_marker(issue.error_id, issue.node)}⚠️ **Conversion error {issue.error_id}:** {reason}"
+
+
+def render_issue_section(issues: list[ConversionIssue]) -> str:
+    """Ignored trailing section with each issue's reason and the raw ADF that failed."""
+    lines = ["<!-- adf:ignore:start -->", "## Conversion errors", ""]
+    for issue in issues:
+        lines += [f"### {issue.error_id} — {issue.node}", "", render_text({"type": "text", "text": issue.reason}), ""]
+        if issue.raw is not None:
+            raw = json.dumps(issue.raw, indent=2, ensure_ascii=False)
+            fence = "`" * max(3, max((len(m.group()) + 1 for m in re.finditer(r"`+", raw)), default=3))
+            lines += [f"{fence}json", raw, fence, ""]
+    lines.append("<!-- adf:ignore:end -->")
+    return "\n".join(lines)
+
+
+def _tolerate(node: object, exception: Exception) -> str:
+    issues = _issues.get()
+    if issues is None:
+        raise exception
+    node_type = node.get("type") if isinstance(node, dict) else None
+    return issue_line(new_issue(issues, str(node_type or type(node).__name__), str(exception), node))
 
 
 def render_blocks(nodes: list[dict]) -> str:
@@ -26,6 +87,13 @@ def render_blocks(nodes: list[dict]) -> str:
 
 
 def render_block(node: dict) -> str:
+    try:
+        return _render_marked_block(node)
+    except (ValueError, NotImplementedError, AttributeError, TypeError) as exception:
+        return _tolerate(node, exception)
+
+
+def _render_marked_block(node: dict) -> str:
     rendered = _render_block_body(node)
     breakout = next((m for m in node.get("marks", []) if m.get("type") == "breakout"), None)
     if breakout and rendered:
@@ -263,21 +331,27 @@ def render_inline(nodes: list[dict]) -> str:
             if comment_id not in open_ids:
                 parts.append(comment_open_tag(comment_id))
                 open_ids.append(comment_id)
-        node_type = node.get("type")
-        if node_type == "text":
-            parts.append(render_text(node))
-        elif node_type == "hardBreak":
-            parts.append("  \n")
-        elif node_type == "status":
-            parts.append(render_status(node))
-        elif node_type == "inlineCard":
-            parts.append(render_inline_card(node))
-        elif node_type == "inlineExtension":
-            parts.append(render_inline_extension(node))
-        else:
-            raise NotImplementedError(f"unhandled inline node type '{node_type}'")
+        try:
+            parts.append(_render_inline_node(node))
+        except (ValueError, NotImplementedError, AttributeError, TypeError) as exception:
+            parts.append(_tolerate(node, exception))
     parts.extend(COMMENT_CLOSE_TAG for _ in open_ids)
     return "".join(parts)
+
+
+def _render_inline_node(node: dict) -> str:
+    node_type = node.get("type")
+    if node_type == "text":
+        return render_text(node)
+    if node_type == "hardBreak":
+        return "  \n"
+    if node_type == "status":
+        return render_status(node)
+    if node_type == "inlineCard":
+        return render_inline_card(node)
+    if node_type == "inlineExtension":
+        return render_inline_extension(node)
+    raise NotImplementedError(f"unhandled inline node type '{node_type}'")
 
 
 def render_inline_card(node: dict) -> str:

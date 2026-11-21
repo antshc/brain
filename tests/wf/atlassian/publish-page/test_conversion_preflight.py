@@ -13,7 +13,7 @@ from atl_cli.page_diagrams import pipeline
     '# Title\n\n<!-- adf:comment id="x" -->unclosed\n',
     '# Title\n\n<!-- adf:breakout mode="wide" -->\nparagraph\n',
     '# Title\n\n| a | b |\n| --- |\n',
-    '# Title\n\n<!-- adf:lossy -->\nbody\n',
+    '# Title\n\n<!-- adf:error id="e1" node="mention" -->⚠️ **Conversion error e1:** x\nbody\n',
 ])
 def test_guard_failure_precedes_remote_clients_and_mutations(tmp_path, monkeypatch, source):
     path = tmp_path / 'source.md'

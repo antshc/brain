@@ -89,3 +89,11 @@ def comment_open_tag(comment_id: str) -> str:
 
 
 COMMENT_CLOSE_TAG = "<!-- /adf:comment -->"
+
+# Conversion failure tag a fetch writes in place of an ADF node it could not convert, e.g.
+# `<!-- adf:error id="e1" node="extension" -->`. Publishing rejects any file that still has one.
+ERROR_MARKER_RE = re.compile(r'<!--\s*adf:error\s+id="(?P<error_id>[A-Za-z0-9-]+)"\s+node="(?P<node>[^"]*)"\s*-->')
+
+
+def error_marker(error_id: str, node: str) -> str:
+    return f'<!-- adf:error id="{error_id}" node="{node}" -->'

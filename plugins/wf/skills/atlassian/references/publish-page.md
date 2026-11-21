@@ -49,7 +49,7 @@ Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```` ```mermaid `
 - Diagrams/local attachments → ensure page (placeholder when creating), render, upload, substitute markers at any depth (image → `mediaSingle`, filename as `alt`, `media-size`: `width`/`height` on the media node, `display-width` and `layout` on the `mediaSingle`; other file → `mediaGroup`), publish.
 - Neither → publish the converted ADF directly.
 
-Exits non-zero naming the cause on: missing `cloudId`/`email`/`apiToken`; missing `mmdc` (diagram path) or `drawio` (`drawio` mode); unsupported/unusable `diagramRenderer`; missing `drawioExtensionKey`; duplicate `%% diagram-id`; leftover marker after substitution. All but the last fail before any page is touched. Fix and re-run; do not work around. A create that fails after the placeholder page exists names the new page id in the error → re-run with `--page-id <id>`, never a second create.
+Exits non-zero naming the cause on: missing `cloudId`/`email`/`apiToken`; unresolved `adf:error` tag from a fetch (see [Conversion errors](conversion-guards.md#conversion-errors)); missing `mmdc` (diagram path) or `drawio` (`drawio` mode); unsupported/unusable `diagramRenderer`; missing `drawioExtensionKey`; duplicate `%% diagram-id`; leftover marker after substitution. All but the last fail before any page is touched. Fix and re-run; do not work around. A create that fails after the placeholder page exists names the new page id in the error → re-run with `--page-id <id>`, never a second create.
 
 Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); override with `--assets-dir`, `--out`.
 

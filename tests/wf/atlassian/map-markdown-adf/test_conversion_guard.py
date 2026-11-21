@@ -80,11 +80,21 @@ def test_mismatched_table_separator_rejected_without_stdout(run_cli):
     '<!-- adf:table width="600" -->\nparagraph',
     '<!-- adf:breakout mode="wide" -->\nparagraph',
     '<!-- adf:mystery -->', '<details>\n<summary>x</summary>\nbody',
-    '<!-- adf:attachment media-id="a" -->', '<!-- adf:lossy -->', '<div>unsupported</div>', '![image](https://example.com/a.png)',
+    '<!-- adf:attachment media-id="a" -->', '<!-- adf:error id="e1" node="mention" -->', '<div>unsupported</div>', '![image](https://example.com/a.png)',
 ])
 def test_invalid_dialect_is_rejected(source):
     with pytest.raises((guard.GuardError, ConversionError, ValueError)):
         md_to_adf(source, guarded=True)
+
+
+def test_adf_error_tag_is_allowed_in_fetched_markdown_but_blocks_publishing():
+    source = 'Hi <!-- adf:error id="e1" node="mention" -->⚠️ **Conversion error e1:** x\n'
+
+    guard.validate_markdown(source, placeholders=True)
+    with pytest.raises(guard.GuardError, match="line 1: unresolved conversion error"):
+        guard.validate_markdown(source)
+    with pytest.raises(guard.GuardError, match="malformed adf:error"):
+        guard.validate_markdown('<!-- adf:error node="x" -->\n', placeholders=True)
 
 
 def test_pragmas_and_ambient_files_cannot_disable_lint(tmp_path, monkeypatch):

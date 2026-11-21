@@ -82,17 +82,23 @@ def test_main_reports_a_safe_fetch_failure_and_writes_nothing(confluence, tmp_pa
     assert not (tmp_path / "page.md").exists()
 
 
-def test_main_reports_a_sanitized_conversion_failure_without_a_traceback_and_writes_nothing(confluence, tmp_path, capsys):
-    confluence.get.return_value = _page("Broken Page", {"type": "doc", "version": 1, "content": [{"type": "totallyUnknownNode"}]})
+def test_main_writes_an_unconvertible_node_as_an_adf_error_and_warns(confluence, tmp_path, capsys):
+    unknown = {"type": "totallyUnknownNode", "attrs": {"a": "<b>"}}
+    paragraph = {"type": "paragraph", "content": [{"type": "text", "text": "Kept."}]}
+    confluence.get.return_value = _page("Broken Page", {"type": "doc", "version": 1, "content": [unknown, paragraph]})
 
-    with pytest.raises(SystemExit):
-        _main(tmp_path)
+    _main(tmp_path)
 
+    markdown = (tmp_path / "page.md").read_text()
+    assert markdown.startswith(
+        '# Broken Page\n\n<!-- adf:error id="e1" node="totallyUnknownNode" -->⚠️ **Conversion error e1:** '
+    )
+    assert "Kept." in markdown
+    assert "## Conversion errors" in markdown
+    assert json.dumps(unknown, indent=2) in markdown
     err = capsys.readouterr().err
-    assert "ADF conversion failed:" in err
-    assert "totallyUnknownNode" in err
+    assert "1 conversion error(s) tagged with adf:error" in err
     assert "Traceback" not in err
-    assert not (tmp_path / "page.md").exists()
 
 
 def _attachment_reference_body() -> dict:

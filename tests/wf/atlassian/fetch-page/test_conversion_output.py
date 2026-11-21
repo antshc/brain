@@ -23,7 +23,7 @@ def test_atomic_write_preserves_existing_file_if_replace_fails(tmp_path, monkeyp
     assert sorted(path.name for path in tmp_path.iterdir()) == ['page.md']
 
 
-def test_fetch_lint_failure_keeps_existing_output(tmp_path, monkeypatch, capsys):
+def test_fetch_lint_failure_is_tagged_as_a_doc_level_adf_error(tmp_path, monkeypatch, capsys):
     path = tmp_path / 'page.md'
     path.write_text('existing')
     monkeypatch.setattr(assemble_page, 'require_supported_library', lambda: None)
@@ -31,8 +31,11 @@ def test_fetch_lint_failure_keeps_existing_output(tmp_path, monkeypatch, capsys)
     monkeypatch.setattr(assemble_page, 'get_confluence', lambda *_: MagicMock())
     monkeypatch.setattr(assemble_page, 'fetch_page', lambda *_: ('Title', {'type': 'doc', 'content': []}))
     monkeypatch.setattr(assemble_page, 'assemble', lambda *_: '# Title\n\ntext\twith tab\n')
-    with pytest.raises(SystemExit) as exception:
-        assemble_page.main(['--page-id', '1', '--config', 'cfg', '--md-path', str(path), '--comments', 'skip'])
-    assert exception.value.code == 1
-    assert 'MD010' in capsys.readouterr().err
-    assert path.read_text() == 'existing'
+
+    assemble_page.main(['--page-id', '1', '--config', 'cfg', '--md-path', str(path), '--comments', 'skip'])
+
+    written = path.read_text()
+    assert written.startswith('# Title\n\ntext\twith tab\n\n<!-- adf:error id="e1" node="doc" -->')
+    assert 'Markdown validation failed: Markdown lint failed' in written
+    assert 'MD010' in written
+    assert '1 conversion error(s) tagged with adf:error' in capsys.readouterr().err

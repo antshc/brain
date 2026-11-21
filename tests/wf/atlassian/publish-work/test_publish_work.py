@@ -165,6 +165,17 @@ def test_markdown_rejected_by_the_converter_fails_before_any_call(jira, tmp_path
     jira.put.assert_not_called()
 
 
+def test_markdown_with_an_unresolved_adf_error_fails_before_any_call(jira, tmp_path, capsys):
+    source = tmp_path / "description.md"
+    source.write_text('Hi <!-- adf:error id="e1" node="mention" -->⚠️ **Conversion error e1:** x\n')
+
+    with pytest.raises(SystemExit):
+        publish_work.main(["update", "--config", "cfg", "--key", "ABC-3", "--markdown", str(source)])
+
+    assert "line 1: unresolved conversion error e1 (adf:error)" in capsys.readouterr().err
+    jira.put.assert_not_called()
+
+
 def test_update_with_only_attachments_resumes_by_key_without_touching_fields(jira, tmp_path, capsys):
     attachment = tmp_path / "a.png"
     attachment.write_bytes(b"x")

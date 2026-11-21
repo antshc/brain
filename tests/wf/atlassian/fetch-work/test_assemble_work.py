@@ -45,7 +45,20 @@ def test_format_header_defaults_a_null_assignee_to_unassigned():
 def test_convert_adf_to_markdown_converts_in_process():
     body = {"type": "doc", "version": 1, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Body text."}]}]}
 
-    assert convert_adf_to_markdown(body) == "Body text.\n"
+    assert convert_adf_to_markdown(body) == ("Body text.\n", [])
+
+
+def test_assemble_tags_an_unconvertible_description_node_and_appends_its_raw_adf(monkeypatch, tmp_path):
+    monkeypatch.setattr("atl_cli.fetch_work.assemble_work.save_attachments", MagicMock(return_value={}))
+    mention = {"type": "mention", "attrs": {"id": "u1", "text": "@Ann"}}
+    body = {"type": "doc", "version": 1, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Hi "}, mention]}]}
+    issues = []
+
+    result = assemble("PROJ-5881", _fields(description=body), MagicMock(), str(tmp_path / "work.md.tmp"), issues=issues)
+
+    assert 'Hi <!-- adf:error id="e1" node="mention" -->⚠️ **Conversion error e1:** ' in result
+    assert result.endswith(f"```json\n{json.dumps(mention, indent=2)}\n```\n\n<!-- adf:ignore:end -->\n")
+    assert [issue.node for issue in issues] == ["mention"]
 
 
 def test_assemble_returns_the_header_alone_for_an_empty_description(monkeypatch):
@@ -72,7 +85,7 @@ def test_assemble_converts_real_adf_and_resolves_attachments(monkeypatch, tmp_pa
     jira = MagicMock()
     monkeypatch.setattr(
         "atl_cli.fetch_work.assemble_work.convert_adf_to_markdown",
-        lambda body: '<!-- adf:attachment media-id="img-1" alt="shot.png" -->',
+        lambda body: ('<!-- adf:attachment media-id="img-1" alt="shot.png" -->', []),
     )
     save_attachments = MagicMock(return_value={"shot.png": b"png-bytes"})
     monkeypatch.setattr("atl_cli.fetch_work.assemble_work.save_attachments", save_attachments)
@@ -95,7 +108,7 @@ def test_assemble_converts_real_adf_and_resolves_attachments(monkeypatch, tmp_pa
 
 def test_assemble_by_default_downloads_only_embedded_and_lists_the_rest(monkeypatch, tmp_path):
     jira = MagicMock()
-    monkeypatch.setattr("atl_cli.fetch_work.assemble_work.convert_adf_to_markdown", lambda body: "Plain text body.\n")
+    monkeypatch.setattr("atl_cli.fetch_work.assemble_work.convert_adf_to_markdown", lambda body: ("Plain text body.\n", []))
     save_attachments = MagicMock(return_value={})
     monkeypatch.setattr("atl_cli.fetch_work.assemble_work.save_attachments", save_attachments)
     attachments = [{"filename": "logs.zip", "size": 2048}]
@@ -109,7 +122,7 @@ def test_assemble_by_default_downloads_only_embedded_and_lists_the_rest(monkeypa
 
 def test_assemble_with_all_downloads_every_attachment(monkeypatch, tmp_path):
     jira = MagicMock()
-    monkeypatch.setattr("atl_cli.fetch_work.assemble_work.convert_adf_to_markdown", lambda body: "Plain text body.\n")
+    monkeypatch.setattr("atl_cli.fetch_work.assemble_work.convert_adf_to_markdown", lambda body: ("Plain text body.\n", []))
     save_attachments = MagicMock(return_value={"shot.png": b"png"})
     monkeypatch.setattr("atl_cli.fetch_work.assemble_work.save_attachments", save_attachments)
     attachments = [{"filename": "shot.png", "size": 3}]
@@ -122,7 +135,7 @@ def test_assemble_with_all_downloads_every_attachment(monkeypatch, tmp_path):
 
 
 def test_assemble_adds_no_section_when_the_issue_has_no_attachments(monkeypatch, tmp_path):
-    monkeypatch.setattr("atl_cli.fetch_work.assemble_work.convert_adf_to_markdown", lambda body: "Plain text body.\n")
+    monkeypatch.setattr("atl_cli.fetch_work.assemble_work.convert_adf_to_markdown", lambda body: ("Plain text body.\n", []))
     monkeypatch.setattr("atl_cli.fetch_work.assemble_work.save_attachments", MagicMock(return_value={}))
 
     result = assemble("PROJ-5881", _fields(), MagicMock(), str(tmp_path / "work.md.tmp"), "all")

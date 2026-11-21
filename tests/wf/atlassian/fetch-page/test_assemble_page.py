@@ -7,7 +7,6 @@ import pytest
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from atl_cli.fetch_page.assemble_page import (
-    ConversionError,
     PageFetchError,
     assemble,
     convert_adf_to_markdown,
@@ -58,11 +57,15 @@ def test_extract_title_and_body_parses_the_rest_v2_adf_string():
     assert extracted_body == body
 
 
-def test_extract_title_and_body_rejects_a_non_object_body():
-    page = {"title": "T", "body": {"atlas_doc_format": {"value": "[]"}}}
+def test_assemble_tags_a_non_object_body_instead_of_failing():
+    title, body = extract_title_and_body({"title": "T", "body": {"atlas_doc_format": {"value": "not json"}}})
+    issues = []
 
-    with pytest.raises(ConversionError, match="must be a JSON object"):
-        extract_title_and_body(page)
+    result = assemble(title, body, "123", MagicMock(), "unused", issues=issues)
+
+    assert result.startswith("# T\n")
+    assert [issue.node for issue in issues] == ["doc"]
+    assert "must be a parsed JSON object" in issues[0].reason
 
 
 def test_fetch_page_reads_rest_v2_with_atlas_doc_format():
@@ -87,19 +90,33 @@ def test_fetch_page_raises_a_safe_category_on_request_failure():
 def test_convert_adf_to_markdown_converts_in_process():
     body = {"type": "doc", "version": 1, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Body."}]}]}
 
-    assert convert_adf_to_markdown(body) == "Body.\n"
+    assert convert_adf_to_markdown(body) == ("Body.\n", [])
 
 
-def test_convert_adf_to_markdown_raises_sanitized_conversion_error_without_a_traceback():
-    with pytest.raises(ConversionError) as excinfo:
-        convert_adf_to_markdown({"type": "doc", "version": 1, "content": [{"type": "weirdNode"}]})
+def test_convert_adf_to_markdown_tags_an_unconvertible_node_and_keeps_the_rest():
+    weird = {"type": "weirdNode", "attrs": {"x": 1}}
+    body = {"type": "doc", "version": 1, "content": [weird, {"type": "paragraph", "content": [{"type": "text", "text": "Kept."}]}]}
 
-    assert str(excinfo.value).startswith("error: ")
-    assert "weirdNode" in str(excinfo.value)
+    markdown, issues = convert_adf_to_markdown(body)
+
+    assert markdown.startswith('<!-- adf:error id="e1" node="weirdNode" -->⚠️ **Conversion error e1:** ')
+    assert "Kept." in markdown
+    assert [(issue.error_id, issue.node, issue.raw) for issue in issues] == [("e1", "weirdNode", weird)]
+
+
+def test_convert_adf_to_markdown_reports_lossy_export_as_a_doc_level_issue():
+    card = {"type": "inlineCard", "attrs": {"url": "https://example.com"}}
+    body = {"type": "doc", "version": 1, "content": [{"type": "paragraph", "content": [card]}]}
+
+    markdown, issues = convert_adf_to_markdown(body)
+
+    assert markdown == "[https://example.com](https://example.com)\n"
+    assert [issue.node for issue in issues] == ["doc"]
+    assert "smart card normalized" in issues[0].reason
 
 
 def test_assemble_skips_attachment_handling_for_a_page_with_no_references(monkeypatch, tmp_path):
-    monkeypatch.setattr("atl_cli.fetch_page.assemble_page.convert_adf_to_markdown", lambda body: "Presentation text.\n")
+    monkeypatch.setattr("atl_cli.fetch_page.assemble_page.convert_adf_to_markdown", lambda body: ("Presentation text.\n", []))
     confluence = MagicMock()
 
     assets_dir = tmp_path / "page.md.tmp"
@@ -114,7 +131,7 @@ def test_assemble_saves_attachments_and_restores_diagrams_when_reference_present
 ):
     monkeypatch.setattr(
         "atl_cli.fetch_page.assemble_page.convert_adf_to_markdown",
-        lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
+        lambda body: ('<!-- adf:diagram drawio="order-flow.drawio" -->', []),
     )
     confluence = MagicMock()
     snapshot = MagicMock()
@@ -138,7 +155,7 @@ def test_assemble_saves_attachments_and_restores_diagrams_when_reference_present
 def test_assemble_does_not_duplicate_a_title_the_body_already_carries_as_h1(monkeypatch, tmp_path):
     monkeypatch.setattr(
         "atl_cli.fetch_page.assemble_page.convert_adf_to_markdown",
-        lambda body: "# Behavior Diagram\n\nPresentation text.\n",
+        lambda body: ("# Behavior Diagram\n\nPresentation text.\n", []),
     )
 
     result = assemble(
@@ -180,7 +197,8 @@ def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_p
         lambda body: (
             '<!-- adf:diagram drawio="order-flow.drawio" -->\n\n'
             '<!-- adf:attachment media-id="image-1" alt="Screenshot.png" -->\n\n'
-            '<!-- adf:attachment media-id="file-1" alt="" -->'
+            '<!-- adf:attachment media-id="file-1" alt="" -->',
+            [],
         ),
     )
 
@@ -199,7 +217,7 @@ def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_p
 def test_assemble_skip_mode_makes_no_attachment_calls(monkeypatch, tmp_path):
     monkeypatch.setattr(
         "atl_cli.fetch_page.assemble_page.convert_adf_to_markdown",
-        lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
+        lambda body: ('<!-- adf:diagram drawio="order-flow.drawio" -->', []),
     )
     confluence = MagicMock()
 
@@ -215,7 +233,7 @@ def test_assemble_skip_mode_makes_no_attachment_calls(monkeypatch, tmp_path):
 def test_assemble_auto_mode_degrades_safely_on_attachment_retrieval_failure(monkeypatch, tmp_path):
     monkeypatch.setattr(
         "atl_cli.fetch_page.assemble_page.convert_adf_to_markdown",
-        lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
+        lambda body: ('<!-- adf:diagram drawio="order-flow.drawio" -->', []),
     )
 
     def fake_fetch_snapshot(confluence, page_id):
@@ -238,7 +256,7 @@ def test_assemble_required_mode_propagates_attachment_retrieval_failure_and_writ
 ):
     monkeypatch.setattr(
         "atl_cli.fetch_page.assemble_page.convert_adf_to_markdown",
-        lambda body: '<!-- adf:diagram drawio="order-flow.drawio" -->',
+        lambda body: ('<!-- adf:diagram drawio="order-flow.drawio" -->', []),
     )
 
     def fake_fetch_snapshot(confluence, page_id):
@@ -259,7 +277,7 @@ def test_assemble_required_mode_raises_when_attachment_placeholder_cannot_be_res
 ):
     monkeypatch.setattr(
         "atl_cli.fetch_page.assemble_page.convert_adf_to_markdown",
-        lambda body: '<!-- adf:attachment media-id="missing" alt="missing.png" -->',
+        lambda body: ('<!-- adf:attachment media-id="missing" alt="missing.png" -->', []),
     )
     monkeypatch.setattr("atl_cli.fetch_page.assemble_page.fetch_attachment_snapshot", lambda confluence, page_id: MagicMock())
     monkeypatch.setattr("atl_cli.fetch_page.assemble_page.publish_attachment_cache", lambda snapshot, assets_dir: None)

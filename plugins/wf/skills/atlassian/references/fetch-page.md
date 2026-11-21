@@ -24,9 +24,9 @@ Return a Confluence **Page** as Markdown from a page ID, tiny ID, URL, or select
    `--format html`, `--detail` other than `full`, or `-o json` leave the Markdown path; omit them. `--section`, `--draft`, or several pages → exit 2 naming the flag. One page per command.
 
    Fetches title + ADF over REST v2 (`body-format=atlas_doc_format`), converts to Markdown (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Assets default to `page.md.assets/`.
-   - Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
+   - Content that cannot be converted → `page.md` still written with `adf:error` tags, exit 0, stderr warning; see [Conversion errors](conversion-guards.md#conversion-errors). Lossy-export warnings are tagged the same way.
    - REST failure → `Page fetch failed: <category>`, no `page.md`; category = exception class + HTTP status, plus a hint for 404 (`check site URL and page id; wrong API base?`) and 401/403 (`check email/apiToken`).
-3. **Return** `page.md` unchanged.
+3. **Return** `page.md` unchanged. stderr names tagged conversion errors → tell the user which ids/nodes failed; read `## Conversion errors` when the task needs the lost content.
 
 Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `page.md` or retry with edited ADF.
 

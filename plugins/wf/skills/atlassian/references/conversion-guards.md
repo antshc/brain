@@ -5,6 +5,7 @@
 - Boundaries
 - Lint policy
 - Fidelity and degradation
+- Conversion errors
 - Verification
 - Python alternatives
 
@@ -34,7 +35,18 @@ Validate only. Do not run generic autofix, trim code or hard-break whitespace, r
 
 Compare exact text, code, hard breaks, list structure/order, marks/link targets, table structure/cells, status values, expands, comment IDs/spans, and layout metadata. Canonical render/parse must reach a fixed point after one cycle. Normalize only named defaults, numeric representation, mark order, adjacent equal-mark text segments, generated `localId`, and the existing `shell`/`bash` alias.
 
-Smart cards normalize to plain links; heading bookmarks/page-creation buttons and non-comment annotations have no reverse mapping. Headerless tables and merged cells cannot round-trip through this Markdown dialect. Non-reproducible column widths are reported. Offline export warns; Fetch page additionally writes `<!-- adf:lossy -->` and an ignored explanation. Publishing that file fails until the unsupported preservation requirement is explicitly resolved. Never silently remove this marker to claim a lossless edit.
+Smart cards normalize to plain links; heading bookmarks/page-creation buttons and non-comment annotations have no reverse mapping. Headerless tables and merged cells cannot round-trip through this Markdown dialect. Non-reproducible column widths are reported. Offline export warns; Fetch page records each warning as a document-level conversion error (see below).
+
+## Conversion errors
+
+Fetch page and Fetch work never drop the whole file for content they cannot convert. Each failure becomes an `adf:error` tag, the file is still written, exit is 0, and stderr says `warning: <N> conversion error(s) tagged with adf:error in <file>`.
+
+- **Node failure** (unhandled node, extension, inline node; malformed table or card) → the node is replaced in place by one line, valid inside paragraphs, lists, and table cells:
+  `<!-- adf:error id="e1" node="<adf type>" -->⚠️ **Conversion error e1:** <reason>`
+- **Document failure** (`node="doc"`): lossy-export warnings, round-trip check failure, non-object/invalid ADF body, or Fetch page's final Markdown validation/lint failure → the same line after the body.
+- **Details:** a trailing `<!-- adf:ignore:start -->` `## Conversion errors` section lists each id, node type, reason, and the failed node's raw ADF in a ```` ```json ```` fence. Read it to recover lost content.
+- **Publishing:** Publish page, Publish work, and offline `md-to-adf` reject any file that still has an `adf:error` tag (`line <n>: unresolved conversion error <id> (adf:error)`), before any remote call. Restore the content in supported Markdown, or accept its loss explicitly, then delete the tag line. **MUST NOT** delete a tag just to make publishing pass without telling the user what was lost.
+- REST, auth, and `--attachments required` failures are not conversion errors; they still exit non-zero with no file.
 
 Media/Draw.io use typed metadata and existing attachment extraction/substitution, since pure placeholders have no complete reverse conversion. Unresolved attachment/diagram placeholders block publishing. Final ADF is checked again before update. Failures after uploads or placeholder creation retain existing partial-create reporting; they are not rolled back automatically.
 

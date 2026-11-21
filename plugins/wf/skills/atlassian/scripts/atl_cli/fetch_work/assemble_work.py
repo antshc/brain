@@ -14,7 +14,8 @@ from pathlib import Path
 
 from ..config import load_credentials, require_supported_library
 from ..jira_client import get_jira
-from ..map_markdown import ConversionError, adf_to_md
+from ..converter.adf_to_md import ConversionIssue
+from ..map_markdown import adf_to_md_tolerant, append_conversion_issues, report_conversion_issues
 from .fetch_attachments import (
     attachments_section,
     fetch_issue,
@@ -25,8 +26,8 @@ from .fetch_attachments import (
 )
 
 
-def convert_adf_to_markdown(body: dict) -> str:
-    return adf_to_md(body)
+def convert_adf_to_markdown(body: object) -> tuple[str, list[ConversionIssue]]:
+    return adf_to_md_tolerant(body)
 
 
 def format_header(issue_key: str, fields: dict) -> str:
@@ -40,10 +41,21 @@ def format_header(issue_key: str, fields: dict) -> str:
     )
 
 
-def assemble(issue_key: str, fields: dict, jira, assets_dir: str, attachments_mode: str = "embedded") -> str:
+def assemble(
+    issue_key: str,
+    fields: dict,
+    jira,
+    assets_dir: str,
+    attachments_mode: str = "embedded",
+    issues: list[ConversionIssue] | None = None,
+) -> str:
+    """Header + body + attachments. Unconvertible description nodes become in-place `adf:error`
+    lines, listed with their raw ADF in a trailing ignored `## Conversion errors` section."""
     header = format_header(issue_key, fields)
     adf_body = fields.get("description")
-    markdown = convert_adf_to_markdown(adf_body) if adf_body else ""
+    markdown, found = convert_adf_to_markdown(adf_body) if adf_body else ("", [])
+    if issues is not None:
+        issues.extend(found)
     referenced = referenced_filenames(markdown)
 
     attachments = fields.get("attachment") or []
@@ -54,11 +66,13 @@ def assemble(issue_key: str, fields: dict, jira, assets_dir: str, attachments_mo
 
     section = attachments_section(attachments, downloaded, referenced, assets_dir)
     if not section:
-        return header + markdown
-    if not markdown:
-        return header + section
-    body = markdown.rstrip("\n")
-    return f"{header}{body}\n\n{section}"
+        result = header + markdown
+    elif not markdown:
+        result = header + section
+    else:
+        body = markdown.rstrip("\n")
+        result = f"{header}{body}\n\n{section}"
+    return append_conversion_issues(result, found)
 
 
 def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
@@ -99,9 +113,7 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
 
     jira = get_jira(credentials)
     fields = fetch_issue(jira, args.issue_key)
-    try:
-        markdown = assemble(args.issue_key, fields, jira, assets_dir, args.attachments)
-    except ConversionError as exception:
-        print(f"error: ADF conversion failed: {exception}", file=sys.stderr)
-        raise SystemExit(1)
+    issues: list[ConversionIssue] = []
+    markdown = assemble(args.issue_key, fields, jira, assets_dir, args.attachments, issues)
     md_path.write_text(markdown)
+    report_conversion_issues(issues, str(md_path))

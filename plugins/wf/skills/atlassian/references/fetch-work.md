@@ -14,7 +14,7 @@ Return a Jira **Work item** as Markdown from a key, URL, or selected Jira search
 
 `-o json`, `--fields`, `--field`, `--full`, `--comments`, or `--remote-links` leave the Markdown path and run raw twg; omit them here. One key per command.
 
-Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description`; converts ADF to Markdown (media nodes → placeholders); applies Attachment rules. Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body, then `## Attachments` when any. Assets default to `work.md.tmp/` beside `work.md`. Non-zero exit → report stderr (missing `cloudId`/`email`/`apiToken`, unsupported `atlassian-python-api`, or `error: ADF conversion failed: <reason>`); no `work.md` on conversion failure.
+Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description`; converts ADF to Markdown (media nodes → placeholders); applies Attachment rules. Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body, then `## Attachments` when any. Assets default to `work.md.tmp/` beside `work.md`. Description content that cannot be converted → `work.md` still written with `adf:error` tags, exit 0, stderr warning; see [Conversion errors](conversion-guards.md#conversion-errors). Non-zero exit → report stderr (missing `cloudId`/`email`/`apiToken`, unsupported `atlassian-python-api`).
 
 **3 — Fetch comments.** Same site as the work item; `--comments -o json` runs raw twg:
 
@@ -24,7 +24,7 @@ Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description`; convert
 
 Keep the complete output unchanged beside `work.md`; no parser or extraction. Another Markdown filename → `<stem>.comments.json`. Command succeeded and output holds no comment-retrieval error → append `## Comments` with `[Comments](work.comments.json)` (relative link matching the saved filename), even when no comments exist. Failure → report it and append a comments-retrieval failure note instead of the link; keep the fetched work item.
 
-**4 — Return** `work.md` unchanged, including its comments link or failure note, plus the assets dir path when `## Attachments` or body links point into it. Read the linked comments, image, or log file only when the task needs it.
+**4 — Return** `work.md` unchanged, including its comments link or failure note, plus the assets dir path when `## Attachments` or body links point into it. stderr names tagged conversion errors → tell the user which ids/nodes failed. Read the linked comments, image, or log file only when the task needs it.
 
 ## Attachment rules
 

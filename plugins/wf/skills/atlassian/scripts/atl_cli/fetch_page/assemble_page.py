@@ -2,6 +2,10 @@
 pass (I/O: Confluence REST via `atlassian-python-api`; ADF->Markdown in-process through
 `map_markdown`; `fetch_diagrams` caches attachments and resolves placeholders).
 
+Content that cannot be converted never aborts the fetch: it is tagged `adf:error` in place,
+listed with its raw ADF in a trailing ignored `## Conversion errors` section, and reported on
+stderr; the page is still written and the exit code stays 0.
+
 REST v2 `body-format=atlas_doc_format` returns the real ADF, annotation marks included, so every
 `map-markdown-adf` construct and inline-comment anchor survives the round trip. Credentials
 (`cloudId`/`email`/`apiToken`) are mandatory; `--site` overrides the configured site. Attachment
@@ -31,9 +35,15 @@ from requests.exceptions import RequestException
 
 from ..config import load_credentials, require_supported_library, site_url
 from ..confluence_client import error_label, get_confluence
-from ..map_markdown import ConversionError as ConverterRejected
-from ..map_markdown import adf_to_md
-from ..conversion_guard import GuardError, guard_adf, lint_markdown, validate_markdown
+from ..converter.adf_to_md import ConversionIssue
+from ..map_markdown import (
+    DOC_NODE,
+    adf_to_md_tolerant,
+    append_conversion_issues,
+    new_issue,
+    report_conversion_issues,
+)
+from ..conversion_guard import GuardError, lint_markdown, validate_markdown
 from .comments import (
     CommentRetrievalError,
     comments_note,
@@ -55,28 +65,24 @@ _ATTACHMENT_MODES = ("auto", "skip", "required")
 _COMMENT_MODES = ("auto", "skip")
 
 
-class ConversionError(Exception):
-    """`map_markdown` rejected the ADF body. The message matches the `map-markdown` CLI's own
-    `error: <reason>` line; never a raw traceback.
-    """
-
-
 class PageFetchError(Exception):
     """The REST page read failed. The message names only the exception class and HTTP status,
     plus a fixed hint for 401/403/404 — never the raw text, which may carry a signed URL or
     credential."""
 
 
-def extract_title_and_body(page: dict) -> tuple[str, dict]:
-    """REST v2 page -> (title, ADF). `atlas_doc_format.value` arrives as a JSON string."""
+def extract_title_and_body(page: dict) -> tuple[str, object]:
+    """REST v2 page -> (title, ADF). `atlas_doc_format.value` arrives as a JSON string; a body
+    that is not valid JSON is returned as-is and tagged as a conversion error later."""
     value = page["body"]["atlas_doc_format"]["value"]
-    body = json.loads(value) if isinstance(value, str) else value
-    if not isinstance(body, dict):
-        raise ConversionError(f"ADF body must be a JSON object, got {type(body).__name__}")
+    try:
+        body = json.loads(value) if isinstance(value, str) else value
+    except ValueError:
+        body = value
     return page["title"], body
 
 
-def fetch_page(confluence, page_id: str) -> tuple[str, dict]:
+def fetch_page(confluence, page_id: str) -> tuple[str, object]:
     try:
         page = confluence.get(f"/api/v2/pages/{page_id}", params={"body-format": "atlas_doc_format"})
     except RequestException as exception:
@@ -84,11 +90,8 @@ def fetch_page(confluence, page_id: str) -> tuple[str, dict]:
     return extract_title_and_body(page)
 
 
-def convert_adf_to_markdown(body: dict) -> str:
-    try:
-        return adf_to_md(body, guarded=True)
-    except ConverterRejected as exception:
-        raise ConversionError(f"error: {exception}") from None
+def convert_adf_to_markdown(body: object) -> tuple[str, list[ConversionIssue]]:
+    return adf_to_md_tolerant(body, guarded=True)
 
 
 def _with_title(markdown: str, title: str) -> str:
@@ -104,11 +107,21 @@ def default_assets_dir(md_path: Path) -> Path:
 
 
 def assemble(
-    title: str, body: dict, page_id: str, confluence, assets_dir: str, attachments: str = "auto"
+    title: str,
+    body: object,
+    page_id: str,
+    confluence,
+    assets_dir: str,
+    attachments: str = "auto",
+    issues: list[ConversionIssue] | None = None,
 ) -> str:
-    markdown = convert_adf_to_markdown(body)
+    """Title + body Markdown. Unconvertible nodes stay as in-place `adf:error` lines and are
+    added to `issues`; callers finish the file with `append_conversion_issues`."""
+    markdown, found = convert_adf_to_markdown(body)
+    if issues is not None:
+        issues.extend(found)
 
-    if not has_attachment_reference(body):
+    if not isinstance(body, dict) or not has_attachment_reference(body):
         return _with_title(markdown, title)
 
     if attachments == "skip":
@@ -190,30 +203,25 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
     assets_dir = args.assets_dir or str(default_assets_dir(md_path))
 
     confluence = get_confluence(credentials)
+    issues: list[ConversionIssue] = []
     try:
         title, body = fetch_page(confluence, args.page_id)
-        markdown = assemble(title, body, args.page_id, confluence, assets_dir, args.attachments)
+        markdown = assemble(title, body, args.page_id, confluence, assets_dir, args.attachments, issues)
         markdown = append_comments(markdown, args.page_id, confluence, site_url(credentials), args.comments)
     except PageFetchError as exception:
         print(f"Page fetch failed: {exception}", file=sys.stderr)
-        raise SystemExit(1)
-    except ConversionError as exception:
-        print(f"ADF conversion failed: {exception}", file=sys.stderr)
         raise SystemExit(1)
     except AttachmentRetrievalError as exception:
         print(f"Attachment retrieval failed: {exception}", file=sys.stderr)
         raise SystemExit(1)
 
     try:
-        warnings = guard_adf(body, fetching=True)
-        if warnings:
-            markdown += "\n<!-- adf:lossy -->\n<!-- adf:ignore:start -->\nConversion degradation: " + "; ".join(warnings) + "\n<!-- adf:ignore:end -->\n"
         validate_markdown(markdown, placeholders=True, media=True)
         lint_markdown(markdown)
     except (GuardError, ValueError, NotImplementedError) as exception:
-        print(f"Markdown validation failed: {exception}", file=sys.stderr)
-        raise SystemExit(1) from None
-    atomic_write_markdown(md_path, markdown)
+        new_issue(issues, DOC_NODE, f"Markdown validation failed: {exception}")
+    atomic_write_markdown(md_path, append_conversion_issues(markdown, issues))
+    report_conversion_issues(issues, str(md_path))
 
 
 def atomic_write_markdown(path: Path, markdown: str) -> None:
