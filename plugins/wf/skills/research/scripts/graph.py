@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Single read-only entry point for graphify-out/ search.
 
-Focused commands (terms, query, resolve, path) need the graphify module and delegate to focused_query.py.
+Focused commands (terms, query, resolve, path, affected) need graphify and delegate to focused_query.py.
 Fallback commands (check, contexts, vocab, slice, traverse, raw-path, explain) use only the stdlib.
 """
 from __future__ import annotations
@@ -14,13 +14,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import graph_raw  # noqa: E402
 
-FOCUSED = ("terms", "query", "resolve", "path")
+FOCUSED = ("terms", "query", "resolve", "path", "affected")
 EPILOG = """\
 focused (needs graphify):
   graph.py terms "which service cleans old orders"
   graph.py query OrderJanitor --anchor --both
   graph.py resolve OrdersController
   graph.py path OrdersController ShipmentTask
+  graph.py affected OrderJanitor --depth 2
 fallback (stdlib only):
   graph.py check
   graph.py contexts

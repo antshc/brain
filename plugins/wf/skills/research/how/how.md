@@ -14,7 +14,7 @@ Read triggered resources in full; pass the ones a worker needs as absolute paths
 | Checks cross-deployable handoffs/contracts/terminals | `how/flow.md` |
 | Checks data shape, keys, ownership, consistency, migration, concurrency, retention | `how/data.md` |
 | Restored NuGet API/implementation evidence | `how/nuget.md` (`hunty` loads it) |
-| Relationship lookup or direct graph query/path/explain | `how/graphify.md` (`hunty` loads it) |
+| Relationship, impact, or direct graph query/path/explain | `how/graphify.md` (`hunty` loads it) |
 | Caller needs system question examples | `how/README.md` |
 
 ## Workflow
