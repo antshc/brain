@@ -345,6 +345,10 @@ def paragraphs_from_lines(lines: list[str]) -> list[dict]:
     return paras
 
 
+def _indent_of(line: str) -> int:
+    return len(line) - len(line.lstrip())
+
+
 def _match_list_marker(line: str):
     """Match `line` against both list-marker patterns, ordered first.
 
@@ -439,6 +443,20 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
                     item_content.append({"type": "paragraph", "content": parse_inline(item_text)})
                 nested_block, i = parse_list(lines, i, deferred_tables)
                 item_content.append(nested_block)
+                continue
+            if item_content and not sub_m and _indent_of(lines[i]) > indent and not _is_block_start(lines[i], lines, i):
+                # A paragraph following the item's code block or nested list.
+                para_lines = []
+                while (
+                    i < n
+                    and lines[i].strip()
+                    and _indent_of(lines[i]) > indent
+                    and not _match_list_marker(lines[i])[1]
+                    and not _INDENTED_FENCE_RE.match(lines[i])
+                ):
+                    para_lines.append(lines[i])
+                    i += 1
+                item_content.append({"type": "paragraph", "content": parse_inline(join_paragraph_lines(para_lines))})
                 continue
             if sub_m or item_content or _is_block_start(lines[i], lines, i):
                 break  # keep list-item parsing simple: one paragraph + optional nested list only

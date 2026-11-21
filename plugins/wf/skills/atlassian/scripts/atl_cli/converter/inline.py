@@ -12,6 +12,7 @@ from .patterns import (
     STATUS_PATTERN,
 )
 
+# Emphasis bodies skip backslash escapes (`(?:\\.|.)`) so an escaped delimiter such as `\*` never closes a span.
 _INLINE_RE = re.compile(
     r"(?P<escape>\\[!\"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])"
     r"|(?P<hard_break><br\s*/?>| {2,}\n|\\\n)"
@@ -19,11 +20,11 @@ _INLINE_RE = re.compile(
     r"|" + STATUS_PATTERN +
     r"|" + EMOJI_STATUS_PATTERN +
     r"|\[(?P<link_txt>(?:\\.|[^\]])*)\]\((?P<link_href>(?:\\.|[^()\s]|\([^()]*\))+)\)"
-    r"|\*\*(?P<strong_txt>.+?)\*\*"
-    r"|__(?P<strong_u_txt>.+?)__"
-    r"|~~(?P<strike_txt>.+?)~~"
-    r"|\*(?P<em_txt>.+?)\*"
-    r"|_(?P<em_u_txt>.+?)_"
+    r"|\*\*(?P<strong_txt>(?:\\.|.)+?)\*\*"
+    r"|__(?P<strong_u_txt>(?:\\.|.)+?)__"
+    r"|~~(?P<strike_txt>(?:\\.|.)+?)~~"
+    r"|\*(?P<em_txt>(?:\\.|.)+?)\*"
+    r"|_(?P<em_u_txt>(?:\\.|.)+?)_"
 )
 
 

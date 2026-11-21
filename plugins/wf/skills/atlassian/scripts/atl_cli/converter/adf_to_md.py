@@ -321,7 +321,9 @@ def render_text(node: dict) -> str:
         elif mark_type == "strike":
             text = f"~~{text}~~"
         elif mark_type == "em":
-            text = f"*{text}*"
+            # `_` keeps bold+italic text from producing a `***` run the parser cannot split.
+            delimiter = "_" if "strong" in marks_by_type and "code" not in marks_by_type else "*"
+            text = f"{delimiter}{text}{delimiter}"
         elif mark_type == "strong":
             text = f"**{text}**"
         elif mark_type == "link":
