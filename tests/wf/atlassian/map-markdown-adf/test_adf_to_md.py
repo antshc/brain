@@ -1,7 +1,14 @@
 """ADF -> Markdown cases, ported from pyadf2md's JSON fixtures and extended for the block/mark
 types pyadf2md never supported (heading, codeBlock, blockquote, rule, expand, strike, code, link).
 """
+from __future__ import annotations
+
 import json
+
+import pytest
+
+from atl_cli.converter.adf_to_md import adf_to_markdown
+from atl_cli.map_markdown import adf_to_md_tolerant, append_conversion_issues
 
 
 def _doc(*content):
@@ -631,3 +638,47 @@ def test_plaintext_code_block_round_trips(md_to_adf, adf_to_md):
 def test_status_with_an_unknown_color_keeps_the_legacy_form(adf_to_md):
     doc = _doc(_p({"type": "status", "attrs": {"text": "Odd", "color": "teal"}}))
     assert adf_to_md(doc) == "[STATUS:Odd|teal]"
+
+
+def test_tolerant_conversion_marks_multiple_failures_and_keeps_neighboring_content():
+    mention = {"type": "mention", "attrs": {"id": "user-1", "text": "@Ann"}}
+    unknown_block = {"type": "totallyUnknownNode", "attrs": {"value": 42}}
+    doc = _doc(
+        _p(_t("Before "), mention, _t(" after.")),
+        unknown_block,
+        _p(_t("Still here.")),
+    )
+
+    markdown, issues = adf_to_md_tolerant(doc, guarded=True)
+
+    assert "Before " in markdown
+    assert 'after.' in markdown
+    assert "Still here." in markdown
+    assert '<!-- adf:error id="e1" node="mention" -->' in markdown
+    assert '<!-- adf:error id="e2" node="totallyUnknownNode" -->' in markdown
+    assert [(issue.error_id, issue.node, issue.raw) for issue in issues] == [
+        ("e1", "mention", mention),
+        ("e2", "totallyUnknownNode", unknown_block),
+    ]
+    report = append_conversion_issues(markdown, issues)
+    assert "## Conversion errors" in report
+    assert json.dumps(mention, indent=2) in report
+    assert json.dumps(unknown_block, indent=2) in report
+
+
+def test_tolerant_conversion_is_local_and_strict_conversion_stays_strict():
+    mention = {"type": "mention", "attrs": {"id": "user-1", "text": "@Ann"}}
+    doc = _doc(
+        {
+            "type": "bulletList",
+            "content": [{"type": "listItem", "content": [_p(_t("Before "), mention, _t(" after."))]}],
+        }
+    )
+
+    markdown, issues = adf_to_md_tolerant(doc)
+
+    assert markdown.startswith('- Before <!-- adf:error id="e1" node="mention" -->')
+    assert markdown.endswith(" after.\n")
+    assert len(issues) == 1
+    with pytest.raises(NotImplementedError, match="mention"):
+        adf_to_markdown(doc)

@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from capabilities import CAPABILITIES, body
-from regression import FIXTURE, main, verify_run
+from regression import FIXTURE, build_degraded_adf, main, verify_run
 
 IDS = [capability.id for capability in CAPABILITIES]
 
@@ -31,6 +31,23 @@ def test_init_creates_a_unique_titled_page_and_an_all_unchecked_checklist(tmp_pa
     assert checklist.count("- [ ] **") == len(CAPABILITIES)
     assert "- [x]" not in checklist
     assert "`TEST`" in checklist
+
+
+def test_build_degraded_adf_appends_a_mention_without_mutating_source():
+    source = {"type": "doc", "version": 1, "content": [{"type": "paragraph", "content": []}]}
+
+    degraded = build_degraded_adf(source, "account-1")
+
+    assert len(source["content"]) == 1
+    assert degraded["content"][-2]["content"][1] == {
+        "type": "mention",
+        "attrs": {
+            "id": "account-1",
+            "text": "@Regression User",
+            "accessLevel": "",
+        },
+    }
+    assert degraded["content"][-1]["content"][0]["text"] == "Still here after degradation."
 
 
 @pytest.mark.parametrize("capability", CAPABILITIES, ids=IDS)
@@ -99,6 +116,24 @@ def test_detached_comment_on_republish_fails(simulated_run):
     assert {o.capability.id: o.status for o in verify_run(simulated_run)}["R02"] == "fail"
 
 
+@pytest.mark.parametrize(
+    ("path", "needle", "capability_id"),
+    [
+        ("fetched-degraded.md", '<!-- adf:error id="e1" node="mention" -->', "G01"),
+        ("fetched-degraded.md", "## Conversion errors", "G02"),
+        ("fetch-degraded.err", "1 conversion error(s) tagged with adf:error", "G03"),
+        ("publish-degraded.err", "unresolved conversion error (adf:error)", "G04"),
+    ],
+)
+def test_graceful_degradation_evidence_is_required(simulated_run, path, needle, capability_id):
+    artifact = simulated_run / path
+    artifact.write_text(artifact.read_text(encoding="utf-8").replace(needle, ""), encoding="utf-8")
+
+    outcome = {item.capability.id: item for item in verify_run(simulated_run)}[capability_id]
+
+    assert outcome.status == "fail"
+
+
 def test_changed_attachment_bytes_fail(simulated_run):
     (simulated_run / "fetched-1.md.assets" / "regression-notes.txt").write_text("other", encoding="utf-8")
     assert {o.capability.id: o.status for o in verify_run(simulated_run)}["A02"] == "fail"
@@ -107,10 +142,12 @@ def test_changed_attachment_bytes_fail(simulated_run):
 def test_missing_artifacts_are_skipped_and_verify_exits_nonzero(simulated_run, capsys):
     for name in ("publish-2.json", "fetched-2.md"):
         (simulated_run / name).unlink()
+    for name in ("fetched-degraded.md", "fetch-degraded.err", "publish-degraded.err"):
+        (simulated_run / name).unlink()
 
     assert main(["verify", "--run", str(simulated_run)]) == 1
     summary = json.loads(capsys.readouterr().out)
-    assert set(summary["skipped"]) == {"R01", "R02", "R03", "R04", "R05"}
+    assert set(summary["skipped"]) == {"R01", "R02", "R03", "R04", "R05", "G01", "G02", "G03", "G04"}
     assert "SKIPPED: artifact not produced" in (simulated_run / "checklist.md").read_text(encoding="utf-8")
 
 

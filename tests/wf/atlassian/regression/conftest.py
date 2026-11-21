@@ -16,8 +16,13 @@ ATL_PY = SKILL_DIR / "scripts" / "atl.py"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from capabilities import FOOTER_COMMENT_BODY, INLINE_ANCHOR_TEXT, INLINE_COMMENT_BODY  # noqa: E402
-from regression import init_run  # noqa: E402
+from capabilities import (  # noqa: E402
+    FOOTER_COMMENT_BODY,
+    INLINE_ANCHOR_TEXT,
+    INLINE_COMMENT_BODY,
+)
+from atl_cli.map_markdown import adf_to_md_tolerant, append_conversion_issues  # noqa: E402
+from regression import build_degraded_adf, init_run  # noqa: E402
 
 _IGNORED_RE = re.compile(r"<!-- adf:ignore:start -->.*?<!-- adf:ignore:end -->\n*", re.DOTALL)
 
@@ -86,4 +91,17 @@ def simulated_run(tmp_path) -> Path:
         (run_dir / f"publish-{number}.json").write_text(json.dumps(publish), encoding="utf-8")
         (run_dir / f"fetched-{number}.md").write_text(simulate_fetch(page_md, number), encoding="utf-8")
         shutil.copytree(run_dir / "assets", run_dir / f"fetched-{number}.md.assets")
+
+    degraded_adf = build_degraded_adf({"type": "doc", "version": 1, "content": []}, "regression-user")
+    degraded_markdown, issues = adf_to_md_tolerant(degraded_adf, guarded=True)
+    degraded = append_conversion_issues(degraded_markdown, issues)
+    (run_dir / "fetched-degraded.md").write_text(degraded, encoding="utf-8")
+    (run_dir / "fetch-degraded.err").write_text(
+        "warning: 1 conversion error(s) tagged with adf:error in fetched-degraded.md\n",
+        encoding="utf-8",
+    )
+    (run_dir / "publish-degraded.err").write_text(
+        "error: line 1: unresolved conversion error (adf:error); restore the content and remove the tag\n",
+        encoding="utf-8",
+    )
     return run_dir

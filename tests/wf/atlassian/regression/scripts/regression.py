@@ -3,15 +3,18 @@
 
     init    create a run directory: the fixture page (unique title), its assets, `run.json`,
             and `checklist.md` listing every capability unchecked
+    degrade inject a supported but unconvertible mention into the published page ADF
     verify  evaluate every capability against the run's artifacts, tick verified items in
             `checklist.md`, write `results.json`; exit 1 unless every capability passed
 
 Artifacts the agent saves into the run directory between the two:
-`publish-1.json`, `fetched-1.md` (+ `.assets`), `publish-2.json`, `fetched-2.md`.
+`publish-1.json`, `fetched-1.md` (+ `.assets`), `publish-2.json`, `fetched-2.md`,
+`degrade.json`, `fetched-degraded.md`, `fetch-degraded.err`, `publish-degraded.err`.
 """
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 import shutil
@@ -23,7 +26,15 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from capabilities import CAPABILITIES, Artifacts, Outcome, evaluate  # noqa: E402
+from capabilities import (  # noqa: E402
+    CAPABILITIES,
+    DEGRADED_MENTION_TEXT,
+    DEGRADED_PREFIX,
+    DEGRADED_SUFFIX,
+    Artifacts,
+    Outcome,
+    evaluate,
+)
 
 REGRESSION_DIR = _SCRIPT_DIR.parent
 FIXTURE = REGRESSION_DIR / "fixtures" / "round-trip-page.md"
@@ -99,10 +110,79 @@ def load_artifacts(run_dir: Path) -> tuple[dict, Artifacts]:
         fetched_1=_read(run_dir / "fetched-1.md", as_json=False),
         publish_2=_read(run_dir / "publish-2.json", as_json=True),
         fetched_2=_read(run_dir / "fetched-2.md", as_json=False),
+        fetched_degraded=_read(run_dir / "fetched-degraded.md", as_json=False),
+        fetch_degraded_err=_read(run_dir / "fetch-degraded.err", as_json=False),
+        publish_degraded_err=_read(run_dir / "publish-degraded.err", as_json=False),
     )
     if artifacts.publish_1:
         run["pageId"] = artifacts.publish_1.get("pageId")
     return run, artifacts
+
+
+def build_degraded_adf(adf: dict, account_id: str) -> dict:
+    degraded = copy.deepcopy(adf)
+    content = degraded.get("content")
+    if not isinstance(content, list):
+        raise ValueError("ADF document content must be a list")
+    content.append(
+        {
+            "type": "paragraph",
+            "content": [
+                {"type": "text", "text": DEGRADED_PREFIX},
+                {
+                    "type": "mention",
+                    "attrs": {
+                        "id": account_id,
+                        "text": DEGRADED_MENTION_TEXT,
+                        "accessLevel": "",
+                    },
+                },
+                {"type": "text", "text": DEGRADED_SUFFIX},
+            ],
+        }
+    )
+    content.append(
+        {
+            "type": "paragraph",
+            "content": [{"type": "text", "text": "Still here after degradation."}],
+        }
+    )
+    return degraded
+
+
+def degrade_run(
+    run_dir: Path,
+    config_path: Path,
+    account_id: str,
+    *,
+    publish_path: Path | None = None,
+) -> dict:
+    run, artifacts = load_artifacts(run_dir)
+    publish = artifacts.publish_2 if publish_path is None else _read(publish_path, as_json=True)
+    publish_label = "publish-2.json" if publish_path is None else str(publish_path)
+    if not publish or not publish.get("pageId"):
+        raise ValueError(f"{publish_label} must contain pageId")
+    adf_path = Path(publish["adfPath"])
+    adf = json.loads(adf_path.read_text(encoding="utf-8"))
+    degraded = build_degraded_adf(adf, account_id)
+    degraded_path = run_dir / "degraded-adf.json"
+    degraded_path.write_text(json.dumps(degraded, indent=2) + "\n", encoding="utf-8")
+
+    skill_scripts = REGRESSION_DIR.parents[3] / "plugins" / "wf" / "skills" / "atlassian" / "scripts"
+    if str(skill_scripts) not in sys.path:
+        sys.path.insert(0, str(skill_scripts))
+    from atl_cli.config import load_credentials  # noqa: PLC0415
+    from atl_cli.confluence_client import get_confluence  # noqa: PLC0415
+    from atl_cli.page_diagrams.rest_publish import get_page_version, update_page_adf  # noqa: PLC0415
+
+    credentials = load_credentials(str(config_path))
+    if credentials is None:
+        raise ValueError("Atlassian config is missing required credentials")
+    page_id = str(publish["pageId"])
+    confluence = get_confluence(credentials)
+    version = get_page_version(confluence, page_id)
+    update_page_adf(confluence, page_id, publish.get("title") or run["title"], degraded, version)
+    return {"method": "rest", "pageId": page_id, "degraded": True, "adfPath": str(degraded_path)}
 
 
 def verify_run(run_dir: Path) -> list[Outcome]:
@@ -125,10 +205,22 @@ def main(argv: list[str] | None = None) -> int:
     init.add_argument("--runs-dir", type=Path, default=DEFAULT_RUNS_DIR, help="Parent of run directories")
     verify = sub.add_parser("verify", help="Check the run's artifacts and tick the checklist")
     verify.add_argument("--run", type=Path, required=True, help="Run directory from `init`")
+    degrade = sub.add_parser("degrade", help="Inject an unsupported mention into the live page ADF")
+    degrade.add_argument("--run", type=Path, required=True, help="Run directory from `init`")
+    degrade.add_argument("--config", type=Path, required=True, help="Resolved Atlassian config path")
+    degrade.add_argument("--account-id", required=True, help="Resolved Atlassian account id for a valid mention")
+    degrade.add_argument(
+        "--publish",
+        type=Path,
+        help="Publish result and ADF to degrade (default: <run>/publish-2.json)",
+    )
     args = parser.parse_args(argv)
 
     if args.action == "init":
         print(json.dumps(init_run(args.space, args.runs_dir)))
+        return 0
+    if args.action == "degrade":
+        print(json.dumps(degrade_run(args.run, args.config, args.account_id, publish_path=args.publish)))
         return 0
     outcomes = verify_run(args.run)
     summary = {status: [o.capability.id for o in outcomes if o.status == status] for status in ("pass", "fail", "skipped")}

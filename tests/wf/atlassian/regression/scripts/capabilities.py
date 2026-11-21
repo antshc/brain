@@ -15,6 +15,9 @@ IGNORED_TEXT = "LOCAL-ONLY-NOTE"
 IMAGE_NAME = "regression-image.png"
 FILE_NAME = "regression-notes.txt"
 DIAGRAM_IDS = ("regression-flow", "regression-sequence")
+DEGRADED_PREFIX = "Graceful degradation before "
+DEGRADED_SUFFIX = " after."
+DEGRADED_MENTION_TEXT = "@Regression User"
 
 _COMMENTS_SECTION_RE = re.compile(r"\n*<!-- adf:ignore:start -->\n## Comments.*\Z", re.DOTALL)
 _ASSETS_DIR_RE = re.compile(r"fetched-\d+\.md\.assets/")
@@ -33,6 +36,9 @@ class Artifacts:
     fetched_1: str | None = None
     publish_2: dict | None = None
     fetched_2: str | None = None
+    fetched_degraded: str | None = None
+    fetch_degraded_err: str | None = None
+    publish_degraded_err: str | None = None
 
 
 @dataclass(frozen=True)
@@ -187,6 +193,46 @@ def _idempotent(artifacts: Artifacts) -> str | None:
     return None if len(first) == len(second) else f"line count {len(first)} != {len(second)}"
 
 
+def _degraded_marker(artifacts: Artifacts) -> str | None:
+    marker = (
+        f"{DEGRADED_PREFIX}"
+        '<!-- adf:error id="e1" node="mention" -->'
+        "⚠️ **Conversion error e1:** "
+    )
+    if marker not in artifacts.fetched_degraded:
+        return "in-place mention degradation marker missing"
+    if DEGRADED_SUFFIX not in artifacts.fetched_degraded:
+        return "content after the unsupported mention was lost"
+    if "Still here after degradation." not in artifacts.fetched_degraded:
+        return "content after the unsupported paragraph was lost"
+    return None
+
+
+def _degraded_report(artifacts: Artifacts) -> str | None:
+    expected = (
+        "## Conversion errors",
+        "### e1 — mention",
+        "unhandled inline node type 'mention'",
+        '"type": "mention"',
+        '"text": ',
+    )
+    missing = [text for text in expected if text not in artifacts.fetched_degraded]
+    return f"conversion report missing {missing[0]!r}" if missing else None
+
+
+def _degraded_warning(artifacts: Artifacts) -> str | None:
+    expected = "1 conversion error(s) tagged with adf:error"
+    return None if expected in artifacts.fetch_degraded_err else f"fetch warning missing {expected!r}"
+
+
+def _degraded_republish_rejected(artifacts: Artifacts) -> str | None:
+    expected = "unresolved conversion error (adf:error)"
+    error = artifacts.publish_degraded_err
+    if expected not in error:
+        return f"publish rejection missing {expected!r}"
+    return "publish rejection included a traceback" if "Traceback" in error else None
+
+
 F1 = ("fetched_1",)
 CAPABILITIES: tuple[Capability, ...] = (
     Capability("P01", "Publish", "Page created over REST with the H1 as title", ("publish_1",), _publish_created),
@@ -228,6 +274,10 @@ CAPABILITIES: tuple[Capability, ...] = (
     Capability("R03", "Republish", "Diagrams replaced in place on republish", ("publish_2",), _republish_diagrams),
     Capability("R04", "Republish", "Second fetch identical to the first (Confluence -> Markdown -> Confluence stable)", ("fetched_1", "fetched_2"), _idempotent),
     Capability("R05", "Republish", "Inline-comment anchor survives republish", ("fetched_2",), _anchor("fetched_2")),
+    Capability("G01", "Degradation", "Unknown inline ADF keeps neighboring and later content", ("fetched_degraded",), _degraded_marker),
+    Capability("G02", "Degradation", "Unknown inline ADF reports its reason and raw node", ("fetched_degraded",), _degraded_report),
+    Capability("G03", "Degradation", "Degraded fetch writes Markdown and warns on stderr", ("fetch_degraded_err",), _degraded_warning),
+    Capability("G04", "Degradation", "Degraded fetched Markdown is rejected before republish", ("publish_degraded_err",), _degraded_republish_rejected),
 )
 
 
