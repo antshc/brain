@@ -20,6 +20,10 @@ def test_plain_commonmark_is_markdown_safe(detect_adf_only):
         ("<!-- adf:wide-table -->\n\n| a |\n| --- |", "wideTable"),
         ('<!-- adf:table layout="wide" width="960" -->\n\n| a |\n| --- |', "tableLayout"),
         ('<!-- adf:breakout mode="wide" width="760" -->\n<details>\n<summary>S</summary>\n</details>', "breakout"),
+        (
+            "<!-- adf:inline-card -->[https://example.com](https://example.com)<!-- /adf:inline-card -->",
+            "inlineCard",
+        ),
     ],
 )
 def test_each_adf_only_construct_is_detected(detect_adf_only, markdown_text, kind):

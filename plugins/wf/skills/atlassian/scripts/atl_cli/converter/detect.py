@@ -12,6 +12,7 @@ from .patterns import (
     COMMENT_OPEN_RE,
     DETAILS_OPEN_RE,
     EMOJI_STATUS_RE,
+    INLINE_CARD_OPEN_RE,
     PANEL_MARKER_RE,
     STATUS_RE,
     BREAKOUT_MARKER_RE,
@@ -49,5 +50,7 @@ def detect_adf_only(markdown: str) -> list[dict]:
             found.append({"kind": "status", "line": number})
         if COMMENT_OPEN_RE.search(line):
             found.append({"kind": "inlineComment", "line": number})
+        if INLINE_CARD_OPEN_RE.search(line):
+            found.append({"kind": "inlineCard", "line": number})
 
     return found

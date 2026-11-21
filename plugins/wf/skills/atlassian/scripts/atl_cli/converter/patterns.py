@@ -90,6 +90,14 @@ def comment_open_tag(comment_id: str) -> str:
 
 COMMENT_CLOSE_TAG = "<!-- /adf:comment -->"
 
+# Reversible inline smart-link marker. The enclosed Markdown link is visible in normal renderers;
+# the paired markers restore the ADF `inlineCard` node when publishing.
+INLINE_CARD_OPEN_RE = re.compile(r"<!--\s*adf:inline-card\s*-->")
+INLINE_CARD_CLOSE_RE = re.compile(r"<!--\s*/adf:inline-card\s*-->")
+INLINE_CARD_TAG_RE = re.compile(f"{INLINE_CARD_OPEN_RE.pattern}|{INLINE_CARD_CLOSE_RE.pattern}")
+INLINE_CARD_OPEN_TAG = "<!-- adf:inline-card -->"
+INLINE_CARD_CLOSE_TAG = "<!-- /adf:inline-card -->"
+
 # Conversion failure tag a fetch writes in place of an ADF node it could not convert, e.g.
 # `<!-- adf:error id="e1" node="extension" -->`. Publishing rejects any file that still has one.
 ERROR_MARKER_RE = re.compile(r'<!--\s*adf:error\s+id="(?P<error_id>[A-Za-z0-9-]+)"\s+node="(?P<node>[^"]*)"\s*-->')

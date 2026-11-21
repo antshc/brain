@@ -39,9 +39,11 @@ def upload_files(confluence: Any, page_id: str, files: list[dict]) -> dict:
         f"/rest/api/content/{page_id}/child/attachment",
         params={"expand": "extensions.fileId", "limit": 200},
     )
+    requested_names = {file["filename"] for file in files}
     file_ids: dict[str, str] = {}
     for a in resp["results"]:
-        file_ids[a["title"]] = a["extensions"]["fileId"]
+        if a["title"] in requested_names:
+            file_ids[a["title"]] = a["extensions"]["fileId"]
     for f in files:
         if f["filename"] not in file_ids:
             raise RuntimeError(f"Uploaded attachment {f['filename']!r} not found on re-read")

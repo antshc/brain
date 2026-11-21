@@ -27,6 +27,9 @@ NATIVE = "--native"
 CONFIG_ACTIONS: dict[str, set[str] | None] = {
     "fetch-work": None,
     "fetch-page": None,
+    "doctor": None,
+    "rename-page": None,
+    "copy-page": None,
     "publish-work": {"create", "update", "read-adf"},
     "publish-page": {"run", "verify", "render-attach", "publish-adf"},
 }
@@ -75,6 +78,24 @@ def _map_markdown(argv: list[str], prog: str) -> int | None:
     return main(argv, prog=prog)
 
 
+def _doctor(argv: list[str], prog: str) -> int | None:
+    from .doctor import main
+
+    return main(argv, prog=prog)
+
+
+def _rename_page(argv: list[str], prog: str) -> int | None:
+    from .page_operations import main
+
+    return main(argv, prog=prog)
+
+
+def _copy_page(argv: list[str], prog: str) -> int | None:
+    from .copy_page import main
+
+    return main(argv, prog=prog)
+
+
 @dataclass(frozen=True)
 class Command:
     summary: str
@@ -90,6 +111,9 @@ COMMANDS: dict[str, Command] = {
         _publish_page,
     ),
     "map-markdown": Command("md-to-adf | adf-to-md | detect-adf-only; offline, no config", _map_markdown),
+    "doctor": Command("Inspect Python packages, CLIs, and configured interpreter", _doctor),
+    "rename-page": Command("Rename a page with a live REST body/version snapshot", _rename_page),
+    "copy-page": Command("Clone one page to another and verify the semantic result", _copy_page),
 }
 
 

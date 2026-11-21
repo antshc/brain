@@ -40,6 +40,7 @@ Publish local Markdown to a Confluence page in one command: extract → convert 
 ```bash
 <atl> confluence content create --content-type page --space-id <spaceId> [--parent-id <parentId>] [--title "<title>"] --body-file <mdPath> --ack-body-formats -y
 <atl> confluence content update <pageId> --body-file <mdPath> [--title "<title>"] [--parent-id <parentId>]
+<atl> publish-page run --md-path <mdPath> --page-id <pageId> --title "<title>" --verify
 ```
 
 Use `--body-file`, so relative image paths resolve and the manifest survives for Step 3. **MUST NOT** pass `--format html` or `--edits*`; they bypass the pipeline. `--snapshot-token`, `--ack-body-formats`, and `-y` are accepted and ignored; `--draft`, `--content-width`, `--minor-edit`, `--version-message` → exit 2. `--assets-dir` is passed on; `--out` or `--mermaid-bg` need the underlying `<atl> publish-page run --md-path <mdPath> (--page-id <pageId> | --space-id <spaceId>) ...`.
@@ -55,10 +56,12 @@ Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); o
 
 Stdout JSON:
 
-- `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"renderer":...,"adfPath":...}` → published.
+- `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"uploadedAttachments":N,"renderer":...,"adfPath":...}` → published. `attachments` and `uploadedAttachments` count only files uploaded in this operation, not unrelated files already on the page.
 - Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId`, `unknownCommentIds`, `partialCommentRemovals` `[{id,before,after}]`, `commentGuard` (`failed (<category>)`, `notice failed (<category>)`).
 
 **3 — Verify.** With `--parent-id`, creation checks the parent belongs to the space and reads back the new page parent; update checks its existing parent before writing. Success includes `parentId`; post-create verification failure returns the created ID for recovery. Recheck hierarchy through Atlassian metadata when publishing a page collection.
+
+`run --verify` performs this step automatically after an update. It derives the expected comment-anchor count from the source and reads `manifestPath`; `--verify-dir` defaults to `<assets-dir>/verify`. A failed verification leaves all artifacts and exits non-zero.
 
 Re-fetch into a separate dir and assert:
 

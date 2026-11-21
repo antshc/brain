@@ -312,6 +312,32 @@ def test_link(md_to_adf):
     }
 
 
+def test_inline_card_marker_preserves_a_confluence_page_link(md_to_adf):
+    source = (
+        "<!-- adf:inline-card -->"
+        "[https://example.atlassian.net/wiki/spaces/X/pages/1]"
+        "(https://example.atlassian.net/wiki/spaces/X/pages/1)"
+        "<!-- /adf:inline-card -->"
+    )
+
+    node = md_to_adf(source)["content"][0]["content"][0]
+
+    assert node == {
+        "type": "inlineCard",
+        "attrs": {"url": "https://example.atlassian.net/wiki/spaces/X/pages/1"},
+    }
+
+
+def test_inline_card_marker_rejects_an_ordinary_non_matching_link(run_cli):
+    source = "<!-- adf:inline-card -->[label](https://example.com)<!-- /adf:inline-card -->"
+
+    result = run_cli("md-to-adf", source)
+
+    assert result.returncode == 1
+    assert "inline-card" in result.stderr
+    assert result.stdout == ""
+
+
 def test_link_without_label_uses_href(md_to_adf):
     doc = md_to_adf("[](https://example.com)")
     assert doc["content"][0]["content"][0]["text"] == "https://example.com"

@@ -19,6 +19,7 @@ Return a Confluence **Page** as Markdown from a page ID, tiny ID, URL, or select
 
    ```bash
    <atl> confluence content get <page> --output-file page.md [--site <site>] [--assets-dir <dir>] [--attachments auto|skip|required] [--comments auto|skip]
+   <atl> fetch-page <page-id-or-url> --md-path page.md [--site <site>] [--attachments auto|skip|required]
    ```
 
    `--format html`, `--detail` other than `full`, or `-o json` leave the Markdown path; omit them. `--section`, `--draft`, or several pages → exit 2 naming the flag. One page per command.
@@ -38,7 +39,7 @@ Non-zero exit → report stderr; **MUST NOT** run `wc`/`cat` on the missing `pag
 - `media` with `attrs.alt` ending `.png|.jpg|.jpeg|.gif|.svg|.webp|.bmp`;
 - `extension` with `attrs.extensionKey` containing `drawio`.
 
-**Caching:** on match, list and download all page attachments once; stage in a sibling dir, then atomically replace the assets dir; failure never leaves a partial cache or damages a prior one. TLS verification always on.
+**Caching:** on match, list attachment metadata once and download only files referenced by body `media` IDs plus required Mermaid source sidecars. Stage downloaded files in a sibling dir, then atomically replace the assets dir; failure never leaves a partial cache or damages a prior one. TLS verification always on.
 
 **Placeholder resolution:**
 

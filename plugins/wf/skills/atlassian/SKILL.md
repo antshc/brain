@@ -18,7 +18,10 @@ Operations and tactics for Jira and Confluence. Pick the tactic by trigger, load
 | **Publish work** | Create or update a Jira work item, issue, story, task, bug, or epic from Markdown; repeat once per item | [references/publish-work.md](references/publish-work.md) | Key, URL, attachment outcomes, read-back when ADF-only constructs exist |
 | **Fetch page** | Confluence page ID/URL/tiny link, or a selected search hit, needs its full body | [references/fetch-page.md](references/fetch-page.md) | `page.md` with anchors, assets, comments per mode |
 | **Publish page** | Publish local Markdown to Confluence, or edit an existing page without replying to threads | [references/publish-page.md](references/publish-page.md) | Page URL, diagram/attachment and anchor outcomes, verify result |
+| **Copy page** | Clone a page body and attachments into another existing page | [references/copy-page.md](references/copy-page.md) | Verified target URL, work dir, attachment and comment policy |
+| **Rename page** | Rename one exact page with a safe live snapshot | [references/rename-page.md](references/rename-page.md) | New title, version, URL, changed flag |
 | **Address page comments** | Settle open review comments on a Confluence page and reply to each thread; 'address page comments', 'reply to review comments' | [references/address-page-comments.md](references/address-page-comments.md) | Targeted in-place edits, one confirmed reply per pending thread, gate report |
+| **Doctor** | Diagnose missing Python/CLI/runtime prerequisites or the wrong interpreter | [references/doctor.md](references/doctor.md) | Runtime report and exact install command |
 | **Install** | Explicit request to install or set up ATL in a repo, refresh `preflight-atlassian`, or generate or migrate `pub-*` wrappers; 'install atlassian' | [references/install.md](references/install.md) | Plugin status, preflight files, config keys added, wrapper paths, missing prerequisites |
 | **Map Markdown** | Convert Markdown/ADF, or decide whether Markdown alone carries a document | [references/map-markdown-adf.md](references/map-markdown-adf.md) | ADF JSON, Markdown, or construct report; offline |
 | **Query or operate with TWG** | Search, discovery, metadata, people, links, transitions, comments, sprints, or other non-body operations | [references/twg.md](references/twg.md), then the TWG routes row | `<atl>` result |
@@ -34,7 +37,7 @@ Out of scope here: daily blocked items and @mentions → *Load and follow the `d
 3. **Body transport.** Full Jira descriptions and Confluence page bodies default to Markdown. `<atl>` routes Markdown body commands (`confluence content get|create|update`, `jira workitem get|create|update`) to REST + ADF through the skill's converter. Every other command runs on twg. **MUST NOT** pass `--format html`, `--description-format html|plain`, or `--native` on a body command, except the Address page comments tactic's targeted HTML edits and a tactic's documented fallback. Never use the Atlassian MCP.
 4. **Fallbacks.** Each fetch reference names its lossy raw-twg fallback and warning; use it only when the Markdown body path is unavailable or fails for a non-auth reason. Auth failure or policy denial → stop and report; no fallback.
 5. **Read-only intents** (read, show, summarize, search, compare) issue no create, update, transition, comment, attach, or publish call.
-6. **Prerequisites.** `tokenAvailable` false, `atlassian-python-api` missing or unsupported, required `pymarkdownlnt` missing, or Preflight unavailable → ask the user to run `/atlassian install` (Install tactic) in Copilot CLI, then stop; never start it unasked.
+6. **Prerequisites.** Run `<atl> doctor` when interpreter/package symptoms occur. `tokenAvailable` false, required package missing or unsupported, or Preflight unavailable → ask the user to run `/atlassian install` (Install tactic) in Copilot CLI, then stop; never start it unasked.
 
 ## TWG routes
 

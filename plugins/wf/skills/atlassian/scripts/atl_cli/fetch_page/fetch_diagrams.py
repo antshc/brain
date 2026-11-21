@@ -59,10 +59,11 @@ class AttachmentRetrievalError(Exception):
 
 @dataclass(frozen=True)
 class AttachmentSnapshot:
-    """Every attachment on the page, listed and downloaded exactly once."""
+    """Referenced attachments plus the number of metadata rows inspected."""
 
     attachments: list[dict]
     downloaded: dict[str, bytes]
+    listed_count: int = 0
 
 
 def media_size_comment(width: str | None, height: str | None, display_width: str | None, layout: str | None) -> str:
@@ -137,17 +138,55 @@ def download_attachment_bytes(confluence: Any, attachment: dict) -> bytes:
     return content if isinstance(content, bytes) else content.encode("utf-8")
 
 
-def fetch_attachment_snapshot(confluence: Any, page_id: str) -> AttachmentSnapshot:
-    """List every attachment on the page and download every attachment's bytes, once. Any TLS,
-    timeout, HTTP, or connection failure raises `AttachmentRetrievalError` naming only the
-    exception's class and HTTP status.
+def referenced_attachment_titles(attachments: list[dict], body: object) -> set[str]:
+    """Attachment titles needed to resolve every file/media and Mermaid source in `body`."""
+    file_ids: set[str] = set()
+    diagram_sidecars: set[str] = set()
+    for node in find_attachment_reference_nodes(body):
+        attrs = node.get("attrs", {})
+        if node.get("type") == "media":
+            file_id = attrs.get("id")
+            if isinstance(file_id, str) and file_id:
+                file_ids.add(file_id)
+            continue
+        params = attrs.get("parameters", {})
+        name = (
+            params.get("guestParams", {}).get("diagramName", "")
+            or params.get("macroParams", {}).get("diagramName", {}).get("value", "")
+        )
+        if isinstance(name, str) and name:
+            diagram_sidecars.add(_sidecar_title(name))
+
+    titles = set(diagram_sidecars)
+    for attachment in attachments:
+        if attachment.get("extensions", {}).get("fileId") in file_ids:
+            title = attachment["title"]
+            titles.add(title)
+            titles.add(_sidecar_title(title))
+    return titles
+
+
+def fetch_attachment_snapshot(
+    confluence: Any,
+    page_id: str,
+    body: object | None = None,
+) -> AttachmentSnapshot:
+    """List attachments once, then download only files referenced by `body`. Passing no `body`
+    retains the historical all-attachment behavior for direct callers.
     """
     try:
         attachments = list_attachments(confluence, page_id)
-        downloaded = {a["title"]: download_attachment_bytes(confluence, a) for a in attachments}
+        titles = referenced_attachment_titles(attachments, body) if body is not None else {
+            attachment["title"] for attachment in attachments
+        }
+        referenced = [attachment for attachment in attachments if attachment["title"] in titles]
+        downloaded = {
+            attachment["title"]: download_attachment_bytes(confluence, attachment)
+            for attachment in referenced
+        }
     except RequestException as exception:
         raise AttachmentRetrievalError(error_label(exception)) from None
-    return AttachmentSnapshot(attachments=attachments, downloaded=downloaded)
+    return AttachmentSnapshot(attachments=referenced, downloaded=downloaded, listed_count=len(attachments))
 
 
 def _publish_staged_directory(staging_path: Path, target_path: Path) -> None:

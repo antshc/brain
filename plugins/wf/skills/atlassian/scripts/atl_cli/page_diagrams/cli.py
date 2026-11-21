@@ -7,8 +7,11 @@ remain for ad-hoc use; see the `atlassian` skill's references/publish-page.md. E
 from __future__ import annotations
 
 import argparse
+import io
 import json
+import re
 import sys
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from .adf import replace_markers, substitute_media
@@ -92,6 +95,8 @@ def build_arg_parser(prog: str | None = None) -> argparse.ArgumentParser:
     )
     run.add_argument("--out", help="Path to write the final ADF to (default: <assets dir>/final-adf.json)")
     run.add_argument("--mermaid-bg", default="white", help="mmdc background color (default: white)")
+    run.add_argument("--verify", action="store_true", help="Re-fetch and semantically verify the published page")
+    run.add_argument("--verify-dir", help="Verification artifacts directory (default: <assets-dir>/verify)")
 
     combine = sub.add_parser(
         "combine",
@@ -223,6 +228,9 @@ def _warn_partial_removals(result: dict) -> None:
 
 def _run_run(args: argparse.Namespace) -> None:
     md_path = Path(args.md_path)
+    if args.verify and not args.page_id:
+        print("error: --verify requires --page-id", file=sys.stderr)
+        raise SystemExit(1)
     # Artifacts sit beside the source as `<md filename>.tmp`, suffix included, so the folder
     # stays adjacent to the document it came from and is obvious to gitignore.
     assets_dir = args.assets_dir or str(md_path.parent / f"{md_path.name}.tmp")
@@ -258,6 +266,38 @@ def _run_run(args: argparse.Namespace) -> None:
         raise SystemExit(1)
 
     _warn_partial_removals(result)
+    if args.verify:
+        from ..verify_publish import main as verify_publish
+
+        anchor_count = len(
+            re.findall(
+                r'<!--\s*adf:comment\s+id="[^"]+"\s*-->',
+                Path(args.md_path).read_text(encoding="utf-8"),
+            )
+        )
+        verification_output = io.StringIO()
+        with redirect_stdout(verification_output):
+            verification_code = verify_publish(
+                [
+                    "--page-id",
+                    args.page_id,
+                    "--config",
+                    args.config,
+                    "--expect-anchors",
+                    str(anchor_count),
+                    "--expected-manifest",
+                    result["manifestPath"],
+                    "--verify-dir",
+                    args.verify_dir or str(Path(assets_dir) / "verify"),
+                ]
+            )
+        result["verified"] = verification_code == 0
+        result["verification"] = verification_output.getvalue().strip().splitlines()
+        if verification_code:
+            print("\n".join(result["verification"]), file=sys.stderr)
+            json.dump(result, sys.stdout)
+            sys.stdout.write("\n")
+            raise SystemExit(1)
     json.dump(result, sys.stdout)
     sys.stdout.write("\n")
 

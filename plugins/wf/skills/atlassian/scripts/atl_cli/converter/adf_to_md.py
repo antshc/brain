@@ -6,7 +6,14 @@ import re
 from contextvars import ContextVar
 from dataclasses import dataclass
 
-from .patterns import COMMENT_CLOSE_TAG, STATUS_EMOJI, comment_open_tag, error_marker
+from .patterns import (
+    COMMENT_CLOSE_TAG,
+    INLINE_CARD_CLOSE_TAG,
+    INLINE_CARD_OPEN_TAG,
+    STATUS_EMOJI,
+    comment_open_tag,
+    error_marker,
+)
 from .table_grid import validate_table_grid
 
 # Applied innermost-first, so combined marks on one text node wrap in a fixed order
@@ -356,9 +363,10 @@ def _render_inline_node(node: dict) -> str:
 
 def render_inline_card(node: dict) -> str:
     url = node.get("attrs", {}).get("url", "")
-    if not url:
+    if not isinstance(url, str) or not url:
         raise ValueError("inlineCard node is missing a non-empty url")
-    return render_text({"type": "text", "text": url, "marks": [{"type": "link", "attrs": {"href": url}}]})
+    link = render_text({"type": "text", "text": url, "marks": [{"type": "link", "attrs": {"href": url}}]})
+    return f"{INLINE_CARD_OPEN_TAG}{link}{INLINE_CARD_CLOSE_TAG}"
 
 
 def render_inline_extension(node: dict) -> str:

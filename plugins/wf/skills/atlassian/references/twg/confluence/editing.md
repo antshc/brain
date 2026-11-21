@@ -18,7 +18,7 @@ read Markdown -> copy original -> edit locally -> update from file -> verify
 4. Update: `<atl> confluence content update <page> --body-file tmp/<pageId>/page.md --title "<existing title>"`. Pass the existing title, else the first `#` heading renames the page.
 5. Verify: `<atl> publish-page verify --page-id <pageId> --expect-anchors <n> [--present <file>] [--absent <file>] --verify-dir tmp/<pageId>/verify`. Pass → delete `tmp/<pageId>/`; fail → keep it and report the failing check.
 
-- Title-only change → `<atl> confluence content update <page> --title "<title>"` (no body; runs on twg).
+- Title-only change → `<atl> rename-page <page> --title "<title>" --yes`. It reads the live body/version, retries a safe version-only conflict once, and verifies the new title. Direct `confluence content update --title` requires a fresh `--snapshot-token` and `--yes`; use the focused command instead.
 - Never replace a long existing body with an inline `--body` string unless the user explicitly intends a complete rewrite.
 - `--draft`, `--minor-edit`, `--version-message`, `--content-width` are not supported on the Markdown path (exit 2); report them as unsupported instead of switching formats.
 

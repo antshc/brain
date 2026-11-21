@@ -30,6 +30,8 @@ import sys
 import os
 import tempfile
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
+import re
 
 from requests.exceptions import RequestException
 
@@ -82,6 +84,20 @@ def extract_title_and_body(page: dict) -> tuple[str, object]:
     return page["title"], body
 
 
+def parse_page_reference(reference: str) -> tuple[str, str | None]:
+    """Resolve a numeric id or standard Confluence page URL without a TWG call."""
+    if reference.isdigit():
+        return reference, None
+    parsed = urlparse(reference)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ValueError(f"{reference!r} is not a numeric page id or Confluence page URL")
+    match = re.search(r"/pages/(?:edit-v2/)?(\d+)", parsed.path)
+    page_id = match.group(1) if match else next(iter(parse_qs(parsed.query).get("pageId", [])), "")
+    if not page_id.isdigit():
+        raise ValueError(f"could not extract a page id from {reference!r}")
+    return page_id, f"{parsed.scheme}://{parsed.netloc}"
+
+
 def fetch_page(confluence, page_id: str) -> tuple[str, object]:
     try:
         page = confluence.get(f"/api/v2/pages/{page_id}", params={"body-format": "atlas_doc_format"})
@@ -130,7 +146,7 @@ def assemble(
         return _with_title(markdown, title)
 
     try:
-        snapshot = fetch_attachment_snapshot(confluence, page_id)
+        snapshot = fetch_attachment_snapshot(confluence, page_id, body)
         publish_attachment_cache(snapshot, assets_dir)
     except AttachmentRetrievalError as exception:
         if attachments == "required":
@@ -165,7 +181,8 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
         prog=prog,
         description="Fetch a Confluence page over REST and assemble its title + Markdown body in one pass."
     )
-    parser.add_argument("--page-id", required=True, help="Numeric Confluence pageId to fetch")
+    parser.add_argument("page", nargs="?", help="Numeric pageId or standard Confluence page URL")
+    parser.add_argument("--page-id", help="Numeric Confluence pageId to fetch")
     parser.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     parser.add_argument("--md-path", required=True, help="Path to write the assembled Markdown to")
     parser.add_argument(
@@ -190,14 +207,21 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
     )
     parser.add_argument("--site", help="Site URL overriding the configured `cloudId` (page URL on another site)")
     args = parser.parse_args(argv)
+    if bool(args.page) == bool(args.page_id):
+        parser.error("provide exactly one page reference, either positional or --page-id")
+    try:
+        page_id, reference_site = parse_page_reference(args.page or args.page_id)
+    except ValueError as exception:
+        print(f"error: {exception}", file=sys.stderr)
+        raise SystemExit(2) from None
 
     require_supported_library()
     credentials = load_credentials(args.config)
     if credentials is None:
         print("error: .atlassian.json.user needs cloudId, email, and apiToken to fetch a page", file=sys.stderr)
         raise SystemExit(1)
-    if args.site:
-        credentials = {**credentials, "site": args.site}
+    if args.site or reference_site:
+        credentials = {**credentials, "site": args.site or reference_site}
 
     md_path = Path(args.md_path)
     assets_dir = args.assets_dir or str(default_assets_dir(md_path))
@@ -205,9 +229,9 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
     confluence = get_confluence(credentials)
     issues: list[ConversionIssue] = []
     try:
-        title, body = fetch_page(confluence, args.page_id)
-        markdown = assemble(title, body, args.page_id, confluence, assets_dir, args.attachments, issues)
-        markdown = append_comments(markdown, args.page_id, confluence, site_url(credentials), args.comments)
+        title, body = fetch_page(confluence, page_id)
+        markdown = assemble(title, body, page_id, confluence, assets_dir, args.attachments, issues)
+        markdown = append_comments(markdown, page_id, confluence, site_url(credentials), args.comments)
     except PageFetchError as exception:
         print(f"Page fetch failed: {exception}", file=sys.stderr)
         raise SystemExit(1)

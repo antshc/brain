@@ -145,9 +145,46 @@ def test_fetch_attachment_snapshot_lists_and_downloads_once():
     snapshot = fetch_attachment_snapshot(confluence, "123")
 
     assert snapshot == AttachmentSnapshot(
-        attachments=attachments, downloaded={"a.png": b"png-bytes", "b.txt": b"text"}
+        attachments=attachments,
+        downloaded={"a.png": b"png-bytes", "b.txt": b"text"},
+        listed_count=2,
     )
     assert [c.args[0] for c in _attachment_list_calls(confluence)] == ["/rest/api/content/123/child/attachment"]
+
+
+def test_fetch_attachment_snapshot_downloads_only_referenced_media_and_sidecars():
+    attachments = [
+        {
+            "title": "shot.png",
+            "_links": {"download": "/shot"},
+            "extensions": {"fileId": "media-1"},
+        },
+        {
+            "title": "shot.source.mmd",
+            "_links": {"download": "/shot-source"},
+            "extensions": {"fileId": "source"},
+        },
+        {
+            "title": "unused.zip",
+            "_links": {"download": "/unused"},
+            "extensions": {"fileId": "media-2"},
+        },
+    ]
+    confluence = _confluence(
+        attachments,
+        {"/shot": b"image", "/shot-source": b"flowchart TD; A-->B;"},
+    )
+    body = {
+        "type": "doc",
+        "content": [{"type": "media", "attrs": {"id": "media-1", "type": "file", "alt": "shot.png"}}],
+    }
+
+    snapshot = fetch_attachment_snapshot(confluence, "123", body)
+
+    assert snapshot.listed_count == 3
+    assert {attachment["title"] for attachment in snapshot.attachments} == {"shot.png", "shot.source.mmd"}
+    assert set(snapshot.downloaded) == {"shot.png", "shot.source.mmd"}
+    assert "/unused" not in [call.args[0] for call in confluence.get.call_args_list]
 
 
 def test_fetch_attachment_snapshot_wraps_a_list_failure_with_only_a_safe_category():

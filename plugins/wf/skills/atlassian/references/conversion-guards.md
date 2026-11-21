@@ -35,7 +35,7 @@ Validate only. Do not run generic autofix, trim code or hard-break whitespace, r
 
 Compare exact text, code, hard breaks, list structure/order, marks/link targets, table structure/cells, status values, expands, comment IDs/spans, and layout metadata. Canonical render/parse must reach a fixed point after one cycle. Normalize only named defaults, numeric representation, mark order, adjacent equal-mark text segments, generated `localId`, and the existing `shell`/`bash` alias.
 
-Smart cards normalize to plain links; heading bookmarks/page-creation buttons and non-comment annotations have no reverse mapping. Headerless tables and merged cells cannot round-trip through this Markdown dialect. Non-reproducible column widths are reported. Offline export warns; Fetch page records each warning as a document-level conversion error (see below).
+Smart cards use a paired `adf:inline-card` marker around a visible URL link and round-trip to `inlineCard`. Heading bookmarks/page-creation buttons and non-comment annotations have no reverse mapping. Headerless tables and merged cells cannot round-trip through this Markdown dialect. Non-reproducible column widths are reported. Offline export warns; Fetch page records each warning as a document-level conversion error (see below).
 
 ## Conversion errors
 

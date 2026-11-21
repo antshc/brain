@@ -12,7 +12,14 @@ from .converter.adf_to_md import adf_to_markdown, render_block
 from .converter.md_to_adf import markdown_to_adf
 from .converter.blocks import CODE_LANG_ALLOWLIST
 from .converter.syntax import syntax_lines
-from .converter.patterns import ERROR_MARKER_RE, breakout_marker_mark, children_marker_params, table_marker_attrs
+from .converter.patterns import (
+    ERROR_MARKER_RE,
+    INLINE_CARD_CLOSE_RE,
+    INLINE_CARD_OPEN_RE,
+    breakout_marker_mark,
+    children_marker_params,
+    table_marker_attrs,
+)
 
 _PROFILE = Path(__file__).resolve().parent.parent / "config" / "confluence-markdown.json"
 _WORKER = Path(__file__).with_name("lint_worker.py")
@@ -104,6 +111,9 @@ def validate_markdown(markdown: str, *, placeholders: bool = False, media: bool 
                         )
                     if not ERROR_MARKER_RE.fullmatch(tag):
                         raise GuardError(f"line {number}: malformed adf:error tag")
+                elif re.match(r"<!--\s*/?adf:inline-card\b", tag):
+                    if not (INLINE_CARD_OPEN_RE.fullmatch(tag) or INLINE_CARD_CLOSE_RE.fullmatch(tag)):
+                        raise GuardError(f"line {number}: malformed inline-card marker")
                 elif re.match(r"<!--\s*(?:media-size:|adf:ignore:(?:start|end))", tag):
                     continue
                 elif not (re.fullmatch(r"<!--\s*adf:toc\s*-->", tag) or children_marker_params(tag) is not None or table_marker_attrs(tag) or breakout_marker_mark(tag)):
@@ -313,12 +323,6 @@ def check_round_trip(doc: dict, *, fetching: bool = False) -> list[str]:
             if node.get("marks"):
                 result["marks"] = node["marks"]
             return result
-        if kind == "inlineCard":
-            warnings.append("smart card normalized to a plain link")
-            url = attrs.get("url", "")
-            if not isinstance(url, str) or not url:
-                raise GuardError("inlineCard node is missing a non-empty url")
-            return {"type": "text", "text": url, "marks": [{"type": "link", "attrs": {"href": url}}]}
         if kind == "inlineExtension" and attrs.get("extensionKey") in {"anchor", "create-from-template"}:
             warnings.append("inline extension omitted: " + attrs["extensionKey"])
             return None
@@ -353,7 +357,7 @@ def check_round_trip(doc: dict, *, fetching: bool = False) -> list[str]:
     canonical = adf_to_markdown(reparsed)
     if adf_to_markdown(markdown_to_adf(canonical)) != canonical:
         raise GuardError("Markdown conversion does not reach a stable fixed point")
-    if any("omitted" in warning or "smart card" in warning for warning in warnings) and not fetching:
+    if any("omitted" in warning for warning in warnings) and not fetching:
         raise GuardError("lossy conversion: " + "; ".join(sorted(set(warnings))))
     return sorted(set(warnings))
 

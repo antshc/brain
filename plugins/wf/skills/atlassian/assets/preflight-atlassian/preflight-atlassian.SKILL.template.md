@@ -25,9 +25,9 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
    - Not found → keys take table Default; keys without Default resolve empty (`site` → step 3, identity → step 5, project key/space id → ask per caller).
    - Found → file value wins; absent keys take Default. `tokenAvailable := email and apiToken both true`.
 3. **site.** `site :=` config `cloudId` (`https://<host>`). Empty and needed → ask developer for `<organization>.atlassian.net`; never guess.
-4. **atl.** `atl := python3 <atlScript> --config "<configPath>"`. `<atlScript>` is the absolute path to the `atlassian` skill's `scripts/atl.py`, filled in by its Install tactic. It runs from any cwd. `atl.py` is the single Atlassian entry point. Any twg command runs on twg, with config `email`/`apiToken`/`cloudId` injected into the twg child only; email and token are redacted from its output. Markdown page and work-item body commands are routed to the skill's ADF converter. `atlassian`, `daily-briefing`, and `research` use this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
+4. **atl.** `pythonPath` is an absolute config value installed by the Atlassian installer. If present, use it as `PYTHON`; otherwise use `python3`. `atl := <PYTHON> <atlScript> --config "<configPath>"`. The launcher also re-executes into that configured interpreter or a dependency-complete repository `.venv/bin/python` when needed. `<atlScript>` is the absolute path to the `atlassian` skill's `scripts/atl.py`, filled in by its Install tactic. It runs from any cwd. `atl.py` is the single Atlassian entry point. Any twg command runs on twg, with config `email`/`apiToken`/`cloudId` injected into the twg child only; email and token are redacted from its output. Markdown page and work-item body commands are routed to the skill's ADF converter. `atlassian`, `daily-briefing`, and `research` use this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
 5. **Identity.** `accountId` and `displayName` both set → skip. Either empty → `<atl> whoami -o json --output-file whoami.json` once, then print only `data.accountId` and `data.name` with Python: success → `accountId`, `displayName`; failure → leave empty, never raise. Exception: the ATL installer's connectivity gate always calls live, ignoring cache.
-6. **Report** `configPath`, `site`, `atl`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`, `displayName`, `maxResults`, `limit` before the caller's operation.
+6. **Report** `configPath`, `site`, `atl`, `pythonPath`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`, `displayName`, `maxResults`, `limit` before the caller's operation.
 
 **Config handoff:** `<atl>` already carries `--config`. Direct `atl.py` commands (`fetch-page`, `publish-page`, ...) also run through `<atl>`, which appends `--config` to them; never rebuild the path.
 
@@ -36,6 +36,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 | `cloudId` | Site URL `https://<host>` (scheme required); reported as `site`; else step 3 | Yes | — |
 | `email` | Account email; REST and twg user | Yes | — |
 | `apiToken` | API token; REST and twg credential | Yes | — |
+| `pythonPath` | Absolute Python executable whose environment owns ATL dependencies; launcher self-selects it | No | — |
 | `jiraProjectKeys` | Project keys; first = default | Yes | — |
 | `confluenceSpaceIds` | Space ids; first = default | Yes | — |
 | `accountId` | Cached by the ATL installer from `<atl> whoami`; never hand-entered | Yes | — |

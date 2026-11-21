@@ -9,6 +9,9 @@ from .patterns import (
     COMMENT_TAG_RE,
     EMOJI_STATUS_COLORS,
     EMOJI_STATUS_PATTERN,
+    INLINE_CARD_CLOSE_RE,
+    INLINE_CARD_OPEN_RE,
+    INLINE_CARD_TAG_RE,
     STATUS_PATTERN,
 )
 
@@ -32,8 +35,13 @@ def _marked(inner: str, mark: dict) -> list[dict]:
     """Inner spans keep their own marks; the outer mark is appended to each text node."""
     nodes = _parse_inline_marks(inner)
     for node in nodes:
-        if node.get("type") == "text":
+        if node.get("type") == "text" or (
+            node.get("type") == "inlineCard"
+            and mark.get("type") == "annotation"
+        ):
             node.setdefault("marks", []).append(mark)
+        elif node.get("type") == "inlineCard":
+            raise ValueError("inline-card marker cannot be wrapped in Markdown formatting marks")
     return nodes
 
 
@@ -44,6 +52,8 @@ def _annotation_mark(comment_id: str) -> dict:
 def _append_plain(nodes: list[dict], plain: str) -> None:
     if COMMENT_CLOSE_RE.search(plain):
         raise ValueError("stray <!-- /adf:comment --> with no matching <!-- adf:comment id=... --> before it")
+    if INLINE_CARD_CLOSE_RE.search(plain):
+        raise ValueError("stray <!-- /adf:inline-card --> with no matching <!-- adf:inline-card --> before it")
     if plain:
         nodes.append({"type": "text", "text": plain})
 
@@ -61,19 +71,59 @@ def _comment_close_span(text: str, start: int, comment_id: str) -> tuple[int, in
     raise ValueError(f'unterminated <!-- adf:comment id="{comment_id}" --> (no matching <!-- /adf:comment -->)')
 
 
+def _inline_card_close_span(text: str, start: int) -> tuple[int, int]:
+    depth = 1
+    for tag in INLINE_CARD_TAG_RE.finditer(text, start):
+        if INLINE_CARD_OPEN_RE.fullmatch(tag.group()):
+            depth += 1
+            continue
+        depth -= 1
+        if depth == 0:
+            return tag.start(), tag.end()
+    raise ValueError("unterminated <!-- adf:inline-card --> (no matching <!-- /adf:inline-card -->)")
+
+
+def _parse_inline_card(inner: str) -> dict:
+    nodes = _parse_inline_marks(inner)
+    if len(nodes) != 1 or nodes[0].get("type") != "text":
+        raise ValueError("inline-card marker must wrap one Markdown link")
+    node = nodes[0]
+    marks = node.get("marks", [])
+    if len(marks) != 1 or marks[0].get("type") != "link":
+        raise ValueError("inline-card marker must wrap one Markdown link")
+    url = marks[0].get("attrs", {}).get("href", "")
+    if not url or node.get("text") != url:
+        raise ValueError("inline-card marker link label must equal its URL")
+    return {"type": "inlineCard", "attrs": {"url": url}}
+
+
 def _parse_inline_marks(text: str) -> list[dict]:
     nodes: list[dict] = []
     pos = 0
     while pos < len(text):
         m = _INLINE_RE.search(text, pos)
         comment = COMMENT_OPEN_RE.search(text, pos)
+        inline_card = INLINE_CARD_OPEN_RE.search(text, pos)
+        marker = comment
+        marker_kind = "comment"
+        if inline_card is not None and (marker is None or inline_card.start() < marker.start()):
+            marker = inline_card
+            marker_kind = "inline_card"
         # The leftmost construct wins, so a code span swallows a literal tag and a comment pair
         # may wrap other marks (and vice versa).
-        if comment is not None and (m is None or comment.start() < m.start()):
-            _append_plain(nodes, text[pos : comment.start()])
-            comment_id = comment.group("comment_id")
-            close_start, close_end = _comment_close_span(text, comment.end(), comment_id)
-            nodes.extend(_marked(text[comment.end() : close_start], _annotation_mark(comment_id)))
+        if marker is not None and (m is None or marker.start() < m.start()):
+            _append_plain(nodes, text[pos:marker.start()])
+            close_start, close_end = (
+                _comment_close_span(text, marker.end(), marker.group("comment_id"))
+                if marker_kind == "comment"
+                else _inline_card_close_span(text, marker.end())
+            )
+            inner = text[marker.end():close_start]
+            nodes.extend(
+                _marked(inner, _annotation_mark(marker.group("comment_id")))
+                if marker_kind == "comment"
+                else [_parse_inline_card(inner)]
+            )
             pos = close_end
             continue
         if m is None:

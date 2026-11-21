@@ -293,6 +293,63 @@ def _fake_render_diagrams(diagrams, assets_dir, background="white", renderer="pn
         d["filename"] = f"{d['name']}.png"
 
 
+def test_run_verify_uses_manifest_and_source_anchor_count(tmp_path, capsys):
+    md_path = tmp_path / "page.md"
+    md_path.write_text('# My Page\n\n<!-- adf:comment id="c1" -->Body<!-- /adf:comment -->\n')
+    manifest = tmp_path / "manifest.json"
+    seen = {}
+
+    with patch(
+        "atl_cli.page_diagrams.cli.publish",
+        return_value={
+            "pageId": "123",
+            "manifestPath": str(manifest),
+        },
+    ), patch(
+        "atl_cli.verify_publish.main",
+        side_effect=lambda argv: seen.setdefault("argv", argv) and 0,
+    ):
+        main(
+            [
+                "run",
+                "--md-path",
+                str(md_path),
+                "--page-id",
+                "123",
+                "--config",
+                config_path(tmp_path),
+                "--verify",
+            ]
+        )
+
+    assert "--expect-anchors" in seen["argv"]
+    assert seen["argv"][seen["argv"].index("--expect-anchors") + 1] == "1"
+    assert seen["argv"][seen["argv"].index("--expected-manifest") + 1] == str(manifest)
+    assert json.loads(capsys.readouterr().out)["verified"] is True
+
+
+def test_run_verify_rejects_creation_before_publish(tmp_path):
+    md_path = tmp_path / "page.md"
+    md_path.write_text("# My Page\n\nBody.\n")
+
+    with patch("atl_cli.page_diagrams.cli.publish") as publish:
+        with pytest.raises(SystemExit):
+            main(
+                [
+                    "run",
+                    "--md-path",
+                    str(md_path),
+                    "--space-id",
+                    "space-1",
+                    "--config",
+                    config_path(tmp_path),
+                    "--verify",
+                ]
+            )
+
+    publish.assert_not_called()
+
+
 def test_run_with_diagrams_and_creds_creates_placeholder_then_publishes(tmp_path, capsys):
     md_path = tmp_path / "page.md"
     md_path.write_text("# My Page\n\n```mermaid\ngraph TD; A-->B;\n```\n")

@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from atl_cli.fetch_page import assemble_page
+from atl_cli.fetch_page.assemble_page import parse_page_reference
 
 CREDENTIALS = {"site": "https://s.example", "email": "e", "token": "t"}
 
@@ -35,6 +36,64 @@ def test_main_writes_markdown_to_md_path_with_default_assets_dir(confluence, tmp
     assert (tmp_path / "page.md").read_text() == "# Simple Page\n"
     assert not (tmp_path / "page.md.assets").exists()
     confluence.get.assert_called_once_with("/api/v2/pages/123", params={"body-format": "atlas_doc_format"})
+
+
+@pytest.mark.parametrize(
+    ("reference", "page_id", "site"),
+    [
+        ("123", "123", None),
+        ("https://s.example/wiki/spaces/ZIC/pages/123/Title", "123", "https://s.example"),
+        ("https://s.example/wiki/pages/viewpage.action?pageId=456", "456", "https://s.example"),
+    ],
+)
+def test_parse_page_reference_supports_ids_and_standard_urls(reference, page_id, site):
+    assert parse_page_reference(reference) == (page_id, site)
+
+
+def test_main_accepts_a_page_url_without_page_id(monkeypatch, tmp_path):
+    seen = {}
+    client = MagicMock()
+    client.get.return_value = _page("URL Page", {"type": "doc", "version": 1, "content": []})
+    monkeypatch.setattr(assemble_page, "load_credentials", lambda config_path: CREDENTIALS)
+    monkeypatch.setattr(
+        assemble_page,
+        "get_confluence",
+        lambda credentials: seen.setdefault("credentials", credentials) and client,
+    )
+
+    assemble_page.main(
+        [
+            "https://other.example/wiki/spaces/ZIC/pages/456/URL+Page",
+            "--config",
+            str(tmp_path / "cfg"),
+            "--md-path",
+            str(tmp_path / "page.md"),
+            "--comments",
+            "skip",
+        ]
+    )
+
+    assert seen["credentials"]["site"] == "https://other.example"
+    client.get.assert_called_once_with("/api/v2/pages/456", params={"body-format": "atlas_doc_format"})
+
+
+def test_main_rejects_unsupported_tiny_link_without_calling_rest(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(assemble_page, "load_credentials", MagicMock())
+    monkeypatch.setattr(assemble_page, "get_confluence", MagicMock())
+
+    with pytest.raises(SystemExit):
+        assemble_page.main(
+            [
+                "https://s.example/wiki/x/AbCdE",
+                "--config",
+                str(tmp_path / "cfg"),
+                "--md-path",
+                str(tmp_path / "page.md"),
+            ]
+        )
+
+    assert "could not extract a page id" in capsys.readouterr().err
+    assemble_page.get_confluence.assert_not_called()
 
 
 def test_main_accepts_an_explicit_assets_dir_override(confluence, tmp_path):
@@ -220,7 +279,11 @@ def test_main_converts_the_synthetic_cross_skill_fixture_with_no_preprocessing(c
 
     markdown = (tmp_path / "page.md").read_text()
     assert "<!-- adf:toc -->" in markdown
-    assert "[https://example.atlassian.net/wiki/x/AbCdE](https://example.atlassian.net/wiki/x/AbCdE)" in markdown
+    assert (
+        "<!-- adf:inline-card -->"
+        "[https://example.atlassian.net/wiki/x/AbCdE](https://example.atlassian.net/wiki/x/AbCdE)"
+        "<!-- /adf:inline-card -->"
+    ) in markdown
     assert "- task one" in markdown
     assert "| Env | Status |" in markdown
     assert "skipped" in markdown

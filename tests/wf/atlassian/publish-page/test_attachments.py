@@ -110,7 +110,12 @@ def test_upload_diagrams_with_nothing_to_attach_skips_the_round_trip():
 
 def test_upload_files_attaches_a_plain_list_of_local_files(tmp_path):
     confluence = MagicMock()
-    confluence.get.return_value = {"results": [{"title": "notes.pdf", "extensions": {"fileId": "file-1"}}]}
+    confluence.get.return_value = {
+        "results": [
+            {"title": "old.png", "extensions": {"fileId": "file-old"}},
+            {"title": "notes.pdf", "extensions": {"fileId": "file-1"}},
+        ]
+    }
 
     result = upload_files(confluence, "12345", [{"path": _file(tmp_path, "notes.pdf"), "filename": "notes.pdf"}])
 

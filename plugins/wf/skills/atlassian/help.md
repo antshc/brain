@@ -20,10 +20,16 @@ TACTICS: chosen from the request
   /atlassian publish docs/design.md to space <key>
   /atlassian update page <id> from docs/design.md
   /atlassian fix the wording in page <id> section <name>
+ Copy page              clone one page into another; required attachments; automatic verification
+  /atlassian copy page <source> to page <target>
+ Rename page            title-only update with safe snapshot and read-back
+  /atlassian rename page <id> to <title>
  Address page comments  edit a page in place, reply to every open review thread
   /atlassian address page comments on <page id or URL>
  Install                set up Atlassian in this repo: skill check, deps, preflight-atlassian, config, pub-* wrappers
   /atlassian install
+ Doctor                 inspect Python packages, interpreter, and required CLIs
+  /atlassian doctor
  Map Markdown           Markdown ↔ ADF, ADF-only construct check; offline
   /atlassian convert docs/story.md to ADF
  Query or operate (twg) search, JQL/CQL, transitions, people, spaces, comments
@@ -43,11 +49,15 @@ CLI: <atl> = python3 <skillDir>/scripts/atl.py --config C   (Preflight; single e
  publish-work    create   --project P --issue-type T --summary S (--markdown F | --adf F) [--parent K] [--fields-json F] [--attach F ...]
                  update   --key K [--summary S] [--markdown F | --adf F] [--fields-json F] [--attach F ...]
                  read-adf --key K --out F
- fetch-page      --page-id ID --md-path P [--assets-dir D] [--attachments auto|skip|required] [--comments auto|skip] [--site S]
- publish-page    run           --md-path P (--page-id ID | --space-id ID) [--title T] [--assets-dir D] [--out F]
+ fetch-page      <ID|URL> --md-path P [--assets-dir D] [--attachments auto|skip|required] [--comments auto|skip] [--site S]
+                 --page-id ID is the equivalent legacy flag
+ publish-page    run           --md-path P (--page-id ID | --space-id ID) [--title T] [--assets-dir D] [--out F] [--verify]
                  verify        --page-id ID --expect-anchors N [--present F] [--absent F] [--verify-dir D]
                  check-anchors --original F --md-path F            offline
                  extract | render-attach | substitute-media | replace-markers | publish-adf | combine   step utilities
+ copy-page       <source> --to-page <target> [--title T] [--work-dir D]
+ rename-page     <page> --title T --yes
+ doctor
  map-markdown    md-to-adf | adf-to-md | detect-adf-only           stdin → stdout, offline
 
 OTHER SCRIPTS

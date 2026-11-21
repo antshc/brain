@@ -10,7 +10,7 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 
 ## Workflow
 
-**1 — Check config and install deps.** `configPath := .github/skills/preflight-atlassian/.atlassian.json.user`. If the config path is tracked or the existing JSON is malformed, stop and report the path without reading values into the conversation. Run `python3 -m pip install -r <skillDir>/scripts/requirements.txt` in the active Python environment. Stop on failure.
+**1 — Check config and install deps.** `configPath := .github/skills/preflight-atlassian/.atlassian.json.user`. If the config path is tracked or the existing JSON is malformed, stop and report the path without reading values into the conversation. Resolve `pythonPath` from `sys.executable` of the Python process used for installation; persist it as an absolute, non-secret config key. Run `"<pythonPath>" -m pip install -r <skillDir>/scripts/requirements.txt`. Stop on failure. Then run `<pythonPath> <skillDir>/scripts/atl.py --config "<configPath>" doctor` and require `ok: true`.
 
 **2 — Copy preflight and ignore config.** Copy `<skillDir>/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md` as `.github/skills/preflight-atlassian/SKILL.md`. Replace every `<atlScript>` in the copy with the absolute path of `<skillDir>/scripts/atl.py`. Remove the obsolete `scripts/twg_cred.py` and `scripts/twg.py` there if present, then remove the empty `scripts/` folder. If `git check-ignore -q -- "$configPath"` fails, add `.atlassian.json.user` to the target's `.gitignore` once. Verify the path is ignored and untracked before creating or editing the config. Keep the skill trackable.
 
@@ -21,6 +21,7 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 | Key | Prompt |
 |---|---|
 | `cloudId` | "Enter your Atlassian site URL (e.g. `https://<organization>.atlassian.net`):" |
+| `pythonPath` | Automatic; never ask. Preserve only an existing valid absolute path or replace an invalid path with the installer interpreter. |
 | `jiraProjectKeys` | "Enter your Jira project key(s), comma-separated, first = default:" → trimmed JSON array |
 | `confluenceSpaceIds` | "Enter your Confluence space id(s), comma-separated, first = default:" → trimmed JSON array |
 | `diagramRenderer` | "How should Confluence publishing render mermaid diagrams — `png` (default, a static image), `drawio` (editable Draw.io diagram), or `mermaid` (live Mermaid macro)?" |

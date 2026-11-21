@@ -201,9 +201,13 @@ def test_expand_with_toc_among_other_content_keeps_details_wrapper(adf_to_md):
     )
 
 
-def test_inline_card_renders_url_as_a_markdown_link(adf_to_md):
+def test_inline_card_renders_url_as_a_reversible_marked_link(adf_to_md):
     doc = _doc(_p({"type": "inlineCard", "attrs": {"url": "https://example.atlassian.net/wiki/x/AbCdE"}}))
-    assert adf_to_md(doc) == "[https://example.atlassian.net/wiki/x/AbCdE](https://example.atlassian.net/wiki/x/AbCdE)"
+    assert adf_to_md(doc) == (
+        "<!-- adf:inline-card -->"
+        "[https://example.atlassian.net/wiki/x/AbCdE](https://example.atlassian.net/wiki/x/AbCdE)"
+        "<!-- /adf:inline-card -->"
+    )
 
 
 def test_inline_card_inside_list_item_and_table_cell(adf_to_md):
@@ -234,8 +238,8 @@ def test_inline_card_inside_list_item_and_table_cell(adf_to_md):
         },
     )
     assert adf_to_md(doc) == (
-        "- [https://example.com/a](https://example.com/a)\n\n"
-        "| [https://example.com/b](https://example.com/b) |"
+        "- <!-- adf:inline-card -->[https://example.com/a](https://example.com/a)<!-- /adf:inline-card -->\n\n"
+        "| <!-- adf:inline-card -->[https://example.com/b](https://example.com/b)<!-- /adf:inline-card --> |"
     )
 
 

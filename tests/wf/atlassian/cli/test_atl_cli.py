@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 ATL_PY = Path(__file__).resolve().parents[4] / "plugins" / "wf" / "skills" / "atlassian" / "scripts" / "atl.py"
-COMMANDS = ("fetch-work", "publish-work", "fetch-page", "publish-page", "map-markdown")
+COMMANDS = ("fetch-work", "publish-work", "fetch-page", "publish-page", "map-markdown", "doctor", "rename-page", "copy-page")
 
 
 def _run(*args: str, cwd: Path, stdin: str = "", env: dict | None = None) -> subprocess.CompletedProcess:

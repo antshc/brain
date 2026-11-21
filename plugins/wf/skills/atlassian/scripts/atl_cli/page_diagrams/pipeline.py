@@ -218,6 +218,7 @@ def _publish_with_diagrams(
             "sizeBytes": adf_body_size(final_adf),
             "diagrams": len(diagrams),
             "attachments": len(filename_to_file_id),
+            "uploadedAttachments": len(filename_to_file_id),
         }
         return result, final_adf
     except _POST_CREATE_ERRORS as exception:
@@ -258,6 +259,7 @@ def _publish_text_only(
         "sizeBytes": adf_body_size(base_adf),
         "diagrams": 0,
         "attachments": 0,
+        "uploadedAttachments": 0,
     }
     return result, base_adf
 

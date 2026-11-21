@@ -104,15 +104,17 @@ def test_convert_adf_to_markdown_tags_an_unconvertible_node_and_keeps_the_rest()
     assert [(issue.error_id, issue.node, issue.raw) for issue in issues] == [("e1", "weirdNode", weird)]
 
 
-def test_convert_adf_to_markdown_reports_lossy_export_as_a_doc_level_issue():
+def test_convert_adf_to_markdown_preserves_inline_card_without_a_doc_level_issue():
     card = {"type": "inlineCard", "attrs": {"url": "https://example.com"}}
     body = {"type": "doc", "version": 1, "content": [{"type": "paragraph", "content": [card]}]}
 
     markdown, issues = convert_adf_to_markdown(body)
 
-    assert markdown == "[https://example.com](https://example.com)\n"
-    assert [issue.node for issue in issues] == ["doc"]
-    assert "smart card normalized" in issues[0].reason
+    assert markdown == (
+        "<!-- adf:inline-card -->[https://example.com](https://example.com)"
+        "<!-- /adf:inline-card -->\n"
+    )
+    assert issues == []
 
 
 def test_assemble_skips_attachment_handling_for_a_page_with_no_references(monkeypatch, tmp_path):
@@ -148,7 +150,7 @@ def test_assemble_saves_attachments_and_restores_diagrams_when_reference_present
     result = assemble("Complex Page", _drawio_body(), "123", confluence, str(assets_dir))
 
     assert result == "# Complex Page\n\n```mermaid\nflowchart TD; A-->B;\n```"
-    fetch_attachment_snapshot.assert_called_once_with(confluence, "123")
+    fetch_attachment_snapshot.assert_called_once_with(confluence, "123", _drawio_body())
     publish_attachment_cache.assert_called_once_with(snapshot, str(assets_dir))
 
 
@@ -202,13 +204,34 @@ def test_assemble_end_to_end_covers_all_three_rendering_rules(monkeypatch, tmp_p
         ),
     )
 
+    body = {
+        "type": "doc",
+        "version": 1,
+        "content": [
+            {
+                "type": "extension",
+                "attrs": {
+                    "extensionKey": "app/env/static/drawio",
+                    "parameters": {"guestParams": {"diagramName": "order-flow.drawio"}},
+                },
+            },
+            {
+                "type": "mediaSingle",
+                "content": [{"type": "media", "attrs": {"id": "image-1", "type": "file", "alt": "Screenshot.png"}}],
+            },
+            {
+                "type": "mediaGroup",
+                "content": [{"type": "media", "attrs": {"id": "file-1", "type": "file", "alt": ""}}],
+            },
+        ],
+    }
     assets_dir = tmp_path / "page.md.tmp"
-    result = assemble("Diagrams Page", _drawio_body(), "123", confluence, str(assets_dir))
+    result = assemble("Diagrams Page", body, "123", confluence, str(assets_dir))
 
     assert "```mermaid\nflowchart TD; A-->B;\n```" in result
     assert "![Screenshot.png](page.md.tmp/Screenshot.png)" in result
     assert "[notes.pdf](page.md.tmp/notes.pdf)" in result
-    assert (assets_dir / "order-flow.drawio").read_bytes() == b"drawio-bytes"
+    assert not (assets_dir / "order-flow.drawio").exists()
     assert (assets_dir / "Screenshot.png").read_bytes() == b"png-bytes"
     assert (assets_dir / "notes.pdf").read_bytes() == b"pdf-bytes"
     assert len(_attachment_list_calls(confluence)) == 1
@@ -236,7 +259,7 @@ def test_assemble_auto_mode_degrades_safely_on_attachment_retrieval_failure(monk
         lambda body: ('<!-- adf:diagram drawio="order-flow.drawio" -->', []),
     )
 
-    def fake_fetch_snapshot(confluence, page_id):
+    def fake_fetch_snapshot(confluence, page_id, body):
         raise AttachmentRetrievalError("SSLError")
 
     monkeypatch.setattr("atl_cli.fetch_page.assemble_page.fetch_attachment_snapshot", fake_fetch_snapshot)
@@ -259,7 +282,7 @@ def test_assemble_required_mode_propagates_attachment_retrieval_failure_and_writ
         lambda body: ('<!-- adf:diagram drawio="order-flow.drawio" -->', []),
     )
 
-    def fake_fetch_snapshot(confluence, page_id):
+    def fake_fetch_snapshot(confluence, page_id, body):
         raise AttachmentRetrievalError("ConnectTimeout")
 
     monkeypatch.setattr("atl_cli.fetch_page.assemble_page.fetch_attachment_snapshot", fake_fetch_snapshot)
@@ -279,7 +302,10 @@ def test_assemble_required_mode_raises_when_attachment_placeholder_cannot_be_res
         "atl_cli.fetch_page.assemble_page.convert_adf_to_markdown",
         lambda body: ('<!-- adf:attachment media-id="missing" alt="missing.png" -->', []),
     )
-    monkeypatch.setattr("atl_cli.fetch_page.assemble_page.fetch_attachment_snapshot", lambda confluence, page_id: MagicMock())
+    monkeypatch.setattr(
+        "atl_cli.fetch_page.assemble_page.fetch_attachment_snapshot",
+        lambda confluence, page_id, body: MagicMock(),
+    )
     monkeypatch.setattr("atl_cli.fetch_page.assemble_page.publish_attachment_cache", lambda snapshot, assets_dir: None)
     monkeypatch.setattr(
         "atl_cli.fetch_page.assemble_page.restore_diagrams",

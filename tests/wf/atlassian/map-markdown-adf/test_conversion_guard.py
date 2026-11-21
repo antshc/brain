@@ -126,11 +126,24 @@ def test_no_source_rewrite_and_no_formatting_rules_for_confluence_dialect():
     assert fixture.read_bytes() == original
 
 
-def test_known_degradation_is_reported_and_publish_rejected():
+def test_inline_card_round_trips_without_conversion_degradation():
     doc = document(paragraph({"type": "inlineCard", "attrs": {"url": "https://example.com"}}))
-    assert guard.guard_adf(doc, fetching=True) == ["smart card normalized to a plain link"]
-    with pytest.raises(guard.GuardError, match="lossy conversion"):
-        guard.guard_adf(doc)
+
+    assert guard.guard_adf(doc) == []
+
+
+def test_inline_card_keeps_an_inline_comment_anchor():
+    card = {
+        "type": "inlineCard",
+        "attrs": {"url": "https://example.com", "localId": "card-1"},
+        "marks": [{"type": "annotation", "attrs": {"annotationType": "inlineComment", "id": "c1"}}],
+    }
+    doc = document(paragraph(card))
+
+    assert guard.guard_adf(doc) == []
+    assert adf_to_markdown(doc).startswith(
+        '<!-- adf:comment id="c1" --><!-- adf:inline-card -->'
+    )
 
 
 def test_unknown_attributes_are_not_silently_dropped():

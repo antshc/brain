@@ -116,12 +116,18 @@ def test_native_forwards_a_markdown_body_command_to_twg_unchanged(fake_twg, tmp_
 def test_leading_config_is_appended_to_atl_commands_that_take_one(tmp_path, monkeypatch):
     seen: list[list[str]] = []
     monkeypatch.setitem(COMMANDS, "fetch-page", Command("", lambda argv, prog: seen.append(argv)))
+    monkeypatch.setitem(COMMANDS, "doctor", Command("", lambda argv, prog: seen.append(argv)))
     monkeypatch.setitem(COMMANDS, "map-markdown", Command("", lambda argv, prog: seen.append(argv)))
 
     cli.main(["--config", "c.json", "fetch-page", "--page-id", "1", "--md-path", "p.md"])
+    cli.main(["--config", "c.json", "doctor"])
     cli.main(["--config", "c.json", "map-markdown", "md-to-adf"])
 
-    assert seen == [["--page-id", "1", "--md-path", "p.md", "--config", "c.json"], ["md-to-adf"]]
+    assert seen == [
+        ["--page-id", "1", "--md-path", "p.md", "--config", "c.json"],
+        ["--config", "c.json"],
+        ["md-to-adf"],
+    ]
 
 
 def test_markdown_workitem_update_publishes_then_forwards_remaining_flags(fake_twg, tmp_path, monkeypatch, capsys):
