@@ -2,7 +2,7 @@
 
 Read [Conversion guards](conversion-guards.md) for lint policy, fidelity checks, supported exceptions, and read-back manifests.
 
-Publish local Markdown to a Confluence page in one `run` command: extract → convert → attach → substitute → publish, always over REST. Not twg: only `atl.py`'s Markdown → ADF conversion carries `<details>`, panels, status, TOC, wide tables, inline-comment anchors, and diagrams intact.
+Publish local Markdown to a Confluence page in one command: extract → convert → attach → substitute → publish, always over REST. `<atl> confluence content create|update` with a Markdown body (the default) runs this pipeline (`publish-page run`): only `atl.py`'s Markdown → ADF conversion carries `<details>`, panels, status, TOC, wide tables, inline-comment anchors, and diagrams intact.
 
 ## Contents
 
@@ -33,13 +33,16 @@ Publish local Markdown to a Confluence page in one `run` command: extract → co
 
 ## Steps
 
-**1 — Resolve target.** `pageId` → update, `--page-id`. Else create, `--space-id` from the first hit: supplied `spaceId` → Preflight `defaultSpaceId` (report) → `<twg> confluence space list --limit <limit>`: one → use, report; several → ask, never choose silently. Space key instead of numeric id (e.g. `ZIC`, `~<accountId>`) → `<twg> confluence space list --keys <key> -o json --output-file space.json` → `data[0].id`; REST v2 create rejects keys.
+**1 — Resolve target.** `pageId` → update, `--page-id`. Else create, `--space-id` from the first hit: supplied `spaceId` → Preflight `defaultSpaceId` (report) → `<atl> confluence space list --limit <limit>`: one → use, report; several → ask, never choose silently. Space key instead of numeric id (e.g. `ZIC`, `~<accountId>`) → `<atl> confluence space list --keys <key> -o json --output-file space.json` → `data[0].id`; REST v2 create rejects keys.
 
 **2 — Run.**
 
 ```bash
-python3 <skillDir>/scripts/atl.py publish-page run --md-path <mdPath> (--page-id <pageId> | --space-id <spaceId>) [--title "<title>"] [--parent-id <parentId>] --config "<configPath>"
+<atl> confluence content create --content-type page --space-id <spaceId> [--parent-id <parentId>] [--title "<title>"] --body-file <mdPath> --ack-body-formats -y
+<atl> confluence content update <pageId> --body-file <mdPath> [--title "<title>"] [--parent-id <parentId>]
 ```
+
+Use `--body-file`, so relative image paths resolve and the manifest survives for Step 3. **MUST NOT** pass `--format html` or `--edits*`; they bypass the pipeline. `--snapshot-token`, `--ack-body-formats`, and `-y` are accepted and ignored; `--draft`, `--content-width`, `--minor-edit`, `--version-message` → exit 2. `--assets-dir` is passed on; `--out` or `--mermaid-bg` need the underlying `<atl> publish-page run --md-path <mdPath> (--page-id <pageId> | --space-id <spaceId>) ...`.
 
 Pipeline: strip `<!-- adf:ignore:start/end -->` spans; replace ```` ```mermaid ```` fences and standalone local image/file refs (as Fetch page writes them) with markers; convert Markdown to ADF; then:
 
@@ -60,7 +63,7 @@ Stdout JSON:
 Re-fetch into a separate dir and assert:
 
 ```bash
-python3 <skillDir>/scripts/atl.py publish-page verify --page-id <pageId> --config "<configPath>" --expect-anchors <n> [--present <file>] [--absent <file>] --verify-dir <workingDir>/verify
+<atl> publish-page verify --page-id <pageId> --expect-anchors <n> [--present <file>] [--absent <file>] --verify-dir <workingDir>/verify
 ```
 
 `<n>` = expected `adf:comment id` span count in the published Markdown; `--present`/`--absent` = one phrase per line (edited / removed phrases). Prints each check `PASS|FAIL <name>`; exit 1 = failed check, 2 = re-fetch failed. Deletes nothing.
@@ -90,7 +93,7 @@ Ordinary edits of an existing page without thread replies. Review-thread replies
 - Anchor id matching no page comment → `unknownCommentIds`; Confluence ignores it. Fix the id or remove the span.
 - Shared id kept on fewer blocks than live, but not zero → stderr `warning: comment anchor <id> spanned N blocks, now M; ...` and `partialCommentRemovals`. Publish proceeds.
 - Create path → no guard. Guard read failure → publish proceeds, `commentGuard: "failed (<category>)"`.
-- Markdown fetched without anchors (older fetch, or a twg Markdown export) → refetch with Fetch page before editing, else every comment detaches.
+- Markdown fetched without anchors (older fetch, or a `--native` twg Markdown export) → refetch with Fetch page before editing, else every comment detaches.
 
 ## Diagram renderer
 

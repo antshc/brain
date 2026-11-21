@@ -1,26 +1,25 @@
 # Fetch work
 
-Return a Jira **Work item** as Markdown from a key, URL, or selected Jira search result. REST v3 reads the real ADF description; `atl.py` converts ADF back to Markdown verbatim. Not twg: its body format drops ADF-only constructs. Comments come from twg into an unchanged sidecar.
+Return a Jira **Work item** as Markdown from a key, URL, or selected Jira search result. `<atl> jira workitem get` defaults to Markdown and is routed to REST v3: it reads the real ADF description, and `atl.py` converts ADF back to Markdown verbatim. twg's own body format drops ADF-only constructs. Comments come from raw twg into an unchanged sidecar.
 
 ## Steps
 
-**1 — Parse input.**
-
-- `https://<site>/browse/<key>` → `<site>`, `<key>`; `<site>` differs from Preflight `site` → pass `--site https://<site>`.
-- Bare `<key>` or search hit key → Preflight `site`.
+**1 — Parse input.** `<item>` := the key, search-hit key, or `https://<site>/browse/<key>` URL, passed as-is. `<atl>` takes the site from a URL itself.
 
 **2 — Fetch and assemble.**
 
 ```bash
-python3 <skillDir>/scripts/atl.py fetch-work --issue-key <key> --config "<configPath>" --md-path work.md [--site https://<site>] [--assets-dir <dir>] [--attachments embedded|all]
+<atl> jira workitem get <item> --output-file work.md [--site <site>] [--assets-dir <dir>] [--attachments embedded|all]
 ```
+
+`-o json`, `--fields`, `--field`, `--full`, `--comments`, or `--remote-links` leave the Markdown path and run raw twg; omit them here. One key per command.
 
 Fetches `summary`, `status`, `issuetype`, `assignee`, ADF `description`; converts ADF to Markdown (media nodes → placeholders); applies Attachment rules. Writes `work.md`: `# <key> — <summary>`, then `**Status:** · **Type:** · **Assignee:**`, then body, then `## Attachments` when any. Assets default to `work.md.tmp/` beside `work.md`. Non-zero exit → report stderr (missing `cloudId`/`email`/`apiToken`, unsupported `atlassian-python-api`, or `error: ADF conversion failed: <reason>`); no `work.md` on conversion failure.
 
-**3 — Fetch comments.** Same site as the work item:
+**3 — Fetch comments.** Same site as the work item; `--comments -o json` runs raw twg:
 
 ```bash
-<twg> jira workitem get <key> --comments --site https://<site> -o json --output-file work.comments.json
+<atl> jira workitem get <key> --comments --site https://<site> -o json --output-file work.comments.json
 ```
 
 Keep the complete output unchanged beside `work.md`; no parser or extraction. Another Markdown filename → `<stem>.comments.json`. Command succeeded and output holds no comment-retrieval error → append `## Comments` with `[Comments](work.comments.json)` (relative link matching the saved filename), even when no comments exist. Failure → report it and append a comments-retrieval failure note instead of the link; keep the fetched work item.
@@ -40,4 +39,4 @@ Keep the complete output unchanged beside `work.md`; no parser or extraction. An
 ## Degraded mode
 
 - Attachment named in the body but no longer attached → one-line note replaces it; rest of the body returned.
-- `atl.py` unavailable or failing for a non-auth reason → `<twg> jira workitem get <key> --site https://<site> -o json --output-file work.json` and warn the description may lose ADF-only constructs. Auth or policy denial → stop and report; no fallback.
+- Markdown body path unavailable or failing for a non-auth reason → `<atl> jira workitem get <key> --site https://<site> -o json --output-file work.json` (raw twg) and warn the description may lose ADF-only constructs. Auth or policy denial → stop and report; no fallback.

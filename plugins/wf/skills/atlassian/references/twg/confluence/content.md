@@ -46,13 +46,13 @@ A saved Remix infographic is exposed as an attachment on its owning page. Find
 and download it with the existing content attachment commands:
 
 ```bash
-twg confluence content attachments list \
+<atl> confluence content attachments list \
   --id <content-id> \
   --filename <media-file-id> \
   --site <site> \
   -o json
 
-twg confluence content attachments download \
+<atl> confluence content attachments download \
   --attachment-id <id-from-list-result> \
   --out <local-path> \
   --site <site>
@@ -67,7 +67,7 @@ To read the generated AI summary for document content, request the dedicated
 detail mode:
 
 ```bash
-twg confluence content get <ID-or-URL> --detail ai_summary -o json --site <site>
+<atl> confluence content get <ID-or-URL> --detail ai_summary -o json --site <site>
 ```
 
 Read `data.aiSummary`. It is a string when a generated summary exists and
@@ -81,7 +81,7 @@ Non-doc body formats hydrate their bodies through `--format`, not `--detail`:
 
 ```bash
 # Editable persisted whiteboard SVG.
-twg confluence content get <ID-or-URL> \
+<atl> confluence content get <ID-or-URL> \
   --format svg \
   -o json \
   --output-file /tmp/whiteboard.json \
@@ -89,7 +89,7 @@ twg confluence content get <ID-or-URL> \
 jq -r '.data.body.value' /tmp/whiteboard.json > /tmp/whiteboard.svg
 
 # Persisted database rows and fields.
-twg confluence content get <ID-or-URL> \
+<atl> confluence content get <ID-or-URL> \
   --format csv \
   -o json \
   --output-file /tmp/database.json \
@@ -102,7 +102,7 @@ those content types reject it. For whiteboard visual verification, request the
 rendered PNG explicitly:
 
 ```bash
-twg confluence content get <ID-or-URL> \
+<atl> confluence content get <ID-or-URL> \
   --format png \
   --output json \
   --site <site> > /tmp/whiteboard-png.json
@@ -124,7 +124,7 @@ connector result by provider identity.
    from `data.body.value`.
 
    ```bash
-   twg confluence content get <content-ID> --format url --site <site> \
+   <atl> confluence content get <content-ID> --format url --site <site> \
      -o json --agent-fields data.title,data.body
    ```
 
@@ -137,8 +137,8 @@ connector result by provider identity.
 
    | Destination                                                                                    | Action                                                                                         |
    |----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-   | A Confluence path such as `<site>.atlassian.net/wiki/...`                                      | Read it with the **Fetch page** tactic (fallback `twg confluence content get "<url>"`, lossy). Do not search Rovo. |
-   | A Jira issue path such as `<site>.atlassian.net/browse/<KEY>`                                  | Read the full body with the **Fetch work** tactic; metadata only: `twg jira workitem get <KEY> --site <site>`. Do not search Rovo. |
+   | A Confluence path such as `<site>.atlassian.net/wiki/...`                                      | Read it with the **Fetch page** tactic (fallback `<atl> confluence content get "<url>"`, lossy). Do not search Rovo. |
+   | A Jira issue path such as `<site>.atlassian.net/browse/<KEY>`                                  | Read the full body with the **Fetch work** tactic; metadata only: `<atl> jira workitem get <KEY> --site <site>`. Do not search Rovo. |
    | Another Atlassian product                                                                      | Hand off to that product's native skill and command when available; otherwise report and stop. |
    | A connector-backed provider such as `docs.google.com` or `drive.google.com` for `google-drive` | Continue to step 3.                                                                            |
    | Anything else, including public sites                                                          | Report the destination as an external link and stop. Do not search Rovo.                       |
@@ -150,13 +150,13 @@ connector result by provider identity.
    recall.
 
    ```bash
-   twg rovo search '"<title>"' --app <connector> --limit 20 \
+   <atl> rovo search '"<title>"' --app <connector> --limit 20 \
      -o json --agent-fields @evidence
    ```
 
 4. Compare each candidate's stable provider resource ID with the destination.
    Ignore query parameters and fragments. Compare recognizable path IDs
-   directly with known scope and bounds; use `twg resolve "<url>"` only when the native contract cannot accept the supplied form or expose a
+   directly with known scope and bounds; use `<atl> resolve "<url>"` only when the native contract cannot accept the supplied form or expose a
    clear identifier. A matching title alone is insufficient.
 
 For a read-only summary request, an exact provider resource ID match is
@@ -168,7 +168,7 @@ Keep the Confluence title and provider title as separate evidence. If they
 differ, report both and do not rewrite either title.
 
 Treat returned Rovo text or snippets as indexed, potentially partial or stale
-content. `twg docs get` is not a direct provider lookup: it scans the caller's
+content. `<atl> docs get` is not a direct provider lookup: it scans the caller's
 recent-activity projection and may return metadata instead of the body.
 
 For a connector destination with no canonical match after the bounded title
@@ -220,8 +220,8 @@ Inspect the exact contract and do not imply a subtree copy without evidence.
 - `--resolution-status open|resolved` covers footer and inline comments; `open` includes reopened
   comments and inline comments whose highlighted text an edit removed.
 - Inline comments carry `inlineOriginalSelection` and `inlineMarkerRef` (the highlight's
-  `data-annotation-id`). If the page HTML lacks that marker, the highlight is gone.
-- List/get `--body-format` accepts `md` or `markdown` for Markdown, and `html` for HTML.
+  annotation id). If the fetched Markdown lacks its `<!-- adf:comment id="<id>" -->` span, the highlight is gone.
+- List/get `--body-format md` returns comment bodies as Markdown; use it for every comment read and write.
 - Create requires `--comment-type footer|inline`. Inline comments also require
   `--text-selection`; use the match index/count flags when the selected text repeats.
 - Get, update, resolve, and reopen auto-detect the type when `--comment-type` is omitted.
@@ -251,8 +251,8 @@ on the requested format:
 For a whiteboard PNG export:
 
 ```bash
-twg confluence content export <ID-or-URL> --format png --site <site> -o json
-twg confluence content export-status <taskId> --site <same-site> -o json
+<atl> confluence content export <ID-or-URL> --format png --site <site> -o json
+<atl> confluence content export-status <taskId> --site <same-site> -o json
 ```
 
 Each start creates a new export. Do not automatically retry the start command.

@@ -11,15 +11,15 @@ Two read-only Jira reports for the current user: blocked items assigned to them,
 
 ## Prerequisites
 
-- **`atlassian`** skill from `wf@brain`, providing twg routing.
+- **`atlassian`** skill from `wf@brain`, providing the `atl` launcher (`atl.py`) used for every Atlassian call.
 - **`preflight-atlassian`** skill generated in this repo by the `atlassian` skill's Install tactic, with `email`/`apiToken` in its `.atlassian.json.user`.
 - Missing `atlassian` → ask the user to install or update `wf@brain` and stop. Missing preflight → ask the user to run `/atlassian install` in Copilot CLI and stop. Never authenticate or install anything yourself.
 
 ## Contract
 
 - **Input:** optional period; empty → `1 month`.
-- **Budget:** two twg searches in one shell call (plus pagination pages), then two local scripts in one shell call. No per-issue reads.
-- **Read-only:** no twg write command, no Jira mutation, no report file.
+- **Budget:** two `<atl>` searches in one shell call (plus pagination pages), then two local scripts in one shell call. No per-issue reads.
+- **Read-only:** no `<atl>` write command, no Jira mutation, no report file.
 - **Identity:** Preflight's `accountId` only; never a display name.
 - **Output:** the Output template in the workflow reference, printed in chat.
 
@@ -30,10 +30,10 @@ Read [references/workflow.md](references/workflow.md) fully, then follow it. Run
 ## Gotchas
 
 - **MUST NOT** `find`/`grep`/`ls -R` to locate this skill's directory; use the parent of the `SKILL.md` path you were given.
-- `<twg>` exit `127` → report missing "twg CLI". Auth error → report `email`/`apiToken` in `.atlassian.json.user`. **MUST NOT** run `twg login` or `twg setup`.
+- `<atl>` exit `127` → report missing "twg CLI". Auth error → report `email`/`apiToken` in `.atlassian.json.user`. **MUST NOT** run `<atl> login` or `<atl> setup`.
 
 ## Completion criteria
 
 - Chat output has the header line and only non-empty sections, every key linked with the row's own `url`.
 - Excluded lists cutoff-excluded and partial-comment issues, truncation, and the Blocked-clause fallback whenever they apply.
-- No file written besides twg spill files in a temp directory; no twg write command run.
+- No file written besides `<atl>` spill files in a temp directory; no `<atl>` write command run.

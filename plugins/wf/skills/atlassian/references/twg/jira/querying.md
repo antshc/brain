@@ -8,7 +8,7 @@ Use the Jira-native workitem search when the target is definitely Jira and the
 user has fuzzy text rather than structured filters:
 
 ```text
-twg jira workitem search "login failures" --limit 20
+<atl> jira workitem search "login failures" --limit 20
 ```
 
 The command safely builds `text ~ "..." ORDER BY updated DESC` and runs it

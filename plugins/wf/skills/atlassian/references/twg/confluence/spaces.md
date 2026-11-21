@@ -13,7 +13,7 @@ updating it, archiving it, and moving content within it.
 ## Space Operations
 
 - Identify the site and space key before acting. For the authenticated user's
-  personal space, run `twg confluence space me --site <site> -o json`; use
+  personal space, run `<atl> confluence space me --site <site> -o json`; use
   `data.space.key` for key-based commands and `data.space.spaceId` when a numeric
   space ID is required.
 - Never construct a personal-space key from `accountId` or infer it by listing

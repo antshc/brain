@@ -132,7 +132,7 @@ Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-
 ## 8. Tools
 
 - **AWS CLI** — configured; see the `query-aws` skill for profiles, account IDs, and usage. Always pass `--profile` explicitly and confirm before running any mutating command.
-- **`twg` CLI** — Jira/Confluence access, credentialed from `.atlassian.json.user` through the `preflight-atlassian` skill; see it for setup, confidentiality, and query-limit rules. Page/work-item bodies go through the `atl` fetch/publish skills.
+- **`atl` launcher** — all Jira/Confluence access, through the `atlassian` skill's `atl.py` wrapping the `twg` CLI, credentialed from `.atlassian.json.user` by the `preflight-atlassian` skill; see it for setup, confidentiality, and query-limit rules. Never call bare `twg`.
 - **AWS Documentation MCP Server** (`aws-knowledge-mcp-server`) — read-only official AWS docs lookup; see the `search-aws-docs` skill.
 - **`mmdc` (`@mermaid-js/mermaid-cli`)** — renders Mermaid diagrams (e.g. from docs) to images/SVG/PDF; installed globally via `npm install -g @mermaid-js/mermaid-cli`. Verify with `mmdc --version`.
 

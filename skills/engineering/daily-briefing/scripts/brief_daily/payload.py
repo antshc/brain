@@ -1,4 +1,4 @@
-"""Shared reading of `twg jira workitem query -o json --output-file` pages."""
+"""Shared reading of `<atl> jira workitem query -o json --output-file` pages."""
 from __future__ import annotations
 
 import json

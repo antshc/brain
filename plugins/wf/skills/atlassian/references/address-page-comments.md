@@ -20,25 +20,25 @@ Safe to repeat. Remaining work comes from the Rerun gate, never from memory of a
 
 ## 1. Preflight
 
-Use the skill's Preflight result: `site`, `twg`, `accountId`. Empty `accountId` → stop and report; it decides which comments are answered.
+Use the skill's Preflight result: `site`, `atl`, `accountId`. Empty `accountId` → stop and report; it decides which comments are answered.
 
-Parse the page input → `@pageId`: URL `/pages/<id>/` → `<id>`; bare number → as-is; tiny link or tiny ID → `<twg> confluence content get <site>/wiki/x/<tiny> --detail summary -o json --output-file tiny.json`, `@pageId := data.id`.
+Parse the page input → `@pageId`: URL `/pages/<id>/` → `<id>`; bare number → as-is; tiny link or tiny ID → `<atl> confluence content get <site>/wiki/x/<tiny> --detail summary -o json --output-file tiny.json`, `@pageId := data.id`.
 
-Done when `@pageId`, `site`, `twg`, `accountId` are set.
+Done when `@pageId`, `site`, `atl`, `accountId` are set.
 
 ## 2. Rerun gate
 
 1. List open comments, every page:
 
    ```bash
-   <twg> confluence content comments list --id <pageId> --resolution-status open --include-replies true --body-format md --limit 250 -o json --output-file comments-1.json
+   <atl> confluence content comments list --id <pageId> --resolution-status open --include-replies true --body-format md --limit 250 -o json --output-file comments-1.json
    ```
 
    `data.nextCursor` present → repeat with `--cursor <value>` into `comments-2.json`, ... until absent.
 2. Fetch the draft body and token:
 
    ```bash
-   <twg> confluence content get <pageId> --draft --detail full --format html --body-only --output-file draft.html -o json > envelope.json
+   <atl> confluence content get <pageId> --draft --detail full --format html --body-only --output-file draft.html -o json > envelope.json
    ```
 
    `@snapshotToken := data.snapshotToken` from `envelope.json`.
@@ -78,7 +78,7 @@ Classify each issue:
 | `answer` | A question, or a change the evidence shows is wrong or unneeded | Reply only |
 | `unclear` | Ambiguous intent, or facts you cannot verify | Ask one focused question |
 
-Verify factual claims before acting: the page itself, Jira/Confluence via `<twg>` search (full bodies: Fetch work or Fetch page tactic, read-only), and the codebase when the page documents code in this workspace. Missing evidence → `unclear`; never invent keys, versions, URLs, or behavior.
+Verify factual claims before acting: the page itself, Jira/Confluence via `<atl>` search (full bodies: Fetch work or Fetch page tactic, read-only), and the codebase when the page documents code in this workspace. Missing evidence → `unclear`; never invent keys, versions, URLs, or behavior.
 
 Done when each pending thread belongs to one issue with a class, target `localId`s for every `edit`, and cited evidence for every verdict.
 
@@ -86,7 +86,7 @@ Done when each pending thread belongs to one issue with a class, target `localId
 
 Skip when no issue is `edit`.
 
-1. Load the HTML body contract once: `<twg> confluence content body-formats html` (required before `--ack-body-formats`).
+1. Load the HTML body contract once: `<atl> confluence content body-formats html` (required before `--ack-body-formats`).
 2. Write `edits.json`: one JSON array, all `edit` issues. Operations (all `value` fields are HTML strings; `localId` from `draft.html`):
 
    | Operation | Shape |
@@ -103,7 +103,7 @@ Skip when no issue is `edit`.
 3. Apply:
 
    ```bash
-   <twg> confluence content update <pageId> --snapshot-token "<snapshotToken>" --edits-file edits.json --ack-body-formats --version-message "Address review comments" -y -o json > update.json
+   <atl> confluence content update <pageId> --snapshot-token "<snapshotToken>" --edits-file edits.json --ack-body-formats --version-message "Address review comments" -y -o json > update.json
    ```
 
    Publishes by default; add `--draft` only when the user asks for a draft.
@@ -120,8 +120,8 @@ Draft each reply per *Reply style*. Claim a change only after step 4 read-back c
 
 | Target | Command |
 |---|---|
-| `thread` (anchored inline or footer) | `<twg> confluence content comments reply --comment-id <thread id> --body-file reply-<id>.md --body-format md -o json` |
-| `page` (orphaned, or lost by this run's edit) | One footer comment for the run: `<twg> confluence content comments create --id <pageId> --comment-type footer --body-file reply-page.md --body-format md -o json` |
+| `thread` (anchored inline or footer) | `<atl> confluence content comments reply --comment-id <thread id> --body-file reply-<id>.md --body-format md -o json` |
+| `page` (orphaned, or lost by this run's edit) | One footer comment for the run: `<atl> confluence content comments create --id <pageId> --comment-type footer --body-file reply-page.md --body-format md -o json` |
 
 `--comment-id` is always the top-level thread `id`, never a reply id.
 
@@ -137,7 +137,7 @@ These comments lost their highlighted text, so the answers are here:
 
 The link **MUST** be the thread `url` (it carries `focusedCommentId=<id>`); the Rerun gate uses it to detect the answer.
 
-Read back each posted comment (`<twg> confluence content comments get --comment-id <new id> --body-format md -o json`); confirm the body. Failed or uncertain post → leave the thread pending; rerun the gate before retrying to avoid duplicates.
+Read back each posted comment (`<atl> confluence content comments get --comment-id <new id> --body-format md -o json`); confirm the body. Failed or uncertain post → leave the thread pending; rerun the gate before retrying to avoid duplicates.
 
 **MUST NOT** resolve or reopen comments; the reviewer closes threads. Rationale: reviewer and agent may share credentials.
 
@@ -174,7 +174,7 @@ No praise, apologies, headings, canned wording, or labels (`Bug:`, `Nit:`, `Note
 - Classic pages (`type=page`) need the `--draft` read's `snapshotToken`; never retry with `data.currentSnapshot.token` from an error.
 - `--resolution-status open` includes inline comments whose highlighted text an edit removed; `comment_state.py` marks them `orphaned` by checking `data-annotation-id` in the body.
 - `-o json --output-file` files are unredacted; read only needed fields with Python.
-- `<twg>` exits `127` → report missing twg CLI; auth error → report `email`/`apiToken` in `.atlassian.json.user`. **MUST NOT** run `twg login`.
+- `<atl>` exits `127` → report missing twg CLI; auth error → report `email`/`apiToken` in `.atlassian.json.user`. **MUST NOT** run `<atl> login`.
 
 ## Completion criteria
 

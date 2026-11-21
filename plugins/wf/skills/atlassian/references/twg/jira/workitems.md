@@ -18,19 +18,19 @@ Inspect live help for the exact command contract.
 - Request only the extra fields needed for the answer.
 - Use typed context alongside the native read when relationships to documents,
   PRs, projects, goals, people, or external URLs matter.
-- Use `twg jira workitem changelog query --issue-id <KEY>` for status and field
+- Use `<atl> jira workitem changelog query --issue-id <KEY>` for status and field
   history, such as when a workitem changed state and who changed it.
 - Treat search snippets as discovery evidence only.
 
 Custom field values are read through the workitem command:
 
 ```bash
-twg jira workitem get <KEY> --field customfield_12345
-twg jira workitem get <KEY> --fields customfield_12345,summary
-twg jira workitem get <KEY> --comments
-twg jira workitem get <KEY> --remote-links
-twg jira workitem get <KEY> --comments --remote-links
-twg jira workitem get <KEY> --full
+<atl> jira workitem get <KEY> --field customfield_12345
+<atl> jira workitem get <KEY> --fields customfield_12345,summary
+<atl> jira workitem get <KEY> --comments
+<atl> jira workitem get <KEY> --remote-links
+<atl> jira workitem get <KEY> --comments --remote-links
+<atl> jira workitem get <KEY> --full
 ```
 
 Do not use Jira administration field commands to read values from a workitem.

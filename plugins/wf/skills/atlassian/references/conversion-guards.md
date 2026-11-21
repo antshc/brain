@@ -45,8 +45,8 @@ Literal Markdown in ADF is escaped; code spans/fences use safe delimiters; hard 
 `publish-page run` returns `manifestPath` next to its `adfPath`. The manifest contains the expected title and ADF, including resolved media identifiers. Extend the existing read-only verify command:
 
 ```bash
-python3 <skillDir>/scripts/atl.py publish-page verify \
-  --page-id <pageId> --config "<configPath>" --expect-anchors <count> \
+<atl> publish-page verify \
+  --page-id <pageId> --expect-anchors <count> \
   --expected-manifest <manifestPath> --verify-dir <workingDir>/verify
 ```
 

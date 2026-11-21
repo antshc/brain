@@ -24,8 +24,8 @@ Use explicit discovery when the detailed reference inside a product or workflow
 skill is unclear:
 
 ```bash
-twg help discover-skills "snapshot token editing"
-twg help discover-skills "JQL sprint prioritization"
+<atl> help discover-skills "snapshot token editing"
+<atl> help discover-skills "JQL sprint prioritization"
 ```
 
 Discovery searches reference titles and curated frontmatter descriptions, not
@@ -41,25 +41,25 @@ user's intent materially changes.
 
 ## Map, Plan, Describe
 
-Use `twg help-map` for command discovery. Text keeps each namespace together,
+Use `<atl> help-map` for command discovery. Text keeps each namespace together,
 with common workflows first and Setup and admin last.
 `[jira.workitem]` sets the command prefix; `|` separates related entries.
 Plain names read, `*` marks writes, and `?` marks unknown access.
-Default text collapses Admin and omits Memory. Use `twg help-map admin`,
-`twg help-map memory`, or `twg help-map --all` to expand them. Writes, setup,
+Default text collapses Admin and omits Memory. Use `<atl> help-map admin`,
+`<atl> help-map memory`, or `<atl> help-map --all` to expand them. Writes, setup,
 and Trello remain visible. JSON/JSONL keep the full inventory and existing order.
 Use describe for flags and inputs.
 
 ```bash
-twg help-map
-twg help-map jira workitem
+<atl> help-map
+<atl> help-map jira workitem
 ```
 
 Describe every selected command you have not already described in a single
 call. Quote each command; up to 10 per call:
 
 ```bash
-twg help describe "goals query" "org-tree" "jira workitem query"
+<atl> help describe "goals query" "org-tree" "jira workitem query"
 ```
 
 After contract review, write a compact plan internally between `### Plan` and `### End plan`.
@@ -77,20 +77,20 @@ earlier one, and select fields with the advertised presets.
 
 ## Help Search
 
-Use `twg help` directly for commands. Do not extract a help file path from
+Use `<atl> help` directly for commands. Do not extract a help file path from
 stdout. With no arguments it emits the compact YAML command map for routing.
 
 ```bash
-twg help
-twg help jira
-twg help jira workitem
-twg help jira workitem link goal
-twg help confluence content get
-twg help describe "jira"
-twg help describe "jira workitem"
+<atl> help
+<atl> help jira
+<atl> help jira workitem
+<atl> help jira workitem link goal
+<atl> help confluence content get
+<atl> help describe "jira"
+<atl> help describe "jira workitem"
 ```
 
-`twg help describe <namespace>` emits compact YAML. The `$` key lists executable
+`<atl> help describe <namespace>` emits compact YAML. The `$` key lists executable
 child commands directly under that namespace; other keys are child namespaces.
 Use the returned `next.describe` commands to inspect exact executable contracts.
 Do not infer flags or arguments from namespace YAML.
@@ -101,7 +101,7 @@ path: [jira]
 depth: 2
 next:
   describe:
-    - 'twg help describe "jira workitem get"'
+    - '<atl> help describe "jira workitem get"'
 legend:
   $: executable child commands
 tree:
@@ -118,9 +118,9 @@ unfamiliar command. Exact executable commands return a one-result `describe_batc
 envelope by default; add `--detail full` for the full JSON record (`type: "cmd"`):
 
 ```bash
-twg help describe "jira workitem query"
-twg help describe "confluence content get"
-twg help describe "user search"
+<atl> help describe "jira workitem query"
+<atl> help describe "confluence content get"
+<atl> help describe "user search"
 ```
 
 The `output` object in `help describe` is the first place to look before
@@ -130,8 +130,8 @@ full record adds every `agentFieldPresets` view. Use them instead of probing raw
 with repeated `jq` calls:
 
 ```bash
-twg help describe "context user"
-twg context user <accountId> --output json --output-summary auto --agent-fields @compact
+<atl> help describe "context user"
+<atl> context user <accountId> --output json --output-summary auto --agent-fields @compact
 ```
 
 If a command does not advertise `agentFieldPresets`, `@compact`/`@evidence`
@@ -147,18 +147,18 @@ trial-and-error filters.
 Use rendered text help only when the user specifically asks for human help:
 
 ```bash
-twg -o text help describe "jira workitem query"
+<atl> -o text help describe "jira workitem query"
 ```
 
 ## Command Selection Rules
 
 - Keep guidance and command discovery separate: `discover-skills` returns an
-  owning skill and selected reference; `twg help <terms>` returns commands.
-- Choose commands from `twg help-map`. If a command name is still uncertain, run
-  `twg help <terms>`.
+  owning skill and selected reference; `<atl> help <terms>` returns commands.
+- Choose commands from `<atl> help-map`. If a command name is still uncertain, run
+  `<atl> help <terms>`.
 - If you need exact arguments, options, choices, defaults, or agent output
   guidance, describe the planned commands together:
-  `twg help describe "<command>" "<command>"`. If a path is a namespace,
+  `<atl> help describe "<command>" "<command>"`. If a path is a namespace,
   describe one of its listed commands.
 - Follow the `next` commands returned by help; do not invent unsupported help
   syntax.
@@ -182,16 +182,16 @@ twg -o text help describe "jira workitem query"
 
 | Need                                         | Discovery path                                                                                                                                                                                      |
 |--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Detailed product or workflow guidance        | `twg help discover-skills "<intent>"`, optionally scoped with `--skill`, then load the returned skill and reference                                                                                 |
-| Person lookup                                | `twg help user search`, then use positional name, `--name`, or `--email`                                                                                                                            |
-| Jira workitem detail or JQL                  | `twg help describe "jira workitem"`, then inspect the chosen exact command                                                                                                                          |
-| Jira required/custom fields on create/update | `twg help jira custom fields`, then use `jira workitem field create-metadata` or `update-metadata`; prefer returned `customfield_*` IDs; do not duplicate keys across `--field` and `--fields-json` |
-| Jira custom field value readback             | `twg jira workitem get <KEY> --field customfield_*`, or `--fields customfield_*,summary` for comma-separated REST fields                                                                            |
-| Confluence page by title, ID, or URL         | `twg help confluence content` and `twg help describe "confluence content get"`                                                                                                                      |
-| Bitbucket PR/repo                            | `twg help bb`, then `twg help describe "bb"`                                                                                                                                                        |
-| Project/goal/focus area key or search result | `twg help projects`, `twg help goals`, `twg help focus-areas`, then describe the exact `get` or `query` command                                                                                     |
-| Relationships or dependencies                | `twg help context`, then `twg help describe "context"`                                                                                                                                              |
-| Assets / CMDB                                | `twg help assets`, then inspect object schema/type help before AQL                                                                                                                                  |
+| Detailed product or workflow guidance        | `<atl> help discover-skills "<intent>"`, optionally scoped with `--skill`, then load the returned skill and reference                                                                                 |
+| Person lookup                                | `<atl> help user search`, then use positional name, `--name`, or `--email`                                                                                                                            |
+| Jira workitem detail or JQL                  | `<atl> help describe "jira workitem"`, then inspect the chosen exact command                                                                                                                          |
+| Jira required/custom fields on create/update | `<atl> help jira custom fields`, then use `jira workitem field create-metadata` or `update-metadata`; prefer returned `customfield_*` IDs; do not duplicate keys across `--field` and `--fields-json` |
+| Jira custom field value readback             | `<atl> jira workitem get <KEY> --field customfield_*`, or `--fields customfield_*,summary` for comma-separated REST fields                                                                            |
+| Confluence page by title, ID, or URL         | `<atl> help confluence content` and `<atl> help describe "confluence content get"`                                                                                                                      |
+| Bitbucket PR/repo                            | `<atl> help bb`, then `<atl> help describe "bb"`                                                                                                                                                        |
+| Project/goal/focus area key or search result | `<atl> help projects`, `<atl> help goals`, `<atl> help focus-areas`, then describe the exact `get` or `query` command                                                                                     |
+| Relationships or dependencies                | `<atl> help context`, then `<atl> help describe "context"`                                                                                                                                              |
+| Assets / CMDB                                | `<atl> help assets`, then inspect object schema/type help before AQL                                                                                                                                  |
 
 For manager-chain/direct-report/peer selectors, partial person results, or
 person-to-artifact handoffs, return control to the orchestrator for *Routing*

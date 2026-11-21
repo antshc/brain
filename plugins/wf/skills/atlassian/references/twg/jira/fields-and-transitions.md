@@ -10,10 +10,10 @@ Jira field configuration varies by project, work type, screen, and operation.
 Discover metadata before create or update:
 
 ```bash
-twg help jira custom fields
-twg jira workitem field create-metadata --space <KEY> --type <TYPE>
-twg jira workitem field update-metadata --id <KEY>
-twg jira workitem field update-metadata --id <KEY> --include-system-fields
+<atl> help jira custom fields
+<atl> jira workitem field create-metadata --space <KEY> --type <TYPE>
+<atl> jira workitem field update-metadata --id <KEY>
+<atl> jira workitem field update-metadata --id <KEY> --include-system-fields
 ```
 
 `update-metadata` returns editable custom fields by default. Pass

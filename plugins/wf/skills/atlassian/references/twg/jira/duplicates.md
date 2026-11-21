@@ -20,7 +20,7 @@ Use this decision policy with existing TWG capabilities. It does not replace
 JQL querying, `jira workitem similar`, or native workitem reads.
 
 When the prompt needs a bounded Jira candidate set, return to the orchestrator's
-*Jira* routing and load querying. Use live `twg help` for exact command grammar.
+*Jira* routing and load querying. Use live `<atl> help` for exact command grammar.
 
 Detect whether a target Jira issue duplicates another issue in the requested
 scope. Base the decision on semantic meaning, not an exact text match. Search

@@ -1,79 +1,49 @@
 ---
-description: Choose HTML or Markdown body formats, load the database CSV and whiteboard SVG specs, preserve macros, encode mentions, diagrams, and avoid unsafe conversions.
+description: Write Confluence page bodies as Markdown through atl, use the Markdown dialect for panels, expands, TOC, status, tables, comment anchors, diagrams, and load whiteboard SVG or database CSV specs.
 ---
 
 # Confluence Body Formats
 
-Use only formats advertised by the exact command and content type.
-
-## HTML
-
-HTML is the preferred lossless editing format for existing page-like content.
-Use real structural tags such as `<p>`, `<h2>`, `<ul>`, `<code>`, and links. For the full compact schema, run `twg confluence content body-formats html`.
-
-Before creating or editing a page, live doc, or blog post body, load and read
-the body format help for the exact content type. Pass `--ack-body-formats` only
-to attest that you read and will follow that help; never pass it otherwise:
-
-```bash
-twg confluence content body-formats html
-```
-
-For mentions, get the person's account ID first with
-`twg user get "<exact name or email>"`. Do not invent an account ID:
-
-```html
-<span data-type="mention" data-user-id="AAID">@Display Name</span>
-```
-
-For arbitrary macros, use extension HTML — never storage XML like `<ac:structured-macro>`. Native Confluence macros use `data-extension-type="com.atlassian.confluence.macro.core"`; third-party/app macros use the same pattern with the exact type/key/params captured from an existing page. Omit `macroId`; Confluence generates it.
-
-```html
-<div data-type="extension" data-extension-key="toc" data-extension-type="com.atlassian.confluence.macro.core" data-parameters='{"macroParams":{"maxLevel":{"value":"3"}},"macroMetadata":{"schemaVersion":{"value":"1"},"title":"Table of Contents"}}'></div>
-```
-
-Use `bodied-extension` for body macros (`excerpt`, `details`) and `inline-extension` inside `<p>` for inline macros (`anchor`, `pagetree`). Popular native `macroParams`: `toc` `{minLevel,maxLevel}`, `children` `{all,depth}`, `include` `{"":"Page title"}`, `excerpt` `{name}`, `details` `{label}`, `detailssummary` `{cql,headings}`, `contentbylabel` `{cql,max}`, `attachments` `{patterns,labels}`, `jira` `{jqlQuery,showSummary}`, `viewpdf` `{name}`.
-
-Do not invent opaque IDs for media, sync blocks, mentions, or embedded resources. Copy `data-id`, `data-collection`, `data-media-id`, `data-media-collection`, `data-resource-id`, and `data-local-id` only from existing content or tool output; omit `data-local-id` on new nodes.
+Page, live doc, and blog post bodies are Markdown. `<atl>` defaults `--format` to `md` and routes the body through the skill's Markdown → ADF converter, so the constructs below survive. Never pass `--format html`, storage XML, or `--native` for a body.
 
 ## Markdown
 
-Use `--format md` (preferred); `--format markdown` is also supported. Before
-acknowledging the body format, load:
+Read and write with the routed commands; no `body-formats` load or `--ack-body-formats` needed (accepted and ignored):
 
 ```bash
-twg confluence content body-formats md
+<atl> confluence content get <page> --output-file page.md
+<atl> confluence content update <page> --body-file page.md [--title "<title>"]
+<atl> confluence content create --content-type page --space-id <spaceId> [--parent-id <parentId>] --title "<title>" --body-file page.md
 ```
 
-Markdown is suitable for new prose and repository-authored documentation when
-the command supports it. It may not preserve every macro or storage-format
-construct during round trips.
+Standard Markdown (headings, lists, tables, code fences, links, `---`) plus this dialect:
+
+| Construct | Markdown |
+|---|---|
+| Panel | `> [!INFO]` / `[!NOTE]` / `[!WARNING]` / `[!SUCCESS]` / `[!ERROR]` blockquote |
+| Expand | `<details><summary>Title</summary>` … `</details>` |
+| Table of contents | `<!-- adf:toc -->` |
+| Wide table / table layout | `<!-- adf:wide-table -->` or `<!-- adf:table layout="<layout>" width="<px>" -->` on the line before the table |
+| Breakout | `<!-- adf:breakout mode="wide\|full-width" -->` on the line before `<details>` or a code fence |
+| Status lozenge | `🔵[In Progress]` (`⚪` `🟣` `🔵` `🔴` `🟡` `🟢`) |
+| Inline-comment anchor | `<!-- adf:comment id="<id>" -->text<!-- /adf:comment -->`; keep id and span unchanged |
+| Diagram | ```` ```mermaid ```` fence, optional `%% diagram-id: <id>` first line |
+| Image / file | `![alt](<local path>)` / `[name](<local path>)`; uploaded as an attachment |
+| Excluded from publish | `<!-- adf:ignore:start -->` … `<!-- adf:ignore:end -->` |
+
+- Check a draft offline: `<atl> map-markdown detect-adf-only < page.md` lists the dialect constructs found.
+- Mentions, Jira macros, page trees, and other app macros have no Markdown form. On an existing page, edit around them only after a fetch shows they are absent; otherwise report that the page holds content this path cannot rewrite and ask the user.
+- Never invent ids: comment anchors, `diagram-id`s, and media come only from fetched content or local files.
 
 ## Specialized Formats
 
-Whiteboards and standalone databases (`--content-type database`) use their own
-specialized helper information. Do not reuse page/blog/live-doc HTML or markdown
-guidance for these content types.
-
-For whiteboards, load the whiteboard body-format helper before creating or
-editing SVG content:
+Whiteboards and standalone databases (`--content-type database`) use their own formats, not Markdown. Load the helper before writing, and pass `--ack-body-formats` only after reading its output:
 
 ```bash
-twg confluence content body-formats --content-type whiteboard
+<atl> confluence content body-formats --content-type whiteboard
+<atl> confluence content body-formats --content-type database
 ```
 
-For databases, load the database body-format helper before creating CSV payloads
-or edit envelopes:
+Each helper returns an index and follow-up `--reference` paths for that content type. Use the whiteboard helper only for whiteboards (SVG) and the database helper only for databases (CSV), then follow the referenced format contract exactly.
 
-```bash
-twg confluence content body-formats --content-type database
-```
-
-Each helper returns an index and follow-up `--reference` paths for that content
-type. Use the whiteboard helper only for whiteboards and the database helper
-only for databases, then follow the referenced format contract exactly. Use
-`--ack-body-formats` only after reading the exact helper output and
-understanding the format contract.
-
-Keep title and body separate. Prefer body files over shell-inline multiline
-content. Verify rendered or returned content after consequential writes.
+Keep title and body separate. Prefer body files over shell-inline multiline content. Verify returned content after consequential writes.

@@ -1,6 +1,6 @@
 # Help
 
-**Trigger:** invocation args start with `help`. `help` alone → print the block below verbatim, then stop. `help <request>` → name the tactic the Tactics table selects for `<request>`, its reference, and the `atl.py` command it would run; run nothing. Never preflight, call Atlassian, or edit files.
+**Trigger:** invocation args start with `help`. `help` alone → print the block below verbatim, then stop. `help <request>` → name the tactic the Tactics table selects for `<request>`, its reference, and the `<atl>` (`atl.py`) command it would run; run nothing. Never preflight, call Atlassian, or edit files.
 
 ```text
 /atlassian <request>                 pick a tactic, preflight once, run it
@@ -30,14 +30,22 @@ TACTICS: chosen from the request
   /atlassian find open bugs in PROJ assigned to me
   /atlassian move PROJ-123 to In Progress
 
-CLI: python3 <skillDir>/scripts/atl.py <command> --help
- fetch-work      --issue-key K --config C --md-path P [--assets-dir D] [--attachments embedded|all] [--site S]
- publish-work    create   --project P --issue-type T --summary S (--markdown F | --adf F) [--parent K] [--fields-json F] [--attach F ...] --config C
-                 update   --key K [--summary S] [--markdown F | --adf F] [--fields-json F] [--attach F ...] --config C
-                 read-adf --key K --out F --config C
- fetch-page      --page-id ID --config C --md-path P [--assets-dir D] [--attachments auto|skip|required] [--comments auto|skip] [--site S]
- publish-page    run           --md-path P (--page-id ID | --space-id ID) [--title T] --config C [--assets-dir D] [--out F]
-                 verify        --page-id ID --config C --expect-anchors N [--present F] [--absent F] [--verify-dir D]
+CLI: <atl> = python3 <skillDir>/scripts/atl.py --config C   (Preflight; single entry point)
+ <atl> <any twg command>   runs on twg with config credentials, output redacted; --native = raw twg
+ Markdown bodies (default format) route to the commands below:
+  confluence content get <ref> --output-file P                         → fetch-page
+  confluence content create --content-type page --body-file F ...     → publish-page run
+  confluence content update <ref> --body-file F [--title T]           → publish-page run
+  jira workitem get <KEY|URL> --output-file P                          → fetch-work
+  jira workitem create|update --description-file F [--attach F ...]   → publish-work
+ <atl> <command> --help; --config is appended to these:
+ fetch-work      --issue-key K --md-path P [--assets-dir D] [--attachments embedded|all] [--site S]
+ publish-work    create   --project P --issue-type T --summary S (--markdown F | --adf F) [--parent K] [--fields-json F] [--attach F ...]
+                 update   --key K [--summary S] [--markdown F | --adf F] [--fields-json F] [--attach F ...]
+                 read-adf --key K --out F
+ fetch-page      --page-id ID --md-path P [--assets-dir D] [--attachments auto|skip|required] [--comments auto|skip] [--site S]
+ publish-page    run           --md-path P (--page-id ID | --space-id ID) [--title T] [--assets-dir D] [--out F]
+                 verify        --page-id ID --expect-anchors N [--present F] [--absent F] [--verify-dir D]
                  check-anchors --original F --md-path F            offline
                  extract | render-attach | substitute-media | replace-markers | publish-adf | combine   step utilities
  map-markdown    md-to-adf | adf-to-md | detect-adf-only           stdin → stdout, offline
