@@ -4,10 +4,11 @@
 <summary>Reviewers</summary>
 
 | **Role** | **Name** |
-| --- | --- |
+|---|---|
 | Author (Feature Lead) | |
 | Reviewers (Architect \ TL) | |
 | PO | |
+
 </details>
 
 <!-- adf:toc -->
@@ -24,7 +25,7 @@ Goal: decide whether body fetch and publish can move to `twg`, and through which
 <summary>Glossary and Abbreviations</summary>
 
 | **Term** | **Description** |
-| --- | --- |
+|---|---|
 | twg | Atlassian Teamwork Graph CLI; reads and writes Confluence and Jira content with `--format html` or `--format md` bodies. |
 | ADF | Atlassian Document Format, the JSON body model Confluence and Jira store. |
 | Current converter | The skill's in-process ADF↔Markdown converter on `main` at the baseline revision, used by Fetch page, Publish page, Fetch work and Publish work. |
@@ -43,7 +44,7 @@ Goal: decide whether body fetch and publish can move to `twg`, and through which
 
 <!-- adf:wide-table -->
 | **#** | **Requirement** | **Priority** | **Details** | **Source** |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | 1 | The `atlassian` skill has one selected twg body route backed by evidence. | MVP |  | Dev team |
 | 1.1 | *The design selects exactly one route — twg-html with a Markdown package converter, or twg-md — for Confluence page and Jira work-item bodies.* | MVP | • Selection follows the compatibility matrix and both prototype comparisons.<br>• A route may keep a justified minimal REST remainder for capabilities twg cannot carry. | Dev team |
 | 1.2 | *Every capability the skill supports today has a verdict in both directions.* | MVP | • Rows cover every regression capability and every behaviour asserted by the Markdown/ADF converter tests.<br>• Verdict is one of twg automatic, implement on twg, keep REST fallback, lost.<br>• A capability with no evidence stays Pending, never assumed. | Dev team |
@@ -87,7 +88,7 @@ Pending — selected route and its fetch/publish design follow the compatibility
 
 Pending — sequence diagram and decisions after route selection.
 
-**Decisions**
+### Decisions
 
 - Pending — fetch decisions after route selection.
 
@@ -95,7 +96,7 @@ Pending — sequence diagram and decisions after route selection.
 
 Pending — sequence diagram and decisions after route selection.
 
-**Decisions**
+### Decisions
 
 - Pending — publish decisions after route selection.
 
@@ -144,7 +145,7 @@ Pending — dependency changes (Markdown package added, REST library retained or
 <summary>Open Questions</summary>
 
 | **Question** | **Answer** |
-| --- | --- |
+|---|---|
 
 </details>
 
@@ -158,7 +159,7 @@ Pending — dependency changes (Markdown package added, REST library retained or
 **Evidence summary:** The baseline has 37 regression capabilities and 14 converter-test behaviours (51 rows). Documentation establishes support for structural HTML, extension-HTML macros, attachments, inline-comment markers and Jira ADF reads; it documents Markdown loss for panels, status, emoji, macros and layouts; per-node forms for most dialect constructs are undocumented. Prototype verdicts pending.
 
 | Row group | twg-html (documented) | twg-md (documented) | Jira |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | Headings, marks, lists, blockquote, rule, plain tables | Structural HTML supported; exact form pending prototype | Exact form pending prototype | Fetch reuses current converter (ADF read); publish pending |
 | Status lozenges, panels | Form pending prototype | Flattened to text | Fetch reuses current converter |
 | TOC, expand | Extension HTML supported; read form pending | Placeholder or lost | Not applicable / reuses converter |
@@ -182,14 +183,14 @@ Not applicable — developer tooling; no VPG, VRA or undo workflows.
 ## Interfaces & Operations
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | Alerts / Events / Tasks | not applicable |  |
 | API | applicable | Confluence and Jira body access moves from REST to the twg CLI. |
 
 ## Resiliency
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | ZVM Restart | not applicable |  |
 | VRA Restart | not applicable |  |
 | Network Disconnections | applicable | Pending — twg timeout and retry behaviour. |
@@ -202,7 +203,7 @@ Not applicable — no analytics, tweaks or product logs.
 ## Security
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | STRIDE analysis, Passwords, Data Validations | not applicable |  |
 | Authentication, Authorization | applicable | twg uses the same configured API token through injected environment credentials. |
 | New endpoints created and their security features | not applicable |  |
@@ -219,13 +220,13 @@ Not applicable — no containers or appliance.
 ## 3rd Party & Open Source Review & Deliverables
 
 | **Component** | **Version** | **License** | **URL** | **Usage** |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | Pending — Markdown package selected by research |  |  |  |  |
 
 ## External Deliverables Change
 
 | **Item** | **Applicable** | **Details** |
-| --- | --- | --- |
+|---|---|---|
 | Requires Change to Documentation? | applicable | Skill references for the body tactics change after migration. |
 | Requires or affects Swagger? Was this executed? | not applicable |  |
 | New Permissions or change in policies? | not applicable |  |

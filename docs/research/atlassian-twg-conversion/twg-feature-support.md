@@ -3,6 +3,7 @@
 Ticket: [Research: twg-html vs twg-md feature support against the current converter](https://github.com/antshc/brain/issues/397). Baseline: `main` @ `ed9e7ef1`, twg 1.4.2. Status: **partial**. The documentation matrix is complete. The authenticated `body-formats` references and live samples are blocked by a malformed preflight config.
 
 Parts:
+
 - [Baseline capability inventory](twg-feature-support-baseline.md): the 51 matrix rows.
 - [twg documentation and CLI help](twg-feature-support-twg-docs.md): what twg documents, with citations.
 
@@ -17,6 +18,7 @@ Parts:
 ## Compatibility matrix (documented support)
 
 Cell meanings:
+
 - **doc✔**: documented as supported or preserved.
 - **text**: documented to flatten to text.
 - **ph**: documented as a macro placeholder.
@@ -70,6 +72,7 @@ Cell meanings:
 ## Gaps
 
 The authenticated twg checks are blocked because `.github/skills/preflight-atlassian/.atlassian.json.user` is invalid JSON (`Extra data: line 15 column 1`). Once it is fixed, rerun:
+
 - `body-formats html` and `body-formats md`;
 - a live read of a rich page in both formats;
 - `jira workitem get ZIC-5914`.

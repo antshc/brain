@@ -5,6 +5,7 @@ Part of [Research: twg-html vs twg-md feature support against the current conver
 ## Answer
 
 twg 1.4.2 documents two Confluence body formats, `html` (the default) and `md`. HTML is the format it calls lossless for editing. Markdown is documented as lossy:
+
 - panels, status lozenges and emoji become plain text;
 - other macros become placeholders;
 - layouts and ADF-only nodes may be lost.
