@@ -55,22 +55,24 @@ Before the first search, print `route: rg | lsp | graphify-path | graphify-find 
 | Target has no local checkout or lacks the requested ref | `unresolved` |
 | Restored NuGet package, its API or behavior; C# type absent from local source after LSP and `rg -uu` | `nuget` |
 | Quoted literal, config key, error text, route path, test name, file glob, frontend component or UI text | `rg` |
+| Impact or blast radius of a known symbol | `lsp` references/implementations, then Graphify `affected` if the graph covers the target |
 | Exact type or member: definition, references, implementations, callers | `lsp`, then `rg` |
 | Two named or describable ends: "how does A reach B", "flow from A to B", "end to end", handoff | `graphify-path` with a covering graph, else `lsp` call hierarchy from A |
 | Unknown names: "which service does X", concept → code, "which modules", architecture, doc ↔ code | `graphify-find` with a covering graph, else `rg` on `GLOSSARY.md` terms |
-| Impact or blast radius of a known symbol | `lsp` references/implementations, then `graphify-find` for cross-module reach |
 
 ## Tools
 
 - **LSP** — definitions, references, implementations, call hierarchy for known symbols; follow with `rg`.
 - **rg** — literals, config keys, error text, routes, tests, globs: the `rg` or grep tool, or shell `rg` (`-t <lang>` / `-g <glob>`). Missing `command -v rg` → install once per-user, no sudo: latest `BurntSushi/ripgrep` release asset for the platform (`x86_64-unknown-linux-musl`, `aarch64-unknown-linux-gnu`, `<arch>-apple-darwin` `.tar.gz`; `x86_64-pc-windows-msvc` `.zip`), verified against its `.sha256`, only `rg` extracted to `~/.local/bin/` (Windows: `%LOCALAPPDATA%\Programs\ripgrep\`), run by absolute path when not on `PATH`. Install fails → LSP and bounded reads; report the coverage gap.
 - **Glossary** — fuzzy concept or unknown ownership → read `GLOSSARY.md` and the matching concept doc first to translate into code vocabulary.
-- **Graphify** — routes `graphify-path` and `graphify-find` only, on a covering graph. Before use, read `@research/how/graphify.md` and `<graph root>/GRAPHIFY.md` (when present) in full. Run every graph operation through `@research/scripts/graph.py` from the graph root with the interpreter in `graphify-out/.graphify_python`, else `python3`.
-  - `graphify-path`: `resolve` both ends, then `path <A> <B>` before any `query` or `rg`; walk each hop in source. A hop through a DTO, exception, or base class is a shortcut → `query <hop> --anchor --both` for the real neighbor.
+- **Graphify** — use a covering graph for `graphify-path`, `graphify-find`, and impact lookups. Before use, read `@research/how/graphify.md` and `<graph root>/GRAPHIFY.md` (when present) in full. Run the focused commands through `@research/scripts/graph.py` from the graph root with the interpreter in `graphify-out/.graphify_python`, else `python3`.
+  - Impact: use `affected` on the changed member or interface member after LSP. Start at depth two. Use a type seed for type-wide changes or missing member coverage. Resolve ambiguity before traversal. Use `slice --direction in` when the focused command is unavailable. Verify material consumers in source, and use LSP or targeted source search when results are empty, unresolved, or incomplete.
+  - `graphify-path`: `resolve` both ends, then `path <A> <B>` before any `query` or `rg`. Use `--directed` when call direction matters. Walk each hop in source, including interface dispatch and DI binding. If the path ends at an interface or is missing, trace the binding through LSP and source. A hop through a DTO, exception, or base class is a shortcut → `query <hop> --anchor --both` for the real neighbor.
   - `graphify-find`: `terms "<question>"`, then `query` with the top 1-2 identifier terms; open the top production hits.
   - Fallbacks: `graphify path | explain` CLI only when the focused commands cannot run; `graph.py raw-path | explain | traverse` only when both are missing.
   - Read-only overrides: skip `graphify reflect --if-stale` (read `graphify-out/reflections/LESSONS.md` if present); never `save-result`, `--update`, add, watch, export, feedback, or rebuild.
   - Worktree target → translate graph paths from `@mainCheckout/…` to `@worktreeRoot/…` before reading source.
+  - Record graph freshness and target coverage separately from the reviewed checkout's revision or dirty state. Stale or revision-mismatched graphs supply candidates only. Record material gaps and their consequences.
 - **NuGet** — route `nuget`: read `@research/how/nuget.md` in full and follow it. An unknown package ID is a valid entry state.
 
 ## Gotchas

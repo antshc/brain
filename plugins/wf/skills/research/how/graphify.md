@@ -1,4 +1,4 @@
-# Graphify search: query, path, explain
+# Graphify search: query, affected, path, explain
 
 How tactic (`hunty`) for searching an existing `graphify-out/` graph; searching only, never building. The graph root is always the harness root (`git rev-parse --show-toplevel` from the launch folder): the only graph is `<root>/graphify-out/`. Run from there, never from a `workspace/<repo>` checkout or a git worktree, and never probe those for their own `graphify-out/`; indexed repositories sit under `<root>/workspace/<repo>`. Default to the focused search script; the `graphify query` CLI and inline NetworkX traversal are fallbacks.
 
@@ -8,6 +8,7 @@ Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names t
 
 - Query health and intent preflight
 - Focused search (default)
+- Reverse dependencies
 - CLI fallback: constrained query expansion and traversal
 - Path between two nodes
 - Explain one node
@@ -24,7 +25,7 @@ Two traversal modes - choose based on the question:
 
 Set `$GRAPH` as in Focused search (default) first.
 
-Run this preflight before every query, path, or explain operation against an existing graph:
+Run this preflight before query, affected, path, or explain operations against an existing graph:
 
 0. Read `<graph root>/GRAPHIFY.md` in full when present. Its corpus, exclusion, health preflight, search vocabulary, and degraded-mode rules override the generic steps below.
 1. Run `graphify reflect --if-stale` and read `graphify-out/reflections/LESSONS.md`. Do not repeat a known dead end unless the graph or source has changed.
@@ -32,9 +33,12 @@ Run this preflight before every query, path, or explain operation against an exi
 3. Inspect node `source_file` prefixes and `file_type` counts in `graphify-out/graph.json`. Report material generated/snapshot inputs such as `.artifacts/`, `bin/`, `obj/`, `TestResults/`, or `review_diff/`, and whether the source or documentation needed by the question is represented.
 4. Print one concise health line before the query: corpus roots/coverage, freshness (`current`, `stale`, or `unknown`), and material noise. Do not rebuild automatically. When coverage is missing or freshness is stale, use the graph only for candidate discovery and verify against current source or authoritative documentation.
 
+For a review, record the reviewed commit or dirty state independently of graph freshness. A current harness graph may cover a different checkout revision. Map indexed files into the reviewed checkout and cite the source there.
+
 Classify the query before choosing traversal:
 
 - **Exact symbol, file, or node:** `$GRAPH query <Symbol> --anchor` (add `--both` for callers), or `graphify explain` with the exact name. If it is ambiguous, retry with the repo-relative path or full node ID. Use broad traversal only if the exact node's neighborhood is insufficient.
+- **Impact of a changed symbol:** use LSP for references and implementations, then `$GRAPH affected <Symbol>` for direct and transitive dependents in a covering graph.
 - **Behavior of a known symbol:** explain the exact class and controlling method first. If the method node omits the calls or data flow that determine the result, state that the graph is insufficient and verify the behavior in live source; do not infer it from nearby type edges.
 - **Broad architecture or relationship:** confirm that architecture/document nodes and the relevant source roots exist in the corpus before BFS. A code-only graph cannot authoritatively answer a documentation-level architecture question.
 - **Path between concepts:** `resolve` both endpoints to exact class labels before path traversal and apply the path-quality rules below.
@@ -56,14 +60,15 @@ GRAPH="$(cat graphify-out/.graphify_python 2>/dev/null || echo python3) <researc
 $GRAPH --help
 ```
 
-`--graph PATH` selects another graph. Focused commands (`terms`, `query`, `resolve`, `path`) need the `graphify` module; they drop nodes that are never the answer to a code question: tests, folders named `*deprecated*`, generated/build output, `graphify-out/`, `mocks/`/`mocker/` servers, project/package manifests, namespace and solution-project nodes, and sourceless external types. Pass `--keep test` (comma list) when the question is about tests. Fallback commands (`check`, `contexts`, `vocab`, `slice`, `traverse`, `raw-path`, `explain`) need only the stdlib.
+`--graph PATH` selects another graph. Focused commands (`terms`, `query`, `resolve`, `path`, `affected`) need the `graphify` module; they exclude tests, folders named `*deprecated*`, generated/build output, `graphify-out/`, `mocks/`/`mocker/` servers, project/package manifests, namespace and solution-project nodes, and sourceless external types. Pass `--keep test` (comma list) when the question is about tests. Fallback commands (`check`, `contexts`, `vocab`, `slice`, `traverse`, `raw-path`, `explain`) need only the stdlib.
 
 | Command | Use |
 |---|---|
 | `terms "<question>"` | Candidate terms: adjacent question words joined into compounds the graph contains (`memberaccounthealth`), longest first, then rare single words, with label hit counts. |
 | `query <T1> [<T2>]` | BFS depth 2 from the best match of each term. `--anchor` seeds only the top match; `--both --anchor` lists 1-hop callers and callees; `--context call` filters edges. |
 | `resolve "<Label or phrase>"` | Exact class label first, then best compound match; returns `label file:line` to pick path endpoints. |
-| `path <A> <B>` | Shortest path on the focused graph, both directions, import edges dropped. |
+| `path <A> <B>` | Shortest path on the focused graph. Use `--directed` for directed dependencies. By default it searches both ways and drops import edges. |
+| `affected <Symbol>` | Traverse reverse dependency edges from a symbol or node ID. Depth defaults to two. Repeat `--relation` to select edge types. |
 
 Search-term rules:
 
@@ -75,9 +80,26 @@ Search-term rules:
 - Flow between two parts → `resolve` both ends to exact class labels, then `path`. Interface hops (`IFoo` between `Foo` and its caller) are the real dependency; a hop through a shared parameter/DTO type is a shortcut, so confirm the call chain in source.
 - Truncated output (`[!] TRUNCATED`) → narrow the term or add `--anchor`; do not raise `--budget` first.
 
-The fallback below applies only when the focused commands cannot run (`graph.py` exits `3`: no `graphify` module for the interpreter).
+## Reverse dependencies
+
+Start with the changed member or interface member. Use the declaring type for type-wide changes or when the graph omits the member. Increase the default depth of two only to answer a specific cross-boundary question.
+
+```bash
+$GRAPH affected OrderService --depth 2
+$GRAPH affected OrderService --depth 1 --relation calls --relation references
+```
+
+Exit `5` lists ambiguous matches with IDs. Retry with a qualified symbol or exact ID. Exit `4` indicates a missing seed. Zero dependents means the resolved seed had no hits within the selected graph, depth, and relations. Verify material hits in the reviewed source. For an unavailable focused command, use a bounded inbound slice on an exact label, adding `--source-contains` to disambiguate when needed.
+
+```bash
+$GRAPH slice OrderService --direction in --depth 1
+```
+
+For a missing or stale graph, unresolved or empty results, or incomplete evidence, continue with LSP and targeted source searches. Record commands or skip reasons, source citations, and remaining coverage gaps. Keep review queries read-only under Hunty's rules.
 
 ## CLI fallback: constrained query expansion and traversal
+
+Use this query fallback when the focused search cannot run (`graph.py` exits `3` for a missing module).
 
 ### Step 0 — Constrained query expansion (REQUIRED before broad traversal)
 
@@ -181,7 +203,7 @@ At the **start** of graph work, refresh and read the lessons: run `graphify refl
 
 ## Path between two nodes
 
-Default: `resolve` both endpoints to exact class labels, then run `$GRAPH path <A> <B>` (see Focused search (default)). The CLI path is directed; across interface edges (`Caller → IFoo ← Foo`) it finds no path, and phrase endpoints resolve to namespaces or generic nodes. Fallback when the script cannot run: first run `graphify explain` for both endpoints. Resolve every ambiguity with a repo-relative path or full node ID before asking for a path. Prefer the CLI when installed:
+Resolve both endpoints to exact class or member labels or node IDs. Use `$GRAPH path <A> <B> --directed` when dependency direction matters. A directed path can stop at an interface (`Caller → IFoo ← Foo`). Trace the implementation binding and each material hop in source. Fallback when the focused command cannot run: use `graphify explain` for both endpoints and resolve ambiguities before using the CLI:
 
 ```bash
 graphify path "NODE_A" "NODE_B"

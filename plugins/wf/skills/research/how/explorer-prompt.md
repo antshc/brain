@@ -21,6 +21,8 @@ Resolve targets/revisions and read contracts first using `hunty`'s procedure. Di
 
 Trace the actual executing path from trigger to observable outcome. Confirm registration, selected implementation, provider/fallback, configuration/flags, data transformations, and relevant failures/retries/async paths. Apply supplied proof checks only to steps needed to settle this question; deepen where the outcome depends on it, not through unrelated methods.
 
+For impact grounding, take the changed symbols or contracts, reviewed checkout/revision or dirty state, and any endpoint pairs from the assigned angle. Apply Hunty's impact and directed path tactics where applicable. Check source relationships the graph may omit, including configuration, event subscriptions, and wire or data contracts. Carry the dependency evidence below into the report draft.
+
 For each internal handoff, establish sender, wire contract, receiver, and deployment/config binding. Matching names are insufficient. Continue into accessible source across repositories while its behavior affects the scoped outcome. Stop at a proven external terminal or explicit scope boundary with the integration contract and reason. Inaccessible source ends source coverage, not downstream behavior proof. A missing sender/receiver/binding remains an unconfirmed crossing. Record cycles as revisits, not new deployables.
 
 Resolve decisive C# dependency behavior through `hunty`'s NuGet tactic, including the restored package version, assembly/TFM, and exact member. XML documents intent; source or decompiled implementation establishes execution. Missing restore/source/tools → name the gap; do not guess version or behavior. Keep searches bounded to resolved targets and package cache.
@@ -36,6 +38,7 @@ Include only applicable fields; keep narrow answers compact.
 - **Scope and revision** — assigned question/angle, targets/revisions, observed environment.
 - **Deployables and slices** — independently running units, functional responsibilities, startup/deployment evidence; key types/services and ownership.
 - **Flow** — ordered triggers, decisions, calls, data, and outcomes; citations for each material claim.
+- **Dependency evidence** — for each material changed boundary, record graph commands or skip reason, graph freshness and corpus coverage, reviewed revision or dirty state, consumers or hops verified with source file/line citations, and the consequence and next check for each unresolved gap.
 - **Boundaries** — inputs/outputs, sender, contract, receiver, and binding evidence at handoffs/stores.
 - **Terminals and coverage** — relevant branches traced/excluded; external terminals, scope stops, inaccessible-source stops, cycles, unconfirmed crossings; stopping reason and completeness consequence.
 - **Packages** — resolved ID/version, assembly/TFM, type/member, XML/source/decompiled provenance and deciding evidence.

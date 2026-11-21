@@ -81,6 +81,17 @@
       ]
     },
     {
+      "id": "blast_radius_graph_grounding",
+      "request": "Route: How. For a diff that changes the missing-order outcome of OrderService.Find, trace OrderController to OrderRepository at the reviewed checkout. OrderController takes IOrderService, which DI binds to OrderService. The harness graph predates the diff. Save grounding-how.md in the supplied run directory.",
+      "checks": [
+        "run bounded affected and directed path queries on resolved symbols where the graph covers them",
+        "record graph freshness separately from the reviewed revision and verify stale graph candidates in reviewed source",
+        "follow interface dispatch through the DI registration when the directed graph stops at IOrderService",
+        "report commands or skip reasons, source-verified consumers, and any material coverage gaps in grounding-how.md",
+        "state the concrete response regression that blast-radius can send to Prove"
+      ]
+    },
+    {
       "id": "default_session_destination",
       "request": "Inspect the deletion flow and save a report.",
       "checks": [

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only focused graphify search: noise-free query, term suggestions, endpoint resolve, hub-free path."""
+"""Read-only focused Graphify search, dependency paths, and reverse traversal."""
 from __future__ import annotations
 
 import argparse
@@ -11,7 +11,7 @@ from itertools import product
 from pathlib import Path
 
 import networkx as nx
-from graphify import serve
+from graphify import affected, serve
 
 NOISE_KINDS = ("sourceless", "structure", "namespace", "generated", "deprecated", "test", "mock", "manifest")
 TYPE_ONLY_CONTEXTS = frozenset({"generic_arg", "parameter_type", "return_type", "attribute", "argument", "type"})
@@ -154,6 +154,8 @@ def suggest_terms(graph: nx.DiGraph, text: str, *, limit: int = 3) -> list[tuple
 
 def resolve(graph: nx.DiGraph, text: str, *, limit: int = 5) -> list[str]:
     """Exact (case-insensitive) label first, type over member, else the best suggested compound."""
+    if text in graph:
+        return [text]
     wanted = _bare(text.strip()).lower()
     exact = [
         nid for nid in graph.nodes
@@ -225,6 +227,24 @@ def _describe(graph: nx.DiGraph, nid: str) -> str:
     return f"{_label(graph, nid)}  {data.get('source_file', '')}:{data.get('source_location', '')}"
 
 
+def show_affected(
+    graph: nx.DiGraph, symbol: str, *, depth: int, relations: list[str] | None,
+) -> int:
+    seed, rivals = affected.resolve_seed_outcome(graph, symbol, Path.cwd())
+    if seed is None:
+        if rivals:
+            print(f"error: ambiguous symbol {symbol!r}; use a qualified symbol or node ID", file=sys.stderr)
+            for nid in rivals:
+                print(f"  {nid}: {_describe(graph, nid)}", file=sys.stderr)
+            return 5
+        print(f"error: no node matches {symbol!r}", file=sys.stderr)
+        return 4
+
+    selected = relations or affected.DEFAULT_AFFECTED_RELATIONS
+    print(affected.format_affected(graph, symbol, seed=seed, depth=depth, relations=selected))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Focused graphify search over production code only [read-only].",
@@ -234,7 +254,8 @@ def main(argv: list[str] | None = None) -> int:
             "  focused_query.py query orderjanitor\n"
             "  focused_query.py query InvoiceManager --anchor --both\n"
             "  focused_query.py resolve OrdersController\n"
-            "  focused_query.py path OrdersController ShipmentTask"
+            "  focused_query.py path OrdersController ShipmentTask\n"
+            "  focused_query.py affected OrderJanitor --depth 2"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -257,6 +278,10 @@ def main(argv: list[str] | None = None) -> int:
     path.add_argument("source")
     path.add_argument("target")
     path.add_argument("--directed", action="store_true")
+    impact = sub.add_parser("affected", help="find nodes that depend on a symbol or node ID")
+    impact.add_argument("symbol")
+    impact.add_argument("--depth", type=int, default=2, help="maximum reverse hops (default: 2)")
+    impact.add_argument("--relation", action="append", help="edge relation to follow (repeatable)")
     args = parser.parse_args(argv)
 
     if not args.graph.exists():
@@ -267,6 +292,16 @@ def main(argv: list[str] | None = None) -> int:
     if unknown:
         print(f"error: unknown noise kinds {sorted(unknown)}", file=sys.stderr)
         return 2
+    if args.command == "affected":
+        if args.depth < 1:
+            impact.error("--depth must be at least 1")
+        try:
+            graph = focus(affected.load_graph(args.graph), keep=keep)
+        except (RuntimeError, KeyError, TypeError, ValueError) as error:
+            print(f"error: cannot load graph: {error}", file=sys.stderr)
+            return 1
+        return show_affected(graph, args.symbol, depth=args.depth, relations=args.relation)
+
     graph = focus(load_graph(args.graph), keep=keep)
     if args.command == "terms":
         suggestions = suggest_terms(graph, args.text, limit=args.limit)
