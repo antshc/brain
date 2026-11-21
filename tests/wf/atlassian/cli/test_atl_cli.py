@@ -24,11 +24,11 @@ def test_root_help_lists_every_command_from_an_unrelated_directory(tmp_path):
         assert command in result.stdout
 
 
-def test_missing_or_unknown_command_exits_2_with_usage(tmp_path):
+def test_missing_command_exits_2_and_help_documents_twg_routing(tmp_path):
     assert _run(cwd=tmp_path).returncode == 2
-    unknown = _run("fetch-pages", cwd=tmp_path)
-    assert unknown.returncode == 2
-    assert "invalid choice" in unknown.stderr
+    help_text = _run("--help", cwd=tmp_path).stdout
+    assert "Any other <command> is a twg command" in help_text
+    assert "--native" in help_text
 
 
 @pytest.mark.parametrize(

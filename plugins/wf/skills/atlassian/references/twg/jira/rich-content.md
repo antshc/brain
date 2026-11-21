@@ -1,34 +1,27 @@
 ---
-description: Write Jira descriptions, comments, mentions, links, and structured content with supported HTML, Markdown, or ADF forms.
+description: Write Jira descriptions, comments, transition comments, mentions, and links as Markdown through atl, with raw ADF only for rich custom fields.
 ---
 
 # Jira Rich Content
 
-Match the command's advertised description or comment format.
+Write every description and comment as Markdown through `<atl>`.
 
-- Use real HTML tags when the format is HTML.
-- Use markdown only when the command explicitly supports it.
-- Do not pass Jira wiki markup such as `h2. Heading`, `[label|url]`, or
-  `*bold*`.
+- **Descriptions** default to Markdown: `--description` / `--description-file` on `<atl> jira workitem create|update` route through the skill's Markdown → ADF converter (panels, `<details>`, status, TOC, wide tables survive). Never pass `--description-format html|plain`.
+- **Comments** run on twg, which defaults to HTML; always pass the Markdown flag:
+  - `<atl> jira workitem comment create ... --body-file <comment.md> --body-format markdown`
+  - `<atl> jira workitem update --id <KEY> --comment "<md>" --comment-format markdown`
+  - `<atl> jira workitem transition ... --transition-comment "<md>" --transition-comment-format markdown` (same on `update --status`)
+- Do not pass Jira wiki markup such as `h2. Heading`, `[label|url]`, or `*bold*`.
 - Use a body file for long or structured content.
-- `--description-format`, `--body-format`, and `--transition-comment-format`
-  convert only the matching description/comment flag. They do not convert
-  values passed through `--field` or `--fields-json`.
-- Rich custom fields passed through `--field` or `--fields-json` need raw ADF.
-- Compact summaries can omit descriptions/comments; inspect referenced output
-  before treating prose as empty.
-- Jira descriptions and comments read back as ADF documents, not strings.
+- Format flags convert only their matching description/comment flag, not values passed through `--field` or `--fields-json`. Rich custom fields there need raw ADF: produce it with `<atl> map-markdown md-to-adf < field.md`.
+- Compact summaries can omit descriptions/comments; inspect referenced output before treating prose as empty.
+- Jira descriptions and comments read back as ADF documents, not strings; read descriptions as Markdown with `<atl> jira workitem get <KEY> --output-file work.md`.
 
-For HTML mentions, get the person's account ID first with
-`twg user get "<exact name or email>"`. Do not invent an account ID:
+## Mentions
 
-```html
-<span data-type="mention" data-user-id="AAID">@Display Name</span>
-```
+Get the person's account ID first with `<atl> user get "<exact name or email>"`. Never invent an account ID.
 
-Markdown has no portable mention syntax. When the Jira write path supports the
-compatibility form, `[~accountId:AAID]` can be converted to an ADF mention.
-Prefer the HTML form when controlling the format.
+- **Comments** (`--body-format markdown` / `--comment-format markdown` on twg): write `[~accountId:AAID]`; twg converts it to an ADF mention when the write path supports the compatibility form.
+- **Descriptions** (the skill's converter): no mention form; `[~accountId:...]` publishes as literal text. Put the mention in a comment instead, or report that the description cannot carry it.
 
-Never invent account IDs. Read back the resulting description or comment when
-format preservation matters.
+Read back the resulting comment and confirm the mention node when it matters.

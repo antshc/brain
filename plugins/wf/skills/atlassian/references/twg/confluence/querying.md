@@ -21,8 +21,8 @@ Guidance:
 - Use CQL for space, type, title, creator, contributor, label, and modified-time
   filters.
 - `confluence content list` has no date filter. For pages and blog posts updated
-  since a point in time, use `twg confluence search query --cql '<CQL>'` with a
-  `lastmodified` clause. `twg confluence search text "<term>" --updated-since
+  since a point in time, use `<atl> confluence search query --cql '<CQL>'` with a
+  `lastmodified` clause. `<atl> confluence search text "<term>" --updated-since
   <date>` also filters by date, but it requires a text term and always
   constrains `type in (page, blogpost)`, so it cannot list a whole space by date.
 - That CQL route is established for pages and blog posts only; it does not

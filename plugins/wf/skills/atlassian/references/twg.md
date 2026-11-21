@@ -1,11 +1,12 @@
 # TWG
 
-General `twg` CLI guidance for the **Query or operate with TWG** tactic. Run every command through Preflight's credentialed `<twg>` launcher in place of bare `twg`. Live help owns command grammar. Product references are routed from the `atlassian` skill's TWG routes section.
+General `twg` CLI guidance for the **Query or operate with TWG** tactic. Run every command through Preflight's `<atl>` launcher (`atl.py`); never call bare `twg`. Live help owns command grammar. Product references are routed from the `atlassian` skill's TWG routes section.
 
 ## Contents
 
 - TWG Terms
 - Fast path
+- Markdown body routing
 - Command index
 - Plan First
 - Invocation And Output
@@ -25,48 +26,64 @@ General `twg` CLI guidance for the **Query or operate with TWG** tactic. Run eve
 
 | Need | Command |
 |---|---|
-| Find sources about a topic | `<twg> rovo search "<topic>" --limit 10` |
-| Read a Confluence page (search hit, ID, or URL) | **Fetch page** tactic. Fallback only when it is unavailable or fails: `<twg> confluence content get <id-or-url> --detail full --format md`; warn it is lossy (diagrams, media, attachments, comments may be missing) |
-| Read a Jira work item body | **Fetch work** tactic. Fallback: `<twg> jira workitem get <KEY>`; warn the body may lose ADF-only constructs |
+| Find sources about a topic | `<atl> rovo search "<topic>" --limit 10` |
+| Read a Confluence page (search hit, ID, or URL) | **Fetch page** tactic: `<atl> confluence content get <ref> --output-file page.md`. Fallback only when it is unavailable or fails: `<atl> confluence content get <id-or-url> --native --detail full --format md`; warn it is lossy (diagrams, media, attachments, comments may be missing) |
+| Read a Jira work item body | **Fetch work** tactic: `<atl> jira workitem get <KEY> --output-file work.md`. Fallback: `<atl> jira workitem get <KEY> -o json --output-file work.json`; warn the body may lose ADF-only constructs |
 
 Use `--site <site>` when supplied or when the anchor URL identifies a site. For a multi-site request, run each query against its intended site. Do not assume the saved default matches every anchor. If the request identifies no site, use the configured default and state the scope.
 
-Read search results before you cite them. For questions these commands cover, do not run `twg help-map` or `twg help describe "<command>"`. Run independent reads in one shell call, separated by `;`.
+Read search results before you cite them. For questions these commands cover, do not run `<atl> help-map` or `<atl> help describe "<command>"`. Run independent reads in one shell call, separated by `;`.
 
 For other tasks or unclear syntax, follow Plan First.
 
+## Markdown body routing
+
+`<atl>` defaults page and work-item bodies to Markdown and routes them to the skill's REST + ADF converter; same output and errors as the body tactics.
+
+| Command | Routed when | Runs |
+|---|---|---|
+| `confluence content get <ref>` | `--format` absent or `md`, `--detail` absent or `full`, no `-o` | `fetch-page`; `--output-file` = Markdown path (required) |
+| `confluence content create --content-type page` | `--body`/`--body-file`, `--format` absent or `md` | `publish-page run`; numeric `--space-id` |
+| `confluence content update <ref>` | `--body`/`--body-file`, `--format` absent or `md` | `publish-page run` |
+| `jira workitem get <KEY>` | no `-o`, `--fields`, `--field`, `--full`, `--comments`, `--remote-links` | `fetch-work`; `--output-file` = Markdown path (required) |
+| `jira workitem create` / `update` | `--description`/`--description-file`, `--description-format` absent or `markdown` | `publish-work`; remaining flags then run on twg |
+
+- Anything else (other format, `--edits*`, structured output) runs on twg unchanged. `--native` forces raw twg.
+- A routed command with a flag it cannot honour → exit 2 naming it; never a silent lossy fallback.
+- Default differs from bare twg: twg defaults `--format`/`--description-format` to `html`; `<atl>` defaults them to Markdown.
+
 ## Command index
 
-`twg help-map` is the live, complete map (`*` = write); use this index to pick a route, then confirm grammar with `twg help describe`.
+`<atl> help-map` is the live, complete map (`*` = write); use this index to pick a route, then confirm grammar with `<atl> help describe`.
 
 | Namespace | Covers |
 |---|---|
-| `rovo search`, `rovo deep-search` | Cross-product discovery, deep research (`twg help rovo`) |
+| `rovo search`, `rovo deep-search` | Cross-product discovery, deep research (`<atl> help rovo`) |
 | `jira workitem` | get, bulk-get, query (JQL), search, similar, create, update, transition, comment, link/unlink, attachment, worklog, field metadata |
 | `jira board`, `jira sprint`, `jira filter`, `jira dashboard`, `jira space`, `jira field`, `spaces` | Boards, backlogs, sprints, filters, dashboards, Jira projects, field admin |
 | `confluence content` | get, list, create, update, move, archive, trash, purge, comments, labels, versions, approvals, attachments, export |
 | `confluence space`, `confluence tree`, `confluence search` | Space lifecycle, instructions, hierarchy, CQL and text search |
-| `context`, `subgraph` | Linked artifacts, graph neighborhoods, Jira links, space containment (`twg help context`) |
+| `context`, `subgraph` | Linked artifacts, graph neighborhoods, Jira links, space containment (`<atl> help context`) |
 | `user`, `people`, `teams`, `org-tree`, `collaborators` | People lookup, reporting lines, teams |
-| `responsibility` | Declared and inferred owners, experts, escalation (`twg help responsibility`) |
+| `responsibility` | Declared and inferred owners, experts, escalation (`<atl> help responsibility`) |
 | `work`, `docs`, `work-tree`, `workitem-tree`, `pr-tree`, `notifications` | Personal and org activity, rollups |
-| `jsm` | Incidents, PIRs, alerts, requests, SLAs, knowledge (`twg help jsm`) |
+| `jsm` | Incidents, PIRs, alerts, requests, SLAs, knowledge (`<atl> help jsm`) |
 | `assets` | Assets objects, AQL, relationship graph |
-| `trello`, `loom`, `meetings`, `videos` | Other connected products (`twg help <namespace>`) |
+| `trello`, `loom`, `meetings`, `videos` | Other connected products (`<atl> help <namespace>`) |
 | `help`, `help-map`, `whoami`, `doctor` | Discovery and diagnostics |
 
 ## Plan First
 
-1. Run `twg help-map`; `*` marks writes. Do not pipe it through `head`.
-2. Describe the selected commands in one call (up to 10): `twg help describe "<a>" "<b>"`. Reuse those contracts.
+1. Run `<atl> help-map`; `*` marks writes. Do not pipe it through `head`.
+2. Describe the selected commands in one call (up to 10): `<atl> help describe "<a>" "<b>"`. Reuse those contracts.
 3. After contract review, plan internally between `### Plan` and `### End plan`. Give one step per call: exact command paths, inputs, flags, dependencies, and unknowns linked to their producer steps. Append the plan after all commands in the first execution shell call, with `#` before each line. Print only on user request or for clarification or approval.
 4. Batch independent reads, separated by `;` (`&&` for dependencies). Pipe JSON to `jq` only with `set -o pipefail`; check error fields.
 
-If a command is unclear, run `twg help <terms>`. For more guidance, run `twg help discover-skills "<intent>"`, then follow `next.loadReference`.
+If a command is unclear, run `<atl> help <terms>`. For more guidance, run `<atl> help discover-skills "<intent>"`, then follow `next.loadReference`.
 
 ## Invocation And Output
 
-Run `<twg> <command>`. The launcher finds `twg` on PATH or in its default install directory; exit `127` (`error: twg CLI not found`) → report missing "twg CLI" and ask the user to install it. Do not treat auth or command errors as PATH failures.
+Run `<atl> <command>`. The launcher finds `twg` on PATH or in its default install directory; exit `127` (`error: twg CLI not found`) → report missing "twg CLI" and ask the user to install it. Do not treat auth or command errors as PATH failures.
 
 Do not add per-command env prefixes unless requested; hosts may set `TWG_AGENT_DEFAULTS=1`.
 
@@ -83,7 +100,7 @@ Do not run a command that waits for user input, such as setup, login, install, u
 
 ## Errors in Sandboxes
 
-For sandboxed `twg bb pipeline get`, `wait`, `grep`, or `tail`, log restrictions are not evidence of auth failure; report the restriction and the evidence you have.
+For sandboxed `<atl> bb pipeline get`, `wait`, `grep`, or `tail`, log restrictions are not evidence of auth failure; report the restriction and the evidence you have.
 
 ## On gathering evidence
 
@@ -98,8 +115,8 @@ When a command accepts many inputs, send about twenty IDs per call with `--agent
 
 ## Assorted Discovery guidelines
 
-- Use `twg trello search "<query>"` for Trello. It has no workspace scope.
-- Run `twg rovo list-apps -o json` only when availability is unknown. Reuse auth. Do not auto-login or fabricate "none found".
+- Use `<atl> trello search "<query>"` for Trello. It has no workspace scope.
+- Run `<atl> rovo list-apps -o json` only when availability is unknown. Reuse auth. Do not auto-login or fabricate "none found".
 - `docs query` and `work query` return user activity, not title or content matches. For topic text, use `docs search` or `work search`.
 - Pass supported original references to native reads. Avoid separate resolve calls.
 - Command shape guardrails:

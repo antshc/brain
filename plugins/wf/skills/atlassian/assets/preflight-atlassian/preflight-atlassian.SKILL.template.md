@@ -1,7 +1,7 @@
 ---
 name: preflight-atlassian
 description: >-
-  Resolve Atlassian connection facts (site, default project key, default space id, token availability, credentialed twg command) from this repo's `.atlassian.json.user` config. Internal gate for `atlassian`, not a user entry point. Not for Jira or Confluence operations → `atlassian`.
+  Resolve Atlassian connection facts (site, default project key, default space id, token availability, credentialed atl command) from this repo's `.atlassian.json.user` config. Internal gate for `atlassian`, not a user entry point. Not for Jira or Confluence operations → `atlassian`.
 compatibility: Requires the `twg` CLI and an Atlassian API token (`email` + `apiToken`); twg and the REST scripts share those credentials.
 ---
 
@@ -25,11 +25,11 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
    - Not found → keys take table Default; keys without Default resolve empty (`site` → step 3, identity → step 5, project key/space id → ask per caller).
    - Found → file value wins; absent keys take Default. `tokenAvailable := email and apiToken both true`.
 3. **site.** `site :=` config `cloudId` (`https://<host>`). Empty and needed → ask developer for `<organization>.atlassian.net`; never guess.
-4. **twg.** `twg := python3 <base>/scripts/twg_cred.py`, `<base>` = this skill's absolute base directory; works from any cwd. Optional leading `--config <configPath>`; default is this skill's `.atlassian.json.user`. Injects config `email`/`apiToken`/`cloudId` into the twg child only and redacts email and token from its output. `atlassian` and `daily-briefing` use this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
-5. **Identity.** `accountId` and `displayName` both set → skip. Either empty → `<twg> whoami -o json --output-file whoami.json` once, then print only `data.accountId` and `data.name` with Python: success → `accountId`, `displayName`; failure → leave empty, never raise. Exception: the ATL installer's connectivity gate always calls live, ignoring cache.
-6. **Report** `configPath`, `site`, `twg`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`, `displayName`, `maxResults`, `limit` before the caller's operation.
+4. **atl.** `atl := python3 <atlScript> --config "<configPath>"`. `<atlScript>` is the absolute path to the `atlassian` skill's `scripts/atl.py`, filled in by its Install tactic. It runs from any cwd. `atl.py` is the single Atlassian entry point. Any twg command runs on twg, with config `email`/`apiToken`/`cloudId` injected into the twg child only; email and token are redacted from its output. Markdown page and work-item body commands are routed to the skill's ADF converter. `atlassian`, `daily-briefing`, and `research` use this one launcher; never rebuild it inline. Malformed config → exit 1, `error: unreadable or malformed Atlassian config`.
+5. **Identity.** `accountId` and `displayName` both set → skip. Either empty → `<atl> whoami -o json --output-file whoami.json` once, then print only `data.accountId` and `data.name` with Python: success → `accountId`, `displayName`; failure → leave empty, never raise. Exception: the ATL installer's connectivity gate always calls live, ignoring cache.
+6. **Report** `configPath`, `site`, `atl`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`, `displayName`, `maxResults`, `limit` before the caller's operation.
 
-**Config handoff:** `atl.py` and the other ATL scripts read the config themselves; pass `--config "<configPath>"`, never rebuild the path.
+**Config handoff:** `<atl>` already carries `--config`. Direct `atl.py` commands (`fetch-page`, `publish-page`, ...) also run through `<atl>`, which appends `--config` to them; never rebuild the path.
 
 | Key | Meaning | API | Default |
 |---|---|---|---|
@@ -38,7 +38,7 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 | `apiToken` | API token; REST and twg credential | Yes | — |
 | `jiraProjectKeys` | Project keys; first = default | Yes | — |
 | `confluenceSpaceIds` | Space ids; first = default | Yes | — |
-| `accountId` | Cached by the ATL installer from `twg whoami`; never hand-entered | Yes | — |
+| `accountId` | Cached by the ATL installer from `<atl> whoami`; never hand-entered | Yes | — |
 | `displayName` | Same origin as `accountId`; never hand-entered | No | — |
 | `diagramRenderer` | Publish page mermaid rendering: `png` \| `drawio` \| `mermaid` | No | `png` |
 | `drawioExtensionKey` | Required when `diagramRenderer: drawio`; `<appId>/<envId>/static/drawio` | Yes | — |
@@ -50,16 +50,17 @@ Preflight resolves facts only; never creates/updates content. Request is the ope
 
 Apply in every skill that runs Preflight:
 
-- **twg first.** Search and every non-body Jira/Confluence operation → *Load and follow the `atlassian` skill to use its TWG tactic for Jira workitems, JQL, Confluence pages, CQL, spaces, and people*, running Preflight's `twg` in place of bare `twg`. Never call the Atlassian MCP.
-- **REST + ADF for bodies.** For full Jira descriptions and Confluence page bodies (`<details>`, panels, status, TOC, wide tables, inline-comment anchors, diagrams, attachments), *Load and follow the `atlassian` skill to fetch and publish Jira and Confluence content* using Fetch work, Publish work, Fetch page, or Publish page (`atl.py` over REST). Never read or write those bodies through twg, except each tactic's documented lossy fallback.
-- **Markdown, not HTML.** twg fallback reads use `--format md` and warn they are lossy; twg writes use markdown body formats. Never request or send `html`, except the `atlassian` Address page comments tactic's targeted edits.
+- **twg first.** Search and every non-body Jira/Confluence operation → *Load and follow the `atlassian` skill to use its TWG tactic for Jira workitems, JQL, Confluence pages, CQL, spaces, and people*, running every command through Preflight's `<atl>`; never call bare `twg`. Never call the Atlassian MCP.
+- **Markdown bodies through `<atl>`.** Full Jira descriptions and Confluence page bodies (`<details>`, panels, status, TOC, wide tables, inline-comment anchors, diagrams, attachments) default to Markdown. `<atl>` routes Markdown body commands to REST + ADF (`confluence content get|create|update`, `jira workitem get|create|update`). For the full workflow, *Load and follow the `atlassian` skill to fetch and publish Jira and Confluence content* using Fetch work, Publish work, Fetch page, or Publish page. **MUST NOT** add `--native` to a body command, except where a tactic's documented lossy fallback calls for it.
+- **Markdown, not HTML.** Never request or send `html`, except the `atlassian` Address page comments tactic's targeted edits.
 - JQL/CQL searches use resolved `maxResults`/`limit` as `--limit`, unless the caller bundles its own extraction script and declares a higher cap.
 - Large twg result → `-o json --output-file <file>.json`, `cd` there, extract with Python (`read_file` silently truncates lines at ~2000 chars). Unknown shape → `print(json.dumps(d, indent=2)[:2000])`.
-- `<twg>` exits `127` → report missing "twg CLI". Auth error → report `email`/`apiToken` in `.atlassian.json.user` as the prerequisite. **MUST NOT** run `twg login`, `setup`, or any interactive command.
+- `<atl>` exits `127` → report missing "twg CLI". Auth error → report `email`/`apiToken` in `.atlassian.json.user` as the prerequisite. **MUST NOT** run `<atl> login`, `setup`, or any interactive command.
 
 ## Gotchas
 
 - **MUST NOT search the filesystem** (`find`/`grep`/`ls -R`/`os.walk`) for this skill's directory or `.atlassian.json.user`. Base dir = parent of the `SKILL.md` path given in context; config is its sibling.
 - **Long absolute paths in `python3 -c` or heredocs get corrupted by terminal line-wrapping.** `cd` to the directory and use relative filenames; multi-statement code → temp `.py` file run by name.
-- `twg -o json` without `--output-file` prints a pointer line (`stdout=<path>`), not JSON. Always pass `--output-file <path>` and parse that file.
-- `<twg>` redacts stdout/stderr only; a file written by `--output-file` is unredacted (whoami holds `email`). Extract needed fields; never print the whole file.
+- `<atl> -o json` without `--output-file` prints a pointer line (`stdout=<path>`), not JSON. Always pass `--output-file <path>` and parse that file.
+- `<atl>` redacts stdout/stderr only; a file written by `--output-file` is unredacted (whoami holds `email`). Extract needed fields; never print the whole file.
+- `<atl>` with a leading `--config` in step 4 still works when `.atlassian.json.user` is absent: twg falls back to its own saved login.

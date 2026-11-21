@@ -20,13 +20,13 @@ and field name **from it** — never from `assets search`, AQL, or the prompt's
 wording verbatim.
 
 1. **Fetch the schema once, to a file.**
-   `twg assets graph schema -o json --output-file /tmp/assets-schema.json` (add
+   `<atl> assets graph schema -o json --output-file /tmp/assets-schema.json` (add
    `--workspace <id-or-ari>` / `--site <site>` for a non-default workspace). Use an
    absolute path so re-runs reuse it. It is large — piping to stdout truncates into
    invalid JSON — so always `--output-file` and `jq` the file (cached ~24h). This
    *is* discovery: do **not** `help describe` the graph subcommands first.
    Once you know the nouns, scope reads with `--node <name>` (repeatable, fuzzy):
-   `twg assets graph schema --node "Maruti Suzuki" -o json` returns just that type
+   `<atl> assets graph schema --node "Maruti Suzuki" -o json` returns just that type
    plus its relationships — prefer it over re-`jq`-ing the whole file.
 2. **Match each noun to an exact type `name`.** Nouns rarely match verbatim
    ("Maruti Suzuki Cars" → `Maruti Suzuki`, "Hyundai cars" → `Hyundai`). Enumerate
@@ -51,7 +51,7 @@ wording verbatim.
    `… IdentityUser AtlassianTeam -r <owner-rel> -r atlassian_user_is_in_atlassian_team`.
    `IdentityTeam` has **no** membership edge.
 5. **Execute the whole path:**
-   `twg assets graph connections <t1> <t2> … -r <r1> -r <r2> --execute -o json`
+   `<atl> assets graph connections <t1> <t2> … -r <r1> -r <r2> --execute -o json`
    (`--execute` required in agent mode; `--show-cypher` to inspect; `--direction
    out|in|any`; `--optional-hop <n>` for OPTIONAL MATCH).
 6. **Filter / timebound in the same call** with `-w "[N:|rN:]field[op]value"` (`N` =
@@ -81,7 +81,7 @@ targets. Act on those hints — do not fall back to `assets search` or client-si
 
 **AQL is the helper, not the enemy.** Where the graph path can't answer — a bounded
 object/attribute fact, or object recency (`Updated > now(-10d)`, AQL's attribute
-names) — use one `twg assets query --aql "<AQL>"`. A time window alone is never a
+names) — use one `<atl> assets query --aql "<AQL>"`. A time window alone is never a
 reason to leave `connections` — use `-w` (step 6). `assets search` is only a
 shallow name lookup: for owner/attribute work inspect the schema/object type
 first, then batch `assets query`/`assets object query` with repeated

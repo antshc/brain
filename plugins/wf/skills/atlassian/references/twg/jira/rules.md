@@ -6,7 +6,7 @@ description: Jira semantics, safe read and write rules, transitions, and handoff
 
 Use when Jira is the source of truth or a Jira mutation is required. Skip when Jira is only one supporting artifact inside a cross-product answer.
 
-Read a known issue with `twg jira workitem get <KEY> --site <SITE>`; pass multiple keys positionally to read a set. `get` rejects `--id` (used by transition); use the positional key or `--issue-id`.
+Read a known issue with `<atl> jira workitem get <KEY> --site <SITE>`; pass multiple keys positionally to read a set. `get` rejects `--id` (used by transition); use the positional key or `--issue-id`.
 
 Verify mutation contracts first; describe them with the planned commands.
 
@@ -25,7 +25,7 @@ Verify mutation contracts first; describe them with the planned commands.
 - Discover create/update field metadata before supplying required or custom fields.
 - Use returned `customfield_*` IDs rather than display names in writes.
 - Discover available transitions instead of guessing a transition name or ID.
-  - Run `twg jira workitem transition --id <KEY> --site <SITE> -o json` without `--transition-id` to discover available transitions and their required screen fields. This call is read-only.
+  - Run `<atl> jira workitem transition --id <KEY> --site <SITE> -o json` without `--transition-id` to discover available transitions and their required screen fields. This call is read-only.
   - Select one and use its `requirements` to gather field values before calling with `--transition-id`.
   - Treat required fields as user-decision inputs. If the user did not supply a required value, ask before transitioning; do not infer or choose an allowed value. This includes Resolution: a request to cancel does not imply `Won't Do`, `Declined`, `Duplicate`, or another Resolution.
 - Keep global Jira field administration separate from workitem field values.

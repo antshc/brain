@@ -2,7 +2,7 @@
 
 Read [Conversion guards](conversion-guards.md) for lint policy, fidelity checks, supported exceptions, and read-back manifests.
 
-Return a Confluence **Page** as Markdown from a page ID, tiny ID, URL, or selected search hit. REST v2 reads the real ADF body, attachments, and comments; `atl.py` converts ADF back to Markdown verbatim. Not twg: its Markdown export drops ADF-only constructs and comment anchors. Use for every page body read; twg only finds pages.
+Return a Confluence **Page** as Markdown from a page ID, tiny ID, URL, or selected search hit. `<atl> confluence content get` defaults to Markdown and is routed to REST v2: it reads the real ADF body, attachments, and comments, and `atl.py` converts ADF back to Markdown verbatim. twg's own Markdown export (`--native`) drops ADF-only constructs and comment anchors. Use for every page body read.
 
 ## Contents
 
@@ -14,15 +14,14 @@ Return a Confluence **Page** as Markdown from a page ID, tiny ID, URL, or select
 
 ## Steps
 
-1. **Parse input.** URL `<site>` differing from Preflight `site` → pass `--site https://<site>`.
-   - `https://<site>/wiki/spaces/<space>/pages/<page_id>/<title>` → `<page_id>`.
-   - Bare numeric ID or search hit ID → `<page_id>` as-is.
-   - Tiny link `https://<site>/wiki/x/<tiny_id>`, or bare tiny ID → URL `<site>/wiki/x/<tiny_id>`; resolve with `<twg> confluence content get <url> --detail summary -o json --output-file tiny.json` → `<page_id> := data.id`.
+1. **Parse input.** `<page>` := the page URL, numeric ID, search-hit ID, or tiny link `https://<site>/wiki/x/<tiny_id>` (bare tiny ID → that URL), passed as-is. `<atl>` extracts the id and site from page URLs and resolves tiny links itself.
 2. **Fetch and assemble.**
 
    ```bash
-   python3 <skillDir>/scripts/atl.py fetch-page --page-id <page_id> --config "<configPath>" --md-path page.md [--site https://<site>] [--assets-dir <dir>] [--attachments auto|skip|required] [--comments auto|skip]
+   <atl> confluence content get <page> --output-file page.md [--site <site>] [--assets-dir <dir>] [--attachments auto|skip|required] [--comments auto|skip]
    ```
+
+   `--format html`, `--detail` other than `full`, or `-o json` leave the Markdown path; omit them. `--section`, `--draft`, or several pages → exit 2 naming the flag. One page per command.
 
    Fetches title + ADF over REST v2 (`body-format=atlas_doc_format`), converts to Markdown (Draw.io, TOC, smart links, media → placeholders/links), caches attachments, resolves placeholders; writes `# <title>\n\n<body>`. Assets default to `page.md.assets/`.
    - Unsupported ADF → non-zero exit, `ADF conversion failed: <reason>` on stderr, no `page.md`.
@@ -67,4 +66,4 @@ Links percent-encoded, relative to `page.md`'s dir. Publish page re-uploads rule
 ## Degraded mode
 
 - Diagram published before sidecars existed → note naming missing `{name}.source.mmd`; republish with Publish page, then refetch.
-- `atl.py` unavailable or failing for a non-auth reason → `<twg> confluence content get <id-or-url> --detail full --format md -o json --output-file page.json`; warn the user it is lossy (diagrams, media, attachments, comments may be missing). Auth or policy denial → stop and report; no fallback.
+- Markdown body path unavailable or failing for a non-auth reason → `<atl> confluence content get <id-or-url> --native --detail full --format md -o json --output-file page.json`; warn the user it is lossy (diagrams, media, attachments, comments may be missing). Auth or policy denial → stop and report; no fallback.

@@ -14,7 +14,7 @@ description: Mixed-identity manager chains, direct reports, reporting peers, and
 - Context And Collaborators
 
 Keep the IDs, site, and time window that a command returns, and reuse them. Replace placeholders
-with returned values. Check focused `twg help describe "<command>"` for availability.
+with returned values. Check focused `<atl> help describe "<command>"` for availability.
 
 ## Routes
 
@@ -51,15 +51,15 @@ Org activity uses tree/batched rollups, not per-person activity loops.
 
 ## Ambiguous Names
 
-If a name matches several people and one of them is in `twg collaborators --limit 50`,
+If a name matches several people and one of them is in `<atl> collaborators --limit 50`,
 do not stop to ask. Answer for that candidate, and list the others at the end.
 
 ## Hierarchy
 
 ```bash
-twg user get --site '<site>' -o json
-twg user manager --identifier '<returned-data.accountId>' --site '<site>' -o json
-twg work query --scope user --identifier '<manager-identifier>' --activity all --since 14d --site '<site>' -o json
+<atl> user get --site '<site>' -o json
+<atl> user manager --identifier '<returned-data.accountId>' --site '<site>' -o json
+<atl> work query --scope user --identifier '<manager-identifier>' --activity all --since 14d --site '<site>' -o json
 ```
 
 | Manager response | Downstream `--identifier` |
@@ -112,18 +112,18 @@ Active, selected, and discarded reconciliation rows differ; report their counts
 without inventing discard reasons or historical status.
 
 ```bash
-twg org-tree --account-id '<aaid>' --down-only --depth '<depth>' --include-counts --site '<site>' -o json
-twg org-tree --account-id '<aaid>' --up-only --site '<site>' -o json
-twg user direct-reports --account-id '<aaid>' --site '<site>' -o json
-twg people describe '<aaid>' --direct-reports --site '<site>' -o json
+<atl> org-tree --account-id '<aaid>' --down-only --depth '<depth>' --include-counts --site '<site>' -o json
+<atl> org-tree --account-id '<aaid>' --up-only --site '<site>' -o json
+<atl> user direct-reports --account-id '<aaid>' --site '<site>' -o json
+<atl> people describe '<aaid>' --direct-reports --site '<site>' -o json
 ```
 
 Mixed-identity hierarchy, when advertised and enabled:
 
 ```bash
-twg user manager-chain --identifier '<person-id>' --depth 2 --site '<site>' -o json
-twg user direct-reports --identifier '<person-id>' --site '<site>' -o json
-twg user peers --identifier '<person-id>' --site '<site>' -o json
+<atl> user manager-chain --identifier '<person-id>' --depth 2 --site '<site>' -o json
+<atl> user direct-reports --identifier '<person-id>' --site '<site>' -o json
+<atl> user peers --identifier '<person-id>' --site '<site>' -o json
 ```
 
 Chain depth defaults to 1; `data.truncated: true` means more levels, not
@@ -135,7 +135,7 @@ ambiguity, cycles, or incomplete scans fail closed; never shrink the roster to b
 Pass one logical person's complete `actorIdentifiers[].ari` set in one call:
 
 ```bash
-twg docs query --actor-identifier '<actor-ari-1>' --actor-identifier '<actor-ari-2>' --since 14d --site '<site>' -o json
+<atl> docs query --actor-identifier '<actor-ari-1>' --actor-identifier '<actor-ari-2>' --since 14d --site '<site>' -o json
 ```
 
 - Supported by work/docs/meetings/videos queries, even when hidden from help.
@@ -162,8 +162,8 @@ twg docs query --actor-identifier '<actor-ari-1>' --actor-identifier '<actor-ari
 | Empty/partial/access-limited results | Describe scope and gaps, not “this person did no work” |
 
 ```bash
-twg docs query --identifier '<person-ari>' --since 14d --site '<site>' -o json
-twg docs query --identifier '<person-ari>' --since 14d --first 100 --after '<returned-cursor>' --site '<site>' -o json
+<atl> docs query --identifier '<person-ari>' --since 14d --site '<site>' -o json
+<atl> docs query --identifier '<person-ari>' --since 14d --first 100 --after '<returned-cursor>' --site '<site>' -o json
 ```
 
 Docs rows are `data.documents[]`. Never invent cursors; report unfinished pagination.
@@ -178,8 +178,8 @@ relationships; counts do not prove impact.
 Check `context user` help for 3P support; absence is a capability gap, not permission to coerce an AAID.
 
 ```bash
-twg context user '<returned-3p-ari>' --since 14d --detail summary --site '<site>' -o json
-twg collaborators --account-id '<verified-aaid>' --limit 10 --site '<site>' -o json
+<atl> context user '<returned-3p-ari>' --since 14d --detail summary --site '<site>' -o json
+<atl> collaborators --account-id '<verified-aaid>' --limit 10 --site '<site>' -o json
 ```
 
 | 3P context contract | Returned value |

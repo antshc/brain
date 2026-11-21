@@ -13,7 +13,8 @@
 
 ## Consequences
 
-- `apiToken` is mandatory: no `atl` body operation reads or publishes without it, and twg uses it via `TWG_USER`/`TWG_TOKEN`/`TWG_SITE` injected by `preflight-atlassian`'s `scripts/twg_cred.py`, which redacts the credentials from output.
+- `apiToken` is mandatory: no `atl` body operation reads or publishes without it, and twg uses it via `TWG_USER`/`TWG_TOKEN`/`TWG_SITE` injected by the `atlassian` skill's `atl.py`, which redacts the credentials from output.
+- `atl.py` is the single Atlassian entry point and Preflight's `twg` launcher: unknown commands pass through to twg, and Markdown body commands (`confluence content get|create|update`, `jira workitem get|create|update`) are routed to the REST + ADF body commands. Bodies default to Markdown, so a plain twg-shaped command cannot silently take twg's lossy conversion; `--native` opts out. The standalone `twg_cred.py` launcher is retired.
 - `plugins/atl/.mcp.json` is deleted; Publish page drops its MCP handback, `--threshold-bytes`, and `notify-comments`.
 - twg commands request Markdown, never HTML.
 - Exception: the `atlassian` skill's Address page comments tactic edits a commented page in place with twg targeted edits (`content update --edits-file`, HTML node values against a `--draft --format html` read). twg preserves untouched nodes exactly, so inline-comment anchors, macros, and diagrams survive; full-body replacement through twg stays forbidden.

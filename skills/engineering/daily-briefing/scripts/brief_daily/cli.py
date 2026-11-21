@@ -16,7 +16,7 @@ def _content_argument(parser: argparse.ArgumentParser) -> None:
         required=True,
         action="append",
         metavar="PATH",
-        help="A `twg jira workitem query -o json --output-file` page; repeat once per pagination page",
+        help="An `<atl> jira workitem query -o json --output-file` page; repeat once per pagination page",
     )
 
 

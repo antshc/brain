@@ -1,16 +1,9 @@
-#!/usr/bin/env python3
-"""Run the `twg` CLI with the REST credentials from `.atlassian.json.user`.
+"""Run the `twg` CLI with the credentials from `.atlassian.json.user`.
 
 twg reads `TWG_USER`/`TWG_TOKEN`/`TWG_SITE` as per-process overrides, so the config's
 `email`/`apiToken`/`cloudId` reach the twg child process only: never this process's
 environment, never a command line. Both output streams are copied with the email and token
 replaced by `<redacted>`; files twg writes via `--output-file` are not redacted.
-
-Usage:
-    python3 twg_cred.py [--config <configPath>] <twg arguments...>
-
-`--config` defaults to `.atlassian.json.user` beside this skill's `SKILL.md`, resolved from
-this file's location, not the cwd.
 """
 from __future__ import annotations
 
@@ -21,27 +14,22 @@ import subprocess
 import sys
 from pathlib import Path
 
-CONFIG_PATH = Path(__file__).resolve().parents[1] / ".atlassian.json.user"
 REDACTED = b"<redacted>"
 MISSING_TWG_EXIT_CODE = 127
 CONFIG_ERROR = "error: unreadable or malformed Atlassian config"
+MISSING_TWG_ERROR = "error: twg CLI not found"
 
 
 class ConfigError(Exception):
     """The config exists but cannot be read or parsed; the message never carries its values."""
 
 
-def split_config_arg(args: list[str]) -> tuple[Path | None, list[str]]:
-    """A leading `--config <path>` / `--config=<path>` -> (path, remaining twg args)."""
-    if args and args[0] == "--config" and len(args) > 1:
-        return Path(args[1]), args[2:]
-    if args and args[0].startswith("--config="):
-        return Path(args[0].removeprefix("--config=")), args[1:]
-    return None, args
+class TwgNotFoundError(Exception):
+    """No `twg` binary on PATH or in its default install directory."""
 
 
-def load_config(config_path: Path) -> dict[str, object]:
-    if not config_path.exists():
+def load_config(config_path: Path | None) -> dict[str, object]:
+    if config_path is None or not config_path.exists():
         return {}
     try:
         config = json.loads(config_path.read_text(encoding="utf-8"))
@@ -71,6 +59,10 @@ def credential_env(config: dict[str, object]) -> dict[str, str]:
     return env
 
 
+def secrets(config: dict[str, object]) -> list[str]:
+    return [value for value in (str(config.get("email", "")).strip(), str(config.get("apiToken", "")).strip()) if value]
+
+
 def find_twg(*, home: Path | None = None, local_app_data: str | None = None) -> str | None:
     found = shutil.which("twg")
     if found:
@@ -83,36 +75,36 @@ def find_twg(*, home: Path | None = None, local_app_data: str | None = None) -> 
     return next((str(path) for path in candidates if path.is_file()), None)
 
 
-def redact(data: bytes, secrets: list[str]) -> bytes:
-    for secret in secrets:
-        data = data.replace(secret.encode("utf-8"), REDACTED)
+def redact(data: bytes, values: list[str]) -> bytes:
+    for value in values:
+        data = data.replace(value.encode("utf-8"), REDACTED)
     return data
 
 
-def main(argv: list[str] | None = None, *, config_path: Path = CONFIG_PATH) -> int:
-    explicit_config, args = split_config_arg(sys.argv[1:] if argv is None else argv)
-    try:
-        config = load_config(explicit_config or config_path)
-    except ConfigError as exception:
-        print(exception, file=sys.stderr)
-        return 1
+def call_twg(args: list[str], config: dict[str, object]) -> subprocess.CompletedProcess[bytes]:
+    """Run twg with injected credentials; stdout and stderr come back redacted."""
     binary = find_twg()
     if binary is None:
-        print("error: twg CLI not found", file=sys.stderr)
-        return MISSING_TWG_EXIT_CODE
-    secrets = [value for value in (str(config.get("email", "")).strip(), str(config.get("apiToken", "")).strip()) if value]
+        raise TwgNotFoundError(MISSING_TWG_ERROR)
     result = subprocess.run(
         [binary, *args],
         env={**os.environ, **credential_env(config)},
         capture_output=True,
         check=False,
     )
-    sys.stdout.buffer.write(redact(result.stdout, secrets))
+    hidden = secrets(config)
+    return subprocess.CompletedProcess(result.args, result.returncode, redact(result.stdout, hidden), redact(result.stderr, hidden))
+
+
+def run_twg(args: list[str], config: dict[str, object]) -> int:
+    """Forward `args` to twg, copy its redacted output to this process, and return its exit code."""
+    try:
+        result = call_twg(args, config)
+    except TwgNotFoundError as exception:
+        print(exception, file=sys.stderr)
+        return MISSING_TWG_EXIT_CODE
+    sys.stdout.buffer.write(result.stdout)
     sys.stdout.flush()
-    sys.stderr.buffer.write(redact(result.stderr, secrets))
+    sys.stderr.buffer.write(result.stderr)
     sys.stderr.flush()
     return result.returncode
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

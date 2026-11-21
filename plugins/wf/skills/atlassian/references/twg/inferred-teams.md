@@ -8,11 +8,11 @@ Default teams commands return canonical TeamV2 teams. Use inferred teams only wh
 the user explicitly asks for inferred teams, project/space-backed teams, or gives
 an inferred-team ID from a previous result.
 
-- Query canonical teams: `twg teams query --query <query>`.
-- Include inferred teams: `twg teams query --query <query> --include-inferred --site <site>`.
+- Query canonical teams: `<atl> teams query --query <query>`.
+- Include inferred teams: `<atl> teams query --query <query> --include-inferred --site <site>`.
 - Follow up on an inferred team: pass the returned `teamIdForFollowUp` to
-  `twg teams get <teamIdForFollowUp> --include-inferred --site <site>` or
-  `twg teams members list <teamIdForFollowUp> --include-inferred --site <site>`.
+  `<atl> teams get <teamIdForFollowUp> --include-inferred --site <site>` or
+  `<atl> teams members list <teamIdForFollowUp> --include-inferred --site <site>`.
 - Follow-up IDs are first-class InferredTeam workspace ARIs:
   `ari:cloud:graph-store::inferred-team/workspace/<workspaceId>/<teamId>`.
   They require `--include-inferred` on `teams get` and `teams members list`.

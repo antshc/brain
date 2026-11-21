@@ -5,7 +5,7 @@ description: Choose among resolve, search, context, responsibility, product comm
 # TWG Routing
 
 Use this reference when the product or surface is uncertain. Exact command
-syntax comes from live `twg help`.
+syntax comes from live `<atl> help`.
 
 For a known native command, send the original supported URL, key, ARI or exact
 scoped name and all known site/parent, filter, projection, pagination and bound
@@ -19,10 +19,10 @@ limits. Native internal lookups do not authorize broader scope or writes.
 
 - Native commands resolve their advertised selectors internally. Pass original
   supported references, known site/cloud/org/parent scope, projection and bounds
-  in one call. Use `twg resolve` only as a last resort: no native selector
+  in one call. Use `<atl> resolve` only as a last resort: no native selector
   accepts the form you have, the scope is unknown, or discovery returns more
   than one match. Add `--type` to read a bare PREFIX-N key as one Jira or Atlas
-  kind, and see `twg help describe resolve` for the contract.
+  kind, and see `<atl> help describe resolve` for the contract.
 - Product-native commands provide authoritative fields and mutations.
 - `rovo search` handles fuzzy topics, partial titles, nicknames, and unknown
   products.
@@ -41,7 +41,7 @@ limits. Native internal lookups do not authorize broader scope or writes.
 - Exact Jira and Atlas keys should go to the product-native get command first:
   `jira workitem get <key>` for a Jira key, `projects get <key>` for an Atlas
   project key, or `goals get <key>` for a goal key. If the kind is unclear, use
-  `twg resolve "<key>" --type jira-workitem` (or `atlas-project`, `atlas-goal`).
+  `<atl> resolve "<key>" --type jira-workitem` (or `atlas-project`, `atlas-goal`).
   Query surfaces are for discovery, filtering, or compatibility shortcuts.
 
 Use search results as candidates, not final facts. Hydrate the few selected

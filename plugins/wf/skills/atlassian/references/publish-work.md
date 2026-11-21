@@ -1,6 +1,6 @@
 # Publish work
 
-Create or update a Jira **Work item** over REST v3 with an ADF description. Not twg: only `atl.py`'s Markdown → ADF conversion carries `<details>`, panels, status lozenges, TOC, and wide tables intact. Repeated publishes (one per story, wrapper call, or batch row) reuse the same Preflight result and run this tactic once per item.
+Create or update a Jira **Work item** with a Markdown description. `<atl> jira workitem create|update` with a Markdown description (the default) is routed to REST v3 + ADF: only `atl.py`'s Markdown → ADF conversion carries `<details>`, panels, status lozenges, TOC, and wide tables intact. Repeated publishes (one per story, wrapper call, or batch row) reuse the same Preflight result and run this tactic once per item.
 
 ## Inputs
 
@@ -28,32 +28,33 @@ Infer from context; ask only when required input is missing.
 `workItemKey` named → **update**; pass `--summary` only when changed:
 
 ```bash
-python3 <skillDir>/scripts/atl.py publish-work update --config "<configPath>" --key <workItemKey> --markdown <description.md> [--summary "<summary>"] [--fields-json <fields.json>] [--attach <path> ...]
+<atl> jira workitem update --id <workItemKey> --description-file <description.md> [--summary "<summary>"] [--fields-json <fields.json>] [--attach <path> ...]
 ```
 
 Else → **create**:
 
-1. `projectKey`: supplied → use. Else Preflight `defaultProjectKey` if non-empty. Else `<twg> jira space query --action create --limit 25`: one → use, report as resolved; several → ask, never choose silently.
+1. `projectKey`: supplied → use. Else Preflight `defaultProjectKey` if non-empty. Else `<atl> jira space query --action create --limit 25`: one → use, report as resolved; several → ask, never choose silently.
 2. Run:
 
 ```bash
-python3 <skillDir>/scripts/atl.py publish-work create --config "<configPath>" --project <projectKey> --issue-type "<issueType>" --summary "<summary>" --markdown <description.md> [--parent <KEY>] [--fields-json <fields.json>] [--attach <path> ...]
+<atl> jira workitem create --space <projectKey> --type "<issueType>" --summary "<summary>" --description-file <description.md> [--parent <KEY>] [--fields-json <fields.json>] [--attach <path> ...]
 ```
 
-`--adf <description.json>` replaces `--markdown` when a caller already holds ADF.
+`--description-file` and `--attach` are `atl.py` extensions; `--description "<markdown>"` also works inline. **MUST NOT** pass `--description-format html|plain`; it bypasses the ADF conversion. Other twg flags (`--labels`, `--priority`, `--status`, ...) run on twg after the description publishes; stdout then gains `followUp` `{command, exitCode}`. Caller already holds ADF → `<atl> publish-work create|update ... --adf <description.json>` (same flags as `--help`).
 
 Stdout `{"key":..., "url":..., "attached":[...], "attachFailed":[{"file","error"}]}` (attachment keys only with `--attach`).
 
 | Failure | Meaning | Do |
 |---|---|---|
-| `error: Jira rejected the request: <message>` | Jira refused; nothing created or changed | Required-field error → `<twg> jira workitem field create-metadata --space <projectKey> --type "<issueType>"`, ask for the missing values, re-run |
-| `error: Jira request outcome unknown (...)` | Connection dropped or timed out; the item may exist | **MUST NOT** re-run `create`. Search `<twg> jira workitem query --jql 'project = <projectKey> AND summary ~ "<summary>" AND created >= -1d'`; found → continue with `update --key`; not found → report and ask before creating |
+| `error: Jira rejected the request: <message>` | Jira refused; nothing created or changed | Required-field error → `<atl> jira workitem field create-metadata --space <projectKey> --type "<issueType>"`, ask for the missing values, re-run |
+| `error: Jira request outcome unknown (...)` | Connection dropped or timed out; the item may exist | **MUST NOT** re-run `create`. Search `<atl> jira workitem query --jql 'project = <projectKey> AND summary ~ "<summary>" AND created >= -1d'`; found → continue with `update --id`; not found → report and ask before creating |
 | `error: Markdown conversion failed: <reason>` | Source rejected before any call | Fix the Markdown, re-run |
-| `attachFailed` entries | Item exists; those files did not attach | Keep the `key`; retry only them: `atl.py publish-work update --config "<configPath>" --key <key> --attach <path> ...` (fields untouched) |
+| `error: <KEY> was published but the remaining twg fields failed` | Item exists with its description; the extra twg flags did not apply | Keep the key; run the printed `jira workitem update --id <KEY> ...` retry through `<atl>` |
+| `attachFailed` entries | Item exists; those files did not attach | Keep the `key`; retry only them: `<atl> publish-work update --key <key> --attach <path> ...` (fields untouched) |
 
 **5 — Report** `key` and `url`; `attached` filenames; each `attachFailed` file with its error. Never fail the call for an attachment; never drop a created key from the report.
 
-**6 — Verify live issue.** Only when Step 2 found constructs: `python3 <skillDir>/scripts/atl.py publish-work read-adf --config "<configPath>" --key <key> --out <source>.tmp/live.json`; confirm each construct is its ADF node (`expand`, `panel`, `status`) and combined marks merged, not literal `` ` ``. Missing → fix `description.md`, re-run Step 4 as update. Read-only: **MUST NOT** re-run `create`/`update` with probe or placeholder content; it overwrites the real publish.
+**6 — Verify live issue.** Only when Step 2 found constructs: `<atl> publish-work read-adf --key <key> --out <source>.tmp/live.json`; confirm each construct is its ADF node (`expand`, `panel`, `status`) and combined marks merged, not literal `` ` ``. Missing → fix `description.md`, re-run Step 4 as update. Read-only: **MUST NOT** re-run `create`/`update` with probe or placeholder content; it overwrites the real publish.
 
 ## Rules
 
@@ -71,4 +72,4 @@ No Atlassian config → Preflight asks for `site`; Step 4 project lookup resolve
 ## Gotchas
 
 - Echoed key proves acceptance, not rendering; Step 6 reads the live issue.
-- REST v3 rejects a Markdown `description`; `atl.py` always sends ADF.
+- REST v3 rejects a Markdown `description`; the Markdown path always sends ADF.

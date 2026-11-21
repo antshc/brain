@@ -2,7 +2,7 @@
 
 Read [Conversion guards](conversion-guards.md) for lint policy, fidelity checks, supported exceptions, and read-back manifests.
 
-The **Install** tactic. Follow only on explicit request in Copilot CLI; it needs no Preflight (it creates it). Resolve the target with `git rev-parse --show-toplevel` and use it as CWD. Stop outside a Git repository. Resolve `assets/` and `scripts/` from the `atlassian` skill's base directory (`<skillDir>`, the parent of this file's `references/` folder). This installer does not install TWG, edit shell profiles, set persistent environment variables, or run `twg login` or `twg setup`.
+The **Install** tactic. Follow only on explicit request in Copilot CLI; it needs no Preflight (it creates it). Resolve the target with `git rev-parse --show-toplevel` and use it as CWD. Stop outside a Git repository. Resolve `assets/` and `scripts/` from the `atlassian` skill's base directory (`<skillDir>`, the parent of this file's `references/` folder). This installer does not install TWG, edit shell profiles, set persistent environment variables, or run `<atl> login` or `<atl> setup`.
 
 ## Skill install
 
@@ -12,7 +12,7 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 
 **1 — Check config and install deps.** `configPath := .github/skills/preflight-atlassian/.atlassian.json.user`. If the config path is tracked or the existing JSON is malformed, stop and report the path without reading values into the conversation. Run `python3 -m pip install -r <skillDir>/scripts/requirements.txt` in the active Python environment. Stop on failure.
 
-**2 — Copy preflight and ignore config.** Copy `<skillDir>/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md` as `.github/skills/preflight-atlassian/SKILL.md` and refresh `scripts/twg_cred.py` from `<skillDir>/assets/preflight-atlassian/scripts/`. Remove the obsolete `scripts/twg.py` there if present. If `git check-ignore -q -- "$configPath"` fails, add `.atlassian.json.user` to the target's `.gitignore` once. Verify the path is ignored and untracked before creating or editing the config. Keep the skill and its scripts trackable.
+**2 — Copy preflight and ignore config.** Copy `<skillDir>/assets/preflight-atlassian/preflight-atlassian.SKILL.template.md` as `.github/skills/preflight-atlassian/SKILL.md`. Replace every `<atlScript>` in the copy with the absolute path of `<skillDir>/scripts/atl.py`. Remove the obsolete `scripts/twg_cred.py` and `scripts/twg.py` there if present, then remove the empty `scripts/` folder. If `git check-ignore -q -- "$configPath"` fails, add `.atlassian.json.user` to the target's `.gitignore` once. Verify the path is ignored and untracked before creating or editing the config. Keep the skill trackable.
 
 **3 — Read config keys.** Inspect only top-level keys and credential presence. Use the copied skill's Configuration table as the key and default schema.
 
@@ -30,15 +30,15 @@ The `atlassian` skill ships with `wf@brain`. You can also follow this file direc
 
 **5 — Write missing keys.** Create the ignored JSON object if needed. Preserve existing values and apply the table defaults for unanswered keys. Leave missing `email` and `apiToken` fields absent. Ask the user to add them locally in the ignored config and resume this file. Keep both out of the Copilot conversation. Report credential presence only.
 
-**6 — Check TWG and cache identity.** If email or token is absent, report the missing credential and skip wrapper generation. Follow **Resolve** in the copied preflight `SKILL.md` to get the site, credentialed TWG command, and token availability, forcing the live identity check (ignore its cache-skip rule; this populates the cache). `<twg>` exit `127` → report missing "twg CLI" (user installs it), skip wrapper generation. Auth failure → report missing "valid `email`/`apiToken`", skip wrapper generation. On success, merge live `accountId` and `displayName` into missing or empty cache fields. Preserve populated fields.
+**6 — Check TWG and cache identity.** If email or token is absent, report the missing credential and skip wrapper generation. Follow **Resolve** in the copied preflight `SKILL.md` to get the site, credentialed TWG command, and token availability, forcing the live identity check (ignore its cache-skip rule; this populates the cache). `<atl>` exit `127` → report missing "twg CLI" (user installs it), skip wrapper generation. Auth failure → report missing "valid `email`/`apiToken`", skip wrapper generation. On success, merge live `accountId` and `displayName` into missing or empty cache fields. Preserve populated fields.
 
-**7 — Offer `pub-<issue-type>` wrappers.** All lookups through Preflight's `twg`, `-o json --output-file`.
+**7 — Offer `pub-<issue-type>` wrappers.** All lookups through Preflight's `<atl>`, `-o json --output-file`.
 
-1. `projectKey :=` Preflight `defaultProjectKey`; empty → `<twg> jira space query --limit 25`: one → use; many → ask; zero → report missing "a visible Jira project", skip wrapper generation.
-2. `<twg> jira space issue-types --id-or-key <projectKey>` → `data.issueTypes`.
+1. `projectKey :=` Preflight `defaultProjectKey`; empty → `<atl> jira space query --limit 25`: one → use; many → ask; zero → report missing "a visible Jira project", skip wrapper generation.
+2. `<atl> jira space issue-types --id-or-key <projectKey>` → `data.issueTypes`.
 3. Per type ask: "Generate a repository-level skill for creating a `<issueType.name>` in `<projectKey>`? (yes/no)".
 4. Per accepted type:
-   - `<twg> jira workitem field create-metadata --space <projectKey> --type <issueType.name>` → keep required fields only.
+   - `<atl> jira workitem field create-metadata --space <projectKey> --type <issueType.name>` → keep required fields only.
    - `skillName := pub-<issueType.name lowercased, spaces → hyphens>` (`Bug` → `pub-bug`).
    - Folder exists → ask before overwriting.
    - Write CWD `.github/skills/<skillName>/SKILL.md` containing:

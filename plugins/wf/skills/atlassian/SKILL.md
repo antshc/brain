@@ -21,7 +21,7 @@ Operations and tactics for Jira and Confluence. Pick the tactic by trigger, load
 | **Address page comments** | Settle open review comments on a Confluence page and reply to each thread; 'address page comments', 'reply to review comments' | [references/address-page-comments.md](references/address-page-comments.md) | Targeted in-place edits, one confirmed reply per pending thread, gate report |
 | **Install** | Explicit request to install or set up ATL in a repo, refresh `preflight-atlassian`, or generate or migrate `pub-*` wrappers; 'install atlassian' | [references/install.md](references/install.md) | Plugin status, preflight files, config keys added, wrapper paths, missing prerequisites |
 | **Map Markdown** | Convert Markdown/ADF, or decide whether Markdown alone carries a document | [references/map-markdown-adf.md](references/map-markdown-adf.md) | ADF JSON, Markdown, or construct report; offline |
-| **Query or operate with TWG** | Search, discovery, metadata, people, links, transitions, comments, sprints, or other non-body operations | [references/twg.md](references/twg.md), then the TWG routes row | Credentialed `twg` result |
+| **Query or operate with TWG** | Search, discovery, metadata, people, links, transitions, comments, sprints, or other non-body operations | [references/twg.md](references/twg.md), then the TWG routes row | `<atl>` result |
 
 Address page comments runs only on an explicit review-thread request; an ordinary edit never triggers it.
 
@@ -29,10 +29,10 @@ Out of scope here: daily blocked items and @mentions → *Load and follow the `d
 
 ## Shared constraints
 
-1. **Preflight once per site.** Before the first operation: *Load and follow the `preflight-atlassian` skill to resolve site, default project key, default space id, credentialed twg command, and token availability from `.atlassian.json.user` config* **Action: Resolve**. Keep `configPath`, `site`, `twg`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`. Later operations in the same request on the same site reuse them; a different site, or a missing fact a tactic needs, re-runs it. Map Markdown and Install need no Preflight.
-2. **CLI.** `<skillDir>` = the parent of this `SKILL.md`. Body operations run `python3 <skillDir>/scripts/atl.py <command> ...` from any working directory; pass `--config "<configPath>"`, never credentials.
-3. **Body transport.** Full Jira descriptions and Confluence page bodies move over REST + ADF through `atl.py` only. Search, discovery, metadata, Jira comments, transitions, and every other non-body operation use Preflight's `<twg>`. Never use the Atlassian MCP. Request Markdown, never HTML, from twg; the only HTML exception is the Address page comments tactic's targeted edits.
-4. **Fallbacks.** Each fetch reference names its lossy twg fallback and warning; use it only when `atl.py` is unavailable or fails for a non-auth reason. Auth failure or policy denial → stop and report; no fallback.
+1. **Preflight once per site.** Before the first operation: *Load and follow the `preflight-atlassian` skill to resolve site, default project key, default space id, credentialed atl command, and token availability from `.atlassian.json.user` config* **Action: Resolve**. Keep `configPath`, `site`, `atl`, `defaultProjectKey`, `defaultSpaceId`, `tokenAvailable`, `accountId`. Later operations in the same request on the same site reuse them; a different site, or a missing fact a tactic needs, re-runs it. Map Markdown and Install need no Preflight.
+2. **CLI.** `<skillDir>` = the parent of this `SKILL.md`. Preflight's `<atl>` is `python3 <skillDir>/scripts/atl.py --config "<configPath>"`, the single entry point: it runs every twg command and the `atl.py` commands (`fetch-page`, `publish-page`, `fetch-work`, `publish-work`), appending `--config` to them. Never pass credentials. Map Markdown runs offline without Preflight: `python3 <skillDir>/scripts/atl.py map-markdown ...`.
+3. **Body transport.** Full Jira descriptions and Confluence page bodies default to Markdown. `<atl>` routes Markdown body commands (`confluence content get|create|update`, `jira workitem get|create|update`) to REST + ADF through the skill's converter. Every other command runs on twg. **MUST NOT** pass `--format html`, `--description-format html|plain`, or `--native` on a body command, except the Address page comments tactic's targeted HTML edits and a tactic's documented fallback. Never use the Atlassian MCP.
+4. **Fallbacks.** Each fetch reference names its lossy raw-twg fallback and warning; use it only when the Markdown body path is unavailable or fails for a non-auth reason. Auth failure or policy denial → stop and report; no fallback.
 5. **Read-only intents** (read, show, summarize, search, compare) issue no create, update, transition, comment, attach, or publish call.
 6. **Prerequisites.** `tokenAvailable` false, `atlassian-python-api` missing or unsupported, required `pymarkdownlnt` missing, or Preflight unavailable → ask the user to run `/atlassian install` (Install tactic) in Copilot CLI, then stop; never start it unasked.
 
@@ -51,7 +51,7 @@ Read [references/twg/jira/rules.md](references/twg/jira/rules.md) before any Jir
 | Confluence CQL, date-filtered lists, fuzzy page discovery | [references/twg/confluence/querying.md](references/twg/confluence/querying.md) |
 | Paginated content list | [references/twg/confluence/pagination.md](references/twg/confluence/pagination.md) |
 | Comments, embeds, smart links, exports, non-Markdown content | [references/twg/confluence/content.md](references/twg/confluence/content.md) |
-| twg-native page edits (outside Publish page) | [references/twg/confluence/editing.md](references/twg/confluence/editing.md), [references/twg/confluence/body-formats.md](references/twg/confluence/body-formats.md) |
+| Page edits and body formats as Markdown (outside Publish page) | [references/twg/confluence/editing.md](references/twg/confluence/editing.md), [references/twg/confluence/body-formats.md](references/twg/confluence/body-formats.md) |
 | Spaces, space instructions, hierarchy | [references/twg/confluence/spaces.md](references/twg/confluence/spaces.md) |
 | Native selectors, first-call scope | [references/twg/KNOWLEDGE-IDENTIFIERS.md](references/twg/KNOWLEDGE-IDENTIFIERS.md) |
 | People, teams, reporting lines | [references/twg/USER-IDENTIFIERS.md](references/twg/USER-IDENTIFIERS.md) |
@@ -61,11 +61,11 @@ Read [references/twg/jira/rules.md](references/twg/jira/rules.md) before any Jir
 | Help, discovery, diagnostics | [references/twg/HELP.md](references/twg/HELP.md) |
 | Output gaps, sandboxed logs | [references/twg/OUTPUT.md](references/twg/OUTPUT.md) |
 
-Current user's personal space → `<twg> confluence space me`; reuse the returned identity, never infer it.
+Current user's personal space → `<atl> confluence space me`; reuse the returned identity, never infer it.
 
 ## Gotchas
 
 - **MUST NOT** `find`/`grep`/`ls -R` to locate this skill's directory; use the parent of the `SKILL.md` path you were given.
 - Read every loaded reference fully; a partially read reference counts as not loaded.
 - **MUST NOT** echo `email`/`apiToken`. `-o json --output-file` files are unredacted; extract needed fields with Python.
-- `<twg>` exit `127` → report missing "twg CLI". **MUST NOT** run `twg login`, `setup`, or any interactive command.
+- `<atl>` exit `127` → report missing "twg CLI". **MUST NOT** run `<atl> login`, `setup`, or any interactive command.

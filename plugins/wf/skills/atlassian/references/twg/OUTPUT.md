@@ -21,7 +21,7 @@ The CLI defaults unspecified output to JSON, writes large payloads to files, and
 Set this environment variable on individual commands only when the host requests it.
 In some agent runtimes, an environment prefix can bypass authorization for that command.
 
-A direct call such as `twg --mode agent --output json work query` also writes large payloads to files.
+A direct call such as `<atl> --mode agent --output json work query` also writes large payloads to files.
 This automatic behavior applies unless you explicitly set `--output-summary`, `--output-file`, or `--output text`.
 Use `--output-summary none` to get structured output directly on stdout.
 The hidden `--mode agent` option supports agent hosts; ordinary help does not show it.
@@ -68,7 +68,7 @@ error:
   code: "TWG_COMMAND_FAILED"
   kind: "twg_command_failed"
   message: "No goal found for key \"NONEXISTENT-1\"."
-  repair: "Check the goal key with `twg goals query`."
+  repair: "Check the goal key with `<atl> goals query`."
   retry:
     recommended: false
     guidance: "do_not_retry_unchanged"
@@ -127,7 +127,7 @@ Use `@rows` or `@compact` for broad scans before custom filters. Use `@evidence`
 
 ## Projections
 
-For unknown field paths, use `twg help describe "<exact command>"` to find the advertised view or `jq` filter.
+For unknown field paths, use `<atl> help describe "<exact command>"` to find the advertised view or `jq` filter.
 Use `jq` for structured JSON. Text search with `rg` can expose hundreds of KiB of raw payload.
 
 ```bash
@@ -146,8 +146,8 @@ Agent defaults already write a JSON payload and show its path in `output_files.s
 Use `--output-file` only when stable filenames simplify a recipe, for example a parallel context batch:
 
 ```bash
-twg jira workitem get PROJ-123 --output-file "$TMPDIR/PROJ-123.json"
-twg context jira workitem PROJ-123 --output-file "$TMPDIR/ctx_PROJ-123.json"
+<atl> jira workitem get PROJ-123 --output-file "$TMPDIR/PROJ-123.json"
+<atl> context jira workitem PROJ-123 --output-file "$TMPDIR/ctx_PROJ-123.json"
 ```
 
 Use `$TMPDIR`, not a fixed `/tmp` path, because agent sandboxes use different temporary directories.
@@ -155,7 +155,7 @@ Use `$TMPDIR`, not a fixed `/tmp` path, because agent sandboxes use different te
 ## Sandboxed Pipeline Logs
 
 Pipeline logs can redirect to S3.
-For sandboxed `twg bb pipeline get`, `wait`, `grep`, or `tail`, these signals indicate sandbox restrictions, not auth failure:
+For sandboxed `<atl> bb pipeline get`, `wait`, `grep`, or `tail`, these signals indicate sandbox restrictions, not auth failure:
 
 - Network blocks or S3 hostnames.
 - HTTP 403 for logs when the metadata read succeeds.

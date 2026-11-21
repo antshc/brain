@@ -9,14 +9,14 @@
 
 ## Steps
 
-**1 — Preflight.** *Run `preflight-atlassian` skill to resolve site, credentialed twg command, and identity from `.atlassian.json.user` config* **Action: Resolve**. It returns `twg` and `accountId`; this skill resolves neither itself. Skill unavailable → stop with the Prerequisites failure message. Empty `accountId` → stop and report missing identity; never fall back to a display name. Searches follow *`atlassian` skill's twg tactic for Jira workitems, JQL queries, and pagination* through Preflight's `twg`.
+**1 — Preflight.** *Run `preflight-atlassian` skill to resolve site, credentialed atl command, and identity from `.atlassian.json.user` config* **Action: Resolve**. It returns `atl` and `accountId`; this skill resolves neither itself. Skill unavailable → stop with the Prerequisites failure message. Empty `accountId` → stop and report missing identity; never fall back to a display name. Searches follow *`atlassian` skill's twg tactic for Jira workitems, JQL queries, and pagination* through Preflight's `<atl>`; never call bare `twg`.
 
 **2 — Resolve period.** Parse `{{input}}`: empty → default `1 month`. Convert it into a JQL relative-date modifier in **days only** — never the `M` (month) unit (see Gotchas) — using 1 month ≈ 30 days: `1 month` → `-30d`, `"2 weeks"` → `-14d`, `"3 months"` → `-90d`. Keep the day count: it is Step 5's `--cutoff-days`.
 
 **3 — Query A: blocked items assigned to me.**
 
 ```bash
-<twg> jira workitem query --jql 'assignee = currentUser() AND (status = "Blocked" OR flagged = Impediment) AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,issuetype,priority,updated --limit 25 -o json --output-file queryA-1.json
+<atl> jira workitem query --jql 'assignee = currentUser() AND (status = "Blocked" OR flagged = Impediment) AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,issuetype,priority,updated --limit 25 -o json --output-file queryA-1.json
 ```
 
 Renders as section 1 of the output template.
@@ -26,7 +26,7 @@ Renders as section 1 of the output template.
 **4 — Query B: mentions.**
 
 ```bash
-<twg> jira workitem query --jql 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,comment --limit 25 -o json --output-file queryB-1.json
+<atl> jira workitem query --jql 'comment ~ "<accountId>" AND statusCategory != Done AND updated >= <cutoffJql> ORDER BY updated DESC' --fields summary,status,comment --limit 25 -o json --output-file queryB-1.json
 ```
 
 Search by Preflight's `accountId`, never display name — a display-name search both false-positives on comments the user authored and misses real `@mentions`. Issue this in the same shell call as Step 3, separated by `;`.
@@ -89,7 +89,7 @@ No reply from you is visible via the API for these. Comment reactions are invisi
 
 ## Gotchas
 
-**Always pass `-o json --output-file <path>` to twg** — run by an agent, twg otherwise prints a YAML envelope pointing at spill files, not the payload, and `read_file` truncates long lines at roughly 2000 characters. Pass the path to `blocked.py`/`mentions.py` rather than reading it.
+**Always pass `-o json --output-file <path>` to `<atl>`** — run by an agent, twg otherwise prints a YAML envelope pointing at spill files, not the payload, and `read_file` truncates long lines at roughly 2000 characters. Pass the path to `blocked.py`/`mentions.py` rather than reading it.
 
 **twg flattens Jira fields onto each issue** — `data.issues[i].summary`, `.status`, `.comment.comments`, plus a ready browse `url`; there is no `fields` wrapper. Pagination is `pageInfo.hasNextPage`/`nextCursor` at the top level.
 
