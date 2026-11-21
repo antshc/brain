@@ -237,3 +237,41 @@ def test_fence_closes_with_trailing_whitespace(run_cli):
     result = run_cli('md-to-adf', '```python\nx = 1\n```  \n')
     assert result.returncode == 0, result.stderr
     assert json.loads(result.stdout)['content'][0]['type'] == 'codeBlock'
+
+
+def _text(value: str, *marks: str) -> dict:
+    node = {"type": "text", "text": value}
+    if marks:
+        node["marks"] = [{"type": mark} for mark in marks]
+    return node
+
+
+def _paragraph(*content: dict) -> dict:
+    return {"type": "paragraph", "content": list(content)}
+
+
+def test_empty_block_paragraphs_and_trailing_space_do_not_fail_the_round_trip():
+    card = {"type": "inlineCard", "attrs": {"url": "https://example.atlassian.net/wiki/spaces/X/pages/1"}}
+    doc = {"type": "doc", "version": 1, "content": [
+        _paragraph(card, _text(" ")),
+        {"type": "paragraph"},
+        _paragraph(_text("after")),
+    ]}
+    guard.check_round_trip(doc, fetching=True)
+
+
+def test_adjacent_bold_italic_spans_with_a_literal_asterisk_round_trip():
+    doc = {"type": "doc", "version": 1, "content": [_paragraph(
+        _text("Add "), _text("*", "strong", "em"), _text(" - new version ", "em"), _text("1.2.14", "strong", "em"),
+    )]}
+    guard.check_round_trip(doc, fetching=True)
+
+
+def test_paragraph_after_a_code_block_in_a_list_item_round_trips():
+    item = {"type": "listItem", "content": [
+        _paragraph(_text("Run")),
+        {"type": "codeBlock", "content": [_text("echo a")]},
+        _paragraph(_text("then wait")),
+    ]}
+    doc = {"type": "doc", "version": 1, "content": [{"type": "orderedList", "content": [item]}]}
+    guard.check_round_trip(doc)

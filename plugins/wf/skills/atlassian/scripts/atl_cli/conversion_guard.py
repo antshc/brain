@@ -160,6 +160,19 @@ _DEFAULTS = {
 }
 
 
+_BLOCK_CONTAINERS = {"doc", "blockquote", "panel", "expand"}
+
+
+def _trim_trailing_space(nodes: list) -> None:
+    """Markdown strips trailing whitespace of a paragraph; drop it from unmarked text nodes."""
+    while nodes and isinstance(nodes[-1], dict) and nodes[-1].get("type") == "text" and not nodes[-1].get("marks"):
+        stripped = nodes[-1].get("text", "").rstrip()
+        if stripped:
+            nodes[-1]["text"] = stripped
+            return
+        nodes.pop()
+
+
 def semantic_document(doc: dict, *, transport: bool = False) -> dict:
     """Normalize only named defaults and transport identifiers; keep unknown attributes."""
     def visit(value):
@@ -194,6 +207,14 @@ def semantic_document(doc: dict, *, transport: bool = False) -> dict:
             node["attrs"] = attrs
         else:
             node.pop("attrs", None)
+        if kind in {"paragraph", "heading"} and isinstance(node.get("content"), list):
+            _trim_trailing_space(node["content"])
+        if kind in _BLOCK_CONTAINERS and isinstance(node.get("content"), list):
+            # An empty block paragraph renders to nothing, so it cannot survive a Markdown round trip.
+            node["content"] = [
+                child for child in node["content"]
+                if not (isinstance(child, dict) and child.get("type") == "paragraph" and not child.get("content"))
+            ]
         if node.get("content") == []:
             node.pop("content")
         return node
