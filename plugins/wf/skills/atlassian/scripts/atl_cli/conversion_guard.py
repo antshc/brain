@@ -178,6 +178,12 @@ _DEFAULTS = {
 }
 
 
+# Confluence stores `bash` as `shell` and the Markdown `text` fence as `plaintext`; other
+# languages are compared as written so a real language change stays visible.
+_CODE_LANGUAGE_ALIASES = {"shell": "bash", "text": "plaintext"}
+
+_MARKS_EXCLUDED_BY_CODE = {"strong", "em", "strike"}
+
 _BLOCK_CONTAINERS = {"doc", "blockquote", "panel", "expand"}
 
 
@@ -210,14 +216,24 @@ def semantic_document(doc: dict, *, transport: bool = False) -> dict:
                 node.pop("content")
         if not transport and kind in {"tableCell", "tableHeader"}:
             attrs.pop("colwidth", None)
-        if kind == "codeBlock" and attrs.get("language") == "shell":
-            attrs["language"] = "bash"
+        if kind == "codeBlock" and attrs.get("language") in _CODE_LANGUAGE_ALIASES:
+            attrs["language"] = _CODE_LANGUAGE_ALIASES[attrs["language"]]
         if kind == "text" and "marks" in node:
             node["marks"] = sorted(node["marks"], key=lambda mark: json.dumps(mark, sort_keys=True))
         attrs.pop("localId", None)
         if kind == "annotation" and attrs.get("annotationType") == "inlineComment":
             attrs.pop("annotationType")
         if transport:
+            if kind == "text" and any(mark.get("type") == "code" for mark in node.get("marks", [])):
+                # Confluence's schema excludes these marks beside `code` and drops them on store.
+                node["marks"] = [mark for mark in node["marks"] if mark.get("type") not in _MARKS_EXCLUDED_BY_CODE]
+                if not node["marks"]:
+                    node.pop("marks")
+            if kind in {"extension", "bodiedExtension", "inlineExtension"} and isinstance(attrs.get("parameters"), dict):
+                # Confluence stamps every stored macro with generated metadata and its host page id.
+                attrs["parameters"].pop("macroMetadata", None)
+                if isinstance(attrs["parameters"].get("macroParams"), dict):
+                    attrs["parameters"]["macroParams"].pop("_parentId", None)
             if kind == "media":
                 # Uploaded IDs remain stable on read-back of this exact publication.
                 attrs.pop("collection", None)

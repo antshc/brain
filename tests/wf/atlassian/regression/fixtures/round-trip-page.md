@@ -12,6 +12,8 @@ LOCAL-ONLY-NOTE: this block must never reach Confluence.
 
 Plain **strong text**, *emphasis text*, `inline code`, [plain link](https://example.com/plain), and ~~struck text~~.
 
+Nested marks: **strong around `nested code` inside** text.
+
 Combined marks: **[bold link](https://example.com/bold-link)** and [label with **bold part** inside](https://example.com/partial).
 
 Inline comment target: the regression anchor phrase sits here.

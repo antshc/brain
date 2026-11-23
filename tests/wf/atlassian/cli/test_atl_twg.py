@@ -187,3 +187,33 @@ def test_script_runs_from_any_cwd_and_forwards_the_exit_code(fake_twg, tmp_path)
     assert result.returncode == 3
     assert json.loads(result.stdout)["args"] == ["jira", "workitem", "query"]
     assert b"secret-token" not in result.stdout + result.stderr
+
+
+def test_markdown_comment_runs_on_twg_with_an_inline_body_and_credentials(fake_twg, tmp_path, monkeypatch, capsysbinary):
+    config = _config(tmp_path, email="me@x.com", apiToken="secret-token", cloudId="org.atlassian.net")
+    body = tmp_path / "comment.md"
+    body.write_text("**done**\n", encoding="utf-8")
+    monkeypatch.setenv("FAKE_TWG_EXIT", "0")
+
+    exit_code = cli.main(
+        ["--config", str(config), "jira", "workitem", "comment", "create", "--issue-id", "ABC-7", "--body-file", str(body), "--body-format", "markdown", "-o", "json"]
+    )
+
+    captured = capsysbinary.readouterr()
+    payload = json.loads(captured.out)
+    assert exit_code == 0
+    assert payload["args"] == ["jira", "workitem", "comment", "create", "--issue-id", "ABC-7", "-o", "json", "--body", "**done**\n", "--body-format", "markdown"]
+    assert payload["token"] == "<redacted>"
+    assert b"secret-token" not in captured.out + captured.err
+
+
+def test_comment_body_file_without_markdown_format_exits_2_without_running_twg(fake_twg, tmp_path, capsysbinary):
+    body = tmp_path / "comment.md"
+    body.write_text("x")
+
+    exit_code = cli.main(["jira", "workitem", "comment", "create", "--issue-id", "ABC-7", "--body-file", str(body)])
+
+    captured = capsysbinary.readouterr()
+    assert exit_code == 2
+    assert b"--body-format markdown" in captured.err
+    assert captured.out == b""

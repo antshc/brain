@@ -57,7 +57,8 @@ def _local_runtime() -> Path | None:
 
 _arguments = sys.argv[1:]
 _python = _configured_python(_arguments) or _local_runtime()
-if _python is not None and not os.environ.get("ATL_PYTHON_REEXEC") and Path(sys.executable).resolve() != _python.resolve():
+# Compare unresolved paths: venv interpreters symlink to a shared base, so resolving would hide a different environment.
+if _python is not None and not os.environ.get("ATL_PYTHON_REEXEC") and os.path.abspath(sys.executable) != os.path.abspath(_python):
     os.execve(
         str(_python),
         [str(_python), str(Path(__file__).resolve()), *_arguments],

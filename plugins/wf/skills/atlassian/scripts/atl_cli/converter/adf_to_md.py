@@ -325,6 +325,21 @@ def _comment_ids(node: dict) -> list[str]:
 def render_inline(nodes: list[dict]) -> str:
     parts = []
     open_ids: list[str] = []
+    run: list[dict] = []
+
+    def flush() -> None:
+        if not run:
+            return
+        try:
+            parts.append(_render_text_run(run))
+        except (ValueError, NotImplementedError, AttributeError, TypeError):
+            for node in run:
+                try:
+                    parts.append(render_text(node))
+                except (ValueError, NotImplementedError, AttributeError, TypeError) as exception:
+                    parts.append(_tolerate(node, exception))
+        run.clear()
+
     for node in nodes:
         # Keep the longest still-wanted prefix of open comment spans; close the rest, then open
         # what this node adds. Consecutive nodes sharing an id render as one span.
@@ -332,18 +347,70 @@ def render_inline(nodes: list[dict]) -> str:
         keep = 0
         while keep < len(open_ids) and open_ids[keep] in wanted:
             keep += 1
+        opened = [comment_id for comment_id in wanted if comment_id not in open_ids[:keep]]
+        if open_ids[keep:] or opened:
+            flush()
         parts.extend(COMMENT_CLOSE_TAG for _ in open_ids[keep:])
         open_ids = open_ids[:keep]
-        for comment_id in wanted:
-            if comment_id not in open_ids:
-                parts.append(comment_open_tag(comment_id))
-                open_ids.append(comment_id)
+        for comment_id in opened:
+            parts.append(comment_open_tag(comment_id))
+            open_ids.append(comment_id)
+        if node.get("type") == "text":
+            run.append(node)
+            continue
+        flush()
         try:
             parts.append(_render_inline_node(node))
         except (ValueError, NotImplementedError, AttributeError, TypeError) as exception:
             parts.append(_tolerate(node, exception))
+    flush()
     parts.extend(COMMENT_CLOSE_TAG for _ in open_ids)
     return "".join(parts)
+
+
+# Outermost first: one span wraps every consecutive text node that shares its mark, so
+# strong text around code renders as `**a `b` c**`, not as adjacent `**a ****`b`**** c**` spans.
+_WRAP_ORDER = ("link", "strong", "em", "strike")
+
+
+def _mark_key(node: dict, kind: str) -> str | None:
+    for mark in node.get("marks", []):
+        if mark.get("type") == kind:
+            return mark.get("attrs", {}).get("href", "") if kind == "link" else kind
+    return None
+
+
+def _render_text_run(nodes: list[dict], kinds: tuple[str, ...] = _WRAP_ORDER, strong_outside: bool = False) -> str:
+    if not kinds:
+        return "".join(
+            render_text({**node, "marks": [mark for mark in node.get("marks", []) if mark.get("type") == "code"]})
+            for node in nodes
+        )
+    kind, rest = kinds[0], kinds[1:]
+    rendered = []
+    start = 0
+    while start < len(nodes):
+        key = _mark_key(nodes[start], kind)
+        end = start + 1
+        while end < len(nodes) and _mark_key(nodes[end], kind) == key:
+            end += 1
+        chunk = nodes[start:end]
+        inner = _render_text_run(chunk, rest, strong_outside or (kind == "strong" and key is not None))
+        if key is None:
+            rendered.append(inner)
+        elif kind == "link":
+            rendered.append(f"[{inner}]({key})")
+        elif kind == "strong":
+            rendered.append(f"**{inner}**")
+        elif kind == "strike":
+            rendered.append(f"~~{inner}~~")
+        else:
+            # `_` keeps bold+italic text from producing a `***` run the parser cannot split.
+            has_code = any(_mark_key(node, "code") for node in chunk)
+            delimiter = "_" if strong_outside and not has_code else "*"
+            rendered.append(f"{delimiter}{inner}{delimiter}")
+        start = end
+    return "".join(rendered)
 
 
 def _render_inline_node(node: dict) -> str:

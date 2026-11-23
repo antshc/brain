@@ -14,9 +14,15 @@ Usage:
         [--markdown <description.md> | --adf <description.json>] [--summary <text>] \
         [--fields-json <file>] [--attach <path> ...]
     atl.py publish-work read-adf --config <configPath> --key <KEY> --out <live.json>
+    atl.py publish-work comment --config <configPath> --key <KEY> [--comment-id <id>] \
+        (--markdown <comment.md> | --adf <comment.json>) [--attach <path> ...]
 
 `update --key <KEY> --attach <path>` alone retries attachments on an existing item without
 touching its fields.
+
+`comment` posts a comment (or replaces comment `--comment-id`) and shows each `--attach` file inline:
+an image preview or a file card. A file that cannot be uploaded stops the command before the comment
+is posted, so the comment never claims a file that is missing.
 """
 from __future__ import annotations
 
@@ -28,6 +34,7 @@ from pathlib import Path
 from requests.exceptions import ConnectionError as RequestsConnectionError, HTTPError, RequestException, Timeout
 
 from .config import load_credentials, require_supported_library, site_url
+from .comment_media import MediaResolver, Uploaded, media_resolver, uploaded_from_response, with_media
 from .jira_client import get_jira
 from .map_markdown import ConversionError, md_to_adf
 
@@ -102,6 +109,33 @@ def attach_files(jira, key: str, paths: list[str]) -> tuple[list[str], list[dict
     return attached, failed
 
 
+def upload_for_comment(jira, key: str, paths: list[str], resolve: MediaResolver) -> list[Uploaded]:
+    missing = [path for path in paths if not Path(path).is_file()]
+    if missing:
+        raise PublishError(f"cannot read attachment {missing[0]}")
+    files = []
+    for path in paths:
+        response = _call(lambda path=path: jira.add_attachment(key, path))
+        try:
+            files.append(uploaded_from_response(response[0], resolve))
+        except (IndexError, KeyError, TypeError, ValueError, RequestException) as exception:
+            raise PublishError(f"attachment {Path(path).name} uploaded but cannot be shown inline: {str(exception) or type(exception).__name__}") from None
+    return files
+
+
+def publish_comment(jira, key: str, adf: dict, *, comment_id: str | None, paths: list[str], resolve: MediaResolver, site: str) -> dict:
+    files = upload_for_comment(jira, key, paths, resolve)
+    body = with_media(adf, files)
+    if comment_id:
+        _call(lambda: jira.put(f"rest/api/3/issue/{key}/comment/{comment_id}", data={"body": body}))
+    else:
+        comment_id = str(_call(lambda: jira.post(f"rest/api/3/issue/{key}/comment", data={"body": body}))["id"])
+    result: dict = {"key": key, "commentId": comment_id, "url": f"{site}/browse/{key}?focusedCommentId={comment_id}"}
+    if files:
+        result["attached"] = [{"id": file.attachment_id, "filename": file.filename, "inline": "preview" if file.image else "card"} for file in files]
+    return result
+
+
 def read_description(jira, key: str) -> dict | None:
     return _call(lambda: jira.get(f"rest/api/3/issue/{key}", params={"fields": "description"}))["fields"]["description"]
 
@@ -131,7 +165,15 @@ def build_arg_parser(prog: str | None = None) -> argparse.ArgumentParser:
     read.add_argument("--key", required=True, help="Work item key to read")
     read.add_argument("--out", required=True, help="Path to write the live ADF to")
 
-    for command in (create, update, read):
+    comment = sub.add_parser("comment", help="Post or replace a comment with inline attachments")
+    comment.add_argument("--key", required=True, help="Work item key")
+    comment.add_argument("--comment-id", help="Replace this comment instead of posting a new one")
+    source = comment.add_mutually_exclusive_group(required=True)
+    source.add_argument("--markdown", help="Markdown comment file; converted to ADF in-process")
+    source.add_argument("--adf", help="ADF comment JSON file")
+    comment.add_argument("--attach", action="append", default=[], metavar="PATH", help="File to upload and show inline; repeatable")
+
+    for command in (create, update, read, comment):
         command.add_argument("--config", required=True, help="`.atlassian.json.user` path (`configPath` from `/preflight-atlassian`)")
     return parser
 
@@ -144,7 +186,11 @@ def read_description_source(args: argparse.Namespace) -> dict | None:
     return None
 
 
-def run(args: argparse.Namespace, jira, site: str) -> dict:
+def run(args: argparse.Namespace, jira, site: str, resolve: MediaResolver | None = None) -> dict:
+    if args.action == "comment":
+        return publish_comment(
+            jira, args.key, read_description_source(args), comment_id=args.comment_id, paths=args.attach, resolve=resolve, site=site
+        )
     if args.action == "read-adf":
         description = read_description(jira, args.key)
         Path(args.out).write_text(json.dumps(description, indent=2) + "\n", encoding="utf-8")
@@ -179,11 +225,14 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
         print("error: .atlassian.json.user needs cloudId, email, and apiToken to publish a work item", file=sys.stderr)
         raise SystemExit(1)
     try:
-        result = run(args, get_jira(credentials), site_url(credentials))
+        result = run(args, get_jira(credentials), site_url(credentials), media_resolver(credentials))
     except ConversionError as exception:
         print(f"error: Markdown conversion failed: {exception}", file=sys.stderr)
         raise SystemExit(1)
     except UncertainPublishError as exception:
+        if args.action == "comment":
+            print(f"error: Jira request outcome unknown ({exception}) for {args.key}; read its comments before retrying, or a retry can post a duplicate", file=sys.stderr)
+            raise SystemExit(1)
         target = "create" if args.action == "create" else args.key
         print(
             f"error: Jira request outcome unknown ({exception}) for {target}; search Jira for the item "

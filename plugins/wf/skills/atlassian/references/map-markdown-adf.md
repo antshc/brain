@@ -57,7 +57,7 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | Ordered list | `orderedList` / `listItem` |
 | Blockquote (`>`) | `blockquote` |
 | `> [!INFO]` / `[!NOTE]` / `[!WARNING]` / `[!SUCCESS]` / `[!ERROR]` blockquote | `panel` (`attrs.panelType`) — **ADF-only** |
-| Fenced code block | `codeBlock` (`attrs.language` when recognized; Confluence stores `bash` as `shell`, read back as `bash`) |
+| Fenced code block | `codeBlock` (`attrs.language` when recognized; Confluence stores `bash` as `shell`, read back as `bash`; `text` and `plaintext` compare equal) |
 | Table | `table` / `tableRow` / `tableHeader` / `tableCell` |
 | Horizontal rule (`---`) | `rule` |
 | `<details><summary>` | `expand` (`attrs.title`) — **ADF-only** |

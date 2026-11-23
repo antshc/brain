@@ -1,7 +1,8 @@
 """Route twg page and work-item body commands to the skill's Markdown <-> ADF commands.
 
 A twg command is overridden only when it reads or writes a Markdown body (Markdown is the
-default when no format is given); any other format, targeted `--edits`, or structured output
+default when no format is given, except for `jira workitem comment create|update`, which need an explicit
+`--body-format markdown`); any other format, targeted `--edits`, or structured output
 (`-o json`, `--select`, ...) returns `None` and passes through to twg unchanged. An overridden
 command with a flag the Markdown path cannot honour raises `OverrideError` instead of silently
 falling back to twg's lossy Markdown.
@@ -50,6 +51,13 @@ class Delegate:
     publishes: bool = False
     follow_up: list[str] = field(default_factory=list)
     output_file: str | None = None
+
+
+@dataclass(frozen=True)
+class TwgCall:
+    """A twg command run with rewritten arguments in place of the original."""
+
+    argv: list[str]
 
 
 @dataclass
@@ -362,6 +370,66 @@ def jira_workitem_update(args: list[str], context: Context) -> Delegate | None:
     )
 
 
+COMMENT_COMMANDS = {("jira", "workitem", "comment", "create"), ("jira", "workitem", "comment", "update")}
+
+
+def _comment_with_attachments(action: str, args: list[str], context: Context) -> Delegate:
+    parsed = parse(args, values={"--issue-id", "--id", "--body", "--body-file", "--body-format", "--attach", "--output", "--output-file"})
+    _positionals(parsed, "post the comment without --attach to use it")
+    if parsed.rest:
+        raise OverrideError(f"unexpected argument {parsed.rest[0]!r} on a comment with attachments")
+    if parsed.get("--body-format") not in ("md", "markdown"):
+        raise OverrideError("--attach needs --body-format markdown; the comment is built as Markdown with the files shown inline")
+    if parsed.get("--output") not in (None, "json"):
+        raise OverrideError("a comment with attachments prints JSON; drop --output or use -o json")
+    if parsed.get("--body") is not None and parsed.get("--body-file") is not None:
+        raise OverrideError("use either --body or --body-file, not both")
+    md_path = _body_file(parsed, "--body", "--body-file", context, "comment.md")
+    if md_path is None:
+        raise OverrideError("--body or --body-file is required with --attach")
+    if not parsed.get("--issue-id"):
+        raise OverrideError("--issue-id <KEY> is required with --attach")
+    key, _ = _issue_ref(parsed.get("--issue-id"))
+    comment_id = parsed.get("--id")
+    if action == "update" and not comment_id:
+        raise OverrideError("--id <commentId> is required to update a comment")
+    if action == "create" and comment_id:
+        raise OverrideError("--id only applies to comment update")
+    return Delegate(
+        "publish-work",
+        ["comment", "--key", key, "--markdown", md_path]
+        + _optional("--comment-id", comment_id)
+        + [token for path in parsed.all("--attach") for token in ("--attach", path)],
+        publishes=True,
+        output_file=parsed.get("--output-file"),
+    )
+
+
+def jira_comment_write(command: list[str], args: list[str], context: Context) -> Delegate | TwgCall | None:
+    """twg takes comment Markdown only through `--body` plus `--body-format markdown`; `--body-file`
+    is read here and forwarded inline. Other `--body` formats run on twg unchanged. `--attach` is not
+    a twg flag: it publishes through `publish-work comment`, which shows each file inline."""
+    if _has_option(args, {"--attach"}):
+        return _comment_with_attachments(command[3], args, context)
+    parsed = parse(args, values={"--body", "--body-file", "--body-format"})
+    body_file, body, body_format = parsed.get("--body-file"), parsed.get("--body"), parsed.get("--body-format")
+    is_markdown = body_format in ("md", "markdown")
+    if body_file is None and not (body is not None and is_markdown):
+        return None
+    if body_file is not None and body is not None:
+        raise OverrideError("use either --body or --body-file, not both")
+    if not is_markdown:
+        raise OverrideError("--body-file needs --body-format markdown; twg has no --body-file, so the file is sent as an inline Markdown --body")
+    if body_file is not None:
+        try:
+            body = Path(body_file).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exception:
+            raise OverrideError(f"cannot read --body-file {body_file}: {type(exception).__name__}") from None
+    if not body.strip():
+        raise OverrideError("the comment body is empty")
+    return TwgCall([*command, *parsed.rest, "--body", body, "--body-format", "markdown"])
+
+
 ROUTES: dict[tuple[str, str, str], Callable[[list[str], Context], Delegate | None]] = {
     ("confluence", "content", "get"): confluence_content_get,
     ("confluence", "content", "create"): confluence_content_create,
@@ -372,8 +440,10 @@ ROUTES: dict[tuple[str, str, str], Callable[[list[str], Context], Delegate | Non
 }
 
 
-def plan(args: list[str], context: Context) -> Delegate | None:
-    """The atl command replacing `args`, or `None` to pass `args` through to twg."""
+def plan(args: list[str], context: Context) -> Delegate | TwgCall | None:
+    """The command replacing `args`, or `None` to pass `args` through to twg."""
+    if tuple(args[:4]) in COMMENT_COMMANDS:
+        return None if any(token in ("-h", "--help") for token in args) else jira_comment_write(args[:4], args[4:], context)
     handler = ROUTES.get(tuple(args[:3]))
     if handler is None or any(token in ("-h", "--help") for token in args):
         return None

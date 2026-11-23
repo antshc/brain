@@ -30,7 +30,7 @@ CONFIG_ACTIONS: dict[str, set[str] | None] = {
     "doctor": None,
     "rename-page": None,
     "copy-page": None,
-    "publish-work": {"create", "update", "read-adf"},
+    "publish-work": {"create", "update", "read-adf", "comment"},
     "publish-page": {"run", "verify", "render-attach", "publish-adf"},
 }
 
@@ -125,6 +125,8 @@ Markdown is the default body format; these twg commands are routed to the comman
   confluence content update <page> --body[-file] ...                     -> publish-page run
   jira workitem get <KEY> --output-file <work.md>                        -> fetch-work
   jira workitem create|update --description[-file] ...                   -> publish-work
+  jira workitem comment create|update --body[-file] ... --body-format markdown -> twg, body inline
+  jira workitem comment create|update ... --attach <path>                -> publish-work comment
 An explicit html/plain format, --edits, or structured output (-o json, --select, --fields,
 --comments, --full) runs on twg unchanged. --native always runs raw twg."""
 
@@ -266,6 +268,8 @@ def run_twg_command(args: list[str], config_path: Path | None, *, native: bool) 
             return runner.MISSING_TWG_EXIT_CODE
         if delegate is None:
             return runner.run_twg(args, config)
+        if isinstance(delegate, overrides.TwgCall):
+            return runner.run_twg(delegate.argv, config)
         if config_path is None:
             print(f"error: `{PROG} --config <configPath>` is required for Markdown body commands", file=sys.stderr)
             return 2

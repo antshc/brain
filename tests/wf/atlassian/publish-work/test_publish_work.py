@@ -199,3 +199,99 @@ def test_create_with_an_unknown_outcome_warns_against_a_blind_retry(jira, adf_fi
     assert "outcome unknown (ConnectionError)" in err
     assert "before retrying" in err
     assert "secret" not in err
+
+
+MEDIA_ID = "a7b047b2-009f-4465-b755-a060ab84fac8"
+
+
+@pytest.fixture
+def comment_jira(jira, monkeypatch):
+    jira.post.return_value = {"id": "900"}
+    jira.add_attachment.side_effect = lambda key, path: [
+        {"id": "55" if path.endswith(".png") else "56", "filename": path.rsplit("/", 1)[-1], "mimeType": "image/png" if path.endswith(".png") else "text/plain"}
+    ]
+    monkeypatch.setattr(publish_work, "media_resolver", lambda credentials: lambda attachment_id: f"{attachment_id}-{MEDIA_ID}"[-36:])
+    return jira
+
+
+def _files(tmp_path):
+    image, report = tmp_path / "shot.png", tmp_path / "report.txt"
+    image.write_bytes(b"x")
+    report.write_text("x")
+    return image, report
+
+
+def test_comment_shows_an_image_preview_and_a_file_card_inline(comment_jira, tmp_path, capsys):
+    image, report = _files(tmp_path)
+    source = tmp_path / "comment.md"
+    source.write_text("See **below**\n")
+
+    publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--markdown", str(source), "--attach", str(report), "--attach", str(image)])
+
+    path, = comment_jira.post.call_args.args
+    body = comment_jira.post.call_args.kwargs["data"]["body"]
+    assert path == "rest/api/3/issue/ABC-7/comment"
+    assert [node["type"] for node in body["content"]] == ["paragraph", "mediaSingle", "mediaGroup"]
+    assert body["content"][1]["content"][0]["attrs"] == {"type": "file", "id": MEDIA_ID, "collection": ""}
+    assert body["content"][2]["content"][0]["attrs"]["type"] == "file"
+    assert _out(capsys) == {
+        "key": "ABC-7",
+        "commentId": "900",
+        "url": "https://org.atlassian.net/browse/ABC-7?focusedCommentId=900",
+        "attached": [
+            {"id": "56", "filename": "report.txt", "inline": "card"},
+            {"id": "55", "filename": "shot.png", "inline": "preview"},
+        ],
+    }
+
+
+def test_comment_with_a_comment_id_replaces_that_comment(comment_jira, tmp_path, capsys):
+    _, report = _files(tmp_path)
+    source = tmp_path / "comment.md"
+    source.write_text("Edited\n")
+
+    publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--comment-id", "900", "--markdown", str(source), "--attach", str(report)])
+
+    comment_jira.post.assert_not_called()
+    assert comment_jira.put.call_args.args == ("rest/api/3/issue/ABC-7/comment/900",)
+    assert _out(capsys)["commentId"] == "900"
+
+
+def test_comment_without_attachments_posts_the_converted_markdown(comment_jira, tmp_path, capsys):
+    source = tmp_path / "comment.md"
+    source.write_text("Plain\n")
+
+    publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--markdown", str(source)])
+
+    assert [node["type"] for node in comment_jira.post.call_args.kwargs["data"]["body"]["content"]] == ["paragraph"]
+    assert "attached" not in _out(capsys)
+
+
+def test_comment_with_a_missing_file_uploads_and_posts_nothing(comment_jira, tmp_path, capsys):
+    image, _ = _files(tmp_path)
+    source = tmp_path / "comment.md"
+    source.write_text("x\n")
+
+    with pytest.raises(SystemExit):
+        publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--markdown", str(source), "--attach", str(image), "--attach", str(tmp_path / "gone.txt")])
+
+    comment_jira.add_attachment.assert_not_called()
+    comment_jira.post.assert_not_called()
+    assert "cannot read attachment" in capsys.readouterr().err
+
+
+def test_comment_is_not_posted_when_a_media_id_cannot_be_resolved(comment_jira, monkeypatch, tmp_path, capsys):
+    image, _ = _files(tmp_path)
+    source = tmp_path / "comment.md"
+    source.write_text("x\n")
+
+    def refuse(attachment_id):
+        raise ValueError(f"attachment {attachment_id} has no media file id (HTTP 404)")
+
+    monkeypatch.setattr(publish_work, "media_resolver", lambda credentials: refuse)
+
+    with pytest.raises(SystemExit):
+        publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--markdown", str(source), "--attach", str(image)])
+
+    comment_jira.post.assert_not_called()
+    assert "cannot be shown inline" in capsys.readouterr().err

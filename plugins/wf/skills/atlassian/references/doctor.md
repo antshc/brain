@@ -8,4 +8,4 @@ Inspect the active Atlassian skill runtime without changing it:
 
 Reports the active Python executable, configured `pythonPath`, supported package versions, and available `twg`, `mmdc`, and `drawio` binaries. Exit `0` means required Python packages are usable; missing or incompatible runtime packages exit `1` with `problems` and an exact install command.
 
-Run after install and before diagnosing a command that reports missing Python imports. The launcher uses an explicit config `pythonPath` when present; in this source repository it also detects a dependency-complete `.venv/bin/python` upward from CWD.
+Run after install and before diagnosing a command that reports missing Python imports. The launcher uses an explicit config `pythonPath` when present; in this source repository it also detects a dependency-complete `.venv/bin/python` upward from CWD (nearest first, skipping any that lack the packages). It re-executes once (`ATL_PYTHON_REEXEC`), comparing interpreter paths unresolved so a venv sharing a base interpreter is still selected.

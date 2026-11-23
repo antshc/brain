@@ -298,3 +298,80 @@ def test_paragraph_after_a_code_block_in_a_list_item_round_trips():
     ]}
     doc = {"type": "doc", "version": 1, "content": [{"type": "orderedList", "content": [item]}]}
     guard.check_round_trip(doc)
+
+
+def test_strong_text_around_code_renders_as_one_canonical_span():
+    doc = {"type": "doc", "version": 1, "content": [_paragraph(
+        _text("Use "), _text("the ", "strong"), _text("atl", "strong", "code"), _text(" command", "strong"), _text(" now"),
+    )]}
+
+    assert adf_to_markdown(doc) == "Use **the `atl` command** now"
+    guard.check_round_trip(doc, fetching=True)
+
+
+@pytest.mark.parametrize("markdown", [
+    "**bold `code` bold** and `**x**` and **`c`**",
+    "*it `c` it* and ~~gone `c`~~",
+    "**a `c` b *i* `d`** tail",
+    "[**link** plain](https://example.com/x) and **[linked bold](https://example.com/y) `c`**",
+])
+def test_nested_inline_marks_reach_a_stable_semantic_round_trip(markdown):
+    doc = markdown_to_adf(markdown)
+
+    guard.check_round_trip(doc)
+    assert adf_to_markdown(markdown_to_adf(adf_to_markdown(doc))) == adf_to_markdown(doc)
+    guard.compare_documents(doc, markdown_to_adf(adf_to_markdown(doc)))
+
+
+def test_server_mark_order_and_text_splits_are_semantically_equal():
+    split = {"type": "doc", "version": 1, "content": [_paragraph(
+        _text("bold ", "strong"), _text("code", "code", "strong"), _text(" bold", "strong"),
+    )]}
+    server = {"type": "doc", "version": 1, "content": [_paragraph(
+        _text("bold ", "strong"), _text("code", "strong", "code"), _text(" bold", "strong"),
+    )]}
+
+    guard.compare_documents(split, server, transport=True)
+
+
+@pytest.mark.parametrize("sent, returned", [("text", "plaintext"), ("plaintext", "text"), ("shell", "bash")])
+def test_code_block_language_aliases_are_semantically_equal(sent, returned):
+    def block(language: str) -> dict:
+        return {"type": "doc", "version": 1, "content": [
+            {"type": "codeBlock", "attrs": {"language": language}, "content": [_text("x")]},
+        ]}
+
+    guard.compare_documents(block(sent), block(returned), transport=True)
+
+
+def test_unknown_code_block_language_stays_observable():
+    def block(language: str) -> dict:
+        return {"type": "doc", "version": 1, "content": [
+            {"type": "codeBlock", "attrs": {"language": language}, "content": [_text("x")]},
+        ]}
+
+    with pytest.raises(guard.GuardError, match=r"doc\.content\[0\]\.attrs\.language"):
+        guard.compare_documents(block("cobol"), block("plaintext"), transport=True)
+
+
+def test_server_drops_formatting_marks_that_the_schema_excludes_beside_code():
+    sent = {"type": "doc", "version": 1, "content": [_paragraph(
+        _text("atl", "code", "strong"), _text("c", "code", "em"), _text("s", "code", "strike", "link"),
+    )]}
+    sent["content"][0]["content"][2]["marks"][2] = {"type": "link", "attrs": {"href": "https://example.com"}}
+    returned = {"type": "doc", "version": 1, "content": [_paragraph(
+        _text("atl", "code"), _text("c", "code"), _text("s", "code", "link"),
+    )]}
+    returned["content"][0]["content"][2]["marks"][1] = {"type": "link", "attrs": {"href": "https://example.com"}}
+
+    guard.compare_documents(sent, returned, transport=True)
+    with pytest.raises(guard.GuardError, match="semantic content"):
+        guard.compare_documents(sent, returned)
+
+
+def test_server_alias_does_not_hide_a_lost_strong_mark_without_code():
+    sent = {"type": "doc", "version": 1, "content": [_paragraph(_text("bold", "strong"))]}
+    returned = {"type": "doc", "version": 1, "content": [_paragraph(_text("bold"))]}
+
+    with pytest.raises(guard.GuardError, match=r"doc\.content\[0\]\.content\[0\]"):
+        guard.compare_documents(sent, returned, transport=True)

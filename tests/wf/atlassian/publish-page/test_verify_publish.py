@@ -149,3 +149,87 @@ def test_semantic_manifest_checks_raw_adf_even_when_markdown_matches(tmp_path, c
     assert path.exists()
     if change == 'mark':
         assert 'FAIL semantic-body' in capsys.readouterr().out
+
+
+def _manifest_run(tmp_path, expected_adf, actual_adf, capsys):
+    import json
+
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps({"title": "Title", "adf": expected_adf}))
+    verify_dir = tmp_path / "verify"
+    verify_dir.mkdir()
+    (verify_dir / "keep.txt").write_text("working artifact")
+    code = verify_publish.main(
+        ["--page-id", "1", "--config", "cfg", "--expect-anchors", "0", "--expected-manifest", str(path), "--verify-dir", str(verify_dir)],
+        fetch=lambda *_: "# Title\n", fetch_raw=lambda *_: ("Title", actual_adf),
+    )
+    assert path.exists() and (verify_dir / "keep.txt").read_text() == "working artifact"
+    return code, capsys.readouterr().out
+
+
+def _doc_of(*content):
+    return {"type": "doc", "version": 1, "content": list(content)}
+
+
+def test_server_language_alias_and_split_marks_pass_the_semantic_check(tmp_path, capsys):
+    sent = _doc_of(
+        {"type": "codeBlock", "attrs": {"language": "text"}, "content": [{"type": "text", "text": "x"}]},
+        {"type": "paragraph", "content": [{"type": "text", "text": "ab", "marks": [{"type": "strong"}, {"type": "code"}]}]},
+    )
+    returned = _doc_of(
+        {"type": "codeBlock", "attrs": {"language": "plaintext", "localId": "srv"}, "content": [{"type": "text", "text": "x"}]},
+        {"type": "paragraph", "content": [
+            {"type": "text", "text": "a", "marks": [{"type": "code"}, {"type": "strong"}]},
+            {"type": "text", "text": "b", "marks": [{"type": "strong"}, {"type": "code"}]},
+        ]},
+    )
+
+    code, out = _manifest_run(tmp_path, sent, returned, capsys)
+
+    assert code == 0
+    assert "PASS semantic-body" in out and "3/3 checks passed" in out
+
+
+def test_semantic_mismatch_names_the_exact_path_and_keeps_artifacts(tmp_path, capsys):
+    sent = _doc_of({"type": "codeBlock", "attrs": {"language": "go"}, "content": [{"type": "text", "text": "x"}]})
+    returned = _doc_of({"type": "codeBlock", "attrs": {"language": "rust"}, "content": [{"type": "text", "text": "x"}]})
+
+    code, out = _manifest_run(tmp_path, sent, returned, capsys)
+
+    assert code == 1
+    assert "FAIL semantic-body (conversion changes semantic content at doc.content[0].attrs.language)" in out
+
+
+def test_verify_requires_config_for_the_rest_read_back(tmp_path):
+    with pytest.raises(SystemExit) as raised:
+        verify_publish.main(["--page-id", "1", "--expect-anchors", "0", "--expected-manifest", str(tmp_path / "m.json")])
+
+    assert raised.value.code == 2
+
+
+def test_server_added_macro_metadata_is_a_transport_alias_not_a_mismatch(tmp_path, capsys):
+    def toc(parameters: dict) -> dict:
+        return _doc_of({"type": "expand", "attrs": {"title": "Table of Contents"}, "content": [
+            {"type": "extension", "attrs": {"extensionKey": "toc", "extensionType": "com.atlassian.confluence.macro.core", "parameters": parameters}},
+        ]})
+
+    sent = toc({"macroParams": {}})
+    returned = toc({
+        "macroParams": {"_parentId": {"value": "42"}},
+        "macroMetadata": {"macroId": {"value": "abc"}, "schemaVersion": {"value": "1"}, "title": "Table of Contents"},
+    })
+
+    code, out = _manifest_run(tmp_path, sent, returned, capsys)
+
+    assert code == 0
+    assert "3/3 checks passed" in out
+
+
+def test_a_changed_macro_parameter_is_still_a_mismatch(tmp_path, capsys):
+    def children(depth: str) -> dict:
+        return _doc_of({"type": "extension", "attrs": {"extensionKey": "children", "parameters": {"macroParams": {"depth": {"value": depth}}}}})
+
+    code, out = _manifest_run(tmp_path, children("1"), children("2"), capsys)
+
+    assert code == 1
+    assert "doc.content[0].attrs.parameters.macroParams.depth.value" in out
